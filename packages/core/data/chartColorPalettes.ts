@@ -44,24 +44,20 @@ const chartColorPalettesData = {
   colorblindsafe: sharedPalettes.colorblindsafe
   },
   v2: {
-    // Modern chart palettes for v2
-    'qualitative-bold': [
-      '#0057b7', '#722161', '#00b1ce', '#d94e5f', '#5a8e3f', 
-      '#ffb24d', '#fb7e38', '#032659', '#975722', '#DFE1E2'
-    ],
-    'qualitative-soft': [
-      '#6197d2', '#af8caa', '#5ebfb3', '#f7c5a8', '#a8c68f',
-      '#fed49c', '#faa478', '#8bb5d9', '#c9a96e', '#e1e1e1'
-    ],
-    qualitative1: ['#0057b7', '#722161', '#00b1ce', '#d94e5f', '#5a8e3f', '#ffb24d', '#fb7e38', '#032659', '#975722', '#DFE1E2'],
-    qualitative2: sharedPalettes.qualitative2,
-    qualitative3: sharedPalettes.qualitative3,
-    qualitative4: sharedPalettes.qualitative4,
-    'sequential-blue': ['#dbe8f7', '#bed5ed', '#99bce1', '#73a1d5', '#4e88c7', '#1e6bc0'],
-    'sequential-teal': ['#e5fafc', '#b3e3ed', '#80cddf', '#4db8d1', '#00b1ce', '#03a2bd'],
-    'sequential-orange': ['#ffe4d5', '#fed0b6', '#f7b99a', '#ed9e7c', '#e58061', '#db6b49'],
-    'sequential-green': ['#d5f9f6', '#aeece7', '#85ded7', '#63d2ca', '#3bbcaf', '#14a594'],
-    colorblindsafe: sharedPalettes.colorblindsafe
+    // New standardized v2 palettes per migration guide (lowercase prefixes for filtering)
+    'sequential-orange': ['#FFE4D5', '#FED0B6', '#F7B99A', '#ED9E7C', '#E58061', '#DB6B49', '#C95936', '#A8462C', '#702B1D'],
+    'sequential-purple': ['#E2D3DF', '#CDB2C8', '#B78FAF', '#A6739B', '#935586', '#823A73', '#722161', '#5F2359', '#47264F'],
+    'sequential-blue': ['#DBE8F7', '#BED5ED', '#99BCE1', '#73A1D5', '#4E88C7', '#1E6BC0', '#0057B7', '#01418D', '#032659'],
+    'sequential-green': ['#D5F9F6', '#AEECE7', '#85DED7', '#63D2CA', '#3BBCAF', '#14A594', '#0A937F', '#0F7A68', '#105B4D'],
+    'qualitative-standard': ['#DFE1E2', '#0057B7', '#722161', '#00B1CE', '#D94E5F', '#5A8E3F', '#FFB24D', '#FB7E38', '#032659', '#975722'],
+    'colorblindsafe': ['#DFE1E2', '#0057B7', '#722161', '#00B1CE', '#D94E5F', '#5A8E3F', '#FFB24D', '#FB7E38', '#032659', '#975722'],
+    
+    // New v2-only palettes (no migration needed)
+    'sequential-teal': ['#e5fafc', '#b3e3ed', '#80cddf', '#4db8d1', '#00b1ce', '#03a2bd', '#0690a6', '#0d6e81', '#125261'],
+    'divergent-bluecyan': ['#032659', '#014697', '#1D6ABF', '#6197D2', '#C1D2DB', '#5CCBDE', '#01ACC9', '#097F95', '#125261'],
+    'divergent-bluepurple': ['#032659', '#014697', '#1D6ABF', '#6197D2', '#C4CDE1', '#AF8CAA', '#935586', '#7C256B', '#47264F'],
+    'divergent-greenorange': ['#105B4D', '#16806E', '#3EA394', '#5EBFB3', '#FABF61', '#EE956C', '#E27447', '#AC4726', '#702B1D'],
+    'divergent-blueorange': ['#032659', '#0057B7', '#0092C6', '#55B1A3', '#FFB24D', '#EA803B', '#DD622F', '#AF3423', '#660F14']
   }
 }
 

@@ -19,30 +19,59 @@ export const useColorPalette = (config, updateConfig) => {
     )
   } else {
     // Get sequential and non-sequential palettes for other visualization types
-    const seqPalettes = []
-    const nonSeqPalettes = []
+    const currentVersion = config.general?.palette?.version || '1.0'
     const isReversed = config.general?.palette?.isReversed
 
-    for (const paletteName in colorPalettesChart) {
-      const isSequential = paletteName.startsWith('sequential')
-      const isQualitative = paletteName.startsWith('qualitative')
-      const colorblindsafe = paletteName.startsWith('colorblindsafe')
+    if (currentVersion === '1.0') {
+      // V1 Logic: Filter by existing v1 palette patterns
+      sequential = filterV1Palettes(colorPalettesChart, 'sequential', isReversed)
+      nonSequential = filterV1Palettes(colorPalettesChart, 'qualitative', isReversed)
+      accessibleColors.push(...filterV1Palettes(colorPalettesChart, 'colorblindsafe', isReversed))
+    } else {
+      // V2 Logic: Filter by new v2 palette patterns
+      sequential = filterV2Palettes(colorPalettesChart, 'sequential', isReversed)
+      nonSequential = filterV2Palettes(colorPalettesChart, 'nonsequential', isReversed) // qualitative + divergent
+      accessibleColors.push(...filterV2Palettes(colorPalettesChart, 'colorblindsafe', isReversed))
+    }
+  }
+
+  // Helper function for v1 palette filtering
+  function filterV1Palettes(palettes, type, isReversed) {
+    const results = []
+    for (const paletteName in palettes) {
       const isPaletteReversed = paletteName.endsWith('reverse')
+      const matchesReversed = (!isReversed && !isPaletteReversed) || (isReversed && isPaletteReversed)
 
-      if (isSequential && ((!isReversed && !isPaletteReversed) || (isReversed && isPaletteReversed))) {
-        seqPalettes.push(paletteName)
-      }
-
-      if (isQualitative && ((!isReversed && !isPaletteReversed) || (isReversed && isPaletteReversed))) {
-        nonSeqPalettes.push(paletteName)
-      }
-      if (colorblindsafe && ((!isReversed && !isPaletteReversed) || (isReversed && isPaletteReversed))) {
-        accessibleColors.push(paletteName)
+      if (type === 'sequential' && paletteName.startsWith('sequential') && matchesReversed) {
+        results.push(paletteName)
+      } else if (type === 'qualitative' && paletteName.startsWith('qualitative') && matchesReversed) {
+        results.push(paletteName)
+      } else if (type === 'colorblindsafe' && paletteName.startsWith('colorblindsafe') && matchesReversed) {
+        results.push(paletteName)
       }
     }
+    return results
+  }
 
-    sequential = seqPalettes
-    nonSequential = nonSeqPalettes
+  // Helper function for v2 palette filtering
+  function filterV2Palettes(palettes, type, isReversed) {
+    const results = []
+    for (const paletteName in palettes) {
+      const isPaletteReversed = paletteName.endsWith('reverse')
+      const matchesReversed = (!isReversed && !isPaletteReversed) || (isReversed && isPaletteReversed)
+
+      if (type === 'sequential' && paletteName.startsWith('sequential') && matchesReversed) {
+        results.push(paletteName)
+      } else if (type === 'nonsequential' && matchesReversed) {
+        // V2 non-sequential includes qualitative AND divergent palettes
+        if (paletteName.startsWith('qualitative') || paletteName.startsWith('divergent')) {
+          results.push(paletteName)
+        }
+      } else if (type === 'colorblindsafe' && paletteName.startsWith('colorblindsafe') && matchesReversed) {
+        results.push(paletteName)
+      }
+    }
+    return results
   }
 
   // Update pairedBar.palette based on isPaletteReversed

@@ -33,7 +33,8 @@ import SankeyChart from './components/Sankey'
 import LinearChart from './components/LinearChart'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 
-import { colorPalettesChart as colorPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
+import { twoColorPalette } from '@cdc/core/data/colorPalettes'
+import { filterChartColorPalettes } from './helpers/filterChartColorPalettes'
 
 import SparkLine from './components/Sparkline'
 import Legend from './components/Legend'
@@ -1118,6 +1119,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const capitalize = str => {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
+
+  // Get version-specific color palettes based on current config
+  const colorPalettes = filterChartColorPalettes(config)
 
   const contextValues = {
     ...state,

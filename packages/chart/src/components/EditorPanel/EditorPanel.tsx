@@ -1120,7 +1120,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         if (!_newConfig.general.palette) {
           _newConfig.general.palette = {}
         }
-        _newConfig.general.palette.name = migrateChartPaletteName(palette)
+        const migratedName = migrateChartPaletteName(palette)
+        _newConfig.general.palette.name = migratedName
         if (isV1Palette) {
           _newConfig.general.palette.version = '2.0'
         }
