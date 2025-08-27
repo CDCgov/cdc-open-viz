@@ -105,8 +105,7 @@
     "predeploy": "storybook build --output-dir .storybook_build && touch .storybook_build/.nojekyll",
     "deploy": "gh-pages -d .storybook_build -t true",
     "lint": "eslint packages/*/src/**/*.{js,jsx,ts,tsx}",
-    "prepare": "husky install",
-    "test:standalone-build": "node scripts/test-standalone-build.js"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@visx/annotation": "^3.3.0",
