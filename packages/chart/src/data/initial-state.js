@@ -27,7 +27,12 @@ export default {
     showMissingDataLabel: true,
     showSuppressedSymbol: true,
     showZeroValueData: true,
-    hideNullValue: true
+    hideNullValue: true,
+    palette: {
+      isReversed: false,
+      version: '1.0',
+      name: 'qualitative-bold'
+    }
   },
   padding: {
     left: 5,
@@ -184,11 +189,10 @@ export default {
     active: false,
     keys: []
   },
-  palette: 'qualitative-bold',
-  isPaletteReversed: false,
   twoColor: {
     palette: 'monochrome-1',
-    isPaletteReversed: false
+    isPaletteReversed: false,
+    version: '1.0'
   },
   labels: false,
   dataFormat: {

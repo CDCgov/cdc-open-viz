@@ -1,4 +1,5 @@
-import { colorPalettesChart, twoColorPalette } from '@cdc/core/data/colorPalettes'
+import { twoColorPalette } from '@cdc/core/data/colorPalettes'
+import { filterChartColorPalettes } from '../helpers/filterChartColorPalettes'
 import { useEffect } from 'react'
 
 export const useColorPalette = (config, updateConfig) => {
@@ -6,6 +7,9 @@ export const useColorPalette = (config, updateConfig) => {
   let sequential = []
   let nonSequential = []
   const accessibleColors = []
+
+  // Get version-specific color palettes
+  const colorPalettesChart = filterChartColorPalettes(config)
 
   // Get two color palettes if visualization type is Paired Bar
   if (config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar') {
@@ -17,21 +21,22 @@ export const useColorPalette = (config, updateConfig) => {
     // Get sequential and non-sequential palettes for other visualization types
     const seqPalettes = []
     const nonSeqPalettes = []
+    const isReversed = config.general?.palette?.isReversed
 
     for (const paletteName in colorPalettesChart) {
       const isSequential = paletteName.startsWith('sequential')
       const isQualitative = paletteName.startsWith('qualitative')
       const colorblindsafe = paletteName.startsWith('colorblindsafe')
-      const isReversed = paletteName.endsWith('reverse')
+      const isPaletteReversed = paletteName.endsWith('reverse')
 
-      if (isSequential && ((!config.isPaletteReversed && !isReversed) || (config.isPaletteReversed && isReversed))) {
+      if (isSequential && ((!isReversed && !isPaletteReversed) || (isReversed && isPaletteReversed))) {
         seqPalettes.push(paletteName)
       }
 
-      if (isQualitative && ((!config.isPaletteReversed && !isReversed) || (config.isPaletteReversed && isReversed))) {
+      if (isQualitative && ((!isReversed && !isPaletteReversed) || (isReversed && isPaletteReversed))) {
         nonSeqPalettes.push(paletteName)
       }
-      if (colorblindsafe && ((!config.isPaletteReversed && !isReversed) || (config.isPaletteReversed && isReversed))) {
+      if (colorblindsafe && ((!isReversed && !isPaletteReversed) || (isReversed && isPaletteReversed))) {
         accessibleColors.push(paletteName)
       }
     }
@@ -55,20 +60,33 @@ export const useColorPalette = (config, updateConfig) => {
     updateConfig({ ...config, twoColor: { ...config.twoColor, palette: palette } })
   }, [config.twoColor.isPaletteReversed])
 
-  // Update palette based on isPaletteReversed
+  // Update palette based on isReversed
   useEffect(() => {
     let palette = ''
+    const isReversed = config.general?.palette?.isReversed
+    const currentPaletteName = config.general?.palette?.name || ''
 
-    if (config.isPaletteReversed && !config.palette.endsWith('reverse')) {
-      palette = config.palette + 'reverse'
+    if (isReversed && !currentPaletteName.endsWith('reverse')) {
+      palette = currentPaletteName + 'reverse'
     }
 
-    if (!config.isPaletteReversed && config.palette.endsWith('reverse')) {
-      palette = config.palette.slice(0, -7)
+    if (!isReversed && currentPaletteName.endsWith('reverse')) {
+      palette = currentPaletteName.slice(0, -7)
     }
 
-    updateConfig({ ...config, palette: palette })
-  }, [config.isPaletteReversed])
+    if (palette && palette !== currentPaletteName) {
+      updateConfig({
+        ...config,
+        general: {
+          ...config.general,
+          palette: {
+            ...config.general.palette,
+            name: palette
+          }
+        }
+      })
+    }
+  }, [config.general?.palette?.isReversed])
 
   // Return all palettes
 

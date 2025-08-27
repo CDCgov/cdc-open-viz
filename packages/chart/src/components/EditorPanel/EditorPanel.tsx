@@ -26,6 +26,7 @@ import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
 // chart components
 import Panels from './components/Panels'
+import PaletteConversionModal from '../PaletteConversionModal'
 
 // cdc additional
 import { useEditorPermissions } from './useEditorPermissions'
@@ -48,6 +49,8 @@ import { updateFieldRankByValue } from './helpers/updateFieldRankByValue'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
+import { getChartColorPaletteVersion } from '../../helpers/getChartColorPaletteVersion'
+import { migrateChartPaletteName } from '../../helpers/migrateChartPaletteName'
 
 interface PreliminaryProps {
   config: ChartConfig
@@ -825,6 +828,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
   const [displayPanel, setDisplayPanel] = useState(true)
   const [displayViewportOverrides, setDisplayViewportOverrides] = useState(false)
+  const [showConversionModal, setShowConversionModal] = useState(false)
+  const [pendingPaletteSelection, setPendingPaletteSelection] = useState<{
+    palette: string
+    action: () => void
+  } | null>(null)
 
   const setLollipopShape = shape => {
     updateConfig({
@@ -1092,6 +1100,71 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
   const section = config.orientation === 'horizontal' ? 'xAxis' : 'yAxis'
   const [warningMsg, setWarningMsg] = useState({ maxMsg: '', minMsg: '', rightMaxMessage: '', minMsgRight: '' })
+
+  // Palette migration functions
+  const handlePaletteSelection = (palette: string) => {
+    try {
+      // Check if config exists and has basic structure
+      if (!config) {
+        console.error('COVE: Config is undefined in handlePaletteSelection')
+        return
+      }
+
+      // Check if it's a v1 palette configuration
+      const currentVersion = getChartColorPaletteVersion(config)
+      const isV1Palette =
+        currentVersion === 1 || config.general?.palette?.version === '1.0' || !config.general?.palette?.version
+
+      const executeSelection = () => {
+        const _newConfig = _.cloneDeep(config)
+        if (!_newConfig.general.palette) {
+          _newConfig.general.palette = {}
+        }
+        _newConfig.general.palette.name = migrateChartPaletteName(palette)
+        if (isV1Palette) {
+          _newConfig.general.palette.version = '2.0'
+        }
+        updateConfig(_newConfig)
+      }
+
+      if (isV1Palette) {
+        setPendingPaletteSelection({ palette, action: executeSelection })
+        setShowConversionModal(true)
+      } else {
+        executeSelection()
+      }
+    } catch (error) {
+      console.error('COVE: Error in handlePaletteSelection:', error)
+    }
+  }
+
+  // Modal handlers
+  const handleConversionConfirm = () => {
+    if (pendingPaletteSelection) {
+      pendingPaletteSelection.action()
+    }
+    setShowConversionModal(false)
+    setPendingPaletteSelection(null)
+  }
+
+  const handleConversionCancel = () => {
+    setShowConversionModal(false)
+    setPendingPaletteSelection(null)
+  }
+
+  const handleReturnToV1 = () => {
+    if (pendingPaletteSelection) {
+      const _newConfig = _.cloneDeep(config)
+      if (!_newConfig.general.palette) {
+        _newConfig.general.palette = {}
+      }
+      _newConfig.general.palette.name = pendingPaletteSelection.palette
+      _newConfig.general.palette.version = '1.0'
+      updateConfig(_newConfig)
+    }
+    setShowConversionModal(false)
+    setPendingPaletteSelection(null)
+  }
 
   const validateMaxValue = () => {
     const enteredValue = config[section].max
@@ -1379,11 +1452,12 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     handleHighlightedBarLegendLabel,
     handleUpdateHighlightedBar,
     handleRemoveHighlightedBar,
-    isPaletteReversed: config.isPaletteReversed,
+    isPaletteReversed: config.general?.palette?.isReversed,
     highlightedSeriesValues,
     handleUpdateHighlightedBorderWidth,
     handleUpdateHighlightedBarColor,
-    setLollipopShape
+    setLollipopShape,
+    handlePaletteSelection
   }
   if (isLoading) {
     return <></>
@@ -4150,6 +4224,15 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />
           )}
         </Layout.Sidebar>
+
+        {showConversionModal && (
+          <PaletteConversionModal
+            onConfirm={handleConversionConfirm}
+            onCancel={handleConversionCancel}
+            onReturnToV1={handleReturnToV1}
+            paletteName={pendingPaletteSelection?.palette}
+          />
+        )}
       </ErrorBoundary>
     </EditorPanelContext.Provider>
   )

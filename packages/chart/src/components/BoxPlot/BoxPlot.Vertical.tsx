@@ -18,7 +18,7 @@ const BoxPlotVertical = ({ xScale, yScale, seriesScale }) => {
   const bodyStyles = getComputedStyle(document.body)
   const defaultColor = APP_FONT_COLOR
   const constrainedWidth = Math.min(40, boxWidth)
-  const color_0 = _.get(colorPalettesChart, [config.palette, 0], '#000')
+  const color_0 = _.get(colorPalettesChart, [config.general?.palette?.name, 0], '#000')
   const plots = createPlots(data, config)
   return (
     <ErrorBoundary component='BoxPlot Vertical'>

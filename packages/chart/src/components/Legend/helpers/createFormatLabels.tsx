@@ -66,7 +66,7 @@ export const createFormatLabels =
       return reverseLabels([labelBelow, labelAbove])
     }
     if (visualizationType === 'Bar' && visualizationSubType === 'regular' && colorCode && series?.length === 1) {
-      let palette = colorPalettes[config.palette]
+      let palette = colorPalettes[config.general?.palette?.name]
 
       while (tableData.length > palette.length) {
         palette = palette.concat(palette)
@@ -119,7 +119,9 @@ export const createFormatLabels =
       // loop through bars for now to meet requirements.
       config.runtime.barSeriesKeys &&
         config.runtime.barSeriesKeys.forEach((bar, index) => {
-          let colorValue = colorPalettes[config.palette][index] ? colorPalettes[config.palette][index] : '#ccc'
+          let colorValue = colorPalettes[config.general?.palette?.name][index]
+            ? colorPalettes[config.general?.palette?.name][index]
+            : '#ccc'
 
           const newLabel = {
             datum: bar,

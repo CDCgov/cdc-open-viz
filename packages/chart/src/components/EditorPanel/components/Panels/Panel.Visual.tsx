@@ -23,12 +23,35 @@ import { useEditorPanelContext } from '../../EditorPanelContext.js'
 import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 import { LineChartConfig } from '../../../../types/ChartConfig'
+import { migrateChartPaletteName } from '../../../../helpers/migrateChartPaletteName'
+import { getChartColorPaletteVersion } from '../../../../helpers/getChartColorPaletteVersion'
 import './panelVisual.styles.css'
 
 const PanelVisual: FC<PanelProps> = props => {
   const { config, updateConfig, colorPalettes, twoColorPalette } = useContext<ChartContext>(ConfigContext)
   const { visual } = config
-  const { setLollipopShape, updateField } = useEditorPanelContext()
+
+  // Helper function to safely get palette colors with version awareness
+  const getPaletteColors = (paletteName: string) => {
+    const currentVersion = getChartColorPaletteVersion(config)
+
+    // Try the palette name as-is first
+    if (colorPalettes[paletteName] && Array.isArray(colorPalettes[paletteName])) {
+      return colorPalettes[paletteName]
+    }
+
+    // If not found and we're in v1, try migrating the name to v2
+    if (currentVersion === 1) {
+      const migratedName = migrateChartPaletteName(paletteName)
+      if (migratedName !== paletteName && colorPalettes[migratedName] && Array.isArray(colorPalettes[migratedName])) {
+        return colorPalettes[migratedName]
+      }
+    }
+
+    // If still not found, return null to indicate the palette doesn't exist
+    return null
+  }
+  const { setLollipopShape, updateField, handlePaletteSelection } = useEditorPanelContext()
   const {
     visHasBarBorders,
     visCanAnimate,
@@ -257,11 +280,11 @@ const PanelVisual: FC<PanelProps> = props => {
             </label>
             {visSupportsReverseColorPalette() && (
               <InputToggle
-                fieldName='isPaletteReversed'
+                fieldName='general.palette.isReversed'
                 size='small'
                 label='Use selected palette in reverse order'
                 updateField={updateField}
-                value={config.isPaletteReversed}
+                value={config.general?.palette?.isReversed}
               />
             )}
             {visSupportsSequentialPallete() && (
@@ -269,16 +292,22 @@ const PanelVisual: FC<PanelProps> = props => {
                 <span>Sequential</span>
                 <ul className='color-palette'>
                   {sequential.map(palette => {
+                    // Use helper function to get palette colors with version awareness
+                    const paletteColors = getPaletteColors(palette)
+                    if (!paletteColors) {
+                      return null
+                    }
+
                     const colorOne = {
-                      backgroundColor: colorPalettes[palette][2]
+                      backgroundColor: paletteColors[2] || '#ccc'
                     }
 
                     const colorTwo = {
-                      backgroundColor: colorPalettes[palette][3]
+                      backgroundColor: paletteColors[3] || '#ccc'
                     }
 
                     const colorThree = {
-                      backgroundColor: colorPalettes[palette][5]
+                      backgroundColor: paletteColors[5] || '#ccc'
                     }
 
                     return (
@@ -287,9 +316,9 @@ const PanelVisual: FC<PanelProps> = props => {
                         key={palette}
                         onClick={e => {
                           e.preventDefault()
-                          updateConfig({ ...config, palette })
+                          handlePaletteSelection(palette)
                         }}
-                        className={config.palette === palette ? 'selected' : ''}
+                        className={config.general?.palette?.name === palette ? 'selected' : ''}
                       >
                         <span style={colorOne}></span>
                         <span style={colorTwo}></span>
@@ -305,16 +334,22 @@ const PanelVisual: FC<PanelProps> = props => {
                 <span>Non-Sequential</span>
                 <ul className='color-palette'>
                   {nonSequential.map(palette => {
+                    // Use helper function to get palette colors with version awareness
+                    const paletteColors = getPaletteColors(palette)
+                    if (!paletteColors) {
+                      return null
+                    }
+
                     const colorOne = {
-                      backgroundColor: colorPalettes[palette][2]
+                      backgroundColor: paletteColors[2] || '#ccc'
                     }
 
                     const colorTwo = {
-                      backgroundColor: colorPalettes[palette][4]
+                      backgroundColor: paletteColors[4] || '#ccc'
                     }
 
                     const colorThree = {
-                      backgroundColor: colorPalettes[palette][6]
+                      backgroundColor: paletteColors[6] || '#ccc'
                     }
 
                     return (
@@ -323,9 +358,9 @@ const PanelVisual: FC<PanelProps> = props => {
                         key={palette}
                         onClick={e => {
                           e.preventDefault()
-                          updateConfig({ ...config, palette })
+                          handlePaletteSelection(palette)
                         }}
-                        className={config.palette === palette ? 'selected' : ''}
+                        className={config.general?.palette?.name === palette ? 'selected' : ''}
                       >
                         <span style={colorOne}></span>
                         <span style={colorTwo}></span>
@@ -337,16 +372,22 @@ const PanelVisual: FC<PanelProps> = props => {
                 <span>Colorblind Safe</span>
                 <ul className='color-palette'>
                   {accessibleColors.map(palette => {
+                    // Use helper function to get palette colors with version awareness
+                    const paletteColors = getPaletteColors(palette)
+                    if (!paletteColors) {
+                      return null
+                    }
+
                     const colorOne = {
-                      backgroundColor: colorPalettes[palette][2]
+                      backgroundColor: paletteColors[2] || '#ccc'
                     }
 
                     const colorTwo = {
-                      backgroundColor: colorPalettes[palette][3]
+                      backgroundColor: paletteColors[3] || '#ccc'
                     }
 
                     const colorThree = {
-                      backgroundColor: colorPalettes[palette][5]
+                      backgroundColor: paletteColors[5] || '#ccc'
                     }
 
                     return (
@@ -355,9 +396,9 @@ const PanelVisual: FC<PanelProps> = props => {
                         key={palette}
                         onClick={e => {
                           e.preventDefault()
-                          updateConfig({ ...config, palette })
+                          handlePaletteSelection(palette)
                         }}
-                        className={config.palette === palette ? 'selected' : ''}
+                        className={config.general?.palette?.name === palette ? 'selected' : ''}
                       >
                         <span style={colorOne}></span>
                         <span style={colorTwo}></span>

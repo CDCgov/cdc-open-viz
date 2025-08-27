@@ -1,9 +1,10 @@
 import { updatePaletteNames } from '../helpers/updatePaletteNames'
 import { sharedPalettes } from './sharedPalettes'
 
-// Chart-specific color palettes
+// Chart-specific color palettes with versioned structure
 
-const colorPalettes2 = {
+const chartColorPalettesData = {
+  v1: {
   'qualitative-bold': [
     '#377eb8',
     '#ff7f00',
@@ -41,6 +42,27 @@ const colorPalettes2 = {
   'sequential-green': ['#c7e9c0', '#a1d99b', '#74c476', '#41ab5d', '#238b45', '#005a32'],
 
   colorblindsafe: sharedPalettes.colorblindsafe
+  },
+  v2: {
+    // Modern chart palettes for v2
+    'qualitative-bold': [
+      '#0057b7', '#722161', '#00b1ce', '#d94e5f', '#5a8e3f', 
+      '#ffb24d', '#fb7e38', '#032659', '#975722', '#DFE1E2'
+    ],
+    'qualitative-soft': [
+      '#6197d2', '#af8caa', '#5ebfb3', '#f7c5a8', '#a8c68f',
+      '#fed49c', '#faa478', '#8bb5d9', '#c9a96e', '#e1e1e1'
+    ],
+    qualitative1: ['#0057b7', '#722161', '#00b1ce', '#d94e5f', '#5a8e3f', '#ffb24d', '#fb7e38', '#032659', '#975722', '#DFE1E2'],
+    qualitative2: sharedPalettes.qualitative2,
+    qualitative3: sharedPalettes.qualitative3,
+    qualitative4: sharedPalettes.qualitative4,
+    'sequential-blue': ['#dbe8f7', '#bed5ed', '#99bce1', '#73a1d5', '#4e88c7', '#1e6bc0'],
+    'sequential-teal': ['#e5fafc', '#b3e3ed', '#80cddf', '#4db8d1', '#00b1ce', '#03a2bd'],
+    'sequential-orange': ['#ffe4d5', '#fed0b6', '#f7b99a', '#ed9e7c', '#e58061', '#db6b49'],
+    'sequential-green': ['#d5f9f6', '#aeece7', '#85ded7', '#63d2ca', '#3bbcaf', '#14a594'],
+    colorblindsafe: sharedPalettes.colorblindsafe
+  }
 }
 
 export const colorPalettes3 = {
@@ -71,7 +93,14 @@ const sequentialColors = {
   'Sequential Green': ['#c7e9c0', '#a1d99b', '#74c476', '#41ab5d', '#238b45', '#005a32']
 }
 
-// Process and export chart color palettes
+// Process and export chart color palettes with versioned structure
+export const chartColorPalettes = {
+  v1: updatePaletteNames(chartColorPalettesData.v1),
+  v2: updatePaletteNames(chartColorPalettesData.v2)
+}
+
 export const sequentialPalettes = sequentialColors
-export const colorPalettesChart = updatePaletteNames(colorPalettes2)
+export const colorPalettesChart = chartColorPalettes.v1 // backwards compatibility
+export const colorPalettesChartV1 = chartColorPalettes.v1
+export const colorPalettesChartV2 = chartColorPalettes.v2
 export const twoColorPalette = updatePaletteNames(colorPalettes3)
