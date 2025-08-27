@@ -1,6 +1,11 @@
-// Placeholder test until we add them in.
-describe('Chart', () => {
-  it('has a test.', async () => {
-    return true
+import path from 'path'
+import { testStandaloneBuild } from '@cdc/core/helpers/tests/testStandaloneBuild.test.ts'
+import { describe, it, expect } from 'vitest'
+
+describe('Data Table', () => {
+  it('Can be built in isolation', async () => {
+    const pkgDir = path.join(__dirname, '..')
+    const result = testStandaloneBuild(pkgDir)
+    expect(result).toBe(true)
   })
 })
