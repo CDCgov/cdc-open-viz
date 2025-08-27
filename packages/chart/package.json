@@ -54,7 +54,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "gitHead": "6097de1ff814001880d9ac64bd66becdc092d63c",
+  "gitHead": "e369994230b5e3facff224e1d89d5937528ac5a0",
   "devDependencies": {
     "@types/d3-array": "^3.2.1",
     "@types/d3-format": "^3.0.4",
