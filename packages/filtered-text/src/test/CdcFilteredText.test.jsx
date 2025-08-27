@@ -1,5 +1,5 @@
 import path from 'path'
-import { testStandaloneBuild } from '@cdc/core/helpers/tests/testStandaloneBuild.test.ts'
+import { testStandaloneBuild } from '@cdc/core/helpers/tests/testStandaloneBuild.ts'
 import { describe, it, expect } from 'vitest'
 
 describe('Filtered Text', () => {
