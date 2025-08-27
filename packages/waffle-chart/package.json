@@ -31,7 +31,9 @@
     "@visx/shape": "^3.12.0",
     "@visx/text": "^3.12.0",
     "chroma": "0.0.1",
-    "react-accessible-accordion": "^5.0.1"
+    "html-react-parser": "5.2.3",
+    "react-accessible-accordion": "^5.0.1",
+    "resize-observer-polyfill": "^1.5.1"
   },
   "peerDependencies": {
     "react": "^18.2.0",

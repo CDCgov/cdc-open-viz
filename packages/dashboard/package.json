@@ -35,7 +35,7 @@
     "@cdc/markup-include": "^4.25.7",
     "@cdc/waffle-chart": "^4.25.7",
     "js-base64": "^2.5.2",
-    "react-accessible-accordion": "^3.3.4",
+    "react-accessible-accordion": "^5.0.1",
     "react-dnd": "^14.0.2",
     "react-dnd-html5-backend": "^14.0.0",
     "use-debounce": "^6.0.1"

@@ -83,7 +83,6 @@
     "use-debounce": "^7.0.1",
     "vite": "^4.4.11",
     "vite-plugin-css-injected-by-js": "^2.4.0",
-    "vite-plugin-md": "^0.21.5",
     "vite-plugin-svgr": "^2.4.0",
     "vitest": "^1.2.2",
     "whatwg-fetch": "3.6.20"
@@ -106,7 +105,8 @@
     "predeploy": "storybook build --output-dir .storybook_build && touch .storybook_build/.nojekyll",
     "deploy": "gh-pages -d .storybook_build -t true",
     "lint": "eslint packages/*/src/**/*.{js,jsx,ts,tsx}",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test:standalone-build": "node scripts/test-standalone-build.js"
   },
   "dependencies": {
     "@visx/annotation": "^3.3.0",

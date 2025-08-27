@@ -26,7 +26,9 @@
   "license": "Apache-2.0",
   "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
   "dependencies": {
-    "@cdc/core": "^4.25.7"
+    "@cdc/core": "^4.25.7",
+    "lodash": "^4.17.21",
+    "html-react-parser": "5.2.3"
   },
   "peerDependencies": {
     "react": "^18.2.0",

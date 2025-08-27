@@ -31,6 +31,7 @@
     "axios": "^1.9.0",
     "chroma": "0.0.1",
     "interweave": "^13.1.1",
+    "lodash": "^4.17.21",
     "react-accessible-accordion": "^5.0.1"
   },
   "peerDependencies": {
