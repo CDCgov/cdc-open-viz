@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import CdcMapComponent from '../CdcMapComponent'
 import defaultPatterns from './_mock/default-patterns.json'
-import { editConfigKeys } from '@cdc/chart/src/helpers/configHelpers'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 
 const meta: Meta<typeof CdcMapComponent> = {
   title: 'Components/Templates/Map/Table',

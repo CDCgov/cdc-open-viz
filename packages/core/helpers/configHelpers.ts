@@ -1,5 +1,4 @@
 import { cloneDeep } from 'lodash'
-import { ChartConfig } from '../types/ChartConfig'
 
 /* editConfigKeys
  * Add edit or update config keys
@@ -8,7 +7,7 @@ import { ChartConfig } from '../types/ChartConfig'
  * value is the new value to be set
  * if the key does not exist, it will be created
  */
-export function editConfigKeys(config: ChartConfig, keyUpdates: { path: string[]; value: any }[]): ChartConfig {
+export function editConfigKeys<T = any>(config: T, keyUpdates: { path: string[]; value: any }[]): T {
   const configDeepCopy = cloneDeep(config)
 
   const newConfig = keyUpdates.reduce((acc, { path, value }) => {

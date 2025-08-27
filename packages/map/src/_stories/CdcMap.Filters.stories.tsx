@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import CdcMap from '../CdcMap'
 import WastewaterMap from './_mock/wastewater-map.json'
-import { editConfigKeys } from '@cdc/chart/src/helpers/configHelpers'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map/Filters',
