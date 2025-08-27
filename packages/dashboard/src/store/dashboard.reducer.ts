@@ -35,6 +35,7 @@ export type DashboardState = {
   loading: boolean
   preview: boolean
   tabSelected: Tab
+  filtersApplied: boolean
 }
 
 const reducer = (state: DashboardState, action: DashboardActions): DashboardState => {
@@ -265,6 +266,9 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         return row
       })
       return { ...state, config: { ...state.config, rows: newRows } }
+    }
+    case 'SET_FILTERS_APPLIED': {
+      return { ...state, filtersApplied: action.payload }
     }
     default:
       return state
