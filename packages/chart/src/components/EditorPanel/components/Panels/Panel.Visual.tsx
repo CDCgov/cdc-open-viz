@@ -280,7 +280,9 @@ const PanelVisual: FC<PanelProps> = props => {
             </label>
             {visSupportsReverseColorPalette() && (
               <InputToggle
-                fieldName='general.palette.isReversed'
+                section='general'
+                subsection='palette'
+                fieldName='isReversed'
                 size='small'
                 label='Use selected palette in reverse order'
                 updateField={updateField}

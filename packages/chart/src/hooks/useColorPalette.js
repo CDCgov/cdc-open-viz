@@ -64,10 +64,10 @@ export const useColorPalette = (config, updateConfig) => {
         results.push(paletteName)
       } else if (type === 'nonsequential' && matchesReversed) {
         // V2 non-sequential includes qualitative AND divergent palettes
-        if (paletteName.startsWith('qualitative') || paletteName.startsWith('divergent')) {
+        if (paletteName.startsWith('divergent')) {
           results.push(paletteName)
         }
-      } else if (type === 'colorblindsafe' && paletteName.startsWith('colorblindsafe') && matchesReversed) {
+      } else if (type === 'colorblindsafe' && paletteName.startsWith('qualitative-standard') && matchesReversed) {
         results.push(paletteName)
       }
     }
