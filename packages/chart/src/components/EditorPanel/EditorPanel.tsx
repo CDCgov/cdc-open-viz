@@ -49,7 +49,7 @@ import { updateFieldRankByValue } from './helpers/updateFieldRankByValue'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
-import { getChartColorPaletteVersion } from '../../helpers/getChartColorPaletteVersion'
+import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import { migrateChartPaletteName } from '../../helpers/migrateChartPaletteName'
 
 interface PreliminaryProps {
@@ -1111,7 +1111,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       }
 
       // Check if it's a v1 palette configuration
-      const currentVersion = getChartColorPaletteVersion(config)
+      const currentVersion = getColorPaletteVersion(config)
       const isV1Palette =
         currentVersion === 1 || config.general?.palette?.version === '1.0' || !config.general?.palette?.version
 

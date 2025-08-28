@@ -51,7 +51,7 @@ import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { migratePaletteName } from '../../../helpers/migratePaletteName'
-import { getMapColorPaletteVersion } from '../../../helpers/getMapColorPaletteVersion'
+import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import PaletteConversionModal from '../../PaletteConversionModal'
 
 type MapEditorPanelProps = {
@@ -913,7 +913,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
   // Helper function to handle palette selection with conversion prompt
   const handlePaletteSelection = (palette: string) => {
-    const currentVersion = getMapColorPaletteVersion(config)
+    const currentVersion = getColorPaletteVersion(config)
     const isV1Palette = currentVersion === 1 || config.general.palette.version === '1.0' || !config.general.palette.version
 
     const executeSelection = () => {
@@ -2986,7 +2986,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               <span>Sequential</span>
               <ul className='color-palette'>
                 {sequential.map(palette => {
-                  const paletteAccessor = colorPalettes?.[`v${getMapColorPaletteVersion(config)}`] || colorPalettes
+                  const paletteAccessor = colorPalettes?.[`v${getColorPaletteVersion(config)}`] || colorPalettes
                   const colorOne = {
                     backgroundColor: paletteAccessor[palette][2]
                   }
@@ -3016,7 +3016,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               <span>Non-Sequential</span>
               <ul className='color-palette'>
                 {nonSequential.map(palette => {
-                  const paletteAccessor = colorPalettes?.[`v${getMapColorPaletteVersion(config)}`] || colorPalettes
+                  const paletteAccessor = colorPalettes?.[`v${getColorPaletteVersion(config)}`] || colorPalettes
                   const colorOne = {
                     backgroundColor: paletteAccessor[palette][2]
                   }
@@ -3050,7 +3050,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               <span>Colorblind Safe</span>
               <ul className='color-palette'>
                 {accessibleColors.map(palette => {
-                  const paletteAccessor = colorPalettes?.[`v${getMapColorPaletteVersion(config)}`] || colorPalettes
+                  const paletteAccessor = colorPalettes?.[`v${getColorPaletteVersion(config)}`] || colorPalettes
                   const colorOne = {
                     backgroundColor: paletteAccessor[palette][2]
                   }

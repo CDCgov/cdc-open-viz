@@ -24,7 +24,7 @@ import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 import { LineChartConfig } from '../../../../types/ChartConfig'
 import { migrateChartPaletteName } from '../../../../helpers/migrateChartPaletteName'
-import { getChartColorPaletteVersion } from '../../../../helpers/getChartColorPaletteVersion'
+import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import './panelVisual.styles.css'
 
 const PanelVisual: FC<PanelProps> = props => {
@@ -33,7 +33,7 @@ const PanelVisual: FC<PanelProps> = props => {
 
   // Helper function to safely get palette colors with version awareness
   const getPaletteColors = (paletteName: string) => {
-    const currentVersion = getChartColorPaletteVersion(config)
+    const currentVersion = getColorPaletteVersion(config)
 
     // Try the palette name as-is first
     if (colorPalettes[paletteName] && Array.isArray(colorPalettes[paletteName])) {

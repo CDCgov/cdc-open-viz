@@ -1,11 +1,11 @@
-import { getMapColorPaletteVersion } from './getMapColorPaletteVersion'
+import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 
 export const filterColorPalettes = ({ isReversed, colorPalettes, config }) => {
   let sequential = []
   let nonSequential = []
   let accessibleColors = []
 
-  for (const paletteName in colorPalettes?.[`v${getMapColorPaletteVersion(config)}`]) {
+  for (const paletteName in colorPalettes?.[`v${getColorPaletteVersion(config)}`]) {
     const isReversedPalette = paletteName.endsWith('reverse')
 
     const handleV1Palette = paletteName => {
