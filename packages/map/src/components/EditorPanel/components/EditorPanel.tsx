@@ -52,7 +52,7 @@ import { Datasets } from '@cdc/core/types/DataSet'
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { migratePaletteName } from '@cdc/core/helpers/migratePaletteName'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
-import PaletteConversionModal from '../../PaletteConversionModal'
+import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
 
 type MapEditorPanelProps = {
   datasets?: Datasets

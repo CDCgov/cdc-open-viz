@@ -26,7 +26,7 @@ import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
 // chart components
 import Panels from './components/Panels'
-import PaletteConversionModal from '../PaletteConversionModal'
+import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
 
 // cdc additional
 import { useEditorPermissions } from './useEditorPermissions'
