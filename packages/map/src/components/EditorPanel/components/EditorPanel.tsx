@@ -50,7 +50,7 @@ import './editorPanel.styles.css'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 import MultiSelect from '@cdc/core/components/MultiSelect'
-import { migratePaletteName } from '../../../helpers/migratePaletteName'
+import { migratePaletteName } from '@cdc/core/helpers/migratePaletteName'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import PaletteConversionModal from '../../PaletteConversionModal'
 
@@ -82,7 +82,10 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const [displayPanel, setDisplayPanel] = useState(true)
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
   const [showConversionModal, setShowConversionModal] = useState(false)
-  const [pendingPaletteSelection, setPendingPaletteSelection] = useState<{ palette: string, action: () => void } | null>(null)
+  const [pendingPaletteSelection, setPendingPaletteSelection] = useState<{
+    palette: string
+    action: () => void
+  } | null>(null)
 
   const {
     MapLayerHandlers: { handleMapLayer, handleAddLayer, handleRemoveLayer }
@@ -914,7 +917,8 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   // Helper function to handle palette selection with conversion prompt
   const handlePaletteSelection = (palette: string) => {
     const currentVersion = getColorPaletteVersion(config)
-    const isV1Palette = currentVersion === 1 || config.general.palette.version === '1.0' || !config.general.palette.version
+    const isV1Palette =
+      currentVersion === 1 || config.general.palette.version === '1.0' || !config.general.palette.version
 
     const executeSelection = () => {
       const _newConfig = _.cloneDeep(config)
@@ -961,7 +965,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   // Helper function to determine if a palette should be marked as selected
   const getPaletteClassName = (palette: string) => {
     const currentPaletteName = config.general.palette.name || ''
-    
+
     // Direct comparison since the UI filters palettes by version
     // When v1 is selected, UI shows v1 palettes; when v2 is selected, UI shows v2 palettes
     return currentPaletteName === palette ? 'selected' : ''
@@ -1123,8 +1127,9 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 </span>
                 <ul className='geo-buttons d-grid' style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
                   <button
-                    className={`${config.general.geoType === 'us' || config.general.geoType === 'us-county' ? 'active' : ''
-                      } full-width`}
+                    className={`${
+                      config.general.geoType === 'us' || config.general.geoType === 'us-county' ? 'active' : ''
+                    } full-width`}
                     onClick={e => {
                       e.preventDefault()
                       handleEditorChanges('geoType', 'us')
@@ -3116,19 +3121,19 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               )}
               {(config.general.geoType === 'world' ||
                 (config.general.geoType === 'us' && config.general.type === 'bubble')) && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={config.visual.showBubbleZeros}
-                      onChange={event => {
-                        const _newConfig = _.cloneDeep(config)
-                        _newConfig.visual.showBubbleZeros = event.target.checked
-                        setConfig(_newConfig)
-                      }}
-                    />
-                    <span className='edit-label'>Show Data with Zero's on Bubble Map</span>
-                  </label>
-                )}
+                <label className='checkbox'>
+                  <input
+                    type='checkbox'
+                    checked={config.visual.showBubbleZeros}
+                    onChange={event => {
+                      const _newConfig = _.cloneDeep(config)
+                      _newConfig.visual.showBubbleZeros = event.target.checked
+                      setConfig(_newConfig)
+                    }}
+                  />
+                  <span className='edit-label'>Show Data with Zero's on Bubble Map</span>
+                </label>
+              )}
               {(config.general.geoType === 'world' || config.general.geoType === 'single-state') && (
                 <label className='checkbox'>
                   <input
@@ -3162,42 +3167,42 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               {(config.general.geoType === 'us' ||
                 config.general.geoType === 'us-county' ||
                 config.general.geoType === 'world') && (
-                  <>
-                    <label>
-                      <span className='edit-label'>Default City Style</span>
-                      <select
-                        value={config.visual.cityStyle || false}
-                        onChange={event => {
-                          handleEditorChanges('handleCityStyle', event.target.value)
-                        }}
-                      >
-                        <option value='circle'>Circle</option>
-                        <option value='pin'>Pin</option>
-                        <option value='square'>Square</option>
-                        <option value='triangle'>Triangle</option>
-                        <option value='diamond'>Diamond</option>
-                        <option value='star'>Star</option>
-                      </select>
-                    </label>
-                    <TextField
-                      value={config.visual.cityStyleLabel}
-                      section='visual'
-                      fieldName='cityStyleLabel'
-                      label='Label (Optional) '
-                      updateField={updateField}
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>When a label is provided, the default city style will appear in the legend.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                    />
-                  </>
-                )}
+                <>
+                  <label>
+                    <span className='edit-label'>Default City Style</span>
+                    <select
+                      value={config.visual.cityStyle || false}
+                      onChange={event => {
+                        handleEditorChanges('handleCityStyle', event.target.value)
+                      }}
+                    >
+                      <option value='circle'>Circle</option>
+                      <option value='pin'>Pin</option>
+                      <option value='square'>Square</option>
+                      <option value='triangle'>Triangle</option>
+                      <option value='diamond'>Diamond</option>
+                      <option value='star'>Star</option>
+                    </select>
+                  </label>
+                  <TextField
+                    value={config.visual.cityStyleLabel}
+                    section='visual'
+                    fieldName='cityStyleLabel'
+                    label='Label (Optional) '
+                    updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>When a label is provided, the default city style will appear in the legend.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                </>
+              )}
               {/* <AdditionalCityStyles /> */}
               <>
                 {config.visual.additionalCityStyles.length > 0 &&

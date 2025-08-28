@@ -23,7 +23,7 @@ import { useEditorPanelContext } from '../../EditorPanelContext.js'
 import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 import { LineChartConfig } from '../../../../types/ChartConfig'
-import { migrateChartPaletteName } from '../../../../helpers/migrateChartPaletteName'
+import { migratePaletteName } from '@cdc/core/helpers/migratePaletteName'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import './panelVisual.styles.css'
 
@@ -42,7 +42,7 @@ const PanelVisual: FC<PanelProps> = props => {
 
     // If not found and we're in v1, try migrating the name to v2
     if (currentVersion === 1) {
-      const migratedName = migrateChartPaletteName(paletteName)
+      const migratedName = migratePaletteName(paletteName)
       if (migratedName !== paletteName && colorPalettes[migratedName] && Array.isArray(colorPalettes[migratedName])) {
         return colorPalettes[migratedName]
       }

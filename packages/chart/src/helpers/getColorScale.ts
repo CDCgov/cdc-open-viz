@@ -2,7 +2,7 @@ import { twoColorPalette } from '@cdc/core/data/colorPalettes'
 import { filterChartColorPalettes } from './filterChartColorPalettes'
 import { scaleOrdinal } from '@visx/scale'
 import { ChartConfig } from '../types/ChartConfig'
-import { migrateChartPaletteName } from './migrateChartPaletteName'
+import { migratePaletteName } from '@cdc/core/helpers/migratePaletteName'
 
 export const getColorScale = (config: ChartConfig): ((value: string) => string) => {
   const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
@@ -12,7 +12,7 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
   const allPalettes: Record<string, string[]> = { ...colorPalettes, ...twoColorPalette }
 
   // Migrate old palette name if needed
-  const migratedPaletteName = configPalette ? migrateChartPaletteName(configPalette) : undefined
+  const migratedPaletteName = configPalette ? migratePaletteName(configPalette) : undefined
 
   let palette = config.customColors || allPalettes[migratedPaletteName] || allPalettes[configPalette]
 

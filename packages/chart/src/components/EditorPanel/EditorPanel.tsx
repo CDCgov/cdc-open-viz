@@ -50,7 +50,7 @@ import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
-import { migrateChartPaletteName } from '../../helpers/migrateChartPaletteName'
+import { migratePaletteName } from '@cdc/core/helpers/migratePaletteName'
 
 interface PreliminaryProps {
   config: ChartConfig
@@ -1120,7 +1120,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         if (!_newConfig.general.palette) {
           _newConfig.general.palette = {}
         }
-        const migratedName = migrateChartPaletteName(palette)
+        const migratedName = migratePaletteName(palette)
         _newConfig.general.palette.name = migratedName
         if (isV1Palette) {
           _newConfig.general.palette.version = '2.0'
