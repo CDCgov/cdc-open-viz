@@ -15,7 +15,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import InputToggle from '@cdc/core/components/inputs/InputToggle'
 
 // contexts
-import { useColorPalette } from '../../../../hooks/useColorPalette'
+import { useColorPalette } from '@cdc/core/hooks/useColorPalette'
 import { ChartContext } from './../../../../types/ChartContext.js'
 
 import { useEditorPermissions } from '../../useEditorPermissions.js'

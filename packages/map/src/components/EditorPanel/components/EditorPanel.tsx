@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState, useMemo } from 'react'
-import { filterColorPalettes } from '../../../helpers/filterColorPalettes'
+import { filterColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 
 // Third Party
 import {
@@ -909,8 +909,8 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
   const isReversed = config.general.palette.isReversed
 
-  const [sequential, nonSequential, accessibleColors] = useMemo(
-    () => filterColorPalettes({ isReversed, colorPalettes, config }),
+  const { sequential, nonSequential, accessibleColors } = useMemo(
+    () => filterColorPalettes({ config, isReversed, colorPalettes }),
     [isReversed, colorPalettes, config.general.palette.version]
   )
 

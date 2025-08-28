@@ -1,5 +1,5 @@
 import { twoColorPalette } from '@cdc/core/data/colorPalettes'
-import { filterChartColorPalettes } from './filterChartColorPalettes'
+import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 import { scaleOrdinal } from '@visx/scale'
 import { ChartConfig } from '../types/ChartConfig'
 import { migratePaletteName } from '@cdc/core/helpers/migratePaletteName'
