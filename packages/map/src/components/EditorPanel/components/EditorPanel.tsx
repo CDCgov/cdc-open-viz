@@ -52,6 +52,7 @@ import { Datasets } from '@cdc/core/types/DataSet'
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { migratePaletteName } from '@cdc/core/helpers/migratePaletteName'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
 import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
 
 type MapEditorPanelProps = {
@@ -2989,103 +2990,53 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 value={config.general.palette.isReversed}
               />
               <span>Sequential</span>
-              <ul className='color-palette'>
-                {sequential.map(palette => {
-                  const paletteAccessor = colorPalettes?.[`v${getColorPaletteVersion(config)}`] || colorPalettes
-                  const colorOne = {
-                    backgroundColor: paletteAccessor[palette][2]
-                  }
-
-                  const colorTwo = {
-                    backgroundColor: paletteAccessor[palette][4]
-                  }
-
-                  const colorThree = {
-                    backgroundColor: paletteAccessor[palette][6]
-                  }
-
-                  return (
-                    <li
-                      title={palette}
-                      key={palette}
-                      onClick={() => handlePaletteSelection(palette)}
-                      className={getPaletteClassName(palette)}
-                    >
-                      <span style={colorOne}></span>
-                      <span style={colorTwo}></span>
-                      <span style={colorThree}></span>
-                    </li>
-                  )
-                })}
-              </ul>
+              <PaletteSelector
+                palettes={sequential}
+                colorPalettes={colorPalettes}
+                config={config}
+                onPaletteSelect={handlePaletteSelection}
+                selectedPalette={config.general?.palette?.name}
+                colorIndices={[2, 4, 6]}
+                className='color-palette'
+                element='li'
+                getItemClassName={getPaletteClassName}
+              />
               <span>Non-Sequential</span>
-              <ul className='color-palette'>
-                {nonSequential.map(palette => {
-                  const paletteAccessor = colorPalettes?.[`v${getColorPaletteVersion(config)}`] || colorPalettes
-                  const colorOne = {
-                    backgroundColor: paletteAccessor[palette][2]
+              <PaletteSelector
+                palettes={nonSequential}
+                colorPalettes={colorPalettes}
+                config={config}
+                onPaletteSelect={handlePaletteSelection}
+                selectedPalette={config.general?.palette?.name}
+                colorIndices={[2, 4, 6]}
+                className='color-palette'
+                element='li'
+                getItemClassName={getPaletteClassName}
+                minColorsForFilter={(_, paletteAccessor, config) => {
+                  if (paletteAccessor.length <= 8 && config.general.geoType === 'us-region') {
+                    return false
                   }
-
-                  const colorTwo = {
-                    backgroundColor: paletteAccessor[palette][4]
-                  }
-
-                  const colorThree = {
-                    backgroundColor: paletteAccessor[palette][6]
-                  }
-
-                  // hide palettes with too few colors for region maps
-                  if (paletteAccessor[palette].length <= 8 && config.general.geoType === 'us-region') {
-                    return ''
-                  }
-                  return (
-                    <li
-                      title={palette}
-                      key={palette}
-                      onClick={() => handlePaletteSelection(palette)}
-                      className={getPaletteClassName(palette)}
-                    >
-                      <span style={colorOne}></span>
-                      <span style={colorTwo}></span>
-                      <span style={colorThree}></span>
-                    </li>
-                  )
-                })}
-              </ul>
+                  return true
+                }}
+              />
               <span>Colorblind Safe</span>
-              <ul className='color-palette'>
-                {accessibleColors.map(palette => {
-                  const paletteAccessor = colorPalettes?.[`v${getColorPaletteVersion(config)}`] || colorPalettes
-                  const colorOne = {
-                    backgroundColor: paletteAccessor[palette][2]
+              <PaletteSelector
+                palettes={accessibleColors}
+                colorPalettes={colorPalettes}
+                config={config}
+                onPaletteSelect={handlePaletteSelection}
+                selectedPalette={config.general?.palette?.name}
+                colorIndices={[2, 4, 6]}
+                className='color-palette'
+                element='li'
+                getItemClassName={getPaletteClassName}
+                minColorsForFilter={(_, paletteAccessor, config) => {
+                  if (paletteAccessor.length <= 8 && config.general.geoType === 'us-region') {
+                    return false
                   }
-
-                  const colorTwo = {
-                    backgroundColor: paletteAccessor[palette][4]
-                  }
-
-                  const colorThree = {
-                    backgroundColor: paletteAccessor[palette][6]
-                  }
-
-                  // hide palettes with too few colors for region maps
-                  if (paletteAccessor[palette].length <= 8 && config.general.geoType === 'us-region') {
-                    return ''
-                  }
-                  return (
-                    <li
-                      title={palette}
-                      key={palette}
-                      onClick={() => handlePaletteSelection(palette)}
-                      className={getPaletteClassName(palette)}
-                    >
-                      <span style={colorOne}></span>
-                      <span style={colorTwo}></span>
-                      <span style={colorThree}></span>
-                    </li>
-                  )
-                })}
-              </ul>
+                  return true
+                }}
+              />
               <label>
                 Geocode Settings
                 <TextField

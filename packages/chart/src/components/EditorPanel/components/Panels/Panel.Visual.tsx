@@ -25,6 +25,7 @@ import { PanelProps } from '../PanelProps'
 import { LineChartConfig } from '../../../../types/ChartConfig'
 import { migratePaletteName } from '@cdc/core/helpers/migratePaletteName'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
 import './panelVisual.styles.css'
 
 const PanelVisual: FC<PanelProps> = props => {
@@ -292,123 +293,39 @@ const PanelVisual: FC<PanelProps> = props => {
             {visSupportsSequentialPallete() && (
               <>
                 <span>Sequential</span>
-                <ul className='color-palette'>
-                  {sequential.map(palette => {
-                    // Use helper function to get palette colors with version awareness
-                    const paletteColors = getPaletteColors(palette)
-                    if (!paletteColors) {
-                      return null
-                    }
-
-                    const colorOne = {
-                      backgroundColor: paletteColors[2] || '#ccc'
-                    }
-
-                    const colorTwo = {
-                      backgroundColor: paletteColors[3] || '#ccc'
-                    }
-
-                    const colorThree = {
-                      backgroundColor: paletteColors[5] || '#ccc'
-                    }
-
-                    return (
-                      <button
-                        title={palette}
-                        key={palette}
-                        onClick={e => {
-                          e.preventDefault()
-                          handlePaletteSelection(palette)
-                        }}
-                        className={config.general?.palette?.name === palette ? 'selected' : ''}
-                      >
-                        <span style={colorOne}></span>
-                        <span style={colorTwo}></span>
-                        <span style={colorThree}></span>
-                      </button>
-                    )
-                  })}
-                </ul>
+                <PaletteSelector
+                  palettes={sequential}
+                  colorPalettes={colorPalettes}
+                  config={config}
+                  onPaletteSelect={handlePaletteSelection}
+                  selectedPalette={config.general?.palette?.name}
+                  colorIndices={[2, 3, 5]}
+                  className='color-palette'
+                />
               </>
             )}
             {visSupportsNonSequentialPallete() && (
               <>
                 <span>Non-Sequential</span>
-                <ul className='color-palette'>
-                  {nonSequential.map(palette => {
-                    // Use helper function to get palette colors with version awareness
-                    const paletteColors = getPaletteColors(palette)
-                    if (!paletteColors) {
-                      return null
-                    }
-
-                    const colorOne = {
-                      backgroundColor: paletteColors[2] || '#ccc'
-                    }
-
-                    const colorTwo = {
-                      backgroundColor: paletteColors[4] || '#ccc'
-                    }
-
-                    const colorThree = {
-                      backgroundColor: paletteColors[6] || '#ccc'
-                    }
-
-                    return (
-                      <button
-                        title={palette}
-                        key={palette}
-                        onClick={e => {
-                          e.preventDefault()
-                          handlePaletteSelection(palette)
-                        }}
-                        className={config.general?.palette?.name === palette ? 'selected' : ''}
-                      >
-                        <span style={colorOne}></span>
-                        <span style={colorTwo}></span>
-                        <span style={colorThree}></span>
-                      </button>
-                    )
-                  })}
-                </ul>
+                <PaletteSelector
+                  palettes={nonSequential}
+                  colorPalettes={colorPalettes}
+                  config={config}
+                  onPaletteSelect={handlePaletteSelection}
+                  selectedPalette={config.general?.palette?.name}
+                  colorIndices={[2, 4, 6]}
+                  className='color-palette'
+                />
                 <span>Colorblind Safe</span>
-                <ul className='color-palette'>
-                  {accessibleColors.map(palette => {
-                    // Use helper function to get palette colors with version awareness
-                    const paletteColors = getPaletteColors(palette)
-                    if (!paletteColors) {
-                      return null
-                    }
-
-                    const colorOne = {
-                      backgroundColor: paletteColors[2] || '#ccc'
-                    }
-
-                    const colorTwo = {
-                      backgroundColor: paletteColors[3] || '#ccc'
-                    }
-
-                    const colorThree = {
-                      backgroundColor: paletteColors[5] || '#ccc'
-                    }
-
-                    return (
-                      <button
-                        title={palette}
-                        key={palette}
-                        onClick={e => {
-                          e.preventDefault()
-                          handlePaletteSelection(palette)
-                        }}
-                        className={config.general?.palette?.name === palette ? 'selected' : ''}
-                      >
-                        <span style={colorOne}></span>
-                        <span style={colorTwo}></span>
-                        <span style={colorThree}></span>
-                      </button>
-                    )
-                  })}
-                </ul>
+                <PaletteSelector
+                  palettes={accessibleColors}
+                  colorPalettes={colorPalettes}
+                  config={config}
+                  onPaletteSelect={handlePaletteSelection}
+                  selectedPalette={config.general?.palette?.name}
+                  colorIndices={[2, 3, 5]}
+                  className='color-palette'
+                />
               </>
             )}
           </>
