@@ -18,11 +18,14 @@ type LegendItem = {
 export const applyColorToLegend = (legendIdx: number, config: MapConfig, result: LegendItem[] = []): string => {
   if (!config) throw new Error('Config is required')
 
-  const { legend, customColors, general } = config
+  const { legend, general } = config
   const { geoType, palette } = general
   const { name: color } = palette
   const specialClasses = legend?.specialClasses ?? []
-  const mapColorPalette = customColors ?? colorPalettes?.[`v${getColorPaletteVersion(config)}`]?.[color] ?? colorPalettes.v1['bluegreen']
+  const mapColorPalette =
+    general?.palette?.customColors ??
+    colorPalettes?.[`v${getColorPaletteVersion(config)}`]?.[color] ??
+    colorPalettes.v1['bluegreen']
 
   // Handle Region Maps need for a 10th color
   if (geoType === 'us-region' && mapColorPalette.length < 10 && mapColorPalette.length > 8) {

@@ -108,7 +108,7 @@ export const Single_State_With_Filters: Story = {
 }
 
 let newConfig = editConfigKeys(exampleCityState, [
-  { path: ['customColors'], value: ['red', 'orange', 'yellow', 'green', 'blue', 'violet'] }
+  { path: ['general', 'palette', 'customColors'], value: ['red', 'orange', 'yellow', 'green', 'blue', 'violet'] }
 ])
 newConfig = editConfigKeys(newConfig, [
   {

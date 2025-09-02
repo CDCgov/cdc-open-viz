@@ -14,6 +14,7 @@ export type General = CoreGeneral & {
     name?: string
     version?: string
     isReversed?: boolean
+    customColors?: string[]
   }
 }
 import { type Link } from './../components/Sankey/types'
@@ -134,7 +135,6 @@ export type AllChartsConfig = {
   colorMatchLineSeriesLabels: boolean
   columns: ChartColumns
   confidenceKeys: ConfidenceInterval
-  customColors: string[]
   data: Object[]
   dataUrl: string
   dataCutoff: number

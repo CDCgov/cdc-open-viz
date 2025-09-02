@@ -52,10 +52,29 @@ const updateMapColorMigrations = config => {
 
 }
 
+// Move config.customColors to config.general.palette.customColors
+const updateCustomColorsMigration = config => {
+    if (config.customColors) {
+        config.general = config.general || {}
+        config.general.palette = config.general.palette || {}
+        config.general.palette.customColors = config.customColors
+        
+        // Remove old customColors property
+        delete config.customColors
+    }
+    
+    if (config.type === 'dashboard') {
+        Object.values(config.visualizations).forEach(visualization => {
+            updateCustomColorsMigration(visualization)
+        })
+    }
+}
+
 const update_4_25_9 = config => {
     const ver = '4.25.9'
     const newConfig = _.cloneDeep(config)
     updateMapColorMigrations(newConfig)
+    updateCustomColorsMigration(newConfig)
     newConfig.version = ver
     return newConfig
 }

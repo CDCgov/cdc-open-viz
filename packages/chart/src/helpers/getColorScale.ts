@@ -14,7 +14,7 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
   // Migrate old palette name if needed
   const migratedPaletteName = configPalette ? migratePaletteName(configPalette) : undefined
 
-  let palette = config.customColors || allPalettes[migratedPaletteName] || allPalettes[configPalette]
+  let palette = config.general?.palette?.customColors || allPalettes[migratedPaletteName] || allPalettes[configPalette]
 
   // Fallback to a default palette if none found
   if (!palette) {

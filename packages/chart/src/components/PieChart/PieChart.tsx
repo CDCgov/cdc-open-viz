@@ -99,7 +99,7 @@ const PieChart = props => {
         if (!keys[d[config.xAxis.dataKey]]) keys[d[config.xAxis.dataKey]] = true
       })
       const numberOfKeys = Object.entries(keys).length
-      let palette = config.customColors || colorPalettes[config.general?.palette?.name]
+      let palette = config.general?.palette?.customColors || colorPalettes[config.general?.palette?.name]
       palette = palette.slice(0, numberOfKeys)
       return scaleOrdinal({
         domain: Object.keys(keys),
@@ -116,7 +116,7 @@ const PieChart = props => {
       // take out Calculated Area so it falls back to `unknown`
       const domainKeys = Object.keys(keys).filter(k => k !== labelForCalcArea)
 
-      const basePalette = (config.customColors || colorPalettes[config.general?.palette?.name]).slice(
+      const basePalette = (config.general?.palette?.customColors || colorPalettes[config.general?.palette?.name]).slice(
         0,
         domainKeys.length
       )

@@ -8,7 +8,7 @@ export const generateRuntimeLegendHash = (config: MapConfig, runtimeFilters) => 
     equalNumberOptIn: config.general.equalNumberOptIn ?? false,
     specialClassesLast: config.legend.showSpecialClassesLast ?? false,
     color: paletteName,
-    customColors: config.customColors,
+    customColors: config.general?.palette?.customColors,
     numberOfItems: config.legend.numberOfItems,
     type: config.legend.type,
     separateZero: config.legend.separateZero ?? false,

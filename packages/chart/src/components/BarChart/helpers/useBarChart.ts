@@ -98,7 +98,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     if (!config.legend.colorCode && config.series.length > 1) {
       return currentBarColor
     }
-    const palettesArr = config.customColors ?? colorPalettes[config.general?.palette?.name]
+    const palettesArr = config.general?.palette?.customColors ?? colorPalettes[config.general?.palette?.name]
     const values = tableData.map(d => {
       return d[config.legend.colorCode]
     })
