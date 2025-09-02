@@ -32,26 +32,6 @@ const PanelVisual: FC<PanelProps> = props => {
   const { config, updateConfig, colorPalettes, twoColorPalette } = useContext<ChartContext>(ConfigContext)
   const { visual } = config
 
-  // Helper function to safely get palette colors with version awareness
-  const getPaletteColors = (paletteName: string) => {
-    const currentVersion = getColorPaletteVersion(config)
-
-    // Try the palette name as-is first
-    if (colorPalettes[paletteName] && Array.isArray(colorPalettes[paletteName])) {
-      return colorPalettes[paletteName]
-    }
-
-    // If not found and we're in v1, try migrating the name to v2
-    if (currentVersion === 1) {
-      const migratedName = migratePaletteName(paletteName)
-      if (migratedName !== paletteName && colorPalettes[migratedName] && Array.isArray(colorPalettes[migratedName])) {
-        return colorPalettes[migratedName]
-      }
-    }
-
-    // If still not found, return null to indicate the palette doesn't exist
-    return null
-  }
   const { setLollipopShape, updateField, handlePaletteSelection } = useEditorPanelContext()
   const {
     visHasBarBorders,

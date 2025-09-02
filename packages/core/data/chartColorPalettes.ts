@@ -5,43 +5,43 @@ import { sharedPalettes } from './sharedPalettes'
 
 const chartColorPalettesData = {
   v1: {
-  'qualitative-bold': [
-    '#377eb8',
-    '#ff7f00',
-    '#4daf4a',
-    '#984ea3',
-    '#e41a1c',
-    '#ffff33',
-    '#a65628',
-    '#f781bf',
-    '#3399CC'
-  ],
+    'qualitative-bold': [
+      '#377eb8',
+      '#ff7f00',
+      '#4daf4a',
+      '#984ea3',
+      '#e41a1c',
+      '#ffff33',
+      '#a65628',
+      '#f781bf',
+      '#3399CC'
+    ],
 
-  'qualitative-soft': [
-    '#a6cee3',
-    '#1f78b4',
-    '#b2df8a',
-    '#33a02c',
-    '#fb9a99',
-    '#e31a1c',
-    '#fdbf6f',
-    '#ff7f00',
-    '#aca9eb'
-  ],
-  qualitative1: sharedPalettes.qualitative1,
+    'qualitative-soft': [
+      '#a6cee3',
+      '#1f78b4',
+      '#b2df8a',
+      '#33a02c',
+      '#fb9a99',
+      '#e31a1c',
+      '#fdbf6f',
+      '#ff7f00',
+      '#aca9eb'
+    ],
+    qualitative1: sharedPalettes.qualitative1,
 
-  qualitative2: sharedPalettes.qualitative2,
+    qualitative2: sharedPalettes.qualitative2,
 
-  qualitative3: sharedPalettes.qualitative3,
+    qualitative3: sharedPalettes.qualitative3,
 
-  qualitative4: sharedPalettes.qualitative4,
+    qualitative4: sharedPalettes.qualitative4,
 
-  'sequential-blue': ['#c6dbef', '#9ecae1', '#6baed6', '#4292c6', '#2171b5', '#084594'],
-  'sequential-blue-2-(MPX)': ['#d5f6f9', '#99e2ed', '#5fb6d1', '#3189b0', '#116091', '#0a3e72'],
-  'sequential-orange-(MPX)': ['#ffefcf', '#ffd49c', '#f7a866', '#eb7723', '#b95117', '#862b0b'],
-  'sequential-green': ['#c7e9c0', '#a1d99b', '#74c476', '#41ab5d', '#238b45', '#005a32'],
+    'sequential-blue': ['#c6dbef', '#9ecae1', '#6baed6', '#4292c6', '#2171b5', '#084594'],
+    'sequential-blue-2-(MPX)': ['#d5f6f9', '#99e2ed', '#5fb6d1', '#3189b0', '#116091', '#0a3e72'],
+    'sequential-orange-(MPX)': ['#ffefcf', '#ffd49c', '#f7a866', '#eb7723', '#b95117', '#862b0b'],
+    'sequential-green': ['#c7e9c0', '#a1d99b', '#74c476', '#41ab5d', '#238b45', '#005a32'],
 
-  colorblindsafe: sharedPalettes.colorblindsafe
+    colorblindsafe: sharedPalettes.colorblindsafe
   },
   v2: {
     // New standardized v2 palettes per migration guide (lowercase prefixes for filtering)
@@ -50,8 +50,7 @@ const chartColorPalettesData = {
     'sequential-blue': ['#DBE8F7', '#BED5ED', '#99BCE1', '#73A1D5', '#4E88C7', '#1E6BC0', '#0057B7', '#01418D', '#032659'],
     'sequential-green': ['#D5F9F6', '#AEECE7', '#85DED7', '#63D2CA', '#3BBCAF', '#14A594', '#0A937F', '#0F7A68', '#105B4D'],
     'qualitative-standard': ['#DFE1E2', '#0057B7', '#722161', '#00B1CE', '#D94E5F', '#5A8E3F', '#FFB24D', '#FB7E38', '#032659', '#975722'],
-    'colorblindsafe': ['#DFE1E2', '#0057B7', '#722161', '#00B1CE', '#D94E5F', '#5A8E3F', '#FFB24D', '#FB7E38', '#032659', '#975722'],
-    
+
     // New v2-only palettes (no migration needed)
     'sequential-teal': ['#e5fafc', '#b3e3ed', '#80cddf', '#4db8d1', '#00b1ce', '#03a2bd', '#0690a6', '#0d6e81', '#125261'],
     'divergent-bluecyan': ['#032659', '#014697', '#1D6ABF', '#6197D2', '#C1D2DB', '#5CCBDE', '#01ACC9', '#097F95', '#125261'],
