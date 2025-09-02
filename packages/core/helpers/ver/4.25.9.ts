@@ -25,8 +25,9 @@ const updateMapColorMigrations = config => {
             config.general.palette = config.general.palette || {}
             config.general.palette.name = config.color
 
-            // Save a backup if version is 1.0
+            // Save a backup and set version to 1.0 for legacy palette names
             if (config.general.palette.version === '1.0' || !config.general.palette.version) {
+                config.general.palette.version = '1.0'
                 config.general.palette.backups = config.general.palette.backups || []
                 config.general.palette.backups.push({ name: config.color, version: '1.0', isReversed: config.general.palette.isReversed })
             }
