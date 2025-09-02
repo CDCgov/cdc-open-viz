@@ -22,8 +22,8 @@ export default {
     convertFipsCodes: true,
     palette: {
       isReversed: false,
-      version: '2.0',
-      name: 'sequential-purple'
+      name: 'pinkpurple',
+      version: '2.0'
     },
     allowMapZoom: true,
     hideGeoColumnInTooltip: false,
@@ -36,7 +36,6 @@ export default {
     ]
   },
   type: 'map',
-  color: 'sequential-purple',
   columns: {
     geo: {
       name: 'FIPS Codes',

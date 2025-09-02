@@ -29,7 +29,7 @@ export const filterColorPalettes = ({
   const palettes = colorPalettes || chartColorPalettes
   const version = getColorPaletteVersion(config)
   const versionKey = `v${version}`
-  const currentPalettes = palettes[versionKey] || palettes.v1
+  const currentPalettes = palettes[versionKey] || palettes.v2
 
   // Handle two-color palettes for specific chart types
   if (visualizationType === 'Paired Bar' || visualizationType === 'Deviation Bar') {
@@ -149,7 +149,7 @@ function filterV2Palette(
  * Legacy function for backwards compatibility with chart package
  */
 export const filterChartColorPalettes = (config: any) => {
-  const version = config?.general?.palette?.version || '1.0'
+  const version = config?.general?.palette?.version || '2.0'
   
   if (version === '1.0') {
     return chartColorPalettes.v1
@@ -159,5 +159,5 @@ export const filterChartColorPalettes = (config: any) => {
     return chartColorPalettes.v2
   }
   
-  return chartColorPalettes.v1
+  return chartColorPalettes.v2
 }

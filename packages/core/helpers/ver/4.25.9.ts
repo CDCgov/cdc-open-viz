@@ -5,14 +5,25 @@ const paletteNameMigrations = {
     'yelloworangered': 'sequential_yellow_orange_red',
     'yelloworangebrown': 'sequential_yellow_orange_brown',
     'pinkpurple': 'sequential_pink_purple',
+    'pinkpurplereverse': 'sequential_pink_purplereverse',
     'bluegreen': 'sequential_blue_green',
+    'bluegreenreverse': 'sequential_blue_greenreverse',
     'orangered': 'sequential_orange_red',
+    'orangeredreverse': 'sequential_orange_redreverse',
     'red': 'sequential_red',
+    'redreverse': 'sequential_redreverse',
     'greenblue': 'sequential_green_blue',
+    'greenbluereverse': 'sequential_green_bluereverse',
+    'yelloworangeredreverse': 'sequential_yellow_orange_redreverse',
+    'yelloworangebrownreverse': 'sequential_yellow_orange_brownreverse',
     'yellowpurple': 'divergent_yellow_purple',
+    'yellowpurplereverse': 'divergent_yellow_purplereverse',
     'qualitative9': 'qualitative_earth_tones',
+    'qualitative9reverse': 'qualitative_earth_tonesreverse',
     'sequential-blue-2(MPX)': 'sequential_blue_extended',
-    'sequential-orange(MPX)': 'sequential_orange_extended'
+    'sequential-blue-2(MPX)reverse': 'sequential_blue_extendedreverse',
+    'sequential-orange(MPX)': 'sequential_orange_extended',
+    'sequential-orange(MPX)reverse': 'sequential_orange_extendedreverse'
 }
 
 // On maps move config.color to config.general.colorPalettes.colorName
@@ -58,11 +69,11 @@ const updateCustomColorsMigration = config => {
         config.general = config.general || {}
         config.general.palette = config.general.palette || {}
         config.general.palette.customColors = config.customColors
-        
+
         // Remove old customColors property
         delete config.customColors
     }
-    
+
     if (config.type === 'dashboard') {
         Object.values(config.visualizations).forEach(visualization => {
             updateCustomColorsMigration(visualization)

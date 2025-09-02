@@ -30,7 +30,7 @@ export default {
     hideNullValue: true,
     palette: {
       isReversed: false,
-      version: '1.0',
+      version: '2.0',
       name: 'qualitative-bold'
     }
   },
@@ -192,7 +192,7 @@ export default {
   twoColor: {
     palette: 'monochrome-1',
     isPaletteReversed: false,
-    version: '1.0'
+    version: '2.0'
   },
   labels: false,
   dataFormat: {

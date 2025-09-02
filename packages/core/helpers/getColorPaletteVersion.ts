@@ -5,8 +5,8 @@
  */
 export const getColorPaletteVersion = (config: any): number => {
   if (!config || !config.general || !config.general.palette) {
-    return 1
+    return 2
   }
-  const version = config.general.palette.version || '1.0'
+  const version = config.general.palette.version || '2.0'
   return parseInt(version.split('.')[0])
 }
