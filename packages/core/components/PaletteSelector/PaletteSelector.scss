@@ -1,0 +1,24 @@
+// PaletteSelector component styles
+// Shared styles for palette color swatches across all visualization types
+
+.color-palette {
+  // Button-based palette selector (used by charts)
+  button {
+    &:not(.selected) {
+      border: var(--cool-gray-30) 2px solid !important;
+    }
+    
+    &.selected {
+      border: black 2px solid !important;
+    }
+  }
+
+  // List item-based palette selector (used by maps)
+  li {
+    border: var(--cool-gray-30) 2px solid;
+    
+    &.selected {
+      border: black 2px solid;
+    }
+  }
+}

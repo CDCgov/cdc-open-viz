@@ -2996,7 +2996,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 config={config}
                 onPaletteSelect={handlePaletteSelection}
                 selectedPalette={config.general?.palette?.name}
-                colorIndices={[2, 4, 6]}
+                colorIndices={[2, 3, 5]}
                 className='color-palette'
                 element='li'
                 getItemClassName={getPaletteClassName}
@@ -3008,7 +3008,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 config={config}
                 onPaletteSelect={handlePaletteSelection}
                 selectedPalette={config.general?.palette?.name}
-                colorIndices={[2, 4, 6]}
+                colorIndices={[2, 3, 5]}
                 className='color-palette'
                 element='li'
                 getItemClassName={getPaletteClassName}
@@ -3026,7 +3026,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 config={config}
                 onPaletteSelect={handlePaletteSelection}
                 selectedPalette={config.general?.palette?.name}
-                colorIndices={[2, 4, 6]}
+                colorIndices={[2, 3, 5]}
                 className='color-palette'
                 element='li'
                 getItemClassName={getPaletteClassName}
