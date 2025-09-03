@@ -1,6 +1,6 @@
 import React from 'react'
 import { getPaletteAccessor } from '../../helpers/getPaletteAccessor'
-import './PaletteSelector.scss'
+import './PaletteSelector.css'
 
 interface PaletteSelectorProps {
   palettes: string[]
