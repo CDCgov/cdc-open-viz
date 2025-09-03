@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import Icon from '../../../core/components/ui/Icon'
+import Icon from '@cdc/core/components/ui/Icon'
 import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 
 type CollapsableVizRow = {

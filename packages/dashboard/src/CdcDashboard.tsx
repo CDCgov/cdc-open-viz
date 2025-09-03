@@ -13,7 +13,7 @@ import { DashboardConfig } from './types/DashboardConfig'
 import { coveUpdateWorker } from '@cdc/core/helpers/coveUpdateWorker'
 import _ from 'lodash'
 import { getQueryParams } from '@cdc/core/helpers/queryStringUtils'
-import EditorContext from '../../editor/src/ConfigContext'
+import EditorContext from '@cdc/core/contexts/EditorContext'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type MultiDashboardProps = Omit<WCMSProps, 'configUrl'> & {

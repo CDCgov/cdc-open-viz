@@ -8,7 +8,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import Loading from '@cdc/core/components/Loading'
 import _ from 'lodash'
-import EditorContext from '../../editor/src/ConfigContext'
+import EditorContext from '@cdc/core/contexts/EditorContext'
 interface CdcChartProps {
   configUrl?: string
   isEditor?: boolean

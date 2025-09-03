@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { cleanSharedFilters } from '../formatConfigBeforeSave'
-import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
+import { DashboardConfig } from '../../types/DashboardConfig'
 
 describe('cleanSharedFilters', () => {
   it('should remove unused shared filters', () => {
@@ -15,13 +15,16 @@ describe('cleanSharedFilters', () => {
       },
       visualizations: {
         viz1: { type: 'dashboardFilters', sharedFilterIndexes: [0, 3] },
-        viz2: { type: 'chart'}
+        viz2: { type: 'chart' }
       }
     }
 
     cleanSharedFilters(config)
 
-    expect(config.dashboard.sharedFilters).toEqual([{ id: 1, type: 'filter1' }, { id: 4, type: 'filter4' }])
+    expect(config.dashboard.sharedFilters).toEqual([
+      { id: 1, type: 'filter1' },
+      { id: 4, type: 'filter4' }
+    ])
   })
 
   it('should retain used shared filters and remove their active state', () => {
@@ -61,8 +64,6 @@ describe('cleanSharedFilters', () => {
 
     cleanSharedFilters(config)
 
-    expect(config.dashboard.sharedFilters).toEqual([
-      { id: 1, type: 'urlfilter' }
-    ])
+    expect(config.dashboard.sharedFilters).toEqual([{ id: 1, type: 'urlfilter' }])
   })
 })

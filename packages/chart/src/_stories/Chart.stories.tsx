@@ -12,7 +12,7 @@ import pieConfig from './_mock/pie_with_data.json'
 import pieCalculatedArea from './_mock/pie_calculated_area.json'
 import areaChartStacked from './_mock/area_chart_stacked.json'
 import multipleLines from './_mock/short_dates.json'
-import { editConfigKeys } from '../helpers/configHelpers'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart',

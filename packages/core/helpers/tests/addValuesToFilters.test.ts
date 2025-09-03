@@ -2,7 +2,6 @@ import _ from 'lodash'
 import { VizFilter } from '../../types/VizFilter'
 import { addValuesToFilters } from '../addValuesToFilters'
 import { describe, it, expect, vi } from 'vitest'
-import { FILTER_STYLE } from '@cdc/dashboard/src/types/FilterStyles'
 
 describe('addValuesToFilters', () => {
   const parentFilter = { columnName: 'parentColumn', id: 11, active: 'apple', values: [] } as VizFilter
@@ -52,7 +51,7 @@ describe('addValuesToFilters', () => {
   it('works for nested dropdowns', () => {
     const nestedParentFilter = {
       ...parentFilter,
-      filterStyle: FILTER_STYLE.nestedDropdown,
+      filterStyle: 'nested-dropdown',
       subGrouping: { columnName: 'childColumn' }
     }
     const newFilters = addValuesToFilters([nestedParentFilter], data)

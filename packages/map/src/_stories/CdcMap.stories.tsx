@@ -4,7 +4,7 @@ import EqualNumberOptInExample from './_mock/DEV-7286.json'
 import MultiState from './_mock/multi-state.json'
 import SingleStateWithFilters from './_mock/DEV-8942.json'
 import exampleCityState from './_mock/example-city-state.json'
-import { editConfigKeys } from '@cdc/chart/src/helpers/configHelpers'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import exampleLegendBins from './_mock/legend-bins.json'
 
 const meta: Meta<typeof CdcMap> = {

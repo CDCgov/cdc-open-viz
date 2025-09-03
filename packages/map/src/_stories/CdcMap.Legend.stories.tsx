@@ -4,7 +4,7 @@ import SingleStateWithFilters from './_mock/DEV-8942.json'
 import CustomLayerMap from './_mock/custom-layer-map.json'
 import WastewaterMap from './_mock/wastewater-map.json'
 import legendTests from './_mock/legends/legend-tests.json'
-import { editConfigKeys } from '@cdc/chart/src/helpers/configHelpers'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import { userEvent, within } from '@storybook/testing-library'
 import { expect } from '@storybook/jest'
 

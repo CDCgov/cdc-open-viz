@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react'
-import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
+import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
 
 export const GlobalTabs = props => {
   const { globalActive } = useContext(ConfigContext)

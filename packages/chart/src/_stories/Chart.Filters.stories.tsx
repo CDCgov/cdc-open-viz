@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import Chart from '../CdcChartComponent'
-import { editConfigKeys } from '../helpers/configHelpers'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import scatterPlotDownloadImage from './_mock/scatterplot-image-download.json'
 
 const meta: Meta<typeof Chart> = {

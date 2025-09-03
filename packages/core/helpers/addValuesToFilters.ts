@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { VizFilter } from '../types/VizFilter'
-import { FILTER_STYLE } from '@cdc/dashboard/src/types/FilterStyles'
 
 type Filter = {
   columnName: string
@@ -99,7 +98,7 @@ const handleVizParents = (filter: VizFilter, data: any[] | MapData, filtersLooku
       ? parent.queuedActive
       : [parent.queuedActive]
     const parentActive = parentQueuedActive || parent?.active
-    if (parent?.filterStyle === FILTER_STYLE.nestedDropdown) {
+    if (parent?.filterStyle === 'nested-dropdown') {
       const { subGrouping } = parent as VizFilter
       const parentSubActive = parentQueuedSubActive || subGrouping?.active
       if (parentSubActive) {
@@ -139,7 +138,7 @@ export const addValuesToFilters = (filters: VizFilter[], data: any[] | MapData):
       const queryStringFilterValue = getQueryStringFilterValue(filterCopy)
       if (queryStringFilterValue) {
         filterCopy.active = queryStringFilterValue
-      } else if (filterCopy.filterStyle === FILTER_STYLE.multiSelect) {
+      } else if (filterCopy.filterStyle === 'multi-select') {
         const defaultValues = filterCopy.values
         const active = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
         filterCopy.active = active.filter(val => includes(defaultValues, val))
