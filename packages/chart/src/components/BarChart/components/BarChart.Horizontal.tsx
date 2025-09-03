@@ -12,6 +12,7 @@ import { BarGroup } from '@visx/shape'
 // CDC core components and helpers
 import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { getBarConfig, testZeroValue } from '../helpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
@@ -54,10 +55,13 @@ export const BarChartHorizontal = () => {
     formatNumber,
     formatDate,
     parseDate,
-    setSharedFilter
+    setSharedFilter,
+    currentViewport
   } = useContext<ChartContext>(ConfigContext)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
+
+  const LABEL_FONT_SIZE = isMobileFontViewport(currentViewport) ? 13 : 16
 
   const hasConfidenceInterval = [config.confidenceKeys?.upper, config.confidenceKeys?.lower].every(
     v => v != null && String(v).trim() !== ''
@@ -132,7 +136,15 @@ export const BarChartHorizontal = () => {
                     barWidthHorizontal: barWidth,
                     isSuppressed,
                     absentDataLabel
-                  } = getBarConfig({ bar, defaultBarWidth, config, isVertical: false, yAxisValue, barWidth: 0 })
+                  } = getBarConfig({
+                    bar,
+                    defaultBarWidth,
+                    config,
+                    isVertical: false,
+                    yAxisValue,
+                    barWidth: 0,
+                    labelFontSize: LABEL_FONT_SIZE
+                  })
 
                   const barPosition = !isPositiveBar ? 'below' : 'above'
 
@@ -298,17 +310,11 @@ export const BarChartHorizontal = () => {
 
                           const hasAsterisk = String(pd.symbol).includes('Asterisk')
                           const verticalAnchor = hasAsterisk ? 'middle' : 'end'
-                          const iconSize =
-                            pd.symbol === 'Asterisk'
-                              ? barHeight * 1.2
-                              : pd.symbol === 'Double Asterisk'
-                              ? barHeight
-                              : barHeight / 1.5
                           const fillColor = pd.displayGray ? '#8b8b8a' : APP_FONT_COLOR
                           return (
                             <Text // prettier-ignore
                               key={index}
-                              fontSize={iconSize}
+                              fontSize={LABEL_FONT_SIZE}
                               display={displayBar ? 'block' : 'none'}
                               opacity={transparentBar ? 0.5 : 1}
                               x={barX}
