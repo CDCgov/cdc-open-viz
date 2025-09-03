@@ -1,7 +1,8 @@
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { formatDate } from '@cdc/core/helpers/cove/date.js'
-import _ from 'lodash'
-import { loadVegaModules, loadVegaLiteModules } from './vegaAsyncLoader'
+import { _ } from 'lodash'
+import { compile as vegaLiteCompile } from 'vega-lite'
+import { parse as vegaParse, View as vegaView } from 'vega'
 
 const CURVE_LOOKUP = {
   linear: 'Linear',
@@ -30,16 +31,16 @@ export const isVegaConfig = config => {
   )
 }
 
-export const getVegaErrors = async (vegaOrVegaLiteConfig, vegaConfig) => {
+export const getVegaErrors = (vegaOrVegaLiteConfig, vegaConfig) => {
   const errors = []
 
-  const data = await extractCoveData(vegaConfig)
+  const data = extractCoveData(vegaConfig)
 
   if (vegaOrVegaLiteConfig.repeat || vegaOrVegaLiteConfig.spec) {
     errors.push("COVE's Vega importer does not support vega-lite's repeat/spec operator.")
   }
 
-  const configType = await getVegaConfigType(vegaConfig)
+  const configType = getVegaConfigType(vegaConfig)
   if (!configType) {
     errors.push(
       `COVE's Vega importer could not find a COVE chart type that matches this Vega config. Supported marks are: ${SUPPORTED_MARKS.join(
@@ -82,10 +83,10 @@ export const getVegaErrors = async (vegaOrVegaLiteConfig, vegaConfig) => {
   return errors
 }
 
-export const getVegaWarnings = async (vegaOrVegaLiteConfig, vegaConfig) => {
+export const getVegaWarnings = (vegaOrVegaLiteConfig, vegaConfig) => {
   const warnings = []
 
-  const configType = await getVegaConfigType(vegaConfig)
+  const configType = getVegaConfigType(vegaConfig)
   const allMarks = getMarks(vegaConfig)
   const comboMarks = getComboMarks(vegaConfig)
   const allMarksTypeCount = [...new Set(allMarks.map(m => m.type))].length
@@ -105,15 +106,14 @@ export const getVegaWarnings = async (vegaOrVegaLiteConfig, vegaConfig) => {
   return warnings
 }
 
-export const parseVegaConfig = async vegaConfig => {
+export const parseVegaConfig = vegaConfig => {
   try {
-    const { vegaLiteCompile } = await loadVegaLiteModules()
     vegaConfig = vegaLiteCompile(vegaConfig).spec
   } catch {}
   return vegaConfig
 }
 
-export const getVegaConfigType = async vegaConfig => {
+export const getVegaConfigType = vegaConfig => {
   if (vegaConfig.projections) {
     return 'Map'
   }
@@ -124,7 +124,7 @@ export const getVegaConfigType = async vegaConfig => {
     return 'Combo Chart'
   }
 
-  const mainMark = await getMainMark(vegaConfig)
+  const mainMark = getMainMark(vegaConfig)
   if (!mainMark) {
     return
   }
@@ -140,14 +140,13 @@ export const getVegaConfigType = async vegaConfig => {
   }
 }
 
-const getMainMark = async vegaConfig => {
+const getMainMark = vegaConfig => {
   let allMarks = getMarks(vegaConfig)
   if (!allMarks.length) return
   if (allMarks.length === 1) return allMarks[0]
-  const dataSizesEntries = await Promise.all(
-    allMarks.map(async mark => [mark.from?.data, (await getVegaData(vegaConfig, mark.from?.data)).length])
+  const dataSizes = Object.fromEntries(
+    allMarks.map(mark => [mark.from?.data, getVegaData(vegaConfig, mark.from?.data).length])
   )
-  const dataSizes = Object.fromEntries(dataSizesEntries)
   return allMarks.sort((a, b) => (dataSizes[a.from?.data] < dataSizes[b.from?.data] ? 1 : -1))[0]
 }
 
@@ -189,9 +188,8 @@ const mergeByKeys = (a1, a2, k1, k2) =>
     ...itm
   }))
 
-const getVegaData = async (vegaConfig, name) => {
+const getVegaData = (vegaConfig, name) => {
   if (!name) return []
-  const { vegaParse, vegaView } = await loadVegaModules()
   const view = new vegaView(vegaParse(vegaConfig)).run()
   try {
     return view.data(name) || []
@@ -201,21 +199,21 @@ const getVegaData = async (vegaConfig, name) => {
   }
 }
 
-export const extractCoveData = async vegaConfig => {
+export const extractCoveData = vegaConfig => {
   const marks = getMarks(vegaConfig)
-  const mainMark = await getMainMark(vegaConfig)
+  const mainMark = getMainMark(vegaConfig)
   const groupMark = getGroupMark(vegaConfig)
   const facetName = groupMark?.from?.facet?.data
   const name = facetName || mainMark?.from?.data
-  let data = await getVegaData(vegaConfig, name)
+  let data = getVegaData(vegaConfig, name)
 
   if (data.length === 0) return data
 
   if (!facetName) {
     const otherNames = [...new Set(getMarks(vegaConfig).map(m => m.from?.data))].filter(n => n)
-    for (const on of _.difference(otherNames, [name])) {
+    _.difference(otherNames, [name]).forEach(on => {
       let mergedData
-      const otherData = await getVegaData(vegaConfig, on)
+      const otherData = getVegaData(vegaConfig, on)
       const keys1 = Object.keys(data[0]).filter(k => new Set(data.map(d => d[k])).size === data.length)
       const keys2 = Object.keys(otherData[0]).filter(k => new Set(otherData.map(d => d[k])).size === data.length)
       keys1.forEach(k1 => {
@@ -226,7 +224,7 @@ export const extractCoveData = async vegaConfig => {
           }
         })
       })
-    }
+    })
   }
 
   const keysToRemove = getKeysToRemove(vegaConfig, data)
@@ -265,13 +263,13 @@ const isValidSeriesKey = (seriesKey, data) => {
   return seriesVals.length > 1 && seriesVals.length <= 10 && maxGroupSize > 1
 }
 
-const getSeriesKey = async (vegaConfig, data, xField, yField) => {
-  const configType = await getVegaConfigType(vegaConfig)
+const getSeriesKey = (vegaConfig, data, xField, yField) => {
+  const configType = getVegaConfigType(vegaConfig)
   if (['Scatter Plot', 'Combo Chart'].includes(configType)) return
 
   let seriesKey
 
-  const mainMark = await getMainMark(vegaConfig)
+  const mainMark = getMainMark(vegaConfig)
   const enterEncoder = mainMark.encode.enter
   const updateEncoder = mainMark.encode.update
   seriesKey =
@@ -372,10 +370,10 @@ export const getSampleVegaJson = vegaConfig => {
   )
 }
 
-export const convertVegaConfig = async (configType: string, vegaConfig: any, config: any) => {
+export const convertVegaConfig = (configType: string, vegaConfig: any, config: any) => {
   delete config.newViz
 
-  const data = await extractCoveData(vegaConfig)
+  const data = extractCoveData(vegaConfig)
 
   config.vegaType = configType
   config.vegaConfig = stripVegaData(vegaConfig)
@@ -388,7 +386,7 @@ export const convertVegaConfig = async (configType: string, vegaConfig: any, con
   config.title = vegaConfig.title?.text || ''
   config.showTitle = config.title ? true : false
 
-  const mainMark = await getMainMark(vegaConfig)
+  const mainMark = getMainMark(vegaConfig)
   const enterEncoder = mainMark.encode?.enter
   const updateEncoder = mainMark.encode?.update
 
@@ -460,7 +458,7 @@ export const convertVegaConfig = async (configType: string, vegaConfig: any, con
 
     yField = stackField || yField
 
-    const seriesKey = await getSeriesKey(vegaConfig, data, xField, yField)
+    const seriesKey = getSeriesKey(vegaConfig, data, xField, yField)
 
     const xDateFormat = getXDateFormat(xField, data)
     config.xAxis = config.xAxis || {}
