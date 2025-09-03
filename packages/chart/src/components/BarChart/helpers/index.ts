@@ -110,3 +110,38 @@ export const testZeroValue = value => {
   const regex = /^0(\.0)?$/
   return regex.test(value.toString())
 }
+
+export const addMinimumBarHeights = barStacks => {
+  const MIN_BAR_HEIGHT = 3
+
+  barStacks[0].bars.forEach((_, i) => {
+    let segments = barStacks
+      .map(bs => bs.bars[i])
+      .filter(s => s.bar.data[s.key])
+      .reverse()
+
+    const segmentsNeedingAdjustment = segments.filter(segment => segment.height > 0 && segment.height < MIN_BAR_HEIGHT)
+    const segmentsToShrink = segments.filter(segment => segment.height > MIN_BAR_HEIGHT)
+
+    if (segmentsNeedingAdjustment.length > 0 && segmentsToShrink.length > 0) {
+      segmentsNeedingAdjustment.forEach(smallSegment => {
+        const heightToAdd = MIN_BAR_HEIGHT - smallSegment.height
+        const heightToTakePerSegment = heightToAdd / segmentsToShrink.length
+
+        segmentsToShrink.forEach(largeSegment => {
+          largeSegment.height -= heightToTakePerSegment
+        })
+
+        smallSegment.height = MIN_BAR_HEIGHT
+      })
+
+      let cumulativeY = segments[0].y
+      segments.forEach(segment => {
+        segment.y = cumulativeY
+        cumulativeY += segment.height
+      })
+    }
+  })
+
+  return barStacks
+}
