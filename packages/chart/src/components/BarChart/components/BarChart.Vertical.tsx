@@ -59,6 +59,8 @@ export const BarChartVertical = () => {
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
+  const LABEL_FONT_SIZE = isMobileFontViewport(currentViewport) ? 13 : 16
+
   const root = document.documentElement
 
   let data = transformedData
@@ -170,7 +172,8 @@ export const BarChartVertical = () => {
                     config,
                     barWidth,
                     isVertical: true,
-                    yAxisValue
+                    yAxisValue,
+                    labelFontSize: LABEL_FONT_SIZE
                   })
                   // configure colors
                   let labelColor = APP_FONT_COLOR
@@ -268,8 +271,6 @@ export const BarChartVertical = () => {
 
                   const BAR_LABEL_PADDING = 10
 
-                  const LABEL_FONT_SIZE = isMobileFontViewport(currentViewport) ? 13 : 16
-
                   return (
                     <Group display={hideGroup} key={`${barGroup.index}--${index}`}>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
@@ -337,13 +338,7 @@ export const BarChartVertical = () => {
                           const hasAsterisk = String(pd.symbol).includes('Asterisk')
                           const yPadding = hasAsterisk ? -5 : -8
                           const verticalAnchor = hasAsterisk ? 'middle' : 'end'
-                          const iconSize =
-                            pd.symbol === 'Asterisk'
-                              ? barWidth * 1.2
-                              : pd.symbol === 'Double Asterisk'
-                              ? barWidth
-                              : barWidth / 1.5
-                          const fillColor = pd.displayGray ? '#8b8b8a' : '#000'
+                          const fillColor = pd.displayGray ? '#8b8b8a' : APP_FONT_COLOR
 
                           return (
                             <Text // prettier-ignore
@@ -356,7 +351,7 @@ export const BarChartVertical = () => {
                               verticalAnchor={verticalAnchor}
                               fill={fillColor}
                               textAnchor='middle'
-                              fontSize={`${iconSize}px`}
+                              fontSize={LABEL_FONT_SIZE}
                             >
                               {pd.iconCode}
                             </Text>
