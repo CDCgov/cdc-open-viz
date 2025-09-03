@@ -89,16 +89,8 @@ const DataImport = () => {
     // Is URL valid?
 
     try {
-      if (isSolrCsv(externalURL) || isSolrJson(externalURL)) {
-        dataURL = externalURL
-      } else {
-        // Try to parse as absolute URL first, fallback to relative URL with base
-        try {
-          dataURL = new URL(externalURL)
-        } catch {
-          dataURL = new URL(externalURL, window.location.origin)
-        }
-      }
+      dataURL =
+        isSolrCsv(externalURL) || isSolrJson(externalURL) ? externalURL : new URL(externalURL, window.location.origin)
     } catch {
       throw errorMessages.urlInvalid
     }
