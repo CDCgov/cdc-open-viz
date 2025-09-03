@@ -255,8 +255,9 @@ export default function CdcDashboard({
           activeDashboard: config.activeDashboard
         }
       })
-      setAPILoading(false)
     }
+    
+    setAPILoading(false)
   }
 
   const findFilterTier = (filters: SharedFilter[], sharedFilter: SharedFilter) => {
