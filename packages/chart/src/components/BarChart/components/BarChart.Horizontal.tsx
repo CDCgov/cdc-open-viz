@@ -8,6 +8,7 @@ import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
+import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 
 // CDC core components and helpers
 import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
@@ -67,6 +68,73 @@ export const BarChartHorizontal = () => {
     v => v != null && String(v).trim() !== ''
   )
 
+  // Pattern helper function
+  const renderPatternDefs = () => {
+    if (!config.legend.patterns || Object.keys(config.legend.patterns).length === 0) {
+      return null
+    }
+
+    return (
+      <defs>
+        {Object.entries(config.legend.patterns).map(([key, pattern]) => {
+          const patternId = `chart-pattern-${key}`
+          const size = pattern.patternSize || 8
+
+          switch (pattern.shape) {
+            case 'circles':
+              return (
+                <PatternCircles
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  fill={pattern.color}
+                  radius={1.25}
+                />
+              )
+            case 'lines':
+              return (
+                <PatternLines
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  stroke={pattern.color}
+                  strokeWidth={0.75}
+                  orientation={['horizontal']}
+                />
+              )
+            case 'diagonalLines':
+              return (
+                <PatternLines
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  stroke={pattern.color}
+                  strokeWidth={0.75}
+                  orientation={['diagonalRightToLeft']}
+                />
+              )
+            case 'waves':
+              return (
+                <PatternWaves
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  fill={pattern.color}
+                  strokeWidth={0.25}
+                />
+              )
+            default:
+              return null
+          }
+        })}
+      </defs>
+    )
+  }
+
   const _data = getBarData(config, data, hasConfidenceInterval)
 
   return (
@@ -74,6 +142,7 @@ export const BarChartHorizontal = () => {
     config.visualizationType === 'Bar' &&
     config.orientation === 'horizontal' && (
       <Group>
+        {renderPatternDefs()}
         <BarGroup
           data={config.preliminaryData?.some(pd => pd.value && pd.type === 'suppression') ? tableData : _data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
@@ -249,14 +318,37 @@ export const BarChartHorizontal = () => {
                     return xScale(d)
                   })
 
+                  // Check if this bar should use a pattern
+                  const getPatternUrl = (): string | null => {
+                    if (!config.legend.patterns || Object.keys(config.legend.patterns).length === 0) {
+                      return null
+                    }
+
+                    // Find a pattern that matches this data point
+                    for (const [patternKey, pattern] of Object.entries(config.legend.patterns)) {
+                      if (pattern.dataKey && pattern.dataValue) {
+                        const dataFieldValue = datum[pattern.dataKey]
+                        if (String(dataFieldValue) === String(pattern.dataValue)) {
+                          return `url(#chart-pattern-${patternKey})`
+                        }
+                      }
+                    }
+
+                    return null
+                  }
+
+                  const patternUrl = getPatternUrl()
+                  const baseBackground = background()
+
                   return (
                     <Group display={hideGroup} key={`${barGroup.index}--${index}`}>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
+                        {/* Base colored bar */}
                         {createBarElement({
                           config: config,
                           index: newIndex,
                           id: `barGroup${barGroup.index}`,
-                          background: background(),
+                          background: baseBackground,
                           borderColor,
                           borderStyle: 'solid',
                           borderWidth: `${borderWidth}px`,
@@ -281,6 +373,32 @@ export const BarChartHorizontal = () => {
                             display: displayBar ? 'block' : 'none'
                           }
                         })}
+
+                        {/* Pattern overlay if pattern exists */}
+                        {patternUrl &&
+                          createBarElement({
+                            config: config,
+                            index: newIndex,
+                            background: patternUrl, // Use pattern as background
+                            borderColor: 'transparent',
+                            borderStyle: 'none',
+                            borderWidth: '0px',
+                            width: barWidth,
+                            height: numbericBarHeight,
+                            x: barX,
+                            y: barHeight * bar.index,
+                            onMouseOver: () => {}, // No interaction
+                            onMouseLeave: () => {}, // No interaction
+                            tooltipHtml: '',
+                            tooltipId: '',
+                            onClick: () => {}, // No interaction
+                            styleOverrides: {
+                              transformOrigin: `0 ${barY + barHeight}px`,
+                              opacity: transparentBar ? 0.2 : 1,
+                              display: displayBar ? 'block' : 'none',
+                              pointerEvents: 'none' // Let clicks pass through to base bar
+                            }
+                          })}
 
                         {(absentDataLabel || isSuppressed) && (
                           <rect

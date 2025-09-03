@@ -177,7 +177,9 @@ export default {
       topBottom: true
     },
     position: 'right',
-    orderedValues: []
+    orderedValues: [],
+    patterns: {},
+    patternField: ''
   },
 
   exclusions: {
