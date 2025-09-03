@@ -6,9 +6,14 @@ import svgr from 'vite-plugin-svgr' // Svg Support
 import dsv from '@rollup/plugin-dsv' // CSV Support
 import dns from 'dns' // nodeJS
 import * as path from 'path'
+import { fileURLToPath } from 'url'
 
 // Force load dev server on `localhost` vs 127.0.0.1
 dns.setDefaultResultOrder('verbatim')
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 // DEV NOTE: Modifications made to this file will not be hot-loaded through HMR for component.
 // - Active dev servers ('lerna run start') must be restarted in order to view the changed settings.

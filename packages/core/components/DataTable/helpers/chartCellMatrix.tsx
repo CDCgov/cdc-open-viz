@@ -31,7 +31,6 @@ const chartCellArray = ({
   const groupBy = config.table?.groupBy
   const dataSeriesColumns = getDataSeriesColumns(config, isVertical, runtimeData)
 
-
   const dataSeriesColumnsSorted = () => {
     if (!sortBy && sortBy.colIndex === null) return dataSeriesColumns
     return dataSeriesColumns.sort((a, b) => {
@@ -73,10 +72,14 @@ const chartCellArray = ({
       return rows.map(row => {
         if (hasRowType) {
           const rowType = getRowType(runtimeData[row])
-          const rowValues = dataSeriesColumns.map(column => getChartCellValue(row, column, config, runtimeData, rightAxisItemsMap))
+          const rowValues = dataSeriesColumns.map(column =>
+            getChartCellValue(row, column, config, runtimeData, rightAxisItemsMap)
+          )
           return [rowType, ...rowValues]
         } else {
-          return dataSeriesColumns.map((column, j) => getChartCellValue(row, column, config, runtimeData, rightAxisItemsMap))
+          return dataSeriesColumns.map((column, j) =>
+            getChartCellValue(row, column, config, runtimeData, rightAxisItemsMap)
+          )
         }
       })
     }
@@ -86,11 +89,11 @@ const chartCellArray = ({
       let nodes: ReactNode[] =
         config.visualizationType !== 'Pie'
           ? [
-            <>
-              {colorScale && colorScale(seriesName) && <LegendShape fill={colorScale(seriesName)} />}
-              {parse(seriesName)}
-            </>
-          ]
+              <>
+                {colorScale && colorScale(seriesName) && <LegendShape fill={colorScale(seriesName)} />}
+                {parse(seriesName)}
+              </>
+            ]
           : []
       return nodes.concat(rows.map((row, i) => getChartCellValue(row, column, config, runtimeData, rightAxisItemsMap)))
     })

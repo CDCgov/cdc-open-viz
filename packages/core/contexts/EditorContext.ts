@@ -1,7 +1,7 @@
 import { WCMSProps } from '@cdc/core/types/WCMSProps'
 import { Dispatch, createContext } from 'react'
-import EditorActions from './store/editor.actions'
-import { EditorState } from './store/editor.reducer'
+import EditorActions from './editor.actions'
+import { EditorState } from '@cdc/core/contexts/editor.reducer'
 
 export type EditorCTX = WCMSProps &
   EditorState & {
@@ -9,7 +9,10 @@ export type EditorCTX = WCMSProps &
     setTempConfig: Function
   }
 
-const ConfigContext = createContext<EditorCTX>({ displayName: 'ConfigContext', setTempConfig: () => {} } as unknown as EditorCTX)
+const ConfigContext = createContext<EditorCTX>({
+  displayName: 'ConfigContext',
+  setTempConfig: () => {}
+} as unknown as EditorCTX)
 
 export default ConfigContext
 export const EditorDispatchContext = createContext<Dispatch<EditorActions>>(() => {})

@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import '../scss/choose-vis-tab.scss'
 
-import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
+import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 
 import DashboardIcon from '@cdc/core/assets/icon-dashboard.svg'

@@ -1,6 +1,6 @@
 import colorPalettes from '@cdc/core/data/colorPalettes'
 import chroma from 'chroma-js'
-import { type MapConfig } from '@cdc/map/src/types/MapConfig'
+import { type MapConfig } from '../types/MapConfig'
 import { colorDistributions } from './colorDistributions'
 
 type LegendItem = {

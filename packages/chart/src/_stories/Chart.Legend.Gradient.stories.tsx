@@ -4,7 +4,7 @@ import chartGroupedLagend from './_mock/legend_groupBy_mock.json'
 import SimplifiedLineConfig from './_mock/simplified_line.json'
 
 import Chart from '../CdcChartComponent'
-import { editConfigKeys } from '../helpers/configHelpers'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Legend',
