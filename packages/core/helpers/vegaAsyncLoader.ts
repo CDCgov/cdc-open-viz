@@ -1,26 +1,38 @@
 // Async loader for Vega and Vega-Lite packages to reduce main bundle size
-let vegaPromise: Promise<typeof import('vega')> | null = null
-let vegaLitePromise: Promise<typeof import('vega-lite')> | null = null
+let vegaParsePromise: Promise<any> | null = null
+let vegaViewPromise: Promise<any> | null = null
+let vegaLitePromise: Promise<any> | null = null
 
-export const loadVega = async () => {
-  if (!vegaPromise) {
-    vegaPromise = import(/* webpackChunkName: "vega" */ 'vega')
+const loadVegaParse = async () => {
+  if (!vegaParsePromise) {
+    vegaParsePromise = import(/* webpackChunkName: "vega-parser" */ 'vega-parser')
   }
-  return vegaPromise
+  const vegaParseModule = await vegaParsePromise
+  return vegaParseModule.parse
 }
 
-export const loadVegaLite = async () => {
-  if (!vegaLitePromise) {
-    vegaLitePromise = import(/* webpackChunkName: "vega-lite" */ 'vega-lite')
+const loadVegaView = async () => {
+  if (!vegaViewPromise) {
+    vegaViewPromise = import(/* webpackChunkName: "vega-view" */ 'vega-view')
   }
-  return vegaLitePromise
+  const vegaViewModule = await vegaViewPromise
+  return vegaViewModule.View
 }
 
 export const loadVegaModules = async () => {
-  const [vega, vegaLite] = await Promise.all([loadVega(), loadVegaLite()])
+  const [vegaParse, vegaView] = await Promise.all([loadVegaParse(), loadVegaView()])
   return {
-    vegaParse: vega.parse,
-    vegaView: vega.View,
-    vegaLiteCompile: vegaLite.compile
+    vegaParse: vegaParse,
+    vegaView: vegaView
+  }
+}
+
+export const loadVegaLiteModules = async () => {
+  if (!vegaLitePromise) {
+    vegaLitePromise = import(/* webpackChunkName: "vega-lite" */ 'vega-lite')
+  }
+  const vegaLiteModule = await vegaLitePromise
+  return {
+    vegaLiteCompile: vegaLiteModule.compile
   }
 }

@@ -1,7 +1,7 @@
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { formatDate } from '@cdc/core/helpers/cove/date.js'
 import _ from 'lodash'
-import { loadVegaModules } from './vegaAsyncLoader'
+import { loadVegaModules, loadVegaLiteModules } from './vegaAsyncLoader'
 
 const CURVE_LOOKUP = {
   linear: 'Linear',
@@ -107,7 +107,7 @@ export const getVegaWarnings = async (vegaOrVegaLiteConfig, vegaConfig) => {
 
 export const parseVegaConfig = async vegaConfig => {
   try {
-    const { vegaLiteCompile } = await loadVegaModules()
+    const { vegaLiteCompile } = await loadVegaLiteModules()
     vegaConfig = vegaLiteCompile(vegaConfig).spec
   } catch {}
   return vegaConfig
