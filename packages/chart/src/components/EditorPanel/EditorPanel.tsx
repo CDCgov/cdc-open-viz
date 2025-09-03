@@ -4126,6 +4126,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
               </>
             )}
             <Panels.Visual name='Visual' />
+            <Panels.PatternSettings name='PatternSettings' />
             {/* Spark Line has no data table */}
             {config.visualizationType !== 'Spark Line' && (
               <AccordionItem>

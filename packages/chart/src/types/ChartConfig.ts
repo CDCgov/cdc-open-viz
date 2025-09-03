@@ -96,6 +96,17 @@ export type Legend = CoreLegend & {
   }
   groupBy: string
   separators?: string
+  patterns?: {
+    [key: string]: {
+      label?: string
+      color?: string
+      shape?: string
+      dataKey?: string
+      dataValue?: string
+      contrastCheck?: boolean
+      patternSize?: number
+    }
+  }
 }
 
 type Visual = {
