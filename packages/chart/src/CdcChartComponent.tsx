@@ -415,7 +415,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         let newData = await fetchRemoteData(newConfig.dataUrl)
 
         if (newConfig.vegaConfig) {
-          newData = extractCoveData(updateVegaData(newConfig.vegaConfig, newData))
+          newData = await extractCoveData(updateVegaData(newConfig.vegaConfig, newData))
         }
 
         if (newData && newConfig.dataDescription) {

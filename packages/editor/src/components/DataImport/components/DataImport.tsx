@@ -178,7 +178,7 @@ const DataImport = () => {
     // Have to use FileReader instead of just .text because IE11 and the polyfills for this are bugged
     const filereader = new FileReader()
 
-    filereader.onload = function () {
+    filereader.onload = async function () {
       const handleSetConfig = (newData: Object[], useTempConfig = false) => {
         const setDataURL = keepURL && fileSourceType === 'url'
         if (config.type === 'dashboard') {
@@ -225,7 +225,7 @@ const DataImport = () => {
       try {
         let result = parseTextByMimeType(this.result.toString(), mimeType, externalURL, setErrors)
         if (config.vegaConfig) {
-          return updateDataFromVegaData(result, fileSource, fileSourceType)
+          return await updateDataFromVegaData(result, fileSource, fileSourceType)
         }
         const text = transform.autoStandardize(result)
         if (config.data && config.series) {
@@ -430,9 +430,9 @@ const DataImport = () => {
     dispatch({ type: 'DELETE_DASHBOARD_DATASET', payload: { datasetKey } })
   }
 
-  const updateDataFromVegaConfig = pastedConfig => {
-    const vegaConfig = parseVegaConfig(JSON.parse(pastedConfig))
-    const newData = extractCoveData(vegaConfig)
+  const updateDataFromVegaConfig = async pastedConfig => {
+    const vegaConfig = await parseVegaConfig(JSON.parse(pastedConfig))
+    const newData = await extractCoveData(vegaConfig)
     let newConfig = {
       ...config,
       data: newData
@@ -441,8 +441,8 @@ const DataImport = () => {
     setConfig(newConfig)
   }
 
-  const updateDataFromVegaData = (vegaData, fileSource, fileSourceType) => {
-    const newData = extractCoveData(updateVegaData(config.vegaConfig, vegaData))
+  const updateDataFromVegaData = async (vegaData, fileSource, fileSourceType) => {
+    const newData = await extractCoveData(updateVegaData(config.vegaConfig, vegaData))
     let newConfig = {
       ...config,
       dataFileName: fileSource,
@@ -750,7 +750,7 @@ const DataImport = () => {
                           type='submit'
                           id='load-data'
                           disabled={!pastedConfig}
-                          onClick={() => updateDataFromVegaConfig(pastedConfig)}
+                          onClick={async () => await updateDataFromVegaConfig(pastedConfig)}
                         >
                           Save & Load
                         </button>
