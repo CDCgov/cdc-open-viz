@@ -18,7 +18,7 @@ export const applyLegendToRow = (
 
   const { general, legend } = config
   const { type } = general
-  const { name: color } = general.palette
+  const color = general.palette?.name ?? 'bluegreenreverse'
   const { showSpecialClassesLast } = legend
 
   try {
@@ -28,7 +28,8 @@ export const applyLegendToRow = (
     }
 
     if (type === 'navigation') {
-      const mapColorPalette = colorPalettes[`v${getColorPaletteVersion(config)}`]?.[color] ?? colorPalettes.v1['bluegreenreverse']
+      const mapColorPalette =
+        colorPalettes[`v${getColorPaletteVersion(config)}`]?.[color] ?? colorPalettes.v1['bluegreenreverse']
       return generateColorsArray(mapColorPalette[3])
     }
 

@@ -2973,7 +2973,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 label='Use selected palette in reverse order'
                 onClick={() => {
                   const _state = _.cloneDeep(config)
-                  const { name: currentPaletteName } = config.general.palette
+                  const currentPaletteName = config.general.palette?.name || ''
                   _state.general.palette.isReversed = !_state.general.palette.isReversed
                   let paletteName = ''
                   if (_state.general.palette.isReversed && !currentPaletteName.endsWith('reverse')) {
