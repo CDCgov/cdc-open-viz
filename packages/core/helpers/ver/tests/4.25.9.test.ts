@@ -316,7 +316,7 @@ describe('update_4_25_9 - Palette Migration Integration Tests', () => {
   describe('Edge cases and error handling', () => {
     it('should handle null/undefined configurations gracefully', () => {
       const migratedConfig = update_4_25_9(null as any)
-      
+
       expect(migratedConfig).not.toBeNull()
       expect(migratedConfig.version).toBe('4.25.9')
     })
@@ -400,7 +400,7 @@ describe('update_4_25_9 - Palette Migration Integration Tests', () => {
 
       // New config should have migrated values
       expect(migratedConfig).not.toBe(oldConfig)
-      expect(migratedConfig.general.palette.name).toBe('qualitative_standard')
+      expect(migratedConfig.general.palette.name).toBe('qualitative_bold')
     })
   })
 })
