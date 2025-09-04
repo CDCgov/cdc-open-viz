@@ -95,7 +95,7 @@ export const chartColorPalettes = {
 }
 
 export const sequentialPalettes = sequentialColors
-export const colorPalettesChart = chartColorPalettes.v1 // backwards compatibility
+export const colorPalettesChart = chartColorPalettes // backwards compatibility
 export const colorPalettesChartV1 = chartColorPalettes.v1
 export const colorPalettesChartV2 = chartColorPalettes.v2
 export const twoColorPalette = updatePaletteNames(colorPalettes3)

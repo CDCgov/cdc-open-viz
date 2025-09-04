@@ -36,6 +36,17 @@ const mapPaletteNameMigrations = {
     'colorblindsafereverse': 'colorblindsafereverse',
 }
 
+
+const saveBackup = (config) => {
+    const version = config.general.palette.version
+    // Save a backup and set version to 1.0 for legacy palette names
+    if (version === '1.0' || !version) {
+        config.general.palette.version = '1.0'
+        config.general.palette.backups = config.general.palette.backups || []
+        config.general.palette.backups.push({ name: config.color, version: '1.0', isReversed: config.general.palette.isReversed })
+    }
+}
+
 // On maps move config.color to config.general.colorPalettes.colorName
 const movePaletteName = config => {
     if (config.type === 'map') {
@@ -47,12 +58,7 @@ const movePaletteName = config => {
             const version = config.general.palette.version
 
             // Save a backup and set version to 1.0 for legacy palette names
-            if (version === '1.0' || !version) {
-                config.general.palette.version = '1.0'
-                config.general.palette.backups = config.general.palette.backups || []
-                config.general.palette.backups.push({ name: config.color, version: '1.0', isReversed: config.general.palette.isReversed })
-            }
-
+            saveBackup(config)
             // Remove old color property
             delete config.color
         }
@@ -69,6 +75,8 @@ const movePaletteName = config => {
         config.general = config.general || {}
         config.general.palette = config.general.palette || {}
         config.general.palette.name = config.palette
+        saveBackup(config)
+        delete config.palette
     }
 
     if (config.type === 'dashboard') {
@@ -103,6 +111,7 @@ const update_4_25_9 = config => {
     movePaletteName(newConfig)
     updateCustomColorsMigration(newConfig)
     newConfig.version = ver
+    console.log('new config', newConfig)
     return newConfig
 }
 
