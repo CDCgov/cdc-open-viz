@@ -16,20 +16,20 @@ export const getCurrentPaletteName = (config: any): string => {
  * @returns The palette colors array or empty array if not found
  */
 export const getPaletteColors = (config: any, colorPalettes: any): string[] => {
-  // First check for custom colors
+  // First check for custom colors (v2 format)
   if (config?.general?.palette?.customColors) {
     return config.general.palette.customColors
+  }
+
+  // Legacy fallback - check for customColors at root level (v1 format)
+  if (config?.customColors) {
+    return config.customColors
   }
 
   // Then check for palette name
   const paletteName = getCurrentPaletteName(config)
   if (paletteName && colorPalettes?.[paletteName]) {
     return colorPalettes[paletteName]
-  }
-
-  // Legacy fallback - check for customColors at root level
-  if (config?.customColors) {
-    return config.customColors
   }
 
   return []
