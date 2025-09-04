@@ -18,7 +18,7 @@ export const useColorPalette = (config: any, updateConfig?: (newConfig: any) => 
   const filteredPalettes = useMemo(() => {
     const isReversed = config.general?.palette?.isReversed
     const visualizationType = config.visualizationType
-    
+
     const result = filterColorPalettes({
       config,
       isReversed,
@@ -64,45 +64,16 @@ export const useColorPalette = (config: any, updateConfig?: (newConfig: any) => 
     }
 
     if (newPalette && newPalette !== palette) {
-      updateConfig({ 
-        ...config, 
-        twoColor: { 
-          ...config.twoColor, 
-          palette: newPalette 
-        } 
+      updateConfig({
+        ...config,
+        twoColor: {
+          ...config.twoColor,
+          palette: newPalette
+        }
       })
     }
   }, [config.twoColor?.isPaletteReversed, updateConfig])
 
-  // Update general palette based on isReversed
-  useEffect(() => {
-    if (!updateConfig || !config.general?.palette) return
-
-    const isReversed = config.general.palette.isReversed
-    const currentPaletteName = config.general.palette.name || ''
-    let newPalette = ''
-
-    if (isReversed && !currentPaletteName.endsWith('reverse')) {
-      newPalette = currentPaletteName + 'reverse'
-    }
-
-    if (!isReversed && currentPaletteName.endsWith('reverse')) {
-      newPalette = currentPaletteName.slice(0, -7)
-    }
-
-    if (newPalette && newPalette !== currentPaletteName) {
-      updateConfig({
-        ...config,
-        general: {
-          ...config.general,
-          palette: {
-            ...config.general.palette,
-            name: newPalette
-          }
-        }
-      })
-    }
-  }, [config.general?.palette?.isReversed, updateConfig])
 
   return filteredPalettes
 }

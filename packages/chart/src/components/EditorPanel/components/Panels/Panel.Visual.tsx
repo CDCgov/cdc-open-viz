@@ -1,4 +1,5 @@
 import { useContext, FC } from 'react'
+import _ from 'lodash'
 
 // external libraries
 import {
@@ -265,6 +266,22 @@ const PanelVisual: FC<PanelProps> = props => {
                 size='small'
                 label='Use selected palette in reverse order'
                 updateField={updateField}
+                onClick={() => {
+                  const _state = _.cloneDeep(config)
+                  const currentPaletteName = config.general?.palette?.name || ''
+                  _state.general.palette.isReversed = !_state.general.palette.isReversed
+                  let paletteName = ''
+                  if (_state.general.palette.isReversed && !currentPaletteName.endsWith('reverse')) {
+                    paletteName = currentPaletteName + 'reverse'
+                  }
+                  if (!_state.general.palette.isReversed && currentPaletteName.endsWith('reverse')) {
+                    paletteName = currentPaletteName.slice(0, -7)
+                  }
+                  if (paletteName) {
+                    _state.general.palette.name = paletteName
+                  }
+                  updateConfig(_state)
+                }}
                 value={config.general?.palette?.isReversed}
               />
             )}

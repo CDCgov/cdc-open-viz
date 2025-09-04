@@ -36,6 +36,47 @@ const newMapPaletteNames = {
     'colorblindsafereverse': 'colorblindsafereverse',
 }
 
+const chartPaletteNameMigrations = {
+    'qualitative-bold': 'qualitative_bold',
+    'qualitative-soft': 'qualitative_soft', 
+    'qualitative-standard': 'qualitative_standard',
+    'sequential-blue': 'sequential_blue',
+    'sequential-blue-2-(MPX)': 'sequential_blue_extended',
+    'sequential-orange': 'sequential_orange',
+    'sequential-orange-(MPX)': 'sequential_orange_extended',
+    'sequential-green': 'sequential_green',
+    'sequential-purple': 'sequential_purple',
+    'sequential-teal': 'sequential_teal',
+    'divergent-bluecyan': 'divergent_blue_cyan',
+    'divergent-bluepurple': 'divergent_blue_purple', 
+    'divergent-greenorange': 'divergent_green_orange',
+    'divergent-blueorange': 'divergent_blue_orange',
+    'qualitative1': 'qualitative1',
+    'qualitative2': 'qualitative2',
+    'qualitative3': 'qualitative3',
+    'qualitative4': 'qualitative4',
+    'colorblindsafe': 'colorblindsafe',
+    // Reverse variants
+    'qualitative-boldreverse': 'qualitative_boldreverse',
+    'qualitative-softreverse': 'qualitative_softreverse', 
+    'qualitative-standardreverse': 'qualitative_standardreverse',
+    'sequential-bluereverse': 'sequential_bluereverse',
+    'sequential-blue-2-(MPX)reverse': 'sequential_blue_extendedreverse',
+    'sequential-orangereverse': 'sequential_orangereverse',
+    'sequential-orange-(MPX)reverse': 'sequential_orange_extendedreverse',
+    'sequential-greenreverse': 'sequential_greenreverse',
+    'sequential-purplereverse': 'sequential_purplereverse',
+    'sequential-tealreverse': 'sequential_tealreverse',
+    'divergent-bluecyanreverse': 'divergent_blue_cyanreverse',
+    'divergent-bluepurplereverse': 'divergent_blue_purplereverse', 
+    'divergent-greenorangereverse': 'divergent_green_orangereverse',
+    'divergent-blueorangereverse': 'divergent_blue_orangereverse',
+    'qualitative1reverse': 'qualitative1reverse',
+    'qualitative2reverse': 'qualitative2reverse',
+    'qualitative3reverse': 'qualitative3reverse',
+    'qualitative4reverse': 'qualitative4reverse',
+    'colorblindsafereverse': 'colorblindsafereverse'
+}
 
 const renameOriginalMapPalettes = (config) => {
     if (config.general?.palette?.name && newMapPaletteNames[config.general.palette.name]) {
@@ -91,7 +132,7 @@ const movePaletteName = config => {
         delete config.palette
         delete config.color // outdated
 
-        // renameOriginalChartPalettes(config)
+        renameOriginalChartPalettes(config)
 
     }
 
