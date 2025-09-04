@@ -97,7 +97,7 @@ export const migrateChartPaletteName = (oldPaletteName: string): string => {
   // Check if this is a reverse palette
   const isReverse = oldPaletteName.endsWith('reverse')
   const basePaletteName = isReverse ? oldPaletteName.slice(0, -7) : oldPaletteName
-  
+
   // Try exact match first
   if (chartPaletteMigrationMap[basePaletteName]) {
     const migratedBase = chartPaletteMigrationMap[basePaletteName]
@@ -140,6 +140,11 @@ export const migrateMapPaletteName = (oldPaletteName: string): string => {
  * @returns The new palette name, or the original if no migration found
  */
 export const migratePaletteName = (oldPaletteName: string): string => {
+  // Handle null/undefined/empty cases
+  if (!oldPaletteName) {
+    return
+  }
+
   // Try exact match first
   if (paletteMigrationMap[oldPaletteName]) {
     return paletteMigrationMap[oldPaletteName]
