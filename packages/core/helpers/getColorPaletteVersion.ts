@@ -4,7 +4,7 @@
  * @returns The major version number (defaults to 1 if not found)
  */
 export const getColorPaletteVersion = (config: any): number => {
-  if (!config || !config.general || !config.general.palette) {
+  if (!config.general.palette) {
     return 2
   }
   const version = config.general.palette.version || '2.0'

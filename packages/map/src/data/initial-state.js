@@ -22,7 +22,7 @@ export default {
     convertFipsCodes: true,
     palette: {
       isReversed: false,
-      name: 'pinkpurple',
+      name: 'sequential_purple',
       version: '2.0'
     },
     allowMapZoom: true,

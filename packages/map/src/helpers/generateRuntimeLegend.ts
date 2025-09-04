@@ -332,7 +332,20 @@ export const generateRuntimeLegend = (
           numberOfRows -= chunkAmt
         }
       } else {
-        let colors = colorPalettes?.[`v${getColorPaletteVersion(configObj)}`]?.[configObj.color]
+        const paletteName = configObj.general?.palette?.name || configObj.color
+        const version = getColorPaletteVersion(configObj)
+        let colors = colorPalettes?.[`v${version}`]?.[paletteName]
+        // Fallback to a default palette if none is selected or found
+        if (!colors) {
+          const defaultPalette = version === 1 ? 'sequential_blue_green' : 'sequential_blue'
+          colors = colorPalettes?.[`v${version}`]?.[defaultPalette]
+        }
+
+        if (!colors) {
+          console.warn('No color palette found, using fallback colors')
+          colors = ['#d3d3d3', '#a0a0a0', '#707070', '#404040'] // Gray fallback
+        }
+
         let colorRange = colors.slice(0, legend.numberOfItems)
 
         const getDomain = () => {
@@ -560,7 +573,11 @@ export const generateRuntimeLegend = (
     return result
   } catch (e) {
     console.error(e)
-    return []
+    return {
+      fromHash: null,
+      runtimeDataHash: null,
+      items: []
+    }
   }
 }
 
