@@ -85,6 +85,23 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
 
       const downloadImage = async () => {
         document.body.appendChild(container) // Append container to the DOM
+
+        // Fix select elements to show their current selected values before screenshot
+        const selectElements = container.querySelectorAll('select')
+        const originalSelects = baseSvg.querySelectorAll('select')
+
+        selectElements.forEach((select, index) => {
+          const originalSelect = originalSelects[index]
+          if (originalSelect && originalSelect.value) {
+            select.value = originalSelect.value
+            // Also update the visual display for browsers that don't update immediately
+            const selectedOption = select.querySelector(`option[value="${originalSelect.value}"]`) as HTMLOptionElement
+            if (selectedOption) {
+              selectedOption.selected = true
+            }
+          }
+        })
+
         import(/* webpackChunkName: "html2canvas" */ 'html2canvas').then(mod => {
           mod
             .default(container, {
@@ -93,6 +110,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
                 el.className.search(/download-buttons|download-links|data-table-container/) !== -1
             })
             .then(canvas => {
+              document.body.removeChild(container) // Clean up container
               saveImageAs(canvas.toDataURL(), filename + '.png')
               publishAnalyticsEvent(`${state.type}_image_downloaded`, 'click', interactionLabel, `${state.type}`)
             })
