@@ -19,6 +19,8 @@ type InputSliderProps = {
   fieldName?: string
   /** Prop drill down of the updateField function */
   updateField?: Function
+  /** Click handler function */
+  onClick?: Function
   /** Current value of the input, usually the current config option value */
   value: boolean
 }

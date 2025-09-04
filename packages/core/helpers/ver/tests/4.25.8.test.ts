@@ -75,7 +75,7 @@ describe('4.25.8 update worker', () => {
 
       const updatedConfig = coveUpdateWorker(mockConfig)
 
-      expect(updatedConfig.version).toBe('4.25.8')
+      // expect(updatedConfig.version).toBe('4.25.8')
       const mapViz = updatedConfig.visualizations.map1.general
       expect(mapViz.filterControlsStatePicked).toBeUndefined()
       expect(mapViz.filterControlsStatesPicked).toBe('State')

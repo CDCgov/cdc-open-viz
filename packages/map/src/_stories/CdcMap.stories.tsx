@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import CdcMap from '../CdcMap'
 import EqualNumberOptInExample from './_mock/DEV-7286.json'
+import EqualNumberMap from './_mock/equal-number.json'
 import MultiState from './_mock/multi-state.json'
 import SingleStateWithFilters from './_mock/DEV-8942.json'
 import exampleCityState from './_mock/example-city-state.json'
@@ -30,7 +31,7 @@ export const Equal_Number_Opt_In: Story = {
 export const Equal_Number_Map: Story = {
   args: {
     isEditor: true,
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/page-elements/equal-number-map.json'
+    config: EqualNumberMap
   }
 }
 
@@ -107,7 +108,7 @@ export const Single_State_With_Filters: Story = {
 }
 
 let newConfig = editConfigKeys(exampleCityState, [
-  { path: ['customColors'], value: ['red', 'orange', 'yellow', 'green', 'blue', 'violet'] }
+  { path: ['general', 'palette', 'customColors'], value: ['red', 'orange', 'yellow', 'green', 'blue', 'violet'] }
 ])
 newConfig = editConfigKeys(newConfig, [
   {

@@ -77,8 +77,6 @@ export type MapConfig = Visualization & {
   annotations: Annotation[]
   // map color palette
   color: string
-  // custom color palette
-  customColors: string[]
   columns: {
     geo: GeoColumnProperties
     primary: PrimaryColumnProperties
@@ -121,6 +119,9 @@ export type MapConfig = Visualization & {
     language: string
     palette: {
       isReversed: boolean
+      name: string
+      version: string
+      customColors?: string[]
     }
     showDownloadMediaButton: boolean
     showDownloadImgButton: boolean

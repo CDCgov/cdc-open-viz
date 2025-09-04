@@ -6,7 +6,17 @@ import { Runtime } from '@cdc/core/types/Runtime'
 import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 import { Table } from '@cdc/core/types/Table'
 import { BoxPlot } from '@cdc/core/types/BoxPlot'
-import { General } from '@cdc/core/types/General'
+import { General as CoreGeneral } from '@cdc/core/types/General'
+
+// Extend the core General type to include palette information for charts
+export type General = CoreGeneral & {
+  palette?: {
+    name?: string
+    version?: string
+    isReversed?: boolean
+    customColors?: string[]
+  }
+}
 import { type Link } from './../components/Sankey/types'
 import { type DataDescription } from '@cdc/core/types/DataDescription'
 import { type Legend as CoreLegend } from '@cdc/core/types/Legend'
@@ -136,7 +146,6 @@ export type AllChartsConfig = {
   colorMatchLineSeriesLabels: boolean
   columns: ChartColumns
   confidenceKeys: ConfidenceInterval
-  customColors: string[]
   data: Object[]
   dataUrl: string
   dataCutoff: number

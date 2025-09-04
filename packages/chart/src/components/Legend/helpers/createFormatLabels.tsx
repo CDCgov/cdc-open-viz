@@ -1,4 +1,5 @@
 import { colorPalettesChart as colorPalettes, sequentialPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
+import { getCurrentPaletteName } from '@cdc/core/helpers/palettes/utils'
 import { FaStar } from 'react-icons/fa'
 import { Label } from '../../../types/Label'
 import { ColorScale, TransformedData } from '../../../types/ChartContext'
@@ -66,7 +67,7 @@ export const createFormatLabels =
       return reverseLabels([labelBelow, labelAbove])
     }
     if (visualizationType === 'Bar' && visualizationSubType === 'regular' && colorCode && series?.length === 1) {
-      let palette = colorPalettes[config.palette]
+      let palette = colorPalettes[getCurrentPaletteName(config)]
 
       while (tableData.length > palette.length) {
         palette = palette.concat(palette)
@@ -119,7 +120,9 @@ export const createFormatLabels =
       // loop through bars for now to meet requirements.
       config.runtime.barSeriesKeys &&
         config.runtime.barSeriesKeys.forEach((bar, index) => {
-          let colorValue = colorPalettes[config.palette][index] ? colorPalettes[config.palette][index] : '#ccc'
+          let colorValue = colorPalettes[getCurrentPaletteName(config)][index]
+            ? colorPalettes[getCurrentPaletteName(config)][index]
+            : '#ccc'
 
           const newLabel = {
             datum: bar,
