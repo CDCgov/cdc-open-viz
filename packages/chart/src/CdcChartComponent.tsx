@@ -171,12 +171,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   const prepareConfig = (loadedConfig: ChartConfig) => {
     // Create defaults without version to avoid overriding legacy configs
-    const defaultsWithoutVersion = _.cloneDeep(defaults)
-    if (defaultsWithoutVersion.general?.palette?.version) {
-      delete defaultsWithoutVersion.general.palette.version
-    }
-    
-    let newConfig = _.defaultsDeep(loadedConfig, defaultsWithoutVersion)
+
+
+    let newConfig = { ...defaults, ...loadedConfig }
+
     _.defaultsDeep(newConfig, {
       table: { showVertical: false }
     })

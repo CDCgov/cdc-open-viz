@@ -1,9 +1,10 @@
 import _ from 'lodash'
 
-// Here we're just organizing palette names to follow a more structured naming convention
-const mapPaletteNameMigrations = {
+// Rname Palettes
+const newMapPaletteNames = {
     'yelloworangered': 'sequential_yellow_orange_red',
     'yelloworangebrown': 'sequential_yellow_orange_brown',
+    'yelloworangebrownreverse': 'sequential_yellow_orange_brownreverse',
     'pinkpurple': 'sequential_pink_purple',
     'pinkpurplereverse': 'sequential_pink_purplereverse',
     'bluegreen': 'sequential_blue_green',
@@ -11,11 +12,10 @@ const mapPaletteNameMigrations = {
     'orangered': 'sequential_orange_red',
     'orangeredreverse': 'sequential_orange_redreverse',
     'red': 'sequential_red',
-    'redreverse': 'sequential_redreverse',
+    'redreverse': 'sequential_red_reverse',
     'greenblue': 'sequential_green_blue',
     'greenbluereverse': 'sequential_green_bluereverse',
     'yelloworangeredreverse': 'sequential_yellow_orange_redreverse',
-    'yelloworangebrownreverse': 'sequential_yellow_orange_brownreverse',
     'yellowpurple': 'divergent_yellow_purple',
     'yellowpurplereverse': 'divergent_yellow_purplereverse',
     'qualitative1': 'qualitative1',
@@ -34,6 +34,19 @@ const mapPaletteNameMigrations = {
     'qualitative4reverse': 'qualitative4reverse',
     'qualitative9reverse': 'qualitative9reverse',
     'colorblindsafereverse': 'colorblindsafereverse',
+}
+
+
+const renameOriginalMapPalettes = (config) => {
+    if (config.general?.palette?.name && newMapPaletteNames[config.general.palette.name]) {
+        config.general.palette.name = newMapPaletteNames[config.general.palette.name]
+    }
+}
+
+const renameOriginalChartPalettes = (config) => {
+    if (config.general?.palette?.name && chartPaletteNameMigrations[config.general.palette.name]) {
+        config.general.palette.name = chartPaletteNameMigrations[config.general.palette.name]
+    }
 }
 
 
@@ -63,10 +76,9 @@ const movePaletteName = config => {
             delete config.color
         }
 
-        // Migrate old palette names to new ones
-        if (config.general?.palette?.name && mapPaletteNameMigrations[config.general.palette.name]) {
-            config.general.palette.name = mapPaletteNameMigrations[config.general.palette.name]
-        }
+        // Rename default palette names to new standardized names in mapColorPalettes.ts
+        renameOriginalMapPalettes(config)
+
 
 
     }
@@ -74,9 +86,13 @@ const movePaletteName = config => {
     if (config.type === 'chart') {
         config.general = config.general || {}
         config.general.palette = config.general.palette || {}
-        config.general.palette.name = config.palette
+        config.general.palette.name = config.palette || 'qualitative-bold'
         saveBackup(config)
         delete config.palette
+        delete config.color // outdated
+
+        // renameOriginalChartPalettes(config)
+
     }
 
     if (config.type === 'dashboard') {
@@ -105,11 +121,27 @@ const updateCustomColorsMigration = config => {
     }
 }
 
+const addDefaultPaletteVersion = config => {
+    if (config.type === 'map' || config.type === 'chart') {
+        config.general = config.general || {}
+        config.general.palette = config.general.palette || {}
+        if (!config.general.palette.version || config.general.palette.version === '1.0') {
+            config.general.palette.version = '1.0'
+        }
+    }
+    if (config.type === 'dashboard') {
+        Object.values(config.visualizations).forEach(visualization => {
+            addDefaultPaletteVersion(visualization)
+        })
+    }
+}
+
 const update_4_25_9 = config => {
     const ver = '4.25.9'
     const newConfig = _.cloneDeep(config)
     movePaletteName(newConfig)
     updateCustomColorsMigration(newConfig)
+    addDefaultPaletteVersion(newConfig)
     newConfig.version = ver
     console.log('new config', newConfig)
     return newConfig

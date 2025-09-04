@@ -465,8 +465,8 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
         {config.visualizationType === 'Line'
           ? 'Add Special Line'
           : config.visualizationType === 'Bar'
-          ? ' Add Special Bar'
-          : 'Add Special Bar/Line'}
+            ? ' Add Special Bar'
+            : 'Add Special Bar/Line'}
       </button>
     </>
   )
@@ -983,15 +983,15 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
   // prettier-ignore
   const {
-      highlightedBarValues,
-      highlightedSeriesValues,
-      handleUpdateHighlightedBar,
-      handleAddNewHighlightedBar,
-      handleRemoveHighlightedBar,
-      handleUpdateHighlightedBarColor,
-      handleHighlightedBarLegendLabel,
-      handleUpdateHighlightedBorderWidth
-     } = useHighlightedBars(config, updateConfig)
+    highlightedBarValues,
+    highlightedSeriesValues,
+    handleUpdateHighlightedBar,
+    handleAddNewHighlightedBar,
+    handleRemoveHighlightedBar,
+    handleUpdateHighlightedBarColor,
+    handleHighlightedBarLegendLabel,
+    handleUpdateHighlightedBorderWidth
+  } = useHighlightedBars(config, updateConfig)
 
   const convertStateToConfig = () => {
     let strippedState = _.cloneDeep(config)
@@ -1596,28 +1596,28 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         </>
                         {((config.series && config.series.length && config.visualizationType === 'Bar') ||
                           (config.series && config.series.length <= 1 && config.visualizationType === 'Line')) && (
-                          <>
-                            <span className='divider-heading'>Confidence Keys</span>
-                            <Select
-                              value={config.confidenceKeys.upper || ''}
-                              section='confidenceKeys'
-                              fieldName='upper'
-                              label='Upper'
-                              updateField={updateFieldDeprecated}
-                              initial='Select'
-                              options={getColumns()}
-                            />
-                            <Select
-                              value={config.confidenceKeys.lower || ''}
-                              section='confidenceKeys'
-                              fieldName='lower'
-                              label='Lower'
-                              updateField={updateFieldDeprecated}
-                              initial='Select'
-                              options={getColumns()}
-                            />
-                          </>
-                        )}
+                            <>
+                              <span className='divider-heading'>Confidence Keys</span>
+                              <Select
+                                value={config.confidenceKeys.upper || ''}
+                                section='confidenceKeys'
+                                fieldName='upper'
+                                label='Upper'
+                                updateField={updateFieldDeprecated}
+                                initial='Select'
+                                options={getColumns()}
+                              />
+                              <Select
+                                value={config.confidenceKeys.lower || ''}
+                                section='confidenceKeys'
+                                fieldName='lower'
+                                label='Lower'
+                                updateField={updateFieldDeprecated}
+                                initial='Select'
+                                options={getColumns()}
+                              />
+                            </>
+                          )}
                         {visSupportsRankByValue() && config.series && config.series.length === 1 && (
                           <Select
                             value={config.rankByValue}
@@ -1649,8 +1649,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     {config.visualizationType === 'Pie'
                       ? 'Data Format'
                       : config.orientation === 'vertical'
-                      ? 'Left Value Axis'
-                      : 'Value Axis'}
+                        ? 'Left Value Axis'
+                        : 'Value Axis'}
                     {config.visualizationType === 'Pie' && !config.yAxis.dataKey && (
                       <WarningImage width='25' className='warning-icon' />
                     )}

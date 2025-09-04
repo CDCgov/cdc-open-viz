@@ -31,7 +31,7 @@ export default {
     palette: {
       isReversed: false,
       version: '2.0',
-      name: 'pinkpurple'
+      name: 'qualitative-standard'
     }
   },
   padding: {

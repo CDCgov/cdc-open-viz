@@ -79,6 +79,7 @@ export const colorPalettes3 = {
   'complementary-5': ['#df168c', '#1eb386']
 }
 
+// Forecasting Palettes should be refactored to use versioned palettes
 const sequentialColors = {
   'Sequential Blue': ['#c6dbef', '#9ecae1', '#6baed6', '#4292c6', '#2171b5', '#084594'],
   'Sequential Blue Two': ['#d5f6f9', '#99e2ed', '#5fb6d1', '#3189b0', '#116091', '#0a3e72'],
@@ -95,7 +96,7 @@ export const chartColorPalettes = {
 }
 
 export const sequentialPalettes = sequentialColors
-export const colorPalettesChart = chartColorPalettes // backwards compatibility
+export const colorPalettesChart = chartColorPalettes
 export const colorPalettesChartV1 = chartColorPalettes.v1
 export const colorPalettesChartV2 = chartColorPalettes.v2
 export const twoColorPalette = updatePaletteNames(colorPalettes3)

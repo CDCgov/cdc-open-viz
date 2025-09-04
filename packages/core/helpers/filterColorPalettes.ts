@@ -43,8 +43,8 @@ export const filterColorPalettes = ({
   }
 
   // Handle regular palette filtering
-  const isReversedFromConfig = isReversed !== undefined 
-    ? isReversed 
+  const isReversedFromConfig = isReversed !== undefined
+    ? isReversed
     : config.general?.palette?.isReversed
 
   return filterRegularPalettes(currentPalettes, version, isReversedFromConfig)
@@ -55,14 +55,14 @@ export const filterColorPalettes = ({
  */
 function filterTwoColorPalettes(palettes: any, isReversed?: boolean): string[] {
   const results: string[] = []
-  
+
   // Look for twoColorPalette specifically (imported from colorPalettes)
   if (palettes.twoColorPalette) {
     return Object.keys(palettes.twoColorPalette).filter(name =>
       isReversed ? name.endsWith('reverse') : !name.endsWith('reverse')
     )
   }
-  
+
   // Fallback for other two-color patterns
   for (const paletteName in palettes) {
     if (paletteName.includes('twocolor') || paletteName.includes('two-color')) {
@@ -72,7 +72,7 @@ function filterTwoColorPalettes(palettes: any, isReversed?: boolean): string[] {
       }
     }
   }
-  
+
   return results
 }
 
@@ -102,10 +102,10 @@ function filterRegularPalettes(palettes: any, version: number, isReversed?: bool
  * Filter V1 palettes using original chart logic
  */
 function filterV1Palette(
-  paletteName: string, 
-  matchesReversed: boolean, 
-  sequential: string[], 
-  nonSequential: string[], 
+  paletteName: string,
+  matchesReversed: boolean,
+  sequential: string[],
+  nonSequential: string[],
   accessibleColors: string[]
 ): void {
   if (!matchesReversed) return
@@ -123,10 +123,10 @@ function filterV1Palette(
  * Filter V2 palettes using updated logic for new palette structure
  */
 function filterV2Palette(
-  paletteName: string, 
-  matchesReversed: boolean, 
-  sequential: string[], 
-  nonSequential: string[], 
+  paletteName: string,
+  matchesReversed: boolean,
+  sequential: string[],
+  nonSequential: string[],
   accessibleColors: string[]
 ): void {
   if (!matchesReversed) return
@@ -150,14 +150,14 @@ function filterV2Palette(
  */
 export const filterChartColorPalettes = (config: any) => {
   const version = config?.general?.palette?.version || '2.0'
-  
+
   if (version === '1.0') {
     return chartColorPalettes.v1
   }
-  
+
   if (version === '2.0') {
     return chartColorPalettes.v2
   }
-  
+
   return chartColorPalettes.v2
 }
