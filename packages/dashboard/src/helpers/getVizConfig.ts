@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { MultiDashboardConfig } from '../types/MultiDashboard'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { getApplicableFilters } from './getFilteredData'
@@ -44,7 +45,7 @@ export const getVizConfig = (
   multiVizColumn?: string
 ): AnyVisualization => {
   if (rowNumber === undefined) return {} as AnyVisualization
-  const visualizationConfig = _.cloneDeep(config.visualizations[visualizationKey])
+  const visualizationConfig = cloneConfig(config.visualizations[visualizationKey])
   const rowData = config.rows[rowNumber]
   if (visualizationConfig.footnotes?.dataKey) {
     visualizationConfig.footnotes.data = config.datasets[visualizationConfig.footnotes.dataKey]?.data

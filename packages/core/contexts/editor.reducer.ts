@@ -2,6 +2,7 @@ import _ from 'lodash'
 import EditorActions from './editor.actions'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 
 export type EditorState = {
   config?: Visualization
@@ -22,7 +23,7 @@ const reducer = (state: EditorState, action: EditorActions): EditorState => {
     case 'SET_DASHBOARD_DATASET': {
       const { dataset, datasetKey, oldDatasetKey } = action.payload
       const oldDataset = oldDatasetKey ? state.config?.datasets[oldDatasetKey] : {}
-      const config = _.cloneDeep(state.config)
+      const config = cloneConfig(state.config)
       if (oldDatasetKey) {
         const changeDatasets = _config => {
           _config.rows?.forEach(row => {
@@ -59,7 +60,7 @@ const reducer = (state: EditorState, action: EditorActions): EditorState => {
           }
         })
       }
-      const config = _.cloneDeep(state.config)
+      const config = cloneConfig(state.config)
       applyMultiDashboards(config, deleteDatasetKeys)
       delete config.datasets[datasetKey]
       return { ...state, config }

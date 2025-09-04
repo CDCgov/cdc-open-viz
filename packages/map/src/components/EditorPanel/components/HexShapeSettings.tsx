@@ -8,6 +8,7 @@ import {
 } from 'react-accessible-accordion'
 import ConfigContext from '../../../context'
 import _ from 'lodash'
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 
 const shapeOptions = ['Arrow Up', 'Arrow Down', 'Arrow Right', 'Arrow Left', 'None']
 
@@ -105,7 +106,7 @@ const HexSettingShapeColumns = props => {
                               type='text'
                               value={shapeGroup.legendTitle || ''}
                               onChange={e => {
-                                const newConfig = _.cloneDeep(config)
+                                const newConfig = cloneConfig(config)
                                 newConfig.hexMap.shapeGroups[shapeGroupIndex].legendTitle = e.target.value
                                 setConfig(newConfig)
                               }}
@@ -243,7 +244,7 @@ const HexSettingShapeColumns = props => {
                               className='cove-button'
                               style={{ marginTop: '15px' }}
                               onClick={() => {
-                                const newConfig = _.cloneDeep(config)
+                                const newConfig = cloneConfig(config)
                                 _.set(
                                   newConfig,
                                   'hexMap.shapeGroups',

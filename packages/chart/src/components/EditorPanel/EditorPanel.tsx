@@ -46,6 +46,7 @@ import EditorPanelContext from './EditorPanelContext'
 import _ from 'lodash'
 import { adjustedSymbols as symbolCodes } from '@cdc/core/helpers/footnoteSymbols'
 import { updateFieldRankByValue } from './helpers/updateFieldRankByValue'
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
@@ -994,7 +995,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   } = useHighlightedBars(config, updateConfig)
 
   const convertStateToConfig = () => {
-    let strippedState = _.cloneDeep(config)
+    let strippedState = cloneConfig(config)
     if (false === missingRequiredSections(config)) {
       delete strippedState.newViz
     }

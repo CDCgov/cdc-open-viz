@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import cloneConfig from '../cloneConfig'
 
 export const removeMultiSelectPropFromMultiselect = newConfig => {
   if (newConfig.type === 'dashboard') {
@@ -47,7 +48,7 @@ export const defineFilterStyles = newConfig => {
 
 const update_4_24_10 = config => {
   const ver = '4.24.10'
-  const newConfig = _.cloneDeep(config)
+  const newConfig = cloneConfig(config)
   setXAxisLabelOffsetToZero(newConfig)
   changePivotColumns(newConfig)
   removeMultiSelectPropFromMultiselect(newConfig)

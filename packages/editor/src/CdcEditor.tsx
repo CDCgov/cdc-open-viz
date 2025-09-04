@@ -23,6 +23,7 @@ import { legacyConfigSupport } from './helpers/legacyConfigSupport'
 import './scss/main.scss'
 import editorReducer, { EditorState } from '@cdc/core/contexts/editor.reducer'
 import _ from 'lodash'
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { WCMSProps } from '@cdc/core/types/WCMSProps'
 import { devToolsStore } from '@cdc/core/helpers/withDevTools'
 
@@ -57,7 +58,7 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
   const [state, dispatch] = useReducer(editorReducer, initialState)
 
   const setTempConfigAndUpdate = config => {
-    updateVizConfig(_.cloneDeep(config))
+    updateVizConfig(cloneConfig(config))
     dispatch({ type: 'EDITOR_TEMP_SAVE', payload: config })
   }
 

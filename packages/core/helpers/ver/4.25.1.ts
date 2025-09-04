@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import cloneConfig from '../cloneConfig'
 
 const removeTerritoriesLabel = config => {
   if (config.general?.territoriesLabel) {
@@ -9,7 +10,7 @@ const removeTerritoriesLabel = config => {
 
 const update_4_25_1 = config => {
   const ver = '4.25.1'
-  const newConfig = _.cloneDeep(config)
+  const newConfig = cloneConfig(config)
   removeTerritoriesLabel(newConfig)
   newConfig.version = ver
   return newConfig
