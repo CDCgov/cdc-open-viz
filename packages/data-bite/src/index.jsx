@@ -8,14 +8,17 @@ import CdcDataBite from './CdcDataBite'
 
 let isEditor = window.location.href.includes('editor=true')
 
+// Check for test config parameter in URL
+const urlParams = new URLSearchParams(window.location.search)
+const testConfig = urlParams.get('config')
+
 let domContainer = document.getElementsByClassName('react-container')[0]
+
+// Use test config if specified, otherwise use data-config attribute
+const configUrl = testConfig || domContainer.attributes['data-config']?.value
 
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
-    <CdcDataBite
-      configUrl={domContainer.attributes['data-config']?.value}
-      interactionLabel={domContainer.attributes['data-config']?.value}
-      isEditor={isEditor}
-    />
+    <CdcDataBite configUrl={configUrl} interactionLabel={configUrl} isEditor={isEditor} />
   </React.StrictMode>
 )

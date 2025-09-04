@@ -7,13 +7,17 @@
   "type": "module",
   "scripts": {
     "start": "vite --open",
+    "start:test": "vite --port 8080",
     "build": "vite build",
     "preview": "vite preview",
     "graph": "nx graph",
     "prepublishOnly": "lerna run --scope @cdc/data-bite build",
     "test": "vitest run --reporter verbose",
     "test-watch": "vitest watch --reporter verbose",
-    "test-watch:ui": "vitest --ui"
+    "test-watch:ui": "vitest --ui",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug"
   },
   "repository": {
     "type": "git",
@@ -35,5 +39,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "gitHead": "6097de1ff814001880d9ac64bd66becdc092d63c"
+  "gitHead": "6097de1ff814001880d9ac64bd66becdc092d63c",
+  "devDependencies": {
+    "@playwright/test": "^1.55.0"
+  }
 }

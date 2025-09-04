@@ -54,3 +54,7 @@ jspm_packages/
 
 # Build folder
 dist/
+
+# Playwright test reports and artifacts
+playwright-report/
+test-results/

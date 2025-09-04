@@ -1,0 +1,83 @@
+{
+  "type": "data-bite",
+  "data": [
+    {
+      "Location": "Test State 1",
+      "Year": "2020",
+      "Type": "Federal",
+      "Amount": "1000"
+    },
+    {
+      "Location": "Test State 1",
+      "Year": "2020",
+      "Type": "State",
+      "Amount": "2000"
+    },
+    {
+      "Location": "Test State 1",
+      "Year": "2021",
+      "Type": "Federal",
+      "Amount": "1100"
+    },
+    {
+      "Location": "Test State 1",
+      "Year": "2021",
+      "Type": "State",
+      "Amount": "2200"
+    },
+    {
+      "Location": "Test State 2",
+      "Year": "2020",
+      "Type": "Federal",
+      "Amount": "1500"
+    },
+    {
+      "Location": "Test State 2",
+      "Year": "2020",
+      "Type": "State",
+      "Amount": "1800"
+    },
+    {
+      "Location": "Test State 2",
+      "Year": "2021",
+      "Type": "Federal",
+      "Amount": "1600"
+    },
+    {
+      "Location": "Test State 2",
+      "Year": "2021",
+      "Type": "State",
+      "Amount": "1900"
+    }
+  ],
+  "dataBite": "",
+  "dataFunction": "Mean (Average)",
+  "dataColumn": "Amount",
+  "bitePosition": "Left",
+  "biteFontSize": "24",
+  "fontSize": "medium",
+  "imageUrl": "",
+  "biteBody": "This is a test data bite for e2e testing. It calculates the average of test data and displays it.",
+  "prefix": "",
+  "suffix": "",
+  "dataFormat": {
+    "roundToPlace": 0,
+    "commas": true,
+    "prefix": "",
+    "suffix": ""
+  },
+  "biteStyle": "graphic",
+  "filters": [
+    {
+      "values": [],
+      "columnName": "Location",
+      "columnValue": "Test State 1"
+    }
+  ],
+  "subtext": "Test Data Source",
+  "title": "Test Data Bite Title",
+  "theme": "theme-blue",
+  "shadow": false,
+  "dataFileName": "test-data.csv",
+  "dataFileSourceType": "file"
+}
