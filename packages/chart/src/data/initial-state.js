@@ -31,7 +31,7 @@ export default {
     palette: {
       isReversed: false,
       version: '2.0',
-      name: 'qualitative-bold'
+      name: 'pinkpurple'
     }
   },
   padding: {
@@ -191,8 +191,7 @@ export default {
   },
   twoColor: {
     palette: 'monochrome-1',
-    isPaletteReversed: false,
-    version: '2.0'
+    isPaletteReversed: false
   },
   labels: false,
   dataFormat: {
