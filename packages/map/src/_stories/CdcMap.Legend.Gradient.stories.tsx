@@ -71,7 +71,7 @@ export const Gradient_Reversed: Story = {
   args: {
     config: editConfigKeys(WastewaterMap, [
       {
-        path: ['customColors'],
+        path: ['general', 'palette', 'customColors'],
         value: undefined
       },
       { path: ['legend', 'specialClasses'], value: ['No Data'] },

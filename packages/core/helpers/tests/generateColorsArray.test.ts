@@ -1,4 +1,5 @@
 import { generateColorsArray } from '../generateColorsArray'
+import { describe, it, expect } from 'vitest'
 
 describe('generateColorsArray', () => {
   it('should return an array of colors', () => {
@@ -14,5 +15,10 @@ describe('generateColorsArray', () => {
   it('should return a darker color for the third element in the array', () => {
     const colors = generateColorsArray('#fde0dd', false)
     expect(colors[2]).toBe('#edd1ce')
+  })
+
+  it('should use black as default color', () => {
+    const colors = generateColorsArray()
+    expect(colors[0]).toBe('#000000')
   })
 })
