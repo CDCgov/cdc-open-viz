@@ -19,8 +19,121 @@ import update_4_25_7 from './ver/4.25.7'
 import update_4_25_8 from './ver/4.25.8'
 import update_4_25_9 from './ver/4.25.9'
 
+/**
+ * Strips data arrays from config to improve performance during updates
+ * Returns both the stripped config and the extracted data for restoration
+ */
+const stripDataFromConfig = (config: any): { strippedConfig: any; extractedData: any } => {
+  const extractedData: any = {}
+  const strippedConfig = { ...config }
+
+  //return { strippedConfig, extractedData }
+
+  // Extract root-level data arrays
+  if (strippedConfig.data) {
+    extractedData.data = strippedConfig.data
+    delete strippedConfig.data
+  }
+  if (strippedConfig.formattedData) {
+    extractedData.formattedData = strippedConfig.formattedData
+    delete strippedConfig.formattedData
+  }
+  if (strippedConfig.datasets) {
+    extractedData.datasets = strippedConfig.datasets
+    delete strippedConfig.datasets
+  }
+
+  // Handle dashboard visualizations
+  if (strippedConfig.visualizations) {
+    extractedData.visualizations = {}
+    Object.keys(strippedConfig.visualizations).forEach(vizKey => {
+      const viz = strippedConfig.visualizations[vizKey]
+      const vizData: any = {}
+
+      if (viz.data) {
+        vizData.data = viz.data
+        delete strippedConfig.visualizations[vizKey].data
+      }
+      if (viz.formattedData) {
+        vizData.formattedData = viz.formattedData
+        delete strippedConfig.visualizations[vizKey].formattedData
+      }
+      if (viz.datasets) {
+        vizData.datasets = viz.datasets
+        delete strippedConfig.visualizations[vizKey].datasets
+      }
+
+      if (Object.keys(vizData).length > 0) {
+        extractedData.visualizations[vizKey] = vizData
+      }
+    })
+  }
+
+  // Handle multiDashboards
+  if (strippedConfig.multiDashboards) {
+    extractedData.multiDashboards = []
+    strippedConfig.multiDashboards.forEach((dashboard, index) => {
+      const { strippedConfig: strippedDashboard, extractedData: dashboardData } = stripDataFromConfig(dashboard)
+      strippedConfig.multiDashboards[index] = strippedDashboard
+      extractedData.multiDashboards[index] = dashboardData
+    })
+  }
+
+  return { strippedConfig, extractedData }
+}
+
+/**
+ * Restores data arrays back to config after updates are complete
+ */
+const restoreDataToConfig = (config: any, extractedData: any): any => {
+  const restoredConfig = { ...config }
+
+  // Restore root-level data arrays
+  if (extractedData.data) {
+    restoredConfig.data = extractedData.data
+  }
+  if (extractedData.formattedData) {
+    restoredConfig.formattedData = extractedData.formattedData
+  }
+  if (extractedData.datasets) {
+    restoredConfig.datasets = extractedData.datasets
+  }
+
+  // Restore dashboard visualizations data
+  if (extractedData.visualizations && restoredConfig.visualizations) {
+    Object.keys(extractedData.visualizations).forEach(vizKey => {
+      const vizData = extractedData.visualizations[vizKey]
+      if (vizData.data) {
+        restoredConfig.visualizations[vizKey].data = vizData.data
+      }
+      if (vizData.formattedData) {
+        restoredConfig.visualizations[vizKey].formattedData = vizData.formattedData
+      }
+      if (vizData.datasets) {
+        restoredConfig.visualizations[vizKey].datasets = vizData.datasets
+      }
+    })
+  }
+
+  // Restore multiDashboards data
+  if (extractedData.multiDashboards && restoredConfig.multiDashboards) {
+    extractedData.multiDashboards.forEach((dashboardData, index) => {
+      if (dashboardData && Object.keys(dashboardData).length > 0) {
+        restoredConfig.multiDashboards[index] = restoreDataToConfig(
+          restoredConfig.multiDashboards[index],
+          dashboardData
+        )
+      }
+    })
+  }
+
+  return restoredConfig
+}
+
 export const coveUpdateWorker = (config, multiDashboardVersion?) => {
-  let genConfig = config
+  // Strip data from config for performance
+  const { strippedConfig, extractedData } = stripDataFromConfig(config)
+  let genConfig = strippedConfig
 
   if (multiDashboardVersion) genConfig.version = multiDashboardVersion
 
@@ -56,7 +169,9 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
 
   // config version is stored at the root level of the config.
   if (multiDashboardVersion) delete genConfig.version
-  return genConfig
+
+  // Restore data arrays after all updates are complete
+  return restoreDataToConfig(genConfig, extractedData)
 }
 
 export default coveUpdateWorker
