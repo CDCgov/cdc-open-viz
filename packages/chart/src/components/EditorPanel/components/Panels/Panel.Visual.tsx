@@ -17,6 +17,7 @@ import InputToggle from '@cdc/core/components/inputs/InputToggle'
 
 // contexts
 import { useColorPalette } from '@cdc/core/hooks/useColorPalette'
+import { getCurrentPaletteName } from '@cdc/core/helpers/palettes/utils'
 import { ChartContext } from './../../../../types/ChartContext.js'
 
 import { useEditorPermissions } from '../../useEditorPermissions.js'
@@ -268,7 +269,7 @@ const PanelVisual: FC<PanelProps> = props => {
                 updateField={updateField}
                 onClick={() => {
                   const _state = _.cloneDeep(config)
-                  const currentPaletteName = config.general?.palette?.name || ''
+                  const currentPaletteName = getCurrentPaletteName(config)
                   _state.general.palette.isReversed = !_state.general.palette.isReversed
                   let paletteName = ''
                   if (_state.general.palette.isReversed && !currentPaletteName.endsWith('reverse')) {
@@ -293,7 +294,7 @@ const PanelVisual: FC<PanelProps> = props => {
                   colorPalettes={colorPalettes}
                   config={config}
                   onPaletteSelect={handlePaletteSelection}
-                  selectedPalette={config.general?.palette?.name}
+                  selectedPalette={getCurrentPaletteName(config)}
                   colorIndices={[2, 3, 5]}
                   className='color-palette'
                 />
@@ -307,7 +308,7 @@ const PanelVisual: FC<PanelProps> = props => {
                   colorPalettes={colorPalettes}
                   config={config}
                   onPaletteSelect={handlePaletteSelection}
-                  selectedPalette={config.general?.palette?.name}
+                  selectedPalette={getCurrentPaletteName(config)}
                   colorIndices={[2, 4, 6]}
                   className='color-palette'
                 />
@@ -317,7 +318,7 @@ const PanelVisual: FC<PanelProps> = props => {
                   colorPalettes={colorPalettes}
                   config={config}
                   onPaletteSelect={handlePaletteSelection}
-                  selectedPalette={config.general?.palette?.name}
+                  selectedPalette={getCurrentPaletteName(config)}
                   colorIndices={[2, 3, 5]}
                   className='color-palette'
                 />

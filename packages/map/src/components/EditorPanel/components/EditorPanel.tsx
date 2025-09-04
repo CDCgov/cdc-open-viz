@@ -51,7 +51,7 @@ import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { migratePaletteName } from '@cdc/core/helpers/migratePaletteName'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { isV1Palette, getCurrentPaletteName } from '@cdc/core/helpers/palettes/utils'
 import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
 import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
 
@@ -917,20 +917,18 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
   // Helper function to handle palette selection with conversion prompt
   const handlePaletteSelection = (palette: string) => {
-    const currentVersion = getColorPaletteVersion(config)
-    const isV1Palette =
-      currentVersion === 1 || config.general.palette.version === '1.0' || !config.general.palette.version
+    const isV1PaletteConfig = isV1Palette(config)
 
     const executeSelection = () => {
       const _newConfig = _.cloneDeep(config)
       _newConfig.general.palette.name = migratePaletteName(palette)
-      if (isV1Palette) {
+      if (isV1PaletteConfig) {
         _newConfig.general.palette.version = '2.0'
       }
       setConfig(_newConfig)
     }
 
-    if (isV1Palette) {
+    if (isV1PaletteConfig) {
       setPendingPaletteSelection({ palette, action: executeSelection })
       setShowConversionModal(true)
     } else {
@@ -2995,7 +2993,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 colorPalettes={colorPalettes}
                 config={config}
                 onPaletteSelect={handlePaletteSelection}
-                selectedPalette={config.general?.palette?.name}
+                selectedPalette={getCurrentPaletteName(config)}
                 colorIndices={[2, 3, 5]}
                 className='color-palette'
                 element='li'
@@ -3007,7 +3005,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 colorPalettes={colorPalettes}
                 config={config}
                 onPaletteSelect={handlePaletteSelection}
-                selectedPalette={config.general?.palette?.name}
+                selectedPalette={getCurrentPaletteName(config)}
                 colorIndices={[2, 3, 5]}
                 className='color-palette'
                 element='li'
@@ -3025,7 +3023,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 colorPalettes={colorPalettes}
                 config={config}
                 onPaletteSelect={handlePaletteSelection}
-                selectedPalette={config.general?.palette?.name}
+                selectedPalette={getCurrentPaletteName(config)}
                 colorIndices={[2, 3, 5]}
                 className='color-palette'
                 element='li'

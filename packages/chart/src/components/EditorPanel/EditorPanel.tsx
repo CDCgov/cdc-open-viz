@@ -49,8 +49,8 @@ import { updateFieldRankByValue } from './helpers/updateFieldRankByValue'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
-import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import { migratePaletteName } from '@cdc/core/helpers/migratePaletteName'
+import { isV1Palette } from '@cdc/core/helpers/palettes/utils'
 
 interface PreliminaryProps {
   config: ChartConfig
@@ -1111,9 +1111,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       }
 
       // Check if it's a v1 palette configuration
-      const currentVersion = getColorPaletteVersion(config)
-      const isV1Palette =
-        currentVersion === 1 || config.general?.palette?.version === '1.0' || !config.general?.palette?.version
+      const isV1PaletteConfig = isV1Palette(config)
 
       const executeSelection = () => {
         const _newConfig = _.cloneDeep(config)
@@ -1122,13 +1120,13 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         }
         const migratedName = migratePaletteName(palette)
         _newConfig.general.palette.name = migratedName
-        if (isV1Palette) {
+        if (isV1PaletteConfig) {
           _newConfig.general.palette.version = '2.0'
         }
         updateConfig(_newConfig)
       }
 
-      if (isV1Palette) {
+      if (isV1PaletteConfig) {
         setPendingPaletteSelection({ palette, action: executeSelection })
         setShowConversionModal(true)
       } else {

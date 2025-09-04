@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { ChartDispatchContext } from '../../../ConfigContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
+import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
 
 export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, configContext) => {
   const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, seriesHighlight } = configContext
@@ -98,7 +99,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     if (!config.legend.colorCode && config.series.length > 1) {
       return currentBarColor
     }
-    const palettesArr = config.general?.palette?.customColors ?? colorPalettes[config.general?.palette?.name]
+    const palettesArr = getPaletteColors(config, colorPalettes)
     const values = tableData.map(d => {
       return d[config.legend.colorCode]
     })

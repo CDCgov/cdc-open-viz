@@ -4,6 +4,7 @@ import { Group } from '@visx/group'
 import ConfigContext from '../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { colorPalettesChart } from '@cdc/core/data/colorPalettes'
+import { getCurrentPaletteName } from '@cdc/core/helpers/palettes/utils'
 import { handleTooltip, createPlots } from './helpers/index'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import _ from 'lodash'
@@ -18,7 +19,7 @@ const BoxPlotVertical = ({ xScale, yScale, seriesScale }) => {
   const bodyStyles = getComputedStyle(document.body)
   const defaultColor = APP_FONT_COLOR
   const constrainedWidth = Math.min(40, boxWidth)
-  const color_0 = _.get(colorPalettesChart, [config.general?.palette?.name, 0], '#000')
+  const color_0 = _.get(colorPalettesChart, [getCurrentPaletteName(config), 0], '#000')
   const plots = createPlots(data, config)
   return (
     <ErrorBoundary component='BoxPlot Vertical'>
