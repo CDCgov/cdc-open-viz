@@ -55,21 +55,22 @@ export const getVizConfig = (
     Object.assign(visualizationConfig, _.pick(rowData, ['dataKey', 'dataDescription', 'formattedData', 'data']))
   }
 
-  if (visualizationConfig.table && config.dashboard.sharedFilters.length) {
-    // Download CSV button needs to know to include shared filter columns
-    const sharedFilterColumns = config.dashboard.sharedFilters.reduce((acc, filter) => {
-      if (!filter.usedBy?.length || filter.usedBy?.includes(visualizationKey)) {
-        const apiFilter = filter.apiFilter
-        const colName = apiFilter?.textSelector || apiFilter?.valueSelector || filter.columnName
-        acc.push(colName)
-        const subGrouping =
-          apiFilter?.subgroupTextSelector || apiFilter?.subgroupValueSelector || filter.subGrouping?.columnName
-        if (subGrouping) {
-          acc.push(subGrouping)
-        }
+  const sharedFilterColumns = config.dashboard.sharedFilters.reduce((acc, filter) => {
+    if (!filter.usedBy?.length || filter.usedBy?.includes(visualizationKey)) {
+      const apiFilter = filter.apiFilter
+      const colName = apiFilter?.textSelector || apiFilter?.valueSelector || filter.columnName
+      acc.push(colName)
+      const subGrouping =
+        apiFilter?.subgroupTextSelector || apiFilter?.subgroupValueSelector || filter.subGrouping?.columnName
+      if (subGrouping) {
+        acc.push(subGrouping)
       }
-      return acc
-    }, [])
+    }
+    return acc
+  }, [])
+
+  // Download CSV button needs to know to include shared filter columns
+  if (visualizationConfig.table && config.dashboard.sharedFilters.length) {
     visualizationConfig.table.sharedFilterColumns = sharedFilterColumns
   }
 
@@ -83,7 +84,7 @@ export const getVizConfig = (
     }
   } else {
     const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
-    visualizationConfig.data = data[dataKey] || []
+    visualizationConfig.data = sharedFilterColumns.length ? [] : data[dataKey] || []
     if (visualizationConfig.formattedData) {
       visualizationConfig.formattedData =
         transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) ||
