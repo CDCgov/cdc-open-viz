@@ -31,6 +31,8 @@ export const stripDataFromConfig = (config: any): { strippedConfig: any; extract
       const viz = strippedConfig.visualizations[vizKey]
       const vizData: any = {}
 
+      if (!viz.type) return
+
       if (viz.data) {
         vizData.data = viz.data
         delete strippedConfig.visualizations[vizKey].data
