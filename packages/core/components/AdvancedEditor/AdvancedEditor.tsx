@@ -25,13 +25,29 @@ export const AdvancedEditor = ({ loadConfig, config, convertStateToConfig, onExp
   }
 
   useEffect(() => {
-    let parsedConfig = config
-    if (config.type !== 'dashboard') {
-      parsedConfig = convertStateToConfig()
-    }
+    // Only process config when advanced editor is open to improve performance
+    if (advancedToggle) {
+      let parsedConfig = config
+      if (config.type !== 'dashboard') {
+        parsedConfig = convertStateToConfig()
+      }
 
-    setConfigTextbox(parsedConfig)
-  }, [config])
+      setConfigTextbox(parsedConfig)
+    }
+  }, [config, advancedToggle])
+
+  // Initialize config when advanced editor is first opened
+  const handleToggleOpen = () => {
+    if (!advancedToggle) {
+      // Process config only when opening for the first time
+      let parsedConfig = config
+      if (config.type !== 'dashboard') {
+        parsedConfig = convertStateToConfig()
+      }
+      setConfigTextbox(parsedConfig)
+    }
+    setAdvancedToggle(!advancedToggle)
+  }
 
   const typeLookup = {
     chart: ['Charts', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
@@ -57,7 +73,7 @@ export const AdvancedEditor = ({ loadConfig, config, convertStateToConfig, onExp
         </div>
       </a>
       <div className='advanced'>
-        <span className='advanced-toggle-link' onClick={() => setAdvancedToggle(!advancedToggle)}>
+        <span className='advanced-toggle-link' onClick={handleToggleOpen}>
           <span>{advancedToggle ? `— ` : `+ `}</span>Advanced Options
         </span>
         {advancedToggle && (
