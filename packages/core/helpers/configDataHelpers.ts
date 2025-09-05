@@ -19,6 +19,10 @@ export const stripDataFromConfig = (config: any): { strippedConfig: any; extract
     extractedData.formattedData = strippedConfig.formattedData
     delete strippedConfig.formattedData
   }
+  if (strippedConfig.originalFormattedData) {
+    extractedData.originalFormattedData = strippedConfig.originalFormattedData
+    delete strippedConfig.originalFormattedData
+  }
   if (strippedConfig.datasets) {
     extractedData.datasets = strippedConfig.datasets
     delete strippedConfig.datasets
@@ -40,6 +44,10 @@ export const stripDataFromConfig = (config: any): { strippedConfig: any; extract
       if (viz.formattedData) {
         vizData.formattedData = viz.formattedData
         delete strippedConfig.visualizations[vizKey].formattedData
+      }
+      if (viz.originalFormattedData) {
+        vizData.originalFormattedData = viz.originalFormattedData
+        delete strippedConfig.visualizations[vizKey].originalFormattedData
       }
       if (viz.datasets) {
         vizData.datasets = viz.datasets
@@ -78,6 +86,9 @@ export const restoreDataToConfig = (config: any, extractedData: any): any => {
   if (extractedData.formattedData) {
     restoredConfig.formattedData = extractedData.formattedData
   }
+  if (extractedData.originalFormattedData) {
+    restoredConfig.originalFormattedData = extractedData.originalFormattedData
+  }
   if (extractedData.datasets) {
     restoredConfig.datasets = extractedData.datasets
   }
@@ -91,6 +102,9 @@ export const restoreDataToConfig = (config: any, extractedData: any): any => {
       }
       if (vizData.formattedData) {
         restoredConfig.visualizations[vizKey].formattedData = vizData.formattedData
+      }
+      if (vizData.originalFormattedData) {
+        restoredConfig.visualizations[vizKey].originalFormattedData = vizData.originalFormattedData
       }
       if (vizData.datasets) {
         restoredConfig.visualizations[vizKey].datasets = vizData.datasets

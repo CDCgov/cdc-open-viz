@@ -123,7 +123,7 @@ export default function CdcDashboard({
     dispatch({ type: 'SET_FILTERED_DATA', payload: emptyFilteredData })
 
     const newData = {} // Start with empty object instead of cloning existing data
-    const newDatasets = _.cloneDeep(config.datasets)
+    const newDatasets = config.datasets
     let dataWasFetched = false
     let newFileName = ''
 
