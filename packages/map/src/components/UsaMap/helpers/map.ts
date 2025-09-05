@@ -101,7 +101,7 @@ export const getFilterControllingStatesPicked = (state, runtimeData) => {
     return state?.general?.statesPicked?.map(sp => sp.stateName) || []
   } else {
     if (hasMoreThanFromHash(runtimeData)) {
-      let statesPickedFromFilter = Object.values(runtimeData)?.map(
+      let statesPickedFromFilter = Object.values(state.data)?.map(
         s => s[state.general.filterControlsStatesPicked]
       )?.[0]
 
