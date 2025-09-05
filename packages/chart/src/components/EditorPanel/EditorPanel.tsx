@@ -1305,18 +1305,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         )
       }
     })
-
-    let columnsByKey = {}
-    config.data.forEach(datum => {
-      Object.keys(datum).forEach(key => {
-        columnsByKey[key] = columnsByKey[key] || []
-        const value = typeof datum[key] === 'number' ? datum[key].toString() : datum[key]
-
-        if (columnsByKey[key].indexOf(value) === -1) {
-          columnsByKey[key].push(value)
-        }
-      })
-    })
   }
 
   // for pie charts
@@ -1333,18 +1321,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
           </option>
         )
       }
-    })
-
-    let columnsByKey = {}
-    data.forEach(datum => {
-      Object.keys(datum).forEach(key => {
-        columnsByKey[key] = columnsByKey[key] || []
-        const value = typeof datum[key] === 'number' ? datum[key].toString() : datum[key]
-
-        if (columnsByKey[key].indexOf(value) === -1) {
-          columnsByKey[key].push(value)
-        }
-      })
     })
   }
 
