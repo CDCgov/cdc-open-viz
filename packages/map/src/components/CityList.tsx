@@ -4,7 +4,7 @@ import { GlyphCircle, GlyphDiamond, GlyphSquare, GlyphStar, GlyphTriangle } from
 import ConfigContext from '../context'
 import { supportedCities } from '../data/supported-geos'
 import { getFilterControllingStatesPicked } from './UsaMap/helpers/map'
-import { displayGeoName, getGeoStrokeColor, SVG_HEIGHT, SVG_PADDING, SVG_WIDTH, titleCase } from '../helpers'
+import { displayGeoName, getGeoStrokeColor, SVG_HEIGHT, SVG_PADDING, SVG_WIDTH, titleCase, hashObj, isLegendItemDisabled } from '../helpers'
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import { applyLegendToRow } from '../helpers/applyLegendToRow'
@@ -37,10 +37,10 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
 
   const citiesData = runtimeData
     ? Object.keys(runtimeData).reduce((acc, key) => {
-        const city = runtimeData[key]
-        acc[city[geoColumnName]] = city
-        return acc
-      }, {})
+      const city = runtimeData[key]
+      acc[city[geoColumnName]] = city
+      return acc
+    }, {})
     : {}
 
   if (config.general.type === 'bubble') {
@@ -76,11 +76,17 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     const legendColors = geoData
       ? applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
       : runtimeData[city]
-      ? applyLegendToRow(runtimeData[city], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
-      : false
+        ? applyLegendToRow(runtimeData[city], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+        : false
 
     if (legendColors === false) {
       return true
+    }
+
+
+    // Don't render if legend item is disabled
+    if (isLegendItemDisabled(geoData || runtimeData[city], runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)) {
+      return null
     }
 
     const toolTip = applyTooltipsToGeo(cityDisplayName, geoData || runtimeData[city])
@@ -140,9 +146,8 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
         _statesPickedData
       )
       let coords = [Number(geoData?.[longitudeColumnName]), Number(geoData?.[latitudeColumnName])]
-      transform = `translate(${newProjection(coords)}) scale(${
-        config.visual.geoCodeCircleSize / (position.zoom > 1 ? position.zoom : 1)
-      })`
+      transform = `translate(${newProjection(coords)}) scale(${config.visual.geoCodeCircleSize / (position.zoom > 1 ? position.zoom : 1)
+        })`
       needsPointer = true
     }
 
@@ -155,9 +160,9 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       opacity: !isFilterValueSupported || (isFilterValueSupported && city === setSharedFilterValue) ? 1 : 0.5,
       stroke:
         setSharedFilterValue &&
-        isFilterValueSupported &&
-        runtimeData[city] &&
-        runtimeData[city][config.columns.geo.name] === setSharedFilterValue
+          isFilterValueSupported &&
+          runtimeData[city] &&
+          runtimeData[city][config.columns.geo.name] === setSharedFilterValue
           ? 'rgba(0, 0, 0, 1)'
           : 'rgba(0, 0, 0, 0.4)',
       '&:hover': {
@@ -219,6 +224,11 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       ) {
         let translate = `translate(${projection(supportedCities[city.toUpperCase()])})`
 
+        // Check if legend is disabled before rendering
+        if (isLegendItemDisabled(geoData || runtimeData[city])) {
+          return null
+        }
+
         return (
           <g key={i} transform={translate} style={styles} className='geo-point' tabIndex={-1}>
             {cityStyleShapes[cityStyle.shape.toLowerCase()]}
@@ -230,6 +240,11 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
         const coords = [Number(geoData?.[longitudeColumnName]), Number(geoData?.[latitudeColumnName])]
         let translate = `translate(${projection(coords)})`
 
+        // Check if legend is disabled before rendering
+        if (isLegendItemDisabled(geoData || runtimeData[city])) {
+          return null
+        }
+
         return (
           <g key={i} transform={translate} style={styles} className='geo-point' tabIndex={-1}>
             {cityStyleShapes[cityStyle.shape.toLowerCase()]}
@@ -238,6 +253,11 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       }
     }
     if (legendColors?.[0] === '#000000') return
+
+    // Final check if legend is disabled before rendering the default city style
+    if (isLegendItemDisabled(geoData || runtimeData[city])) {
+      return null
+    }
 
     return (
       <g key={i} transform={transform} style={styles} className='geo-point' tabIndex={-1}>
