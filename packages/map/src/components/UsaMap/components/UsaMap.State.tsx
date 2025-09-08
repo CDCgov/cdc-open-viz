@@ -20,6 +20,7 @@ import Annotation from '../../Annotation'
 import Territory from './Territory'
 
 import ConfigContext, { MapDispatchContext } from '../../../context'
+import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { MapContext } from '../../../types/MapContext'
 import { checkColorContrast, getContrastColor, outlinedTextColor } from '@cdc/core/helpers/cove/accessibility'
 import TerritoriesSection from './TerritoriesSection'
@@ -69,19 +70,19 @@ const nudges = {
 
 const UsaMap = () => {
   const {
-    data,
+    runtimeData,
     setSharedFilterValue,
     config,
     setConfig,
     tooltipId,
     mapId,
     logo,
-    legendMemo,
-    legendSpecialClassLastMemo,
     currentViewport,
     translate,
     runtimeLegend
   } = useContext<MapContext>(ConfigContext)
+
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
   let isFilterValueSupported = false
   const { general, columns, tooltips, hexMap, map, annotations } = config
@@ -120,14 +121,14 @@ const UsaMap = () => {
 
   const legendMemoUpdated = focusedStates?.every(geo => {
     const geoKey = geo.properties.iso
-    const geoData = data[geoKey]
+    const geoData = runtimeData[geoKey]
     const hash = hashObj(geoData)
     return legendMemo.current.has(hash)
   })
 
   // we use dataRef so that we can use the old data when legendMemo has not been updated yet
   // prevents flickering of the map when filter is changed
-  if (legendMemoUpdated) dataRef.current = data
+  if (legendMemoUpdated) dataRef.current = runtimeData
 
   useEffect(() => {
     const fetchData = async () => {
@@ -153,10 +154,10 @@ const UsaMap = () => {
       setTerritoriesData(territoriesKeys)
     } else {
       // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
-      const territoriesList = territoriesKeys.filter(key => data?.[key])
+      const territoriesList = territoriesKeys.filter(key => runtimeData?.[key])
       setTerritoriesData(territoriesList)
     }
-  }, [data, dataRef.current, general.territoriesAlwaysShow])
+  }, [runtimeData, dataRef.current, general.territoriesAlwaysShow])
 
   const geoStrokeColor = getGeoStrokeColor(config)
   const geoFillColor = getGeoFillColor(config)
@@ -164,7 +165,7 @@ const UsaMap = () => {
   const territories = territoriesData.map((territory, territoryIndex) => {
     const Shape = displayAsHex ? Territory.Hexagon : Territory.Rectangle
 
-    const territoryData = data?.[territory]
+    const territoryData = runtimeData?.[territory]
 
     let toolTip
 
@@ -290,7 +291,7 @@ const UsaMap = () => {
 
       if (!geoKey) return
 
-      const geoData = data?.[geoKey]
+      const geoData = runtimeData?.[geoKey]
 
       let legendColors
 

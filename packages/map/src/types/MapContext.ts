@@ -2,12 +2,10 @@ import { DataRow, type MapConfig } from './MapConfig'
 import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { VizFilter } from '@cdc/core/types/VizFilter'
-import { type RefObject } from 'react'
 
 export type MapContext = {
   currentViewport: ViewPort
   content: { geoName: string; keyedData: Record<string, any> }
-  data: DataRow[]
   dimensions: DimensionsType
   displayDataAsText: string | number
   displayGeoName: (key: string, convertFipsCodes: boolean) => string
@@ -22,7 +20,6 @@ export type MapContext = {
   handleCircleClick: Function
   handleDragStateChange: Function
   isDraggingAnnotation: boolean
-  innerContainerRef: RefObject<HTMLDivElement>
   isDashboard: boolean
   isEditor: boolean
   isFilterValueSupported: boolean
@@ -32,13 +29,9 @@ export type MapContext = {
   position: 'side' | 'top' | 'bottom'
   resetLegendToggles: Function
   runtimeFilters: Function
-  legendMemo: Function
-  legendSpecialClassLastMemo: Function
   runtimeLegend
   setParentConfig: Function
   setRuntimeData: Function
-  setRuntimeFilters: Function
-  setRuntimeLegend: Function
   setSharedFilterValue: Function
   setConfig: (newState: MapConfig) => MapConfig
   config: MapConfig

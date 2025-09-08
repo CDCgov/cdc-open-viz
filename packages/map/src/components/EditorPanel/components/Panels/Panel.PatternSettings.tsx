@@ -7,6 +7,7 @@ import {
   AccordionItemButton
 } from 'react-accessible-accordion'
 import ConfigContext from '../../../../context'
+import { useLegendMemoContext } from '../../../../context/LegendMemoContext'
 import { type MapContext } from '../../../../types/MapContext'
 import Button from '@cdc/core/components/elements/Button'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
@@ -26,8 +27,8 @@ type PanelProps = {
 }
 
 const PatternSettings = ({ name }: PanelProps) => {
-  const { config, setConfig, runtimeData, legendMemo, legendSpecialClassLastMemo, runtimeLegend } =
-    useContext<MapContext>(ConfigContext)
+  const { config, setConfig, runtimeData, runtimeLegend } = useContext<MapContext>(ConfigContext)
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const defaultPattern = 'circles'
   const patternTypes = ['circles', 'waves', 'lines']
 

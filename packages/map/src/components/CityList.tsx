@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react'
 import { scaleLinear } from 'd3-scale'
 import { GlyphCircle, GlyphDiamond, GlyphSquare, GlyphStar, GlyphTriangle } from '@visx/glyph'
 import ConfigContext from '../context'
+import { useLegendMemoContext } from '../context/LegendMemoContext'
 import { supportedCities } from '../data/supported-geos'
 import { getFilterControllingStatesPicked } from './UsaMap/helpers/map'
 import {
@@ -27,15 +28,8 @@ type CityListProps = {
 }
 
 const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValueSupported, tooltipId, projection }) => {
-  const {
-    config,
-    topoData,
-    data: runtimeData,
-    position,
-    legendMemo,
-    legendSpecialClassLastMemo,
-    runtimeLegend
-  } = useContext(ConfigContext)
+  const { config, topoData, runtimeData, position, runtimeLegend } = useContext(ConfigContext)
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
 
