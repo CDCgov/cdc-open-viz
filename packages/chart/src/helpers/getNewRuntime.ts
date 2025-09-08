@@ -1,7 +1,6 @@
 import _ from 'lodash'
 
 export const getNewRuntime = (visualizationConfig, newFilteredData) => {
-  // Optimized: Use object spread instead of deep clone since we rebuild the runtime anyway
   const runtime = visualizationConfig.runtime ? { ...visualizationConfig.runtime } : {}
   runtime.series = []
   runtime.seriesLabels = {}

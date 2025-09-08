@@ -1,39 +1,38 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <style>
+      body {
+        margin: 0;
+        border-top: none !important;
+      }
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <style>
-    body {
-      margin: 0;
-      border-top: none !important;
-    }
+      .cdc-map-outer-container {
+        min-height: 100vh;
+      }
 
-    .cdc-map-outer-container {
-      min-height: 100vh;
-    }
-
-    /* .react-container + .react-container {
+      /* .react-container + .react-container {
         margin-top: 3rem;
       } */
-  </style>
-  <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />
-</head>
+    </style>
+    <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />
+  </head>
 
-<body>
-  <!-- SANKEY EXAMPLE -->
-  <!-- <div class="container d-flex flex-wrap body-wrapper bg-white" style="width:  750px">
+  <body>
+    <!-- SANKEY EXAMPLE -->
+    <!-- <div class="container d-flex flex-wrap body-wrapper bg-white" style="width:  750px">
       <main class="col-lg-9 order-lg-2" role="main" aria-label="Main Content Area">
         <div class="row">
           <div class="col-md-12"> -->
-  <!-- <div class="react-container" data-config="/examples/feature/sankey/sankey-example-data.json"></div> -->
-  <!-- </div>
+    <!-- <div class="react-container" data-config="/examples/feature/sankey/sankey-example-data.json"></div> -->
+    <!-- </div>
         </div>
       </main>
     </div> -->
 
-  <!--
+    <!--
       EXAMPLES:
         chart/examples/features: different chart types and tests
         chart/examples/private: an ignored git folder used for addl. troubleshooting.
@@ -45,123 +44,124 @@
 
   -->
 
-  <!-- GENERIC CHART TYPES -->
-  <!-- <div class="react-container" data-config="/examples/private/ari-other-conditions-1.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/private/Viral-Respiratory-Deaths-Age.json"></div> -->
-  <div class="react-container" data-config="/examples/cases-year.json"></div>
-  <!-- <div class="react-container" data-config="/examples/test.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/line/line-chart.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/dev-8332.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/annotations/index.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/filters/url-filter.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/bar/additional-column-tooltip.json"></div> -->
-  <!-- <div class="react-container" data-config="https://cdc.gov/poxvirus/mpox/modules/data-viz/mpx-trends_1.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/area/area-chart-date-apple.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/forest-plot/linear.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/forest-plot/logarithmic.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/forest-plot/forest-plot.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/pie/planet-pie-example-config.json"></div> -->
-  <!-- <div class="react-container" data-config=https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Line_Chart_Viz.json></div> -->
-  <!-- <div class="react-container" data-config=/examples/feature/regions/index.json></div> -->
-  <!-- <div class="react-container" data-config=https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Line_Chart_Regions_Viz.json></div> -->
-  <!-- <div class="react-container" data-config=https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Line_Chart_Regions_Viz.json></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/forecasting/forecasting.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/forecasting/combo-forecasting.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/forecasting/effective_reproduction.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/area/area-chart-date.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/area/area-chart-category.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/scatterplot-image-download.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/deviation/planet-deviation-config.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/private/test.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/combo/planet-combo-example-config.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/combo/right-issues.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/dev-9822.json"></div> -->
+    <!-- GENERIC CHART TYPES -->
+    <!-- <div class="react-container" data-config="/examples/private/ari-other-conditions-1.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/private/Viral-Respiratory-Deaths-Age.json"></div> -->
+    <div class="react-container" data-config="/examples/private/perf/big-data-2.json"></div>
+    <!-- <div class="react-container" data-config="/examples/test.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/line/line-chart.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/dev-8332.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/annotations/index.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/filters/url-filter.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/bar/additional-column-tooltip.json"></div> -->
+    <!-- <div class="react-container" data-config="https://cdc.gov/poxvirus/mpox/modules/data-viz/mpx-trends_1.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/area/area-chart-date-apple.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/forest-plot/linear.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/forest-plot/logarithmic.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/forest-plot/forest-plot.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/pie/planet-pie-example-config.json"></div> -->
+    <!-- <div class="react-container" data-config=https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Line_Chart_Viz.json></div> -->
+    <!-- <div class="react-container" data-config=/examples/feature/regions/index.json></div> -->
+    <!-- <div class="react-container" data-config=https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Line_Chart_Regions_Viz.json></div> -->
+    <!-- <div class="react-container" data-config=https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Line_Chart_Regions_Viz.json></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/forecasting/forecasting.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/forecasting/combo-forecasting.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/forecasting/effective_reproduction.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/area/area-chart-date.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/area/area-chart-category.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/scatterplot-image-download.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/deviation/planet-deviation-config.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/private/test.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/combo/planet-combo-example-config.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/combo/right-issues.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/dev-9822.json"></div> -->
 
-  <!-- BAR -->
-  <!-- <div class="react-container" data-config="/examples/feature/bar/planet-example-config.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/bar/planet-chart-horizontal-example-config.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/bar/example-bar-chart.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/bar/horizontal-chart-max-increase.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/bar/horizontal-chart.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/bar/horizontal-stacked-bar-chart.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/bar/planet-chart-horizontal-example-config.json"></div> -->
+    <!-- BAR -->
+    <!-- <div class="react-container" data-config="/examples/feature/bar/planet-example-config.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/bar/planet-chart-horizontal-example-config.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/bar/example-bar-chart.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/bar/horizontal-chart-max-increase.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/bar/horizontal-chart.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/bar/horizontal-stacked-bar-chart.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/bar/planet-chart-horizontal-example-config.json"></div> -->
 
-  <!-- TESTS DATA TABLE SORTING  -->
-  <!-- Bar Chart with Confidence Intervals (bottom of page)  -->
-  <!-- <div class="react-container" data-config="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Example_Bar_CI.json"></div> -->
-  <!-- TPOXX Patient Data -->
-  <!-- <div class="react-container" data-config="https://www.cdc.gov/poxvirus/mpox/modules/data-viz/tpoxx_weekly_race_eth.json"></div> -->
-  <!-- <div class="react-container" data-config="https://www.cdc.gov/poxvirus/mpox/modules/data-viz/mpx-tpoxx-age-gender.json"></div> -->
-  <!-- Non-Variola Orthopoxvirus (NVO) Laboratory Testing by Demographics -->
-  <!-- <div class="react-container" data-config="https://wwwdev-cdc.msappproxy.net/poxvirus/mpox/modules/data-viz/lab-data.json"></div> -->
-  <!-- <div class="react-container" data-config="https://wwwdev-cdc.msappproxy.net/poxvirus/mpox/modules/data-viz/lab-data-age.json"></div> -->
-  <!-- PROBLEM WITH THEIR PAGE CONFIG or CONFLICT with -->
-  <!-- CORS ERROR pulling data on Covid Flu RSV page at https://wwwdev-cdc.msappproxy.net/respiratory-viruses/index.html-->
-  <!-- <div class="react-container" data-config="https://wwwdev-cdc.msappproxy.net/respiratory-viruses/modules/emergency-dept-visits_live.json"></div> -->
-  <!-- MPOX -->
-  <!-- <div class="react-container" data-config="https://www.cdc.gov/poxvirus/mpox/modules/data-viz/mpox-demographics-monthly.json"></div> -->
-  <!-- <div class="react-container" data-config="/https://www.cdc.gov/poxvirus/mpox/modules/data-viz/mpx-age-sex1.json"></div> -->
+    <!-- TESTS DATA TABLE SORTING  -->
+    <!-- Bar Chart with Confidence Intervals (bottom of page)  -->
+    <!-- <div class="react-container" data-config="https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Example_Bar_CI.json"></div> -->
+    <!-- TPOXX Patient Data -->
+    <!-- <div class="react-container" data-config="https://www.cdc.gov/poxvirus/mpox/modules/data-viz/tpoxx_weekly_race_eth.json"></div> -->
+    <!-- <div class="react-container" data-config="https://www.cdc.gov/poxvirus/mpox/modules/data-viz/mpx-tpoxx-age-gender.json"></div> -->
+    <!-- Non-Variola Orthopoxvirus (NVO) Laboratory Testing by Demographics -->
+    <!-- <div class="react-container" data-config="https://wwwdev-cdc.msappproxy.net/poxvirus/mpox/modules/data-viz/lab-data.json"></div> -->
+    <!-- <div class="react-container" data-config="https://wwwdev-cdc.msappproxy.net/poxvirus/mpox/modules/data-viz/lab-data-age.json"></div> -->
+    <!-- PROBLEM WITH THEIR PAGE CONFIG or CONFLICT with -->
+    <!-- CORS ERROR pulling data on Covid Flu RSV page at https://wwwdev-cdc.msappproxy.net/respiratory-viruses/index.html-->
+    <!-- <div class="react-container" data-config="https://wwwdev-cdc.msappproxy.net/respiratory-viruses/modules/emergency-dept-visits_live.json"></div> -->
+    <!-- MPOX -->
+    <!-- <div class="react-container" data-config="https://www.cdc.gov/poxvirus/mpox/modules/data-viz/mpox-demographics-monthly.json"></div> -->
+    <!-- <div class="react-container" data-config="/https://www.cdc.gov/poxvirus/mpox/modules/data-viz/mpx-age-sex1.json"></div> -->
 
-  <!-- TESTS DATE EXCLUSIONS -->
-  <!-- <div class="react-container" data-config="/examples/feature/boxplot/boxplot.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/tests-case-rate/case-rate-example-config.json"></div> -->
+    <!-- TESTS DATE EXCLUSIONS -->
+    <!-- <div class="react-container" data-config="/examples/feature/boxplot/boxplot.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/tests-case-rate/case-rate-example-config.json"></div> -->
 
-  <!-- TESTS BIG SMALL-->
-  <!-- <div class="react-container" data-config="/examples/feature/tests-big-small/big-small-test-line.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/tests-big-small/big-small-test-bar.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/tests-big-small/big-small-test-negative.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/tests-big-small/line-chart-max-increase.json"></div> -->
+    <!-- TESTS BIG SMALL-->
+    <!-- <div class="react-container" data-config="/examples/feature/tests-big-small/big-small-test-line.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/tests-big-small/big-small-test-bar.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/tests-big-small/big-small-test-negative.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/tests-big-small/line-chart-max-increase.json"></div> -->
 
-  <!-- TESTS NONNUMERICS -->
-  <!-- <div
+    <!-- TESTS NONNUMERICS -->
+    <!-- <div
       class="react-container"
       data-config="/examples/feature/tests-non-numerics/planet-pie-example-config-nonnumeric.json"
     ></div> -->
-  <div class="react-container" data-config="/examples/feature/tests-non-numerics/example-combo-bar-nonnumeric.json">
-  </div>
-  <!-- <div class="react-container" data-config="/examples/feature/tests-non-numerics/example-bar-chart-nonnumeric.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/sparkline.json"></div> -->
-  <!-- <div
+    <div
+      class="react-container"
+      data-config="/examples/feature/tests-non-numerics/example-combo-bar-nonnumeric.json"
+    ></div>
+    <!-- <div class="react-container" data-config="/examples/feature/tests-non-numerics/example-bar-chart-nonnumeric.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/sparkline.json"></div> -->
+    <!-- <div
       class="react-container"
       data-config="/examples/feature/tests-non-numerics/sparkline-chart-nonnumeric.json"
     ></div> -->
-  <!-- <div class="react-container" data-config="/examples/region-issue.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/tests-non-numerics/stacked-vertical-bar-example-nonnumerics.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/region-issue.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/tests-non-numerics/stacked-vertical-bar-example-nonnumerics.json"></div> -->
 
-  <!-- TESTS CUTOFF -->
-  <!-- <div class="react-container" data-config="/examples/feature/tests-cutoff/cutoff-example-config.json"></div> -->
+    <!-- TESTS CUTOFF -->
+    <!-- <div class="react-container" data-config="/examples/feature/tests-cutoff/cutoff-example-config.json"></div> -->
 
-  <!-- TESTS COVID -->
-  <!-- <div class="react-container" data-config="/examples/feature/tests-covid/covid-confidence-example-config.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/tests-covid/covid-example-config.json"></div> -->
+    <!-- TESTS COVID -->
+    <!-- <div class="react-container" data-config="/examples/feature/tests-covid/covid-confidence-example-config.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/tests-covid/covid-example-config.json"></div> -->
 
-  <!--
+    <!--
       GALLERY EXAMPLES BELOW THIS LINE...
         https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-data-map-cities-states.html
 
     -->
 
-  <!-- GENERIC CHART TYPES  -->
-  <!-- <div class="react-container" data-config="/examples/gallery/paired-bar/paired-bar-chart.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/line/line-chart.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/feature/annotations/index.json"></div> -->
+    <!-- GENERIC CHART TYPES  -->
+    <!-- <div class="react-container" data-config="/examples/gallery/paired-bar/paired-bar-chart.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/line/line-chart.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/feature/annotations/index.json"></div> -->
 
-  <!-- HORIZONTAL BAR CHARTS -->
-  <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-horizontal/horizontal-bar-chart-with-numbers-on-bar.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-horizontal/horizontal-bar-chart.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-horizontal/horizontal-stacked.json"></div> -->
+    <!-- HORIZONTAL BAR CHARTS -->
+    <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-horizontal/horizontal-bar-chart-with-numbers-on-bar.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-horizontal/horizontal-bar-chart.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-horizontal/horizontal-stacked.json"></div> -->
 
-  <!-- VERTICAL BAR CHARTS -->
-  <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-vertical/combo-line-chart.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-vertical/vertical-bar-chart-categorical.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-vertical/vertical-bar-chart-stacked.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-vertical/vertical-bar-chart-confidence.json"></div> -->
-  <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-vertical/vertical-bar-chart.json"></div> -->
-  <!-- <div class="react-container" data-config="https://www.cdc.gov/respiratory-viruses/modules/respiratory-virus-activity/emergency-dept-visits_live.json"></div> -->
+    <!-- VERTICAL BAR CHARTS -->
+    <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-vertical/combo-line-chart.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-vertical/vertical-bar-chart-categorical.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-vertical/vertical-bar-chart-stacked.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-vertical/vertical-bar-chart-confidence.json"></div> -->
+    <!-- <div class="react-container" data-config="/examples/gallery/bar-chart-vertical/vertical-bar-chart.json"></div> -->
+    <!-- <div class="react-container" data-config="https://www.cdc.gov/respiratory-viruses/modules/respiratory-virus-activity/emergency-dept-visits_live.json"></div> -->
 
-  <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
 
-  <script type="module" src="./src/index.jsx"></script>
-</body>
-
+    <script type="module" src="./src/index.jsx"></script>
+  </body>
 </html>
