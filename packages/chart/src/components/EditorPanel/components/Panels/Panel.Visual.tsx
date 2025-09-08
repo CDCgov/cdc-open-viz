@@ -182,60 +182,60 @@ const PanelVisual: FC<PanelProps> = props => {
         ) &&
           config.visualizationType === 'Combo') ||
           config.visualizationType === 'Line') && (
-            <>
-              <Select
-                tooltip={
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon
-                        display='question'
-                        style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                      />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>
-                        Shapes will appear in the following order: circle, square, triangle, diamond, and inverted
-                        triangle. Use with a maximum of 5 data points.
-                      </p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                }
-                value={config.visual.lineDatapointSymbol}
-                section='visual'
-                fieldName='lineDatapointSymbol'
-                label='Line Datapoint Symbols'
-                updateField={updateField}
-                options={['none', 'standard']}
-              />
-              {config.series.length > config.visual.maximumShapeAmount &&
-                config.visual.lineDatapointSymbol === 'standard' && (
-                  <small className='text-danger'>Standard only supports up to 7 data points</small>
-                )}
+          <>
+            <Select
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon
+                      display='question'
+                      style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                    />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>
+                      Shapes will appear in the following order: circle, square, triangle, diamond, and inverted
+                      triangle. Use with a maximum of 5 data points.
+                    </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+              value={config.visual.lineDatapointSymbol}
+              section='visual'
+              fieldName='lineDatapointSymbol'
+              label='Line Datapoint Symbols'
+              updateField={updateField}
+              options={['none', 'standard']}
+            />
+            {config.series.length > config.visual.maximumShapeAmount &&
+              config.visual.lineDatapointSymbol === 'standard' && (
+                <small className='text-danger'>Standard only supports up to 7 data points</small>
+              )}
 
-              <Select
-                value={config.lineDatapointStyle}
-                fieldName='lineDatapointStyle'
-                label='Line Datapoint Style'
-                updateField={updateField}
-                options={['hidden', 'hover', 'always show']}
-              />
-              <Select
-                value={config.lineDatapointColor}
-                fieldName='lineDatapointColor'
-                label='Line Datapoint Color'
-                updateField={updateField}
-                options={['Same as Line', 'Lighter than Line']}
-              />
-              <CheckBox
-                value={!(config as LineChartConfig).isolatedDotsSameSize}
-                fieldName='isolatedDotsSameSize'
-                label='Accentuate isolated data points'
-                updateField={(section, subsection, fieldname, value) =>
-                  updateField(section, subsection, fieldname, !value)
-                }
-              />
-            </>
-          )}
+            <Select
+              value={config.lineDatapointStyle}
+              fieldName='lineDatapointStyle'
+              label='Line Datapoint Style'
+              updateField={updateField}
+              options={['hidden', 'hover', 'always show']}
+            />
+            <Select
+              value={config.lineDatapointColor}
+              fieldName='lineDatapointColor'
+              label='Line Datapoint Color'
+              updateField={updateField}
+              options={['Same as Line', 'Lighter than Line']}
+            />
+            <CheckBox
+              value={!(config as LineChartConfig).isolatedDotsSameSize}
+              fieldName='isolatedDotsSameSize'
+              label='Accentuate isolated data points'
+              updateField={(section, subsection, fieldname, value) =>
+                updateField(section, subsection, fieldname, !value)
+              }
+            />
+          </>
+        )}
         {/* eslint-disable */}
         <label className='header'>
           <span className='edit-label'>Header Theme</span>
@@ -458,14 +458,14 @@ const PanelVisual: FC<PanelProps> = props => {
         {(config.visualizationType === 'Bar' ||
           config.visualizationType === 'Line' ||
           config.visualizationType === 'Combo') && (
-            <CheckBox
-              value={config.topAxis.hasLine}
-              section='topAxis'
-              fieldName='hasLine'
-              label='Add Top Axis Line'
-              updateField={updateField}
-            />
-          )}
+          <CheckBox
+            value={config.topAxis.hasLine}
+            section='topAxis'
+            fieldName='hasLine'
+            label='Add Top Axis Line'
+            updateField={updateField}
+          />
+        )}
         {config.visualizationType === 'Spark Line' && (
           <div className='cove-accordion__panel-section checkbox-group'>
             <CheckBox

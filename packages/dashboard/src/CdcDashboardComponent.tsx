@@ -83,11 +83,11 @@ export default function CdcDashboard({
 
   const inNoDataState = useMemo(() => {
     const hasApplyBehavior = hasDashboardApplyBehavior(state.config.visualizations)
-    
+
     if (hasApplyBehavior && !state.filtersApplied) {
       return true
     }
-    
+
     const vals = reloadURLHelpers.getDatasetKeys(state.config).map(key => state.data[key])
     if (!vals.length) return true
     return vals.some(val => val === undefined)
@@ -256,7 +256,7 @@ export default function CdcDashboard({
         }
       })
     }
-    
+
     setAPILoading(false)
   }
 

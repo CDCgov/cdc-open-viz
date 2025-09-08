@@ -117,10 +117,7 @@ const PieChart = props => {
       // take out Calculated Area so it falls back to `unknown`
       const domainKeys = Object.keys(keys).filter(k => k !== labelForCalcArea)
 
-      const basePalette = getPaletteColors(config, colorPalettes).slice(
-        0,
-        domainKeys.length
-      )
+      const basePalette = getPaletteColors(config, colorPalettes).slice(0, domainKeys.length)
       const COOL_GRAY_90 = getComputedStyle(document.documentElement).getPropertyValue('--cool-gray-10').trim()
       return scaleOrdinal({
         domain: domainKeys,

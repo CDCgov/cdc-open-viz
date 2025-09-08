@@ -105,7 +105,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
 
       dispatch({ type: 'SET_DATA', payload: emptyData })
       dispatch({ type: 'SET_FILTERED_DATA', payload: emptyFilteredData })
-      
+
       loadAPIFilters(dashboardConfig.sharedFilters, apiFilterDropdowns)
         .then(newFilters => {
           reloadURLData(newFilters)

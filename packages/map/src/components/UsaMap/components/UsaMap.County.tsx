@@ -7,6 +7,7 @@ import Loading from '@cdc/core/components/Loading'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
+import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { drawShape, createShapeProperties } from '../helpers/shapes'
 import { getGeoStrokeColor, handleMapAriaLabels, displayGeoName, isLegendItemDisabled } from '../../../helpers'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
@@ -131,17 +132,17 @@ const CountyMap = () => {
   const {
     container,
     containerEl,
-    data,
+    runtimeData,
     runtimeFilters,
     runtimeLegend,
     setConfig,
     config,
     tooltipId,
     tooltipRef,
-    legendMemo,
-    legendSpecialClassLastMemo,
     configUrl
   } = useContext(ConfigContext)
+
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
   // CREATE STATE LINES
   const geoStrokeColor = getGeoStrokeColor(config)
@@ -200,7 +201,7 @@ const CountyMap = () => {
   const canvasRef = useRef()
 
   // If runtimeData is not defined, show loader
-  if (!data || !isTopoReady(topoData, config, runtimeFilters)) {
+  if (!runtimeData || !isTopoReady(topoData, config, runtimeFilters)) {
     return (
       <div style={{ height: 300 }}>
         <Loading />
@@ -208,7 +209,7 @@ const CountyMap = () => {
     )
   }
 
-  const runtimeKeys = Object.keys(data)
+  const runtimeKeys = Object.keys(runtimeData)
   const lineWidth = 1
 
   const onReset = () => {
@@ -256,8 +257,8 @@ const CountyMap = () => {
             break
           }
         }
-        if (county && data[county.id]) {
-          geoClickHandler(displayGeoName(county.id), data[county.id])
+        if (county && runtimeData[county.id]) {
+          geoClickHandler(displayGeoName(county.id), runtimeData[county.id])
         }
       }
 
@@ -283,8 +284,8 @@ const CountyMap = () => {
       let clickedGeo
       for (let i = 0; i < runtimeKeys.length; i++) {
         const pixelCoords = topoData.projection([
-          data[runtimeKeys[i]][config.columns.longitude.name],
-          data[runtimeKeys[i]][config.columns.latitude.name]
+          runtimeData[runtimeKeys[i]][config.columns.longitude.name],
+          runtimeData[runtimeKeys[i]][config.columns.latitude.name]
         ])
         if (
           pixelCoords &&
@@ -332,7 +333,7 @@ const CountyMap = () => {
         if (
           !isNaN(currentTooltipIndex) &&
           applyLegendToRow(
-            data[topoData.mapData[currentTooltipIndex].id],
+            runtimeData[topoData.mapData[currentTooltipIndex].id],
             config,
             runtimeLegend,
             legendMemo,
@@ -340,7 +341,7 @@ const CountyMap = () => {
           )
         ) {
           context.fillStyle = applyLegendToRow(
-            data[topoData.mapData[currentTooltipIndex].id],
+            runtimeData[topoData.mapData[currentTooltipIndex].id],
             config,
             runtimeLegend,
             legendMemo,
@@ -377,10 +378,10 @@ const CountyMap = () => {
         }
 
         // If the hovered county is found, show the tooltip for that county, otherwise hide the tooltip
-        if (county && data[county.id]) {
-          if (applyLegendToRow(data[county.id], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)) {
+        if (county && runtimeData[county.id]) {
+          if (applyLegendToRow(runtimeData[county.id], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)) {
             let fillColor = applyLegendToRow(
-              data[county.id],
+              runtimeData[county.id],
               config,
               runtimeLegend,
               legendMemo,
@@ -406,7 +407,7 @@ const CountyMap = () => {
             tooltipRef.current.style.transform = 'translate(0, -50%)'
             tooltipRef.current.style.left = tooltipX + 5 + 'px'
           }
-          tooltipRef.current.innerHTML = applyTooltipsToGeo(displayGeoName(county.id), data[county.id])
+          tooltipRef.current.innerHTML = applyTooltipsToGeo(displayGeoName(county.id), runtimeData[county.id])
           tooltipRef.current.setAttribute('data-index', countyIndex)
         } else {
           tooltipRef.current.style.display = 'none'
@@ -417,8 +418,8 @@ const CountyMap = () => {
       // Handle geo map hover
       if (!isNaN(currentTooltipIndex)) {
         const pixelCoords = topoData.projection([
-          data[runtimeKeys[currentTooltipIndex]][config.columns.longitude.name],
-          data[runtimeKeys[currentTooltipIndex]][config.columns.latitude.name]
+          runtimeData[runtimeKeys[currentTooltipIndex]][config.columns.longitude.name],
+          runtimeData[runtimeKeys[currentTooltipIndex]][config.columns.latitude.name]
         ])
         if (pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
           return // The user is still hovering over the previous geo point, don't redraw tooltip
@@ -432,8 +433,8 @@ const CountyMap = () => {
       let hoveredGeoIndex
       for (let i = 0; i < runtimeKeys.length; i++) {
         const pixelCoords = topoData.projection([
-          data[runtimeKeys[i]][config.columns.longitude.name],
-          data[runtimeKeys[i]][config.columns.latitude.name]
+          runtimeData[runtimeKeys[i]][config.columns.longitude.name],
+          runtimeData[runtimeKeys[i]][config.columns.latitude.name]
         ])
         let includedShapes = ['circle', 'diamond', 'star', 'triangle', 'square'].includes(config.visual.cityStyle)
         if (
@@ -443,7 +444,7 @@ const CountyMap = () => {
           applyLegendToRow(data[runtimeKeys[i]], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo) &&
           !isLegendItemDisabled(data[runtimeKeys[i]], runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
         ) {
-          hoveredGeo = data[runtimeKeys[i]]
+          hoveredGeo = runtimeData[runtimeKeys[i]]
           hoveredGeoIndex = i
           break
         }
@@ -455,7 +456,7 @@ const CountyMap = () => {
             applyLegendToRow(data[runtimeKeys[i]], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo) &&
             !isLegendItemDisabled(data[runtimeKeys[i]], runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
           ) {
-            hoveredGeo = data[runtimeKeys[i]]
+            hoveredGeo = runtimeData[runtimeKeys[i]]
             hoveredGeoIndex = i
             break
           }
@@ -539,7 +540,7 @@ const CountyMap = () => {
         if (!focus.id && config.general.type === 'us-geocode' && geo.id.length > 2) return
 
         // Gets numeric data associated with the topo data for this state/county
-        const geoData = data[geo.id]
+        const geoData = runtimeData[geo.id]
 
         // Renders state/county
         const legendValues =
@@ -602,7 +603,7 @@ const CountyMap = () => {
 
           if (cityPixelCoords) {
             const legendValues = applyLegendToRow(
-              data[city?.value],
+              runtimeData[city?.value],
               config,
               runtimeLegend,
               legendMemo,
@@ -623,13 +624,13 @@ const CountyMap = () => {
           const citiesList = new Set(cityStyles.map(item => item.value))
 
           const pixelCoords = topoData.projection([
-            data[key][config.columns.longitude.name],
-            data[key][config.columns.latitude.name]
+            runtimeData[key][config.columns.longitude.name],
+            runtimeData[key][config.columns.latitude.name]
           ])
           if (pixelCoords && !citiesList.has(key)) {
             const legendValues =
-              data[key] !== undefined
-                ? applyLegendToRow(data[key], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+              runtimeData[key] !== undefined
+                ? applyLegendToRow(runtimeData[key], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
                 : false
             if (legendValues) {
               if (legendValues?.[0] === '#000000' || legendValues?.[0] === DEFAULT_MAP_BACKGROUND) return

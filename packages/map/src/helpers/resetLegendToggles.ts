@@ -1,5 +1,6 @@
 import _ from 'lodash'
-export const resetLegendToggles = (runtimeLegend, setRuntimeLegend) => {
+
+export const resetLegendToggles = (runtimeLegend, dispatch) => {
   const legendCopy = _.cloneDeep(runtimeLegend)
 
   legendCopy.items.forEach(legendItem => {
@@ -9,5 +10,5 @@ export const resetLegendToggles = (runtimeLegend, setRuntimeLegend) => {
 
   legendCopy.runtimeDataHash = runtimeLegend.runtimeDataHash
 
-  setRuntimeLegend(legendCopy)
+  dispatch({ type: 'SET_RUNTIME_LEGEND', payload: legendCopy })
 }
