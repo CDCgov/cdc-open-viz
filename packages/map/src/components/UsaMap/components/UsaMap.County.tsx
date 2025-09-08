@@ -8,7 +8,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { drawShape, createShapeProperties } from '../helpers/shapes'
-import { getGeoStrokeColor, handleMapAriaLabels, displayGeoName } from '../../../helpers'
+import { getGeoStrokeColor, handleMapAriaLabels, displayGeoName, isLegendItemDisabled } from '../../../helpers'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
@@ -271,8 +271,12 @@ const CountyMap = () => {
 
       // Redraw with focus on state
       setFocus({ id: clickedState.id, index: focusIndex, center: geoCentroid(clickedState), feature: clickedState })
-      publishAnalyticsEvent('map_zoomed_in', 'click', `${configUrl}|zoom_level_3|${clickedState.properties.name}`, 'map')
-
+      publishAnalyticsEvent(
+        'map_zoomed_in',
+        'click',
+        `${configUrl}|zoom_level_3|${clickedState.properties.name}`,
+        'map'
+      )
     }
     if (config.general.type === 'us-geocode') {
       const geoRadius = (config.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
@@ -282,7 +286,11 @@ const CountyMap = () => {
           data[runtimeKeys[i]][config.columns.longitude.name],
           data[runtimeKeys[i]][config.columns.latitude.name]
         ])
-        if (pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
+        if (
+          pixelCoords &&
+          Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius &&
+          !isLegendItemDisabled(data[runtimeKeys[i]], runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
+        ) {
           clickedGeo = data[runtimeKeys[i]]
           break
         }
@@ -432,7 +440,8 @@ const CountyMap = () => {
           includedShapes &&
           pixelCoords &&
           Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius &&
-          applyLegendToRow(data[runtimeKeys[i]], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+          applyLegendToRow(data[runtimeKeys[i]], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo) &&
+          !isLegendItemDisabled(data[runtimeKeys[i]], runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
         ) {
           hoveredGeo = data[runtimeKeys[i]]
           hoveredGeoIndex = i
@@ -443,7 +452,8 @@ const CountyMap = () => {
           const distance = Math.hypot(pixelCoords[0] - x, pixelCoords[1] - y)
           if (
             distance < 15 &&
-            applyLegendToRow(data[runtimeKeys[i]], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+            applyLegendToRow(data[runtimeKeys[i]], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo) &&
+            !isLegendItemDisabled(data[runtimeKeys[i]], runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
           ) {
             hoveredGeo = data[runtimeKeys[i]]
             hoveredGeoIndex = i
