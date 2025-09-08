@@ -10,6 +10,7 @@ interface BarConfigProps {
   barWidth: number
   isVertical: boolean
   yAxisValue: number
+  labelFontSize: number
 }
 
 // Function to create bar width based on suppression status and missing data label
@@ -20,7 +21,8 @@ export const getBarConfig = ({
   config,
   barWidth,
   isVertical,
-  yAxisValue
+  yAxisValue,
+  labelFontSize
 }: BarConfigProps) => {
   const heightMini = 3 /// height of small bars aka suppressed/NA/Zero valued
   let barHeight = defaultBarHeight
@@ -50,7 +52,7 @@ export const getBarConfig = ({
 
   // Handle undefined, null, or non-calculable bar.value
   if (!isSuppressed && !isNumber(bar.value) && config.general.showMissingDataLabel) {
-    const labelWidth = getTextWidth(barLabel, `normal ${barWidth / 2}px sans-serif`)
+    const labelWidth = getTextWidth(barLabel, `normal ${labelFontSize}px sans-serif`)
     const labelFits = Number(labelWidth) < barWidth && barWidth > 10
     showMissingDataLabel = true
     barHeight = labelFits ? heightMini : 0
@@ -59,7 +61,7 @@ export const getBarConfig = ({
   // Handle undefined, null, or non-calculable bar.value
 
   if (!isSuppressed && bar.value === '0' && config.general.showZeroValueData) {
-    const labelWidth = getTextWidth('0', `normal ${barWidth / 2}px sans-serif`)
+    const labelWidth = getTextWidth('0', `normal ${labelFontSize}px sans-serif`)
     const labelFits = Number(labelWidth) < barWidth && barWidth > 10
     showZeroValueData = true
     barHeight = labelFits ? heightMini : 0
@@ -91,7 +93,7 @@ export const getBarConfig = ({
     if (showZeroValueData) label = '0'
 
     // determine label width in pixels & check if it fits to the bar width
-    const labelWidth = getTextWidth(barLabel, `normal ${barWidth / 2}px sans-serif`)
+    const labelWidth = getTextWidth(barLabel, `normal ${labelFontSize}px sans-serif`)
     const labelFits = Number(labelWidth) < barWidth && barWidth > 10
     if (config.isLollipopChart) {
       return label
@@ -109,4 +111,39 @@ export const testZeroValue = value => {
   }
   const regex = /^0(\.0)?$/
   return regex.test(value.toString())
+}
+
+export const addMinimumBarHeights = barStacks => {
+  const MIN_BAR_HEIGHT = 3
+
+  barStacks[0].bars.forEach((_, i) => {
+    let segments = barStacks
+      .map(bs => bs.bars[i])
+      .filter(s => s.bar.data[s.key])
+      .reverse()
+
+    const segmentsNeedingAdjustment = segments.filter(segment => segment.height > 0 && segment.height < MIN_BAR_HEIGHT)
+    const segmentsToShrink = segments.filter(segment => segment.height > MIN_BAR_HEIGHT)
+
+    if (segmentsNeedingAdjustment.length > 0 && segmentsToShrink.length > 0) {
+      segmentsNeedingAdjustment.forEach(smallSegment => {
+        const heightToAdd = MIN_BAR_HEIGHT - smallSegment.height
+        const heightToTakePerSegment = heightToAdd / segmentsToShrink.length
+
+        segmentsToShrink.forEach(largeSegment => {
+          largeSegment.height -= heightToTakePerSegment
+        })
+
+        smallSegment.height = MIN_BAR_HEIGHT
+      })
+
+      let cumulativeY = segments[0].y
+      segments.forEach(segment => {
+        segment.y = cumulativeY
+        cumulativeY += segment.height
+      })
+    }
+  })
+
+  return barStacks
 }

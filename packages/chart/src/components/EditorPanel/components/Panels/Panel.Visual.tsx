@@ -1,4 +1,5 @@
 import { useContext, FC } from 'react'
+import _ from 'lodash'
 
 // external libraries
 import {
@@ -15,7 +16,8 @@ import Icon from '@cdc/core/components/ui/Icon'
 import InputToggle from '@cdc/core/components/inputs/InputToggle'
 
 // contexts
-import { useColorPalette } from '../../../../hooks/useColorPalette'
+import { useColorPalette } from '@cdc/core/hooks/useColorPalette'
+import { getCurrentPaletteName } from '@cdc/core/helpers/palettes/utils'
 import { ChartContext } from './../../../../types/ChartContext.js'
 
 import { useEditorPermissions } from '../../useEditorPermissions.js'
@@ -23,12 +25,14 @@ import { useEditorPanelContext } from '../../EditorPanelContext.js'
 import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 import { LineChartConfig } from '../../../../types/ChartConfig'
+import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
 import './panelVisual.styles.css'
 
 const PanelVisual: FC<PanelProps> = props => {
   const { config, updateConfig, colorPalettes, twoColorPalette } = useContext<ChartContext>(ConfigContext)
   const { visual } = config
-  const { setLollipopShape, updateField } = useEditorPanelContext()
+
+  const { setLollipopShape, updateField, handlePaletteSelection } = useEditorPanelContext()
   const {
     visHasBarBorders,
     visCanAnimate,
@@ -257,115 +261,67 @@ const PanelVisual: FC<PanelProps> = props => {
             </label>
             {visSupportsReverseColorPalette() && (
               <InputToggle
-                fieldName='isPaletteReversed'
+                section='general'
+                subsection='palette'
+                fieldName='isReversed'
                 size='small'
                 label='Use selected palette in reverse order'
                 updateField={updateField}
-                value={config.isPaletteReversed}
+                onClick={() => {
+                  const _state = _.cloneDeep(config)
+                  const currentPaletteName = getCurrentPaletteName(config)
+                  _state.general.palette.isReversed = !_state.general.palette.isReversed
+                  let paletteName = ''
+                  if (_state.general.palette.isReversed && !currentPaletteName.endsWith('reverse')) {
+                    paletteName = currentPaletteName + 'reverse'
+                  }
+                  if (!_state.general.palette.isReversed && currentPaletteName.endsWith('reverse')) {
+                    paletteName = currentPaletteName.slice(0, -7)
+                  }
+                  if (paletteName) {
+                    _state.general.palette.name = paletteName
+                  }
+                  updateConfig(_state)
+                }}
+                value={config.general?.palette?.isReversed}
               />
             )}
             {visSupportsSequentialPallete() && (
               <>
                 <span>Sequential</span>
-                <ul className='color-palette'>
-                  {sequential.map(palette => {
-                    const colorOne = {
-                      backgroundColor: colorPalettes[palette][2]
-                    }
-
-                    const colorTwo = {
-                      backgroundColor: colorPalettes[palette][3]
-                    }
-
-                    const colorThree = {
-                      backgroundColor: colorPalettes[palette][5]
-                    }
-
-                    return (
-                      <button
-                        title={palette}
-                        key={palette}
-                        onClick={e => {
-                          e.preventDefault()
-                          updateConfig({ ...config, palette })
-                        }}
-                        className={config.palette === palette ? 'selected' : ''}
-                      >
-                        <span style={colorOne}></span>
-                        <span style={colorTwo}></span>
-                        <span style={colorThree}></span>
-                      </button>
-                    )
-                  })}
-                </ul>
+                <PaletteSelector
+                  palettes={sequential}
+                  colorPalettes={colorPalettes}
+                  config={config}
+                  onPaletteSelect={handlePaletteSelection}
+                  selectedPalette={getCurrentPaletteName(config)}
+                  colorIndices={[2, 3, 5]}
+                  className='color-palette'
+                />
               </>
             )}
             {visSupportsNonSequentialPallete() && (
               <>
                 <span>Non-Sequential</span>
-                <ul className='color-palette'>
-                  {nonSequential.map(palette => {
-                    const colorOne = {
-                      backgroundColor: colorPalettes[palette][2]
-                    }
-
-                    const colorTwo = {
-                      backgroundColor: colorPalettes[palette][4]
-                    }
-
-                    const colorThree = {
-                      backgroundColor: colorPalettes[palette][6]
-                    }
-
-                    return (
-                      <button
-                        title={palette}
-                        key={palette}
-                        onClick={e => {
-                          e.preventDefault()
-                          updateConfig({ ...config, palette })
-                        }}
-                        className={config.palette === palette ? 'selected' : ''}
-                      >
-                        <span style={colorOne}></span>
-                        <span style={colorTwo}></span>
-                        <span style={colorThree}></span>
-                      </button>
-                    )
-                  })}
-                </ul>
+                <PaletteSelector
+                  palettes={nonSequential}
+                  colorPalettes={colorPalettes}
+                  config={config}
+                  onPaletteSelect={handlePaletteSelection}
+                  selectedPalette={getCurrentPaletteName(config)}
+                  colorIndices={[2, 4, 6]}
+                  className='color-palette'
+                />
                 <span>Colorblind Safe</span>
-                <ul className='color-palette'>
-                  {accessibleColors.map(palette => {
-                    const colorOne = {
-                      backgroundColor: colorPalettes[palette][2]
-                    }
-
-                    const colorTwo = {
-                      backgroundColor: colorPalettes[palette][3]
-                    }
-
-                    const colorThree = {
-                      backgroundColor: colorPalettes[palette][5]
-                    }
-
-                    return (
-                      <button
-                        title={palette}
-                        key={palette}
-                        onClick={e => {
-                          e.preventDefault()
-                          updateConfig({ ...config, palette })
-                        }}
-                        className={config.palette === palette ? 'selected' : ''}
-                      >
-                        <span style={colorOne}></span>
-                        <span style={colorTwo}></span>
-                        <span style={colorThree}></span>
-                      </button>
-                    )
-                  })}
-                </ul>
+                <PaletteSelector
+                  palettes={accessibleColors}
+                  colorPalettes={colorPalettes}
+                  config={config}
+                  onPaletteSelect={handlePaletteSelection}
+                  selectedPalette={getCurrentPaletteName(config)}
+                  colorIndices={[2, 3, 5]}
+                  className='color-palette'
+                />
               </>
             )}
           </>

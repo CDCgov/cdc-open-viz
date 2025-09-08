@@ -8,10 +8,12 @@ import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
+import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 
 // CDC core components and helpers
 import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { getBarConfig, testZeroValue } from '../helpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
@@ -54,14 +56,84 @@ export const BarChartHorizontal = () => {
     formatNumber,
     formatDate,
     parseDate,
-    setSharedFilter
+    setSharedFilter,
+    currentViewport
   } = useContext<ChartContext>(ConfigContext)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
+  const LABEL_FONT_SIZE = isMobileFontViewport(currentViewport) ? 13 : 16
+
   const hasConfidenceInterval = [config.confidenceKeys?.upper, config.confidenceKeys?.lower].every(
     v => v != null && String(v).trim() !== ''
   )
+
+  // Pattern helper function
+  const renderPatternDefs = () => {
+    if (!config.legend.patterns || Object.keys(config.legend.patterns).length === 0) {
+      return null
+    }
+
+    return (
+      <defs>
+        {Object.entries(config.legend.patterns).map(([key, pattern]) => {
+          const patternId = `chart-pattern-${key}`
+          const size = pattern.patternSize || 8
+
+          switch (pattern.shape) {
+            case 'circles':
+              return (
+                <PatternCircles
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  fill={pattern.color}
+                  radius={1.25}
+                />
+              )
+            case 'lines':
+              return (
+                <PatternLines
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  stroke={pattern.color}
+                  strokeWidth={0.75}
+                  orientation={['horizontal']}
+                />
+              )
+            case 'diagonalLines':
+              return (
+                <PatternLines
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  stroke={pattern.color}
+                  strokeWidth={0.75}
+                  orientation={['diagonalRightToLeft']}
+                />
+              )
+            case 'waves':
+              return (
+                <PatternWaves
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  fill={pattern.color}
+                  strokeWidth={0.25}
+                />
+              )
+            default:
+              return null
+          }
+        })}
+      </defs>
+    )
+  }
 
   const _data = getBarData(config, data, hasConfidenceInterval)
 
@@ -70,6 +142,7 @@ export const BarChartHorizontal = () => {
     config.visualizationType === 'Bar' &&
     config.orientation === 'horizontal' && (
       <Group>
+        {renderPatternDefs()}
         <BarGroup
           data={config.preliminaryData?.some(pd => pd.value && pd.type === 'suppression') ? tableData : _data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
@@ -132,7 +205,15 @@ export const BarChartHorizontal = () => {
                     barWidthHorizontal: barWidth,
                     isSuppressed,
                     absentDataLabel
-                  } = getBarConfig({ bar, defaultBarWidth, config, isVertical: false, yAxisValue, barWidth: 0 })
+                  } = getBarConfig({
+                    bar,
+                    defaultBarWidth,
+                    config,
+                    isVertical: false,
+                    yAxisValue,
+                    barWidth: 0,
+                    labelFontSize: LABEL_FONT_SIZE
+                  })
 
                   const barPosition = !isPositiveBar ? 'below' : 'above'
 
@@ -237,14 +318,37 @@ export const BarChartHorizontal = () => {
                     return xScale(d)
                   })
 
+                  // Check if this bar should use a pattern
+                  const getPatternUrl = (): string | null => {
+                    if (!config.legend.patterns || Object.keys(config.legend.patterns).length === 0) {
+                      return null
+                    }
+
+                    // Find a pattern that matches this data point
+                    for (const [patternKey, pattern] of Object.entries(config.legend.patterns)) {
+                      if (pattern.dataKey && pattern.dataValue) {
+                        const dataFieldValue = datum[pattern.dataKey]
+                        if (String(dataFieldValue) === String(pattern.dataValue)) {
+                          return `url(#chart-pattern-${patternKey})`
+                        }
+                      }
+                    }
+
+                    return null
+                  }
+
+                  const patternUrl = getPatternUrl()
+                  const baseBackground = background()
+
                   return (
                     <Group display={hideGroup} key={`${barGroup.index}--${index}`}>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
+                        {/* Base colored bar */}
                         {createBarElement({
                           config: config,
                           index: newIndex,
                           id: `barGroup${barGroup.index}`,
-                          background: background(),
+                          background: baseBackground,
                           borderColor,
                           borderStyle: 'solid',
                           borderWidth: `${borderWidth}px`,
@@ -269,6 +373,32 @@ export const BarChartHorizontal = () => {
                             display: displayBar ? 'block' : 'none'
                           }
                         })}
+
+                        {/* Pattern overlay if pattern exists */}
+                        {patternUrl &&
+                          createBarElement({
+                            config: config,
+                            index: newIndex,
+                            background: patternUrl, // Use pattern as background
+                            borderColor: 'transparent',
+                            borderStyle: 'none',
+                            borderWidth: '0px',
+                            width: barWidth,
+                            height: numbericBarHeight,
+                            x: barX,
+                            y: barHeight * bar.index,
+                            onMouseOver: () => {}, // No interaction
+                            onMouseLeave: () => {}, // No interaction
+                            tooltipHtml: '',
+                            tooltipId: '',
+                            onClick: () => {}, // No interaction
+                            styleOverrides: {
+                              transformOrigin: `0 ${barY + barHeight}px`,
+                              opacity: transparentBar ? 0.2 : 1,
+                              display: displayBar ? 'block' : 'none',
+                              pointerEvents: 'none' // Let clicks pass through to base bar
+                            }
+                          })}
 
                         {(absentDataLabel || isSuppressed) && (
                           <rect
@@ -298,17 +428,11 @@ export const BarChartHorizontal = () => {
 
                           const hasAsterisk = String(pd.symbol).includes('Asterisk')
                           const verticalAnchor = hasAsterisk ? 'middle' : 'end'
-                          const iconSize =
-                            pd.symbol === 'Asterisk'
-                              ? barHeight * 1.2
-                              : pd.symbol === 'Double Asterisk'
-                              ? barHeight
-                              : barHeight / 1.5
                           const fillColor = pd.displayGray ? '#8b8b8a' : APP_FONT_COLOR
                           return (
                             <Text // prettier-ignore
                               key={index}
-                              fontSize={iconSize}
+                              fontSize={LABEL_FONT_SIZE}
                               display={displayBar ? 'block' : 'none'}
                               opacity={transparentBar ? 0.5 : 1}
                               x={barX}

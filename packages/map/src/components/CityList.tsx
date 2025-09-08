@@ -5,7 +5,16 @@ import ConfigContext from '../context'
 import { useLegendMemoContext } from '../context/LegendMemoContext'
 import { supportedCities } from '../data/supported-geos'
 import { getFilterControllingStatesPicked } from './UsaMap/helpers/map'
-import { displayGeoName, getGeoStrokeColor, SVG_HEIGHT, SVG_PADDING, SVG_WIDTH, titleCase } from '../helpers'
+import {
+  displayGeoName,
+  getGeoStrokeColor,
+  SVG_HEIGHT,
+  SVG_PADDING,
+  SVG_WIDTH,
+  titleCase,
+  hashObj,
+  isLegendItemDisabled
+} from '../helpers'
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import { applyLegendToRow } from '../helpers/applyLegendToRow'
@@ -75,6 +84,13 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
 
     if (legendColors === false) {
       return true
+    }
+
+    // Don't render if legend item is disabled
+    if (
+      isLegendItemDisabled(geoData || runtimeData[city], runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
+    ) {
+      return null
     }
 
     const toolTip = applyTooltipsToGeo(cityDisplayName, geoData || runtimeData[city])
@@ -213,6 +229,19 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       ) {
         let translate = `translate(${projection(supportedCities[city.toUpperCase()])})`
 
+        // Check if legend is disabled before rendering
+        if (
+          isLegendItemDisabled(
+            geoData || runtimeData[city],
+            runtimeLegend,
+            legendMemo,
+            legendSpecialClassLastMemo,
+            config
+          )
+        ) {
+          return null
+        }
+
         return (
           <g key={i} transform={translate} style={styles} className='geo-point' tabIndex={-1}>
             {cityStyleShapes[cityStyle.shape.toLowerCase()]}
@@ -224,6 +253,19 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
         const coords = [Number(geoData?.[longitudeColumnName]), Number(geoData?.[latitudeColumnName])]
         let translate = `translate(${projection(coords)})`
 
+        // Check if legend is disabled before rendering
+        if (
+          isLegendItemDisabled(
+            geoData || runtimeData[city],
+            runtimeLegend,
+            legendMemo,
+            legendSpecialClassLastMemo,
+            config
+          )
+        ) {
+          return null
+        }
+
         return (
           <g key={i} transform={translate} style={styles} className='geo-point' tabIndex={-1}>
             {cityStyleShapes[cityStyle.shape.toLowerCase()]}
@@ -232,6 +274,13 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       }
     }
     if (legendColors?.[0] === '#000000') return
+
+    // Final check if legend is disabled before rendering the default city style
+    if (
+      isLegendItemDisabled(geoData || runtimeData[city], runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
+    ) {
+      return null
+    }
 
     return (
       <g key={i} transform={transform} style={styles} className='geo-point' tabIndex={-1}>

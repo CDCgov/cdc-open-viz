@@ -13,6 +13,8 @@ import parse from 'html-react-parser'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import { DashboardContext, DashboardDispatchContext } from './DashboardContext'
+import { Visualization } from '@cdc/core/types/Visualization'
+import { hasDashboardApplyBehavior } from './helpers/hasDashboardApplyBehavior'
 
 import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
 import Loading from '@cdc/core/components/Loading'
@@ -40,7 +42,7 @@ import { type WCMSProps } from '@cdc/core/types/WCMSProps'
 import { type InitialState } from './types/InitialState'
 import MultiTabs from './components/MultiConfigTabs'
 import _ from 'lodash'
-import EditorContext from '../../editor/src/ConfigContext'
+import EditorContext from '@cdc/core/contexts/EditorContext'
 import { APIFilterDropdowns } from './components/DashboardFilters'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import VisualizationRow from './components/VisualizationRow'
@@ -80,10 +82,16 @@ export default function CdcDashboard({
   const isPreview = state.tabSelected === 'Dashboard Preview'
 
   const inNoDataState = useMemo(() => {
+    const hasApplyBehavior = hasDashboardApplyBehavior(state.config.visualizations)
+
+    if (hasApplyBehavior && !state.filtersApplied) {
+      return true
+    }
+
     const vals = reloadURLHelpers.getDatasetKeys(state.config).map(key => state.data[key])
     if (!vals.length) return true
     return vals.some(val => val === undefined)
-  }, [state.data])
+  }, [state.data, state.config.visualizations, state.filtersApplied])
 
   const vizRowColumnLocator = getVizRowColumnLocator(state.config.rows)
 
@@ -108,7 +116,12 @@ export default function CdcDashboard({
     const filters = newFilters || config.dashboard.sharedFilters
     const datasetKeys = reloadURLHelpers.getDatasetKeys(config)
 
-    const newData = _.cloneDeep(state.data)
+    const emptyData = {}
+    const emptyFilteredData = {}
+    dispatch({ type: 'SET_DATA', payload: emptyData })
+    dispatch({ type: 'SET_FILTERED_DATA', payload: emptyFilteredData })
+
+    const newData = {} // Start with empty object instead of cloning existing data
     const newDatasets = _.cloneDeep(config.datasets)
     let dataWasFetched = false
     let newFileName = ''
@@ -161,7 +174,7 @@ export default function CdcDashboard({
 
         const dataNeedsUpdate = reloadURLHelpers.isUpdateNeeded(filters, currentQSParams, updatedQSParams)
         const alreadyFetched = !!dataset.data
-        if (alreadyFetched) {
+        if (alreadyFetched && !newFilters && !dataNeedsUpdate) {
           dataWasFetched = true
           newData[datasetKey] = dataset.data
         } else if (!!newFilters || dataNeedsUpdate) {
@@ -229,7 +242,10 @@ export default function CdcDashboard({
         _newData
       )
       dispatch({ type: 'SET_FILTERED_DATA', payload: filteredData })
-      const visualizations = reloadURLHelpers.getVisualizationsWithFormattedData(config.visualizations, newData)
+      const visualizations = reloadURLHelpers.getVisualizationsWithFormattedData(
+        config.visualizations as Record<string, Visualization>,
+        newData
+      )
       dispatch({
         type: 'SET_CONFIG',
         payload: {
@@ -239,8 +255,9 @@ export default function CdcDashboard({
           activeDashboard: config.activeDashboard
         }
       })
-      setAPILoading(false)
     }
+
+    setAPILoading(false)
   }
 
   const findFilterTier = (filters: SharedFilter[], sharedFilter: SharedFilter) => {
@@ -311,12 +328,31 @@ export default function CdcDashboard({
       })
       if (allValuesSelected) {
         reloadURLData(newFilters)
-        setAPILoading(false)
       } else {
         setAPILoading(false)
       }
     })
   }, [isEditor, isPreview, state.config?.activeDashboard])
+
+  useEffect(() => {
+    return () => {
+      // Clear all data when component unmounts to prevent memory leaks
+      dispatch({ type: 'SET_DATA', payload: {} })
+      dispatch({ type: 'SET_FILTERED_DATA', payload: {} })
+
+      // Clear any pending API requests
+      setAPILoading(false)
+
+      // Force garbage collection hint if available
+      if (window.gc && typeof window.gc === 'function') {
+        try {
+          window.gc()
+        } catch (e) {
+          // Ignore gc errors
+        }
+      }
+    }
+  }, [])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
     const config = _.cloneDeep(state.config)

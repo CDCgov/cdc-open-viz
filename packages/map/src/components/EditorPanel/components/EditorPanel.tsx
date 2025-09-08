@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useMemo } from 'react'
+import { filterColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 
 // Third Party
 import {
@@ -16,7 +17,7 @@ import Panels from './Panels'
 import Layout from '@cdc/core/components/Layout'
 
 // Data
-import colorPalettes from '@cdc/core/data/colorPalettes'
+import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { supportedStatesFipsCodes } from '../../../data/supported-geos.js'
 
 // Components - Core
@@ -49,6 +50,10 @@ import './editorPanel.styles.css'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 import MultiSelect from '@cdc/core/components/MultiSelect'
+import { migratePaletteName } from '@cdc/core/helpers/migratePaletteName'
+import { isV1Palette, getCurrentPaletteName } from '@cdc/core/helpers/palettes/utils'
+import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
+import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
 
 type MapEditorPanelProps = {
   datasets?: Datasets
@@ -76,6 +81,11 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const [loadedDefault, setLoadedDefault] = useState(false)
   const [displayPanel, setDisplayPanel] = useState(true)
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
+  const [showConversionModal, setShowConversionModal] = useState(false)
+  const [pendingPaletteSelection, setPendingPaletteSelection] = useState<{
+    palette: string
+    action: () => void
+  } | null>(null)
 
   const {
     MapLayerHandlers: { handleMapLayer, handleAddLayer, handleRemoveLayer }
@@ -899,46 +909,65 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
   const isReversed = config.general.palette.isReversed
 
-  function filterColorPalettes() {
-    let sequential = []
-    let nonSequential = []
-    let accessibleColors = []
-    for (let paletteName in colorPalettes) {
-      if (!isReversed) {
-        if (paletteName.includes('qualitative') && !paletteName.endsWith('reverse')) {
-          nonSequential.push(paletteName)
-        }
-        if (paletteName.includes('colorblindsafe') && !paletteName.endsWith('reverse')) {
-          accessibleColors.push(paletteName)
-        }
-        if (
-          !paletteName.includes('qualitative') &&
-          !paletteName.includes('colorblindsafe') &&
-          !paletteName.endsWith('reverse')
-        ) {
-          sequential.push(paletteName)
-        }
+  const { sequential, nonSequential, accessibleColors } = useMemo(
+    () => filterColorPalettes({ config, isReversed, colorPalettes }),
+    [isReversed, colorPalettes, config.general.palette.version]
+  )
+
+  // Helper function to handle palette selection with conversion prompt
+  const handlePaletteSelection = (palette: string) => {
+    const isV1PaletteConfig = isV1Palette(config)
+
+    const executeSelection = () => {
+      const _newConfig = _.cloneDeep(config)
+      _newConfig.general.palette.name = migratePaletteName(palette)
+      if (isV1PaletteConfig) {
+        _newConfig.general.palette.version = '2.0'
       }
-      if (isReversed) {
-        if (paletteName.includes('qualitative') && paletteName.endsWith('reverse')) {
-          nonSequential.push(paletteName)
-        }
-        if (paletteName.includes('colorblindsafe') && paletteName.endsWith('reverse')) {
-          accessibleColors.push(paletteName)
-        }
-        if (
-          !paletteName.includes('qualitative') &&
-          !paletteName.includes('colorblindsafe') &&
-          paletteName.endsWith('reverse')
-        ) {
-          sequential.push(paletteName)
-        }
-      }
+      setConfig(_newConfig)
     }
 
-    return [sequential, nonSequential, accessibleColors]
+    if (isV1PaletteConfig) {
+      setPendingPaletteSelection({ palette, action: executeSelection })
+      setShowConversionModal(true)
+    } else {
+      executeSelection()
+    }
   }
-  const [sequential, nonSequential, accessibleColors] = filterColorPalettes()
+
+  // Modal handlers
+  const handleConversionConfirm = () => {
+    if (pendingPaletteSelection) {
+      pendingPaletteSelection.action()
+    }
+    setShowConversionModal(false)
+    setPendingPaletteSelection(null)
+  }
+
+  const handleConversionCancel = () => {
+    setShowConversionModal(false)
+    setPendingPaletteSelection(null)
+  }
+
+  const handleReturnToV1 = () => {
+    if (pendingPaletteSelection) {
+      const _newConfig = _.cloneDeep(config)
+      _newConfig.general.palette.name = pendingPaletteSelection.palette
+      _newConfig.general.palette.version = '1.0'
+      setConfig(_newConfig)
+    }
+    setShowConversionModal(false)
+    setPendingPaletteSelection(null)
+  }
+
+  // Helper function to determine if a palette should be marked as selected
+  const getPaletteClassName = (palette: string) => {
+    const currentPaletteName = config.general.palette.name || ''
+
+    // Direct comparison since the UI filters palettes by version
+    // When v1 is selected, UI shows v1 palettes; when v2 is selected, UI shows v2 palettes
+    return currentPaletteName === palette ? 'selected' : ''
+  }
 
   useEffect(() => {
     setLoadedDefault(config.defaultData)
@@ -2941,126 +2970,70 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 label='Use selected palette in reverse order'
                 onClick={() => {
                   const _state = _.cloneDeep(config)
+                  const currentPaletteName = config.general.palette?.name || ''
                   _state.general.palette.isReversed = !_state.general.palette.isReversed
                   let paletteName = ''
-                  if (_state.general.palette.isReversed && !config.color.endsWith('reverse')) {
-                    paletteName = config.color + 'reverse'
+                  if (_state.general.palette.isReversed && !currentPaletteName.endsWith('reverse')) {
+                    paletteName = currentPaletteName + 'reverse'
                   }
-                  if (!_state.general.palette.isReversed && config.color.endsWith('reverse')) {
-                    paletteName = config.color.slice(0, -7)
+                  if (!_state.general.palette.isReversed && currentPaletteName.endsWith('reverse')) {
+                    paletteName = currentPaletteName.slice(0, -7)
                   }
                   if (paletteName) {
-                    _state.color = paletteName
+                    _state.general.palette.name = paletteName
                   }
                   setConfig(_state)
                 }}
                 value={config.general.palette.isReversed}
               />
               <span>Sequential</span>
-              <ul className='color-palette'>
-                {sequential.map(palette => {
-                  const colorOne = {
-                    backgroundColor: colorPalettes[palette][2]
-                  }
-
-                  const colorTwo = {
-                    backgroundColor: colorPalettes[palette][4]
-                  }
-
-                  const colorThree = {
-                    backgroundColor: colorPalettes[palette][6]
-                  }
-
-                  return (
-                    <li
-                      title={palette}
-                      key={palette}
-                      onClick={() => {
-                        const _newConfig = _.cloneDeep(config)
-                        _newConfig.color = palette
-                        setConfig(_newConfig)
-                      }}
-                      className={config.color === palette ? 'selected' : ''}
-                    >
-                      <span style={colorOne}></span>
-                      <span style={colorTwo}></span>
-                      <span style={colorThree}></span>
-                    </li>
-                  )
-                })}
-              </ul>
+              <PaletteSelector
+                palettes={sequential}
+                colorPalettes={colorPalettes}
+                config={config}
+                onPaletteSelect={handlePaletteSelection}
+                selectedPalette={getCurrentPaletteName(config)}
+                colorIndices={[2, 3, 5]}
+                className='color-palette'
+                element='li'
+                getItemClassName={getPaletteClassName}
+              />
               <span>Non-Sequential</span>
-              <ul className='color-palette'>
-                {nonSequential.map(palette => {
-                  const colorOne = {
-                    backgroundColor: colorPalettes[palette][2]
+              <PaletteSelector
+                palettes={nonSequential}
+                colorPalettes={colorPalettes}
+                config={config}
+                onPaletteSelect={handlePaletteSelection}
+                selectedPalette={getCurrentPaletteName(config)}
+                colorIndices={[2, 3, 5]}
+                className='color-palette'
+                element='li'
+                getItemClassName={getPaletteClassName}
+                minColorsForFilter={(_, paletteAccessor, config) => {
+                  if (paletteAccessor.length <= 8 && config.general.geoType === 'us-region') {
+                    return false
                   }
-
-                  const colorTwo = {
-                    backgroundColor: colorPalettes[palette][4]
-                  }
-
-                  const colorThree = {
-                    backgroundColor: colorPalettes[palette][6]
-                  }
-
-                  // hide palettes with too few colors for region maps
-                  if (colorPalettes[palette].length <= 8 && config.general.geoType === 'us-region') {
-                    return ''
-                  }
-                  return (
-                    <li
-                      title={palette}
-                      key={palette}
-                      onClick={() => {
-                        const _newConfig = _.cloneDeep(config)
-                        _newConfig.color = palette
-                        setConfig(_newConfig)
-                      }}
-                      className={config.color === palette ? 'selected' : ''}
-                    >
-                      <span style={colorOne}></span>
-                      <span style={colorTwo}></span>
-                      <span style={colorThree}></span>
-                    </li>
-                  )
-                })}
-              </ul>
+                  return true
+                }}
+              />
               <span>Colorblind Safe</span>
-              <ul className='color-palette'>
-                {accessibleColors.map(palette => {
-                  const colorOne = {
-                    backgroundColor: colorPalettes[palette][2]
+              <PaletteSelector
+                palettes={accessibleColors}
+                colorPalettes={colorPalettes}
+                config={config}
+                onPaletteSelect={handlePaletteSelection}
+                selectedPalette={getCurrentPaletteName(config)}
+                colorIndices={[2, 3, 5]}
+                className='color-palette'
+                element='li'
+                getItemClassName={getPaletteClassName}
+                minColorsForFilter={(_, paletteAccessor, config) => {
+                  if (paletteAccessor.length <= 8 && config.general.geoType === 'us-region') {
+                    return false
                   }
-
-                  const colorTwo = {
-                    backgroundColor: colorPalettes[palette][4]
-                  }
-
-                  const colorThree = {
-                    backgroundColor: colorPalettes[palette][6]
-                  }
-
-                  // hide palettes with too few colors for region maps
-                  if (colorPalettes[palette].length <= 8 && config.general.geoType === 'us-region') {
-                    return ''
-                  }
-                  return (
-                    <li
-                      title={palette}
-                      key={palette}
-                      onClick={() => {
-                        handleEditorChanges('color', palette)
-                      }}
-                      className={config.color === palette ? 'selected' : ''}
-                    >
-                      <span style={colorOne}></span>
-                      <span style={colorTwo}></span>
-                      <span style={colorThree}></span>
-                    </li>
-                  )
-                })}
-              </ul>
+                  return true
+                }}
+              />
               <label>
                 Geocode Settings
                 <TextField
@@ -3373,6 +3346,15 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
         </Accordion>
         <AdvancedEditor loadConfig={setConfig} config={config} convertStateToConfig={convertStateToConfig} />
       </Layout.Sidebar>
+
+      {showConversionModal && (
+        <PaletteConversionModal
+          onConfirm={handleConversionConfirm}
+          onCancel={handleConversionCancel}
+          onReturnToV1={handleReturnToV1}
+          paletteName={pendingPaletteSelection?.palette}
+        />
+      )}
     </ErrorBoundary>
   )
 }

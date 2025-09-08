@@ -52,7 +52,7 @@ const ScatterPlot = ({ xScale, yScale }) => {
         return config.runtime.seriesKeys.map((s, index) => {
           const transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s) === -1
           const displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s) !== -1
-          const seriesColor = config?.customColors ? config.customColors[index] : config.palette ? colorPalettes[config.palette][index] : '#000'
+          const seriesColor = config.general?.palette?.customColors ? config.general.palette.customColors[index] : config.general?.palette?.name ? colorPalettes[config.general.palette.name][index] : '#000'
 
           let pointStyles = {
             filter: 'unset',

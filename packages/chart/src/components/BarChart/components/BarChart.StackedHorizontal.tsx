@@ -3,6 +3,7 @@ import ConfigContext from '../../../ConfigContext'
 import { BarStackHorizontal } from '@visx/shape'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
+import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
@@ -43,10 +44,79 @@ const BarChartStackedHorizontal = () => {
   } = barChart
 
   const { orientation, visualizationSubType } = config
+
+  // Pattern helper function
+  const renderPatternDefs = () => {
+    if (!config.legend.patterns || Object.keys(config.legend.patterns).length === 0) {
+      return null
+    }
+
+    return (
+      <defs>
+        {Object.entries(config.legend.patterns).map(([key, pattern]) => {
+          const patternId = `chart-pattern-${key}`
+          const size = pattern.patternSize || 8
+
+          switch (pattern.shape) {
+            case 'circles':
+              return (
+                <PatternCircles
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  fill={pattern.color}
+                  radius={1.25}
+                />
+              )
+            case 'lines':
+              return (
+                <PatternLines
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  stroke={pattern.color}
+                  strokeWidth={0.75}
+                  orientation={['horizontal']}
+                />
+              )
+            case 'diagonalLines':
+              return (
+                <PatternLines
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  stroke={pattern.color}
+                  strokeWidth={0.75}
+                  orientation={['diagonalRightToLeft']}
+                />
+              )
+            case 'waves':
+              return (
+                <PatternWaves
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  fill={pattern.color}
+                  strokeWidth={0.25}
+                />
+              )
+            default:
+              return null
+          }
+        })}
+      </defs>
+    )
+  }
+
   return (
     config.visualizationSubType === 'stacked' &&
     isHorizontal && (
       <>
+        {renderPatternDefs()}
         <BarStackHorizontal
           data={data}
           keys={barStackedSeriesKeys}
@@ -73,7 +143,7 @@ const BarChartStackedHorizontal = () => {
                 let labelColor = getContrastColor(APP_FONT_COLOR, barColor)
                 let constrast = getColorContrast(APP_FONT_COLOR, barColor)
                 const contrastLevel = 7
-                if (constrast < contrastLevel) {
+                if (typeof constrast === 'number' && constrast < contrastLevel) {
                   labelColor = '#fff'
                 }
                 // tooltips
@@ -94,9 +164,31 @@ const BarChartStackedHorizontal = () => {
                   <li class="tooltip-body ">${additionalColTooltip}</li>
                     </li></ul>`
 
+                // Check if this bar should use a pattern
+                const getPatternUrl = (): string | null => {
+                  if (!config.legend.patterns || Object.keys(config.legend.patterns).length === 0) {
+                    return null
+                  }
+
+                  // Find a pattern that matches this data point
+                  for (const [patternKey, pattern] of Object.entries(config.legend.patterns)) {
+                    if (pattern.dataKey && pattern.dataValue) {
+                      const dataFieldValue = data[bar.index][pattern.dataKey]
+                      if (String(dataFieldValue) === String(pattern.dataValue)) {
+                        return `url(#chart-pattern-${patternKey})`
+                      }
+                    }
+                  }
+
+                  return null
+                }
+
+                const patternUrl = getPatternUrl()
+
                 return (
                   <>
                     <Group key={index} id={`barStack${barStack.index}-${bar.index}`} className='stack horizontal'>
+                      {/* Base colored bar */}
                       {createBarElement({
                         config: config,
                         seriesHighlight,
@@ -128,6 +220,37 @@ const BarChartStackedHorizontal = () => {
                           display: displayBar ? 'block' : 'none'
                         }
                       })}
+
+                      {/* Pattern overlay using createBarElement for consistent animation */}
+                      {patternUrl &&
+                        createBarElement({
+                          config: config,
+                          seriesHighlight,
+                          index: barStack.index,
+                          className: `animated-chart pattern-overlay ${animatedChart ? 'animated' : ''}`,
+                          background: patternUrl, // Use pattern as background
+                          borderColor: 'transparent',
+                          borderStyle: 'none',
+                          borderWidth: '0px',
+                          width: bar.width,
+                          height: bar.height,
+                          x: bar.x,
+                          y: bar.y,
+                          onMouseOver: () => {}, // No interaction
+                          onMouseLeave: () => {}, // No interaction
+                          tooltipHtml: '',
+                          tooltipId: '',
+                          onClick: () => {}, // No interaction
+                          styleOverrides: {
+                            animationDelay: `${barStack.index * 0.5}s`,
+                            transformOrigin: `${bar.x}px 0`,
+                            opacity: animatedChart ? 0 : transparentBar ? 0.2 : 1, // Start hidden if animated
+                            display: displayBar ? 'block' : 'none',
+                            pointerEvents: 'none', // Let clicks pass through to base bar
+                            // Force the initial transform state to match CSS animation
+                            transform: animatedChart ? 'scale(0, 1)' : 'scale(1, 1)'
+                          }
+                        })}
 
                       {orientation === 'horizontal' &&
                         visualizationSubType === 'stacked' &&

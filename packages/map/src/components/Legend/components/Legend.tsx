@@ -20,7 +20,7 @@ import './index.scss'
 import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { isBelowBreakpoint, isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
-import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
+import { toggleLegendActive } from '../../../helpers/toggleLegendActive'
 import { resetLegendToggles } from '../../../helpers'
 import { MapContext } from '../../../types/MapContext'
 import LegendGroup from './LegendGroup/Legend.Group'
@@ -60,7 +60,10 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const getFormattedLegendItems = () => {
     try {
-      if (!runtimeLegend.items) Error('No runtime legend data')
+      if (!runtimeLegend.items) {
+        console.warn('No runtime legend data available')
+        return []
+      }
       return runtimeLegend.items.map((entry, idx) => {
         const entryMax = displayDataAsText(entry.max, 'primary', config)
 

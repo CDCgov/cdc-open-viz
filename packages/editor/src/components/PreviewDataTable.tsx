@@ -8,7 +8,7 @@ import {
   useResizeColumns,
   usePagination
 } from 'react-table'
-import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
+import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
 import { useDebounce } from 'use-debounce'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { MdNavigateNext } from 'react-icons/md'
@@ -17,7 +17,7 @@ import { GrFormPrevious } from 'react-icons/gr'
 // Core
 import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
 import { errorMessages } from '../helpers/errorMessages'
-import { DataSet } from '@cdc/dashboard/src/types/DataSet'
+import { DataSet } from '@cdc/core/types/DataSet'
 import Icon from '@cdc/core/components/ui/Icon'
 
 const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }: any) => {

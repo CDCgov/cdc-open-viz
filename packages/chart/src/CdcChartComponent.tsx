@@ -33,7 +33,8 @@ import SankeyChart from './components/Sankey'
 import LinearChart from './components/LinearChart'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 
-import { colorPalettesChart as colorPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
+import { twoColorPalette } from '@cdc/core/data/colorPalettes'
+import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 
 import SparkLine from './components/Sparkline'
 import Legend from './components/Legend'
@@ -46,7 +47,7 @@ import { handleChartAriaLabels } from './helpers/handleChartAriaLabels'
 import { lineOptions } from './helpers/lineOptions'
 import { handleLineType } from './helpers/handleLineType'
 import { handleRankByValue } from './helpers/handleRankByValue'
-import { generateColorsArray } from './helpers/generateColorsArray'
+import { generateColorsArray } from '@cdc/core/helpers/generateColorsArray'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
@@ -63,7 +64,7 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import EditorContext from '../../editor/src/ConfigContext'
+import EditorContext from '@cdc/core/contexts/EditorContext'
 import { EDITOR_WIDTH } from '@cdc/core/helpers/constants'
 import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 // Local helpers
@@ -169,7 +170,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const convertLineToBarGraph = isConvertLineToBarGraph(config, filteredData)
 
   const prepareConfig = (loadedConfig: ChartConfig) => {
-    let newConfig = _.defaultsDeep(loadedConfig, defaults)
+    // Create defaults without version to avoid overriding legacy configs
+
+    let newConfig = { ...defaults, ...loadedConfig }
+
     _.defaultsDeep(newConfig, {
       table: { showVertical: false }
     })
@@ -1067,7 +1071,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
                   <DataTable
                     /* changing the "key" will force the table to re-render
-                          when the default sort changes while editing */
+                            when the default sort changes while editing */
                     key={dataTableDefaultSortBy}
                     config={pivotDynamicSeries(config)}
                     rawData={
@@ -1118,6 +1122,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const capitalize = str => {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
+
+  // Get version-specific color palettes based on current config
+  const colorPalettes = filterChartColorPalettes(config)
 
   const contextValues = {
     ...state,

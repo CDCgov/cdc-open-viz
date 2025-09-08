@@ -1,7 +1,7 @@
 import { useContext, useMemo } from 'react'
 import './legend.group.css'
 import LegendShape from '@cdc/core/components/LegendShape'
-import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
+import { toggleLegendActive } from '../../../../helpers/toggleLegendActive'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ConfigContext, { MapDispatchContext } from '../../../../context'
 

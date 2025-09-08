@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import CdcMapComponent from '../CdcMapComponent'
 import cityStateConfig from './_mock/example-city-state.json'
-import { editConfigKeys } from '@cdc/chart/src/helpers/configHelpers'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 
 const meta: Meta<typeof CdcMapComponent> = {
   title: 'Components/Templates/Map',

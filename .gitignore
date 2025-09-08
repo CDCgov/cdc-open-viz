@@ -8,8 +8,8 @@ ehthumbs.db
 Thumbs.db
 
 # IDE Specific
-CLAUDE.local.md
 .claude
+CLAUDE.local.md
 nbproject
 .~lock.*
 .buildpath

@@ -8,9 +8,9 @@ import { scaleLinear } from '@visx/scale'
 import { curveLinearClosed } from '@visx/curve'
 
 // types
-import { type ForestPlotProps } from '@cdc/chart/src/components/ForestPlot/ForestPlotProps'
-import { type ChartConfig } from '@cdc/chart/src/types/ChartConfig'
-import { type ChartContext } from '@cdc/chart/src/types/ChartContext'
+import { type ForestPlotProps } from './ForestPlotProps'
+import { type ChartConfig } from '../../types/ChartConfig'
+import { type ChartContext } from '../../types/ChartContext'
 
 // cdc
 import ConfigContext from '../../ConfigContext'
@@ -73,7 +73,7 @@ const ForestPlot = ({
 
       updateConfig(newConfig)
     } catch (e) {
-      console.log(e.message)
+      console.error(e.message)
     }
   }, [])
 

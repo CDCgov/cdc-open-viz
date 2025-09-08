@@ -50,7 +50,12 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
 
   const applyFilters = e => {
     e.preventDefault() // prevent form submission
-    const dashboardConfig = _.cloneDeep(state.config.dashboard)
+
+    const dashboardConfig = {
+      ...state.config.dashboard,
+      sharedFilters: [...state.config.dashboard.sharedFilters] // Only clone the array we need to modify
+    }
+
     const nonAutoLoadFilterIndexes = Object.values(state.config.visualizations)
       .filter(v => v.type === 'dashboardFilters')
       .reduce((acc, viz: DashboardFilters) => (!viz.autoLoad ? [...acc, viz.sharedFilterIndexes] : acc), [])
@@ -64,6 +69,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
     })
     if (allRequiredFiltersSelected) {
       if (hasDashboardApplyBehavior(state.config.visualizations)) {
+        dispatch({ type: 'SET_FILTERS_APPLIED', payload: true })
         const queryParams = getQueryParams()
         let needsQueryUpdate = false
         dashboardConfig.sharedFilters.forEach(sharedFilter => {
@@ -85,7 +91,21 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       }
       setAPILoading(true)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: dashboardConfig.sharedFilters })
-      dispatch({ type: 'SET_FILTERED_DATA', payload: getFilteredData(_.cloneDeep(state)) })
+
+      // Clear data when applying filters to force fresh reload
+      const emptyData = Object.keys(state.data).reduce((acc, key) => {
+        acc[key] = []
+        return acc
+      }, {})
+
+      const emptyFilteredData = Object.keys(state.filteredData).reduce((acc, key) => {
+        acc[key] = []
+        return acc
+      }, {})
+
+      dispatch({ type: 'SET_DATA', payload: emptyData })
+      dispatch({ type: 'SET_FILTERED_DATA', payload: emptyFilteredData })
+
       loadAPIFilters(dashboardConfig.sharedFilters, apiFilterDropdowns)
         .then(newFilters => {
           reloadURLData(newFilters)
@@ -99,15 +119,20 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   }
 
   const handleOnChange = (index: number, value: string | string[]) => {
-    const newConfig = _.cloneDeep(dashboardConfig)
+    const newConfig = {
+      ...dashboardConfig,
+      dashboard: {
+        ...dashboardConfig.dashboard,
+        sharedFilters: [...dashboardConfig.dashboard.sharedFilters] // Only clone the array we modify
+      }
+    }
+
     let [newSharedFilters, changedFilterIndexes] = changeFilterActive(
       index,
       value,
       newConfig.dashboard.sharedFilters,
       visualizationConfig
     )
-
-    console.log('interactionLabel', interactionLabel || 'no')
 
     publishAnalyticsEvent(
       'dashboard_filter_changed',
@@ -137,9 +162,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         })
       } else {
         newSharedFilters[index].queuedActive = value
-        // setData to empty object because we no longer have a data state.
-        dispatch({ type: 'SET_DATA', payload: {} })
-        dispatch({ type: 'SET_FILTERED_DATA', payload: {} })
+
+        // Don't clear data immediately - keep existing data until new data loads
+        // Only update the filter dropdowns and prepare for reload
         setAPIFilterDropdowns(loadingFilterMemo)
         loadAPIFilters(newSharedFilters, loadingFilterMemo)
       }
@@ -147,8 +172,16 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       if (newSharedFilters[index].type === 'urlfilter' && newSharedFilters[index].apiFilter) {
         reloadURLData(newSharedFilters)
       } else {
-        const clonedState = _.cloneDeep(state)
-        clonedState.config.dashboard.sharedFilters = newSharedFilters
+        const clonedState = {
+          ...state,
+          config: {
+            ...state.config,
+            dashboard: {
+              ...state.config.dashboard,
+              sharedFilters: newSharedFilters
+            }
+          }
+        }
         const newFilteredData = getFilteredData(clonedState)
         dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
         dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })

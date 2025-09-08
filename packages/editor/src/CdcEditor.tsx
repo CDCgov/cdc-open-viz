@@ -7,7 +7,7 @@ import ResizeObserver from 'resize-observer-polyfill'
 import getViewport from '@cdc/core/helpers/getViewport'
 
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
-import ConfigContext, { EditorDispatchContext } from './ConfigContext'
+import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
 
 import OverlayFrame from '@cdc/core/components/ui/OverlayFrame'
 
@@ -16,12 +16,12 @@ import ChooseTab from './components/ChooseTab'
 import ConfigureTab from './components/ConfigureTab'
 import TabPane from './components/TabPane'
 import { GlobalTabs as Tabs } from './components/Tabs'
-import { formatConfigBeforeSave as stripConfig } from '@cdc/core/helpers/formatConfigBeforeSave'
+import { formatConfigBeforeSave as stripConfig } from '@cdc/dashboard/src/helpers/formatConfigBeforeSave'
 import { saveConfigToWindow as updateVizConfig } from './helpers/saveConfigToWindow'
 import { legacyConfigSupport } from './helpers/legacyConfigSupport'
 
 import './scss/main.scss'
-import editorReducer, { EditorState } from './store/editor.reducer'
+import editorReducer, { EditorState } from '@cdc/core/contexts/editor.reducer'
 import _ from 'lodash'
 import { WCMSProps } from '@cdc/core/types/WCMSProps'
 import { devToolsStore } from '@cdc/core/helpers/withDevTools'

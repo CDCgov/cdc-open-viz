@@ -108,6 +108,7 @@ const SingleStateMap: React.FC = () => {
         topoData={topoData}
         path={path}
         scale={scale}
+        runtimeData={runtimeData}
       />
     )
 

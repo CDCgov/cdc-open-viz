@@ -9,6 +9,7 @@ import { getBarConfig, testZeroValue } from '../helpers'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
+import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 // Local components
 import Regions from '../../Regions'
 // CDC core components and helpers
@@ -59,6 +60,8 @@ export const BarChartVertical = () => {
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
+  const LABEL_FONT_SIZE = isMobileFontViewport(currentViewport) ? 13 : 16
+
   const root = document.documentElement
 
   let data = transformedData
@@ -76,11 +79,80 @@ export const BarChartVertical = () => {
     config.confidenceKeys.lower !== ''
 
   const _data = getBarData(config, data, hasConfidenceInterval)
+
+  // Pattern helper function
+  const renderPatternDefs = () => {
+    if (!config.legend.patterns || Object.keys(config.legend.patterns).length === 0) {
+      return null
+    }
+
+    return (
+      <defs>
+        {Object.entries(config.legend.patterns).map(([key, pattern]) => {
+          const patternId = `chart-pattern-${key}`
+          const size = pattern.patternSize || 8
+
+          switch (pattern.shape) {
+            case 'circles':
+              return (
+                <PatternCircles
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  fill={pattern.color}
+                  radius={1.25}
+                />
+              )
+            case 'lines':
+              return (
+                <PatternLines
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  stroke={pattern.color}
+                  strokeWidth={0.75}
+                  orientation={['horizontal']}
+                />
+              )
+            case 'diagonalLines':
+              return (
+                <PatternLines
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  stroke={pattern.color}
+                  strokeWidth={0.75}
+                  orientation={['diagonalRightToLeft']}
+                />
+              )
+            case 'waves':
+              return (
+                <PatternWaves
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  fill={pattern.color}
+                  strokeWidth={0.25}
+                />
+              )
+            default:
+              return null
+          }
+        })}
+      </defs>
+    )
+  }
+
   return (
     config.visualizationSubType !== 'stacked' &&
     (config.visualizationType === 'Bar' || config.visualizationType === 'Combo' || convertLineToBarGraph) &&
     config.orientation === 'vertical' && (
       <Group>
+        {renderPatternDefs()}
         <BarGroup
           data={_data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
@@ -170,7 +242,8 @@ export const BarChartVertical = () => {
                     config,
                     barWidth,
                     isVertical: true,
-                    yAxisValue
+                    yAxisValue,
+                    labelFontSize: LABEL_FONT_SIZE
                   })
                   // configure colors
                   let labelColor = APP_FONT_COLOR
@@ -250,6 +323,28 @@ export const BarChartVertical = () => {
                     return _barColor
                   }
 
+                  // Check if this bar should use a pattern
+                  const getPatternUrl = (): string | null => {
+                    if (!config.legend.patterns || Object.keys(config.legend.patterns).length === 0) {
+                      return null
+                    }
+
+                    // Find a pattern that matches this data point
+                    for (const [patternKey, pattern] of Object.entries(config.legend.patterns)) {
+                      if (pattern.dataKey && pattern.dataValue) {
+                        const dataFieldValue = datum[pattern.dataKey]
+                        if (String(dataFieldValue) === String(pattern.dataValue)) {
+                          return `url(#chart-pattern-${patternKey})`
+                        }
+                      }
+                    }
+
+                    return null
+                  }
+
+                  const patternUrl = getPatternUrl()
+                  const baseBackground = getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key]))
+
                   // Confidence Interval Variables
                   const tickWidth = 5
                   const xPos = barX + (config.xAxis.type !== 'date-time' ? barWidth / 2 : 0)
@@ -268,16 +363,15 @@ export const BarChartVertical = () => {
 
                   const BAR_LABEL_PADDING = 10
 
-                  const LABEL_FONT_SIZE = isMobileFontViewport(currentViewport) ? 13 : 16
-
                   return (
                     <Group display={hideGroup} key={`${barGroup.index}--${index}`}>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
+                        {/* Base colored bar */}
                         {createBarElement({
                           config: config,
                           index: newIndex,
                           id: `barGroup${barGroup.index}`,
-                          background: getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key])),
+                          background: baseBackground,
                           borderColor,
                           borderStyle: 'solid',
                           borderWidth: `${borderWidth}px`,
@@ -303,6 +397,32 @@ export const BarChartVertical = () => {
                             cursor: dashboardConfig ? 'pointer' : 'default'
                           }
                         })}
+
+                        {/* Pattern overlay if pattern exists */}
+                        {patternUrl &&
+                          createBarElement({
+                            config: config,
+                            index: newIndex,
+                            background: patternUrl, // Use pattern as background
+                            borderColor: 'transparent',
+                            borderStyle: 'none',
+                            borderWidth: '0px',
+                            width: barWidth,
+                            height: barHeight,
+                            x: barX,
+                            y: barY,
+                            onMouseOver: () => {}, // No interaction
+                            onMouseLeave: () => {}, // No interaction
+                            tooltipHtml: '',
+                            tooltipId: '',
+                            onClick: () => {}, // No interaction
+                            styleOverrides: {
+                              transformOrigin: `0 ${barY + barHeight}px`,
+                              opacity: transparentBar ? 0.2 : 1,
+                              display: displayBar ? 'block' : 'none',
+                              pointerEvents: 'none' // Let clicks pass through to base bar
+                            }
+                          })}
 
                         {(absentDataLabel || isSuppressed) && (
                           <rect
@@ -337,13 +457,7 @@ export const BarChartVertical = () => {
                           const hasAsterisk = String(pd.symbol).includes('Asterisk')
                           const yPadding = hasAsterisk ? -5 : -8
                           const verticalAnchor = hasAsterisk ? 'middle' : 'end'
-                          const iconSize =
-                            pd.symbol === 'Asterisk'
-                              ? barWidth * 1.2
-                              : pd.symbol === 'Double Asterisk'
-                              ? barWidth
-                              : barWidth / 1.5
-                          const fillColor = pd.displayGray ? '#8b8b8a' : '#000'
+                          const fillColor = pd.displayGray ? '#8b8b8a' : APP_FONT_COLOR
 
                           return (
                             <Text // prettier-ignore
@@ -356,7 +470,7 @@ export const BarChartVertical = () => {
                               verticalAnchor={verticalAnchor}
                               fill={fillColor}
                               textAnchor='middle'
-                              fontSize={`${iconSize}px`}
+                              fontSize={LABEL_FONT_SIZE}
                             >
                               {pd.iconCode}
                             </Text>

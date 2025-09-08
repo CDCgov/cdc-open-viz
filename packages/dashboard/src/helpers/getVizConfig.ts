@@ -23,10 +23,12 @@ export const getFootnotesVizConfig = (
   const sharedFilters = config.dashboard.sharedFilters
   const matchingFilters = sharedFilters.filter(f => f.usedBy?.includes(visualizationKey))
 
-  if (matchingFilters.length) {
+  if (matchingFilters.length && visualizationConfig.footnotes.data) {
     visualizationConfig.footnotes.data = filterData(matchingFilters, data)
   } else {
-    visualizationConfig.footnotes.data = data
+    if (visualizationConfig.footnotes.data) {
+      visualizationConfig.footnotes.data = data
+    }
   }
 
   return visualizationConfig
