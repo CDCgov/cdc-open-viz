@@ -920,7 +920,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     const isV1PaletteConfig = isV1Palette(config)
 
     const executeSelection = () => {
-      const _newConfig = _.cloneDeep(config)
+      const _newConfig = cloneConfig(config)
       _newConfig.general.palette.name = migratePaletteName(palette)
       if (isV1PaletteConfig) {
         _newConfig.general.palette.version = '2.0'
@@ -952,7 +952,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
   const handleReturnToV1 = () => {
     if (pendingPaletteSelection) {
-      const _newConfig = _.cloneDeep(config)
+      const _newConfig = cloneConfig(config)
       _newConfig.general.palette.name = pendingPaletteSelection.palette
       _newConfig.general.palette.version = '1.0'
       setConfig(_newConfig)

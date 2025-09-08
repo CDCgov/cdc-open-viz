@@ -17,6 +17,7 @@ import update_4_25_4 from './ver/4.25.4'
 import update_4_25_6 from './ver/4.25.6'
 import update_4_25_7 from './ver/4.25.7'
 import update_4_25_8 from './ver/4.25.8'
+import update_4_25_9 from './ver/4.25.9'
 
 import { stripDataFromConfig, restoreDataToConfig } from './configDataHelpers'
 

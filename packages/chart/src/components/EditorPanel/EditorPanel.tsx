@@ -1115,7 +1115,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       const isV1PaletteConfig = isV1Palette(config)
 
       const executeSelection = () => {
-        const _newConfig = _.cloneDeep(config)
+        const _newConfig = cloneConfig(config)
         if (!_newConfig.general.palette) {
           _newConfig.general.palette = {}
         }
@@ -1154,7 +1154,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
   const handleReturnToV1 = () => {
     if (pendingPaletteSelection) {
-      const _newConfig = _.cloneDeep(config)
+      const _newConfig = cloneConfig(config)
       if (!_newConfig.general.palette) {
         _newConfig.general.palette = {}
       }
