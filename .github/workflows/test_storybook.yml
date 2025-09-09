@@ -2,6 +2,8 @@ name: Test Storybook
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main, dev]
 
 jobs:
   storybook-tests:
