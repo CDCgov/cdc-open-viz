@@ -147,7 +147,7 @@ export default {
     collapsible: true
   },
   orientation: 'vertical',
-  color: 'sequential_purple',
+  color: 'sequential_blue',
   columns: {
     // start with a blank list
   },
