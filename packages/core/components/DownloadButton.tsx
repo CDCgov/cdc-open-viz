@@ -7,9 +7,10 @@ type DownloadButtonProps = {
   headerColor: string
   skipId: string | number
   configUrl?: string
+  interactionLabel?: string
 }
 
-const DownloadButton = ({ rawData, fileName, headerColor, skipId, configUrl }: DownloadButtonProps) => {
+const DownloadButton = ({ rawData, fileName, headerColor, skipId, configUrl, interactionLabel }: DownloadButtonProps) => {
   const csvData = Papa.unparse(rawData)
   // Prepend a Byte Order Mark (BOM) to the CSV data.
   // The BOM is a special marker that helps applications like Excel recognize the file as UTF-8 encoded.
@@ -24,7 +25,7 @@ const DownloadButton = ({ rawData, fileName, headerColor, skipId, configUrl }: D
       //@ts-ignore
       navigator.msSaveBlob(blob, fileName)
     }
-    publishAnalyticsEvent('data_downloaded', 'click', configUrl)
+    publishAnalyticsEvent('data_downloaded', 'click', interactionLabel || configUrl)
   }
 
   return (
