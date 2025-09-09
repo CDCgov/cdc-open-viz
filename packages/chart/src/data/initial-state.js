@@ -31,7 +31,7 @@ export default {
     palette: {
       isReversed: false,
       version: '2.0',
-      name: 'qualitative-standard'
+      name: 'sequential_blue'
     }
   },
   padding: {
@@ -147,7 +147,7 @@ export default {
     collapsible: true
   },
   orientation: 'vertical',
-  color: 'pinkpurple',
+  color: 'sequential_purple',
   columns: {
     // start with a blank list
   },

@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { FALLBACK_COLOR_PALETTE } from '../constants'
 
 // Rname Palettes
 const newMapPaletteNames = {
@@ -38,7 +39,7 @@ const newMapPaletteNames = {
 
 const chartPaletteNameMigrations = {
     'qualitative-bold': 'qualitative_bold',
-    'qualitative-soft': 'qualitative_soft', 
+    'qualitative-soft': 'qualitative_soft',
     'qualitative-standard': 'qualitative_standard',
     'sequential-blue': 'sequential_blue',
     'sequential-blue-2-(MPX)': 'sequential_blue_extended',
@@ -48,7 +49,7 @@ const chartPaletteNameMigrations = {
     'sequential-purple': 'sequential_purple',
     'sequential-teal': 'sequential_teal',
     'divergent-bluecyan': 'divergent_blue_cyan',
-    'divergent-bluepurple': 'divergent_blue_purple', 
+    'divergent-bluepurple': 'divergent_blue_purple',
     'divergent-greenorange': 'divergent_green_orange',
     'divergent-blueorange': 'divergent_blue_orange',
     'qualitative1': 'qualitative1',
@@ -58,7 +59,7 @@ const chartPaletteNameMigrations = {
     'colorblindsafe': 'colorblindsafe',
     // Reverse variants
     'qualitative-boldreverse': 'qualitative_boldreverse',
-    'qualitative-softreverse': 'qualitative_softreverse', 
+    'qualitative-softreverse': 'qualitative_softreverse',
     'qualitative-standardreverse': 'qualitative_standardreverse',
     'sequential-bluereverse': 'sequential_bluereverse',
     'sequential-blue-2-(MPX)reverse': 'sequential_blue_extendedreverse',
@@ -68,7 +69,7 @@ const chartPaletteNameMigrations = {
     'sequential-purplereverse': 'sequential_purplereverse',
     'sequential-tealreverse': 'sequential_tealreverse',
     'divergent-bluecyanreverse': 'divergent_blue_cyanreverse',
-    'divergent-bluepurplereverse': 'divergent_blue_purplereverse', 
+    'divergent-bluepurplereverse': 'divergent_blue_purplereverse',
     'divergent-greenorangereverse': 'divergent_green_orangereverse',
     'divergent-blueorangereverse': 'divergent_blue_orangereverse',
     'qualitative1reverse': 'qualitative1reverse',
@@ -127,13 +128,11 @@ const movePaletteName = config => {
     if (config.type === 'chart') {
         config.general = config.general || {}
         config.general.palette = config.general.palette || {}
-        config.general.palette.name = config.palette || 'qualitative-bold'
+        config.general.palette.name = config.palette || config.color || FALLBACK_COLOR_PALETTE
         saveBackup(config)
         delete config.palette
         delete config.color // outdated
-
         renameOriginalChartPalettes(config)
-
     }
 
     if (config.type === 'dashboard') {

@@ -1,3 +1,4 @@
+import { FALLBACK_COLOR_PALETTE } from '../constants'
 import { getColorPaletteVersion } from '../getColorPaletteVersion'
 
 /**
@@ -6,7 +7,7 @@ import { getColorPaletteVersion } from '../getColorPaletteVersion'
  * @returns The current palette name or empty string if not found
  */
 export const getCurrentPaletteName = (config: any): string => {
-  return config?.general?.palette?.name || config?.palette || ''
+  return config?.general?.palette?.name || FALLBACK_COLOR_PALETTE
 }
 
 /**
@@ -43,8 +44,8 @@ export const getPaletteColors = (config: any, colorPalettes: any): string[] => {
 export const isV1Palette = (config: any): boolean => {
   const currentVersion = getColorPaletteVersion(config)
   return (
-    currentVersion === 1 || 
-    config?.general?.palette?.version === '1.0' || 
+    currentVersion === 1 ||
+    config?.general?.palette?.version === '1.0' ||
     !config?.general?.palette?.version
   )
 }

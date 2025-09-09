@@ -49,6 +49,8 @@ const PanelVisual: FC<PanelProps> = props => {
   } = useEditorPermissions()
   const { twoColorPalettes, sequential, nonSequential, accessibleColors } = useColorPalette(config, updateConfig)
 
+  const currentPaletteName = getCurrentPaletteName(config)
+
   const updateColor = (property, _value) => {
     console.error('value', _value)
     if (property === 'storyNodeFontColor') {
@@ -294,7 +296,7 @@ const PanelVisual: FC<PanelProps> = props => {
                   colorPalettes={colorPalettes}
                   config={config}
                   onPaletteSelect={handlePaletteSelection}
-                  selectedPalette={getCurrentPaletteName(config)}
+                  selectedPalette={currentPaletteName}
                   colorIndices={[2, 3, 5]}
                   className='color-palette'
                 />
