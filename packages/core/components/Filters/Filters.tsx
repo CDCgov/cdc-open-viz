@@ -91,7 +91,8 @@ const Filters: React.FC<FilterProps> = ({
       `${visualizationConfig.type}_filter_changed`,
       'click',
       `${interactionLabel}|key_${newFilters?.[index]?.columnName}|value_${newFilters?.[index]?.active}`,
-      visualizationConfig.type
+      visualizationConfig.type,
+      { title: visualizationConfig?.title }
     )
   }
 
@@ -117,7 +118,8 @@ const Filters: React.FC<FilterProps> = ({
       `${visualizationConfig.type}_filter_applied`,
       'click',
       `${interactionLabel}|${newFilters.map(f => f.active)}`,
-      visualizationConfig.type
+      visualizationConfig.type,
+      { title: visualizationConfig?.title }
     )
 
     setShowApplyButton(false)
@@ -152,7 +154,8 @@ const Filters: React.FC<FilterProps> = ({
       `${visualizationConfig.type}_filter_reset`,
       'click',
       `${interactionLabel}`,
-      visualizationConfig.type
+      visualizationConfig.type,
+      { title: visualizationConfig?.title }
     )
   }
 

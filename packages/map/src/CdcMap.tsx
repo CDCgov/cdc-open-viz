@@ -119,7 +119,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
   useEffect(() => {
     init()
-    publishAnalyticsEvent('map_loaded', 'load', interactionLabel, 'map')
+    publishAnalyticsEvent('map_loaded', 'load', interactionLabel, 'map', { title: config?.title })
   }, [])
 
   useEffect(() => {

@@ -472,7 +472,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (container && !isLoading && !_.isEmpty(config) && !coveLoadedEventRan) {
       publish('cove_loaded', { config: config })
       dispatch({ type: 'SET_LOADED_EVENT', payload: true })
-      publishAnalyticsEvent('chart_loaded', 'load', interactionLabel, 'chart')
+      publishAnalyticsEvent('chart_loaded', 'load', interactionLabel, 'chart', { title: config?.title })
     }
   }, [container, config, isLoading]) // eslint-disable-line
 
@@ -562,7 +562,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     } catch (e) {
       console.error('COVE:', e.message)
     }
-    publishAnalyticsEvent('chart_legend_reset', 'click', interactionLabel, 'chart')
+    publishAnalyticsEvent('chart_legend_reset', 'click', interactionLabel, 'chart', { title: config?.title })
     dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [] })
   }
 
