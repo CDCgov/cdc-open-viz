@@ -96,7 +96,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   setConfig: setParentConfig,
   loadConfig,
   datasets,
-  interactionLabel = ''
+  interactionLabel = 'no link provided'
 }) => {
   const initialState = getInitialState(configObj)
 
