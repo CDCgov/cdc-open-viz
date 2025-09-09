@@ -139,7 +139,7 @@ const CountyMap = () => {
     config,
     tooltipId,
     tooltipRef,
-    configUrl
+    interactionLabel
   } = useContext(ConfigContext)
 
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
@@ -213,7 +213,7 @@ const CountyMap = () => {
   const lineWidth = 1
 
   const onReset = () => {
-    publishAnalyticsEvent('map_reset_zoom_level', 'click', configUrl, 'map')
+    publishAnalyticsEvent('map_reset_zoom_level', 'click', interactionLabel, 'map')
     setConfig({
       ...config,
       mapPosition: { coordinates: [0, 30], zoom: 1 }
