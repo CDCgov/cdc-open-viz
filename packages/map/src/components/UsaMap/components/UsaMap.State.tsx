@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 // United States Topojson resources
 import hexTopoJSON from '../data/us-hex-topo.json'
@@ -79,7 +80,8 @@ const UsaMap = () => {
     logo,
     currentViewport,
     translate,
-    runtimeLegend
+    runtimeLegend,
+    interactionLabel
   } = useContext<MapContext>(ConfigContext)
 
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
@@ -441,6 +443,14 @@ const UsaMap = () => {
               data-tooltip-id={`tooltip__${tooltipId}`}
               data-tooltip-html={tooltip}
               tabIndex={-1}
+              onMouseEnter={() => {
+                // Track hover analytics event if this is a new location
+                const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
+                publishAnalyticsEvent(`map_hover_${locationName?.toLowerCase()}`, 'hover', interactionLabel, 'map', {
+                  title: config?.title || config?.general?.title,
+                  location: geoDisplayName
+                })
+              }}
             >
               {/* state path */}
               <path tabIndex={-1} className='single-geo' strokeWidth={1} d={path} />

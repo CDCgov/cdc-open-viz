@@ -90,6 +90,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleChartAriaLabels,
     handleLineType,
     handleDragStateChange,
+    interactionLabel,
     isDraggingAnnotation,
     legendRef,
     parseDate,
@@ -268,7 +269,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     yScale,
     seriesScale,
     showTooltip,
-    hideTooltip
+    hideTooltip,
+    interactionLabel
   })
   // get the number of months between the first and last date
   const { dataKey } = runtime.xAxis

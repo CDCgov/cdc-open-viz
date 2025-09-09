@@ -27,6 +27,7 @@ type TooltipData = {
 }
 
 const PieChart = props => {
+  const { interactionLabel = '' } = props
   const {
     transformedData: data,
     config,
@@ -40,7 +41,8 @@ const PieChart = props => {
     xScale: false,
     yScale: false,
     showTooltip,
-    hideTooltip
+    hideTooltip,
+    interactionLabel
   })
   const [filteredData, setFilteredData] = useState(undefined)
   const [animatedPie, setAnimatePie] = useState(false)

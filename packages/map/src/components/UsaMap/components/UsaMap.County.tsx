@@ -10,6 +10,7 @@ import ConfigContext from '../../../context'
 import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { drawShape, createShapeProperties } from '../helpers/shapes'
 import { getGeoStrokeColor, handleMapAriaLabels, displayGeoName, isLegendItemDisabled } from '../../../helpers'
+import { supportedStatesFipsCodes } from '../../../data/supported-geos'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
@@ -398,6 +399,18 @@ const CountyMap = () => {
             context.stroke()
           }
 
+          // Track hover analytics event if this is a new location
+          if (isNaN(currentTooltipIndex) || currentTooltipIndex !== countyIndex) {
+            const countyName = displayGeoName(county.id).replace(/[^a-zA-Z0-9]/g, '_')
+            const stateFips = county.id.slice(0, 2)
+            const stateName = supportedStatesFipsCodes[stateFips]?.replace(/[^a-zA-Z0-9]/g, '_') || 'unknown'
+            const locationName = `${countyName}_${stateName}`
+            publishAnalyticsEvent(`map_hover_${locationName?.toLowerCase()}`, 'hover', interactionLabel, 'map', {
+              title: config?.title || config?.general?.title,
+              location: displayGeoName(county.id)
+            })
+          }
+
           tooltipRef.current.style.display = 'block'
           tooltipRef.current.style.top = tooltipY + 'px'
           if (tooltipX > containerBounds.width / 2) {
@@ -464,6 +477,15 @@ const CountyMap = () => {
       }
 
       if (hoveredGeo) {
+        // Track hover analytics event if this is a new location  
+        if (isNaN(currentTooltipIndex) || currentTooltipIndex !== hoveredGeoIndex) {
+          const locationName = displayGeoName(hoveredGeo[config.columns.geo.name]).replace(/[^a-zA-Z0-9]/g, '_')
+          publishAnalyticsEvent(`map_hover_${locationName?.toLowerCase()}`, 'hover', interactionLabel, 'map', {
+            title: config?.title || config?.general?.title,
+            location: displayGeoName(hoveredGeo[config.columns.geo.name])
+          })
+        }
+
         tooltipRef.current.style.display = 'block'
         tooltipRef.current.style.top = tooltipY + 'px'
         if (tooltipX > containerBounds.width / 2) {

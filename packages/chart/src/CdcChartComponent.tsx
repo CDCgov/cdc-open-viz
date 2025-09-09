@@ -1144,6 +1144,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     handleChartTabbing,
     highlight,
     handleShowAll,
+    interactionLabel,
     isDashboard,
     isDebug,
     handleDragStateChange,
