@@ -104,7 +104,7 @@ const removeRuntimeDataURLs = (config: DashboardConfig) => {
   }
 }
 
-export const formatConfigBeforeSave = configToStrip => {
+export const stripConfig = configToStrip => {
   const strippedConfig = cloneConfig(configToStrip)
   if (strippedConfig.type === 'dashboard') {
     if (strippedConfig.multiDashboards) {

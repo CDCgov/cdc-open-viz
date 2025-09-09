@@ -7,7 +7,13 @@ import './advanced-editor-styles.css'
 import _ from 'lodash'
 import Tooltip from '../ui/Tooltip'
 
-export const AdvancedEditor = ({ loadConfig, config, convertStateToConfig, onExpandCollapse = () => {} }) => {
+export const AdvancedEditor = ({
+  loadConfig,
+  config,
+  convertStateToConfig,
+  stripConfig = config => config,
+  onExpandCollapse = () => {}
+}) => {
   const [advancedToggle, _setAdvancedToggle] = useState(false)
   const [configTextboxValue, setConfigTextbox] = useState<Record<string, any>>({})
   const setAdvancedToggle = val => {
@@ -27,7 +33,7 @@ export const AdvancedEditor = ({ loadConfig, config, convertStateToConfig, onExp
   useEffect(() => {
     // Only process config when advanced editor is open to improve performance
     if (advancedToggle) {
-      let parsedConfig = config
+      let parsedConfig = stripConfig(config)
       if (config.type !== 'dashboard') {
         parsedConfig = convertStateToConfig()
       }
@@ -40,7 +46,7 @@ export const AdvancedEditor = ({ loadConfig, config, convertStateToConfig, onExp
   const handleToggleOpen = () => {
     if (!advancedToggle) {
       // Process config only when opening for the first time
-      let parsedConfig = config
+      let parsedConfig = stripConfig(config)
       if (config.type !== 'dashboard') {
         parsedConfig = convertStateToConfig()
       }
