@@ -169,6 +169,14 @@ const WorldMap = () => {
             stroke={geoStrokeColor}
             strokeWidth={strokeWidth}
             onClick={() => geoClickHandler(geoDisplayName, geoData)}
+            onMouseEnter={() => {
+              // Track hover analytics event if this is a new location
+              const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
+              publishAnalyticsEvent(`map_hover_${locationName?.toLowerCase()}`, 'hover', interactionLabel, 'map', {
+                title: config?.title || config?.general?.title,
+                location: geoDisplayName
+              })
+            }}
             data-tooltip-id={`tooltip__${tooltipId}`}
             data-tooltip-html={toolTip}
             tabIndex={-1}
@@ -186,6 +194,14 @@ const WorldMap = () => {
           strokeWidth={strokeWidth}
           styles={styles}
           path={path}
+          onMouseEnter={() => {
+            // Track hover analytics event if this is a new location
+            const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
+            publishAnalyticsEvent(`map_hover_${locationName?.toLowerCase()}`, 'hover', interactionLabel, 'map', {
+              title: config?.title || config?.general?.title,
+              location: geoDisplayName
+            })
+          }}
           data-tooltip-id={`tooltip__${tooltipId}`}
           data-tooltip-html={toolTip}
         />
