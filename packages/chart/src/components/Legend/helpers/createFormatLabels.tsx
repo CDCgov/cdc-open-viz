@@ -1,5 +1,5 @@
 import { colorPalettesChart as colorPalettes, sequentialPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
-import { getCurrentPaletteName } from '@cdc/core/helpers/palettes/utils'
+import { getCurrentPaletteName, getFallbackColorPalette } from '@cdc/core/helpers/palettes/utils'
 import { migrateChartPaletteName } from '@cdc/core/helpers/migratePaletteName'
 import { getPaletteAccessor } from '@cdc/core/helpers/getPaletteAccessor'
 import { FaStar } from 'react-icons/fa'
@@ -7,7 +7,6 @@ import { Label } from '../../../types/Label'
 import { ColorScale, TransformedData } from '../../../types/ChartContext'
 import { ChartConfig } from '../../../types/ChartConfig'
 import _ from 'lodash'
-import { FALLBACK_COLOR_PALETTE } from '@cdc/core/helpers/constants'
 
 export const createFormatLabels =
   (config: ChartConfig, tableData: Object[], data: TransformedData[], colorScale: ColorScale) =>
@@ -70,7 +69,7 @@ export const createFormatLabels =
       return reverseLabels([labelBelow, labelAbove])
     }
     if (visualizationType === 'Bar' && visualizationSubType === 'regular' && colorCode && series?.length === 1) {
-      const currentPaletteName = getCurrentPaletteName(config) || FALLBACK_COLOR_PALETTE
+      const currentPaletteName = getCurrentPaletteName(config) || getFallbackColorPalette(config)
       const paletteName = migrateChartPaletteName(currentPaletteName)
       let palette = getPaletteAccessor(colorPalettes, config, paletteName)
 
@@ -125,7 +124,7 @@ export const createFormatLabels =
       // loop through bars for now to meet requirements.
       config.runtime.barSeriesKeys &&
         config.runtime.barSeriesKeys.forEach((bar, index) => {
-          const currentPaletteName = getCurrentPaletteName(config) || 'qualitative_bold'
+          const currentPaletteName = getCurrentPaletteName(config) || getFallbackColorPalette(config)
           const migratedPaletteName = migrateChartPaletteName(currentPaletteName)
           const palette = getPaletteAccessor(colorPalettes, config, migratedPaletteName)
           let colorValue = palette?.[index] || '#ccc'

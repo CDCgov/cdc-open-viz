@@ -75,3 +75,13 @@ export const isV1Palette = (config: any): boolean => {
     !config?.general?.palette?.version
   )
 }
+
+/**
+ * Returns the appropriate fallback color palette based on the palette version
+ * @param config - The visualization config object
+ * @returns The fallback palette name for the detected version
+ */
+export const getFallbackColorPalette = (config: any): string => {
+  const paletteVersion = getColorPaletteVersion(config)
+  return paletteVersion === 1 ? 'qualitative-bold' : 'sequential_blue'
+}
