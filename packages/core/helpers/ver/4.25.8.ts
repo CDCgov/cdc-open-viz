@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import cloneConfig from '../cloneConfig'
 
 export const updateAxisColors = config => {
   if (config.type === 'chart') {
@@ -51,7 +52,7 @@ export const updateStatePickedToStatesPicked = config => {
 
 const update_4_25_8 = config => {
   const ver = '4.25.8'
-  const newConfig = _.cloneDeep(config)
+  const newConfig = cloneConfig(config)
   updateAxisColors(newConfig)
   updateStatePickedToStatesPicked(newConfig)
   newConfig.version = ver

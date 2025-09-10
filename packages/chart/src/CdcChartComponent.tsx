@@ -84,6 +84,7 @@ import { getNewRuntime } from './helpers/getNewRuntime'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import { Datasets } from '@cdc/core/types/DataSet'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -195,7 +196,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
-    const newConfig = _.cloneDeep(_config)
+    const newConfig = cloneConfig(_config)
     let data = dataOverride || stateData
 
     data = handleRankByValue(data, newConfig)
@@ -825,7 +826,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const pivotDynamicSeries = (config: ChartConfig): TableConfig => {
-    const tableConfig: TableConfig = _.cloneDeep(config)
+    const tableConfig: TableConfig = cloneConfig(config)
     const dynamicSeries = tableConfig.series.find(series => !!series.dynamicCategory)
     if (dynamicSeries) {
       const pivot: Pivot = { columnName: dynamicSeries.dynamicCategory, valueColumns: [dynamicSeries.dataKey] }
@@ -1158,7 +1159,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     outerContainerRef,
     parentRef,
     parseDate,
-    rawData: _.cloneDeep(stateData) ?? {},
+    rawData: stateData ?? {},
     setConfig,
     setEditing,
     setParentConfig,
@@ -1168,7 +1169,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     tableData: filteredData || excludedData,
     transformedData: getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean }),
     twoColorPalette,
-    unfilteredData: _.cloneDeep(stateData),
+    unfilteredData: stateData,
     updateConfig
   }
 

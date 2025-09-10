@@ -11,6 +11,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend'
 import parse from 'html-react-parser'
 
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 import { DashboardContext, DashboardDispatchContext } from './DashboardContext'
 import { Visualization } from '@cdc/core/types/Visualization'
@@ -111,7 +112,7 @@ export default function CdcDashboard({
   )
 
   const reloadURLData = async (newFilters?: SharedFilter[]) => {
-    const config = _.cloneDeep(state.config)
+    const config = cloneConfig(state.config)
     if (!config.datasets) return
     const filters = newFilters || config.dashboard.sharedFilters
     const datasetKeys = reloadURLHelpers.getDatasetKeys(config)
@@ -122,7 +123,7 @@ export default function CdcDashboard({
     dispatch({ type: 'SET_FILTERED_DATA', payload: emptyFilteredData })
 
     const newData = {} // Start with empty object instead of cloning existing data
-    const newDatasets = _.cloneDeep(config.datasets)
+    const newDatasets = config.datasets
     let dataWasFetched = false
     let newFileName = ''
 
@@ -355,7 +356,7 @@ export default function CdcDashboard({
   }, [])
 
   const updateChildConfig = (visualizationKey, newConfig) => {
-    const config = _.cloneDeep(state.config)
+    const config = cloneConfig(state.config)
     const updatedConfig = _.pick(config, ['visualizations', 'multiDashboards'])
     updatedConfig.visualizations[visualizationKey] = newConfig
     updatedConfig.visualizations[visualizationKey].formattedData = config.visualizations[visualizationKey].formattedData
@@ -583,10 +584,16 @@ export default function CdcDashboard({
                   })
 
                   //Applys any applicable filters to the Table
-                  const filteredTableData =
+                  let filteredTableData =
                     applicableFilters.length > 0
                       ? filterData(applicableFilters, config.datasets[datasetKey].data)
                       : undefined
+
+                  // Filters are not set on first component render, don't render full dataset
+                  if (applicableFilters.length > 0 && !applicableFilters.some(filter => filter.active)) {
+                    filteredTableData = []
+                  }
+
                   return (
                     <div
                       className='multi-table-container'

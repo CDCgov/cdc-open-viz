@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { FALLBACK_COLOR_PALETTE } from '../constants'
+import cloneConfig from '../cloneConfig'
 
 // Rname Palettes
 const newMapPaletteNames = {
@@ -178,7 +179,7 @@ const addDefaultPaletteVersion = config => {
 
 const update_4_25_9 = config => {
     const ver = '4.25.9'
-    const newConfig = _.cloneDeep(config)
+    const newConfig = cloneConfig(config)
     movePaletteName(newConfig)
     updateCustomColorsMigration(newConfig)
     addDefaultPaletteVersion(newConfig)
