@@ -584,10 +584,16 @@ export default function CdcDashboard({
                   })
 
                   //Applys any applicable filters to the Table
-                  const filteredTableData =
+                  let filteredTableData =
                     applicableFilters.length > 0
                       ? filterData(applicableFilters, config.datasets[datasetKey].data)
                       : undefined
+
+                  // Filters are not set on first component render, don't render full dataset
+                  if (applicableFilters.length > 0 && !applicableFilters.some(filter => filter.active)) {
+                    filteredTableData = []
+                  }
+
                   return (
                     <div
                       className='multi-table-container'
