@@ -4,6 +4,16 @@
 
 This system tracks user interactions across various data visualization components in the COVE (Data Visualization) platform. Events are categorized by visualization type, user action, and specific interaction patterns.
 
+## Notes
+
+- The `interactionLabel` is derived from the config url path
+- All events include visualization type, version, and additional metadata automatically (including `title` when available)
+- Event actions follow standard user interaction patterns (click, drag, toggle, load, hover, etc.)
+- Legend toggle modes are either 'highlight' or 'isolate' based on legend behavior
+- Hover events are automatically generated for chart series interactions and include series metadata
+- Event labels use pipe (`|`) separation for compound values (e.g., `config|key_filter|value_health`)
+
+
 ## Visualization Types
 The following visualization types are supported across various events
 ```.ts
@@ -89,10 +99,18 @@ export type ANALYTICS_EVENT_ACTIONS =
 | `${viz_type}_filter_reset` | `click` | `interactionLabel` | User resets all filters |
 | `dashboard_filter_changed\|key_${key}\|value_${value}` | `change` | `interactionLabel` | Dashboard-specific filter change |
 
+## Map Interaction Events
+
+| EventType | EventAction | EventLabel | Description |
+| --------- | ----------- | ---------- | ----------- |
+| `map_click_${feature_name}` | `click` | `interactionLabel` | User clicks on map features (states, counties, etc.) |
+| `map_hover_${feature_name}` | `hover` | `interactionLabel` | User hovers over map features (states, counties, etc.) |
+
 ## Chart Interaction Events
 
 | EventType | EventAction | EventLabel | Description |
 | --------- | ----------- | ---------- | ----------- |
+| `chart_click_${series_name}` | `click` | `interactionLabel` | User clicks on chart data series (bars, pie slices, line points, etc.) |
 | `chart_hover_${series_name}` | `hover` | `interactionLabel` | User hovers over chart data series (pie chart, line chart, scatter plot) |
 
 ## Image Download Events
@@ -164,46 +182,4 @@ publishAnalyticsEvent('link_to_data_table_click|#data-table-health_data', 'click
 publishAnalyticsEvent('map_navigation_menu|https://example.com/state/california', 'submit', 'Map Config', 'map', { title: 'State Map' })
 ```
 
-## Event Label Patterns
 
-Event labels follow these common patterns:
-
-1. **Simple labels:** `interactionLabel` or `configUrl`
-2. **Compound labels:** `${interactionLabel}|${additionalInfo}`
-3. **Multi-value labels:** `${interactionLabel}|${value1}|${value2}`
-4. **Filter labels:** Event type includes filter data: `${viz_type}_filter_changed|key_${filterKey}|value_${filterValue}`
-5. **Array labels:** `${interactionLabel}|${array.join(',')}`
-6. **Zoom event labels:** Event type includes zoom data: `map_zoomed_in|zoom_level_${level}|${coordinates}`
-7. **Data table link labels:** Event type includes anchor: `link_to_data_table_click|#data-table-${dataKey}`
-8. **Legend toggle labels:** Event type includes mode and item: `map_legend_item_toggled|isolate-mode|${item.label}`, `chart_legend_item_toggled|highlight-mode|${label.text}`
-9. **Navigation menu labels:** Event type includes URL: `map_navigation_menu|${urlString}`
-
-## Template Event Types
-
-Several event types use template literals with visualization types:
-
-- `${viz_type}_filter_reset` - where `viz_type` can be any visualization type
-- `${viz_type}_filter_applied` - applies to all visualization types
-- `${viz_type}_filter_changed` - applies to all visualization types
-- `${viz_type}_image_downloaded` - applies to all visualization types
-- `${viz_type}_legend_item_toggled|${mode}-mode|${item_label}` - where `mode` is `highlight` or `isolate`, and item_label is the legend item text
-- `${viz_type}_legend_reset` - applies to visualizations with legends
-- `${viz_type}_loaded` - fired when any visualization loads
-- `${viz_type}_hover_${series_name}` - fired when user hovers over chart data series
-
-## Performance Considerations
-
-Hover events are tracked to understand user interaction patterns but should be used thoughtfully:
-
-- **Chart Hover Events**: Only fire when hovering over a new series (not on every mouse movement)
-- **Event Throttling**: Hover events include basic throttling to prevent excessive analytics traffic
-- **Metadata**: All events include contextual metadata like `title` and `series` information for better analysis
-
-## Notes
-
-- The `interactionLabel` is derived from the config url path
-- All events include visualization type, version, and additional metadata automatically (including `title` when available)
-- Event actions follow standard user interaction patterns (click, drag, toggle, load, hover, etc.)
-- Legend toggle modes are either 'highlight' or 'isolate' based on legend behavior
-- Hover events are automatically generated for chart series interactions and include series metadata
-- Event labels use pipe (`|`) separation for compound values (e.g., `config|key_filter|value_health`)
