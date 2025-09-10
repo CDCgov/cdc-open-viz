@@ -79,6 +79,18 @@ const chartPaletteNameMigrations = {
     'colorblindsafereverse': 'colorblindsafereverse'
 }
 
+const cleanPaletteProperties = (config) => {
+    if (config?.color) {
+        delete config.color
+    }
+    if (config?.palette) {
+        delete config.palette
+    }
+    if (config?.customColors) {
+        delete config.customColors
+    }
+}
+
 const renameOriginalMapPalettes = (config) => {
     if (config.general?.palette?.name && newMapPaletteNames[config.general.palette.name]) {
         config.general.palette.name = newMapPaletteNames[config.general.palette.name]
@@ -91,15 +103,17 @@ const renameOriginalChartPalettes = (config) => {
     }
 }
 
+const setMissingVersion = (config) => {
+    const version = config?.general?.palette?.version
+    if (!version || version === '1.0') {
+        config.general.palette.version = '1.0'
+    }
+}
+
 
 const saveBackup = (config) => {
-    const version = config.general.palette.version
-    // Save a backup and set version to 1.0 for legacy palette names
-    if (version === '1.0' || !version) {
-        config.general.palette.version = '1.0'
-        config.general.palette.backups = config.general.palette.backups || []
-        config.general.palette.backups.push({ name: config.color, version: '1.0', isReversed: config.general.palette.isReversed })
-    }
+    config.general.palette.backups = config.general.palette.backups || []
+    config.general.palette.backups.push({ name: config.color, version: '1.0', isReversed: config.general.palette.isReversed })
 }
 
 // On maps move config.color to config.general.colorPalettes.colorName
@@ -111,11 +125,7 @@ const movePaletteName = config => {
             config.general.palette = config.general.palette || {}
             config.general.palette.name = config.color
             const version = config.general.palette.version
-
-            // Save a backup and set version to 1.0 for legacy palette names
             saveBackup(config)
-            // Remove old color property
-            delete config.color
         }
 
         // Rename default palette names to new standardized names in mapColorPalettes.ts
@@ -130,8 +140,6 @@ const movePaletteName = config => {
         config.general.palette = config.general.palette || {}
         config.general.palette.name = config.palette || config.color || FALLBACK_COLOR_PALETTE
         saveBackup(config)
-        delete config.palette
-        delete config.color // outdated
         renameOriginalChartPalettes(config)
     }
 
@@ -179,9 +187,11 @@ const addDefaultPaletteVersion = config => {
 const update_4_25_9 = config => {
     const ver = '4.25.9'
     const newConfig = _.cloneDeep(config)
+    setMissingVersion(newConfig)
     movePaletteName(newConfig)
     updateCustomColorsMigration(newConfig)
     addDefaultPaletteVersion(newConfig)
+    cleanPaletteProperties(newConfig)
     newConfig.version = ver
     console.log('new config', newConfig)
     return newConfig
