@@ -95,7 +95,7 @@ export type ANALYTICS_EVENT_ACTIONS =
 | EventType | EventAction | EventLabel | Description |
 | --------- | ----------- | ---------- | ----------- |
 | `${viz_type}_filter_changed\|key_${columnName}\|value_${activeValue}` | `click` | `interactionLabel` | User changes a filter value |
-| `${viz_type}_filter_applied` | `click` | `${interactionLabel}\|${filters.map(f => f.active)}` | User applies filter selections |
+| `${viz_type}_filter_applied\|${filters.map(f => f.active)}` | `click` | `${interactionLabel}` | User applies filter selections |
 | `${viz_type}_filter_reset` | `click` | `interactionLabel` | User resets all filters |
 | `dashboard_filter_changed\|key_${key}\|value_${value}` | `change` | `interactionLabel` | Dashboard-specific filter change |
 
