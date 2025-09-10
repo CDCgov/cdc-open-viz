@@ -38,6 +38,14 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
   // Identify Selector
   const baseSvg = document.querySelector(`[data-download-id=${elementToCapture}]`)
 
+  // Extract title from different state structures
+  const getTitle = state => {
+    if (state?.dashboard?.title) return state.dashboard.title
+    if (state?.general?.title) return state.general.title
+    if (state?.title) return state.title
+    return undefined
+  }
+
   // Handles different state title locations between components
   // Apparently some packages use state.title where others use state.general.title
   const handleFileName = state => {
@@ -112,7 +120,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
             .then(canvas => {
               document.body.removeChild(container) // Clean up container
               saveImageAs(canvas.toDataURL(), filename + '.png')
-              publishAnalyticsEvent(`${state.type}_image_downloaded`, 'click', interactionLabel, `${state.type}`)
+              publishAnalyticsEvent(`${state.type}_image_downloaded`, 'click', interactionLabel, `${state.type}`, { title: getTitle(state) })
             })
         })
       }
@@ -169,7 +177,7 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
         title={buttonText.link}
         target='_blank'
         onClick={() => {
-          publishAnalyticsEvent('data_viewed', 'click', `${unknown}`)
+          publishAnalyticsEvent('data_viewed', 'click', `${unknown}`, undefined, { title: config?.title })
         }}
       >
         {buttonText.link}
@@ -184,7 +192,7 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
       title='Link to view full data set'
       target='_blank'
       onClick={() => {
-        publishAnalyticsEvent('data_viewed', 'click', `${interactionLabel}`)
+        publishAnalyticsEvent('data_viewed', 'click', `${interactionLabel}`, undefined, { title: config?.title })
       }}
     >
       {buttonText.link}

@@ -96,7 +96,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   setConfig: setParentConfig,
   loadConfig,
   datasets,
-  interactionLabel = ''
+  interactionLabel = 'no link provided'
 }) => {
   const initialState = getInitialState(configObj)
 
@@ -314,9 +314,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       className='margin-left-href'
       onClick={() => {
         publishAnalyticsEvent(
-          'link_to_data_table_click',
+          `link_to_data_table_click|#data-table-${config.dataKey}`,
           'click',
-          `${interactionLabel}|#data-table-${config.dataKey}`,
+          `${interactionLabel}`,
           'map'
         )
       }}

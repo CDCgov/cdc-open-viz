@@ -80,7 +80,9 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
           _prevPosition.coordinates[0] !== 0 && _prevPosition.coordinates[1] !== 0
             ? _prevPosition.coordinates
             : projectionData.stateCenter
-        publishAnalyticsEvent('map_zoomed_in', 'click', `${interactionLabel}|${newZoom}|${newCoordinates}`, 'map')
+        publishAnalyticsEvent('map_zoomed_in', 'click', `${interactionLabel}|${newZoom}|${newCoordinates}`, 'map', {
+          title: config?.title || config?.general?.title
+        })
       } else if (zoomFunction === 'zoomOut' && _prevPosition.zoom > 1) {
         newZoom = _prevPosition.zoom / 1.5
         newCoordinates =
@@ -97,7 +99,9 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
       if (zoomFunction === 'reset') {
         dispatch({ type: 'SET_TRANSLATE', payload: [0, 0] }) // needed for state switcher
         dispatch({ type: 'SET_SCALE', payload: 1 }) // needed for state switcher
-        publishAnalyticsEvent('map_reset_zoom_level', 'click', interactionLabel, 'map')
+        publishAnalyticsEvent('map_reset_zoom_level', 'click', interactionLabel, 'map', {
+          title: config?.title || config?.general?.title
+        })
       }
     },
     [config.mapPosition, projectionData.stateCenter, interactionLabel, dispatch]
