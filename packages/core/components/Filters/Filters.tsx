@@ -88,9 +88,9 @@ const Filters: React.FC<FilterProps> = ({
     setFilters(newFilters)
 
     publishAnalyticsEvent(
-      `${visualizationConfig.type}_filter_changed`,
+      `${visualizationConfig.type}_filter_changed|key_${newFilters?.[index]?.columnName}|value_${newFilters?.[index]?.active}`,
       'click',
-      `${interactionLabel}|key_${newFilters?.[index]?.columnName}|value_${newFilters?.[index]?.active}`,
+      `${interactionLabel}`,
       visualizationConfig.type,
       { title: visualizationConfig?.title }
     )
@@ -115,9 +115,9 @@ const Filters: React.FC<FilterProps> = ({
     setFilters(newFilters)
 
     publishAnalyticsEvent(
-      `${visualizationConfig.type}_filter_applied`,
+      `${visualizationConfig.type}_filter_applied|${newFilters.map(f => f.active)}`,
       'click',
-      `${interactionLabel}|${newFilters.map(f => f.active)}`,
+      `${interactionLabel}`,
       visualizationConfig.type,
       { title: visualizationConfig?.title }
     )

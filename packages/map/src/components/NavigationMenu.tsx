@@ -12,7 +12,7 @@ const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoN
     if (activeGeo !== '') {
       const urlString = data[dropdownItems[activeGeo]][columns.navigate.name]
 
-      publishAnalyticsEvent('map_navigation_menu', 'submit', `${interactionLabel}|${urlString}`, undefined, {
+      publishAnalyticsEvent(`map_navigation_menu|${urlString}`, 'submit', `${interactionLabel}`, undefined, {
         title: config?.title || config?.general?.title
       })
 

@@ -76,9 +76,9 @@ const WorldMap = () => {
   const handleZoomIn = position => {
     if (position.zoom >= 4) return
     publishAnalyticsEvent(
-      'map_zoomed_in',
+      `map_zoomed_in|zoom_level_${Math.floor(position.zoom * 1.5)}|${position.coordinates}`,
       'click',
-      `${interactionLabel}|zoom_level_${Math.floor(position.zoom * 1.5)}|${position.coordinates}`,
+      `${interactionLabel}`,
       'map'
     )
     dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: position.zoom * 1.5 } })
@@ -87,9 +87,9 @@ const WorldMap = () => {
   const handleZoomOut = position => {
     if (position.zoom <= 1) return
     publishAnalyticsEvent(
-      'map_zoomed_out',
+      `map_zoomed_out|zoom_level_${Math.floor(position.zoom / 1.5)}|${position.coordinates}`,
       'click',
-      `${interactionLabel}|zoom_level_${Math.floor(position.zoom / 1.5)}|${position.coordinates}`,
+      `${interactionLabel}`,
       'map'
     )
     dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: position.zoom / 1.5 } })

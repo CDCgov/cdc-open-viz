@@ -274,9 +274,9 @@ const CountyMap = () => {
       // Redraw with focus on state
       setFocus({ id: clickedState.id, index: focusIndex, center: geoCentroid(clickedState), feature: clickedState })
       publishAnalyticsEvent(
-        'map_zoomed_in',
+        `map_zoomed_in|zoom_level_3|${clickedState.properties.name}`,
         'click',
-        `${configUrl}|zoom_level_3|${clickedState.properties.name}`,
+        `${configUrl}`,
         'map'
       )
     }
@@ -477,7 +477,7 @@ const CountyMap = () => {
       }
 
       if (hoveredGeo) {
-        // Track hover analytics event if this is a new location  
+        // Track hover analytics event if this is a new location
         if (isNaN(currentTooltipIndex) || currentTooltipIndex !== hoveredGeoIndex) {
           const locationName = displayGeoName(hoveredGeo[config.columns.geo.name]).replace(/[^a-zA-Z0-9]/g, '_')
           publishAnalyticsEvent(`map_hover_${locationName?.toLowerCase()}`, 'hover', interactionLabel, 'map', {
