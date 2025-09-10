@@ -130,9 +130,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           onClick={() => {
             toggleLegendActive(idx, item.label, runtimeLegend, dispatch)
             publishAnalyticsEvent(
-              `map_legend_item_toggled--isolate-mode`,
+              `map_legend_item_toggled|isolate-mode|${item.label}`,
               'click',
-              `${interactionLabel}|${item.label}`,
+              `${interactionLabel}`,
               'map'
             )
           }}
@@ -141,9 +141,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
               e.preventDefault()
               toggleLegendActive(idx, item.label, runtimeLegend, dispatch)
               publishAnalyticsEvent(
-                `map_legend_item_toggled--isolate-mode`,
+                `map_legend_item_toggled|isolate-mode|${item.label}`,
                 'keydown',
-                `${interactionLabel}|${item.label}`,
+                `${interactionLabel}`,
                 'map'
               )
             }

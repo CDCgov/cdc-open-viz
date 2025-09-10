@@ -28,6 +28,7 @@ type CdcMarkupIncludeProps = {
   isDashboard: boolean
   isEditor: boolean
   setConfig: any
+  interactionLabel?: string
 }
 
 import Title from '@cdc/core/components/ui/Title'
@@ -41,7 +42,8 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   datasets,
   isDashboard = true,
   isEditor = false,
-  setConfig: setParentConfig
+  setConfig: setParentConfig,
+  interactionLabel = 'no link provided'
 }) => {
   const initialState = {
     config: configObj,
@@ -246,7 +248,9 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     if (config && !coveLoadedHasRan && container) {
       publish('cove_loaded', { config: config })
       dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
-      publishAnalyticsEvent('markup-include_loaded', 'load', configUrl, 'markup-include')
+      publishAnalyticsEvent('markup-include_loaded', 'load', interactionLabel, 'markup-include', {
+        title: config?.title
+      })
     }
   }, [config, container])
 

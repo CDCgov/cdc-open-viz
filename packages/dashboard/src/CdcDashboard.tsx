@@ -58,7 +58,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
     const { newConfig, datasets } =
       selected !== null ? await loadMultiDashboard(_config, selected) : await loadSingleDashboard(_config)
     setInitial(formatInitialState(newConfig, datasets))
-    publishAnalyticsEvent('dashboard_loaded', 'load', interactionLabel, 'dashboard')
+    publishAnalyticsEvent('dashboard_loaded', 'load', interactionLabel, 'dashboard', { title: newConfig?.title })
   }
 
   useEffect(() => {

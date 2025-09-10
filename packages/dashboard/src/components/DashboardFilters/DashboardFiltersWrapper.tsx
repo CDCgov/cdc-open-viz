@@ -135,9 +135,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
     )
 
     publishAnalyticsEvent(
-      'dashboard_filter_changed',
+      `dashboard_filter_changed|key_${newSharedFilters?.[index]?.key}|value_${value}`,
       'change',
-      `${interactionLabel}|key_${newSharedFilters?.[index]?.key}|value_${value}`,
+      `${interactionLabel}`,
       'dashboard'
     )
 

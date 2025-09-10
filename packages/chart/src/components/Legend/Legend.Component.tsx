@@ -141,9 +141,9 @@ const Legend: React.FC<LegendProps> = forwardRef(
                             if (e.key === 'Enter') {
                               e.preventDefault()
                               publishAnalyticsEvent(
-                                `chart_legend_item_toggled--${legend.behavior}-mode`,
+                                `chart_legend_item_toggled|${legend.behavior}-mode|${label.text}`,
                                 'keydown',
-                                `${interactionLabel}|${label.text}`,
+                                `${interactionLabel}`,
                                 'chart'
                               )
                               highlight(label)
@@ -152,9 +152,9 @@ const Legend: React.FC<LegendProps> = forwardRef(
                           onClick={e => {
                             e.preventDefault()
                             publishAnalyticsEvent(
-                              `chart_legend_item_toggled--${legend.behavior}-mode`,
+                              `chart_legend_item_toggled|${legend.behavior}-mode|${label.text}`,
                               'click',
-                              `${interactionLabel}|${label.text}`,
+                              `${interactionLabel}`,
                               'chart'
                             )
                             highlight(label)

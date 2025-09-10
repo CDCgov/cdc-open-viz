@@ -148,7 +148,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     const processedConfig = { ...coveUpdateWorker(response) }
 
     updateConfig({ ...defaults, ...processedConfig })
-    publishAnalyticsEvent('data-bite_loaded', 'load', interactionLabel, 'data-bite')
+    publishAnalyticsEvent('data-bite_loaded', 'load', interactionLabel, 'data-bite', { title: processedConfig?.title })
     dispatch({ type: 'SET_LOADING', payload: false })
   }
 
