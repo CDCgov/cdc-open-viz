@@ -3,6 +3,7 @@ import { AnyVisualization, Visualization } from '@cdc/core/types/Visualization'
 import { DashboardConfig } from '../types/DashboardConfig'
 import { removeDashboardFilter } from './removeDashboardFilter'
 import _ from 'lodash'
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 
 const cleanDashboardFootnotes = (config: DashboardConfig) => {
   if (config.visualizations) {
@@ -103,8 +104,8 @@ const removeRuntimeDataURLs = (config: DashboardConfig) => {
   }
 }
 
-export const formatConfigBeforeSave = configToStrip => {
-  const strippedConfig = _.cloneDeep(configToStrip)
+export const stripConfig = configToStrip => {
+  const strippedConfig = cloneConfig(configToStrip)
   if (strippedConfig.type === 'dashboard') {
     if (strippedConfig.multiDashboards) {
       strippedConfig.multiDashboards.forEach((multiDashboard, i) => {

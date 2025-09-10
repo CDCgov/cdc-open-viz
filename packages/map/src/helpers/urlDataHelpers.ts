@@ -4,6 +4,7 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { MapConfig } from '../types/MapConfig'
 import { CSV_PARSE_CONFIG } from './constants'
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 
 export const buildQueryString = (params: Record<string, string>): string =>
   Object.keys(params)
@@ -62,7 +63,7 @@ export const reloadURLData = async (config: MapConfig, setConfig: (config: MapCo
     data = transform.developerStandardize(data, config.dataDescription)
   }
 
-  const newConfig = _.cloneDeep(config)
+  const newConfig = cloneConfig(config)
   newConfig.data = data
   newConfig.runtimeDataUrl = dataUrlFinal
 

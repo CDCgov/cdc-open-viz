@@ -66,6 +66,7 @@ import { RuntimeData } from './types/RuntimeData'
 import EditorContext from '@cdc/core/contexts/EditorContext'
 import MapActions from './store/map.actions'
 import _ from 'lodash'
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import useModal from './hooks/useModal'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
@@ -133,7 +134,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   useEffect(() => {
-    const _newConfig = getInitialState(_.cloneDeep(configObj)).config
+    const _newConfig = getInitialState(cloneConfig(configObj)).config
     if (configObj.data) {
       _newConfig.data = configObj.data
     }

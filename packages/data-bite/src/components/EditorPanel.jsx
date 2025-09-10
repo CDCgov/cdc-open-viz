@@ -1,4 +1,5 @@
 import { memo, useContext, useEffect, useState } from 'react'
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import _ from 'lodash'
 import {
   Accordion,
@@ -51,7 +52,7 @@ const EditorPanel = memo(() => {
   }
 
   const convertStateToConfig = () => {
-    let strippedState = _.cloneDeep(config)
+    let strippedState = cloneConfig(config)
     //if(false === missingRequiredSections()) {
     //strippedState.newViz
     //}

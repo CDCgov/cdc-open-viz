@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash'
+import cloneConfig from './cloneConfig'
 
 /* editConfigKeys
  * Add edit or update config keys
@@ -8,7 +8,7 @@ import { cloneDeep } from 'lodash'
  * if the key does not exist, it will be created
  */
 export function editConfigKeys<T = any>(config: T, keyUpdates: { path: string[]; value: any }[]): T {
-  const configDeepCopy = cloneDeep(config)
+  const configDeepCopy = cloneConfig(config)
 
   const newConfig = keyUpdates.reduce((acc, { path, value }) => {
     const pathCopy = [...path]

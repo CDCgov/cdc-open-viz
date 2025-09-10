@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import cloneConfig from '../cloneConfig'
 import { AnyVisualization } from '../../types/Visualization'
 import { VizFilter } from '../../types/VizFilter'
 import versionNeedsUpdate from './versionNeedsUpdate'
@@ -49,7 +50,7 @@ const supportLineStyledLegend = newConfig => {
 
 const update_4_24_9 = config => {
   const ver = '4.24.9'
-  const newConfig = _.cloneDeep(config)
+  const newConfig = cloneConfig(config)
   patchSingleStateZoom(newConfig)
   addIdsToVisFilters(newConfig)
   supportLineStyledLegend(config)

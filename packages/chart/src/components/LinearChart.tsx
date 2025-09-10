@@ -205,7 +205,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   const yMax = initialHeight + forestRowsHeight
 
-  const isNoDataAvailable = config.filters && config.filters.values.length === 0 && data.length === 0
+  const isNoDataAvailable = config.filters?.length > 0 && data.length === 0
 
   const getXAxisData = d =>
     isDateScale(config.runtime.xAxis)

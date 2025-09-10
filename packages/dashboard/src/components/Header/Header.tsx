@@ -1,5 +1,5 @@
 import { useEffect, useContext } from 'react'
-
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
 
 import './index.scss'
@@ -20,7 +20,7 @@ const Header = (props: HeaderProps) => {
   const dispatch = useContext(DashboardDispatchContext)
   const back = () => {
     if (!visualizationKey) return
-    const newConfig = _.cloneDeep(config)
+    const newConfig = cloneConfig(config)
     newConfig.visualizations[visualizationKey].editing = false
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
 
@@ -49,7 +49,7 @@ const Header = (props: HeaderProps) => {
   }
 
   const convertStateToConfig = () => {
-    const strippedState = _.cloneDeep(config)
+    const strippedState = cloneConfig(config)
     delete strippedState.newViz
     delete strippedState.runtime
 
