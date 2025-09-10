@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { SharedFilter } from '../types/SharedFilter'
 import { handleSorting } from '@cdc/core/components/Filters'
+import { FILTER_STYLE } from '../types/FilterStyles'
 
 // Gets filter values from dataset
 const generateValuesForFilter = (columnName: string, data: Record<string, any[]>) => {
@@ -45,7 +46,7 @@ export const addValuesToDashboardFilters = (
       const queryStringFilterValue = getQueryStringFilterValue(filterCopy)
       if (queryStringFilterValue) {
         filterCopy.active = queryStringFilterValue
-      } else if (filter.multiSelect) {
+      } else if (filter.filterStyle === FILTER_STYLE.multiSelect) {
         const defaultValues = filterCopy.values
         const active: string[] = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
         filterCopy.active = active.filter(val => defaultValues.includes(val))
@@ -55,6 +56,32 @@ export const addValuesToDashboardFilters = (
         filterCopy.active = filterCopy.defaultValue || defaultValue
       }
     }
+
+    // Handle nested dropdown subGrouping.active property
+    if (filterCopy.subGrouping && filterCopy.subGrouping.valuesLookup) {
+      const groupName = filterCopy.active as string
+      const subGroupingFilter = {
+        ...filterCopy.subGrouping,
+        values: filterCopy.subGrouping.valuesLookup[groupName]?.values || []
+      }
+      const queryStringFilterValue = getQueryStringFilterValue(subGroupingFilter)
+      const groupActive = groupName || filterCopy.values[0]
+      const defaultSubValue = filterCopy.subGrouping.valuesLookup[groupActive as string]?.values[0]
+
+      // Priority order: query string > existing active > configured default > first available value
+      let activeValue = queryStringFilterValue || filterCopy.subGrouping.active
+
+      // If we have a configured default value and it exists in the current group's options, use it
+      if (!activeValue && filterCopy.subGrouping.defaultValue) {
+        const currentGroupValues = filterCopy.subGrouping.valuesLookup[groupActive as string]?.values || []
+        if (currentGroupValues.includes(filterCopy.subGrouping.defaultValue)) {
+          activeValue = filterCopy.subGrouping.defaultValue
+        }
+      }
+
+      filterCopy.subGrouping.active = activeValue || defaultSubValue
+    }
+
     return handleSorting(filterCopy)
   })
 }
