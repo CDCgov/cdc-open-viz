@@ -1,6 +1,6 @@
 import { colorPalettesChart as colorPalettes, sequentialPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
-import { getCurrentPaletteName, getFallbackColorPalette } from '@cdc/core/helpers/palettes/utils'
-import { migrateChartPaletteName } from '@cdc/core/helpers/migratePaletteName'
+import { getCurrentPaletteName, getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
+import { chartPaletteMigrationMap } from '@cdc/core/helpers/migratePaletteName'
 import { getPaletteAccessor } from '@cdc/core/helpers/getPaletteAccessor'
 import { FaStar } from 'react-icons/fa'
 import { Label } from '../../../types/Label'
@@ -70,7 +70,7 @@ export const createFormatLabels =
     }
     if (visualizationType === 'Bar' && visualizationSubType === 'regular' && colorCode && series?.length === 1) {
       const currentPaletteName = getCurrentPaletteName(config) || getFallbackColorPalette(config)
-      const paletteName = migrateChartPaletteName(currentPaletteName)
+      const paletteName = migratePaletteWithMap(currentPaletteName, chartPaletteMigrationMap, true)
       let palette = getPaletteAccessor(colorPalettes, config, paletteName)
 
       while (tableData.length > palette.length) {
@@ -125,7 +125,7 @@ export const createFormatLabels =
       config.runtime.barSeriesKeys &&
         config.runtime.barSeriesKeys.forEach((bar, index) => {
           const currentPaletteName = getCurrentPaletteName(config) || getFallbackColorPalette(config)
-          const migratedPaletteName = migrateChartPaletteName(currentPaletteName)
+          const migratedPaletteName = migratePaletteWithMap(currentPaletteName, chartPaletteMigrationMap, true)
           const palette = getPaletteAccessor(colorPalettes, config, migratedPaletteName)
           let colorValue = palette?.[index] || '#ccc'
 

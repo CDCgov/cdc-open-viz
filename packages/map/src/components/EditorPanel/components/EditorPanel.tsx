@@ -50,8 +50,8 @@ import './editorPanel.styles.css'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 import MultiSelect from '@cdc/core/components/MultiSelect'
-import { migratePaletteName } from '@cdc/core/helpers/migratePaletteName'
-import { isV1Palette, getCurrentPaletteName } from '@cdc/core/helpers/palettes/utils'
+import { paletteMigrationMap } from '@cdc/core/helpers/migratePaletteName'
+import { isV1Palette, getCurrentPaletteName, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
 import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
 
@@ -920,7 +920,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
     const executeSelection = () => {
       const _newConfig = _.cloneDeep(config)
-      _newConfig.general.palette.name = migratePaletteName(palette)
+      _newConfig.general.palette.name = palette ? migratePaletteWithMap(palette, paletteMigrationMap, false) : undefined
       if (isV1PaletteConfig) {
         _newConfig.general.palette.version = '2.0'
       }

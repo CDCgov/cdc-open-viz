@@ -1,7 +1,7 @@
 import { FALLBACK_COLOR_PALETTE_V1, FALLBACK_COLOR_PALETTE_V2 } from '../constants'
 import { getColorPaletteVersion } from '../getColorPaletteVersion'
 import { getPaletteAccessor } from '../getPaletteAccessor'
-import { migrateChartPaletteName } from '../migratePaletteName'
+import { chartPaletteMigrationMap } from '../migratePaletteName'
 
 /**
  * Gets the current palette name from a visualization config
@@ -49,8 +49,8 @@ export const getPaletteColors = (config: any, colorPalettes: any): string[] => {
 
   // Apply v1 palette name migrations if this is a v1 config
   const paletteVersion = getColorPaletteVersion(config)
-  if (paletteVersion === 1 && migrateChartPaletteName(paletteName)) {
-    paletteName = migrateChartPaletteName(paletteName)
+  if (paletteVersion === 1) {
+    paletteName = migratePaletteWithMap(paletteName, chartPaletteMigrationMap, true)
   }
 
   // Get the versioned palette accessor
@@ -85,4 +85,71 @@ export const isV1Palette = (config: any): boolean => {
 export const getFallbackColorPalette = (config: any): string => {
   const paletteVersion = getColorPaletteVersion(config)
   return paletteVersion === 1 ? FALLBACK_COLOR_PALETTE_V1 : FALLBACK_COLOR_PALETTE_V2
+}
+
+/**
+ * Finds a palette name in a migration map using exact match first, then case-insensitive fallback
+ * @param paletteName - The palette name to look up
+ * @param migrationMap - The migration map to search in
+ * @returns The migrated palette name or null if not found
+ */
+export const findPaletteInMigrationMap = (paletteName: string, migrationMap: Record<string, string>): string | null => {
+  // Try exact match first
+  if (migrationMap[paletteName]) {
+    return migrationMap[paletteName]
+  }
+
+  // Try case-insensitive match
+  const lowerCaseName = paletteName.toLowerCase()
+  const matchingKey = Object.keys(migrationMap).find(key => key.toLowerCase() === lowerCaseName)
+
+  return matchingKey ? migrationMap[matchingKey] : null
+}
+
+/**
+ * Handles reverse palette suffix logic for chart palettes
+ * @param originalPaletteName - The original palette name that may have 'reverse' suffix
+ * @param migratedBase - The migrated base name
+ * @returns The properly formatted migrated palette name with reverse suffix if needed
+ */
+export const handleReversePalette = (originalPaletteName: string, migratedBase: string): string => {
+  const isReverse = originalPaletteName.endsWith('reverse')
+  return isReverse ? migratedBase + 'reverse' : migratedBase
+}
+
+/**
+ * Generic migration function that works with any migration map
+ * @param oldPaletteName - The palette name to migrate
+ * @param migrationMap - The migration map to use
+ * @param handleReverse - Whether to handle reverse palette suffixes (for chart palettes)
+ * @returns The migrated palette name or original if no migration found
+ */
+export const migratePaletteWithMap = (
+  oldPaletteName: string,
+  migrationMap: Record<string, string>,
+  handleReverse: boolean = false
+): string => {
+  // Handle null/undefined/empty cases - maintain original behavior
+  if (!oldPaletteName) {
+    return oldPaletteName
+  }
+
+  if (handleReverse) {
+    // Chart palette logic - handle reverse suffix
+    const isReverse = oldPaletteName.endsWith('reverse')
+    const basePaletteName = isReverse ? oldPaletteName.slice(0, -7) : oldPaletteName
+
+    const migratedBase = findPaletteInMigrationMap(basePaletteName, migrationMap)
+    if (migratedBase) {
+      return handleReversePalette(oldPaletteName, migratedBase)
+    }
+  } else {
+    // Map palette logic - direct lookup
+    const migrated = findPaletteInMigrationMap(oldPaletteName, migrationMap)
+    if (migrated) {
+      return migrated
+    }
+  }
+
+  return oldPaletteName
 }

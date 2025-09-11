@@ -1,5 +1,5 @@
 // Chart palette migration map
-const chartPaletteMigrationMap: Record<string, string> = {
+export const chartPaletteMigrationMap: Record<string, string> = {
   yelloworangered: 'sequential_orange',
   yelloworangebrown: 'sequential_orange',
   orangered: 'sequential_orange',
@@ -55,8 +55,8 @@ const chartPaletteMigrationMap: Record<string, string> = {
   'qualitative-softreverse': 'qualitative_standardreverse'
 }
 
-// Map palette migration map
-const mapPaletteMigrationMap: Record<string, string> = {
+// Map palette migration map  
+export const mapPaletteMigrationMap: Record<string, string> = {
   sequential_yellow_orange_red: 'sequential_orange',
   sequential_yellow_orange_brown: 'sequential_orange',
   sequential_orange_red: 'sequential_orange',
@@ -83,76 +83,8 @@ const mapPaletteMigrationMap: Record<string, string> = {
 }
 
 // Combined palette migration map for backward compatibility
-const paletteMigrationMap: Record<string, string> = {
+export const paletteMigrationMap: Record<string, string> = {
   ...chartPaletteMigrationMap,
   ...mapPaletteMigrationMap
 }
 
-/**
- * Migrates chart palette names from old format to new format
- * @param oldPaletteName - The old palette name to migrate
- * @returns The new palette name, or the original if no migration found
- */
-export const migrateChartPaletteName = (oldPaletteName: string): string => {
-  // Check if this is a reverse palette
-  const isReverse = oldPaletteName.endsWith('reverse')
-  const basePaletteName = isReverse ? oldPaletteName.slice(0, -7) : oldPaletteName
-
-  // Try exact match first
-  if (chartPaletteMigrationMap[basePaletteName]) {
-    const migratedBase = chartPaletteMigrationMap[basePaletteName]
-    return isReverse ? migratedBase + 'reverse' : migratedBase
-  }
-
-  // Try case-insensitive match for chart palettes
-  const lowerCaseName = basePaletteName.toLowerCase()
-  const matchingKey = Object.keys(chartPaletteMigrationMap).find(key => key.toLowerCase() === lowerCaseName)
-
-  if (matchingKey) {
-    const migratedBase = chartPaletteMigrationMap[matchingKey]
-    return isReverse ? migratedBase + 'reverse' : migratedBase
-  }
-
-  return oldPaletteName
-}
-
-/**
- * Migrates map palette names from old format to new format
- * @param oldPaletteName - The old palette name to migrate
- * @returns The new palette name, or the original if no migration found
- */
-export const migrateMapPaletteName = (oldPaletteName: string): string => {
-  // Try exact match first
-  if (mapPaletteMigrationMap[oldPaletteName]) {
-    return mapPaletteMigrationMap[oldPaletteName]
-  }
-
-  // Try case-insensitive match for map palettes
-  const lowerCaseName = oldPaletteName.toLowerCase()
-  const matchingKey = Object.keys(mapPaletteMigrationMap).find(key => key.toLowerCase() === lowerCaseName)
-
-  return matchingKey ? mapPaletteMigrationMap[matchingKey] : oldPaletteName
-}
-
-/**
- * Migrates palette names from old format to new format for any visualization component
- * @param oldPaletteName - The old palette name to migrate
- * @returns The new palette name, or the original if no migration found
- */
-export const migratePaletteName = (oldPaletteName: string): string => {
-  // Handle null/undefined/empty cases
-  if (!oldPaletteName) {
-    return
-  }
-
-  // Try exact match first
-  if (paletteMigrationMap[oldPaletteName]) {
-    return paletteMigrationMap[oldPaletteName]
-  }
-
-  // Try case-insensitive match
-  const lowerCaseName = oldPaletteName.toLowerCase()
-  const matchingKey = Object.keys(paletteMigrationMap).find(key => key.toLowerCase() === lowerCaseName)
-
-  return matchingKey ? paletteMigrationMap[matchingKey] : oldPaletteName
-}

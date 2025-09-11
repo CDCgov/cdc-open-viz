@@ -49,8 +49,8 @@ import { updateFieldRankByValue } from './helpers/updateFieldRankByValue'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
-import { migratePaletteName } from '@cdc/core/helpers/migratePaletteName'
-import { isV1Palette } from '@cdc/core/helpers/palettes/utils'
+import { paletteMigrationMap } from '@cdc/core/helpers/migratePaletteName'
+import { isV1Palette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 
 interface PreliminaryProps {
   config: ChartConfig
@@ -1118,7 +1118,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         if (!_newConfig.general.palette) {
           _newConfig.general.palette = {}
         }
-        const migratedName = migratePaletteName(palette)
+        const migratedName = palette ? migratePaletteWithMap(palette, paletteMigrationMap, false) : undefined
         _newConfig.general.palette.name = migratedName
         if (isV1PaletteConfig) {
           _newConfig.general.palette.version = '2.0'
