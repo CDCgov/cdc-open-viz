@@ -32,7 +32,7 @@ const mapColorPalettesData = {
     divergent_blue_purple: ["#032659", "#014697", "#1d6abf", "#6197d2", "#c4cde1", "#af8caa", "#935586", "#7c256b", "#47264f"],
     divergent_green_orange: ["#105b4d", "#16806e", "#3ea394", "#5ebfb3", "#fabf61", "#ee956c", "#e27447", "#ac4726", "#702b1d"],
     divergent_blue_orange: ["#032659", "#0057b7", "#0092c6", "#55b1a3", "#ffb24d", "#ea803b", "#dd622f", "#af3423", "#660f14"],
-    'qualitative-standard': ["#DFE1E2", "#0057b7", "#722161", "#00b1ce", "#d94e5f", "#5a8e3f", "#ffb24d", "#fb7e38", "#032659", "#975722"]
+    'qualitative-standard': ["#DFE1E2", "#0057b7", "#722161", "#00b1ce", "#d94e5f", "#5a8e3f", "#ffb24d", "#fb7e38", "#032659", "#975722"],
   }
 }
 

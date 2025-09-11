@@ -21,8 +21,8 @@ export default {
     type: 'data',
     convertFipsCodes: true,
     palette: {
-      isReversed: false,
-      name: 'sequential_purple',
+      isReversed: true,
+      name: 'sequential_blue',
       version: '2.0'
     },
     allowMapZoom: true,

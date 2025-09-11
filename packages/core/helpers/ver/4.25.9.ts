@@ -200,7 +200,6 @@ const update_4_25_9 = config => {
     addDefaultPaletteVersion(newConfig)
     cleanConfig(newConfig)
     newConfig.version = ver
-    console.log('new config', newConfig)
     return newConfig
 }
 

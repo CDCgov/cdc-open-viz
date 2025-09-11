@@ -88,3 +88,4 @@ export const paletteMigrationMap: Record<string, string> = {
   ...mapPaletteMigrationMap
 }
 
+
