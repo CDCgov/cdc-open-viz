@@ -1,8 +1,8 @@
 import _ from 'lodash'
 import { getFallbackColorPalette } from '../palettes/utils'
 
-// Rname Palettes
-const newMapPaletteNames = {
+// Rename Palettes
+export const newMapPaletteNames = {
     'yelloworangered': 'sequential_yellow_orange_red',
     'yelloworangebrown': 'sequential_yellow_orange_brown',
     'yelloworangebrownreverse': 'sequential_yellow_orange_brownreverse',
@@ -37,7 +37,7 @@ const newMapPaletteNames = {
     'colorblindsafereverse': 'colorblindsafereverse',
 }
 
-const chartPaletteNameMigrations = {
+export const chartPaletteNameMigrations = {
     'qualitative-bold': 'qualitative_bold',
     'qualitative-soft': 'qualitative_soft',
     'qualitative-standard': 'qualitative_standard',
@@ -98,7 +98,7 @@ const saveBackup = (config) => {
     if (version === '1.0' || !version) {
         config.general.palette.version = '1.0'
         config.general.palette.backups = config.general.palette.backups || []
-        config.general.palette.backups.push({ name: config.color, version: '1.0', isReversed: config.general.palette.isReversed })
+        config.general.palette.backups.push({ name: config.general.palette.name, version: '1.0', isReversed: config.general.palette.isReversed })
     }
 }
 
@@ -111,11 +111,6 @@ const movePaletteName = config => {
             config.general.palette = config.general.palette || {}
             config.general.palette.name = config.color
             const version = config.general.palette.version
-
-            // Save a backup and set version to 1.0 for legacy palette names
-            saveBackup(config)
-            // Remove old color property
-            delete config.color
         }
 
         // Rename default palette names to new standardized names in mapColorPalettes.ts
@@ -128,15 +123,12 @@ const movePaletteName = config => {
     if (config.type === 'chart') {
         config.general = config.general || {}
         config.general.palette = config.general.palette || {}
-        
+
         // Only set palette name if it doesn't already exist (avoid overriding new configs)
         if (!config.general.palette.name) {
             config.general.palette.name = config.palette || config.color || getFallbackColorPalette(config)
         }
-        
-        saveBackup(config)
-        delete config.palette
-        delete config.color // outdated
+
         renameOriginalChartPalettes(config)
     }
 
@@ -154,9 +146,6 @@ const updateCustomColorsMigration = config => {
         config.general = config.general || {}
         config.general.palette = config.general.palette || {}
         config.general.palette.customColors = config.customColors
-
-        // Remove old customColors property
-        delete config.customColors
     }
 
     if (config.type === 'dashboard') {
@@ -181,12 +170,35 @@ const addDefaultPaletteVersion = config => {
     }
 }
 
+const cleanConfig = config => {
+    // remove config.palette
+    if (config.palette) {
+        delete config.palette
+    }
+    // remove config.color
+    if (config.color) {
+        delete config.color
+    }
+    // remove config.customColors
+    if (config.customColors) {
+        delete config.customColors
+    }
+
+    if (config.type === 'dashboard') {
+        Object.values(config.visualizations).forEach(visualization => {
+            cleanConfig(visualization)
+        })
+    }
+}
+
 const update_4_25_9 = config => {
     const ver = '4.25.9'
     const newConfig = _.cloneDeep(config)
     movePaletteName(newConfig)
     updateCustomColorsMigration(newConfig)
+    saveBackup(newConfig)
     addDefaultPaletteVersion(newConfig)
+    cleanConfig(newConfig)
     newConfig.version = ver
     console.log('new config', newConfig)
     return newConfig

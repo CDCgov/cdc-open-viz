@@ -72,7 +72,8 @@ export const Pie: Story = {
 }
 export const Pie_Calculated_Area: Story = {
   args: {
-    config: pieCalculatedArea
+    config: pieCalculatedArea,
+    isEditor: true
   }
 }
 

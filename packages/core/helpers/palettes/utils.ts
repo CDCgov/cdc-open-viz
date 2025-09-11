@@ -1,7 +1,9 @@
+import { map } from 'lodash'
 import { FALLBACK_COLOR_PALETTE_V1, FALLBACK_COLOR_PALETTE_V2 } from '../constants'
 import { getColorPaletteVersion } from '../getColorPaletteVersion'
 import { getPaletteAccessor } from '../getPaletteAccessor'
-import { chartPaletteMigrationMap } from '../migratePaletteName'
+import { chartPaletteMigrationMap, mapPaletteMigrationMap } from '../migratePaletteName'
+import { newMapPaletteNames, chartPaletteNameMigrations } from '../ver/4.25.9'
 
 /**
  * Gets the current palette name from a visualization config
@@ -152,4 +154,56 @@ export const migratePaletteWithMap = (
   }
 
   return oldPaletteName
+}
+
+/**
+ * Checks if a config has palette backup data available for rollback
+ * @param config - The visualization config object
+ * @returns True if backup data exists
+ */
+export const hasPaletteBackup = (config: any): boolean => {
+  return !!(config?.general?.palette?.backups?.length > 0)
+}
+
+/**
+ * Gets the original palette name from backup data
+ * @param config - The visualization config object
+ * @returns The original palette name or null if no backup exists
+ */
+export const getOriginalPaletteName = (config: any): string | null => {
+  const backups = config?.general?.palette?.backups
+  if (!backups || backups.length === 0) return null
+
+  // Get the most recent backup (last in array)
+  const latestBackup = backups[backups.length - 1]
+  return latestBackup?.name || null
+}
+
+/**
+ * Rolls back palette configuration to original pre-migration state
+ * @param config - The visualization config object to modify
+ * @returns True if rollback was successful, false if no backup available
+ */
+export const rollbackPaletteToOriginal = (config: any): boolean => {
+  const backups = config?.general?.palette?.backups
+  if (!backups || backups.length === 0) {
+    return false
+  }
+
+  // Get the most recent backup
+  const latestBackup = backups[backups.length - 1]
+  if (!latestBackup?.name) {
+    return false
+  }
+
+  // Restore the original configuration
+  if (config.type === 'map') {
+    config.general.palette.name = newMapPaletteNames[latestBackup.name] || latestBackup.name
+    config.general.palette.version = '1.0' // Reset to v1
+  } else if (config.type === 'chart') {
+    config.general.palette.name = chartPaletteMigrationMap[latestBackup.name] || latestBackup.name
+    config.general.palette.version = '1.0' // Reset to v1
+  }
+
+  return config
 }

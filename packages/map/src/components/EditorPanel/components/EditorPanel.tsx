@@ -52,7 +52,7 @@ import { Datasets } from '@cdc/core/types/DataSet'
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { paletteMigrationMap } from '@cdc/core/helpers/migratePaletteName'
 import { isV1Palette, getCurrentPaletteName, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
-import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
+import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
 import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
 
 type MapEditorPanelProps = {
@@ -2961,6 +2961,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               <label>
                 <span className='edit-label'>Map Color Palette</span>
               </label>
+              <DeveloperPaletteRollback config={config} updateConfig={setConfig} />
               <InputToggle
                 type='3d'
                 section='general'

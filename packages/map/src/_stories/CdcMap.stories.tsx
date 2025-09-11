@@ -38,7 +38,8 @@ export const Equal_Number_Map: Story = {
 export const Scale_Based: Story = {
   args: {
     configUrl:
-      'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Scale-Based-Categorical-Map-With-Special-Classes.json'
+      'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Scale-Based-Categorical-Map-With-Special-Classes.json',
+    isEditor: true
   }
 }
 export const Qualitative: Story = {

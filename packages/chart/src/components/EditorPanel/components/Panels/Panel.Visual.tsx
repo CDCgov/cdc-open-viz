@@ -25,7 +25,7 @@ import { useEditorPanelContext } from '../../EditorPanelContext.js'
 import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 import { LineChartConfig } from '../../../../types/ChartConfig'
-import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
+import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
 import './panelVisual.styles.css'
 
 const PanelVisual: FC<PanelProps> = props => {
@@ -261,6 +261,7 @@ const PanelVisual: FC<PanelProps> = props => {
             <label>
               <span className='edit-label'>Chart Color Palette</span>
             </label>
+            <DeveloperPaletteRollback config={config} updateConfig={updateConfig} />
             {visSupportsReverseColorPalette() && (
               <InputToggle
                 section='general'
