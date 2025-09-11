@@ -2,7 +2,6 @@ import _ from 'lodash'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { SharedFilter } from '../types/SharedFilter'
 import { handleSorting } from '@cdc/core/components/Filters'
-import { FILTER_STYLE } from '../types/FilterStyles'
 
 // Gets filter values from dataset
 const generateValuesForFilter = (columnName: string, data: Record<string, any[]>) => {
@@ -46,7 +45,7 @@ export const addValuesToDashboardFilters = (
       const queryStringFilterValue = getQueryStringFilterValue(filterCopy)
       if (queryStringFilterValue) {
         filterCopy.active = queryStringFilterValue
-      } else if (filter.filterStyle === FILTER_STYLE.multiSelect) {
+      } else if (filter.multiSelect) {
         const defaultValues = filterCopy.values
         const active: string[] = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
         filterCopy.active = active.filter(val => defaultValues.includes(val))
