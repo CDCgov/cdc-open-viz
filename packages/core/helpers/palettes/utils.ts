@@ -1,4 +1,4 @@
-import { FALLBACK_COLOR_PALETTE } from '../constants'
+import { FALLBACK_COLOR_PALETTE_V1, FALLBACK_COLOR_PALETTE_V2 } from '../constants'
 import { getColorPaletteVersion } from '../getColorPaletteVersion'
 import { getPaletteAccessor } from '../getPaletteAccessor'
 import { migrateChartPaletteName } from '../migratePaletteName'
@@ -23,7 +23,8 @@ export const getCurrentPaletteName = (config: any): string => {
     return config.color
   }
 
-  return FALLBACK_COLOR_PALETTE
+  const paletteVersion = getColorPaletteVersion(config)
+  return paletteVersion === 1 ? FALLBACK_COLOR_PALETTE_V1 : FALLBACK_COLOR_PALETTE_V2
 }
 
 /**
@@ -83,5 +84,5 @@ export const isV1Palette = (config: any): boolean => {
  */
 export const getFallbackColorPalette = (config: any): string => {
   const paletteVersion = getColorPaletteVersion(config)
-  return paletteVersion === 1 ? 'qualitative-bold' : 'sequential_blue'
+  return paletteVersion === 1 ? FALLBACK_COLOR_PALETTE_V1 : FALLBACK_COLOR_PALETTE_V2
 }

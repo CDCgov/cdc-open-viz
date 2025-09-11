@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { FALLBACK_COLOR_PALETTE } from '../constants'
+import { getFallbackColorPalette } from '../palettes/utils'
 
 // Rname Palettes
 const newMapPaletteNames = {
@@ -128,7 +128,12 @@ const movePaletteName = config => {
     if (config.type === 'chart') {
         config.general = config.general || {}
         config.general.palette = config.general.palette || {}
-        config.general.palette.name = config.palette || config.color || FALLBACK_COLOR_PALETTE
+        
+        // Only set palette name if it doesn't already exist (avoid overriding new configs)
+        if (!config.general.palette.name) {
+            config.general.palette.name = config.palette || config.color || getFallbackColorPalette(config)
+        }
+        
         saveBackup(config)
         delete config.palette
         delete config.color // outdated
