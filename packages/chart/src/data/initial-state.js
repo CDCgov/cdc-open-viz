@@ -29,9 +29,9 @@ export default {
     showZeroValueData: true,
     hideNullValue: true,
     palette: {
-      isReversed: false,
+      isReversed: true,
       version: '2.0',
-      name: 'sequential_blue'
+      name: 'sequential_bluereverse'
     }
   },
   padding: {
