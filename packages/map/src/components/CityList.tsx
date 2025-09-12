@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useMemo } from 'react'
 import { scaleLinear } from 'd3-scale'
 import { GlyphCircle, GlyphDiamond, GlyphSquare, GlyphStar, GlyphTriangle } from '@visx/glyph'
 import ConfigContext from '../context'
@@ -12,7 +12,6 @@ import {
   SVG_PADDING,
   SVG_WIDTH,
   titleCase,
-  hashObj,
   isLegendItemDisabled
 } from '../helpers'
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
@@ -33,67 +32,86 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
 
-  const { geoColumnName, latitudeColumnName, longitudeColumnName, primaryColumnName } = getColumnNames(config.columns)
-  const { additionalCityStyles } = config.visual || []
+  const { geoColumnName, latitudeColumnName, longitudeColumnName, primaryColumnName } =
+    getColumnNames(config.columns) || {}
 
-  if (!projection) return
+  // Memoize expensive city data creation
+  const citiesData = useMemo(() => {
+    if (!runtimeData) return {}
 
-  const citiesData = runtimeData
-    ? Object.keys(runtimeData).reduce((acc, key) => {
-        const city = runtimeData[key]
+    return Object.keys(runtimeData).reduce((acc, key) => {
+      const city = runtimeData[key]
+      if (city && city[geoColumnName]) {
         acc[city[geoColumnName]] = city
-        return acc
-      }, {})
-    : {}
+      }
+      return acc
+    }, {})
+  }, [runtimeData, geoColumnName])
 
-  if (config.general.type === 'bubble') {
-    const maxDataValue = Math.max(
-      ...(runtimeData ? Object.keys(runtimeData).map(key => runtimeData[key][config.columns.primary.name]) : [0])
-    )
-    const sortedRuntimeData = Object.values(runtimeData).sort((a, b) =>
-      a[primaryColumnName] < b[primaryColumnName] ? 1 : -1
-    )
-    if (!sortedRuntimeData) return
-
-    // Set bubble sizes
-    var size = scaleLinear().domain([1, maxDataValue]).range([config.visual.minBubbleSize, config.visual.maxBubbleSize])
-  }
-  const cityList = Object.keys(citiesData).filter(c => undefined !== c || undefined !== runtimeData[c])
-  if (!cityList) return true
-
-  // Cities output
-  return cityList.map((city, i) => {
-    let geoData: Object
-    if (runtimeData) {
-      Object.keys(runtimeData).forEach(key => {
-        if (city === runtimeData[key][config.columns.geo.name]) {
-          geoData = runtimeData[key]
-        }
-      })
-    }
-    if (!geoData) {
-      geoData = runtimeData ? runtimeData[city] : undefined
-    }
-    const cityDisplayName = titleCase(displayGeoName(city))
-
-    const legendColors = geoData
-      ? applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
-      : runtimeData[city]
-      ? applyLegendToRow(runtimeData[city], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
-      : false
-
-    if (legendColors === false) {
-      return true
-    }
-
-    // Don't render if legend item is disabled
-    if (
-      isLegendItemDisabled(geoData || runtimeData[city], runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
-    ) {
+  // Memoize bubble size calculation
+  const size = useMemo(() => {
+    if (config.general.type !== 'bubble' || !runtimeData) {
       return null
     }
 
-    const toolTip = applyTooltipsToGeo(cityDisplayName, geoData || runtimeData[city])
+    const maxVal = Math.max(...Object.keys(runtimeData).map(key => runtimeData[key][config.columns.primary.name]))
+
+    if (maxVal <= 0) {
+      return null
+    }
+
+    return scaleLinear().domain([1, maxVal]).range([config.visual.minBubbleSize, config.visual.maxBubbleSize])
+  }, [
+    config.general.type,
+    config.columns.primary.name,
+    config.visual.minBubbleSize,
+    config.visual.maxBubbleSize,
+    runtimeData
+  ])
+
+  // Get the list of cities to render
+  const cityList = useMemo(() => {
+    return Object.keys(citiesData).filter(cityName => cityName && citiesData[cityName])
+  }, [citiesData])
+
+  // Early exit for map types that don't use city rendering
+  if (
+    !projection ||
+    (config.general.type !== 'us-geocode' &&
+      config.general.type !== 'world-geocode' &&
+      config.general.type !== 'bubble')
+  ) {
+    return null
+  }
+
+  // Early exit if no cities to render
+  if (!cityList.length) {
+    return null
+  }
+
+  // Cities output
+  return cityList.map((city, i) => {
+    // Get the city data directly from our memoized citiesData
+    const geoData = citiesData[city]
+
+    if (!geoData) {
+      return null
+    }
+
+    const cityDisplayName = titleCase(displayGeoName(city))
+
+    const legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+
+    if (!legendColors || legendColors.length === 0) {
+      return null
+    }
+
+    // Don't render if legend item is disabled
+    if (isLegendItemDisabled(geoData, runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)) {
+      return null
+    }
+
+    const toolTip = applyTooltipsToGeo(cityDisplayName, geoData)
 
     const radius = config.visual.geoCodeCircleSize || 8
 
@@ -104,19 +122,21 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     const geoStrokeColor = getGeoStrokeColor(config)
 
     const pin = (
-      <path
-        className='marker'
-        d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z'
-        title='Select for more information'
-        onClick={() => geoClickHandler(cityDisplayName, geoData)}
-        data-tooltip-id={`tooltip__${tooltipId}`}
-        data-tooltip-html={toolTip}
-        transform={`scale(${radius / 7.5})`}
-        stroke={geoStrokeColor}
-        strokeWidth={'2px'}
-        tabIndex='-1'
-        {...additionalProps}
-      />
+      <g>
+        <title>Select for more information</title>
+        <path
+          className='marker'
+          d='M0,0l-8.8-17.7C-12.1-24.3-7.4-32,0-32h0c7.4,0,12.1,7.7,8.8,14.3L0,0z'
+          onClick={() => geoClickHandler(cityDisplayName, geoData)}
+          data-tooltip-id={`tooltip__${tooltipId}`}
+          data-tooltip-html={toolTip}
+          transform={`scale(${radius / 7.5})`}
+          stroke={geoStrokeColor}
+          strokeWidth={'2px'}
+          tabIndex={-1}
+          {...additionalProps}
+        />
+      </g>
     )
 
     let transform = ''
@@ -140,7 +160,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
 
     if (geoData?.[longitudeColumnName] && geoData?.[latitudeColumnName] && config.general.geoType === 'single-state') {
       const statesPicked = getFilterControllingStatesPicked(config, runtimeData)
-      const _statesPickedData = topoData?.states?.find(s => statesPicked.includes(s.properties.name))
+      const _statesPickedData = (topoData as any)?.states?.find(s => statesPicked.includes(s.properties.name))
 
       const newProjection = projection.fitExtent(
         [
@@ -151,7 +171,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       )
       let coords = [Number(geoData?.[longitudeColumnName]), Number(geoData?.[latitudeColumnName])]
       transform = `translate(${newProjection(coords)}) scale(${
-        config.visual.geoCodeCircleSize / (position.zoom > 1 ? position.zoom : 1)
+        config.visual.geoCodeCircleSize / ((position as any).zoom > 1 ? (position as any).zoom : 1)
       })`
       needsPointer = true
     }
@@ -191,8 +211,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
 
     const shapeProps = {
       onClick: () => geoClickHandler(cityDisplayName, geoData),
-      size: config.general.type === 'bubble' ? size(geoData[primaryColumnName]) : radius * 30,
-      title: 'Select for more information',
+      size: config.general.type === 'bubble' && size ? size(geoData[primaryColumnName]) : radius * 30,
       'data-tooltip-id': `tooltip__${tooltipId}`,
       'data-tooltip-html': toolTip,
       stroke: geoStrokeColor,
@@ -210,81 +229,10 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       triangle: <GlyphTriangle {...shapeProps} />
     }
 
-    const cityStyle = Object.values(runtimeData)
-      .filter(d => additionalCityStyles?.some(style => String(d[style.column]) === String(style.value)))
-      .map(d => {
-        const conditionsMatched = additionalCityStyles.find(style => String(d[style.column]) === String(style.value))
-        return { ...conditionsMatched, ...d }
-      })
-      .find(item => {
-        return Object.keys(item).find(key => item[key] === city)
-      })
-
-    if (cityStyle !== undefined && cityStyle.shape) {
-      if (
-        !geoData?.[longitudeColumnName] &&
-        !geoData?.[latitudeColumnName] &&
-        city &&
-        supportedCities[city.toUpperCase()]
-      ) {
-        let translate = `translate(${projection(supportedCities[city.toUpperCase()])})`
-
-        // Check if legend is disabled before rendering
-        if (
-          isLegendItemDisabled(
-            geoData || runtimeData[city],
-            runtimeLegend,
-            legendMemo,
-            legendSpecialClassLastMemo,
-            config
-          )
-        ) {
-          return null
-        }
-
-        return (
-          <g key={i} transform={translate} style={styles} className='geo-point' tabIndex={-1}>
-            {cityStyleShapes[cityStyle.shape.toLowerCase()]}
-          </g>
-        )
-      }
-
-      if (geoData?.[longitudeColumnName] && geoData?.[latitudeColumnName]) {
-        const coords = [Number(geoData?.[longitudeColumnName]), Number(geoData?.[latitudeColumnName])]
-        let translate = `translate(${projection(coords)})`
-
-        // Check if legend is disabled before rendering
-        if (
-          isLegendItemDisabled(
-            geoData || runtimeData[city],
-            runtimeLegend,
-            legendMemo,
-            legendSpecialClassLastMemo,
-            config
-          )
-        ) {
-          return null
-        }
-
-        return (
-          <g key={i} transform={translate} style={styles} className='geo-point' tabIndex={-1}>
-            {cityStyleShapes[cityStyle.shape.toLowerCase()]}
-          </g>
-        )
-      }
-    }
-    if (legendColors?.[0] === '#000000') return
-
-    // Final check if legend is disabled before rendering the default city style
-    if (
-      isLegendItemDisabled(geoData || runtimeData[city], runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
-    ) {
-      return null
-    }
-
+    // Render the city marker
     return (
       <g key={i} transform={transform} style={styles} className='geo-point' tabIndex={-1}>
-        {cityStyleShapes[config.visual.cityStyle.toLowerCase()]}
+        {cityStyleShapes[config.visual.cityStyle?.toLowerCase() || 'circle']}
       </g>
     )
   })

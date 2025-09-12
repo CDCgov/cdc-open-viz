@@ -1,0 +1,306 @@
+{
+  "annotations": [],
+  "general": {
+    "title": "US Cities Bubble Map - CityList Test",
+    "subtext": "This bubble map uses CityList component to render bubble sizes based on data values",
+    "type": "bubble",
+    "geoType": "us",
+    "headerColor": "theme-green",
+    "showSidebar": true,
+    "showTitle": true,
+    "showDownloadButton": true,
+    "expandDataTable": false,
+    "backgroundColor": "#ffffff",
+    "geoBorderColor": "darkGray",
+    "territoriesLabel": "Territories",
+    "language": "en",
+    "hasRegions": false,
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": false,
+    "fullBorder": false,
+    "palette": {
+      "isReversed": false
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "territoriesAlwaysShow": false,
+    "geoLabelOverride": "",
+    "noDataFoundMessage": "No data found",
+    "convertFipsCodes": false
+  },
+  "type": "map",
+  "color": "orangered",
+  "columns": {
+    "geo": {
+      "name": "city",
+      "label": "City",
+      "tooltip": true,
+      "dataTable": true
+    },
+    "primary": {
+      "dataTable": true,
+      "tooltip": true,
+      "prefix": "",
+      "suffix": " cases",
+      "name": "covid_cases",
+      "label": "COVID-19 Cases"
+    },
+    "latitude": {
+      "name": "latitude",
+      "label": "Latitude"
+    },
+    "longitude": {
+      "name": "longitude", 
+      "label": "Longitude"
+    },
+    "navigate": {
+      "name": ""
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [],
+    "unified": false,
+    "singleColumn": true,
+    "dynamicDescription": false,
+    "type": "equalinterval",
+    "numberOfItems": 5,
+    "position": "side",
+    "title": "COVID-19 Cases",
+    "showTitle": true,
+    "reversedOrder": false,
+    "singleColumnLegend": false,
+    "hideBorder": false
+  },
+  "filters": [],
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": true,
+    "indexLabel": "",
+    "wrapColumns": false,
+    "showDownloadLinkBelow": true
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "capitalizeLabels": true,
+    "opacity": 90
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "minBubbleSize": 5,
+    "maxBubbleSize": 40,
+    "extraBubbleBorder": true,
+    "cityStyle": "circle",
+    "geoCodeCircleSize": 12,
+    "showBubbleZeros": true,
+    "cityStyleLabel": "City Bubbles",
+    "additionalCityStyles": []
+  },
+  "mapPosition": {
+    "coordinates": [0, 39],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": []
+  },
+  "data": [
+    {
+      "city": "New York",
+      "latitude": 40.7128,
+      "longitude": -74.0060,
+      "covid_cases": 2845
+    },
+    {
+      "city": "Los Angeles", 
+      "latitude": 34.0522,
+      "longitude": -118.2437,
+      "covid_cases": 2234
+    },
+    {
+      "city": "Chicago",
+      "latitude": 41.8781,
+      "longitude": -87.6298,
+      "covid_cases": 1567
+    },
+    {
+      "city": "Houston",
+      "latitude": 29.7604,
+      "longitude": -95.3698,
+      "covid_cases": 1890
+    },
+    {
+      "city": "Phoenix",
+      "latitude": 33.4484,
+      "longitude": -112.0740,
+      "covid_cases": 1234
+    },
+    {
+      "city": "Philadelphia",
+      "latitude": 39.9526,
+      "longitude": -75.1652,
+      "covid_cases": 1678
+    },
+    {
+      "city": "San Antonio",
+      "latitude": 29.4241,
+      "longitude": -98.4936,
+      "covid_cases": 987
+    },
+    {
+      "city": "San Diego",
+      "latitude": 32.7157,
+      "longitude": -117.1611,
+      "covid_cases": 1456
+    },
+    {
+      "city": "Dallas",
+      "latitude": 32.7767,
+      "longitude": -96.7970,
+      "covid_cases": 1789
+    },
+    {
+      "city": "San Jose",
+      "latitude": 37.3382,
+      "longitude": -121.8863,
+      "covid_cases": 934
+    },
+    {
+      "city": "Austin",
+      "latitude": 30.2672,
+      "longitude": -97.7431,
+      "covid_cases": 876
+    },
+    {
+      "city": "Jacksonville",
+      "latitude": 30.3322,
+      "longitude": -81.6557,
+      "covid_cases": 743
+    },
+    {
+      "city": "Fort Worth",
+      "latitude": 32.7555,
+      "longitude": -97.3308,
+      "covid_cases": 654
+    },
+    {
+      "city": "Columbus",
+      "latitude": 39.9612,
+      "longitude": -82.9988,
+      "covid_cases": 567
+    },
+    {
+      "city": "Charlotte",
+      "latitude": 35.2271,
+      "longitude": -80.8431,
+      "covid_cases": 789
+    },
+    {
+      "city": "San Francisco",
+      "latitude": 37.7749,
+      "longitude": -122.4194,
+      "covid_cases": 1123
+    },
+    {
+      "city": "Indianapolis",
+      "latitude": 39.7684,
+      "longitude": -86.1581,
+      "covid_cases": 445
+    },
+    {
+      "city": "Seattle",
+      "latitude": 47.6062,
+      "longitude": -122.3321,
+      "covid_cases": 823
+    },
+    {
+      "city": "Denver",
+      "latitude": 39.7392,
+      "longitude": -104.9903,
+      "covid_cases": 634
+    },
+    {
+      "city": "Boston",
+      "latitude": 42.3601,
+      "longitude": -71.0589,
+      "covid_cases": 976
+    },
+    {
+      "city": "El Paso",
+      "latitude": 31.7619,
+      "longitude": -106.4850,
+      "covid_cases": 312
+    },
+    {
+      "city": "Nashville",
+      "latitude": 36.1627,
+      "longitude": -86.7816,
+      "covid_cases": 456
+    },
+    {
+      "city": "Detroit",
+      "latitude": 42.3314,
+      "longitude": -83.0458,
+      "covid_cases": 578
+    },
+    {
+      "city": "Oklahoma City",
+      "latitude": 35.4676,
+      "longitude": -97.5164,
+      "covid_cases": 289
+    },
+    {
+      "city": "Portland",
+      "latitude": 45.5152,
+      "longitude": -122.6784,
+      "covid_cases": 387
+    },
+    {
+      "city": "Las Vegas",
+      "latitude": 36.1699,
+      "longitude": -115.1398,
+      "covid_cases": 534
+    },
+    {
+      "city": "Memphis",
+      "latitude": 35.1495,
+      "longitude": -90.0490,
+      "covid_cases": 267
+    },
+    {
+      "city": "Louisville",
+      "latitude": 38.2527,
+      "longitude": -85.7585,
+      "covid_cases": 189
+    },
+    {
+      "city": "Baltimore",
+      "latitude": 39.2904,
+      "longitude": -76.6122,
+      "covid_cases": 445
+    },
+    {
+      "city": "Milwaukee",
+      "latitude": 43.0389,
+      "longitude": -87.9065,
+      "covid_cases": 334
+    }
+  ]
+}
