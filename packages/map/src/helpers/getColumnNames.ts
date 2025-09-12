@@ -8,7 +8,7 @@ type ColumnNames = {
   categoricalColumnName: string | null
 } | null
 
-export const getColumnNames = (columns?: Pick<MapConfig, 'columns'>): ColumnNames => {
+export const getColumnNames = (columns?: MapConfig['columns']): ColumnNames => {
   if (!columns) return null
   const geoColumnName = columns.geo?.name || null
   const primaryColumnName = columns.primary?.name || null
