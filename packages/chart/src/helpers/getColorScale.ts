@@ -2,7 +2,7 @@ import { twoColorPalette } from '@cdc/core/data/colorPalettes'
 import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 import { scaleOrdinal } from '@visx/scale'
 import { ChartConfig } from '../types/ChartConfig'
-import { paletteMigrationMap } from '@cdc/core/helpers/migratePaletteName'
+import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 
 export const getColorScale = (config: ChartConfig): ((value: string) => string) => {

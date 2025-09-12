@@ -79,7 +79,20 @@ export const mapPaletteMigrationMap: Record<string, string> = {
   sequential_blue_extendedreverse: 'sequential_bluereverse',
   sequential_green_bluereverse: 'sequential_tealreverse',
   sequential_redreverse: 'sequential_orangereverse',
-  qualitative_earth_tonesreverse: 'qualitativereverse'
+  qualitative_earth_tonesreverse: 'qualitativereverse',
+  'qualitative_bold': 'qualitative_standard',
+  'qualitative_soft': 'qualitative_standard',
+  'qualitative_boldreverse': 'qualitative_standardreverse',
+  'qualitative_softreverse': 'qualitative_standardreverse',
+  'qualitative1': 'qualitative_standard',
+  'qualitative2': 'qualitative_standard',
+  'qualitative3': 'qualitative_standard',
+  'qualitative4': 'qualitative_standard',
+  'colorblindsafe': 'qualitative_standard',
+  'qualitative1reverse': 'qualitative_standardreverse',
+  'qualitative2reverse': 'qualitative_standardreverse',
+  'qualitative3reverse': 'qualitative_standardreverse',
+  'qualitative4reverse': 'qualitative_standardreverse',
 }
 
 // Combined palette migration map for backward compatibility

@@ -2,8 +2,8 @@ import { map } from 'lodash'
 import { FALLBACK_COLOR_PALETTE_V1, FALLBACK_COLOR_PALETTE_V2 } from '../constants'
 import { getColorPaletteVersion } from '../getColorPaletteVersion'
 import { getPaletteAccessor } from '../getPaletteAccessor'
-import { chartPaletteMigrationMap, mapPaletteMigrationMap } from '../migratePaletteName'
-import { newMapPaletteNames, chartPaletteNameMigrations } from '../ver/4.25.9'
+import { chartPaletteMigrationMap } from './migratePaletteName'
+import { newMapPaletteNames } from './standardizePaletteNames'
 
 /**
  * Gets the current palette name from a visualization config
