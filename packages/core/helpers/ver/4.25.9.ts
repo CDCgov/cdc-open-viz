@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { getFallbackColorPalette } from '../palettes/utils'
 import { newChartPaletteNames, newMapPaletteNames } from '../palettes/standardizePaletteNames'
+import cloneConfig from '../cloneConfig'
 
 const renameOriginalMapPalettes = (config) => {
     if (config.general?.palette?.name && newMapPaletteNames[config.general.palette.name]) {
