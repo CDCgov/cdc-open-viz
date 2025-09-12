@@ -91,7 +91,7 @@ const chartCellArray = ({
           ? [
               <>
                 {colorScale && colorScale(seriesName) && <LegendShape fill={colorScale(seriesName)} />}
-                {parse(seriesName)}
+                {parse(String(seriesName))}
               </>
             ]
           : []
