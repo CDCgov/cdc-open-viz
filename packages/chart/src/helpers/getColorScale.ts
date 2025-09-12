@@ -5,19 +5,20 @@ import { scaleOrdinal } from '@visx/scale'
 import { ChartConfig } from '../types/ChartConfig'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
+import { v2ColorDistribution } from './chartColorDistributions'
 
 export const getColorScale = (config: ChartConfig): ((value: string) => string) => {
   const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
     ? config.twoColor.palette
     : config.general?.palette?.name
   const colorPalettes = filterChartColorPalettes(config)
-  
+
   // Get the correct version of two-color palettes
   const version = getColorPaletteVersion(config)
   const versionKey = `v${version}`
   const versionedTwoColorPalette = twoColorPalette[versionKey] || twoColorPalette.v2
-  
-  const allPalettes: Record<string, string[]> = { ...colorPalettes, ...versionedTwoColorPalette }
+
+  const allPalettes: Record<string, string[]> = { ...versionedTwoColorPalette, ...colorPalettes }
 
   // Migrate old palette name if needed
   const migratedPaletteName = configPalette ? configPalette : getFallbackColorPalette(config)
@@ -35,11 +36,22 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
 
   let numberOfKeys = config.runtime.seriesKeys.length
 
-  while (numberOfKeys > palette.length) {
-    palette = palette.concat(palette)
-  }
+  // Check if we should use v2 distribution logic for better contrast
+  const paletteVersion = getColorPaletteVersion(config)
+  const isSequentialOrDivergent = configPalette && (configPalette.includes('sequential') || configPalette.includes('divergent'))
+  const useV2Distribution = paletteVersion === 2 && isSequentialOrDivergent && palette.length === 9 && numberOfKeys <= 9
 
-  palette = palette.slice(0, numberOfKeys)
+  if (useV2Distribution && v2ColorDistribution[numberOfKeys]) {
+    // Use strategic color distribution for v2 sequential palettes
+    const distributionIndices = v2ColorDistribution[numberOfKeys]
+    palette = distributionIndices.map(index => palette[index])
+  } else {
+    // Use existing logic for v1 palettes and other cases
+    while (numberOfKeys > palette.length) {
+      palette = palette.concat(palette)
+    }
+    palette = palette.slice(0, numberOfKeys)
+  }
 
   return scaleOrdinal({
     domain: config.runtime.seriesLabelsAll,
