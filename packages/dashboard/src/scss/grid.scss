@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 $blue-light: #8bc6f7;
 $red: #f74242;
 
@@ -88,7 +90,7 @@ $red: #f74242;
   &:hover {
     transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     width: 180px;
-    background-color: lighten($blue, 8%);
+    background-color: color.adjust($blue, $lightness: 8%);
     li {
       display: flex;
     }
@@ -136,7 +138,7 @@ $red: #f74242;
   flex: 1 1 auto;
 
   &:hover {
-    border-color: darken(#c2c2c2, 20%);
+    border-color: color.adjust(#c2c2c2, $lightness: -20%);
   }
 
   &.column--populated {
@@ -194,15 +196,15 @@ $red: #f74242;
   &:hover {
     $lightGray: #c7c7c7;
     $mediumGray: #565656;
-    border-color: darken($lightGray, 20%);
+    border-color: color.adjust($lightGray, $lightness: -20%);
 
     .widget-menu-item svg {
-      fill: darken($mediumGray, 20%);
+      fill: color.adjust($mediumGray, $lightness: -20%);
     }
 
     .drag-icon,
     .drag-icon svg {
-      fill: darken($lightGray, 20%);
+      fill: color.adjust($lightGray, $lightness: -20%);
     }
   }
 

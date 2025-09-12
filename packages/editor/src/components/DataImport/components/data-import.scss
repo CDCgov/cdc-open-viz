@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import './../../../scss/variables.scss';
 
 .cdc-editor .data-designer {
@@ -114,7 +115,7 @@
     }
     .btn.active {
       $primary: #005eaa;
-      background: darken($primary, 15%);
+      background: color.adjust($primary, $lightness: -15%);
     }
     .input-group {
       display: flex;
