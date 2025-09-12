@@ -1,5 +1,6 @@
 import { twoColorPalette } from '@cdc/core/data/colorPalettes'
 import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
+import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import { scaleOrdinal } from '@visx/scale'
 import { ChartConfig } from '../types/ChartConfig'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
@@ -10,7 +11,13 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
     ? config.twoColor.palette
     : config.general?.palette?.name
   const colorPalettes = filterChartColorPalettes(config)
-  const allPalettes: Record<string, string[]> = { ...colorPalettes, ...twoColorPalette }
+  
+  // Get the correct version of two-color palettes
+  const version = getColorPaletteVersion(config)
+  const versionKey = `v${version}`
+  const versionedTwoColorPalette = twoColorPalette[versionKey] || twoColorPalette.v2
+  
+  const allPalettes: Record<string, string[]> = { ...colorPalettes, ...versionedTwoColorPalette }
 
   // Migrate old palette name if needed
   const migratedPaletteName = configPalette ? configPalette : getFallbackColorPalette(config)

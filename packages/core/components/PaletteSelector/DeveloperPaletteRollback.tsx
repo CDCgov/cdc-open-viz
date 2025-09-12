@@ -1,7 +1,14 @@
 import React from 'react'
 import _ from 'lodash'
 import { isCoveDeveloperMode } from '../../helpers/queryStringUtils'
-import { hasPaletteBackup, getOriginalPaletteName, rollbackPaletteToOriginal } from '../../helpers/palettes/utils'
+import { 
+  hasPaletteBackup, 
+  getOriginalPaletteName, 
+  rollbackPaletteToOriginal,
+  hasTwoColorPaletteBackup,
+  getOriginalTwoColorPaletteName,
+  rollbackTwoColorPaletteToOriginal
+} from '../../helpers/palettes/utils'
 import './PaletteSelector.css'
 
 interface DeveloperPaletteRollbackProps {
@@ -20,46 +27,83 @@ const DeveloperPaletteRollback: React.FC<DeveloperPaletteRollbackProps> = ({
     return null
   }
 
+  // Check for both regular and two-color palette backups
+  const hasRegularBackup = hasPaletteBackup(config)
+  const hasTwoColorBackup = hasTwoColorPaletteBackup(config)
+  
   // Only show if there's backup data available
-  if (!hasPaletteBackup(config)) {
+  if (!hasRegularBackup && !hasTwoColorBackup) {
     return null
   }
 
   const originalPaletteName = getOriginalPaletteName(config)
+  const originalTwoColorPaletteName = getOriginalTwoColorPaletteName(config)
   const currentPaletteName = config?.general?.palette?.name || config?.palette || config?.color
+  const currentTwoColorPaletteName = config?.twoColor?.palette
 
   const handleRollback = () => {
-    const confirmRollback = window.confirm(
-      `Are you sure you want to rollback the palette from "${currentPaletteName}" to "${originalPaletteName}"?\n\nThis will restore the original palette configuration and remove the migrated structure.`
-    )
+    // Determine which type of rollback to perform and show appropriate confirmation
+    let confirmMessage = ''
+    let fromName = ''
+    let toName = ''
+    
+    if (hasTwoColorBackup) {
+      // Two-color palette rollback
+      fromName = currentTwoColorPaletteName
+      toName = originalTwoColorPaletteName
+      confirmMessage = `Are you sure you want to rollback the palette from "${fromName}" to "${toName}"?\n\nThis will restore the original v1 palette configuration.`
+    } else if (hasRegularBackup) {
+      // Regular palette rollback  
+      fromName = currentPaletteName
+      toName = originalPaletteName
+      confirmMessage = `Are you sure you want to rollback the palette from "${fromName}" to "${toName}"?\n\nThis will restore the original palette configuration and remove the migrated structure.`
+    }
+
+    const confirmRollback = window.confirm(confirmMessage)
 
     if (confirmRollback) {
       const configCopy = _.cloneDeep(config)
       console.log('Config before rollback:', JSON.stringify(configCopy, null, 2))
-      const rolledBackConfig = rollbackPaletteToOriginal(configCopy)
-      console.log('Rollback success:', rolledBackConfig)
+      
+      let success = false
+      
+      if (hasTwoColorBackup) {
+        success = rollbackTwoColorPaletteToOriginal(configCopy)
+        console.log('Two-color rollback success:', success)
+      } else if (hasRegularBackup) {
+        const rolledBackConfig = rollbackPaletteToOriginal(configCopy)
+        success = !!rolledBackConfig
+        console.log('Regular rollback success:', success)
+      }
+      
       console.log('Config after rollback:', JSON.stringify(configCopy, null, 2))
 
-      if (rolledBackConfig) {
-        updateConfig(rolledBackConfig)
+      if (success) {
+        updateConfig(configCopy)
       } else {
         alert('Rollback failed: No backup data available')
       }
     }
   }
 
+  // Determine display text based on available backups
+  const displayPaletteName = hasTwoColorBackup ? originalTwoColorPaletteName : originalPaletteName
+  const infoText = hasTwoColorBackup 
+    ? `Developer Mode: Two-color palette migrated from "${originalTwoColorPaletteName}"`
+    : `Developer Mode: Migrated from "${originalPaletteName}"`
+
   return (
     <div className={`developer-palette-rollback ${className}`}>
       <div className="rollback-info">
         <small className="text-muted">
-          Developer Mode: Migrated from "{originalPaletteName}"
+          {infoText}
         </small>
       </div>
       <button
         type="button"
         className="btn btn-sm btn-outline-warning"
         onClick={handleRollback}
-        title={`Rollback to original palette: ${originalPaletteName}`}
+        title={`Rollback to original palette: ${displayPaletteName}`}
       >
         Rollback Palette
       </button>

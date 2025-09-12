@@ -95,10 +95,56 @@ export const mapPaletteMigrationMap: Record<string, string> = {
   'qualitative4reverse': 'qualitative_standardreverse',
 }
 
+// Two-color palette migration map (v1 to v2)
+export const twoColorPaletteMigrationMap: Record<string, string> = {
+  // Monochrome palettes → divergent_blue_purple
+  'monochrome-1': 'divergent_blue_purple',
+  'monochrome-2': 'divergent_blue_purple', 
+  'monochrome-3': 'divergent_blue_purple',
+  'monochrome-4': 'divergent_blue_purple',
+  
+  // Warm palettes → divergent_green_orange
+  'monochrome-5': 'divergent_green_orange',
+  'warm-1': 'divergent_green_orange',
+  
+  // Cool palettes → divergent_blue_cyan
+  'cool-1': 'divergent_blue_cyan',
+  'cool-2': 'divergent_blue_cyan',
+  'cool-3': 'divergent_blue_cyan', 
+  'cool-4': 'divergent_blue_cyan',
+  'cool-5': 'divergent_blue_cyan',
+  
+  // Complementary palettes → divergent_blue_orange
+  'complementary-1': 'divergent_blue_orange',
+  'complementary-2': 'divergent_blue_orange',
+  'complementary-3': 'divergent_blue_orange',
+  'complementary-4': 'divergent_blue_orange',
+  'complementary-5': 'divergent_blue_orange',
+  
+  // Reverse palette migrations
+  'monochrome-1reverse': 'divergent_blue_purplereverse',
+  'monochrome-2reverse': 'divergent_blue_purplereverse',
+  'monochrome-3reverse': 'divergent_blue_purplereverse', 
+  'monochrome-4reverse': 'divergent_blue_purplereverse',
+  'monochrome-5reverse': 'divergent_green_orangereverse',
+  'warm-1reverse': 'divergent_green_orangereverse',
+  'cool-1reverse': 'divergent_blue_cyanreverse',
+  'cool-2reverse': 'divergent_blue_cyanreverse',
+  'cool-3reverse': 'divergent_blue_cyanreverse',
+  'cool-4reverse': 'divergent_blue_cyanreverse',
+  'cool-5reverse': 'divergent_blue_cyanreverse',
+  'complementary-1reverse': 'divergent_blue_orangereverse',
+  'complementary-2reverse': 'divergent_blue_orangereverse',
+  'complementary-3reverse': 'divergent_blue_orangereverse',
+  'complementary-4reverse': 'divergent_blue_orangereverse',
+  'complementary-5reverse': 'divergent_blue_orangereverse'
+}
+
 // Combined palette migration map for backward compatibility
 export const paletteMigrationMap: Record<string, string> = {
   ...chartPaletteMigrationMap,
-  ...mapPaletteMigrationMap
+  ...mapPaletteMigrationMap,
+  ...twoColorPaletteMigrationMap
 }
 
 

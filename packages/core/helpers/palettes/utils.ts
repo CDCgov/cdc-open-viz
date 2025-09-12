@@ -180,6 +180,31 @@ export const getOriginalPaletteName = (config: any): string | null => {
 }
 
 /**
+ * Gets the original two-color palette name from backup data
+ * @param config - The visualization config object
+ * @returns The original two-color palette name or null if no backup exists
+ */
+export const getOriginalTwoColorPaletteName = (config: any): string | null => {
+  const backups = config?.general?.palette?.backups
+  if (!backups || backups.length === 0) return null
+
+  // Find the two-color palette backup
+  const twoColorBackup = backups.find((backup: any) => backup.type === 'twoColor')
+  return twoColorBackup?.name || null
+}
+
+/**
+ * Checks if a config has two-color palette backup data available for rollback
+ * @param config - The visualization config object
+ * @returns True if two-color backup data exists
+ */
+export const hasTwoColorPaletteBackup = (config: any): boolean => {
+  const backups = config?.general?.palette?.backups
+  if (!backups || backups.length === 0) return false
+  return backups.some((backup: any) => backup.type === 'twoColor')
+}
+
+/**
  * Rolls back palette configuration to original pre-migration state
  * @param config - The visualization config object to modify
  * @returns True if rollback was successful, false if no backup available
@@ -206,4 +231,37 @@ export const rollbackPaletteToOriginal = (config: any): boolean => {
   }
 
   return config
+}
+
+/**
+ * Rolls back two-color palette configuration to original pre-migration state
+ * @param config - The visualization config object to modify
+ * @returns True if rollback was successful, false if no backup available
+ */
+export const rollbackTwoColorPaletteToOriginal = (config: any): boolean => {
+  const backups = config?.general?.palette?.backups
+  if (!backups || backups.length === 0) {
+    return false
+  }
+
+  // Find the two-color palette backup
+  const twoColorBackup = backups.find((backup: any) => backup.type === 'twoColor')
+  if (!twoColorBackup?.name) {
+    return false
+  }
+
+  // Restore the original two-color palette configuration
+  if (config.twoColor) {
+    config.twoColor.palette = twoColorBackup.name
+    config.twoColor.isPaletteReversed = twoColorBackup.isReversed || false
+  }
+  
+  // Reset to v1
+  if (config.general?.palette) {
+    config.general.palette.version = twoColorBackup.version || '1.0'
+    // Remove the two-color backup since we've rolled back
+    config.general.palette.backups = backups.filter((backup: any) => backup.type !== 'twoColor')
+  }
+
+  return true
 }

@@ -33,7 +33,7 @@ export const filterColorPalettes = ({
 
   // Handle two-color palettes for specific chart types
   if (visualizationType === 'Paired Bar' || visualizationType === 'Deviation Bar') {
-    const twoColorPalettes = filterTwoColorPalettes(currentPalettes, isReversed)
+    const twoColorPalettes = filterTwoColorPalettes(version, isReversed)
     return {
       sequential: [],
       nonSequential: [],
@@ -53,9 +53,12 @@ export const filterColorPalettes = ({
 /**
  * Filter two-color palettes (for Paired Bar and Deviation Bar charts)
  */
-function filterTwoColorPalettes(_palettes: any, isReversed?: boolean): string[] {
-  // Use the imported twoColorPalette directly
-  return Object.keys(twoColorPalette).filter(name =>
+function filterTwoColorPalettes(version: number, isReversed?: boolean): string[] {
+  // Use the version to get the correct two-color palettes
+  const versionKey = `v${version}`
+  const versionedTwoColorPalettes = twoColorPalette[versionKey] || twoColorPalette.v2
+  
+  return Object.keys(versionedTwoColorPalettes).filter(name =>
     isReversed ? name.endsWith('reverse') : !name.endsWith('reverse')
   )
 }
