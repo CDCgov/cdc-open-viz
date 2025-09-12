@@ -17,7 +17,11 @@ const renameOriginalChartPalettes = (config) => {
 
 
 const saveBackup = (config) => {
-    const version = config.general.palette.version
+    if (!config.general) {
+        config.general = config.general || {}
+        config.general.palette = config.general.palette || {}
+    }
+    const version = config?.general?.palette?.version || '1.0'
     // Save a backup and set version to 1.0 for legacy palette names
     if (version === '1.0' || !version) {
         config.general.palette.version = '1.0'
@@ -94,6 +98,45 @@ const addDefaultPaletteVersion = config => {
     }
 }
 
+// Migration mapping for two-color palettes to divergent palettes
+const twoColorPaletteMapping = {
+    'monochrome-1': 'divergent_blue_purple',
+    'monochrome-2': 'divergent_blue_purple', 
+    'monochrome-3': 'divergent_blue_purple',
+    'monochrome-4': 'divergent_blue_purple',
+    'monochrome-5': 'divergent_green_orange',
+    'cool-1': 'divergent_blue_cyan',
+    'cool-2': 'divergent_blue_cyan',
+    'cool-3': 'divergent_blue_cyan', 
+    'cool-4': 'divergent_blue_cyan',
+    'cool-5': 'divergent_blue_cyan',
+    'warm-1': 'divergent_green_orange',
+    'complementary-1': 'divergent_blue_orange',
+    'complementary-2': 'divergent_blue_orange',
+    'complementary-3': 'divergent_blue_orange',
+    'complementary-4': 'divergent_blue_orange',
+    'complementary-5': 'divergent_blue_orange'
+}
+
+// Migrate two-color palettes for paired bar and deviation charts
+const migrateTwoColorPalettes = config => {
+    if (config.type === 'chart' && (config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar')) {
+        if (config.twoColor?.palette && twoColorPaletteMapping[config.twoColor.palette]) {
+            // Update general palette from twoColor settings
+            config.general = config.general || {}
+            config.general.palette = config.general.palette || {}
+            config.general.palette.name = twoColorPaletteMapping[config.twoColor.palette]
+            config.general.palette.isReversed = config.twoColor.isPaletteReversed || false
+        }
+    }
+
+    if (config.type === 'dashboard') {
+        Object.values(config.visualizations).forEach(visualization => {
+            migrateTwoColorPalettes(visualization)
+        })
+    }
+}
+
 const cleanConfig = config => {
     // remove config.palette
     if (config.palette) {
@@ -120,6 +163,7 @@ const update_4_25_9 = config => {
     const newConfig = cloneConfig(config)
     movePaletteName(newConfig)
     updateCustomColorsMigration(newConfig)
+    migrateTwoColorPalettes(newConfig)
     saveBackup(newConfig)
     addDefaultPaletteVersion(newConfig)
     cleanConfig(newConfig)

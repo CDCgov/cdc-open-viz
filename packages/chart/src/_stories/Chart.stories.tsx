@@ -79,7 +79,8 @@ export const Pie_Calculated_Area: Story = {
 
 export const Paired_Bar: Story = {
   args: {
-    config: pairedBar
+    config: pairedBar,
+    isEditor: true
   }
 }
 
