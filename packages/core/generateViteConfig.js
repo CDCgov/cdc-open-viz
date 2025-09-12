@@ -24,7 +24,7 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
         scss: {
           // Suppress legacy JS API warnings from Vite's internal Sass usage
           quietDeps: true,
-          silenceDeprecations: ['legacy-js-api']
+          silenceDeprecations: ['legacy-js-api', 'import']
         }
       }
     },
