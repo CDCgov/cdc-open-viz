@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState, useMemo } from 'react'
 import { filterColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 
 // Third Party
 import {
@@ -877,7 +878,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   }
 
   const convertStateToConfig = () => {
-    let strippedState = _.cloneDeep(config) // Deep copy
+    let strippedState = cloneConfig(config) // Deep copy
 
     // Strip ref
     delete strippedState['']
@@ -951,7 +952,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
   const handleReturnToV1 = () => {
     if (pendingPaletteSelection) {
-      const _newConfig = _.cloneDeep(config)
+      const _newConfig = cloneConfig(config)
       _newConfig.general.palette.name = pendingPaletteSelection.palette
       _newConfig.general.palette.version = '1.0'
       setConfig(_newConfig)
@@ -1125,8 +1126,9 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 </span>
                 <ul className='geo-buttons d-grid' style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
                   <button
-                    className={`${config.general.geoType === 'us' || config.general.geoType === 'us-county' ? 'active' : ''
-                      } full-width`}
+                    className={`${
+                      config.general.geoType === 'us' || config.general.geoType === 'us-county' ? 'active' : ''
+                    } full-width`}
                     onClick={e => {
                       e.preventDefault()
                       handleEditorChanges('geoType', 'us')
@@ -1290,7 +1292,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     { value: '_blank', label: 'New Window' }
                   ]}
                   onChange={event => {
-                    const _newConfig = _.cloneDeep(config)
+                    const _newConfig = cloneConfig(config)
                     _newConfig.general.navigationTarget = event.target.value
                     setConfig(_newConfig)
                   }}
@@ -1329,7 +1331,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     type='checkbox'
                     checked={config.general.displayAsHex}
                     onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.general.displayAsHex = event.target.checked
                       setConfig(_newConfig)
                     }}
@@ -1385,7 +1387,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     type='checkbox'
                     checked={general.territoriesAlwaysShow || false}
                     onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.general.territoriesAlwaysShow = event.target.checked
                       setConfig(_newConfig)
                     }}
@@ -1429,7 +1431,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   type='checkbox'
                   checked={config.general.showTitle || false}
                   onChange={event => {
-                    const _newConfig = _.cloneDeep(config)
+                    const _newConfig = cloneConfig(config)
                     _newConfig.general.showTitle = event.target.checked
                     setConfig(_newConfig)
                   }}
@@ -1573,7 +1575,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     type='checkbox'
                     checked={config.general.hideGeoColumnInTooltip || false}
                     onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.general.hideGeoColumnInTooltip = event.target.checked
                       setConfig(_newConfig)
                     }}
@@ -1606,7 +1608,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     value={columns.primary.name}
                     options={columnsOptions.map(c => c.key)}
                     onChange={event => {
-                      const _state = _.cloneDeep(config)
+                      const _state = cloneConfig(config)
                       _state.columns.primary.name = event.target.value
                       _state.columns.primary.label = event.target.value
                       setConfig(_state)
@@ -2110,7 +2112,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         messages = []
                       }
 
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.legend.type = event.target.value
                       _newConfig.runtime.editorErrorMessage = messages
                       setConfig(_newConfig)
@@ -2123,7 +2125,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       type='checkbox'
                       checked={config.general.showSidebar || false}
                       onChange={event => {
-                        const _newConfig = _.cloneDeep(config)
+                        const _newConfig = cloneConfig(config)
                         _newConfig.general.showSidebar = event.target.checked
                         setConfig(_newConfig)
                       }}
@@ -2263,7 +2265,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       type='checkbox'
                       checked={legend.singleColumn}
                       onChange={event => {
-                        const _newConfig = _.cloneDeep(config)
+                        const _newConfig = cloneConfig(config)
                         _newConfig.legend.singleColumn = event.target.checked
                         _newConfig.legend.singleRow = false
                         _newConfig.legend.verticalSorted = false
@@ -2280,7 +2282,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       type='checkbox'
                       checked={legend.singleRow}
                       onChange={event => {
-                        const _newConfig = _.cloneDeep(config)
+                        const _newConfig = cloneConfig(config)
                         _newConfig.legend.singleRow = event.target.checked
                         _newConfig.legend.singleColumn = false
                         _newConfig.legend.verticalSorted = false
@@ -2298,7 +2300,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     value={legend.groupBy || ''}
                     options={columnsOptions.map(c => c.key)}
                     onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.legend.groupBy = event.target.value
                       setConfig(_newConfig)
                     }}
@@ -2310,7 +2312,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       type='checkbox'
                       checked={legend.verticalSorted}
                       onChange={event => {
-                        const _newConfig = _.cloneDeep(config)
+                        const _newConfig = cloneConfig(config)
                         _newConfig.legend.verticalSorted = event.target.checked
                         setConfig(_newConfig)
                       }}
@@ -2338,7 +2340,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       type='checkbox'
                       checked={legend.separateZero || false}
                       onChange={event => {
-                        const _newConfig = _.cloneDeep(config)
+                        const _newConfig = cloneConfig(config)
                         _newConfig.legend.separateZero = event.target.checked
                         return setConfig(_newConfig)
                       }}
@@ -2798,7 +2800,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       type='checkbox'
                       checked={config.table.showDataTableLink}
                       onChange={event => {
-                        const _newConfig = _.cloneDeep(config)
+                        const _newConfig = cloneConfig(config)
                         _newConfig.table.showDataTableLink = event.target.checked
                         setConfig(_newConfig)
                       }}
@@ -2812,7 +2814,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       type='checkbox'
                       checked={config.table.showDownloadUrl}
                       onChange={event => {
-                        const _newConfig = _.cloneDeep(config)
+                        const _newConfig = cloneConfig(config)
                         _newConfig.table.showDownloadUrl = event.target.checked
                         setConfig(_newConfig)
                       }}
@@ -2938,7 +2940,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     type='checkbox'
                     checked={config.general.fullBorder || false}
                     onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.general.fullBorder = event.target.checked
                       setConfig(_newConfig)
                     }}
@@ -2969,7 +2971,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 size='small'
                 label='Use selected palette in reverse order'
                 onClick={() => {
-                  const _state = _.cloneDeep(config)
+                  const _state = cloneConfig(config)
                   const currentPaletteName = config.general.palette?.name || ''
                   _state.general.palette.isReversed = !_state.general.palette.isReversed
                   let paletteName = ''
@@ -3069,26 +3071,26 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               )}
               {(config.general.geoType === 'world' ||
                 (config.general.geoType === 'us' && config.general.type === 'bubble')) && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={config.visual.showBubbleZeros}
-                      onChange={event => {
-                        const _newConfig = _.cloneDeep(config)
-                        _newConfig.visual.showBubbleZeros = event.target.checked
-                        setConfig(_newConfig)
-                      }}
-                    />
-                    <span className='edit-label'>Show Data with Zero's on Bubble Map</span>
-                  </label>
-                )}
+                <label className='checkbox'>
+                  <input
+                    type='checkbox'
+                    checked={config.visual.showBubbleZeros}
+                    onChange={event => {
+                      const _newConfig = _.cloneDeep(config)
+                      _newConfig.visual.showBubbleZeros = event.target.checked
+                      setConfig(_newConfig)
+                    }}
+                  />
+                  <span className='edit-label'>Show Data with Zero's on Bubble Map</span>
+                </label>
+              )}
               {(config.general.geoType === 'world' || config.general.geoType === 'single-state') && (
                 <label className='checkbox'>
                   <input
                     type='checkbox'
                     checked={config.general.allowMapZoom}
                     onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.general.allowMapZoom = event.target.checked
                       _newConfig.mapPosition.coordinates = config.general.geoType === 'world' ? [0, 30] : [0, 0]
                       _newConfig.mapPosition.zoom = 1
@@ -3104,7 +3106,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     type='checkbox'
                     checked={config.visual.extraBubbleBorder}
                     onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.visual.extraBubbleBorder = event.target.checked
                       setConfig(_newConfig)
                     }}
@@ -3115,42 +3117,42 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               {(config.general.geoType === 'us' ||
                 config.general.geoType === 'us-county' ||
                 config.general.geoType === 'world') && (
-                  <>
-                    <label>
-                      <span className='edit-label'>Default City Style</span>
-                      <select
-                        value={config.visual.cityStyle || false}
-                        onChange={event => {
-                          handleEditorChanges('handleCityStyle', event.target.value)
-                        }}
-                      >
-                        <option value='circle'>Circle</option>
-                        <option value='pin'>Pin</option>
-                        <option value='square'>Square</option>
-                        <option value='triangle'>Triangle</option>
-                        <option value='diamond'>Diamond</option>
-                        <option value='star'>Star</option>
-                      </select>
-                    </label>
-                    <TextField
-                      value={config.visual.cityStyleLabel}
-                      section='visual'
-                      fieldName='cityStyleLabel'
-                      label='Label (Optional) '
-                      updateField={updateField}
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>When a label is provided, the default city style will appear in the legend.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                    />
-                  </>
-                )}
+                <>
+                  <label>
+                    <span className='edit-label'>Default City Style</span>
+                    <select
+                      value={config.visual.cityStyle || false}
+                      onChange={event => {
+                        handleEditorChanges('handleCityStyle', event.target.value)
+                      }}
+                    >
+                      <option value='circle'>Circle</option>
+                      <option value='pin'>Pin</option>
+                      <option value='square'>Square</option>
+                      <option value='triangle'>Triangle</option>
+                      <option value='diamond'>Diamond</option>
+                      <option value='star'>Star</option>
+                    </select>
+                  </label>
+                  <TextField
+                    value={config.visual.cityStyleLabel}
+                    section='visual'
+                    fieldName='cityStyleLabel'
+                    label='Label (Optional) '
+                    updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>When a label is provided, the default city style will appear in the legend.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                </>
+              )}
               {/* <AdditionalCityStyles /> */}
               <>
                 {config.visual.additionalCityStyles.length > 0 &&

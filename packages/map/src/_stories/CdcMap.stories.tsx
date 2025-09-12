@@ -5,6 +5,7 @@ import EqualNumberMap from './_mock/equal-number.json'
 import MultiState from './_mock/multi-state.json'
 import SingleStateWithFilters from './_mock/DEV-8942.json'
 import exampleCityState from './_mock/example-city-state.json'
+import USBubbleCities from './_mock/us-bubble-cities.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import exampleLegendBins from './_mock/legend-bins.json'
 
@@ -169,6 +170,13 @@ export const Custom_Color_Distributions_With_Update_Needed: Story = {
 export const Legend_Bins: Story = {
   args: {
     config: exampleLegendBins,
+    isEditor: true
+  }
+}
+
+export const US_Bubble_Cities_Test: Story = {
+  args: {
+    config: USBubbleCities,
     isEditor: true
   }
 }

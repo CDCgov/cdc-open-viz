@@ -9,6 +9,7 @@ import EditorContext from '@cdc/core/contexts/EditorContext'
 import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 import { MapConfig } from './types/MapConfig'
 import _ from 'lodash'
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type CdcMapProps = {
@@ -107,7 +108,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
   }
 
   const init = async () => {
-    let _newConfig = _.cloneDeep(config ?? initialState)
+    let _newConfig = cloneConfig(config ?? initialState)
 
     if (configUrl) {
       _newConfig = await fetchRemoteData(configUrl)

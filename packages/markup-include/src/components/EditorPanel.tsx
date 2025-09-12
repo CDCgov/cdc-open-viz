@@ -3,6 +3,8 @@ import React, { useState, useEffect, memo, useContext, useRef, useMemo, useReduc
 // Third Party
 import _ from 'lodash'
 
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
+
 // Context
 import { Variable } from '../types/Variable'
 import ConfigContext from '../ConfigContext'
@@ -80,7 +82,7 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
   }
 
   const convertStateToConfig = () => {
-    const strippedState = _.cloneDeep(config)
+    const strippedState = cloneConfig(config)
     delete strippedState.newViz
     delete strippedState.runtime
 

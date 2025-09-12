@@ -1,5 +1,6 @@
 import { useContext, FC } from 'react'
 import _ from 'lodash'
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 
 // external libraries
 import {
@@ -271,7 +272,7 @@ const PanelVisual: FC<PanelProps> = props => {
                 label='Use selected palette in reverse order'
                 updateField={updateField}
                 onClick={() => {
-                  const _state = _.cloneDeep(config)
+                  const _state = cloneConfig(config)
                   const currentPaletteName = getCurrentPaletteName(config)
                   _state.general.palette.isReversed = !_state.general.palette.isReversed
                   let paletteName = ''

@@ -116,7 +116,7 @@ const cleanConfig = config => {
 
 const update_4_25_9 = config => {
     const ver = '4.25.9'
-    const newConfig = _.cloneDeep(config)
+    const newConfig = cloneConfig(config)
     movePaletteName(newConfig)
     updateCustomColorsMigration(newConfig)
     saveBackup(newConfig)
