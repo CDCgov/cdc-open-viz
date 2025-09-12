@@ -17,9 +17,14 @@ const renameOriginalChartPalettes = (config) => {
 
 
 const saveBackup = (config) => {
-    if (!config.general) {
+    config.general = config.general || {}
+    config.general.palette = config.general.palette || {}
+
+    if (!config.general.palette) {
         config.general = config.general || {}
         config.general.palette = config.general.palette || {}
+        config.general.backups = config.general.palette.backups || []
+        config.general.palette.version = ''
     }
     const version = config?.general?.palette?.version || '1.0'
     // Save a backup and set version to 1.0 for legacy palette names
@@ -101,13 +106,13 @@ const addDefaultPaletteVersion = config => {
 // Migration mapping for two-color palettes to divergent palettes
 const twoColorPaletteMapping = {
     'monochrome-1': 'divergent_blue_purple',
-    'monochrome-2': 'divergent_blue_purple', 
+    'monochrome-2': 'divergent_blue_purple',
     'monochrome-3': 'divergent_blue_purple',
     'monochrome-4': 'divergent_blue_purple',
     'monochrome-5': 'divergent_green_orange',
     'cool-1': 'divergent_blue_cyan',
     'cool-2': 'divergent_blue_cyan',
-    'cool-3': 'divergent_blue_cyan', 
+    'cool-3': 'divergent_blue_cyan',
     'cool-4': 'divergent_blue_cyan',
     'cool-5': 'divergent_blue_cyan',
     'warm-1': 'divergent_green_orange',
