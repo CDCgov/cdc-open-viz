@@ -98,8 +98,8 @@ export const getVegaWarnings = (vegaOrVegaLiteConfig, vegaConfig) => {
       `This Vega config contains multiple types of marks (${allMarks
         .map(m => m.type)
         .join(', ')}), but COVE's combo charts only support these types of marks: (${Object.keys(COMBO_MARKS).join(
-          ', '
-        )}). Not all marks were imported.`
+        ', '
+      )}). Not all marks were imported.`
     )
   }
 
@@ -109,7 +109,7 @@ export const getVegaWarnings = (vegaOrVegaLiteConfig, vegaConfig) => {
 export const parseVegaConfig = vegaConfig => {
   try {
     vegaConfig = vegaLiteCompile(vegaConfig).spec
-  } catch { }
+  } catch {}
   return vegaConfig
 }
 
@@ -423,8 +423,6 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
       hideBorder: true,
       title: colorLabel
     }
-    config.color = 'sequential-blue-2(MPX)'
-    config.general.palette.name = 'sequential-blue-2(MPX)'
   } else {
     const stack = getStack(vegaConfig)
     const stackField = stack?.field
