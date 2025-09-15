@@ -6,6 +6,7 @@ export interface FilterColorPalettesOptions {
   isReversed?: boolean
   colorPalettes?: any
   visualizationType?: string
+  useV2Migration?: boolean
 }
 
 export interface FilteredPalettes {
@@ -23,11 +24,12 @@ export const filterColorPalettes = ({
   config,
   isReversed,
   colorPalettes,
-  visualizationType
+  visualizationType,
+  useV2Migration
 }: FilterColorPalettesOptions): FilteredPalettes => {
   // Use provided colorPalettes or fall back to chart palettes
   const palettes = colorPalettes || chartColorPalettes
-  const version = getColorPaletteVersion(config)
+  const version = getColorPaletteVersion(config, useV2Migration)
   const versionKey = `v${version}`
   const currentPalettes = palettes[versionKey] || palettes.v2
 
@@ -136,13 +138,13 @@ function filterV2Palette(
  * Legacy function for backwards compatibility with chart package
  */
 export const filterChartColorPalettes = (config: any) => {
-  const version = config?.general?.palette?.version || '2.0'
+  const version = getColorPaletteVersion(config)
 
-  if (version === '1.0') {
+  if (version === 1) {
     return chartColorPalettes.v1
   }
 
-  if (version === '2.0') {
+  if (version === 2) {
     return chartColorPalettes.v2
   }
 

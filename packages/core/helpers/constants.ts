@@ -4,3 +4,6 @@ export const APP_FONT_COLOR = COOL_GRAY_90
 export const FALLBACK_COLOR_PALETTE_V1 = 'qualitative-bold'
 export const FALLBACK_COLOR_PALETTE_V2 = 'sequential_blue'
 export const EDITOR_WIDTH = 350
+
+// Palette migration behavior flag
+export const USE_V2_MIGRATION = true // Set to true to enable v2 migration and conversion modal

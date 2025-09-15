@@ -1,4 +1,18 @@
-export default {
+import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
+
+// Dynamic initial state based on migration flag
+const createInitialState = () => {
+  const paletteDefaults = USE_V2_MIGRATION ? {
+    isReversed: true,
+    name: 'sequential_blue',
+    version: '2.0'
+  } : {
+    isReversed: true,
+    name: 'bluegreen',
+    version: '1.0'
+  }
+
+  return {
   annotations: [],
   general: {
     navigationTarget: '_self',
@@ -20,11 +34,7 @@ export default {
     fullBorder: false,
     type: 'data',
     convertFipsCodes: true,
-    palette: {
-      isReversed: true,
-      name: 'sequential_blue',
-      version: '2.0'
-    },
+    palette: paletteDefaults,
     allowMapZoom: true,
     hideGeoColumnInTooltip: false,
     hidePrimaryColumnInTooltip: false,
@@ -133,4 +143,7 @@ export default {
   },
   filterBehavior: 'Filter Change',
   filterIntro: ''
+  }
 }
+
+export default createInitialState()

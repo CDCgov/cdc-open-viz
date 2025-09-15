@@ -1,5 +1,5 @@
 import { map } from 'lodash'
-import { FALLBACK_COLOR_PALETTE_V1, FALLBACK_COLOR_PALETTE_V2 } from '../constants'
+import { FALLBACK_COLOR_PALETTE_V1, FALLBACK_COLOR_PALETTE_V2, USE_V2_MIGRATION } from '../constants'
 import { getColorPaletteVersion } from '../getColorPaletteVersion'
 import { getPaletteAccessor } from '../getPaletteAccessor'
 import { chartPaletteMigrationMap } from './migratePaletteName'
@@ -68,9 +68,14 @@ export const getPaletteColors = (config: any, colorPalettes: any): string[] => {
 /**
  * Determines if the config is using a v1 palette configuration
  * @param config - The visualization config object
- * @returns True if the config is using v1 palette configuration
+ * @returns True if the config is using v1 palette configuration (which would show conversion modal)
  */
 export const isV1Palette = (config: any): boolean => {
+  // If v2 migration is disabled globally, don't treat as v1 (no conversion modal)
+  if (!USE_V2_MIGRATION) {
+    return false
+  }
+
   const currentVersion = getColorPaletteVersion(config)
   return (
     currentVersion === 1 ||

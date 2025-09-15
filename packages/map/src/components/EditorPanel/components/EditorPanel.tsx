@@ -53,6 +53,7 @@ import { Datasets } from '@cdc/core/types/DataSet'
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { isV1Palette, getCurrentPaletteName, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
+import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
 import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
 import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
 
@@ -921,9 +922,17 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
     const executeSelection = () => {
       const _newConfig = _.cloneDeep(config)
-      _newConfig.general.palette.name = palette ? migratePaletteWithMap(palette, paletteMigrationMap, false) : undefined
-      if (isV1PaletteConfig) {
-        _newConfig.general.palette.version = '2.0'
+
+      // If v2 migration is disabled, use the original palette name and keep v1 version
+      if (!USE_V2_MIGRATION) {
+        _newConfig.general.palette.name = palette
+        _newConfig.general.palette.version = '1.0'
+      } else {
+        // V2 migration logic
+        _newConfig.general.palette.name = palette ? migratePaletteWithMap(palette, paletteMigrationMap, false) : undefined
+        if (isV1PaletteConfig) {
+          _newConfig.general.palette.version = '2.0'
+        }
       }
       setConfig(_newConfig)
     }

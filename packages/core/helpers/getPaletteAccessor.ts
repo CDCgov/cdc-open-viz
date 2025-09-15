@@ -9,10 +9,10 @@ import { getColorPaletteVersion } from './getColorPaletteVersion'
  */
 export const getPaletteAccessor = (colorPalettes: any, config: any, paletteName?: string) => {
   const paletteAccessor = colorPalettes?.[`v${getColorPaletteVersion(config)}`] || colorPalettes
-  
+
   if (paletteName && paletteAccessor) {
     return paletteAccessor[paletteName]
   }
-  
+
   return paletteAccessor
 }

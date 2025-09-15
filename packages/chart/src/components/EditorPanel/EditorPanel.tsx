@@ -52,6 +52,7 @@ import { Datasets } from '@cdc/core/types/DataSet'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { paletteMigrationMap, twoColorPaletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { isV1Palette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
+import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
 
 interface PreliminaryProps {
   config: ChartConfig
@@ -1119,10 +1120,18 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         if (!_newConfig.general.palette) {
           _newConfig.general.palette = {}
         }
-        const migratedName = palette ? migratePaletteWithMap(palette, paletteMigrationMap, false) : undefined
-        _newConfig.general.palette.name = migratedName
-        if (isV1PaletteConfig) {
-          _newConfig.general.palette.version = '2.0'
+
+        // If v2 migration is disabled, use the original palette name and keep v1 version
+        if (!USE_V2_MIGRATION) {
+          _newConfig.general.palette.name = palette
+          _newConfig.general.palette.version = '1.0'
+        } else {
+          // V2 migration logic
+          const migratedName = palette ? migratePaletteWithMap(palette, paletteMigrationMap, false) : undefined
+          _newConfig.general.palette.name = migratedName
+          if (isV1PaletteConfig) {
+            _newConfig.general.palette.version = '2.0'
+          }
         }
         updateConfig(_newConfig)
       }
@@ -1155,33 +1164,45 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         if (!_newConfig.twoColor) {
           _newConfig.twoColor = { palette: '', isPaletteReversed: false }
         }
-        
-        // Migrate palette name if upgrading from v1 to v2
-        const migratedPaletteName = isV1PaletteConfig 
-          ? migratePaletteWithMap(palette, twoColorPaletteMigrationMap, false) 
-          : palette
-        
-        _newConfig.twoColor.palette = migratedPaletteName
-        
-        if (isV1PaletteConfig) {
+
+        // If v2 migration is disabled, use the original palette name and keep v1 version
+        if (!USE_V2_MIGRATION) {
+          _newConfig.twoColor.palette = palette
           if (!_newConfig.general) {
             _newConfig.general = {}
           }
           if (!_newConfig.general.palette) {
             _newConfig.general.palette = {}
           }
-          _newConfig.general.palette.version = '2.0'
-          
-          // Create backup for rollback functionality (consistent with standard format)
-          if (!_newConfig.general.palette.backups) {
-            _newConfig.general.palette.backups = []
+          _newConfig.general.palette.version = '1.0'
+        } else {
+          // V2 migration logic
+          const migratedPaletteName = isV1PaletteConfig
+            ? migratePaletteWithMap(palette, twoColorPaletteMigrationMap, false)
+            : palette
+
+          _newConfig.twoColor.palette = migratedPaletteName
+
+          if (isV1PaletteConfig) {
+            if (!_newConfig.general) {
+              _newConfig.general = {}
+            }
+            if (!_newConfig.general.palette) {
+              _newConfig.general.palette = {}
+            }
+            _newConfig.general.palette.version = '2.0'
+
+            // Create backup for rollback functionality (consistent with standard format)
+            if (!_newConfig.general.palette.backups) {
+              _newConfig.general.palette.backups = []
+            }
+            _newConfig.general.palette.backups.push({
+              name: config.twoColor?.palette || palette,
+              version: '1.0',
+              isReversed: false,
+              type: 'twoColor'
+            })
           }
-          _newConfig.general.palette.backups.push({
-            name: config.twoColor?.palette || palette,
-            version: '1.0',
-            isReversed: config.twoColor?.isPaletteReversed || false,
-            type: 'twoColor'
-          })
         }
         updateConfig(_newConfig)
       }
