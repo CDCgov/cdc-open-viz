@@ -5,9 +5,17 @@ import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 import _ from 'lodash'
 
 export const getInitialState = (configObj = {}): MapState => {
+  // Create defaults without palette version to avoid overriding legacy configs
+  const defaultsWithoutPalette = { ...defaults }
+
+  // Only apply palette defaults if the loaded config explicitly has general.palette
+  if (!configObj?.general?.palette) {
+    delete defaultsWithoutPalette.general?.palette
+  }
+
   return {
     dataUrl: configObj.dataUrl || '',
-    config: _.merge({}, defaults, configObj),
+    config: _.merge({}, defaultsWithoutPalette, configObj),
     loading: false,
     accessibleStatus: '',
     coveLoadedHasRan: false,

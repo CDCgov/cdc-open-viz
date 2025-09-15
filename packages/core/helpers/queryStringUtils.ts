@@ -49,3 +49,16 @@ export function removeQueryParam(key: string) {
   delete queryParams[key]
   updateQueryString(queryParams)
 }
+
+/**
+ * Checks if developer mode is enabled via URL parameter
+ * @returns true if isCoveDeveloper URL parameter is present and truthy
+ */
+export function isCoveDeveloperMode(): boolean {
+  const param = getQueryParam('isCoveDeveloper')
+  if (!param) return false
+
+  // Handle various truthy values
+  const lowerParam = param.toLowerCase()
+  return lowerParam === 'true' || lowerParam === '1' || lowerParam === 'yes'
+}

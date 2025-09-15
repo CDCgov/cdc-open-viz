@@ -51,9 +51,10 @@ import './editorPanel.styles.css'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 import MultiSelect from '@cdc/core/components/MultiSelect'
-import { migratePaletteName } from '@cdc/core/helpers/migratePaletteName'
-import { isV1Palette, getCurrentPaletteName } from '@cdc/core/helpers/palettes/utils'
-import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
+import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
+import { isV1Palette, getCurrentPaletteName, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
+import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
+import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
 import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
 
 type MapEditorPanelProps = {
@@ -920,10 +921,18 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     const isV1PaletteConfig = isV1Palette(config)
 
     const executeSelection = () => {
-      const _newConfig = cloneConfig(config)
-      _newConfig.general.palette.name = migratePaletteName(palette)
-      if (isV1PaletteConfig) {
-        _newConfig.general.palette.version = '2.0'
+      const _newConfig = _.cloneDeep(config)
+
+      // If v2 migration is disabled, use the original palette name and keep v1 version
+      if (!USE_V2_MIGRATION) {
+        _newConfig.general.palette.name = palette
+        _newConfig.general.palette.version = '1.0'
+      } else {
+        // V2 migration logic
+        _newConfig.general.palette.name = palette ? migratePaletteWithMap(palette, paletteMigrationMap, false) : undefined
+        if (isV1PaletteConfig) {
+          _newConfig.general.palette.version = '2.0'
+        }
       }
       setConfig(_newConfig)
     }
@@ -2962,6 +2971,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               <label>
                 <span className='edit-label'>Map Color Palette</span>
               </label>
+              <DeveloperPaletteRollback config={config} updateConfig={setConfig} />
               <InputToggle
                 type='3d'
                 section='general'
@@ -3075,7 +3085,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     type='checkbox'
                     checked={config.visual.showBubbleZeros}
                     onChange={event => {
-                      const _newConfig = cloneConfig(config)
+                      const _newConfig = _.cloneDeep(config)
                       _newConfig.visual.showBubbleZeros = event.target.checked
                       setConfig(_newConfig)
                     }}

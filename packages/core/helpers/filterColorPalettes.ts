@@ -1,11 +1,12 @@
 import { getColorPaletteVersion } from './getColorPaletteVersion'
-import { chartColorPalettes } from '../data/colorPalettes'
+import { chartColorPalettes, twoColorPalette } from '../data/colorPalettes'
 
 export interface FilterColorPalettesOptions {
   config: any
   isReversed?: boolean
   colorPalettes?: any
   visualizationType?: string
+  useV2Migration?: boolean
 }
 
 export interface FilteredPalettes {
@@ -23,17 +24,18 @@ export const filterColorPalettes = ({
   config,
   isReversed,
   colorPalettes,
-  visualizationType
+  visualizationType,
+  useV2Migration
 }: FilterColorPalettesOptions): FilteredPalettes => {
   // Use provided colorPalettes or fall back to chart palettes
   const palettes = colorPalettes || chartColorPalettes
-  const version = getColorPaletteVersion(config)
+  const version = getColorPaletteVersion(config, useV2Migration)
   const versionKey = `v${version}`
   const currentPalettes = palettes[versionKey] || palettes.v2
 
   // Handle two-color palettes for specific chart types
   if (visualizationType === 'Paired Bar' || visualizationType === 'Deviation Bar') {
-    const twoColorPalettes = filterTwoColorPalettes(currentPalettes, isReversed)
+    const twoColorPalettes = filterTwoColorPalettes(version, isReversed)
     return {
       sequential: [],
       nonSequential: [],
@@ -53,27 +55,14 @@ export const filterColorPalettes = ({
 /**
  * Filter two-color palettes (for Paired Bar and Deviation Bar charts)
  */
-function filterTwoColorPalettes(palettes: any, isReversed?: boolean): string[] {
-  const results: string[] = []
-
-  // Look for twoColorPalette specifically (imported from colorPalettes)
-  if (palettes.twoColorPalette) {
-    return Object.keys(palettes.twoColorPalette).filter(name =>
-      isReversed ? name.endsWith('reverse') : !name.endsWith('reverse')
-    )
-  }
-
-  // Fallback for other two-color patterns
-  for (const paletteName in palettes) {
-    if (paletteName.includes('twocolor') || paletteName.includes('two-color')) {
-      const isPaletteReversed = paletteName.endsWith('reverse')
-      if ((isReversed && isPaletteReversed) || (!isReversed && !isPaletteReversed)) {
-        results.push(paletteName)
-      }
-    }
-  }
-
-  return results
+function filterTwoColorPalettes(version: number, isReversed?: boolean): string[] {
+  // Use the version to get the correct two-color palettes
+  const versionKey = `v${version}`
+  const versionedTwoColorPalettes = twoColorPalette[versionKey] || twoColorPalette.v2
+  
+  return Object.keys(versionedTwoColorPalettes).filter(name =>
+    isReversed ? name.endsWith('reverse') : !name.endsWith('reverse')
+  )
 }
 
 /**
@@ -149,13 +138,13 @@ function filterV2Palette(
  * Legacy function for backwards compatibility with chart package
  */
 export const filterChartColorPalettes = (config: any) => {
-  const version = config?.general?.palette?.version || '2.0'
+  const version = getColorPaletteVersion(config)
 
-  if (version === '1.0') {
+  if (version === 1) {
     return chartColorPalettes.v1
   }
 
-  if (version === '2.0') {
+  if (version === 2) {
     return chartColorPalettes.v2
   }
 

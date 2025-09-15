@@ -43,7 +43,7 @@ export const LineHoverPoints: Story = {
 export const Bar_Vertical: Story = {
   args: {
     config: DynamicSeriesBarConfig,
-    isEditor: false
+    isEditor: true
   }
 }
 

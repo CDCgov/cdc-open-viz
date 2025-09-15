@@ -21,3 +21,31 @@
 .color-palette li.selected {
   border: black 2px solid;
 }
+
+/* Developer rollback component styles */
+.developer-palette-rollback {
+  margin: 8px 0;
+  padding: 8px;
+  border: 1px dashed #ffc107;
+  border-radius: 4px;
+  background-color: #fffbf0;
+}
+
+.developer-palette-rollback .rollback-info {
+  margin-bottom: 4px;
+}
+
+.developer-palette-rollback .rollback-info small {
+  color: #856404;
+  font-size: 0.75rem;
+}
+
+.developer-palette-rollback button {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+}
+
+.developer-palette-rollback button:hover {
+  background-color: #ffc107;
+  color: #212529;
+}

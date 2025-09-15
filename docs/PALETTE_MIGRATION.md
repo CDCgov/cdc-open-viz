@@ -7,6 +7,44 @@ Version 4.25.9 introduces a major refactoring of the color palette system to pro
 - **Versioned palette structure** for backward compatibility
 - **Centralized palette management** in the `@cdc/core` package
 - **Automatic migration** of existing configurations
+- **Developer rollback features** for debugging and testing
+- **Enhanced migration utilities** with comprehensive fallback handling
+
+## Key Architectural Changes
+
+### 1. Centralized Migration System
+- **Core helpers**: All palette migration logic centralized in `packages/core/helpers/palettes/utils.ts`
+- **Migration Dictionaries**: Separate migration maps for charts and maps in `packages/core/helpers/migratePaletteName.ts`
+- **Version management**: Smart version detection and handling in migration utilities
+
+### 2. Enhanced Developer Experience
+- **Rollback functionality**: Developers can revert palette migrations for testing
+- **Query string utilities**: Developer tools accessible via URL parameters  
+- **Comprehensive error handling**: Graceful fallbacks when migrations fail
+- **Visual debugging**: Developer-friendly palette selection components
+
+## Palette Migration Flow
+
+### High-Level Architecture
+```
+Legacy Config (v1)           Migration System            Modern Config (v2)
+├─ config.palette           ────────────────────────►    ├─ config.general.palette.name
+├─ config.color                                           ├─ config.general.palette.version
+├─ config.customColors      ◄────────────────────────    ├─ config.general.palette.customColors
+                                                          └─ config.general.palette.backups[]
+```
+
+### Core Functions Flow
+
+```
+getCurrentPaletteName() ──► getPaletteColors() ──► Render Component
+        │                          │
+        ▼                          ▼
+findPaletteInMigrationMap()   getPaletteAccessor()
+        │                          │
+        ▼                          ▼
+migratePaletteWithMap()      Versioned Palette Data
+```
 
 ## Breaking Changes
 
@@ -39,34 +77,6 @@ config.general.palette = {
 
 Many palette names have been standardized. Here are the key migrations:
 
-#### Chart Palettes
-| Old Name | New Name |
-|----------|----------|
-| `qualitative-bold` | `qualitative_standard` |
-| `qualitative-soft` | `qualitative_standard` |
-| `sequential-blue` | `sequential_blue` |
-| `sequential-orange` | `sequential_orange` |
-| `colorblindsafe` | `qualitative_standard` |
-
-#### Map Palettes
-| Old Name | New Name |
-|----------|----------|
-| `yelloworangered` | `sequential_orange` |
-| `bluegreen` | `sequential_blue` |
-| `pinkpurple` | `sequential_purple` |
-| `sequential_blue_green` | `sequential_blue` |
-| `qualitative_earth_tones` | `qualitative` |
-
-## Migration Process
-
-### Automatic Migration
-
-The migration happens automatically when configurations are loaded in version 4.25.9+:
-
-1. **Palette names** are moved to the new structure
-2. **Legacy names** are mapped to standardized equivalents
-3. **Backup copies** of original configurations are preserved
-4. **Custom colors** are migrated to the new location
 
 ### Manual Migration
 
@@ -103,23 +113,45 @@ import { filterColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 const availablePalettes = filterColorPalettes(allPalettes, config.visualizationType)
 ```
 
-### New React Hooks
+### Core Migration Functions (New in v2)
 
 ```javascript
-// Centralized palette management
-import { useColorPalette } from '@cdc/core/hooks/useColorPalette'
+// Enhanced palette utilities
+import { 
+  getCurrentPaletteName, 
+  getPaletteColors,
+  findPaletteInMigrationMap,
+  migratePaletteWithMap,
+  rollbackPaletteToOriginal,
+  hasPaletteBackup 
+} from '@cdc/core/helpers/palettes/utils'
 
-function MyComponent() {
-  const { currentPalette, availablePalettes } = useColorPalette(config, colorPalettes)
-  // ...
+// Get current palette name with fallback handling
+const paletteName = getCurrentPaletteName(config) // Handles v1/v2 configs
+
+// Get colors with migration applied
+const colors = getPaletteColors(config, colorPalettes) // Includes custom colors
+
+// Advanced migration with maps
+const migratedName = migratePaletteWithMap(
+  'qualitative-bold', 
+  chartPaletteMigrationMap, 
+  true // handle reverse palettes
+)
+
+// Developer rollback functionality
+if (hasPaletteBackup(config)) {
+  const success = rollbackPaletteToOriginal(config)
+  console.log('Rollback successful:', success)
 }
 ```
 
-### New Components
+### New Components and Developer Tools
 
 ```javascript
-// Palette selection component
+// Enhanced palette selection with rollback
 import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
+import { DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector/DeveloperPaletteRollback'
 
 <PaletteSelector
   config={config}
@@ -128,82 +160,24 @@ import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
   type="chart" // or "map"
 />
 
+// Developer rollback component (only shows if dev tools enabled)
+<DeveloperPaletteRollback
+  config={config}
+  updateConfig={updateConfig}
+/>
+
 // Migration modal for user notifications
 import { PaletteConversionModal } from '@cdc/core/components/PaletteConversionModal'
 ```
 
-## Backward Compatibility
-
-### Version Support
-- **v1 configurations** continue to work with automatic migration
-- **Original palette names** are preserved in `config.general.palette.backups`
-- **Fallback behavior** ensures missing palettes default gracefully
-
-### Migration Safety
-- No data loss during migration
-- Original configurations backed up before changes
-- Rollback possible using backup data
-
-## Testing Migration
-
-### Validate Your Configuration
+### Developer Query String Parameters
 
 ```javascript
-// Test if your config needs migration
-if (!config.general?.palette?.name && (config.palette || config.color)) {
-  console.log('Configuration needs migration')
-}
+// Enable developer palette tools via URL
+// ?isCoveDeveloper=true
 
-// Verify migration results
-import update_4_25_9 from '@cdc/core/helpers/ver/4.25.9'
-const migratedConfig = update_4_25_9(originalConfig)
-console.log('Migrated config:', migratedConfig)
+import { getQueryParam, setQueryParam } from '@cdc/core/helpers/queryStringUtils'
+
+// Check if developer mode is enabled
+const devMode = getQueryParam('isCoveDeveloper') === 'true'
 ```
-
-### Common Migration Issues
-
-1. **Custom palette names** that don't match migration maps remain unchanged
-2. **Case sensitivity** - migration handles case-insensitive matching
-3. **Reverse palettes** - automatically detected and preserved with 'reverse' suffix
-
-## For Package Consumers
-
-### If You're Using CDC Open Viz Components
-
-Your existing code should continue working without changes. The migration happens automatically when configurations are processed.
-
-### If You're Building on Top of the Packages
-
-Update your imports to use the new centralized helpers:
-
-```javascript
-// Old
-import { generateColorsArray } from '@cdc/chart/helpers/generateColorsArray'
-
-// New
-import { generateColorsArray } from '@cdc/core/helpers/generateColorsArray'
-```
-
-## Troubleshooting
-
-### Common Issues
-
-**Issue**: Palette colors look different after migration
-**Solution**: Check the migration mapping table above. Some legacy palettes now map to standardized equivalents.
-
-**Issue**: Custom colors not appearing
-**Solution**: Verify that `config.general.palette.customColors` contains your custom color array.
-
-**Issue**: Configuration not migrating
-**Solution**: Ensure you're using version 4.25.9+ and the configuration is being processed through the update system.
-
-### Getting Help
-
-For migration issues or questions:
-1. Check the backup data in `config.general.palette.backups`
-2. Review the migration maps in `packages/core/helpers/migratePaletteName.ts`
-3. Test with the Storybook examples for your component type
-
-## Future Considerations
-
-This versioned palette system is designed to support future palette updates while maintaining backward compatibility. When adding new palettes or modifying existing ones, follow the established patterns for version management and migration support.
