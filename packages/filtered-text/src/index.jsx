@@ -2,7 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 
 import '@cdc/core/styles/cove-main.scss'
-import './coreStyles_filteredtext.scss'
 
 import CdcFilteredText from './CdcFilteredText'
 

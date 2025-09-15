@@ -24,7 +24,6 @@ import { Label } from './types/Label'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import { timeParse, timeFormat } from 'd3-time-format'
 import parse from 'html-react-parser'
-import 'react-tooltip/dist/react-tooltip.css'
 import _ from 'lodash'
 // Primary Components
 import ConfigContext, { ChartDispatchContext } from './ConfigContext'

@@ -14,6 +14,7 @@ import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
 import { useDebounce } from 'use-debounce'
 import _ from 'lodash'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
+import 'react-tooltip/dist/react-tooltip.css'
 import Panels from './Panels'
 import Layout from '@cdc/core/components/Layout'
 
