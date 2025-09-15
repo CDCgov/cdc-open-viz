@@ -1,4 +1,18 @@
-export default {
+import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
+
+// Dynamic initial state based on migration flag
+const createInitialState = () => {
+  const paletteDefaults = USE_V2_MIGRATION ? {
+    isReversed: true,
+    version: '2.0',
+    name: 'sequential_bluereverse'
+  } : {
+    isReversed: true,
+    version: '1.0',
+    name: 'qualitative_bold'
+  }
+
+  return {
   annotations: [],
   allowLineToBarGraph: undefined,
   type: 'chart',
@@ -28,11 +42,7 @@ export default {
     showSuppressedSymbol: true,
     showZeroValueData: true,
     hideNullValue: true,
-    palette: {
-      isReversed: false,
-      version: '2.0',
-      name: 'sequential_blue'
-    }
+    palette: paletteDefaults
   },
   padding: {
     left: 5,
@@ -147,7 +157,7 @@ export default {
     collapsible: true
   },
   orientation: 'vertical',
-  color: 'sequential_blue',
+  color: 'qualitative-bold',
   columns: {
     // start with a blank list
   },
@@ -314,4 +324,7 @@ export default {
     },
     data: []
   }
+  }
 }
+
+export default createInitialState()

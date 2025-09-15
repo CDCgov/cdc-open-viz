@@ -172,8 +172,20 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   const prepareConfig = (loadedConfig: ChartConfig) => {
     // Create defaults without version to avoid overriding legacy configs
+    const defaultsWithoutPalette = { ...defaults }
 
-    let newConfig = { ...defaults, ...loadedConfig }
+    // Only remove palette defaults for legacy (v1) configs
+    // New configs and v2 configs should get the v2 palette defaults
+    if (loadedConfig?.general?.palette || (!loadedConfig?.general && !loadedConfig?.color)) {
+      // Keep palette defaults for:
+      // 1. Configs that already have general.palette (v2 configs)
+      // 2. New configs (no general section and no legacy color property)
+    } else {
+      // Remove palette defaults for legacy configs that have color but no general.palette
+      delete defaultsWithoutPalette.general?.palette
+    }
+
+    let newConfig = { ...defaultsWithoutPalette, ...loadedConfig }
 
     _.defaultsDeep(newConfig, {
       table: { showVertical: false }
