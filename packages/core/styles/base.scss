@@ -66,6 +66,11 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
 .cdc-open-viz-module {
   position: relative;
   line-height: 1.4;
+  // Force printing chart images
+  -webkit-print-color-adjust: exact !important; /* Chrome, Safari 6 – 15.3, Edge */
+  color-adjust: exact !important; /* Firefox 48 – 96 */
+  print-color-adjust: exact !important; /* Firefox 97+, Safari 15.4+ */
+
   @import 'global';
   @import 'button-section';
   @import 'series-list';
@@ -74,11 +79,6 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
   input[type='range'] {
     appearance: auto !important;
   }
-
-  // Force printing chart images
-  -webkit-print-color-adjust: exact !important; /* Chrome, Safari 6 – 15.3, Edge */
-  color-adjust: exact !important; /* Firefox 48 – 96 */
-  print-color-adjust: exact !important; /* Firefox 97+, Safari 15.4+ */
 
   $theme: (
     'amber': (
