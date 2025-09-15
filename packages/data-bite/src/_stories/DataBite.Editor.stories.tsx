@@ -56,9 +56,9 @@ export const BasicEditorLoading: Story = {
 
 /**
  * GENERAL SECTION TESTS
- * Converted from editor/editor-general.spec.js
+ * Tests all functionality within the General accordion
  */
-export const GeneralTitleUpdate: Story = {
+export const GeneralSectionTests: Story = {
   args: {
     configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
     isEditor: true
@@ -68,111 +68,50 @@ export const GeneralTitleUpdate: Story = {
     await waitForEditor(canvas)
     await openAccordion(canvas, 'General')
 
-    // Find title input and update it
+    // Test 1: Title Update
     const titleInput = canvas.getByDisplayValue(/test data bite title/i)
     await userEvent.clear(titleInput)
     await userEvent.type(titleInput, 'Test Data Bite Title E2E')
-
     await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // Verify title appears in component
     await expect(canvas.getByText('Test Data Bite Title E2E')).toBeVisible()
-  }
-}
 
-export const GeneralBiteStyleChange: Story = {
-  args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'General')
-
-    // Find bite style select
+    // Test 2: Bite Style Change
     const biteStyleSelect = canvas.queryByDisplayValue(/graphic|body|value/i)
     if (biteStyleSelect) {
       const currentValue = (biteStyleSelect as HTMLSelectElement).value
       const targetValue = currentValue === 'graphic' ? 'body' : 'graphic'
-
       await userEvent.selectOptions(biteStyleSelect, targetValue)
       await new Promise(resolve => setTimeout(resolve, 500))
-
-      // Verify selection changed
       await expect(biteStyleSelect).toHaveValue(targetValue)
     }
-  }
-}
 
-export const GeneralShowTitleToggle: Story = {
-  args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'General')
-
-    // Find show title checkbox
+    // Test 3: Show Title Toggle
     const showTitleCheckbox = canvas.queryByRole('checkbox', { name: /show title/i })
     if (showTitleCheckbox) {
       const wasChecked = (showTitleCheckbox as HTMLInputElement).checked
       await userEvent.click(showTitleCheckbox)
       await new Promise(resolve => setTimeout(resolve, 500))
-
-      // Verify checkbox state changed
       expect((showTitleCheckbox as HTMLInputElement).checked).toBe(!wasChecked)
     }
-  }
-}
 
-export const GeneralBodyTextChange: Story = {
-  args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'General')
-
-    // Find body textarea
+    // Test 4: Body Text Change
     const bodyTextarea = canvas.queryByRole('textbox', { name: /body|message/i })
     if (bodyTextarea) {
       const newBodyText = 'This is a test message for E2E testing'
       await userEvent.clear(bodyTextarea)
       await userEvent.type(bodyTextarea, newBodyText)
-
       await new Promise(resolve => setTimeout(resolve, 1000))
-
-      // Verify body text appears in component
-      await expect(canvas.getByText(newBodyText)).toBeVisible()
+      const renderedText = canvas.getByText(newBodyText, { selector: '.bite-text' })
+      await expect(renderedText).toBeVisible()
     }
-  }
-}
 
-export const GeneralSubtextChange: Story = {
-  args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'General')
-
-    // Find subtext input
+    // Test 5: Subtext Change
     const subtextInput = canvas.queryByLabelText(/subtext|citation|source/i)
     if (subtextInput) {
       const newSubtext = 'Updated Test Data Source Citation'
       await userEvent.clear(subtextInput)
       await userEvent.type(subtextInput, newSubtext)
-
       await new Promise(resolve => setTimeout(resolve, 1000))
-
-      // Verify subtext appears in component
       await expect(canvas.getByText(newSubtext)).toBeVisible()
     }
   }
@@ -180,9 +119,9 @@ export const GeneralSubtextChange: Story = {
 
 /**
  * DATA SECTION TESTS
- * Converted from editor/editor-data.spec.js
+ * Tests all functionality within the Data accordion
  */
-export const DataConfigurationValidation: Story = {
+export const DataSectionTests: Story = {
   args: {
     configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
     isEditor: true
@@ -192,206 +131,110 @@ export const DataConfigurationValidation: Story = {
     await waitForEditor(canvas)
     await openAccordion(canvas, 'Data')
 
-    // Verify data column and function selects exist
+    // Test 1: Configuration Validation
     const dataColumnSelect = canvas.queryByLabelText(/data column/i)
     const dataFunctionSelect = canvas.queryByLabelText(/data function/i)
-
     if (dataColumnSelect) {
       await expect(dataColumnSelect).toBeVisible()
     }
     if (dataFunctionSelect) {
       await expect(dataFunctionSelect).toBeVisible()
     }
-  }
-}
 
-export const DataPrefixChange: Story = {
-  args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Data')
-
-    // Find prefix input
+    // Test 2: Prefix Change
     const prefixInput = canvas.queryByLabelText(/prefix/i)
     if (prefixInput) {
       await userEvent.clear(prefixInput)
       await userEvent.type(prefixInput, '$')
-
       await new Promise(resolve => setTimeout(resolve, 1000))
-
-      // Check that prefix is in input
       await expect(prefixInput).toHaveValue('$')
     }
-  }
-}
 
-export const DataSuffixChange: Story = {
-  args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Data')
-
-    // Find suffix input
+    // Test 3: Suffix Change
     const suffixInput = canvas.queryByLabelText(/suffix/i)
     if (suffixInput) {
       await userEvent.clear(suffixInput)
       await userEvent.type(suffixInput, '%')
-
       await new Promise(resolve => setTimeout(resolve, 1000))
-
-      // Check that suffix is in input
       await expect(suffixInput).toHaveValue('%')
     }
-  }
-}
 
-export const DataRoundingChange: Story = {
-  args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Data')
-
-    // First, capture the initial displayed value
-    const initialValue = canvas.queryByText(/\d+(\.\d+)?/)?.textContent
-
-    // Find rounding input
-    const roundingInput = canvas.queryByLabelText(/round|decimal/i)
+    // Test 4: Rounding Change
+    const roundingInput = canvasElement.querySelector('input[name="dataFormat-null-roundToPlace"]') as HTMLInputElement
     if (roundingInput) {
       // Change from 0 decimal places to 2 decimal places
       await userEvent.clear(roundingInput)
       await userEvent.type(roundingInput, '2')
-
       await new Promise(resolve => setTimeout(resolve, 1500))
+      await expect(roundingInput).toHaveValue(2)
 
-      // Verify rounding value changed in input
-      await expect(roundingInput).toHaveValue('2')
-
-      // Verify the displayed value now shows decimal places
-      // The mean of [1000, 2000, 1100, 2200] for Test State 1 is 1575
-      // With 2 decimal places it should show 1575.00
-      const updatedValue = canvas.queryByText(/1575\.00/)
-      if (updatedValue) {
-        await expect(updatedValue).toBeVisible()
-      } else {
-        // Fallback: just verify some number with .00 is displayed
-        const decimalValue = canvas.queryByText(/\d+\.\d{2}/)
-        if (decimalValue) {
-          await expect(decimalValue).toBeVisible()
-        }
+      // Look for the value with 2 decimal places in SVG text
+      const svgTextElements = canvasElement.querySelectorAll('svg text')
+      const valueElement = Array.from(svgTextElements).find(
+        (el: Element) => el.textContent && /1575\.00/.test(el.textContent)
+      )
+      if (valueElement) {
+        await expect(valueElement).toBeInTheDocument()
       }
 
       // Test changing back to 0 decimal places
       await userEvent.clear(roundingInput)
       await userEvent.type(roundingInput, '0')
-
       await new Promise(resolve => setTimeout(resolve, 1500))
 
-      // Verify it goes back to no decimal places
-      const roundedValue = canvas.queryByText(/^1575$/)
-      if (roundedValue) {
-        await expect(roundedValue).toBeVisible()
+      // Look for the rounded value in SVG text
+      const roundedElements = canvasElement.querySelectorAll('svg text')
+      const roundedElement = Array.from(roundedElements).find(
+        (el: Element) => el.textContent && /^1,?575$/.test(el.textContent)
+      )
+      if (roundedElement) {
+        await expect(roundedElement).toBeInTheDocument()
       }
     }
-  }
-}
 
-export const DataCommasToggle: Story = {
-  args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Data')
-
-    // Find commas checkbox
+    // Test 5: Commas Toggle
     const commasCheckbox = canvas.queryByRole('checkbox', { name: /comma/i })
     if (commasCheckbox) {
       const wasChecked = (commasCheckbox as HTMLInputElement).checked
       await userEvent.click(commasCheckbox)
-
       await new Promise(resolve => setTimeout(resolve, 500))
-
-      // Verify checkbox state changed
       expect((commasCheckbox as HTMLInputElement).checked).toBe(!wasChecked)
     }
-  }
-}
 
-export const DataColumnChange: Story = {
-  args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Data')
-
-    // Find data column select
-    const dataColumnSelect = canvas.queryByLabelText(/data column/i)
-    if (dataColumnSelect) {
-      const options = (dataColumnSelect as HTMLSelectElement).options
+    // Test 6: Data Column Change
+    const dataColumnSelectForChange = canvas.queryByLabelText(/data column/i)
+    if (dataColumnSelectForChange) {
+      const options = (dataColumnSelectForChange as HTMLSelectElement).options
       if (options.length > 2) {
-        // Has more than "Select" and current option
-        const currentValue = (dataColumnSelect as HTMLSelectElement).value
+        const currentValue = (dataColumnSelectForChange as HTMLSelectElement).value
         // Find a different option
         for (let i = 0; i < options.length; i++) {
           if (options[i].value !== currentValue && options[i].value !== '') {
-            await userEvent.selectOptions(dataColumnSelect, options[i].value)
+            await userEvent.selectOptions(dataColumnSelectForChange, options[i].value)
             break
           }
         }
-
         await new Promise(resolve => setTimeout(resolve, 1000))
       }
     }
-  }
-}
 
-export const DataFunctionChange: Story = {
-  args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Data')
-
-    // Find data function select
-    const dataFunctionSelect = canvas.queryByLabelText(/data function/i)
-    if (dataFunctionSelect) {
-      const currentValue = (dataFunctionSelect as HTMLSelectElement).value
+    // Test 7: Data Function Change
+    const dataFunctionSelectForChange = canvas.queryByLabelText(/data function/i)
+    if (dataFunctionSelectForChange) {
+      const currentValue = (dataFunctionSelectForChange as HTMLSelectElement).value
       const targetValue = currentValue === 'Mean (Average)' ? 'Max' : 'Mean (Average)'
-
-      await userEvent.selectOptions(dataFunctionSelect, targetValue)
+      await userEvent.selectOptions(dataFunctionSelectForChange, targetValue)
       await new Promise(resolve => setTimeout(resolve, 1000))
-
-      // Verify function changed
-      await expect(dataFunctionSelect).toHaveValue(targetValue)
+      await expect(dataFunctionSelectForChange).toHaveValue(targetValue)
     }
   }
 }
 
 /**
  * VISUAL SECTION TESTS
- * Converted from editor/editor-visual.spec.js
+ * Tests all functionality within the Visual accordion
  */
-export const VisualThemeChange: Story = {
+export const VisualSectionTests: Story = {
   args: {
     configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
     isEditor: true
@@ -401,7 +244,7 @@ export const VisualThemeChange: Story = {
     await waitForEditor(canvas)
     await openAccordion(canvas, 'Visual')
 
-    // Look for theme color palette buttons
+    // Test 1: Theme Change
     const themeButtons = canvas.queryAllByRole('button')
     const colorButtons = themeButtons.filter(
       btn =>
@@ -409,170 +252,78 @@ export const VisualThemeChange: Story = {
         btn.className?.includes('color') ||
         btn.className?.includes('theme')
     )
-
     if (colorButtons.length > 1) {
-      // Click on a different theme button
       await userEvent.click(colorButtons[1])
       await new Promise(resolve => setTimeout(resolve, 1000))
-
-      // Verify theme button is clickable
       await expect(colorButtons[1]).toBeVisible()
     }
-  }
-}
 
-export const VisualFontSizeChange: Story = {
-  args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Visual')
-
-    // Find bite font size input
-    const fontSizeInput = canvas.queryByLabelText(/bite font size|font size/i)
+    // Test 2: Font Size Change (Bite-specific)
+    const fontSizeInput = canvasElement.querySelector('input[name="biteFontSize"]') as HTMLInputElement
     if (fontSizeInput) {
-      const currentSize = (fontSizeInput as HTMLInputElement).value
-      const newSize = currentSize === '24' ? '36' : '24'
-
+      const currentSize = parseInt(fontSizeInput.value)
+      const newSize = currentSize === 24 ? 36 : 24
       await userEvent.clear(fontSizeInput)
-      await userEvent.type(fontSizeInput, newSize)
-
+      await userEvent.type(fontSizeInput, newSize.toString())
       await new Promise(resolve => setTimeout(resolve, 500))
-
-      // Verify font size changed
       await expect(fontSizeInput).toHaveValue(newSize)
     }
-  }
-}
 
-export const VisualBorderToggle: Story = {
-  args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Visual')
-
-    // Find border checkbox
-    const borderCheckbox = canvas.queryByRole('checkbox', { name: /border/i })
+    // Test 3: Border Toggle
+    const borderCheckbox = canvasElement.querySelector('input[name="border"]') as HTMLInputElement
     if (borderCheckbox) {
-      const wasChecked = (borderCheckbox as HTMLInputElement).checked
+      const wasChecked = borderCheckbox.checked
       await userEvent.click(borderCheckbox)
-
       await new Promise(resolve => setTimeout(resolve, 500))
-
-      // Verify checkbox state changed
-      expect((borderCheckbox as HTMLInputElement).checked).toBe(!wasChecked)
+      expect(borderCheckbox.checked).toBe(!wasChecked)
 
       // Toggle back to test both directions
       await userEvent.click(borderCheckbox)
       await new Promise(resolve => setTimeout(resolve, 500))
-      expect((borderCheckbox as HTMLInputElement).checked).toBe(wasChecked)
+      expect(borderCheckbox.checked).toBe(wasChecked)
     }
-  }
-}
 
-export const VisualAccentToggle: Story = {
-  args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Visual')
-
-    // Find accent checkbox
+    // Test 4: Accent Toggle
     const accentCheckbox = canvas.queryByRole('checkbox', { name: /accent/i })
     if (accentCheckbox) {
       const wasChecked = (accentCheckbox as HTMLInputElement).checked
       await userEvent.click(accentCheckbox)
-
       await new Promise(resolve => setTimeout(resolve, 500))
-
-      // Verify checkbox state changed
       expect((accentCheckbox as HTMLInputElement).checked).toBe(!wasChecked)
     }
-  }
-}
 
-export const VisualBackgroundOptions: Story = {
-  args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Visual')
-
-    // Test background checkboxes
-    const backgroundCheckbox = canvas.queryByRole('checkbox', { name: /background/i })
-    const hideBackgroundCheckbox = canvas.queryByRole('checkbox', { name: /hide background/i })
+    // Test 5: Background Options
+    const backgroundCheckbox = canvasElement.querySelector('input[name="background"]') as HTMLInputElement
+    const hideBackgroundCheckbox = canvasElement.querySelector('input[name="hideBackgroundColor"]') as HTMLInputElement
 
     if (backgroundCheckbox) {
-      const wasChecked = (backgroundCheckbox as HTMLInputElement).checked
+      const wasChecked = backgroundCheckbox.checked
       await userEvent.click(backgroundCheckbox)
       await new Promise(resolve => setTimeout(resolve, 500))
-      expect((backgroundCheckbox as HTMLInputElement).checked).toBe(!wasChecked)
+      expect(backgroundCheckbox.checked).toBe(!wasChecked)
     }
 
     if (hideBackgroundCheckbox) {
-      const wasChecked = (hideBackgroundCheckbox as HTMLInputElement).checked
+      const wasChecked = hideBackgroundCheckbox.checked
       await userEvent.click(hideBackgroundCheckbox)
       await new Promise(resolve => setTimeout(resolve, 500))
-      expect((hideBackgroundCheckbox as HTMLInputElement).checked).toBe(!wasChecked)
+      expect(hideBackgroundCheckbox.checked).toBe(!wasChecked)
     }
-  }
-}
 
-export const VisualOverallFontSize: Story = {
-  args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Visual')
-
-    // Find overall font size select
-    const fontSizeSelect = canvas.queryByLabelText(/overall font size|font size/i)
-    if (fontSizeSelect && fontSizeSelect !== canvas.queryByLabelText(/bite font size/i)) {
-      const currentValue = (fontSizeSelect as HTMLSelectElement).value
+    // Test 6: Overall Font Size
+    const fontSizeSelect = canvasElement.querySelector('select[name="fontSize"]') as HTMLSelectElement
+    if (fontSizeSelect) {
+      const currentValue = fontSizeSelect.value
       const targetValue = currentValue === 'medium' ? 'large' : 'medium'
-
       await userEvent.selectOptions(fontSizeSelect, targetValue)
       await new Promise(resolve => setTimeout(resolve, 500))
-
-      // Verify font size changed
       await expect(fontSizeSelect).toHaveValue(targetValue)
     }
-  }
-}
 
-export const VisualBitePosition: Story = {
-  args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-
-    // Try Visual section first, then General
-    let positionSelect = null
-
-    await openAccordion(canvas, 'Visual')
-    await new Promise(resolve => setTimeout(resolve, 500))
-    positionSelect = canvas.queryByLabelText(/position|bite position/i)
-
+    // Test 7: Bite Position
+    let positionSelect = canvas.queryByLabelText(/position|bite position/i)
     if (!positionSelect) {
+      // Try General section if not found in Visual
       await openAccordion(canvas, 'General')
       await new Promise(resolve => setTimeout(resolve, 500))
       positionSelect = canvas.queryByLabelText(/position|bite position/i)
@@ -581,11 +332,8 @@ export const VisualBitePosition: Story = {
     if (positionSelect) {
       const currentValue = (positionSelect as HTMLSelectElement).value
       const targetValue = currentValue === 'Left' ? 'Right' : 'Left'
-
       await userEvent.selectOptions(positionSelect, targetValue)
       await new Promise(resolve => setTimeout(resolve, 500))
-
-      // Verify position changed
       await expect(positionSelect).toHaveValue(targetValue)
     }
   }
@@ -621,7 +369,7 @@ export const ComprehensiveEditorWorkflow: Story = {
 
     // 3. Configure visual settings
     await openAccordion(canvas, 'Visual')
-    const borderCheckbox = canvas.queryByRole('checkbox', { name: /border/i })
+    const borderCheckbox = canvasElement.querySelector('input[name="border"]') as HTMLInputElement
     if (borderCheckbox) {
       await userEvent.click(borderCheckbox)
     }
