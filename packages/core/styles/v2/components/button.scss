@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import '../utils/variables';
 @import '../themes/index';
 
@@ -110,7 +111,7 @@
     background-color: #44aa41;
 
     &:hover {
-      background-color: lighten(#44aa41, 5%);
+      background-color: color.adjust(#44aa41, $lightness: 5%);
     }
   }
 
@@ -118,7 +119,7 @@
     background-color: #d73636;
 
     &:hover {
-      background-color: darken(#d73636, 5%);
+      background-color: color.adjust(#d73636, $lightness: -5%);
     }
   }
 
@@ -126,7 +127,7 @@
     background-color: #a0a0a0;
 
     &:hover {
-      background-color: darken(#a0a0a0, 5%);
+      background-color: color.adjust(#a0a0a0, $lightness: -5%);
     }
   }
 
