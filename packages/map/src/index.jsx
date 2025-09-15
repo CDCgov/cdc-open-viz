@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client'
 
 import '@cdc/core/styles/cove-main.scss'
 import 'react-tooltip/dist/react-tooltip.css'
-import './coreStyles_map.scss'
 
 import CdcMap from './CdcMap'
 

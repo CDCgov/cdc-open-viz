@@ -1,7 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
-import './coreStyles_chart.scss'
 import '@cdc/core/styles/cove-main.scss'
 import 'react-tooltip/dist/react-tooltip.css'
 
