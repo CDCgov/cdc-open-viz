@@ -129,7 +129,7 @@ const SingleStateMap: React.FC = () => {
   }
   return (
     <ErrorBoundary component='SingleStateMap'>
-      {statesPicked.length && config.general.allowMapZoom && statesPicked.some(sp => sp.fipsCode) && (
+      {!!statesPicked.length && config.general.allowMapZoom && statesPicked.some(sp => sp.fipsCode) && (
         <svg
           viewBox={SVG_VIEWBOX}
           preserveAspectRatio='xMinYMin'
@@ -192,7 +192,7 @@ const SingleStateMap: React.FC = () => {
           </ZoomableGroup>
         </svg>
       )}
-      {statesPicked && !config.general.allowMapZoom && statesPicked.some(sp => sp.fipsCode) && (
+      {!!statesPicked && !config.general.allowMapZoom && statesPicked.some(sp => sp.fipsCode) && (
         <svg
           viewBox={SVG_VIEWBOX}
           preserveAspectRatio='xMinYMin'
@@ -262,7 +262,7 @@ const SingleStateMap: React.FC = () => {
             fontSize={18}
             style={{ fontSize: '28px', height: '18px' }}
           >
-            {config.general.noStateFoundMessage}
+            {config.general.noDataMessage}
           </Text>
         </svg>
       )}
