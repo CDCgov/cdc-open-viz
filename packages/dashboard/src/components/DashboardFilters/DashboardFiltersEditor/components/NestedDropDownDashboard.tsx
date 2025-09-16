@@ -2,7 +2,7 @@ import { DashboardConfig } from '../../../../types/DashboardConfig'
 import { SharedFilter } from '../../../../types/SharedFilter'
 import _ from 'lodash'
 import { SubGrouping } from '@cdc/core/types/VizFilter'
-import { TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import { TextField, Select } from '@cdc/core/components/EditorPanel/Inputs'
 
 type NestedDropDownEditorDashboardProps = {
   config: DashboardConfig
@@ -51,6 +51,7 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
     const selectedOptionDatasetName = selectedOption.selectedOptions[0].dataset.set
     const newColumnName = selectedOption.value
     updateFilterProp('columnName', newColumnName)
+    updateFilterProp('defaultValue', '') // Reset default value when column changes
     populateSubGroupingOptions(selectedOptionDatasetName, newColumnName)
   }
 
@@ -77,7 +78,8 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
     const newSubGrouping: SubGrouping = {
       ...subGrouping,
       columnName: newColumnName,
-      valuesLookup
+      valuesLookup,
+      defaultValue: '' // Reset default value when column changes
     }
 
     updateFilterProp('subGrouping', newSubGrouping)
@@ -137,6 +139,34 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
           })}
         </select>
       </label>
+
+      {/* Default Value for Main Group */}
+      {filter.columnName && filter.values && filter.values.length > 0 && (
+        <Select
+          value={filter.defaultValue}
+          options={filter.values}
+          updateField={(_section, _subSection, _key, value) => updateFilterProp('defaultValue', value)}
+          label={'Group Default Value'}
+          initial={'Select'}
+        />
+      )}
+
+      {/* Default Value for Sub Group */}
+      {subGrouping?.columnName && (filter.defaultValue || filter.active) && subGrouping.valuesLookup && (
+        <Select
+          value={subGrouping.defaultValue}
+          options={(() => {
+            const groupKey = filter.defaultValue || (Array.isArray(filter.active) ? filter.active[0] : filter.active)
+            return subGrouping.valuesLookup[groupKey as string]?.values || []
+          })()}
+          updateField={(_section, _subSection, _key, value) => {
+            const newSubGrouping = { ...subGrouping, defaultValue: value }
+            updateFilterProp('subGrouping', newSubGrouping)
+          }}
+          label={'Sub Group Default Value'}
+          initial={'Select'}
+        />
+      )}
     </div>
   )
 }
