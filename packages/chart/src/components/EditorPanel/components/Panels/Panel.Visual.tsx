@@ -269,6 +269,11 @@ const PanelVisual: FC<PanelProps> = props => {
             <label>
               <span className='edit-label'>Chart Color Palette</span>
             </label>
+            <div className="mb-2">
+              <small className="text-muted">
+                Review color contrasts <a href="https://webaim.org/resources/contrastchecker/" target="_blank" rel="noopener noreferrer">here</a>
+              </small>
+            </div>
             <DeveloperPaletteRollback config={config} updateConfig={updateConfig} />
             {visSupportsReverseColorPalette() && (
               <InputToggle
