@@ -49,7 +49,7 @@ const chartColorPalettesData = {
     'sequential_purple': ['#E2D3DF', '#CDB2C8', '#B78FAF', '#A6739B', '#935586', '#823A73', '#722161', '#5F2359', '#47264F'],
     'sequential_blue': ['#DBE8F7', '#BED5ED', '#99BCE1', '#73A1D5', '#4E88C7', '#1E6BC0', '#0057B7', '#01418D', '#032659'],
     'sequential_green': ['#D5F9F6', '#AEECE7', '#85DED7', '#63D2CA', '#3BBCAF', '#14A594', '#0A937F', '#0F7A68', '#105B4D'],
-    'qualitative_standard': ['#DFE1E2', '#0057B7', '#722161', '#00B1CE', '#D94E5F', '#5A8E3F', '#FFB24D', '#FB7E38', '#032659', '#975722'],
+    'qualitative_standard': ['#0057B7', '#722161', '#00B1CE', '#D94E5F', '#5A8E3F', '#FFB24D', '#FB7E38', '#032659', '#975722'],
 
     // New v2-only palettes (no migration needed)
     'sequential_teal': ['#e5fafc', '#b3e3ed', '#80cddf', '#4db8d1', '#00b1ce', '#03a2bd', '#0690a6', '#0d6e81', '#125261'],
@@ -83,7 +83,7 @@ export const twoColorPaletteData = {
     // Monochrome palettes (monochrome-1,2,3,4) → divergent_blue_purple using indexes [1,7]
     'divergent_blue_purple': ['#014697', '#7C256B'],
 
-    // Warm palettes (monochrome-5, warm-1) → divergent_green_orange using indexes [5,7] 
+    // Warm palettes (monochrome-5, warm-1) → divergent_green_orange using indexes [5,7]
     'divergent_green_orange': ['#EE956C', '#AC4726'],
 
     // Cool palettes (cool-1,2,3,4,5) → divergent_blue_cyan using indexes [1,6]
