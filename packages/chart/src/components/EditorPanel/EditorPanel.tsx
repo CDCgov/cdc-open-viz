@@ -1876,6 +1876,41 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 </AccordionItem>
               )}
             <Panels.BoxPlot name='Measures' />
+            {/* Small Multiples */}
+            {(config.visualizationType === 'Line' || config.visualizationType === 'Bar') && (
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Small Multiples</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <Select
+                    value={config.smallMultiples?.mode || ''}
+                    fieldName='mode'
+                    section='smallMultiples'
+                    label='Tile Mode'
+                    initial='Select Mode'
+                    updateField={updateField}
+                    options={['by-column', 'by-series']}
+                  />
+                  {config.smallMultiples?.mode === 'by-column' && (
+                    <Select
+                      value={config.smallMultiples?.tileColumn || ''}
+                      fieldName='tileColumn'
+                      section='smallMultiples'
+                      label='Tile By Column'
+                      initial='Select Column'
+                      updateField={updateField}
+                      options={getColumns()}
+                    />
+                  )}
+                  {config.smallMultiples?.mode === 'by-series' && (
+                    <p style={{ fontStyle: 'italic', color: '#666', marginTop: '10px' }}>
+                      Each configured data series will become its own tile.
+                    </p>
+                  )}
+                </AccordionItemPanel>
+              </AccordionItem>
+            )}
             {/* Left Value Axis */}
             {visSupportsLeftValueAxis() && (
               <AccordionItem>

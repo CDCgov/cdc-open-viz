@@ -49,6 +49,7 @@ import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
 import HoverLine from './HoverLine/HoverLine'
+import { SmallMultiplesRenderer } from './SmallMultiples'
 
 type LinearChartProps = {
   parentWidth: number
@@ -524,6 +525,19 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const maxWidth = rightSide ? dataXPosition - 10 : parentWidth - (dataXPosition + 6)
     tooltipRef.current.node.style.maxWidth = `${maxWidth}px`
   }, [tooltipOpen, tooltipData])
+
+  // Check if small multiples are enabled - if so, render SmallMultiplesRenderer instead
+  if (config.smallMultiples?.mode) {
+    return (
+      <SmallMultiplesRenderer
+        config={config}
+        data={data}
+        svgRef={svgRef}
+        parentWidth={parentWidth}
+        parentHeight={parentHeight}
+      />
+    )
+  }
 
   // Render Functions
   const generatePairedBarAxis = () => {
