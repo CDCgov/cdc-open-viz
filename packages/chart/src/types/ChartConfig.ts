@@ -194,6 +194,10 @@ export type AllChartsConfig = {
   showLineSeriesLabels: boolean
   showSidebar: boolean
   showTitle: boolean
+  smallMultiples?: {
+    mode?: 'by-column' | 'by-series'
+    tileColumn?: string // Used when mode is 'by-column'
+  }
   sortData: 'ascending' | 'descending'
   stackedAreaChartLineType: string
   suppressedData?: { label: string; icon: string; value: string }[]
