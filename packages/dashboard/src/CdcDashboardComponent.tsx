@@ -60,6 +60,7 @@ import Alert from '@cdc/core/components/Alert'
 import { shouldLoadAllFilters } from './helpers/shouldLoadAllFilters'
 import { subscribe, unsubscribe } from '@cdc/core/helpers/events'
 import DashboardEditors from './components/DashboardEditors'
+import { FILTER_STYLE } from './types/FilterStyles'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -325,7 +326,13 @@ export default function CdcDashboard({
     setAPILoading(true)
     loadAPIFilters(sharedFiltersWithValues, apiFilterDropdowns, loadAllFilters)?.then(newFilters => {
       const allValuesSelected = newFilters.every(filter => {
-        return filter.type === 'datafilter' || filter.active
+        if (filter.type === 'datafilter') return true
+        if (!filter.active) return false
+        // For nested dropdown filters, also check if subGrouping is active
+        if (filter.filterStyle === FILTER_STYLE.nestedDropdown && filter.subGrouping && !filter.subGrouping.active) {
+          return false
+        }
+        return true
       })
       if (allValuesSelected) {
         reloadURLData(newFilters)
