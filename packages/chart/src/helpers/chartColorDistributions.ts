@@ -2,7 +2,7 @@
 // Similar to map distributions but optimized for chart legends
 export const v2ColorDistribution = {
   1: [4], // Middle color for single item
-  2: [0, 4], // First and last for maximum contrast
+  2: [0, 4], // First and middle
   3: [0, 4, 8], // First, middle, last
   4: [0, 2, 6, 8], // Evenly spaced
   5: [0, 2, 4, 6, 8], // Well-distributed
