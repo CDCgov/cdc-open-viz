@@ -103,11 +103,18 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
         <h4 className='tile-title'>{tileTitle}</h4>
       </div>
       <div ref={tileParentRef} className='tile-chart'>
-        <ConfigContext.Provider value={tileContextValues}>
-          <ParentSize key={`${tilesPerRow}-${mode}-${seriesKey || tileValue}`}>
-            {parent => <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />}
-          </ParentSize>
-        </ConfigContext.Provider>
+        <ParentSize key={`${tilesPerRow}-${mode}-${seriesKey || tileValue}`}>
+          {parent => (
+            <ConfigContext.Provider
+              value={{
+                ...tileContextValues,
+                dimensions: [parent.width, parent.height] // Override with tile-specific dimensions
+              }}
+            >
+              <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
+            </ConfigContext.Provider>
+          )}
+        </ParentSize>
       </div>
     </div>
   )
