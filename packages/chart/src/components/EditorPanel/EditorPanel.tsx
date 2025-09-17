@@ -1974,6 +1974,27 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           </Tooltip>
                         }
                       />
+
+                      <CheckBox
+                        value={config.smallMultiples?.consistentYAxis}
+                        section='smallMultiples'
+                        fieldName='consistentYAxis'
+                        label='Consistent Y-Axis Scale'
+                        updateField={updateField}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                Use the same Y-axis scale across all tiles for easier comparison. When unchecked, each
+                                tile will use its own optimal scale.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
                     </>
                   )}
                 </AccordionItemPanel>
