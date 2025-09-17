@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState, useMemo } from 'react'
+import React, { useContext, useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import SmallMultipleTile from './SmallMultipleTile'
 import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
@@ -38,35 +38,45 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
   // Ref for the container to set height dynamically
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Figure out what objects to iterate over based on mode
-  let tileItems: Array<{
-    key: string | number
-    mode: 'by-series' | 'by-column'
-    seriesKey?: string
-    tileValue?: any
-    tileColumn?: string
-  }> = []
+  // Figure out what objects to iterate over based on mode - memoized to prevent recalculation
+  const tileItems = useMemo<
+    Array<{
+      key: string | number
+      mode: 'by-series' | 'by-column'
+      seriesKey?: string
+      tileValue?: any
+      tileColumn?: string
+    }>
+  >(() => {
+    let items: Array<{
+      key: string | number
+      mode: 'by-series' | 'by-column'
+      seriesKey?: string
+      tileValue?: any
+      tileColumn?: string
+    }> = []
 
-  if (mode === 'by-series') {
-    tileItems = config.series.map(series => ({
-      key: series.dataKey,
-      mode: 'by-series' as const,
-      seriesKey: series.dataKey
-    }))
-  } else if (mode === 'by-column') {
-    const uniqueValues = Array.from(new Set(data.map(row => row[tileColumn])))
-      .filter(val => val != null)
-      .sort()
-    tileItems = uniqueValues.map(value => ({
-      key: value,
-      mode: 'by-column' as const,
-      tileValue: value,
-      tileColumn: tileColumn
-    }))
-  }
+    if (mode === 'by-series') {
+      items = config.series.map(series => ({
+        key: series.dataKey,
+        mode: 'by-series' as const,
+        seriesKey: series.dataKey
+      }))
+    } else if (mode === 'by-column') {
+      const uniqueValues = Array.from(new Set(data.map(row => row[tileColumn])))
+        .filter(val => val != null)
+        .sort()
+      items = uniqueValues.map(value => ({
+        key: value,
+        mode: 'by-column' as const,
+        tileValue: value,
+        tileColumn: tileColumn
+      }))
+    }
 
-  // Apply tile ordering based on user preference
-  tileItems = applyTileOrder(tileItems, config.smallMultiples?.tileOrderType || 'asc', config.smallMultiples?.tileOrder)
+    // Apply tile ordering based on user preference
+    return applyTileOrder(items, config.smallMultiples?.tileOrderType || 'asc', config.smallMultiples?.tileOrder)
+  }, [mode, config.series, data, tileColumn, config.smallMultiples?.tileOrderType, config.smallMultiples?.tileOrder])
 
   // Calculate the grid styling based on tiles per row
   const gridGap = isMobile ? '1rem' : '2rem'
@@ -115,12 +125,12 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
     return { min, max }
   }, [config.smallMultiples?.consistentYAxis, min, max, combinedDataForYAxis.data.length])
 
-  const numberOfRows = Math.ceil(tileItems.length / tilesPerRow)
+  const numberOfRows = useMemo(() => Math.ceil(tileItems.length / tilesPerRow), [tileItems.length, tilesPerRow])
 
   // Handle tile height changes from ResizeObserver
-  const handleTileHeightChange = (tileKey: string, height: number) => {
+  const handleTileHeightChange = useCallback((tileKey: string, height: number) => {
     setTileHeights(prev => ({ ...prev, [tileKey]: height }))
-  }
+  }, [])
 
   // Calculate container height from measured tile heights
   useEffect(() => {
