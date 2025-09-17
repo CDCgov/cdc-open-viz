@@ -13,23 +13,40 @@ type RowProps = {
   style?: object
   preliminaryData?: PreliminaryDataItem[]
   rightAlignedCols: object
+  rowColor?: {
+    backgroundColor: string
+    textColor: string
+  }
 }
 
 const Row: FC<RowProps> = props => {
-  const { childRow, rowKey, wrapColumns, cellMinWidth = 0, isTotal, preliminaryData, rightAlignedCols } = props
+  const { childRow, rowKey, wrapColumns, cellMinWidth = 0, isTotal, preliminaryData, rightAlignedCols, rowColor } = props
   const whiteSpace = wrapColumns ? 'unset' : 'nowrap'
   const minWidth = cellMinWidth + 'px'
   const isHtmlString = (str: any): str is string => typeof str === 'string' && /<\/?[a-z][\s\S]*>/i.test(str)
   const isReactNode = (val: any): boolean => React.isValidElement(val) || typeof val === 'object'
 
+  // Apply row colors if provided using CSS custom properties
+  const rowStyle = rowColor
+    ? {
+        '--row-bg-color': rowColor.backgroundColor,
+        '--row-text-color': rowColor.textColor
+      } as React.CSSProperties
+    : {}
+
   return (
-    <tr>
+    <tr style={rowStyle} className={rowColor ? 'row-colored' : ''}>
       {childRow.map((child, i) => {
         const style =
           (preliminaryData?.some(
             pd => pd.type === 'suppression' && child === pd.iconCode && pd.displayGray && pd.displayTable
           ) && { color: '#777772' }) ||
           {}
+
+        // Override cell color with row text color if row coloring is applied
+        if (rowColor && !style.color) {
+          style.color = rowColor.textColor
+        }
 
         const textAlign = rightAlignedCols && rightAlignedCols[i] ? 'right' : ''
         // handle Parsing

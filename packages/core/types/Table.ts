@@ -3,6 +3,17 @@ export type Pivot = {
   valueColumns: string[]
 }
 
+export type RowColorMode = 'sequential' | 'categorical' | 'custom'
+
+export type RowColorConfig = {
+  enabled: boolean
+  colorColumn?: string
+  mode?: RowColorMode
+  palette?: string
+  customColors?: Record<string, string>
+  customRange?: { min: number; max: number }
+}
+
 export type Table = {
   caption?: string
   cellMinWidth?: number
@@ -21,6 +32,7 @@ export type Table = {
   label?: string
   limitHeight?: boolean
   pivot?: Pivot
+  rowColors?: RowColorConfig
   show?: boolean
   sharedFilterColumns?: string[] // added at runtime by Dashboard
   showBottomCollapse?: boolean // if true, the table will have a button to collapse at bottom of the expanded table

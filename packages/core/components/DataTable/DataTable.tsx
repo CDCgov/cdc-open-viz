@@ -25,6 +25,7 @@ import isRightAlignedTableValue from '@cdc/core/helpers/isRightAlignedTableValue
 import './data-table.css'
 import _ from 'lodash'
 import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
+import { getRowColors } from './helpers/getRowColors'
 
 export type DataTableProps = {
   colorScale?: Function
@@ -57,6 +58,7 @@ export type DataTableProps = {
 
 const DataTable = (props: DataTableProps) => {
   const {
+    colorScale,
     columns,
     config,
     dataConfig,
@@ -275,6 +277,9 @@ const DataTable = (props: DataTableProps) => {
       return classes
     }
 
+    // Create sorted runtime data to match the row order for color calculations
+    const sortedRuntimeData = rows.map(rowKey => runtimeData[rowKey]).filter(Boolean)
+
     const childrenMatrix =
       config.type === 'map'
         ? mapCellMatrix({ ...props, rows, wrapColumns, runtimeData, viewport })
@@ -283,7 +288,7 @@ const DataTable = (props: DataTableProps) => {
     const useBottomExpandCollapse = config.table.showBottomCollapse && expanded && Array.isArray(childrenMatrix)
 
     // If every value in a column is a number, record the column index so the header and cells can be right-aligned
-    const rightAlignedCols = childrenMatrix.length
+    const rightAlignedCols = Array.isArray(childrenMatrix) && childrenMatrix.length
       ? Object.fromEntries(
           Object.keys(childrenMatrix[0])
             .filter(
@@ -292,6 +297,30 @@ const DataTable = (props: DataTableProps) => {
             .map(x => [x, true])
         )
       : {}
+
+    // Calculate row colors if row coloring is enabled
+    const getRowColor = useMemo(() => {
+      return config.table?.rowColors?.enabled
+        ? getRowColors(
+            runtimeData,
+            config.table.rowColors,
+            'v2',
+            colorScale,
+            config.general?.palette?.name, // Use general palette if no table-specific palette
+            config.table.rowColors?.customRange
+          )
+        : () => undefined
+    }, [
+      config.table?.rowColors?.enabled,
+      config.table?.rowColors?.colorColumn,
+      config.table?.rowColors?.mode,
+      config.table?.rowColors?.palette,
+      config.table?.rowColors?.customRange,
+      config.general?.palette?.name, // Add this so it updates when palette changes
+      runtimeData,
+      colorScale
+    ])
+
 
     const showCollapseButton = config.table.collapsible !== false && useBottomExpandCollapse
     const TableMediaControls = ({ belowTable }) => {
@@ -331,6 +360,7 @@ const DataTable = (props: DataTableProps) => {
           )}
           <div className='table-container' style={limitHeight}>
             <Table
+              key={`table-${config.general?.palette?.name}-${config.table?.rowColors?.palette}`}
               preliminaryData={config.preliminaryData}
               viewport={viewport}
               wrapColumns={wrapColumns}
@@ -374,6 +404,9 @@ const DataTable = (props: DataTableProps) => {
                 cellMinWidth: 100
               }}
               rightAlignedCols={rightAlignedCols}
+              getRowColor={getRowColor}
+              colorColumn={config.table?.rowColors?.colorColumn}
+              runtimeData={sortedRuntimeData}
             />
 
             {/* REGION Data Table */}

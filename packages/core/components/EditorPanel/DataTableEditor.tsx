@@ -7,6 +7,7 @@ import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import { Visualization } from '../../types/Visualization'
 import _ from 'lodash'
 import { Column } from '../../types/Column'
+import { chartColorPalettes } from '../../data/chartColorPalettes'
 
 interface DataTableProps {
   config: Partial<Visualization>
@@ -25,6 +26,28 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
       .filter(([key, dataTable]) => !dataTable)
       .map(([key]) => key)
   }, [config.columns])
+
+  // Helper function to update rowColors with proper state management
+  const updateRowColorsField = (_section: string, _subsection: string, fieldName: string, value: any) => {
+    // Start with existing rowColors or create a new object
+    const currentRowColors = config.table.rowColors || {} as any
+    const newRowColors = {
+      enabled: currentRowColors.enabled || false,
+      colorColumn: currentRowColors.colorColumn,
+      mode: currentRowColors.mode || 'sequential',
+      palette: currentRowColors.palette || 'sequential_blue',
+      customColors: currentRowColors.customColors,
+      ...currentRowColors, // Preserve any other existing properties
+      [fieldName]: value // Update the specific field
+    }
+
+    // Auto-enable when selecting a color column
+    if (fieldName === 'colorColumn' && value !== '') {
+      newRowColors.enabled = true
+    }
+
+    updateField('table', null, 'rowColors', newRowColors as any)
+  }
 
   const groupPivotColumns = useMemo(() => {
     const columns: string[] = config.data.flatMap(Object.keys)
@@ -322,6 +345,76 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           }
         />
       )}
+
+      {/* ROW COLORING SECTION */}
+      <CheckBox
+        value={config.table.rowColors?.enabled || false}
+        fieldName='enabled'
+        label='Enable Row Coloring'
+        section='table'
+        subsection='rowColors'
+        updateField={updateRowColorsField}
+        tooltip={
+          <Tooltip style={{ textTransform: 'none' }}>
+            <Tooltip.Target>
+              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+            </Tooltip.Target>
+            <Tooltip.Content>
+              <p>Apply background colors to table rows based on data values</p>
+            </Tooltip.Content>
+          </Tooltip>
+        }
+      />
+
+      {config.table.rowColors?.enabled && (
+        <>
+          <Select
+            value={config.table.rowColors?.colorColumn || ''}
+            fieldName='colorColumn'
+            section='table'
+            subsection='rowColors'
+            label='Color Column'
+            updateField={updateRowColorsField}
+            initial='-Select Column-'
+            options={dataColumns}
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>Select the data column to base row colors on</p>
+                </Tooltip.Content>
+              </Tooltip>
+            }
+          />
+
+          <Select
+            value={config.table.rowColors?.mode || 'sequential'}
+            fieldName='mode'
+            section='table'
+            subsection='rowColors'
+            label='Color Mode'
+            updateField={updateRowColorsField}
+            options={[
+              { label: 'Sequential (Numeric)', value: 'sequential' },
+              { label: 'Categorical (Discrete)', value: 'categorical' }
+            ]}
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>Sequential: Colors scale with numeric values. Categorical: Different color per unique value. Custom: Manual color mapping.</p>
+                </Tooltip.Content>
+              </Tooltip>
+            }
+          />
+
+        </>
+      )}
+
       <Select
         label='Pivot Column'
         tooltip={
