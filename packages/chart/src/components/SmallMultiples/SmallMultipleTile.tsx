@@ -11,6 +11,7 @@ interface SmallMultipleTileProps {
   seriesKey?: string
   tileValue?: any
   tileColumn?: string
+  customTitle?: string
   svgRef?: React.RefObject<SVGAElement>
   parentWidth?: number
   parentHeight?: number
@@ -29,6 +30,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   seriesKey,
   tileValue,
   tileColumn,
+  customTitle,
   svgRef,
   parentWidth,
   parentHeight,
@@ -59,7 +61,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
       smallMultiples: undefined // Remove smallMultiples to prevent infinite loop
     }
     tileData = data // All data, but only one series will render
-    tileTitle = seriesKey // "COVID-19", "RSV", etc.
+    tileTitle = customTitle || seriesKey
   } else if (mode === 'by-column') {
     // BY-COLUMN: All series, filtered data by tile column value
     tileConfig = {
@@ -68,7 +70,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
       smallMultiples: undefined // Remove smallMultiples to prevent infinite loop
     }
     tileData = data.filter(row => row[tileColumn] === tileValue) // Filtered data
-    tileTitle = tileValue // "State A", "Region 1", etc.
+    tileTitle = customTitle || tileValue
   }
 
   // Conditionally hide axis labels and tick marks based on showAxisLabels prop

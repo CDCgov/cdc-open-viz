@@ -147,3 +147,11 @@ export const getTileKeys = (config, data) => {
   }
   return []
 }
+
+/**
+ * Get the display title for a tile key
+ * Returns custom title if set, otherwise falls back to the original key
+ */
+export const getTileTitle = (tileKey, config) => {
+  return config.smallMultiples?.tileTitles?.[tileKey] || tileKey
+}
