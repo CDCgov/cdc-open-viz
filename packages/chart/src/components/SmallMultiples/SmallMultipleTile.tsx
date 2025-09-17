@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useRef, useEffect } from 'react'
 import LinearChart from '../LinearChart'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import ConfigContext from '../../ConfigContext'
@@ -7,24 +7,30 @@ interface SmallMultipleTileProps {
   mode: 'by-series' | 'by-column'
   config: any
   data: any[]
+  tileKey: string
   seriesKey?: string
   tileValue?: any
   tileColumn?: string
-  svgRef?: React.RefObject<SVGElement>
+  svgRef?: React.RefObject<SVGAElement>
   parentWidth?: number
   parentHeight?: number
+  tilesPerRow?: number
+  onHeightChange?: (tileKey: string, height: number) => void
 }
 
 const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   mode,
   config,
   data,
+  tileKey,
   seriesKey,
   tileValue,
   tileColumn,
   svgRef,
   parentWidth,
-  parentHeight
+  parentHeight,
+  tilesPerRow,
+  onHeightChange
 }) => {
   let tileConfig = { ...config }
   let tileData = data
@@ -62,21 +68,43 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   // Get the original context values to merge with our filtered config
   const originalContextValues = useContext(ConfigContext)
 
+  // Create a tile-specific parentRef for this tile's chart
+  const tileParentRef = useRef<HTMLDivElement>(null)
+
+  // Create a ref for the entire tile (including header) for height measurement
+  const fullTileRef = useRef<HTMLDivElement>(null)
+
   // Create new context values with our filtered config
   const tileContextValues = {
     ...originalContextValues,
     config: tileConfig,
-    transformedData: tileData
+    transformedData: tileData,
+    parentRef: tileParentRef // Override with tile-specific parentRef
   }
 
+  // Use ResizeObserver to capture actual full tile height changes (including header)
+  useEffect(() => {
+    if (!fullTileRef.current || !onHeightChange) return
+
+    const resizeObserver = new ResizeObserver(entries => {
+      entries.forEach(entry => {
+        const { height } = entry.contentRect
+        onHeightChange(tileKey, height)
+      })
+    })
+
+    resizeObserver.observe(fullTileRef.current)
+    return () => resizeObserver.disconnect()
+  }, [tileKey, onHeightChange])
+
   return (
-    <div className='small-multiple-tile'>
+    <div ref={fullTileRef} className='small-multiple-tile'>
       <div className='tile-header'>
         <h4 className='tile-title'>{tileTitle}</h4>
       </div>
-      <div className='tile-chart'>
+      <div ref={tileParentRef} className='tile-chart'>
         <ConfigContext.Provider value={tileContextValues}>
-          <ParentSize>
+          <ParentSize key={`${tilesPerRow}-${mode}-${seriesKey || tileValue}`}>
             {parent => <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />}
           </ParentSize>
         </ConfigContext.Provider>

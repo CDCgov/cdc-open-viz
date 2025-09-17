@@ -1905,6 +1905,53 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       Each configured data series will become its own tile.
                     </p>
                   )}
+
+                  {config.smallMultiples?.mode && (
+                    <>
+                      <div className='two-col-inputs'>
+                        <TextField
+                          type='number'
+                          value={config.smallMultiples?.tilesPerRowDesktop}
+                          section='smallMultiples'
+                          fieldName='tilesPerRowDesktop'
+                          label='Desktop Tiles Per Row'
+                          updateField={updateField}
+                          min={1}
+                          max={6}
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>Number of tiles to display per row on desktop screens.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                        />
+                        <TextField
+                          type='number'
+                          value={config.smallMultiples?.tilesPerRowMobile}
+                          section='smallMultiples'
+                          fieldName='tilesPerRowMobile'
+                          label='Mobile Tiles Per Row'
+                          updateField={updateField}
+                          min={1}
+                          max={3}
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>Number of tiles to display per row on mobile screens.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                        />
+                      </div>
+                    </>
+                  )}
                 </AccordionItemPanel>
               </AccordionItem>
             )}

@@ -197,6 +197,8 @@ export type AllChartsConfig = {
   smallMultiples?: {
     mode?: 'by-column' | 'by-series'
     tileColumn?: string // Used when mode is 'by-column'
+    tilesPerRowDesktop?: number // Number of tiles per row on desktop
+    tilesPerRowMobile?: number // Number of tiles per row on mobile
   }
   sortData: 'ascending' | 'descending'
   stackedAreaChartLineType: string
