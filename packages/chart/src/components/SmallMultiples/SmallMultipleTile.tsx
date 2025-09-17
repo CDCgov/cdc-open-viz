@@ -15,6 +15,7 @@ interface SmallMultipleTileProps {
   parentWidth?: number
   parentHeight?: number
   tilesPerRow?: number
+  showAxisLabels?: boolean
   onHeightChange?: (tileKey: string, height: number) => void
 }
 
@@ -30,6 +31,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   parentWidth,
   parentHeight,
   tilesPerRow,
+  showAxisLabels,
   onHeightChange
 }) => {
   let tileConfig = { ...config }
@@ -63,6 +65,37 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
     }
     tileData = data.filter(row => row[tileColumn] === tileValue) // Filtered data
     tileTitle = tileValue // "State A", "Region 1", etc.
+  }
+
+  // Conditionally hide axis labels and tick marks based on showAxisLabels prop
+  if (!showAxisLabels) {
+    tileConfig = {
+      ...tileConfig,
+      xAxis: {
+        ...tileConfig.xAxis,
+        hideLabel: true,
+        hideTicks: true
+      },
+      yAxis: {
+        ...tileConfig.yAxis,
+        hideLabel: true,
+        hideTicks: true
+      },
+      // Also update runtime properties since LinearChart checks runtime.yAxis.hideTicks
+      runtime: {
+        ...tileConfig.runtime,
+        xAxis: {
+          ...tileConfig.runtime?.xAxis,
+          hideLabel: true,
+          hideTicks: true
+        },
+        yAxis: {
+          ...tileConfig.runtime?.yAxis,
+          hideLabel: true,
+          hideTicks: true
+        }
+      }
+    }
   }
 
   // Get the original context values to merge with our filtered config

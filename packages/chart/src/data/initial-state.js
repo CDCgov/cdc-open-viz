@@ -202,7 +202,8 @@ const createInitialState = () => {
       mode: '',
       tileColumn: '',
       tilesPerRowDesktop: 3,
-      tilesPerRowMobile: 2
+      tilesPerRowMobile: 2,
+      showAllAxisLabels: true
     },
     exclusions: {
       active: false,

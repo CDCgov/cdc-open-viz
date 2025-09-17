@@ -96,23 +96,31 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
   return (
     <div ref={containerRef} className='small-multiples-container'>
       <div className='small-multiples-grid' style={gridStyle}>
-        {tileItems.map(item => (
-          <SmallMultipleTile
-            key={item.key}
-            tileKey={String(item.key)}
-            mode={item.mode}
-            seriesKey={item.seriesKey}
-            tileValue={item.tileValue}
-            tileColumn={item.tileColumn}
-            config={config}
-            data={data}
-            svgRef={svgRef}
-            parentWidth={parentWidth}
-            parentHeight={parentHeight}
-            tilesPerRow={tilesPerRow}
-            onHeightChange={handleTileHeightChange}
-          />
-        ))}
+        {tileItems.map((item, index) => {
+          // Determine if this tile is the first in its row
+          const isFirstInRow = index % tilesPerRow === 0
+          // Determine if axis labels should be shown on this tile
+          const showAxisLabels = config.smallMultiples?.showAllAxisLabels || isFirstInRow
+
+          return (
+            <SmallMultipleTile
+              key={item.key}
+              tileKey={String(item.key)}
+              mode={item.mode}
+              seriesKey={item.seriesKey}
+              tileValue={item.tileValue}
+              tileColumn={item.tileColumn}
+              config={config}
+              data={data}
+              svgRef={svgRef}
+              parentWidth={parentWidth}
+              parentHeight={parentHeight}
+              tilesPerRow={tilesPerRow}
+              showAxisLabels={showAxisLabels}
+              onHeightChange={handleTileHeightChange}
+            />
+          )
+        })}
       </div>
     </div>
   )
