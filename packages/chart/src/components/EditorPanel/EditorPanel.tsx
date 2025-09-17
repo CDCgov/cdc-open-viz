@@ -2116,6 +2116,71 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           )
                         })()}
                       </fieldset>
+
+                      {/* Tile Titles */}
+                      <fieldset className='edit-block'>
+                        <legend>
+                          <label>Tile Titles</label>
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                Customize the titles displayed above each tile. Leave blank to use the original values.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </legend>
+
+                        {(() => {
+                          const availableTiles = getTileKeys(config, data)
+                          if (availableTiles.length === 0) return null
+
+                          const handleTitleChange = (tileKey, customTitle) => {
+                            const newTitles = { ...config.smallMultiples?.tileTitles }
+                            if (customTitle.trim() === '' || customTitle === tileKey) {
+                              delete newTitles[tileKey] // Remove entry if empty or same as key
+                            } else {
+                              newTitles[tileKey] = customTitle
+                            }
+
+                            updateConfig({
+                              ...config,
+                              smallMultiples: {
+                                ...config.smallMultiples,
+                                tileTitles: newTitles
+                              }
+                            })
+                          }
+
+                          return (
+                            <div className='tile-titles-editor'>
+                              {availableTiles.map(tileKey => {
+                                const customTitle = config.smallMultiples?.tileTitles?.[tileKey] || ''
+                                return (
+                                  <div
+                                    key={tileKey}
+                                    className='tile-title-row'
+                                    style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}
+                                  >
+                                    <label style={{ minWidth: '100px', marginRight: '1rem', fontWeight: 'normal' }}>
+                                      {tileKey}:
+                                    </label>
+                                    <input
+                                      type='text'
+                                      value={customTitle}
+                                      placeholder={tileKey}
+                                      onChange={event => handleTitleChange(tileKey, event.target.value)}
+                                      style={{ flex: 1 }}
+                                    />
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          )
+                        })()}
+                      </fieldset>
                     </>
                   )}
                 </AccordionItemPanel>

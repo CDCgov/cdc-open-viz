@@ -206,7 +206,8 @@ const createInitialState = () => {
       showAllAxisLabels: true,
       consistentYAxis: true,
       tileOrder: [],
-      tileOrderType: 'asc'
+      tileOrderType: 'asc',
+      tileTitles: {}
     },
     exclusions: {
       active: false,
