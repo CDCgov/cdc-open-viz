@@ -203,7 +203,8 @@ const createInitialState = () => {
       tileColumn: '',
       tilesPerRowDesktop: 3,
       tilesPerRowMobile: 2,
-      showAllAxisLabels: true
+      showAllAxisLabels: true,
+      consistentYAxis: true
     },
     exclusions: {
       active: false,
