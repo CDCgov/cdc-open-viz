@@ -199,6 +199,7 @@ export type AllChartsConfig = {
     tileColumn?: string // Used when mode is 'by-column'
     tilesPerRowDesktop?: number // Number of tiles per row on desktop
     tilesPerRowMobile?: number // Number of tiles per row on mobile
+    showAllAxisLabels?: boolean // Whether to show axis labels on all tiles (true) or just first in each row (false)
   }
   sortData: 'ascending' | 'descending'
   stackedAreaChartLineType: string
