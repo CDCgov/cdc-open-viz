@@ -204,7 +204,9 @@ const createInitialState = () => {
       tilesPerRowDesktop: 3,
       tilesPerRowMobile: 2,
       showAllAxisLabels: true,
-      consistentYAxis: true
+      consistentYAxis: true,
+      tileOrder: [],
+      tileOrderType: 'asc'
     },
     exclusions: {
       active: false,

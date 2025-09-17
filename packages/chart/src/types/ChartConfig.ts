@@ -201,6 +201,8 @@ export type AllChartsConfig = {
     tilesPerRowMobile?: number // Number of tiles per row on mobile
     showAllAxisLabels?: boolean // Whether to show axis labels on all tiles (true) or just first in each row (false)
     consistentYAxis?: boolean // Whether to use consistent Y-axis scaling across all tiles (true) or let each tile calculate its own (false)
+    tileOrder?: string[] // Custom order of tiles (series keys for by-series mode, unique values for by-column mode) - used when tileOrderType is 'custom'
+    tileOrderType?: 'asc' | 'desc' | 'custom' // Type of tile ordering: ascending alphanumeric, descending alphanumeric, or custom drag-drop
   }
   sortData: 'ascending' | 'descending'
   stackedAreaChartLineType: string

@@ -78,3 +78,72 @@ export const createCombinedDataForYAxis = (config, data, tileItems) => {
 
   return { data: allTileData, config: combinedConfig }
 }
+
+/**
+ * Apply tile ordering to tile items array
+ * Sorts tiles according to the user's order preference (ascending, descending, or custom)
+ */
+export const applyTileOrder = (tileItems, orderType, customOrder) => {
+  if (!orderType) {
+    return tileItems
+  }
+
+  const getTileKey = item => (item.mode === 'by-series' ? item.seriesKey : item.tileValue)
+
+  switch (orderType) {
+    case 'asc':
+      return [...tileItems].sort((a, b) => {
+        const keyA = String(getTileKey(a)).toLowerCase()
+        const keyB = String(getTileKey(b)).toLowerCase()
+        return keyA.localeCompare(keyB)
+      })
+
+    case 'desc':
+      return [...tileItems].sort((a, b) => {
+        const keyA = String(getTileKey(a)).toLowerCase()
+        const keyB = String(getTileKey(b)).toLowerCase()
+        return keyB.localeCompare(keyA)
+      })
+
+    case 'custom':
+      if (!customOrder || customOrder.length === 0) {
+        return tileItems
+      }
+
+      // Sort tiles based on custom order, with unordered items at the end
+      return [...tileItems].sort((a, b) => {
+        const keyA = getTileKey(a)
+        const keyB = getTileKey(b)
+
+        const orderA = customOrder.indexOf(keyA)
+        const orderB = customOrder.indexOf(keyB)
+
+        // Items not in customOrder go to the end
+        const finalOrderA = orderA === -1 ? 999999 : orderA
+        const finalOrderB = orderB === -1 ? 999999 : orderB
+
+        return finalOrderA - finalOrderB
+      })
+
+    default:
+      return tileItems
+  }
+}
+
+/**
+ * Get the available tile keys that can be reordered
+ * Returns series keys for by-series mode, unique column values for by-column mode
+ */
+export const getTileKeys = (config, data) => {
+  if (config.smallMultiples?.mode === 'by-series') {
+    return config.series.map(series => series.dataKey)
+  } else if (config.smallMultiples?.mode === 'by-column') {
+    const tileColumn = config.smallMultiples.tileColumn
+    if (!tileColumn) return []
+
+    return Array.from(new Set(data.map(row => row[tileColumn])))
+      .filter(val => val != null)
+      .sort()
+  }
+  return []
+}

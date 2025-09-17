@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, memo, useContext } from 'react'
-import { DragDropContext, Droppable } from '@hello-pangea/dnd'
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import chroma from 'chroma-js'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import {
@@ -45,6 +45,7 @@ import '@cdc/core/components/EditorPanel/EditorPanel.styles.css'
 import './editor-panel.scss'
 import { Anchor } from '@cdc/core/types/Axis'
 import EditorPanelContext from './EditorPanelContext'
+import { getTileKeys } from '../../helpers/smallMultiplesHelpers'
 import _ from 'lodash'
 import { adjustedSymbols as symbolCodes } from '@cdc/core/helpers/footnoteSymbols'
 import { updateFieldRankByValue } from './helpers/updateFieldRankByValue'
@@ -1995,6 +1996,129 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           </Tooltip>
                         }
                       />
+
+                      {/* Tile Ordering */}
+                      <fieldset className='edit-block'>
+                        <legend>
+                          <label>Tile Order</label>
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Choose how to order tiles in your small multiples grid.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </legend>
+
+                        {(() => {
+                          const availableTiles = getTileKeys(config, data)
+                          if (availableTiles.length === 0) return null
+
+                          const tileOrderOptions = [
+                            {
+                              label: 'Ascending Alphanumeric',
+                              value: 'asc'
+                            },
+                            {
+                              label: 'Descending Alphanumeric',
+                              value: 'desc'
+                            },
+                            {
+                              label: 'Custom',
+                              value: 'custom'
+                            }
+                          ]
+
+                          const currentOrderType = config.smallMultiples?.tileOrderType || 'asc'
+
+                          const handleOrderTypeChange = orderType => {
+                            const newConfig = {
+                              ...config,
+                              smallMultiples: {
+                                ...config.smallMultiples,
+                                tileOrderType: orderType
+                              }
+                            }
+
+                            // If switching to custom, initialize with current tile order
+                            if (orderType === 'custom' && !config.smallMultiples?.tileOrder?.length) {
+                              newConfig.smallMultiples.tileOrder = [...availableTiles]
+                            }
+
+                            updateConfig(newConfig)
+                          }
+
+                          const handleCustomTileOrderChange = (sourceIndex, destinationIndex) => {
+                            if (destinationIndex === null) return
+
+                            const currentOrder = config.smallMultiples?.tileOrder || [...availableTiles]
+                            const newOrder = [...currentOrder]
+                            const [removed] = newOrder.splice(sourceIndex, 1)
+                            newOrder.splice(destinationIndex, 0, removed)
+
+                            updateConfig({
+                              ...config,
+                              smallMultiples: {
+                                ...config.smallMultiples,
+                                tileOrder: newOrder,
+                                tileOrderType: 'custom'
+                              }
+                            })
+                          }
+
+                          return (
+                            <>
+                              <Select
+                                value={currentOrderType}
+                                options={tileOrderOptions}
+                                label='Order Type'
+                                updateField={(_section, _subsection, _fieldName, value) => {
+                                  handleOrderTypeChange(value)
+                                }}
+                              />
+
+                              {currentOrderType === 'custom' && (
+                                <DragDropContext
+                                  onDragEnd={({ source, destination }) =>
+                                    handleCustomTileOrderChange(source.index, destination?.index)
+                                  }
+                                >
+                                  <Droppable droppableId='tile_order'>
+                                    {provided => (
+                                      <ul
+                                        {...provided.droppableProps}
+                                        className='sort-list'
+                                        ref={provided.innerRef}
+                                        style={{ marginTop: '1em' }}
+                                      >
+                                        {(config.smallMultiples?.tileOrder || availableTiles).map((tileKey, index) => (
+                                          <Draggable key={tileKey} draggableId={`tile-${tileKey}`} index={index}>
+                                            {(provided, snapshot) => (
+                                              <li>
+                                                <div
+                                                  className={snapshot.isDragging ? 'currently-dragging' : ''}
+                                                  style={provided.draggableProps.style}
+                                                  ref={provided.innerRef}
+                                                  {...provided.draggableProps}
+                                                  {...provided.dragHandleProps}
+                                                >
+                                                  {tileKey}
+                                                </div>
+                                              </li>
+                                            )}
+                                          </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                      </ul>
+                                    )}
+                                  </Droppable>
+                                </DragDropContext>
+                              )}
+                            </>
+                          )
+                        })()}
+                      </fieldset>
                     </>
                   )}
                 </AccordionItemPanel>
