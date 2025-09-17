@@ -2,6 +2,7 @@ import React, { useContext, useRef, useEffect } from 'react'
 import LinearChart from '../LinearChart'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import ConfigContext from '../../ConfigContext'
+import { ColorScale } from '../../types/ChartContext'
 
 interface SmallMultipleTileProps {
   mode: 'by-series' | 'by-column'
@@ -12,6 +13,7 @@ interface SmallMultipleTileProps {
   tileValue?: any
   tileColumn?: string
   customTitle?: string
+  customColorScale?: ColorScale
   svgRef?: React.RefObject<SVGAElement>
   parentWidth?: number
   parentHeight?: number
@@ -31,6 +33,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   tileValue,
   tileColumn,
   customTitle,
+  customColorScale,
   svgRef,
   parentWidth,
   parentHeight,
@@ -139,7 +142,8 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
     ...originalContextValues,
     config: tileConfig,
     transformedData: tileData,
-    parentRef: tileParentRef // Override with tile-specific parentRef
+    parentRef: tileParentRef, // Override with tile-specific parentRef
+    ...(customColorScale && { colorScale: customColorScale }) // Override colorScale if provided
   }
 
   // Use ResizeObserver to capture actual full tile height changes (including header)

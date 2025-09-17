@@ -8,7 +8,8 @@ import {
   getTileConfig,
   createCombinedDataForYAxis,
   applyTileOrder,
-  getTileTitle
+  getTileTitle,
+  createTileColorScale
 } from '../../helpers/smallMultiplesHelpers'
 import './SmallMultiples.scss'
 
@@ -27,7 +28,7 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
   parentWidth,
   parentHeight
 }) => {
-  const { currentViewport } = useContext(ConfigContext)
+  const { currentViewport, colorScale } = useContext(ConfigContext)
   const { mode, tileColumn, tilesPerRowDesktop, tilesPerRowMobile } = config.smallMultiples || {}
 
   // Determine if current viewport is mobile (xs, sm) or desktop (md, lg, xl)
@@ -156,6 +157,9 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
           const tileKey = item.mode === 'by-series' ? item.seriesKey : item.tileValue
           const customTitle = getTileTitle(tileKey, config)
 
+          // Create custom colorScale for this tile based on color mode
+          const customColorScale = createTileColorScale(item, config, colorScale, index, tileItems.length)
+
           return (
             <SmallMultipleTile
               key={item.key}
@@ -165,6 +169,7 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
               tileValue={item.tileValue}
               tileColumn={item.tileColumn}
               customTitle={customTitle}
+              customColorScale={customColorScale}
               config={config}
               data={data}
               svgRef={svgRef}

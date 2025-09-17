@@ -1,3 +1,7 @@
+import { scaleOrdinal } from '@visx/scale'
+import { getColorScale } from './getColorScale'
+import { ColorScale } from '../types/ChartContext'
+
 /**
  * Get filtered data for a specific tile based on its mode
  */
@@ -154,4 +158,67 @@ export const getTileKeys = (config, data) => {
  */
 export const getTileTitle = (tileKey, config) => {
   return config.smallMultiples?.tileTitles?.[tileKey] || tileKey
+}
+
+/**
+ * Get the full color palette from config with exactly the number of colors needed
+ * This creates a temporary colorScale with the right number of series to get the needed colors
+ */
+const getFullColorPalette = (config, numberOfTiles) => {
+  // Create fake series keys for exactly the number of tiles needed
+  const tempSeriesKeys = Array(numberOfTiles)
+    .fill(null)
+    .map((_, i) => `temp${i + 1}`)
+  const tempConfig = {
+    ...config,
+    runtime: {
+      ...config.runtime,
+      seriesKeys: tempSeriesKeys,
+      seriesLabelsAll: tempSeriesKeys
+    }
+  }
+
+  const tempColorScale = getColorScale(tempConfig) as ColorScale
+  return tempColorScale.range()
+}
+
+/**
+ * Create a custom colorScale for a tile based on the color mode
+ * This reuses the existing colorScale and extracts/manipulates its palette as needed
+ */
+export const createTileColorScale = (tileItem, config, originalColorScale, tileIndex, numberOfTiles) => {
+  const colorMode = config.smallMultiples?.colorMode || 'same'
+
+  if (colorMode === 'same') {
+    if (tileItem.mode === 'by-series') {
+      // Same mode + by-series: All tiles use the same color
+      const palette = originalColorScale.range() // Extract palette from existing colorScale
+      const baseColor = palette[0]
+      // Create a ScaleOrdinal that always returns the same color
+      return scaleOrdinal({
+        domain: originalColorScale.domain(), // Reuse existing domain
+        range: [baseColor],
+        unknown: baseColor
+      })
+    } else {
+      // Same mode + by-column: Use original colorScale
+      return originalColorScale
+    }
+  } else {
+    if (tileItem.mode === 'by-series') {
+      // Different mode + by-series: Each series gets different color
+      return originalColorScale
+    } else {
+      // Different mode + by-column: Each tile gets a different base color
+      // Get exactly the right number of colors for the tiles
+      const fullPalette = getFullColorPalette(config, numberOfTiles)
+      const baseColor = fullPalette[tileIndex]
+      // Create a ScaleOrdinal that returns the tile-specific color for all series
+      return scaleOrdinal({
+        domain: originalColorScale.domain(), // Reuse existing domain
+        range: [baseColor],
+        unknown: baseColor
+      })
+    }
+  }
 }
