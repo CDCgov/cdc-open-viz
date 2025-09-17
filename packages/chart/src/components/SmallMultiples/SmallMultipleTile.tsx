@@ -16,6 +16,8 @@ interface SmallMultipleTileProps {
   parentHeight?: number
   tilesPerRow?: number
   showAxisLabels?: boolean
+  globalYAxisMax?: number
+  globalYAxisMin?: number
   onHeightChange?: (tileKey: string, height: number) => void
 }
 
@@ -32,6 +34,8 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   parentHeight,
   tilesPerRow,
   showAxisLabels,
+  globalYAxisMax,
+  globalYAxisMin,
   onHeightChange
 }) => {
   let tileConfig = { ...config }
@@ -93,6 +97,27 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
           ...tileConfig.runtime?.yAxis,
           hideLabel: true,
           hideTicks: true
+        }
+      }
+    }
+  }
+
+  // Apply global Y-axis values for consistent scaling if provided
+  if (globalYAxisMax !== undefined) {
+    tileConfig = {
+      ...tileConfig,
+      yAxis: {
+        ...tileConfig.yAxis,
+        max: globalYAxisMax,
+        min: globalYAxisMin
+      },
+      // Also update runtime properties since LinearChart checks runtime.yAxis.max
+      runtime: {
+        ...tileConfig.runtime,
+        yAxis: {
+          ...tileConfig.runtime?.yAxis,
+          max: globalYAxisMax,
+          min: globalYAxisMin
         }
       }
     }

@@ -1,6 +1,9 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState, useMemo } from 'react'
 import SmallMultipleTile from './SmallMultipleTile'
 import ConfigContext from '../../ConfigContext'
+import useReduceData from '../../hooks/useReduceData'
+import useMinMax from '../../hooks/useMinMax'
+import { getTileData, getTileConfig, createCombinedDataForYAxis } from '../../helpers/smallMultiplesHelpers'
 import './SmallMultiples.scss'
 
 interface SmallMultiplesRendererProps {
@@ -64,6 +67,44 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
 
   const [tileHeights, setTileHeights] = useState<Record<string, number>>({})
 
+  // Create combined data and config for consistent Y-axis calculation
+  const combinedDataForYAxis = useMemo(
+    () => createCombinedDataForYAxis(config, data, tileItems),
+    [config, data, tileItems]
+  )
+
+  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(
+    combinedDataForYAxis.config,
+    combinedDataForYAxis.data
+  )
+
+  const yAxisProperties = useMemo(
+    () => ({
+      data: combinedDataForYAxis.data,
+      tableData: combinedDataForYAxis.data,
+      config: combinedDataForYAxis.config,
+      minValue,
+      maxValue,
+      isAllLine,
+      existPositiveValue,
+      xAxisDataMapped: [], // Not needed for Y-axis calculation
+      xMax: parentWidth,
+      yMax: parentHeight
+    }),
+    [combinedDataForYAxis, minValue, maxValue, isAllLine, existPositiveValue, parentWidth, parentHeight]
+  )
+
+  const { min, max } = useMinMax(yAxisProperties)
+
+  // Use consistent Y-axis if the feature is enabled and we have valid values
+  const globalYAxisValues = useMemo(() => {
+    if (!config.smallMultiples?.consistentYAxis) return null
+    if (typeof min !== 'number' || typeof max !== 'number') return null
+    if (combinedDataForYAxis.data.length === 0) return null
+
+    return { min, max }
+  }, [config.smallMultiples?.consistentYAxis, min, max, combinedDataForYAxis.data.length])
+
   const numberOfRows = Math.ceil(tileItems.length / tilesPerRow)
 
   // Handle tile height changes from ResizeObserver
@@ -117,6 +158,8 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
               parentHeight={parentHeight}
               tilesPerRow={tilesPerRow}
               showAxisLabels={showAxisLabels}
+              globalYAxisMax={globalYAxisValues?.max}
+              globalYAxisMin={globalYAxisValues?.min}
               onHeightChange={handleTileHeightChange}
             />
           )
