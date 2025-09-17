@@ -9,15 +9,10 @@ export default defineConfig({
     svgr({ exportAsDefault: true })
   ],
   test: {
-    browser: {
-      enabled: true,
-      name: 'chromium',
-      provider: 'playwright',
-      headless: true
-    },
     environment: 'jsdom',
     globals: true,
-    setupFiles: ['./vitest.setup.ts']
+    setupFiles: ['./vitest.setup.ts'],
+    include: ['packages/**/src/**/*.{test,spec}.{js,ts,jsx,tsx}', 'packages/**/tests/**/*.{test,spec}.{js,ts,jsx,tsx}', 'packages/**/components/**/*.{test,spec}.{js,ts,jsx,tsx}', 'packages/**/helpers/**/*.{test,spec}.{js,ts,jsx,tsx}']
   },
   define: {
     global: 'globalThis'
