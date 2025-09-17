@@ -207,7 +207,8 @@ const createInitialState = () => {
       consistentYAxis: true,
       tileOrder: [],
       tileOrderType: 'asc',
-      tileTitles: {}
+      tileTitles: {},
+      colorMode: 'same'
     },
     exclusions: {
       active: false,
