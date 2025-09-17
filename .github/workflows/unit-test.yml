@@ -19,4 +19,5 @@ jobs:
           node-version: 20.x
           cache: 'npm'
       - run: npx yarn install
+      - run: lerna run build
       - run: npm run test --workspaces
