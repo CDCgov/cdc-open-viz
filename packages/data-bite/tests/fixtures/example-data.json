@@ -1,0 +1,833 @@
+[
+  {
+    "Insured Rate": "43",
+    "Coverage Status": "Insured",
+    "state": "Alabama",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "0",
+    "Coverage Status": "Uninsured",
+    "state": "Alaska",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "72.7",
+    "Coverage Status": "Insured",
+    "state": "Arizona",
+    "Year (Good filter option)": "2010",
+    "link": "#lorem"
+  },
+  {
+    "Insured Rate": "78.7",
+    "Coverage Status": "Insured",
+    "state": "Arkansas",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "37.2",
+    "Coverage Status": "Insured",
+    "state": "California",
+    "Year (Good filter option)": "2010",
+    "link": "https://search.cdc.gov/search/?query=California&utf8=%E2%9C%93&affiliate=cdc-main"
+  },
+  {
+    "Insured Rate": "50.6",
+    "Coverage Status": "Insured",
+    "state": "Colorado",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "83.2",
+    "Coverage Status": "Insured",
+    "state": "Connecticut",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "90",
+    "Coverage Status": "Insured",
+    "state": "Delaware",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "77",
+    "Coverage Status": "Insured",
+    "state": "District of Columbia",
+    "Year (Good filter option)": "2010",
+    "link": "https://search.cdc.gov/search/index.html?query=Washington+D.C.&sitelimit=&utf8=%E2%9C%93&affiliate=cdc-main"
+  },
+  {
+    "Insured Rate": "83",
+    "Coverage Status": "Insured",
+    "state": "Florida",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "83.7",
+    "Coverage Status": "Uninsured",
+    "state": "Georgia",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "N/A",
+    "Coverage Status": "Insured",
+    "state": "Hawaii",
+    "Year (Good filter option)": "2010",
+    "link": "https://cdc.gov/"
+  },
+  {
+    "Insured Rate": "80.96",
+    "Coverage Status": "Insured",
+    "state": "Idaho",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "86.9",
+    "Coverage Status": "Insured",
+    "state": "Illinois",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "85",
+    "Coverage Status": "Insured",
+    "state": "Indiana",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "89.6",
+    "Coverage Status": "Insured",
+    "state": "Iowa",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "87.5",
+    "Coverage Status": "Insured",
+    "state": "Kansas",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "83.1",
+    "Coverage Status": "Insured",
+    "state": "Kentucky",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "79.2",
+    "Coverage Status": "Insured",
+    "state": "Louisiana",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "88",
+    "Coverage Status": "Insured",
+    "state": "Maine",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "9.1",
+    "Coverage Status": "Insured",
+    "state": "Maryland",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "95.7",
+    "Coverage Status": "Insured",
+    "state": "Massachusetts",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "86.1",
+    "Coverage Status": "Insured",
+    "state": "Michigan",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "21",
+    "Coverage Status": "Insured",
+    "state": "Minnesota",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "78.46",
+    "Coverage Status": "Insured",
+    "state": "Mississippi",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "85",
+    "Coverage Status": "Insured",
+    "state": "Missouri",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "81.599",
+    "Coverage Status": "Uninsured",
+    "state": "Montana",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "86.3",
+    "Coverage Status": "Insured",
+    "state": "Nebraska",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "80.3",
+    "Coverage Status": "Insured",
+    "state": "Nevada",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "88.7",
+    "Coverage Status": "Insured",
+    "state": "New Hampshire",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "88.5",
+    "Coverage Status": "Insured",
+    "state": "New Jersey",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "80.96",
+    "Coverage Status": "Insured",
+    "state": "New Mexico",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "88.6",
+    "Coverage Status": "Insured",
+    "state": "New York",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "81",
+    "Coverage Status": "Uninsured",
+    "state": "North Carolina",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "88.9",
+    "Coverage Status": "Insured",
+    "state": "North Dakota",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "57.2",
+    "Coverage Status": "Insured",
+    "state": "Ohio",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "80.8",
+    "Coverage Status": "Insured",
+    "state": "Oklahoma",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "83.5",
+    "Coverage Status": "Medicaid",
+    "state": "Oregon",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "88.5",
+    "Coverage Status": "Insured",
+    "state": "Pennsylvania",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "87.7",
+    "Coverage Status": "Medicaid",
+    "state": "Rhode Island",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "81.2",
+    "Coverage Status": "Insured",
+    "state": "South Carolina",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "89.4",
+    "Coverage Status": "Insured",
+    "state": "South Dakota",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "83.5",
+    "Coverage Status": "Insured",
+    "state": "Tennessee",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "26.96",
+    "Coverage Status": "Insured",
+    "state": "Texas",
+    "Year (Good filter option)": "2010",
+    "link": "https://search.cdc.gov/search/?query=Texas&utf8=%E2%9C%93&affiliate=cdc-main"
+  },
+  {
+    "Insured Rate": "44.1",
+    "Coverage Status": "Insured",
+    "state": "Utah",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "45.2",
+    "Coverage Status": "Medicaid",
+    "state": "Vermont",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "55",
+    "Coverage Status": "Insured",
+    "state": "Virginia",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "55",
+    "Coverage Status": "Insured",
+    "state": "Washington",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "82.5",
+    "Coverage Status": "Insured",
+    "state": "West Virginia",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "26",
+    "Coverage Status": "Insured",
+    "state": "Wisconsin",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "59.3",
+    "Coverage Status": "Insured",
+    "state": "Los Angeles",
+    "Year (Good filter option)": "2010",
+    "link": "https://cdc.gov/"
+  },
+  {
+    "Insured Rate": "63",
+    "Coverage Status": "Insured",
+    "state": "Dallas",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "83.5",
+    "Coverage Status": "Insured",
+    "state": "Wyoming",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "18",
+    "Coverage Status": "Insured",
+    "state": "Virgin Islands",
+    "Year (Good filter option)": "2010",
+    "link": ""
+  },
+  {
+    "Insured Rate": "43",
+    "Coverage Status": "Insured",
+    "state": "PR",
+    "Year (Good filter option)": "2010",
+    "link": "https://cdc.gov/"
+  },
+  {
+    "Insured Rate": "43",
+    "Coverage Status": "Insured",
+    "state": "Alabama",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "72.7",
+    "Coverage Status": "Uninsured",
+    "state": "Alaska",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "0",
+    "Coverage Status": "Insured",
+    "state": "Arizona",
+    "Year (Good filter option)": "2015",
+    "link": "https://search.cdc.gov/search/?query=Arizona&utf8=%E2%9C%93&affiliate=cdc-main"
+  },
+  {
+    "Insured Rate": "67",
+    "Coverage Status": "Test Category",
+    "state": "Arkansas",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "29",
+    "Coverage Status": "Insured",
+    "state": "California",
+    "Year (Good filter option)": "2015",
+    "link": "https://search.cdc.gov/search/?query=California&utf8=%E2%9C%93&affiliate=cdc-main"
+  },
+  {
+    "Insured Rate": "50.6",
+    "Coverage Status": "Insured",
+    "state": "Colorado",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "90",
+    "Coverage Status": "Insured",
+    "state": "Connecticut",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "83.2",
+    "Coverage Status": "Insured",
+    "state": "Delaware",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "77",
+    "Coverage Status": "Insured",
+    "state": "District of Columbia",
+    "Year (Good filter option)": "2015",
+    "link": "https://search.cdc.gov/search/index.html?query=Washington+D.C.&sitelimit=&utf8=%E2%9C%93&affiliate=cdc-main"
+  },
+  {
+    "Insured Rate": "83.7",
+    "Coverage Status": "Insured",
+    "state": "Florida",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "83",
+    "Coverage Status": "Uninsured",
+    "state": "Georgia",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "15",
+    "Coverage Status": "Insured",
+    "state": "Hawaii",
+    "Year (Good filter option)": "2015",
+    "link": "https://cdc.gov/"
+  },
+  {
+    "Insured Rate": "80.96",
+    "Coverage Status": "Insured",
+    "state": "Idaho",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "86.9",
+    "Coverage Status": "Insured",
+    "state": "Illinois",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "85",
+    "Coverage Status": "Insured",
+    "state": "Indiana",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "89.6",
+    "Coverage Status": "Insured",
+    "state": "Iowa",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "87.5",
+    "Coverage Status": "Insured",
+    "state": "Kansas",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "83.1",
+    "Coverage Status": "Insured",
+    "state": "Kentucky",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "79.2",
+    "Coverage Status": "Insured",
+    "state": "Louisiana",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "88",
+    "Coverage Status": "Insured",
+    "state": "Maine",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "9.1",
+    "Coverage Status": "Insured",
+    "state": "Maryland",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "95.7",
+    "Coverage Status": "Insured",
+    "state": "Massachusetts",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "86.1",
+    "Coverage Status": "Insured",
+    "state": "Michigan",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "21",
+    "Coverage Status": "Insured",
+    "state": "Minnesota",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "78.46",
+    "Coverage Status": "Insured",
+    "state": "Mississippi",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "85",
+    "Coverage Status": "Insured",
+    "state": "Missouri",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "81.599",
+    "Coverage Status": "Uninsured",
+    "state": "Montana",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "86.3",
+    "Coverage Status": "Insured",
+    "state": "Nebraska",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "80.3",
+    "Coverage Status": "Insured",
+    "state": "Nevada",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "88.7",
+    "Coverage Status": "Insured",
+    "state": "New Hampshire",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "88.5",
+    "Coverage Status": "Insured",
+    "state": "New Jersey",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "80.96",
+    "Coverage Status": "Insured",
+    "state": "New Mexico",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "88.6",
+    "Coverage Status": "Insured",
+    "state": "New York",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "81",
+    "Coverage Status": "Uninsured",
+    "state": "North Carolina",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "88.9",
+    "Coverage Status": "Insured",
+    "state": "North Dakota",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "57.2",
+    "Coverage Status": "Insured",
+    "state": "Ohio",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "80.8",
+    "Coverage Status": "Insured",
+    "state": "Oklahoma",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "83.5",
+    "Coverage Status": "Medicaid",
+    "state": "Oregon",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "88.5",
+    "Coverage Status": "Insured",
+    "state": "Pennsylvania",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "87.7",
+    "Coverage Status": "Medicaid",
+    "state": "Rhode Island",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "81.2",
+    "Coverage Status": "Insured",
+    "state": "South Carolina",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "89.4",
+    "Coverage Status": "Insured",
+    "state": "South Dakota",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "83.5",
+    "Coverage Status": "Insured",
+    "state": "Tennessee",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "26.96",
+    "Coverage Status": "Insured",
+    "state": "Texas",
+    "Year (Good filter option)": "2015",
+    "link": "https://search.cdc.gov/search/?query=Texas&utf8=%E2%9C%93&affiliate=cdc-main"
+  },
+  {
+    "Insured Rate": "44.1",
+    "Coverage Status": "Insured",
+    "state": "Utah",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "45.2",
+    "Coverage Status": "Medicaid",
+    "state": "Vermont",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "27.8",
+    "Coverage Status": "Insured",
+    "state": "Virginia",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "55",
+    "Coverage Status": "Insured",
+    "state": "Washington",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "82.5",
+    "Coverage Status": "Insured",
+    "state": "West Virginia",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "89.3",
+    "Coverage Status": "Insured",
+    "state": "Wisconsin",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "59.3",
+    "Coverage Status": "Insured",
+    "state": "Los Angeles",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "89.3",
+    "Coverage Status": "Insured",
+    "state": "Dallas",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "83.5",
+    "Coverage Status": "Insured",
+    "state": "Wyoming",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "18",
+    "Coverage Status": "Insured",
+    "state": "Virgin Islands",
+    "Year (Good filter option)": "2015",
+    "link": ""
+  },
+  {
+    "Insured Rate": "33.5",
+    "Coverage Status": "Insured",
+    "state": "PR",
+    "Year (Good filter option)": "2015",
+    "link": "https://cdc.gov/"
+  },
+  {
+    "Region Name": "Region 1",
+    "States in Region": "Maine, New Hampshire, Vermont, Massachusetts, Connecticut, Rhode Island",
+    "Insured Rate": "10",
+    "Coverage Status": "Insured"
+  },
+  {
+    "Region Name": "Region 2",
+    "States in Region": "New York, New York City, New Jersey",
+    "Insured Rate": "50",
+    "Coverage Status": "Insured"
+  },
+  {
+    "Region Name": "Region 3",
+    "States in Region": "Pennsylvania, Delaware, Maryland, Virginia, West Virginia",
+    "Insured Rate": "13",
+    "Coverage Status": "Insured"
+  },
+  {
+    "Region Name": "Region 4",
+    "States in Region": "Tennessee, Kentucky, North Carolina, South Carolina, Georgia, Alabama, Mississippi, Florida",
+    "Insured Rate": "20",
+    "Coverage Status": "Uninsured"
+  },
+  {
+    "Region Name": "Region 5",
+    "States in Region": "Illinois, Indiana, Ohio, Michigan, Wisconsin, Minnesota",
+    "Insured Rate": "99",
+    "Coverage Status": "Insured",
+    "link": "https://cdc.gov/"
+  },
+  {
+    "Region Name": "Region 6",
+    "States in Region": "Texas, New Mexico, Oklahoma, Arkansas, Louisiana",
+    "Insured Rate": "75",
+    "Coverage Status": "Uninsured"
+  },
+  {
+    "Region Name": "Region 7",
+    "States in Region": "Nebraska, Kansas, Missouri, Iowa",
+    "Insured Rate": "60",
+    "Coverage Status": "Insured"
+  },
+  {
+    "Region Name": "Region 8",
+    "States in Region": "Montana, Wyoming, Utah, Colorado, South Dakota, North Dakota",
+    "Insured Rate": "16",
+    "Coverage Status": "Medicaid"
+  },
+  {
+    "Region Name": "Region 9",
+    "States in Region": "Nevada, California, Arizona, Hawaii",
+    "Insured Rate": "88",
+    "Coverage Status": "Insured"
+  },
+  {
+    "Region Name": "Region 10",
+    "States in Region": "Alaska, Washington, Oregon",
+    "Insured Rate": "30",
+    "Coverage Status": "Medicaid"
+  }
+]

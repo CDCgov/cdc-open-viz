@@ -119,7 +119,7 @@ const iconList = [
 const categories = [...new Set(iconList.map(icon => icon.category))]
 
 const meta: Meta = {
-  title: 'Guides/Icon Gallery',
+  title: 'Components/Atoms/Icon Gallery',
   parameters: {
     docs: {
       page: () => (

@@ -75,7 +75,7 @@ export const GeneralSectionTests: Story = {
     await expect(canvas.getByText('Test Data Bite Title E2E')).toBeVisible()
 
     // Test 2: Bite Style Change
-    const biteStyleSelect = canvas.queryByDisplayValue(/graphic|body|value/i)
+    const biteStyleSelect = canvasElement.querySelector('select[name="biteStyle"]') as HTMLSelectElement
     if (biteStyleSelect) {
       const currentValue = (biteStyleSelect as HTMLSelectElement).value
       const targetValue = currentValue === 'graphic' ? 'body' : 'graphic'

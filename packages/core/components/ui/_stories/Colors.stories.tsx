@@ -1,8 +1,11 @@
 import type { Meta } from '@storybook/react'
-import colorPalettes, { colorPalettesChart, twoColorPalette, sequentialPalettes } from '../../../data/colorPalettes'
+import { mapColorPalettesV2, colorPalettesChartV2, twoColorPalette, sequentialPalettes } from '../../../data/colorPalettes'
+
+// Get the v2 palettes for consistency
+const twoColorPaletteV2 = twoColorPalette.v2
 
 const meta: Meta = {
-  title: 'Guides/Colors',
+  title: 'Components/Atoms/Colors',
   parameters: {
     docs: {
       page: () => (
@@ -14,7 +17,7 @@ const meta: Meta = {
           <p>These palettes are designed for categorical data where each color represents a different category.</p>
 
           <h3>Chart Palettes</h3>
-          {Object.entries(colorPalettesChart).map(([name, colors]) => (
+          {Object.entries(colorPalettesChartV2).map(([name, colors]) => (
             <div key={name} style={{ marginBottom: '20px' }}>
               <h4 style={{ textTransform: 'capitalize', marginBottom: '10px' }}>{name.replace(/-/g, ' ')}</h4>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -78,7 +81,7 @@ const meta: Meta = {
 
           <h3>Two-Color Palettes</h3>
           <p>These palettes are designed for paired comparisons and side-by-side visualizations.</p>
-          {Object.entries(twoColorPalette).map(([name, colors]) => (
+          {Object.entries(twoColorPaletteV2).map(([name, colors]) => (
             <div key={name} style={{ marginBottom: '20px' }}>
               <h4 style={{ textTransform: 'capitalize', marginBottom: '10px' }}>{name.replace(/-/g, ' ')}</h4>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -111,7 +114,7 @@ const meta: Meta = {
 
           <h2>Map Palettes</h2>
           <p>These palettes are primarily used for geographic visualizations and maps.</p>
-          {Object.entries(colorPalettes).map(([name, colors]) => (
+          {Object.entries(mapColorPalettesV2).map(([name, colors]) => (
             <div key={name} style={{ marginBottom: '20px' }}>
               <h4 style={{ textTransform: 'capitalize', marginBottom: '10px' }}>{name.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase()}</h4>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -153,11 +156,12 @@ const meta: Meta = {
 
           <h2>Implementation</h2>
           <p>Import color palettes in your components:</p>
-          <pre><code>{`import colorPalettes, { colorPalettesChart, twoColorPalette, sequentialPalettes } from '@cdc/core/data/colorPalettes'
+          <pre><code>{`import { mapColorPalettesV2, colorPalettesChartV2, twoColorPalette, sequentialPalettes } from '@cdc/core/data/colorPalettes'
 
 // Use in your visualization
-const colors = colorPalettesChart['qualitative-bold']
-const mapColors = colorPalettes.bluegreen`}</code></pre>
+const colors = colorPalettesChartV2['qualitative-bold']
+const twoColors = twoColorPalette.v2['divergent-blue-orange']
+const mapColors = mapColorPalettesV2.sequential_blue`}</code></pre>
         </div>
       )
     }
@@ -176,7 +180,7 @@ export const Guide = {
       <p>These palettes are designed for categorical data where each color represents a different category.</p>
 
       <h3>Chart Palettes</h3>
-      {Object.entries(colorPalettesChart).map(([name, colors]) => (
+      {Object.entries(colorPalettesChartV2).map(([name, colors]) => (
         <div key={name} style={{ marginBottom: '20px' }}>
           <h4 style={{ textTransform: 'capitalize', marginBottom: '10px' }}>{name.replace(/-/g, ' ')}</h4>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -240,7 +244,7 @@ export const Guide = {
 
       <h3>Two-Color Palettes</h3>
       <p>These palettes are designed for paired comparisons and side-by-side visualizations.</p>
-      {Object.entries(twoColorPalette).map(([name, colors]) => (
+      {Object.entries(twoColorPaletteV2).map(([name, colors]) => (
         <div key={name} style={{ marginBottom: '20px' }}>
           <h4 style={{ textTransform: 'capitalize', marginBottom: '10px' }}>{name.replace(/-/g, ' ')}</h4>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -273,7 +277,7 @@ export const Guide = {
 
       <h2>Map Palettes</h2>
       <p>These palettes are primarily used for geographic visualizations and maps.</p>
-      {Object.entries(colorPalettes).map(([name, colors]) => (
+      {Object.entries(mapColorPalettesV2).map(([name, colors]) => (
         <div key={name} style={{ marginBottom: '20px' }}>
           <h4 style={{ textTransform: 'capitalize', marginBottom: '10px' }}>{name.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase()}</h4>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -315,11 +319,12 @@ export const Guide = {
 
       <h2>Implementation</h2>
       <p>Import color palettes in your components:</p>
-      <pre><code>{`import colorPalettes, { colorPalettesChart, twoColorPalette, sequentialPalettes } from '@cdc/core/data/colorPalettes'
+      <pre><code>{`import { mapColorPalettesV2, colorPalettesChartV2, twoColorPalette, sequentialPalettes } from '@cdc/core/data/colorPalettes'
 
 // Use in your visualization
-const colors = colorPalettesChart['qualitative-bold']
-const mapColors = colorPalettes.bluegreen`}</code></pre>
+const colors = colorPalettesChartV2['qualitative-bold']
+const twoColors = twoColorPalette.v2['divergent-blue-orange']
+const mapColors = mapColorPalettesV2.sequential_blue`}</code></pre>
     </div>
   )
 }
