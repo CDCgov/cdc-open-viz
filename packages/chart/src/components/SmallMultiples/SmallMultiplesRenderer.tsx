@@ -7,7 +7,8 @@ import {
   getTileData,
   getTileConfig,
   createCombinedDataForYAxis,
-  applyTileOrder
+  applyTileOrder,
+  getTileTitle
 } from '../../helpers/smallMultiplesHelpers'
 import './SmallMultiples.scss'
 
@@ -151,6 +152,10 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
           // Determine if axis labels should be shown on this tile
           const showAxisLabels = config.smallMultiples?.showAllAxisLabels || isFirstInRow
 
+          // Get the tile key for title lookup
+          const tileKey = item.mode === 'by-series' ? item.seriesKey : item.tileValue
+          const customTitle = getTileTitle(tileKey, config)
+
           return (
             <SmallMultipleTile
               key={item.key}
@@ -159,6 +164,7 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
               seriesKey={item.seriesKey}
               tileValue={item.tileValue}
               tileColumn={item.tileColumn}
+              customTitle={customTitle}
               config={config}
               data={data}
               svgRef={svgRef}
