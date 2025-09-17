@@ -3,7 +3,12 @@ import SmallMultipleTile from './SmallMultipleTile'
 import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
 import useMinMax from '../../hooks/useMinMax'
-import { getTileData, getTileConfig, createCombinedDataForYAxis } from '../../helpers/smallMultiplesHelpers'
+import {
+  getTileData,
+  getTileConfig,
+  createCombinedDataForYAxis,
+  applyTileOrder
+} from '../../helpers/smallMultiplesHelpers'
 import './SmallMultiples.scss'
 
 interface SmallMultiplesRendererProps {
@@ -58,6 +63,9 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
     }))
   }
 
+  // Apply tile ordering based on user preference
+  tileItems = applyTileOrder(tileItems, config.smallMultiples?.tileOrderType || 'asc', config.smallMultiples?.tileOrder)
+
   // Calculate the grid styling based on tiles per row
   const gridGap = isMobile ? '1rem' : '2rem'
   const gridStyle = {
@@ -87,7 +95,7 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
       maxValue,
       isAllLine,
       existPositiveValue,
-      xAxisDataMapped: [], // Not needed for Y-axis calculation
+      xAxisDataMapped: [],
       xMax: parentWidth,
       yMax: parentHeight
     }),
