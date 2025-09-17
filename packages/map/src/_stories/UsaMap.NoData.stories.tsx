@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import CdcMapComponent from '../CdcMapComponent'
 import cityStateConfig from './_mock/example-city-state.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'

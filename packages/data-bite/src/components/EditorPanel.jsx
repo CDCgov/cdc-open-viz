@@ -1,4 +1,4 @@
-import { memo, useContext, useEffect, useState } from 'react'
+import React, { memo, useContext, useEffect, useState } from 'react'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import _ from 'lodash'
 import {

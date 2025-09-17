@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChartComponent'
 import suppressionConfig from './_mock/suppression_mock.json'
 import SuppressedConfig from './_mock/bar-chart-suppressed.json'

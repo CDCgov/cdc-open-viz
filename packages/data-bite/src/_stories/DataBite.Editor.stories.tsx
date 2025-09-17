@@ -1,6 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import { userEvent, within } from '@storybook/testing-library'
-import { expect } from '@storybook/jest'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { within, userEvent, expect } from 'storybook/test'
 import DataBite from '../CdcDataBite'
 
 const meta: Meta<typeof DataBite> = {

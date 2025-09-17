@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import annotationConfig from './_mock/annotation_category_mock.json'
 import annotationConfigDateLinear from './_mock/annotation_date-linear_mock.json'
 import annotationConfigDateTime from './_mock/annotation_date-time_mock.json'

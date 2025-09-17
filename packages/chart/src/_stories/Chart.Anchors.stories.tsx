@@ -1,5 +1,5 @@
 import React from 'react'
-import { Meta, Story } from '@storybook/react'
+import { Meta, Story } from '@storybook/react-vite'
 import Chart from '../CdcChartComponent'
 import exampleComboBarNonNumeric from './../../examples/feature/tests-date-exclusions/date-exclusions-config.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
