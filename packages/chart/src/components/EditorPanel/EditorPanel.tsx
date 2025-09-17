@@ -2120,6 +2120,48 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         })()}
                       </fieldset>
 
+                      {/* Color Mode */}
+                      <fieldset className='edit-block'>
+                        <legend>
+                          <label>Tile Colors</label>
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                Choose whether all tiles use the same colors or each tile uses different colors for
+                                visual distinction.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </legend>
+
+                        <Select
+                          value={config.smallMultiples?.colorMode || 'different'}
+                          options={[
+                            {
+                              label: 'Same Colors',
+                              value: 'same'
+                            },
+                            {
+                              label: 'Different Colors',
+                              value: 'different'
+                            }
+                          ]}
+                          label='Color Mode'
+                          updateField={(_section, _subsection, _fieldName, value) => {
+                            updateConfig({
+                              ...config,
+                              smallMultiples: {
+                                ...config.smallMultiples,
+                                colorMode: value
+                              }
+                            })
+                          }}
+                        />
+                      </fieldset>
+
                       {/* Tile Titles */}
                       <fieldset className='edit-block'>
                         <legend>
