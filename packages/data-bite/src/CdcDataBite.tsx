@@ -124,7 +124,25 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
   //@ts-ignore
   const loadConfig = async () => {
-    let response = configObj || (await (await fetch(configUrl)).json())
+    let response = configObj
+
+    if (!response && configUrl) {
+      try {
+        const fetchResponse = await fetch(configUrl)
+        if (fetchResponse.ok) {
+          const text = await fetchResponse.text()
+          response = text ? JSON.parse(text) : {}
+        } else {
+          console.warn(`Failed to fetch config from ${configUrl}: ${fetchResponse.status}`)
+          response = {}
+        }
+      } catch (error) {
+        console.warn(`Error loading config from ${configUrl}:`, error)
+        response = {}
+      }
+    } else if (!response) {
+      response = {}
+    }
 
     // If data is included through a URL, fetch that and store
     let responseData = response.data ?? []
@@ -630,7 +648,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   }
 
   return (
-    <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
+    <Context.Provider
+      value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, isEditor }}
+    >
       {biteStyle !== 'gradient' && (
         <Layout.VisualizationWrapper
           ref={outerContainerRef}

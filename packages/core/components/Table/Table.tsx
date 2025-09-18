@@ -46,8 +46,10 @@ const Table = ({
   const headStyle = stickyHeader ? { position: 'sticky' as Position, top: 0, zIndex: 2 } : {}
   const isGroupedMatrix = !Array.isArray(childrenMatrix)
 
+  const { cellMinWidth, ...tableAttrs } = tableOptions
+
   return (
-    <table {...tableOptions}>
+    <table {...tableAttrs}>
       <caption className='visually-hidden'>{caption}</caption>
       {noData ? (
         <tr>

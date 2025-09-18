@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import boxPlotConfig from './_mock/boxplot_multiseries.json'
 import Chart from '../CdcChartComponent'
 

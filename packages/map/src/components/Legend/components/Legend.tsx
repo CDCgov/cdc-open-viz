@@ -163,9 +163,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         const { pattern, dataKey, size } = patternData
         let defaultPatternColor = 'black'
         const sizes = {
-          small: '8',
-          medium: '10',
-          large: '12'
+          small: 8,
+          medium: 10,
+          large: 12
         }
 
         const legendSize = 16
@@ -349,9 +349,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                   )}
 
                   {config.visual.additionalCityStyles.map(
-                    ({ shape, label }) =>
+                    ({ shape, label }, index) =>
                       label && (
-                        <div>
+                        <div key={`additional-city-style-${index}-${shape}`}>
                           <svg>
                             <Group top={shape === 'Pin' ? 19 : shape === 'Triangle' ? 13 : 11} left={10}>
                               {cityStyleShapes[shape.toLowerCase()]}

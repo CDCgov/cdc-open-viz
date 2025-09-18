@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 
 import InputSelect from '../inputs/InputSelect'
 import { useState } from 'react'

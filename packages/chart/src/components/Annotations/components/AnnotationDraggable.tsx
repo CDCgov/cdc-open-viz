@@ -49,6 +49,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
 
       return (
         <AnnotationComponent
+          key={`annotation-${index}`}
           width={200}
           height={height}
           dx={annotation.dx} // label position
