@@ -78,7 +78,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
   if (geoType === 'world') {
     return (
       sortedRuntimeData &&
-      sortedRuntimeData.map(country => {
+      sortedRuntimeData.map((country, index) => {
         let coordinates = countryCoordinates[country.uid]
 
         if (!coordinates) return true
@@ -100,10 +100,9 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
         if (!projection(coordinates)) return true
 
         const circle = (
-          <>
+          <React.Fragment key={`circle-fragment-${countryName.replace(' ', '')}`}>
             <circle
               tabIndex={-1}
-              key={`circle-${countryName.replace(' ', '')}`}
               className={`bubble country--${countryName}`}
               cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0}
               cy={Number(projection(coordinates[1], coordinates[0])[1]) || 0}
@@ -139,7 +138,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
             {extraBubbleBorder && (
               <circle
                 tabIndex={-1}
-                key={`circle-${countryName.replace(' ', '')}`}
+                key={`circle-border-${countryName.replace(' ', '')}`}
                 className='bubble'
                 cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0}
                 cy={Number(projection(coordinates[1], coordinates[0])[1]) || 0}
@@ -171,11 +170,11 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
                 data-tooltip-html={toolTip}
               />
             )}
-          </>
+          </React.Fragment>
         )
 
         return (
-          <g key={`group-${countryName.replace(' ', '')}`} tabIndex={-1}>
+          <g key={`group-${index}-${countryName.replace(' ', '')}`} tabIndex={-1}>
             {circle}
           </g>
         )
@@ -186,7 +185,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
   if (geoType === 'us') {
     return (
       sortedRuntimeData &&
-      sortedRuntimeData.map(item => {
+      sortedRuntimeData.map((item, index) => {
         let stateData = stateCoordinates[item.uid]
         if (Number(size(item[primaryColumnName])) === 0) return
 
@@ -250,7 +249,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
             {extraBubbleBorder && (
               <circle
                 tabIndex={-1}
-                key={`circle-${stateName.replace(' ', '')}`}
+                key={`circle-border-${stateName.replace(' ', '')}`}
                 className='bubble'
                 cx={projection(coordinates)[0] || 0}
                 cy={projection(coordinates)[1] || 0}
@@ -286,7 +285,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
           </>
         )
 
-        return <g key={`group-${stateName.replace(' ', '')}`}>{circle}</g>
+        return <g key={`group-${index}-${stateName.replace(' ', '')}`}>{circle}</g>
       })
     )
   }

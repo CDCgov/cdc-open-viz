@@ -262,17 +262,21 @@ const PreviewDataTable = () => {
         <thead>
           {headerGroups.map(headerGroup => (
             <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map(column => (
-                <th
-                  scope='col'
-                  {...column.getHeaderProps(column.getSortByToggleProps())}
-                  className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : ''}
-                  title={column.Header}
-                >
-                  {column.render('Header')}
-                  <div {...column.getResizerProps()} className='resizer' />
-                </th>
-              ))}
+              {headerGroup.headers.map(column => {
+                const { key, ...headerProps } = column.getHeaderProps(column.getSortByToggleProps())
+                return (
+                  <th
+                    key={key}
+                    scope='col'
+                    {...headerProps}
+                    className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : ''}
+                    title={column.Header}
+                  >
+                    {column.render('Header')}
+                    <div {...column.getResizerProps()} className='resizer' />
+                  </th>
+                )
+              })}
             </tr>
           ))}
         </thead>

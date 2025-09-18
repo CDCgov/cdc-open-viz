@@ -1,0 +1,26 @@
+{
+  "type": "data-bite",
+  "dataUrl": "/packages/data-bite/tests/fixtures/example-data.json",
+  "dataBite": "",
+  "dataFunction": "Mean (Average)",
+  "dataColumn": "Insured Rate",
+  "bitePosition": "Left",
+  "biteFontSize": "24",
+  "imageData": {
+    "display": "none",
+    "url": "",
+    "options": []
+  },
+  "biteBody": "Test data bite body text for E2E testing",
+  "dataFormat": {
+    "roundToPlace": 0,
+    "commas": true,
+    "prefix": "",
+    "suffix": "%"
+  },
+  "filters": [],
+  "biteStyle": "graphic",
+  "subtext": "Test Data Source Citation",
+  "title": "Test Data Bite Title",
+  "theme": "theme-blue"
+}

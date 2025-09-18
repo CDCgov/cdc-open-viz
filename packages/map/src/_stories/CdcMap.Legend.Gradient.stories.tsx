@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import CdcMap from '../CdcMap'
 import UsGradient from './_mock/usa-state-gradient.json'
 import WastewaterMap from './_mock/wastewater-map.json'

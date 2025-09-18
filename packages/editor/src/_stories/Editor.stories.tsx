@@ -1,6 +1,6 @@
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 import CdcEditor from '../CdcEditor'
-import { within, userEvent } from '@storybook/testing-library'
+import { within, userEvent } from 'storybook/test'
 
 const sleep = ms => {
   return new Promise(r => setTimeout(r, ms))

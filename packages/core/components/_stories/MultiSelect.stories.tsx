@@ -1,7 +1,7 @@
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 
 import MultiSelect from '../MultiSelect'
-import { userEvent, within } from '@storybook/testing-library'
+import { userEvent, within } from 'storybook/test'
 
 const meta: Meta<typeof MultiSelect> = {
   title: 'Components/Molecules/MultiSelect',

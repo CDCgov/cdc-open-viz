@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import CdcMap from '../CdcMap'
 import WastewaterMap from './_mock/wastewater-map.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'

@@ -206,15 +206,15 @@ const ChooseTab: React.FC = (): JSX.Element => {
         </div>
       </a>
 
-      {rowLabels.map(label => {
+      {rowLabels.map((label, index) => {
         return (
-          <React.Fragment>
+          <React.Fragment key={`row-label-${index}-${label}`}>
             <div className='heading-2'>{label}</div>
             <ul className={`visualization-grid category_${label.toLowerCase()}`}>
               {buttons
                 .filter(button => button.category === label)
-                .map((button, index) => (
-                  <li key={index}>
+                .map((button, buttonIndex) => (
+                  <li key={`${label}-button-${buttonIndex}`}>
                     <Tooltip position='right'>
                       <Tooltip.Target>
                         <VizButton {...button} />

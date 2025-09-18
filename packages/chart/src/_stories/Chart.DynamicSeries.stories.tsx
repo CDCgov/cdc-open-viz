@@ -1,7 +1,7 @@
 import DynamicSeriesConfig from './_mock/dynamic_series_config.json'
 import DynamicSeriesBarConfig from './_mock/dynamic_series_bar_config.json'
 import DynamicSeriesSuppression from './_mock/dynamic_series_suppression_mock.json'
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChartComponent'
 
 const meta: Meta<typeof Chart> = {

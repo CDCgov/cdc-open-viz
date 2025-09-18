@@ -128,7 +128,7 @@ const BarChartStackedHorizontal = () => {
           offset='none'
         >
           {barStacks =>
-            barStacks.map(barStack =>
+            barStacks.map((barStack, stackIndex) =>
               getHorizontalBarHeights(config, barStack.bars).map((bar, index) => {
                 const transparentBar =
                   config.legend.behavior === 'highlight' &&
@@ -186,7 +186,7 @@ const BarChartStackedHorizontal = () => {
                 const patternUrl = getPatternUrl()
 
                 return (
-                  <>
+                  <React.Fragment key={`stack-${stackIndex}-bar-${index}-${barStack.index}`}>
                     <Group key={index} id={`barStack${barStack.index}-${bar.index}`} className='stack horizontal'>
                       {/* Base colored bar */}
                       {createBarElement({
@@ -281,7 +281,7 @@ const BarChartStackedHorizontal = () => {
                         </Text>
                       )}
                     </Group>
-                  </>
+                  </React.Fragment>
                 )
               })
             )
