@@ -1,0 +1,50 @@
+[
+  {
+    "Deaths": "250",
+    "Total Overdoses": "600",
+    "state": "Alabama",
+    "Year": "2010"
+  },
+  {
+    "Deaths": "16",
+    "Total Overdoses": "80",
+    "state": "Alaska",
+    "Year": "2008"
+  },
+  {
+    "Deaths": "19",
+    "Total Overdoses": "100",
+    "state": "Alaska",
+    "Year": "2010"
+  },
+  {
+    "Deaths": "93",
+    "Total Overdoses": "400",
+    "state": "Alaska",
+    "Year": "2012"
+  },
+  {
+    "Deaths": "82",
+    "Total Overdoses": "400",
+    "state": "Arizona",
+    "Year": "2010"
+  },
+  {
+    "Deaths": "150",
+    "Total Overdoses": "350",
+    "state": "California",
+    "Year": "2010"
+  },
+  {
+    "Deaths": "45",
+    "Total Overdoses": "120",
+    "state": "Colorado",
+    "Year": "2010"
+  },
+  {
+    "Deaths": "33",
+    "Total Overdoses": "85",
+    "state": "Connecticut",
+    "Year": "2010"
+  }
+]
