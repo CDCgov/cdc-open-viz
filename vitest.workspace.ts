@@ -4,21 +4,27 @@ import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 export default defineWorkspace([
   // Main Vitest config for regular tests
   'vitest.config.ts',
-  // Storybook specific config
+  // Storybook specific config (standalone, not extending base config)
   {
-    extends: 'vitest.config.ts',
-    plugins: [
-      storybookTest()
-    ],
+    plugins: [storybookTest()],
     test: {
       name: 'storybook',
-      include: ['**/*.stories.?(m)[jt]s?(x)'],
+      environment: 'jsdom',
+      globals: true,
+      setupFiles: ['./vitest.setup.ts'],
       browser: {
         enabled: true,
-        name: 'chromium',
+        instances: [
+          {
+            browser: 'chromium'
+          }
+        ],
         provider: 'playwright',
         headless: true
       }
+    },
+    define: {
+      global: 'globalThis'
     }
   }
 ])

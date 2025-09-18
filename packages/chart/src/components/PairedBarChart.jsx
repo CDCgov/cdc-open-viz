@@ -113,7 +113,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 const textFits = textWidth < barWidth - 5 // minus padding dx(5)
 
                 return (
-                  <>
+                  <React.Fragment key={`fragment-group1-${groupOne.dataKey}-${index}`}>
                     <Group key={`group-${groupOne.dataKey}-${d[config.xAxis.dataKey]}`} className='horizontal'>
                       <Bar
                         id={`bar-${groupOne.dataKey}-${d[config.dataDescription?.xKey]}`}
@@ -145,7 +145,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                         </Text>
                       )}
                     </Group>
-                  </>
+                  </React.Fragment>
                 )
               })}
             {data
@@ -171,7 +171,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 const isTextFits = textWidth < barWidth - 5 // minus padding dx(5)
 
                 return (
-                  <>
+                  <React.Fragment key={`fragment-group2-${groupTwo.dataKey}-${index}`}>
                     <style>
                       {`
                       .bar-${groupTwo.dataKey}-${d[config.xAxis.dataKey]} {
@@ -210,7 +210,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                         </Text>
                       )}
                     </Group>
-                  </>
+                  </React.Fragment>
                 )
               })}
           </Group>

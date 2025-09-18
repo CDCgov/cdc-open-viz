@@ -105,7 +105,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
       <g
         transform={transformShape(pointData[config.xAxis.dataKey], pointData[filtered?.dataKey])}
         className={`visx-glyph-group${displayArea ? '' : '-hidden'}`}
-        data-seriesIndex={seriesIndex}
+        data-seriesindex={seriesIndex}
       >
         <Shape
           fillOpacity={mode === 'ALWAYS_SHOW_POINTS' ? 1 : 0}
@@ -142,7 +142,7 @@ const LineChartCircle = (props: LineChartCircleProps) => {
         <g
           transform={transformShape(pointData[config.xAxis?.dataKey], pointData[filtered?.dataKey])}
           className={`visx-glyph-group${displayArea ? '' : '-hidden'}`}
-          data-seriesIndex={seriesIndex}
+          data-seriesindex={seriesIndex}
         >
           <Shape size={dotSize} stroke={color} fill={color} />
         </g>

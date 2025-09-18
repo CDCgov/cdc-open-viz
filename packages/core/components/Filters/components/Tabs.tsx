@@ -41,6 +41,7 @@ const Tabs: React.FC<TabsProps> = ({ filter, index: outerIndex, changeFilterActi
   const Tabs = filter.values.map((value, index) => {
     return (
       <button
+        key={`${value}-${outerIndex}-${index}-${id}`}
         id={`${value}-${outerIndex}-${index}-${id}`}
         className={getClassList(value)}
         onClick={e => {

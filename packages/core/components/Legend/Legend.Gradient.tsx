@@ -70,7 +70,7 @@ const LegendGradient = ({
     const lastTick = index === labels.length - 1
 
     return (
-      <Group top={MARGIN}>
+      <Group key={`tick-${index}`} top={MARGIN}>
         {!lastTick && !isLinearBlocks && <line x1={xPositionX} x2={xPositionX} y1={30} y2={boxHeight} stroke='black' />}
         <Text
           angle={-tickRotation}
@@ -123,9 +123,8 @@ const LegendGradient = ({
               const segmentWidth = (legendWidth - legendSeparatorsToSubtract) / numTicks
               const xPosition = index * segmentWidth + MARGIN + getTickSeparatorsAdjustment(index)
               return (
-                <Group>
+                <Group key={`color-block-${index}`}>
                   <rect
-                    key={index}
                     x={xPosition}
                     y={MARGIN}
                     width={segmentWidth}
@@ -142,10 +141,9 @@ const LegendGradient = ({
               const segmentWidth = (legendWidth - legendSeparatorsToSubtract) / numTicks
               const xPosition = separatorAfter * segmentWidth + MARGIN + getTickSeparatorsAdjustment(separatorAfter - 1)
               return (
-                <Group>
+                <Group key={`separator-${index}`}>
                   {/* Separators block */}
                   <rect
-                    key={index}
                     x={xPosition}
                     y={MARGIN / 2}
                     width={separatorSize}
@@ -157,7 +155,6 @@ const LegendGradient = ({
 
                   {/* Dotted dividing line */}
                   <line
-                    key={index}
                     x1={xPosition + separatorSize / 2}
                     x2={xPosition + separatorSize / 2}
                     y1={-3}

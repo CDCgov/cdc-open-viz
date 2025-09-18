@@ -1,11 +1,11 @@
-import { createRequire } from "node:module";
-import { dirname, join } from "node:path";
+import { createRequire } from 'node:module'
+import { dirname, join } from 'node:path'
 import { mergeConfig } from 'vite'
 import type { StorybookConfig } from '@storybook/react-vite'
 import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr' // Svg Support
 
-const require = createRequire(import.meta.url);
+const require = createRequire(import.meta.url)
 
 const config: StorybookConfig = {
   stories: [
@@ -15,17 +15,17 @@ const config: StorybookConfig = {
   ],
 
   addons: [
-    getAbsolutePath("@storybook/addon-links"),
+    getAbsolutePath('@storybook/addon-links'),
     // getAbsolutePath("storybook-addon-fetch-mock"), // Incompatible with Storybook 9 - cannot resolve @storybook/preview-api
-    getAbsolutePath("@storybook/addon-a11y"),
-    getAbsolutePath("@storybook/addon-docs"),
-    getAbsolutePath("@storybook/addon-vitest")
+    getAbsolutePath('@storybook/addon-a11y'),
+    getAbsolutePath('@storybook/addon-docs'),
+    getAbsolutePath('@storybook/addon-vitest')
   ],
 
   staticDirs: ['./assets'],
 
   framework: {
-    name: getAbsolutePath("@storybook/react-vite"),
+    name: getAbsolutePath('@storybook/react-vite'),
     options: {}
   },
 
@@ -34,7 +34,7 @@ const config: StorybookConfig = {
   },
 
   core: {
-    builder: getAbsolutePath("@storybook/builder-vite"),
+    builder: getAbsolutePath('@storybook/builder-vite'),
     disableTelemetry: true
   },
 
@@ -63,16 +63,31 @@ const config: StorybookConfig = {
     if (configType === 'DEVELOPMENT') {
       // run Storybook locally
       return mergeConfig(config, {
-        plugins: [
-          react({ jsxRuntime: 'automatic' }),
-          svgr(svgrConfig)
-        ]
+        css: {
+          preprocessorOptions: {
+            scss: {
+              // Suppress SASS @import deprecation warnings (same as packages)
+              quietDeps: true,
+              silenceDeprecations: ['legacy-js-api', 'import']
+            }
+          }
+        },
+        plugins: [react({ jsxRuntime: 'automatic' }), svgr(svgrConfig)]
       })
     }
 
     return mergeConfig(config, {
       commonjsOptions: {
         include: [/@cdc\/core/, /node_modules/]
+      },
+      css: {
+        preprocessorOptions: {
+          scss: {
+            // Suppress SASS @import deprecation warnings (same as packages)
+            quietDeps: true,
+            silenceDeprecations: ['legacy-js-api', 'import']
+          }
+        }
       },
       build: {
         sourcemap: false,
@@ -99,5 +114,5 @@ const config: StorybookConfig = {
 export default config
 
 function getAbsolutePath(value: string): any {
-  return dirname(require.resolve(join(value, "package.json")));
+  return dirname(require.resolve(join(value, 'package.json')))
 }
