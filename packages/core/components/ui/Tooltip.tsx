@@ -2,6 +2,7 @@ import { useId } from 'react'
 
 // Third Party
 import { Tooltip as ReactTooltip } from 'react-tooltip'
+import 'react-tooltip/dist/react-tooltip.css'
 import type { PlacesType } from 'react-tooltip'
 
 // Styles

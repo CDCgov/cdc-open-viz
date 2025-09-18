@@ -1,5 +1,5 @@
 // Chart palette migration map
-const chartPaletteMigrationMap: Record<string, string> = {
+export const chartPaletteMigrationMap: Record<string, string> = {
   yelloworangered: 'sequential_orange',
   yelloworangebrown: 'sequential_orange',
   orangered: 'sequential_orange',
@@ -55,8 +55,8 @@ const chartPaletteMigrationMap: Record<string, string> = {
   'qualitative-softreverse': 'qualitative_standardreverse'
 }
 
-// Map palette migration map
-const mapPaletteMigrationMap: Record<string, string> = {
+// Map palette migration map  
+export const mapPaletteMigrationMap: Record<string, string> = {
   sequential_yellow_orange_red: 'sequential_orange',
   sequential_yellow_orange_brown: 'sequential_orange',
   sequential_orange_red: 'sequential_orange',
@@ -79,80 +79,72 @@ const mapPaletteMigrationMap: Record<string, string> = {
   sequential_blue_extendedreverse: 'sequential_bluereverse',
   sequential_green_bluereverse: 'sequential_tealreverse',
   sequential_redreverse: 'sequential_orangereverse',
-  qualitative_earth_tonesreverse: 'qualitativereverse'
+  qualitative_earth_tonesreverse: 'qualitativereverse',
+  'qualitative_bold': 'qualitative_standard',
+  'qualitative_soft': 'qualitative_standard',
+  'qualitative_boldreverse': 'qualitative_standardreverse',
+  'qualitative_softreverse': 'qualitative_standardreverse',
+  'qualitative1': 'qualitative_standard',
+  'qualitative2': 'qualitative_standard',
+  'qualitative3': 'qualitative_standard',
+  'qualitative4': 'qualitative_standard',
+  'colorblindsafe': 'qualitative_standard',
+  'qualitative1reverse': 'qualitative_standardreverse',
+  'qualitative2reverse': 'qualitative_standardreverse',
+  'qualitative3reverse': 'qualitative_standardreverse',
+  'qualitative4reverse': 'qualitative_standardreverse',
+}
+
+// Two-color palette migration map (v1 to v2)
+export const twoColorPaletteMigrationMap: Record<string, string> = {
+  // Monochrome palettes → divergent_blue_purple
+  'monochrome-1': 'divergent_blue_purple',
+  'monochrome-2': 'divergent_blue_purple', 
+  'monochrome-3': 'divergent_blue_purple',
+  'monochrome-4': 'divergent_blue_purple',
+  
+  // Warm palettes → divergent_green_orange
+  'monochrome-5': 'divergent_green_orange',
+  'warm-1': 'divergent_green_orange',
+  
+  // Cool palettes → divergent_blue_cyan
+  'cool-1': 'divergent_blue_cyan',
+  'cool-2': 'divergent_blue_cyan',
+  'cool-3': 'divergent_blue_cyan', 
+  'cool-4': 'divergent_blue_cyan',
+  'cool-5': 'divergent_blue_cyan',
+  
+  // Complementary palettes → divergent_blue_orange
+  'complementary-1': 'divergent_blue_orange',
+  'complementary-2': 'divergent_blue_orange',
+  'complementary-3': 'divergent_blue_orange',
+  'complementary-4': 'divergent_blue_orange',
+  'complementary-5': 'divergent_blue_orange',
+  
+  // Reverse palette migrations
+  'monochrome-1reverse': 'divergent_blue_purplereverse',
+  'monochrome-2reverse': 'divergent_blue_purplereverse',
+  'monochrome-3reverse': 'divergent_blue_purplereverse', 
+  'monochrome-4reverse': 'divergent_blue_purplereverse',
+  'monochrome-5reverse': 'divergent_green_orangereverse',
+  'warm-1reverse': 'divergent_green_orangereverse',
+  'cool-1reverse': 'divergent_blue_cyanreverse',
+  'cool-2reverse': 'divergent_blue_cyanreverse',
+  'cool-3reverse': 'divergent_blue_cyanreverse',
+  'cool-4reverse': 'divergent_blue_cyanreverse',
+  'cool-5reverse': 'divergent_blue_cyanreverse',
+  'complementary-1reverse': 'divergent_blue_orangereverse',
+  'complementary-2reverse': 'divergent_blue_orangereverse',
+  'complementary-3reverse': 'divergent_blue_orangereverse',
+  'complementary-4reverse': 'divergent_blue_orangereverse',
+  'complementary-5reverse': 'divergent_blue_orangereverse'
 }
 
 // Combined palette migration map for backward compatibility
-const paletteMigrationMap: Record<string, string> = {
+export const paletteMigrationMap: Record<string, string> = {
   ...chartPaletteMigrationMap,
-  ...mapPaletteMigrationMap
+  ...mapPaletteMigrationMap,
+  ...twoColorPaletteMigrationMap
 }
 
-/**
- * Migrates chart palette names from old format to new format
- * @param oldPaletteName - The old palette name to migrate
- * @returns The new palette name, or the original if no migration found
- */
-export const migrateChartPaletteName = (oldPaletteName: string): string => {
-  // Check if this is a reverse palette
-  const isReverse = oldPaletteName.endsWith('reverse')
-  const basePaletteName = isReverse ? oldPaletteName.slice(0, -7) : oldPaletteName
 
-  // Try exact match first
-  if (chartPaletteMigrationMap[basePaletteName]) {
-    const migratedBase = chartPaletteMigrationMap[basePaletteName]
-    return isReverse ? migratedBase + 'reverse' : migratedBase
-  }
-
-  // Try case-insensitive match for chart palettes
-  const lowerCaseName = basePaletteName.toLowerCase()
-  const matchingKey = Object.keys(chartPaletteMigrationMap).find(key => key.toLowerCase() === lowerCaseName)
-
-  if (matchingKey) {
-    const migratedBase = chartPaletteMigrationMap[matchingKey]
-    return isReverse ? migratedBase + 'reverse' : migratedBase
-  }
-
-  return oldPaletteName
-}
-
-/**
- * Migrates map palette names from old format to new format
- * @param oldPaletteName - The old palette name to migrate
- * @returns The new palette name, or the original if no migration found
- */
-export const migrateMapPaletteName = (oldPaletteName: string): string => {
-  // Try exact match first
-  if (mapPaletteMigrationMap[oldPaletteName]) {
-    return mapPaletteMigrationMap[oldPaletteName]
-  }
-
-  // Try case-insensitive match for map palettes
-  const lowerCaseName = oldPaletteName.toLowerCase()
-  const matchingKey = Object.keys(mapPaletteMigrationMap).find(key => key.toLowerCase() === lowerCaseName)
-
-  return matchingKey ? mapPaletteMigrationMap[matchingKey] : oldPaletteName
-}
-
-/**
- * Migrates palette names from old format to new format for any visualization component
- * @param oldPaletteName - The old palette name to migrate
- * @returns The new palette name, or the original if no migration found
- */
-export const migratePaletteName = (oldPaletteName: string): string => {
-  // Handle null/undefined/empty cases
-  if (!oldPaletteName) {
-    return
-  }
-
-  // Try exact match first
-  if (paletteMigrationMap[oldPaletteName]) {
-    return paletteMigrationMap[oldPaletteName]
-  }
-
-  // Try case-insensitive match
-  const lowerCaseName = oldPaletteName.toLowerCase()
-  const matchingKey = Object.keys(paletteMigrationMap).find(key => key.toLowerCase() === lowerCaseName)
-
-  return matchingKey ? paletteMigrationMap[matchingKey] : oldPaletteName
-}

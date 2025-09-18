@@ -2,7 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 
 import '@cdc/core/styles/cove-main.scss'
-import './coreStyles_databite.scss'
 
 import CdcDataBite from './CdcDataBite'
 

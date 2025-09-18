@@ -49,7 +49,7 @@ const chartColorPalettesData = {
     'sequential_purple': ['#E2D3DF', '#CDB2C8', '#B78FAF', '#A6739B', '#935586', '#823A73', '#722161', '#5F2359', '#47264F'],
     'sequential_blue': ['#DBE8F7', '#BED5ED', '#99BCE1', '#73A1D5', '#4E88C7', '#1E6BC0', '#0057B7', '#01418D', '#032659'],
     'sequential_green': ['#D5F9F6', '#AEECE7', '#85DED7', '#63D2CA', '#3BBCAF', '#14A594', '#0A937F', '#0F7A68', '#105B4D'],
-    'qualitative_standard': ['#DFE1E2', '#0057B7', '#722161', '#00B1CE', '#D94E5F', '#5A8E3F', '#FFB24D', '#FB7E38', '#032659', '#975722'],
+    'qualitative_standard': ['#0057B7', '#722161', '#00B1CE', '#D94E5F', '#5A8E3F', '#FFB24D', '#FB7E38', '#032659', '#975722'],
 
     // New v2-only palettes (no migration needed)
     'sequential_teal': ['#e5fafc', '#b3e3ed', '#80cddf', '#4db8d1', '#00b1ce', '#03a2bd', '#0690a6', '#0d6e81', '#125261'],
@@ -60,23 +60,38 @@ const chartColorPalettesData = {
   }
 }
 
-export const colorPalettes3 = {
-  'monochrome-1': ['#a6cee3', '#15017a'],
-  'monochrome-2': ['#c2c0fc', '#15017a'],
-  'monochrome-3': ['#cab2d6', '#6a3d9a'],
-  'monochrome-4': ['#c2c0fc', '#6a3d9a'],
-  'monochrome-5': ['#fedab8', '#bf5b17'],
-  'cool-1': ['#b2df8a', '#1f78b4'],
-  'cool-2': ['#a6cee3', '#72d66b'],
-  'cool-3': ['#c2c0fc', '#386cb0'],
-  'cool-4': ['#72d66b', '#6a3d9a'],
-  'cool-5': ['#a6cee3', '#6a3d9a'],
-  'warm-1': ['#e31a1c', '#fedab8'],
-  'complementary-1': ['#1f78b4', '#e6ab02'],
-  'complementary-2': ['#1f78b4', '#ff7f00'],
-  'complementary-3': ['#6a3d9a', '#ff7f00'],
-  'complementary-4': ['#6a3d9a', '#e6ab02'],
-  'complementary-5': ['#df168c', '#1eb386']
+export const twoColorPaletteData = {
+  v1: {
+    'monochrome-1': ['#a6cee3', '#15017a'],
+    'monochrome-2': ['#c2c0fc', '#15017a'],
+    'monochrome-3': ['#cab2d6', '#6a3d9a'],
+    'monochrome-4': ['#c2c0fc', '#6a3d9a'],
+    'monochrome-5': ['#fedab8', '#bf5b17'],
+    'cool-1': ['#b2df8a', '#1f78b4'],
+    'cool-2': ['#a6cee3', '#72d66b'],
+    'cool-3': ['#c2c0fc', '#386cb0'],
+    'cool-4': ['#72d66b', '#6a3d9a'],
+    'cool-5': ['#a6cee3', '#6a3d9a'],
+    'warm-1': ['#e31a1c', '#fedab8'],
+    'complementary-1': ['#1f78b4', '#e6ab02'],
+    'complementary-2': ['#1f78b4', '#ff7f00'],
+    'complementary-3': ['#6a3d9a', '#ff7f00'],
+    'complementary-4': ['#6a3d9a', '#e6ab02'],
+    'complementary-5': ['#df168c', '#1eb386']
+  },
+  v2: {
+    // Monochrome palettes (monochrome-1,2,3,4) → divergent_blue_purple using indexes [1,7]
+    'divergent_blue_purple': ['#014697', '#7C256B'],
+
+    // Warm palettes (monochrome-5, warm-1) → divergent_green_orange using indexes [5,7]
+    'divergent_green_orange': ['#EE956C', '#AC4726'],
+
+    // Cool palettes (cool-1,2,3,4,5) → divergent_blue_cyan using indexes [1,6]
+    'divergent_blue_cyan': ['#014697', '#01ACC9'],
+
+    // Complementary palettes (complementary-1,2,3,4,5) → divergent_blue_orange using indexes [1,5]
+    'divergent_blue_orange': ['#014697', '#EA803B']
+  }
 }
 
 // Forecasting Palettes should be refactored to use versioned palettes
@@ -95,8 +110,12 @@ export const chartColorPalettes = {
   v2: updatePaletteNames(chartColorPalettesData.v2)
 }
 
+export const twoColorPalette = {
+  v1: updatePaletteNames(twoColorPaletteData.v1),
+  v2: updatePaletteNames(twoColorPaletteData.v2) // No changes for v2, but structured for consistency
+}
+
 export const sequentialPalettes = sequentialColors
 export const colorPalettesChart = chartColorPalettes
 export const colorPalettesChartV1 = chartColorPalettes.v1
 export const colorPalettesChartV2 = chartColorPalettes.v2
-export const twoColorPalette = updatePaletteNames(colorPalettes3)

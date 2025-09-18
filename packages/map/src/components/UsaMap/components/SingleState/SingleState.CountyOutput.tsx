@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import ConfigContext from '../../../../context'
 import { useLegendMemoContext } from '../../../../context/LegendMemoContext'
 import { MapContext } from '../../../../types/MapContext'
@@ -6,6 +6,7 @@ import { getGeoFillColor, displayGeoName } from '../../../../helpers'
 import useApplyTooltipsToGeo from '../../../../hooks/useApplyTooltipsToGeo'
 import { applyLegendToRow } from '../../../../helpers/applyLegendToRow'
 import useGeoClickHandler, { geoClickHandler } from '././../../../../hooks/useGeoClickHandler'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 interface CountyOutputProps {
   counties: any[]
@@ -16,7 +17,7 @@ interface CountyOutputProps {
 }
 
 const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoStrokeColor, tooltipId }) => {
-  const { config, runtimeData, runtimeLegend } = useContext<MapContext>(ConfigContext)
+  const { config, runtimeData, runtimeLegend, interactionLabel } = useContext<MapContext>(ConfigContext)
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const geoFillColor = getGeoFillColor(config)
@@ -24,7 +25,7 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
 
   return (
     <>
-      {counties.map(county => {
+      {counties.map((county, countyIndex) => {
         // Map the name from the geo data with the appropriate key for the processed data
         const geoKey = county.id
 
@@ -77,6 +78,14 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
               onClick={() => geoClickHandler(geoDisplayName, geoData)}
               data-tooltip-id={`tooltip__${tooltipId}`}
               data-tooltip-html={toolTip}
+              onMouseEnter={() => {
+                // Track hover analytics event if this is a new location
+                const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
+                publishAnalyticsEvent(`map_hover_${locationName?.toLowerCase()}`, 'hover', interactionLabel, 'map', {
+                  title: config?.title || config?.general?.title,
+                  location: geoDisplayName
+                })
+              }}
             >
               <path
                 tabIndex={-1}

@@ -1,9 +1,9 @@
-import { formatConfigBeforeSave } from '@cdc/dashboard/src/helpers/formatConfigBeforeSave'
+import { stripConfig } from '@cdc/dashboard/src/helpers/formatConfigBeforeSave'
 
 export const saveConfigToWindow = newTempConfig => {
   if (null !== newTempConfig) {
     // Remove runtime/unnecessary items from config before saving to WCMS, performance optimization
-    let strippedConfig = formatConfigBeforeSave(newTempConfig)
+    let strippedConfig = stripConfig(newTempConfig)
 
     const parsedData = JSON.stringify(strippedConfig)
     // Emit the data in a regular JS event so it can be consumed by anything.

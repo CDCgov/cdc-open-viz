@@ -41,6 +41,7 @@ export const publishAnalyticsEvent = <T extends ANALYTICS_EVENT_TYPES>(
   const ANALYTICS_POWERED_ON = true
   if (!ANALYTICS_POWERED_ON) return
 
+
   return publish('cove:analytics', {
     eventType,
     eventAction,

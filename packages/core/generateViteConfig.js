@@ -19,6 +19,15 @@ const __dirname = path.dirname(__filename)
 // - Active dev servers ('lerna run start') must be restarted in order to view the changed settings.
 const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}) => {
   let configOptionsDefault = {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          // Suppress legacy JS API warnings from Vite's internal Sass usage
+          quietDeps: true,
+          silenceDeprecations: ['legacy-js-api', 'import']
+        }
+      }
+    },
     server: {
       port: 8080,
       headers: {

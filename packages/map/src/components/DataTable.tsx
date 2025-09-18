@@ -180,7 +180,9 @@ const DataTable = props => {
         type='button'
         onClick={() => {
           saveBlob
-          publishAnalyticsEvent('data_downloaded', 'click', interactionLabel)
+          publishAnalyticsEvent('data_downloaded', 'click', interactionLabel, undefined, {
+            title: state?.title || state?.general?.title
+          })
         }}
         href={URL.createObjectURL(blob)}
         aria-label='Download this data in a CSV file format.'

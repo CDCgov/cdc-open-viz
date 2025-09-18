@@ -66,6 +66,7 @@ import { RuntimeData } from './types/RuntimeData'
 import EditorContext from '@cdc/core/contexts/EditorContext'
 import MapActions from './store/map.actions'
 import _ from 'lodash'
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import useModal from './hooks/useModal'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
@@ -96,7 +97,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   setConfig: setParentConfig,
   loadConfig,
   datasets,
-  interactionLabel = ''
+  interactionLabel = 'no link provided'
 }) => {
   const initialState = getInitialState(configObj)
 
@@ -133,7 +134,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   useEffect(() => {
-    const _newConfig = getInitialState(_.cloneDeep(configObj)).config
+    const _newConfig = getInitialState(cloneConfig(configObj)).config
     if (configObj.data) {
       _newConfig.data = configObj.data
     }
@@ -314,9 +315,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       className='margin-left-href'
       onClick={() => {
         publishAnalyticsEvent(
-          'link_to_data_table_click',
+          `link_to_data_table_click|#data-table-${config.dataKey}`,
           'click',
-          `${interactionLabel}|#data-table-${config.dataKey}`,
+          `${interactionLabel}`,
           'map'
         )
       }}

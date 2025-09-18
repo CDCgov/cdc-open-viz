@@ -3,6 +3,7 @@ import { feature } from 'topojson-client'
 import { Group } from '@visx/group'
 import { MapConfig } from '../types/MapConfig'
 import _ from 'lodash'
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 
 /**
  * This is the starting structure for adding custom geoJSON shape layers to a projection.
@@ -46,10 +47,10 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
 
   const handleRemoveLayer = (e: MouseEvent<HTMLButtonElement>, index: number) => {
     e.preventDefault()
-    const newConfig = _.cloneDeep(config)
+    const newConfig = cloneConfig(config)
     const layers = newConfig.map.layers.filter((_layer, i) => i !== index)
     newConfig.map.layers = layers
-    setConfig(newConfig )
+    setConfig(newConfig)
   }
 
   const handleAddLayer = (e: Event) => {
@@ -58,9 +59,9 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
       name: 'New Custom Layer',
       url: ''
     }
-    const newConfig = _.cloneDeep(config)
+    const newConfig = cloneConfig(config)
     newConfig.map.layers.unshift(placeHolderLayer)
-    setConfig( newConfig )
+    setConfig(newConfig)
   }
 
   const handleMapLayer = (e: ChangeEvent<HTMLInputElement>, index: number, layerKey: string) => {

@@ -5,6 +5,7 @@ import EqualNumberMap from './_mock/equal-number.json'
 import MultiState from './_mock/multi-state.json'
 import SingleStateWithFilters from './_mock/DEV-8942.json'
 import exampleCityState from './_mock/example-city-state.json'
+import USBubbleCities from './_mock/us-bubble-cities.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import exampleLegendBins from './_mock/legend-bins.json'
 
@@ -38,7 +39,8 @@ export const Equal_Number_Map: Story = {
 export const Scale_Based: Story = {
   args: {
     configUrl:
-      'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Scale-Based-Categorical-Map-With-Special-Classes.json'
+      'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Scale-Based-Categorical-Map-With-Special-Classes.json',
+    isEditor: true
   }
 }
 export const Qualitative: Story = {
@@ -168,6 +170,13 @@ export const Custom_Color_Distributions_With_Update_Needed: Story = {
 export const Legend_Bins: Story = {
   args: {
     config: exampleLegendBins,
+    isEditor: true
+  }
+}
+
+export const US_Bubble_Cities_Test: Story = {
+  args: {
+    config: USBubbleCities,
     isEditor: true
   }
 }

@@ -1,7 +1,8 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import ConfigContext from '../../ConfigContext'
 import { Group } from '@visx/group'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 const ScatterPlot = ({ xScale, yScale }) => {
   const {
@@ -10,12 +11,16 @@ const ScatterPlot = ({ xScale, yScale }) => {
     tableData,
     formatNumber,
     seriesHighlight,
-    colorPalettes
+    colorPalettes,
+    interactionLabel
   } = useContext(ConfigContext)
 
   // TODO: copied from line chart should probably be a constant somewhere.
   const circleRadii = 4.5
   const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
+
+  // Track current hover for analytics
+  const [currentHover, setCurrentHover] = useState({ dataIndex: null, seriesKey: null })
   // tooltips for additional columns
   const additionalColumns = Object.entries(config.columns)
     .filter(([_, value]) => value.tooltips)
@@ -77,6 +82,18 @@ const ScatterPlot = ({ xScale, yScale }) => {
               data-tooltip-html={handleTooltip(item, s, dataIndex)}
               data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
               tabIndex={-1}
+              onMouseEnter={() => {
+                // Track hover analytics event if this is a new hover
+                if (interactionLabel && (currentHover.dataIndex !== dataIndex || currentHover.seriesKey !== s)) {
+                  const seriesName = config.runtime.seriesLabels?.[s] || s
+                  const safeSeriesName = String(seriesName).replace(/[^a-zA-Z0-9]/g, '_')
+                  publishAnalyticsEvent(`chart_hover_${safeSeriesName.toLowerCase()}`, 'hover', interactionLabel, 'chart', { 
+                    title: config?.title,
+                    series: seriesName
+                  })
+                  setCurrentHover({ dataIndex, seriesKey: s })
+                }
+              }}
             />
           )
         })

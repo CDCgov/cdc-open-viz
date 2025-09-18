@@ -67,18 +67,21 @@ export const BarChart_Labels: Story = {
 
 export const Pie: Story = {
   args: {
-    config: pieConfig
+    config: pieConfig,
+    isEditor: true
   }
 }
 export const Pie_Calculated_Area: Story = {
   args: {
-    config: pieCalculatedArea
+    config: pieCalculatedArea,
+    isEditor: true
   }
 }
 
 export const Paired_Bar: Story = {
   args: {
-    config: pairedBar
+    config: pairedBar,
+    isEditor: true
   }
 }
 

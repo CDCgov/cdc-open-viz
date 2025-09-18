@@ -1,5 +1,6 @@
-import { useContext, FC } from 'react'
+import { useContext, FC, useMemo } from 'react'
 import _ from 'lodash'
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 
 // external libraries
 import {
@@ -18,6 +19,7 @@ import InputToggle from '@cdc/core/components/inputs/InputToggle'
 // contexts
 import { useColorPalette } from '@cdc/core/hooks/useColorPalette'
 import { getCurrentPaletteName } from '@cdc/core/helpers/palettes/utils'
+import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import { ChartContext } from './../../../../types/ChartContext.js'
 
 import { useEditorPermissions } from '../../useEditorPermissions.js'
@@ -25,14 +27,15 @@ import { useEditorPanelContext } from '../../EditorPanelContext.js'
 import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 import { LineChartConfig } from '../../../../types/ChartConfig'
-import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
+import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
 import './panelVisual.styles.css'
 
 const PanelVisual: FC<PanelProps> = props => {
   const { config, updateConfig, colorPalettes, twoColorPalette } = useContext<ChartContext>(ConfigContext)
   const { visual } = config
 
-  const { setLollipopShape, updateField, handlePaletteSelection } = useEditorPanelContext()
+  const { setLollipopShape, updateField, handlePaletteSelection, handleTwoColorPaletteSelection } =
+    useEditorPanelContext()
   const {
     visHasBarBorders,
     visCanAnimate,
@@ -48,6 +51,14 @@ const PanelVisual: FC<PanelProps> = props => {
     visHasSingleSeriesTooltip
   } = useEditorPermissions()
   const { twoColorPalettes, sequential, nonSequential, accessibleColors } = useColorPalette(config, updateConfig)
+
+  const currentPaletteName = getCurrentPaletteName(config)
+
+  const versionedTwoColorPalette = useMemo(() => {
+    const version = getColorPaletteVersion(config)
+    const versionKey = `v${version}`
+    return twoColorPalette[versionKey] || twoColorPalette.v2
+  }, [config, twoColorPalette])
 
   const updateColor = (property, _value) => {
     console.error('value', _value)
@@ -259,6 +270,15 @@ const PanelVisual: FC<PanelProps> = props => {
             <label>
               <span className='edit-label'>Chart Color Palette</span>
             </label>
+            <div className='mb-2'>
+              <small className='text-muted'>
+                Review color contrasts{' '}
+                <a href='https://webaim.org/resources/contrastchecker/' target='_blank' rel='noopener noreferrer'>
+                  here
+                </a>
+              </small>
+            </div>
+            <DeveloperPaletteRollback config={config} updateConfig={updateConfig} />
             {visSupportsReverseColorPalette() && (
               <InputToggle
                 section='general'
@@ -268,7 +288,7 @@ const PanelVisual: FC<PanelProps> = props => {
                 label='Use selected palette in reverse order'
                 updateField={updateField}
                 onClick={() => {
-                  const _state = _.cloneDeep(config)
+                  const _state = cloneConfig(config)
                   const currentPaletteName = getCurrentPaletteName(config)
                   _state.general.palette.isReversed = !_state.general.palette.isReversed
                   let paletteName = ''
@@ -294,7 +314,7 @@ const PanelVisual: FC<PanelProps> = props => {
                   colorPalettes={colorPalettes}
                   config={config}
                   onPaletteSelect={handlePaletteSelection}
-                  selectedPalette={getCurrentPaletteName(config)}
+                  selectedPalette={currentPaletteName}
                   colorIndices={[2, 3, 5]}
                   className='color-palette'
                 />
@@ -362,6 +382,7 @@ const PanelVisual: FC<PanelProps> = props => {
         )}
         {(config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar') && (
           <>
+            <DeveloperPaletteRollback config={config} updateConfig={updateConfig} className='mt-3' />
             <InputToggle
               section='twoColor'
               fieldName='isPaletteReversed'
@@ -371,30 +392,48 @@ const PanelVisual: FC<PanelProps> = props => {
               value={config.twoColor.isPaletteReversed}
             />
             <ul className='color-palette'>
-              {twoColorPalettes.map(palette => {
-                const colorOne = {
-                  backgroundColor: twoColorPalette[palette][0]
-                }
+              {twoColorPalettes
+                .map(palette => {
+                  const paletteColors = versionedTwoColorPalette[palette]
 
-                const colorTwo = {
-                  backgroundColor: twoColorPalette[palette][1]
-                }
+                  if (!paletteColors || paletteColors.length < 2) {
+                    console.warn(
+                      `Two-color palette "${palette}" not found or incomplete in version ${getColorPaletteVersion(
+                        config
+                      )}`
+                    )
+                    return null
+                  }
 
-                return (
-                  <button
-                    title={palette}
-                    key={palette}
-                    onClick={e => {
-                      e.preventDefault()
-                      updateConfig({ ...config, twoColor: { ...config.twoColor, palette } })
-                    }}
-                    className={config.twoColor.palette === palette ? 'selected' : ''}
-                  >
-                    <span className='two-color' style={colorOne}></span>
-                    <span className='two-color' style={colorTwo}></span>
-                  </button>
-                )
-              })}
+                  const colorOne = {
+                    backgroundColor: paletteColors[0]
+                  }
+
+                  const colorTwo = {
+                    backgroundColor: paletteColors[1]
+                  }
+
+                  return (
+                    <button
+                      title={palette}
+                      key={palette}
+                      onClick={e => {
+                        e.preventDefault()
+                        if (handleTwoColorPaletteSelection) {
+                          handleTwoColorPaletteSelection(palette)
+                        } else {
+                          // Fallback to direct update if handler not available
+                          updateConfig({ ...config, twoColor: { ...config.twoColor, palette } })
+                        }
+                      }}
+                      className={config.twoColor.palette === palette ? 'selected' : ''}
+                    >
+                      <span className='two-color' style={colorOne}></span>
+                      <span className='two-color' style={colorTwo}></span>
+                    </button>
+                  )
+                })
+                .filter(Boolean)}
             </ul>
           </>
         )}
