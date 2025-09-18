@@ -135,12 +135,12 @@ export const useTooltip = props => {
         // Track hover analytics event for pie chart series
         if (pieData[config.xAxis.dataKey] && interactionLabel) {
           const seriesName = String(pieData[config.xAxis.dataKey]).replace(/[^a-zA-Z0-9]/g, '_')
-          publishAnalyticsEvent(`chart_hover_${seriesName.toLowerCase()}`, 'hover', interactionLabel, 'chart', { 
+          publishAnalyticsEvent(`chart_hover_${seriesName.toLowerCase()}`, 'hover', interactionLabel, 'chart', {
             title: config?.title,
             series: pieData[config.xAxis.dataKey]
           })
         }
-        
+
         tooltipItems.push(
           [config.xAxis.dataKey, pieData[config.xAxis.dataKey]],
           [
@@ -178,17 +178,23 @@ export const useTooltip = props => {
               const seriesObjWithName = config.runtime.series.find(
                 series => series.dataKey === seriesKey && series.name !== undefined
               )
-              
+
               // Track hover analytics event for linear chart series
               if (interactionLabel && seriesKey && seriesKey !== config.xAxis?.dataKey) {
                 const seriesName = seriesObjWithName?.name || seriesKey
                 const safeSeriesName = String(seriesName).replace(/[^a-zA-Z0-9]/g, '_')
-                publishAnalyticsEvent(`chart_hover_${safeSeriesName.toLowerCase()}`, 'hover', interactionLabel, 'chart', { 
-                  title: config?.title,
-                  series: seriesName
-                })
+                publishAnalyticsEvent(
+                  `chart_hover_${safeSeriesName.toLowerCase()}`,
+                  'hover',
+                  interactionLabel,
+                  'chart',
+                  {
+                    title: config?.title,
+                    series: seriesName
+                  }
+                )
               }
-              
+
               if (
                 (value === null || value === undefined || value === '' || formattedValue === 'N/A') &&
                 config.general.hideNullValue

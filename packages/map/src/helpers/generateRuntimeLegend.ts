@@ -348,8 +348,10 @@ export const generateRuntimeLegend = (
         }
 
         // Check if we should use v2 distribution logic for better contrast
-        const isSequentialOrDivergent = paletteName && (paletteName.includes('sequential') || paletteName.includes('divergent'))
-        const useV2Distribution = version === 2 && isSequentialOrDivergent && colors.length === 9 && legend.numberOfItems <= 9
+        const isSequentialOrDivergent =
+          paletteName && (paletteName.includes('sequential') || paletteName.includes('divergent'))
+        const useV2Distribution =
+          version === 2 && isSequentialOrDivergent && colors.length === 9 && legend.numberOfItems <= 9
 
         let colorRange
         if (useV2Distribution && v2ColorDistribution[legend.numberOfItems]) {

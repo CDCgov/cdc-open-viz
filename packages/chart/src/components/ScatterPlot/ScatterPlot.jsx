@@ -18,7 +18,7 @@ const ScatterPlot = ({ xScale, yScale }) => {
   // TODO: copied from line chart should probably be a constant somewhere.
   const circleRadii = 4.5
   const hasMultipleSeries = Object.keys(config.runtime.seriesLabels).length > 1
-  
+
   // Track current hover for analytics
   const [currentHover, setCurrentHover] = useState({ dataIndex: null, seriesKey: null })
   // tooltips for additional columns
