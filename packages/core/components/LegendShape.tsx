@@ -4,6 +4,7 @@ interface PatternInfo {
   pattern: string
   patternId: string
   size?: string
+  color?: string
 }
 
 interface LegendShapeProps {
@@ -26,7 +27,10 @@ const LegendShape: React.FC<LegendShapeProps> = props => {
       medium: '10',
       large: '12'
     }
+
     const patternSize = sizes[patternInfo.size as keyof typeof sizes] || '10'
+    // Use the exact pattern color from config, with a reliable fallback
+    const patternColor = patternInfo.color || '#212529'
 
     return (
       <span className={`legend-item ${isCircleOrSquare ? 'me-2' : ''}`} style={{ display, verticalAlign: 'middle', width: dimensions.width, height: dimensions.height }}>
@@ -42,7 +46,7 @@ const LegendShape: React.FC<LegendShapeProps> = props => {
               >
                 <path
                   d={`M0,${parseInt(patternSize) / 2} Q${parseInt(patternSize) / 4},0 ${parseInt(patternSize) / 2},${parseInt(patternSize) / 2} T${patternSize},${parseInt(patternSize) / 2}`}
-                  stroke="#000"
+                  stroke={patternColor}
                   strokeWidth="0.25"
                   fill="none"
                 />
@@ -59,7 +63,7 @@ const LegendShape: React.FC<LegendShapeProps> = props => {
                   cx={parseInt(patternSize) / 2}
                   cy={parseInt(patternSize) / 2}
                   r="1.25"
-                  fill="#000"
+                  fill={patternColor}
                 />
               </pattern>
             )}
@@ -75,7 +79,7 @@ const LegendShape: React.FC<LegendShapeProps> = props => {
                   y1="0"
                   x2={patternSize}
                   y2={patternSize}
-                  stroke="#000"
+                  stroke={patternColor}
                   strokeWidth="0.75"
                 />
               </pattern>
