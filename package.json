@@ -93,7 +93,7 @@
     "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
     "publish": "npx lerna publish",
     "storybook": "storybook dev -p 6006",
-    "test-storybook": "vitest --project=storybook",
+    "test-storybook": "vitest run --project=storybook",
     "storybook-docs": "storybook dev --docs",
     "build-storybook": "storybook build",
     "postinstall": "patch-package",

@@ -38,4 +38,4 @@ jobs:
         run: npx wait-on http://localhost:6006
 
       - name: Run Storybook tests
-        run: yarn test-storybook
+        run: yarn test-storybook --no-watch --reporter=default
