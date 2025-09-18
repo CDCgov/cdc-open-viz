@@ -1,5 +1,5 @@
 // COVE Storybook Themes
-import { create } from '@storybook/theming'
+import { create } from 'storybook/theming'
 import logo from './assets/cove-logo-long.svg'
 
 export const managerTheme = create({

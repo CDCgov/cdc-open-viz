@@ -1,6 +1,6 @@
 import { Line } from '@visx/shape'
 import { Group } from '@visx/group'
-import { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import ConfigContext from '../ConfigContext'
 import { Text } from '@visx/text'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'

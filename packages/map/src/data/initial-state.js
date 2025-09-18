@@ -18,7 +18,7 @@ const createInitialState = () => {
     annotations: [],
     general: {
       navigationTarget: '_self',
-      noStateFoundMessage: 'Map Unavailable',
+      noDataMessage: 'No State Selected',
       annotationDropdownText: 'Annotations',
       geoBorderColor: 'darkGray',
       headerColor: 'theme-blue',
@@ -40,12 +40,7 @@ const createInitialState = () => {
       allowMapZoom: true,
       hideGeoColumnInTooltip: false,
       hidePrimaryColumnInTooltip: false,
-      statesPicked: [
-        {
-          fipsCode: '01',
-          stateName: 'Alabama'
-        }
-      ]
+      statesPicked: []
     },
     type: 'map',
     columns: {

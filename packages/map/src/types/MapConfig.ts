@@ -96,6 +96,7 @@ export type MapConfig = Visualization & {
   filters: VizFilter[]
   general: {
     navigationTarget: '_self' | '_blank'
+    noDataMessage: string // single-state no data message
     subtext: string
     introText: string
     allowMapZoom: boolean
@@ -186,8 +187,6 @@ export type MapConfig = Visualization & {
   }
   runtime: {
     editorErrorMessage: string[]
-    // when a single state map doesn't include a fips code show a message...
-    noStateFoundMessage: string
   }
   mapPosition: { coordinates: Coordinate; zoom: number }
   map: {

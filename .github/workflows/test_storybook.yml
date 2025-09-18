@@ -2,6 +2,8 @@ name: Test Storybook
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main, dev]
 
 jobs:
   storybook-tests:
@@ -14,7 +16,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
           cache: yarn
 
       - name: Install dependencies
@@ -36,4 +38,4 @@ jobs:
         run: npx wait-on http://localhost:6006
 
       - name: Run Storybook tests
-        run: yarn test-storybook
+        run: yarn test-storybook --no-watch --reporter=default

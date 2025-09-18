@@ -96,7 +96,7 @@ export const hasMoreThanFromHash = (data: { [key: string]: any }): boolean => {
   return otherKeys.length > 0
 }
 
-export const getFilterControllingStatesPicked = (state, runtimeData) => {
+export const getFilterControllingStatesPicked = (state, runtimeData): string[] => {
   if (!state.general.filterControlsStatesPicked || !runtimeData) {
     return state?.general?.statesPicked?.map(sp => sp.stateName) || []
   } else {
@@ -109,7 +109,7 @@ export const getFilterControllingStatesPicked = (state, runtimeData) => {
       } else if (statesPickedFromFilter) {
         return [statesPickedFromFilter]
       } else {
-        return state?.general?.statesPicked?.map(sp => sp.stateName) || ['Alabama']
+        return state?.general?.statesPicked?.map(sp => sp.stateName) || []
       }
     }
     return state?.general?.statesPicked?.map(sp => sp.stateName) || []

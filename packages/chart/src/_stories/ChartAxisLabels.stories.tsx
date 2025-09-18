@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import SimplifiedLineConfig from './_mock/simplified_line.json'
 
 import Chart from '../CdcChartComponent'

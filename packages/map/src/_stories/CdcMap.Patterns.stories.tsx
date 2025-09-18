@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import CdcMap from '../CdcMap'
 import defaultPatterns from './_mock/default-patterns.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
