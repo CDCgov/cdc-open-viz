@@ -71,8 +71,9 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
           return (
             <g
               key={`key--${county.id}`}
-              className={`county county--${geoDisplayName.split(' ').join('')} county--${geoData[config.columns.geo.name]
-                }`}
+              className={`county county--${geoDisplayName.split(' ').join('')} county--${
+                geoData[config.columns.geo.name]
+              }`}
               style={styles}
               onClick={() => geoClickHandler(geoDisplayName, geoData)}
               data-tooltip-id={`tooltip__${tooltipId}`}

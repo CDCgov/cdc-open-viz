@@ -6,6 +6,7 @@ import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import _ from 'lodash'
 import { applyLegendToRow } from '@cdc/map/src/helpers/applyLegendToRow'
 import { hashObj } from '@cdc/map/src/helpers'
+import { getPatternForRow } from '@cdc/map/src/helpers/getPatternForRow'
 
 type MapRowsProps = DataTableProps & {
   rows: string[]
@@ -104,10 +105,26 @@ const mapCellArray = ({
             type === 'bubble' && allowMapZoom && geoType === 'world' ? () => setFilteredCountryCode(row) : undefined
 
           const validColor = legendColor && legendColor.length > 0 && !noColor
+          
+          // Check for pattern information
+          const patternInfo = getPatternForRow(rowObj, config)
+          const mapId = config.runtime?.uniqueId || 'map'
+          
           return (
             <div className='col-12'>
               {validColor ? (
-                <LegendShape fill={legendColor[0]} />
+                patternInfo ? (
+                  <LegendShape
+                    fill={legendColor[0]}
+                    patternInfo={{
+                      pattern: patternInfo.pattern,
+                      patternId: `${mapId}--${patternInfo.dataKey}--${patternInfo.patternIndex}--table`,
+                      size: patternInfo.size
+                    }}
+                  />
+                ) : (
+                  <LegendShape fill={legendColor[0]} />
+                )
               ) : (
                 <div className='d-inline-block me-2' style={{ width: '1rem', height: '1rem' }} />
               )}

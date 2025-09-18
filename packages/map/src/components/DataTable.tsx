@@ -13,6 +13,7 @@ import Loading from '@cdc/core/components/Loading'
 import { navigationHandler } from '../helpers'
 import ConfigContext, { MapDispatchContext } from '../context'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getPatternForRow } from '../helpers/getPatternForRow'
 
 const DataTable = props => {
   const {
@@ -34,7 +35,7 @@ const DataTable = props => {
   } = props
 
   const dispatch = useContext(MapDispatchContext)
-  const { currentViewport: viewport } = useContext(ConfigContext)
+  const { currentViewport: viewport, mapId } = useContext(ConfigContext)
   const [expanded, setExpanded] = useState(expandDataTable)
   const [sortBy, setSortBy] = useState({ column: 'geo', asc: false })
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
@@ -343,9 +344,24 @@ const DataTable = props => {
 
                           labelValue = getCellAnchor(labelValue, rowObj)
 
+                          // Check for pattern information
+                          const patternInfo = getPatternForRow(rowObj, state)
+                          const legendShape = patternInfo ? (
+                            <LegendShape
+                              fill={legendColor[0]}
+                              patternInfo={{
+                                pattern: patternInfo.pattern,
+                                patternId: `${mapId}--${patternInfo.dataKey}--${patternInfo.patternIndex}--table`,
+                                size: patternInfo.size
+                              }}
+                            />
+                          ) : (
+                            <LegendShape fill={legendColor[0]} />
+                          )
+
                           cellValue = (
                             <>
-                              <LegendShape fill={legendColor[0]} />
+                              {legendShape}
                               {labelValue}
                             </>
                           )
@@ -355,9 +371,9 @@ const DataTable = props => {
 
                         return (
                           <td
-                            tabIndex='0'
+                            tabIndex={0}
                             role='gridcell'
-                            onClick={e =>
+                            onClick={() =>
                               state.general.type === 'bubble' &&
                               state.general.allowMapZoom &&
                               state.general.geoType === 'world'
