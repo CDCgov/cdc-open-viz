@@ -155,12 +155,23 @@ const BarChartStackedVertical = () => {
                       return null
                     }
 
-                    // Find a pattern that matches this data point
-                    for (const [patternKey, pattern] of Object.entries(config.legend.patterns)) {
-                      if (pattern.dataKey && pattern.dataValue) {
-                        const dataFieldValue = bar.bar.data[pattern.dataKey]
-                        if (String(dataFieldValue) === String(pattern.dataValue)) {
+                    // Find a pattern that matches this specific bar
+                    for (const [patternKey, patternObj] of Object.entries(config.legend.patterns)) {
+                      const pattern = patternObj as any
+                      if (pattern?.dataKey && pattern?.dataValue) {
+                        // For stacked bar charts, check if the pattern's dataKey matches the current bar's series key
+                        // and if the pattern's dataValue matches the current bar's value
+                        const barValue = bar.bar.data[bar.key]
+                        if (pattern.dataKey === bar.key && String(barValue) === String(pattern.dataValue)) {
                           return `url(#chart-pattern-${patternKey})`
+                        }
+                        // Fallback for non-series pattern matching (like the original stacked pattern test)
+                        // Only check this if the pattern dataKey is NOT a series key
+                        else if (!config.runtime.seriesLabels || !config.runtime.seriesLabels[pattern.dataKey]) {
+                          const dataFieldValue = bar.bar.data[pattern.dataKey]
+                          if (String(dataFieldValue) === String(pattern.dataValue)) {
+                            return `url(#chart-pattern-${patternKey})`
+                          }
                         }
                       }
                     }

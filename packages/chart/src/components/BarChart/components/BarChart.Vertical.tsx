@@ -329,12 +329,20 @@ export const BarChartVertical = () => {
                       return null
                     }
 
-                    // Find a pattern that matches this data point
+                    // Find a pattern that matches this specific bar
                     for (const [patternKey, pattern] of Object.entries(config.legend.patterns)) {
                       if (pattern.dataKey && pattern.dataValue) {
-                        const dataFieldValue = datum[pattern.dataKey]
-                        if (String(dataFieldValue) === String(pattern.dataValue)) {
+                        // For grouped bar charts, check if the pattern's dataKey matches the current bar's series key
+                        // and if the pattern's dataValue matches the current bar's value
+                        if (pattern.dataKey === bar.key && String(bar.value) === String(pattern.dataValue)) {
                           return `url(#chart-pattern-${patternKey})`
+                        }
+                        // Fallback for non-grouped charts: check datum field value
+                        else if (!config.series || config.series.length <= 1) {
+                          const dataFieldValue = datum[pattern.dataKey]
+                          if (String(dataFieldValue) === String(pattern.dataValue)) {
+                            return `url(#chart-pattern-${patternKey})`
+                          }
                         }
                       }
                     }
