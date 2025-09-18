@@ -314,9 +314,8 @@ const DataTable = props => {
                           : null)}
                       >
                         {text}
-                        <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${
-                          sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
-                        } order`}</span>
+                        <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
+                          } order`}</span>
                       </th>
                     )
                   })}
@@ -346,13 +345,15 @@ const DataTable = props => {
 
                           // Check for pattern information
                           const patternInfo = getPatternForRow(rowObj, state)
+
                           const legendShape = patternInfo ? (
                             <LegendShape
                               fill={legendColor[0]}
                               patternInfo={{
                                 pattern: patternInfo.pattern,
-                                patternId: `${mapId}--${patternInfo.dataKey}--${patternInfo.patternIndex}--table`,
-                                size: patternInfo.size
+                                patternId: `${mapId}--${String(patternInfo.dataKey).replace(' ', '-')}--${patternInfo.patternIndex}--table`,
+                                size: patternInfo.size,
+                                color: patternInfo.color
                               }}
                             />
                           ) : (
@@ -375,8 +376,8 @@ const DataTable = props => {
                             role='gridcell'
                             onClick={() =>
                               state.general.type === 'bubble' &&
-                              state.general.allowMapZoom &&
-                              state.general.geoType === 'world'
+                                state.general.allowMapZoom &&
+                                state.general.geoType === 'world'
                                 ? dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: row })
                                 : true
                             }

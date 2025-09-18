@@ -5,10 +5,11 @@ export interface PatternInfo {
   dataKey: string
   size?: string
   patternIndex: number
+  color?: string
 }
 
 export const getPatternForRow = (
-  rowObj: Record<string, any>, 
+  rowObj: Record<string, any>,
   config: MapConfig
 ): PatternInfo | null => {
   if (!config.map?.patterns || !rowObj) {
@@ -19,13 +20,14 @@ export const getPatternForRow = (
   for (let i = 0; i < config.map.patterns.length; i++) {
     const patternData = config.map.patterns[i]
     const hasMatchingValues = patternData.dataValue === rowObj[patternData.dataKey]
-    
+
     if (hasMatchingValues) {
       return {
         pattern: patternData.pattern,
         dataKey: patternData.dataKey,
         size: patternData.size,
-        patternIndex: i
+        patternIndex: i,
+        color: patternData.color
       }
     }
   }
