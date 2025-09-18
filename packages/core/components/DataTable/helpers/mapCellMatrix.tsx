@@ -119,7 +119,8 @@ const mapCellArray = ({
                     patternInfo={{
                       pattern: patternInfo.pattern,
                       patternId: `${mapId}--${patternInfo.dataKey}--${patternInfo.patternIndex}--table`,
-                      size: patternInfo.size
+                      size: patternInfo.size,
+                      color: patternInfo.color
                     }}
                   />
                 ) : (
