@@ -5,7 +5,7 @@ import cloneConfig from '../cloneConfig'
 import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 
 const addMissingDataFormatFields = (config) => {
-  if (config.type === 'chart' && config.visualizationType === 'Pie Chart') {
+  if (config.type === 'chart' && config.visualizationType === 'Pie') {
     // if we're missing the show pie percent field
     if (config.data?.showPiePercent === undefined) {
       config.data = config.data || {}
