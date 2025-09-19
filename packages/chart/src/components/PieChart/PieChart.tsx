@@ -108,10 +108,9 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
   const applyEnhancedColorDistribution = (config, palette, numberOfKeys) => {
     const version = getColorPaletteVersion(config)
     const configPalette = config.general?.palette?.name || config.palette
-    const isPairedBarOrDeviation = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
 
-    // Skip enhanced distribution for paired bar or deviation charts
-    if (isPairedBarOrDeviation || version !== 2 || numberOfKeys > 9 || palette.length !== 9) {
+    // Skip enhanced distribution if not v2, too many keys, or wrong palette length
+    if (version !== 2 || numberOfKeys > 9 || palette.length !== 9) {
       return palette.slice(0, numberOfKeys)
     }
 
