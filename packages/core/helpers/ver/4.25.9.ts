@@ -11,8 +11,6 @@ const addMissingDataFormatFields = (config) => {
       config.data = config.data || {}
       config.data.showPiePercent = false
     }
-
-
   }
 }
 
