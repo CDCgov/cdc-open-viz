@@ -12,7 +12,7 @@ interface SmallMultipleTileProps {
   seriesKey?: string
   tileValue?: any
   tileColumn?: string
-  customTitle?: string
+  tileTitle: string
   customColorScale?: ColorScale
   svgRef?: React.RefObject<SVGAElement>
   parentWidth?: number
@@ -31,7 +31,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   seriesKey,
   tileValue,
   tileColumn,
-  customTitle,
+  tileTitle,
   customColorScale,
   svgRef,
   parentWidth,
@@ -43,7 +43,6 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
 }) => {
   let tileConfig = { ...config }
   let tileData = data
-  let tileTitle = ''
 
   if (mode === 'by-series') {
     // BY-SERIES: One series per tile, all data
@@ -62,7 +61,6 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
       smallMultiples: undefined // Remove smallMultiples to prevent infinite loop
     }
     tileData = data // All data, but only one series will render
-    tileTitle = customTitle || seriesKey
   } else if (mode === 'by-column') {
     // BY-COLUMN: All series, filtered data by tile column value
     tileConfig = {
@@ -71,7 +69,6 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
       smallMultiples: undefined // Remove smallMultiples to prevent infinite loop
     }
     tileData = data.filter(row => row[tileColumn] === tileValue) // Filtered data
-    tileTitle = customTitle || tileValue
   }
 
   // Apply global Y-axis values for consistent scaling if provided
@@ -131,7 +128,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   return (
     <div ref={fullTileRef} className='small-multiple-tile'>
       <div className='tile-header'>
-        <h4 className='tile-title'>{tileTitle}</h4>
+        <div className='tile-title'>{tileTitle}</div>
       </div>
       <div ref={tileParentRef} className='tile-chart'>
         <ParentSize key={`${tilesPerRow}-${mode}-${seriesKey || tileValue}`}>

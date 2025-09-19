@@ -1891,7 +1891,23 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     label='Tile Mode'
                     initial='Select Mode'
                     updateField={updateField}
-                    options={['by-column', 'by-series']}
+                    options={[
+                      { label: 'By data series', value: 'by-series' },
+                      { label: 'By column values', value: 'by-column' }
+                    ]}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>
+                            Choose how to create multiple charts. "By Data Series" creates a tile for each configured
+                            data series. "By Column Values" creates a tile for each unique value in the selected column.
+                          </p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
                   />
                   {config.smallMultiples?.mode === 'by-column' && (
                     <Select
@@ -1904,11 +1920,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       options={getColumns()}
                     />
                   )}
-                  {config.smallMultiples?.mode === 'by-series' && (
-                    <p style={{ fontStyle: 'italic', color: '#666', marginTop: '10px' }}>
-                      Each configured data series will become its own tile.
-                    </p>
-                  )}
 
                   {config.smallMultiples?.mode && (
                     <>
@@ -1918,7 +1929,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           value={config.smallMultiples?.tilesPerRowDesktop}
                           section='smallMultiples'
                           fieldName='tilesPerRowDesktop'
-                          label='Desktop Tiles Per Row'
+                          label='Tiles Per Row'
                           updateField={updateField}
                           min={1}
                           max={6}
@@ -1938,7 +1949,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           value={config.smallMultiples?.tilesPerRowMobile}
                           section='smallMultiples'
                           fieldName='tilesPerRowMobile'
-                          label='Mobile Tiles Per Row'
+                          label='Mobile'
                           updateField={updateField}
                           min={1}
                           max={3}
@@ -1955,6 +1966,234 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         />
                       </div>
 
+                      {/* Tile Ordering */}
+                      {(() => {
+                        const availableTiles = getTileKeys(config, data)
+                        if (availableTiles.length === 0) return null
+
+                        const tileOrderOptions = [
+                          {
+                            label: 'Ascending By Title',
+                            value: 'asc'
+                          },
+                          {
+                            label: 'Descending By Title',
+                            value: 'desc'
+                          },
+                          {
+                            label: 'Custom',
+                            value: 'custom'
+                          }
+                        ]
+
+                        const currentOrderType = config.smallMultiples?.tileOrderType || 'asc'
+
+                        const handleOrderTypeChange = orderType => {
+                          const newConfig = {
+                            ...config,
+                            smallMultiples: {
+                              ...config.smallMultiples,
+                              tileOrderType: orderType
+                            }
+                          }
+
+                          // If switching to custom, initialize with current tile order
+                          if (orderType === 'custom' && !config.smallMultiples?.tileOrder?.length) {
+                            newConfig.smallMultiples.tileOrder = [...availableTiles]
+                          }
+
+                          updateConfig(newConfig)
+                        }
+
+                        const handleCustomTileOrderChange = (sourceIndex, destinationIndex) => {
+                          if (destinationIndex === null) return
+
+                          const currentOrder = config.smallMultiples?.tileOrder || [...availableTiles]
+                          const newOrder = [...currentOrder]
+                          const [removed] = newOrder.splice(sourceIndex, 1)
+                          newOrder.splice(destinationIndex, 0, removed)
+
+                          updateConfig({
+                            ...config,
+                            smallMultiples: {
+                              ...config.smallMultiples,
+                              tileOrder: newOrder,
+                              tileOrderType: 'custom'
+                            }
+                          })
+                        }
+
+                        return (
+                          <>
+                            <Select
+                              value={currentOrderType}
+                              options={tileOrderOptions}
+                              label='Tile Order'
+                              updateField={(_section, _subsection, _fieldName, value) => {
+                                handleOrderTypeChange(value)
+                              }}
+                            />
+
+                            {currentOrderType === 'custom' && (
+                              <DragDropContext
+                                onDragEnd={({ source, destination }) =>
+                                  handleCustomTileOrderChange(source.index, destination?.index)
+                                }
+                              >
+                                <Droppable droppableId='tile_order'>
+                                  {provided => (
+                                    <ul
+                                      {...provided.droppableProps}
+                                      className='sort-list'
+                                      ref={provided.innerRef}
+                                      style={{ marginTop: '1em' }}
+                                    >
+                                      {(config.smallMultiples?.tileOrder || availableTiles).map((tileKey, index) => (
+                                        <Draggable key={tileKey} draggableId={`tile-${tileKey}`} index={index}>
+                                          {(provided, snapshot) => (
+                                            <li>
+                                              <div
+                                                className={snapshot.isDragging ? 'currently-dragging' : ''}
+                                                style={provided.draggableProps.style}
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                              >
+                                                {tileKey}
+                                              </div>
+                                            </li>
+                                          )}
+                                        </Draggable>
+                                      ))}
+                                      {provided.placeholder}
+                                    </ul>
+                                  )}
+                                </Droppable>
+                              </DragDropContext>
+                            )}
+                          </>
+                        )
+                      })()}
+
+                      {/* Color Mode */}
+                      <Select
+                        value={config.smallMultiples?.colorMode || 'different'}
+                        options={[
+                          {
+                            label: 'Same Color',
+                            value: 'same'
+                          },
+                          {
+                            label: 'Different Colors',
+                            value: 'different'
+                          }
+                        ]}
+                        label='Color Mode'
+                        updateField={(_section, _subsection, _fieldName, value) => {
+                          updateConfig({
+                            ...config,
+                            smallMultiples: {
+                              ...config.smallMultiples,
+                              colorMode: value
+                            }
+                          })
+                        }}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                When "Different Colors" is selected, each tile will use the next color in the configured
+                                color palette.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+
+                      {/* Custom Tile Titles - only show for by-column mode */}
+                      {config.smallMultiples?.mode === 'by-column' && (
+                        <div>
+                          <label style={{ marginTop: '1.5rem', marginBottom: '0.5rem' }}>Custom Tile Titles</label>
+
+                          {(() => {
+                            const availableTiles = getTileKeys(config, data)
+                            if (availableTiles.length === 0) return null
+
+                            const handleTitleChange = (tileKey, customTitle) => {
+                              const newTitles = { ...config.smallMultiples?.tileTitles }
+                              if (customTitle.trim() === '' || customTitle === tileKey) {
+                                delete newTitles[tileKey] // Remove entry if empty or same as key
+                              } else {
+                                newTitles[tileKey] = customTitle
+                              }
+
+                              updateConfig({
+                                ...config,
+                                smallMultiples: {
+                                  ...config.smallMultiples,
+                                  tileTitles: newTitles
+                                }
+                              })
+                            }
+
+                            return (
+                              <div className='tile-titles-editor' style={{ maxWidth: '100%', overflow: 'hidden' }}>
+                                {availableTiles.map(tileKey => {
+                                  const customTitle = config.smallMultiples?.tileTitles?.[tileKey] || ''
+                                  return (
+                                    <div
+                                      key={tileKey}
+                                      className='tile-title-row'
+                                      style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        marginBottom: '0.75rem',
+                                        maxWidth: '100%'
+                                      }}
+                                    >
+                                      <label
+                                        style={{
+                                          minWidth: '80px',
+                                          maxWidth: '120px',
+                                          marginRight: '0.75rem',
+                                          fontWeight: 'normal',
+                                          fontSize: '13px',
+                                          overflow: 'hidden',
+                                          textOverflow: 'ellipsis',
+                                          whiteSpace: 'nowrap',
+                                          flexShrink: 0
+                                        }}
+                                      >
+                                        {tileKey}:
+                                      </label>
+                                      <input
+                                        type='text'
+                                        value={customTitle}
+                                        placeholder={tileKey}
+                                        onChange={event => handleTitleChange(tileKey, event.target.value)}
+                                        style={{
+                                          flex: 1,
+                                          minWidth: 0,
+                                          maxWidth: '200px',
+                                          fontSize: '13px',
+                                          padding: '4px 8px',
+                                          height: '30px',
+                                          border: '1px solid #ccc',
+                                          borderRadius: '3px'
+                                        }}
+                                      />
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            )
+                          })()}
+                        </div>
+                      )}
+
                       <CheckBox
                         value={config.smallMultiples?.consistentYAxis}
                         section='smallMultiples'
@@ -1969,242 +2208,13 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             <Tooltip.Content>
                               <p>
                                 Use the same Y-axis scale across all tiles for easier comparison. When unchecked, each
-                                tile will use its own optimal scale.
+                                tile will use its own scale. If configured, the chart's y-axis min/max will always be
+                                used.
                               </p>
                             </Tooltip.Content>
                           </Tooltip>
                         }
                       />
-
-                      {/* Tile Ordering */}
-                      <fieldset className='edit-block'>
-                        <legend>
-                          <label>Tile Order</label>
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>Choose how to order tiles in your small multiples grid.</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </legend>
-
-                        {(() => {
-                          const availableTiles = getTileKeys(config, data)
-                          if (availableTiles.length === 0) return null
-
-                          const tileOrderOptions = [
-                            {
-                              label: 'Ascending Alphanumeric',
-                              value: 'asc'
-                            },
-                            {
-                              label: 'Descending Alphanumeric',
-                              value: 'desc'
-                            },
-                            {
-                              label: 'Custom',
-                              value: 'custom'
-                            }
-                          ]
-
-                          const currentOrderType = config.smallMultiples?.tileOrderType || 'asc'
-
-                          const handleOrderTypeChange = orderType => {
-                            const newConfig = {
-                              ...config,
-                              smallMultiples: {
-                                ...config.smallMultiples,
-                                tileOrderType: orderType
-                              }
-                            }
-
-                            // If switching to custom, initialize with current tile order
-                            if (orderType === 'custom' && !config.smallMultiples?.tileOrder?.length) {
-                              newConfig.smallMultiples.tileOrder = [...availableTiles]
-                            }
-
-                            updateConfig(newConfig)
-                          }
-
-                          const handleCustomTileOrderChange = (sourceIndex, destinationIndex) => {
-                            if (destinationIndex === null) return
-
-                            const currentOrder = config.smallMultiples?.tileOrder || [...availableTiles]
-                            const newOrder = [...currentOrder]
-                            const [removed] = newOrder.splice(sourceIndex, 1)
-                            newOrder.splice(destinationIndex, 0, removed)
-
-                            updateConfig({
-                              ...config,
-                              smallMultiples: {
-                                ...config.smallMultiples,
-                                tileOrder: newOrder,
-                                tileOrderType: 'custom'
-                              }
-                            })
-                          }
-
-                          return (
-                            <>
-                              <Select
-                                value={currentOrderType}
-                                options={tileOrderOptions}
-                                label='Order Type'
-                                updateField={(_section, _subsection, _fieldName, value) => {
-                                  handleOrderTypeChange(value)
-                                }}
-                              />
-
-                              {currentOrderType === 'custom' && (
-                                <DragDropContext
-                                  onDragEnd={({ source, destination }) =>
-                                    handleCustomTileOrderChange(source.index, destination?.index)
-                                  }
-                                >
-                                  <Droppable droppableId='tile_order'>
-                                    {provided => (
-                                      <ul
-                                        {...provided.droppableProps}
-                                        className='sort-list'
-                                        ref={provided.innerRef}
-                                        style={{ marginTop: '1em' }}
-                                      >
-                                        {(config.smallMultiples?.tileOrder || availableTiles).map((tileKey, index) => (
-                                          <Draggable key={tileKey} draggableId={`tile-${tileKey}`} index={index}>
-                                            {(provided, snapshot) => (
-                                              <li>
-                                                <div
-                                                  className={snapshot.isDragging ? 'currently-dragging' : ''}
-                                                  style={provided.draggableProps.style}
-                                                  ref={provided.innerRef}
-                                                  {...provided.draggableProps}
-                                                  {...provided.dragHandleProps}
-                                                >
-                                                  {tileKey}
-                                                </div>
-                                              </li>
-                                            )}
-                                          </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                      </ul>
-                                    )}
-                                  </Droppable>
-                                </DragDropContext>
-                              )}
-                            </>
-                          )
-                        })()}
-                      </fieldset>
-
-                      {/* Color Mode */}
-                      <fieldset className='edit-block'>
-                        <legend>
-                          <label>Tile Colors</label>
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>
-                                Choose whether all tiles use the same colors or each tile uses different colors for
-                                visual distinction.
-                              </p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </legend>
-
-                        <Select
-                          value={config.smallMultiples?.colorMode || 'different'}
-                          options={[
-                            {
-                              label: 'Same Colors',
-                              value: 'same'
-                            },
-                            {
-                              label: 'Different Colors',
-                              value: 'different'
-                            }
-                          ]}
-                          label='Color Mode'
-                          updateField={(_section, _subsection, _fieldName, value) => {
-                            updateConfig({
-                              ...config,
-                              smallMultiples: {
-                                ...config.smallMultiples,
-                                colorMode: value
-                              }
-                            })
-                          }}
-                        />
-                      </fieldset>
-
-                      {/* Tile Titles */}
-                      <fieldset className='edit-block'>
-                        <legend>
-                          <label>Tile Titles</label>
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>
-                                Customize the titles displayed above each tile. Leave blank to use the original values.
-                              </p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        </legend>
-
-                        {(() => {
-                          const availableTiles = getTileKeys(config, data)
-                          if (availableTiles.length === 0) return null
-
-                          const handleTitleChange = (tileKey, customTitle) => {
-                            const newTitles = { ...config.smallMultiples?.tileTitles }
-                            if (customTitle.trim() === '' || customTitle === tileKey) {
-                              delete newTitles[tileKey] // Remove entry if empty or same as key
-                            } else {
-                              newTitles[tileKey] = customTitle
-                            }
-
-                            updateConfig({
-                              ...config,
-                              smallMultiples: {
-                                ...config.smallMultiples,
-                                tileTitles: newTitles
-                              }
-                            })
-                          }
-
-                          return (
-                            <div className='tile-titles-editor'>
-                              {availableTiles.map(tileKey => {
-                                const customTitle = config.smallMultiples?.tileTitles?.[tileKey] || ''
-                                return (
-                                  <div
-                                    key={tileKey}
-                                    className='tile-title-row'
-                                    style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}
-                                  >
-                                    <label style={{ minWidth: '100px', marginRight: '1rem', fontWeight: 'normal' }}>
-                                      {tileKey}:
-                                    </label>
-                                    <input
-                                      type='text'
-                                      value={customTitle}
-                                      placeholder={tileKey}
-                                      onChange={event => handleTitleChange(tileKey, event.target.value)}
-                                      style={{ flex: 1 }}
-                                    />
-                                  </div>
-                                )
-                              })}
-                            </div>
-                          )
-                        })()}
-                      </fieldset>
                     </>
                   )}
                 </AccordionItemPanel>

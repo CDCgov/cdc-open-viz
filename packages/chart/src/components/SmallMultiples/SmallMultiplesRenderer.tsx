@@ -8,7 +8,7 @@ import {
   getTileConfig,
   createCombinedDataForYAxis,
   applyTileOrder,
-  getTileTitle,
+  getTileDisplayTitle,
   createTileColorScale
 } from '../../helpers/smallMultiplesHelpers'
 import './SmallMultiples.scss'
@@ -31,9 +31,8 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
   const { currentViewport, colorScale } = useContext(ConfigContext)
   const { mode, tileColumn, tilesPerRowDesktop, tilesPerRowMobile } = config.smallMultiples || {}
 
-  // Determine if current viewport is mobile (xs, sm) or desktop (md, lg, xl)
   const isMobile = currentViewport === 'xs' || currentViewport === 'sm'
-  const tilesPerRow = isMobile ? tilesPerRowMobile : tilesPerRowDesktop
+  const tilesPerRow = isMobile ? tilesPerRowMobile || 2 : tilesPerRowDesktop || 3
 
   // Ref for the container to set height dynamically
   const containerRef = useRef<HTMLDivElement>(null)
@@ -75,8 +74,21 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
     }
 
     // Apply tile ordering based on user preference
-    return applyTileOrder(items, config.smallMultiples?.tileOrderType || 'asc', config.smallMultiples?.tileOrder)
-  }, [mode, config.series, data, tileColumn, config.smallMultiples?.tileOrderType, config.smallMultiples?.tileOrder])
+    return applyTileOrder(
+      items,
+      config.smallMultiples?.tileOrderType || 'asc',
+      config.smallMultiples?.tileOrder,
+      config
+    )
+  }, [
+    mode,
+    config.series,
+    data,
+    tileColumn,
+    config.smallMultiples?.tileOrderType,
+    config.smallMultiples?.tileOrder,
+    config.smallMultiples?.tileTitles
+  ])
 
   // Calculate the grid styling based on tiles per row
   const gridGap = isMobile ? '1rem' : '2rem'
@@ -158,9 +170,8 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
     <div ref={containerRef} className='small-multiples-container'>
       <div className='small-multiples-grid' style={gridStyle}>
         {tileItems.map((item, index) => {
-          // Get the tile key for title lookup
-          const tileKey = item.mode === 'by-series' ? item.seriesKey : item.tileValue
-          const customTitle = getTileTitle(tileKey, config)
+          // Get the calculated display title
+          const displayTitle = getTileDisplayTitle(item, config)
 
           // Create custom colorScale for this tile based on color mode
           const customColorScale = createTileColorScale(item, config, colorScale, index, tileItems.length)
@@ -173,7 +184,7 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
               seriesKey={item.seriesKey}
               tileValue={item.tileValue}
               tileColumn={item.tileColumn}
-              customTitle={customTitle}
+              tileTitle={displayTitle}
               customColorScale={customColorScale}
               config={config}
               data={data}
