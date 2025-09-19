@@ -158,11 +158,6 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
     <div ref={containerRef} className='small-multiples-container'>
       <div className='small-multiples-grid' style={gridStyle}>
         {tileItems.map((item, index) => {
-          // Determine if this tile is the first in its row
-          const isFirstInRow = index % tilesPerRow === 0
-          // Determine if axis labels should be shown on this tile
-          const showAxisLabels = config.smallMultiples?.showAllAxisLabels || isFirstInRow
-
           // Get the tile key for title lookup
           const tileKey = item.mode === 'by-series' ? item.seriesKey : item.tileValue
           const customTitle = getTileTitle(tileKey, config)
@@ -186,7 +181,6 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
               parentWidth={parentWidth}
               parentHeight={parentHeight}
               tilesPerRow={tilesPerRow}
-              showAxisLabels={showAxisLabels}
               globalYAxisMax={globalYAxisValues?.max}
               globalYAxisMin={globalYAxisValues?.min}
               onHeightChange={handleTileHeightChange}
