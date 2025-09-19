@@ -9,7 +9,7 @@ import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import { colorPalettesChart as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
-import { v2ColorDistribution } from '../../helpers/chartColorDistributions'
+import { v2ColorDistribution, divergentColorDistribution, colorblindColorDistribution } from '../../helpers/chartColorDistributions'
 
 // cove
 import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
@@ -104,23 +104,36 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     return baseData
   }, [data, dataNeedsPivot, showPercentage, config])
 
-  // Helper function to determine if we should use v2 distribution
-  const shouldUseV2Distribution = (config, palette, numberOfKeys) => {
+  // Helper function to determine enhanced distribution type and apply it
+  const applyEnhancedColorDistribution = (config, palette, numberOfKeys) => {
     const version = getColorPaletteVersion(config)
     const configPalette = config.general?.palette?.name || config.palette
-    const isSequentialOrDivergent =
-      configPalette && (configPalette.includes('sequential') || configPalette.includes('divergent'))
     const isPairedBarOrDeviation = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
 
-    return version === 2 && isSequentialOrDivergent && palette.length === 9 && numberOfKeys <= 9 && !isPairedBarOrDeviation
-  }
-
-  // Helper function to apply color distribution to palette
-  const applyColorDistribution = (palette, numberOfKeys, useV2) => {
-    if (useV2 && v2ColorDistribution[numberOfKeys]) {
-      const distributionIndices = v2ColorDistribution[numberOfKeys]
-      return distributionIndices.map(index => palette[index])
+    // Skip enhanced distribution for paired bar or deviation charts
+    if (isPairedBarOrDeviation || version !== 2 || numberOfKeys > 9 || palette.length !== 9) {
+      return palette.slice(0, numberOfKeys)
     }
+
+    const isSequential = configPalette && configPalette.includes('sequential')
+    const isDivergent = configPalette && configPalette.includes('divergent')
+    const isColorblindSafe = configPalette && (configPalette.includes('colorblindsafe') || configPalette.includes('qualitative_standard'))
+
+    // Determine which distribution to use based on palette type
+    let distributionMap = null
+    if (isDivergent) {
+      distributionMap = divergentColorDistribution
+    } else if (isColorblindSafe) {
+      distributionMap = colorblindColorDistribution
+    } else if (isSequential) {
+      distributionMap = v2ColorDistribution
+    }
+
+    if (distributionMap && distributionMap[numberOfKeys]) {
+      const distributionIndices = distributionMap[numberOfKeys]
+      return distributionIndices.map((index: number) => palette[index])
+    }
+
     return palette.slice(0, numberOfKeys)
   }
 
@@ -140,8 +153,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     const numberOfKeys = domainKeys.length
 
     let palette = getPaletteColors(config, colorPalettes)
-    const useV2 = shouldUseV2Distribution(config, palette, numberOfKeys)
-    palette = applyColorDistribution(palette, numberOfKeys, useV2)
+    palette = applyEnhancedColorDistribution(config, palette, numberOfKeys)
 
     const unknownColor = isPercentageMode
       ? getComputedStyle(document.documentElement).getPropertyValue('--cool-gray-10').trim()
@@ -155,20 +167,18 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
   }
 
   const _colorScale = useMemo(() => {
-    // Use filteredData if available, otherwise use _data
-    const dataToUse = filteredData || _data
-
+    // Always use the full _data for color scale to ensure legend shows all items
     if (dataNeedsPivot) {
-      return createPieColorScale(dataToUse, config)
+      return createPieColorScale(_data, config)
     }
 
     if (showPercentage) {
-      return createPieColorScale(dataToUse, config, true, labelForCalcArea)
+      return createPieColorScale(_data, config, true, labelForCalcArea)
     }
 
     // Handle normal pie chart case
-    return createPieColorScale(dataToUse, config)
-  }, [_data, filteredData, dataNeedsPivot, colorScale, showPercentage, config])
+    return createPieColorScale(_data, config)
+  }, [_data, dataNeedsPivot, colorScale, showPercentage, config])
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -221,14 +231,21 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
         roundedPercentage = '**'
       }
 
+      // Determine if this slice should be muted based on legend behavior
+      const isHighlighted = seriesHighlight.length === 0 || seriesHighlight.indexOf(arc.data[config.runtime.xAxis.dataKey]) !== -1
+      const shouldMute = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && !isHighlighted
+      const sliceOpacity = shouldMute ? 0.3 : 1
+      const textOpacity = shouldMute ? 0.3 : 1
+
       return (
         <Group key={key} className={`slice-${key}`}>
           {/* ── the slice */}
           <animated.path
-            d={to([styles.startAngle, styles.endAngle], (start, end) =>
+            d={to([styles.startAngle, styles.endAngle], (start: number, end: number) =>
               path({ ...arc, startAngle: start, endAngle: end })
             )}
             fill={colorScale(key)}
+            opacity={sliceOpacity}
             onMouseEnter={e =>
               onHover(e, {
                 data: arc.data,
@@ -244,7 +261,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
           {/* ── the percentage label */}
           {arc.endAngle - arc.startAngle > 0.1 && (
             <animated.text
-              transform={to([styles.startAngle, styles.endAngle], (start, end) => {
+              transform={to([styles.startAngle, styles.endAngle], (start: number, end: number) => {
                 const [x, y] = path.centroid({
                   ...arc,
                   startAngle: start,
@@ -255,6 +272,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
               textAnchor='middle'
               pointerEvents='none'
               fill={textColor}
+              opacity={textOpacity}
             >
               {/** compute text inside the spring callback */}
               {roundedPercentage}
