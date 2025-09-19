@@ -38,7 +38,8 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
 
   // Check if we should use v2 distribution logic for better contrast
   const paletteVersion = getColorPaletteVersion(config)
-  const isSequentialOrDivergent = configPalette && (configPalette.includes('sequential') || configPalette.includes('divergent'))
+  const isSequentialOrDivergent =
+    configPalette && (configPalette.includes('sequential') || configPalette.includes('divergent'))
   const useV2Distribution = paletteVersion === 2 && isSequentialOrDivergent && palette.length === 9 && numberOfKeys <= 9
 
   if (useV2Distribution && v2ColorDistribution[numberOfKeys]) {

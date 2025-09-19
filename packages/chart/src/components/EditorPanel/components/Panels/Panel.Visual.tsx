@@ -34,7 +34,8 @@ const PanelVisual: FC<PanelProps> = props => {
   const { config, updateConfig, colorPalettes, twoColorPalette } = useContext<ChartContext>(ConfigContext)
   const { visual } = config
 
-  const { setLollipopShape, updateField, handlePaletteSelection, handleTwoColorPaletteSelection } = useEditorPanelContext()
+  const { setLollipopShape, updateField, handlePaletteSelection, handleTwoColorPaletteSelection } =
+    useEditorPanelContext()
   const {
     visHasBarBorders,
     visCanAnimate,
@@ -192,60 +193,60 @@ const PanelVisual: FC<PanelProps> = props => {
         ) &&
           config.visualizationType === 'Combo') ||
           config.visualizationType === 'Line') && (
-            <>
-              <Select
-                tooltip={
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon
-                        display='question'
-                        style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                      />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>
-                        Shapes will appear in the following order: circle, square, triangle, diamond, and inverted
-                        triangle. Use with a maximum of 5 data points.
-                      </p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                }
-                value={config.visual.lineDatapointSymbol}
-                section='visual'
-                fieldName='lineDatapointSymbol'
-                label='Line Datapoint Symbols'
-                updateField={updateField}
-                options={['none', 'standard']}
-              />
-              {config.series.length > config.visual.maximumShapeAmount &&
-                config.visual.lineDatapointSymbol === 'standard' && (
-                  <small className='text-danger'>Standard only supports up to 7 data points</small>
-                )}
+          <>
+            <Select
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon
+                      display='question'
+                      style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                    />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>
+                      Shapes will appear in the following order: circle, square, triangle, diamond, and inverted
+                      triangle. Use with a maximum of 5 data points.
+                    </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+              value={config.visual.lineDatapointSymbol}
+              section='visual'
+              fieldName='lineDatapointSymbol'
+              label='Line Datapoint Symbols'
+              updateField={updateField}
+              options={['none', 'standard']}
+            />
+            {config.series.length > config.visual.maximumShapeAmount &&
+              config.visual.lineDatapointSymbol === 'standard' && (
+                <small className='text-danger'>Standard only supports up to 7 data points</small>
+              )}
 
-              <Select
-                value={config.lineDatapointStyle}
-                fieldName='lineDatapointStyle'
-                label='Line Datapoint Style'
-                updateField={updateField}
-                options={['hidden', 'hover', 'always show']}
-              />
-              <Select
-                value={config.lineDatapointColor}
-                fieldName='lineDatapointColor'
-                label='Line Datapoint Color'
-                updateField={updateField}
-                options={['Same as Line', 'Lighter than Line']}
-              />
-              <CheckBox
-                value={!(config as LineChartConfig).isolatedDotsSameSize}
-                fieldName='isolatedDotsSameSize'
-                label='Accentuate isolated data points'
-                updateField={(section, subsection, fieldname, value) =>
-                  updateField(section, subsection, fieldname, !value)
-                }
-              />
-            </>
-          )}
+            <Select
+              value={config.lineDatapointStyle}
+              fieldName='lineDatapointStyle'
+              label='Line Datapoint Style'
+              updateField={updateField}
+              options={['hidden', 'hover', 'always show']}
+            />
+            <Select
+              value={config.lineDatapointColor}
+              fieldName='lineDatapointColor'
+              label='Line Datapoint Color'
+              updateField={updateField}
+              options={['Same as Line', 'Lighter than Line']}
+            />
+            <CheckBox
+              value={!(config as LineChartConfig).isolatedDotsSameSize}
+              fieldName='isolatedDotsSameSize'
+              label='Accentuate isolated data points'
+              updateField={(section, subsection, fieldname, value) =>
+                updateField(section, subsection, fieldname, !value)
+              }
+            />
+          </>
+        )}
         {/* eslint-disable */}
         <label className='header'>
           <span className='edit-label'>Header Theme</span>
@@ -269,9 +270,12 @@ const PanelVisual: FC<PanelProps> = props => {
             <label>
               <span className='edit-label'>Chart Color Palette</span>
             </label>
-            <div className="mb-2">
-              <small className="text-muted">
-                Review color contrasts <a href="https://webaim.org/resources/contrastchecker/" target="_blank" rel="noopener noreferrer">here</a>
+            <div className='mb-2'>
+              <small className='text-muted'>
+                Review color contrasts{' '}
+                <a href='https://webaim.org/resources/contrastchecker/' target='_blank' rel='noopener noreferrer'>
+                  here
+                </a>
               </small>
             </div>
             <DeveloperPaletteRollback config={config} updateConfig={updateConfig} />
@@ -378,11 +382,7 @@ const PanelVisual: FC<PanelProps> = props => {
         )}
         {(config.visualizationType === 'Paired Bar' || config.visualizationType === 'Deviation Bar') && (
           <>
-            <DeveloperPaletteRollback
-              config={config}
-              updateConfig={updateConfig}
-              className="mt-3"
-            />
+            <DeveloperPaletteRollback config={config} updateConfig={updateConfig} className='mt-3' />
             <InputToggle
               section='twoColor'
               fieldName='isPaletteReversed'
@@ -392,44 +392,49 @@ const PanelVisual: FC<PanelProps> = props => {
               value={config.twoColor.isPaletteReversed}
             />
             <ul className='color-palette'>
-              {twoColorPalettes.map(palette => {
-                const paletteColors = versionedTwoColorPalette[palette]
+              {twoColorPalettes
+                .map(palette => {
+                  const paletteColors = versionedTwoColorPalette[palette]
 
-                if (!paletteColors || paletteColors.length < 2) {
-                  console.warn(`Two-color palette "${palette}" not found or incomplete in version ${getColorPaletteVersion(config)}`)
-                  return null
-                }
+                  if (!paletteColors || paletteColors.length < 2) {
+                    console.warn(
+                      `Two-color palette "${palette}" not found or incomplete in version ${getColorPaletteVersion(
+                        config
+                      )}`
+                    )
+                    return null
+                  }
 
-                const colorOne = {
-                  backgroundColor: paletteColors[0]
-                }
+                  const colorOne = {
+                    backgroundColor: paletteColors[0]
+                  }
 
-                const colorTwo = {
-                  backgroundColor: paletteColors[1]
-                }
+                  const colorTwo = {
+                    backgroundColor: paletteColors[1]
+                  }
 
-                return (
-                  <button
-                    title={palette}
-                    key={palette}
-                    onClick={e => {
-                      e.preventDefault()
-                      if (handleTwoColorPaletteSelection) {
-                        handleTwoColorPaletteSelection(palette)
-                      } else {
-                        // Fallback to direct update if handler not available
-                        updateConfig({ ...config, twoColor: { ...config.twoColor, palette } })
-                      }
-                    }}
-                    className={config.twoColor.palette === palette ? 'selected' : ''}
-                  >
-                    <span className='two-color' style={colorOne}></span>
-                    <span className='two-color' style={colorTwo}></span>
-                  </button>
-                )
-              }).filter(Boolean)}
+                  return (
+                    <button
+                      title={palette}
+                      key={palette}
+                      onClick={e => {
+                        e.preventDefault()
+                        if (handleTwoColorPaletteSelection) {
+                          handleTwoColorPaletteSelection(palette)
+                        } else {
+                          // Fallback to direct update if handler not available
+                          updateConfig({ ...config, twoColor: { ...config.twoColor, palette } })
+                        }
+                      }}
+                      className={config.twoColor.palette === palette ? 'selected' : ''}
+                    >
+                      <span className='two-color' style={colorOne}></span>
+                      <span className='two-color' style={colorTwo}></span>
+                    </button>
+                  )
+                })
+                .filter(Boolean)}
             </ul>
-
           </>
         )}
         {visHasDataCutoff() && (
@@ -492,14 +497,14 @@ const PanelVisual: FC<PanelProps> = props => {
         {(config.visualizationType === 'Bar' ||
           config.visualizationType === 'Line' ||
           config.visualizationType === 'Combo') && (
-            <CheckBox
-              value={config.topAxis.hasLine}
-              section='topAxis'
-              fieldName='hasLine'
-              label='Add Top Axis Line'
-              updateField={updateField}
-            />
-          )}
+          <CheckBox
+            value={config.topAxis.hasLine}
+            section='topAxis'
+            fieldName='hasLine'
+            label='Add Top Axis Line'
+            updateField={updateField}
+          />
+        )}
         {config.visualizationType === 'Spark Line' && (
           <div className='cove-accordion__panel-section checkbox-group'>
             <CheckBox

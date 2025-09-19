@@ -41,11 +41,6 @@ export const getPaletteColors = (config: any, colorPalettes: any): string[] => {
     return config.general.palette.customColors
   }
 
-  // Legacy fallback - check for customColors at root level (v1 format)
-  if (config?.customColors) {
-    return config.customColors
-  }
-
   // Get the raw palette name
   let paletteName = getCurrentPaletteName(config)
 
@@ -260,7 +255,7 @@ export const rollbackTwoColorPaletteToOriginal = (config: any): boolean => {
     config.twoColor.palette = twoColorBackup.name
     config.twoColor.isPaletteReversed = twoColorBackup.isReversed || false
   }
-  
+
   // Reset to v1
   if (config.general?.palette) {
     config.general.palette.version = twoColorBackup.version || '1.0'
