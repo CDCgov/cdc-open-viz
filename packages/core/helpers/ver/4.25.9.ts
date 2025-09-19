@@ -12,6 +12,12 @@ const addMissingDataFormatFields = (config) => {
       config.data.showPiePercent = false
     }
   }
+  
+  if (config.type === 'dashboard') {
+    Object.values(config.visualizations).forEach(visualization => {
+      addMissingDataFormatFields(visualization)
+    })
+  }
 }
 
 const renameOriginalMapPalettes = config => {
