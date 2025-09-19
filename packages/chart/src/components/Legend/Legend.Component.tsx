@@ -72,6 +72,8 @@ const Legend: React.FC<LegendProps> = forwardRef(
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
     let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
+
+
     if (!legend) return null
     return (
       <aside
@@ -225,9 +227,8 @@ const Legend: React.FC<LegendProps> = forwardRef(
                 {/* Pattern Legend Items */}
                 {config.legend.patterns && Object.keys(config.legend.patterns).length > 0 && (
                   <div
-                    className={`legend-patterns d-flex ${
-                      ['top', 'bottom'].includes(config.legend.position) ? 'flex-row flex-wrap' : 'flex-column'
-                    }`}
+                    className={`legend-patterns d-flex ${['top', 'bottom'].includes(config.legend.position) ? 'flex-row flex-wrap' : 'flex-column'
+                      }`}
                   >
                     {Object.entries(config.legend.patterns).map(([key, pattern]) => {
                       const patternId = `legend-pattern-${key}`
