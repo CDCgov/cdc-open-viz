@@ -70,7 +70,7 @@ const SingleStateMap: React.FC = () => {
         dispatch({ type: 'SET_TOPO_DATA', payload: response })
       })
     }
-  }, [runtimeFilters?.length, topoData?.year])
+  }, [config.general.countyCensusYear, config.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
 
   if (!isTopoReady(topoData, config, runtimeFilters)) {
     return (
