@@ -1956,27 +1956,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       </div>
 
                       <CheckBox
-                        value={config.smallMultiples?.showAllAxisLabels}
-                        section='smallMultiples'
-                        fieldName='showAllAxisLabels'
-                        label='Show All Axis Labels'
-                        updateField={updateField}
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>
-                                Show axis labels and tick marks on all tiles. When unchecked, only the first tile in
-                                each row will show labels and ticks.
-                              </p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                      />
-
-                      <CheckBox
                         value={config.smallMultiples?.consistentYAxis}
                         section='smallMultiples'
                         fieldName='consistentYAxis'

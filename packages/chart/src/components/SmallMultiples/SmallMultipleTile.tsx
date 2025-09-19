@@ -18,7 +18,6 @@ interface SmallMultipleTileProps {
   parentWidth?: number
   parentHeight?: number
   tilesPerRow?: number
-  showAxisLabels?: boolean
   globalYAxisMax?: number
   globalYAxisMin?: number
   onHeightChange?: (tileKey: string, height: number) => void
@@ -38,7 +37,6 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   parentWidth,
   parentHeight,
   tilesPerRow,
-  showAxisLabels,
   globalYAxisMax,
   globalYAxisMin,
   onHeightChange
@@ -74,37 +72,6 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
     }
     tileData = data.filter(row => row[tileColumn] === tileValue) // Filtered data
     tileTitle = customTitle || tileValue
-  }
-
-  // Conditionally hide axis labels and tick marks based on showAxisLabels prop
-  if (!showAxisLabels) {
-    tileConfig = {
-      ...tileConfig,
-      xAxis: {
-        ...tileConfig.xAxis,
-        hideLabel: true,
-        hideTicks: true
-      },
-      yAxis: {
-        ...tileConfig.yAxis,
-        hideLabel: true,
-        hideTicks: true
-      },
-      // Also update runtime properties since LinearChart checks runtime.yAxis.hideTicks
-      runtime: {
-        ...tileConfig.runtime,
-        xAxis: {
-          ...tileConfig.runtime?.xAxis,
-          hideLabel: true,
-          hideTicks: true
-        },
-        yAxis: {
-          ...tileConfig.runtime?.yAxis,
-          hideLabel: true,
-          hideTicks: true
-        }
-      }
-    }
   }
 
   // Apply global Y-axis values for consistent scaling if provided
