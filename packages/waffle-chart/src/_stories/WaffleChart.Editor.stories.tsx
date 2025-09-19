@@ -17,8 +17,20 @@ type Story = StoryObj<typeof WaffleChart>
 // SHARED HELPERS - Used across all test sections
 // ============================================================================
 
-// Constants
-const MIN_ANIMATION_DELAY_MS = 250
+// Use 250ms delay for visual perception in Storybook UI, but skip in automated tests
+const MIN_ANIMATION_DELAY_MS = (() => {
+  // Check if we're in automated test environment (Vitest/Jest)
+  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+    return 0
+  }
+
+  // Check if we're running via test runner (Vitest has __vitest__ global)
+  if (typeof globalThis !== 'undefined' && '__vitest__' in globalThis) {
+    return 0
+  }
+
+  return 250
+})()
 
 // Helper function to wait for editor to load
 const waitForEditor = async (canvas: any) => {
@@ -39,7 +51,7 @@ const pollUntil = async <T,>(
   read: () => T,
   predicate: (curr: T, elapsed: number) => boolean,
   timeout = 5000,
-  interval = 80
+  interval = 20
 ): Promise<T> => {
   const start = performance.now()
   // Capture the full call stack to show where this was actually called from
