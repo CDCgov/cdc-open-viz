@@ -87,7 +87,7 @@ export const createCombinedDataForYAxis = (config, data, tileItems) => {
  * Apply tile ordering to tile items array
  * Sorts tiles according to the user's order preference (ascending, descending, or custom)
  */
-export const applyTileOrder = (tileItems, orderType, customOrder) => {
+export const applyTileOrder = (tileItems, orderType, customOrder, config) => {
   if (!orderType) {
     return tileItems
   }
@@ -97,16 +97,16 @@ export const applyTileOrder = (tileItems, orderType, customOrder) => {
   switch (orderType) {
     case 'asc':
       return [...tileItems].sort((a, b) => {
-        const keyA = String(getTileKey(a)).toLowerCase()
-        const keyB = String(getTileKey(b)).toLowerCase()
-        return keyA.localeCompare(keyB)
+        const titleA = String(getTileDisplayTitle(a, config)).toLowerCase()
+        const titleB = String(getTileDisplayTitle(b, config)).toLowerCase()
+        return titleA.localeCompare(titleB)
       })
 
     case 'desc':
       return [...tileItems].sort((a, b) => {
-        const keyA = String(getTileKey(a)).toLowerCase()
-        const keyB = String(getTileKey(b)).toLowerCase()
-        return keyB.localeCompare(keyA)
+        const titleA = String(getTileDisplayTitle(a, config)).toLowerCase()
+        const titleB = String(getTileDisplayTitle(b, config)).toLowerCase()
+        return titleB.localeCompare(titleA)
       })
 
     case 'custom':
@@ -153,11 +153,20 @@ export const getTileKeys = (config, data) => {
 }
 
 /**
- * Get the display title for a tile key
- * Returns custom title if set, otherwise falls back to the original key
+ * Get the display title for a tile item based on its mode
+ * For by-series: uses series.name or seriesKey
+ * For by-column: uses custom title or tileValue
  */
-export const getTileTitle = (tileKey, config) => {
-  return config.smallMultiples?.tileTitles?.[tileKey] || tileKey
+export const getTileDisplayTitle = (tileItem, config) => {
+  if (tileItem.mode === 'by-series') {
+    // For by-series mode: use configured series name, fall back to seriesKey
+    const series = config.series?.find(s => s.dataKey === tileItem.seriesKey)
+    return series?.name || tileItem.seriesKey
+  } else if (tileItem.mode === 'by-column') {
+    // For by-column mode: use custom title from editor, fall back to column value
+    return config.smallMultiples?.tileTitles?.[tileItem.tileValue] || tileItem.tileValue
+  }
+  return tileItem.key
 }
 
 /**
