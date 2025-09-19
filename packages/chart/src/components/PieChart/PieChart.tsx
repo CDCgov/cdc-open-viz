@@ -12,7 +12,7 @@ import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion
 import { v2ColorDistribution } from '../../helpers/chartColorDistributions'
 
 // cove
-import ConfigContext from '../../ConfigContext'
+import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
 import { useTooltip as useCoveTooltip } from '../../hooks/useTooltip'
 import useIntersectionObserver from '../../hooks/useIntersectionObserver'
 import { handleChartAriaLabels } from '../../helpers/handleChartAriaLabels'
@@ -28,7 +28,13 @@ type TooltipData = {
   dataYPosition: number
 }
 
-const PieChart = props => {
+type PieChartProps = {
+  parentWidth?: number
+  parentHeight?: number
+  interactionLabel?: string
+}
+
+const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => {
   const { interactionLabel = '' } = props
   const {
     transformedData: data,
@@ -38,6 +44,7 @@ const PieChart = props => {
     seriesHighlight,
     isDraggingAnnotation
   } = useContext(ConfigContext)
+  const dispatch = useContext(ChartDispatchContext)
   const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip<TooltipData>()
   const { handleTooltipMouseOver, handleTooltipMouseOff, TooltipListItem } = useCoveTooltip({
     xScale: false,
@@ -97,83 +104,71 @@ const PieChart = props => {
     return baseData
   }, [data, dataNeedsPivot, showPercentage, config])
 
+  // Helper function to determine if we should use v2 distribution
+  const shouldUseV2Distribution = (config, palette, numberOfKeys) => {
+    const version = getColorPaletteVersion(config)
+    const configPalette = config.general?.palette?.name || config.palette
+    const isSequentialOrDivergent =
+      configPalette && (configPalette.includes('sequential') || configPalette.includes('divergent'))
+    const isPairedBarOrDeviation = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
+
+    return version === 2 && isSequentialOrDivergent && palette.length === 9 && numberOfKeys <= 9 && !isPairedBarOrDeviation
+  }
+
+  // Helper function to apply color distribution to palette
+  const applyColorDistribution = (palette, numberOfKeys, useV2) => {
+    if (useV2 && v2ColorDistribution[numberOfKeys]) {
+      const distributionIndices = v2ColorDistribution[numberOfKeys]
+      return distributionIndices.map(index => palette[index])
+    }
+    return palette.slice(0, numberOfKeys)
+  }
+
+  // Helper function to extract keys from data
+  const extractDataKeys = (data, dataKey) => {
+    const keys = {}
+    data.forEach(d => {
+      if (!keys[d[dataKey]]) keys[d[dataKey]] = true
+    })
+    return Object.keys(keys)
+  }
+
+  // Helper function to create color scale for pie charts
+  const createPieColorScale = (data, config, isPercentageMode = false, labelForCalcArea = null) => {
+    const dataKeys = extractDataKeys(data, config.xAxis.dataKey)
+    const domainKeys = isPercentageMode ? dataKeys.filter(k => k !== labelForCalcArea) : dataKeys
+    const numberOfKeys = domainKeys.length
+
+    let palette = getPaletteColors(config, colorPalettes)
+    const useV2 = shouldUseV2Distribution(config, palette, numberOfKeys)
+    palette = applyColorDistribution(palette, numberOfKeys, useV2)
+
+    const unknownColor = isPercentageMode
+      ? getComputedStyle(document.documentElement).getPropertyValue('--cool-gray-10').trim()
+      : null
+
+    return scaleOrdinal({
+      domain: domainKeys,
+      range: palette,
+      unknown: unknownColor
+    })
+  }
+
   const _colorScale = useMemo(() => {
+    // Use filteredData if available, otherwise use _data
+    const dataToUse = filteredData || _data
+
     if (dataNeedsPivot) {
-      const keys = {}
-      _data.forEach(d => {
-        if (!keys[d[config.xAxis.dataKey]]) keys[d[config.xAxis.dataKey]] = true
-      })
-      const numberOfKeys = Object.entries(keys).length
-      let palette = getPaletteColors(config, colorPalettes)
-
-      // Check if we should use v2 distribution logic for better contrast
-      const version = getColorPaletteVersion(config)
-      const configPalette = config.general?.palette?.name || config.palette
-      const isSequentialOrDivergent =
-        configPalette && (configPalette.includes('sequential') || configPalette.includes('divergent'))
-      const isPairedBarOrDeviation = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
-      const useV2Distribution =
-        version === 2 && isSequentialOrDivergent && palette.length === 9 && numberOfKeys <= 9 && !isPairedBarOrDeviation
-
-      if (useV2Distribution && v2ColorDistribution[numberOfKeys]) {
-        // Use strategic color distribution for v2 sequential palettes
-        const distributionIndices = v2ColorDistribution[numberOfKeys]
-        palette = distributionIndices.map(index => palette[index])
-      } else {
-        // Use existing logic for v1 palettes and other cases
-        palette = palette.slice(0, numberOfKeys)
-      }
-
-      return scaleOrdinal({
-        domain: Object.keys(keys),
-        range: palette,
-        unknown: null
-      })
+      return createPieColorScale(dataToUse, config)
     }
 
     if (showPercentage) {
-      const keys = {}
-      _data.forEach(d => {
-        keys[d[config.xAxis.dataKey]] = true
-      })
-      // take out Calculated Area so it falls back to `unknown`
-      const domainKeys = Object.keys(keys).filter(k => k !== labelForCalcArea)
-
-      // Use the same palette distribution logic as the main colorScale
-      let basePalette = getPaletteColors(config, colorPalettes)
-      const numberOfKeys = domainKeys.length
-
-      // Check if we should use v2 distribution logic for better contrast
-      const version = getColorPaletteVersion(config)
-      const configPalette = config.general?.palette?.name || config.palette
-      const isSequentialOrDivergent =
-        configPalette && (configPalette.includes('sequential') || configPalette.includes('divergent'))
-      const isPairedBarOrDeviation = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
-      const useV2Distribution =
-        version === 2 &&
-        isSequentialOrDivergent &&
-        basePalette.length === 9 &&
-        numberOfKeys <= 9 &&
-        !isPairedBarOrDeviation
-
-      if (useV2Distribution && v2ColorDistribution[numberOfKeys]) {
-        // Use strategic color distribution for v2 sequential palettes
-        const distributionIndices = v2ColorDistribution[numberOfKeys]
-        basePalette = distributionIndices.map(index => basePalette[index])
-      } else {
-        // Use existing logic for v1 palettes and other cases
-        basePalette = basePalette.slice(0, numberOfKeys)
-      }
-
-      const COOL_GRAY_90 = getComputedStyle(document.documentElement).getPropertyValue('--cool-gray-10').trim()
-      return scaleOrdinal({
-        domain: domainKeys,
-        range: basePalette,
-        unknown: COOL_GRAY_90
-      })
+      return createPieColorScale(dataToUse, config, true, labelForCalcArea)
     }
-    return colorScale
-  }, [_data, dataNeedsPivot, colorScale, showPercentage, config])
+
+    // Handle normal pie chart case
+    return createPieColorScale(dataToUse, config)
+  }, [_data, filteredData, dataNeedsPivot, colorScale, showPercentage, config])
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -300,6 +295,14 @@ const PieChart = props => {
     }
   }, [seriesHighlight]) // eslint-disable-line
 
+  // Update the context colorScale when the pie chart's colorScale changes
+  // This ensures the Legend component uses the same colors as the pie chart
+  useEffect(() => {
+    if (_colorScale && config.visualizationType === 'Pie') {
+      dispatch({ type: 'SET_COLOR_SCALE', payload: _colorScale })
+    }
+  }, [_colorScale, config.visualizationType, dispatch])
+
   const getSvgClasses = () => {
     let classes = ['animated-pie', 'group']
     if (config.animate === false || animatedPie) {
@@ -348,9 +351,8 @@ const PieChart = props => {
           tooltipData.dataYPosition &&
           tooltipData.dataXPosition && (
             <>
-              <style>{`.tooltip {background-color: rgba(255,255,255, ${
-                config.tooltips.opacity / 100
-              }) !important`}</style>
+              <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100
+                }) !important`}</style>
               <TooltipWithBounds
                 key={Math.random()}
                 className={'tooltip cdc-open-viz-module'}
@@ -367,6 +369,6 @@ const PieChart = props => {
       </ErrorBoundary>
     </>
   )
-}
+})
 
 export default PieChart

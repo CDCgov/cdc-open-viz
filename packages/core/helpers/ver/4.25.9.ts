@@ -4,6 +4,18 @@ import { newChartPaletteNames, newMapPaletteNames } from '../palettes/standardiz
 import cloneConfig from '../cloneConfig'
 import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 
+const addMissingDataFormatFields = (config) => {
+  if (config.type === 'chart' && config.visualizationType === 'Pie Chart') {
+    // if we're missing the show pie percent field
+    if (config.data?.showPiePercent === undefined) {
+      config.data = config.data || {}
+      config.data.showPiePercent = false
+    }
+
+
+  }
+}
+
 const renameOriginalMapPalettes = config => {
   if (config.general?.palette?.name && newMapPaletteNames[config.general.palette.name]) {
     config.general.palette.name = newMapPaletteNames[config.general.palette.name]
@@ -197,6 +209,7 @@ const update_4_25_9 = config => {
   addDefaultPaletteVersion(newConfig)
   cleanConfig(newConfig)
   changeSingleStateMapNoDataMessage(newConfig)
+  addMissingDataFormatFields(newConfig)
   newConfig.version = ver
   return newConfig
 }

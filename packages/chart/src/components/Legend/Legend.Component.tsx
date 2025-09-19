@@ -72,6 +72,11 @@ const Legend: React.FC<LegendProps> = forwardRef(
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
     let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
+
+    // For pie charts, the PieChart component creates its own colorScale based on filtered data
+    // so the Legend should use the original colorScale and just filter items
+    let effectiveColorScale = colorScale
+
     if (!legend) return null
     return (
       <aside
@@ -97,7 +102,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
         />
         <LegendGroup formatLabels={formatLabels} />
 
-        <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
+        <LegendOrdinal scale={effectiveColorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
           {labels => {
             return (
               <>
