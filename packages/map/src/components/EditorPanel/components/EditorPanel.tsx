@@ -930,7 +930,9 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
         _newConfig.general.palette.version = '1.0'
       } else {
         // V2 migration logic
-        _newConfig.general.palette.name = palette ? migratePaletteWithMap(palette, paletteMigrationMap, false) : undefined
+        _newConfig.general.palette.name = palette
+          ? migratePaletteWithMap(palette, paletteMigrationMap, false)
+          : undefined
         if (isV1PaletteConfig) {
           _newConfig.general.palette.version = '2.0'
         }
@@ -2972,9 +2974,12 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               <label>
                 <span className='edit-label'>Map Color Palette</span>
               </label>
-              <div className="mb-2">
-                <small className="text-muted">
-                  Review color contrasts <a href="https://webaim.org/resources/contrastchecker/" target="_blank" rel="noopener noreferrer">here</a>
+              <div className='mb-2'>
+                <small className='text-muted'>
+                  Review color contrasts{' '}
+                  <a href='https://webaim.org/resources/contrastchecker/' target='_blank' rel='noopener noreferrer'>
+                    here
+                  </a>
                 </small>
               </div>
               <DeveloperPaletteRollback config={config} updateConfig={setConfig} />

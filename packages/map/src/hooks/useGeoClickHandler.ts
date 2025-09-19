@@ -4,7 +4,13 @@ import { useContext } from 'react'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 const useGeoClickHandler = () => {
-  const { config: state, setConfig, setSharedFilter, customNavigationHandler, interactionLabel } = useContext(ConfigContext)
+  const {
+    config: state,
+    setConfig,
+    setSharedFilter,
+    customNavigationHandler,
+    interactionLabel
+  } = useContext(ConfigContext)
   const dispatch = useContext(MapDispatchContext)
 
   const geoClickHandler = (geoDisplayName: string, geoData: object): void => {
@@ -35,7 +41,7 @@ const useGeoClickHandler = () => {
       if (interactionLabel) {
         const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
         publishAnalyticsEvent(`map_click_${locationName}`, 'click', interactionLabel, 'map', {
-          title: state?.title || state?.general?.title,
+          title: state?.title || state?.general?.title
         })
       }
 

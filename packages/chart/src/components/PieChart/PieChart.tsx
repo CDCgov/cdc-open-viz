@@ -109,9 +109,11 @@ const PieChart = props => {
       // Check if we should use v2 distribution logic for better contrast
       const version = getColorPaletteVersion(config)
       const configPalette = config.general?.palette?.name || config.palette
-      const isSequentialOrDivergent = configPalette && (configPalette.includes('sequential') || configPalette.includes('divergent'))
+      const isSequentialOrDivergent =
+        configPalette && (configPalette.includes('sequential') || configPalette.includes('divergent'))
       const isPairedBarOrDeviation = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
-      const useV2Distribution = version === 2 && isSequentialOrDivergent && palette.length === 9 && numberOfKeys <= 9 && !isPairedBarOrDeviation
+      const useV2Distribution =
+        version === 2 && isSequentialOrDivergent && palette.length === 9 && numberOfKeys <= 9 && !isPairedBarOrDeviation
 
       if (useV2Distribution && v2ColorDistribution[numberOfKeys]) {
         // Use strategic color distribution for v2 sequential palettes
@@ -144,9 +146,15 @@ const PieChart = props => {
       // Check if we should use v2 distribution logic for better contrast
       const version = getColorPaletteVersion(config)
       const configPalette = config.general?.palette?.name || config.palette
-      const isSequentialOrDivergent = configPalette && (configPalette.includes('sequential') || configPalette.includes('divergent'))
+      const isSequentialOrDivergent =
+        configPalette && (configPalette.includes('sequential') || configPalette.includes('divergent'))
       const isPairedBarOrDeviation = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
-      const useV2Distribution = version === 2 && isSequentialOrDivergent && basePalette.length === 9 && numberOfKeys <= 9 && !isPairedBarOrDeviation
+      const useV2Distribution =
+        version === 2 &&
+        isSequentialOrDivergent &&
+        basePalette.length === 9 &&
+        numberOfKeys <= 9 &&
+        !isPairedBarOrDeviation
 
       if (useV2Distribution && v2ColorDistribution[numberOfKeys]) {
         // Use strategic color distribution for v2 sequential palettes
@@ -340,8 +348,9 @@ const PieChart = props => {
           tooltipData.dataYPosition &&
           tooltipData.dataXPosition && (
             <>
-              <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100
-                }) !important`}</style>
+              <style>{`.tooltip {background-color: rgba(255,255,255, ${
+                config.tooltips.opacity / 100
+              }) !important`}</style>
               <TooltipWithBounds
                 key={Math.random()}
                 className={'tooltip cdc-open-viz-module'}
