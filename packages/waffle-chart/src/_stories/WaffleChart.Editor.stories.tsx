@@ -42,13 +42,19 @@ const pollUntil = async <T,>(
   interval = 80
 ): Promise<T> => {
   const start = performance.now()
+  // Capture the full call stack to show where this was actually called from
+  const originalStack = new Error().stack
+
   return new Promise<T>((resolve, reject) => {
+    let lastValue: any = undefined
     const step = () => {
       let val: T
       try {
         val = read()
-      } catch (_) {
+        lastValue = val
+      } catch (error) {
         val = undefined as any
+        lastValue = `Error: ${error instanceof Error ? error.message : String(error)}`
       }
       const elapsed = performance.now() - start
       try {
@@ -56,7 +62,36 @@ const pollUntil = async <T,>(
       } catch (_) {
         /* ignore */
       }
-      if (elapsed > timeout) return reject(new Error('Polling timeout'))
+      if (elapsed > timeout) {
+        const error = new Error()
+
+        // Skip over helper functions to show the actual test location
+        if (originalStack) {
+          const stackLines = originalStack.split('\n')
+          const helpersToSkip = [
+            'pollUntil',
+            'waitForPresence',
+            'waitForAbsence',
+            'waitForTextContent',
+            'performAndAssert'
+          ]
+
+          // Find the first line that's not a helper function
+          let actualTestLine = 2 // default fallback
+          for (let i = 1; i < stackLines.length; i++) {
+            const line = stackLines[i]
+            if (!helpersToSkip.some(helper => line.includes(helper))) {
+              actualTestLine = i
+              break
+            }
+          }
+
+          // Reconstruct stack with error message + the actual calling location
+          error.stack = error.message + '\n' + stackLines.slice(actualTestLine).join('\n')
+        }
+
+        return reject(error)
+      }
       setTimeout(step, interval)
     }
     step()
@@ -305,7 +340,6 @@ export const DataSectionTests: Story = {
     ) as HTMLSelectElement
     await userEvent.selectOptions(conditionalColumnSelect, 'Deaths')
     await userEvent.selectOptions(conditionalOperatorSelect, '<')
-    // Brief wait for UI state to settle - replaced fixed sleep with minimal delay
     // ============================================================================
     // TEST 4: Conditional Value Entry (<5 fallback 1)
     // Expectation: Primary value text changes (filter applied).
@@ -542,16 +576,9 @@ export const VisualSectionTests: Story = {
     expect(waffleRoot()).toBeTruthy()
 
     // ============================================================================
-    // UI ORDER REFERENCE
-    // 1 Shape | 2 Width | 3 Spacer | 4 Layout | 5 Data Point Font Size | 6 Overall Font Size
-    // 7 Theme | 8 Display Border | 9 Theme Border Color | 10 Accent Style | 11 Theme Background | 12 Hide Background
-    // ============================================================================
-
-    // ============================================================================
     // TEST 1: Shape Change
     // Expectation: Exclusive primitive set switches (only rects OR only circles OR only paths)
     // ============================================================================
-    // Shape signature: counts per SVG primitive
     const shapeSig = () => {
       const svg = waffleRoot()?.querySelector('svg')
       if (!svg) return { rect: 0, circle: 0, path: 0 }
