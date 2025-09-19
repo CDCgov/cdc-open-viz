@@ -5,7 +5,7 @@ const createInitialState = () => {
   const paletteDefaults = USE_V2_MIGRATION
     ? {
         isReversed: true,
-        name: 'sequential_blue',
+        name: 'sequential_bluereverse',
         version: '2.0'
       }
     : {
