@@ -1,0 +1,65 @@
+[
+  {
+    "week_end": "2023-01-07",
+    "geography": "United States",
+    "percent_hospitals_reporting": "85.5",
+    "total_admissions": "12345",
+    "rate_per_100k": "25.3"
+  },
+  {
+    "week_end": "2023-01-14",
+    "geography": "United States",
+    "percent_hospitals_reporting": "87.2",
+    "total_admissions": "13456",
+    "rate_per_100k": "26.8"
+  },
+  {
+    "week_end": "2023-01-21",
+    "geography": "United States",
+    "percent_hospitals_reporting": "89.1",
+    "total_admissions": "14567",
+    "rate_per_100k": "28.2"
+  },
+  {
+    "week_end": "2023-01-07",
+    "geography": "Alabama",
+    "percent_hospitals_reporting": "82.3",
+    "total_admissions": "234",
+    "rate_per_100k": "23.1"
+  },
+  {
+    "week_end": "2023-01-14",
+    "geography": "Alabama",
+    "percent_hospitals_reporting": "84.7",
+    "total_admissions": "267",
+    "rate_per_100k": "24.5"
+  },
+  {
+    "week_end": "2023-01-21",
+    "geography": "Alabama",
+    "percent_hospitals_reporting": "86.2",
+    "total_admissions": "289",
+    "rate_per_100k": "25.8"
+  },
+  {
+    "week_end": "2023-01-07",
+    "geography": "California",
+    "percent_hospitals_reporting": "91.4",
+    "total_admissions": "1567",
+    "rate_per_100k": "31.2"
+  },
+  {
+    "week_end": "2023-01-14",
+    "geography": "California",
+    "percent_hospitals_reporting": "92.8",
+    "total_admissions": "1623",
+    "rate_per_100k": "32.5"
+  },
+  {
+    "week_end": "2023-01-21",
+    "geography": "California",
+    "percent_hospitals_reporting": "94.1",
+    "total_admissions": "1789",
+    "rate_per_100k": "33.8"
+  }
+]

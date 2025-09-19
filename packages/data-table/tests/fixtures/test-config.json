@@ -1,0 +1,105 @@
+{
+  "version": "4.25.1",
+  "type": "table",
+  "visualizationType": "Table",
+  "dataUrl": "/packages/data-table/tests/fixtures/example-data.json",
+  "general": {
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true
+  },
+  "table": {
+    "label": "Test Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "",
+    "caption": "Test table for editor functionality",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "indexLabel": "Week Ending",
+    "download": true,
+    "showVertical": true,
+    "dateDisplayFormat": "%B %-d, %Y",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "show": true,
+    "collapsible": false,
+    "showBottomCollapse": false,
+    "cellMinWidth": 100
+  },
+  "columns": {
+    "percent_hospitals_reporting": {
+      "label": "Percent of Hospitals Reporting",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "%",
+      "roundToPlace": 1,
+      "commas": false,
+      "showInViz": false,
+      "name": "percent_hospitals_reporting"
+    },
+    "week_end": {
+      "label": "Week Ending",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "name": "week_end"
+    },
+    "total_admissions": {
+      "label": "Total Admissions",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "roundToPlace": 0,
+      "commas": true,
+      "showInViz": false,
+      "name": "total_admissions"
+    },
+    "rate_per_100k": {
+      "label": "Rate per 100k Population",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "roundToPlace": 1,
+      "commas": false,
+      "showInViz": false,
+      "name": "rate_per_100k"
+    }
+  },
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": true,
+    "roundTo": "1"
+  },
+  "filters": [
+    {
+      "values": [
+        "United States",
+        "Alabama",
+        "California"
+      ],
+      "active": "United States",
+      "filterStyle": "dropdown",
+      "order": "cust",
+      "columnName": "geography",
+      "id": 1732556562584,
+      "orderedValues": [
+        "United States",
+        "Alabama",
+        "California"
+      ],
+      "label": "Geographic Area",
+      "showDropdown": true
+    }
+  ],
+  "filterBehavior": "Filter Change"
+}
