@@ -29,14 +29,11 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
   parentWidth,
   parentHeight
 }) => {
-  const { currentViewport, colorScale } = useContext(ConfigContext)
+  const { currentViewport, colorScale, parentRef } = useContext(ConfigContext)
   const { mode, tileColumn, tilesPerRowDesktop, tilesPerRowMobile } = config.smallMultiples || {}
 
   const isMobile = currentViewport === 'xs' || currentViewport === 'sm'
   const tilesPerRow = isMobile ? tilesPerRowMobile || 2 : tilesPerRowDesktop || 3
-
-  // Ref for the container to set height dynamically
-  const containerRef = useRef<HTMLDivElement>(null)
 
   // Figure out what objects to iterate over based on mode - memoized to prevent recalculation
   const tileItems = useMemo<
@@ -186,7 +183,7 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
 
   // Calculate container height from measured tile heights
   useEffect(() => {
-    if (!containerRef.current) return
+    if (!parentRef.current) return
 
     const measuredHeights = Object.values(tileHeights)
     if (measuredHeights.length === 0) {
@@ -199,15 +196,15 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
     const containerPadding = 36 // Padding on .small-multiple-tile
     const totalHeight = numberOfRows * maxTileHeight + totalGapsHeight + containerPadding
 
-    containerRef.current.style.height = `${totalHeight}px`
-  }, [tileHeights, numberOfRows, isMobile])
+    parentRef.current.style.height = `${totalHeight}px`
+  }, [tileHeights, numberOfRows, isMobile, parentRef])
 
   if (tileItems.length === 0) {
     return null
   }
 
   return (
-    <div ref={containerRef} className='small-multiples-container'>
+    <div className='small-multiples-container'>
       <div className='small-multiples-grid' style={gridStyle}>
         {tileItems.map((item, index) => {
           // Get the calculated display title
