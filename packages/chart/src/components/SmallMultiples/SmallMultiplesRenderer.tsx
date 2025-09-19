@@ -112,7 +112,7 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
   )
 
   // Check if auto-padding should be applied to unified Y-axis
-  const shouldApplyUnifiedAutoPadding = config.smallMultiples?.consistentYAxis
+  const shouldApplyUnifiedAutoPadding = !config.smallMultiples?.independentYAxis
   const inlineLabel = combinedDataForYAxis.config.yAxis?.inlineLabel
   const inlineLabelHasNoSpace = !inlineLabel?.includes(' ')
   const shouldApplyAutoPadding = shouldApplyUnifiedAutoPadding && inlineLabel && !inlineLabelHasNoSpace
@@ -170,12 +170,12 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
 
   // Use consistent Y-axis if the feature is enabled and we have valid values
   const globalYAxisValues = useMemo(() => {
-    if (!config.smallMultiples?.consistentYAxis) return null
+    if (config.smallMultiples?.independentYAxis) return null
     if (typeof min !== 'number' || typeof max !== 'number') return null
     if (combinedDataForYAxis.data.length === 0) return null
 
     return { min, max }
-  }, [config.smallMultiples?.consistentYAxis, min, max, combinedDataForYAxis.data.length])
+  }, [config.smallMultiples?.independentYAxis, min, max, combinedDataForYAxis.data.length])
 
   const numberOfRows = useMemo(() => Math.ceil(tileItems.length / tilesPerRow), [tileItems.length, tilesPerRow])
 

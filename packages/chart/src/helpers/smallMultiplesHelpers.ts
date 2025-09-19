@@ -48,7 +48,7 @@ export const getTileConfig = (tileItem, config) => {
  * This combines all tile data into one dataset and creates a unified config
  */
 export const createCombinedDataForYAxis = (config, data, tileItems) => {
-  if (!config.smallMultiples?.consistentYAxis) {
+  if (config.smallMultiples?.independentYAxis) {
     return { data: [], config: config }
   }
 

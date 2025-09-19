@@ -203,7 +203,7 @@ const createInitialState = () => {
       tileColumn: '',
       tilesPerRowDesktop: 3,
       tilesPerRowMobile: 2,
-      consistentYAxis: true,
+      independentYAxis: false,
       tileOrder: [],
       tileOrderType: 'asc',
       tileTitles: {},
