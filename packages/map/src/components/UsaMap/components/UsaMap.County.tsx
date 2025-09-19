@@ -607,7 +607,7 @@ const CountyMap = () => {
         context.strokeStyle = geoStrokeColor
         const geoRadius = (config.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
         const { additionalCityStyles } = config.visual || []
-        const cityStyles = Object.values(data)
+        const cityStyles = Object.values(runtimeData)
           .filter(d => additionalCityStyles.some(style => String(d[style.column]) === String(style.value)))
           .map(d => {
             const conditionsMatched = additionalCityStyles.find(
