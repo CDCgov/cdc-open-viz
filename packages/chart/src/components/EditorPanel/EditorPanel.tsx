@@ -2192,10 +2192,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       )}
 
                       <CheckBox
-                        value={config.smallMultiples?.consistentYAxis}
+                        value={config.smallMultiples?.independentYAxis}
                         section='smallMultiples'
-                        fieldName='consistentYAxis'
-                        label='Consistent Y-Axis Scale'
+                        fieldName='independentYAxis'
+                        label='Independent Y-Axis Scales'
                         updateField={updateField}
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
@@ -2204,9 +2204,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>
-                                Use the same Y-axis scale across all tiles for easier comparison. When unchecked, each
-                                tile will use its own scale. If configured, the chart's y-axis min/max will always be
-                                used.
+                                When checked, the y-axis scale for each tile will be calculated separately. The chart's
+                                y-axis min/max will override this setting if they are configured.
                               </p>
                             </Tooltip.Content>
                           </Tooltip>
