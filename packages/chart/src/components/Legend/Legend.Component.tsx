@@ -73,9 +73,6 @@ const Legend: React.FC<LegendProps> = forwardRef(
     const { HighLightedBarUtils } = useHighlightedBars(config)
     let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
 
-    // For pie charts, the PieChart component creates its own colorScale based on filtered data
-    // so the Legend should use the original colorScale and just filter items
-    let effectiveColorScale = colorScale
 
     if (!legend) return null
     return (
@@ -102,7 +99,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
         />
         <LegendGroup formatLabels={formatLabels} />
 
-        <LegendOrdinal scale={effectiveColorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
+        <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
           {labels => {
             return (
               <>
@@ -230,9 +227,8 @@ const Legend: React.FC<LegendProps> = forwardRef(
                 {/* Pattern Legend Items */}
                 {config.legend.patterns && Object.keys(config.legend.patterns).length > 0 && (
                   <div
-                    className={`legend-patterns d-flex ${
-                      ['top', 'bottom'].includes(config.legend.position) ? 'flex-row flex-wrap' : 'flex-column'
-                    }`}
+                    className={`legend-patterns d-flex ${['top', 'bottom'].includes(config.legend.position) ? 'flex-row flex-wrap' : 'flex-column'
+                      }`}
                   >
                     {Object.entries(config.legend.patterns).map(([key, pattern]) => {
                       const patternId = `legend-pattern-${key}`
