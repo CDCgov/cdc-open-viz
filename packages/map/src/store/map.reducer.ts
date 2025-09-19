@@ -6,16 +6,16 @@ import _ from 'lodash'
 
 export const getInitialState = (configObj = {}): MapState => {
   // Create defaults without palette version to avoid overriding legacy configs
-  const defaultsWithoutPalette = { ...defaults }
+  const defaultsWithoutPaletteaName = { ...defaults }
 
   // Only apply palette defaults if the loaded config explicitly has general.palette
-  if (!configObj?.general?.palette) {
-    delete defaultsWithoutPalette.general?.palette
+  if (!configObj?.general?.palette.name) {
+    delete defaultsWithoutPaletteaName.general?.palette.name
   }
 
   return {
     dataUrl: configObj.dataUrl || '',
-    config: _.merge({}, defaultsWithoutPalette, configObj),
+    config: _.merge({}, defaultsWithoutPaletteaName, configObj),
     loading: false,
     accessibleStatus: '',
     coveLoadedHasRan: false,
