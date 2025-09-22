@@ -3,7 +3,7 @@ import { getCurrentPaletteName, getFallbackColorPalette, migratePaletteWithMap }
 import { chartPaletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { getPaletteAccessor } from '@cdc/core/helpers/getPaletteAccessor'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
-import { v2ColorDistribution } from '../../../helpers/chartColorDistributions'
+import { v2ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
 import { FaStar } from 'react-icons/fa'
 import { Label } from '../../../types/Label'
 import { ColorScale, TransformedData } from '../../../types/ChartContext'

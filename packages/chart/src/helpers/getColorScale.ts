@@ -5,7 +5,7 @@ import { scaleOrdinal } from '@visx/scale'
 import { ChartConfig } from '../types/ChartConfig'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
-import { v2ColorDistribution, divergentColorDistribution, colorblindColorDistribution } from './chartColorDistributions'
+import { v2ColorDistribution, divergentColorDistribution, colorblindColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
 
 export const getColorScale = (config: ChartConfig): ((value: string) => string) => {
   const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)

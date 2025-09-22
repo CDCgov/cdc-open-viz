@@ -1,7 +1,7 @@
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import chroma from 'chroma-js'
 import { type MapConfig } from '../types/MapConfig'
-import { colorDistributions } from './colorDistributions'
+import { mapV1ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 
 // Palette name migrations from v1 to v2
@@ -114,8 +114,8 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
   const amt =
     Math.max(result.length - specialClasses.length, 1) < 10
       ? Math.max(result.length - specialClasses.length, 1)
-      : Object.keys(colorDistributions).length
-  const distributionArray = colorDistributions[amt] ?? []
+      : Object.keys(mapV1ColorDistribution).length
+  const distributionArray = mapV1ColorDistribution[amt] ?? []
 
   // Safety check to ensure mapColorPalette exists and is an array
   if (!mapColorPalette || !Array.isArray(mapColorPalette) || mapColorPalette.length === 0) {

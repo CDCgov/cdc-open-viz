@@ -1,6 +1,5 @@
 export { addUIDs } from './addUIDs'
 export { applyColorToLegend } from './applyColorToLegend'
-export { colorDistributions } from './colorDistributions'
 export { displayGeoName } from './displayGeoName'
 export { formatLegendLocation } from './formatLegendLocation'
 export { generateColorsArray } from '@cdc/core/helpers/generateColorsArray'
