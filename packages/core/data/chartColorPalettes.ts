@@ -80,17 +80,14 @@ export const twoColorPaletteData = {
     'complementary-5': ['#df168c', '#1eb386']
   },
   v2: {
-    // Monochrome palettes (monochrome-1,2,3,4) → divergent_blue_purple using indexes [1,7]
-    'divergent_blue_purple': ['#014697', '#7C256B'],
+    // All palettes using indexes [2,6] from their respective divergent palettes
+    'divergent_blue_purple': ['#1D6ABF', '#935586'],
 
-    // Warm palettes (monochrome-5, warm-1) → divergent_green_orange using indexes [5,7]
-    'divergent_green_orange': ['#EE956C', '#AC4726'],
+    'divergent_green_orange': ['#3EA394', '#E27447'],
 
-    // Cool palettes (cool-1,2,3,4,5) → divergent_blue_cyan using indexes [1,6]
-    'divergent_blue_cyan': ['#014697', '#01ACC9'],
+    'divergent_blue_cyan': ['#1D6ABF', '#01ACC9'],
 
-    // Complementary palettes (complementary-1,2,3,4,5) → divergent_blue_orange using indexes [1,5]
-    'divergent_blue_orange': ['#014697', '#EA803B']
+    'divergent_blue_orange': ['#0092C6', '#DD622F']
   }
 }
 
