@@ -5,7 +5,7 @@ import { scaleOrdinal } from '@visx/scale'
 import { ChartConfig } from '../types/ChartConfig'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
-import { v2ColorDistribution } from './chartColorDistributions'
+import { v2ColorDistribution, divergentColorDistribution, colorblindColorDistribution } from './chartColorDistributions'
 
 export const getColorScale = (config: ChartConfig): ((value: string) => string) => {
   const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
@@ -36,22 +36,84 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
 
   let numberOfKeys = config.runtime.seriesKeys.length
 
-  // Check if we should use v2 distribution logic for better contrast
+  // Apply enhanced color distribution like pie charts for better contrast
   const paletteVersion = getColorPaletteVersion(config)
-  const isSequentialOrDivergent =
-    configPalette && (configPalette.includes('sequential') || configPalette.includes('divergent'))
-  const useV2Distribution = paletteVersion === 2 && isSequentialOrDivergent && palette.length === 9 && numberOfKeys <= 9
+  const useEnhancedDistribution = paletteVersion === 2 && numberOfKeys <= 9 && palette.length === 9
 
-  if (useV2Distribution && v2ColorDistribution[numberOfKeys]) {
-    // Use strategic color distribution for v2 sequential palettes
-    const distributionIndices = v2ColorDistribution[numberOfKeys]
-    palette = distributionIndices.map(index => palette[index])
+  if (useEnhancedDistribution) {
+    // Determine which distribution to use based on palette type (same logic as pie charts)
+    const isSequential = configPalette && configPalette.includes('sequential')
+    const isDivergent = configPalette && configPalette.includes('divergent')
+    const isColorblindSafe =
+      configPalette && (configPalette.includes('colorblindsafe') || configPalette.includes('qualitative_standard'))
+
+    let distributionMap = null
+    if (isDivergent) {
+      distributionMap = divergentColorDistribution
+    } else if (isColorblindSafe) {
+      distributionMap = colorblindColorDistribution
+    } else if (isSequential) {
+      distributionMap = v2ColorDistribution
+    }
+
+    if (distributionMap && distributionMap[numberOfKeys]) {
+      const distributionIndices = distributionMap[numberOfKeys]
+      palette = distributionIndices.map((index: number) => palette[index])
+    } else {
+      palette = palette.slice(0, numberOfKeys)
+    }
   } else {
     // Use existing logic for v1 palettes and other cases
     while (numberOfKeys > palette.length) {
       palette = palette.concat(palette)
     }
     palette = palette.slice(0, numberOfKeys)
+  }
+
+  // Apply reverse if configured
+  if (config.general?.palette?.isReversed) {
+    // Get the full original palette and reverse it, then take what we need
+    const originalPalette = config.general?.palette?.customColors ||
+      allPalettes[migratePaletteWithMap(migratedPaletteName, paletteMigrationMap, false)] ||
+      allPalettes[configPalette] || ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
+
+    const reversedPalette = [...originalPalette].reverse()
+
+    // Apply the same enhanced distribution logic to the reversed palette
+    if (useEnhancedDistribution) {
+      const isSequential = configPalette && configPalette.includes('sequential')
+      const isDivergent = configPalette && configPalette.includes('divergent')
+      const isColorblindSafe =
+        configPalette && (configPalette.includes('colorblindsafe') || configPalette.includes('qualitative_standard'))
+
+      let distributionMap = null
+      if (isDivergent) {
+        distributionMap = divergentColorDistribution
+      } else if (isColorblindSafe) {
+        distributionMap = colorblindColorDistribution
+      } else if (isSequential) {
+        distributionMap = v2ColorDistribution
+      }
+
+      if (distributionMap && distributionMap[numberOfKeys]) {
+        let distributionIndices = distributionMap[numberOfKeys]
+
+        // For single series when reversed, use the first color instead of middle for better visual contrast
+        if (numberOfKeys === 1 && (isSequential || isDivergent)) {
+          distributionIndices = [0]
+        }
+
+        palette = distributionIndices.map((index: number) => reversedPalette[index])
+      } else {
+        palette = reversedPalette.slice(0, numberOfKeys)
+      }
+    } else {
+      let extendedPalette = [...reversedPalette]
+      while (numberOfKeys > extendedPalette.length) {
+        extendedPalette = extendedPalette.concat(reversedPalette)
+      }
+      palette = extendedPalette.slice(0, numberOfKeys)
+    }
   }
 
   return scaleOrdinal({

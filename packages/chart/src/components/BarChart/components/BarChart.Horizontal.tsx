@@ -296,9 +296,22 @@ export const BarChartHorizontal = () => {
                       labelColor = '#fff'
                     }
                   }
+                  // For two-tone lollipops, create separate colors for circle and bar
+                  const lollipopCircleColor = barColor
                   const background = () => {
                     if (isRegularLollipopColor) return barColor
-                    if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
+                    if (isTwoToneLollipopColor) {
+                      // For two-tone lollipops, adjust bar color based on lightness to maintain visibility
+                      const color = chroma(barColor)
+                      const lightness = color.get('hsl.l')
+
+                      // If color is already light (from reversed palette), darken it instead of brightening
+                      if (lightness > 0.7) {
+                        return color.darken(1)
+                      } else {
+                        return color.brighten(1)
+                      }
+                    }
                     if (isHighlightedBar) return 'transparent'
                     return barColor
                   }
@@ -535,7 +548,7 @@ export const BarChartHorizontal = () => {
                             cx={bar.y}
                             cy={barHeight * bar.index + lollipopBarWidth / 2}
                             r={lollipopShapeSize / 2}
-                            fill={barColor}
+                            fill={lollipopCircleColor}
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
@@ -549,7 +562,7 @@ export const BarChartHorizontal = () => {
                             y={0 - lollipopBarWidth / 2}
                             width={lollipopShapeSize}
                             height={lollipopShapeSize}
-                            fill={barColor}
+                            fill={lollipopCircleColor}
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
