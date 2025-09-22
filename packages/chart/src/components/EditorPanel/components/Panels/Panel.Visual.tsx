@@ -287,22 +287,6 @@ const PanelVisual: FC<PanelProps> = props => {
                 size='small'
                 label='Use selected palette in reverse order'
                 updateField={updateField}
-                onClick={() => {
-                  const _state = cloneConfig(config)
-                  const currentPaletteName = getCurrentPaletteName(config)
-                  _state.general.palette.isReversed = !_state.general.palette.isReversed
-                  let paletteName = ''
-                  if (_state.general.palette.isReversed && !currentPaletteName.endsWith('reverse')) {
-                    paletteName = currentPaletteName + 'reverse'
-                  }
-                  if (!_state.general.palette.isReversed && currentPaletteName.endsWith('reverse')) {
-                    paletteName = currentPaletteName.slice(0, -7)
-                  }
-                  if (paletteName) {
-                    _state.general.palette.name = paletteName
-                  }
-                  updateConfig(_state)
-                }}
                 value={config.general?.palette?.isReversed}
               />
             )}
