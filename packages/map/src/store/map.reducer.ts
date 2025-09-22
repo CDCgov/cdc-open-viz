@@ -9,9 +9,9 @@ export const getInitialState = (configObj = {}): MapState => {
   const defaultsWithoutPaletteaName = { ...defaults }
 
   // Only apply palette defaults if the loaded config explicitly has general.palette
-  if (!configObj?.general?.palette.name) {
-    delete defaultsWithoutPaletteaName.general?.palette.name
-  }
+  // if (!configObj?.general?.palette?.name) {
+  //   delete defaultsWithoutPaletteaName.general?.palette.name
+  // }
 
   return {
     dataUrl: configObj.dataUrl || '',
