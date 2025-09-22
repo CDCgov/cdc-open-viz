@@ -12,6 +12,7 @@ const ScatterPlot = ({ xScale, yScale }) => {
     formatNumber,
     seriesHighlight,
     colorPalettes,
+    colorScale,
     interactionLabel
   } = useContext(ConfigContext)
 
@@ -35,19 +36,18 @@ const ScatterPlot = ({ xScale, yScale }) => {
       }
     ])
   const handleTooltip = (item, s, dataIndex) => `<div>
-    ${
-      config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries
-        ? `${config.runtime.seriesLabels[s] || ''}<br/>`
-        : ''
+    ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries
+      ? `${config.runtime.seriesLabels[s] || ''}<br/>`
+      : ''
     }
     ${config.xAxis.label}: ${formatNumber(item[config.xAxis.dataKey], 'bottom')} <br/>
     ${config.yAxis.label}: ${formatNumber(item[s], 'left')}<br/>
    ${additionalColumns
-     .map(
-       ([label, name, options]) =>
-         `${label} : ${formatColNumber(tableData[dataIndex][name], 'left', false, config, options)}<br/>`
-     )
-     .join('')}
+      .map(
+        ([label, name, options]) =>
+          `${label} : ${formatColNumber(tableData[dataIndex][name], 'left', false, config, options)}<br/>`
+      )
+      .join('')}
 </div>`
 
   return (
@@ -57,14 +57,14 @@ const ScatterPlot = ({ xScale, yScale }) => {
         return config.runtime.seriesKeys.map((s, index) => {
           const transparentArea = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && seriesHighlight.indexOf(s) === -1
           const displayArea = config.legend.behavior === 'highlight' || seriesHighlight.length === 0 || seriesHighlight.indexOf(s) !== -1
-          const seriesColor = config.general?.palette?.customColors ? config.general.palette.customColors[index] : config.general?.palette?.name ? colorPalettes[config.general.palette.name][index] : '#000'
+          const seriesColor = config?.general?.palette?.customColors ? config.general.palette.customColors : colorScale(config.runtime.seriesLabels?.[s] || s)
 
           let pointStyles = {
             filter: 'unset',
             opacity: 1,
             stroke: displayArea ? 'black' : ''
           }
-          if (item[s]==='') {
+          if (item[s] === '') {
             return <> </>
           }
 
@@ -87,7 +87,7 @@ const ScatterPlot = ({ xScale, yScale }) => {
                 if (interactionLabel && (currentHover.dataIndex !== dataIndex || currentHover.seriesKey !== s)) {
                   const seriesName = config.runtime.seriesLabels?.[s] || s
                   const safeSeriesName = String(seriesName).replace(/[^a-zA-Z0-9]/g, '_')
-                  publishAnalyticsEvent(`chart_hover_${safeSeriesName.toLowerCase()}`, 'hover', interactionLabel, 'chart', { 
+                  publishAnalyticsEvent(`chart_hover_${safeSeriesName.toLowerCase()}`, 'hover', interactionLabel, 'chart', {
                     title: config?.title,
                     series: seriesName
                   })
