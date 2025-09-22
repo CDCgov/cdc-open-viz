@@ -18,6 +18,11 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
   const versionKey = `v${version}`
   const versionedTwoColorPalette = twoColorPalette[versionKey] || twoColorPalette.v2
 
+  // For paired/deviation bars, only use two-color palettes
+  const palettesSource = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
+    ? versionedTwoColorPalette
+    : colorPalettes
+
   const allPalettes: Record<string, string[]> = { ...versionedTwoColorPalette, ...colorPalettes }
 
   // Migrate old palette name if needed
@@ -25,8 +30,20 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
 
   let palette =
     config.general?.palette?.customColors ||
-    allPalettes[migratePaletteWithMap(migratedPaletteName, paletteMigrationMap, false)] ||
-    allPalettes[configPalette]
+    palettesSource[migratePaletteWithMap(migratedPaletteName, paletteMigrationMap, false)] ||
+    palettesSource[configPalette]
+
+  // Debug logging for paired bars
+  if (['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)) {
+    console.log('🎨 Paired Bar Color Debug:', {
+      configPalette,
+      migratedPaletteName,
+      version: versionKey,
+      availablePalettes: Object.keys(versionedTwoColorPalette),
+      selectedPalette: palette,
+      allPalettes: Object.keys(allPalettes)
+    })
+  }
 
   // Fallback to a default palette if none found
   if (!palette) {
