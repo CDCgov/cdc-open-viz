@@ -22,7 +22,7 @@ const LegendWrapper: React.FC<LegendWrapperProps> = props => {
     return classes.join(' ')
   }
 
-  return <div className={getLegendWrappingClasses()}>{...children}</div>
+  return <div className={getLegendWrappingClasses()}>{children}</div>
 }
 
 export default LegendWrapper
