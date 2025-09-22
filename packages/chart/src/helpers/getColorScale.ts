@@ -33,18 +33,6 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
     palettesSource[migratePaletteWithMap(migratedPaletteName, paletteMigrationMap, false)] ||
     palettesSource[configPalette]
 
-  // Debug logging for paired bars
-  if (['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)) {
-    console.log('🎨 Paired Bar Color Debug:', {
-      configPalette,
-      migratedPaletteName,
-      version: versionKey,
-      availablePalettes: Object.keys(versionedTwoColorPalette),
-      selectedPalette: palette,
-      allPalettes: Object.keys(allPalettes)
-    })
-  }
-
   // Fallback to a default palette if none found
   if (!palette) {
     console.warn(`Palette "${configPalette}" not found, falling back to default`)
