@@ -102,7 +102,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     }
 
     return baseData
-  }, [data, dataNeedsPivot, showPercentage, config])
+  }, [data, dataNeedsPivot, showPercentage, config.yAxis.dataKey, config.xAxis.dataKey, config.runtime.yAxis.dataKey, config.runtime.xAxis.dataKey])
 
   // Helper function to determine enhanced distribution type and apply it
   const applyEnhancedColorDistribution = (config, palette, numberOfKeys) => {
@@ -177,7 +177,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
 
     // Handle normal pie chart case
     return createPieColorScale(_data, config)
-  }, [_data, dataNeedsPivot, colorScale, showPercentage, config])
+  }, [_data, dataNeedsPivot, colorScale, showPercentage, config.xAxis.dataKey, config.general?.palette, config.palette])
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -189,9 +189,9 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     const element = document.querySelector('.isEditor')
     if (element) {
       // parent element is visible
-      setAnimatePie(prevState => true)
+      setAnimatePie(true)
     }
-  })
+  }, [])
 
   useEffect(() => {
     if (dataRef?.isIntersecting && config.animate && !animatedPie) {
@@ -314,11 +314,12 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
 
   // Update the context colorScale when the pie chart's colorScale changes
   // This ensures the Legend component uses the same colors as the pie chart
+  // Only update when specific color-related properties change, not the entire colorScale
   useEffect(() => {
     if (_colorScale && config.visualizationType === 'Pie') {
       dispatch({ type: 'SET_COLOR_SCALE', payload: _colorScale })
     }
-  }, [_colorScale, config.visualizationType, dispatch])
+  }, [config.visualizationType, config.xAxis.dataKey, config.general?.palette?.name, config.palette, dispatch])
 
   const getSvgClasses = () => {
     let classes = ['animated-pie', 'group']
@@ -371,7 +372,6 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
               <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100
                 }) !important`}</style>
               <TooltipWithBounds
-                key={Math.random()}
                 className={'tooltip cdc-open-viz-module'}
                 left={tooltipLeft + centerX - radius}
                 top={tooltipTop}
