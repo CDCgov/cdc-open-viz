@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, userEvent, expect } from 'storybook/test'
+import { waitFor } from '@testing-library/react'
 import WaffleChart from '../CdcWaffleChart'
 
 const meta: Meta<typeof WaffleChart> = {
@@ -46,71 +47,38 @@ const openAccordion = async (canvas: any, sectionName: string) => {
   await new Promise(resolve => setTimeout(resolve, 500))
 }
 
-// Generic polling utility with minimum animation delay
-const pollUntil = async <T,>(
-  read: () => T,
-  predicate: (curr: T, elapsed: number) => boolean,
-  timeout = 5000,
-  interval = 20
-): Promise<T> => {
-  const start = performance.now()
-  // Capture the full call stack to show where this was actually called from
-  const originalStack = new Error().stack
-
-  return new Promise<T>((resolve, reject) => {
-    let lastValue: any = undefined
-    const step = () => {
-      let val: T
-      try {
-        val = read()
-        lastValue = val
-      } catch (error) {
-        val = undefined as any
-        lastValue = `Error: ${error instanceof Error ? error.message : String(error)}`
-      }
-      const elapsed = performance.now() - start
-      try {
-        if (predicate(val, elapsed) && elapsed >= MIN_ANIMATION_DELAY_MS) return resolve(val)
-      } catch (_) {
-        /* ignore */
-      }
-      if (elapsed > timeout) {
-        const error = new Error()
-
-        // Skip over helper functions to show the actual test location
-        if (originalStack) {
-          const stackLines = originalStack.split('\n')
-          const helpersToSkip = [
-            'pollUntil',
-            'waitForPresence',
-            'waitForAbsence',
-            'waitForTextContent',
-            'performAndAssert'
-          ]
-
-          // Find the first line that's not a helper function
-          let actualTestLine = 2 // default fallback
-          for (let i = 1; i < stackLines.length; i++) {
-            const line = stackLines[i]
-            if (!helpersToSkip.some(helper => line.includes(helper))) {
-              actualTestLine = i
-              break
-            }
-          }
-
-          // Reconstruct stack with error message + the actual calling location
-          error.stack = error.message + '\n' + stackLines.slice(actualTestLine).join('\n')
-        }
-
-        return reject(error)
-      }
-      setTimeout(step, interval)
-    }
-    step()
-  })
+const waitForTextContent = async (el: HTMLElement | null, expected: string) => {
+  expect(el).toBeTruthy()
+  await waitFor(
+    () => {
+      expect(el!.textContent?.trim()).toBe(expected.trim())
+    },
+    { timeout: 5000, interval: MIN_ANIMATION_DELAY_MS }
+  )
 }
 
-// Perform action and assert using polling
+const waitForPresence = async (selector: string, canvasElement: HTMLElement) => {
+  await waitFor(
+    () => {
+      const element = canvasElement.querySelector(selector)
+      expect(element).toBeTruthy()
+    },
+    { timeout: 5000, interval: MIN_ANIMATION_DELAY_MS }
+  )
+  return canvasElement.querySelector(selector)
+}
+
+const waitForAbsence = async (selector: string, canvasElement: HTMLElement) => {
+  await waitFor(
+    () => {
+      const element = canvasElement.querySelector(selector)
+      expect(element).toBeFalsy()
+    },
+    { timeout: 5000, interval: MIN_ANIMATION_DELAY_MS }
+  )
+}
+
+// Perform action and assert using @testing-library waitFor
 const performAndAssert = async <T extends unknown>(
   label: string,
   read: () => T,
@@ -120,32 +88,15 @@ const performAndAssert = async <T extends unknown>(
 ): Promise<void> => {
   const before = read()
   await act()
-  const after = await pollUntil(read, curr => predicate(before, curr), 5000)
-  if (extraAssert) extraAssert(after)
-  expect(predicate(before, after)).toBe(true)
-}
 
-// Specialized helper functions
-const waitForTextContent = async (el: HTMLElement | null, expected: string) => {
-  expect(el).toBeTruthy()
-  await pollUntil(
-    () => el!.textContent || '',
-    (curr, elapsed) => curr.trim() === expected.trim() && elapsed >= MIN_ANIMATION_DELAY_MS
-  )
-}
-
-const waitForPresence = async (selector: string, canvasElement: HTMLElement) => {
-  await pollUntil(
-    () => canvasElement.querySelector(selector),
-    (curr, elapsed) => !!curr && elapsed >= MIN_ANIMATION_DELAY_MS
-  )
-  return canvasElement.querySelector(selector)
-}
-
-const waitForAbsence = async (selector: string, canvasElement: HTMLElement) => {
-  await pollUntil(
-    () => !canvasElement.querySelector(selector),
-    (curr, elapsed) => curr === true && elapsed >= MIN_ANIMATION_DELAY_MS
+  await waitFor(
+    () => {
+      const after = read()
+      const result = predicate(before, after)
+      expect(result).toBe(true)
+      if (extraAssert) extraAssert(after)
+    },
+    { timeout: 5000, interval: MIN_ANIMATION_DELAY_MS }
   )
 }
 
@@ -507,10 +458,13 @@ export const DataSectionTests: Story = {
     await userEvent.clear(prefixInput)
     await userEvent.type(prefixInput, '$')
 
-    // Wait for prefix to be applied with proper polling
-    await pollUntil(
-      getValueText,
-      (curr, elapsed) => curr !== valueBeforePrefix && curr.startsWith('$') && elapsed >= MIN_ANIMATION_DELAY_MS
+    await waitFor(
+      () => {
+        const curr = getValueText()
+        expect(curr).not.toBe(valueBeforePrefix)
+        expect(curr.startsWith('$')).toBe(true)
+      },
+      { timeout: 5000, interval: MIN_ANIMATION_DELAY_MS }
     )
 
     expect(prefixInput.value).toBe('$')
@@ -526,10 +480,13 @@ export const DataSectionTests: Story = {
     await userEvent.clear(suffixInput)
     await userEvent.type(suffixInput, ' deaths')
 
-    // Wait for suffix to be applied with proper polling
-    await pollUntil(
-      getValueText,
-      (curr, elapsed) => curr !== afterPrefix && curr.endsWith('deaths') && elapsed >= MIN_ANIMATION_DELAY_MS
+    await waitFor(
+      () => {
+        const curr = getValueText()
+        expect(curr).not.toBe(afterPrefix)
+        expect(curr.endsWith('deaths')).toBe(true)
+      },
+      { timeout: 5000, interval: MIN_ANIMATION_DELAY_MS }
     )
 
     expect(suffixInput.value).toBe(' deaths')
@@ -542,26 +499,33 @@ export const DataSectionTests: Story = {
     // Expectation: Primary value text changes after filter applied.
     // ============================================================================
     const addFilterButton = Array.from(canvasElement.querySelectorAll('button')).find(
-      b => b.textContent?.trim() === 'Add Filter'
+      b => (b as HTMLButtonElement).textContent?.trim() === 'Add Filter'
     ) as HTMLButtonElement
     await performAndAssert(
       'Add Filter',
       getValueText,
       async () => {
         await userEvent.click(addFilterButton)
-        // Poll for filter UI to appear instead of fixed sleep
-        await pollUntil(
-          () => canvasElement.querySelector('.filters-list .edit-block:last-of-type'),
-          (curr, elapsed) => !!curr && elapsed >= MIN_ANIMATION_DELAY_MS
+
+        await waitFor(
+          () => {
+            const filterUI = canvasElement.querySelector('.filters-list .edit-block:last-of-type')
+            expect(filterUI).toBeTruthy()
+          },
+          { timeout: 5000, interval: MIN_ANIMATION_DELAY_MS }
         )
+
         const newFilter = canvasElement.querySelector('.filters-list .edit-block:last-of-type') as HTMLElement
         const [colSelect, valSelect] = Array.from(newFilter.querySelectorAll('select')) as HTMLSelectElement[]
         await userEvent.selectOptions(colSelect, 'state')
-        // Brief wait for value options to populate
-        await pollUntil(
-          () => valSelect.options.length,
-          (curr, elapsed) => curr > 1 && elapsed >= MIN_ANIMATION_DELAY_MS
+
+        await waitFor(
+          () => {
+            expect(valSelect.options.length).toBeGreaterThan(1)
+          },
+          { timeout: 5000, interval: MIN_ANIMATION_DELAY_MS }
         )
+
         await userEvent.selectOptions(valSelect, 'Alaska')
       },
       (before, after) => after !== before
