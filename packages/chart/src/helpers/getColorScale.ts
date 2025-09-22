@@ -5,7 +5,7 @@ import { scaleOrdinal } from '@visx/scale'
 import { ChartConfig } from '../types/ChartConfig'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
-import { v2ColorDistribution } from './chartColorDistributions'
+import { v2ColorDistribution, divergentColorDistribution, colorblindColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
 
 export const getColorScale = (config: ChartConfig): ((value: string) => string) => {
   const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
@@ -41,22 +41,38 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
 
   let numberOfKeys = config.runtime.seriesKeys.length
 
-  // Check if we should use v2 distribution logic for better contrast
+  // Apply enhanced color distribution (same logic as pie charts)
   const paletteVersion = getColorPaletteVersion(config)
-  const isSequentialOrDivergent =
-    configPalette && (configPalette.includes('sequential') || configPalette.includes('divergent'))
-  const useV2Distribution = paletteVersion === 2 && isSequentialOrDivergent && palette.length === 9 && numberOfKeys <= 9
 
-  if (useV2Distribution && v2ColorDistribution[numberOfKeys]) {
-    // Use strategic color distribution for v2 sequential palettes
-    const distributionIndices = v2ColorDistribution[numberOfKeys]
-    palette = distributionIndices.map(index => palette[index])
-  } else {
+  // Skip enhanced distribution if not v2, too many keys, or wrong palette length
+  if (paletteVersion !== 2 || numberOfKeys > 9 || palette.length !== 9) {
     // Use existing logic for v1 palettes and other cases
     while (numberOfKeys > palette.length) {
       palette = palette.concat(palette)
     }
     palette = palette.slice(0, numberOfKeys)
+  } else {
+    // Apply enhanced distribution for v2 palettes
+    const isSequential = configPalette && configPalette.includes('sequential')
+    const isDivergent = configPalette && configPalette.includes('divergent')
+    const isColorblindSafe = configPalette && (configPalette.includes('colorblindsafe') || configPalette.includes('qualitative_standard'))
+
+    // Determine which distribution to use based on palette type
+    let distributionMap = null
+    if (isDivergent) {
+      distributionMap = divergentColorDistribution
+    } else if (isColorblindSafe) {
+      distributionMap = colorblindColorDistribution
+    } else if (isSequential) {
+      distributionMap = v2ColorDistribution
+    }
+
+    if (distributionMap && distributionMap[numberOfKeys]) {
+      const distributionIndices = distributionMap[numberOfKeys]
+      palette = distributionIndices.map((index: number) => palette[index])
+    } else {
+      palette = palette.slice(0, numberOfKeys)
+    }
   }
 
   return scaleOrdinal({
