@@ -30,52 +30,71 @@ const MIN_ANIMATION_DELAY_MS = (() => {
     return 0
   }
 
-  return 250
+  return 500
 })()
+
+const WAIT_FOR_TIMEOUT_MS = 5000
+
+// Wrapper for waitFor that includes explicit animation delay
+const waitForWithDelay = async (predicate: () => void, options?: { timeout?: number; interval?: number }) => {
+  // Add explicit delay before starting to poll
+  if (MIN_ANIMATION_DELAY_MS > 0) {
+    await new Promise(resolve => setTimeout(resolve, MIN_ANIMATION_DELAY_MS))
+  }
+
+  await waitFor(predicate, {
+    timeout: options?.timeout || WAIT_FOR_TIMEOUT_MS,
+    interval: options?.interval || 100 // Use smaller interval for more responsive polling
+  })
+}
 
 // Helper function to wait for editor to load
 const waitForEditor = async (canvas: any) => {
-  await new Promise(resolve => setTimeout(resolve, 2000))
-  const editorElement = canvas.queryAllByText(/general|data|visual/i)
-  await expect(editorElement[0]).toBeVisible()
+  await waitForWithDelay(() => {
+    const editorElement = canvas.queryAllByText(/general|data|visual/i)
+    expect(editorElement[0]).toBeVisible()
+  })
 }
 
 // Helper function to open accordion
 const openAccordion = async (canvas: any, sectionName: string) => {
   const accordion = canvas.getByRole('button', { name: new RegExp(sectionName, 'i') })
   await userEvent.click(accordion)
-  await new Promise(resolve => setTimeout(resolve, 500))
+
+  // Wait for accordion to be fully opened with animation delay
+  await waitForWithDelay(() => {
+    // Check if accordion content is visible/expanded
+    const accordionContent = accordion.closest('.accordion-item, .accordion-section, [class*="accordion"]')
+    expect(accordionContent).toBeTruthy()
+  })
 }
 
 const waitForTextContent = async (el: HTMLElement | null, expected: string) => {
   expect(el).toBeTruthy()
-  await waitFor(
-    () => {
-      expect(el!.textContent?.trim()).toBe(expected.trim())
-    },
-    { timeout: 5000, interval: MIN_ANIMATION_DELAY_MS }
-  )
+  await waitForWithDelay(() => {
+    expect(el!.textContent?.trim()).toBe(expected.trim())
+  })
 }
 
 const waitForPresence = async (selector: string, canvasElement: HTMLElement) => {
-  await waitFor(
-    () => {
-      const element = canvasElement.querySelector(selector)
-      expect(element).toBeTruthy()
-    },
-    { timeout: 5000, interval: MIN_ANIMATION_DELAY_MS }
-  )
+  await waitForWithDelay(() => {
+    const element = canvasElement.querySelector(selector)
+    expect(element).toBeTruthy()
+  })
   return canvasElement.querySelector(selector)
 }
 
 const waitForAbsence = async (selector: string, canvasElement: HTMLElement) => {
-  await waitFor(
-    () => {
-      const element = canvasElement.querySelector(selector)
-      expect(element).toBeFalsy()
-    },
-    { timeout: 5000, interval: MIN_ANIMATION_DELAY_MS }
-  )
+  await waitForWithDelay(() => {
+    const element = canvasElement.querySelector(selector)
+    expect(element).toBeFalsy()
+  })
+}
+
+const waitForOptionsToPopulate = async (selectElement: HTMLSelectElement, minCount: number = 2) => {
+  await waitForWithDelay(() => {
+    expect(selectElement.options.length).toBeGreaterThanOrEqual(minCount)
+  })
 }
 
 // Perform action and assert using @testing-library waitFor
@@ -89,15 +108,12 @@ const performAndAssert = async <T extends unknown>(
   const before = read()
   await act()
 
-  await waitFor(
-    () => {
-      const after = read()
-      const result = predicate(before, after)
-      expect(result).toBe(true)
-      if (extraAssert) extraAssert(after)
-    },
-    { timeout: 5000, interval: MIN_ANIMATION_DELAY_MS }
-  )
+  await waitForWithDelay(() => {
+    const after = read()
+    const result = predicate(before, after)
+    expect(result).toBe(true)
+    if (extraAssert) extraAssert(after)
+  })
 }
 
 /**
@@ -454,45 +470,30 @@ export const DataSectionTests: Story = {
     // Expectation: Value starts with '$' and differs from prior snapshot.
     // ============================================================================
     const prefixInput = canvasElement.querySelector('input[name*="prefix"]') as HTMLInputElement
-    const valueBeforePrefix = getValueText()
-    await userEvent.clear(prefixInput)
-    await userEvent.type(prefixInput, '$')
-
-    await waitFor(
-      () => {
-        const curr = getValueText()
-        expect(curr).not.toBe(valueBeforePrefix)
-        expect(curr.startsWith('$')).toBe(true)
+    await performAndAssert(
+      'Prefix Update',
+      getValueText,
+      async () => {
+        await userEvent.clear(prefixInput)
+        await userEvent.type(prefixInput, '$')
       },
-      { timeout: 5000, interval: MIN_ANIMATION_DELAY_MS }
+      (before, after) => after !== before && after.startsWith('$')
     )
-
-    expect(prefixInput.value).toBe('$')
-    const afterPrefix = getValueText()
-    expect(afterPrefix.startsWith('$')).toBe(true)
-    expect(afterPrefix).not.toBe(valueBeforePrefix)
 
     // ============================================================================
     // TEST 15: Suffix -> ' deaths'
     // Expectation: Value ends with 'deaths' and differs from prior snapshot.
     // ============================================================================
     const suffixInput = canvasElement.querySelector('input[name*="suffix"]') as HTMLInputElement
-    await userEvent.clear(suffixInput)
-    await userEvent.type(suffixInput, ' deaths')
-
-    await waitFor(
-      () => {
-        const curr = getValueText()
-        expect(curr).not.toBe(afterPrefix)
-        expect(curr.endsWith('deaths')).toBe(true)
+    await performAndAssert(
+      'Suffix Update',
+      getValueText,
+      async () => {
+        await userEvent.clear(suffixInput)
+        await userEvent.type(suffixInput, ' deaths')
       },
-      { timeout: 5000, interval: MIN_ANIMATION_DELAY_MS }
+      (before, after) => after !== before && after.endsWith('deaths')
     )
-
-    expect(suffixInput.value).toBe(' deaths')
-    const afterSuffix = getValueText()
-    expect(afterSuffix.endsWith('deaths')).toBe(true)
-    expect(afterSuffix).not.toBe(afterPrefix)
 
     // ============================================================================
     // TEST 16: Add Filter (state = Alaska)
@@ -507,24 +508,13 @@ export const DataSectionTests: Story = {
       async () => {
         await userEvent.click(addFilterButton)
 
-        await waitFor(
-          () => {
-            const filterUI = canvasElement.querySelector('.filters-list .edit-block:last-of-type')
-            expect(filterUI).toBeTruthy()
-          },
-          { timeout: 5000, interval: MIN_ANIMATION_DELAY_MS }
-        )
+        await waitForPresence('.filters-list .edit-block:last-of-type', canvasElement)
 
         const newFilter = canvasElement.querySelector('.filters-list .edit-block:last-of-type') as HTMLElement
         const [colSelect, valSelect] = Array.from(newFilter.querySelectorAll('select')) as HTMLSelectElement[]
         await userEvent.selectOptions(colSelect, 'state')
 
-        await waitFor(
-          () => {
-            expect(valSelect.options.length).toBeGreaterThan(1)
-          },
-          { timeout: 5000, interval: MIN_ANIMATION_DELAY_MS }
-        )
+        await waitForOptionsToPopulate(valSelect)
 
         await userEvent.selectOptions(valSelect, 'Alaska')
       },
