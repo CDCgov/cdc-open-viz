@@ -17,7 +17,7 @@ import * as d3 from 'd3'
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { supportedCountries } from '../data/supported-geos'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
-import { v2ColorDistribution } from '@cdc/chart/src/helpers/chartColorDistributions'
+import { v2ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
 
 type LegendItem = {
   special?: boolean

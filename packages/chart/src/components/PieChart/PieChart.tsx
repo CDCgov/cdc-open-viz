@@ -9,7 +9,7 @@ import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import { colorPalettesChart as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
-import { v2ColorDistribution, divergentColorDistribution, colorblindColorDistribution } from '../../helpers/chartColorDistributions'
+import { v2ColorDistribution, divergentColorDistribution, colorblindColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
 
 // cove
 import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
