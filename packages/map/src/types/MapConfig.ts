@@ -4,6 +4,9 @@ import { type EditorColumnProperties } from '@cdc/core/types/EditorColumnPropert
 import { type Version } from '@cdc/core/types/Version'
 import { type VizFilter } from '@cdc/core/types/VizFilter'
 
+// Runtime data types
+export type RuntimeFilters = VizFilter[] & { fromHash?: number }
+
 export type MapVisualSettings = {
   /** minBubbleSize - Minimum Circle Size when the map has a type of bubble */
   minBubbleSize: number
@@ -75,7 +78,7 @@ export type Coordinate = [number, number]
 
 export type DataRow = {
   uid?: string // optional 'uid' property
-  [key: string]: any // allowing any additional properties with a dynamic key (e.g., for `configPrimaryName`)
+  [key: string]: string | number | boolean | null | undefined // allowing primitive data types for dynamic columns
 }
 
 export type MapConfig = Visualization & {

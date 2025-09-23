@@ -75,12 +75,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
   }, [citiesData])
 
   // Early exit for map types that don't use city rendering
-  if (
-    !projection ||
-    (config.general.type !== 'us-geocode' &&
-      config.general.type !== 'world-geocode' &&
-      config.general.type !== 'bubble')
-  ) {
+  if (!projection) {
     return null
   }
 
