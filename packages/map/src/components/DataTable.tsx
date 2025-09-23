@@ -125,7 +125,7 @@ const DataTable = props => {
           role='link'
           tabIndex='0'
           onKeyDown={e => {
-            if (e.keyCode === 13) {
+            if (e.key === 'Enter') {
               navigationHandler(state.general.navigationTarget, row[columns.navigate.name])
             }
           }}
@@ -252,7 +252,7 @@ const DataTable = props => {
           }}
           tabIndex='0'
           onKeyDown={e => {
-            if (e.keyCode === 13) {
+            if (e.key === 'Enter') {
               setExpanded(!expanded)
             }
           }}
@@ -300,7 +300,7 @@ const DataTable = props => {
                           setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
                         }}
                         onKeyDown={e => {
-                          if (e.keyCode === 13) {
+                          if (e.key === 'Enter') {
                             setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
                           }
                         }}
@@ -314,8 +314,9 @@ const DataTable = props => {
                           : null)}
                       >
                         {text}
-                        <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
-                          } order`}</span>
+                        <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${
+                          sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
+                        } order`}</span>
                       </th>
                     )
                   })}
@@ -351,7 +352,9 @@ const DataTable = props => {
                               fill={legendColor[0]}
                               patternInfo={{
                                 pattern: patternInfo.pattern,
-                                patternId: `${mapId}--${String(patternInfo.dataKey).replace(' ', '-')}--${patternInfo.patternIndex}--table`,
+                                patternId: `${mapId}--${String(patternInfo.dataKey).replace(' ', '-')}--${
+                                  patternInfo.patternIndex
+                                }--table`,
                                 size: patternInfo.size,
                                 color: patternInfo.color
                               }}
@@ -376,8 +379,8 @@ const DataTable = props => {
                             role='gridcell'
                             onClick={() =>
                               state.general.type === 'bubble' &&
-                                state.general.allowMapZoom &&
-                                state.general.geoType === 'world'
+                              state.general.allowMapZoom &&
+                              state.general.geoType === 'world'
                                 ? dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: row })
                                 : true
                             }

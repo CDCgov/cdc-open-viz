@@ -52,8 +52,7 @@ export const reloadURLData = async (config: MapConfig, setConfig: (config: MapCo
       data = []
     }
   } catch (e) {
-    console.error(`Cannot parse URL: ${dataUrlFinal}`) // eslint-disable-line
-    console.log(e) // eslint-disable-line
+    console.error(`Cannot parse URL: ${dataUrlFinal}`, e)
     data = []
   }
 
