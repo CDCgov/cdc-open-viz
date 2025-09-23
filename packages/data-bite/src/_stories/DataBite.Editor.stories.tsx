@@ -1,6 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, userEvent, expect } from 'storybook/test'
 import DataBite from '../CdcDataBite'
+import {
+  MIN_ANIMATION_DELAY_MS,
+  pollUntil,
+  performAndAssert,
+  waitForPresence,
+  waitForAbsence,
+  waitForTextContent,
+  waitForEditor,
+  openAccordion,
+  getDisplayValue,
+  getTitleText
+} from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof DataBite> = {
   title: 'Components/Templates/Data Bite/Editor Tests',
@@ -25,177 +37,12 @@ type Story = StoryObj<typeof DataBite>
 // ============================================================================
 
 // ============================================================================
-// SHARED CONSTANTS AND UTILITIES - Adopted from WaffleChart best practices
+// SHARED CONSTANTS AND UTILITIES - Now imported from @cdc/core/helpers/testing
 // ============================================================================
-
-// Use 250ms delay for visual perception in Storybook UI, but skip in automated tests
-const MIN_ANIMATION_DELAY_MS = (() => {
-  // Check if we're in automated test environment (Vitest/Jest)
-  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
-    return 0
-  }
-
-  // Check if we're running via test runner (Vitest has __vitest__ global)
-  if (typeof globalThis !== 'undefined' && '__vitest__' in globalThis) {
-    return 0
-  }
-
-  return 250
-})()
-
-// Generic polling utility with minimum animation delay
-const pollUntil = async <T,>(
-  read: () => T,
-  predicate: (curr: T, elapsed: number) => boolean,
-  timeout = 5000,
-  interval = 20
-): Promise<T> => {
-  const start = performance.now()
-  // Capture the full call stack to show where this was actually called from
-  const originalStack = new Error().stack
-
-  return new Promise<T>((resolve, reject) => {
-    let lastValue: any = undefined
-    const step = () => {
-      let val: T
-      try {
-        val = read()
-        lastValue = val
-      } catch (error) {
-        val = undefined as any
-        lastValue = `Error: ${error instanceof Error ? error.message : String(error)}`
-      }
-      const elapsed = performance.now() - start
-      try {
-        if (predicate(val, elapsed) && elapsed >= MIN_ANIMATION_DELAY_MS) return resolve(val)
-      } catch (_) {
-        /* ignore */
-      }
-      if (elapsed > timeout) {
-        const error = new Error()
-
-        // Skip over helper functions to show the actual test location
-        if (originalStack) {
-          const stackLines = originalStack.split('\n')
-          const helpersToSkip = [
-            'pollUntil',
-            'waitForPresence',
-            'waitForAbsence',
-            'waitForTextContent',
-            'performAndAssert'
-          ]
-
-          // Find the first line that's not a helper function
-          let actualTestLine = 2 // default fallback
-          for (let i = 1; i < stackLines.length; i++) {
-            const line = stackLines[i]
-            if (!helpersToSkip.some(helper => line.includes(helper))) {
-              actualTestLine = i
-              break
-            }
-          }
-
-          // Reconstruct stack with error message + the actual calling location
-          error.stack = error.message + '\n' + stackLines.slice(actualTestLine).join('\n')
-        }
-
-        return reject(error)
-      }
-      setTimeout(step, interval)
-    }
-    step()
-  })
-}
-
-// Perform action and assert using polling
-const performAndAssert = async <T extends unknown>(
-  label: string,
-  read: () => T,
-  act: () => Promise<void> | void,
-  predicate: (before: T, after: T) => boolean,
-  extraAssert?: (after: T) => void
-): Promise<void> => {
-  const before = read()
-  await act()
-  const after = await pollUntil(read, curr => predicate(before, curr), 5000)
-  if (extraAssert) extraAssert(after)
-  expect(predicate(before, after)).toBe(true)
-}
-
-// Specialized helper functions
-const waitForTextContent = async (el: HTMLElement | null, expected: string) => {
-  expect(el).toBeTruthy()
-  await pollUntil(
-    () => el!.textContent || '',
-    (curr, elapsed) => curr.trim() === expected.trim() && elapsed >= MIN_ANIMATION_DELAY_MS
-  )
-}
-
-const waitForPresence = async (selector: string, canvasElement: HTMLElement) => {
-  await pollUntil(
-    () => canvasElement.querySelector(selector),
-    (curr, elapsed) => !!curr && elapsed >= MIN_ANIMATION_DELAY_MS
-  )
-  return canvasElement.querySelector(selector)
-}
-
-const waitForAbsence = async (selector: string, canvasElement: HTMLElement) => {
-  await pollUntil(
-    () => !canvasElement.querySelector(selector),
-    (curr, elapsed) => curr === true && elapsed >= MIN_ANIMATION_DELAY_MS
-  )
-}
-
-// Helper function to wait for editor to load
-const waitForEditor = async (canvas: any) => {
-  await new Promise(resolve => setTimeout(resolve, 2000))
-  const editorElement = canvas.queryAllByText(/general|data|visual/i)
-  await expect(editorElement[0]).toBeVisible()
-}
-
-// Helper function to open accordion
-const openAccordion = async (canvas: any, sectionName: string) => {
-  const accordion = canvas.getByRole('button', { name: new RegExp(sectionName, 'i') })
-  await userEvent.click(accordion)
-  await new Promise(resolve => setTimeout(resolve, 500))
-}
 
 // ============================================================================
 // SECTION-SPECIFIC HELPERS
 // ============================================================================
-
-/**
- * Get the primary data value displayed in the visualization
- */
-const getDisplayValue = (canvasElement: HTMLElement): string => {
-  // Try multiple selectors for data value
-  const selectors = ['svg text', '.bite-text', '.data-value', '[data-testid="data-value"]']
-
-  for (const selector of selectors) {
-    const elements = canvasElement.querySelectorAll(selector)
-    for (let i = 0; i < elements.length; i++) {
-      const element = elements[i]
-      const text = element.textContent?.trim()
-      if (text && /[\d,]+/.test(text)) {
-        return text
-      }
-    }
-  }
-
-  return ''
-}
-
-/**
- * Get the title text from the visualization
- */
-const getTitleText = (canvas: any): string => {
-  try {
-    const titleElement = canvas.getByRole('heading') || canvas.querySelector('h1, h2, h3, .title')
-    return titleElement?.textContent?.trim() || ''
-  } catch {
-    return ''
-  }
-}
 
 // ============================================================================
 // TEST 1: Basic Editor Loading
@@ -208,7 +55,7 @@ export const BasicEditorLoading: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await waitForEditor(canvas)
+    await waitForEditor(canvas, expect)
 
     // Verify all three main accordion sections are present
     const generalButton = canvas.getByRole('button', { name: /general/i })
@@ -236,8 +83,8 @@ export const GeneralSectionTests: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'general')
+    await waitForEditor(canvas, expect)
+    await openAccordion(canvas, 'general', userEvent)
 
     // Wait for accordion to open
     await pollUntil(
@@ -277,7 +124,8 @@ export const GeneralSectionTests: Story = {
         (before, after) =>
           before.hasSvg !== after.hasSvg ||
           before.textCount !== after.textCount ||
-          before.containerClasses !== after.containerClasses
+          before.containerClasses !== after.containerClasses,
+        expect
       )
 
       // Switch back to show the difference
@@ -290,7 +138,8 @@ export const GeneralSectionTests: Story = {
         (before, after) =>
           before.hasSvg !== after.hasSvg ||
           before.textCount !== after.textCount ||
-          before.containerClasses !== after.containerClasses
+          before.containerClasses !== after.containerClasses,
+        expect
       )
     }
 
@@ -306,7 +155,8 @@ export const GeneralSectionTests: Story = {
       'Title Update',
       () => canvasElement.querySelector('.cove-component__header')?.textContent?.trim() || '',
       async () => {}, // action already performed above
-      (before, after) => after === 'Updated Data Bite Title'
+      (before, after) => after === 'Updated Data Bite Title',
+      expect
     )
 
     // ============================================================================
@@ -328,7 +178,8 @@ export const GeneralSectionTests: Story = {
       async () => {
         await userEvent.click(showTitleCheckbox)
       },
-      (before, after) => after !== before
+      (before, after) => after !== before,
+      expect
     )
 
     // Toggle back to original state
@@ -338,7 +189,8 @@ export const GeneralSectionTests: Story = {
       async () => {
         await userEvent.click(showTitleCheckbox)
       },
-      (before, after) => after === wasVisible
+      (before, after) => after === wasVisible,
+      expect
     )
 
     // ============================================================================
@@ -354,7 +206,7 @@ export const GeneralSectionTests: Story = {
 
     const bodyElement = canvasElement.querySelector('.bite-body, .bite-text, .message-text') as HTMLElement
     if (bodyElement) {
-      await waitForTextContent(bodyElement, newBodyContent)
+      await waitForTextContent(bodyElement, newBodyContent, expect)
     }
 
     // ============================================================================
@@ -370,7 +222,7 @@ export const GeneralSectionTests: Story = {
 
     const subtextElement = canvasElement.querySelector('.bite-subtext, .citation, .subtext') as HTMLElement
     if (subtextElement) {
-      await waitForTextContent(subtextElement, newSubtext)
+      await waitForTextContent(subtextElement, newSubtext, expect)
     }
   }
 }
@@ -386,8 +238,8 @@ export const DataSectionTests: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Data')
+    await waitForEditor(canvas, expect)
+    await openAccordion(canvas, 'Data', userEvent)
 
     // Get the current data value for comparison
     const getDataValue = () => canvasElement.querySelector('svg text, .bite-text')?.textContent?.trim() || ''
@@ -412,7 +264,8 @@ export const DataSectionTests: Story = {
         async () => {
           await userEvent.selectOptions(dataColumnSelect, targetColumn)
         },
-        (before, after) => after !== before
+        (before, after) => after !== before,
+        expect
       )
     }
 
@@ -436,7 +289,8 @@ export const DataSectionTests: Story = {
         async () => {
           await userEvent.selectOptions(dataFunctionSelect, targetFunction)
         },
-        (before, after) => after !== before
+        (before, after) => after !== before,
+        expect
       )
     }
 
@@ -457,7 +311,8 @@ export const DataSectionTests: Story = {
         await userEvent.type(prefixInput, '$')
         await userEvent.tab() // Trigger change event
       },
-      (before, after) => after.startsWith('$') && after !== before
+      (before, after) => after.startsWith('$') && after !== before,
+      expect
     )
 
     // ============================================================================
@@ -475,7 +330,8 @@ export const DataSectionTests: Story = {
         await userEvent.type(suffixInput, ' miles')
         await userEvent.tab() // Trigger change event
       },
-      (before, after) => after.includes('miles') && after !== before
+      (before, after) => after.includes('miles') && after !== before,
+      expect
     )
 
     // ============================================================================
@@ -496,7 +352,8 @@ export const DataSectionTests: Story = {
           await userEvent.type(roundInput, newValue)
           await userEvent.tab() // Trigger change event
         },
-        (before, after) => after !== before
+        (before, after) => after !== before,
+        expect
       )
     } catch (error) {
       throw error
@@ -766,8 +623,8 @@ export const VisualSectionTests: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Visual')
+    await waitForEditor(canvas, expect)
+    await openAccordion(canvas, 'Visual', userEvent)
 
     // ============================================================================
     // TEST 1: Bite Font Size Change
@@ -817,7 +674,8 @@ export const VisualSectionTests: Story = {
           (before, after) => {
             // Check for clean change from 24 to 26
             return before === '24' && after === '26'
-          }
+          },
+          expect
         )
       } else {
         // Log all inputs for debugging
@@ -851,7 +709,8 @@ export const VisualSectionTests: Story = {
         },
         (before, after) => {
           return after !== before
-        }
+        },
+        expect
       )
     } catch (error) {
       throw error
@@ -1034,8 +893,8 @@ export const CrossSectionWorkflow: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'general')
+    await waitForEditor(canvas, expect)
+    await openAccordion(canvas, 'general', userEvent)
 
     // Step 1: Update title in General section
     await pollUntil(
@@ -1049,7 +908,7 @@ export const CrossSectionWorkflow: Story = {
     await userEvent.type(titleInput, 'Workflow Demo Title', { delay: 100 })
 
     // Step 2: Configure data formatting in Data section
-    await openAccordion(canvas, 'data')
+    await openAccordion(canvas, 'data', userEvent)
 
     const prefixInput = canvas.getByLabelText(/prefix/i)
     await userEvent.clear(prefixInput)
@@ -1057,7 +916,7 @@ export const CrossSectionWorkflow: Story = {
     await userEvent.tab()
 
     // Step 3: Change visual styling in Visual section
-    await openAccordion(canvas, 'visual')
+    await openAccordion(canvas, 'visual', userEvent)
 
     // Check border state before and after clicking
     const getBorderState = () => {
@@ -1073,7 +932,7 @@ export const CrossSectionWorkflow: Story = {
     const borderStateAfter = getBorderState()
 
     // Step 4: Return to General to verify persistence
-    await openAccordion(canvas, 'general')
+    await openAccordion(canvas, 'general', userEvent)
 
     // Verify all changes persisted across sections
     const persistedTitle = canvas.getByText(/Workflow Demo Title/i)

@@ -1,6 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, userEvent, expect } from 'storybook/test'
 import WaffleChart from '../CdcWaffleChart'
+import {
+  MIN_ANIMATION_DELAY_MS,
+  pollUntil,
+  performAndAssert,
+  waitForPresence,
+  waitForAbsence,
+  waitForTextContent,
+  waitForEditor,
+  openAccordion
+} from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof WaffleChart> = {
   title: 'Components/Templates/WaffleChart/Editor Tests',
@@ -14,140 +24,8 @@ export default meta
 type Story = StoryObj<typeof WaffleChart>
 
 // ============================================================================
-// SHARED HELPERS - Used across all test sections
+// SHARED HELPERS - Now imported from @cdc/core/helpers/testing
 // ============================================================================
-
-// Use 250ms delay for visual perception in Storybook UI, but skip in automated tests
-const MIN_ANIMATION_DELAY_MS = (() => {
-  // Check if we're in automated test environment (Vitest/Jest)
-  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
-    return 0
-  }
-
-  // Check if we're running via test runner (Vitest has __vitest__ global)
-  if (typeof globalThis !== 'undefined' && '__vitest__' in globalThis) {
-    return 0
-  }
-
-  return 250
-})()
-
-// Helper function to wait for editor to load
-const waitForEditor = async (canvas: any) => {
-  await new Promise(resolve => setTimeout(resolve, 2000))
-  const editorElement = canvas.queryAllByText(/general|data|visual/i)
-  await expect(editorElement[0]).toBeVisible()
-}
-
-// Helper function to open accordion
-const openAccordion = async (canvas: any, sectionName: string) => {
-  const accordion = canvas.getByRole('button', { name: new RegExp(sectionName, 'i') })
-  await userEvent.click(accordion)
-  await new Promise(resolve => setTimeout(resolve, 500))
-}
-
-// Generic polling utility with minimum animation delay
-const pollUntil = async <T,>(
-  read: () => T,
-  predicate: (curr: T, elapsed: number) => boolean,
-  timeout = 5000,
-  interval = 20
-): Promise<T> => {
-  const start = performance.now()
-  // Capture the full call stack to show where this was actually called from
-  const originalStack = new Error().stack
-
-  return new Promise<T>((resolve, reject) => {
-    let lastValue: any = undefined
-    const step = () => {
-      let val: T
-      try {
-        val = read()
-        lastValue = val
-      } catch (error) {
-        val = undefined as any
-        lastValue = `Error: ${error instanceof Error ? error.message : String(error)}`
-      }
-      const elapsed = performance.now() - start
-      try {
-        if (predicate(val, elapsed) && elapsed >= MIN_ANIMATION_DELAY_MS) return resolve(val)
-      } catch (_) {
-        /* ignore */
-      }
-      if (elapsed > timeout) {
-        const error = new Error()
-
-        // Skip over helper functions to show the actual test location
-        if (originalStack) {
-          const stackLines = originalStack.split('\n')
-          const helpersToSkip = [
-            'pollUntil',
-            'waitForPresence',
-            'waitForAbsence',
-            'waitForTextContent',
-            'performAndAssert'
-          ]
-
-          // Find the first line that's not a helper function
-          let actualTestLine = 2 // default fallback
-          for (let i = 1; i < stackLines.length; i++) {
-            const line = stackLines[i]
-            if (!helpersToSkip.some(helper => line.includes(helper))) {
-              actualTestLine = i
-              break
-            }
-          }
-
-          // Reconstruct stack with error message + the actual calling location
-          error.stack = error.message + '\n' + stackLines.slice(actualTestLine).join('\n')
-        }
-
-        return reject(error)
-      }
-      setTimeout(step, interval)
-    }
-    step()
-  })
-}
-
-// Perform action and assert using polling
-const performAndAssert = async <T extends unknown>(
-  label: string,
-  read: () => T,
-  act: () => Promise<void> | void,
-  predicate: (before: T, after: T) => boolean,
-  extraAssert?: (after: T) => void
-): Promise<void> => {
-  const before = read()
-  await act()
-  const after = await pollUntil(read, curr => predicate(before, curr), 5000)
-  if (extraAssert) extraAssert(after)
-  expect(predicate(before, after)).toBe(true)
-}
-
-// Specialized helper functions
-const waitForTextContent = async (el: HTMLElement | null, expected: string) => {
-  expect(el).toBeTruthy()
-  await pollUntil(
-    () => el!.textContent || '',
-    (curr, elapsed) => curr.trim() === expected.trim() && elapsed >= MIN_ANIMATION_DELAY_MS
-  )
-}
-
-const waitForPresence = async (selector: string, canvasElement: HTMLElement) => {
-  await pollUntil(
-    () => canvasElement.querySelector(selector),
-    (curr, elapsed) => !!curr && elapsed >= MIN_ANIMATION_DELAY_MS
-  )
-  return canvasElement.querySelector(selector)
-}
-
-const waitForAbsence = async (selector: string, canvasElement: HTMLElement) => {
-  await pollUntil(
-    () => !canvasElement.querySelector(selector),
-    (curr, elapsed) => curr === true && elapsed >= MIN_ANIMATION_DELAY_MS
-  )
-}
 
 /**
  * GENERAL SECTION TESTS
@@ -160,8 +38,8 @@ export const GeneralSectionTests: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'General')
+    await waitForEditor(canvas, expect)
+    await openAccordion(canvas, 'General', userEvent)
 
     // ============================================================================
     // TEST 1: Chart Type Change (Waffle to Gauge and back)
@@ -212,7 +90,8 @@ export const GeneralSectionTests: Story = {
       'Title Update',
       () => canvasElement.querySelector('.cove-component__header h2')?.textContent?.trim() || '',
       async () => {}, // action already performed above
-      (before, after) => after === 'Updated Waffle Chart Title E2E'
+      (before, after) => after === 'Updated Waffle Chart Title E2E',
+      expect
     )
 
     const chartTitleHeader = canvasElement.querySelector('.cove-component__header h2')
@@ -235,7 +114,8 @@ export const GeneralSectionTests: Story = {
       async () => {
         await userEvent.click(checkboxWrapper as HTMLElement)
       },
-      (before, after) => after === !wasChecked
+      (before, after) => after === !wasChecked,
+      expect
     )
     expect(showTitleCheckbox.checked).toBe(!wasChecked)
 
@@ -253,7 +133,8 @@ export const GeneralSectionTests: Story = {
       async () => {
         await userEvent.click(checkboxWrapper as HTMLElement)
       },
-      (before, after) => after === wasChecked
+      (before, after) => after === wasChecked,
+      expect
     )
 
     // ============================================================================
@@ -266,7 +147,11 @@ export const GeneralSectionTests: Story = {
     const newContent = 'Updated test message for E2E testing'
     await userEvent.clear(contentTextarea)
     await userEvent.type(contentTextarea, newContent)
-    await waitForTextContent(canvasElement.querySelector('.cove-waffle-chart__data--text') as HTMLElement, newContent)
+    await waitForTextContent(
+      canvasElement.querySelector('.cove-waffle-chart__data--text') as HTMLElement,
+      newContent,
+      expect
+    )
 
     const chartContentElement = canvasElement.querySelector('.cove-waffle-chart__data--text')
     expect(chartContentElement).toBeTruthy()
@@ -282,7 +167,11 @@ export const GeneralSectionTests: Story = {
     const newSubtext = 'Updated test citation for E2E testing'
     await userEvent.clear(subtextInput)
     await userEvent.type(subtextInput, newSubtext)
-    await waitForTextContent(canvasElement.querySelector('.cove-waffle-chart__subtext') as HTMLElement, newSubtext)
+    await waitForTextContent(
+      canvasElement.querySelector('.cove-waffle-chart__subtext') as HTMLElement,
+      newSubtext,
+      expect
+    )
 
     const chartSubtextElement = canvasElement.querySelector('.cove-waffle-chart__subtext')
     expect(chartSubtextElement).toBeTruthy()
@@ -300,8 +189,8 @@ export const DataSectionTests: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Data')
+    await waitForEditor(canvas, expect)
+    await openAccordion(canvas, 'Data', userEvent)
 
     const getPrimaryEl = () => {
       const el = canvasElement.querySelector('.cove-waffle-chart__data--primary') as HTMLElement
@@ -322,7 +211,8 @@ export const DataSectionTests: Story = {
         const target = dataColumnSelect.value === 'Deaths' ? 'Total Overdoses' : 'Deaths'
         await userEvent.selectOptions(dataColumnSelect, target)
       },
-      (before, after) => after !== before
+      (before, after) => after !== before,
+      expect
     )
 
     // ============================================================================
@@ -337,7 +227,8 @@ export const DataSectionTests: Story = {
         const target = dataFunctionSelect.value === 'Sum' ? 'Mean (Average)' : 'Sum'
         await userEvent.selectOptions(dataFunctionSelect, target)
       },
-      (before, after) => after !== before
+      (before, after) => after !== before,
+      expect
     )
 
     // ============================================================================
@@ -366,7 +257,8 @@ export const DataSectionTests: Story = {
         await userEvent.clear(conditionalValueInput)
         await userEvent.type(conditionalValueInput, '5')
       },
-      (before, after) => after !== before
+      (before, after) => after !== before,
+      expect
     )
     // ============================================================================
     // TEST 5: Clear Conditional Value (restore dataset)
@@ -378,7 +270,8 @@ export const DataSectionTests: Story = {
       async () => {
         await userEvent.clear(conditionalValueInput)
       },
-      (before, after) => after !== before
+      (before, after) => after !== before,
+      expect
     )
 
     // ============================================================================
@@ -393,7 +286,8 @@ export const DataSectionTests: Story = {
         const target = denomFunctionSelect.value === 'Sum' ? 'Mean (Average)' : 'Sum'
         await userEvent.selectOptions(denomFunctionSelect, target)
       },
-      (before, after) => after !== before
+      (before, after) => after !== before,
+      expect
     )
 
     // ============================================================================
@@ -408,7 +302,8 @@ export const DataSectionTests: Story = {
         const target = denomColumnSelect.value === 'Deaths' ? 'Total Overdoses' : 'Deaths'
         await userEvent.selectOptions(denomColumnSelect, target)
       },
-      (before, after) => after !== before
+      (before, after) => after !== before,
+      expect
     )
 
     // ============================================================================
@@ -422,7 +317,8 @@ export const DataSectionTests: Story = {
         const target = denomFunctionSelect.value === 'Sum' ? 'Mean (Average)' : 'Sum'
         await userEvent.selectOptions(denomFunctionSelect, target)
       },
-      (before, after) => after !== before
+      (before, after) => after !== before,
+      expect
     )
 
     // ============================================================================
@@ -437,7 +333,8 @@ export const DataSectionTests: Story = {
       async () => {
         await userEvent.click(customDenomWrapper)
       },
-      (before, after) => after !== before
+      (before, after) => after !== before,
+      expect
     )
 
     // ============================================================================
@@ -452,7 +349,8 @@ export const DataSectionTests: Story = {
         await userEvent.clear(staticDenomInput)
         await userEvent.type(staticDenomInput, '150')
       },
-      (before, after) => after !== before
+      (before, after) => after !== before,
+      expect
     )
 
     // ============================================================================
@@ -466,7 +364,8 @@ export const DataSectionTests: Story = {
         await userEvent.clear(staticDenomInput)
         await userEvent.type(staticDenomInput, '160')
       },
-      (before, after) => after !== before
+      (before, after) => after !== before,
+      expect
     )
 
     // ============================================================================
@@ -481,7 +380,8 @@ export const DataSectionTests: Story = {
         await userEvent.clear(roundingInput)
         await userEvent.type(roundingInput, '1')
       },
-      (before, after) => after !== before
+      (before, after) => after !== before,
+      expect
     )
 
     // ============================================================================
@@ -495,7 +395,8 @@ export const DataSectionTests: Story = {
         await userEvent.clear(roundingInput)
         await userEvent.type(roundingInput, '0')
       },
-      (before, after) => after !== before
+      (before, after) => after !== before,
+      expect
     )
 
     // ============================================================================
@@ -564,7 +465,8 @@ export const DataSectionTests: Story = {
         )
         await userEvent.selectOptions(valSelect, 'Alaska')
       },
-      (before, after) => after !== before
+      (before, after) => after !== before,
+      expect
     )
   }
 }
@@ -580,8 +482,8 @@ export const VisualSectionTests: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await waitForEditor(canvas)
-    await openAccordion(canvas, 'Visual')
+    await waitForEditor(canvas, expect)
+    await openAccordion(canvas, 'Visual', userEvent)
     // Core helper functions used throughout the visual tests
     const waffleRoot = () => canvasElement.querySelector('.cove-waffle-chart') as HTMLElement
     const contentContainer = () => canvasElement.querySelector('.cove-component__content > div') as HTMLElement
@@ -618,7 +520,8 @@ export const VisualSectionTests: Story = {
       },
       (before, after) =>
         (before.rect !== after.rect || before.circle !== after.circle || before.path !== after.path) &&
-        [after.rect, after.circle, after.path].filter(c => c > 0).length === 1
+        [after.rect, after.circle, after.path].filter(c => c > 0).length === 1,
+      expect
     )
 
     // ============================================================================
@@ -642,7 +545,8 @@ export const VisualSectionTests: Story = {
         await userEvent.type(widthInput, String(next))
         widthInput.blur()
       },
-      (before, after) => after !== before && after > 0
+      (before, after) => after !== before && after > 0,
+      expect
     )
 
     // ============================================================================
@@ -672,7 +576,8 @@ export const VisualSectionTests: Story = {
         await userEvent.type(spacerInput, String(next))
         spacerInput.blur()
       },
-      (before, after) => after !== before
+      (before, after) => after !== before,
+      expect
     )
 
     // ============================================================================
@@ -689,7 +594,8 @@ export const VisualSectionTests: Story = {
       },
       (before, after) =>
         before.hasClass !== after.hasClass || // primary signal
-        (after.width !== before.width && after.width > 0) // fallback: width change due to ratio recalculation
+        (after.width !== before.width && after.width > 0), // fallback: width change due to ratio recalculation
+      expect
     )
 
     // ============================================================================
@@ -711,7 +617,8 @@ export const VisualSectionTests: Story = {
         await userEvent.type(pointFontSizeInput, String(next))
         pointFontSizeInput.blur()
       },
-      (before, after) => before !== after && after.length > 0
+      (before, after) => before !== after && after.length > 0,
+      expect
     )
 
     // ============================================================================
@@ -737,7 +644,8 @@ export const VisualSectionTests: Story = {
         const target = cycle[(idx + 1) % cycle.length]
         await userEvent.selectOptions(overallFontSizeSelect, target)
       },
-      (before, after) => before !== after && ['font-small', 'font-medium', 'font-large'].includes(after)
+      (before, after) => before !== after && ['font-small', 'font-medium', 'font-large'].includes(after),
+      expect
     )
 
     // ============================================================================
@@ -764,7 +672,8 @@ export const VisualSectionTests: Story = {
         if (next !== selected) await userEvent.click(next)
         else await userEvent.click(themeButtons[(themeButtons.indexOf(next) + 1) % themeButtons.length])
       },
-      (before, after) => after !== before && after.length > 0
+      (before, after) => after !== before && after.length > 0,
+      expect
     )
 
     // ============================================================================
@@ -797,7 +706,8 @@ export const VisualSectionTests: Story = {
         before.classes !== after.classes ||
         before.top !== after.top ||
         before.right !== after.right ||
-        before.color !== after.color
+        before.color !== after.color,
+      expect
     )
 
     // ============================================================================
@@ -816,7 +726,9 @@ export const VisualSectionTests: Story = {
       async () => {
         await userEvent.click(borderColorThemeWrapper)
       },
-      (before, after) => before !== after && (after.includes('borderColorTheme') || before.includes('borderColorTheme'))
+      (before, after) =>
+        before !== after && (after.includes('borderColorTheme') || before.includes('borderColorTheme')),
+      expect
     )
 
     // ============================================================================
@@ -833,7 +745,8 @@ export const VisualSectionTests: Story = {
       async () => {
         await userEvent.click(accentWrapper)
       },
-      (before, after) => before !== after
+      (before, after) => before !== after,
+      expect
     )
 
     // ============================================================================
@@ -850,7 +763,8 @@ export const VisualSectionTests: Story = {
       async () => {
         await userEvent.click(backgroundWrapper)
       },
-      (before, after) => before !== after
+      (before, after) => before !== after,
+      expect
     )
 
     // ============================================================================
@@ -869,7 +783,8 @@ export const VisualSectionTests: Story = {
       async () => {
         await userEvent.click(hideBackgroundWrapper)
       },
-      (before, after) => before !== after
+      (before, after) => before !== after,
+      expect
     )
   }
 }
