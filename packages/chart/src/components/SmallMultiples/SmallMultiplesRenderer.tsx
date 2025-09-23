@@ -8,7 +8,6 @@ import {
   getTileConfig,
   createCombinedDataForYAxis,
   applyTileOrder,
-  getTileDisplayTitle,
   createTileColorScale
 } from '../../helpers/smallMultiplesHelpers'
 import { calculateYAxisWithAutoPadding } from '../../helpers/calculateYAxisWithAutoPadding'
@@ -207,9 +206,6 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
     <div className='small-multiples-container'>
       <div className='small-multiples-grid' style={gridStyle}>
         {tileItems.map((item, index) => {
-          // Get the calculated display title
-          const displayTitle = getTileDisplayTitle(item, config)
-
           // Create custom colorScale for this tile based on color mode
           const customColorScale = createTileColorScale(item, config, colorScale, index, tileItems.length)
 
@@ -221,16 +217,15 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
               seriesKey={item.seriesKey}
               tileValue={item.tileValue}
               tileColumn={item.tileColumn}
-              tileTitle={displayTitle}
               customColorScale={customColorScale}
               config={config}
               data={data}
               svgRef={svgRef}
               parentWidth={parentWidth}
               parentHeight={parentHeight}
-              tilesPerRow={tilesPerRow}
               globalYAxisMax={globalYAxisValues?.max}
               globalYAxisMin={globalYAxisValues?.min}
+              isFirstInRow={index % tilesPerRow === 0}
               onHeightChange={handleTileHeightChange}
             />
           )

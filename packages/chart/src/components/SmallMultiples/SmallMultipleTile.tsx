@@ -4,6 +4,7 @@ import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import ConfigContext from '../../ConfigContext'
 import { ColorScale } from '../../types/ChartContext'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
+import { getTileDisplayTitle } from '../../helpers/smallMultiplesHelpers'
 
 interface SmallMultipleTileProps {
   mode: 'by-series' | 'by-column'
@@ -13,14 +14,13 @@ interface SmallMultipleTileProps {
   seriesKey?: string
   tileValue?: any
   tileColumn?: string
-  tileTitle: string
   customColorScale?: ColorScale
   svgRef?: React.RefObject<SVGAElement>
   parentWidth?: number
   parentHeight?: number
-  tilesPerRow?: number
   globalYAxisMax?: number
   globalYAxisMin?: number
+  isFirstInRow?: boolean
   onHeightChange?: (tileKey: string, height: number) => void
 }
 
@@ -32,14 +32,11 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   seriesKey,
   tileValue,
   tileColumn,
-  tileTitle,
   customColorScale,
   svgRef,
-  parentWidth,
-  parentHeight,
-  tilesPerRow,
   globalYAxisMax,
   globalYAxisMin,
+  isFirstInRow,
   onHeightChange
 }) => {
   let tileConfig = cloneConfig(config)
@@ -93,6 +90,8 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
     }
   }
 
+  const displayTitle = getTileDisplayTitle(mode, seriesKey, tileValue, tileKey, config)
+
   // Get the original context values to merge with our filtered config
   const originalContextValues = useContext(ConfigContext)
 
@@ -130,10 +129,10 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   return (
     <div ref={fullTileRef} className='small-multiple-tile'>
       <div className='tile-header'>
-        <div className='tile-title'>{tileTitle}</div>
+        <div className='tile-title'>{displayTitle}</div>
       </div>
       <div ref={tileParentRef} className='tile-chart'>
-        <ParentSize key={`${tilesPerRow}-${mode}-${seriesKey || tileValue}`}>
+        <ParentSize key={`${mode}-${seriesKey || tileValue}`}>
           {parent => (
             <ConfigContext.Provider
               value={{
