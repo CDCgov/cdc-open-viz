@@ -95,7 +95,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
     ...tileConfig,
     yAxis: {
       ...tileConfig.yAxis,
-      inlineLabel: isFirstInRow ? tileConfig.yAxis?.inlineLabel : undefined,
+      //inlineLabel: isFirstInRow ? tileConfig.yAxis?.inlineLabel : undefined,
       label: isFirstInRow ? tileConfig.yAxis?.label : undefined
     },
     runtime: {
@@ -150,9 +150,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   return (
     <div ref={fullTileRef} className='small-multiple-tile'>
       <div className='tile-header'>
-        <div className='tile-title' style={{ marginLeft: `${tileConfig.runtime?.yAxis?.size || 0}px` }}>
-          {displayTitle}
-        </div>
+        <div className='tile-title'>{displayTitle}</div>
       </div>
       <div ref={tileParentRef} className='tile-chart'>
         <ParentSize key={`${mode}-${seriesKey || tileValue}`}>
