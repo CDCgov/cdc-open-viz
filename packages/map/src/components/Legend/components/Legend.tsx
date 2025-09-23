@@ -1,5 +1,5 @@
 //TODO: Move legends to core
-import { forwardRef, useContext } from 'react'
+import { forwardRef, useContext, useMemo } from 'react'
 import parse from 'html-react-parser'
 
 //types
@@ -259,14 +259,17 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     />
   )
 
-  const cityStyleShapes = {
-    pin: pin,
-    circle: <GlyphCircle color='#000' size={150} />,
-    square: <GlyphSquare color='#000' size={150} />,
-    diamond: <GlyphDiamond color='#000' size={150} />,
-    star: <GlyphStar color='#000' size={150} />,
-    triangle: <GlyphTriangle color='#000' size={150} />
-  }
+  const cityStyleShapes = useMemo(
+    () => ({
+      pin: pin,
+      circle: <GlyphCircle color='#000' size={150} />,
+      square: <GlyphSquare color='#000' size={150} />,
+      diamond: <GlyphDiamond color='#000' size={150} />,
+      star: <GlyphStar color='#000' size={150} />,
+      triangle: <GlyphTriangle color='#000' size={150} />
+    }),
+    [pin]
+  )
 
   const shouldRenderLegendList = legendListItems.length > 0 && ['Select Option', ''].includes(config.legend.groupBy)
 
