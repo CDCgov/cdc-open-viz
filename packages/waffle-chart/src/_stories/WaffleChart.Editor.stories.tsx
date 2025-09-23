@@ -89,8 +89,7 @@ export const GeneralSectionTests: Story = {
       'Title Update',
       () => canvasElement.querySelector('.cove-component__header h2')?.textContent?.trim() || '',
       async () => {}, // action already performed above
-      (before, after) => after === 'Updated Waffle Chart Title E2E',
-      expect
+      (before, after) => after === 'Updated Waffle Chart Title E2E'
     )
 
     const chartTitleHeader = canvasElement.querySelector('.cove-component__header h2')
@@ -113,8 +112,7 @@ export const GeneralSectionTests: Story = {
       async () => {
         await userEvent.click(checkboxWrapper as HTMLElement)
       },
-      (before, after) => after === !wasChecked,
-      expect
+      (before, after) => after === !wasChecked
     )
     expect(showTitleCheckbox.checked).toBe(!wasChecked)
 
@@ -132,8 +130,7 @@ export const GeneralSectionTests: Story = {
       async () => {
         await userEvent.click(checkboxWrapper as HTMLElement)
       },
-      (before, after) => after === wasChecked,
-      expect
+      (before, after) => after === wasChecked
     )
 
     // ============================================================================
@@ -202,8 +199,7 @@ export const DataSectionTests: Story = {
         const target = dataColumnSelect.value === 'Deaths' ? 'Total Overdoses' : 'Deaths'
         await userEvent.selectOptions(dataColumnSelect, target)
       },
-      (before, after) => after !== before,
-      expect
+      (before, after) => after !== before
     )
 
     // ============================================================================
@@ -218,8 +214,7 @@ export const DataSectionTests: Story = {
         const target = dataFunctionSelect.value === 'Sum' ? 'Mean (Average)' : 'Sum'
         await userEvent.selectOptions(dataFunctionSelect, target)
       },
-      (before, after) => after !== before,
-      expect
+      (before, after) => after !== before
     )
 
     // ============================================================================
@@ -248,8 +243,7 @@ export const DataSectionTests: Story = {
         await userEvent.clear(conditionalValueInput)
         await userEvent.type(conditionalValueInput, '5')
       },
-      (before, after) => after !== before,
-      expect
+      (before, after) => after !== before
     )
     // ============================================================================
     // TEST 5: Clear Conditional Value (restore dataset)
@@ -261,8 +255,7 @@ export const DataSectionTests: Story = {
       async () => {
         await userEvent.clear(conditionalValueInput)
       },
-      (before, after) => after !== before,
-      expect
+      (before, after) => after !== before
     )
 
     // ============================================================================
@@ -277,8 +270,7 @@ export const DataSectionTests: Story = {
         const target = denomFunctionSelect.value === 'Sum' ? 'Mean (Average)' : 'Sum'
         await userEvent.selectOptions(denomFunctionSelect, target)
       },
-      (before, after) => after !== before,
-      expect
+      (before, after) => after !== before
     )
 
     // ============================================================================
@@ -293,8 +285,7 @@ export const DataSectionTests: Story = {
         const target = denomColumnSelect.value === 'Deaths' ? 'Total Overdoses' : 'Deaths'
         await userEvent.selectOptions(denomColumnSelect, target)
       },
-      (before, after) => after !== before,
-      expect
+      (before, after) => after !== before
     )
 
     // ============================================================================
@@ -308,8 +299,7 @@ export const DataSectionTests: Story = {
         const target = denomFunctionSelect.value === 'Sum' ? 'Mean (Average)' : 'Sum'
         await userEvent.selectOptions(denomFunctionSelect, target)
       },
-      (before, after) => after !== before,
-      expect
+      (before, after) => after !== before
     )
 
     // ============================================================================
@@ -324,8 +314,7 @@ export const DataSectionTests: Story = {
       async () => {
         await userEvent.click(customDenomWrapper)
       },
-      (before, after) => after !== before,
-      expect
+      (before, after) => after !== before
     )
 
     // ============================================================================
@@ -340,8 +329,7 @@ export const DataSectionTests: Story = {
         await userEvent.clear(staticDenomInput)
         await userEvent.type(staticDenomInput, '150')
       },
-      (before, after) => after !== before,
-      expect
+      (before, after) => after !== before
     )
 
     // ============================================================================
@@ -355,8 +343,7 @@ export const DataSectionTests: Story = {
         await userEvent.clear(staticDenomInput)
         await userEvent.type(staticDenomInput, '160')
       },
-      (before, after) => after !== before,
-      expect
+      (before, after) => after !== before
     )
 
     // ============================================================================
@@ -371,8 +358,7 @@ export const DataSectionTests: Story = {
         await userEvent.clear(roundingInput)
         await userEvent.type(roundingInput, '1')
       },
-      (before, after) => after !== before,
-      expect
+      (before, after) => after !== before
     )
 
     // ============================================================================
@@ -386,8 +372,7 @@ export const DataSectionTests: Story = {
         await userEvent.clear(roundingInput)
         await userEvent.type(roundingInput, '0')
       },
-      (before, after) => after !== before,
-      expect
+      (before, after) => after !== before
     )
 
     // ============================================================================
@@ -521,8 +506,7 @@ export const VisualSectionTests: Story = {
         await userEvent.type(widthInput, String(next))
         widthInput.blur()
       },
-      (before, after) => after !== before && after > 0,
-      expect
+      (before, after) => after !== before && after > 0
     )
 
     // ============================================================================
@@ -552,8 +536,7 @@ export const VisualSectionTests: Story = {
         await userEvent.type(spacerInput, String(next))
         spacerInput.blur()
       },
-      (before, after) => after !== before,
-      expect
+      (before, after) => after !== before
     )
 
     // ============================================================================
@@ -593,8 +576,7 @@ export const VisualSectionTests: Story = {
         await userEvent.type(pointFontSizeInput, String(next))
         pointFontSizeInput.blur()
       },
-      (before, after) => before !== after && after.length > 0,
-      expect
+      (before, after) => before !== after && after.length > 0
     )
 
     // ============================================================================
@@ -620,8 +602,7 @@ export const VisualSectionTests: Story = {
         const target = cycle[(idx + 1) % cycle.length]
         await userEvent.selectOptions(overallFontSizeSelect, target)
       },
-      (before, after) => before !== after && ['font-small', 'font-medium', 'font-large'].includes(after),
-      expect
+      (before, after) => before !== after && ['font-small', 'font-medium', 'font-large'].includes(after)
     )
 
     // ============================================================================
@@ -648,8 +629,7 @@ export const VisualSectionTests: Story = {
         if (next !== selected) await userEvent.click(next)
         else await userEvent.click(themeButtons[(themeButtons.indexOf(next) + 1) % themeButtons.length])
       },
-      (before, after) => after !== before && after.length > 0,
-      expect
+      (before, after) => after !== before && after.length > 0
     )
 
     // ============================================================================
@@ -682,8 +662,7 @@ export const VisualSectionTests: Story = {
         before.classes !== after.classes ||
         before.top !== after.top ||
         before.right !== after.right ||
-        before.color !== after.color,
-      expect
+        before.color !== after.color
     )
 
     // ============================================================================
@@ -702,9 +681,7 @@ export const VisualSectionTests: Story = {
       async () => {
         await userEvent.click(borderColorThemeWrapper)
       },
-      (before, after) =>
-        before !== after && (after.includes('borderColorTheme') || before.includes('borderColorTheme')),
-      expect
+      (before, after) => before !== after && (after.includes('borderColorTheme') || before.includes('borderColorTheme'))
     )
 
     // ============================================================================
@@ -721,8 +698,7 @@ export const VisualSectionTests: Story = {
       async () => {
         await userEvent.click(accentWrapper)
       },
-      (before, after) => before !== after,
-      expect
+      (before, after) => before !== after
     )
 
     // ============================================================================
@@ -739,8 +715,7 @@ export const VisualSectionTests: Story = {
       async () => {
         await userEvent.click(backgroundWrapper)
       },
-      (before, after) => before !== after,
-      expect
+      (before, after) => before !== after
     )
 
     // ============================================================================
@@ -759,8 +734,7 @@ export const VisualSectionTests: Story = {
       async () => {
         await userEvent.click(hideBackgroundWrapper)
       },
-      (before, after) => before !== after,
-      expect
+      (before, after) => before !== after
     )
   }
 }

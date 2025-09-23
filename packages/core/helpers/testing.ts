@@ -73,13 +73,38 @@ export const performAndAssert = async <T extends unknown>(
   predicate: (before: T, after: T) => boolean,
   extraAssert?: (after: T) => void
 ): Promise<void> => {
+  // Capture the call site stack trace
+  const callSite = new Error().stack
+
   const before = read()
   await act()
 
   await waitForWithDelay(() => {
     const after = read()
     const result = predicate(before, after)
-    expect(result).toBe(true)
+    if (!result) {
+      // Create a more informative error with the original call site
+      const error = new Error(
+        `${label} failed: Expected predicate to return true. Before: ${JSON.stringify(before)}, After: ${JSON.stringify(
+          after
+        )}`
+      )
+
+      // Try to preserve the original call site in the stack trace
+      if (callSite) {
+        const originalStack = callSite.split('\n')
+        const currentStack = error.stack?.split('\n') || []
+        // Replace the generic helper stack with the original call site
+        if (originalStack.length > 2) {
+          error.stack = [
+            error.message,
+            ...originalStack.slice(2) // Skip the first two lines (error creation in helper)
+          ].join('\n')
+        }
+      }
+
+      throw error
+    }
     if (extraAssert) extraAssert(after)
   })
 }
