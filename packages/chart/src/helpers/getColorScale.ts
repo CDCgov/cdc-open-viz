@@ -5,7 +5,11 @@ import { scaleOrdinal } from '@visx/scale'
 import { ChartConfig } from '../types/ChartConfig'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
-import { v2ColorDistribution, divergentColorDistribution, colorblindColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
+import {
+  v2ColorDistribution,
+  divergentColorDistribution,
+  colorblindColorDistribution
+} from '@cdc/core/helpers/palettes/colorDistributions'
 
 export const getColorScale = (config: ChartConfig): ((value: string) => string) => {
   const configPalette = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
@@ -33,18 +37,6 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
     palettesSource[migratePaletteWithMap(migratedPaletteName, paletteMigrationMap, false)] ||
     palettesSource[configPalette]
 
-  // Debug logging for paired bars
-  if (['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)) {
-    console.log('🎨 Paired Bar Color Debug:', {
-      configPalette,
-      migratedPaletteName,
-      version: versionKey,
-      availablePalettes: Object.keys(versionedTwoColorPalette),
-      selectedPalette: palette,
-      allPalettes: Object.keys(allPalettes)
-    })
-  }
-
   // Fallback to a default palette if none found
   if (!palette) {
     console.warn(`Palette "${configPalette}" not found, falling back to default`)
@@ -67,7 +59,8 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
     // Apply enhanced distribution for v2 palettes
     const isSequential = configPalette && configPalette.includes('sequential')
     const isDivergent = configPalette && configPalette.includes('divergent')
-    const isColorblindSafe = configPalette && (configPalette.includes('colorblindsafe') || configPalette.includes('qualitative_standard'))
+    const isColorblindSafe =
+      configPalette && (configPalette.includes('colorblindsafe') || configPalette.includes('qualitative_standard'))
 
     // Determine which distribution to use based on palette type
     let distributionMap = null
