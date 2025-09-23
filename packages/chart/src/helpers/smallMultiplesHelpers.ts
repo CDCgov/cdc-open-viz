@@ -97,15 +97,15 @@ export const applyTileOrder = (tileItems, orderType, customOrder, config) => {
   switch (orderType) {
     case 'asc':
       return [...tileItems].sort((a, b) => {
-        const titleA = String(getTileDisplayTitle(a, config)).toLowerCase()
-        const titleB = String(getTileDisplayTitle(b, config)).toLowerCase()
+        const titleA = String(getTileDisplayTitle(a.mode, a.seriesKey, a.tileValue, a.key, config)).toLowerCase()
+        const titleB = String(getTileDisplayTitle(b.mode, b.seriesKey, b.tileValue, b.key, config)).toLowerCase()
         return titleA.localeCompare(titleB)
       })
 
     case 'desc':
       return [...tileItems].sort((a, b) => {
-        const titleA = String(getTileDisplayTitle(a, config)).toLowerCase()
-        const titleB = String(getTileDisplayTitle(b, config)).toLowerCase()
+        const titleA = String(getTileDisplayTitle(a.mode, a.seriesKey, a.tileValue, a.key, config)).toLowerCase()
+        const titleB = String(getTileDisplayTitle(b.mode, b.seriesKey, b.tileValue, b.key, config)).toLowerCase()
         return titleB.localeCompare(titleA)
       })
 
@@ -153,20 +153,20 @@ export const getTileKeys = (config, data) => {
 }
 
 /**
- * Get the display title for a tile item based on its mode
+ * Get the display title for a tile based on its mode
  * For by-series: uses series.name or seriesKey
  * For by-column: uses custom title or tileValue
  */
-export const getTileDisplayTitle = (tileItem, config) => {
-  if (tileItem.mode === 'by-series') {
+export const getTileDisplayTitle = (mode, seriesKey, tileValue, tileKey, config) => {
+  if (mode === 'by-series') {
     // For by-series mode: use configured series name, fall back to seriesKey
-    const series = config.series?.find(s => s.dataKey === tileItem.seriesKey)
-    return series?.name || tileItem.seriesKey
-  } else if (tileItem.mode === 'by-column') {
+    const series = config.series?.find(s => s.dataKey === seriesKey)
+    return series?.name || seriesKey
+  } else if (mode === 'by-column') {
     // For by-column mode: use custom title from editor, fall back to column value
-    return config.smallMultiples?.tileTitles?.[tileItem.tileValue] || tileItem.tileValue
+    return config.smallMultiples?.tileTitles?.[tileValue] || tileValue
   }
-  return tileItem.key
+  return tileKey
 }
 
 /**
