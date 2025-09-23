@@ -128,9 +128,12 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
     mapColorPalette[colorIdx] ??
     mapColorPalette[mapColorPalette.length - 1]
 
-  // Ensure specificColor is valid
-  if (typeof specificColor === 'number' && specificColor < mapColorPalette.length) {
-    return mapColorPalette[specificColor]
+  if (typeof specificColor === 'number') {
+    if (specificColor < mapColorPalette.length) {
+      return mapColorPalette[specificColor]
+    } else {
+      return mapColorPalette[mapColorPalette.length - 1]
+    }
   } else if (typeof specificColor === 'string') {
     return specificColor
   }
