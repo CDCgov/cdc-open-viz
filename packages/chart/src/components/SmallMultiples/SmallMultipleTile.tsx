@@ -3,6 +3,7 @@ import LinearChart from '../LinearChart'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import ConfigContext from '../../ConfigContext'
 import { ColorScale } from '../../types/ChartContext'
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 
 interface SmallMultipleTileProps {
   mode: 'by-series' | 'by-column'
@@ -41,21 +42,21 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   globalYAxisMin,
   onHeightChange
 }) => {
-  let tileConfig = { ...config }
+  let tileConfig = cloneConfig(config)
   let tileData = data
 
   if (mode === 'by-series') {
     // BY-SERIES: One series per tile, all data
-    const singleSeries = config.series.find(s => s.dataKey === seriesKey)
+    const singleSeries = tileConfig.series.find(s => s.dataKey === seriesKey)
     tileConfig = {
-      ...config,
+      ...tileConfig,
       series: [singleSeries], // Single series
       runtime: {
-        ...config.runtime,
-        series: config.runtime.series.filter(s => s.dataKey === seriesKey),
+        ...tileConfig.runtime,
+        series: tileConfig.runtime.series.filter(s => s.dataKey === seriesKey),
         seriesKeys: [seriesKey],
-        seriesLabels: { [seriesKey]: config.runtime.seriesLabels?.[seriesKey] || seriesKey },
-        seriesLabelsAll: [config.runtime.seriesLabels?.[seriesKey] || seriesKey]
+        seriesLabels: { [seriesKey]: tileConfig.runtime.seriesLabels?.[seriesKey] || seriesKey },
+        seriesLabelsAll: [tileConfig.runtime.seriesLabels?.[seriesKey] || seriesKey]
       },
       showTitle: false, // Individual tiles don't need the main title
       smallMultiples: undefined // Remove smallMultiples to prevent infinite loop
@@ -64,7 +65,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   } else if (mode === 'by-column') {
     // BY-COLUMN: All series, filtered data by tile column value
     tileConfig = {
-      ...config,
+      ...tileConfig,
       showTitle: false, // Individual tiles don't need the main title
       smallMultiples: undefined // Remove smallMultiples to prevent infinite loop
     }
@@ -107,6 +108,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
     config: tileConfig,
     transformedData: tileData,
     parentRef: tileParentRef, // Override with tile-specific parentRef
+    updateConfig: () => {}, // Prevent tile hooks from modifying global config
     ...(customColorScale && { colorScale: customColorScale }) // Override colorScale if provided
   }
 
