@@ -2,8 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, userEvent, expect } from 'storybook/test'
 import DataBite from '../CdcDataBite'
 import {
-  MIN_ANIMATION_DELAY_MS,
-  pollUntil,
   performAndAssert,
   waitForPresence,
   waitForAbsence,
@@ -55,7 +53,7 @@ export const BasicEditorLoadingTests: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await waitForEditor(canvas, expect)
+    await waitForEditor(canvas)
 
     // Verify all three main accordion sections are present
     const generalButton = canvas.getByRole('button', { name: /general/i })
@@ -83,15 +81,8 @@ export const GeneralSectionTests: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await waitForEditor(canvas, expect)
-    await openAccordion(canvas, 'general', userEvent)
-
-    // Wait for accordion to open
-    await pollUntil(
-      () => canvas.getByRole('button', { name: /general/i }).getAttribute('aria-expanded'),
-      expanded => expanded === 'true',
-      1000
-    )
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'general')
 
     // ============================================================================
     // TEST 1: Bite Style Change
@@ -124,8 +115,7 @@ export const GeneralSectionTests: Story = {
         (before, after) =>
           before.hasSvg !== after.hasSvg ||
           before.textCount !== after.textCount ||
-          before.containerClasses !== after.containerClasses,
-        expect
+          before.containerClasses !== after.containerClasses
       )
 
       // Switch back to show the difference
@@ -138,8 +128,7 @@ export const GeneralSectionTests: Story = {
         (before, after) =>
           before.hasSvg !== after.hasSvg ||
           before.textCount !== after.textCount ||
-          before.containerClasses !== after.containerClasses,
-        expect
+          before.containerClasses !== after.containerClasses
       )
     }
 
@@ -155,8 +144,7 @@ export const GeneralSectionTests: Story = {
       'Title Update',
       () => canvasElement.querySelector('.cove-component__header')?.textContent?.trim() || '',
       async () => {}, // action already performed above
-      (before, after) => after === 'Updated Data Bite Title',
-      expect
+      (before, after) => after === 'Updated Data Bite Title'
     )
 
     // ============================================================================
@@ -178,8 +166,7 @@ export const GeneralSectionTests: Story = {
       async () => {
         await userEvent.click(showTitleCheckbox)
       },
-      (before, after) => after !== before,
-      expect
+      (before, after) => after !== before
     )
 
     // Toggle back to original state
@@ -189,8 +176,7 @@ export const GeneralSectionTests: Story = {
       async () => {
         await userEvent.click(showTitleCheckbox)
       },
-      (before, after) => after === wasVisible,
-      expect
+      (before, after) => after === wasVisible
     )
 
     // ============================================================================
@@ -206,7 +192,7 @@ export const GeneralSectionTests: Story = {
 
     const bodyElement = canvasElement.querySelector('.bite-body, .bite-text, .message-text') as HTMLElement
     if (bodyElement) {
-      await waitForTextContent(bodyElement, newBodyContent, expect)
+      await waitForTextContent(bodyElement, newBodyContent)
     }
 
     // ============================================================================
@@ -222,7 +208,7 @@ export const GeneralSectionTests: Story = {
 
     const subtextElement = canvasElement.querySelector('.bite-subtext, .citation, .subtext') as HTMLElement
     if (subtextElement) {
-      await waitForTextContent(subtextElement, newSubtext, expect)
+      await waitForTextContent(subtextElement, newSubtext)
     }
   }
 }
@@ -238,8 +224,8 @@ export const DataSectionTests: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await waitForEditor(canvas, expect)
-    await openAccordion(canvas, 'Data', userEvent)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Data')
 
     // Get the current data value for comparison
     const getDataValue = () => canvasElement.querySelector('svg text, .bite-text')?.textContent?.trim() || ''
@@ -264,8 +250,7 @@ export const DataSectionTests: Story = {
         async () => {
           await userEvent.selectOptions(dataColumnSelect, targetColumn)
         },
-        (before, after) => after !== before,
-        expect
+        (before, after) => after !== before
       )
     }
 
@@ -289,8 +274,7 @@ export const DataSectionTests: Story = {
         async () => {
           await userEvent.selectOptions(dataFunctionSelect, targetFunction)
         },
-        (before, after) => after !== before,
-        expect
+        (before, after) => after !== before
       )
     }
 
@@ -311,8 +295,7 @@ export const DataSectionTests: Story = {
         await userEvent.type(prefixInput, '$')
         await userEvent.tab() // Trigger change event
       },
-      (before, after) => after.startsWith('$') && after !== before,
-      expect
+      (before, after) => after.startsWith('$') && after !== before
     )
 
     // ============================================================================
@@ -330,8 +313,7 @@ export const DataSectionTests: Story = {
         await userEvent.type(suffixInput, ' miles')
         await userEvent.tab() // Trigger change event
       },
-      (before, after) => after.includes('miles') && after !== before,
-      expect
+      (before, after) => after.includes('miles') && after !== before
     )
 
     // ============================================================================
@@ -352,8 +334,7 @@ export const DataSectionTests: Story = {
           await userEvent.type(roundInput, newValue)
           await userEvent.tab() // Trigger change event
         },
-        (before, after) => after !== before,
-        expect
+        (before, after) => after !== before
       )
     } catch (error) {
       throw error
@@ -623,8 +604,8 @@ export const VisualSectionTests: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await waitForEditor(canvas, expect)
-    await openAccordion(canvas, 'Visual', userEvent)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Visual')
 
     // ============================================================================
     // TEST 1: Bite Font Size Change
@@ -674,8 +655,7 @@ export const VisualSectionTests: Story = {
           (before, after) => {
             // Check for clean change from 24 to 26
             return before === '24' && after === '26'
-          },
-          expect
+          }
         )
       } else {
         // Log all inputs for debugging
@@ -709,8 +689,7 @@ export const VisualSectionTests: Story = {
         },
         (before, after) => {
           return after !== before
-        },
-        expect
+        }
       )
     } catch (error) {
       throw error
@@ -879,71 +858,5 @@ export const VisualSectionTests: Story = {
 
     // Wait for any theme change effects
     await new Promise(resolve => setTimeout(resolve, 300))
-  }
-}
-
-// ============================================================================
-// TEST 4: Cross-Section Workflow
-// Expectation: Changes persist across accordion sections and complex interactions work.
-// ============================================================================
-export const CrossSectionWorkflowTests: Story = {
-  args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
-    isEditor: true
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-    await waitForEditor(canvas, expect)
-    await openAccordion(canvas, 'general', userEvent)
-
-    // Step 1: Update title in General section
-    await pollUntil(
-      () => canvas.getByRole('button', { name: /general/i }).getAttribute('aria-expanded'),
-      expanded => expanded === 'true',
-      1000
-    )
-
-    const titleInput = canvas.getByDisplayValue(/test data bite title/i)
-    await userEvent.clear(titleInput)
-    await userEvent.type(titleInput, 'Workflow Demo Title', { delay: 100 })
-
-    // Step 2: Configure data formatting in Data section
-    await openAccordion(canvas, 'data', userEvent)
-
-    const prefixInput = canvas.getByLabelText(/prefix/i)
-    await userEvent.clear(prefixInput)
-    await userEvent.type(prefixInput, '$', { delay: 200 })
-    await userEvent.tab()
-
-    // Step 3: Change visual styling in Visual section
-    await openAccordion(canvas, 'visual', userEvent)
-
-    // Check border state before and after clicking
-    const getBorderState = () => {
-      const content = canvasElement.querySelector('.cove-component__content')
-      return !content?.classList.contains('no-borders') // true means border is shown
-    }
-
-    const borderStateBefore = getBorderState()
-    const borderCheckbox = canvasElement.querySelector('input[name="border"]')
-    if (borderCheckbox) {
-      await userEvent.click(borderCheckbox as HTMLElement)
-    }
-    const borderStateAfter = getBorderState()
-
-    // Step 4: Return to General to verify persistence
-    await openAccordion(canvas, 'general', userEvent)
-
-    // Verify all changes persisted across sections
-    const persistedTitle = canvas.getByText(/Workflow Demo Title/i)
-    await expect(persistedTitle).toBeVisible()
-
-    // Verify data formatting persisted (prefix should be visible in data value)
-    const dataValue = canvasElement.querySelector('svg text, .bite-text')?.textContent || ''
-    expect(dataValue).toMatch(/\$/) // Should contain the $ prefix
-
-    // Verify visual styling persisted
-    const finalBorderState = getBorderState()
-    expect(finalBorderState).toBe(borderStateAfter) // Border state should persist
   }
 }

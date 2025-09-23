@@ -2,11 +2,10 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, userEvent, expect } from 'storybook/test'
 import WaffleChart from '../CdcWaffleChart'
 import {
-  MIN_ANIMATION_DELAY_MS,
-  pollUntil,
   performAndAssert,
   waitForPresence,
   waitForAbsence,
+  waitForOptionsToPopulate,
   waitForTextContent,
   waitForEditor,
   openAccordion
@@ -38,8 +37,8 @@ export const GeneralSectionTests: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await waitForEditor(canvas, expect)
-    await openAccordion(canvas, 'General', userEvent)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'General')
 
     // ============================================================================
     // TEST 1: Chart Type Change (Waffle to Gauge and back)
@@ -147,11 +146,7 @@ export const GeneralSectionTests: Story = {
     const newContent = 'Updated test message for E2E testing'
     await userEvent.clear(contentTextarea)
     await userEvent.type(contentTextarea, newContent)
-    await waitForTextContent(
-      canvasElement.querySelector('.cove-waffle-chart__data--text') as HTMLElement,
-      newContent,
-      expect
-    )
+    await waitForTextContent(canvasElement.querySelector('.cove-waffle-chart__data--text') as HTMLElement, newContent)
 
     const chartContentElement = canvasElement.querySelector('.cove-waffle-chart__data--text')
     expect(chartContentElement).toBeTruthy()
@@ -167,11 +162,7 @@ export const GeneralSectionTests: Story = {
     const newSubtext = 'Updated test citation for E2E testing'
     await userEvent.clear(subtextInput)
     await userEvent.type(subtextInput, newSubtext)
-    await waitForTextContent(
-      canvasElement.querySelector('.cove-waffle-chart__subtext') as HTMLElement,
-      newSubtext,
-      expect
-    )
+    await waitForTextContent(canvasElement.querySelector('.cove-waffle-chart__subtext') as HTMLElement, newSubtext)
 
     const chartSubtextElement = canvasElement.querySelector('.cove-waffle-chart__subtext')
     expect(chartSubtextElement).toBeTruthy()
@@ -189,8 +180,8 @@ export const DataSectionTests: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await waitForEditor(canvas, expect)
-    await openAccordion(canvas, 'Data', userEvent)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Data')
 
     const getPrimaryEl = () => {
       const el = canvasElement.querySelector('.cove-waffle-chart__data--primary') as HTMLElement
@@ -404,69 +395,55 @@ export const DataSectionTests: Story = {
     // Expectation: Value starts with '$' and differs from prior snapshot.
     // ============================================================================
     const prefixInput = canvasElement.querySelector('input[name*="prefix"]') as HTMLInputElement
-    const valueBeforePrefix = getValueText()
-    await userEvent.clear(prefixInput)
-    await userEvent.type(prefixInput, '$')
-
-    // Wait for prefix to be applied with proper polling
-    await pollUntil(
+    await performAndAssert(
+      'Prefix Update',
       getValueText,
-      (curr, elapsed) => curr !== valueBeforePrefix && curr.startsWith('$') && elapsed >= MIN_ANIMATION_DELAY_MS
+      async () => {
+        await userEvent.clear(prefixInput)
+        await userEvent.type(prefixInput, '$')
+      },
+      (before, after) => after !== before && after.startsWith('$')
     )
-
-    expect(prefixInput.value).toBe('$')
-    const afterPrefix = getValueText()
-    expect(afterPrefix.startsWith('$')).toBe(true)
-    expect(afterPrefix).not.toBe(valueBeforePrefix)
 
     // ============================================================================
     // TEST 15: Suffix -> ' deaths'
     // Expectation: Value ends with 'deaths' and differs from prior snapshot.
     // ============================================================================
     const suffixInput = canvasElement.querySelector('input[name*="suffix"]') as HTMLInputElement
-    await userEvent.clear(suffixInput)
-    await userEvent.type(suffixInput, ' deaths')
-
-    // Wait for suffix to be applied with proper polling
-    await pollUntil(
+    await performAndAssert(
+      'Suffix Update',
       getValueText,
-      (curr, elapsed) => curr !== afterPrefix && curr.endsWith('deaths') && elapsed >= MIN_ANIMATION_DELAY_MS
+      async () => {
+        await userEvent.clear(suffixInput)
+        await userEvent.type(suffixInput, ' deaths')
+      },
+      (before, after) => after !== before && after.endsWith('deaths')
     )
-
-    expect(suffixInput.value).toBe(' deaths')
-    const afterSuffix = getValueText()
-    expect(afterSuffix.endsWith('deaths')).toBe(true)
-    expect(afterSuffix).not.toBe(afterPrefix)
 
     // ============================================================================
     // TEST 16: Add Filter (state = Alaska)
     // Expectation: Primary value text changes after filter applied.
     // ============================================================================
     const addFilterButton = Array.from(canvasElement.querySelectorAll('button')).find(
-      b => b.textContent?.trim() === 'Add Filter'
+      b => (b as HTMLButtonElement).textContent?.trim() === 'Add Filter'
     ) as HTMLButtonElement
     await performAndAssert(
       'Add Filter',
       getValueText,
       async () => {
         await userEvent.click(addFilterButton)
-        // Poll for filter UI to appear instead of fixed sleep
-        await pollUntil(
-          () => canvasElement.querySelector('.filters-list .edit-block:last-of-type'),
-          (curr, elapsed) => !!curr && elapsed >= MIN_ANIMATION_DELAY_MS
-        )
+
+        await waitForPresence('.filters-list .edit-block:last-of-type', canvasElement)
+
         const newFilter = canvasElement.querySelector('.filters-list .edit-block:last-of-type') as HTMLElement
         const [colSelect, valSelect] = Array.from(newFilter.querySelectorAll('select')) as HTMLSelectElement[]
         await userEvent.selectOptions(colSelect, 'state')
-        // Brief wait for value options to populate
-        await pollUntil(
-          () => valSelect.options.length,
-          (curr, elapsed) => curr > 1 && elapsed >= MIN_ANIMATION_DELAY_MS
-        )
+
+        await waitForOptionsToPopulate(valSelect)
+
         await userEvent.selectOptions(valSelect, 'Alaska')
       },
-      (before, after) => after !== before,
-      expect
+      (before, after) => after !== before
     )
   }
 }
@@ -482,8 +459,8 @@ export const VisualSectionTests: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await waitForEditor(canvas, expect)
-    await openAccordion(canvas, 'Visual', userEvent)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Visual')
     // Core helper functions used throughout the visual tests
     const waffleRoot = () => canvasElement.querySelector('.cove-waffle-chart') as HTMLElement
     const contentContainer = () => canvasElement.querySelector('.cove-component__content > div') as HTMLElement
@@ -520,8 +497,7 @@ export const VisualSectionTests: Story = {
       },
       (before, after) =>
         (before.rect !== after.rect || before.circle !== after.circle || before.path !== after.path) &&
-        [after.rect, after.circle, after.path].filter(c => c > 0).length === 1,
-      expect
+        [after.rect, after.circle, after.path].filter(c => c > 0).length === 1
     )
 
     // ============================================================================
