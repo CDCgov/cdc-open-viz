@@ -48,7 +48,7 @@ type Story = StoryObj<typeof DataBite>
 // TEST 1: Basic Editor Loading
 // Expectation: Editor loads and becomes interactive with all accordion sections.
 // ============================================================================
-export const BasicEditorLoading: Story = {
+export const BasicEditorLoadingTests: Story = {
   args: {
     configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
     isEditor: true
@@ -886,7 +886,7 @@ export const VisualSectionTests: Story = {
 // TEST 4: Cross-Section Workflow
 // Expectation: Changes persist across accordion sections and complex interactions work.
 // ============================================================================
-export const CrossSectionWorkflow: Story = {
+export const CrossSectionWorkflowTests: Story = {
   args: {
     configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
     isEditor: true
