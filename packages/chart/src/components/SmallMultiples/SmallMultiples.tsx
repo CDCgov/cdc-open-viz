@@ -13,7 +13,7 @@ import {
 import { calculateYAxisWithAutoPadding } from '../../helpers/calculateYAxisWithAutoPadding'
 import './SmallMultiples.scss'
 
-interface SmallMultiplesRendererProps {
+interface SmallMultiplesProps {
   config: any
   data: any[]
   svgRef?: React.RefObject<SVGAElement>
@@ -21,13 +21,7 @@ interface SmallMultiplesRendererProps {
   parentHeight?: number
 }
 
-const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
-  config,
-  data,
-  svgRef,
-  parentWidth,
-  parentHeight
-}) => {
+const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, parentWidth, parentHeight }) => {
   const { currentViewport, colorScale, parentRef } = useContext(ConfigContext)
   const { mode, tileColumn, tilesPerRowDesktop, tilesPerRowMobile } = config.smallMultiples || {}
 
@@ -206,7 +200,6 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
     <div className='small-multiples-container'>
       <div className='small-multiples-grid' style={gridStyle}>
         {tileItems.map((item, index) => {
-          // Create custom colorScale for this tile based on color mode
           const customColorScale = createTileColorScale(item, config, colorScale, index, tileItems.length)
 
           return (
@@ -235,4 +228,4 @@ const SmallMultiplesRenderer: React.FC<SmallMultiplesRendererProps> = ({
   )
 }
 
-export default SmallMultiplesRenderer
+export default SmallMultiples
