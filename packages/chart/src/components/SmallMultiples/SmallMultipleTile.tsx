@@ -90,6 +90,27 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
     }
   }
 
+  // Small multiples-specific modifications
+  tileConfig = {
+    ...tileConfig,
+    yAxis: {
+      ...tileConfig.yAxis,
+      inlineLabel: isFirstInRow ? tileConfig.yAxis?.inlineLabel : undefined,
+      label: isFirstInRow ? tileConfig.yAxis?.label : undefined
+    },
+    runtime: {
+      ...tileConfig.runtime,
+      yAxis: {
+        ...tileConfig.runtime?.yAxis,
+        label: isFirstInRow ? tileConfig.yAxis?.label : undefined
+      }
+    },
+    legend: {
+      ...tileConfig.legend,
+      hide: true
+    }
+  }
+
   const displayTitle = getTileDisplayTitle(mode, seriesKey, tileValue, tileKey, config)
 
   // Get the original context values to merge with our filtered config
@@ -129,7 +150,9 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   return (
     <div ref={fullTileRef} className='small-multiple-tile'>
       <div className='tile-header'>
-        <div className='tile-title'>{displayTitle}</div>
+        <div className='tile-title' style={{ marginLeft: `${tileConfig.runtime?.yAxis?.size || 0}px` }}>
+          {displayTitle}
+        </div>
       </div>
       <div ref={tileParentRef} className='tile-chart'>
         <ParentSize key={`${mode}-${seriesKey || tileValue}`}>
