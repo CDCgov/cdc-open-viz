@@ -50,11 +50,10 @@ type MarkupIncludeEditorPanelProps = {
 const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
   const { config, data, isDashboard, loading, setParentConfig, updateConfig } = useContext(ConfigContext)
   const { contentEditor, theme, visual } = config
-  const { inlineHTML, markupVariables, srcUrl, title, useInlineHTML, allowHideSection, shoNoDataMessage } =
-    contentEditor
+  const { inlineHTML, markupVariables, srcUrl, title, useInlineHTML, allowHideSection } = contentEditor
   const [displayPanel, setDisplayPanel] = useState(true)
   const updateField = updateFieldFactory(config, updateConfig, true)
-  const hasData = data?.[0] !== undefined ?? false
+  const hasData = data?.[0] !== undefined
 
   const openVariableControls = useState<boolean[]>([])
 
