@@ -296,11 +296,35 @@ export const BarChartHorizontal = () => {
                       labelColor = '#fff'
                     }
                   }
-                  const background = () => {
+                  const getBarBackgroundColor = () => {
                     if (isRegularLollipopColor) return barColor
-                    if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
+                    if (isTwoToneLollipopColor) {
+                      // For two-tone lollipops, ensure stem has good contrast against white but is lighter than head
+                      const lightness = chroma(barColor).get('hsl.l')
+                      if (lightness > 0.7) {
+                        // Very light colors: darken slightly to ensure visibility
+                        return chroma(barColor).darken(0.1).hex()
+                      } else if (lightness > 0.4) {
+                        // Medium colors: lighten moderately
+                        return chroma(barColor).brighten(0.5).hex()
+                      } else {
+                        // Dark colors: lighten significantly but keep visible
+                        return chroma(barColor).brighten(1.0).hex()
+                      }
+                    }
                     if (isHighlightedBar) return 'transparent'
                     return barColor
+                  }
+
+                  // Function to get the lollipop head color (should be darker than stem)
+                  const getLollipopHeadColor = (): string => {
+                    if (!isTwoToneLollipopColor) {
+                      return barColor
+                    }
+                    // For two-tone lollipops, keep head at full opacity/saturation for maximum contrast
+                    // Use the original color but ensure it's dark enough for contrast
+                    const lightness = chroma(barColor).get('hsl.l')
+                    return lightness > 0.6 ? chroma(barColor).darken(1.5).hex() : barColor
                   }
 
                   // Confidence Interval Variables
@@ -346,7 +370,7 @@ export const BarChartHorizontal = () => {
                   }
 
                   const patternUrl = getPatternUrl()
-                  const baseBackground = background()
+                  const baseBackground = getBarBackgroundColor()
 
                   return (
                     <Group display={hideGroup} key={`${barGroup.index}--${index}`}>
@@ -535,7 +559,7 @@ export const BarChartHorizontal = () => {
                             cx={bar.y}
                             cy={barHeight * bar.index + lollipopBarWidth / 2}
                             r={lollipopShapeSize / 2}
-                            fill={barColor}
+                            fill={getLollipopHeadColor()}
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
@@ -549,7 +573,7 @@ export const BarChartHorizontal = () => {
                             y={0 - lollipopBarWidth / 2}
                             width={lollipopShapeSize}
                             height={lollipopShapeSize}
-                            fill={barColor}
+                            fill={getLollipopHeadColor()}
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
