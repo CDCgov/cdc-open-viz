@@ -8,7 +8,8 @@ import { getLegendClasses } from './helpers/getLegendClasses'
 import { useHighlightedBars } from '../../hooks/useHighlightedBars'
 import { getMarginTop, getGradientConfig, getMarginBottom } from './helpers/index'
 import { Label } from '../../types/Label'
-import { ChartConfig, ViewportSize } from '../../types/ChartConfig'
+import { ChartConfig } from '../../types/ChartConfig'
+import { ViewportSize } from '@cdc/core/types/ViewportSize'
 import { ColorScale } from '../../types/ChartContext'
 import { forwardRef } from 'react'
 import LegendSuppression from './Legend.Suppression'
@@ -72,7 +73,6 @@ const Legend: React.FC<LegendProps> = forwardRef(
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
     let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
-
 
     if (!legend) return null
     return (
@@ -227,8 +227,9 @@ const Legend: React.FC<LegendProps> = forwardRef(
                 {/* Pattern Legend Items */}
                 {config.legend.patterns && Object.keys(config.legend.patterns).length > 0 && (
                   <div
-                    className={`legend-patterns d-flex ${['top', 'bottom'].includes(config.legend.position) ? 'flex-row flex-wrap' : 'flex-column'
-                      }`}
+                    className={`legend-patterns d-flex ${
+                      ['top', 'bottom'].includes(config.legend.position) ? 'flex-row flex-wrap' : 'flex-column'
+                    }`}
                   >
                     {Object.entries(config.legend.patterns).map(([key, pattern]) => {
                       const patternId = `legend-pattern-${key}`
