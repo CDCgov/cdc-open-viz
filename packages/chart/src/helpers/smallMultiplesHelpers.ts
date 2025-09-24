@@ -42,7 +42,15 @@ export const getTileConfig = (tileItem, config) => {
         seriesLabels: {
           [tileItem.seriesKey]: config.runtime.seriesLabels?.[tileItem.seriesKey] || tileItem.seriesKey
         },
-        seriesLabelsAll: [config.runtime.seriesLabels?.[tileItem.seriesKey] || tileItem.seriesKey]
+        seriesLabelsAll: [config.runtime.seriesLabels?.[tileItem.seriesKey] || tileItem.seriesKey],
+        // Filter area chart specific series keys for proper rendering
+        ...(config.runtime.areaSeriesKeys && {
+          areaSeriesKeys: config.runtime.areaSeriesKeys.filter(s => s.dataKey === tileItem.seriesKey)
+        }),
+        // Filter line chart specific series keys for proper rendering
+        ...(config.runtime.lineSeriesKeys && {
+          lineSeriesKeys: config.runtime.lineSeriesKeys.filter(key => key === tileItem.seriesKey)
+        })
       }
     }
   } else if (tileItem.mode === 'by-column') {
