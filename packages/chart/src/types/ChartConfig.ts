@@ -204,6 +204,7 @@ export type AllChartsConfig = {
     tileOrderType?: 'asc' | 'desc' | 'custom' // Type of tile ordering: ascending alphanumeric, descending alphanumeric, or custom drag-drop
     tileTitles?: { [key: string]: string } // Map tile keys to custom display titles
     colorMode?: 'same' | 'different' // Whether all tiles use same colors ('same') or each tile uses different colors ('different')
+    hideLegend?: boolean // Whether to hide the legend in small multiples mode (defaults to true)
   }
   sortData: 'ascending' | 'descending'
   stackedAreaChartLineType: string
