@@ -11,7 +11,7 @@ import {
   createTileColorScale
 } from '../../helpers/smallMultiplesHelpers'
 import { calculateYAxisWithAutoPadding } from '../../helpers/calculateYAxisWithAutoPadding'
-import './SmallMultiples.scss'
+import './SmallMultiples.css'
 
 interface SmallMultiplesProps {
   config: any
