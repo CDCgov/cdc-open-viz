@@ -153,7 +153,11 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
         <div className='tile-title'>{displayTitle}</div>
       </div>
       <div ref={tileParentRef} className='tile-chart'>
-        <ParentSize key={`${mode}-${seriesKey || tileValue}`}>
+        <ParentSize
+          key={`${mode}-${seriesKey || tileValue}-${config.smallMultiples?.tilesPerRowDesktop}-${
+            config.smallMultiples?.tilesPerRowMobile
+          }`}
+        >
           {parent => (
             <ConfigContext.Provider
               value={{
