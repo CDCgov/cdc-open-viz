@@ -53,7 +53,15 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
         series: tileConfig.runtime.series.filter(s => s.dataKey === seriesKey),
         seriesKeys: [seriesKey],
         seriesLabels: { [seriesKey]: tileConfig.runtime.seriesLabels?.[seriesKey] || seriesKey },
-        seriesLabelsAll: [tileConfig.runtime.seriesLabels?.[seriesKey] || seriesKey]
+        seriesLabelsAll: [tileConfig.runtime.seriesLabels?.[seriesKey] || seriesKey],
+        // Filter area chart specific series keys for proper rendering
+        ...(tileConfig.runtime.areaSeriesKeys && {
+          areaSeriesKeys: tileConfig.runtime.areaSeriesKeys.filter(s => s.dataKey === seriesKey)
+        }),
+        // Filter line chart specific series keys for proper rendering
+        ...(tileConfig.runtime.lineSeriesKeys && {
+          lineSeriesKeys: tileConfig.runtime.lineSeriesKeys.filter(key => key === seriesKey)
+        })
       },
       showTitle: false, // Individual tiles don't need the main title
       smallMultiples: undefined // Remove smallMultiples to prevent infinite loop

@@ -384,7 +384,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsSmallMultiples = () => {
-    const enabledCharts = ['Line', 'Bar']
+    const enabledCharts = ['Line', 'Bar', 'Area Chart']
     if (enabledCharts.includes(visualizationType)) return true
     return false
   }
