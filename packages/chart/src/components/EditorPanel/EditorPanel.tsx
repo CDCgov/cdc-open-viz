@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, memo, useContext } from 'react'
-import { DragDropContext, Droppable } from '@hello-pangea/dnd'
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import chroma from 'chroma-js'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import {
@@ -4276,6 +4276,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
               </AccordionItem>
             )}
             <Panels.Annotate name='Text Annotations' />
+            <Panels.SmallMultiples name='Small Multiples' />
             {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
           </Accordion>
           {config.type !== 'Spark Line' && (

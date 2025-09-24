@@ -84,6 +84,7 @@ import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAl
 import { Datasets } from '@cdc/core/types/DataSet'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
+import { shouldHideLegendInSmallMultiples } from './helpers/smallMultiplesHelpers'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -942,7 +943,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 <LegendWrapper>
                   <div
                     className={
-                      legend.hide || isLegendWrapViewport(currentViewport)
+                      legend.hide || shouldHideLegendInSmallMultiples(config) || isLegendWrapViewport(currentViewport)
                         ? 'w-100'
                         : legend.position === 'bottom' ||
                           legend.position === 'top' ||
