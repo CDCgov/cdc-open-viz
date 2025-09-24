@@ -177,7 +177,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const legendOnTopOrBottom = ['bottom', 'top'].includes(config.legend?.position)
     const legendWrapped = isLegendWrapViewport(currentViewport)
 
-    const legendShowingLeftOrRight = !isForestPlot && !legendHidden && !legendOnTopOrBottom && !legendWrapped
+    const legendShowingLeftOrRight =
+      !isForestPlot && !legendHidden && !legendOnTopOrBottom && !legendWrapped && !config.smallMultiples?.mode
 
     if (!legendShowingLeftOrRight) return initialWidth
 
