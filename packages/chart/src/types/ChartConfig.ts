@@ -27,7 +27,6 @@ import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { Version } from '@cdc/core/types/Version'
 import Footnotes from '@cdc/core/types/Footnotes'
-import { ViewportSize } from '@cdc/core/types/ViewportSize'
 
 export type ChartColumns = Record<string, Column>
 export type ChartOrientation = 'vertical' | 'horizontal'
