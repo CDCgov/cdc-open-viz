@@ -1,3 +1,6 @@
+import { expect, userEvent } from 'storybook/test'
+import { waitFor } from '@testing-library/react'
+
 /**
  * Shared Testing Helpers for Editor Story Tests
  *
@@ -12,8 +15,6 @@
  * - Text content change detection
  * - Editor loading and accordion interaction helpers
  *
- * Note: This file does not import storybook test utilities directly to avoid
- * circular dependencies. Import userEvent and expect in your test files.
  */
 
 // ============================================================================
@@ -21,7 +22,7 @@
 // ============================================================================
 
 /**
- * Use 250ms delay for visual perception in Storybook UI, but skip in automated tests
+ * Use 500ms delay for visual perception in Storybook UI, but skip in automated tests
  * This ensures smooth visual feedback for manual testing while keeping automated tests fast
  */
 export const MIN_ANIMATION_DELAY_MS = (() => {
@@ -35,82 +36,23 @@ export const MIN_ANIMATION_DELAY_MS = (() => {
     return 0
   }
 
-  return 250
+  return 500
 })()
+
+const WAIT_FOR_TIMEOUT_MS = 5000
 
 // ============================================================================
 // CORE POLLING UTILITIES
 // ============================================================================
 
-/**
- * Generic polling utility with minimum animation delay and enhanced error reporting
- *
- * @param read Function that reads the current state
- * @param predicate Function that determines if the desired state is reached
- * @param timeout Maximum time to wait (default: 5000ms)
- * @param interval Polling interval (default: 20ms)
- * @returns Promise that resolves with the final value when predicate is true
- */
-export const pollUntil = async <T>(
-  read: () => T,
-  predicate: (curr: T, elapsed: number) => boolean,
-  timeout = 5000,
-  interval = 20
-): Promise<T> => {
-  const start = performance.now()
-  // Capture the full call stack to show where this was actually called from
-  const originalStack = new Error().stack
+// Wrapper for waitFor that includes explicit animation delay
+const waitForWithDelay = async (predicate: () => void, options?: { timeout?: number }) => {
+  if (MIN_ANIMATION_DELAY_MS > 0) {
+    await new Promise(resolve => setTimeout(resolve, MIN_ANIMATION_DELAY_MS))
+  }
 
-  return new Promise<T>((resolve, reject) => {
-    let lastValue: any = undefined
-    const step = () => {
-      let val: T
-      try {
-        val = read()
-        lastValue = val
-      } catch (error) {
-        val = undefined as any
-        lastValue = `Error: ${error instanceof Error ? error.message : String(error)}`
-      }
-      const elapsed = performance.now() - start
-      try {
-        if (predicate(val, elapsed) && elapsed >= MIN_ANIMATION_DELAY_MS) return resolve(val)
-      } catch (_) {
-        /* ignore */
-      }
-      if (elapsed > timeout) {
-        const error = new Error(`pollUntil timeout after ${timeout}ms. Last value: ${JSON.stringify(lastValue)}`)
-
-        // Skip over helper functions to show the actual test location
-        if (originalStack) {
-          const stackLines = originalStack.split('\n')
-          const helpersToSkip = [
-            'pollUntil',
-            'waitForPresence',
-            'waitForAbsence',
-            'waitForTextContent',
-            'performAndAssert'
-          ]
-
-          // Find the first line that's not a helper function
-          let actualTestLine = 2 // default fallback
-          for (let i = 1; i < stackLines.length; i++) {
-            const line = stackLines[i]
-            if (!helpersToSkip.some(helper => line.includes(helper))) {
-              actualTestLine = i
-              break
-            }
-          }
-
-          // Reconstruct stack with error message + the actual calling location
-          error.stack = error.message + '\n' + stackLines.slice(actualTestLine).join('\n')
-        }
-
-        return reject(error)
-      }
-      setTimeout(step, interval)
-    }
-    step()
+  await waitFor(predicate, {
+    timeout: options?.timeout || WAIT_FOR_TIMEOUT_MS
   })
 }
 
@@ -122,7 +64,6 @@ export const pollUntil = async <T>(
  * @param read Function that reads the current state
  * @param act Function that performs the action
  * @param predicate Function that validates the state change
- * @param expect The expect function from your test framework
  * @param extraAssert Optional additional assertion on the final value
  */
 export const performAndAssert = async <T extends unknown>(
@@ -130,14 +71,41 @@ export const performAndAssert = async <T extends unknown>(
   read: () => T,
   act: () => Promise<void> | void,
   predicate: (before: T, after: T) => boolean,
-  expect: any,
   extraAssert?: (after: T) => void
 ): Promise<void> => {
+  // Capture the call site stack trace
+  const callSite = new Error().stack
+
   const before = read()
   await act()
-  const after = await pollUntil(read, curr => predicate(before, curr), 5000)
-  if (extraAssert) extraAssert(after)
-  expect(predicate(before, after)).toBe(true)
+
+  await waitForWithDelay(() => {
+    const after = read()
+    const result = predicate(before, after)
+    if (!result) {
+      // Create a more informative error with the original call site
+      const error = new Error(
+        `${label} failed: Expected predicate to return true. Before: ${JSON.stringify(before)}, After: ${JSON.stringify(
+          after
+        )}`
+      )
+
+      // Try to preserve the original call site in the stack trace
+      if (callSite) {
+        const originalStack = callSite.split('\n')
+        // Replace the generic helper stack with the original call site
+        if (originalStack.length > 2) {
+          error.stack = [
+            error.message,
+            ...originalStack.slice(2) // Skip the first two lines (error creation in helper)
+          ].join('\n')
+        }
+      }
+
+      throw error
+    }
+    if (extraAssert) extraAssert(after)
+  })
 }
 
 // ============================================================================
@@ -152,10 +120,10 @@ export const performAndAssert = async <T extends unknown>(
  * @returns Promise that resolves to the found element
  */
 export const waitForPresence = async (selector: string, canvasElement: HTMLElement) => {
-  await pollUntil(
-    () => canvasElement.querySelector(selector),
-    (curr, elapsed) => !!curr && elapsed >= MIN_ANIMATION_DELAY_MS
-  )
+  await waitForWithDelay(() => {
+    const element = canvasElement.querySelector(selector)
+    expect(element).toBeTruthy()
+  })
   return canvasElement.querySelector(selector)
 }
 
@@ -166,10 +134,22 @@ export const waitForPresence = async (selector: string, canvasElement: HTMLEleme
  * @param canvasElement Container element to search within
  */
 export const waitForAbsence = async (selector: string, canvasElement: HTMLElement) => {
-  await pollUntil(
-    () => !canvasElement.querySelector(selector),
-    (curr, elapsed) => curr === true && elapsed >= MIN_ANIMATION_DELAY_MS
-  )
+  await waitForWithDelay(() => {
+    const element = canvasElement.querySelector(selector)
+    expect(element).toBeFalsy()
+  })
+}
+
+/**
+ * Wait for a select element's options to populate
+ *
+ * @param selectElement The select element to monitor
+ * @param minCount The minimum number of expected elements
+ */
+export const waitForOptionsToPopulate = async (selectElement: HTMLSelectElement, minCount: number = 2) => {
+  await waitForWithDelay(() => {
+    expect(selectElement.options.length).toBeGreaterThanOrEqual(minCount)
+  })
 }
 
 /**
@@ -177,14 +157,12 @@ export const waitForAbsence = async (selector: string, canvasElement: HTMLElemen
  *
  * @param el The element to monitor
  * @param expected The expected text content
- * @param expect The expect function from your test framework
  */
-export const waitForTextContent = async (el: HTMLElement | null, expected: string, expect: any) => {
+export const waitForTextContent = async (el: HTMLElement | null, expected: string) => {
   expect(el).toBeTruthy()
-  await pollUntil(
-    () => el!.textContent || '',
-    (curr, elapsed) => curr.trim() === expected.trim() && elapsed >= MIN_ANIMATION_DELAY_MS
-  )
+  await waitForWithDelay(() => {
+    expect(el!.textContent?.trim()).toBe(expected.trim())
+  })
 }
 
 // ============================================================================
@@ -196,12 +174,12 @@ export const waitForTextContent = async (el: HTMLElement | null, expected: strin
  * This ensures all accordion sections are present and the component is ready for testing
  *
  * @param canvas Storybook canvas object from within(canvasElement)
- * @param expect The expect function from your test framework
  */
-export const waitForEditor = async (canvas: any, expect: any) => {
-  await new Promise(resolve => setTimeout(resolve, 2000))
-  const editorElement = canvas.queryAllByText(/general|data|visual/i)
-  await expect(editorElement[0]).toBeVisible()
+export const waitForEditor = async (canvas: any) => {
+  await waitForWithDelay(() => {
+    const editorElement = canvas.queryAllByText(/general|data|visual/i)
+    expect(editorElement[0]).toBeVisible()
+  })
 }
 
 /**
@@ -209,12 +187,14 @@ export const waitForEditor = async (canvas: any, expect: any) => {
  *
  * @param canvas Storybook canvas object from within(canvasElement)
  * @param sectionName Name of the accordion section (case-insensitive)
- * @param userEvent The userEvent object from your test framework
  */
-export const openAccordion = async (canvas: any, sectionName: string, userEvent: any) => {
+export const openAccordion = async (canvas: any, sectionName: string) => {
   const accordion = canvas.getByRole('button', { name: new RegExp(sectionName, 'i') })
   await userEvent.click(accordion)
-  await new Promise(resolve => setTimeout(resolve, 500))
+  await waitForWithDelay(() => {
+    const accordionContent = accordion.closest('.accordion-item, .accordion-section, [class*="accordion"]')
+    expect(accordionContent).toBeTruthy()
+  })
 }
 
 // ============================================================================
@@ -285,16 +265,8 @@ export const getVisualState = (
  * @param checkbox The checkbox element to test
  * @param getVisualState Function that returns the current visual state
  * @param testName Descriptive name for the test
- * @param userEvent The userEvent object from your test framework
- * @param expect The expect function from your test framework
  */
-export const testBooleanControl = async (
-  checkbox: HTMLInputElement,
-  getVisualState: () => any,
-  testName: string,
-  userEvent: any,
-  expect: any
-) => {
+export const testBooleanControl = async (checkbox: HTMLInputElement, getVisualState: () => any, testName: string) => {
   // Get initial state
   const initialCheckboxState = checkbox.checked
   const initialVisualState = getVisualState()
