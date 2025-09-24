@@ -1,17 +1,20 @@
-import { MapConfig } from '../types/MapConfig'
+import { MapConfig, RuntimeFilters } from '../types/MapConfig'
 import MapActions from './map.actions'
 import defaults from './../data/initial-state'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 import _ from 'lodash'
+import { Modal } from '../types/Modal'
+import { GeneratedLegend } from '../helpers/generateRuntimeLegend'
+import { RuntimeData } from '../types/RuntimeData'
 
 export const getInitialState = (configObj = {}): MapState => {
   // Create defaults without palette version to avoid overriding legacy configs
   const defaultsWithoutPaletteaName = { ...defaults }
 
   // Only apply palette defaults if the loaded config explicitly has general.palette
-  if (!configObj?.general?.palette.name) {
-    delete defaultsWithoutPaletteaName.general?.palette.name
-  }
+  // if (!configObj?.general?.palette?.name) {
+  //   delete defaultsWithoutPaletteaName.general?.palette.name
+  // }
 
   return {
     dataUrl: configObj.dataUrl || '',
@@ -50,10 +53,10 @@ export type MapState = {
   projection: object | null
   requiredColumns: string[]
   scale: number
-  modal: object | null
-  runtimeData: object
-  runtimeFilters: object[]
-  runtimeLegend: object[]
+  modal: Modal | null
+  runtimeData: RuntimeData | { init: boolean }
+  runtimeFilters: RuntimeFilters
+  runtimeLegend: GeneratedLegend | []
   statesToShow: string[]
   dataUrl: string
 }

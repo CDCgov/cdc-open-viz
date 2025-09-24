@@ -1,6 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, userEvent, expect } from 'storybook/test'
 import WaffleChart from '../CdcWaffleChart'
+import {
+  performAndAssert,
+  waitForPresence,
+  waitForAbsence,
+  waitForOptionsToPopulate,
+  waitForTextContent,
+  waitForEditor,
+  openAccordion
+} from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof WaffleChart> = {
   title: 'Components/Templates/WaffleChart/Editor Tests',
@@ -14,140 +23,8 @@ export default meta
 type Story = StoryObj<typeof WaffleChart>
 
 // ============================================================================
-// SHARED HELPERS - Used across all test sections
+// SHARED HELPERS - Now imported from @cdc/core/helpers/testing
 // ============================================================================
-
-// Use 250ms delay for visual perception in Storybook UI, but skip in automated tests
-const MIN_ANIMATION_DELAY_MS = (() => {
-  // Check if we're in automated test environment (Vitest/Jest)
-  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
-    return 0
-  }
-
-  // Check if we're running via test runner (Vitest has __vitest__ global)
-  if (typeof globalThis !== 'undefined' && '__vitest__' in globalThis) {
-    return 0
-  }
-
-  return 250
-})()
-
-// Helper function to wait for editor to load
-const waitForEditor = async (canvas: any) => {
-  await new Promise(resolve => setTimeout(resolve, 2000))
-  const editorElement = canvas.queryAllByText(/general|data|visual/i)
-  await expect(editorElement[0]).toBeVisible()
-}
-
-// Helper function to open accordion
-const openAccordion = async (canvas: any, sectionName: string) => {
-  const accordion = canvas.getByRole('button', { name: new RegExp(sectionName, 'i') })
-  await userEvent.click(accordion)
-  await new Promise(resolve => setTimeout(resolve, 500))
-}
-
-// Generic polling utility with minimum animation delay
-const pollUntil = async <T,>(
-  read: () => T,
-  predicate: (curr: T, elapsed: number) => boolean,
-  timeout = 5000,
-  interval = 20
-): Promise<T> => {
-  const start = performance.now()
-  // Capture the full call stack to show where this was actually called from
-  const originalStack = new Error().stack
-
-  return new Promise<T>((resolve, reject) => {
-    let lastValue: any = undefined
-    const step = () => {
-      let val: T
-      try {
-        val = read()
-        lastValue = val
-      } catch (error) {
-        val = undefined as any
-        lastValue = `Error: ${error instanceof Error ? error.message : String(error)}`
-      }
-      const elapsed = performance.now() - start
-      try {
-        if (predicate(val, elapsed) && elapsed >= MIN_ANIMATION_DELAY_MS) return resolve(val)
-      } catch (_) {
-        /* ignore */
-      }
-      if (elapsed > timeout) {
-        const error = new Error()
-
-        // Skip over helper functions to show the actual test location
-        if (originalStack) {
-          const stackLines = originalStack.split('\n')
-          const helpersToSkip = [
-            'pollUntil',
-            'waitForPresence',
-            'waitForAbsence',
-            'waitForTextContent',
-            'performAndAssert'
-          ]
-
-          // Find the first line that's not a helper function
-          let actualTestLine = 2 // default fallback
-          for (let i = 1; i < stackLines.length; i++) {
-            const line = stackLines[i]
-            if (!helpersToSkip.some(helper => line.includes(helper))) {
-              actualTestLine = i
-              break
-            }
-          }
-
-          // Reconstruct stack with error message + the actual calling location
-          error.stack = error.message + '\n' + stackLines.slice(actualTestLine).join('\n')
-        }
-
-        return reject(error)
-      }
-      setTimeout(step, interval)
-    }
-    step()
-  })
-}
-
-// Perform action and assert using polling
-const performAndAssert = async <T extends unknown>(
-  label: string,
-  read: () => T,
-  act: () => Promise<void> | void,
-  predicate: (before: T, after: T) => boolean,
-  extraAssert?: (after: T) => void
-): Promise<void> => {
-  const before = read()
-  await act()
-  const after = await pollUntil(read, curr => predicate(before, curr), 5000)
-  if (extraAssert) extraAssert(after)
-  expect(predicate(before, after)).toBe(true)
-}
-
-// Specialized helper functions
-const waitForTextContent = async (el: HTMLElement | null, expected: string) => {
-  expect(el).toBeTruthy()
-  await pollUntil(
-    () => el!.textContent || '',
-    (curr, elapsed) => curr.trim() === expected.trim() && elapsed >= MIN_ANIMATION_DELAY_MS
-  )
-}
-
-const waitForPresence = async (selector: string, canvasElement: HTMLElement) => {
-  await pollUntil(
-    () => canvasElement.querySelector(selector),
-    (curr, elapsed) => !!curr && elapsed >= MIN_ANIMATION_DELAY_MS
-  )
-  return canvasElement.querySelector(selector)
-}
-
-const waitForAbsence = async (selector: string, canvasElement: HTMLElement) => {
-  await pollUntil(
-    () => !canvasElement.querySelector(selector),
-    (curr, elapsed) => curr === true && elapsed >= MIN_ANIMATION_DELAY_MS
-  )
-}
 
 /**
  * GENERAL SECTION TESTS
@@ -503,65 +380,52 @@ export const DataSectionTests: Story = {
     // Expectation: Value starts with '$' and differs from prior snapshot.
     // ============================================================================
     const prefixInput = canvasElement.querySelector('input[name*="prefix"]') as HTMLInputElement
-    const valueBeforePrefix = getValueText()
-    await userEvent.clear(prefixInput)
-    await userEvent.type(prefixInput, '$')
-
-    // Wait for prefix to be applied with proper polling
-    await pollUntil(
+    await performAndAssert(
+      'Prefix Update',
       getValueText,
-      (curr, elapsed) => curr !== valueBeforePrefix && curr.startsWith('$') && elapsed >= MIN_ANIMATION_DELAY_MS
+      async () => {
+        await userEvent.clear(prefixInput)
+        await userEvent.type(prefixInput, '$')
+      },
+      (before, after) => after !== before && after.startsWith('$')
     )
-
-    expect(prefixInput.value).toBe('$')
-    const afterPrefix = getValueText()
-    expect(afterPrefix.startsWith('$')).toBe(true)
-    expect(afterPrefix).not.toBe(valueBeforePrefix)
 
     // ============================================================================
     // TEST 15: Suffix -> ' deaths'
     // Expectation: Value ends with 'deaths' and differs from prior snapshot.
     // ============================================================================
     const suffixInput = canvasElement.querySelector('input[name*="suffix"]') as HTMLInputElement
-    await userEvent.clear(suffixInput)
-    await userEvent.type(suffixInput, ' deaths')
-
-    // Wait for suffix to be applied with proper polling
-    await pollUntil(
+    await performAndAssert(
+      'Suffix Update',
       getValueText,
-      (curr, elapsed) => curr !== afterPrefix && curr.endsWith('deaths') && elapsed >= MIN_ANIMATION_DELAY_MS
+      async () => {
+        await userEvent.clear(suffixInput)
+        await userEvent.type(suffixInput, ' deaths')
+      },
+      (before, after) => after !== before && after.endsWith('deaths')
     )
-
-    expect(suffixInput.value).toBe(' deaths')
-    const afterSuffix = getValueText()
-    expect(afterSuffix.endsWith('deaths')).toBe(true)
-    expect(afterSuffix).not.toBe(afterPrefix)
 
     // ============================================================================
     // TEST 16: Add Filter (state = Alaska)
     // Expectation: Primary value text changes after filter applied.
     // ============================================================================
     const addFilterButton = Array.from(canvasElement.querySelectorAll('button')).find(
-      b => b.textContent?.trim() === 'Add Filter'
+      b => (b as HTMLButtonElement).textContent?.trim() === 'Add Filter'
     ) as HTMLButtonElement
     await performAndAssert(
       'Add Filter',
       getValueText,
       async () => {
         await userEvent.click(addFilterButton)
-        // Poll for filter UI to appear instead of fixed sleep
-        await pollUntil(
-          () => canvasElement.querySelector('.filters-list .edit-block:last-of-type'),
-          (curr, elapsed) => !!curr && elapsed >= MIN_ANIMATION_DELAY_MS
-        )
+
+        await waitForPresence('.filters-list .edit-block:last-of-type', canvasElement)
+
         const newFilter = canvasElement.querySelector('.filters-list .edit-block:last-of-type') as HTMLElement
         const [colSelect, valSelect] = Array.from(newFilter.querySelectorAll('select')) as HTMLSelectElement[]
         await userEvent.selectOptions(colSelect, 'state')
-        // Brief wait for value options to populate
-        await pollUntil(
-          () => valSelect.options.length,
-          (curr, elapsed) => curr > 1 && elapsed >= MIN_ANIMATION_DELAY_MS
-        )
+
+        await waitForOptionsToPopulate(valSelect)
+
         await userEvent.selectOptions(valSelect, 'Alaska')
       },
       (before, after) => after !== before
@@ -689,7 +553,8 @@ export const VisualSectionTests: Story = {
       },
       (before, after) =>
         before.hasClass !== after.hasClass || // primary signal
-        (after.width !== before.width && after.width > 0) // fallback: width change due to ratio recalculation
+        (after.width !== before.width && after.width > 0), // fallback: width change due to ratio recalculation
+      expect
     )
 
     // ============================================================================

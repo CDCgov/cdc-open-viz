@@ -39,3 +39,18 @@ export const colorblindColorDistribution = {
   8: [0, 1, 2, 4, 5, 6, 7, 8], // Add black for maximum contrast
   9: [0, 1, 2, 3, 4, 5, 6, 7, 8] // Use all colors
 }
+
+// Basic color distribution for map v1 compatibility
+// Simple distribution pattern for any palette length up to 10 items
+export const mapV1ColorDistribution = {
+  1: [1],
+  2: [1, 3],
+  3: [1, 3, 5],
+  4: [0, 2, 4, 6],
+  5: [0, 2, 4, 6, 7],
+  6: [0, 2, 3, 4, 5, 7],
+  7: [0, 2, 3, 4, 5, 6, 7],
+  8: [0, 2, 3, 4, 5, 6, 7, 8],
+  9: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+  10: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+}

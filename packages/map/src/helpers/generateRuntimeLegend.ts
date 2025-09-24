@@ -17,7 +17,10 @@ import * as d3 from 'd3'
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { supportedCountries } from '../data/supported-geos'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
-import { v2ColorDistribution } from '@cdc/chart/src/helpers/chartColorDistributions'
+import { v2ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
+
+// Types
+import { MapConfig, DataRow, RuntimeFilters } from '../types/MapConfig'
 
 type LegendItem = {
   special?: boolean
@@ -36,11 +39,11 @@ export type GeneratedLegend = {
 }
 
 export const generateRuntimeLegend = (
-  configObj,
-  runtimeData: object[],
+  configObj: MapConfig,
+  runtimeData: DataRow[],
   hash: string,
-  setConfig: Function,
-  runtimeFilters: object[],
+  setConfig: (newMapConfig: MapConfig) => void,
+  runtimeFilters: RuntimeFilters,
   legendMemo: React.MutableRefObject<Map<string, number>>,
   legendSpecialClassLastMemo: React.MutableRefObject<Map<string, number>>
 ): GeneratedLegend | [] => {

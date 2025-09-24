@@ -9,7 +9,11 @@ import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import { colorPalettesChart as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
-import { v2ColorDistribution, divergentColorDistribution, colorblindColorDistribution } from '../../helpers/chartColorDistributions'
+import {
+  v2ColorDistribution,
+  divergentColorDistribution,
+  colorblindColorDistribution
+} from '@cdc/core/helpers/palettes/colorDistributions'
 
 // cove
 import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
@@ -102,7 +106,15 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     }
 
     return baseData
-  }, [data, dataNeedsPivot, showPercentage, config])
+  }, [
+    data,
+    dataNeedsPivot,
+    showPercentage,
+    config.yAxis.dataKey,
+    config.xAxis.dataKey,
+    config.runtime.yAxis.dataKey,
+    config.runtime.xAxis.dataKey
+  ])
 
   // Helper function to determine enhanced distribution type and apply it
   const applyEnhancedColorDistribution = (config, palette, numberOfKeys) => {
@@ -116,7 +128,8 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
 
     const isSequential = configPalette && configPalette.includes('sequential')
     const isDivergent = configPalette && configPalette.includes('divergent')
-    const isColorblindSafe = configPalette && (configPalette.includes('colorblindsafe') || configPalette.includes('qualitative_standard'))
+    const isColorblindSafe =
+      configPalette && (configPalette.includes('colorblindsafe') || configPalette.includes('qualitative_standard'))
 
     // Determine which distribution to use based on palette type
     let distributionMap = null
@@ -177,7 +190,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
 
     // Handle normal pie chart case
     return createPieColorScale(_data, config)
-  }, [_data, dataNeedsPivot, colorScale, showPercentage, config])
+  }, [_data, dataNeedsPivot, colorScale, showPercentage, config.xAxis.dataKey, config.general?.palette, config.palette])
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -189,9 +202,9 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     const element = document.querySelector('.isEditor')
     if (element) {
       // parent element is visible
-      setAnimatePie(prevState => true)
+      setAnimatePie(true)
     }
-  })
+  }, [])
 
   useEffect(() => {
     if (dataRef?.isIntersecting && config.animate && !animatedPie) {
@@ -231,7 +244,8 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
       }
 
       // Determine if this slice should be muted based on legend behavior
-      const isHighlighted = seriesHighlight.length === 0 || seriesHighlight.indexOf(arc.data[config.runtime.xAxis.dataKey]) !== -1
+      const isHighlighted =
+        seriesHighlight.length === 0 || seriesHighlight.indexOf(arc.data[config.runtime.xAxis.dataKey]) !== -1
       const shouldMute = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && !isHighlighted
       const sliceOpacity = shouldMute ? 0.3 : 1
       const textOpacity = shouldMute ? 0.3 : 1
@@ -314,11 +328,12 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
 
   // Update the context colorScale when the pie chart's colorScale changes
   // This ensures the Legend component uses the same colors as the pie chart
+  // Only update when specific color-related properties change, not the entire colorScale
   useEffect(() => {
     if (_colorScale && config.visualizationType === 'Pie') {
       dispatch({ type: 'SET_COLOR_SCALE', payload: _colorScale })
     }
-  }, [_colorScale, config.visualizationType, dispatch])
+  }, [config.visualizationType, config.xAxis.dataKey, config.general?.palette?.name, config.palette, dispatch])
 
   const getSvgClasses = () => {
     let classes = ['animated-pie', 'group']
@@ -337,6 +352,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
           className={getSvgClasses()}
           role='img'
           aria-label={handleChartAriaLabels(config)}
+          onMouseLeave={handleTooltipMouseOff}
         >
           <Group top={centerY} left={radius}>
             {/* prettier-ignore */}
@@ -368,10 +384,10 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
           tooltipData.dataYPosition &&
           tooltipData.dataXPosition && (
             <>
-              <style>{`.tooltip {background-color: rgba(255,255,255, ${config.tooltips.opacity / 100
-                }) !important`}</style>
+              <style>{`.tooltip {background-color: rgba(255,255,255, ${
+                config.tooltips.opacity / 100
+              }) !important`}</style>
               <TooltipWithBounds
-                key={Math.random()}
                 className={'tooltip cdc-open-viz-module'}
                 left={tooltipLeft + centerX - radius}
                 top={tooltipTop}

@@ -20,7 +20,7 @@ export const DefaultEditor: Story = {
   }
 }
 
-export const PreviewTable: Story = {
+export const PreviewTableTests: Story = {
   args: {},
   parameters: {},
   play: async ({ canvasElement }) => {

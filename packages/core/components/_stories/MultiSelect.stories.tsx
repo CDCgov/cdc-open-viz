@@ -10,7 +10,7 @@ const meta: Meta<typeof MultiSelect> = {
 
 type Story = StoryObj<typeof MultiSelect>
 
-export const Primary: Story = {
+export const PrimaryTests: Story = {
   args: {
     options: [
       { value: '1', label: 'One' },

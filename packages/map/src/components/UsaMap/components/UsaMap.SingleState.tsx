@@ -176,9 +176,8 @@ const SingleStateMap: React.FC = () => {
                 return (
                   <g
                     id='mapGroup'
-                    className={`countyMapGroup ${
-                      config.general.geoType === 'single-state' ? `countyMapGroup--no-transition` : ''
-                    }`}
+                    className={`countyMapGroup ${config.general.geoType === 'single-state' ? `countyMapGroup--no-transition` : ''
+                      }`}
                     transform={`translate(${translate}) scale(${scale})`}
                     data-scale=''
                     key='countyMapGroup'
@@ -229,9 +228,8 @@ const SingleStateMap: React.FC = () => {
               return (
                 <g
                   id='mapGroup'
-                  className={`countyMapGroup ${
-                    config.general.geoType === 'single-state' ? `countyMapGroup--no-transition` : ''
-                  }`}
+                  className={`countyMapGroup ${config.general.geoType === 'single-state' ? `countyMapGroup--no-transition` : ''
+                    }`}
                   transform={`translate(${translate}) scale(${scale})`}
                   data-scale=''
                   key='countyMapGroup'
