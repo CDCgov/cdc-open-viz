@@ -325,14 +325,6 @@ export const BarChartVertical = () => {
                     return _barColor
                   }
 
-                  // Function to get the lollipop head color (should be darker than stem)
-                  const getLocalLollipopHeadColor = (barColor: string): string => {
-                    if (!isTwoToneLollipopColor) {
-                      return getBarBackgroundColor(barColor)
-                    }
-                    return getLollipopHeadColor(barColor)
-                  }
-
                   // Check if this bar should use a pattern
                   const getPatternUrl = (): string | null => {
                     if (!config.legend.patterns || Object.keys(config.legend.patterns).length === 0) {
@@ -522,7 +514,11 @@ export const BarChartVertical = () => {
                             cx={barX + lollipopShapeSize / 3.5}
                             cy={bar.y}
                             r={lollipopShapeSize / 2}
-                            fill={getLocalLollipopHeadColor(colorScale(config.runtime.seriesLabels[bar.key]))}
+                            fill={
+                              isTwoToneLollipopColor
+                                ? getLollipopHeadColor(colorScale(config.runtime.seriesLabels[bar.key]))
+                                : getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key]))
+                            }
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
@@ -536,7 +532,11 @@ export const BarChartVertical = () => {
                             y={bar.y}
                             width={lollipopShapeSize}
                             height={lollipopShapeSize}
-                            fill={getLocalLollipopHeadColor(colorScale(config.runtime.seriesLabels[bar.key]))}
+                            fill={
+                              isTwoToneLollipopColor
+                                ? getLollipopHeadColor(colorScale(config.runtime.seriesLabels[bar.key]))
+                                : getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key]))
+                            }
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
