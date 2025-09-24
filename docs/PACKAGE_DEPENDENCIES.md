@@ -12,6 +12,7 @@ The CDC Open Viz monorepo follows a specific dependency architecture to maintain
 
 1. **Core Package (`@cdc/core`)**
 
+   - **Can depend on ANY other package**
    - **Any package can depend on `@cdc/core`**
    - Core contains shared utilities, types, components, and helpers used across the monorepo
    - Examples: `import { cloneConfig } from '@cdc/core/helpers/cloneConfig'`
