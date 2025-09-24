@@ -517,7 +517,7 @@ export const BarChartVertical = () => {
                             fill={
                               isTwoToneLollipopColor
                                 ? getLollipopHeadColor(colorScale(config.runtime.seriesLabels[bar.key]))
-                                : getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key]))
+                                : colorScale(config.runtime.seriesLabels[bar.key])
                             }
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
@@ -535,7 +535,7 @@ export const BarChartVertical = () => {
                             fill={
                               isTwoToneLollipopColor
                                 ? getLollipopHeadColor(colorScale(config.runtime.seriesLabels[bar.key]))
-                                : getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key]))
+                                : colorScale(config.runtime.seriesLabels[bar.key])
                             }
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
