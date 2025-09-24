@@ -1057,7 +1057,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 <LegendWrapper>
                   <div
                     className={
-                      legend.hide || isLegendWrapViewport(currentViewport)
+                      legend.hide || config.smallMultiples?.mode || isLegendWrapViewport(currentViewport)
                         ? 'w-100'
                         : legend.position === 'bottom' ||
                           legend.position === 'top' ||
