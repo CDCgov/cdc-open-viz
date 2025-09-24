@@ -43,10 +43,10 @@
   "gitHead": "9062881d50c824ee6cdd71868bafd016a5e5694d",
   "devDependencies": {
     "sass": "^1.89.2",
-    "vite": "^4.4.11",
+    "vite": "^5.4.19",
     "@vitejs/plugin-react": "^4.3.4",
     "vite-plugin-css-injected-by-js": "^2.4.0",
-    "vite-plugin-svgr": "^2.4.0",
+    "vite-plugin-svgr": "^4.2.0",
     "@rollup/plugin-dsv": "^3.0.2"
   }
 }
