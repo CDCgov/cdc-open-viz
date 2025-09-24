@@ -147,3 +147,5 @@ export const addMinimumBarHeights = barStacks => {
 
   return barStacks
 }
+
+export { getLollipopStemColor, getLollipopHeadColor } from './lollipopColors'

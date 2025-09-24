@@ -4,7 +4,7 @@ import ConfigContext from '../../../ConfigContext'
 import BarChartContext, { type BarChartContextValues } from './context'
 // Local hooks
 import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
-import { getBarConfig, testZeroValue } from '../helpers'
+import { getBarConfig, testZeroValue, getLollipopStemColor, getLollipopHeadColor } from '../helpers'
 // VisX library imports
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
@@ -18,8 +18,6 @@ import isNumber from '@cdc/core/helpers/isNumber'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
-// Third party libraries
-import chroma from 'chroma-js'
 // Types
 import { type ChartContext } from '../../../types/ChartContext'
 import _ from 'lodash'
@@ -309,12 +307,16 @@ export const BarChartVertical = () => {
                       if (isHighlightedBar) _barColor = 'transparent'
                       if (config.legend.colorCode)
                         _barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
-                      if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
+                      if (isTwoToneLollipopColor) {
+                        _barColor = getLollipopStemColor(barColor)
+                      }
                       return _barColor
                     }
 
-                    // if this is a two tone lollipop slightly lighten the bar.
-                    if (isTwoToneLollipopColor) _barColor = chroma(barColor).brighten(1)
+                    // if this is a two tone lollipop, ensure stem has good contrast against white but is lighter than head
+                    if (isTwoToneLollipopColor) {
+                      _barColor = getLollipopStemColor(barColor)
+                    }
                     if (config.legend.colorCode)
                       _barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor)
 
@@ -512,7 +514,11 @@ export const BarChartVertical = () => {
                             cx={barX + lollipopShapeSize / 3.5}
                             cy={bar.y}
                             r={lollipopShapeSize / 2}
-                            fill={getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key]))}
+                            fill={
+                              isTwoToneLollipopColor
+                                ? getLollipopHeadColor(colorScale(config.runtime.seriesLabels[bar.key]))
+                                : colorScale(config.runtime.seriesLabels[bar.key])
+                            }
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
@@ -526,7 +532,11 @@ export const BarChartVertical = () => {
                             y={bar.y}
                             width={lollipopShapeSize}
                             height={lollipopShapeSize}
-                            fill={getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key]))}
+                            fill={
+                              isTwoToneLollipopColor
+                                ? getLollipopHeadColor(colorScale(config.runtime.seriesLabels[bar.key]))
+                                : colorScale(config.runtime.seriesLabels[bar.key])
+                            }
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}

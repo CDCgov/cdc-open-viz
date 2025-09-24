@@ -15,12 +15,9 @@ import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/acces
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import createBarElement from '@cdc/core/components/createBarElement'
-import { getBarConfig, testZeroValue } from '../helpers'
+import { getBarConfig, testZeroValue, getLollipopStemColor, getLollipopHeadColor } from '../helpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import isNumber from '@cdc/core/helpers/isNumber'
-
-// Third party libraries
-import chroma from 'chroma-js'
 
 // Local context and types
 import BarChartContext, { BarChartContextValues } from './context'
@@ -296,11 +293,21 @@ export const BarChartHorizontal = () => {
                       labelColor = '#fff'
                     }
                   }
-                  const background = () => {
+                  const getBarBackgroundColor = () => {
                     if (isRegularLollipopColor) return barColor
-                    if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
+                    if (isTwoToneLollipopColor) {
+                      return getLollipopStemColor(barColor)
+                    }
                     if (isHighlightedBar) return 'transparent'
                     return barColor
+                  }
+
+                  // Function to get the lollipop head color (should be darker than stem)
+                  const getLocalLollipopHeadColor = (): string => {
+                    if (!isTwoToneLollipopColor) {
+                      return barColor
+                    }
+                    return getLollipopHeadColor(barColor)
                   }
 
                   // Confidence Interval Variables
@@ -346,7 +353,7 @@ export const BarChartHorizontal = () => {
                   }
 
                   const patternUrl = getPatternUrl()
-                  const baseBackground = background()
+                  const baseBackground = getBarBackgroundColor()
 
                   return (
                     <Group display={hideGroup} key={`${barGroup.index}--${index}`}>
@@ -535,7 +542,7 @@ export const BarChartHorizontal = () => {
                             cx={bar.y}
                             cy={barHeight * bar.index + lollipopBarWidth / 2}
                             r={lollipopShapeSize / 2}
-                            fill={barColor}
+                            fill={getLocalLollipopHeadColor()}
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
@@ -549,7 +556,7 @@ export const BarChartHorizontal = () => {
                             y={0 - lollipopBarWidth / 2}
                             width={lollipopShapeSize}
                             height={lollipopShapeSize}
-                            fill={barColor}
+                            fill={getLocalLollipopHeadColor()}
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
