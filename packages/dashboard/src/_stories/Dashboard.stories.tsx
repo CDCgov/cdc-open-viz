@@ -417,7 +417,7 @@ export const RegressionHiddenFilter: Story = {
   // }
 }
 
-export const RegressionMultiVisualization: Story = {
+export const RegressionMultiVisualizationTests: Story = {
   args: {
     config: { ...MultiVizConfig, datasets: multiVizData },
     isEditor: false

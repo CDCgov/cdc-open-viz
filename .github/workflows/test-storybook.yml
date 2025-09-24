@@ -25,9 +25,6 @@ jobs:
       - name: Build Packages
         run: lerna run build
 
-      - name: Build Storybook
-        run: yarn build-storybook --output-dir storybook-static
-
       - name: Add Playwright
         run: npx playwright install
 

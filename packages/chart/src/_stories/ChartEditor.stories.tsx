@@ -31,7 +31,7 @@ export const Url_Filter: Story = {
   }
 }
 
-export const ScatterPlot: Story = {
+export const ScatterPlotTests: Story = {
   args: {
     config: mockScatterPlot,
     isEditor: true
