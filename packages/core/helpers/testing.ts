@@ -93,7 +93,6 @@ export const performAndAssert = async <T extends unknown>(
       // Try to preserve the original call site in the stack trace
       if (callSite) {
         const originalStack = callSite.split('\n')
-        const currentStack = error.stack?.split('\n') || []
         // Replace the generic helper stack with the original call site
         if (originalStack.length > 2) {
           error.stack = [
