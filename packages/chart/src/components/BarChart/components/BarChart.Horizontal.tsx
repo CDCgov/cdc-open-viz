@@ -15,12 +15,9 @@ import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/acces
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import createBarElement from '@cdc/core/components/createBarElement'
-import { getBarConfig, testZeroValue } from '../helpers'
+import { getBarConfig, testZeroValue, getLollipopStemColor, getLollipopHeadColor } from '../helpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import isNumber from '@cdc/core/helpers/isNumber'
-
-// Third party libraries
-import chroma from 'chroma-js'
 
 // Local context and types
 import BarChartContext, { BarChartContextValues } from './context'
@@ -299,32 +296,18 @@ export const BarChartHorizontal = () => {
                   const getBarBackgroundColor = () => {
                     if (isRegularLollipopColor) return barColor
                     if (isTwoToneLollipopColor) {
-                      // For two-tone lollipops, ensure stem has good contrast against white but is lighter than head
-                      const lightness = chroma(barColor).get('hsl.l')
-                      if (lightness > 0.7) {
-                        // Very light colors: darken slightly to ensure visibility
-                        return chroma(barColor).darken(0.1).hex()
-                      } else if (lightness > 0.4) {
-                        // Medium colors: lighten moderately
-                        return chroma(barColor).brighten(0.5).hex()
-                      } else {
-                        // Dark colors: lighten significantly but keep visible
-                        return chroma(barColor).brighten(1.0).hex()
-                      }
+                      return getLollipopStemColor(barColor)
                     }
                     if (isHighlightedBar) return 'transparent'
                     return barColor
                   }
 
                   // Function to get the lollipop head color (should be darker than stem)
-                  const getLollipopHeadColor = (): string => {
+                  const getLocalLollipopHeadColor = (): string => {
                     if (!isTwoToneLollipopColor) {
                       return barColor
                     }
-                    // For two-tone lollipops, keep head at full opacity/saturation for maximum contrast
-                    // Use the original color but ensure it's dark enough for contrast
-                    const lightness = chroma(barColor).get('hsl.l')
-                    return lightness > 0.6 ? chroma(barColor).darken(1.5).hex() : barColor
+                    return getLollipopHeadColor(barColor)
                   }
 
                   // Confidence Interval Variables
@@ -559,7 +542,7 @@ export const BarChartHorizontal = () => {
                             cx={bar.y}
                             cy={barHeight * bar.index + lollipopBarWidth / 2}
                             r={lollipopShapeSize / 2}
-                            fill={getLollipopHeadColor()}
+                            fill={getLocalLollipopHeadColor()}
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
@@ -573,7 +556,7 @@ export const BarChartHorizontal = () => {
                             y={0 - lollipopBarWidth / 2}
                             width={lollipopShapeSize}
                             height={lollipopShapeSize}
-                            fill={getLollipopHeadColor()}
+                            fill={getLocalLollipopHeadColor()}
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
