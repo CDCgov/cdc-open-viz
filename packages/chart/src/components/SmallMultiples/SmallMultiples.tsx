@@ -185,9 +185,8 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
 
     const maxTileHeight = Math.max(...measuredHeights)
     const gapSize = isMobile ? 18 : 36
-    const totalGapsHeight = (numberOfRows - 1) * (gapSize + 36) // 36 is padding on .small-multiples-container
-    const containerPadding = 36 // Padding on .small-multiple-tile
-    const totalHeight = numberOfRows * maxTileHeight + totalGapsHeight + containerPadding
+    const totalGapsHeight = (numberOfRows - 1) * gapSize
+    const totalHeight = numberOfRows * maxTileHeight + totalGapsHeight
 
     parentRef.current.style.height = `${totalHeight}px`
   }, [tileHeights, numberOfRows, isMobile, parentRef, tilesPerRow])
