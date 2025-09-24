@@ -22,6 +22,7 @@ type DataDesignerProps = {
 
 const DataDesigner = (props: DataDesignerProps) => {
   const { configureData, updateDescriptionProp, config, setConfig } = props
+  const firstDataRow = configureData?.data?.[0] || {}
   const hasDataOrientation = config?.visualizationType !== 'Forest Plot'
   const hasMultipleSeries = config?.visualizationType !== 'Forest Plot'
   const hasRowSelection = config?.visualizationType !== 'Forest Plot'
@@ -134,7 +135,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                 defaultValue={configureData.dataDescription.seriesKey}
               >
                 <option value=''>Choose an option</option>
-                {Object.keys(configureData.data[0]).map((value, index) => (
+                {Object.keys(firstDataRow).map((value, index) => (
                   <option value={value} key={index}>
                     {value}
                   </option>
@@ -200,7 +201,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                         defaultValue={configureData.dataDescription.seriesKey}
                       >
                         <option value=''>Choose an option</option>
-                        {Object.keys(configureData.data[0]).map((value, index) => (
+                        {Object.keys(firstDataRow).map((value, index) => (
                           <option value={value} key={index}>
                             {value}
                           </option>
@@ -218,7 +219,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                         defaultValue={configureData.dataDescription.xKey}
                       >
                         <option value=''>Choose an option</option>
-                        {Object.keys(configureData.data[0]).map((value, index) => (
+                        {Object.keys(firstDataRow).map((value, index) => (
                           <option value={value} key={index}>
                             {value}
                           </option>
@@ -264,7 +265,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                         }}
                       >
                         <option value=''>Choose an option</option>
-                        {Object.keys(configureData.data[0])
+                        {Object.keys(firstDataRow)
                           .filter(
                             value =>
                               !configureData.dataDescription.valueKeysTallSupport ||
@@ -313,7 +314,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                         }}
                       >
                         <option value=''>Choose an option</option>
-                        {Object.keys(configureData.data[0])
+                        {Object.keys(firstDataRow)
                           .filter(
                             value =>
                               !configureData.dataDescription.ignoredKeys ||
@@ -348,7 +349,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                   defaultValue={'Select'}
                 >
                   <option value=''>Choose an option</option>
-                  {Object.keys(configureData.data[0]).map((value, index) => (
+                  {Object.keys(firstDataRow).map((value, index) => (
                     <option value={value} key={index}>
                       {value}
                     </option>
@@ -371,7 +372,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                   defaultValue={'Select'}
                 >
                   <option value=''>Choose an option</option>
-                  {Object.keys(configureData.data[0]).map((value, index) => (
+                  {Object.keys(firstDataRow).map((value, index) => (
                     <option value={value} key={index}>
                       {value}
                     </option>
@@ -394,7 +395,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                   defaultValue={'Select'}
                 >
                   <option value=''>Choose an option</option>
-                  {Object.keys(configureData.data[0]).map((value, index) => (
+                  {Object.keys(firstDataRow).map((value, index) => (
                     <option value={value} key={index}>
                       {value}
                     </option>
@@ -417,7 +418,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                   defaultValue={'Select'}
                 >
                   <option value=''>Choose an option</option>
-                  {Object.keys(configureData.data[0]).map((value, index) => (
+                  {Object.keys(firstDataRow).map((value, index) => (
                     <option value={value} key={index}>
                       {value}
                     </option>
