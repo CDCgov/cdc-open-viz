@@ -50,7 +50,6 @@ import { countNumOfTicks } from '../helpers/countNumOfTicks'
 import HoverLine from './HoverLine/HoverLine'
 import { SmallMultiples } from './SmallMultiples'
 import { calculateYAxisWithAutoPadding } from '../helpers/calculateYAxisWithAutoPadding'
-import { shouldHideLegendInSmallMultiples } from '../helpers/smallMultiplesHelpers'
 
 type LinearChartProps = {
   parentWidth: number
@@ -178,12 +177,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const legendOnTopOrBottom = ['bottom', 'top'].includes(config.legend?.position)
     const legendWrapped = isLegendWrapViewport(currentViewport)
 
-    const legendShowingLeftOrRight =
-      !isForestPlot &&
-      !legendHidden &&
-      !legendOnTopOrBottom &&
-      !legendWrapped &&
-      !shouldHideLegendInSmallMultiples(config)
+    const legendShowingLeftOrRight = !isForestPlot && !legendHidden && !legendOnTopOrBottom && !legendWrapped
 
     if (!legendShowingLeftOrRight) return initialWidth
 
