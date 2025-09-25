@@ -34,6 +34,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   tileColumn,
   customColorScale,
   svgRef,
+  parentWidth,
   globalYAxisMax,
   globalYAxisMin,
   isFirstInRow,
@@ -171,7 +172,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
         <ParentSize
           key={`${mode}-${seriesKey || tileValue}-${config.smallMultiples?.tilesPerRowDesktop}-${
             config.smallMultiples?.tilesPerRowMobile
-          }`}
+          }-${parentWidth}`}
         >
           {parent => (
             <ConfigContext.Provider
