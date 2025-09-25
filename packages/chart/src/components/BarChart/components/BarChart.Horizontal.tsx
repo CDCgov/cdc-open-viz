@@ -257,7 +257,7 @@ export const BarChartHorizontal = () => {
                       ? colorScale(config.runtime.seriesLabels[bar.key])
                       : colorScale(bar.key)
                   const hasDynamicCategory = config.series.find(s => s.dynamicCategory)
-                  if (!hasDynamicCategory) {
+                  if (!hasDynamicCategory && config.legend.colorCode) {
                     barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor) // Color code by category
                   }
                   const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
