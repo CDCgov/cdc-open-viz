@@ -1,8 +1,7 @@
 import { clamp } from 'lodash'
 
 import { isMobileHeightViewport } from '@cdc/core/helpers/viewports'
-import { ChartConfig } from '../types/ChartConfig'
-import { ViewportSize } from '@cdc/core/types/ViewportSize'
+import { ChartConfig, ViewportSize } from '../types/ChartConfig'
 import { EDITOR_WIDTH } from '@cdc/core/helpers/constants'
 
 export function getOrientation(
