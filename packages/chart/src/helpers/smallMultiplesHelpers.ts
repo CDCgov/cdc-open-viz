@@ -3,15 +3,6 @@ import { getColorScale } from './getColorScale'
 import { ColorScale } from '../types/ChartContext'
 
 /**
- * Check if the legend should be hidden in small multiples mode
- * Returns true if small multiples is active and legend should be hidden (default behavior)
- * Returns false if legend should be shown (when hideLegend is explicitly set to false)
- */
-export const shouldHideLegendInSmallMultiples = config => {
-  return config.smallMultiples?.mode && config.smallMultiples?.hideLegend !== false
-}
-
-/**
  * Get filtered data for a specific tile based on its mode
  */
 export const getTileData = (tileItem, data) => {

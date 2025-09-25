@@ -19,7 +19,6 @@ import LegendLineShape from './LegendLine.Shape'
 import LegendGroup from './LegendGroup'
 import { getSeriesWithData } from '../../helpers/dataHelpers'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
-import { shouldHideLegendInSmallMultiples } from '../../helpers/smallMultiplesHelpers'
 
 const LEGEND_PADDING = 36
 
@@ -74,7 +73,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
     const { HighLightedBarUtils } = useHighlightedBars(config)
     let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
 
-    if (!legend || shouldHideLegendInSmallMultiples(config)) return null
+    if (!legend) return null
     return (
       <aside
         ref={ref}
