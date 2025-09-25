@@ -1,0 +1,1943 @@
+{
+  "annotations": [],
+  "allowLineToBarGraph": "__​undefined__",
+  "type": "chart",
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "title": "",
+  "showTitle": false,
+  "showDownloadMediaButton": false,
+  "theme": "theme-blue",
+  "animate": false,
+  "lineDatapointStyle": "hover",
+  "lineDatapointColor": "Same as Line",
+  "barHasBorder": "false",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "stacked",
+  "barStyle": "",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "isResponsiveTicks": false,
+  "general": {
+    "annotationDropdownText": "Annotations",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": true,
+    "hideNullValue": true,
+    "palette": {
+      "name": "qualitative_bold",
+      "customColors": [
+        "#012551",
+        "#1192E9",
+        "#002D9D",
+        "#A66EFF",
+        "#0A6C75",
+        "#C0F2FD",
+        "#C0F2FD",
+        "#C0F2FD",
+        "#C0F2FD"
+      ],
+      "version": "1.0",
+      "backups": [
+        {
+          "name": "qualitative_bold",
+          "version": "1.0",
+          "isReversed": "__​undefined__"
+        }
+      ]
+    }
+  },
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "preliminaryData": [],
+  "yAxis": {
+    "hideAxis": true,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": true,
+    "size": "55",
+    "gridLines": true,
+    "enablePadding": false,
+    "min": "",
+    "max": "",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
+    "rightHideAxis": true,
+    "rightAxisSize": 0,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#1c1d1f",
+    "rightAxisTickLabelColor": "#1c1d1f",
+    "rightAxisTickColor": "#1c1d1f",
+    "numTicks": "4",
+    "axisPadding": 0,
+    "scalePadding": 10,
+    "tickRotation": 0,
+    "anchors": [],
+    "shoMissingDataLabel": true,
+    "showMissingDataLine": true,
+    "categories": [],
+    "maxValue": 100.10000000000001,
+    "label": "",
+    "inlineLabel": "%"
+  },
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "total": "Total",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds",
+      "count": "Count"
+    },
+    "firstQuartilePercentage": 25,
+    "thirdQuartilePercentage": 75,
+    "boxWidthPercentage": 40,
+    "legend": {
+      "showHowToReadText": false,
+      "howToReadText": ""
+    }
+  },
+  "topAxis": {
+    "hasLine": false
+  },
+  "isLegendValue": false,
+  "barThickness": "0.8",
+  "barHeight": 25,
+  "barSpace": 15,
+  "heights": {
+    "vertical": "250",
+    "horizontal": 750,
+    "mobileVertical": "150"
+  },
+  "xAxis": {
+    "sortDates": false,
+    "anchors": [],
+    "type": "date",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 75,
+    "tickRotation": 0,
+    "min": "",
+    "max": "",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
+    "numTicks": "6",
+    "labelOffset": 0,
+    "axisPadding": 200,
+    "target": 0,
+    "maxTickRotation": "45",
+    "padding": 6,
+    "showYearsOnce": false,
+    "sortByRecentDate": false,
+    "brushActive": false,
+    "dataKey": "week_end",
+    "axisBBox": 45.86000061035156,
+    "tickWidthMax": 98,
+    "label": "",
+    "dateParseFormat": "%Y-%m-%d",
+    "dateDisplayFormat": "%b. %-d %Y",
+    "manual": false,
+    "manualStep": "2",
+    "viewportStepCount": {
+      "sm": "2",
+      "xs": "4",
+      "xxs": "4"
+    },
+    "viewportNumTicks": {
+      "sm": "4",
+      "xs": "4",
+      "xxs": "3"
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "indexLabel": "Week Ending",
+    "download": true,
+    "showVertical": true,
+    "dateDisplayFormat": "",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "collapsible": true,
+    "show": true
+  },
+  "orientation": "vertical",
+  "columns": {},
+  "legend": {
+    "hide": true,
+    "behavior": "isolate",
+    "axisAlign": true,
+    "singleRow": true,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "hideSuppressedLabels": false,
+    "hideSuppressionLink": false,
+    "seriesHighlight": [],
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "groupBy": "",
+    "shape": "circle",
+    "tickRotation": "",
+    "order": "dataColumn",
+    "hideBorder": {
+      "side": false,
+      "topBottom": true
+    },
+    "position": "top",
+    "orderedValues": [],
+    "patterns": {},
+    "patternField": "",
+    "unified": true
+  },
+  "smallMultiples": {
+    "mode": "by-series",
+    "tileColumn": "",
+    "tilesPerRowDesktop": "2",
+    "tilesPerRowMobile": 2,
+    "independentYAxis": false,
+    "tileOrder": [],
+    "tileOrderType": "asc",
+    "tileTitles": {},
+    "colorMode": "same"
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
+  "labels": false,
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": true,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false,
+    "roundTo": "1"
+  },
+  "filters": [
+    {
+      "values": ["COVID-19", "Influenza", "RSV"],
+      "filterStyle": "dropdown",
+      "id": 1726689614021,
+      "columnName": "pathogen",
+      "showDropdown": false,
+      "active": "Influenza",
+      "setByQueryParameter": "Influenza"
+    },
+    {
+      "values": ["Adults", "Children"],
+      "filterStyle": "tab-simple",
+      "id": 1729201744650,
+      "active": "Adults",
+      "columnName": "demographic_group",
+      "orderedValues": ["Adults", "Children"]
+    }
+  ],
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false,
+    "lineDatapointSymbol": "none",
+    "maximumShapeAmount": 7
+  },
+  "useLogScale": false,
+  "filterBehavior": "Filter Change",
+  "highlightedBarValues": [],
+  "series": [
+    {
+      "dataKey": "Received vaccine",
+      "type": "Bar",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Definitely will get a vaccine",
+      "type": "Bar",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Probably will get a vaccine or are unsure",
+      "type": "Bar",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Probably or definitely will not get a vaccine",
+      "type": "Bar",
+      "axis": "Left",
+      "tooltip": true
+    }
+  ],
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": "%b. %-d, %Y"
+  },
+  "forestPlot": {
+    "startAt": 0,
+    "colors": {
+      "line": "",
+      "shape": ""
+    },
+    "lineOfNoEffect": {
+      "show": true
+    },
+    "type": "",
+    "pooledResult": {
+      "diamondHeight": 5,
+      "column": ""
+    },
+    "estimateField": "",
+    "estimateRadius": "",
+    "shape": "square",
+    "rowHeight": 20,
+    "description": {
+      "show": true,
+      "text": "description",
+      "location": 0
+    },
+    "result": {
+      "show": true,
+      "text": "result",
+      "location": 100
+    },
+    "radius": {
+      "min": 2,
+      "max": 10,
+      "scalingColumn": ""
+    },
+    "regression": {
+      "lower": 0,
+      "upper": 0,
+      "estimateField": 0
+    },
+    "leftWidthOffset": 0,
+    "rightWidthOffset": 0,
+    "showZeroLine": false,
+    "leftLabel": "",
+    "rightLabel": ""
+  },
+  "area": {
+    "isStacked": false
+  },
+  "sankey": {
+    "title": {
+      "defaultColor": "black"
+    },
+    "iterations": 1,
+    "rxValue": 0.9,
+    "overallSize": {
+      "width": 900,
+      "height": 700
+    },
+    "margin": {
+      "margin_y": 25,
+      "margin_x": 0
+    },
+    "nodeSize": {
+      "nodeWidth": 26,
+      "nodeHeight": 40
+    },
+    "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": {
+      "default": "#ff8500",
+      "inactive": "#808080"
+    },
+    "linkColor": {
+      "default": "#ffc900",
+      "inactive": "#D3D3D3"
+    },
+    "opacity": {
+      "nodeOpacityDefault": 1,
+      "nodeOpacityInactive": 0.1,
+      "LinkOpacityDefault": 1,
+      "LinkOpacityInactive": 0.1
+    },
+    "storyNodeFontColor": "#006778",
+    "storyNodeText": [],
+    "nodeValueStyle": {
+      "textBefore": "(",
+      "textAfter": ")"
+    },
+    "data": []
+  },
+  "fontSize": "medium",
+  "brush": {
+    "height": 25,
+    "active": false
+  },
+  "isPaletteReversed": false,
+  "visualizationType": "Bar",
+  "dataFileName": "https://www.cdc.gov/wcms/vizdata/Respitory_Viruses/NISVaccinationsIntent7b.json",
+  "dataFileSourceType": "url",
+  "dataUrl": "https://www.cdc.gov/wcms/vizdata/Respitory_Viruses/NISVaccinationsIntent7b.json",
+  "dataDescription": {
+    "horizontal": false,
+    "series": true,
+    "singleRow": false,
+    "seriesKey": "vaccination_intent_category",
+    "xKey": "week_end",
+    "valueKeysTallSupport": ["value"],
+    "ignoredKeys": [
+      "95_confidence_internal_range",
+      "95_confidence_interval_upper",
+      "95_confidence_interval_lower",
+      "suppression_flag"
+    ]
+  },
+  "version": "4.25.9",
+  "dynamicMarginTop": 0,
+  "runtimeDataUrl": "https://www.cdc.gov/wcms/vizdata/Respitory_Viruses/NISVaccinationsIntent7b.json",
+  "description": "<div class=\"text-left\"><p class=\"fnote\">95% confidence intervals for the point estimates are presented at the data.cdc.gov link below.<br><br> Data last updated on <span data-timestamp=\"NISVaccinationsIntent7b:Data_as_of\"></span> and presented through <span data-timestamp=\"NISVaccinationsIntent7b:Data_Presented_Through\"></span>. <a href=\"https://data.cdc.gov/Vaccinations/Weekly-Respiratory-Virus-Vaccination-Data-Children/5c6r-xi2t\">View this dataset</a> on data.CDC.gov.</p></div>",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "data": [
+    {
+      "week_end": "2024-08-24",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "36.9",
+      "Probably or definitely will not get a vaccine": "31.5",
+      "Probably will get a vaccine or are unsure": "28.9",
+      "Received vaccine": "2.7"
+    },
+    {
+      "week_end": "2024-08-24",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "11.9",
+      "Probably or definitely will not get a vaccine": "19.8",
+      "Probably will get a vaccine or are unsure": "39.5",
+      "Received vaccine": "28.8"
+    },
+    {
+      "week_end": "2024-08-31",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "36.4",
+      "Probably or definitely will not get a vaccine": "33.0",
+      "Probably will get a vaccine or are unsure": "27.5",
+      "Received vaccine": "3.1"
+    },
+    {
+      "week_end": "2024-08-31",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "10.3",
+      "Probably or definitely will not get a vaccine": "20.9",
+      "Probably will get a vaccine or are unsure": "39.9",
+      "Received vaccine": "28.9"
+    },
+    {
+      "week_end": "2024-09-07",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "23.9",
+      "Probably or definitely will not get a vaccine": "44.4",
+      "Probably will get a vaccine or are unsure": "29.7",
+      "Received vaccine": "2.0"
+    },
+    {
+      "week_end": "2024-09-07",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "36.7",
+      "Probably or definitely will not get a vaccine": "31.8",
+      "Probably will get a vaccine or are unsure": "27.0",
+      "Received vaccine": "4.5"
+    },
+    {
+      "week_end": "2024-09-07",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "12.8",
+      "Probably or definitely will not get a vaccine": "17.7",
+      "Probably will get a vaccine or are unsure": "40.6",
+      "Received vaccine": "28.9"
+    },
+    {
+      "week_end": "2024-09-14",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "23.1",
+      "Probably or definitely will not get a vaccine": "41.7",
+      "Probably will get a vaccine or are unsure": "31.8",
+      "Received vaccine": "3.4"
+    },
+    {
+      "week_end": "2024-09-14",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "34.9",
+      "Probably or definitely will not get a vaccine": "30.5",
+      "Probably will get a vaccine or are unsure": "27.9",
+      "Received vaccine": "6.6"
+    },
+    {
+      "week_end": "2024-09-14",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "12.8",
+      "Probably or definitely will not get a vaccine": "20.7",
+      "Probably will get a vaccine or are unsure": "37.3",
+      "Received vaccine": "29.1"
+    },
+    {
+      "week_end": "2024-09-21",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "23.3",
+      "Probably or definitely will not get a vaccine": "42.5",
+      "Probably will get a vaccine or are unsure": "29.3",
+      "Received vaccine": "5.0"
+    },
+    {
+      "week_end": "2024-09-21",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "33.1",
+      "Probably or definitely will not get a vaccine": "30.9",
+      "Probably will get a vaccine or are unsure": "26.5",
+      "Received vaccine": "9.5"
+    },
+    {
+      "week_end": "2024-09-21",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "15.3",
+      "Probably or definitely will not get a vaccine": "21.2",
+      "Probably will get a vaccine or are unsure": "33.8",
+      "Received vaccine": "29.8"
+    },
+    {
+      "week_end": "2024-09-28",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "20.9",
+      "Probably or definitely will not get a vaccine": "42.7",
+      "Probably will get a vaccine or are unsure": "29.9",
+      "Received vaccine": "6.5"
+    },
+    {
+      "week_end": "2024-09-28",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "31.1",
+      "Probably or definitely will not get a vaccine": "32.5",
+      "Probably will get a vaccine or are unsure": "24.9",
+      "Received vaccine": "11.6"
+    },
+    {
+      "week_end": "2024-09-28",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "13.4",
+      "Probably or definitely will not get a vaccine": "19.5",
+      "Probably will get a vaccine or are unsure": "37.2",
+      "Received vaccine": "29.9"
+    },
+    {
+      "week_end": "2024-10-05",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "17.0",
+      "Probably or definitely will not get a vaccine": "48.9",
+      "Probably will get a vaccine or are unsure": "30.5",
+      "Received vaccine": "3.5"
+    },
+    {
+      "week_end": "2024-10-05",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "21.3",
+      "Probably or definitely will not get a vaccine": "39.2",
+      "Probably will get a vaccine or are unsure": "31.6",
+      "Received vaccine": "7.9"
+    },
+    {
+      "week_end": "2024-10-05",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "28.7",
+      "Probably or definitely will not get a vaccine": "32.0",
+      "Probably will get a vaccine or are unsure": "23.2",
+      "Received vaccine": "16.1"
+    },
+    {
+      "week_end": "2024-10-05",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "32.2",
+      "Probably or definitely will not get a vaccine": "30.8",
+      "Probably will get a vaccine or are unsure": "19.3",
+      "Received vaccine": "17.7"
+    },
+    {
+      "week_end": "2024-10-05",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "14.7",
+      "Probably or definitely will not get a vaccine": "14.4",
+      "Probably will get a vaccine or are unsure": "37.8",
+      "Received vaccine": "33.2"
+    },
+    {
+      "week_end": "2024-10-12",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "19.9",
+      "Probably or definitely will not get a vaccine": "41.3",
+      "Probably will get a vaccine or are unsure": "29.1",
+      "Received vaccine": "9.7"
+    },
+    {
+      "week_end": "2024-10-12",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "14.1",
+      "Probably or definitely will not get a vaccine": "47.5",
+      "Probably will get a vaccine or are unsure": "34.3",
+      "Received vaccine": "4.1"
+    },
+    {
+      "week_end": "2024-10-12",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "29.2",
+      "Probably or definitely will not get a vaccine": "30.4",
+      "Probably will get a vaccine or are unsure": "19.9",
+      "Received vaccine": "20.5"
+    },
+    {
+      "week_end": "2024-10-12",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "26.9",
+      "Probably or definitely will not get a vaccine": "31.7",
+      "Probably will get a vaccine or are unsure": "22.3",
+      "Received vaccine": "19.1"
+    },
+    {
+      "week_end": "2024-10-12",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "16.0",
+      "Probably or definitely will not get a vaccine": "17.3",
+      "Probably will get a vaccine or are unsure": "32.8",
+      "Received vaccine": "33.9"
+    },
+    {
+      "week_end": "2024-10-19",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "13.7",
+      "Probably or definitely will not get a vaccine": "48.8",
+      "Probably will get a vaccine or are unsure": "32.1",
+      "Received vaccine": "5.4"
+    },
+    {
+      "week_end": "2024-10-19",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "15.9",
+      "Probably or definitely will not get a vaccine": "45.0",
+      "Probably will get a vaccine or are unsure": "27.7",
+      "Received vaccine": "11.4"
+    },
+    {
+      "week_end": "2024-10-19",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "22.5",
+      "Probably or definitely will not get a vaccine": "32.8",
+      "Probably will get a vaccine or are unsure": "22.1",
+      "Received vaccine": "22.6"
+    },
+    {
+      "week_end": "2024-10-19",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "24.2",
+      "Probably or definitely will not get a vaccine": "33.7",
+      "Probably will get a vaccine or are unsure": "18.5",
+      "Received vaccine": "23.6"
+    },
+    {
+      "week_end": "2024-10-19",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "9.6",
+      "Probably or definitely will not get a vaccine": "21.4",
+      "Probably will get a vaccine or are unsure": "33.9",
+      "Received vaccine": "35.1"
+    },
+    {
+      "week_end": "2024-10-26",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "13.4",
+      "Probably or definitely will not get a vaccine": "50.1",
+      "Probably will get a vaccine or are unsure": "30.6",
+      "Received vaccine": "5.9"
+    },
+    {
+      "week_end": "2024-10-26",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "14.2",
+      "Probably or definitely will not get a vaccine": "44.3",
+      "Probably will get a vaccine or are unsure": "28.9",
+      "Received vaccine": "12.7"
+    },
+    {
+      "week_end": "2024-10-26",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "25.5",
+      "Probably or definitely will not get a vaccine": "30.8",
+      "Probably will get a vaccine or are unsure": "17.9",
+      "Received vaccine": "25.8"
+    },
+    {
+      "week_end": "2024-10-26",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "19.2",
+      "Probably or definitely will not get a vaccine": "31.4",
+      "Probably will get a vaccine or are unsure": "23.8",
+      "Received vaccine": "25.5"
+    },
+    {
+      "week_end": "2024-10-26",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "9.2",
+      "Probably or definitely will not get a vaccine": "17.3",
+      "Probably will get a vaccine or are unsure": "38.0",
+      "Received vaccine": "35.5"
+    },
+    {
+      "week_end": "2024-11-02",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "14.7",
+      "Probably or definitely will not get a vaccine": "42.8",
+      "Probably will get a vaccine or are unsure": "27.5",
+      "Received vaccine": "14.9"
+    },
+    {
+      "week_end": "2024-11-02",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "12.1",
+      "Probably or definitely will not get a vaccine": "47.7",
+      "Probably will get a vaccine or are unsure": "32.5",
+      "Received vaccine": "7.7"
+    },
+    {
+      "week_end": "2024-11-02",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "20.4",
+      "Probably or definitely will not get a vaccine": "31.5",
+      "Probably will get a vaccine or are unsure": "16.9",
+      "Received vaccine": "31.2"
+    },
+    {
+      "week_end": "2024-11-02",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "16.4",
+      "Probably or definitely will not get a vaccine": "32.2",
+      "Probably will get a vaccine or are unsure": "20.7",
+      "Received vaccine": "30.7"
+    },
+    {
+      "week_end": "2024-11-02",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "7.2",
+      "Probably or definitely will not get a vaccine": "19.3",
+      "Probably will get a vaccine or are unsure": "34.2",
+      "Received vaccine": "39.3"
+    },
+    {
+      "week_end": "2024-11-09",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "13.8",
+      "Probably or definitely will not get a vaccine": "42.6",
+      "Probably will get a vaccine or are unsure": "27.7",
+      "Received vaccine": "15.9"
+    },
+    {
+      "week_end": "2024-11-09",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "10.6",
+      "Probably or definitely will not get a vaccine": "47.8",
+      "Probably will get a vaccine or are unsure": "33.2",
+      "Received vaccine": "8.4"
+    },
+    {
+      "week_end": "2024-11-09",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "14.9",
+      "Probably or definitely will not get a vaccine": "31.0",
+      "Probably will get a vaccine or are unsure": "21.0",
+      "Received vaccine": "33.0"
+    },
+    {
+      "week_end": "2024-11-09",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "18.0",
+      "Probably or definitely will not get a vaccine": "31.5",
+      "Probably will get a vaccine or are unsure": "17.8",
+      "Received vaccine": "32.7"
+    },
+    {
+      "week_end": "2024-11-09",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "7.3",
+      "Probably or definitely will not get a vaccine": "20.4",
+      "Probably will get a vaccine or are unsure": "32.9",
+      "Received vaccine": "39.5"
+    },
+    {
+      "week_end": "2024-11-16",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "11.9",
+      "Probably or definitely will not get a vaccine": "54.2",
+      "Probably will get a vaccine or are unsure": "25.1",
+      "Received vaccine": "8.8"
+    },
+    {
+      "week_end": "2024-11-16",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "12.1",
+      "Probably or definitely will not get a vaccine": "45.3",
+      "Probably will get a vaccine or are unsure": "25.9",
+      "Received vaccine": "16.7"
+    },
+    {
+      "week_end": "2024-11-16",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "13.4",
+      "Probably or definitely will not get a vaccine": "32.6",
+      "Probably will get a vaccine or are unsure": "19.5",
+      "Received vaccine": "34.5"
+    },
+    {
+      "week_end": "2024-11-16",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "16.0",
+      "Probably or definitely will not get a vaccine": "34.7",
+      "Probably will get a vaccine or are unsure": "14.8",
+      "Received vaccine": "34.5"
+    },
+    {
+      "week_end": "2024-11-16",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "6.1",
+      "Probably or definitely will not get a vaccine": "25.2",
+      "Probably will get a vaccine or are unsure": "29.1",
+      "Received vaccine": "39.6"
+    },
+    {
+      "week_end": "2024-11-23",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "9.2",
+      "Probably or definitely will not get a vaccine": "52.3",
+      "Probably will get a vaccine or are unsure": "29.2",
+      "Received vaccine": "9.4"
+    },
+    {
+      "week_end": "2024-11-23",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "11.3",
+      "Probably or definitely will not get a vaccine": "45.5",
+      "Probably will get a vaccine or are unsure": "25.4",
+      "Received vaccine": "17.8"
+    },
+    {
+      "week_end": "2024-11-23",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "11.5",
+      "Probably or definitely will not get a vaccine": "33.6",
+      "Probably will get a vaccine or are unsure": "18.8",
+      "Received vaccine": "36.1"
+    },
+    {
+      "week_end": "2024-11-23",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "15.3",
+      "Probably or definitely will not get a vaccine": "34.6",
+      "Probably will get a vaccine or are unsure": "14.3",
+      "Received vaccine": "35.8"
+    },
+    {
+      "week_end": "2024-11-23",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "7.2",
+      "Probably or definitely will not get a vaccine": "24.0",
+      "Probably will get a vaccine or are unsure": "28.3",
+      "Received vaccine": "40.5"
+    },
+    {
+      "week_end": "2024-11-30",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "9.8",
+      "Probably or definitely will not get a vaccine": "47.6",
+      "Probably will get a vaccine or are unsure": "24.5",
+      "Received vaccine": "18.1"
+    },
+    {
+      "week_end": "2024-11-30",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "8.2",
+      "Probably or definitely will not get a vaccine": "51.6",
+      "Probably will get a vaccine or are unsure": "30.6",
+      "Received vaccine": "9.6"
+    },
+    {
+      "week_end": "2024-11-30",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "10.2",
+      "Probably or definitely will not get a vaccine": "39.0",
+      "Probably will get a vaccine or are unsure": "14.1",
+      "Received vaccine": "36.7"
+    },
+    {
+      "week_end": "2024-11-30",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "11.3",
+      "Probably or definitely will not get a vaccine": "33.4",
+      "Probably will get a vaccine or are unsure": "18.6",
+      "Received vaccine": "36.7"
+    },
+    {
+      "week_end": "2024-11-30",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "8.0",
+      "Probably or definitely will not get a vaccine": "16.7",
+      "Probably will get a vaccine or are unsure": "33.4",
+      "Received vaccine": "41.8"
+    },
+    {
+      "week_end": "2024-12-07",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "9.7",
+      "Probably or definitely will not get a vaccine": "45.0",
+      "Probably will get a vaccine or are unsure": "26.1",
+      "Received vaccine": "19.1"
+    },
+    {
+      "week_end": "2024-12-07",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "9.4",
+      "Probably or definitely will not get a vaccine": "52.4",
+      "Probably will get a vaccine or are unsure": "28.0",
+      "Received vaccine": "10.1"
+    },
+    {
+      "week_end": "2024-12-07",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "9.5",
+      "Probably or definitely will not get a vaccine": "31.8",
+      "Probably will get a vaccine or are unsure": "19.5",
+      "Received vaccine": "39.2"
+    },
+    {
+      "week_end": "2024-12-07",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "9.0",
+      "Probably or definitely will not get a vaccine": "36.5",
+      "Probably will get a vaccine or are unsure": "13.6",
+      "Received vaccine": "40.8"
+    },
+    {
+      "week_end": "2024-12-07",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "7.3",
+      "Probably or definitely will not get a vaccine": "24.8",
+      "Probably will get a vaccine or are unsure": "25.0",
+      "Received vaccine": "42.9"
+    },
+    {
+      "week_end": "2024-12-14",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "8.5",
+      "Probably or definitely will not get a vaccine": "53.8",
+      "Probably will get a vaccine or are unsure": "27.4",
+      "Received vaccine": "10.3"
+    },
+    {
+      "week_end": "2024-12-14",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "9.9",
+      "Probably or definitely will not get a vaccine": "45.1",
+      "Probably will get a vaccine or are unsure": "25.4",
+      "Received vaccine": "19.6"
+    },
+    {
+      "week_end": "2024-12-14",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "8.7",
+      "Probably or definitely will not get a vaccine": "35.3",
+      "Probably will get a vaccine or are unsure": "14.5",
+      "Received vaccine": "41.5"
+    },
+    {
+      "week_end": "2024-12-14",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "7.9",
+      "Probably or definitely will not get a vaccine": "33.1",
+      "Probably will get a vaccine or are unsure": "18.6",
+      "Received vaccine": "40.4"
+    },
+    {
+      "week_end": "2024-12-14",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "6.9",
+      "Probably or definitely will not get a vaccine": "24.6",
+      "Probably will get a vaccine or are unsure": "25.6",
+      "Received vaccine": "42.9"
+    },
+    {
+      "week_end": "2024-12-21",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "8.2",
+      "Probably or definitely will not get a vaccine": "53.0",
+      "Probably will get a vaccine or are unsure": "28.2",
+      "Received vaccine": "10.6"
+    },
+    {
+      "week_end": "2024-12-21",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "9.0",
+      "Probably or definitely will not get a vaccine": "46.4",
+      "Probably will get a vaccine or are unsure": "24.5",
+      "Received vaccine": "20.1"
+    },
+    {
+      "week_end": "2024-12-21",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "9.0",
+      "Probably or definitely will not get a vaccine": "35.9",
+      "Probably will get a vaccine or are unsure": "13.2",
+      "Received vaccine": "42.0"
+    },
+    {
+      "week_end": "2024-12-21",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "7.6",
+      "Probably or definitely will not get a vaccine": "33.0",
+      "Probably will get a vaccine or are unsure": "18.2",
+      "Received vaccine": "41.2"
+    },
+    {
+      "week_end": "2024-12-21",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "9.1",
+      "Probably or definitely will not get a vaccine": "18.8",
+      "Probably will get a vaccine or are unsure": "28.8",
+      "Received vaccine": "43.3"
+    },
+    {
+      "week_end": "2024-12-28",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "9.3",
+      "Probably or definitely will not get a vaccine": "42.9",
+      "Probably will get a vaccine or are unsure": "27.5",
+      "Received vaccine": "20.2"
+    },
+    {
+      "week_end": "2024-12-28",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "8.6",
+      "Probably or definitely will not get a vaccine": "53.4",
+      "Probably will get a vaccine or are unsure": "27.2",
+      "Received vaccine": "10.8"
+    },
+    {
+      "week_end": "2024-12-28",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "6.1",
+      "Probably or definitely will not get a vaccine": "38.8",
+      "Probably will get a vaccine or are unsure": "13.0",
+      "Received vaccine": "42.1"
+    },
+    {
+      "week_end": "2024-12-28",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "6.5",
+      "Probably or definitely will not get a vaccine": "32.2",
+      "Probably will get a vaccine or are unsure": "19.7",
+      "Received vaccine": "41.6"
+    },
+    {
+      "week_end": "2024-12-28",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "7.6",
+      "Probably or definitely will not get a vaccine": "16.7",
+      "Probably will get a vaccine or are unsure": "32.4",
+      "Received vaccine": "43.3"
+    },
+    {
+      "week_end": "2025-01-04",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "7.2",
+      "Probably or definitely will not get a vaccine": "49.7",
+      "Probably will get a vaccine or are unsure": "32.0",
+      "Received vaccine": "11.2"
+    },
+    {
+      "week_end": "2025-01-04",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "10.5",
+      "Probably or definitely will not get a vaccine": "44.1",
+      "Probably will get a vaccine or are unsure": "24.7",
+      "Received vaccine": "20.6"
+    },
+    {
+      "week_end": "2025-01-04",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "7.1",
+      "Probably or definitely will not get a vaccine": "36.9",
+      "Probably will get a vaccine or are unsure": "12.6",
+      "Received vaccine": "43.5"
+    },
+    {
+      "week_end": "2025-01-04",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "7.7",
+      "Probably or definitely will not get a vaccine": "32.8",
+      "Probably will get a vaccine or are unsure": "17.9",
+      "Received vaccine": "41.6"
+    },
+    {
+      "week_end": "2025-01-04",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "11.0",
+      "Probably or definitely will not get a vaccine": "18.1",
+      "Probably will get a vaccine or are unsure": "26.7",
+      "Received vaccine": "44.2"
+    },
+    {
+      "week_end": "2025-01-11",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "10.0",
+      "Probably or definitely will not get a vaccine": "44.4",
+      "Probably will get a vaccine or are unsure": "24.5",
+      "Received vaccine": "21.1"
+    },
+    {
+      "week_end": "2025-01-11",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "7.5",
+      "Probably or definitely will not get a vaccine": "52.1",
+      "Probably will get a vaccine or are unsure": "29.0",
+      "Received vaccine": "11.3"
+    },
+    {
+      "week_end": "2025-01-11",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "6.5",
+      "Probably or definitely will not get a vaccine": "34.1",
+      "Probably will get a vaccine or are unsure": "17.0",
+      "Received vaccine": "42.4"
+    },
+    {
+      "week_end": "2025-01-11",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "6.7",
+      "Probably or definitely will not get a vaccine": "35.8",
+      "Probably will get a vaccine or are unsure": "13.7",
+      "Received vaccine": "43.7"
+    },
+    {
+      "week_end": "2025-01-11",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "5.5",
+      "Probably or definitely will not get a vaccine": "20.7",
+      "Probably will get a vaccine or are unsure": "29.5",
+      "Received vaccine": "44.3"
+    },
+    {
+      "week_end": "2025-01-18",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "9.2",
+      "Probably or definitely will not get a vaccine": "43.9",
+      "Probably will get a vaccine or are unsure": "25.8",
+      "Received vaccine": "21.1"
+    },
+    {
+      "week_end": "2025-01-18",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "7.7",
+      "Probably or definitely will not get a vaccine": "52.6",
+      "Probably will get a vaccine or are unsure": "28.4",
+      "Received vaccine": "11.4"
+    },
+    {
+      "week_end": "2025-01-18",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "5.3",
+      "Probably or definitely will not get a vaccine": "36.9",
+      "Probably will get a vaccine or are unsure": "13.4",
+      "Received vaccine": "44.4"
+    },
+    {
+      "week_end": "2025-01-18",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "5.7",
+      "Probably or definitely will not get a vaccine": "32.8",
+      "Probably will get a vaccine or are unsure": "18.6",
+      "Received vaccine": "42.9"
+    },
+    {
+      "week_end": "2025-01-18",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "11.2",
+      "Probably or definitely will not get a vaccine": "17.5",
+      "Probably will get a vaccine or are unsure": "26.9",
+      "Received vaccine": "44.4"
+    },
+    {
+      "week_end": "2025-01-25",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "9.4",
+      "Probably or definitely will not get a vaccine": "43.8",
+      "Probably will get a vaccine or are unsure": "25.6",
+      "Received vaccine": "21.2"
+    },
+    {
+      "week_end": "2025-01-25",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "7.8",
+      "Probably or definitely will not get a vaccine": "51.0",
+      "Probably will get a vaccine or are unsure": "29.8",
+      "Received vaccine": "11.5"
+    },
+    {
+      "week_end": "2025-01-25",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "5.1",
+      "Probably or definitely will not get a vaccine": "35.7",
+      "Probably will get a vaccine or are unsure": "16.1",
+      "Received vaccine": "43.1"
+    },
+    {
+      "week_end": "2025-01-25",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "5.9",
+      "Probably or definitely will not get a vaccine": "36.1",
+      "Probably will get a vaccine or are unsure": "13.4",
+      "Received vaccine": "44.6"
+    },
+    {
+      "week_end": "2025-01-25",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "4.8",
+      "Probably or definitely will not get a vaccine": "20.4",
+      "Probably will get a vaccine or are unsure": "30.1",
+      "Received vaccine": "44.7"
+    },
+    {
+      "week_end": "2025-02-01",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "8.2",
+      "Probably or definitely will not get a vaccine": "51.9",
+      "Probably will get a vaccine or are unsure": "28.0",
+      "Received vaccine": "11.9"
+    },
+    {
+      "week_end": "2025-02-01",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "8.6",
+      "Probably or definitely will not get a vaccine": "43.4",
+      "Probably will get a vaccine or are unsure": "26.4",
+      "Received vaccine": "21.5"
+    },
+    {
+      "week_end": "2025-02-01",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "3.9",
+      "Probably or definitely will not get a vaccine": "39.5",
+      "Probably will get a vaccine or are unsure": "10.7",
+      "Received vaccine": "45.9"
+    },
+    {
+      "week_end": "2025-02-01",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "4.6",
+      "Probably or definitely will not get a vaccine": "34.7",
+      "Probably will get a vaccine or are unsure": "16.8",
+      "Received vaccine": "43.9"
+    },
+    {
+      "week_end": "2025-02-01",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "5.4",
+      "Probably or definitely will not get a vaccine": "21.8",
+      "Probably will get a vaccine or are unsure": "27.3",
+      "Received vaccine": "45.6"
+    },
+    {
+      "week_end": "2025-02-08",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "6.3",
+      "Probably or definitely will not get a vaccine": "56.4",
+      "Probably will get a vaccine or are unsure": "25.4",
+      "Received vaccine": "11.9"
+    },
+    {
+      "week_end": "2025-02-08",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "8.3",
+      "Probably or definitely will not get a vaccine": "45.7",
+      "Probably will get a vaccine or are unsure": "24.2",
+      "Received vaccine": "21.8"
+    },
+    {
+      "week_end": "2025-02-08",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "3.5",
+      "Probably or definitely will not get a vaccine": "40.8",
+      "Probably will get a vaccine or are unsure": "9.7",
+      "Received vaccine": "46.0"
+    },
+    {
+      "week_end": "2025-02-08",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "5.1",
+      "Probably or definitely will not get a vaccine": "35.7",
+      "Probably will get a vaccine or are unsure": "15.0",
+      "Received vaccine": "44.2"
+    },
+    {
+      "week_end": "2025-02-08",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "11.0",
+      "Probably or definitely will not get a vaccine": "20.0",
+      "Probably will get a vaccine or are unsure": "23.3",
+      "Received vaccine": "45.6"
+    },
+    {
+      "week_end": "2025-02-15",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "8.2",
+      "Probably or definitely will not get a vaccine": "45.7",
+      "Probably will get a vaccine or are unsure": "24.1",
+      "Received vaccine": "22.0"
+    },
+    {
+      "week_end": "2025-02-15",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "7.3",
+      "Probably or definitely will not get a vaccine": "55.1",
+      "Probably will get a vaccine or are unsure": "25.7",
+      "Received vaccine": "11.9"
+    },
+    {
+      "week_end": "2025-02-15",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "4.4",
+      "Probably or definitely will not get a vaccine": "36.0",
+      "Probably will get a vaccine or are unsure": "15.0",
+      "Received vaccine": "44.6"
+    },
+    {
+      "week_end": "2025-02-15",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "4.0",
+      "Probably or definitely will not get a vaccine": "41.3",
+      "Probably will get a vaccine or are unsure": "8.6",
+      "Received vaccine": "46.1"
+    },
+    {
+      "week_end": "2025-02-15",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "11.9",
+      "Probably or definitely will not get a vaccine": "20.1",
+      "Probably will get a vaccine or are unsure": "21.8",
+      "Received vaccine": "46.2"
+    },
+    {
+      "week_end": "2025-02-22",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "8.4",
+      "Probably or definitely will not get a vaccine": "43.1",
+      "Probably will get a vaccine or are unsure": "26.4",
+      "Received vaccine": "22.1"
+    },
+    {
+      "week_end": "2025-02-22",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "7.3",
+      "Probably or definitely will not get a vaccine": "54.5",
+      "Probably will get a vaccine or are unsure": "26.4",
+      "Received vaccine": "11.9"
+    },
+    {
+      "week_end": "2025-02-22",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "5.1",
+      "Probably or definitely will not get a vaccine": "34.4",
+      "Probably will get a vaccine or are unsure": "15.7",
+      "Received vaccine": "44.8"
+    },
+    {
+      "week_end": "2025-02-22",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "3.8",
+      "Probably or definitely will not get a vaccine": "42.0",
+      "Probably will get a vaccine or are unsure": "8.0",
+      "Received vaccine": "46.3"
+    },
+    {
+      "week_end": "2025-02-22",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "7.1",
+      "Probably or definitely will not get a vaccine": "15.7",
+      "Probably will get a vaccine or are unsure": "30.8",
+      "Received vaccine": "46.4"
+    },
+    {
+      "week_end": "2025-03-01",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "6.0",
+      "Probably or definitely will not get a vaccine": "51.8",
+      "Probably will get a vaccine or are unsure": "29.6",
+      "Received vaccine": "12.6"
+    },
+    {
+      "week_end": "2025-03-01",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "8.7",
+      "Probably or definitely will not get a vaccine": "43.8",
+      "Probably will get a vaccine or are unsure": "25.2",
+      "Received vaccine": "22.3"
+    },
+    {
+      "week_end": "2025-03-01",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "4.7",
+      "Probably or definitely will not get a vaccine": "35.2",
+      "Probably will get a vaccine or are unsure": "14.7",
+      "Received vaccine": "45.4"
+    },
+    {
+      "week_end": "2025-03-01",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "3.2",
+      "Probably or definitely will not get a vaccine": "39.1",
+      "Probably will get a vaccine or are unsure": "10.1",
+      "Received vaccine": "47.6"
+    },
+    {
+      "week_end": "2025-03-01",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "7.9",
+      "Probably or definitely will not get a vaccine": "21.7",
+      "Probably will get a vaccine or are unsure": "23.4",
+      "Received vaccine": "47.0"
+    },
+    {
+      "week_end": "2025-03-08",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "8.6",
+      "Probably or definitely will not get a vaccine": "44.3",
+      "Probably will get a vaccine or are unsure": "24.7",
+      "Received vaccine": "22.4"
+    },
+    {
+      "week_end": "2025-03-08",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "6.8",
+      "Probably or definitely will not get a vaccine": "51.0",
+      "Probably will get a vaccine or are unsure": "29.5",
+      "Received vaccine": "12.6"
+    },
+    {
+      "week_end": "2025-03-08",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "3.2",
+      "Probably or definitely will not get a vaccine": "35.5",
+      "Probably will get a vaccine or are unsure": "15.6",
+      "Received vaccine": "45.7"
+    },
+    {
+      "week_end": "2025-03-08",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "4.0",
+      "Probably or definitely will not get a vaccine": "40.3",
+      "Probably will get a vaccine or are unsure": "8.0",
+      "Received vaccine": "47.7"
+    },
+    {
+      "week_end": "2025-03-08",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "6.3",
+      "Probably or definitely will not get a vaccine": "19.7",
+      "Probably will get a vaccine or are unsure": "26.9",
+      "Received vaccine": "47.1"
+    },
+    {
+      "week_end": "2025-03-15",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "7.9",
+      "Probably or definitely will not get a vaccine": "43.4",
+      "Probably will get a vaccine or are unsure": "26.3",
+      "Received vaccine": "22.5"
+    },
+    {
+      "week_end": "2025-03-15",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "6.9",
+      "Probably or definitely will not get a vaccine": "51.0",
+      "Probably will get a vaccine or are unsure": "29.5",
+      "Received vaccine": "12.6"
+    },
+    {
+      "week_end": "2025-03-15",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "4.1",
+      "Probably or definitely will not get a vaccine": "35.5",
+      "Probably will get a vaccine or are unsure": "14.6",
+      "Received vaccine": "45.8"
+    },
+    {
+      "week_end": "2025-03-15",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "3.4",
+      "Probably or definitely will not get a vaccine": "42.0",
+      "Probably will get a vaccine or are unsure": "6.8",
+      "Received vaccine": "47.7"
+    },
+    {
+      "week_end": "2025-03-15",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "4.7",
+      "Probably or definitely will not get a vaccine": "19.0",
+      "Probably will get a vaccine or are unsure": "29.2",
+      "Received vaccine": "47.1"
+    },
+    {
+      "week_end": "2025-03-22",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "6.9",
+      "Probably or definitely will not get a vaccine": "52.2",
+      "Probably will get a vaccine or are unsure": "28.2",
+      "Received vaccine": "12.7"
+    },
+    {
+      "week_end": "2025-03-22",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "6.9",
+      "Probably or definitely will not get a vaccine": "44.5",
+      "Probably will get a vaccine or are unsure": "26.0",
+      "Received vaccine": "22.6"
+    },
+    {
+      "week_end": "2025-03-22",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "3.0",
+      "Probably or definitely will not get a vaccine": "35.8",
+      "Probably will get a vaccine or are unsure": "15.4",
+      "Received vaccine": "45.8"
+    },
+    {
+      "week_end": "2025-03-22",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "2.9",
+      "Probably or definitely will not get a vaccine": "41.1",
+      "Probably will get a vaccine or are unsure": "8.1",
+      "Received vaccine": "47.8"
+    },
+    {
+      "week_end": "2025-03-22",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "4.9",
+      "Probably or definitely will not get a vaccine": "20.4",
+      "Probably will get a vaccine or are unsure": "27.6",
+      "Received vaccine": "47.1"
+    },
+    {
+      "week_end": "2025-03-29",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "5.9",
+      "Probably or definitely will not get a vaccine": "53.7",
+      "Probably will get a vaccine or are unsure": "27.7",
+      "Received vaccine": "12.7"
+    },
+    {
+      "week_end": "2025-03-29",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "3.1",
+      "Probably or definitely will not get a vaccine": "41.4",
+      "Probably will get a vaccine or are unsure": "7.6",
+      "Received vaccine": "47.9"
+    },
+    {
+      "week_end": "2025-03-29",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "7.4",
+      "Probably or definitely will not get a vaccine": "45.3",
+      "Probably will get a vaccine or are unsure": "24.6",
+      "Received vaccine": "22.7"
+    },
+    {
+      "week_end": "2025-03-29",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "3.7",
+      "Probably or definitely will not get a vaccine": "36.0",
+      "Probably will get a vaccine or are unsure": "14.5",
+      "Received vaccine": "45.9"
+    },
+    {
+      "week_end": "2025-03-29",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "4.9",
+      "Probably or definitely will not get a vaccine": "24.4",
+      "Probably will get a vaccine or are unsure": "23.5",
+      "Received vaccine": "47.1"
+    },
+    {
+      "week_end": "2025-04-05",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "6.6",
+      "Probably or definitely will not get a vaccine": "52.3",
+      "Probably will get a vaccine or are unsure": "28.3",
+      "Received vaccine": "12.9"
+    },
+    {
+      "week_end": "2025-04-05",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "7.7",
+      "Probably or definitely will not get a vaccine": "44.9",
+      "Probably will get a vaccine or are unsure": "24.5",
+      "Received vaccine": "22.9"
+    },
+    {
+      "week_end": "2025-04-05",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "2.3",
+      "Probably or definitely will not get a vaccine": "41.5",
+      "Probably will get a vaccine or are unsure": "7.0",
+      "Received vaccine": "49.1"
+    },
+    {
+      "week_end": "2025-04-05",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "3.5",
+      "Probably or definitely will not get a vaccine": "35.9",
+      "Probably will get a vaccine or are unsure": "14.0",
+      "Received vaccine": "46.7"
+    },
+    {
+      "week_end": "2025-04-05",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "7.8",
+      "Probably or definitely will not get a vaccine": "15.5",
+      "Probably will get a vaccine or are unsure": "29.3",
+      "Received vaccine": "47.4"
+    },
+    {
+      "week_end": "2025-04-12",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "8.0",
+      "Probably or definitely will not get a vaccine": "43.4",
+      "Probably will get a vaccine or are unsure": "25.7",
+      "Received vaccine": "22.9"
+    },
+    {
+      "week_end": "2025-04-12",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "6.8",
+      "Probably or definitely will not get a vaccine": "52.2",
+      "Probably will get a vaccine or are unsure": "28.1",
+      "Received vaccine": "12.9"
+    },
+    {
+      "week_end": "2025-04-12",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "3.1",
+      "Probably or definitely will not get a vaccine": "35.8",
+      "Probably will get a vaccine or are unsure": "14.5",
+      "Received vaccine": "46.7"
+    },
+    {
+      "week_end": "2025-04-12",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "3.0",
+      "Probably or definitely will not get a vaccine": "41.5",
+      "Probably will get a vaccine or are unsure": "6.4",
+      "Received vaccine": "49.2"
+    },
+    {
+      "week_end": "2025-04-12",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "6.6",
+      "Probably or definitely will not get a vaccine": "19.4",
+      "Probably will get a vaccine or are unsure": "26.5",
+      "Received vaccine": "47.4"
+    },
+    {
+      "week_end": "2025-04-19",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "8.3",
+      "Probably or definitely will not get a vaccine": "41.8",
+      "Probably will get a vaccine or are unsure": "26.9",
+      "Received vaccine": "22.9"
+    },
+    {
+      "week_end": "2025-04-19",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "6.7",
+      "Probably or definitely will not get a vaccine": "53.7",
+      "Probably will get a vaccine or are unsure": "26.7",
+      "Received vaccine": "12.9"
+    },
+    {
+      "week_end": "2025-04-19",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "2.6",
+      "Probably or definitely will not get a vaccine": "37.0",
+      "Probably will get a vaccine or are unsure": "13.7",
+      "Received vaccine": "46.7"
+    },
+    {
+      "week_end": "2025-04-19",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "2.9",
+      "Probably or definitely will not get a vaccine": "41.4",
+      "Probably will get a vaccine or are unsure": "6.5",
+      "Received vaccine": "49.2"
+    },
+    {
+      "week_end": "2025-04-19",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "8.8",
+      "Probably or definitely will not get a vaccine": "23.6",
+      "Probably will get a vaccine or are unsure": "20.1",
+      "Received vaccine": "47.4"
+    },
+    {
+      "week_end": "2025-04-26",
+      "pathogen": "COVID-19",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "6.7",
+      "Probably or definitely will not get a vaccine": "51.8",
+      "Probably will get a vaccine or are unsure": "28.4",
+      "Received vaccine": "13.0"
+    },
+    {
+      "week_end": "2025-04-26",
+      "pathogen": "Influenza",
+      "demographic_group": "Children",
+      "Definitely will get a vaccine": "2.8",
+      "Probably or definitely will not get a vaccine": "40.1",
+      "Probably will get a vaccine or are unsure": "7.9",
+      "Received vaccine": "49.2"
+    },
+    {
+      "week_end": "2025-04-26",
+      "pathogen": "COVID-19",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "7.0",
+      "Probably or definitely will not get a vaccine": "45.1",
+      "Probably will get a vaccine or are unsure": "25.0",
+      "Received vaccine": "23.0"
+    },
+    {
+      "week_end": "2025-04-26",
+      "pathogen": "Influenza",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "3.0",
+      "Probably or definitely will not get a vaccine": "38.3",
+      "Probably will get a vaccine or are unsure": "12.0",
+      "Received vaccine": "46.7"
+    },
+    {
+      "week_end": "2025-04-26",
+      "pathogen": "RSV",
+      "demographic_group": "Adults",
+      "Definitely will get a vaccine": "8.0",
+      "Probably or definitely will not get a vaccine": "17.4",
+      "Probably will get a vaccine or are unsure": "27.1",
+      "Received vaccine": "47.5"
+    }
+  ]
+}
