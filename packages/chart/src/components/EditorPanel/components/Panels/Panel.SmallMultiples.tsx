@@ -388,27 +388,6 @@ const PanelSmallMultiples: FC<PanelProps> = props => {
                     </Tooltip>
                   }
                 />
-
-                <CheckBox
-                  value={config.smallMultiples?.hideLegend !== false}
-                  section='smallMultiples'
-                  fieldName='hideLegend'
-                  label='Hide Legend'
-                  updateField={updateField}
-                  tooltip={
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>
-                          When checked, the legend is hidden in small multiples mode. When unchecked, the main chart
-                          legend is displayed.
-                        </p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  }
-                />
               </>
             )}
           </AccordionItemPanel>
