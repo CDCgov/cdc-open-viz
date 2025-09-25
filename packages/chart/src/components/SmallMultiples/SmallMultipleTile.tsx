@@ -101,13 +101,20 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   // Small multiples-specific modifications
   tileConfig = {
     ...tileConfig,
+    xAxis: {
+      ...tileConfig.xAxis,
+      label: isFirstInRow ? tileConfig.xAxis?.label : undefined
+    },
     yAxis: {
       ...tileConfig.yAxis,
-      //inlineLabel: isFirstInRow ? tileConfig.yAxis?.inlineLabel : undefined,
       label: isFirstInRow ? tileConfig.yAxis?.label : undefined
     },
     runtime: {
       ...tileConfig.runtime,
+      xAxis: {
+        ...tileConfig.runtime?.xAxis,
+        label: isFirstInRow ? tileConfig.xAxis?.label : undefined
+      },
       yAxis: {
         ...tileConfig.runtime?.yAxis,
         label: isFirstInRow ? tileConfig.yAxis?.label : undefined
