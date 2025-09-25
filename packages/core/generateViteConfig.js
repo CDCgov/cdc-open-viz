@@ -58,13 +58,7 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
     plugins: [
       react(reactOptions),
       svgr({
-        svgrOptions: {
-          exportType: "default",
-          ref: true,
-          svgo: false,
-          titleProp: true
-        },
-        include: "**/*.svg"
+        exportAsDefault: true
       }),
       cssInjectedByJsPlugin(),
       dsv()

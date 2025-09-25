@@ -5,15 +5,7 @@ import svgr from 'vite-plugin-svgr'
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 
 export default defineConfig({
-  plugins: [react({ jsxRuntime: 'automatic' }), (svgr as any)({
-    svgrOptions: {
-      exportType: "default",
-      ref: true,
-      svgo: false,
-      titleProp: true
-    },
-    include: "**/*.svg"
-  })],
+  plugins: [react({ jsxRuntime: 'automatic' }), (svgr as any)({ exportAsDefault: true })],
   test: {
     environment: 'jsdom',
     globals: true,
