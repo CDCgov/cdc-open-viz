@@ -1,4 +1,4 @@
-import { ViewportSize } from '../types/ViewportSize'
+import { ViewportSize } from '@cdc/map/src/types/MapConfig'
 
 const BREAKPOINTS = ['xxs', 'xs', 'sm', 'md', 'lg']
 
