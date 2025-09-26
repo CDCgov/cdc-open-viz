@@ -51,13 +51,7 @@ const config: StorybookConfig = {
 
     // Common SVG configuration for both dev and build
     const svgrConfig = {
-      svgrOptions: {
-        exportType: 'default',
-        ref: true,
-        svgo: false,
-        titleProp: true
-      },
-      include: '**/*.svg'
+      exportAsDefault: true
     }
 
     if (configType === 'DEVELOPMENT') {

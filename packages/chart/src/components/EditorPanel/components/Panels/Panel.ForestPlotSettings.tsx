@@ -4,7 +4,7 @@ import { useContext, FC } from 'react'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import { Select, CheckBox, TextField } from '@cdc/core/components/EditorPanel/Inputs'
-import WarningImage from '../../../../images/warning.svg'
+import WarningImage from '../../../../images/warning.svg?react'
 
 // contexts
 import ConfigContext from '../../../../ConfigContext'
@@ -13,7 +13,12 @@ import ConfigContext from '../../../../ConfigContext'
 import { type ChartContext } from '../../../../types/ChartContext'
 import { type PanelProps } from '../PanelProps'
 
-import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
+import {
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemPanel,
+  AccordionItemButton
+} from 'react-accessible-accordion'
 
 const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
   const { config, rawData: unfilteredData, updateConfig } = useContext<ChartContext>(ConfigContext)
@@ -151,7 +156,9 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
       <AccordionItemHeading>
         <AccordionItemButton>
           {name}
-          {(!config.forestPlot.estimateField || !config.forestPlot.upper || !config.forestPlot.lower) && <WarningImage width='25' className='warning-icon' />}
+          {(!config.forestPlot.estimateField || !config.forestPlot.upper || !config.forestPlot.lower) && (
+            <WarningImage width='25' className='warning-icon' />
+          )}
         </AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
@@ -201,14 +208,22 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
               <Tooltip.Content>
                 <p>
                   Linear - Typically used for continuous outcomes. Line of no effect is positioned on 0 (zero) <br />
-                  <br /> Logarithmic - Typically used for binary outcomes such as risk ratios and odds ratios. Line of no effect is positioned on 1.
+                  <br /> Logarithmic - Typically used for binary outcomes such as risk ratios and odds ratios. Line of
+                  no effect is positioned on 1.
                 </p>
               </Tooltip.Content>
             </Tooltip>
           }
         />
 
-        <TextField type='text' value={config.forestPlot?.title || ''} updateField={updateField} section='forestPlot' fieldName='title' label='Plot Title' />
+        <TextField
+          type='text'
+          value={config.forestPlot?.title || ''}
+          updateField={updateField}
+          section='forestPlot'
+          fieldName='title'
+          label='Plot Title'
+        />
 
         <br />
         <hr />
@@ -317,7 +332,14 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
           </span>
         </label>
 
-        <CheckBox value={config.forestPlot?.lineOfNoEffect?.show || false} section='forestPlot' subsection='lineOfNoEffect' fieldName='show' label='Show Line of No Effect' updateField={updateField} />
+        <CheckBox
+          value={config.forestPlot?.lineOfNoEffect?.show || false}
+          section='forestPlot'
+          subsection='lineOfNoEffect'
+          fieldName='show'
+          label='Show Line of No Effect'
+          updateField={updateField}
+        />
 
         <br />
         <hr />
@@ -400,13 +422,37 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
           />
         </label>
 
-        <TextField type='number' min={20} max={45} value={config.forestPlot.rowHeight ? config.forestPlot.rowHeight : 10} updateField={updateField} section='forestPlot' fieldName='rowHeight' label='Row Height' placeholder='10' />
+        <TextField
+          type='number'
+          min={20}
+          max={45}
+          value={config.forestPlot.rowHeight ? config.forestPlot.rowHeight : 10}
+          updateField={updateField}
+          section='forestPlot'
+          fieldName='rowHeight'
+          label='Row Height'
+          placeholder='10'
+        />
         <br />
         <hr />
         <br />
         <h4>Labels Settings</h4>
-        <TextField type='text' value={config.forestPlot?.leftLabel || ''} updateField={updateField} section='forestPlot' fieldName='leftLabel' label='Left Label' />
-        <TextField type='text' value={config.forestPlot?.rightLabel || ''} updateField={updateField} section='forestPlot' fieldName='rightLabel' label='Right Label' />
+        <TextField
+          type='text'
+          value={config.forestPlot?.leftLabel || ''}
+          updateField={updateField}
+          section='forestPlot'
+          fieldName='leftLabel'
+          label='Left Label'
+        />
+        <TextField
+          type='text'
+          value={config.forestPlot?.rightLabel || ''}
+          updateField={updateField}
+          section='forestPlot'
+          fieldName='rightLabel'
+          label='Right Label'
+        />
 
         <br />
         <hr />
