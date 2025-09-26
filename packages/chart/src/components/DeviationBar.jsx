@@ -8,6 +8,7 @@ import useIntersectionObserver from '../hooks/useIntersectionObserver'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
+import { isV1Palette } from '@cdc/core/helpers/palettes/utils'
 
 export default function DeviationBar({ height, xScale }) {
   const {
@@ -176,7 +177,8 @@ export default function DeviationBar({ height, xScale }) {
           const squareY = barY - barHeight / 2
           const borderRadius = applyRadius(barPosition)
           // colors
-          const [leftColor, rightColor] = twoColorPalette[twoColor.palette]
+          let versionName = isV1Palette(twoColor.palette) ? 'v1' : 'v2'
+          const [leftColor, rightColor] = twoColorPalette[versionName][twoColor.palette]
           const barColor = { left: leftColor, right: rightColor }
           const fill = getContrastColor(APP_FONT_COLOR, barColor[barPosition])
 

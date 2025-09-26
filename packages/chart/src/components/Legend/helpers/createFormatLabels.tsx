@@ -3,6 +3,7 @@ import { getCurrentPaletteName, getFallbackColorPalette, migratePaletteWithMap }
 import { chartPaletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { getPaletteAccessor } from '@cdc/core/helpers/getPaletteAccessor'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { isV1Palette } from '@cdc/core/helpers/palettes/utils'
 import { v2ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
 import { FaStar } from 'react-icons/fa'
 import { Label } from '../../../types/Label'
@@ -54,7 +55,9 @@ export const createFormatLabels =
     }
     const colorCode = config.legend?.colorCode
     if (visualizationType === 'Deviation Bar') {
-      const [belowColor, aboveColor] = twoColorPalette[config.twoColor.palette]
+      let versionName = isV1Palette(config.twoColor.palette) ? 'v1' : 'v2'
+      const [belowColor, aboveColor] = twoColorPalette[versionName][config.twoColor.palette]
+
       const labelBelow = {
         datum: 'X',
         index: 0,
