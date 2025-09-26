@@ -27,10 +27,10 @@ export default function DeviationBar({ height, xScale }) {
     roundingStyle === 'standard'
       ? '8px'
       : roundingStyle === 'shallow'
-      ? '5px'
-      : roundingStyle === 'finger'
-      ? '15px'
-      : '0px'
+        ? '5px'
+        : roundingStyle === 'finger'
+          ? '15px'
+          : '0px'
   const isRounded = config.barStyle === 'rounded'
   const target = Number(config.xAxis.target)
   const seriesKey = config.series[0].dataKey
@@ -177,8 +177,8 @@ export default function DeviationBar({ height, xScale }) {
           const squareY = barY - barHeight / 2
           const borderRadius = applyRadius(barPosition)
           // colors
-          let versionName = isV1Palette(twoColor.palette) ? 'v1' : 'v2'
-          const [leftColor, rightColor] = twoColorPalette[versionName][twoColor.palette]
+          let versionName = isV1Palette(config) ? 'v1' : 'v2'
+          const [leftColor, rightColor] = twoColorPalette?.[versionName]?.[twoColor.palette] || ['#1D6ABF', '#935586']
           const barColor = { left: leftColor, right: rightColor }
           const fill = getContrastColor(APP_FONT_COLOR, barColor[barPosition])
 
