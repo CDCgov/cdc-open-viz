@@ -90,6 +90,9 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
 
   const [tileHeights, setTileHeights] = useState<Record<string, number>>({})
 
+  // Refs to all LinearChart instances for tooltip coordination
+  const chartRefs = useRef<Record<string, any>>({})
+
   // Create combined data and config for consistent Y-axis calculation
   const combinedDataForYAxis = useMemo(
     () => createCombinedDataForYAxis(config, data, tileItems),
@@ -174,6 +177,33 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     setTileHeights(prev => ({ ...prev, [tileKey]: height }))
   }, [])
 
+  // Handle tooltip synchronization across small multiple tiles
+  const handleChartHover = useCallback(
+    (sourceTileKey: string, xAxisValue: any, yCoordinate: number) => {
+      if (!config.smallMultiples?.synchronizedTooltips) return
+
+      // If xAxisValue is null, it means mouse left the chart - hide all tooltips
+      if (xAxisValue === null) {
+        Object.entries(chartRefs.current).forEach(([tileKey, chartRef]) => {
+          if (tileKey !== sourceTileKey && chartRef?.hideTooltip) {
+            chartRef.hideTooltip()
+          }
+        })
+        return
+      }
+
+      // For each OTHER chart in the grid, trigger tooltip at same X-axis data value and exact Y coordinate
+      Object.entries(chartRefs.current).forEach(([tileKey, chartRef]) => {
+        if (tileKey === sourceTileKey || !chartRef) return
+
+        if (chartRef.triggerTooltipAtDataValue) {
+          chartRef.triggerTooltipAtDataValue(xAxisValue, yCoordinate)
+        }
+      })
+    },
+    [config.smallMultiples?.synchronizedTooltips]
+  )
+
   // Calculate container height from measured tile heights
   useEffect(() => {
     if (!parentRef.current) return
@@ -219,6 +249,10 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
               globalYAxisMin={globalYAxisValues?.min}
               isFirstInRow={index % tilesPerRow === 0}
               onHeightChange={handleTileHeightChange}
+              onChartRef={ref => {
+                chartRefs.current[String(item.key)] = ref
+              }}
+              onChartHover={(xAxisValue, yCoordinate) => handleChartHover(String(item.key), xAxisValue, yCoordinate)}
             />
           )
         })}

@@ -22,6 +22,8 @@ interface SmallMultipleTileProps {
   globalYAxisMin?: number
   isFirstInRow?: boolean
   onHeightChange?: (tileKey: string, height: number) => void
+  onChartRef?: (ref: any) => void
+  onChartHover?: (xAxisValue: any, yCoordinate: number) => void
 }
 
 const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
@@ -38,7 +40,9 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   globalYAxisMax,
   globalYAxisMin,
   isFirstInRow,
-  onHeightChange
+  onHeightChange,
+  onChartRef,
+  onChartHover
 }) => {
   let tileConfig = cloneConfig(config)
   let tileData = data
@@ -138,6 +142,9 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   // Create a ref for the entire tile (including header) for height measurement
   const fullTileRef = useRef<HTMLDivElement>(null)
 
+  // Create a ref for the LinearChart instance for tooltip coordination
+  const linearChartRef = useRef<any>(null)
+
   // Create new context values with our filtered config
   const tileContextValues = {
     ...originalContextValues,
@@ -163,6 +170,13 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
     return () => resizeObserver.disconnect()
   }, [tileKey, onHeightChange])
 
+  // Pass chart ref to parent SmallMultiples component for tooltip coordination
+  useEffect(() => {
+    if (onChartRef && linearChartRef.current) {
+      onChartRef(linearChartRef.current)
+    }
+  }, [onChartRef])
+
   return (
     <div ref={fullTileRef} className='small-multiple-tile'>
       <div className='tile-header'>
@@ -178,10 +192,11 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
             <ConfigContext.Provider
               value={{
                 ...tileContextValues,
-                dimensions: [parent.width, parent.height] // Override with tile-specific dimensions
+                dimensions: [parent.width, parent.height], // Override with tile-specific dimensions
+                handleSmallMultipleHover: onChartHover
               }}
             >
-              <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
+              <LinearChart ref={linearChartRef} parentWidth={parent.width} parentHeight={parent.height} />
             </ConfigContext.Provider>
           )}
         </ParentSize>

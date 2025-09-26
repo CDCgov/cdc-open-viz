@@ -207,7 +207,8 @@ const createInitialState = () => {
       tileOrder: [],
       tileOrderType: 'asc',
       tileTitles: {},
-      colorMode: 'same'
+      colorMode: 'same',
+      synchronizedTooltips: false
     },
     exclusions: {
       active: false,

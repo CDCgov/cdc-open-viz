@@ -388,6 +388,27 @@ const PanelSmallMultiples: FC<PanelProps> = props => {
                     </Tooltip>
                   }
                 />
+
+                <CheckBox
+                  value={config.smallMultiples?.synchronizedTooltips}
+                  fieldName='synchronizedTooltips'
+                  section='smallMultiples'
+                  label='Synchronized Tooltips'
+                  updateField={updateField}
+                  tooltip={
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                      </Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>
+                          When checked, hovering over one chart will show synchronized tooltips on all other charts at
+                          the same data point.
+                        </p>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  }
+                />
               </>
             )}
           </AccordionItemPanel>
