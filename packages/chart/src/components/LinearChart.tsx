@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useContext, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 
 // Libraries
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -40,6 +40,7 @@ import useMinMax from '../hooks/useMinMax'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import useScales, { getTickValues } from '../hooks/useScales'
+import { useProgrammaticTooltip } from '../hooks/useProgrammaticTooltip'
 
 import getTopAxis from '../helpers/getTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
@@ -102,7 +103,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     tableData,
     transformedData: data,
     seriesHighlight,
-
+    handleSmallMultipleHover
   } = useContext(ConfigContext)
 
   // CONFIG
@@ -121,6 +122,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     dataFormat,
     debugSvg
   } = config
+
   const { labelsAboveGridlines, hideAxis, inlineLabel } = config.yAxis
 
   // HOOKS  % STATES
@@ -281,6 +283,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleTooltipClick,
     handleTooltipMouseOff,
     TooltipListItem,
+    getXValueFromCoordinate,
+    getCoordinateFromXValue,
   } = useCoveTooltip({
     xScale,
     yScale,
@@ -374,7 +378,32 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       x,
       y
     })
+
+    if (handleSmallMultipleHover) {
+      const xAxisValue = getXValueFromCoordinate(x - Number(config.yAxis.size || 0))
+      if (xAxisValue !== null && xAxisValue !== undefined) {
+        handleSmallMultipleHover(xAxisValue, y)
+      }
+    }
   }
+
+  const onMouseLeave = () => {
+    setShowHoverLine(false)
+    if (handleSmallMultipleHover) {
+      handleSmallMultipleHover(null, null)
+    }
+  }
+
+  // Use custom hook to provide programmatic tooltip control for small multiples
+  const internalSvgRef = useProgrammaticTooltip({
+    svgRef,
+    getCoordinateFromXValue,
+    config,
+    setPoint,
+    setShowHoverLine,
+    handleTooltipMouseOver,
+    hideTooltip
+  })
 
   // EFFECTS
   // Adjust padding on the right side of the chart to accommodate for overflow
@@ -464,7 +493,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     if (!topLabelOnGridlineHeight) return
 
     // Adjust the viewBox for the svg
-    const svg = svgRef.current
+    const svg = internalSvgRef.current
     if (!svg) return
     const parentWidthFromRef = parentRef.current.getBoundingClientRect().width
     svg.setAttribute('viewBox', `0 ${-topLabelOnGridlineHeight} ${parentWidthFromRef} ${newHeight}`)
@@ -668,7 +697,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
         className='tooltip-boundary'
       >
         <svg
-          ref={svgRef}
+          ref={internalSvgRef}
           onMouseMove={onMouseMove}
           width={parentWidth + config.yAxis.rightAxisSize}
           height={isNoDataAvailable ? 1 : parentHeight}

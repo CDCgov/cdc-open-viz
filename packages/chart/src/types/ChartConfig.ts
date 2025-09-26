@@ -196,14 +196,15 @@ export type AllChartsConfig = {
   showTitle: boolean
   smallMultiples?: {
     mode?: 'by-column' | 'by-series'
-    tileColumn?: string // Used when mode is 'by-column'
-    tilesPerRowDesktop?: number // Number of tiles per row on desktop
-    tilesPerRowMobile?: number // Number of tiles per row on mobile
-    independentYAxis?: boolean // Whether each tile uses its own Y-axis scale (true) or all tiles use the same scale (false)
-    tileOrder?: string[] // Custom order of tiles (series keys for by-series mode, unique values for by-column mode) - used when tileOrderType is 'custom'
-    tileOrderType?: 'asc' | 'desc' | 'custom' // Type of tile ordering: ascending alphanumeric, descending alphanumeric, or custom drag-drop
-    tileTitles?: { [key: string]: string } // Map tile keys to custom display titles
-    colorMode?: 'same' | 'different' // Whether all tiles use same colors ('same') or each tile uses different colors ('different')
+    tileColumn?: string
+    tilesPerRowDesktop?: number
+    tilesPerRowMobile?: number
+    independentYAxis?: boolean
+    tileOrderType?: 'asc' | 'desc' | 'custom'
+    tileOrder?: string[]
+    tileTitles?: { [key: string]: string }
+    colorMode?: 'same' | 'different'
+    synchronizedTooltips?: boolean
   }
   sortData: 'ascending' | 'descending'
   stackedAreaChartLineType: string

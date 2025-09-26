@@ -1,4 +1,4 @@
-import { useContext, useRef } from 'react'
+import { useContext, useRef, useLayoutEffect } from 'react'
 // Local imports
 import parse from 'html-react-parser'
 import ConfigContext from '../ConfigContext'
@@ -27,6 +27,14 @@ export const useTooltip = props => {
   } = useContext<ChartContext>(ConfigContext)
   const { xScale, yScale, seriesScale, showTooltip, hideTooltip, interactionLabel = '' } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
+
+  // Track the latest xScale in a ref to prevent stale closures
+  const xScaleRef = useRef(xScale)
+
+  // Update ref whenever xScale prop changes
+  useLayoutEffect(() => {
+    xScaleRef.current = xScale
+  }, [xScale])
 
   const Y_AXIS_SIZE = Number(config.yAxis.size || 0)
 
@@ -289,15 +297,15 @@ export const useTooltip = props => {
    */
   const getXValueFromCoordinateDate = x => {
     if (config.xAxis.type === 'categorical' || config.visualizationType === 'Combo') {
-      let eachBand = xScale.step()
+      let eachBand = xScaleRef.current.step()
       let numerator = x
       const index = Math.floor(Number(numerator) / eachBand)
-      return xScale.domain()[index - 1] // fixes off by 1 error
+      return xScaleRef.current.domain()[index - 1] // fixes off by 1 error
     }
 
     if (isDateScale(config.xAxis) && config.visualizationType !== 'Combo') {
       const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
-      const x0 = xScale.invert(xScale(x))
+      const x0 = xScaleRef.current.invert(xScaleRef.current(x))
       const index = bisectDate(config.data, x0, 1)
       const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
       return val
@@ -314,15 +322,17 @@ export const useTooltip = props => {
     if (orientation === 'horizontal') return
 
     // Check the type of x equal to point or if the type of xAxis is equal to continuous or date
-    if (xScale.type === 'point' || xAxis.type === 'continuous' || isDateScale(xAxis)) {
+    if (xScaleRef.current.type === 'point' || xAxis.type === 'continuous' || isDateScale(xAxis)) {
       // Find the closest x value by calculating the minimum distance
       let closestX = null
       let minDistance = Number.MAX_VALUE
       let offset = x
 
-      const barThicknessOffset = config.xAxis.type === 'date' ? xScale.bandwidth() / 2 : 0
+      const barThicknessOffset = config.xAxis.type === 'date' ? xScaleRef.current.bandwidth() / 2 : 0
       data.forEach(d => {
-        const xPosition = isDateScale(xAxis) ? xScale(parseDate(d[xAxis.dataKey])) : xScale(d[xAxis.dataKey])
+        const xPosition = isDateScale(xAxis)
+          ? xScaleRef.current(parseDate(d[xAxis.dataKey]))
+          : xScaleRef.current(d[xAxis.dataKey])
         let bwOffset = config.barHeight
         const distance = Math.abs(Number(xPosition + barThicknessOffset - offset + (isClick ? bwOffset * 2 : 0)))
 
@@ -335,13 +345,29 @@ export const useTooltip = props => {
     }
 
     if (config.xAxis.type === 'categorical' || visualizationType === 'Combo') {
-      let range = xScale.range()[1] - xScale.range()[0]
-      let eachBand = range / (xScale.domain().length + 1)
+      let range = xScaleRef.current.range()[1] - xScaleRef.current.range()[0]
+      let eachBand = range / (xScaleRef.current.domain().length + 1)
 
       let numerator = x
       const index = Math.floor((Number(numerator) - eachBand / 2) / eachBand)
-      return xScale.domain()[index] // fixes off by 1 error
+      return xScaleRef.current.domain()[index] // fixes off by 1 error
     }
+  }
+
+  /**
+   * Helper for converting data value to pixel coordinate (inverse of getXValueFromCoordinate)
+   * @function getCoordinateFromXValue
+   * @param {any} xAxisValue - X-axis data value (date, number, or category)
+   * @returns {number} - pixel coordinate for the data value
+   */
+  const getCoordinateFromXValue = xAxisValue => {
+    if (visualizationType === 'Pie') return 0
+    if (orientation === 'horizontal') return 0
+
+    // Convert data value to pixel coordinate using current xScale
+    const pixelX = isDateScale(xAxis) ? xScaleRef.current(parseDate(xAxisValue)) : xScaleRef.current(xAxisValue)
+
+    return pixelX
   }
 
   const findClosest = (dataArray: [any, number][], mouseXorY) => {
@@ -502,7 +528,7 @@ export const useTooltip = props => {
         const dataWithXScale = dataToSearch.map(
           d => [d, seriesScale(d[dynamicSeries.dynamicCategory])] as [Object, number]
         )
-        const xOffset = x - Y_AXIS_SIZE - xScale(closestXScaleValue)
+        const xOffset = x - Y_AXIS_SIZE - xScaleRef.current(closestXScaleValue)
         dataToSearch = [findClosest(dataWithXScale, xOffset)]
       }
     }
@@ -645,6 +671,7 @@ export const useTooltip = props => {
     getIncludedTooltipSeries,
     getXValueFromCoordinate,
     getXValueFromCoordinateDate,
+    getCoordinateFromXValue,
     handleTooltipClick,
     handleTooltipMouseOff,
     handleTooltipMouseOver,
