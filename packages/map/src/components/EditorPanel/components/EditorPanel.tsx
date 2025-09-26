@@ -922,7 +922,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     const isV1PaletteConfig = isV1Palette(config)
 
     const executeSelection = () => {
-      const _newConfig = _.cloneDeep(config)
+      const _newConfig = cloneConfig(config)
 
       // If v2 migration is disabled, use the original palette name and keep v1 version
       if (!USE_V2_MIGRATION) {
@@ -3096,7 +3096,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     type='checkbox'
                     checked={config.visual.showBubbleZeros}
                     onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.visual.showBubbleZeros = event.target.checked
                       setConfig(_newConfig)
                     }}

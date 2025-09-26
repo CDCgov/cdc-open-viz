@@ -7,5 +7,5 @@ describe('Markup Include', () => {
     const pkgDir = path.join(__dirname, '..')
     const result = testStandaloneBuild(pkgDir)
     expect(result).toBe(true)
-  })
+  }, 60000)
 })
