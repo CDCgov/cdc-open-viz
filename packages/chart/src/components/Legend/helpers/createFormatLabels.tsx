@@ -55,13 +55,9 @@ export const createFormatLabels =
     }
     const colorCode = config.legend?.colorCode
     if (visualizationType === 'Deviation Bar') {
-      // colors
-      let belowColor, aboveColor
-      if (isV1Palette(config.twoColor.palette)) {
-        ;[belowColor, aboveColor] = twoColorPalette.v1[config.twoColor.palette]
-      } else {
-        ;[belowColor, aboveColor] = twoColorPalette.v2[config.twoColor.palette]
-      }
+      let versionName = isV1Palette(config.twoColor.palette) ? 'v1' : 'v2'
+      const [belowColor, aboveColor] = twoColorPalette[versionName][config.twoColor.palette]
+
       const labelBelow = {
         datum: 'X',
         index: 0,

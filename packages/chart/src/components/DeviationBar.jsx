@@ -177,12 +177,8 @@ export default function DeviationBar({ height, xScale }) {
           const squareY = barY - barHeight / 2
           const borderRadius = applyRadius(barPosition)
           // colors
-          let leftColor, rightColor
-          if (isV1Palette(twoColor.palette)) {
-            ;[leftColor, rightColor] = twoColorPalette.v1[twoColor.palette]
-          } else {
-            ;[leftColor, rightColor] = twoColorPalette.v2[twoColor.palette]
-          }
+          let versionName = isV1Palette(twoColor.palette) ? 'v1' : 'v2'
+          const [leftColor, rightColor] = twoColorPalette[versionName][twoColor.palette]
           const barColor = { left: leftColor, right: rightColor }
           const fill = getContrastColor(APP_FONT_COLOR, barColor[barPosition])
 
