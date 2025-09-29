@@ -197,9 +197,9 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               className='margin-left-href'
               onClick={() => {
                 publishAnalyticsEvent(
-                  `link_to_data_table_click`,
+                  `link_to_data_table_click|#data-table-${dataKey}`,
                   'click',
-                  `${interactionLabel}|#data-table-${dataKey}`,
+                  `${interactionLabel}`,
                   visualizationConfig.type
                 )
               }}

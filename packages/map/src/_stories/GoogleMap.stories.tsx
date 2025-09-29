@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import CdcMap from '../CdcMap'
 import googleMapConfig from './_mock/google-map.json'
-import { editConfigKeys } from '@cdc/chart/src/helpers/configHelpers'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map',

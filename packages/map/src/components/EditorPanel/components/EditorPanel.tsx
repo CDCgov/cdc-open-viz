@@ -1,4 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useMemo } from 'react'
+import { filterColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 
 // Third Party
 import {
@@ -12,11 +14,12 @@ import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
 import { useDebounce } from 'use-debounce'
 import _ from 'lodash'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
+import 'react-tooltip/dist/react-tooltip.css'
 import Panels from './Panels'
 import Layout from '@cdc/core/components/Layout'
 
 // Data
-import colorPalettes from '@cdc/core/data/colorPalettes'
+import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { supportedStatesFipsCodes } from '../../../data/supported-geos.js'
 
 // Components - Core
@@ -49,6 +52,11 @@ import './editorPanel.styles.css'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 import MultiSelect from '@cdc/core/components/MultiSelect'
+import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
+import { isV1Palette, getCurrentPaletteName, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
+import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
+import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
+import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
 
 type MapEditorPanelProps = {
   datasets?: Datasets
@@ -65,8 +73,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     setConfig,
     config,
     tooltipId,
-    runtimeData,
-    setRuntimeData
+    runtimeData
   } = useContext<MapContext>(ConfigContext)
 
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
@@ -77,6 +84,11 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const [loadedDefault, setLoadedDefault] = useState(false)
   const [displayPanel, setDisplayPanel] = useState(true)
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
+  const [showConversionModal, setShowConversionModal] = useState(false)
+  const [pendingPaletteSelection, setPendingPaletteSelection] = useState<{
+    palette: string
+    action: () => void
+  } | null>(null)
 
   const {
     MapLayerHandlers: { handleMapLayer, handleAddLayer, handleRemoveLayer }
@@ -691,7 +703,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
         if (config) {
           const newData = generateRuntimeData(config)
-          setRuntimeData(newData)
+          dispatch({ type: 'SET_RUNTIME_DATA', payload: newData })
         }
         break
       case 'classificationType':
@@ -868,7 +880,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   }
 
   const convertStateToConfig = () => {
-    let strippedState = _.cloneDeep(config) // Deep copy
+    let strippedState = cloneConfig(config) // Deep copy
 
     // Strip ref
     delete strippedState['']
@@ -900,46 +912,75 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
   const isReversed = config.general.palette.isReversed
 
-  function filterColorPalettes() {
-    let sequential = []
-    let nonSequential = []
-    let accessibleColors = []
-    for (let paletteName in colorPalettes) {
-      if (!isReversed) {
-        if (paletteName.includes('qualitative') && !paletteName.endsWith('reverse')) {
-          nonSequential.push(paletteName)
-        }
-        if (paletteName.includes('colorblindsafe') && !paletteName.endsWith('reverse')) {
-          accessibleColors.push(paletteName)
-        }
-        if (
-          !paletteName.includes('qualitative') &&
-          !paletteName.includes('colorblindsafe') &&
-          !paletteName.endsWith('reverse')
-        ) {
-          sequential.push(paletteName)
-        }
-      }
-      if (isReversed) {
-        if (paletteName.includes('qualitative') && paletteName.endsWith('reverse')) {
-          nonSequential.push(paletteName)
-        }
-        if (paletteName.includes('colorblindsafe') && paletteName.endsWith('reverse')) {
-          accessibleColors.push(paletteName)
-        }
-        if (
-          !paletteName.includes('qualitative') &&
-          !paletteName.includes('colorblindsafe') &&
-          paletteName.endsWith('reverse')
-        ) {
-          sequential.push(paletteName)
+  const { sequential, nonSequential, accessibleColors } = useMemo(
+    () => filterColorPalettes({ config, isReversed, colorPalettes }),
+    [isReversed, colorPalettes, config.general.palette.version]
+  )
+
+  // Helper function to handle palette selection with conversion prompt
+  const handlePaletteSelection = (palette: string) => {
+    const isV1PaletteConfig = isV1Palette(config)
+
+    const executeSelection = () => {
+      const _newConfig = _.cloneDeep(config)
+
+      // If v2 migration is disabled, use the original palette name and keep v1 version
+      if (!USE_V2_MIGRATION) {
+        _newConfig.general.palette.name = palette
+        _newConfig.general.palette.version = '1.0'
+      } else {
+        // V2 migration logic
+        _newConfig.general.palette.name = palette
+          ? migratePaletteWithMap(palette, paletteMigrationMap, false)
+          : undefined
+        if (isV1PaletteConfig) {
+          _newConfig.general.palette.version = '2.0'
         }
       }
+      setConfig(_newConfig)
     }
 
-    return [sequential, nonSequential, accessibleColors]
+    if (isV1PaletteConfig) {
+      setPendingPaletteSelection({ palette, action: executeSelection })
+      setShowConversionModal(true)
+    } else {
+      executeSelection()
+    }
   }
-  const [sequential, nonSequential, accessibleColors] = filterColorPalettes()
+
+  // Modal handlers
+  const handleConversionConfirm = () => {
+    if (pendingPaletteSelection) {
+      pendingPaletteSelection.action()
+    }
+    setShowConversionModal(false)
+    setPendingPaletteSelection(null)
+  }
+
+  const handleConversionCancel = () => {
+    setShowConversionModal(false)
+    setPendingPaletteSelection(null)
+  }
+
+  const handleReturnToV1 = () => {
+    if (pendingPaletteSelection) {
+      const _newConfig = cloneConfig(config)
+      _newConfig.general.palette.name = pendingPaletteSelection.palette
+      _newConfig.general.palette.version = '1.0'
+      setConfig(_newConfig)
+    }
+    setShowConversionModal(false)
+    setPendingPaletteSelection(null)
+  }
+
+  // Helper function to determine if a palette should be marked as selected
+  const getPaletteClassName = (palette: string) => {
+    const currentPaletteName = config.general.palette.name || ''
+
+    // Direct comparison since the UI filters palettes by version
+    // When v1 is selected, UI shows v1 palettes; when v2 is selected, UI shows v2 palettes
+    return currentPaletteName === palette ? 'selected' : ''
+  }
 
   useEffect(() => {
     setLoadedDefault(config.defaultData)
@@ -1263,7 +1304,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     { value: '_blank', label: 'New Window' }
                   ]}
                   onChange={event => {
-                    const _newConfig = _.cloneDeep(config)
+                    const _newConfig = cloneConfig(config)
                     _newConfig.general.navigationTarget = event.target.value
                     setConfig(_newConfig)
                   }}
@@ -1302,7 +1343,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     type='checkbox'
                     checked={config.general.displayAsHex}
                     onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.general.displayAsHex = event.target.checked
                       setConfig(_newConfig)
                     }}
@@ -1358,7 +1399,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     type='checkbox'
                     checked={general.territoriesAlwaysShow || false}
                     onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.general.territoriesAlwaysShow = event.target.checked
                       setConfig(_newConfig)
                     }}
@@ -1402,7 +1443,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   type='checkbox'
                   checked={config.general.showTitle || false}
                   onChange={event => {
-                    const _newConfig = _.cloneDeep(config)
+                    const _newConfig = cloneConfig(config)
                     _newConfig.general.showTitle = event.target.checked
                     setConfig(_newConfig)
                   }}
@@ -1546,7 +1587,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     type='checkbox'
                     checked={config.general.hideGeoColumnInTooltip || false}
                     onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.general.hideGeoColumnInTooltip = event.target.checked
                       setConfig(_newConfig)
                     }}
@@ -1579,7 +1620,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     value={columns.primary.name}
                     options={columnsOptions.map(c => c.key)}
                     onChange={event => {
-                      const _state = _.cloneDeep(config)
+                      const _state = cloneConfig(config)
                       _state.columns.primary.name = event.target.value
                       _state.columns.primary.label = event.target.value
                       setConfig(_state)
@@ -2083,7 +2124,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         messages = []
                       }
 
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.legend.type = event.target.value
                       _newConfig.runtime.editorErrorMessage = messages
                       setConfig(_newConfig)
@@ -2096,7 +2137,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       type='checkbox'
                       checked={config.general.showSidebar || false}
                       onChange={event => {
-                        const _newConfig = _.cloneDeep(config)
+                        const _newConfig = cloneConfig(config)
                         _newConfig.general.showSidebar = event.target.checked
                         setConfig(_newConfig)
                       }}
@@ -2236,7 +2277,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       type='checkbox'
                       checked={legend.singleColumn}
                       onChange={event => {
-                        const _newConfig = _.cloneDeep(config)
+                        const _newConfig = cloneConfig(config)
                         _newConfig.legend.singleColumn = event.target.checked
                         _newConfig.legend.singleRow = false
                         _newConfig.legend.verticalSorted = false
@@ -2253,7 +2294,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       type='checkbox'
                       checked={legend.singleRow}
                       onChange={event => {
-                        const _newConfig = _.cloneDeep(config)
+                        const _newConfig = cloneConfig(config)
                         _newConfig.legend.singleRow = event.target.checked
                         _newConfig.legend.singleColumn = false
                         _newConfig.legend.verticalSorted = false
@@ -2271,7 +2312,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     value={legend.groupBy || ''}
                     options={columnsOptions.map(c => c.key)}
                     onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.legend.groupBy = event.target.value
                       setConfig(_newConfig)
                     }}
@@ -2283,7 +2324,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       type='checkbox'
                       checked={legend.verticalSorted}
                       onChange={event => {
-                        const _newConfig = _.cloneDeep(config)
+                        const _newConfig = cloneConfig(config)
                         _newConfig.legend.verticalSorted = event.target.checked
                         setConfig(_newConfig)
                       }}
@@ -2311,7 +2352,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       type='checkbox'
                       checked={legend.separateZero || false}
                       onChange={event => {
-                        const _newConfig = _.cloneDeep(config)
+                        const _newConfig = cloneConfig(config)
                         _newConfig.legend.separateZero = event.target.checked
                         return setConfig(_newConfig)
                       }}
@@ -2771,7 +2812,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       type='checkbox'
                       checked={config.table.showDataTableLink}
                       onChange={event => {
-                        const _newConfig = _.cloneDeep(config)
+                        const _newConfig = cloneConfig(config)
                         _newConfig.table.showDataTableLink = event.target.checked
                         setConfig(_newConfig)
                       }}
@@ -2785,7 +2826,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       type='checkbox'
                       checked={config.table.showDownloadUrl}
                       onChange={event => {
-                        const _newConfig = _.cloneDeep(config)
+                        const _newConfig = cloneConfig(config)
                         _newConfig.table.showDownloadUrl = event.target.checked
                         setConfig(_newConfig)
                       }}
@@ -2911,7 +2952,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     type='checkbox'
                     checked={config.general.fullBorder || false}
                     onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.general.fullBorder = event.target.checked
                       setConfig(_newConfig)
                     }}
@@ -2933,6 +2974,15 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               <label>
                 <span className='edit-label'>Map Color Palette</span>
               </label>
+              <div className='mb-2'>
+                <small className='text-muted'>
+                  Review color contrasts{' '}
+                  <a href='https://webaim.org/resources/contrastchecker/' target='_blank' rel='noopener noreferrer'>
+                    here
+                  </a>
+                </small>
+              </div>
+              <DeveloperPaletteRollback config={config} updateConfig={setConfig} />
               <InputToggle
                 type='3d'
                 section='general'
@@ -2941,127 +2991,71 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 size='small'
                 label='Use selected palette in reverse order'
                 onClick={() => {
-                  const _state = _.cloneDeep(config)
+                  const _state = cloneConfig(config)
+                  const currentPaletteName = config.general.palette?.name || ''
                   _state.general.palette.isReversed = !_state.general.palette.isReversed
                   let paletteName = ''
-                  if (_state.general.palette.isReversed && !config.color.endsWith('reverse')) {
-                    paletteName = config.color + 'reverse'
+                  if (_state.general.palette.isReversed && !currentPaletteName.endsWith('reverse')) {
+                    paletteName = currentPaletteName + 'reverse'
                   }
-                  if (!_state.general.palette.isReversed && config.color.endsWith('reverse')) {
-                    paletteName = config.color.slice(0, -7)
+                  if (!_state.general.palette.isReversed && currentPaletteName.endsWith('reverse')) {
+                    paletteName = currentPaletteName.slice(0, -7)
                   }
                   if (paletteName) {
-                    _state.color = paletteName
+                    _state.general.palette.name = paletteName
                   }
                   setConfig(_state)
                 }}
                 value={config.general.palette.isReversed}
               />
               <span>Sequential</span>
-              <ul className='color-palette'>
-                {sequential.map(palette => {
-                  const colorOne = {
-                    backgroundColor: colorPalettes[palette][2]
-                  }
-
-                  const colorTwo = {
-                    backgroundColor: colorPalettes[palette][4]
-                  }
-
-                  const colorThree = {
-                    backgroundColor: colorPalettes[palette][6]
-                  }
-
-                  return (
-                    <li
-                      title={palette}
-                      key={palette}
-                      onClick={() => {
-                        const _newConfig = _.cloneDeep(config)
-                        _newConfig.color = palette
-                        setConfig(_newConfig)
-                      }}
-                      className={config.color === palette ? 'selected' : ''}
-                    >
-                      <span style={colorOne}></span>
-                      <span style={colorTwo}></span>
-                      <span style={colorThree}></span>
-                    </li>
-                  )
-                })}
-              </ul>
+              <PaletteSelector
+                palettes={sequential}
+                colorPalettes={colorPalettes}
+                config={config}
+                onPaletteSelect={handlePaletteSelection}
+                selectedPalette={getCurrentPaletteName(config)}
+                colorIndices={[2, 3, 5]}
+                className='color-palette'
+                element='li'
+                getItemClassName={getPaletteClassName}
+              />
               <span>Non-Sequential</span>
-              <ul className='color-palette'>
-                {nonSequential.map(palette => {
-                  const colorOne = {
-                    backgroundColor: colorPalettes[palette][2]
+              <PaletteSelector
+                palettes={nonSequential}
+                colorPalettes={colorPalettes}
+                config={config}
+                onPaletteSelect={handlePaletteSelection}
+                selectedPalette={getCurrentPaletteName(config)}
+                colorIndices={[2, 3, 5]}
+                className='color-palette'
+                element='li'
+                getItemClassName={getPaletteClassName}
+                minColorsForFilter={(_, paletteAccessor, config) => {
+                  if (paletteAccessor.length <= 8 && config.general.geoType === 'us-region') {
+                    return false
                   }
-
-                  const colorTwo = {
-                    backgroundColor: colorPalettes[palette][4]
-                  }
-
-                  const colorThree = {
-                    backgroundColor: colorPalettes[palette][6]
-                  }
-
-                  // hide palettes with too few colors for region maps
-                  if (colorPalettes[palette].length <= 8 && config.general.geoType === 'us-region') {
-                    return ''
-                  }
-                  return (
-                    <li
-                      title={palette}
-                      key={palette}
-                      onClick={() => {
-                        const _newConfig = _.cloneDeep(config)
-                        _newConfig.color = palette
-                        setConfig(_newConfig)
-                      }}
-                      className={config.color === palette ? 'selected' : ''}
-                    >
-                      <span style={colorOne}></span>
-                      <span style={colorTwo}></span>
-                      <span style={colorThree}></span>
-                    </li>
-                  )
-                })}
-              </ul>
+                  return true
+                }}
+              />
               <span>Colorblind Safe</span>
-              <ul className='color-palette'>
-                {accessibleColors.map(palette => {
-                  const colorOne = {
-                    backgroundColor: colorPalettes[palette][2]
+              <PaletteSelector
+                palettes={accessibleColors}
+                colorPalettes={colorPalettes}
+                config={config}
+                onPaletteSelect={handlePaletteSelection}
+                selectedPalette={getCurrentPaletteName(config)}
+                colorIndices={[2, 3, 5]}
+                className='color-palette'
+                element='li'
+                getItemClassName={getPaletteClassName}
+                minColorsForFilter={(_, paletteAccessor, config) => {
+                  if (paletteAccessor.length <= 8 && config.general.geoType === 'us-region') {
+                    return false
                   }
-
-                  const colorTwo = {
-                    backgroundColor: colorPalettes[palette][4]
-                  }
-
-                  const colorThree = {
-                    backgroundColor: colorPalettes[palette][6]
-                  }
-
-                  // hide palettes with too few colors for region maps
-                  if (colorPalettes[palette].length <= 8 && config.general.geoType === 'us-region') {
-                    return ''
-                  }
-                  return (
-                    <li
-                      title={palette}
-                      key={palette}
-                      onClick={() => {
-                        handleEditorChanges('color', palette)
-                      }}
-                      className={config.color === palette ? 'selected' : ''}
-                    >
-                      <span style={colorOne}></span>
-                      <span style={colorTwo}></span>
-                      <span style={colorThree}></span>
-                    </li>
-                  )
-                })}
-              </ul>
+                  return true
+                }}
+              />
               <label>
                 Geocode Settings
                 <TextField
@@ -3116,7 +3110,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     type='checkbox'
                     checked={config.general.allowMapZoom}
                     onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.general.allowMapZoom = event.target.checked
                       _newConfig.mapPosition.coordinates = config.general.geoType === 'world' ? [0, 30] : [0, 0]
                       _newConfig.mapPosition.zoom = 1
@@ -3132,7 +3126,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     type='checkbox'
                     checked={config.visual.extraBubbleBorder}
                     onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.visual.extraBubbleBorder = event.target.checked
                       setConfig(_newConfig)
                     }}
@@ -3374,6 +3368,15 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
         </Accordion>
         <AdvancedEditor loadConfig={setConfig} config={config} convertStateToConfig={convertStateToConfig} />
       </Layout.Sidebar>
+
+      {showConversionModal && (
+        <PaletteConversionModal
+          onConfirm={handleConversionConfirm}
+          onCancel={handleConversionCancel}
+          onReturnToV1={handleReturnToV1}
+          paletteName={pendingPaletteSelection?.palette}
+        />
+      )}
     </ErrorBoundary>
   )
 }

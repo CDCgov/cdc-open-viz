@@ -1,5 +1,6 @@
 import React from 'react'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
+import 'react-tooltip/dist/react-tooltip.css'
 import './richTooltip.css'
 
 const RichTooltip = ({ linkText, href = null, tooltipOpacity = 100, tooltipContent }) => {

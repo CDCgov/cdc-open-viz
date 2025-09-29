@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { timeParse } from 'd3-time-format'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -53,6 +53,10 @@ export type DataTableProps = {
   // determines if columns should be wrapped in the table
   wrapColumns?: boolean
   interactionLabel?: string
+  // Map-specific props (optional)
+  legendMemo?: React.MutableRefObject<Map<any, any>>
+  legendSpecialClassLastMemo?: React.MutableRefObject<Map<any, any>>
+  runtimeLegend?: any
 }
 
 const DataTable = (props: DataTableProps) => {
@@ -94,6 +98,11 @@ const DataTable = (props: DataTableProps) => {
   })
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
+
+  // Create default refs for map-specific props when not provided
+  const defaultLegendMemo = useRef(new Map())
+  const defaultLegendSpecialClassLastMemo = useRef(new Map())
+  const defaultRuntimeLegend = null
 
   const isVertical = !(config.type === 'chart' && !config.table?.showVertical)
 
@@ -277,7 +286,16 @@ const DataTable = (props: DataTableProps) => {
 
     const childrenMatrix =
       config.type === 'map'
-        ? mapCellMatrix({ ...props, rows, wrapColumns, runtimeData, viewport })
+        ? mapCellMatrix({ 
+            ...props, 
+            rows, 
+            wrapColumns, 
+            runtimeData, 
+            viewport,
+            legendMemo: props.legendMemo || defaultLegendMemo,
+            legendSpecialClassLastMemo: props.legendSpecialClassLastMemo || defaultLegendSpecialClassLastMemo,
+            runtimeLegend: props.runtimeLegend || defaultRuntimeLegend
+          })
         : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
 
     const useBottomExpandCollapse = config.table.showBottomCollapse && expanded && Array.isArray(childrenMatrix)

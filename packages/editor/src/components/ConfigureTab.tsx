@@ -7,9 +7,9 @@ import CdcWaffleChart from '@cdc/waffle-chart/src/CdcWaffleChart'
 import CdcMarkupInclude from '@cdc/markup-include/src/CdcMarkupInclude'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import ConfigContext from '../ConfigContext'
+import ConfigContext from '@cdc/core/contexts/EditorContext'
 import MultiDashboardWrapper from '@cdc/dashboard/src/CdcDashboard'
-import CdcDataTable from '../../../data-table/src/CdcDataTable'
+import CdcDataTable from '@cdc/data-table/src/CdcDataTable'
 
 export default function ConfigureTab({ containerEl }) {
   const { config, setTempConfig, isDebug, configUrl } = useContext(ConfigContext)

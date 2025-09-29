@@ -121,7 +121,9 @@ const ChartHeader = ({
                     newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'undefined'
                   }`,
                   'click',
-                  interactionLabel
+                  interactionLabel,
+                  undefined,
+                  { title: config?.title }
                 )
                 setSortBy(newSortBy)
               }}

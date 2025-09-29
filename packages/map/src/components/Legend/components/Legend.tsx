@@ -1,5 +1,5 @@
 //TODO: Move legends to core
-import { forwardRef, useContext } from 'react'
+import { forwardRef, useContext, useMemo } from 'react'
 import parse from 'html-react-parser'
 
 //types
@@ -20,7 +20,7 @@ import './index.scss'
 import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { isBelowBreakpoint, isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
-import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
+import { toggleLegendActive } from '../../../helpers/toggleLegendActive'
 import { resetLegendToggles } from '../../../helpers'
 import { MapContext } from '../../../types/MapContext'
 import LegendGroup from './LegendGroup/Legend.Group'
@@ -45,8 +45,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     dimensions,
     mapId,
     runtimeFilters,
-    runtimeLegend,
-    setRuntimeLegend
+    runtimeLegend
   } = useContext<MapContext>(ConfigContext)
 
   const dispatch = useContext(MapDispatchContext)
@@ -61,7 +60,10 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const getFormattedLegendItems = () => {
     try {
-      if (!runtimeLegend.items) Error('No runtime legend data')
+      if (!runtimeLegend.items) {
+        console.warn('No runtime legend data available')
+        return []
+      }
       return runtimeLegend.items.map((entry, idx) => {
         const entryMax = displayDataAsText(entry.max, 'primary', config)
 
@@ -120,32 +122,28 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         return classes.join(' ')
       }
 
-      const setAccessibleStatus = (message: string) => {
-        dispatch({ type: 'SET_ACCESSIBLE_STATUS', payload: message })
-      }
-
       return (
         <li
           className={handleListItemClass()}
           key={idx}
           title={`Legend item ${item.label} - Click to disable`}
           onClick={() => {
-            toggleLegendActive(idx, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)
+            toggleLegendActive(idx, item.label, runtimeLegend, dispatch)
             publishAnalyticsEvent(
-              `map_legend_item_toggled--isolate-mode`,
+              `map_legend_item_toggled|isolate-mode|${item.label}`,
               'click',
-              `${interactionLabel}|${item.label}`,
+              `${interactionLabel}`,
               'map'
             )
           }}
           onKeyDown={e => {
             if (e.key === 'Enter') {
               e.preventDefault()
-              toggleLegendActive(idx, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)
+              toggleLegendActive(idx, item.label, runtimeLegend, dispatch)
               publishAnalyticsEvent(
-                `map_legend_item_toggled--isolate-mode`,
+                `map_legend_item_toggled|isolate-mode|${item.label}`,
                 'keydown',
-                `${interactionLabel}|${item.label}`,
+                `${interactionLabel}`,
                 'map'
               )
             }
@@ -165,9 +163,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         const { pattern, dataKey, size } = patternData
         let defaultPatternColor = 'black'
         const sizes = {
-          small: '8',
-          medium: '10',
-          large: '12'
+          small: 8,
+          medium: 10,
+          large: 12
         }
 
         const legendSize = 16
@@ -241,7 +239,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       e.preventDefault()
     }
     publishAnalyticsEvent('map_legend_reset', 'click', interactionLabel, 'map')
-    resetLegendToggles(runtimeLegend, setRuntimeLegend)
+    resetLegendToggles(runtimeLegend, dispatch)
     dispatch({
       type: 'SET_ACCESSIBLE_STATUS',
       payload: 'Legend has been reset, please reference the data table to see updated values.'
@@ -261,14 +259,17 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     />
   )
 
-  const cityStyleShapes = {
-    pin: pin,
-    circle: <GlyphCircle color='#000' size={150} />,
-    square: <GlyphSquare color='#000' size={150} />,
-    diamond: <GlyphDiamond color='#000' size={150} />,
-    star: <GlyphStar color='#000' size={150} />,
-    triangle: <GlyphTriangle color='#000' size={150} />
-  }
+  const cityStyleShapes = useMemo(
+    () => ({
+      pin: pin,
+      circle: <GlyphCircle color='#000' size={150} />,
+      square: <GlyphSquare color='#000' size={150} />,
+      diamond: <GlyphDiamond color='#000' size={150} />,
+      star: <GlyphStar color='#000' size={150} />,
+      triangle: <GlyphTriangle color='#000' size={150} />
+    }),
+    [pin]
+  )
 
   const shouldRenderLegendList = legendListItems.length > 0 && ['Select Option', ''].includes(config.legend.groupBy)
 
@@ -351,9 +352,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                   )}
 
                   {config.visual.additionalCityStyles.map(
-                    ({ shape, label }) =>
+                    ({ shape, label }, index) =>
                       label && (
-                        <div>
+                        <div key={`additional-city-style-${index}-${shape}`}>
                           <svg>
                             <Group top={shape === 'Pin' ? 19 : shape === 'Triangle' ? 13 : 11} left={10}>
                               {cityStyleShapes[shape.toLowerCase()]}

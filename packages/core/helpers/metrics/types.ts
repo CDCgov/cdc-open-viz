@@ -19,6 +19,7 @@ export type ANALYTICS_EVENT_ACTIONS =
   | 'load'
   | 'submit'
   | 'change'
+  | 'hover'
   | 'unknown'
 
 export type LEGEND_TOGGLE_MODES = 'highlight' | 'isolate'
@@ -39,5 +40,6 @@ export type ANALYTICS_EVENT_TYPES =
   | `${COVE_VISUALIZATION_TYPES}_reset_zoom_level`
   | `${COVE_VISUALIZATION_TYPES}_zoomed_in`
   | `${COVE_VISUALIZATION_TYPES}_zoomed_out`
+  | `${COVE_VISUALIZATION_TYPES}_hover_${string}`
   | `data_table_sort_by|${string}|${'asc' | 'desc' | 'undefined'}`
   | 'link_to_data_table_click'

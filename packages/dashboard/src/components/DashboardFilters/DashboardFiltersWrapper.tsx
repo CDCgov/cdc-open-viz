@@ -105,7 +105,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
 
       dispatch({ type: 'SET_DATA', payload: emptyData })
       dispatch({ type: 'SET_FILTERED_DATA', payload: emptyFilteredData })
-      
+
       loadAPIFilters(dashboardConfig.sharedFilters, apiFilterDropdowns)
         .then(newFilters => {
           reloadURLData(newFilters)
@@ -135,9 +135,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
     )
 
     publishAnalyticsEvent(
-      'dashboard_filter_changed',
+      `dashboard_filter_changed|key_${newSharedFilters?.[index]?.key}|value_${value}`,
       'change',
-      `${interactionLabel}|key_${newSharedFilters?.[index]?.key}|value_${value}`,
+      `${interactionLabel}`,
       'dashboard'
     )
 

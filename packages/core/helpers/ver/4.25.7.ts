@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import cloneConfig from '../cloneConfig'
 
 export const updatePreliminaryDataSeriesKeys = config => {
   if (config.type === 'chart') {
@@ -17,7 +18,7 @@ export const updatePreliminaryDataSeriesKeys = config => {
 
 const update_4_25_7 = config => {
   const ver = '4.25.7'
-  const newConfig = _.cloneDeep(config)
+  const newConfig = cloneConfig(config)
   updatePreliminaryDataSeriesKeys(newConfig)
   newConfig.version = ver
   return newConfig

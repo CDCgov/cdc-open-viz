@@ -512,7 +512,14 @@ export const supportedCountries = {
   NIU: ['Niue', 'Niue (New Zealand)'],
   NFK: ['Norfolk Island', 'Norfolk Island (Australia)'],
   MKD: ['North Macedonia', 'Republic of North Macedonia', 'Macedonia'],
-  MNP: ['Northern Mariana Islands', 'N. Mariana Is.', 'Northern Mariana Islands (U.S.)'],
+  MNP: [
+    'Northern Mariana Islands',
+    'N. Mariana Is.',
+    'Northern Mariana Islands (U.S.)',
+    'Commonwealth of Northern Mariana Islands',
+    'Commonwealth of the Northern Mariana Islands',
+    'Commonwealth of the Northern Mariana Islands (CNMI)'
+  ],
   NOR: ['Norway'],
   OMN: ['Oman'],
   PAK: ['Pakistan'],
@@ -643,7 +650,15 @@ export const supportedTerritories = {
   'US-GU': ['GUAM', 'GU'],
   'US-PR': ['PUERTO RICO', 'PR'],
   'US-VI': ['U.S. VIRGIN ISLANDS', 'VI', 'US VIRGIN ISLANDS', 'VIRGIN ISLANDS'],
-  'US-MP': ['NORTHERN MARIANAS', 'MP', 'CNMI'],
+  'US-MP': [
+    'NORTHERN MARIANA ISLANDS',
+    'MP',
+    'CNMI',
+    'NORTHERN MARIANAS',
+    'COMMONWEALTH OF NORTHERN MARIANA ISLANDS',
+    'COMMONWEALTH OF THE NORTHERN MARIANA ISLANDS',
+    'COMMONWEALTH OF THE NORTHERN MARIANA ISLANDS (CNMI)'
+  ],
   'US-FM': ['MICRONESIA', 'FM', 'Federated States of Micronesia'], // Note: Key is not an official ISO code
   'US-PW': ['PALAU', 'PW'], // Note: Key is not an official ISO code
   'US-MH': ['MARSHALL ISLANDS', 'MH', 'RMI'] // Note: Key is not an official ISO code

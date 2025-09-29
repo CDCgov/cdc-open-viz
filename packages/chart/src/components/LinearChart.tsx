@@ -5,6 +5,7 @@ import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 import { Group } from '@visx/group'
 import { Line, Bar } from '@visx/shape'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
+import 'react-tooltip/dist/react-tooltip.css'
 import { Text } from '@visx/text'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import _ from 'lodash'
@@ -90,6 +91,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleChartAriaLabels,
     handleLineType,
     handleDragStateChange,
+    interactionLabel,
     isDraggingAnnotation,
     legendRef,
     parseDate,
@@ -204,7 +206,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   const yMax = initialHeight + forestRowsHeight
 
-  const isNoDataAvailable = config.filters && config.filters.values.length === 0 && data.length === 0
+  const isNoDataAvailable = config.filters?.length > 0 && data.length === 0
 
   const getXAxisData = d =>
     isDateScale(config.runtime.xAxis)
@@ -268,7 +270,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     yScale,
     seriesScale,
     showTooltip,
-    hideTooltip
+    hideTooltip,
+    interactionLabel
   })
   // get the number of months between the first and last date
   const { dataKey } = runtime.xAxis

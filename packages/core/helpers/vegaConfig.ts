@@ -423,7 +423,6 @@ export const convertVegaConfig = (configType: string, vegaConfig: any, config: a
       hideBorder: true,
       title: colorLabel
     }
-    config.color = 'sequential-blue-2(MPX)'
   } else {
     const stack = getStack(vegaConfig)
     const stackField = stack?.field

@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { MultiDashboardConfig } from '../types/MultiDashboard'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { getApplicableFilters } from './getFilteredData'
@@ -44,7 +45,7 @@ export const getVizConfig = (
   multiVizColumn?: string
 ): AnyVisualization => {
   if (rowNumber === undefined) return {} as AnyVisualization
-  const visualizationConfig = _.cloneDeep(config.visualizations[visualizationKey])
+  const visualizationConfig = cloneConfig(config.visualizations[visualizationKey])
   const rowData = config.rows[rowNumber]
   if (visualizationConfig.footnotes?.dataKey) {
     visualizationConfig.footnotes.data = config.datasets[visualizationConfig.footnotes.dataKey]?.data
@@ -54,21 +55,22 @@ export const getVizConfig = (
     Object.assign(visualizationConfig, _.pick(rowData, ['dataKey', 'dataDescription', 'formattedData', 'data']))
   }
 
-  if (visualizationConfig.table && config.dashboard.sharedFilters.length) {
-    // Download CSV button needs to know to include shared filter columns
-    const sharedFilterColumns = config.dashboard.sharedFilters.reduce((acc, filter) => {
-      if (!filter.usedBy?.length || filter.usedBy?.includes(visualizationKey)) {
-        const apiFilter = filter.apiFilter
-        const colName = apiFilter?.textSelector || apiFilter?.valueSelector || filter.columnName
-        acc.push(colName)
-        const subGrouping =
-          apiFilter?.subgroupTextSelector || apiFilter?.subgroupValueSelector || filter.subGrouping?.columnName
-        if (subGrouping) {
-          acc.push(subGrouping)
-        }
+  const sharedFilterColumns = config.dashboard.sharedFilters.reduce((acc, filter) => {
+    if (!filter.usedBy?.length || filter.usedBy?.includes(visualizationKey)) {
+      const apiFilter = filter.apiFilter
+      const colName = apiFilter?.textSelector || apiFilter?.valueSelector || filter.columnName
+      acc.push(colName)
+      const subGrouping =
+        apiFilter?.subgroupTextSelector || apiFilter?.subgroupValueSelector || filter.subGrouping?.columnName
+      if (subGrouping) {
+        acc.push(subGrouping)
       }
-      return acc
-    }, [])
+    }
+    return acc
+  }, [])
+
+  // Download CSV button needs to know to include shared filter columns
+  if (visualizationConfig.table && config.dashboard.sharedFilters.length) {
     visualizationConfig.table.sharedFilterColumns = sharedFilterColumns
   }
 
@@ -82,7 +84,7 @@ export const getVizConfig = (
     }
   } else {
     const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
-    visualizationConfig.data = data[dataKey] || []
+    visualizationConfig.data = sharedFilterColumns.length ? [] : data[dataKey] || []
     if (visualizationConfig.formattedData) {
       visualizationConfig.formattedData =
         transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) ||

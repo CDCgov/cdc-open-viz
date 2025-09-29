@@ -1,5 +1,6 @@
 import { ConfigRow } from '@cdc/dashboard/src/types/ConfigRow'
 import _ from 'lodash'
+import cloneConfig from '../cloneConfig'
 
 const remapDashboardRows = config => {
   if (config.type === 'dashboard') {
@@ -43,7 +44,7 @@ const mapUpdates = newConfig => {
 const update_4_24_3 = config => {
   const ver = '4.24.3'
 
-  const newConfig = _.cloneDeep(config)
+  const newConfig = cloneConfig(config)
 
   remapDashboardRows(newConfig)
   chartUpdates(newConfig)

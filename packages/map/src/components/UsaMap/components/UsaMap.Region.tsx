@@ -7,7 +7,9 @@ import { Mercator } from '@visx/geo'
 
 // Cdc Components
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import ConfigContext from '../../../context'
+import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import Annotation from '../../Annotation'
 
 // Data
@@ -51,7 +53,8 @@ const Rect: React.FC<RectProps> = ({ label, text, stroke, strokeWidth, ...props 
 }
 
 const UsaRegionMap = () => {
-  const { data, config, tooltipId, legendMemo, legendSpecialClassLastMemo, runtimeLegend } = useContext(ConfigContext)
+  const { runtimeData, config, tooltipId, runtimeLegend, interactionLabel } = useContext(ConfigContext)
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const [focusedStates, setFocusedStates] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
@@ -75,10 +78,10 @@ const UsaRegionMap = () => {
 
   useEffect(() => {
     // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
-    const territoriesList = territoriesKeys.filter(key => data[key])
+    const territoriesList = territoriesKeys.filter(key => runtimeData[key])
 
     setTerritoriesData(territoriesList)
-  }, [data])
+  }, [runtimeData])
 
   if (!focusedStates) {
     return <></>
@@ -90,7 +93,7 @@ const UsaRegionMap = () => {
   const territories = territoriesData.map(territory => {
     const Shape = Rect
 
-    const territoryData = data[territory]
+    const territoryData = runtimeData[territory]
 
     let toolTip: string
 
@@ -162,7 +165,7 @@ const UsaRegionMap = () => {
 
       if (!geoKey) return
 
-      const geoData = data[geoKey]
+      const geoData = runtimeData[geoKey]
 
       let legendColors
       // Once we receive data for this geographic item, setup variables.
@@ -215,6 +218,14 @@ const UsaRegionMap = () => {
             data-tooltip-id={`tooltip__${tooltipId}`}
             data-tooltip-html={toolTip}
             tabIndex={-1}
+            onMouseEnter={() => {
+              // Track hover analytics event if this is a new location
+              const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
+              publishAnalyticsEvent(`map_hover_${locationName?.toLowerCase()}`, 'hover', interactionLabel, 'map', {
+                title: config?.title || config?.general?.title,
+                location: geoDisplayName
+              })
+            }}
           >
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1} d={path} />
             <g id={`region-${index + 1}-label`}>

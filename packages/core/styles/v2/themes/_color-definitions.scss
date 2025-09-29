@@ -1,4 +1,5 @@
 @use 'sass:string';
+@use 'sass:list';
 @import './../../variables';
 
 $theme: (
@@ -82,8 +83,8 @@ $theme: (
   @each $theme-name, $theme-colors in $theme {
     // Header
     .theme-#{$theme-name} {
-      background-color: string.unquote(nth($theme-colors, 1));
-      border-color: string.unquote(nth($theme-colors, 2));
+      background-color: string.unquote(list.nth($theme-colors, 1));
+      border-color: string.unquote(list.nth($theme-colors, 2));
       border-bottom-style: solid;
       border-bottom-width: 4px;
     }
@@ -95,7 +96,7 @@ $theme: (
         &:not(.no-borders) {
           /// borders are the theme color
           &.component--has-borderColorTheme {
-            border: 1px solid string.unquote(nth($theme-colors, 1));
+            border: 1px solid string.unquote(list.nth($theme-colors, 1));
           }
           /// using default border color to draw borders
           &:not(.component--has-borderColorTheme) {
@@ -108,23 +109,23 @@ $theme: (
 
         /// left accent bar
         &.component--has-accent {
-          border-left: 0.5rem solid string.unquote(nth($theme-colors, 1)) !important;
+          border-left: 0.5rem solid string.unquote(list.nth($theme-colors, 1)) !important;
         }
 
         /// Apply a background color
         &.component--has-background:not(.component--hideBackgroundColor) {
-          background: string.unquote(nth($theme-colors, 3));
+          background: string.unquote(list.nth($theme-colors, 3));
         }
       }
 
       .cove-component__header {
-        border-color: string.unquote(nth($theme-colors, 2));
+        border-color: string.unquote(list.nth($theme-colors, 2));
       }
     }
 
     &.theme-#{$theme-name} {
       .cove-component__header {
-        border-color: string.unquote(nth($theme-colors, 2));
+        border-color: string.unquote(list.nth($theme-colors, 2));
       }
     }
   }
@@ -135,42 +136,42 @@ $theme: (
   @each $theme-name, $theme-colors in $theme {
     &.theme-#{$theme-name} {
       .single-filters--tab .tab--active:not(.tab--simple) {
-        border: 1px solid string.unquote(nth($theme-colors, 1));
-        border-top: 3px solid string.unquote(nth($theme-colors, 1));
+        border: 1px solid string.unquote(list.nth($theme-colors, 1));
+        border-top: 3px solid string.unquote(list.nth($theme-colors, 1));
         border-bottom: none;
       }
 
       .single-filters--tab .tab:not(.tab--active):not(.tab--simple) {
-        border-bottom: 1px solid string.unquote(nth($theme-colors, 1));
+        border-bottom: 1px solid string.unquote(list.nth($theme-colors, 1));
       }
 
       .single-filters--pill .pill--active {
-        background-color: string.unquote(nth($theme-colors, 1));
+        background-color: string.unquote(list.nth($theme-colors, 1));
         color: #fff;
       }
     }
 
     .theme-#{$theme-name} {
       .single-filters--tab .tab--active:not(.tab--simple) {
-        border: 1px solid string.unquote(nth($theme-colors, 1));
-        border-top: 3px solid string.unquote(nth($theme-colors, 1));
+        border: 1px solid string.unquote(list.nth($theme-colors, 1));
+        border-top: 3px solid string.unquote(list.nth($theme-colors, 1));
         border-bottom: none;
       }
 
       .single-filters--tab .tab:not(.tab--active):not(.tab--simple) {
-        border-bottom: 1px solid string.unquote(nth($theme-colors, 1));
+        border-bottom: 1px solid string.unquote(list.nth($theme-colors, 1));
       }
 
       .single-filters--pill .pill--active {
-        background-color: string.unquote(nth($theme-colors, 1));
+        background-color: string.unquote(list.nth($theme-colors, 1));
         color: #fff;
       }
 
       .button__tab-bar--active {
-        outline: 2px solid string.unquote(nth($theme-colors, 1));
+        outline: 2px solid string.unquote(list.nth($theme-colors, 1));
       }
       .apply:not([disabled]) {
-        background-color: string.unquote(nth($theme-colors, 1));
+        background-color: string.unquote(list.nth($theme-colors, 1));
       }
     }
   }

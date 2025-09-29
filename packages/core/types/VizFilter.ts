@@ -46,6 +46,7 @@ export type SubGrouping = {
   setByQueryParameter: string
   order?: OrderBy
   valuesLookup: Record<string, { orderedValues?: string[]; values: string[] }>
+  defaultValue?: string
 }
 
 export type VizFilter = GeneralFilter | MultiSelectFilter

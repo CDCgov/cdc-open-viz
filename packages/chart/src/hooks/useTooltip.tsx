@@ -5,6 +5,7 @@ import ConfigContext from '../ConfigContext'
 import { type ChartContext } from '../types/ChartContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 // Third-party library imports
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
@@ -23,7 +24,7 @@ export const useTooltip = props => {
     setSharedFilter,
     isDraggingAnnotation
   } = useContext<ChartContext>(ConfigContext)
-  const { xScale, yScale, seriesScale, showTooltip, hideTooltip } = props
+  const { xScale, yScale, seriesScale, showTooltip, hideTooltip, interactionLabel = '' } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
 
   const Y_AXIS_SIZE = Number(config.yAxis.size || 0)
@@ -131,6 +132,15 @@ export const useTooltip = props => {
       if (showPiePercent && pieData[config.xAxis.dataKey] === 'Calculated Area') {
         tooltipItems.push(['', 'Calculated Area'])
       } else {
+        // Track hover analytics event for pie chart series
+        if (pieData[config.xAxis.dataKey] && interactionLabel) {
+          const seriesName = String(pieData[config.xAxis.dataKey]).replace(/[^a-zA-Z0-9]/g, '_')
+          publishAnalyticsEvent(`chart_hover_${seriesName.toLowerCase()}`, 'hover', interactionLabel, 'chart', {
+            title: config?.title,
+            series: pieData[config.xAxis.dataKey]
+          })
+        }
+
         tooltipItems.push(
           [config.xAxis.dataKey, pieData[config.xAxis.dataKey]],
           [
@@ -168,6 +178,23 @@ export const useTooltip = props => {
               const seriesObjWithName = config.runtime.series.find(
                 series => series.dataKey === seriesKey && series.name !== undefined
               )
+
+              // Track hover analytics event for linear chart series
+              if (interactionLabel && seriesKey && seriesKey !== config.xAxis?.dataKey) {
+                const seriesName = seriesObjWithName?.name || seriesKey
+                const safeSeriesName = String(seriesName).replace(/[^a-zA-Z0-9]/g, '_')
+                publishAnalyticsEvent(
+                  `chart_hover_${safeSeriesName.toLowerCase()}`,
+                  'hover',
+                  interactionLabel,
+                  'chart',
+                  {
+                    title: config?.title,
+                    series: seriesName
+                  }
+                )
+              }
+
               if (
                 (value === null || value === undefined || value === '' || formattedValue === 'N/A') &&
                 config.general.hideNullValue
@@ -571,18 +598,26 @@ export const useTooltip = props => {
 
     // TOOLTIP BODY
     // handle suppressed tooltip items
-    const { label, displayGray } =
-      (config.visualizationSubType !== 'stacked' &&
-        config.general.showSuppressedSymbol &&
-        config.preliminaryData?.find(
-          pd =>
-            pd.label &&
-            pd.type === 'suppression' &&
-            pd.displayTooltip &&
-            value === pd.value &&
-            (!pd.column || key === pd.column)
-        )) ||
-      {}
+    const shouldCheckSuppression = config.visualizationSubType !== 'stacked'
+    let suppressionEntry
+    if (shouldCheckSuppression && config.preliminaryData) {
+      suppressionEntry = config.preliminaryData.find(
+        pd =>
+          pd.label &&
+          pd.type === 'suppression' &&
+          pd.displayTooltip &&
+          value === pd.value &&
+          (!pd.column || key === pd.column)
+      )
+    }
+
+    // Remove suppressed items entirely if not showing symbols
+    if (suppressionEntry && !config.general.showSuppressedSymbol) {
+      return null
+    }
+
+    const { label, displayGray } = suppressionEntry || {}
+
     let newValue = label || value
     const style = displayGray ? { color: '#8b8b8a' } : {}
 

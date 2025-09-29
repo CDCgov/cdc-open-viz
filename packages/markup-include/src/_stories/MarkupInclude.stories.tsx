@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import CdcMarkupInclude from '../CdcMarkupInclude'
 import primary from './_mock/primary.json'
 import noConditions from './_mock/no-conditions.json'

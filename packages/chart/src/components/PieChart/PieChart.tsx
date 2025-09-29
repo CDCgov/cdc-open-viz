@@ -7,9 +7,16 @@ import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import { colorPalettesChart as colorPalettes } from '@cdc/core/data/colorPalettes'
+import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
+import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import {
+  v2ColorDistribution,
+  divergentColorDistribution,
+  colorblindColorDistribution
+} from '@cdc/core/helpers/palettes/colorDistributions'
 
 // cove
-import ConfigContext from '../../ConfigContext'
+import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
 import { useTooltip as useCoveTooltip } from '../../hooks/useTooltip'
 import useIntersectionObserver from '../../hooks/useIntersectionObserver'
 import { handleChartAriaLabels } from '../../helpers/handleChartAriaLabels'
@@ -25,7 +32,14 @@ type TooltipData = {
   dataYPosition: number
 }
 
-const PieChart = props => {
+type PieChartProps = {
+  parentWidth?: number
+  parentHeight?: number
+  interactionLabel?: string
+}
+
+const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => {
+  const { interactionLabel = '' } = props
   const {
     transformedData: data,
     config,
@@ -34,12 +48,14 @@ const PieChart = props => {
     seriesHighlight,
     isDraggingAnnotation
   } = useContext(ConfigContext)
+  const dispatch = useContext(ChartDispatchContext)
   const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip<TooltipData>()
   const { handleTooltipMouseOver, handleTooltipMouseOff, TooltipListItem } = useCoveTooltip({
     xScale: false,
     yScale: false,
     showTooltip,
-    hideTooltip
+    hideTooltip,
+    interactionLabel
   })
   const [filteredData, setFilteredData] = useState(undefined)
   const [animatedPie, setAnimatePie] = useState(false)
@@ -90,42 +106,91 @@ const PieChart = props => {
     }
 
     return baseData
-  }, [data, dataNeedsPivot, showPercentage, config])
+  }, [
+    data,
+    dataNeedsPivot,
+    showPercentage,
+    config.yAxis.dataKey,
+    config.xAxis.dataKey,
+    config.runtime.yAxis.dataKey,
+    config.runtime.xAxis.dataKey
+  ])
+
+  // Helper function to determine enhanced distribution type and apply it
+  const applyEnhancedColorDistribution = (config, palette, numberOfKeys) => {
+    const version = getColorPaletteVersion(config)
+    const configPalette = config.general?.palette?.name || config.palette
+
+    // Skip enhanced distribution if not v2, too many keys, or wrong palette length
+    if (version !== 2 || numberOfKeys > 9 || palette.length !== 9) {
+      return palette.slice(0, numberOfKeys)
+    }
+
+    const isSequential = configPalette && configPalette.includes('sequential')
+    const isDivergent = configPalette && configPalette.includes('divergent')
+    const isColorblindSafe =
+      configPalette && (configPalette.includes('colorblindsafe') || configPalette.includes('qualitative_standard'))
+
+    // Determine which distribution to use based on palette type
+    let distributionMap = null
+    if (isDivergent) {
+      distributionMap = divergentColorDistribution
+    } else if (isColorblindSafe) {
+      distributionMap = colorblindColorDistribution
+    } else if (isSequential) {
+      distributionMap = v2ColorDistribution
+    }
+
+    if (distributionMap && distributionMap[numberOfKeys]) {
+      const distributionIndices = distributionMap[numberOfKeys]
+      return distributionIndices.map((index: number) => palette[index])
+    }
+
+    return palette.slice(0, numberOfKeys)
+  }
+
+  // Helper function to extract keys from data
+  const extractDataKeys = (data, dataKey) => {
+    const keys = {}
+    data.forEach(d => {
+      if (!keys[d[dataKey]]) keys[d[dataKey]] = true
+    })
+    return Object.keys(keys)
+  }
+
+  // Helper function to create color scale for pie charts
+  const createPieColorScale = (data, config, isPercentageMode = false, labelForCalcArea = null) => {
+    const dataKeys = extractDataKeys(data, config.xAxis.dataKey)
+    const domainKeys = isPercentageMode ? dataKeys.filter(k => k !== labelForCalcArea) : dataKeys
+    const numberOfKeys = domainKeys.length
+
+    let palette = getPaletteColors(config, colorPalettes)
+    palette = applyEnhancedColorDistribution(config, palette, numberOfKeys)
+
+    const unknownColor = isPercentageMode
+      ? getComputedStyle(document.documentElement).getPropertyValue('--cool-gray-10').trim()
+      : null
+
+    return scaleOrdinal({
+      domain: domainKeys,
+      range: palette,
+      unknown: unknownColor
+    })
+  }
 
   const _colorScale = useMemo(() => {
+    // Always use the full _data for color scale to ensure legend shows all items
     if (dataNeedsPivot) {
-      const keys = {}
-      _data.forEach(d => {
-        if (!keys[d[config.xAxis.dataKey]]) keys[d[config.xAxis.dataKey]] = true
-      })
-      const numberOfKeys = Object.entries(keys).length
-      let palette = config.customColors || colorPalettes[config.palette]
-      palette = palette.slice(0, numberOfKeys)
-      return scaleOrdinal({
-        domain: Object.keys(keys),
-        range: palette,
-        unknown: null
-      })
+      return createPieColorScale(_data, config)
     }
 
     if (showPercentage) {
-      const keys = {}
-      _data.forEach(d => {
-        keys[d[config.xAxis.dataKey]] = true
-      })
-      // take out Calculated Area so it falls back to `unknown`
-      const domainKeys = Object.keys(keys).filter(k => k !== labelForCalcArea)
-
-      const basePalette = (config.customColors || colorPalettes[config.palette]).slice(0, domainKeys.length)
-      const COOL_GRAY_90 = getComputedStyle(document.documentElement).getPropertyValue('--cool-gray-10').trim()
-      return scaleOrdinal({
-        domain: domainKeys,
-        range: basePalette,
-        unknown: COOL_GRAY_90
-      })
+      return createPieColorScale(_data, config, true, labelForCalcArea)
     }
-    return colorScale
-  }, [_data, dataNeedsPivot, colorScale])
+
+    // Handle normal pie chart case
+    return createPieColorScale(_data, config)
+  }, [_data, dataNeedsPivot, colorScale, showPercentage, config.xAxis.dataKey, config.general?.palette, config.palette])
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -137,9 +202,9 @@ const PieChart = props => {
     const element = document.querySelector('.isEditor')
     if (element) {
       // parent element is visible
-      setAnimatePie(prevState => true)
+      setAnimatePie(true)
     }
-  })
+  }, [])
 
   useEffect(() => {
     if (dataRef?.isIntersecting && config.animate && !animatedPie) {
@@ -178,14 +243,22 @@ const PieChart = props => {
         roundedPercentage = '**'
       }
 
+      // Determine if this slice should be muted based on legend behavior
+      const isHighlighted =
+        seriesHighlight.length === 0 || seriesHighlight.indexOf(arc.data[config.runtime.xAxis.dataKey]) !== -1
+      const shouldMute = config.legend.behavior === 'highlight' && seriesHighlight.length > 0 && !isHighlighted
+      const sliceOpacity = shouldMute ? 0.3 : 1
+      const textOpacity = shouldMute ? 0.3 : 1
+
       return (
         <Group key={key} className={`slice-${key}`}>
           {/* ── the slice */}
           <animated.path
-            d={to([styles.startAngle, styles.endAngle], (start, end) =>
+            d={to([styles.startAngle, styles.endAngle], (start: number, end: number) =>
               path({ ...arc, startAngle: start, endAngle: end })
             )}
             fill={colorScale(key)}
+            opacity={sliceOpacity}
             onMouseEnter={e =>
               onHover(e, {
                 data: arc.data,
@@ -201,7 +274,7 @@ const PieChart = props => {
           {/* ── the percentage label */}
           {arc.endAngle - arc.startAngle > 0.1 && (
             <animated.text
-              transform={to([styles.startAngle, styles.endAngle], (start, end) => {
+              transform={to([styles.startAngle, styles.endAngle], (start: number, end: number) => {
                 const [x, y] = path.centroid({
                   ...arc,
                   startAngle: start,
@@ -212,6 +285,7 @@ const PieChart = props => {
               textAnchor='middle'
               pointerEvents='none'
               fill={textColor}
+              opacity={textOpacity}
             >
               {/** compute text inside the spring callback */}
               {roundedPercentage}
@@ -252,6 +326,15 @@ const PieChart = props => {
     }
   }, [seriesHighlight]) // eslint-disable-line
 
+  // Update the context colorScale when the pie chart's colorScale changes
+  // This ensures the Legend component uses the same colors as the pie chart
+  // Only update when specific color-related properties change, not the entire colorScale
+  useEffect(() => {
+    if (_colorScale && config.visualizationType === 'Pie') {
+      dispatch({ type: 'SET_COLOR_SCALE', payload: _colorScale })
+    }
+  }, [config.visualizationType, config.xAxis.dataKey, config.general?.palette?.name, config.palette, dispatch])
+
   const getSvgClasses = () => {
     let classes = ['animated-pie', 'group']
     if (config.animate === false || animatedPie) {
@@ -269,26 +352,27 @@ const PieChart = props => {
           className={getSvgClasses()}
           role='img'
           aria-label={handleChartAriaLabels(config)}
+          onMouseLeave={handleTooltipMouseOff}
         >
           <Group top={centerY} left={radius}>
             {/* prettier-ignore */}
             <Pie
-            data={filteredData || _data}
-            pieValue={d => parseFloat(d[pivotKey || config.runtime.yAxis.dataKey])}
-            pieSortValues={() => -1}
-            innerRadius={radius - donutThickness}
-            outerRadius={radius}
-          >
-           {pie => (
-             <AnimatedPie
-             {...pie}
-              getKey={d => d.data[config.runtime.xAxis.dataKey]}
-              colorScale={_colorScale}
-              onHover={handleTooltipMouseOver}
-               onLeave={handleTooltipMouseOff}
-           />
-            )}
-          </Pie>
+              data={filteredData || _data}
+              pieValue={d => parseFloat(d[pivotKey || config.runtime.yAxis.dataKey])}
+              pieSortValues={() => -1}
+              innerRadius={radius - donutThickness}
+              outerRadius={radius}
+            >
+              {pie => (
+                <AnimatedPie
+                  {...pie}
+                  getKey={d => d.data[config.runtime.xAxis.dataKey]}
+                  colorScale={_colorScale}
+                  onHover={handleTooltipMouseOver}
+                  onLeave={handleTooltipMouseOff}
+                />
+              )}
+            </Pie>
           </Group>
         </svg>
         <div ref={triggerRef} />
@@ -304,7 +388,6 @@ const PieChart = props => {
                 config.tooltips.opacity / 100
               }) !important`}</style>
               <TooltipWithBounds
-                key={Math.random()}
                 className={'tooltip cdc-open-viz-module'}
                 left={tooltipLeft + centerX - radius}
                 top={tooltipTop}
@@ -319,6 +402,6 @@ const PieChart = props => {
       </ErrorBoundary>
     </>
   )
-}
+})
 
 export default PieChart

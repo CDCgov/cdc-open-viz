@@ -228,10 +228,10 @@ const LineChart = (props: LineChartProps) => {
                   />
 
                   {suppressedSegments.map((segment, index) => {
-                    return Object.entries(segment.data).map(([key, value]) => {
+                    return Object.entries(segment.data).map(([key, value], entryIndex) => {
                       return (
                         <LinePath
-                          key={index}
+                          key={`${index}-${key}-${entryIndex}`}
                           data={value}
                           x={d => xPos(d)}
                           y={d =>

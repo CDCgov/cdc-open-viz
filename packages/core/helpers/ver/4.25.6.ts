@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import cloneConfig from '../cloneConfig'
 
 // *NOTE: This ends support for only showing the top prefix
 export const changeOnlyShowTopSuffixToInlineLabel = config => {
@@ -27,7 +28,7 @@ export const changeOnlyShowTopSuffixToInlineLabel = config => {
 
 const update_4_25_6 = config => {
   const ver = '4.25.6'
-  const newConfig = _.cloneDeep(config)
+  const newConfig = cloneConfig(config)
   changeOnlyShowTopSuffixToInlineLabel(newConfig)
   newConfig.version = ver
   return newConfig
