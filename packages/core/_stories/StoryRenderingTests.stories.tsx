@@ -126,7 +126,7 @@ const testIframeVisualization = async (iframeUrl: string) => {
   }
 }
 
-export const StoriesLoadTests: Story = {
+export const StoryRenderingTests: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     expect(canvas.getByTestId('chart-rendering-validator')).toBeInTheDocument()
@@ -137,6 +137,9 @@ export const StoriesLoadTests: Story = {
       console.warn('No visualization stories found to test')
       return
     }
+
+    // Wait 5 seconds before first test for browser/Storybook initialization (for GitHub Actions)
+    await new Promise(resolve => setTimeout(resolve, 5000))
 
     const results: { iframeUrl: string; storyUrl: string; success: boolean; error?: string }[] = []
 
