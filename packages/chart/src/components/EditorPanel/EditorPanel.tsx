@@ -4277,6 +4277,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             )}
             <Panels.Annotate name='Text Annotations' />
             {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
+            <Panels.Markup name='Markup Variables' />
           </Accordion>
           {config.type !== 'Spark Line' && (
             <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />

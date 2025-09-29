@@ -7,6 +7,7 @@ import axios from 'axios'
 // cdc
 import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 import { publish } from '@cdc/core/helpers/events'
+import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import ConfigContext from './ConfigContext'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import EditorPanel from '../src/components/EditorPanel'
@@ -157,71 +158,6 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     }
   }
 
-  const filterOutConditions = (workingData, conditionList) => {
-    const { columnName, isOrIsNotEqualTo, value } = conditionList[0]
-
-    const newWorkingData =
-      isOrIsNotEqualTo === 'is'
-        ? workingData?.filter(dataObject => dataObject[columnName] === value)
-        : workingData?.filter(dataObject => dataObject[columnName] !== value)
-
-    conditionList.shift()
-    return conditionList.length === 0 ? newWorkingData : filterOutConditions(newWorkingData, conditionList)
-  }
-
-  const emptyVariableChecker = []
-  const noDataMessageChecker = []
-
-  const convertVariablesInMarkup = inlineMarkup => {
-    if (_.isEmpty(markupVariables)) return inlineMarkup
-    const variableRegexPattern = /{{(.*?)}}/g
-    const convertedInlineMarkup = inlineMarkup.replace(variableRegexPattern, variableTag => {
-      if (emptyVariableChecker.length > 0) return
-      const workingVariable = markupVariables.filter(variable => variable.tag === variableTag)[0]
-      if (workingVariable === undefined) return [variableTag]
-      const workingData =
-        workingVariable && workingVariable.conditions.length === 0
-          ? data
-          : filterOutConditions(data, [...workingVariable.conditions])
-
-      const variableValues: string[] = _.uniq(
-        (workingData || []).map(dataObject => {
-          const dataObjectValue = dataObject[workingVariable.columnName]
-          return workingVariable.addCommas && !isNaN(parseFloat(dataObjectValue))
-            ? parseFloat(dataObjectValue).toLocaleString('en-US', { useGrouping: true })
-            : dataObjectValue
-        })
-      )
-
-      const variableDisplay = []
-
-      const listConjunction = !isEditor ? 'and' : 'or'
-
-      const length = variableValues.length
-      if (length === 2) {
-        const newVariableValues = variableValues.join(` ${listConjunction} `)
-        variableValues.splice(0, 2, newVariableValues)
-      }
-      if (length > 2) {
-        variableValues[length - 1] = `${listConjunction} ${variableValues[length - 1]}`
-      }
-
-      variableDisplay.push(variableValues.join(', '))
-
-      const finalDisplay = variableDisplay[0]
-
-      if (showNoDataMessage && finalDisplay === '') {
-        noDataMessageChecker.push(true)
-      }
-
-      if (finalDisplay === '' && contentEditor.allowHideSection) {
-        emptyVariableChecker.push(true)
-      }
-      return finalDisplay
-    })
-    return convertedInlineMarkup
-  }
-
   const parseBodyMarkup = markup => {
     let parse
     let hasBody = false
@@ -261,10 +197,18 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   let content = <Loading />
 
-  const markup = useInlineHTML ? convertVariablesInMarkup(inlineHTML) : parseBodyMarkup(urlMarkup)
+  const processedMarkup = useInlineHTML
+    ? processMarkupVariables(inlineHTML, data || [], markupVariables || [], {
+        isEditor,
+        showNoDataMessage,
+        allowHideSection
+      })
+    : { processedContent: parseBodyMarkup(urlMarkup), shouldHideSection: false, shouldShowNoDataMessage: false }
 
-  const hideMarkupInclude = contentEditor?.allowHideSection && emptyVariableChecker.length > 0 && !isEditor
-  const _showNoDataMessage = showNoDataMessage && noDataMessageChecker.length > 0 && !isEditor
+  const markup = processedMarkup.processedContent
+
+  const hideMarkupInclude = processedMarkup.shouldHideSection
+  const _showNoDataMessage = processedMarkup.shouldShowNoDataMessage
 
   if (loading === false) {
     content = (

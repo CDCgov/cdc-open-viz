@@ -47,6 +47,7 @@ import { lineOptions } from './helpers/lineOptions'
 import { handleLineType } from './helpers/handleLineType'
 import { handleRankByValue } from './helpers/handleRankByValue'
 import { generateColorsArray } from '@cdc/core/helpers/generateColorsArray'
+import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
@@ -152,6 +153,35 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Destructure items from config for more readable JSX
   let { legend, title } = config
+
+  // Process markup variables for text fields
+  let processedSuperTitle = config.superTitle
+  let processedIntroText = config.introText
+  let processedLegacyFootnotes = config.legacyFootnotes
+
+  if (config.enableMarkupVariables && config.markupVariables?.length > 0) {
+    if (title) {
+      title = processMarkupVariables(title, config.data || [], config.markupVariables, { isEditor }).processedContent
+    }
+    if (config.superTitle) {
+      processedSuperTitle = processMarkupVariables(config.superTitle, config.data || [], config.markupVariables, {
+        isEditor
+      }).processedContent
+    }
+    if (config.introText) {
+      processedIntroText = processMarkupVariables(config.introText, config.data || [], config.markupVariables, {
+        isEditor
+      }).processedContent
+    }
+    if (config.legacyFootnotes) {
+      processedLegacyFootnotes = processMarkupVariables(
+        config.legacyFootnotes,
+        config.data || [],
+        config.markupVariables,
+        { isEditor }
+      ).processedContent
+    }
+  }
 
   // set defaults on titles if blank AND only in editor
   if (isEditor) {
@@ -909,16 +939,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 showTitle={config.showTitle}
                 isDashboard={isDashboard}
                 title={title}
-                superTitle={config.superTitle}
+                superTitle={processedSuperTitle}
                 classes={['chart-title', `${config.theme}`, 'cove-component__header', 'mb-3']}
                 style={undefined}
+                config={config}
               />
 
               {/* Visualization Wrapper */}
               <div className={getChartWrapperClasses().join(' ')}>
                 {/* Intro Text/Message */}
-                {config?.introText && config.visualizationType !== 'Spark Line' && (
-                  <section className={`introText mb-4`}>{parse(config.introText)}</section>
+                {processedIntroText && config.visualizationType !== 'Spark Line' && (
+                  <section className={`introText mb-4`}>{parse(processedIntroText)}</section>
                 )}
 
                 {/* Filters */}
@@ -1009,9 +1040,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           dimensions={dimensions}
                           interactionLabel={interactionLabel}
                         />
-                        {config?.introText && (
+                        {processedIntroText && (
                           <section className='introText mb-4' style={{ padding: '0px 0 35px' }}>
-                            {parse(config.introText)}
+                            {parse(processedIntroText)}
                           </section>
                         )}
                         <div style={{ height: `100px`, width: `100%`, ...sparkLineStyles }}>
@@ -1049,7 +1080,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 {/* Description */}
 
                 {config.description && config.visualizationType !== 'Spark Line' && (
-                  <div className={getChartSubTextClasses().join(' ')}>{parse(config.description)}</div>
+                  <div className={getChartSubTextClasses().join(' ')}>
+                    {parse(
+                      config.enableMarkupVariables && config.markupVariables?.length > 0
+                        ? processMarkupVariables(config.description, config.data || [], config.markupVariables, {
+                            isEditor
+                          }).processedContent
+                        : config.description
+                    )}
+                  </div>
                 )}
 
                 {/* buttons */}
@@ -1110,8 +1149,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 )}
                 {config?.annotations?.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
-                {config?.legacyFootnotes && (
-                  <section className='footnotes pt-2 mt-4'>{parse(config.legacyFootnotes)}</section>
+                {processedLegacyFootnotes && (
+                  <section className='footnotes pt-2 mt-4'>{parse(processedLegacyFootnotes)}</section>
                 )}
               </div>
               <FootnotesStandAlone
