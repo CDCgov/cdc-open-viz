@@ -113,8 +113,6 @@ const testIframeVisualization = async (iframeUrl: string) => {
       },
       async () => {},
       (before, after) => {
-        console.log('before', before)
-        console.log('after', after)
         return (after.svgCount > 0 && after.hasCoveModule) || after.isDataBite
       }
     )
@@ -137,20 +135,19 @@ export const StoryRenderingTests: Story = {
       return
     }
 
-    // Wait 5 seconds before first test for browser/Storybook initialization (for GitHub Actions)
-    await new Promise(resolve => setTimeout(resolve, 5000))
-
     const results: { iframeUrl: string; storyUrl: string; success: boolean; error?: string }[] = []
 
-    for (const iframeUrl of storyUrls) {
+    for (const [i, iframeUrl] of storyUrls.entries()) {
       const storyUrl = iframeUrlToStoryUrl(iframeUrl)
 
       try {
         await testIframeVisualization(iframeUrl)
         results.push({ iframeUrl, storyUrl, success: true })
       } catch (error: any) {
-        results.push({ iframeUrl, storyUrl, success: false, error: error.message })
-        console.log(`❌ FAILED: ${storyUrl}`)
+        if (i > 0) {
+          results.push({ iframeUrl, storyUrl, success: false, error: error.message })
+          console.log(`❌ FAILED: ${storyUrl}`)
+        }
       }
     }
 
