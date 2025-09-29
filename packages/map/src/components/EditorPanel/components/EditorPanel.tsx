@@ -3365,6 +3365,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           </AccordionItem>
           {config.general.geoType === 'us' && <Panels.PatternSettings name='Pattern Settings' />}
           {config.general.geoType !== 'us-county' && <Panels.Annotate name='Text Annotations' />}
+          <Panels.Markup name='Markup Variables' />
         </Accordion>
         <AdvancedEditor loadConfig={setConfig} config={config} convertStateToConfig={convertStateToConfig} />
       </Layout.Sidebar>
