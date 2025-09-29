@@ -1,18 +1,19 @@
 {
+  "annotations": [],
+  "allowLineToBarGraph": "__​undefined__",
   "type": "chart",
   "debugSvg": false,
   "chartMessage": {
     "noData": "No Data Available"
   },
-  "title": "ARDI",
+  "title": "",
   "showTitle": true,
   "showDownloadMediaButton": false,
   "theme": "theme-blue",
   "animate": false,
-  "fontSize": "medium",
   "lineDatapointStyle": "hover",
   "lineDatapointColor": "Same as Line",
-  "barHasBorder": "false",
+  "barHasBorder": "true",
   "isLollipopChart": false,
   "lollipopShape": "circle",
   "lollipopColorStyle": "two-tone",
@@ -22,13 +23,22 @@
   "tipRounding": "top",
   "isResponsiveTicks": false,
   "general": {
-    "showDownloadButton": false
+    "annotationDropdownText": "Annotations",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": true,
+    "hideNullValue": true,
+    "palette": {
+      "isReversed": true,
+      "version": "2.0",
+      "name": "sequential_bluereverse"
+    }
   },
   "padding": {
     "left": 5,
     "right": 5
   },
-  "suppressedData": [],
+  "preliminaryData": [],
   "yAxis": {
     "hideAxis": false,
     "displayNumbersOnBar": false,
@@ -39,21 +49,48 @@
     "enablePadding": false,
     "min": "",
     "max": "",
-    "labelColor": "#333",
-    "tickLabelColor": "#333",
-    "tickColor": "#333",
-    "rightHideAxis": true,
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
+    "rightHideAxis": false,
     "rightAxisSize": 0,
     "rightLabel": "",
     "rightLabelOffsetSize": 0,
-    "rightAxisLabelColor": "#333",
-    "rightAxisTickLabelColor": "#333",
-    "rightAxisTickColor": "#333",
+    "rightAxisLabelColor": "#1c1d1f",
+    "rightAxisTickLabelColor": "#1c1d1f",
+    "rightAxisTickColor": "#1c1d1f",
     "numTicks": "",
     "axisPadding": 0,
+    "scalePadding": 10,
     "tickRotation": 0,
     "anchors": [],
-    "dataKey": "males"
+    "shoMissingDataLabel": true,
+    "showMissingDataLine": true,
+    "categories": [],
+    "dataKey": "Age-adjusted rate"
+  },
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "count": "Count",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
+    }
   },
   "topAxis": {
     "hasLine": false
@@ -79,15 +116,19 @@
     "tickRotation": 0,
     "min": "",
     "max": "",
-    "labelColor": "#333",
-    "tickLabelColor": "#333",
-    "tickColor": "#333",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
     "numTicks": "",
-    "labelOffset": 65,
-    "axisPadding": 0,
+    "labelOffset": 0,
+    "axisPadding": 200,
     "target": 0,
     "maxTickRotation": 0,
-    "dataKey": "cause_type"
+    "padding": 5,
+    "showYearsOnce": false,
+    "sortByRecentDate": false,
+    "brushActive": false,
+    "dataKey": "Race"
   },
   "table": {
     "label": "Data Table",
@@ -97,20 +138,23 @@
     "caption": "",
     "showDownloadUrl": false,
     "showDataTableLink": true,
-    "indexLabel": "Cause Type",
-    "download": false,
+    "showDownloadLinkBelow": true,
+    "indexLabel": "",
+    "download": true,
     "showVertical": true,
-    "show": true,
-    "customTableConfig": true,
-    "excludeColumns": ["location", "age", "use", "data_group", "data_sub_group", "cause_category"]
+    "dateDisplayFormat": "",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "collapsible": true,
+    "show": true
   },
-  "orientation": "vertical",
-  "color": "pinkpurple",
+  "orientation": "Pie",
   "columns": {},
   "legend": {
     "hide": false,
     "behavior": "isolate",
-    "singleRow": false,
+    "axisAlign": true,
+    "singleRow": true,
     "colorCode": "",
     "reverseLabelOrder": false,
     "description": "",
@@ -119,21 +163,33 @@
     "dynamicLegendItemLimit": 5,
     "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
     "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "",
     "lineMode": false,
     "verticalSorted": false,
-    "highlightOnHover": false
-  },
-  "brush": {
-    "height": 25,
-    "data": [],
-    "active": false
+    "highlightOnHover": false,
+    "hideSuppressedLabels": false,
+    "hideSuppressionLink": false,
+    "seriesHighlight": [],
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "groupBy": "",
+    "shape": "circle",
+    "tickRotation": "",
+    "order": "dataColumn",
+    "hideBorder": {
+      "side": false,
+      "topBottom": true
+    },
+    "position": "right",
+    "orderedValues": [],
+    "patterns": {},
+    "patternField": "",
+    "unified": true
   },
   "exclusions": {
-    "active": true,
-    "keys": ["all_causes"]
+    "active": false,
+    "keys": []
   },
-  "palette": "qualitative-soft",
-  "isPaletteReversed": false,
   "twoColor": {
     "palette": "monochrome-1",
     "isPaletteReversed": false
@@ -146,47 +202,186 @@
     "abbreviated": false,
     "bottomSuffix": "",
     "bottomPrefix": "",
-    "bottomAbbreviated": false,
-    "roundTo": 1
+    "bottomAbbreviated": false
   },
+  "filters": [],
   "confidenceKeys": {},
   "visual": {
     "border": true,
     "accent": true,
     "background": true,
     "verticalHoverLine": false,
-    "horizontalHoverLine": false
+    "horizontalHoverLine": false,
+    "lineDatapointSymbol": "none",
+    "maximumShapeAmount": 7
   },
   "useLogScale": false,
   "filterBehavior": "Filter Change",
   "highlightedBarValues": [],
-  "series": [
-    {
-      "dataKey": "males",
-      "axis": "Left",
-      "tooltip": true
-    }
-  ],
+  "series": [],
   "tooltips": {
     "opacity": 90,
-    "singleSeries": false
+    "singleSeries": false,
+    "dateDisplayFormat": ""
   },
-  "dashboard": {
-    "theme": "theme-blue",
-    "title": "ARDI"
+  "forestPlot": {
+    "startAt": 0,
+    "colors": {
+      "line": "",
+      "shape": ""
+    },
+    "lineOfNoEffect": {
+      "show": true
+    },
+    "type": "",
+    "pooledResult": {
+      "diamondHeight": 5,
+      "column": ""
+    },
+    "estimateField": "",
+    "estimateRadius": "",
+    "shape": "square",
+    "rowHeight": 20,
+    "description": {
+      "show": true,
+      "text": "description",
+      "location": 0
+    },
+    "result": {
+      "show": true,
+      "text": "result",
+      "location": 100
+    },
+    "radius": {
+      "min": 2,
+      "max": 10,
+      "scalingColumn": ""
+    },
+    "regression": {
+      "lower": 0,
+      "upper": 0,
+      "estimateField": 0
+    },
+    "leftWidthOffset": 0,
+    "rightWidthOffset": 0,
+    "showZeroLine": false,
+    "leftLabel": "",
+    "rightLabel": ""
   },
-  "animateReplay": true,
-  "aspectRatio": 1,
-  "validated": 4.23,
+  "area": {
+    "isStacked": false
+  },
+  "sankey": {
+    "title": {
+      "defaultColor": "black"
+    },
+    "iterations": 1,
+    "rxValue": 0.9,
+    "overallSize": {
+      "width": 900,
+      "height": 700
+    },
+    "margin": {
+      "margin_y": 25,
+      "margin_x": 0
+    },
+    "nodeSize": {
+      "nodeWidth": 26,
+      "nodeHeight": 40
+    },
+    "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": {
+      "default": "#ff8500",
+      "inactive": "#808080"
+    },
+    "linkColor": {
+      "default": "#ffc900",
+      "inactive": "#D3D3D3"
+    },
+    "opacity": {
+      "nodeOpacityDefault": 1,
+      "nodeOpacityInactive": 0.1,
+      "LinkOpacityDefault": 1,
+      "LinkOpacityInactive": 0.1
+    },
+    "storyNodeFontColor": "#006778",
+    "storyNodeText": [],
+    "nodeValueStyle": {
+      "textBefore": "(",
+      "textAfter": ")"
+    },
+    "data": []
+  },
+  "errors": [],
+  "currentViewport": "lg",
+  "id": 13,
+  "category": "Charts",
+  "label": "Pie",
+  "subType": "Pie",
+  "icon": {
+    "key": null,
+    "ref": null,
+    "props": {},
+    "_owner": null,
+    "_store": {}
+  },
+  "content": "Present the numerical proportions of a data series.",
   "visualizationType": "Pie",
-  "pieType": "Donut",
-  "filters": [
+  "activeVizButtonID": 13,
+  "dataFileName": "valid-data-chart.csv",
+  "dataFileSourceType": "file",
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
+  "version": "4.25.9",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "data": [
     {
-      "values": ["age", "sex"],
-      "active": "sex",
-      "filterStyle": "dropdown",
-      "order": "asc",
-      "columnName": "data_group"
+      "Race": "Hispanic or Latino",
+      "Age-adjusted rate": "644.2"
+    },
+    {
+      "Race": "Non-Hispanic American Indian",
+      "Age-adjusted rate": "636.1"
+    },
+    {
+      "Race": "Non-Hispanic Black",
+      "Age-adjusted rate": "563.7"
+    },
+    {
+      "Race": "Non-Hispanic Asian or Pacific Islander",
+      "Age-adjusted rate": "202.5"
+    },
+    {
+      "Race": "Non-Hispanic White",
+      "Age-adjusted rate": "183.6"
     }
-  ]
+  ],
+  "formattedData": [
+    {
+      "Race": "Hispanic or Latino",
+      "Age-adjusted rate": "644.2"
+    },
+    {
+      "Race": "Non-Hispanic American Indian",
+      "Age-adjusted rate": "636.1"
+    },
+    {
+      "Race": "Non-Hispanic Black",
+      "Age-adjusted rate": "563.7"
+    },
+    {
+      "Race": "Non-Hispanic Asian or Pacific Islander",
+      "Age-adjusted rate": "202.5"
+    },
+    {
+      "Race": "Non-Hispanic White",
+      "Age-adjusted rate": "183.6"
+    }
+  ],
+  "datasets": {}
 }
