@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useId, useContext, useReducer } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useId, useContext, useReducer, useMemo } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -154,34 +154,59 @@ const CdcChart: React.FC<CdcChartProps> = ({
   // Destructure items from config for more readable JSX
   let { legend, title } = config
 
-  // Process markup variables for text fields
-  let processedSuperTitle = config.superTitle
-  let processedIntroText = config.introText
-  let processedLegacyFootnotes = config.legacyFootnotes
+  // Process markup variables for text fields (memoized to prevent re-processing on every render)
+  // Note: XSS Safety - The processed content is parsed using html-react-parser which sanitizes
+  // HTML input by default. The markup processor returns plain text with user data substituted.
+  const processedTextFields = useMemo(() => {
+    if (!config.enableMarkupVariables || !config.markupVariables?.length) {
+      return {
+        title,
+        superTitle: config.superTitle,
+        introText: config.introText,
+        legacyFootnotes: config.legacyFootnotes,
+        description: config.description
+      }
+    }
 
-  if (config.enableMarkupVariables && config.markupVariables?.length > 0) {
-    if (title) {
-      title = processMarkupVariables(title, config.data || [], config.markupVariables, { isEditor }).processedContent
+    return {
+      title: title
+        ? processMarkupVariables(title, config.data || [], config.markupVariables, { isEditor }).processedContent
+        : title,
+      superTitle: config.superTitle
+        ? processMarkupVariables(config.superTitle, config.data || [], config.markupVariables, { isEditor })
+            .processedContent
+        : config.superTitle,
+      introText: config.introText
+        ? processMarkupVariables(config.introText, config.data || [], config.markupVariables, { isEditor })
+            .processedContent
+        : config.introText,
+      legacyFootnotes: config.legacyFootnotes
+        ? processMarkupVariables(config.legacyFootnotes, config.data || [], config.markupVariables, { isEditor })
+            .processedContent
+        : config.legacyFootnotes,
+      description: config.description
+        ? processMarkupVariables(config.description, config.data || [], config.markupVariables, { isEditor })
+            .processedContent
+        : config.description
     }
-    if (config.superTitle) {
-      processedSuperTitle = processMarkupVariables(config.superTitle, config.data || [], config.markupVariables, {
-        isEditor
-      }).processedContent
-    }
-    if (config.introText) {
-      processedIntroText = processMarkupVariables(config.introText, config.data || [], config.markupVariables, {
-        isEditor
-      }).processedContent
-    }
-    if (config.legacyFootnotes) {
-      processedLegacyFootnotes = processMarkupVariables(
-        config.legacyFootnotes,
-        config.data || [],
-        config.markupVariables,
-        { isEditor }
-      ).processedContent
-    }
-  }
+  }, [
+    config.enableMarkupVariables,
+    config.markupVariables,
+    config.data,
+    title,
+    config.superTitle,
+    config.introText,
+    config.legacyFootnotes,
+    config.description,
+    isEditor
+  ])
+
+  // Destructure processed values
+  title = processedTextFields.title
+  const processedSuperTitle = processedTextFields.superTitle
+  const processedIntroText = processedTextFields.introText
+  const processedLegacyFootnotes = processedTextFields.legacyFootnotes
+  const processedDescription = processedTextFields.description
 
   // set defaults on titles if blank AND only in editor
   if (isEditor) {
@@ -1079,16 +1104,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   : link && link}
                 {/* Description */}
 
-                {config.description && config.visualizationType !== 'Spark Line' && (
-                  <div className={getChartSubTextClasses().join(' ')}>
-                    {parse(
-                      config.enableMarkupVariables && config.markupVariables?.length > 0
-                        ? processMarkupVariables(config.description, config.data || [], config.markupVariables, {
-                            isEditor
-                          }).processedContent
-                        : config.description
-                    )}
-                  </div>
+                {processedDescription && config.visualizationType !== 'Spark Line' && (
+                  <div className={getChartSubTextClasses().join(' ')}>{parse(processedDescription)}</div>
                 )}
 
                 {/* buttons */}

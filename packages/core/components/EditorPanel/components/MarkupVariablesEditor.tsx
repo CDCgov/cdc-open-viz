@@ -6,15 +6,24 @@ import Icon from '../../ui/Icon'
 import Accordion from '../../ui/Accordion'
 
 type MarkupVariablesEditorProps = {
+  /** Array of markup variable configurations */
   markupVariables: MarkupVariable[]
+  /** Dataset to extract column names and values from */
   data: any[]
+  /** Callback when variables are added, updated, or removed */
   onChange: (variables: MarkupVariable[]) => void
+  /** Whether markup variables feature is enabled */
   enableMarkupVariables?: boolean
+  /** Callback when enable/disable toggle changes */
   onToggleEnable?: (enabled: boolean) => void
 }
 
 export type { MarkupVariablesEditorProps }
 
+/**
+ * Editor for creating and managing markup variables with {{variable-name}} syntax.
+ * Supports conditional filters, number formatting, and auto-generated tags.
+ */
 const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
   markupVariables = [],
   data = [],
@@ -23,10 +32,47 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
   onToggleEnable
 }) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
+  const [validationErrors, setValidationErrors] = useState<Record<number, string[]>>({})
 
   // Ensure we always have a valid array
   const safeMarkupVariables = markupVariables || []
   const availableColumns = data.length > 0 ? Object.keys(data[0]) : []
+
+  // Validate a variable and return array of error messages
+  const validateVariable = React.useCallback((variable: MarkupVariable): string[] => {
+    const errors: string[] = []
+    if (!variable.name || variable.name.trim() === '') {
+      errors.push('Variable name is required')
+    }
+    if (!variable.tag || variable.tag.trim() === '') {
+      errors.push('Variable tag is required')
+    }
+    if (!variable.columnName || variable.columnName.trim() === '') {
+      errors.push('Data column is required')
+    }
+    // Validate conditions
+    variable.conditions?.forEach((condition, index) => {
+      if (!condition.columnName) {
+        errors.push(`Condition ${index + 1}: Column is required`)
+      }
+      if (!condition.value) {
+        errors.push(`Condition ${index + 1}: Value is required`)
+      }
+    })
+    return errors
+  }, [])
+
+  // Validate all variables on mount and when variables change
+  React.useEffect(() => {
+    const errors: Record<number, string[]> = {}
+    safeMarkupVariables.forEach((variable, index) => {
+      const variableErrors = validateVariable(variable)
+      if (variableErrors.length > 0) {
+        errors[index] = variableErrors
+      }
+    })
+    setValidationErrors(errors)
+  }, [safeMarkupVariables, validateVariable]) // Re-validate when variables change
 
 
   const addVariable = () => {
@@ -40,7 +86,15 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
     }
     const newVariables = [...safeMarkupVariables, newVariable]
     onChange(newVariables)
-    setEditingIndex(safeMarkupVariables.length)
+    const newIndex = safeMarkupVariables.length
+    setEditingIndex(newIndex)
+
+    // Immediately show validation errors for the new empty variable
+    const errors = validateVariable(newVariable)
+    setValidationErrors(prev => ({
+      ...prev,
+      [newIndex]: errors
+    }))
   }
 
   const updateVariable = (index: number, updates: Partial<MarkupVariable>) => {
@@ -48,6 +102,13 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
       i === index ? { ...variable, conditions: variable.conditions || [], ...updates } : variable
     )
     onChange(updated)
+
+    // Validate and update errors for this variable
+    const errors = validateVariable(updated[index])
+    setValidationErrors(prev => ({
+      ...prev,
+      [index]: errors
+    }))
   }
 
   const removeVariable = (index: number) => {
@@ -145,6 +206,16 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                           <span> • {variable.conditions.length} condition{variable.conditions.length !== 1 ? 's' : ''}</span>
                         )}
                       </div>
+                      {validationErrors[index] && validationErrors[index].length > 0 && (
+                        <div style={{ fontSize: '12px', color: '#dc3545', marginTop: '8px' }}>
+                          <strong>⚠ Validation Errors:</strong>
+                          <ul style={{ margin: '4px 0 0 0', paddingLeft: '20px' }}>
+                            {validationErrors[index].map((error, errorIndex) => (
+                              <li key={errorIndex}>{error}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                     <div className='d-flex gap-2'>
                       <Button

@@ -4,19 +4,25 @@ import Accordion from '../../ui/Accordion'
 import { MarkupVariable } from '../../../types/MarkupVariable'
 
 type PanelMarkupProps = {
+  /** Display name for the panel */
   name: string
+  /** Array of markup variable configurations */
   markupVariables: MarkupVariable[]
+  /** Dataset to extract column names and values from */
   data: any[]
+  /** Whether markup variables feature is enabled */
   enableMarkupVariables: boolean
+  /** Callback when variables are added, updated, or removed */
   onMarkupVariablesChange: (variables: MarkupVariable[]) => void
+  /** Callback when enable/disable toggle changes */
   onToggleEnable: (enabled: boolean) => void
   /** Optional: wrap in accordion. Default true */
   withAccordion?: boolean
 }
 
 /**
- * Shared Panel component for Markup Variables editor
- * Can be used across Chart, Map, Data Bite, and other packages
+ * Shared panel for markup variables editor across all visualization packages.
+ * Wraps MarkupVariablesEditor with optional accordion functionality.
  */
 const PanelMarkup: React.FC<PanelMarkupProps> = ({
   name,

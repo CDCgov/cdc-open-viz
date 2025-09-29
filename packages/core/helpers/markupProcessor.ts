@@ -2,14 +2,15 @@ import _ from 'lodash'
 import { MarkupVariable, MarkupCondition } from '../types/MarkupVariable'
 
 /**
- * Processes markup variables in content, replacing {{variable}} tags with actual data values
- * @param content - The content string containing markup variables
- * @param data - The dataset to extract values from
- * @param markupVariables - Array of markup variable configurations
- * @param isEditor - Whether in editor mode (affects list conjunction)
- * @param showNoDataMessage - Whether to show no data messages
- * @param allowHideSection - Whether to allow hiding sections when variables are empty
- * @returns Object containing processed content and state flags
+ * Replaces {{variable}} tags in content with actual data values.
+ *
+ * @param content - Content string with markup variables
+ * @param data - Dataset to extract values from
+ * @param markupVariables - Variable configurations
+ * @param options - isEditor, showNoDataMessage, allowHideSection
+ * @returns Processed content and state flags
+ *
+ * @security Returns plain text - must be parsed with html-react-parser before rendering
  */
 export const processMarkupVariables = (
   content: string,
@@ -27,58 +28,95 @@ export const processMarkupVariables = (
 } => {
   const { isEditor = false, showNoDataMessage = false, allowHideSection = false } = options
 
+  // Early return for invalid inputs
   if (_.isEmpty(markupVariables) || !content) {
     return {
-      processedContent: content,
+      processedContent: content || '',
       shouldHideSection: false,
       shouldShowNoDataMessage: false
     }
   }
 
-  const emptyVariableChecker: boolean[] = []
-  const noDataMessageChecker: boolean[] = []
+  try {
+    const emptyVariableChecker: boolean[] = []
+    const noDataMessageChecker: boolean[] = []
 
-  const variableRegexPattern = /{{(.*?)}}/g
-  const processedContent = content.replace(variableRegexPattern, variableTag => {
-    if (emptyVariableChecker.length > 0) return variableTag
+    const variableRegexPattern = /{{(.*?)}}/g
+    const processedContent = content.replace(variableRegexPattern, variableTag => {
+      try {
+        if (emptyVariableChecker.length > 0) return variableTag
 
-    const workingVariable = markupVariables.find(variable => variable.tag === variableTag)
-    if (!workingVariable) return variableTag
+        const workingVariable = markupVariables.find(variable => variable.tag === variableTag)
+        if (!workingVariable) return variableTag
 
-    const workingData =
-      workingVariable.conditions.length === 0
-        ? data
-        : filterDataByConditions(data, [...workingVariable.conditions])
+        // Validate that columnName exists
+        if (!workingVariable.columnName) {
+          console.warn(`Markup variable ${variableTag} has no columnName specified`)
+          return variableTag
+        }
 
-    const variableValues: string[] = _.uniq(
-      (workingData || []).map(dataObject => {
-        const dataObjectValue = dataObject[workingVariable.columnName]
-        return workingVariable.addCommas && !isNaN(parseFloat(dataObjectValue))
-          ? parseFloat(dataObjectValue).toLocaleString('en-US', { useGrouping: true })
-          : String(dataObjectValue || '')
-      })
-    ).filter(value => value !== '') // Filter out empty values
+        // Filter data with error handling
+        const workingData =
+          workingVariable.conditions.length === 0
+            ? data
+            : filterDataByConditions(data, [...workingVariable.conditions])
 
-    const listConjunction = !isEditor ? 'and' : 'or'
-    const formattedValues = formatValuesList(variableValues, listConjunction)
+        // Extract values with error handling
+        const variableValues: string[] = _.uniq(
+          (workingData || []).map(dataObject => {
+            try {
+              const dataObjectValue = dataObject[workingVariable.columnName]
 
-    const finalDisplay = formattedValues.join(', ')
+              // Handle undefined column
+              if (dataObjectValue === undefined && isEditor) {
+                console.warn(
+                  `Column "${workingVariable.columnName}" not found in data for variable ${variableTag}`
+                )
+              }
 
-    if (showNoDataMessage && finalDisplay === '') {
-      noDataMessageChecker.push(true)
+              return workingVariable.addCommas && !isNaN(parseFloat(dataObjectValue))
+                ? parseFloat(dataObjectValue).toLocaleString('en-US', { useGrouping: true })
+                : String(dataObjectValue || '')
+            } catch (error) {
+              console.error(`Error processing data value for ${variableTag}:`, error)
+              return ''
+            }
+          })
+        ).filter(value => value !== '') // Filter out empty values
+
+        const listConjunction = !isEditor ? 'and' : 'or'
+        const formattedValues = formatValuesList(variableValues, listConjunction)
+
+        const finalDisplay = formattedValues.join(', ')
+
+        if (showNoDataMessage && finalDisplay === '') {
+          noDataMessageChecker.push(true)
+        }
+
+        if (finalDisplay === '' && allowHideSection) {
+          emptyVariableChecker.push(true)
+        }
+
+        return finalDisplay
+      } catch (error) {
+        console.error(`Error processing markup variable ${variableTag}:`, error)
+        return variableTag // Return original tag on error
+      }
+    })
+
+    return {
+      processedContent,
+      shouldHideSection: allowHideSection && emptyVariableChecker.length > 0 && !isEditor,
+      shouldShowNoDataMessage: showNoDataMessage && noDataMessageChecker.length > 0 && !isEditor
     }
-
-    if (finalDisplay === '' && allowHideSection) {
-      emptyVariableChecker.push(true)
+  } catch (error) {
+    console.error('Error in processMarkupVariables:', error)
+    // Return original content on error
+    return {
+      processedContent: content,
+      shouldHideSection: false,
+      shouldShowNoDataMessage: false
     }
-
-    return finalDisplay
-  })
-
-  return {
-    processedContent,
-    shouldHideSection: allowHideSection && emptyVariableChecker.length > 0 && !isEditor,
-    shouldShowNoDataMessage: showNoDataMessage && noDataMessageChecker.length > 0 && !isEditor
   }
 }
 
