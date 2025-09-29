@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
-import { MarkupVariable } from '../../../types/MarkupVariable'
+import React, { useState, useMemo } from 'react'
+import { MarkupVariable, MarkupCondition } from '../../../types/MarkupVariable'
 import Button from '../../elements/Button'
 import { TextField, Select, CheckBox } from '../Inputs'
 import Icon from '../../ui/Icon'
+import Accordion from '../../ui/Accordion'
 
 type MarkupVariablesEditorProps = {
   markupVariables: MarkupVariable[]
@@ -34,7 +35,8 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
       tag: '',
       columnName: '',
       conditions: [],
-      addCommas: false
+      addCommas: false,
+      hideOnNull: false
     }
     const newVariables = [...safeMarkupVariables, newVariable]
     onChange(newVariables)
@@ -62,18 +64,59 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
     return `{{${name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')}}}`
   }
 
+  // Get unique values for a given column for condition dropdowns
+  const getColumnValues = useMemo(() => {
+    if (!data || data.length === 0) return {}
+
+    const columnValues: Record<string, (string | number)[]> = {}
+    availableColumns.forEach(column => {
+      const uniqueValues = Array.from(new Set(data.map(row => row[column])))
+        .filter(val => val !== null && val !== undefined && val !== '')
+      columnValues[column] = uniqueValues
+    })
+    return columnValues
+  }, [data, availableColumns])
+
+  const addCondition = (variableIndex: number) => {
+    const variable = safeMarkupVariables[variableIndex]
+    const newCondition: MarkupCondition = {
+      columnName: '',
+      isOrIsNotEqualTo: 'is',
+      value: ''
+    }
+    const updatedConditions = [...(variable.conditions || []), newCondition]
+    updateVariable(variableIndex, { conditions: updatedConditions })
+  }
+
+  const updateCondition = (variableIndex: number, conditionIndex: number, updates: Partial<MarkupCondition>) => {
+    const variable = safeMarkupVariables[variableIndex]
+    const conditions = variable.conditions || []
+    const updatedConditions = conditions.map((condition, i) =>
+      i === conditionIndex ? { ...condition, ...updates } : condition
+    )
+    updateVariable(variableIndex, { conditions: updatedConditions })
+  }
+
+  const removeCondition = (variableIndex: number, conditionIndex: number) => {
+    const variable = safeMarkupVariables[variableIndex]
+    const updatedConditions = variable.conditions.filter((_, i) => i !== conditionIndex)
+    updateVariable(variableIndex, { conditions: updatedConditions })
+  }
+
   return (
     <div className='markup-variables-editor'>
-      {onToggleEnable && (
-        <div className='mb-3'>
-          <CheckBox
-            value={enableMarkupVariables}
-            fieldName='enableMarkupVariables'
-            label='Enable Markup Variables'
-            updateField={(section, subsection, fieldName, value) => onToggleEnable(value)}
-          />
-        </div>
-      )}
+      <div className='mb-3'>
+        <CheckBox
+          value={enableMarkupVariables}
+          fieldName='enableMarkupVariables'
+          label='Enable Markup Variables'
+          updateField={(_section, _subsection, _fieldName, value) => {
+            if (onToggleEnable) {
+              onToggleEnable(value)
+            }
+          }}
+        />
+      </div>
 
       {enableMarkupVariables && (
         <>
@@ -84,95 +127,199 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
             </p>
           </div>
 
-          {safeMarkupVariables.length > 0 && (
+      {safeMarkupVariables.length > 0 && (
             <div className='variables-list mb-3'>
               {safeMarkupVariables.map((variable, index) => variable ? (
-                <div key={index} className='variable-item p-3 border rounded mb-2'>
-                  <div className='flex justify-between items-start'>
-                    <div className='flex-1'>
-                      <div className='font-medium'>{variable.name || 'Unnamed Variable'}</div>
-                      <div className='text-sm text-gray-500'>{variable.tag}</div>
-                      <div className='text-sm text-gray-500'>
-                        Column: {variable.columnName}
-                        {variable.conditions && variable.conditions.length > 0 && ` (${variable.conditions.length} conditions)`}
+                <div key={index} className='variable-item p-3 border rounded mb-2' style={{ backgroundColor: '#fff' }}>
+                  <div className='d-flex justify-content-between align-items-start mb-2'>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>
+                        {variable.name || 'Unnamed Variable'}
+                      </div>
+                      <div style={{ fontSize: '13px', color: '#6c757d', fontFamily: 'monospace', marginBottom: '4px' }}>
+                        {variable.tag}
+                      </div>
+                      <div style={{ fontSize: '13px', color: '#6c757d' }}>
+                        Column: <strong>{variable.columnName || 'Not selected'}</strong>
+                        {variable.conditions && variable.conditions.length > 0 && (
+                          <span> • {variable.conditions.length} condition{variable.conditions.length !== 1 ? 's' : ''}</span>
+                        )}
                       </div>
                     </div>
-                    <div className='flex gap-2'>
+                    <div className='d-flex gap-2'>
                       <Button
                         className='btn-sm'
                         onClick={() => setEditingIndex(editingIndex === index ? null : index)}
                       >
                         {editingIndex === index ? 'Close' : 'Edit'}
                       </Button>
-                      <Button
-                        className='btn-sm btn-danger'
-                        onClick={() => removeVariable(index)}
-                      >
-                        {/* <Icon display='x' size={16} /> */}
-                      </Button>
                     </div>
                   </div>
 
                   {editingIndex === index && (
                     <div className='mt-3 pt-3 border-t'>
-                      <div className='grid grid-cols-2 gap-3'>
-                        <TextField
-                          value={variable.name}
-                          fieldName='name'
-                          label='Variable Name'
-                          placeholder='e.g., "State Name"'
-                          updateField={(section, subsection, fieldName, value) => {
-                            updateVariable(index, {
-                              name: value,
-                              tag: generateTag(value)
-                            })
-                          }}
-                        />
-                        <TextField
-                          value={variable.tag}
-                          fieldName='tag'
-                          label='Tag (auto-generated)'
-                          placeholder='{{variable-name}}'
-                        />
-                      </div>
-
-                      <div className='mt-3'>
-                        <Select
-                          value={variable.columnName}
-                          fieldName='columnName'
-                          label='Data Column'
-                          options={[
-                            { value: '', label: 'Select Column...' },
-                            ...availableColumns.map(col => ({ value: col, label: col }))
-                          ]}
-                          updateField={(section, subsection, fieldName, value) => {
-                            updateVariable(index, { columnName: value })
-                          }}
-                        />
-                      </div>
-
-                      <div className='mt-3'>
-                        <CheckBox
-                          value={variable.addCommas || false}
-                          fieldName='addCommas'
-                          label='Format numbers with commas'
-                          updateField={(section, subsection, fieldName, value) =>
-                            updateVariable(index, { addCommas: value })
-                          }
-                        />
-                      </div>
-
-                      {/* Conditions will be added in a future enhancement */}
-                      {variable.conditions && variable.conditions.length > 0 && (
-                        <div className='mt-3'>
-                          <label className='text-sm font-medium text-gray-700'>
-                            Conditions ({variable.conditions.length})
-                          </label>
-                          <div className='text-sm text-gray-500'>
-                            Condition editing will be available in a future update
+                      <Accordion>
+                        <Accordion.Section title='Basic Settings'>
+                          <div className='mb-3'>
+                            <TextField
+                              value={variable.name}
+                              fieldName='name'
+                              label='Variable Name'
+                              placeholder='e.g., "State Name"'
+                              updateField={(section, subsection, fieldName, value) => {
+                                updateVariable(index, {
+                                  name: value,
+                                  tag: generateTag(value)
+                                })
+                              }}
+                            />
                           </div>
-                        </div>
-                      )}
+                          <div className='mb-3'>
+                            <label>
+                              <span className='edit-label column-heading'>Tag (auto-generated)</span>
+                              <input
+                                type='text'
+                                value={variable.tag}
+                                placeholder='{{variable-name}}'
+                                readOnly
+                                style={{ backgroundColor: '#e9ecef', cursor: 'not-allowed' }}
+                              />
+                            </label>
+                          </div>
+
+                          <div className='mb-3'>
+                            <Select
+                              value={variable.columnName}
+                              fieldName='columnName'
+                              label='Data Column'
+                              options={[
+                                { value: '', label: 'Select Column...' },
+                                ...availableColumns.map(col => ({ value: col, label: col }))
+                              ]}
+                              updateField={(_section, _subsection, _fieldName, value) => {
+                                updateVariable(index, { columnName: value })
+                              }}
+                            />
+                          </div>
+                        </Accordion.Section>
+
+                        <Accordion.Section title='Conditions'>
+                          <div className='text-sm text-gray-500 mb-2'>
+                            Add conditions to filter when this variable should display data
+                          </div>
+
+                          {variable.conditions && variable.conditions.length > 0 && (
+                            <div className='conditions-list mb-2'>
+                              {variable.conditions.map((condition, conditionIndex) => (
+                                <div key={`${index}-${conditionIndex}-${condition.columnName}-${condition.value}`} className='condition-item p-2 border rounded mb-2' style={{ backgroundColor: '#f8f9fa' }}>
+                                  <div className='mb-2'>
+                                    <Select
+                                      value={condition.columnName || ''}
+                                      fieldName={`condition-column-${index}-${conditionIndex}`}
+                                      label='Column'
+                                      options={[
+                                        { value: '', label: 'Select Column...' },
+                                        ...availableColumns.map(col => ({ value: col, label: col }))
+                                      ]}
+                                      updateField={(_section, _subsection, _fieldName, newColumnName) => {
+                                        // Reset value when column changes
+                                        updateCondition(index, conditionIndex, {
+                                          columnName: newColumnName,
+                                          value: ''
+                                        })
+                                      }}
+                                    />
+                                  </div>
+                                  <div className='mb-2'>
+                                    <Select
+                                      value={condition.isOrIsNotEqualTo || 'is'}
+                                      fieldName={`condition-operator-${index}-${conditionIndex}`}
+                                      label='Operator'
+                                      options={[
+                                        { value: 'is', label: 'is' },
+                                        { value: 'is not', label: 'is not' }
+                                      ]}
+                                      updateField={(_section, _subsection, _fieldName, value) => {
+                                        updateCondition(index, conditionIndex, { isOrIsNotEqualTo: value as 'is' | 'is not' })
+                                      }}
+                                    />
+                                  </div>
+                                  <div className='mb-2'>
+                                    <Select
+                                      value={condition.value || ''}
+                                      fieldName={`condition-value-${index}-${conditionIndex}`}
+                                      label='Value'
+                                      options={[
+                                        { value: '', label: 'Select Value...' },
+                                        ...(condition.columnName && getColumnValues[condition.columnName]
+                                          ? getColumnValues[condition.columnName].map(val => ({
+                                              value: String(val),
+                                              label: String(val)
+                                            }))
+                                          : [])
+                                      ]}
+                                      updateField={(_section, _subsection, _fieldName, value) => {
+                                        updateCondition(index, conditionIndex, { value })
+                                      }}
+                                    />
+                                  </div>
+                                  <Button
+                                    className='btn-sm btn-danger'
+                                    onClick={() => removeCondition(index, conditionIndex)}
+                                  >
+                                    Remove Condition
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          <Button
+                            className='btn-sm'
+                            onClick={() => addCondition(index)}
+                          >
+                            <Icon display='plus' size={14} className='mr-1' />
+                            Add Condition
+                          </Button>
+                        </Accordion.Section>
+
+                        <Accordion.Section title='Formatting Options'>
+                          <div className='mb-3'>
+                            <CheckBox
+                              value={variable.addCommas || false}
+                              fieldName='addCommas'
+                              label='Format numbers with commas'
+                              updateField={(_section, _subsection, _fieldName, value) =>
+                                updateVariable(index, { addCommas: value })
+                              }
+                            />
+                          </div>
+
+                          <div className='mb-3'>
+                            <CheckBox
+                              value={variable.hideOnNull || false}
+                              fieldName='hideOnNull'
+                              label='Hide section when value is null'
+                              updateField={(_section, _subsection, _fieldName, value) =>
+                                updateVariable(index, { hideOnNull: value })
+                              }
+                            />
+                          </div>
+                        </Accordion.Section>
+                      </Accordion>
+
+                      <div className='mt-3 pt-3 border-t' style={{ textAlign: 'center' }}>
+                        <Button
+                          className='btn-sm btn-danger'
+                          onClick={() => {
+                            if (window.confirm(`Are you sure you want to delete the variable "${variable.name || 'Unnamed Variable'}"?`)) {
+                              removeVariable(index)
+                            }
+                          }}
+                        >
+                          Delete Variable
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -180,10 +327,10 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
             </div>
           )}
 
-          <Button className='btn-primary' onClick={addVariable}>
-            <Icon display='plus' size={16} className='mr-2' />
-            Add Variable
-          </Button>
+      <Button className='btn-primary' onClick={addVariable}>
+        <Icon display='plus' size={16} className='mr-2' />
+        Add Variable
+      </Button>
         </>
       )}
     </div>
