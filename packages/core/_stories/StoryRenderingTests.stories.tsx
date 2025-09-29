@@ -87,6 +87,7 @@ const testIframeVisualization = async (iframeUrl: string) => {
             readyState: iframeDoc?.readyState || 'unknown'
           }
         } catch (error: any) {
+          console.log('Error loading iframe:', error.message)
           return { loaded: false, readyState: 'error', error: error.message }
         }
       },
@@ -110,6 +111,7 @@ const testIframeVisualization = async (iframeUrl: string) => {
 
           return { svgCount, hasCoveModule, isDataBite, error: null }
         } catch (error: any) {
+          console.log('Error waiting for SVG elements to render in iframe:', error.message)
           return { svgCount: 0, hasCoveModule: false, isDataBite: false, error: error.message }
         }
       },
@@ -118,7 +120,6 @@ const testIframeVisualization = async (iframeUrl: string) => {
         return (after.svgCount > 0 && after.hasCoveModule) || after.isDataBite
       }
     )
-    return { success: true, svgCount: 0, hasCoveModule: true, isDataBite: false }
   } finally {
     if (iframe.parentNode) {
       document.body.removeChild(iframe)
