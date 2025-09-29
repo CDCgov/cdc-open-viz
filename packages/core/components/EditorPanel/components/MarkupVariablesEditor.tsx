@@ -127,7 +127,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
             </p>
           </div>
 
-      {safeMarkupVariables.length > 0 && (
+          {safeMarkupVariables.length > 0 && (
             <div className='variables-list mb-3'>
               {safeMarkupVariables.map((variable, index) => variable ? (
                 <div key={index} className='variable-item p-3 border rounded mb-2' style={{ backgroundColor: '#fff' }}>
@@ -211,7 +211,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                           {variable.conditions && variable.conditions.length > 0 && (
                             <div className='conditions-list mb-2'>
                               {variable.conditions.map((condition, conditionIndex) => (
-                                <div key={`${index}-${conditionIndex}-${condition.columnName}-${condition.value}`} className='condition-item p-2 border rounded mb-2' style={{ backgroundColor: '#f8f9fa' }}>
+                                <div key={`condition-${index}-${conditionIndex}`} className='condition-item p-2 border rounded mb-2' style={{ backgroundColor: '#f8f9fa' }}>
                                   <div className='mb-2'>
                                     <Select
                                       value={condition.columnName || ''}
@@ -253,9 +253,9 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                         { value: '', label: 'Select Value...' },
                                         ...(condition.columnName && getColumnValues[condition.columnName]
                                           ? getColumnValues[condition.columnName].map(val => ({
-                                              value: String(val),
-                                              label: String(val)
-                                            }))
+                                            value: String(val),
+                                            label: String(val)
+                                          }))
                                           : [])
                                       ]}
                                       updateField={(_section, _subsection, _fieldName, value) => {
@@ -323,14 +323,14 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                     </div>
                   )}
                 </div>
-              ) : null)}
+              ) : <></>)}
             </div>
           )}
 
-      <Button className='btn-primary' onClick={addVariable}>
-        <Icon display='plus' size={16} className='mr-2' />
-        Add Variable
-      </Button>
+          <Button className='btn-primary' onClick={addVariable}>
+            <Icon display='plus' size={16} className='mr-2' />
+            Add Variable
+          </Button>
         </>
       )}
     </div>

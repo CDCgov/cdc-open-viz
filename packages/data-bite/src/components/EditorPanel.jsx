@@ -19,7 +19,7 @@ import { BITE_LOCATIONS, DATA_FUNCTIONS, IMAGE_POSITIONS, DATA_OPERATORS, HEADER
 import Layout from '@cdc/core/components/Layout'
 import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import Button from '@cdc/core/components/elements/Button'
-import MarkupVariablesEditor from '@cdc/core/components/EditorPanel/components/MarkupVariablesEditor'
+import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 
 const EditorPanel = memo(() => {
   const { config, updateConfig, loading, data, setParentConfig, isDashboard, isEditor } = useContext(Context)
@@ -697,12 +697,14 @@ const EditorPanel = memo(() => {
                   <AccordionItemButton>Markup Variables</AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <MarkupVariablesEditor
+                  <PanelMarkup
+                    name='Markup Variables'
                     markupVariables={config.markupVariables || []}
                     data={data}
-                    onChange={variables => updateField(null, null, 'markupVariables', variables)}
                     enableMarkupVariables={config.enableMarkupVariables || false}
+                    onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
                     onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
+                    withAccordion={false}
                   />
                 </AccordionItemPanel>
               </AccordionItem>

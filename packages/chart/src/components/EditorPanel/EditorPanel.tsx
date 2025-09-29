@@ -23,6 +23,7 @@ import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/In
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { viewports } from '@cdc/core/helpers/getViewport'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
+import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 
 // chart components
 import Panels from './components/Panels'
@@ -4277,7 +4278,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             )}
             <Panels.Annotate name='Text Annotations' />
             {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
-            <Panels.Markup name='Markup Variables' />
+            <PanelMarkup
+              name='Markup Variables'
+              markupVariables={config.markupVariables || []}
+              data={rawData}
+              enableMarkupVariables={config.enableMarkupVariables || false}
+              onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
+              onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
+            />
           </Accordion>
           {config.type !== 'Spark Line' && (
             <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />
