@@ -5,15 +5,7 @@ import ConfigContext from '../context'
 import { useLegendMemoContext } from '../context/LegendMemoContext'
 import { supportedCities } from '../data/supported-geos'
 import { getFilterControllingStatesPicked } from './UsaMap/helpers/map'
-import {
-  displayGeoName,
-  getGeoStrokeColor,
-  SVG_HEIGHT,
-  SVG_PADDING,
-  SVG_WIDTH,
-  titleCase,
-  isLegendItemDisabled
-} from '../helpers'
+import { displayGeoName, getGeoStrokeColor, SVG_HEIGHT, SVG_PADDING, SVG_WIDTH, isLegendItemDisabled } from '../helpers'
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import { applyLegendToRow } from '../helpers/applyLegendToRow'
@@ -93,7 +85,7 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       return null
     }
 
-    const cityDisplayName = titleCase(displayGeoName(city))
+    const cityDisplayName = displayGeoName(city)
 
     const legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
 
