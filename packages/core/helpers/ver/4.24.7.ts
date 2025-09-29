@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import cloneConfig from '../cloneConfig'
 import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
 import { MultiDashboardConfig } from '@cdc/dashboard/src/types/MultiDashboard'
 import { AnyVisualization } from '../../types/Visualization'
@@ -130,7 +131,7 @@ const updateLogarithmicConfig = newConfig => {
 const update_4_24_7 = config => {
   const ver = '4.24.7'
 
-  const newConfig = _.cloneDeep(config)
+  const newConfig = cloneConfig(config)
 
   mapUpdates(newConfig)
   dashboardFiltersMigrate(newConfig)

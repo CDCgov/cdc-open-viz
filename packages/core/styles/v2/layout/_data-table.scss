@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 .cove-data-table {
   position: relative;
 }
@@ -144,7 +146,7 @@
   }
 
   .sort {
-    background-color: darken($mediumGray, 10%);
+    background-color: color.adjust($mediumGray, $lightness: -10%);
     background-repeat: no-repeat;
     background-position: right 0.5em center;
     background-size: 10px 5px;
@@ -160,7 +162,6 @@
     touch-action: none;
   }
 }
-
 
 .cove-data-table__footer {
   margin-top: 1rem;

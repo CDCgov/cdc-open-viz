@@ -6,6 +6,7 @@ import BoxPlot from './Panel.BoxPlot'
 import Visual from './Panel.Visual'
 import Sankey from './Panel.Sankey'
 import Annotate from './Panel.Annotate'
+import PatternSettings from './Panel.PatternSettings'
 
 const Panels = {
   ForestPlot: ForestPlotSettings,
@@ -15,7 +16,8 @@ const Panels = {
   BoxPlot,
   Visual,
   Sankey,
-  Annotate
+  Annotate,
+  PatternSettings
 }
 
 export default Panels

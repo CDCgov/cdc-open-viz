@@ -4,7 +4,7 @@ import axios from 'axios'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
-import ConfigContext, { EditorDispatchContext } from '../../../ConfigContext'
+import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
 
 import TabPane from '../../TabPane'
 import Tabs from '../../Tabs'
@@ -21,7 +21,7 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { type Visualization } from '@cdc/core/types/Visualization'
-import { type DataSet } from '@cdc/dashboard/src/types/DataSet'
+import { type DataSet } from '@cdc/core/types/DataSet'
 
 import './data-import.scss'
 import '@cdc/core/styles/v2/components/data-designer.scss'

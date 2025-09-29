@@ -7,6 +7,7 @@ import {
   AccordionItemButton
 } from 'react-accessible-accordion'
 import ConfigContext from '../../../../context'
+import { useLegendMemoContext } from '../../../../context/LegendMemoContext'
 import { type MapContext } from '../../../../types/MapContext'
 import Button from '@cdc/core/components/elements/Button'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
@@ -14,6 +15,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import './Panel.PatternSettings-style.css'
 import Alert from '@cdc/core/components/Alert'
 import _ from 'lodash'
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 
 // topojson helpers for checking color contrasts
 import { feature } from 'topojson-client'
@@ -26,8 +28,8 @@ type PanelProps = {
 }
 
 const PatternSettings = ({ name }: PanelProps) => {
-  const { config, setConfig, runtimeData, legendMemo, legendSpecialClassLastMemo, runtimeLegend } =
-    useContext<MapContext>(ConfigContext)
+  const { config, setConfig, runtimeData, runtimeLegend } = useContext<MapContext>(ConfigContext)
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const defaultPattern = 'circles'
   const patternTypes = ['circles', 'waves', 'lines']
 
@@ -114,14 +116,14 @@ const PatternSettings = ({ name }: PanelProps) => {
   }
 
   const handlePatternFieldUpdate = (field: string, color: string, patternIndex: number) => {
-    const _newConfig = _.cloneDeep(config)
+    const _newConfig = cloneConfig(config)
     _newConfig.map.patterns[patternIndex][field] = color
     reviewColorContrast(_newConfig, patternIndex)
     setConfig(_newConfig)
   }
 
   const handleRemovePattern = index => {
-    const _newConfig = _.cloneDeep(config)
+    const _newConfig = cloneConfig(config)
     const updatedPatterns = config.map.patterns.filter((pattern, i) => i !== index)
     _newConfig.map.patterns = updatedPatterns
     if (checkPatternContrasts()) {
@@ -161,7 +163,7 @@ const PatternSettings = ({ name }: PanelProps) => {
         {patterns.length > 0 && (
           <Alert
             type={checkPatternContrasts() ? 'success' : 'danger'}
-            message='Pattern colors must comply with <br /> <a href="https://www.w3.org/TR/WCAG21/">WCAG 2.1</a> 3:1 contrast ratio.'
+            message='Pattern colors must comply with <a href="https://www.w3.org/TR/WCAG21/">WCAG 2.1</a> 3:1 contrast ratio.'
           />
         )}
         <br />

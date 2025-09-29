@@ -1,37 +1,74 @@
 import isNumber from '@cdc/core/helpers/isNumber'
+import { useMemo } from 'react'
 
 function useReduceData(config, data) {
-  const isBar = config.series.every(({ type }) => type === 'Bar')
-  const isAllLine = config.series.every(({ type }) => ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg'].includes(type))
-  const sumYValues = seriesKeys => xValue =>
-    seriesKeys.reduce((yTotal, k) => (isNaN(Number(xValue[k])) ? yTotal : yTotal + Number(xValue[k])), 0)
-  const getSeriesKey = seriesKey => {
-    const series = config.runtime.series.find(item => item.dataKey === seriesKey)
-    return series?.dynamicCategory ? series.originalDataKey : seriesKey
-  }
-  const getMaxValueFromData = () => {
-    let max = Math.max(
-      ...data?.map(d =>
-        Math.max(
-          ...config.runtime.seriesKeys.map(key => {
-            const seriesKey = getSeriesKey(key)
-            return isNumber(d[seriesKey]) ? Number(cleanChars(d[seriesKey])) : 0
-          })
-        )
-      )
-    )
+  return useMemo(() => {
+    if (!data || !config?.runtime?.seriesKeys) {
+      return { minValue: 0, maxValue: 0, existPositiveValue: false, isAllLine: false }
+    }
+
+    const isBar = config.series.every(({ type }) => type === 'Bar')
+    const isAllLine = config.series.every(({ type }) => ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg'].includes(type))
+
+    const cleanChars = value => {
+      if (value === null || value === '') {
+        return ''
+      }
+      return typeof value === 'string' ? value.replace(/[,$]/g, '') : value
+    }
+
+    const getSeriesKey = seriesKey => {
+      const series = config.runtime.series.find(item => item.dataKey === seriesKey)
+      return series?.dynamicCategory ? series.originalDataKey : seriesKey
+    }
+
+    const seriesKeysMap = new Map()
+    config.runtime.seriesKeys.forEach(key => {
+      seriesKeysMap.set(key, getSeriesKey(key))
+    })
+
+    let minValue = Infinity
+    let maxValue = -Infinity
+    let existPositiveValue = false
+    const stackedTotals = []
+
+    for (let i = 0; i < data.length; i++) {
+      const row = data[i]
+      let rowMax = -Infinity
+      let rowMin = Infinity
+      let stackedSum = 0
+
+      for (const key of config.runtime.seriesKeys) {
+        const seriesKey = seriesKeysMap.get(key)
+        const cleanValue = cleanChars(row[seriesKey])
+
+        if (isNumber(cleanValue)) {
+          const numValue = Number(cleanValue)
+
+          if (numValue > rowMax) rowMax = numValue
+          if (numValue < rowMin) rowMin = numValue
+
+          if (numValue >= 0) existPositiveValue = true
+
+          if (!isNaN(numValue)) stackedSum += numValue
+        }
+      }
+
+      if (rowMax > maxValue) maxValue = rowMax
+      if (rowMin < minValue) minValue = rowMin
+
+      if (!isNaN(stackedSum)) stackedTotals.push(stackedSum)
+    }
 
     if (
       (config.visualizationType === 'Bar' || (config.visualizationType === 'Combo' && isBar)) &&
       config.visualizationSubType === 'stacked'
     ) {
-      const yTotals = data.map(sumYValues(config.runtime.seriesKeys)).filter(num => !isNaN(num))
-      max = Math.max(...yTotals)
+      maxValue = Math.max(...stackedTotals)
     }
 
     if (config.visualizationSubType === 'stacked' && config.visualizationType === 'Area Chart') {
-      const yTotals = data.map(sumYValues(config.runtime.seriesKeys))
-      max = Math.max(...yTotals)
+      maxValue = Math.max(...stackedTotals)
     }
 
     if (
@@ -39,62 +76,60 @@ function useReduceData(config, data) {
       config.series &&
       config.series.dataKey
     ) {
-      max = Math.max(
-        ...data.map(d => (isNumber(d[config.series.dataKey]) ? Number(cleanChars(d[config.series.dataKey])) : 0))
-      )
+      let specialMax = -Infinity
+      for (const row of data) {
+        const cleanValue = cleanChars(row[config.series.dataKey])
+        if (isNumber(cleanValue)) {
+          const numValue = Number(cleanValue)
+          if (numValue > specialMax) specialMax = numValue
+        }
+      }
+      maxValue = specialMax
     }
 
     if (config.visualizationType === 'Combo' && config.visualizationSubType === 'stacked' && !isBar) {
       if (config.runtime.barSeriesKeys && config.runtime.lineSeriesKeys) {
-        const yTotals = data.map(sumYValues(config.runtime.barSeriesKeys))
+        let barMax = -Infinity
+        let lineMax = -Infinity
 
-        const lineMax = Math.max(
-          ...data.map(d => Math.max(...config.runtime.lineSeriesKeys.map(key => Number(cleanChars(d[key])))))
-        )
-        const barMax = Math.max(...yTotals)
+        for (const row of data) {
+          let barSum = 0
+          let rowLineMax = -Infinity
 
-        max = Math.max(barMax, lineMax)
+          for (const key of config.runtime.barSeriesKeys) {
+            const cleanValue = cleanChars(row[key])
+            if (isNumber(cleanValue)) {
+              const numValue = Number(cleanValue)
+              if (!isNaN(numValue)) barSum += numValue
+            }
+          }
+
+          for (const key of config.runtime.lineSeriesKeys) {
+            const cleanValue = cleanChars(row[key])
+            if (isNumber(cleanValue)) {
+              const numValue = Number(cleanValue)
+              if (numValue > rowLineMax) rowLineMax = numValue
+            }
+          }
+
+          if (barSum > barMax) barMax = barSum
+          if (rowLineMax > lineMax) lineMax = rowLineMax
+        }
+
+        maxValue = Math.max(barMax, lineMax)
       }
     }
 
-    return max
-  }
+    if (minValue === Infinity) minValue = 0
+    if (maxValue === -Infinity) maxValue = 0
 
-  const getMinValueFromData = () => {
-    const minNumberFromData = Math.min(
-      ...data.map(d =>
-        Math.min(
-          ...config.runtime.seriesKeys.map(key => {
-            const seriesKey = getSeriesKey(key)
-            return isNumber(d[seriesKey]) ? Number(cleanChars(d[seriesKey])) : Infinity
-          })
-        )
-      )
-    )
-
-    return String(minNumberFromData)
-  }
-
-  const findPositiveNum = () => {
-    if (!config.runtime.seriesKeys) {
-      return false
+    return {
+      minValue: Number(minValue),
+      maxValue: Number(maxValue),
+      existPositiveValue,
+      isAllLine
     }
-    return config.runtime.seriesKeys.some(key => data.some(d => d[getSeriesKey(key)] >= 0))
-  }
-
-  const cleanChars = value => {
-    if (value === null || value === '') {
-      return ''
-    }
-
-    return typeof value === 'string' ? value.replace(/[,$]/g, '') : value
-  }
-
-  const maxValue = Number(getMaxValueFromData())
-  const minValue = Number(getMinValueFromData())
-  const existPositiveValue = findPositiveNum()
-
-  return { minValue, maxValue, existPositiveValue, isAllLine }
+  }, [config, data])
 }
 
 export default useReduceData

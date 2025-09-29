@@ -6,6 +6,8 @@ type GeoProps = {
   strokeWidth?: number
   path?: string
   className?: string
+  onMouseEnter?: () => void
+  onClick?: () => void
 }
 
 const Geo: React.FC<GeoProps> = ({ path, styles, stroke, strokeWidth, ...props }) => {

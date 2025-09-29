@@ -17,7 +17,7 @@ const ExpandCollapse = ({ expanded, setExpanded, tableTitle, config, interaction
       role='button'
       className={expanded ? 'data-table-heading p-3' : 'collapsed data-table-heading p-3'}
       onClick={() => {
-        publishAnalyticsEvent('data_table_toggled', 'click', interactionLabel, config.type || 'unknown')
+        publishAnalyticsEvent('data_table_toggled', 'click', interactionLabel, config.type || 'unknown', { title: config?.title })
         setExpanded(!expanded)
       }}
       tabIndex={0}

@@ -8,9 +8,9 @@ import { scaleLinear } from '@visx/scale'
 import { curveLinearClosed } from '@visx/curve'
 
 // types
-import { type ForestPlotProps } from '@cdc/chart/src/components/ForestPlot/ForestPlotProps'
-import { type ChartConfig } from '@cdc/chart/src/types/ChartConfig'
-import { type ChartContext } from '@cdc/chart/src/types/ChartContext'
+import { type ForestPlotProps } from './ForestPlotProps'
+import { type ChartConfig } from '../../types/ChartConfig'
+import { type ChartContext } from '../../types/ChartContext'
 
 // cdc
 import ConfigContext from '../../ConfigContext'
@@ -73,7 +73,7 @@ const ForestPlot = ({
 
       updateConfig(newConfig)
     } catch (e) {
-      console.log(e.message)
+      console.error(e.message)
     }
   }, [])
 
@@ -184,7 +184,7 @@ const ForestPlot = ({
           const isTotalColumn = d[config.xAxis.dataKey] === forestPlot.pooledResult.column
 
           return !isTotalColumn ? (
-            <Group>
+            <Group key={`forest-plot-row-${i}-${d[config.xAxis.dataKey]}`}>
               {/* Confidence Interval Paths */}
               <path
                 stroke={lineColor}
@@ -252,6 +252,7 @@ const ForestPlot = ({
             </Group>
           ) : (
             <LinePath
+              key={`forest-plot-regression-${i}-${d[config.xAxis.dataKey]}`}
               data={regressionPoints}
               x={d => d.x}
               y={d => d.y - APP_FONT_SIZE / 2}
@@ -314,10 +315,11 @@ const ForestPlot = ({
       />
 
       {/* column data */}
-      {columnsOnChart.map(column => {
+      {columnsOnChart.map((column, colIndex) => {
         return data.map((d, i) => {
           return (
             <Text
+              key={`forest-plot-column-${colIndex}-${i}-${d[config.xAxis.dataKey]}`}
               className={`${d[column.name]}`}
               x={column.forestPlotAlignRight ? width : column.forestPlotStartingPoint}
               y={yScale(i)}
@@ -336,6 +338,7 @@ const ForestPlot = ({
         data.map((d, i) => {
           return (
             <Text
+              key={`forest-plot-xaxis-${i}-${d[config.xAxis.dataKey]}`}
               className={`${d[config.xAxis.dataKey]}`}
               x={0}
               y={yScale(i)}
@@ -356,9 +359,10 @@ const ForestPlot = ({
       )}
 
       {/* column headers */}
-      {columnsOnChart.map(column => {
+      {columnsOnChart.map((column, colIndex) => {
         return (
           <Text
+            key={`forest-plot-header-${colIndex}-${column.label}`}
             className={`${column.label}`}
             x={column.forestPlotAlignRight ? width : column.forestPlotStartingPoint}
             y={0}

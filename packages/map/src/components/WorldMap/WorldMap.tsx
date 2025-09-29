@@ -3,6 +3,7 @@ import { geoMercator } from 'd3-geo'
 import { Mercator } from '@visx/geo'
 import { feature } from 'topojson-client'
 import ConfigContext, { MapDispatchContext } from '../../context'
+import { useLegendMemoContext } from '../../context/LegendMemoContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ZoomableGroup from '../ZoomableGroup'
 import Geo from '../Geo'
@@ -34,16 +35,15 @@ let projection = geoMercator()
 const WorldMap = () => {
   // prettier-ignore
   const {
-    data,
+    runtimeData,
     position,
-    setRuntimeData,
     config,
     tooltipId,
     runtimeLegend,
-    legendMemo,
-    legendSpecialClassLastMemo,
     interactionLabel
   } = useContext(ConfigContext)
+
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
   const { type, allowMapZoom } = config.general
 
@@ -70,15 +70,15 @@ const WorldMap = () => {
     publishAnalyticsEvent('map_reset_zoom_level', 'click', interactionLabel, 'map')
     dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
     dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
-    setRuntimeData(newRuntimeData)
+    dispatch({ type: 'SET_RUNTIME_DATA', payload: newRuntimeData })
   }
 
   const handleZoomIn = position => {
     if (position.zoom >= 4) return
     publishAnalyticsEvent(
-      'map_zoomed_in',
+      `map_zoomed_in|zoom_level_${Math.floor(position.zoom * 1.5)}|${position.coordinates}`,
       'click',
-      `${interactionLabel}|zoom_level_${Math.floor(position.zoom * 1.5)}|${position.coordinates}`,
+      `${interactionLabel}`,
       'map'
     )
     dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: position.zoom * 1.5 } })
@@ -87,9 +87,9 @@ const WorldMap = () => {
   const handleZoomOut = position => {
     if (position.zoom <= 1) return
     publishAnalyticsEvent(
-      'map_zoomed_out',
+      `map_zoomed_out|zoom_level_${Math.floor(position.zoom / 1.5)}|${position.coordinates}`,
       'click',
-      `${interactionLabel}|zoom_level_${Math.floor(position.zoom / 1.5)}|${position.coordinates}`,
+      `${interactionLabel}`,
       'map'
     )
     dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: position.zoom / 1.5 } })
@@ -105,7 +105,7 @@ const WorldMap = () => {
       // If the geo.properties.config value is found in the data use that, otherwise fall back to geo.properties.iso
       const dataHasStateName = config.data.some(d => d[config.columns.geo.name] === geo.properties.state)
       const geoKey =
-        geo.properties.state && data[geo.properties.state]
+        geo.properties.state && runtimeData[geo.properties.state]
           ? geo.properties.state
           : geo.properties.name
           ? geo.properties.name
@@ -116,7 +116,7 @@ const WorldMap = () => {
       }
       if (!geoKey) return null
 
-      let geoData = data[geoKey]
+      let geoData = runtimeData[geoKey]
 
       const geoDisplayName = displayGeoName(supportedCountries[geoKey]?.[0])
       let legendColors
@@ -169,6 +169,14 @@ const WorldMap = () => {
             stroke={geoStrokeColor}
             strokeWidth={strokeWidth}
             onClick={() => geoClickHandler(geoDisplayName, geoData)}
+            onMouseEnter={() => {
+              // Track hover analytics event if this is a new location
+              const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
+              publishAnalyticsEvent(`map_hover_${locationName?.toLowerCase()}`, 'hover', interactionLabel, 'map', {
+                title: config?.title || config?.general?.title,
+                location: geoDisplayName
+              })
+            }}
             data-tooltip-id={`tooltip__${tooltipId}`}
             data-tooltip-html={toolTip}
             tabIndex={-1}
@@ -186,6 +194,14 @@ const WorldMap = () => {
           strokeWidth={strokeWidth}
           styles={styles}
           path={path}
+          onMouseEnter={() => {
+            // Track hover analytics event if this is a new location
+            const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
+            publishAnalyticsEvent(`map_hover_${locationName?.toLowerCase()}`, 'hover', interactionLabel, 'map', {
+              title: config?.title || config?.general?.title,
+              location: geoDisplayName
+            })
+          }}
           data-tooltip-id={`tooltip__${tooltipId}`}
           data-tooltip-html={toolTip}
         />

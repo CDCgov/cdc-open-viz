@@ -509,7 +509,7 @@ const CdcWaffleChart = ({
   useEffect(() => {
     if (config && !coveLoadedHasRan && container) {
       publish('cove_loaded', { config: config })
-      publishAnalyticsEvent('waffle-chart_loaded', 'load', interactionLabel, 'waffle-chart')
+      publishAnalyticsEvent('waffle-chart_loaded', 'load', interactionLabel, 'waffle-chart', { title: config?.title })
       dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
     }
   }, [config, container])

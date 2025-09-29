@@ -24,7 +24,6 @@ import { Label } from './types/Label'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import { timeParse, timeFormat } from 'd3-time-format'
 import parse from 'html-react-parser'
-import 'react-tooltip/dist/react-tooltip.css'
 import _ from 'lodash'
 // Primary Components
 import ConfigContext, { ChartDispatchContext } from './ConfigContext'
@@ -33,7 +32,8 @@ import SankeyChart from './components/Sankey'
 import LinearChart from './components/LinearChart'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 
-import { colorPalettesChart as colorPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
+import { twoColorPalette } from '@cdc/core/data/colorPalettes'
+import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 
 import SparkLine from './components/Sparkline'
 import Legend from './components/Legend'
@@ -46,7 +46,7 @@ import { handleChartAriaLabels } from './helpers/handleChartAriaLabels'
 import { lineOptions } from './helpers/lineOptions'
 import { handleLineType } from './helpers/handleLineType'
 import { handleRankByValue } from './helpers/handleRankByValue'
-import { generateColorsArray } from './helpers/generateColorsArray'
+import { generateColorsArray } from '@cdc/core/helpers/generateColorsArray'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
@@ -63,7 +63,7 @@ import numberFromString from '@cdc/core/helpers/numberFromString'
 import getViewport from '@cdc/core/helpers/getViewport'
 import isNumber from '@cdc/core/helpers/isNumber'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import EditorContext from '../../editor/src/ConfigContext'
+import EditorContext from '@cdc/core/contexts/EditorContext'
 import { EDITOR_WIDTH } from '@cdc/core/helpers/constants'
 import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 // Local helpers
@@ -83,6 +83,7 @@ import { getNewRuntime } from './helpers/getNewRuntime'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import { Datasets } from '@cdc/core/types/DataSet'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -169,7 +170,22 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const convertLineToBarGraph = isConvertLineToBarGraph(config, filteredData)
 
   const prepareConfig = (loadedConfig: ChartConfig) => {
-    let newConfig = _.defaultsDeep(loadedConfig, defaults)
+    // Create defaults without version to avoid overriding legacy configs
+    const defaultsWithoutPalette = { ...defaults }
+
+    // Only remove palette defaults for legacy (v1) configs
+    // New configs and v2 configs should get the v2 palette defaults
+    if (loadedConfig?.general?.palette || (!loadedConfig?.general && !loadedConfig?.color)) {
+      // Keep palette defaults for:
+      // 1. Configs that already have general.palette (v2 configs)
+      // 2. New configs (no general section and no legacy color property)
+    } else {
+      // Remove palette defaults for legacy configs that have color but no general.palette
+      delete defaultsWithoutPalette.general?.palette
+    }
+
+    let newConfig = { ...defaultsWithoutPalette, ...loadedConfig }
+
     _.defaultsDeep(newConfig, {
       table: { showVertical: false }
     })
@@ -191,7 +207,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
-    const newConfig = _.cloneDeep(_config)
+    const newConfig = cloneConfig(_config)
     let data = dataOverride || stateData
 
     data = handleRankByValue(data, newConfig)
@@ -468,7 +484,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (container && !isLoading && !_.isEmpty(config) && !coveLoadedEventRan) {
       publish('cove_loaded', { config: config })
       dispatch({ type: 'SET_LOADED_EVENT', payload: true })
-      publishAnalyticsEvent('chart_loaded', 'load', interactionLabel, 'chart')
+      publishAnalyticsEvent('chart_loaded', 'load', interactionLabel, 'chart', { title: config?.title })
     }
   }, [container, config, isLoading]) // eslint-disable-line
 
@@ -558,7 +574,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     } catch (e) {
       console.error('COVE:', e.message)
     }
-    publishAnalyticsEvent('chart_legend_reset', 'click', interactionLabel, 'chart')
+    publishAnalyticsEvent('chart_legend_reset', 'click', interactionLabel, 'chart', { title: config?.title })
     dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [] })
   }
 
@@ -821,7 +837,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const pivotDynamicSeries = (config: ChartConfig): TableConfig => {
-    const tableConfig: TableConfig = _.cloneDeep(config)
+    const tableConfig: TableConfig = cloneConfig(config)
     const dynamicSeries = tableConfig.series.find(series => !!series.dynamicCategory)
     if (dynamicSeries) {
       const pivot: Pivot = { columnName: dynamicSeries.dynamicCategory, valueColumns: [dynamicSeries.dataKey] }
@@ -1067,7 +1083,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
                   <DataTable
                     /* changing the "key" will force the table to re-render
-                          when the default sort changes while editing */
+                            when the default sort changes while editing */
                     key={dataTableDefaultSortBy}
                     config={pivotDynamicSeries(config)}
                     rawData={
@@ -1119,6 +1135,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
 
+  // Get version-specific color palettes based on current config
+  const colorPalettes = filterChartColorPalettes(config)
+
   const contextValues = {
     ...state,
     capitalize,
@@ -1137,6 +1156,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     handleChartTabbing,
     highlight,
     handleShowAll,
+    interactionLabel,
     isDashboard,
     isDebug,
     handleDragStateChange,
@@ -1150,7 +1170,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     outerContainerRef,
     parentRef,
     parseDate,
-    rawData: _.cloneDeep(stateData) ?? {},
+    rawData: stateData ?? {},
     setConfig,
     setEditing,
     setParentConfig,
@@ -1160,7 +1180,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     tableData: filteredData || excludedData,
     transformedData: getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean }),
     twoColorPalette,
-    unfilteredData: _.cloneDeep(stateData),
+    unfilteredData: stateData,
     updateConfig
   }
 

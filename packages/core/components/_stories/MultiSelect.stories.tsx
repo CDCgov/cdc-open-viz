@@ -1,7 +1,7 @@
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 
 import MultiSelect from '../MultiSelect'
-import { userEvent, within } from '@storybook/testing-library'
+import { userEvent, within } from 'storybook/test'
 
 const meta: Meta<typeof MultiSelect> = {
   title: 'Components/Molecules/MultiSelect',
@@ -10,7 +10,7 @@ const meta: Meta<typeof MultiSelect> = {
 
 type Story = StoryObj<typeof MultiSelect>
 
-export const Primary: Story = {
+export const PrimaryTests: Story = {
   args: {
     options: [
       { value: '1', label: 'One' },

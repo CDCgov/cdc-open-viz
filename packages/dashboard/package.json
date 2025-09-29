@@ -35,7 +35,7 @@
     "@cdc/markup-include": "^4.25.7",
     "@cdc/waffle-chart": "^4.25.7",
     "js-base64": "^2.5.2",
-    "react-accessible-accordion": "^3.3.4",
+    "react-accessible-accordion": "^5.0.1",
     "react-dnd": "^14.0.2",
     "react-dnd-html5-backend": "^14.0.0",
     "use-debounce": "^6.0.1"
@@ -43,6 +43,13 @@
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "vite": "^4.4.11",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite-plugin-css-injected-by-js": "^2.4.0",
+    "vite-plugin-svgr": "^2.4.0",
+    "@rollup/plugin-dsv": "^3.0.2"
   },
   "gitHead": "6097de1ff814001880d9ac64bd66becdc092d63c"
 }

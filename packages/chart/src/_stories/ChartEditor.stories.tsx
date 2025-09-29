@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import { userEvent, within } from '@storybook/testing-library'
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { userEvent, within } from 'storybook/test'
 import Chart from '../CdcChartComponent'
 import pieChartExample from './_mock/pie_config.json'
 import pieData from './_mock/pie_data.json'
@@ -31,7 +31,7 @@ export const Url_Filter: Story = {
   }
 }
 
-export const ScatterPlot: Story = {
+export const ScatterPlotTests: Story = {
   args: {
     config: mockScatterPlot,
     isEditor: true

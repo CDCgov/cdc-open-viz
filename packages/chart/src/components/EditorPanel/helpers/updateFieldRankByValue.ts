@@ -1,5 +1,6 @@
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { ChartConfig } from '../../../types/ChartConfig'
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import _ from 'lodash'
 
 const transform = new DataTransform()
@@ -26,7 +27,7 @@ export const updateFieldRankByValue = (
   newValue: 'asc' | 'desc' | undefined,
   preTransformedData: Object[]
 ): [ChartConfig, Object[]?] => {
-  const newConfig = _.cloneDeep(config)
+  const newConfig = cloneConfig(config)
   newConfig.rankByValue = newValue
 
   if (config.rankByValue && !newValue) {

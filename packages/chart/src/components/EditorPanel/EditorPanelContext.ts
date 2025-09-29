@@ -23,6 +23,8 @@ export type EditorPanelContext = {
   isPaletteReversed?: boolean
   handleRemoveHighlightedBar?: Function
   setLollipopShape?: Function
+  handlePaletteSelection?: (palette: string) => void
+  handleTwoColorPaletteSelection?: (palette: string) => void
 }
 
 const EditorPanelContext = createContext<EditorPanelContext>(null)

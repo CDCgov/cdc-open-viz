@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 strong {
   font-weight: 600;
 }
@@ -42,11 +44,11 @@ strong {
 .inline-icon {
   width: 1em !important;
   height: auto !important;
+  font-size: 1rem;
+  color: inherit;
   @media all and (-ms-high-contrast: none) {
     height: 30px !important;
   }
-  font-size: 1rem;
-  color: inherit;
   path {
     fill: currentColor;
   }
@@ -76,7 +78,7 @@ strong {
     font-size: 0.8 em;
     color: #fff;
     &:hover {
-      background-color: darken($red, 5%);
+      background-color: color.adjust($red, $lightness: -5%);
     }
   }
 
@@ -168,8 +170,8 @@ section.footnotes {
   background-color: $blue;
   border-color: $blue;
   &:hover:not([disabled]) {
-    background-color: darken($blue, 5%);
-    border-color: darken($blue, 5%);
+    background-color: color.adjust($blue, $lightness: -5%);
+    border-color: color.adjust($blue, $lightness: -5%);
   }
 }
 
