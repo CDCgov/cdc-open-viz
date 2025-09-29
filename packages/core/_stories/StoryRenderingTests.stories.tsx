@@ -55,10 +55,7 @@ const getVisualizationStoryUrls = async (): Promise<string[]> => {
 const iframeUrlToStoryUrl = (iframeUrl: string): string => {
   const url = new URL(iframeUrl)
   const storyId = url.searchParams.get('id')
-  if (storyId) {
-    return `http://localhost:6006/?path=/story/${storyId}`
-  }
-  return iframeUrl // fallback to original URL if parsing fails
+  return `http://localhost:6006/?path=/story/${storyId}`
 }
 
 /**
@@ -97,7 +94,6 @@ const testIframeVisualization = async (iframeUrl: string) => {
       }
     )
 
-    // Wait for React components to render
     await performAndAssert(
       'Wait for SVG elements to render in iframe',
       () => {
@@ -117,6 +113,8 @@ const testIframeVisualization = async (iframeUrl: string) => {
       },
       async () => {},
       (before, after) => {
+        console.log('before', before)
+        console.log('after', after)
         return (after.svgCount > 0 && after.hasCoveModule) || after.isDataBite
       }
     )
