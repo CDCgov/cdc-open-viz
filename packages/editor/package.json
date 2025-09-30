@@ -32,7 +32,7 @@
     "@cdc/map": "^4.25.8",
     "@cdc/markup-include": "^4.25.8",
     "@cdc/waffle-chart": "^4.25.8",
-    "axios": "^1.9.0",
+    "axios": "^0.30.2",
     "d3": "^7.9.0",
     "react-dropzone": "^14.3.8",
     "use-debounce": "^10.0.5"
