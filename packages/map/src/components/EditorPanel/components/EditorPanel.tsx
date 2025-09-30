@@ -31,10 +31,10 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 
 // Assets
-import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg'
-import UsaRegionGraphic from '@cdc/core/assets/usa-region-graphic.svg'
-import WorldGraphic from '@cdc/core/assets/icon-map-world.svg'
-import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
+import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg?react'
+import UsaRegionGraphic from '@cdc/core/assets/usa-region-graphic.svg?react'
+import WorldGraphic from '@cdc/core/assets/icon-map-world.svg?react'
+import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg?react'
 import worldDefaultConfig from '../../../../examples/default-world.json'
 import usaDefaultConfig from '../../../../examples/default-usa.json'
 import countyDefaultConfig from '../../../../examples/default-county.json'
@@ -922,7 +922,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     const isV1PaletteConfig = isV1Palette(config)
 
     const executeSelection = () => {
-      const _newConfig = _.cloneDeep(config)
+      const _newConfig = cloneConfig(config)
 
       // If v2 migration is disabled, use the original palette name and keep v1 version
       if (!USE_V2_MIGRATION) {
@@ -3096,7 +3096,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     type='checkbox'
                     checked={config.visual.showBubbleZeros}
                     onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
+                      const _newConfig = cloneConfig(config)
                       _newConfig.visual.showBubbleZeros = event.target.checked
                       setConfig(_newConfig)
                     }}

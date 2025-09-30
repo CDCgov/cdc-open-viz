@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo } from 'react'
 import PropTypes from 'prop-types'
 
-import Check from '../../assets/icon-check.svg'
+import Check from '../../assets/icon-check.svg?react'
 import '../../styles/v2/components/input/index.scss'
 
 const InputCheckbox = memo(
@@ -40,8 +40,18 @@ const InputCheckbox = memo(
     return (
       <div className='input-group'>
         {label && <label>{label}</label>}
-        <div className={'cove-input__checkbox' + (size === 'small' ? '--small' : size === 'large' ? '--large' : '') + (value ? ' active' : '')} onClick={() => setValue(!value)}>
-          <div className={`cove-input__checkbox-box${activeColor ? ' custom-color' : ''}`} style={value && activeColor ? { backgroundColor: activeColor } : null}>
+        <div
+          className={
+            'cove-input__checkbox' +
+            (size === 'small' ? '--small' : size === 'large' ? '--large' : '') +
+            (value ? ' active' : '')
+          }
+          onClick={() => setValue(!value)}
+        >
+          <div
+            className={`cove-input__checkbox-box${activeColor ? ' custom-color' : ''}`}
+            style={value && activeColor ? { backgroundColor: activeColor } : null}
+          >
             <Check className='cove-input__checkbox-check' style={{ fill: activeCheckColor || '#025eaa' }} />
           </div>
           <input className='cove-input--hidden' type='checkbox' name={name} checked={value || false} readOnly />

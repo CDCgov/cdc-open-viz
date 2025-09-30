@@ -14,7 +14,7 @@ import DataTable from '@cdc/core/components/DataTable'
 // Local Components
 import LegendWrapper from './components/LegendWrapper'
 //types
-import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
+import { type DashboardConfig } from '@cdc/core/types/DashboardConfig'
 import type { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import { AllChartsConfig, ChartConfig } from './types/ChartConfig'
 import { Pivot } from '@cdc/core/types/Table'

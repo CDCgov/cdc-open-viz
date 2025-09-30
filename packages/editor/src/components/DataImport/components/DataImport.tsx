@@ -9,12 +9,12 @@ import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorC
 import TabPane from '../../TabPane'
 import Tabs from '../../Tabs'
 import PreviewDataTable from '../../PreviewDataTable'
-import LinkIcon from '../../../assets/icons/link.svg'
+import LinkIcon from '../../../assets/icons/link.svg?react'
 import SampleDataContext from './samples/SampleDataContext'
 import SampleData from './SampleData'
 
-import FileUploadIcon from '../../../assets/icons/file-upload-solid.svg'
-import CloseIcon from '@cdc/core/assets/icon-close.svg'
+import FileUploadIcon from '../../../assets/icons/file-upload-solid.svg?react'
+import CloseIcon from '@cdc/core/assets/icon-close.svg?react'
 
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 import Tooltip from '@cdc/core/components/ui/Tooltip'

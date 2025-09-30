@@ -2,58 +2,58 @@ import type { Meta } from '@storybook/react'
 import React from 'react'
 
 // Import all icons
-import AreaChartIcon from '../../../assets/icon-area-chart.svg'
-import CaretDownIcon from '../../../assets/icon-caret-down.svg'
-import CaretFilledDownIcon from '../../../assets/icon-caret-filled-down.svg'
-import CaretFilledUpIcon from '../../../assets/icon-caret-filled-up.svg'
-import CaretUpIcon from '../../../assets/icon-caret-up.svg'
-import BarPairedIcon from '../../../assets/icon-chart-bar-paired.svg'
-import BarStackedIcon from '../../../assets/icon-chart-bar-stacked.svg'
-import BarChartIcon from '../../../assets/icon-chart-bar.svg'
-import BoxWhiskerIcon from '../../../assets/icon-chart-box-whisker.svg'
-import ForecastIcon from '../../../assets/icon-chart-forecast.svg'
-import ForestPlotIcon from '../../../assets/icon-chart-forest-plot.svg'
-import LineChartIcon from '../../../assets/icon-chart-line.svg'
-import PieChartIcon from '../../../assets/icon-chart-pie.svg'
-import ScatterplotIcon from '../../../assets/icon-chart-scatterplot.svg'
-import StackedAreaIcon from '../../../assets/icon-chart-stacked-area.svg'
-import CheckIcon from '../../../assets/icon-check.svg'
-import CloseIcon from '../../../assets/icon-close.svg'
-import CodeIcon from '../../../assets/icon-code.svg'
-import ComboChartIcon from '../../../assets/icon-combo-chart.svg'
-import CommandIcon from '../../../assets/icon-command.svg'
-import DashboardIcon from '../../../assets/icon-dashboard.svg'
-import DataBiteIcon from '../../../assets/icon-databite.svg'
-import DeviationBarIcon from '../../../assets/icon-deviation-bar.svg'
-import EditIcon from '../../../assets/icon-edit.svg'
-import EpiChartIcon from '../../../assets/icon-epi-chart.svg'
-import FileUploadIcon from '../../../assets/icon-file-upload.svg'
-import FilterBarsIcon from '../../../assets/icon-filter-bars.svg'
-import FilterDropdownsIcon from '../../../assets/icon-filter-dropdowns.svg'
-import FilteredTextIcon from '../../../assets/icon-filtered-text.svg'
-import GearIcon from '../../../assets/icon-gear.svg'
-import GearMultiIcon from '../../../assets/icon-gear-multi.svg'
-import GridIcon from '../../../assets/icon-grid.svg'
-import InfoIcon from '../../../assets/icon-info.svg'
-import LinearGaugeIcon from '../../../assets/icon-linear-gauge.svg'
-import LinkIcon from '../../../assets/icon-link.svg'
-import MapAlabamaIcon from '../../../assets/icon-map-alabama.svg'
-import MapUSAIcon from '../../../assets/icon-map-usa.svg'
-import MapWorldIcon from '../../../assets/icon-map-world.svg'
-import MinusIcon from '../../../assets/icon-minus.svg'
-import MoveIcon from '../../../assets/icon-move.svg'
-import PlusIcon from '../../../assets/icon-plus.svg'
-import QuestionCircleIcon from '../../../assets/icon-question-circle.svg'
-import RotateLeftIcon from '../../../assets/icon-rotate-left.svg'
-import SankeyIcon from '../../../assets/icon-sankey.svg'
-import TableIcon from '../../../assets/icon-table.svg'
-import ToolsIcon from '../../../assets/icon-tools.svg'
-import UploadIcon from '../../../assets/icon-upload.svg'
-import WarningCircleIcon from '../../../assets/icon-warning-circle.svg'
-import WarningTriangleIcon from '../../../assets/icon-warning-triangle.svg'
-import ExternalLinkIcon from '../../../assets/external-link.svg'
-import MapFoldedIcon from '../../../assets/map-folded.svg'
-import USARegionGraphicIcon from '../../../assets/usa-region-graphic.svg'
+import AreaChartIcon from '../../../assets/icon-area-chart.svg?react'
+import CaretDownIcon from '../../../assets/icon-caret-down.svg?react'
+import CaretFilledDownIcon from '../../../assets/icon-caret-filled-down.svg?react'
+import CaretFilledUpIcon from '../../../assets/icon-caret-filled-up.svg?react'
+import CaretUpIcon from '../../../assets/icon-caret-up.svg?react'
+import BarPairedIcon from '../../../assets/icon-chart-bar-paired.svg?react'
+import BarStackedIcon from '../../../assets/icon-chart-bar-stacked.svg?react'
+import BarChartIcon from '../../../assets/icon-chart-bar.svg?react'
+import BoxWhiskerIcon from '../../../assets/icon-chart-box-whisker.svg?react'
+import ForecastIcon from '../../../assets/icon-chart-forecast.svg?react'
+import ForestPlotIcon from '../../../assets/icon-chart-forest-plot.svg?react'
+import LineChartIcon from '../../../assets/icon-chart-line.svg?react'
+import PieChartIcon from '../../../assets/icon-chart-pie.svg?react'
+import ScatterplotIcon from '../../../assets/icon-chart-scatterplot.svg?react'
+import StackedAreaIcon from '../../../assets/icon-chart-stacked-area.svg?react'
+import CheckIcon from '../../../assets/icon-check.svg?react'
+import CloseIcon from '../../../assets/icon-close.svg?react'
+import CodeIcon from '../../../assets/icon-code.svg?react'
+import ComboChartIcon from '../../../assets/icon-combo-chart.svg?react'
+import CommandIcon from '../../../assets/icon-command.svg?react'
+import DashboardIcon from '../../../assets/icon-dashboard.svg?react'
+import DataBiteIcon from '../../../assets/icon-databite.svg?react'
+import DeviationBarIcon from '../../../assets/icon-deviation-bar.svg?react'
+import EditIcon from '../../../assets/icon-edit.svg?react'
+import EpiChartIcon from '../../../assets/icon-epi-chart.svg?react'
+import FileUploadIcon from '../../../assets/icon-file-upload.svg?react'
+import FilterBarsIcon from '../../../assets/icon-filter-bars.svg?react'
+import FilterDropdownsIcon from '../../../assets/icon-filter-dropdowns.svg?react'
+import FilteredTextIcon from '../../../assets/icon-filtered-text.svg?react'
+import GearIcon from '../../../assets/icon-gear.svg?react'
+import GearMultiIcon from '../../../assets/icon-gear-multi.svg?react'
+import GridIcon from '../../../assets/icon-grid.svg?react'
+import InfoIcon from '../../../assets/icon-info.svg?react'
+import LinearGaugeIcon from '../../../assets/icon-linear-gauge.svg?react'
+import LinkIcon from '../../../assets/icon-link.svg?react'
+import MapAlabamaIcon from '../../../assets/icon-map-alabama.svg?react'
+import MapUSAIcon from '../../../assets/icon-map-usa.svg?react'
+import MapWorldIcon from '../../../assets/icon-map-world.svg?react'
+import MinusIcon from '../../../assets/icon-minus.svg?react'
+import MoveIcon from '../../../assets/icon-move.svg?react'
+import PlusIcon from '../../../assets/icon-plus.svg?react'
+import QuestionCircleIcon from '../../../assets/icon-question-circle.svg?react'
+import RotateLeftIcon from '../../../assets/icon-rotate-left.svg?react'
+import SankeyIcon from '../../../assets/icon-sankey.svg?react'
+import TableIcon from '../../../assets/icon-table.svg?react'
+import ToolsIcon from '../../../assets/icon-tools.svg?react'
+import UploadIcon from '../../../assets/icon-upload.svg?react'
+import WarningCircleIcon from '../../../assets/icon-warning-circle.svg?react'
+import WarningTriangleIcon from '../../../assets/icon-warning-triangle.svg?react'
+import ExternalLinkIcon from '../../../assets/external-link.svg?react'
+import MapFoldedIcon from '../../../assets/map-folded.svg?react'
+import USARegionGraphicIcon from '../../../assets/usa-region-graphic.svg?react'
 
 const iconList = [
   { name: 'Area Chart', component: AreaChartIcon, category: 'Charts' },
@@ -113,7 +113,7 @@ const iconList = [
   { name: 'Question Circle', component: QuestionCircleIcon, category: 'Interface' },
   { name: 'Tools', component: ToolsIcon, category: 'Interface' },
   { name: 'Warning Circle', component: WarningCircleIcon, category: 'Interface' },
-  { name: 'Warning Triangle', component: WarningTriangleIcon, category: 'Interface' },
+  { name: 'Warning Triangle', component: WarningTriangleIcon, category: 'Interface' }
 ]
 
 const categories = [...new Set(iconList.map(icon => icon.category))]
@@ -130,12 +130,14 @@ const meta: Meta = {
           {categories.map(category => (
             <div key={category} style={{ marginBottom: '40px' }}>
               <h2>{category}</h2>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                gap: '20px',
-                marginBottom: '20px'
-              }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                  gap: '20px',
+                  marginBottom: '20px'
+                }}
+              >
                 {iconList
                   .filter(icon => icon.category === category)
                   .map(icon => (
@@ -151,30 +153,30 @@ const meta: Meta = {
                         backgroundColor: '#fafafa'
                       }}
                     >
-                      <icon.component
-                        width="48"
-                        height="48"
-                        style={{ marginBottom: '10px' }}
-                      />
-                      <span style={{
-                        fontSize: '12px',
-                        fontWeight: 'bold',
-                        textAlign: 'center',
-                        color: '#333'
-                      }}>
+                      <icon.component width='48' height='48' style={{ marginBottom: '10px' }} />
+                      <span
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          textAlign: 'center',
+                          color: '#333'
+                        }}
+                      >
                         {icon.name}
                       </span>
-                      <code style={{
-                        fontSize: '10px',
-                        color: '#666',
-                        marginTop: '5px',
-                        textAlign: 'center',
-                        wordBreak: 'break-all'
-                      }}>
+                      <code
+                        style={{
+                          fontSize: '10px',
+                          color: '#666',
+                          marginTop: '5px',
+                          textAlign: 'center',
+                          wordBreak: 'break-all'
+                        }}
+                      >
                         {icon.component.toString().includes('icon-')
                           ? icon.component.toString().match(/icon-[^.]+/)?.[0] || 'icon'
-                          : icon.component.toString().match(/[^/]+(?=\.svg)/)?.[0] || 'icon'
-                        }.svg
+                          : icon.component.toString().match(/[^/]+(?=\.svg)/)?.[0] || 'icon'}
+                        .svg
                       </code>
                     </div>
                   ))}
@@ -184,7 +186,8 @@ const meta: Meta = {
 
           <h2>Usage</h2>
           <p>Import and use icons as React components:</p>
-          <pre><code>{`import WarningIcon from '@cdc/core/assets/icon-warning-circle.svg'
+          <pre>
+            <code>{`import WarningIcon from '@cdc/core/assets/icon-warning-circle.svg?react'
 
 // Basic usage
 <WarningIcon width="24" height="24" />
@@ -195,22 +198,39 @@ const meta: Meta = {
   height="32"
   className="warning-icon"
   style={{ color: '#ff6b6b' }}
-/>`}</code></pre>
+/>`}</code>
+          </pre>
 
           <h2>Guidelines</h2>
           <ul>
-            <li><strong>Consistent Sizing</strong>: Use standard sizes (16px, 24px, 32px, 48px) for consistency</li>
-            <li><strong>Accessibility</strong>: Always provide meaningful alt text or aria-labels when needed</li>
-            <li><strong>Color</strong>: Icons inherit the current text color by default, can be overridden with CSS</li>
-            <li><strong>Context</strong>: Choose icons that clearly represent their function or content</li>
-            <li><strong>Performance</strong>: SVG icons are optimized for fast loading and scalability</li>
+            <li>
+              <strong>Consistent Sizing</strong>: Use standard sizes (16px, 24px, 32px, 48px) for consistency
+            </li>
+            <li>
+              <strong>Accessibility</strong>: Always provide meaningful alt text or aria-labels when needed
+            </li>
+            <li>
+              <strong>Color</strong>: Icons inherit the current text color by default, can be overridden with CSS
+            </li>
+            <li>
+              <strong>Context</strong>: Choose icons that clearly represent their function or content
+            </li>
+            <li>
+              <strong>Performance</strong>: SVG icons are optimized for fast loading and scalability
+            </li>
           </ul>
 
           <h2>File Location</h2>
-          <p>All icons are located in <code>packages/core/assets/</code> and follow the naming convention:</p>
+          <p>
+            All icons are located in <code>packages/core/assets/</code> and follow the naming convention:
+          </p>
           <ul>
-            <li><code>icon-[name].svg</code> for interface and action icons</li>
-            <li><code>[descriptive-name].svg</code> for specialized graphics</li>
+            <li>
+              <code>icon-[name].svg</code> for interface and action icons
+            </li>
+            <li>
+              <code>[descriptive-name].svg</code> for specialized graphics
+            </li>
           </ul>
         </div>
       )
@@ -229,12 +249,14 @@ export const Gallery = {
       {categories.map(category => (
         <div key={category} style={{ marginBottom: '40px' }}>
           <h2>{category}</h2>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-            gap: '20px',
-            marginBottom: '20px'
-          }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+              gap: '20px',
+              marginBottom: '20px'
+            }}
+          >
             {iconList
               .filter(icon => icon.category === category)
               .map(icon => (
@@ -250,30 +272,30 @@ export const Gallery = {
                     backgroundColor: '#fafafa'
                   }}
                 >
-                  <icon.component
-                    width="48"
-                    height="48"
-                    style={{ marginBottom: '10px' }}
-                  />
-                  <span style={{
-                    fontSize: '12px',
-                    fontWeight: 'bold',
-                    textAlign: 'center',
-                    color: '#333'
-                  }}>
+                  <icon.component width='48' height='48' style={{ marginBottom: '10px' }} />
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                      color: '#333'
+                    }}
+                  >
                     {icon.name}
                   </span>
-                  <code style={{
-                    fontSize: '10px',
-                    color: '#666',
-                    marginTop: '5px',
-                    textAlign: 'center',
-                    wordBreak: 'break-all'
-                  }}>
+                  <code
+                    style={{
+                      fontSize: '10px',
+                      color: '#666',
+                      marginTop: '5px',
+                      textAlign: 'center',
+                      wordBreak: 'break-all'
+                    }}
+                  >
                     {icon.component.toString().includes('icon-')
                       ? icon.component.toString().match(/icon-[^.]+/)?.[0] || 'icon'
-                      : icon.component.toString().match(/[^/]+(?=\.svg)/)?.[0] || 'icon'
-                    }.svg
+                      : icon.component.toString().match(/[^/]+(?=\.svg)/)?.[0] || 'icon'}
+                    .svg
                   </code>
                 </div>
               ))}
@@ -283,7 +305,8 @@ export const Gallery = {
 
       <h2>Usage</h2>
       <p>Import and use icons as React components:</p>
-      <pre><code>{`import WarningIcon from '@cdc/core/assets/icon-warning-circle.svg'
+      <pre>
+        <code>{`import WarningIcon from '@cdc/core/assets/icon-warning-circle.svg?react'
 
 // Basic usage
 <WarningIcon width="24" height="24" />
@@ -294,22 +317,39 @@ export const Gallery = {
   height="32"
   className="warning-icon"
   style={{ color: '#ff6b6b' }}
-/>`}</code></pre>
+/>`}</code>
+      </pre>
 
       <h2>Guidelines</h2>
       <ul>
-        <li><strong>Consistent Sizing</strong>: Use standard sizes (16px, 24px, 32px, 48px) for consistency</li>
-        <li><strong>Accessibility</strong>: Always provide meaningful alt text or aria-labels when needed</li>
-        <li><strong>Color</strong>: Icons inherit the current text color by default, can be overridden with CSS</li>
-        <li><strong>Context</strong>: Choose icons that clearly represent their function or content</li>
-        <li><strong>Performance</strong>: SVG icons are optimized for fast loading and scalability</li>
+        <li>
+          <strong>Consistent Sizing</strong>: Use standard sizes (16px, 24px, 32px, 48px) for consistency
+        </li>
+        <li>
+          <strong>Accessibility</strong>: Always provide meaningful alt text or aria-labels when needed
+        </li>
+        <li>
+          <strong>Color</strong>: Icons inherit the current text color by default, can be overridden with CSS
+        </li>
+        <li>
+          <strong>Context</strong>: Choose icons that clearly represent their function or content
+        </li>
+        <li>
+          <strong>Performance</strong>: SVG icons are optimized for fast loading and scalability
+        </li>
       </ul>
 
       <h2>File Location</h2>
-      <p>All icons are located in <code>packages/core/assets/</code> and follow the naming convention:</p>
+      <p>
+        All icons are located in <code>packages/core/assets/</code> and follow the naming convention:
+      </p>
       <ul>
-        <li><code>icon-[name].svg</code> for interface and action icons</li>
-        <li><code>[descriptive-name].svg</code> for specialized graphics</li>
+        <li>
+          <code>icon-[name].svg</code> for interface and action icons
+        </li>
+        <li>
+          <code>[descriptive-name].svg</code> for specialized graphics
+        </li>
       </ul>
     </div>
   )

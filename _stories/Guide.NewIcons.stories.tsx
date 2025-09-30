@@ -13,16 +13,22 @@ const meta: Meta = {
           <ul>
             <li>Icons should be in SVG format for scalability and performance</li>
             <li>Use consistent sizing and visual weight across all icons</li>
-            <li>Icons should be placed in the <code>packages/core/assets/</code> directory</li>
-            <li>Follow the existing naming convention: <code>icon-[name].svg</code></li>
+            <li>
+              Icons should be placed in the <code>packages/core/assets/</code> directory
+            </li>
+            <li>
+              Follow the existing naming convention: <code>icon-[name].svg</code>
+            </li>
           </ul>
 
           <h2>Import and Usage</h2>
           <p>Icons can be imported and used as React components:</p>
-          <pre><code>{`import WarningIcon from '@cdc/core/assets/icon-warning-circle.svg'
+          <pre>
+            <code>{`import WarningIcon from '@cdc/core/assets/icon-warning-circle.svg?react'
 
 // Usage
-<WarningIcon width="24" height="24" className="warning-icon" />`}</code></pre>
+<WarningIcon width="24" height="24" className="warning-icon" />`}</code>
+          </pre>
 
           <h2>Icon Optimization</h2>
           <ul>
@@ -56,16 +62,22 @@ export const Guide = {
       <ul>
         <li>Icons should be in SVG format for scalability and performance</li>
         <li>Use consistent sizing and visual weight across all icons</li>
-        <li>Icons should be placed in the <code>packages/core/assets/</code> directory</li>
-        <li>Follow the existing naming convention: <code>icon-[name].svg</code></li>
+        <li>
+          Icons should be placed in the <code>packages/core/assets/</code> directory
+        </li>
+        <li>
+          Follow the existing naming convention: <code>icon-[name].svg</code>
+        </li>
       </ul>
 
       <h2>Import and Usage</h2>
       <p>Icons can be imported and used as React components:</p>
-      <pre><code>{`import WarningIcon from '@cdc/core/assets/icon-warning-circle.svg'
+      <pre>
+        <code>{`import WarningIcon from '@cdc/core/assets/icon-warning-circle.svg?react'
 
 // Usage
-<WarningIcon width="24" height="24" className="warning-icon" />`}</code></pre>
+<WarningIcon width="24" height="24" className="warning-icon" />`}</code>
+      </pre>
 
       <h2>Icon Optimization</h2>
       <ul>
