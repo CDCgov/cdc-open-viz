@@ -5,7 +5,9 @@ import ConfigContext from '../../../../ConfigContext'
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import Check from '@cdc/core/assets/icon-check.svg'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
-import { sequentialPalettes } from '@cdc/core/data/colorPalettes'
+import { colorPalettesChartV1, colorPalettesChartV2, sequentialPalettes } from '@cdc/core/data/colorPalettes'
+import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
+import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import Icon from '@cdc/core/components/ui/Icon'
 import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 
@@ -25,7 +27,7 @@ const SeriesContext = React.createContext({})
 const SeriesWrapper = props => {
   const { updateConfig, config, rawData } = useContext(ConfigContext)
 
-  const { getColumns, selectComponent } = props
+  const { getColumns, selectComponent, handleForecastPaletteSelection } = props
 
   const supportedRightAxisTypes = ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg']
 
@@ -57,7 +59,7 @@ const SeriesWrapper = props => {
   }
 
   return (
-    <SeriesContext.Provider value={{ updateSeries, supportedRightAxisTypes, getColumns, selectComponent }}>
+    <SeriesContext.Provider value={{ updateSeries, supportedRightAxisTypes, getColumns, selectComponent, handleForecastPaletteSelection }}>
       {props.children}
     </SeriesContext.Provider>
   )
@@ -240,7 +242,8 @@ const SeriesDropdownAxisPosition = props => {
 }
 
 const SeriesDropdownForecastColor = props => {
-  const { config, updateConfig } = useContext(ConfigContext)
+  const { config } = useContext(ConfigContext)
+  const { handleForecastPaletteSelection } = useContext(SeriesContext)
 
   const { index, series } = props
 
@@ -249,8 +252,69 @@ const SeriesDropdownForecastColor = props => {
   // Hide AxisPositionDropdown in certain cases.
   if (!series) return
 
-  const allowedForecastingColors = () => {
-    return Object.keys(sequentialPalettes)
+  // Determine palette version and use appropriate palette set
+  // Forecasting charts use sequentialPalettes for v1, sequential-only palettes for v2
+  const paletteVersion = getColorPaletteVersion(config)
+
+  let forecastPalettes
+  if (paletteVersion === 1) {
+    // V1: Use original sequential palettes
+    forecastPalettes = sequentialPalettes
+  } else {
+    // V2: Only show sequential palettes (filter out divergent and qualitative)
+    const allV2Palettes = colorPalettesChartV2
+    forecastPalettes = {}
+    Object.keys(allV2Palettes).forEach(key => {
+      if (key.startsWith('sequential')) {
+        forecastPalettes[key] = allV2Palettes[key]
+      }
+    })
+  }
+
+  // For dropdown options, only show version-specific palettes
+  const processedPalettes = updatePaletteNames(forecastPalettes)
+
+  // Create user-friendly options with clean, readable names
+  const paletteOptions = {}
+  Object.keys(processedPalettes).forEach(key => {
+    // Clean up the display name:
+    // 1. Replace underscores with spaces
+    // 2. Add space before "reverse" if it's concatenated
+    // 3. Capitalize first letter of each word
+    let cleanName = key
+      .replace(/_/g, ' ')  // Replace underscores with spaces
+      .replace(/reverse$/i, ' Reverse')  // Add space before reverse
+      .replace(/\b\w/g, (char) => char.toUpperCase())  // Capitalize first letter of each word
+
+    // Use lowercase with hyphens as the key for consistency with existing saved values
+    // Convert both underscores and spaces to hyphens
+    const displayKey = key.replace(/_/g, '-').replace(/ /g, '-').toLowerCase()
+    paletteOptions[displayKey] = cleanName
+  })
+
+  // Add MPX aliases for v1 backward compatibility (these were historical names)
+  if (paletteVersion === 1) {
+    // Map "Sequential Blue Two" to MPX alias
+    if (paletteOptions['sequential-blue-two']) {
+      paletteOptions['sequential-blue-2-(mpx)'] = 'Sequential Blue 2 (MPX)'
+    }
+    if (paletteOptions['sequential-blue-tworeverse']) {
+      paletteOptions['sequential-blue-2-(mpx)reverse'] = 'Sequential Blue 2 (MPX) Reverse'
+    }
+    // Map "Sequential Orange" to MPX alias
+    if (paletteOptions['sequential-orange']) {
+      paletteOptions['sequential-orange-(mpx)'] = 'Sequential Orange (MPX)'
+    }
+    if (paletteOptions['sequential-orangereverse']) {
+      paletteOptions['sequential-orange-(mpx)reverse'] = 'Sequential Orange (MPX) Reverse'
+    }
+  }
+
+  // Normalize the current value to match our standardized format
+  const normalizeValue = (value) => {
+    if (!value) return 'Select'
+    // Convert to lowercase with hyphens for consistent matching
+    return value.toLowerCase().replace(/ /g, '-').replace(/_/g, '-')
   }
 
   return series?.stages?.map((stage, stageIndex) => (
@@ -258,21 +322,17 @@ const SeriesDropdownForecastColor = props => {
       key={`${stage}--${stageIndex}`}
       initial='Select an option'
       value={
-        config.series?.[index].stages?.[stageIndex].color ? config.series?.[index].stages?.[stageIndex].color : 'Select'
+        config.series?.[index].stages?.[stageIndex].color
+          ? normalizeValue(config.series?.[index].stages?.[stageIndex].color)
+          : 'Select'
       }
       label={`${stage.key} Series Color`}
       onChange={event => {
-        const copyOfSeries = [...config.series] // copy the entire series array
-        const copyOfStages = copyOfSeries[index].stages
-        copyOfStages[stageIndex].color = event.target.value
-        copyOfSeries[index] = { ...copyOfSeries[index], stages: copyOfStages }
-
-        updateConfig({
-          ...config,
-          series: copyOfSeries
-        })
+        if (handleForecastPaletteSelection) {
+          handleForecastPaletteSelection(event.target.value, index, stageIndex)
+        }
       }}
-      options={Object.keys(sequentialPalettes)}
+      options={paletteOptions}
     />
   ))
 }

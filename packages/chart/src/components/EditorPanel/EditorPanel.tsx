@@ -834,6 +834,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   const [pendingPaletteSelection, setPendingPaletteSelection] = useState<{
     palette: string
     action: () => void
+    seriesIndex?: number
+    stageIndex?: number
+    type?: 'general' | 'twoColor' | 'forecast'
   } | null>(null)
 
   const setLollipopShape = shape => {
@@ -1137,7 +1140,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       }
 
       if (isV1PaletteConfig) {
-        setPendingPaletteSelection({ palette, action: executeSelection })
+        setPendingPaletteSelection({ palette, action: executeSelection, type: 'general' })
         setShowConversionModal(true)
       } else {
         executeSelection()
@@ -1208,13 +1211,57 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       }
 
       if (isV1PaletteConfig) {
-        setPendingPaletteSelection({ palette, action: executeSelection })
+        setPendingPaletteSelection({ palette, action: executeSelection, type: 'twoColor' })
         setShowConversionModal(true)
       } else {
         executeSelection()
       }
     } catch (error) {
       console.error('COVE: Error in handleTwoColorPaletteSelection:', error)
+    }
+  }
+
+  // Forecast palette migration function
+  const handleForecastPaletteSelection = (palette: string, seriesIndex: number, stageIndex: number) => {
+    try {
+      if (!config) {
+        console.error('COVE: Config is undefined in handleForecastPaletteSelection')
+        return
+      }
+
+      const isV1PaletteConfig = isV1Palette(config)
+
+      const executeSelection = () => {
+        const copyOfSeries = [...config.series]
+        const copyOfStages = copyOfSeries[seriesIndex].stages
+        copyOfStages[stageIndex].color = palette
+        copyOfSeries[seriesIndex] = { ...copyOfSeries[seriesIndex], stages: copyOfStages }
+
+        const _newConfig = cloneConfig(config)
+        _newConfig.series = copyOfSeries
+
+        // Update palette version to v2 if migrating
+        if (isV1PaletteConfig && USE_V2_MIGRATION) {
+          if (!_newConfig.general) {
+            _newConfig.general = {}
+          }
+          if (!_newConfig.general.palette) {
+            _newConfig.general.palette = {}
+          }
+          _newConfig.general.palette.version = '2.0'
+        }
+
+        updateConfig(_newConfig)
+      }
+
+      if (isV1PaletteConfig) {
+        setPendingPaletteSelection({ palette, action: executeSelection, seriesIndex, stageIndex, type: 'forecast' })
+        setShowConversionModal(true)
+      } else {
+        executeSelection()
+      }
+    } catch (error) {
+      console.error('COVE: Error in handleForecastPaletteSelection:', error)
     }
   }
 
@@ -1228,6 +1275,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   }
 
   const handleConversionCancel = () => {
+    // Don't update config - just close modal and discard pending selection
     setShowConversionModal(false)
     setPendingPaletteSelection(null)
   }
@@ -1235,11 +1283,45 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   const handleReturnToV1 = () => {
     if (pendingPaletteSelection) {
       const _newConfig = cloneConfig(config)
+      const { palette, type } = pendingPaletteSelection
+
+      // Handle based on palette type
+      if (type === 'forecast') {
+        // Forecast palette selection
+        const { seriesIndex, stageIndex } = pendingPaletteSelection
+        if (seriesIndex !== undefined && stageIndex !== undefined) {
+          const copyOfSeries = [..._newConfig.series]
+          const copyOfStages = [...copyOfSeries[seriesIndex].stages]
+          copyOfStages[stageIndex] = { ...copyOfStages[stageIndex], color: palette }
+          copyOfSeries[seriesIndex] = { ...copyOfSeries[seriesIndex], stages: copyOfStages }
+          _newConfig.series = copyOfSeries
+        }
+      } else if (type === 'twoColor') {
+        // Two-color palette selection
+        if (!_newConfig.twoColor) {
+          _newConfig.twoColor = { palette: '', isPaletteReversed: false }
+        }
+        _newConfig.twoColor.palette = palette
+      } else {
+        // General palette selection (type === 'general' or undefined for backwards compatibility)
+        if (!_newConfig.general) {
+          _newConfig.general = {}
+        }
+        if (!_newConfig.general.palette) {
+          _newConfig.general.palette = {}
+        }
+        _newConfig.general.palette.name = palette
+      }
+
+      // Set version to V1
+      if (!_newConfig.general) {
+        _newConfig.general = {}
+      }
       if (!_newConfig.general.palette) {
         _newConfig.general.palette = {}
       }
-      _newConfig.general.palette.name = pendingPaletteSelection.palette
       _newConfig.general.palette.version = '1.0'
+
       updateConfig(_newConfig)
     }
     setShowConversionModal(false)
@@ -1514,7 +1596,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     handleUpdateHighlightedBarColor,
     setLollipopShape,
     handlePaletteSelection,
-    handleTwoColorPaletteSelection
+    handleTwoColorPaletteSelection,
+    handleForecastPaletteSelection
   }
   if (isLoading) {
     return <></>
@@ -1609,7 +1692,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             options={getColumns()}
                           />
                           {config.series && config.series.length !== 0 && (
-                            <Panels.Series.Wrapper getColumns={getColumns}>
+                            <Panels.Series.Wrapper getColumns={getColumns} handleForecastPaletteSelection={handleForecastPaletteSelection}>
                               <fieldset>
                                 <legend className='edit-label float-left'>Displaying</legend>
                                 <Tooltip style={{ textTransform: 'none' }}>
