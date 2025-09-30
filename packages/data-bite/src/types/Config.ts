@@ -1,4 +1,5 @@
 import { Version } from '@cdc/core/types/Version'
+import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 
 export type Config = {
   type: string
@@ -40,4 +41,4 @@ export type Config = {
     isCompactStyle: boolean
   }
   version: Version
-}
+} & MarkupConfig

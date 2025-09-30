@@ -325,7 +325,9 @@ const createInitialState = () => {
         textAfter: ')'
       },
       data: []
-    }
+    },
+    markupVariables: [],
+    enableMarkupVariables: false
   }
 }
 

@@ -139,7 +139,9 @@ const createInitialState = () => {
       ]
     },
     filterBehavior: 'Filter Change',
-    filterIntro: ''
+    filterIntro: '',
+    markupVariables: [],
+    enableMarkupVariables: false
   }
 }
 

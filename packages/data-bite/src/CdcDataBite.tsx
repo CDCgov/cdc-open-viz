@@ -17,6 +17,9 @@ import Layout from '@cdc/core/components/Layout'
 import ResizeObserver from 'resize-observer-polyfill'
 import parse from 'html-react-parser'
 
+// markup processing
+import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
+
 // helpers
 import getViewport from '@cdc/core/helpers/getViewport'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
@@ -90,7 +93,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     dataFormat,
     biteStyle,
     filters,
-    subtext
+    subtext,
+    markupVariables,
+    enableMarkupVariables
   } = config
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
@@ -168,6 +173,21 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     updateConfig({ ...defaults, ...processedConfig })
     publishAnalyticsEvent('data-bite_loaded', 'load', interactionLabel, 'data-bite', { title: processedConfig?.title })
     dispatch({ type: 'SET_LOADING', payload: false })
+  }
+
+  // Process markup variables in content
+  const processContentWithMarkup = (content: string) => {
+    if (!enableMarkupVariables || !markupVariables || markupVariables.length === 0) {
+      return content
+    }
+
+    const result = processMarkupVariables(content, config.data, markupVariables, {
+      isEditor,
+      showNoDataMessage: false,
+      allowHideSection: false
+    })
+
+    return result.processedContent
   }
 
   const calculateDataBite = (includePrefixSuffix = true) => {
@@ -584,7 +604,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
             <Title
               showTitle={config.visual?.showTitle}
               config={config}
-              title={title}
+              title={processContentWithMarkup(title)}
               isDashboard={isDashboard}
               classes={['bite-header', `${config.theme}`]}
             />
@@ -618,14 +638,16 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                             {calculateDataBite()}
                           </span>
                         )}
-                        {parse(biteBody)}
+                        {parse(processContentWithMarkup(biteBody))}
                       </p>
                       {showBite && 'end' === biteStyle && (
                         <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
                           {calculateDataBite()}
                         </span>
                       )}
-                      {subtext && !config.general.isCompactStyle && <p className='bite-subtext'>{parse(subtext)}</p>}
+                      {subtext && !config.general.isCompactStyle && (
+                        <p className='bite-subtext'>{parse(processContentWithMarkup(subtext))}</p>
+                      )}
                     </div>
                   </Fragment>
                 </div>

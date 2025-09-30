@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useId, useContext, useReducer } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useId, useContext, useReducer, useMemo } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -47,6 +47,7 @@ import { lineOptions } from './helpers/lineOptions'
 import { handleLineType } from './helpers/handleLineType'
 import { handleRankByValue } from './helpers/handleRankByValue'
 import { generateColorsArray } from '@cdc/core/helpers/generateColorsArray'
+import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
@@ -152,6 +153,60 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Destructure items from config for more readable JSX
   let { legend, title } = config
+
+  // Process markup variables for text fields (memoized to prevent re-processing on every render)
+  // Note: XSS Safety - The processed content is parsed using html-react-parser which sanitizes
+  // HTML input by default. The markup processor returns plain text with user data substituted.
+  const processedTextFields = useMemo(() => {
+    if (!config.enableMarkupVariables || !config.markupVariables?.length) {
+      return {
+        title,
+        superTitle: config.superTitle,
+        introText: config.introText,
+        legacyFootnotes: config.legacyFootnotes,
+        description: config.description
+      }
+    }
+
+    return {
+      title: title
+        ? processMarkupVariables(title, config.data || [], config.markupVariables, { isEditor }).processedContent
+        : title,
+      superTitle: config.superTitle
+        ? processMarkupVariables(config.superTitle, config.data || [], config.markupVariables, { isEditor })
+            .processedContent
+        : config.superTitle,
+      introText: config.introText
+        ? processMarkupVariables(config.introText, config.data || [], config.markupVariables, { isEditor })
+            .processedContent
+        : config.introText,
+      legacyFootnotes: config.legacyFootnotes
+        ? processMarkupVariables(config.legacyFootnotes, config.data || [], config.markupVariables, { isEditor })
+            .processedContent
+        : config.legacyFootnotes,
+      description: config.description
+        ? processMarkupVariables(config.description, config.data || [], config.markupVariables, { isEditor })
+            .processedContent
+        : config.description
+    }
+  }, [
+    config.enableMarkupVariables,
+    config.markupVariables,
+    config.data,
+    title,
+    config.superTitle,
+    config.introText,
+    config.legacyFootnotes,
+    config.description,
+    isEditor
+  ])
+
+  // Destructure processed values
+  title = processedTextFields.title
+  const processedSuperTitle = processedTextFields.superTitle
+  const processedIntroText = processedTextFields.introText
+  const processedLegacyFootnotes = processedTextFields.legacyFootnotes
+  const processedDescription = processedTextFields.description
 
   // set defaults on titles if blank AND only in editor
   if (isEditor) {
@@ -909,16 +964,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 showTitle={config.showTitle}
                 isDashboard={isDashboard}
                 title={title}
-                superTitle={config.superTitle}
+                superTitle={processedSuperTitle}
                 classes={['chart-title', `${config.theme}`, 'cove-component__header', 'mb-3']}
                 style={undefined}
+                config={config}
               />
 
               {/* Visualization Wrapper */}
               <div className={getChartWrapperClasses().join(' ')}>
                 {/* Intro Text/Message */}
-                {config?.introText && config.visualizationType !== 'Spark Line' && (
-                  <section className={`introText mb-4`}>{parse(config.introText)}</section>
+                {processedIntroText && config.visualizationType !== 'Spark Line' && (
+                  <section className={`introText mb-4`}>{parse(processedIntroText)}</section>
                 )}
 
                 {/* Filters */}
@@ -1009,9 +1065,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           dimensions={dimensions}
                           interactionLabel={interactionLabel}
                         />
-                        {config?.introText && (
+                        {processedIntroText && (
                           <section className='introText mb-4' style={{ padding: '0px 0 35px' }}>
-                            {parse(config.introText)}
+                            {parse(processedIntroText)}
                           </section>
                         )}
                         <div style={{ height: `100px`, width: `100%`, ...sparkLineStyles }}>
@@ -1048,8 +1104,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   : link && link}
                 {/* Description */}
 
-                {config.description && config.visualizationType !== 'Spark Line' && (
-                  <div className={getChartSubTextClasses().join(' ')}>{parse(config.description)}</div>
+                {processedDescription && config.visualizationType !== 'Spark Line' && (
+                  <div className={getChartSubTextClasses().join(' ')}>{parse(processedDescription)}</div>
                 )}
 
                 {/* buttons */}
@@ -1110,8 +1166,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 )}
                 {config?.annotations?.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
-                {config?.legacyFootnotes && (
-                  <section className='footnotes pt-2 mt-4'>{parse(config.legacyFootnotes)}</section>
+                {processedLegacyFootnotes && (
+                  <section className='footnotes pt-2 mt-4'>{parse(processedLegacyFootnotes)}</section>
                 )}
               </div>
               <FootnotesStandAlone

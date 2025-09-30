@@ -1,7 +1,6 @@
 export default {
   contentEditor: {
     inlineHTML: '<h2>Inline HTML</h2>',
-    markupVariables: [],
     showHeader: true,
     srcUrl: '#example',
     title: 'Markup Include',
@@ -21,5 +20,7 @@ export default {
     background: false,
     hideBackgroundColor: false,
     borderColorTheme: false
-  }
+  },
+  markupVariables: [],
+  enableMarkupVariables: false
 }
