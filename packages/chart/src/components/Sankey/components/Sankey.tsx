@@ -171,6 +171,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
           fill={nodeColor}
           fillOpacity={opacityValue}
           rx={sankeyConfig.rxValue}
+          onMouseEnter={() => {}}
           // todo: move enable tooltips to sankey
           data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
           data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
@@ -204,6 +205,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               className='node-text'
               style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
               onClick={() => handleNodeClick(node.id)}
+              onMouseEnter={() => {}}
               data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
               data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
             >
@@ -220,6 +222,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               textAnchor='start'
               style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
               onClick={() => handleNodeClick(node.id)}
+              onMouseEnter={() => {}}
               data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
               data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
             >
@@ -237,6 +240,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               verticalAnchor='start'
               style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
               onClick={() => handleNodeClick(node.id)}
+              onMouseEnter={() => {}}
               data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
               data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
             >
@@ -248,6 +252,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
             <Text
               style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
               onClick={() => handleNodeClick(node.id)}
+              onMouseEnter={() => {}}
               data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
               data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
               x={node.x0! + textPositionHorizontal}
@@ -270,6 +275,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               textAnchor='start'
               style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
               onClick={() => handleNodeClick(node.id)}
+              onMouseEnter={() => {}}
               data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
               data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
             >

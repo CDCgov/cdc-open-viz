@@ -1753,7 +1753,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             options={getColumns()}
                           />
                           {config.series && config.series.length !== 0 && (
-                            <Panels.Series.Wrapper getColumns={getColumns} handleForecastPaletteSelection={handleForecastPaletteSelection}>
+                            <Panels.Series.Wrapper
+                              getColumns={getColumns}
+                              handleForecastPaletteSelection={handleForecastPaletteSelection}
+                            >
                               <fieldset>
                                 <legend className='edit-label float-left'>Displaying</legend>
                                 <Tooltip style={{ textTransform: 'none' }}>

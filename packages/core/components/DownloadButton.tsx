@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import Papa from 'papaparse'
 import { publishAnalyticsEvent } from '../helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 type DownloadButtonProps = {
   rawData: any[]
@@ -12,7 +13,7 @@ type DownloadButtonProps = {
   title?: string
 }
 
-const DownloadButton = ({ rawData, fileName, headerColor, skipId, interactionLabel }: DownloadButtonProps) => {
+const DownloadButton = ({ rawData, fileName, headerColor, skipId, interactionLabel, configUrl, title, config }: DownloadButtonProps) => {
   const linkRef = useRef<HTMLAnchorElement>(null)
 
   const handleDownload = (event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -42,7 +43,14 @@ const DownloadButton = ({ rawData, fileName, headerColor, skipId, interactionLab
       document.body.removeChild(downloadLink)
     }
     URL.revokeObjectURL(url)
-    publishAnalyticsEvent('data_downloaded', 'click', interactionLabel || configUrl, undefined, { title })
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: 'data_downloaded',
+      eventAction: 'click',
+      eventLabel: interactionLabel || configUrl,
+      vizTitle: getVizTitle(config)
+    })
   }
 
   return (

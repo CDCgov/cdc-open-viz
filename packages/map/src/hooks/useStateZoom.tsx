@@ -7,6 +7,7 @@ import { getFilterControllingStatesPicked } from '../components/UsaMap/helpers/m
 import { supportedStatesFipsCodes } from '../data/supported-geos'
 import { SVG_HEIGHT, SVG_WIDTH, SVG_PADDING } from '../helpers'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 interface StateData {
   geometry: { type: 'MultiPolygon'; coordinates: number[][][][] }
@@ -80,8 +81,14 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
           _prevPosition.coordinates[0] !== 0 && _prevPosition.coordinates[1] !== 0
             ? _prevPosition.coordinates
             : projectionData.stateCenter
-        publishAnalyticsEvent('map_zoomed_in', 'click', `${interactionLabel}|${newZoom}|${newCoordinates}`, 'map', {
-          title: config?.title || config?.general?.title
+        publishAnalyticsEvent({
+          vizType: 'map',
+          vizSubType: getVizSubType(config),
+          eventType: 'zoom_in',
+          eventAction: 'click',
+          eventLabel: interactionLabel,
+          vizTitle: getVizTitle(config),
+          specifics: `zoom: ${newZoom}, coordinates:${newCoordinates}`
         })
       } else if (zoomFunction === 'zoomOut' && _prevPosition.zoom > 1) {
         newZoom = _prevPosition.zoom / 1.5
@@ -99,8 +106,13 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
       if (zoomFunction === 'reset') {
         dispatch({ type: 'SET_TRANSLATE', payload: [0, 0] }) // needed for state switcher
         dispatch({ type: 'SET_SCALE', payload: 1 }) // needed for state switcher
-        publishAnalyticsEvent('map_reset_zoom_level', 'click', interactionLabel, 'map', {
-          title: config?.title || config?.general?.title
+        publishAnalyticsEvent({
+          vizType: 'map',
+          vizSubType: getVizSubType(config),
+          eventType: 'map_reset_zoom_level',
+          eventAction: 'click',
+          eventLabel: interactionLabel,
+          vizTitle: getVizTitle(config)
         })
       }
     },

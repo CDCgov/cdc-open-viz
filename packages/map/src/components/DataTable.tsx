@@ -14,6 +14,7 @@ import { navigationHandler } from '../helpers'
 import ConfigContext, { MapDispatchContext } from '../context'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getPatternForRow } from '../helpers/getPatternForRow'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const DataTable = props => {
   const {
@@ -180,8 +181,13 @@ const DataTable = props => {
         type='button'
         onClick={() => {
           saveBlob
-          publishAnalyticsEvent('data_downloaded', 'click', interactionLabel, undefined, {
-            title: state?.title || state?.general?.title
+          publishAnalyticsEvent({
+            vizType: state.type,
+            vizSubType: getVizSubType(state),
+            eventType: 'data_downloaded',
+            eventAction: 'click',
+            eventLabel: interactionLabel,
+            vizTitle: getVizTitle(state)
           })
         }}
         href={URL.createObjectURL(blob)}
@@ -200,7 +206,7 @@ const DataTable = props => {
     return (
       <MediaControls.Section classes={['download-links']}>
         <MediaControls.Link config={state} interactionLabel={interactionLabel} />
-        {state.table.download && <DownloadButton />}
+        {state.table.download && <DownloadButton config={state} />}
       </MediaControls.Section>
     )
   }

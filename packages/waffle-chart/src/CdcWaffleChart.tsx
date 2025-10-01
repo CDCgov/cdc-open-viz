@@ -29,6 +29,7 @@ import './scss/main.scss'
 import Title from '@cdc/core/components/ui/Title'
 import Layout from '@cdc/core/components/Layout'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 type CdcWaffleChartProps = {
   configUrl?: string
@@ -403,9 +404,8 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
           )}
           {config.visualizationType !== 'Gauge' && (
             <div
-              className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${
-                config.overallFontSize ? ' font-' + config.overallFontSize : ''
-              }`}
+              className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''
+                }`}
             >
               <div className='cove-waffle-chart__chart' style={{ width: setRatio() }}>
                 <svg width={setRatio()} height={setRatio()}>
@@ -509,7 +509,14 @@ const CdcWaffleChart = ({
   useEffect(() => {
     if (config && !coveLoadedHasRan && container) {
       publish('cove_loaded', { config: config })
-      publishAnalyticsEvent('waffle-chart_loaded', 'load', interactionLabel, 'waffle-chart', { title: config?.title })
+      publishAnalyticsEvent({
+        vizType: 'waffle-chart',
+        vizSubType: getVizSubType(config),
+        eventType: 'waffle-chart_ready',
+        eventAction: 'load',
+        eventLabel: interactionLabel,
+        vizTitle: getVizTitle(config)
+      })
       dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
     }
   }, [config, container])

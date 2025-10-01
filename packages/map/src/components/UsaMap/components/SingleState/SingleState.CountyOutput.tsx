@@ -7,6 +7,7 @@ import useApplyTooltipsToGeo from '../../../../hooks/useApplyTooltipsToGeo'
 import { applyLegendToRow } from '../../../../helpers/applyLegendToRow'
 import useGeoClickHandler, { geoClickHandler } from '././../../../../hooks/useGeoClickHandler'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 interface CountyOutputProps {
   counties: any[]
@@ -71,9 +72,8 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
           return (
             <g
               key={`key--${county.id}`}
-              className={`county county--${geoDisplayName.split(' ').join('')} county--${
-                geoData[config.columns.geo.name]
-              }`}
+              className={`county county--${geoDisplayName.split(' ').join('')} county--${geoData[config.columns.geo.name]
+                }`}
               style={styles}
               onClick={() => geoClickHandler(geoDisplayName, geoData)}
               data-tooltip-id={`tooltip__${tooltipId}`}
@@ -81,9 +81,15 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
               onMouseEnter={() => {
                 // Track hover analytics event if this is a new location
                 const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
-                publishAnalyticsEvent(`map_hover_${locationName?.toLowerCase()}`, 'hover', interactionLabel, 'map', {
-                  title: config?.title || config?.general?.title,
-                  location: geoDisplayName
+                publishAnalyticsEvent({
+                  vizType: config.type,
+                  vizSubType: getVizSubType(config),
+                  eventType: `map_hover`,
+                  eventAction: 'hover',
+                  eventLabel: interactionLabel,
+                  vizTitle: getVizTitle(config),
+                  location: geoDisplayName,
+                  specifics: `location: ${locationName?.toLowerCase()}`
                 })
               }}
             >

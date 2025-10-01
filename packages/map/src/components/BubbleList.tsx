@@ -111,6 +111,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
               stroke={legendColors[0]}
               strokeWidth={1.25}
               fillOpacity={0.4}
+              onMouseEnter={() => {}}
               onPointerDown={e => {
                 pointerX = e.clientX
                 pointerY = e.clientY
@@ -146,6 +147,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
                 fill={'transparent'}
                 stroke={'white'}
                 strokeWidth={0.5}
+                onMouseEnter={() => {}}
                 onPointerDown={e => {
                   pointerX = e.clientX
                   pointerY = e.clientY
@@ -223,6 +225,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
               stroke={legendColors[0]}
               strokeWidth={1.25}
               fillOpacity={0.4}
+              onMouseEnter={() => {}}
               onPointerDown={e => {
                 pointerX = e.clientX
                 pointerY = e.clientY
@@ -258,6 +261,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
                 stroke={'white'}
                 strokeWidth={0.5}
                 fillOpacity={0.4}
+                onMouseEnter={() => {}}
                 onPointerDown={e => {
                   pointerX = e.clientX
                   pointerY = e.clientY
