@@ -25,6 +25,7 @@ export type EditorPanelContext = {
   setLollipopShape?: Function
   handlePaletteSelection?: (palette: string) => void
   handleTwoColorPaletteSelection?: (palette: string) => void
+  handleForecastPaletteSelection?: (palette: string, seriesIndex: number, stageIndex: number) => void
 }
 
 const EditorPanelContext = createContext<EditorPanelContext>(null)
