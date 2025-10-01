@@ -1,6 +1,5 @@
 import {
   colorPalettesChart as colorPalettes,
-  colorPalettesChartV1,
   colorPalettesChartV2,
   sequentialPalettes,
   twoColorPalette
@@ -12,6 +11,7 @@ import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion
 import { isV1Palette } from '@cdc/core/helpers/palettes/utils'
 import { v2ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
 import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
+import { buildForecastPaletteMappings } from '../../../helpers/buildForecastPaletteMappings'
 import { FaStar } from 'react-icons/fa'
 import { Label } from '../../../types/Label'
 import { ColorScale, TransformedData } from '../../../types/ChartContext'
@@ -152,37 +152,7 @@ export const createFormatLabels =
       }
 
       const processedPalettes = updatePaletteNames(forecastPalettes)
-      const forecastingPalettes = {}
-
-      // Add processed palettes with multiple naming formats for backward compatibility
-      Object.keys(processedPalettes).forEach(key => {
-        const value = processedPalettes[key]
-        forecastingPalettes[key] = value
-        forecastingPalettes[key.toLowerCase().replace(/ /g, '-')] = value
-        forecastingPalettes[key.toLowerCase().replace(/ /g, '_')] = value
-        forecastingPalettes[key.replace(/_/g, '-')] = value
-        forecastingPalettes[key.toLowerCase()] = value
-      })
-
-      // Special mappings for MPX variants (old naming convention) - only for v1
-      // Note: Sequential Blue Two was aliased as "Sequential Blue 2 (MPX)" and Sequential Orange as "Sequential Orange (MPX)"
-      if (paletteVersion === 1) {
-        const PALETTE_ALIASES = {
-          'sequential-blue-two': ['sequential-blue-2-(mpx)', 'sequential-blue-2-(MPX)'],
-          'sequential-blue-tworeverse': ['sequential-blue-2-(mpx)reverse', 'sequential-blue-2-(MPX)reverse'],
-          'sequential-orange': ['sequential-orange-(mpx)', 'sequential-orange-(MPX)'],
-          'sequential-orangereverse': ['sequential-orange-(mpx)reverse', 'sequential-orange-(MPX)reverse']
-        }
-
-        Object.entries(PALETTE_ALIASES).forEach(([canonical, aliases]) => {
-          const palette = forecastingPalettes[canonical]
-          if (palette) {
-            aliases.forEach(alias => {
-              forecastingPalettes[alias] = palette
-            })
-          }
-        })
-      }
+      const forecastingPalettes = buildForecastPaletteMappings(processedPalettes, paletteVersion)
 
       //store unique values to Set by colorCode
       // loop through each stage/group/area on the chart and create a label

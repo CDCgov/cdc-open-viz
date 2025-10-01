@@ -10,6 +10,7 @@ import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import Icon from '@cdc/core/components/ui/Icon'
 import { Select } from '@cdc/core/components/EditorPanel/Inputs'
+import { buildForecastPaletteOptions, normalizePaletteValue } from '../../../../helpers/buildForecastPaletteOptions'
 
 // Third Party
 import {
@@ -59,7 +60,9 @@ const SeriesWrapper = props => {
   }
 
   return (
-    <SeriesContext.Provider value={{ updateSeries, supportedRightAxisTypes, getColumns, selectComponent, handleForecastPaletteSelection }}>
+    <SeriesContext.Provider
+      value={{ updateSeries, supportedRightAxisTypes, getColumns, selectComponent, handleForecastPaletteSelection }}
+    >
       {props.children}
     </SeriesContext.Provider>
   )
@@ -273,49 +276,7 @@ const SeriesDropdownForecastColor = props => {
 
   // For dropdown options, only show version-specific palettes
   const processedPalettes = updatePaletteNames(forecastPalettes)
-
-  // Create user-friendly options with clean, readable names
-  const paletteOptions = {}
-  Object.keys(processedPalettes).forEach(key => {
-    // Clean up the display name:
-    // 1. Replace underscores with spaces
-    // 2. Add space before "reverse" if it's concatenated
-    // 3. Capitalize first letter of each word
-    let cleanName = key
-      .replace(/_/g, ' ')  // Replace underscores with spaces
-      .replace(/reverse$/i, ' Reverse')  // Add space before reverse
-      .replace(/\b\w/g, (char) => char.toUpperCase())  // Capitalize first letter of each word
-
-    // Use lowercase with hyphens as the key for consistency with existing saved values
-    // Convert both underscores and spaces to hyphens
-    const displayKey = key.replace(/_/g, '-').replace(/ /g, '-').toLowerCase()
-    paletteOptions[displayKey] = cleanName
-  })
-
-  // Add MPX aliases for v1 backward compatibility (these were historical names)
-  if (paletteVersion === 1) {
-    // Map "Sequential Blue Two" to MPX alias
-    if (paletteOptions['sequential-blue-two']) {
-      paletteOptions['sequential-blue-2-(mpx)'] = 'Sequential Blue 2 (MPX)'
-    }
-    if (paletteOptions['sequential-blue-tworeverse']) {
-      paletteOptions['sequential-blue-2-(mpx)reverse'] = 'Sequential Blue 2 (MPX) Reverse'
-    }
-    // Map "Sequential Orange" to MPX alias
-    if (paletteOptions['sequential-orange']) {
-      paletteOptions['sequential-orange-(mpx)'] = 'Sequential Orange (MPX)'
-    }
-    if (paletteOptions['sequential-orangereverse']) {
-      paletteOptions['sequential-orange-(mpx)reverse'] = 'Sequential Orange (MPX) Reverse'
-    }
-  }
-
-  // Normalize the current value to match our standardized format
-  const normalizeValue = (value) => {
-    if (!value) return 'Select'
-    // Convert to lowercase with hyphens for consistent matching
-    return value.toLowerCase().replace(/ /g, '-').replace(/_/g, '-')
-  }
+  const paletteOptions = buildForecastPaletteOptions(processedPalettes, paletteVersion)
 
   return series?.stages?.map((stage, stageIndex) => (
     <InputSelect
@@ -323,7 +284,7 @@ const SeriesDropdownForecastColor = props => {
       initial='Select an option'
       value={
         config.series?.[index].stages?.[stageIndex].color
-          ? normalizeValue(config.series?.[index].stages?.[stageIndex].color)
+          ? normalizePaletteValue(config.series?.[index].stages?.[stageIndex].color)
           : 'Select'
       }
       label={`${stage.key} Series Color`}

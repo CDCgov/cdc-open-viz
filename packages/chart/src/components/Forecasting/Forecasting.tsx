@@ -3,10 +3,11 @@ import { replace } from 'lodash'
 // cdc
 import ConfigContext from '../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import { colorPalettesChartV1, colorPalettesChartV2, sequentialPalettes } from '@cdc/core/data/colorPalettes'
+import { colorPalettesChartV2, sequentialPalettes } from '@cdc/core/data/colorPalettes'
 import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import { getBridgedData } from '../../helpers/getBridgedData'
+import { buildForecastPaletteMappings } from '../../helpers/buildForecastPaletteMappings'
 
 // visx & d3
 import { curveMonotoneX } from '@visx/curve'
@@ -40,51 +41,7 @@ const Forecasting = ({ xScale, yScale, height, width, handleTooltipMouseOver, ha
     }
 
     const processedPalettes = updatePaletteNames(forecastPalettes)
-
-    // Create a lookup map that handles multiple naming conventions
-    const paletteMap = {}
-
-    // Map palette names to multiple formats for backward compatibility:
-    // - sequential-blue (hyphenated)
-    // - sequential_blue (underscore)
-    // - Sequential Blue (with spaces)
-    Object.keys(processedPalettes).forEach(key => {
-      const value = processedPalettes[key]
-      // Original key
-      paletteMap[key] = value
-      // Lowercase with hyphens
-      paletteMap[key.toLowerCase().replace(/ /g, '-')] = value
-      // Lowercase with underscores
-      paletteMap[key.toLowerCase().replace(/ /g, '_')] = value
-      // Original key variations
-      paletteMap[key.replace(/_/g, '-')] = value
-      paletteMap[key.toLowerCase()] = value
-    })
-
-    // Special mappings for MPX variants (old naming convention) - only for v1
-    // Note: Sequential Blue Two was aliased as "Sequential Blue 2 (MPX)" and Sequential Orange as "Sequential Orange (MPX)"
-    if (paletteVersion === 1) {
-      // Map "Sequential Blue Two" variations to MPX alias
-      if (paletteMap['sequential-blue-two']) {
-        paletteMap['sequential-blue-2-(mpx)'] = paletteMap['sequential-blue-two']
-        paletteMap['sequential-blue-2-(MPX)'] = paletteMap['sequential-blue-two']
-      }
-      if (paletteMap['sequential-blue-tworeverse']) {
-        paletteMap['sequential-blue-2-(mpx)reverse'] = paletteMap['sequential-blue-tworeverse']
-        paletteMap['sequential-blue-2-(MPX)reverse'] = paletteMap['sequential-blue-tworeverse']
-      }
-      // Map "Sequential Orange" variations to MPX alias
-      if (paletteMap['sequential-orange']) {
-        paletteMap['sequential-orange-(mpx)'] = paletteMap['sequential-orange']
-        paletteMap['sequential-orange-(MPX)'] = paletteMap['sequential-orange']
-      }
-      if (paletteMap['sequential-orangereverse']) {
-        paletteMap['sequential-orange-(mpx)reverse'] = paletteMap['sequential-orangereverse']
-        paletteMap['sequential-orange-(MPX)reverse'] = paletteMap['sequential-orangereverse']
-      }
-    }
-
-    return paletteMap
+    return buildForecastPaletteMappings(processedPalettes, paletteVersion)
   }, [config])
 
   return (
