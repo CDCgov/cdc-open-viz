@@ -10,7 +10,7 @@ import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import Icon from '@cdc/core/components/ui/Icon'
 import { Select } from '@cdc/core/components/EditorPanel/Inputs'
-import { buildForecastPaletteOptions, normalizePaletteValue } from '../../../../helpers/buildForecastPaletteOptions'
+import { buildForecastPaletteOptions } from '../../../../helpers/buildForecastPaletteOptions'
 
 // Third Party
 import {
@@ -259,20 +259,11 @@ const SeriesDropdownForecastColor = props => {
   // Forecasting charts use sequentialPalettes for v1, sequential-only palettes for v2
   const paletteVersion = getColorPaletteVersion(config)
 
-  let forecastPalettes
-  if (paletteVersion === 1) {
-    // V1: Use original sequential palettes
-    forecastPalettes = sequentialPalettes
-  } else {
-    // V2: Only show sequential palettes (filter out divergent and qualitative)
-    const allV2Palettes = colorPalettesChartV2
-    forecastPalettes = {}
-    Object.keys(allV2Palettes).forEach(key => {
-      if (key.startsWith('sequential')) {
-        forecastPalettes[key] = allV2Palettes[key]
-      }
-    })
-  }
+  // Get version-appropriate palettes (v1 uses sequentialPalettes, v2 uses filtered v2 palettes)
+  const forecastPalettes =
+    paletteVersion === 1
+      ? sequentialPalettes
+      : Object.fromEntries(Object.entries(colorPalettesChartV2).filter(([key]) => key.startsWith('sequential')))
 
   // For dropdown options, only show version-specific palettes
   const processedPalettes = updatePaletteNames(forecastPalettes)
@@ -282,11 +273,7 @@ const SeriesDropdownForecastColor = props => {
     <InputSelect
       key={`${stage}--${stageIndex}`}
       initial='Select an option'
-      value={
-        config.series?.[index].stages?.[stageIndex].color
-          ? normalizePaletteValue(config.series?.[index].stages?.[stageIndex].color)
-          : 'Select'
-      }
+      value={config.series?.[index].stages?.[stageIndex].color || 'Select'}
       label={`${stage.key} Series Color`}
       onChange={event => {
         if (handleForecastPaletteSelection) {
