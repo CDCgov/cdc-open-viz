@@ -301,3 +301,189 @@ export const TypeSectionTests: Story = {
     )
   }
 }
+
+export const GeneralSectionTests: Story = {
+  args: {
+    ...DEFAULT_ARGS
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await waitForPresence('.map-container', canvasElement)
+
+    await openAccordion(canvas, 'General')
+
+    // ==========================================================================
+    // TEST: Title field
+    // Verifies: Title text appears in the Title component on the visualization
+    // ==========================================================================
+    const titleInput = canvasElement.querySelector('[data-testid="title-input"]') as HTMLInputElement
+    expect(titleInput).toBeTruthy()
+
+    const getTitleVisual = () => {
+      const titleElement = canvasElement.querySelector('.map-title')
+      return {
+        titleText: titleElement?.textContent || '',
+        hasTitleElement: Boolean(titleElement)
+      }
+    }
+
+    await performAndAssert(
+      'Title → Update text',
+      getTitleVisual,
+      async () => {
+        await userEvent.clear(titleInput)
+        await userEvent.type(titleInput, 'Test Map Title')
+      },
+      (before, after) => before.titleText !== after.titleText && after.titleText.includes('Test Map Title')
+    )
+
+    // ==========================================================================
+    // TEST: Show Title checkbox
+    // Verifies: Title element visibility changes (visible/hidden class)
+    // ==========================================================================
+    const generalAccordion = canvasElement.querySelector('[aria-expanded="true"]')?.closest('.accordion__item')
+    const showTitleLabel = Array.from(generalAccordion?.querySelectorAll('label') || []).find(label =>
+      label.textContent?.includes('Show Title')
+    )
+    const showTitleCheckbox = showTitleLabel?.querySelector('input[type="checkbox"]') as HTMLInputElement
+    expect(showTitleCheckbox).toBeTruthy()
+
+    const getTitleVisibility = () => {
+      const titleElement = canvasElement.querySelector('.map-title')
+      const classes = titleElement ? Array.from(titleElement.classList) : []
+      return {
+        isVisible: classes.includes('visible'),
+        isHidden: classes.includes('hidden')
+      }
+    }
+
+    // Test config has showTitle: true, so title starts visible
+    await performAndAssert(
+      'Show Title → Hide',
+      getTitleVisibility,
+      async () => {
+        await userEvent.click(showTitleCheckbox)
+      },
+      (before, after) => before.isVisible && !after.isVisible && after.isHidden
+    )
+
+    await performAndAssert(
+      'Show Title → Show',
+      getTitleVisibility,
+      async () => {
+        await userEvent.click(showTitleCheckbox)
+      },
+      (before, after) => !before.isVisible && after.isVisible && !after.isHidden
+    )
+
+    // ==========================================================================
+    // TEST: Super Title field
+    // Verifies: Super title text appears in the Title component
+    // ==========================================================================
+    const superTitleInput = canvas.getByLabelText(/Super Title/i) as HTMLInputElement
+    expect(superTitleInput).toBeTruthy()
+
+    const getSuperTitleVisual = () => {
+      const titleElement = canvasElement.querySelector('.map-title')
+      return {
+        titleText: titleElement?.textContent || ''
+      }
+    }
+
+    await performAndAssert(
+      'Super Title → Add text',
+      getSuperTitleVisual,
+      async () => {
+        await userEvent.clear(superTitleInput)
+        await userEvent.type(superTitleInput, 'Super Title Text')
+      },
+      (before, after) => !before.titleText.includes('Super Title Text') && after.titleText.includes('Super Title Text')
+    )
+
+    // ==========================================================================
+    // TEST: Message/Intro Text field
+    // Verifies: Intro text appears in section with class 'introText'
+    // ==========================================================================
+    const messageInput = canvas.getByLabelText(/Message/i) as HTMLTextAreaElement
+    expect(messageInput).toBeTruthy()
+
+    const getIntroTextVisual = () => {
+      const introSection = canvasElement.querySelector('.introText')
+      return {
+        introText: introSection?.textContent || '',
+        hasIntroSection: Boolean(introSection)
+      }
+    }
+
+    await performAndAssert(
+      'Message → Add intro text',
+      getIntroTextVisual,
+      async () => {
+        await userEvent.clear(messageInput)
+        await userEvent.type(messageInput, 'This is test intro text')
+      },
+      (before, after) =>
+        !before.introText.includes('This is test intro text') &&
+        after.introText.includes('This is test intro text') &&
+        after.hasIntroSection
+    )
+
+    // ==========================================================================
+    // TEST: Subtext field
+    // Verifies: Subtext appears in paragraph with class 'subtext'
+    // ==========================================================================
+    const subtextInput = canvas.getByLabelText(/Subtext/i) as HTMLTextAreaElement
+    expect(subtextInput).toBeTruthy()
+
+    const getSubtextVisual = () => {
+      const subtextElement = canvasElement.querySelector('.subtext')
+      return {
+        subtextContent: subtextElement?.textContent || '',
+        hasSubtext: Boolean(subtextElement)
+      }
+    }
+
+    await performAndAssert(
+      'Subtext → Add text',
+      getSubtextVisual,
+      async () => {
+        await userEvent.clear(subtextInput)
+        await userEvent.type(subtextInput, 'This is test subtext')
+      },
+      (before, after) =>
+        !before.subtextContent.includes('This is test subtext') &&
+        after.subtextContent.includes('This is test subtext') &&
+        after.hasSubtext
+    )
+
+    // ==========================================================================
+    // TEST: Footnotes field
+    // Verifies: Footnotes appear in section with class 'footnotes'
+    // ==========================================================================
+    const footnotesInput = canvas.getByLabelText(/Footnotes/i) as HTMLTextAreaElement
+    expect(footnotesInput).toBeTruthy()
+
+    const getFootnotesVisual = () => {
+      const footnotesSection = canvasElement.querySelector('.footnotes')
+      return {
+        footnotesContent: footnotesSection?.textContent || '',
+        hasFootnotes: Boolean(footnotesSection)
+      }
+    }
+
+    await performAndAssert(
+      'Footnotes → Add text',
+      getFootnotesVisual,
+      async () => {
+        await userEvent.clear(footnotesInput)
+        await userEvent.type(footnotesInput, 'Test footnote text')
+      },
+      (before, after) =>
+        !before.footnotesContent.includes('Test footnote text') &&
+        after.footnotesContent.includes('Test footnote text') &&
+        after.hasFootnotes
+    )
+  }
+}
