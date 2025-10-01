@@ -2,12 +2,14 @@ export type COVE_VISUALIZATION_TYPES =
   | 'map'
   | 'chart'
   | 'data-table'
+  | 'table'
   | 'markup-include'
   | 'waffle-chart'
   | 'dashboard'
   | 'filtered-text'
   | 'table-filter'
   | 'data-bite'
+  | 'navigation'
   | 'unknown'
 
 export type ANALYTICS_EVENT_ACTIONS =
@@ -16,6 +18,7 @@ export type ANALYTICS_EVENT_ACTIONS =
   | 'toggle'
   | 'none'
   | 'keydown'
+  | 'keyboard'
   | 'load'
   | 'submit'
   | 'change'

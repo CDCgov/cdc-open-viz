@@ -92,11 +92,12 @@ const ScatterPlot = ({ xScale, yScale }) => {
                   publishAnalyticsEvent({
                     vizType: config?.type,
                     vizSubType: getVizSubType(config),
-                    eventType: `chart_hover_${safeSeriesName.toLowerCase()}`,
+                    eventType: `chart_hover`,
                     eventAction: 'hover',
                     eventLabel: interactionLabel,
                     vizTitle: getVizTitle(config),
-                    series: seriesName
+                    series: seriesName,
+                    specifics: `hovered on: ${String(safeSeriesName).toLowerCase()}`
                   })
                   setCurrentHover({ dataIndex, seriesKey: s })
                 }

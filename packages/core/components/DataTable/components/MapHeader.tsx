@@ -69,7 +69,16 @@ const MapHeader = ({
                 setSortBy(newSortBy)
               }}
               onKeyDown={e => {
-                if (e.keyCode === 13) {
+                if (e.key === 'Enter') {
+                  publishAnalyticsEvent({
+                    vizType: config.type,
+                    vizSubType: getVizSubType(config),
+                    eventType: `data_table_sort`,
+                    eventAction: 'keyboard',
+                    eventLabel: interactionLabel,
+                    vizTitle: getVizTitle(config),
+                    specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                  })
                   setSortBy(newSortBy)
                 }
               }}
@@ -80,7 +89,7 @@ const MapHeader = ({
                   : { 'aria-sort': 'descending' }
                 : null)}
             >
-              <ColumnHeadingText text={text} config={config} column={column} />
+              <ColumnHeadingText text={text} config={config} />
               <SortIcon ascending={sortByAsc} />
               <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
                 } order`}</span>

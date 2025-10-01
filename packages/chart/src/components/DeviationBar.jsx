@@ -207,6 +207,7 @@ export default function DeviationBar({ height, xScale }) {
                 y={barY}
                 width={barWidth}
                 height={barHeight}
+                onMouseEnter={() => {}}
                 data-tooltip-html={tooltip}
                 data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                 tabIndex={-1}

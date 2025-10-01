@@ -7,7 +7,7 @@ const getVizTitle = (config) => {
   } else if (config?.general?.title) {
     return String(config.general.title).toLowerCase()
   } else {
-    return 'none'
+    return 'no title'
   }
 }
 
@@ -17,6 +17,13 @@ const getVizSubType = config => {
   }
   if (config?.general?.geoType) {
     return `${config.general.geoType}`
+  }
+
+  if (config?.type === 'chart' && config?.visualizationType) {
+    // Convert chart visualization type to format: chart_subtype
+    // e.g., "Bar" -> "chart_bar", "Line" -> "chart_line"
+    const subtype = String(config.visualizationType).toLowerCase().replace(/\s+/g, '_')
+    return `${subtype}`
   }
 
   if (config?.type === 'chart') {

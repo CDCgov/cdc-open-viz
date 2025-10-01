@@ -134,7 +134,17 @@ const WorldMap = () => {
       eventType: 'map_panned',
       eventAction: 'drag',
       eventLabel: interactionLabel,
-      vizTitle: getVizTitle(config)
+      vizTitle: getVizTitle(config),
+      specifics: `zoom: ${position.zoom}`
+    })
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: 'map_panned',
+      eventAction: 'drag',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config),
+      specifics: `coordinates: ${position.coordinates}`
     })
     dispatch({ type: 'SET_POSITION', payload: position })
   }

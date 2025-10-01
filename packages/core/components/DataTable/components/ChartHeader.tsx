@@ -129,7 +129,16 @@ const ChartHeader = ({
               }}
               onKeyDown={e => {
                 if (hasRowType) return
-                if (e.keyCode === 13) {
+                if (e.key === 'Enter') {
+                  publishAnalyticsEvent({
+                    vizType: config.type,
+                    vizSubType: getVizSubType(config),
+                    eventType: `data_table_sort`,
+                    eventAction: 'keyboard',
+                    eventLabel: interactionLabel,
+                    vizTitle: getVizTitle(config),
+                    specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                  })
                   setSortBy(newSortBy)
                 }
               }}
@@ -139,7 +148,7 @@ const ChartHeader = ({
                   : { 'aria-sort': 'descending' }
                 : null)}
             >
-              <ColumnHeadingText text={text} column={column} config={config} />
+              <ColumnHeadingText text={text} config={config} />
               {isSortedCol && <SortIcon ascending={sortByAsc} />}
               <ScreenReaderSortByText sortBy={sortBy} config={config} text={text} />
             </th>
@@ -173,10 +182,29 @@ const ChartHeader = ({
               role='columnheader'
               scope='col'
               onClick={() => {
+                if (hasRowType) return
+                publishAnalyticsEvent({
+                  vizType: config.type,
+                  vizSubType: getVizSubType(config),
+                  eventType: `data_table_sort`,
+                  eventAction: 'click',
+                  eventLabel: interactionLabel,
+                  vizTitle: getVizTitle(config),
+                  specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                })
                 setSortBy(newSortBy)
               }}
               onKeyDown={e => {
-                if (e.keyCode === 13) {
+                if (e.key === 'Enter') {
+                  publishAnalyticsEvent({
+                    vizType: config.type,
+                    vizSubType: getVizSubType(config),
+                    eventType: `data_table_sort`,
+                    eventAction: 'keyboard',
+                    eventLabel: interactionLabel,
+                    vizTitle: getVizTitle(config),
+                    specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                  })
                   setSortBy(newSortBy)
                 }
               }}
@@ -186,7 +214,7 @@ const ChartHeader = ({
                   : { 'aria-sort': 'descending' }
                 : null)}
             >
-              <ColumnHeadingText text={text} column={column} config={config} />
+              <ColumnHeadingText text={text} config={config} />
               {isSortedCol && <SortIcon ascending={sortByAsc} />}
 
               <ScreenReaderSortByText text={text} config={config} sortBy={sortBy} />

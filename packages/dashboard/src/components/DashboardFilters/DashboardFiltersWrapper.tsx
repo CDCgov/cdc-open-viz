@@ -142,7 +142,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       eventAction: 'change',
       eventLabel: `${interactionLabel}`,
       vizTitle: getVizTitle(dashboardConfig),
-      specifics: `key: ${newSharedFilters?.[index]?.key}, value: ${value}`
+      specifics: `key: ${newConfig.dashboard.sharedFilters[index]?.columnName || 'unknown'}, value: ${value}`
     })
 
     // sets the active filter option that the user just selected.

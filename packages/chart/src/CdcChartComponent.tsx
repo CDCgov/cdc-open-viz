@@ -491,7 +491,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
         eventType: 'chart_ready',
         eventAction: 'load',
         eventLabel: interactionLabel,
-        vizTitle: getVizTitle(config)
+        vizTitle: getVizTitle(config),
+        ...(config.visualizationType === 'Bar' && {
+          specifics: `orientation: ${config.orientation === 'horizontal' ? 'horizontal' : 'vertical'}`
+        })
       })
     }
   }, [container, config, isLoading]) // eslint-disable-line
@@ -588,7 +591,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
       eventType: 'chart_legend_reset',
       eventAction: 'click',
       eventLabel: interactionLabel,
-      vizTitle: getVizTitle(config)
+      vizTitle: getVizTitle(config),
+      ...(config.visualizationType === 'Bar' && {
+        specifics: `orientation: ${config.orientation === 'horizontal' ? 'horizontal' : 'vertical'}`
+      })
     })
     dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [] })
   }
@@ -927,6 +933,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 superTitle={config.superTitle}
                 classes={['chart-title', `${config.theme}`, 'cove-component__header', 'mb-3']}
                 style={undefined}
+                config={config}
               />
 
               {/* Visualization Wrapper */}

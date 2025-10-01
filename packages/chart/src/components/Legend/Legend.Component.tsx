@@ -146,10 +146,12 @@ const Legend: React.FC<LegendProps> = forwardRef(
                                 vizType: config?.type,
                                 vizSubType: getVizSubType(config),
                                 vizTitle: getVizTitle(config),
-                                eventType: `chart_legend_item_toggled--${legend.behavior}-mode` as any,
+                                eventType: `chart_legend_item_toggled` as any,
                                 eventAction: 'keydown',
                                 eventLabel: interactionLabel,
-                                specifics: label.text
+                                specifics: config.visualizationType === 'Bar'
+                                  ? `label: ${label.text}, orientation: ${config.orientation === 'horizontal' ? 'horizontal' : 'vertical'}, mode: ${legend.behavior}`
+                                  : `label: ${label.text}, mode: ${legend.behavior}`,
                               })
                               highlight(label)
                             }
@@ -159,10 +161,13 @@ const Legend: React.FC<LegendProps> = forwardRef(
                             publishAnalyticsEvent({
                               vizType: config?.type,
                               vizSubType: getVizSubType(config),
-                              eventType: `chart_legend_item_toggled--${legend.behavior}-mode` as any,
+                              eventType: `chart_legend_item_toggled` as any,
                               eventAction: 'click',
                               eventLabel: interactionLabel,
-                              specifics: label.text,
+                              specifics: config.visualizationType === 'Bar'
+                                ? `label: ${label.text}, orientation: ${config.orientation === 'horizontal' ? 'horizontal' : 'vertical'}, mode: ${legend.behavior}`
+                                : `label: ${label.text}, mode: ${legend.behavior}`,
+
                               vizTitle: getVizTitle(config)
                             })
                             highlight(label)
@@ -233,9 +238,8 @@ const Legend: React.FC<LegendProps> = forwardRef(
                 {/* Pattern Legend Items */}
                 {config.legend.patterns && Object.keys(config.legend.patterns).length > 0 && (
                   <div
-                    className={`legend-patterns d-flex ${
-                      ['top', 'bottom'].includes(config.legend.position) ? 'flex-row flex-wrap' : 'flex-column'
-                    }`}
+                    className={`legend-patterns d-flex ${['top', 'bottom'].includes(config.legend.position) ? 'flex-row flex-wrap' : 'flex-column'
+                      }`}
                   >
                     {Object.entries(config.legend.patterns).map(([key, pattern]) => {
                       const patternId = `legend-pattern-${key}`
