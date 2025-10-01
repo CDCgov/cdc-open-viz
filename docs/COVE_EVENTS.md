@@ -2,6 +2,19 @@
 
 ## Overview
 
+## Order
+```
+APP|VIZ_TYPE (MAP_COUNTY)|VIZ_TITLE|INTERACTION_EVENT|INTERACTION_TYPE(IE.CLICK)|SPECIFICS
+P40: COVE|MAP_COUNTY|MY MAP|ZOOM|CLICK|ZOOM_LEVEL: 3
+P40: COVE|MAP_COUNTY|MY MAP|ZOOM|CLICK|COORDINATES: 00, 00
+
+P40 COVE|DASHBOARD|DASHBOARD TITLE|CLICK|FILTERS...
+--P40: COVE|MAP_STATE|MY MAP|FILTERED|CLICK|KEY: STATE, VALUE: GEORGIA
+--P40: COVE|MAP_STATE|MY MAP|FILTERED|CLICK|KEY: YEAR, VALUE: 2000
+
+LINK: MYCONFIG.JSON
+```
+
 This system tracks user interactions across various data visualization components in the COVE (Data Visualization) platform. Events are categorized by visualization type, user action, and specific interaction patterns.
 
 ## Notes
@@ -166,7 +179,7 @@ publishAnalyticsEvent('dashboard_filter_changed|key_region|value_west', 'change'
 // Map legend toggle in isolate mode
 publishAnalyticsEvent('map_legend_item_toggled|isolate-mode|Population', 'click', 'Map Config', 'map', { title: 'Population Map' })
 
-// Chart legend toggle in highlight mode  
+// Chart legend toggle in highlight mode
 publishAnalyticsEvent('chart_legend_item_toggled|highlight-mode|Data Series 1', 'click', 'Chart Config', 'chart', { title: 'Chart Title' })
 
 // Chart hover event
