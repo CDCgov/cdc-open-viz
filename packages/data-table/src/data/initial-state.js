@@ -14,7 +14,12 @@ export default {
     showVertical: true,
     dateDisplayFormat: '',
     showMissingDataLabel: true,
-    showSuppressedSymbol: true
+    showSuppressedSymbol: true,
+    rowColors: {
+      enabled: false,
+      colorColumn: '',
+      mode: 'sequential'
+    }
   },
   columns: {},
   dataFormat: {}

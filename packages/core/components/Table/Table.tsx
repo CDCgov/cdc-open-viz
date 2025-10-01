@@ -25,6 +25,9 @@ type TableProps = {
   viewport: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   preliminaryData?: PreliminaryDataItem[]
   rightAlignedCols: object
+  getRowColor?: (value: any) => { backgroundColor: string; textColor: string } | undefined
+  colorColumn?: string
+  runtimeData?: Record<string, any>[]
 }
 
 type Position = 'sticky'
@@ -41,7 +44,10 @@ const Table = ({
   hasRowType,
   viewport,
   preliminaryData,
-  rightAlignedCols
+  rightAlignedCols,
+  getRowColor,
+  colorColumn,
+  runtimeData
 }: TableProps) => {
   const headStyle = stickyHeader ? { position: 'sticky' as Position, top: 0, zIndex: 2 } : {}
   const isGroupedMatrix = !Array.isArray(childrenMatrix)
@@ -75,6 +81,7 @@ const Table = ({
                         cellMinWidth={tableOptions.cellMinWidth}
                         viewport={viewport}
                         rightAlignedCols={rightAlignedCols}
+                        rowColor={rowColors?.get(i)}
                       />
                     )
                   })
@@ -96,6 +103,7 @@ const Table = ({
                         cellMinWidth={tableOptions.cellMinWidth}
                         viewport={viewport}
                         rightAlignedCols={rightAlignedCols}
+                        rowColor={getRowColor && colorColumn && runtimeData ? getRowColor(runtimeData[i]?.[colorColumn]) : undefined}
                       />
                     )
                   } else {
@@ -114,6 +122,7 @@ const Table = ({
                             cellMinWidth={tableOptions.cellMinWidth}
                             viewport={viewport}
                             rightAlignedCols={rightAlignedCols}
+                            rowColor={getRowColor && colorColumn && runtimeData ? getRowColor(runtimeData[i]?.[colorColumn]) : undefined}
                           />
                         )
                       case RowType.row_group_total:
@@ -129,6 +138,7 @@ const Table = ({
                             cellMinWidth={tableOptions.cellMinWidth}
                             viewport={viewport}
                             rightAlignedCols={rightAlignedCols}
+                            rowColor={getRowColor && colorColumn && runtimeData ? getRowColor(runtimeData[i]?.[colorColumn]) : undefined}
                           />
                         )
                     }

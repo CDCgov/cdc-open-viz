@@ -8,3 +8,16 @@
   position: fixed;
   left: -10000px;
 }
+
+/* Row coloring styles with high specificity to override Bootstrap .table>:not(caption)>*>* */
+table.table:not(caption) tbody tr.row-colored,
+table.table-striped:not(caption) tbody tr.row-colored:nth-of-type(odd),
+table.table-striped:not(caption) tbody tr.row-colored:nth-of-type(even) {
+  background-color: var(--row-bg-color) !important;
+  color: var(--row-text-color) !important;
+}
+
+table.table:not(caption) tbody tr.row-colored td {
+  color: inherit !important;
+  background-color: transparent !important;
+}
