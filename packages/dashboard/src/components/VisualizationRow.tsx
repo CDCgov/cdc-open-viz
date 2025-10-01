@@ -20,6 +20,7 @@ import CdcChart from '@cdc/chart/src/CdcChartComponent'
 import ExpandCollapseButtons from './ExpandCollapseButtons'
 import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 type VisualizationWrapperProps = {
   allExpanded: boolean
@@ -196,12 +197,15 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               href={`#data-table-${dataKey}`}
               className='margin-left-href'
               onClick={() => {
-                publishAnalyticsEvent(
-                  `link_to_data_table_click|#data-table-${dataKey}`,
-                  'click',
-                  `${interactionLabel}`,
-                  visualizationConfig.type
-                )
+                publishAnalyticsEvent({
+                  vizType: visualizationConfig.type,
+                  vizSubType: getVizSubType(visualizationConfig),
+                  eventType: `link_to_data_table_click`,
+                  eventAction: 'click',
+                  eventLabel: `${interactionLabel}`,
+                  vizTitle: getVizTitle(visualizationConfig),
+                  specifics: `table: #data-table-${dataKey}`
+                })
               }}
             >
               {dataKey} (Go to Table)
@@ -219,12 +223,11 @@ const VisualizationRow: React.FC<VizRowProps> = ({
             type === 'dashboardFilters' &&
             sharedFilterIndexes &&
             sharedFilterIndexes.filter(idx => config.dashboard.sharedFilters?.[idx]?.showDropdown === false).length ===
-              sharedFilterIndexes.length
+            sharedFilterIndexes.length
           const hasMarginBottom = !isLastRow && !hiddenDashboardFilters
 
-          const vizWrapperClass = `col-12 col-md-${col.width}${!shouldShow ? ' d-none' : ''}${
-            hideVisualization ? ' hide-parent-visualization' : hasMarginBottom ? ' mb-4' : ''
-          }`
+          const vizWrapperClass = `col-12 col-md-${col.width}${!shouldShow ? ' d-none' : ''}${hideVisualization ? ' hide-parent-visualization' : hasMarginBottom ? ' mb-4' : ''
+            }`
           const link =
             config.table && config.table.show && config.datasets && table && table.showDataTableLink
               ? tableLink

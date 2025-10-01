@@ -19,6 +19,7 @@ import LegendLineShape from './LegendLine.Shape'
 import LegendGroup from './LegendGroup'
 import { getSeriesWithData } from '../../helpers/dataHelpers'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const LEGEND_PADDING = 36
 
@@ -72,7 +73,6 @@ const Legend: React.FC<LegendProps> = forwardRef(
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
     let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
-
 
     if (!legend) return null
     return (
@@ -142,23 +142,34 @@ const Legend: React.FC<LegendProps> = forwardRef(
                           onKeyDown={e => {
                             if (e.key === 'Enter') {
                               e.preventDefault()
-                              publishAnalyticsEvent(
-                                `chart_legend_item_toggled|${legend.behavior}-mode|${label.text}`,
-                                'keydown',
-                                `${interactionLabel}`,
-                                'chart'
-                              )
+                              publishAnalyticsEvent({
+                                vizType: config?.type,
+                                vizSubType: getVizSubType(config),
+                                vizTitle: getVizTitle(config),
+                                eventType: `chart_legend_item_toggled` as any,
+                                eventAction: 'keydown',
+                                eventLabel: interactionLabel,
+                                specifics: config.visualizationType === 'Bar'
+                                  ? `label: ${label.text}, orientation: ${config.orientation === 'horizontal' ? 'horizontal' : 'vertical'}, mode: ${legend.behavior}`
+                                  : `label: ${label.text}, mode: ${legend.behavior}`,
+                              })
                               highlight(label)
                             }
                           }}
                           onClick={e => {
                             e.preventDefault()
-                            publishAnalyticsEvent(
-                              `chart_legend_item_toggled|${legend.behavior}-mode|${label.text}`,
-                              'click',
-                              `${interactionLabel}`,
-                              'chart'
-                            )
+                            publishAnalyticsEvent({
+                              vizType: config?.type,
+                              vizSubType: getVizSubType(config),
+                              eventType: `chart_legend_item_toggled` as any,
+                              eventAction: 'click',
+                              eventLabel: interactionLabel,
+                              specifics: config.visualizationType === 'Bar'
+                                ? `label: ${label.text}, orientation: ${config.orientation === 'horizontal' ? 'horizontal' : 'vertical'}, mode: ${legend.behavior}`
+                                : `label: ${label.text}, mode: ${legend.behavior}`,
+
+                              vizTitle: getVizTitle(config)
+                            })
                             highlight(label)
                           }}
                           role='button'

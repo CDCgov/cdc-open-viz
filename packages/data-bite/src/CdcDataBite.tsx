@@ -46,6 +46,7 @@ import {
 // styles
 import './scss/main.scss'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 type CdcDataBiteProps = {
   config: Config
@@ -166,7 +167,14 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     const processedConfig = { ...coveUpdateWorker(response) }
 
     updateConfig({ ...defaults, ...processedConfig })
-    publishAnalyticsEvent('data-bite_loaded', 'load', interactionLabel, 'data-bite', { title: processedConfig?.title })
+    publishAnalyticsEvent({
+      vizType: 'data-bite',
+      vizSubType: getVizSubType(processedConfig),
+      eventType: 'data-bite_ready',
+      eventAction: 'load',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(processedConfig)
+    })
     dispatch({ type: 'SET_LOADING', payload: false })
   }
 

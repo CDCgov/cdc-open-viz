@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import ConfigContext from '../context'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoName, mapTabbingID }) => {
   const { interactionLabel, config } = useContext(ConfigContext)
@@ -12,8 +13,14 @@ const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoN
     if (activeGeo !== '') {
       const urlString = data[dropdownItems[activeGeo]][columns.navigate.name]
 
-      publishAnalyticsEvent(`map_navigation_menu|${urlString}`, 'submit', `${interactionLabel}`, undefined, {
-        title: config?.title || config?.general?.title
+      publishAnalyticsEvent({
+        vizType: config.type,
+        vizSubType: getVizSubType(config),
+        eventType: `map_navigation_menu`,
+        eventAction: 'submit',
+        eventLabel: `${interactionLabel}`,
+        vizTitle: getVizTitle(config),
+        specifics: `url: ${urlString}, activeGeo: ${activeGeo}`
       })
 
       navigationHandler(urlString)

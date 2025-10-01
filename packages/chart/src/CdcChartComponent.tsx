@@ -84,6 +84,7 @@ import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAl
 import { Datasets } from '@cdc/core/types/DataSet'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -484,7 +485,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (container && !isLoading && !_.isEmpty(config) && !coveLoadedEventRan) {
       publish('cove_loaded', { config: config })
       dispatch({ type: 'SET_LOADED_EVENT', payload: true })
-      publishAnalyticsEvent('chart_loaded', 'load', interactionLabel, 'chart', { title: config?.title })
+      publishAnalyticsEvent({
+        vizType: config?.type,
+        vizSubType: getVizSubType(config),
+        eventType: 'chart_ready',
+        eventAction: 'load',
+        eventLabel: interactionLabel,
+        vizTitle: getVizTitle(config),
+        ...(config.visualizationType === 'Bar' && {
+          specifics: `orientation: ${config.orientation === 'horizontal' ? 'horizontal' : 'vertical'}`
+        })
+      })
     }
   }, [container, config, isLoading]) // eslint-disable-line
 
@@ -574,7 +585,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
     } catch (e) {
       console.error('COVE:', e.message)
     }
-    publishAnalyticsEvent('chart_legend_reset', 'click', interactionLabel, 'chart', { title: config?.title })
+    publishAnalyticsEvent({
+      vizType: config?.type,
+      vizSubType: getVizSubType(config),
+      eventType: 'chart_legend_reset',
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config),
+      ...(config.visualizationType === 'Bar' && {
+        specifics: `orientation: ${config.orientation === 'horizontal' ? 'horizontal' : 'vertical'}`
+      })
+    })
     dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [] })
   }
 
@@ -912,6 +933,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 superTitle={config.superTitle}
                 classes={['chart-title', `${config.theme}`, 'cove-component__header', 'mb-3']}
                 style={undefined}
+                config={config}
               />
 
               {/* Visualization Wrapper */}
@@ -948,8 +970,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           legend.position === 'top' ||
                           visualizationType === 'Sankey' ||
                           visualizationType === 'Spark Line'
-                        ? 'w-100'
-                        : 'w-75'
+                          ? 'w-100'
+                          : 'w-75'
                     }
                   >
                     {/* All charts with LinearChart */}
@@ -985,7 +1007,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                               const labelMargin = 120
                               const widthReduction =
                                 config.showLineSeriesLabels &&
-                                (config.legend.position !== 'right' || config.legend.hide)
+                                  (config.legend.position !== 'right' || config.legend.hide)
                                   ? labelMargin
                                   : 0
                               return (
@@ -1081,33 +1103,33 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   config.visualizationType !== 'Spark Line' &&
                   config.visualizationType !== 'Sankey') ||
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
-                  <DataTable
-                    /* changing the "key" will force the table to re-render
-                            when the default sort changes while editing */
-                    key={dataTableDefaultSortBy}
-                    config={pivotDynamicSeries(config)}
-                    rawData={
-                      config.visualizationType === 'Sankey'
-                        ? config?.data?.[0]?.tableData
-                        : config.table.customTableConfig
-                        ? filterVizData(config.filters, config.data)
-                        : config.data
-                    }
-                    runtimeData={getTableRuntimeData()}
-                    expandDataTable={config.table.expanded}
-                    columns={config.columns}
-                    defaultSortBy={dataTableDefaultSortBy}
-                    displayGeoName={name => name}
-                    applyLegendToRow={applyLegendToRow}
-                    tableTitle={config.table.label}
-                    indexTitle={config.table.indexLabel}
-                    vizTitle={title}
-                    viewport={currentViewport}
-                    tabbingId={handleChartTabbing(config, legendId)}
-                    colorScale={colorScale}
-                    interactionLabel={interactionLabel}
-                  />
-                )}
+                    <DataTable
+                      /* changing the "key" will force the table to re-render
+                                when the default sort changes while editing */
+                      key={dataTableDefaultSortBy}
+                      config={pivotDynamicSeries(config)}
+                      rawData={
+                        config.visualizationType === 'Sankey'
+                          ? config?.data?.[0]?.tableData
+                          : config.table.customTableConfig
+                            ? filterVizData(config.filters, config.data)
+                            : config.data
+                      }
+                      runtimeData={getTableRuntimeData()}
+                      expandDataTable={config.table.expanded}
+                      columns={config.columns}
+                      defaultSortBy={dataTableDefaultSortBy}
+                      displayGeoName={name => name}
+                      applyLegendToRow={applyLegendToRow}
+                      tableTitle={config.table.label}
+                      indexTitle={config.table.indexLabel}
+                      vizTitle={title}
+                      viewport={currentViewport}
+                      tabbingId={handleChartTabbing(config, legendId)}
+                      colorScale={colorScale}
+                      interactionLabel={interactionLabel}
+                    />
+                  )}
                 {config?.annotations?.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
                 {config?.legacyFootnotes && (

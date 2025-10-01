@@ -9,8 +9,9 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 // Third-party library imports
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
-import _ from 'lodash'
+import _, { get } from 'lodash'
 import { getHorizontalBarHeights } from '../components/BarChart/helpers/getBarHeights'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 export const useTooltip = props => {
   const {
@@ -99,8 +100,8 @@ export const useTooltip = props => {
       const columnData =
         config.tooltips.singleSeries && visualizationType === 'Line'
           ? resolvedScaleValues.filter(
-              value => value[config.runtime.series[0].dynamicCategory] === singleSeriesValue
-            )[0][colKey]
+            value => value[config.runtime.series[0].dynamicCategory] === singleSeriesValue
+          )[0][colKey]
           : resolvedScaleValues[0]?.[colKey]
       const closestValue = config.visualizationType === 'Pie' ? pieColumnData : columnData
 
@@ -135,9 +136,15 @@ export const useTooltip = props => {
         // Track hover analytics event for pie chart series
         if (pieData[config.xAxis.dataKey] && interactionLabel) {
           const seriesName = String(pieData[config.xAxis.dataKey]).replace(/[^a-zA-Z0-9]/g, '_')
-          publishAnalyticsEvent(`chart_hover_${seriesName.toLowerCase()}`, 'hover', interactionLabel, 'chart', {
-            title: config?.title,
-            series: pieData[config.xAxis.dataKey]
+          publishAnalyticsEvent({
+            vizType: config?.type,
+            vizSubType: getVizSubType(config),
+            eventType: `chart_hover`,
+            eventAction: 'hover',
+            eventLabel: interactionLabel,
+            vizTitle: getVizTitle(config),
+            series: pieData[config.xAxis.dataKey],
+            specifics: `hovered on: ${String(seriesName).toLowerCase()}`
           })
         }
 
@@ -180,19 +187,19 @@ export const useTooltip = props => {
               )
 
               // Track hover analytics event for linear chart series
-              if (interactionLabel && seriesKey && seriesKey !== config.xAxis?.dataKey) {
+              if (interactionLabel && seriesKey && seriesKey !== config.xAxis?.dataKey && value) {
                 const seriesName = seriesObjWithName?.name || seriesKey
                 const safeSeriesName = String(seriesName).replace(/[^a-zA-Z0-9]/g, '_')
-                publishAnalyticsEvent(
-                  `chart_hover_${safeSeriesName.toLowerCase()}`,
-                  'hover',
-                  interactionLabel,
-                  'chart',
-                  {
-                    title: config?.title,
-                    series: seriesName
-                  }
-                )
+                publishAnalyticsEvent({
+                  vizType: config?.type,
+                  vizSubType: getVizSubType(config),
+                  eventType: `chart_hover`,
+                  eventAction: 'hover',
+                  eventLabel: interactionLabel,
+                  vizTitle: getVizTitle(config),
+                  series: seriesName,
+                  specifics: `key: ${String(safeSeriesName).toLowerCase()}, value: ${value}`
+                })
               }
 
               if (
@@ -569,9 +576,8 @@ export const useTooltip = props => {
     if (visualizationType === 'Forest Plot') {
       if (key === config.xAxis.dataKey)
         return (
-          <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${
-            isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value
-          }`}</li>
+          <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value
+            }`}</li>
         )
       return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
     }

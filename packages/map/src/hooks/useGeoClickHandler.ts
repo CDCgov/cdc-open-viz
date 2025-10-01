@@ -2,6 +2,7 @@ import ConfigContext, { MapDispatchContext } from '../context'
 import { navigationHandler } from '../helpers'
 import { useContext } from 'react'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle } from '@cdc/core/helpers/metrics/utils'
 
 const useGeoClickHandler = () => {
   const {
@@ -40,8 +41,13 @@ const useGeoClickHandler = () => {
       // Track modal click analytics event
       if (interactionLabel) {
         const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
-        publishAnalyticsEvent(`map_click_${locationName}`, 'click', interactionLabel, 'map', {
-          title: state?.title || state?.general?.title
+        publishAnalyticsEvent({
+          vizType: 'map',
+          eventType: `modal_trigger` as any,
+          eventAction: 'click',
+          eventLabel: interactionLabel,
+          vizTitle: getVizTitle(state),
+          specifics: `clicked on: ${String(locationName).toLowerCase()}`
         })
       }
 
@@ -53,9 +59,13 @@ const useGeoClickHandler = () => {
       // Track navigation click analytics event
       if (interactionLabel) {
         const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
-        publishAnalyticsEvent(`map_click_${locationName}`, 'click', interactionLabel, 'map', {
-          title: state?.title || state?.general?.title,
-          url: geoData[state.columns.navigate.name]
+        publishAnalyticsEvent({
+          vizType: 'map',
+          eventType: `map_trigger` as any,
+          eventAction: 'click',
+          eventLabel: interactionLabel,
+          vizTitle: getVizTitle(state),
+          specifics: `clicked on: ${String(locationName).toLowerCase()}`
         })
       }
 
