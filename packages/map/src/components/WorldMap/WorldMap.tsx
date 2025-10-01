@@ -86,7 +86,7 @@ const WorldMap = () => {
     publishAnalyticsEvent({
       vizType: config.type,
       vizSubType: getVizSubType(config),
-      eventType: `map_zoomed_in`,
+      eventType: `zoom_in`,
       eventAction: 'click',
       eventLabel: interactionLabel,
       vizTitle: getVizTitle(config),
@@ -95,7 +95,7 @@ const WorldMap = () => {
     publishAnalyticsEvent({
       vizType: config.type,
       vizSubType: getVizSubType(config),
-      eventType: `map_zoomed_in`,
+      eventType: `zoom_in`,
       eventAction: 'click',
       eventLabel: interactionLabel,
       vizTitle: getVizTitle(config),
@@ -109,7 +109,7 @@ const WorldMap = () => {
     publishAnalyticsEvent({
       vizType: config.type,
       vizSubType: getVizSubType(config),
-      eventType: `map_zoomed_out`,
+      eventType: `zoom_out`,
       eventAction: 'click',
       eventLabel: interactionLabel,
       vizTitle: getVizTitle(config),
@@ -118,7 +118,7 @@ const WorldMap = () => {
     publishAnalyticsEvent({
       vizType: config.type,
       vizSubType: getVizSubType(config),
-      eventType: `map_zoomed_out`,
+      eventType: `zoom_out`,
       eventAction: 'click',
       eventLabel: interactionLabel,
       vizTitle: getVizTitle(config),
@@ -157,8 +157,8 @@ const WorldMap = () => {
         geo.properties.state && runtimeData[geo.properties.state]
           ? geo.properties.state
           : geo.properties.name
-            ? geo.properties.name
-            : geo.properties.iso
+          ? geo.properties.name
+          : geo.properties.iso
 
       const additionalData = {
         name: geo.properties.name

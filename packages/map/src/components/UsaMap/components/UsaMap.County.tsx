@@ -284,7 +284,7 @@ const CountyMap = () => {
       publishAnalyticsEvent({
         vizType: config.type,
         vizSubType: getVizSubType(config),
-        eventType: `map_zoomed_in`,
+        eventType: `zoom_in`,
         eventAction: 'click',
         eventLabel: interactionLabel,
         vizTitle: getVizTitle(config),

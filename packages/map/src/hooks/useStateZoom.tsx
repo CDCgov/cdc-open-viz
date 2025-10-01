@@ -84,7 +84,7 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
         publishAnalyticsEvent({
           vizType: 'map',
           vizSubType: getVizSubType(config),
-          eventType: 'map_zoomed_in',
+          eventType: 'zoom_in',
           eventAction: 'click',
           eventLabel: interactionLabel,
           vizTitle: getVizTitle(config),

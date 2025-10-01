@@ -35,8 +35,8 @@ export type LEGEND_TOGGLE_MODES = 'highlight' | 'isolate'
 export type EventSpecifics = {
   // Map events
   map_hover: `location: ${string}`
-  map_zoomed_in: `zoom_level: ${number}` | `location: ${string}` | `zoom_level: ${number}, location: ${string}`
-  map_zoomed_out: `zoom_level: ${number}` | `location: ${string}` | `zoom_level: ${number}, location: ${string}`
+  zoom_in: `zoom_level: ${number}` | `location: ${string}` | `zoom_level: ${number}, location: ${string}`
+  zoom_out: `zoom_level: ${number}` | `location: ${string}` | `zoom_level: ${number}, location: ${string}`
 
   // Legend events
   map_legend_item_toggled: `mode: ${LEGEND_TOGGLE_MODES}` | `mode: ${LEGEND_TOGGLE_MODES}, item: ${string}`
@@ -77,8 +77,8 @@ export type ANALYTICS_EVENT_TYPES =
   | `${COVE_VISUALIZATION_TYPES}_hover` // simplified with specifics for location
   | `${COVE_VISUALIZATION_TYPES}_panned`
   | `${COVE_VISUALIZATION_TYPES}_reset_zoom_level`
-  | `${COVE_VISUALIZATION_TYPES}_zoomed_in` // simplified with specifics for zoom level and location
-  | `${COVE_VISUALIZATION_TYPES}_zoomed_out` // simplified with specifics for zoom level and location
+  | `zoom_in` // simplified with specifics for zoom level and location
+  | `zoom_out` // simplified with specifics for zoom level and location
   | `${COVE_VISUALIZATION_TYPES}_navigation_menu`
 
   // Image/export events
