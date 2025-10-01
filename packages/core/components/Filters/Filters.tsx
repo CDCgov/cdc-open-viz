@@ -20,6 +20,7 @@ import { applyQueuedActive } from './helpers/applyQueuedActive'
 import Tabs from './components/Tabs'
 import Dropdown from './components/Dropdown'
 import { publishAnalyticsEvent } from '../../helpers/metrics/helpers'
+import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
 
 export const VIZ_FILTER_STYLE = {
   dropdown: 'dropdown',
@@ -87,13 +88,15 @@ const Filters: React.FC<FilterProps> = ({
     const newFilters = getChangedFilters([...filters], index, value, filterBehavior)
     setFilters(newFilters)
 
-    publishAnalyticsEvent(
-      `${visualizationConfig.type}_filter_changed|key_${newFilters?.[index]?.columnName}|value_${newFilters?.[index]?.active}`,
-      'click',
-      `${interactionLabel}`,
-      visualizationConfig.type,
-      { title: visualizationConfig?.title }
-    )
+    publishAnalyticsEvent({
+      vizType: visualizationConfig.type as any,
+      vizSubType: getVizSubType(visualizationConfig),
+      eventType: `${visualizationConfig.type}_filter_changed` as any,
+      eventAction: 'change',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(visualizationConfig),
+      specifics: `key: ${String(newFilters?.[index]?.columnName).toLowerCase()}, value: ${String(newFilters?.[index]?.active).toLowerCase()}`
+    })
   }
 
   const handleApplyButton = newFilters => {
@@ -114,13 +117,14 @@ const Filters: React.FC<FilterProps> = ({
 
     setFilters(newFilters)
 
-    publishAnalyticsEvent(
-      `${visualizationConfig.type}_filter_applied|${newFilters.map(f => f.active)}`,
-      'click',
-      `${interactionLabel}`,
-      visualizationConfig.type,
-      { title: visualizationConfig?.title }
-    )
+    publishAnalyticsEvent({
+      vizType: visualizationConfig.type as any,
+      eventType: `${visualizationConfig.type}_filter_applied` as any,
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(visualizationConfig),
+      specifics: newFilters.map(f => f.active).join(',')
+    })
 
     setShowApplyButton(false)
   }
@@ -150,13 +154,13 @@ const Filters: React.FC<FilterProps> = ({
     }
 
     setFilters(newFilters)
-    publishAnalyticsEvent(
-      `${visualizationConfig.type}_filter_reset`,
-      'click',
-      `${interactionLabel}`,
-      visualizationConfig.type,
-      { title: visualizationConfig?.title }
-    )
+    publishAnalyticsEvent({
+      vizType: visualizationConfig.type as any,
+      eventType: `${visualizationConfig.type}_filter_reset` as any,
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: visualizationConfig?.title
+    })
   }
 
   const mobileFilterStyle = useMemo(() => {

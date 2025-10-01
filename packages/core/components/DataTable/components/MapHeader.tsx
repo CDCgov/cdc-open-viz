@@ -3,6 +3,7 @@ import ScreenReaderText from '../../elements/ScreenReaderText'
 import { SortIcon } from './SortIcon'
 import { getNewSortBy } from '../helpers/getNewSortBy'
 import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 type MapHeaderProps = DataTableProps & {
   sortBy: { column; asc }
@@ -56,19 +57,28 @@ const MapHeader = ({
               role='columnheader'
               scope='col'
               onClick={() => {
-                publishAnalyticsEvent(
-                  `data_table_sort_by|${newSortBy.column}|${
-                    newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'undefined'
-                  }`,
-                  'click',
-                  interactionLabel,
-                  undefined,
-                  { title: config?.title }
-                )
+                publishAnalyticsEvent({
+                  vizType: config.type,
+                  vizSubType: getVizSubType(config),
+                  eventType: `data_table_sort`,
+                  eventAction: 'click',
+                  eventLabel: interactionLabel,
+                  vizTitle: getVizTitle(config),
+                  specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                })
                 setSortBy(newSortBy)
               }}
               onKeyDown={e => {
-                if (e.keyCode === 13) {
+                if (e.key === 'Enter') {
+                  publishAnalyticsEvent({
+                    vizType: config.type,
+                    vizSubType: getVizSubType(config),
+                    eventType: `data_table_sort`,
+                    eventAction: 'keyboard',
+                    eventLabel: interactionLabel,
+                    vizTitle: getVizTitle(config),
+                    specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                  })
                   setSortBy(newSortBy)
                 }
               }}
@@ -79,15 +89,14 @@ const MapHeader = ({
                   : { 'aria-sort': 'descending' }
                 : null)}
             >
-              <ColumnHeadingText text={text} config={config} column={column} />
+              <ColumnHeadingText text={text} config={config} />
               <SortIcon ascending={sortByAsc} />
-              <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${
-                sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
-              } order`}</span>
+              <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
+                } order`}</span>
             </th>
           )
         })}
-    </tr>
+    </tr >
   )
 }
 

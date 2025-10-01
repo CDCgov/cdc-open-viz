@@ -17,6 +17,7 @@ import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import { MapConfig } from '../../../types/MapConfig'
 import { DEFAULT_MAP_BACKGROUND } from '../../../helpers/constants'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -214,7 +215,14 @@ const CountyMap = () => {
   const lineWidth = 1
 
   const onReset = () => {
-    publishAnalyticsEvent('map_reset_zoom_level', 'click', interactionLabel, 'map')
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: 'map_reset_zoom_level',
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config)
+    })
     setConfig({
       ...config,
       mapPosition: { coordinates: [0, 30], zoom: 1 }
@@ -273,12 +281,15 @@ const CountyMap = () => {
 
       // Redraw with focus on state
       setFocus({ id: clickedState.id, index: focusIndex, center: geoCentroid(clickedState), feature: clickedState })
-      publishAnalyticsEvent(
-        `map_zoomed_in|zoom_level_3|${clickedState.properties.name}`,
-        'click',
-        `${configUrl}`,
-        'map'
-      )
+      publishAnalyticsEvent({
+        vizType: config.type,
+        vizSubType: getVizSubType(config),
+        eventType: `zoom_in`,
+        eventAction: 'click',
+        eventLabel: interactionLabel,
+        vizTitle: getVizTitle(config),
+        specifics: `zoom_level: 3, location: ${clickedState.properties.name}`
+      })
     }
     if (config.general.type === 'us-geocode') {
       const geoRadius = (config.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
@@ -407,13 +418,19 @@ const CountyMap = () => {
 
           // Track hover analytics event if this is a new location
           if (isNaN(currentTooltipIndex) || currentTooltipIndex !== countyIndex) {
-            const countyName = displayGeoName(county.id).replace(/[^a-zA-Z0-9]/g, '_')
+            const countyName = displayGeoName(county.id).replace(/[^a-zA-Z0-9]/g, ' ')
             const stateFips = county.id.slice(0, 2)
             const stateName = supportedStatesFipsCodes[stateFips]?.replace(/[^a-zA-Z0-9]/g, '_') || 'unknown'
-            const locationName = `${countyName}_${stateName}`
-            publishAnalyticsEvent(`map_hover_${locationName?.toLowerCase()}`, 'hover', interactionLabel, 'map', {
-              title: config?.title || config?.general?.title,
-              location: displayGeoName(county.id)
+            const locationName = `${countyName}, ${stateName}`
+            publishAnalyticsEvent({
+              vizType: config.type,
+              vizSubType: getVizSubType(config),
+              eventType: `map_hover`,
+              eventAction: 'hover',
+              eventLabel: interactionLabel,
+              vizTitle: getVizTitle(config),
+              location: displayGeoName(county.id),
+              specifics: `location: ${locationName?.toLowerCase()}`
             })
           }
 
@@ -498,9 +515,15 @@ const CountyMap = () => {
         // Track hover analytics event if this is a new location
         if (isNaN(currentTooltipIndex) || currentTooltipIndex !== hoveredGeoIndex) {
           const locationName = displayGeoName(hoveredGeo[config.columns.geo.name]).replace(/[^a-zA-Z0-9]/g, '_')
-          publishAnalyticsEvent(`map_hover_${locationName?.toLowerCase()}`, 'hover', interactionLabel, 'map', {
-            title: config?.title || config?.general?.title,
-            location: displayGeoName(hoveredGeo[config.columns.geo.name])
+          publishAnalyticsEvent({
+            vizType: config.type,
+            vizSubType: getVizSubType(config),
+            eventType: `map_hover`,
+            eventAction: 'hover',
+            eventLabel: interactionLabel,
+            vizTitle: getVizTitle(config),
+            location: displayGeoName(hoveredGeo[config.columns.geo.name]),
+            specifics: `location: ${locationName?.toLowerCase()}`
           })
         }
 

@@ -3,6 +3,7 @@ import ConfigContext from '../../ConfigContext'
 import { Group } from '@visx/group'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const ScatterPlot = ({ xScale, yScale }) => {
   const {
@@ -36,18 +37,19 @@ const ScatterPlot = ({ xScale, yScale }) => {
       }
     ])
   const handleTooltip = (item, s, dataIndex) => `<div>
-    ${config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries
-      ? `${config.runtime.seriesLabels[s] || ''}<br/>`
-      : ''
+    ${
+      config.legend.showLegendValuesTooltip && config.runtime.seriesLabels && hasMultipleSeries
+        ? `${config.runtime.seriesLabels[s] || ''}<br/>`
+        : ''
     }
     ${config.xAxis.label}: ${formatNumber(item[config.xAxis.dataKey], 'bottom')} <br/>
     ${config.yAxis.label}: ${formatNumber(item[s], 'left')}<br/>
    ${additionalColumns
-      .map(
-        ([label, name, options]) =>
-          `${label} : ${formatColNumber(tableData[dataIndex][name], 'left', false, config, options)}<br/>`
-      )
-      .join('')}
+     .map(
+       ([label, name, options]) =>
+         `${label} : ${formatColNumber(tableData[dataIndex][name], 'left', false, config, options)}<br/>`
+     )
+     .join('')}
 </div>`
 
   return (
@@ -87,9 +89,15 @@ const ScatterPlot = ({ xScale, yScale }) => {
                 if (interactionLabel && (currentHover.dataIndex !== dataIndex || currentHover.seriesKey !== s)) {
                   const seriesName = config.runtime.seriesLabels?.[s] || s
                   const safeSeriesName = String(seriesName).replace(/[^a-zA-Z0-9]/g, '_')
-                  publishAnalyticsEvent(`chart_hover_${safeSeriesName.toLowerCase()}`, 'hover', interactionLabel, 'chart', {
-                    title: config?.title,
-                    series: seriesName
+                  publishAnalyticsEvent({
+                    vizType: config?.type,
+                    vizSubType: getVizSubType(config),
+                    eventType: `chart_hover`,
+                    eventAction: 'hover',
+                    eventLabel: interactionLabel,
+                    vizTitle: getVizTitle(config),
+                    series: seriesName,
+                    specifics: `hovered on: ${String(safeSeriesName).toLowerCase()}`
                   })
                   setCurrentHover({ dataIndex, seriesKey: s })
                 }
