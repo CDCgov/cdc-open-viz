@@ -8,8 +8,9 @@ import { addUIDs, validateFipsCodeLength } from './helpers'
 import EditorContext from '@cdc/core/contexts/EditorContext'
 import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 import { MapConfig } from './types/MapConfig'
-import _ from 'lodash'
+import _, { get } from 'lodash'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type CdcMapProps = {
@@ -103,6 +104,14 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
     setTimeout(() => {
       setConfig(processedConfig)
+      publishAnalyticsEvent({
+        vizType: 'map',
+        vizSubType: getVizSubType(processedConfig),
+        eventType: 'map_ready',
+        eventAction: 'load',
+        eventLabel: interactionLabel,
+        vizTitle: getVizTitle(processedConfig)
+      })
       setLoading(false)
     }, 10)
   }
@@ -120,7 +129,6 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
   useEffect(() => {
     init()
-    publishAnalyticsEvent('map_loaded', 'load', interactionLabel, 'map', { title: config?.title })
   }, [])
 
   useEffect(() => {

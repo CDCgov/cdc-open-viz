@@ -1,10 +1,13 @@
-import React, { useContext } from 'react'
+import React, { useContext, useMemo } from 'react'
 import { replace } from 'lodash'
 // cdc
 import ConfigContext from '../../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import { colorPalettesChart, sequentialPalettes } from '@cdc/core/data/colorPalettes'
+import { colorPalettesChartV2, sequentialPalettes } from '@cdc/core/data/colorPalettes'
+import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
+import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import { getBridgedData } from '../../helpers/getBridgedData'
+import { buildForecastPaletteMappings } from '../../helpers/buildForecastPaletteMappings'
 
 // visx & d3
 import { curveMonotoneX } from '@visx/curve'
@@ -15,6 +18,31 @@ const Forecasting = ({ xScale, yScale, height, width, handleTooltipMouseOver, ha
   const { transformedData: data, rawData, config, seriesHighlight, parseDate } = useContext(ConfigContext)
   const { xAxis, yAxis, legend, runtime } = config
   const DEBUG = false
+
+  // Memoize processed palettes - use version-specific palettes
+  const forecastingPalettes = useMemo(() => {
+    // Determine palette version from config
+    // Forecasting charts use sequentialPalettes for v1, sequential-only palettes for v2
+    const paletteVersion = getColorPaletteVersion(config)
+
+    let forecastPalettes
+    if (paletteVersion === 1) {
+      // V1: Use original sequential palettes
+      forecastPalettes = sequentialPalettes
+    } else {
+      // V2: Only use sequential palettes (filter out divergent and qualitative)
+      const allV2Palettes = colorPalettesChartV2
+      forecastPalettes = {}
+      Object.keys(allV2Palettes).forEach(key => {
+        if (key.startsWith('sequential')) {
+          forecastPalettes[key] = allV2Palettes[key]
+        }
+      })
+    }
+
+    const processedPalettes = updatePaletteNames(forecastPalettes)
+    return buildForecastPaletteMappings(processedPalettes, paletteVersion)
+  }, [config])
 
   return (
     data && (
@@ -36,16 +64,18 @@ const Forecasting = ({ xScale, yScale, height, width, handleTooltipMouseOver, ha
                   key={`forecasting-areas--stage-${replace(stage.key, / /g, '—')}-${index}`}
                 >
                   {group.confidenceIntervals?.map((ciGroup, ciGroupIndex) => {
-                    const palette = sequentialPalettes[stage.color] || colorPalettesChart[stage.color] || false
+                    const palette = forecastingPalettes[stage.color] || false
+                    const isReversed = stage.color?.toLowerCase().includes('reverse')
 
                     const getFill = () => {
-                      if (displayArea) return palette[2] ? palette[2] : 'transparent'
+                      if (displayArea) return palette?.[2] || 'transparent'
                       return 'transparent'
                     }
 
                     const getStroke = () => {
-                      if (displayArea) return palette[1] ? palette[1] : 'transparent'
-                      return 'transparent'
+                      if (!displayArea) return 'transparent'
+                      // Use darker colors: index 1 for reversed (dark at start), index 4 for non-reversed (dark at end)
+                      return isReversed ? palette?.[1] || 'transparent' : palette?.[4] || 'transparent'
                     }
 
                     if (ciGroup.high === '' || ciGroup.low === '') return

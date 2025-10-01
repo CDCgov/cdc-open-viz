@@ -182,6 +182,77 @@ const migrateTwoColorPalettes = config => {
   }
 }
 
+const normalizeForecastStageColors = config => {
+  if (config.type === 'chart' && config.series) {
+    const paletteVersion = config.general?.palette?.version === '2.0' ? 2 : 1
+
+    // Forecast palette migration map for v1 → v2 names (all lowercase-hyphen format)
+    const forecastPaletteMigrationMap = {
+      // Sequential Blue variants → sequential-blue
+      'sequential-blue': 'sequential-blue',
+      'sequential-blue-two': 'sequential-blue',
+      'sequential-blue-three': 'sequential-blue',
+      'sequential-blue-2-(mpx)': 'sequential-blue',
+      'sequential-blue-2-mpx': 'sequential-blue',
+      // Sequential Orange variants → sequential-orange
+      'sequential-orange': 'sequential-orange',
+      'sequential-orange-two': 'sequential-orange',
+      'sequential-orange-(mpx)': 'sequential-orange',
+      'sequential-orange-mpx': 'sequential-orange',
+      // Other sequential palettes (no variants, just normalize)
+      'sequential-green': 'sequential-green',
+      'sequential-purple': 'sequential-purple',
+      'sequential-teal': 'sequential-teal',
+      // Reverse variants - Sequential Blue
+      'sequential-bluereverse': 'sequential-bluereverse',
+      'sequential-blue-reverse': 'sequential-bluereverse',
+      'sequential-blue-tworeverse': 'sequential-bluereverse',
+      'sequential-blue-two-reverse': 'sequential-bluereverse',
+      'sequential-blue-threereverse': 'sequential-bluereverse',
+      'sequential-blue-three-reverse': 'sequential-bluereverse',
+      'sequential-blue-2-(mpx)reverse': 'sequential-bluereverse',
+      'sequential-blue-2-(mpx)-reverse': 'sequential-bluereverse',
+      'sequential-blue-2-mpxreverse': 'sequential-bluereverse',
+      'sequential-blue-2-mpx-reverse': 'sequential-bluereverse',
+      // Reverse variants - Sequential Orange
+      'sequential-orangereverse': 'sequential-orangereverse',
+      'sequential-orange-reverse': 'sequential-orangereverse',
+      'sequential-orange-tworeverse': 'sequential-orangereverse',
+      'sequential-orange-two-reverse': 'sequential-orangereverse',
+      'sequential-orange-(mpx)reverse': 'sequential-orangereverse',
+      'sequential-orange-(mpx)-reverse': 'sequential-orangereverse',
+      'sequential-orange-mpxreverse': 'sequential-orangereverse',
+      'sequential-orange-mpx-reverse': 'sequential-orangereverse',
+      // Reverse variants - Other sequential palettes
+      'sequential-greenreverse': 'sequential-greenreverse',
+      'sequential-green-reverse': 'sequential-greenreverse',
+      'sequential-purplereverse': 'sequential-purplereverse',
+      'sequential-purple-reverse': 'sequential-purplereverse',
+      'sequential-tealreverse': 'sequential-tealreverse',
+      'sequential-teal-reverse': 'sequential-tealreverse'
+    }
+
+    config.series.forEach(series => {
+      if (series.type === 'Forecasting' && series.stages) {
+        series.stages.forEach(stage => {
+          if (stage.color) {
+            // First, normalize to lowercase-hyphen format
+            let normalized = stage.color.toLowerCase().replace(/ /g, '-').replace(/_/g, '-')
+            // Then, migrate v1 palette names to v2 equivalents if applicable
+            stage.color = forecastPaletteMigrationMap[normalized] || normalized
+          }
+        })
+      }
+    })
+  }
+
+  if (config.type === 'dashboard') {
+    Object.values(config.visualizations).forEach(visualization => {
+      normalizeForecastStageColors(visualization)
+    })
+  }
+}
+
 const cleanConfig = config => {
   // remove config.palette
   if (config.palette) {
@@ -211,6 +282,7 @@ const update_4_25_9 = config => {
   migrateTwoColorPalettes(newConfig)
   saveBackup(newConfig)
   addDefaultPaletteVersion(newConfig)
+  normalizeForecastStageColors(newConfig)
   cleanConfig(newConfig)
   changeSingleStateMapNoDataMessage(newConfig)
   addMissingDataFormatFields(newConfig)

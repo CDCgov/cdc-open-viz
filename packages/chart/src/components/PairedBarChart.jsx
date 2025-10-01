@@ -124,6 +124,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                         width={xScale(d[config.series[0].dataKey])}
                         height={barHeight}
                         fill={groupOne.color}
+                        onMouseEnter={() => {}}
                         data-tooltip-html={dataTipOne(d)}
                         data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                         stroke='#333'
@@ -189,6 +190,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                         width={xScale(d[config.series[1].dataKey])}
                         height={barHeight}
                         fill={groupTwo.color}
+                        onMouseEnter={() => {}}
                         data-tooltip-html={dataTipTwo(d)}
                         data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                         strokeWidth={borderWidth}

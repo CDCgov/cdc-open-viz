@@ -69,6 +69,7 @@ import _ from 'lodash'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import useModal from './hooks/useModal'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 type CdcMapComponent = {
   config: MapConfig
@@ -314,12 +315,15 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       href={`#data-table-${config.dataKey}`}
       className='margin-left-href'
       onClick={() => {
-        publishAnalyticsEvent(
-          `link_to_data_table_click|#data-table-${config.dataKey}`,
-          'click',
-          `${interactionLabel}`,
-          'map'
-        )
+        publishAnalyticsEvent({
+          vizType: config.type,
+          vizSubType: getVizSubType(config),
+          eventType: `link_to_data_table_click`,
+          eventAction: 'click',
+          eventLabel: `${interactionLabel}`,
+          vizTitle: getVizTitle(config),
+          specifics: `table: #data-table-${config.dataKey}`
+        })
       }}
     >
       {config.dataKey} (Go to Table)
