@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 // United States Topojson resources
 import hexTopoJSON from '../data/us-hex-topo.json'
@@ -446,9 +447,15 @@ const UsaMap = () => {
               onMouseEnter={() => {
                 // Track hover analytics event if this is a new location
                 const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
-                publishAnalyticsEvent(`map_hover_${locationName?.toLowerCase()}`, 'hover', interactionLabel, 'map', {
-                  title: config?.title || config?.general?.title,
-                  location: geoDisplayName
+                publishAnalyticsEvent({
+                  vizType: config.type,
+                  vizSubType: getVizSubType(config),
+                  eventType: `map_hover`,
+                  eventAction: 'hover',
+                  eventLabel: interactionLabel,
+                  vizTitle: getVizTitle(config),
+                  location: geoDisplayName,
+                  specifics: `location: ${locationName?.toLowerCase()}`
                 })
               }}
             >

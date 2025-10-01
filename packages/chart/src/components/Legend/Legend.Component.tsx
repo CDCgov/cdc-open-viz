@@ -145,7 +145,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                               publishAnalyticsEvent({
                                 vizType: config?.type,
                                 vizSubType: getVizSubType(config),
-                                title: getVizTitle(config),
+                                vizTitle: getVizTitle(config),
                                 eventType: `chart_legend_item_toggled--${legend.behavior}-mode` as any,
                                 eventAction: 'keydown',
                                 eventLabel: interactionLabel,
@@ -163,7 +163,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                               eventAction: 'click',
                               eventLabel: interactionLabel,
                               specifics: label.text,
-                              title: getVizTitle(config)
+                              vizTitle: getVizTitle(config)
                             })
                             highlight(label)
                           }}

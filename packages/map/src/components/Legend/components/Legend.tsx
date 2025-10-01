@@ -25,6 +25,7 @@ import { resetLegendToggles } from '../../../helpers'
 import { MapContext } from '../../../types/MapContext'
 import LegendGroup from './LegendGroup/Legend.Group'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const LEGEND_PADDING = 30
 
@@ -129,23 +130,29 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           title={`Legend item ${item.label} - Click to disable`}
           onClick={() => {
             toggleLegendActive(idx, item.label, runtimeLegend, dispatch)
-            publishAnalyticsEvent(
-              `map_legend_item_toggled|isolate-mode|${item.label}`,
-              'click',
-              `${interactionLabel}`,
-              'map'
-            )
+            publishAnalyticsEvent({
+              vizType: config.type,
+              vizSubType: getVizSubType(config),
+              eventType: `map_legend_item_toggled`,
+              eventAction: 'click',
+              eventLabel: `${interactionLabel}`,
+              vizTitle: getVizTitle(config),
+              specifics: `mode: isolate, label: ${item.label}`
+            })
           }}
           onKeyDown={e => {
             if (e.key === 'Enter') {
               e.preventDefault()
               toggleLegendActive(idx, item.label, runtimeLegend, dispatch)
-              publishAnalyticsEvent(
-                `map_legend_item_toggled|isolate-mode|${item.label}`,
-                'keydown',
-                `${interactionLabel}`,
-                'map'
-              )
+              publishAnalyticsEvent({
+                vizType: config.type,
+                vizSubType: getVizSubType(config),
+                eventType: `map_legend_item_toggled`,
+                eventAction: 'keydown',
+                eventLabel: `${interactionLabel}`,
+                vizTitle: getVizTitle(config),
+                specifics: `mode: isolate, label: ${item.label}`
+              })
             }
           }}
           tabIndex={0}
@@ -238,7 +245,14 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     if (e) {
       e.preventDefault()
     }
-    publishAnalyticsEvent('map_legend_reset', 'click', interactionLabel, 'map')
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: 'map_legend_reset',
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config)
+    })
     resetLegendToggles(runtimeLegend, dispatch)
     dispatch({
       type: 'SET_ACCESSIBLE_STATUS',
@@ -332,41 +346,41 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
             {((config.visual.additionalCityStyles && config.visual.additionalCityStyles.some(c => c.label)) ||
               config.visual.cityStyleLabel) && (
-              <>
-                <hr />
-                <div className={legendClasses.div.join(' ') || ''}>
-                  {config.visual.cityStyleLabel && (
-                    <div>
-                      <svg>
-                        <Group
-                          top={
-                            config.visual.cityStyle === 'pin' ? 19 : config.visual.cityStyle === 'triangle' ? 13 : 11
-                          }
-                          left={10}
-                        >
-                          {cityStyleShapes[config.visual.cityStyle.toLowerCase()]}
-                        </Group>
-                      </svg>
-                      <p>{config.visual.cityStyleLabel}</p>
-                    </div>
-                  )}
+                <>
+                  <hr />
+                  <div className={legendClasses.div.join(' ') || ''}>
+                    {config.visual.cityStyleLabel && (
+                      <div>
+                        <svg>
+                          <Group
+                            top={
+                              config.visual.cityStyle === 'pin' ? 19 : config.visual.cityStyle === 'triangle' ? 13 : 11
+                            }
+                            left={10}
+                          >
+                            {cityStyleShapes[config.visual.cityStyle.toLowerCase()]}
+                          </Group>
+                        </svg>
+                        <p>{config.visual.cityStyleLabel}</p>
+                      </div>
+                    )}
 
-                  {config.visual.additionalCityStyles.map(
-                    ({ shape, label }, index) =>
-                      label && (
-                        <div key={`additional-city-style-${index}-${shape}`}>
-                          <svg>
-                            <Group top={shape === 'Pin' ? 19 : shape === 'Triangle' ? 13 : 11} left={10}>
-                              {cityStyleShapes[shape.toLowerCase()]}
-                            </Group>
-                          </svg>
-                          <p>{label}</p>
-                        </div>
-                      )
-                  )}
-                </div>
-              </>
-            )}
+                    {config.visual.additionalCityStyles.map(
+                      ({ shape, label }, index) =>
+                        label && (
+                          <div key={`additional-city-style-${index}-${shape}`}>
+                            <svg>
+                              <Group top={shape === 'Pin' ? 19 : shape === 'Triangle' ? 13 : 11} left={10}>
+                                {cityStyleShapes[shape.toLowerCase()]}
+                              </Group>
+                            </svg>
+                            <p>{label}</p>
+                          </div>
+                        )
+                    )}
+                  </div>
+                </>
+              )}
             {runtimeLegend.disabledAmt > 0 && (
               <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
                 Show All

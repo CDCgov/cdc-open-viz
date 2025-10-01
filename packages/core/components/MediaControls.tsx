@@ -186,7 +186,8 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
         target='_blank'
         onClick={() => {
           publishAnalyticsEvent({
-            vizType: getVizTypeSubType(config),
+            vizType: config.type,
+            vizSubType: getVizSubType(config),
             eventType: 'clicked_data_link_to_view',
             eventAction: 'click',
             eventLabel: interactionLabel,
@@ -207,11 +208,12 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
       target='_blank'
       onClick={() => {
         publishAnalyticsEvent({
-          vizType: 'unknown' as any,
+          vizType: config.type,
+          vizSubType: getVizSubType(config),
           eventType: 'data_viewed',
           eventAction: 'click',
           eventLabel: interactionLabel,
-          vizTitle: config?.title
+          vizTitle: getVizTitle(config)
         })
       }}
     >

@@ -7,6 +7,7 @@ import { getNewSortBy } from '../helpers/getNewSortBy'
 import parse from 'html-react-parser'
 import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 type ChartHeaderProps = {
   data
@@ -116,12 +117,13 @@ const ChartHeader = ({
               onClick={() => {
                 if (hasRowType) return
                 publishAnalyticsEvent({
-                  vizType: 'unknown' as any,
-                  eventType: `data_table_sort_by|${newSortBy.column}|${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'undefined'
-                    }` as any,
+                  vizType: config.type,
+                  vizSubType: getVizSubType(config),
+                  eventType: `data_table_sort`,
                   eventAction: 'click',
                   eventLabel: interactionLabel,
-                  vizTitle: config?.title
+                  vizTitle: getVizTitle(config),
+                  specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
                 })
                 setSortBy(newSortBy)
               }}

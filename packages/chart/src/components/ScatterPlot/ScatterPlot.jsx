@@ -3,6 +3,7 @@ import ConfigContext from '../../ConfigContext'
 import { Group } from '@visx/group'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const ScatterPlot = ({ xScale, yScale }) => {
   const {

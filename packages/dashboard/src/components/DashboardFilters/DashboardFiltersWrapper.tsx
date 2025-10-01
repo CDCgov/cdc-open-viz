@@ -16,6 +16,7 @@ import { applyQueuedActive } from '@cdc/core/components/Filters/helpers/applyQue
 import './dashboardfilter.styles.css'
 import { updateChildFilters } from '../../helpers/updateChildFilters'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 type SubOptions = { subOptions?: Record<'value' | 'text', string>[] }
 
@@ -134,12 +135,15 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       visualizationConfig
     )
 
-    publishAnalyticsEvent(
-      `dashboard_filter_changed|key_${newSharedFilters?.[index]?.key}|value_${value}`,
-      'change',
-      `${interactionLabel}`,
-      'dashboard'
-    )
+    publishAnalyticsEvent({
+      vizType: dashboardConfig.type,
+      vizSubType: getVizSubType(dashboardConfig),
+      eventType: `dashboard_filter_changed`,
+      eventAction: 'change',
+      eventLabel: `${interactionLabel}`,
+      vizTitle: getVizTitle(dashboardConfig),
+      specifics: `key: ${newSharedFilters?.[index]?.key}, value: ${value}`
+    })
 
     // sets the active filter option that the user just selected.
     dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
@@ -220,9 +224,8 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       {!displayNone && (
         <Layout.Responsive isEditor={isEditor}>
           <div
-            className={`${
-              isEditor ? ' is-editor' : ''
-            } cove-component__content col-12 cove-dashboard-filters-container`}
+            className={`${isEditor ? ' is-editor' : ''
+              } cove-component__content col-12 cove-dashboard-filters-container`}
           >
             <Filters
               show={visualizationConfig?.sharedFilterIndexes?.map(Number)}

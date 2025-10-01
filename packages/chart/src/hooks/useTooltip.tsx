@@ -11,7 +11,7 @@ import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
 import _, { get } from 'lodash'
 import { getHorizontalBarHeights } from '../components/BarChart/helpers/getBarHeights'
-import { getVizTitle, getVizSubType } from '@cdc/map/src/helpers/metrics'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 export const useTooltip = props => {
   const {
@@ -137,7 +137,8 @@ export const useTooltip = props => {
         if (pieData[config.xAxis.dataKey] && interactionLabel) {
           const seriesName = String(pieData[config.xAxis.dataKey]).replace(/[^a-zA-Z0-9]/g, '_')
           publishAnalyticsEvent({
-            vizType: getVizTypeSubType(config),
+            vizType: config?.type,
+            vizSubType: getVizSubType(config),
             eventType: `chart_hover_${seriesName.toLowerCase()}`,
             eventAction: 'hover',
             eventLabel: interactionLabel,

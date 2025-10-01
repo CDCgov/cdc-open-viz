@@ -3,7 +3,8 @@ import packageJson from '../../package.json'
 import {
   COVE_VISUALIZATION_TYPES,
   ANALYTICS_EVENT_ACTIONS,
-  ANALYTICS_EVENT_TYPES
+  ANALYTICS_EVENT_TYPES,
+  EventSpecifics
 } from './types'
 import { GetLabelForEvent } from './getLabelForEvent'
 
@@ -32,10 +33,33 @@ export const getPackageVersion = () => {
  * @param {ANALYTICS_EVENT_TYPES} params.eventType - The interaction event name
  * @param {ANALYTICS_EVENT_ACTIONS} [params.eventAction='unknown'] - The interaction type (e.g., 'click', 'hover')
  * @param {string} [params.eventLabel] - The event label (typically config URL or interaction label)
- * @param {string} [params.specifics] - Additional specifics about the event
+ * @param {string} [params.specifics] - Additional specifics about the event (structured as "key: value, key2: value2")
  * @param {string} [params.version] - The version of the package (defaults to package.json version)
  * @returns {void}
  * @description This function is used to publish analytics events for various user interactions and system states.
+ *
+ * @example
+ * // Map hover event with location specifics
+ * publishAnalyticsEvent({
+ *   vizType: 'map',
+ *   vizSubType: 'us-county',
+ *   eventType: 'map_hover',
+ *   eventAction: 'hover',
+ *   eventLabel: interactionLabel,
+ *   vizTitle: getVizTitle(config),
+ *   specifics: 'location: california_los_angeles'
+ * })
+ *
+ * @example
+ * // Table sort event with column and order specifics
+ * publishAnalyticsEvent({
+ *   vizType: 'chart',
+ *   eventType: 'data_table_sort',
+ *   eventAction: 'click',
+ *   eventLabel: interactionLabel,
+ *   vizTitle: getVizTitle(config),
+ *   specifics: 'column: population, order: desc'
+ * })
  */
 export const publishAnalyticsEvent = <T extends ANALYTICS_EVENT_TYPES>({
   app = 'cove',
@@ -56,7 +80,7 @@ export const publishAnalyticsEvent = <T extends ANALYTICS_EVENT_TYPES>({
   eventType: T
   eventAction?: ANALYTICS_EVENT_ACTIONS
   eventLabel?: GetLabelForEvent<T>
-  specifics?: string
+  specifics?: T extends keyof EventSpecifics ? EventSpecifics[T] : string
   version?: string
   [key: string]: any
 }) => {
