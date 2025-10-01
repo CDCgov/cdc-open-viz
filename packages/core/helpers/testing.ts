@@ -177,8 +177,11 @@ export const waitForTextContent = async (el: HTMLElement | null, expected: strin
  */
 export const waitForEditor = async (canvas: any) => {
   await waitForWithDelay(() => {
-    const editorElement = canvas.queryAllByText(/general|data|visual/i)
-    expect(editorElement[0]).toBeVisible()
+    const accordionButtons = canvas.getAllByRole('button', { name: /general|data|visual/i })
+    expect(accordionButtons.length).toBeGreaterThan(0)
+    for (const button of accordionButtons) {
+      expect(button).toBeVisible()
+    }
   })
 }
 

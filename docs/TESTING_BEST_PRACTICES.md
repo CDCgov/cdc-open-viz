@@ -144,6 +144,8 @@ await performAndAssert(
 - ❌ Checkbox is checked (this is control state, not visualization output)
 - ❌ Input value changed (this is control state, not visualization output)
 
+**Trace Control Implementation**: When you are unsure what visual change to assert, inspect the component or handler that powers the editor control. Identify the exact class name, attribute, or style the control toggles and assert on that output instead of guessing from the UI.
+
 ### 3. Using `getVisualState` Helper
 
 Use `getVisualState` to capture multiple visual properties at once:
@@ -299,6 +301,8 @@ await performAndAssert(
 | Custom polling/waiting functions             | Use provided helpers from `@cdc/core/helpers/testing`              |
 | `if (element) { await click(element) }`      | `await click(canvas.getByRole(...))` - fail fast                   |
 | Console.log debugging in final tests         | Remove before committing                                           |
+
+**Avoid Defensive Guard Clauses**: Do not return early when a required control or visualization element is missing (e.g., `if (!dropdown) return`). Use assertive queries (`getBy*`) or explicit `expect` checks so the test fails loudly when the UI regresses.
 
 ## Creating New Tests: Quick Checklist
 
