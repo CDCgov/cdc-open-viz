@@ -9,8 +9,9 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 // Third-party library imports
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
-import _ from 'lodash'
+import _, { get } from 'lodash'
 import { getHorizontalBarHeights } from '../components/BarChart/helpers/getBarHeights'
+import { getVizTitle, getVizSubType } from '@cdc/map/src/helpers/metrics'
 
 export const useTooltip = props => {
   const {
@@ -135,8 +136,12 @@ export const useTooltip = props => {
         // Track hover analytics event for pie chart series
         if (pieData[config.xAxis.dataKey] && interactionLabel) {
           const seriesName = String(pieData[config.xAxis.dataKey]).replace(/[^a-zA-Z0-9]/g, '_')
-          publishAnalyticsEvent(`chart_hover_${seriesName.toLowerCase()}`, 'hover', interactionLabel, 'chart', {
-            title: config?.title,
+          publishAnalyticsEvent({
+            vizType: getVizTypeSubType(config),
+            eventType: `chart_hover_${seriesName.toLowerCase()}`,
+            eventAction: 'hover',
+            eventLabel: interactionLabel,
+            vizTitle: getVizTitle(config),
             series: pieData[config.xAxis.dataKey]
           })
         }
@@ -183,16 +188,15 @@ export const useTooltip = props => {
               if (interactionLabel && seriesKey && seriesKey !== config.xAxis?.dataKey) {
                 const seriesName = seriesObjWithName?.name || seriesKey
                 const safeSeriesName = String(seriesName).replace(/[^a-zA-Z0-9]/g, '_')
-                publishAnalyticsEvent(
-                  `chart_hover_${safeSeriesName.toLowerCase()}`,
-                  'hover',
-                  interactionLabel,
-                  'chart',
-                  {
-                    title: config?.title,
-                    series: seriesName
-                  }
-                )
+                publishAnalyticsEvent({
+                  vizType: config?.type,
+                  vizSubType: getVizSubType(config),
+                  eventType: `chart_hover_${safeSeriesName.toLowerCase()}`,
+                  eventAction: 'hover',
+                  eventLabel: interactionLabel,
+                  vizTitle: getVizTitle(config),
+                  series: seriesName
+                })
               }
 
               if (

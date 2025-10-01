@@ -84,6 +84,7 @@ import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAl
 import { Datasets } from '@cdc/core/types/DataSet'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -484,7 +485,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (container && !isLoading && !_.isEmpty(config) && !coveLoadedEventRan) {
       publish('cove_loaded', { config: config })
       dispatch({ type: 'SET_LOADED_EVENT', payload: true })
-      publishAnalyticsEvent('chart_loaded', 'load', interactionLabel, 'chart', { title: config?.title })
+      publishAnalyticsEvent({
+        vizType: config?.type,
+        vizSubType: getVizSubType(config),
+        eventType: 'chart_loaded',
+        eventAction: 'load',
+        eventLabel: interactionLabel,
+        vizTitle: getVizTitle(config)
+      })
     }
   }, [container, config, isLoading]) // eslint-disable-line
 
@@ -574,7 +582,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
     } catch (e) {
       console.error('COVE:', e.message)
     }
-    publishAnalyticsEvent('chart_legend_reset', 'click', interactionLabel, 'chart', { title: config?.title })
+    publishAnalyticsEvent({
+      vizType: 'chart',
+      eventType: 'chart_legend_reset',
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: config?.title,
+      vizSubType: getVizSubType(config)
+    })
     dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [] })
   }
 
@@ -1083,7 +1098,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
                   <DataTable
                     /* changing the "key" will force the table to re-render
-                            when the default sort changes while editing */
+                              when the default sort changes while editing */
                     key={dataTableDefaultSortBy}
                     config={pivotDynamicSeries(config)}
                     rawData={

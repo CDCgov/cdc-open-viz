@@ -19,6 +19,7 @@ import LegendLineShape from './LegendLine.Shape'
 import LegendGroup from './LegendGroup'
 import { getSeriesWithData } from '../../helpers/dataHelpers'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const LEGEND_PADDING = 36
 
@@ -72,7 +73,6 @@ const Legend: React.FC<LegendProps> = forwardRef(
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
     let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
-
 
     if (!legend) return null
     return (
@@ -142,23 +142,29 @@ const Legend: React.FC<LegendProps> = forwardRef(
                           onKeyDown={e => {
                             if (e.key === 'Enter') {
                               e.preventDefault()
-                              publishAnalyticsEvent(
-                                `chart_legend_item_toggled|${legend.behavior}-mode|${label.text}`,
-                                'keydown',
-                                `${interactionLabel}`,
-                                'chart'
-                              )
+                              publishAnalyticsEvent({
+                                vizType: config?.type,
+                                vizSubType: getVizSubType(config),
+                                title: getVizTitle(config),
+                                eventType: `chart_legend_item_toggled--${legend.behavior}-mode` as any,
+                                eventAction: 'keydown',
+                                eventLabel: interactionLabel,
+                                specifics: label.text
+                              })
                               highlight(label)
                             }
                           }}
                           onClick={e => {
                             e.preventDefault()
-                            publishAnalyticsEvent(
-                              `chart_legend_item_toggled|${legend.behavior}-mode|${label.text}`,
-                              'click',
-                              `${interactionLabel}`,
-                              'chart'
-                            )
+                            publishAnalyticsEvent({
+                              vizType: config?.type,
+                              vizSubType: getVizSubType(config),
+                              eventType: `chart_legend_item_toggled--${legend.behavior}-mode` as any,
+                              eventAction: 'click',
+                              eventLabel: interactionLabel,
+                              specifics: label.text,
+                              title: getVizTitle(config)
+                            })
                             highlight(label)
                           }}
                           role='button'
@@ -227,8 +233,9 @@ const Legend: React.FC<LegendProps> = forwardRef(
                 {/* Pattern Legend Items */}
                 {config.legend.patterns && Object.keys(config.legend.patterns).length > 0 && (
                   <div
-                    className={`legend-patterns d-flex ${['top', 'bottom'].includes(config.legend.position) ? 'flex-row flex-wrap' : 'flex-column'
-                      }`}
+                    className={`legend-patterns d-flex ${
+                      ['top', 'bottom'].includes(config.legend.position) ? 'flex-row flex-wrap' : 'flex-column'
+                    }`}
                   >
                     {Object.entries(config.legend.patterns).map(([key, pattern]) => {
                       const patternId = `legend-pattern-${key}`

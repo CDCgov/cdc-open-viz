@@ -61,9 +61,8 @@ const ChartHeader = ({
     if (columnHeaderText === notApplicableText) return
 
     return (
-      <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${
-        sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'
-      }  order`}</span>
+      <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'
+        }  order`}</span>
     )
   }
 
@@ -116,15 +115,14 @@ const ChartHeader = ({
               scope='col'
               onClick={() => {
                 if (hasRowType) return
-                publishAnalyticsEvent(
-                  `data_table_sort_by|${newSortBy.column}|${
-                    newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'undefined'
-                  }`,
-                  'click',
-                  interactionLabel,
-                  undefined,
-                  { title: config?.title }
-                )
+                publishAnalyticsEvent({
+                  vizType: 'unknown' as any,
+                  eventType: `data_table_sort_by|${newSortBy.column}|${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'undefined'
+                    }` as any,
+                  eventAction: 'click',
+                  eventLabel: interactionLabel,
+                  vizTitle: config?.title
+                })
                 setSortBy(newSortBy)
               }}
               onKeyDown={e => {

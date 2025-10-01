@@ -1,6 +1,7 @@
 import React from 'react'
 // import html2pdf from 'html2pdf.js'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const buttonText = {
   pdf: 'Download PDF',
@@ -120,7 +121,14 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
             .then(canvas => {
               document.body.removeChild(container) // Clean up container
               saveImageAs(canvas.toDataURL(), filename + '.png')
-              publishAnalyticsEvent(`${state.type}_image_downloaded`, 'click', interactionLabel, `${state.type}`, { title: getTitle(state) })
+              publishAnalyticsEvent({
+                vizType: state.type,
+                vizSubType: getVizSubType(state),
+                eventType: `image_download`,
+                eventAction: 'click',
+                eventLabel: interactionLabel,
+                vizTitle: getTitle(state)
+              })
             })
         })
       }
@@ -177,7 +185,13 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
         title={buttonText.link}
         target='_blank'
         onClick={() => {
-          publishAnalyticsEvent('data_viewed', 'click', `${unknown}`, undefined, { title: config?.title })
+          publishAnalyticsEvent({
+            vizType: getVizTypeSubType(config),
+            eventType: 'clicked_data_link_to_view',
+            eventAction: 'click',
+            eventLabel: interactionLabel,
+            vizTitle: getVizTitle(config)
+          })
         }}
       >
         {buttonText.link}
@@ -192,7 +206,13 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
       title='Link to view full data set'
       target='_blank'
       onClick={() => {
-        publishAnalyticsEvent('data_viewed', 'click', `${interactionLabel}`, undefined, { title: config?.title })
+        publishAnalyticsEvent({
+          vizType: 'unknown' as any,
+          eventType: 'data_viewed',
+          eventAction: 'click',
+          eventLabel: interactionLabel,
+          vizTitle: config?.title
+        })
       }}
     >
       {buttonText.link}

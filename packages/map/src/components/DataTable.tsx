@@ -200,7 +200,7 @@ const DataTable = props => {
     return (
       <MediaControls.Section classes={['download-links']}>
         <MediaControls.Link config={state} interactionLabel={interactionLabel} />
-        {state.table.download && <DownloadButton />}
+        {state.table.download && <DownloadButton config={state} />}
       </MediaControls.Section>
     )
   }
