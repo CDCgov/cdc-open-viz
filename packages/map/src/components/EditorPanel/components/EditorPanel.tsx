@@ -1559,7 +1559,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     options={columnsOptions.map(c => c.key)}
                     onChange={event => {
                       editColumn('geo', 'name', event.target.value)
-                      checkConfigurationNeeded(config)
                     }}
                   />
                 </label>
@@ -1624,7 +1623,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       _state.columns.primary.name = event.target.value
                       _state.columns.primary.label = event.target.value
                       setConfig(_state)
-                      checkConfigurationNeeded(_state)
                     }}
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
