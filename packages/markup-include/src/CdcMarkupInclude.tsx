@@ -34,8 +34,6 @@ type CdcMarkupIncludeProps = {
 import Title from '@cdc/core/components/ui/Title'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import { Datasets } from '@cdc/core/types/DataSet'
-import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
-import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   configUrl,
@@ -249,13 +247,6 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     if (config && !coveLoadedHasRan && container) {
       publish('cove_loaded', { config: config })
       dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
-      publishAnalyticsEvent({
-        vizType: 'markup-include',
-        eventType: 'markup-include_ready',
-        eventAction: 'load',
-        eventLabel: interactionLabel,
-        vizTitle: getVizTitle(config)
-      })
     }
   }, [config, container])
 
