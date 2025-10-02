@@ -14,7 +14,7 @@ APP|VIZTYPE_VIZSUBTYPE|VIZ_TITLE|EVENT_TYPE|EVENT_ACTION|SPECIFICS
 
 **Example Output:**
 ```
-cove|map_us-county|Population Map|map_zoomed_in|click|zoom_level: 1.5, location: 40.71,-74.01
+cove|map_us-county|Population Map|map_hover|hover|location: california
 ```
 
 ## Function Usage
@@ -26,11 +26,11 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 publishAnalyticsEvent({
   vizType: 'map',           // Required: Visualization type
-  eventType: 'map_ready',   // Required: Event being tracked
-  eventAction: 'load',      // Optional: User action (default: 'unknown')
+  eventType: 'map_hover',   // Required: Event being tracked
+  eventAction: 'hover',     // Optional: User action (default: 'unknown')
   eventLabel: configUrl,    // Optional: Typically config URL
   vizTitle: config?.title,  // Optional: Visualization title
-  specifics: 'additional details' // Optional: Extra context
+  specifics: 'location: california' // Optional: Extra context
 })
 ```
 
@@ -49,18 +49,6 @@ publishAnalyticsEvent({
 | `version` | | `string` | package.json | Package version |
 
 ## Event Types Reference
-
-### Visualization Lifecycle
-```
-// When visualizations finish loading
-cove|{vizType}|{title}|{vizType}_ready|load|no details
-
-// Examples:
-cove|map|Population Map|map_ready|load|no details
-cove|chart|Sales Chart|chart_ready|load|no details
-cove|dashboard|Health Dashboard|dashboard_ready|load|no details
-cove|data-bite|Key Metric|data-bite_ready|load|no details
-```
 
 ### Data Management
 ```
@@ -186,17 +174,6 @@ type ANALYTICS_EVENT_ACTIONS =
 
 ## Common Usage Patterns
 
-### Visualization Ready
-```typescript
-publishAnalyticsEvent({
-  vizType: 'chart',
-  eventType: 'chart_ready',
-  eventAction: 'load',
-  eventLabel: interactionLabel,
-  vizTitle: config?.title
-})
-```
-
 ### Filter Changes
 ```typescript
 publishAnalyticsEvent({
@@ -249,7 +226,6 @@ publishAnalyticsEvent({
 ## Output Examples
 
 ```
-cove|map_us-county|Population Map|map_ready|load|no details
 cove|dashboard|Health Dashboard|dashboard_filter_changed|change|key: state, value: california
 cove|chart_bar|Sales Chart|chart_legend_item_toggled|click|mode: highlight, item: Q1 Sales
 cove|map|State Map|map_hover|hover|location: california
