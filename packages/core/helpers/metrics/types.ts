@@ -61,9 +61,6 @@ export type ANALYTICS_EVENT_TYPES =
   | 'clicked_data_link_to_view'
   | 'link_to_data_table_click'
 
-  // Visualization lifecycle events
-  | `${COVE_VISUALIZATION_TYPES}_ready`
-
   // Filter events
   | `${COVE_VISUALIZATION_TYPES}_filter_reset`
   | `${COVE_VISUALIZATION_TYPES}_filter_applied`

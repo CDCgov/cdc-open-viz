@@ -212,7 +212,7 @@ const BarChartStackedHorizontal = () => {
                         height: bar.height,
                         x: bar.x,
                         y: bar.y,
-                        onMouseOver: e => onMouseOverBar(yAxisValue, bar.key, e, data),
+                        onMouseOver: e => onMouseOverBar(yAxisValue, bar.key, e, data, bar.bar.data[bar.key]),
                         onMouseLeave: onMouseLeaveBar,
                         tooltipHtml: tooltip,
                         tooltipId: `cdc-open-viz-tooltip-${config.runtime.uniqueId}`,
