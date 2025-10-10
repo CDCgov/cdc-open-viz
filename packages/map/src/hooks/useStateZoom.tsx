@@ -161,9 +161,12 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     [dispatch]
   )
 
-  const handleZoomReset = useCallback(() => {
-    setScaleAndTranslate('reset')
-  }, [setScaleAndTranslate])
+  const handleZoomReset = useCallback(
+    _setRuntimeData => {
+      setScaleAndTranslate('reset')
+    },
+    [setScaleAndTranslate]
+  )
 
   return {
     statesPicked,
