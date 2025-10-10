@@ -80,7 +80,7 @@ const WorldMap = () => {
     dispatch({ type: 'SET_RUNTIME_DATA', payload: newRuntimeData })
   }
 
-  const handleZoomReset = () => {
+  const handleZoomReset = _setRuntimeData => {
     publishAnalyticsEvent({
       vizType: config.type,
       vizSubType: getVizSubType(config),
