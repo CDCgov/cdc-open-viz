@@ -66,8 +66,21 @@ const WorldMap = () => {
     return <></>
   }
 
-  const handleReset = () => {
+  const handleFiltersReset = () => {
     const newRuntimeData = generateRuntimeData(config)
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: 'map_filter_reset',
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config)
+    })
+    dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
+    dispatch({ type: 'SET_RUNTIME_DATA', payload: newRuntimeData })
+  }
+
+  const handleZoomReset = () => {
     publishAnalyticsEvent({
       vizType: config.type,
       vizSubType: getVizSubType(config),
@@ -77,8 +90,6 @@ const WorldMap = () => {
       vizTitle: getVizTitle(config)
     })
     dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
-    dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
-    dispatch({ type: 'SET_RUNTIME_DATA', payload: newRuntimeData })
   }
 
   const handleZoomIn = position => {
@@ -284,7 +295,7 @@ const WorldMap = () => {
     <ErrorBoundary component='WorldMap'>
       {allowMapZoom ? (
         <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(config)}>
-          <rect height={SVG_HEIGHT} width={SVG_WIDTH} onClick={handleReset} fill='white' />
+          <rect height={SVG_HEIGHT} width={SVG_WIDTH} onClick={handleFiltersReset} fill='white' />
           <ZoomableGroup
             zoom={position.zoom}
             center={position.coordinates}
@@ -313,7 +324,7 @@ const WorldMap = () => {
         </svg>
       )}
       {(type === 'data' || (type === 'world-geocode' && allowMapZoom) || (type === 'bubble' && allowMapZoom)) && (
-        <ZoomControls handleZoomIn={handleZoomIn} handleZoomOut={handleZoomOut} handleReset={handleReset} />
+        <ZoomControls handleZoomIn={handleZoomIn} handleZoomOut={handleZoomOut} handleZoomReset={handleZoomReset} />
       )}
     </ErrorBoundary>
   )

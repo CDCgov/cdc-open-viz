@@ -161,7 +161,7 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     [dispatch]
   )
 
-  const handleReset = useCallback(() => {
+  const handleZoomReset = useCallback(() => {
     setScaleAndTranslate('reset')
   }, [setScaleAndTranslate])
 
@@ -172,7 +172,7 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     handleZoomIn,
     handleZoomOut,
     handleMoveEnd,
-    handleReset,
+    handleZoomReset,
     projection: projectionData.projection
   }
 }
