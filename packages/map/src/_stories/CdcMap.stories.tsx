@@ -1,9 +1,13 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import CdcMap from '../CdcMap'
 import EqualNumberOptInExample from './_mock/DEV-7286.json'
+import EqualNumberMap from './_mock/equal-number.json'
+import MultiState from './_mock/multi-state.json'
 import SingleStateWithFilters from './_mock/DEV-8942.json'
 import exampleCityState from './_mock/example-city-state.json'
-import { editConfigKeys } from '@cdc/chart/src/helpers/configHelpers'
+import USBubbleCities from './_mock/us-bubble-cities.json'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
+import exampleLegendBins from './_mock/legend-bins.json'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map',
@@ -14,6 +18,7 @@ type Story = StoryObj<typeof CdcMap>
 
 export const Equal_Interval_Map: Story = {
   args: {
+    isEditor: true,
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/page-elements/equal-interval-map.json'
   }
 }
@@ -26,14 +31,16 @@ export const Equal_Number_Opt_In: Story = {
 
 export const Equal_Number_Map: Story = {
   args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/page-elements/equal-number-map.json'
+    isEditor: true,
+    config: EqualNumberMap
   }
 }
 
 export const Scale_Based: Story = {
   args: {
     configUrl:
-      'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Scale-Based-Categorical-Map-With-Special-Classes.json'
+      'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Scale-Based-Categorical-Map-With-Special-Classes.json',
+    isEditor: true
   }
 }
 export const Qualitative: Story = {
@@ -72,6 +79,12 @@ export const Single_State: Story = {
   }
 }
 
+export const Multi_State: Story = {
+  args: {
+    config: MultiState
+  }
+}
+
 export const Bubble_Map: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-Bubble-Map-world.json'
@@ -97,7 +110,7 @@ export const Single_State_With_Filters: Story = {
 }
 
 let newConfig = editConfigKeys(exampleCityState, [
-  { path: ['customColors'], value: ['red', 'orange', 'yellow', 'green', 'blue', 'violet'] }
+  { path: ['general', 'palette', 'customColors'], value: ['red', 'orange', 'yellow', 'green', 'blue', 'violet'] }
 ])
 newConfig = editConfigKeys(newConfig, [
   {
@@ -137,7 +150,8 @@ export const Custom_Color_Distributions_Without_Special_Classes: Story = {
 
 export const Standard_Color_Distributions_With_Special_Classes: Story = {
   args: {
-    config: exampleCityStateStandardColors
+    config: exampleCityStateStandardColors,
+    isEditor: true
   }
 }
 
@@ -150,6 +164,20 @@ export const Standard_Color_Distributions_Without_Special_Classes: Story = {
 export const Custom_Color_Distributions_With_Update_Needed: Story = {
   args: {
     config: editConfigKeys(newConfig, [{ path: ['version'], value: '4.24.10' }])
+  }
+}
+
+export const Legend_Bins: Story = {
+  args: {
+    config: exampleLegendBins,
+    isEditor: true
+  }
+}
+
+export const US_Bubble_Cities_Test: Story = {
+  args: {
+    config: USBubbleCities,
+    isEditor: true
   }
 }
 

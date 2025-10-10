@@ -1,4 +1,4 @@
-import { stateFipsToTwoDigit, supportedCounties } from '../data/supported-geos'
+import { stateFipsToTwoDigit, supportedCounties, countyKeySet } from '../data/supported-geos'
 import { titleCase } from './titleCase'
 
 export const formatLegendLocation = (key, runtimeLookup) => {
@@ -9,8 +9,7 @@ export const formatLegendLocation = (key, runtimeLookup) => {
     formattedName += stateName
   }
 
-  const countyKeys = Object.keys(supportedCounties)
-  if (countyKeys.includes(key)) {
+  if (countyKeySet.has(key)) {
     formattedName += ', ' + titleCase(supportedCounties[key])
   }
 

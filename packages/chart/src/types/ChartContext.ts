@@ -12,7 +12,6 @@ export type TransformedData = {
 
 type SharedChartContext = {
   animatedChart?: boolean
-  brushConfig: { data: []; isBrushing: boolean; isActive: boolean }
   capitalize: (value: string) => string
   clean: Function
   colorScale?: ColorScale
@@ -24,6 +23,7 @@ type SharedChartContext = {
   handleDragStateChange: (isDragging: any) => void
   highlight?: Function
   handleShowAll?: Function
+  interactionLabel?: string
   // whether or not the chart is viewed within the editor screen
   isEditor?: boolean
   // whether or not the user is dragging an annotation
@@ -31,7 +31,6 @@ type SharedChartContext = {
   legendIsolateValues?: string[]
   legendRef?: React.RefObject<HTMLDivElement>
   parentRef?: React.RefObject<HTMLDivElement>
-  setBrushConfig: Function
   setLegendIsolateValues?: Function
   svgRef?: React.RefObject<SVGSVGElement>
 }

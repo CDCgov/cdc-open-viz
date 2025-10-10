@@ -1,0 +1,13 @@
+diff --git a/node_modules/d3-time/src/ticks.js b/node_modules/d3-time/src/ticks.js
+index c314789..19a7f9f 100644
+--- a/node_modules/d3-time/src/ticks.js
++++ b/node_modules/d3-time/src/ticks.js
+@@ -29,6 +29,8 @@ function ticker(year, month, week, day, hour, minute) {
+     [  week,  1,      durationWeek  ],
+     [ month,  1,      durationMonth ],
+     [ month,  3,  3 * durationMonth ],
++    [ month,  4,  4 * durationMonth ],
++    [ month,  6,  6 * durationMonth ],
+     [  year,  1,      durationYear  ]
+   ];
+ 

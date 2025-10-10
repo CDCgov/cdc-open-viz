@@ -17,6 +17,7 @@ export type Axis = {
   hideAxis?: boolean
   hideLabel?: boolean
   hideTicks?: boolean
+  inlineLabel?: string
   label?: string
   labelOffset?: number
   labelPlacement?: string
@@ -50,4 +51,5 @@ export type Axis = {
   axisBBox: number
   maxValue: string
   sortByRecentDate: boolean
+  brushActive: boolean
 }

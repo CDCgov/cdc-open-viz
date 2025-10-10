@@ -35,21 +35,11 @@ export type DashboardState = {
   loading: boolean
   preview: boolean
   tabSelected: Tab
+  filtersApplied: boolean
 }
 
 const reducer = (state: DashboardState, action: DashboardActions): DashboardState => {
   switch (action.type) {
-    case 'ADD_FOOTNOTE': {
-      const { id, rowIndex, config } = action.payload
-      const newRows = state.config.rows.map((row, i) => (i === rowIndex ? { ...row, footnotesId: id } : row))
-      return {
-        ...state,
-        config: saveMultiChanges(
-          { ...state.config, rows: newRows, visualizations: { ...state.config.visualizations, [id]: config } },
-          state.config.activeDashboard
-        )
-      }
-    }
     case 'ADD_NEW_DASHBOARD': {
       const currentMultiDashboards = state.config.multiDashboards
       const label = 'New Dashboard ' + (currentMultiDashboards.length + 1)
@@ -276,6 +266,9 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         return row
       })
       return { ...state, config: { ...state.config, rows: newRows } }
+    }
+    case 'SET_FILTERS_APPLIED': {
+      return { ...state, filtersApplied: action.payload }
     }
     default:
       return state

@@ -1,8 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
 import ConfigContext from '../context'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoName, mapTabbingID }) => {
-  const { state } = useContext(ConfigContext)
+  const { interactionLabel, config } = useContext(ConfigContext)
   const [activeGeo, setActiveGeo] = useState('')
   const [dropdownItems, setDropdownItems] = useState({})
 
@@ -10,6 +12,16 @@ const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoN
     event.preventDefault()
     if (activeGeo !== '') {
       const urlString = data[dropdownItems[activeGeo]][columns.navigate.name]
+
+      publishAnalyticsEvent({
+        vizType: config.type,
+        vizSubType: getVizSubType(config),
+        eventType: `map_navigation_menu`,
+        eventAction: 'submit',
+        eventLabel: `${interactionLabel}`,
+        vizTitle: getVizTitle(config),
+        specifics: `url: ${urlString}, activeGeo: ${activeGeo}`
+      })
 
       navigationHandler(urlString)
     }
@@ -24,7 +36,7 @@ const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoN
       navGo = 'Ir'
       break
     default:
-      navSelect = 'Select an Item'
+      navSelect = 'Select a Location'
       navGo = 'Go'
   }
 
@@ -55,15 +67,17 @@ const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoN
       <form onSubmit={handleSubmit} type='get'>
         <label htmlFor={mapTabbingID.replace('#', '')}>
           <div className='select-heading'>{navSelect}</div>
-          <select value={activeGeo} id={mapTabbingID.replace('#', '')} onChange={e => setActiveGeo(e.target.value)}>
-            {Object.keys(dropdownItems).map(key => (
-              <option key={key} value={key}>
-                {key}
-              </option>
-            ))}
-          </select>
+          <div className='d-flex'>
+            <select value={activeGeo} id={mapTabbingID.replace('#', '')} onChange={e => setActiveGeo(e.target.value)}>
+              {Object.keys(dropdownItems).map(key => (
+                <option key={key} value={key}>
+                  {key}
+                </option>
+              ))}
+            </select>
+            <input type='submit' value={navGo} className={`${options.headerColor} btn`} id='cdcnavmap-dropdown-go' />
+          </div>
         </label>
-        <input type='submit' value={navGo} className={`${options.headerColor} btn`} id='cdcnavmap-dropdown-go' />
       </form>
     </section>
   )

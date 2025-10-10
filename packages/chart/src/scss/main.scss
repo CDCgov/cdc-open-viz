@@ -1,3 +1,5 @@
+@import '@cdc/core/styles/accessibility';
+
 @mixin breakpoint($class) {
   @if $class == xs {
     @media (max-width: 767px) {
@@ -513,10 +515,6 @@
     }
   }
 
-  [tabindex]:focus-visible {
-    outline: 2px solid rgb(0, 95, 204) !important;
-  }
-
   // ANIMATIONS
   // Pie Chart Animations
   .animated-pie {
@@ -742,4 +740,16 @@
 
 .cdc-open-viz-module .debug {
   border: 2px solid red;
+}
+
+// Pattern Legend Styles - using Bootstrap classes for layout, CSS for gaps only
+.legend-patterns {
+  gap: var(--space-between-legend-item-rows);
+  margin-top: var(--space-between-legend-item-rows);
+
+  // When in row layout (top/bottom), override gap for proper row/column spacing
+  &.flex-row {
+    row-gap: var(--space-between-legend-item-rows);
+    column-gap: var(--space-between-legend-item-columns);
+  }
 }

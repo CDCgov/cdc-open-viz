@@ -2,7 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 
 import '@cdc/core/styles/cove-main.scss'
-import './coreStyles_dashboard.scss'
 
 import MultiDashboardWrapper from './CdcDashboard'
 
@@ -15,6 +14,7 @@ ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
     <MultiDashboardWrapper
       configUrl={domContainer.attributes['data-config'].value}
+      interactionLabel={domContainer.attributes['data-config'].value}
       isEditor={isEditor}
       isDebug={isDebug}
     />

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext, useRef } from 'react'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 // United States Topojson resources
 import hexTopoJSON from '../data/us-hex-topo.json'
@@ -20,6 +22,7 @@ import Annotation from '../../Annotation'
 import Territory from './Territory'
 
 import ConfigContext, { MapDispatchContext } from '../../../context'
+import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { MapContext } from '../../../types/MapContext'
 import { checkColorContrast, getContrastColor, outlinedTextColor } from '@cdc/core/helpers/cove/accessibility'
 import TerritoriesSection from './TerritoriesSection'
@@ -27,12 +30,21 @@ import TerritoriesSection from './TerritoriesSection'
 import { isMobileStateLabelViewport } from '@cdc/core/helpers/viewports'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
-
 import useMapLayers from '../../../hooks/useMapLayers'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
-import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
+import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
-import { getGeoFillColor, getGeoStrokeColor, handleMapAriaLabels, titleCase, displayGeoName, SVG_HEIGHT, SVG_VIEWBOX, SVG_WIDTH, hashObj } from '../../../helpers'
+import {
+  getGeoFillColor,
+  getGeoStrokeColor,
+  handleMapAriaLabels,
+  titleCase,
+  displayGeoName,
+  SVG_HEIGHT,
+  SVG_VIEWBOX,
+  SVG_WIDTH,
+  hashObj
+} from '../../../helpers'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
@@ -59,26 +71,26 @@ const nudges = {
 }
 
 const UsaMap = () => {
-
   const {
-    data,
+    runtimeData,
     setSharedFilterValue,
     config,
     setConfig,
     tooltipId,
     mapId,
     logo,
-    legendMemo,
-    legendSpecialClassLastMemo,
     currentViewport,
-    translate
-    } = useContext<MapContext>(ConfigContext)
+    translate,
+    runtimeLegend,
+    interactionLabel
+  } = useContext<MapContext>(ConfigContext)
+
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
   let isFilterValueSupported = false
   const { general, columns, tooltips, hexMap, map, annotations } = config
   const { displayAsHex } = general
   const { geoClickHandler } = useGeoClickHandler()
-  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const dispatch = useContext(MapDispatchContext)
 
@@ -112,14 +124,14 @@ const UsaMap = () => {
 
   const legendMemoUpdated = focusedStates?.every(geo => {
     const geoKey = geo.properties.iso
-    const geoData = data[geoKey]
+    const geoData = runtimeData[geoKey]
     const hash = hashObj(geoData)
     return legendMemo.current.has(hash)
   })
 
   // we use dataRef so that we can use the old data when legendMemo has not been updated yet
   // prevents flickering of the map when filter is changed
-  if (legendMemoUpdated) dataRef.current = data
+  if (legendMemoUpdated) dataRef.current = runtimeData
 
   useEffect(() => {
     const fetchData = async () => {
@@ -145,10 +157,10 @@ const UsaMap = () => {
       setTerritoriesData(territoriesKeys)
     } else {
       // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities
-      const territoriesList = territoriesKeys.filter(key => dataRef.current?.[key])
+      const territoriesList = territoriesKeys.filter(key => runtimeData?.[key])
       setTerritoriesData(territoriesList)
     }
-  }, [data, general.territoriesAlwaysShow])
+  }, [runtimeData, dataRef.current, general.territoriesAlwaysShow])
 
   const geoStrokeColor = getGeoStrokeColor(config)
   const geoFillColor = getGeoFillColor(config)
@@ -156,7 +168,7 @@ const UsaMap = () => {
   const territories = territoriesData.map((territory, territoryIndex) => {
     const Shape = displayAsHex ? Territory.Hexagon : Territory.Rectangle
 
-    const territoryData = data?.[territory]
+    const territoryData = runtimeData?.[territory]
 
     let toolTip
 
@@ -183,7 +195,7 @@ const UsaMap = () => {
 
     toolTip = applyTooltipsToGeo(displayGeoName(territory), territoryData)
 
-    const legendColors = applyLegendToRow(territoryData)
+    const legendColors = applyLegendToRow(territoryData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
 
     if (legendColors) {
       let needsPointer = false
@@ -282,13 +294,13 @@ const UsaMap = () => {
 
       if (!geoKey) return
 
-      const geoData = data?.[geoKey]
+      const geoData = runtimeData?.[geoKey]
 
       let legendColors
 
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
-        legendColors = applyLegendToRow(geoData)
+        legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
       }
 
       const geoDisplayName = displayGeoName(geoKey)
@@ -432,6 +444,20 @@ const UsaMap = () => {
               data-tooltip-id={`tooltip__${tooltipId}`}
               data-tooltip-html={tooltip}
               tabIndex={-1}
+              onMouseEnter={() => {
+                // Track hover analytics event if this is a new location
+                const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
+                publishAnalyticsEvent({
+                  vizType: config.type,
+                  vizSubType: getVizSubType(config),
+                  eventType: `map_hover`,
+                  eventAction: 'hover',
+                  eventLabel: interactionLabel,
+                  vizTitle: getVizTitle(config),
+                  location: geoDisplayName,
+                  specifics: `location: ${locationName?.toLowerCase()}`
+                })
+              }}
             >
               {/* state path */}
               <path tabIndex={-1} className='single-geo' strokeWidth={1} d={path} />
@@ -463,6 +489,7 @@ const UsaMap = () => {
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
+                        stroke={patternColor}
                         radius={0.5}
                       />
                     )}
@@ -537,13 +564,13 @@ const UsaMap = () => {
   }
 
   const geoLabel = (geo, bgColor = '#FFFFFF', projection) => {
-    let centroid = projection ? projection(geoCentroid(geo)) : [22, 17.5]
-    let abbr = geo.properties.iso
+    const centroid = projection ? projection(geoCentroid(geo)) : [22, 17.5]
+    const abbr = geo.properties.iso
 
     if (undefined === abbr) return null
 
     // HI background is always white since it is off to the side
-    if (abbr === 'US-HI' && !general.displayAsHex) {
+    if ((abbr === 'US-HI' && !general.displayAsHex) || (Object.keys(offsets).includes(abbr) && !general.displayAsHex)) {
       bgColor = '#FFF'
     }
     const { textColor, strokeColor } = outlinedTextColor(bgColor)

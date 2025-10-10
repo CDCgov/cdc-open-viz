@@ -1,4 +1,17 @@
-import { colorPalettesChart as colorPalettes, sequentialPalettes, twoColorPalette } from '@cdc/core/data/colorPalettes'
+import {
+  colorPalettesChart as colorPalettes,
+  colorPalettesChartV2,
+  sequentialPalettes,
+  twoColorPalette
+} from '@cdc/core/data/colorPalettes'
+import { getCurrentPaletteName, getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
+import { chartPaletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
+import { getPaletteAccessor } from '@cdc/core/helpers/getPaletteAccessor'
+import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { isV1Palette } from '@cdc/core/helpers/palettes/utils'
+import { v2ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
+import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
+import { buildForecastPaletteMappings } from '../../../helpers/buildForecastPaletteMappings'
 import { FaStar } from 'react-icons/fa'
 import { Label } from '../../../types/Label'
 import { ColorScale, TransformedData } from '../../../types/ChartContext'
@@ -49,7 +62,12 @@ export const createFormatLabels =
     }
     const colorCode = config.legend?.colorCode
     if (visualizationType === 'Deviation Bar') {
-      const [belowColor, aboveColor] = twoColorPalette[config.twoColor.palette]
+      let versionName = isV1Palette(config) ? 'v1' : 'v2'
+      const [belowColor, aboveColor] = twoColorPalette?.[versionName]?.[config.twoColor.palette] || [
+        '#1D6ABF',
+        '#935586'
+      ]
+
       const labelBelow = {
         datum: 'X',
         index: 0,
@@ -66,12 +84,31 @@ export const createFormatLabels =
       return reverseLabels([labelBelow, labelAbove])
     }
     if (visualizationType === 'Bar' && visualizationSubType === 'regular' && colorCode && series?.length === 1) {
-      let palette = colorPalettes[config.palette]
+      const currentPaletteName = getCurrentPaletteName(config) || getFallbackColorPalette(config)
+      const paletteName = migratePaletteWithMap(currentPaletteName, chartPaletteMigrationMap, true)
+      let palette = getPaletteAccessor(colorPalettes, config, paletteName)
 
-      while (tableData.length > palette.length) {
-        palette = palette.concat(palette)
+      const numberOfKeys = data.length
+
+      // Check if we should use v2 distribution logic for better contrast
+      const version = getColorPaletteVersion(config)
+      const isSequentialOrDivergent =
+        paletteName && (paletteName.includes('sequential') || paletteName.includes('divergent'))
+      const isPairedBarOrDeviation = ['Paired Bar', 'Deviation Bar'].includes(config.visualizationType)
+      const useV2Distribution =
+        version === 2 && isSequentialOrDivergent && palette.length === 9 && numberOfKeys <= 9 && !isPairedBarOrDeviation
+
+      if (useV2Distribution && v2ColorDistribution[numberOfKeys]) {
+        // Use strategic color distribution for v2 sequential palettes
+        const distributionIndices = v2ColorDistribution[numberOfKeys]
+        palette = distributionIndices.map(index => palette[index])
+      } else {
+        // Use existing logic for v1 palettes and other cases
+        while (tableData.length > palette.length) {
+          palette = palette.concat(palette)
+        }
+        palette = palette.slice(0, data.length)
       }
-      palette = palette.slice(0, data.length)
       //store unique values to Set by colorCode
       const set = new Set()
 
@@ -95,15 +132,34 @@ export const createFormatLabels =
     if (runtime?.forecastingSeriesKeys?.length > 0) {
       let seriesLabels = []
 
+      // Create palette lookup map - use version-specific palettes
+      // Forecasting charts use sequentialPalettes for v1, sequential-only palettes for v2
+      const paletteVersion = getColorPaletteVersion(config)
+
+      let forecastPalettes
+      if (paletteVersion === 1) {
+        // V1: Use original sequential palettes
+        forecastPalettes = sequentialPalettes
+      } else {
+        // V2: Only use sequential palettes (filter out divergent and qualitative)
+        const allV2Palettes = colorPalettesChartV2
+        forecastPalettes = {}
+        Object.keys(allV2Palettes).forEach(key => {
+          if (key.startsWith('sequential')) {
+            forecastPalettes[key] = allV2Palettes[key]
+          }
+        })
+      }
+
+      const processedPalettes = updatePaletteNames(forecastPalettes)
+      const forecastingPalettes = buildForecastPaletteMappings(processedPalettes, paletteVersion)
+
       //store unique values to Set by colorCode
       // loop through each stage/group/area on the chart and create a label
       config.runtime?.forecastingSeriesKeys?.map((outerGroup, index) => {
         return outerGroup?.stages?.map((stage, index) => {
-          let colorValue = sequentialPalettes[stage.color]?.[2]
-            ? sequentialPalettes[stage.color]?.[2]
-            : colorPalettes[stage.color]?.[2]
-            ? colorPalettes[stage.color]?.[2]
-            : '#ccc'
+          const palette = forecastingPalettes[stage.color] || false
+          let colorValue = palette?.[2] || '#ccc'
 
           const newLabel = {
             datum: stage.key,
@@ -119,7 +175,10 @@ export const createFormatLabels =
       // loop through bars for now to meet requirements.
       config.runtime.barSeriesKeys &&
         config.runtime.barSeriesKeys.forEach((bar, index) => {
-          let colorValue = colorPalettes[config.palette][index] ? colorPalettes[config.palette][index] : '#ccc'
+          const currentPaletteName = getCurrentPaletteName(config) || getFallbackColorPalette(config)
+          const migratedPaletteName = migratePaletteWithMap(currentPaletteName, chartPaletteMigrationMap, true)
+          const palette = getPaletteAccessor(colorPalettes, config, migratedPaletteName)
+          let colorValue = palette?.[index] || '#ccc'
 
           const newLabel = {
             datum: bar,

@@ -3,6 +3,7 @@ import { geoMercator } from 'd3-geo'
 import { Mercator } from '@visx/geo'
 import { feature } from 'topojson-client'
 import ConfigContext, { MapDispatchContext } from '../../context'
+import { useLegendMemoContext } from '../../context/LegendMemoContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import ZoomableGroup from '../ZoomableGroup'
 import Geo from '../Geo'
@@ -22,33 +23,34 @@ import {
   MAX_ZOOM_LEVEL
 } from '../../helpers'
 import useGeoClickHandler from '../../hooks/useGeoClickHandler'
-import useApplyLegendToRow from '../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../hooks/useApplyTooltipsToGeo'
-import useGenerateRuntimeData from '../../hooks/useGenerateRuntimeData'
+import generateRuntimeData from '../../helpers/generateRuntimeData'
+import { applyLegendToRow } from '../../helpers/applyLegendToRow'
 
 import './worldMap.styles.css'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 let projection = geoMercator()
 
 const WorldMap = () => {
   // prettier-ignore
   const {
-    data,
+    runtimeData,
     position,
-    setRuntimeData,
     config,
     tooltipId,
-    legendMemo,
-    legendSpecialClassLastMemo
+    runtimeLegend,
+    interactionLabel
   } = useContext(ConfigContext)
+
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
   const { type, allowMapZoom } = config.general
 
   const [world, setWorld] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
-  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
-  const { generateRuntimeData } = useGenerateRuntimeData(config)
   const dispatch = useContext(MapDispatchContext)
 
   useEffect(() => {
@@ -64,23 +66,86 @@ const WorldMap = () => {
     return <></>
   }
 
-  const handleReset = setRuntimeData => {
+  const handleReset = () => {
     const newRuntimeData = generateRuntimeData(config)
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: 'map_reset_zoom_level',
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config)
+    })
     dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
     dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
-    setRuntimeData(newRuntimeData)
+    dispatch({ type: 'SET_RUNTIME_DATA', payload: newRuntimeData })
   }
+
   const handleZoomIn = position => {
     if (position.zoom >= 4) return
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: `zoom_in`,
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config),
+      specifics: `zoom_level: ${Math.floor(position.zoom * 1.5)}`
+    })
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: `zoom_in`,
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config),
+      specifics: `location: ${position.coordinates}`
+    })
     dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: position.zoom * 1.5 } })
   }
 
   const handleZoomOut = position => {
     if (position.zoom <= 1) return
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: `zoom_out`,
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config),
+      specifics: `zoom_level: ${Math.floor(position.zoom / 1.5)}`
+    })
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: `zoom_out`,
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config),
+      specifics: `location: ${position.coordinates}`
+    })
     dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: position.zoom / 1.5 } })
   }
 
   const handleMoveEnd = position => {
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: 'map_panned',
+      eventAction: 'drag',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config),
+      specifics: `zoom: ${position.zoom}`
+    })
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: 'map_panned',
+      eventAction: 'drag',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config),
+      specifics: `coordinates: ${position.coordinates}`
+    })
     dispatch({ type: 'SET_POSITION', payload: position })
   }
 
@@ -89,7 +154,7 @@ const WorldMap = () => {
       // If the geo.properties.config value is found in the data use that, otherwise fall back to geo.properties.iso
       const dataHasStateName = config.data.some(d => d[config.columns.geo.name] === geo.properties.state)
       const geoKey =
-        geo.properties.state && data[geo.properties.state]
+        geo.properties.state && runtimeData[geo.properties.state]
           ? geo.properties.state
           : geo.properties.name
           ? geo.properties.name
@@ -100,14 +165,14 @@ const WorldMap = () => {
       }
       if (!geoKey) return null
 
-      let geoData = data[geoKey]
+      let geoData = runtimeData[geoKey]
 
       const geoDisplayName = displayGeoName(supportedCountries[geoKey]?.[0])
       let legendColors
 
       // Once we receive data for this geographic item, setup variables.
       if (geoData !== undefined) {
-        legendColors = applyLegendToRow(geoData, config)
+        legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
       }
 
       const geoStrokeColor = getGeoStrokeColor(config)
@@ -153,6 +218,20 @@ const WorldMap = () => {
             stroke={geoStrokeColor}
             strokeWidth={strokeWidth}
             onClick={() => geoClickHandler(geoDisplayName, geoData)}
+            onMouseEnter={() => {
+              // Track hover analytics event if this is a new location
+              const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
+              publishAnalyticsEvent({
+                vizType: config.type,
+                vizSubType: getVizSubType(config),
+                eventType: `map_hover`,
+                eventAction: 'hover',
+                eventLabel: interactionLabel,
+                vizTitle: getVizTitle(config),
+                location: geoDisplayName,
+                specifics: `location: ${locationName?.toLowerCase()}`
+              })
+            }}
             data-tooltip-id={`tooltip__${tooltipId}`}
             data-tooltip-html={toolTip}
             tabIndex={-1}
@@ -170,6 +249,20 @@ const WorldMap = () => {
           strokeWidth={strokeWidth}
           styles={styles}
           path={path}
+          onMouseEnter={() => {
+            // Track hover analytics event if this is a new location
+            const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
+            publishAnalyticsEvent({
+              vizType: config.type,
+              vizSubType: getVizSubType(config),
+              eventType: `map_hover`,
+              eventAction: 'hover',
+              eventLabel: interactionLabel,
+              vizTitle: getVizTitle(config),
+              location: geoDisplayName,
+              specifics: `location: ${locationName?.toLowerCase()}`
+            })
+          }}
           data-tooltip-id={`tooltip__${tooltipId}`}
           data-tooltip-html={toolTip}
         />
@@ -191,12 +284,7 @@ const WorldMap = () => {
     <ErrorBoundary component='WorldMap'>
       {allowMapZoom ? (
         <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(config)}>
-          <rect
-            height={SVG_HEIGHT}
-            width={SVG_WIDTH}
-            onClick={() => handleReset(config, setRuntimeData)}
-            fill='white'
-          />
+          <rect height={SVG_HEIGHT} width={SVG_WIDTH} onClick={handleReset} fill='white' />
           <ZoomableGroup
             zoom={position.zoom}
             center={position.coordinates}

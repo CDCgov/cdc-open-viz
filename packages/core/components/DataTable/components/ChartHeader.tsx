@@ -4,8 +4,22 @@ import { getDataSeriesColumns } from '../helpers/getDataSeriesColumns'
 import ScreenReaderText from '@cdc/core/components/elements/ScreenReaderText'
 import { SortIcon } from './SortIcon'
 import { getNewSortBy } from '../helpers/getNewSortBy'
+import parse from 'html-react-parser'
+import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
+import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
-type ChartHeaderProps = { data; isVertical; config; setSortBy; sortBy; hasRowType?; viewport; rightAlignedCols }
+type ChartHeaderProps = {
+  data
+  isVertical
+  config
+  setSortBy
+  sortBy
+  hasRowType?
+  viewport
+  rightAlignedCols
+  interactionLabel: string
+}
 
 const ChartHeader = ({
   data,
@@ -15,7 +29,8 @@ const ChartHeader = ({
   sortBy,
   hasRowType,
   viewport,
-  rightAlignedCols
+  rightAlignedCols,
+  interactionLabel
 }: ChartHeaderProps) => {
   const groupBy = config.table?.groupBy
   if (!data) return
@@ -47,21 +62,29 @@ const ChartHeader = ({
     if (columnHeaderText === notApplicableText) return
 
     return (
-      <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${
-        sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'
-      }  order`}</span>
+      <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'
+        }  order`}</span>
     )
   }
 
-  const ColumnHeadingText = ({ column, text, config }) => {
+  const ColumnHeadingText = ({ text, config }: { text: string; config: ChartConfig }) => {
+    const notApplicableText = 'Not Applicable'
     if (text === '_pivotedFrom') return ''
-    let notApplicableText = 'Not Applicable'
-    if (text === '__series__' && config.table.indexLabel) return `${config.table.indexLabel} `
-    if (text === '__series__' && !config.table.indexLabel)
-      return <ScreenReaderText as='span'>{notApplicableText}</ScreenReaderText>
-    return text
-  }
+    if (text === '__series__') {
+      if (config.table.indexLabel) {
+        return parse(String(config.table.indexLabel))
+      } else {
+        return <ScreenReaderText as='span'>{notApplicableText}</ScreenReaderText>
+      }
+    }
 
+    //  handle any unexpected values
+    if (typeof text !== 'string') {
+      return parse('')
+    }
+
+    return parse(text)
+  }
   if (isVertical) {
     if (hasRowType) {
       // find the row type column and place it at the beginning of the array
@@ -93,11 +116,29 @@ const ChartHeader = ({
               scope='col'
               onClick={() => {
                 if (hasRowType) return
+                publishAnalyticsEvent({
+                  vizType: config.type,
+                  vizSubType: getVizSubType(config),
+                  eventType: `data_table_sort`,
+                  eventAction: 'click',
+                  eventLabel: interactionLabel,
+                  vizTitle: getVizTitle(config),
+                  specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                })
                 setSortBy(newSortBy)
               }}
               onKeyDown={e => {
                 if (hasRowType) return
-                if (e.keyCode === 13) {
+                if (e.key === 'Enter') {
+                  publishAnalyticsEvent({
+                    vizType: config.type,
+                    vizSubType: getVizSubType(config),
+                    eventType: `data_table_sort`,
+                    eventAction: 'keyboard',
+                    eventLabel: interactionLabel,
+                    vizTitle: getVizTitle(config),
+                    specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                  })
                   setSortBy(newSortBy)
                 }
               }}
@@ -107,7 +148,7 @@ const ChartHeader = ({
                   : { 'aria-sort': 'descending' }
                 : null)}
             >
-              <ColumnHeadingText text={text} column={column} config={config} />
+              <ColumnHeadingText text={text} config={config} />
               {isSortedCol && <SortIcon ascending={sortByAsc} />}
               <ScreenReaderSortByText sortBy={sortBy} config={config} text={text} />
             </th>
@@ -120,8 +161,12 @@ const ChartHeader = ({
     return (
       <tr>
         {['__series__', ...Object.keys(data)].slice(sliceVal).map((row, index) => {
+          const rightAxisItems = config.series?.filter(item => item?.axis === 'Right') || []
+          const rightAxisItemsMap = new Map(rightAxisItems.map(item => [item.dataKey, item]))
+
           let column = config.xAxis?.dataKey
-          let text = row !== '__series__' ? getChartCellValue(row, column, config, data) : '__series__'
+          let text =
+            row !== '__series__' ? getChartCellValue(row, column, config, data, rightAxisItemsMap) : '__series__'
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.colIndex === index ? sortBy.asc : undefined
           const isSortedCol = index === sortBy.colIndex && !hasRowType
@@ -137,10 +182,29 @@ const ChartHeader = ({
               role='columnheader'
               scope='col'
               onClick={() => {
+                if (hasRowType) return
+                publishAnalyticsEvent({
+                  vizType: config.type,
+                  vizSubType: getVizSubType(config),
+                  eventType: `data_table_sort`,
+                  eventAction: 'click',
+                  eventLabel: interactionLabel,
+                  vizTitle: getVizTitle(config),
+                  specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                })
                 setSortBy(newSortBy)
               }}
               onKeyDown={e => {
-                if (e.keyCode === 13) {
+                if (e.key === 'Enter') {
+                  publishAnalyticsEvent({
+                    vizType: config.type,
+                    vizSubType: getVizSubType(config),
+                    eventType: `data_table_sort`,
+                    eventAction: 'keyboard',
+                    eventLabel: interactionLabel,
+                    vizTitle: getVizTitle(config),
+                    specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                  })
                   setSortBy(newSortBy)
                 }
               }}
@@ -150,7 +214,7 @@ const ChartHeader = ({
                   : { 'aria-sort': 'descending' }
                 : null)}
             >
-              <ColumnHeadingText text={text} column={column} config={config} />
+              <ColumnHeadingText text={text} config={config} />
               {isSortedCol && <SortIcon ascending={sortByAsc} />}
 
               <ScreenReaderSortByText text={text} config={config} sortBy={sortBy} />

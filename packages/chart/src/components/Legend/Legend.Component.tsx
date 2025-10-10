@@ -1,6 +1,7 @@
 import parse from 'html-react-parser'
 import React from 'react'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
+import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import LegendShape from '@cdc/core/components/LegendShape'
 import Button from '@cdc/core/components/elements/Button'
 import { getLegendClasses } from './helpers/getLegendClasses'
@@ -17,6 +18,8 @@ import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import LegendLineShape from './LegendLine.Shape'
 import LegendGroup from './LegendGroup'
 import { getSeriesWithData } from '../../helpers/dataHelpers'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const LEGEND_PADDING = 36
 
@@ -32,9 +35,9 @@ export interface LegendProps {
   skipId: string
   dimensions: DimensionsType // for responsive width legend
   transformedData: any
+  interactionLabel: string
 }
 
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const Legend: React.FC<LegendProps> = forwardRef(
   (
     {
@@ -47,7 +50,8 @@ const Legend: React.FC<LegendProps> = forwardRef(
       formatLabels,
       skipId = 'legend',
       dimensions,
-      transformedData: data
+      transformedData: data,
+      interactionLabel = ''
     },
     ref
   ) => {
@@ -69,6 +73,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
     let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
+
     if (!legend) return null
     return (
       <aside
@@ -137,11 +142,40 @@ const Legend: React.FC<LegendProps> = forwardRef(
                           onKeyDown={e => {
                             if (e.key === 'Enter') {
                               e.preventDefault()
+                              publishAnalyticsEvent({
+                                vizType: config?.type,
+                                vizSubType: getVizSubType(config),
+                                vizTitle: getVizTitle(config),
+                                eventType: `chart_legend_item_toggled` as any,
+                                eventAction: 'keydown',
+                                eventLabel: interactionLabel,
+                                specifics:
+                                  config.visualizationType === 'Bar'
+                                    ? `label: ${label.text}, orientation: ${
+                                        config.orientation === 'horizontal' ? 'horizontal' : 'vertical'
+                                      }, mode: ${legend.behavior}`
+                                    : `label: ${label.text}, mode: ${legend.behavior}`
+                              })
                               highlight(label)
                             }
                           }}
                           onClick={e => {
                             e.preventDefault()
+                            publishAnalyticsEvent({
+                              vizType: config?.type,
+                              vizSubType: getVizSubType(config),
+                              eventType: `chart_legend_item_toggled` as any,
+                              eventAction: 'click',
+                              eventLabel: interactionLabel,
+                              specifics:
+                                config.visualizationType === 'Bar'
+                                  ? `label: ${label.text}, orientation: ${
+                                      config.orientation === 'horizontal' ? 'horizontal' : 'vertical'
+                                    }, mode: ${legend.behavior}`
+                                  : `label: ${label.text}, mode: ${legend.behavior}`,
+
+                              vizTitle: getVizTitle(config)
+                            })
                             highlight(label)
                           }}
                           role='button'
@@ -206,6 +240,87 @@ const Legend: React.FC<LegendProps> = forwardRef(
                 </div>
 
                 <LegendSuppression config={config} isLegendBottom={isLegendBottom} />
+
+                {/* Pattern Legend Items */}
+                {config.legend.patterns && Object.keys(config.legend.patterns).length > 0 && (
+                  <div
+                    className={`legend-patterns d-flex ${
+                      ['top', 'bottom'].includes(config.legend.position) ? 'flex-row flex-wrap' : 'flex-column'
+                    }`}
+                  >
+                    {Object.entries(config.legend.patterns).map(([key, pattern]) => {
+                      const patternId = `legend-pattern-${key}`
+                      const size = config.legend.patternSize || 8
+                      const legendSize = 16
+                      const pColor = (pattern as any)?.color || '#666666'
+
+                      return (
+                        <LegendItem
+                          key={patternId}
+                          className='legend-item legend-item--pattern d-flex align-items-center'
+                          tabIndex={0}
+                          role='button'
+                        >
+                          <span className='me-2'>
+                            <svg width={legendSize} height={legendSize}>
+                              <defs>
+                                {pattern.shape === 'circles' && (
+                                  <PatternCircles
+                                    id={patternId}
+                                    height={size}
+                                    width={size}
+                                    fill={pColor}
+                                    radius={1.25}
+                                  />
+                                )}
+                                {pattern.shape === 'lines' && (
+                                  <PatternLines
+                                    id={patternId}
+                                    height={size}
+                                    width={size}
+                                    stroke={pColor}
+                                    strokeWidth={0.75}
+                                    orientation={['horizontal']}
+                                  />
+                                )}
+                                {pattern.shape === 'diagonalLines' && (
+                                  <PatternLines
+                                    id={patternId}
+                                    height={size}
+                                    width={size}
+                                    stroke={pColor}
+                                    strokeWidth={0.75}
+                                    orientation={['diagonalRightToLeft']}
+                                  />
+                                )}
+                                {pattern.shape === 'waves' && (
+                                  <PatternWaves
+                                    id={patternId}
+                                    height={size}
+                                    width={size}
+                                    fill={pColor}
+                                    strokeWidth={0.25}
+                                  />
+                                )}
+                              </defs>
+                              <circle
+                                fill={`url(#${patternId})`}
+                                r={legendSize / 2}
+                                cx={legendSize / 2}
+                                cy={legendSize / 2}
+                                stroke='#0000004d'
+                                strokeWidth={1}
+                              />
+                            </svg>
+                          </span>
+                          <LegendLabel align='left' className='m-0'>
+                            {parse(String((pattern as any)?.label || key))}
+                          </LegendLabel>
+                        </LegendItem>
+                      )
+                    })}
+                  </div>
+                )}
               </>
             )
           }}

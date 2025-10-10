@@ -4,7 +4,6 @@ import ReactDOM from 'react-dom/client'
 import { GlobalContextProvider } from '@cdc/core/components/GlobalContext'
 
 import '@cdc/core/styles/cove-main.scss'
-import './coreStyles_markupinclude.scss'
 
 import CdcMarkupInclude from './CdcMarkupInclude'
 
@@ -15,7 +14,11 @@ let domContainer = document.getElementsByClassName('react-container')[0]
 ReactDOM.createRoot(domContainer).render(
   <React.StrictMode>
     <GlobalContextProvider>
-      <CdcMarkupInclude configUrl={domContainer.attributes['data-config'].value} isEditor={isEditor} />
+      <CdcMarkupInclude
+        configUrl={domContainer.attributes['data-config'].value}
+        interactionLabel={domContainer.attributes['data-config'].value}
+        isEditor={isEditor}
+      />
     </GlobalContextProvider>
   </React.StrictMode>
 )

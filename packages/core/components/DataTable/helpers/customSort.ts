@@ -37,8 +37,10 @@ export const customSort = (a, b, sortBy, config) => {
   const isNumB = !isNaN(Number(valueB)) && valueB !== undefined && valueB !== null && trimmedB !== ''
 
   // Handle empty strings or spaces
-  if (trimmedA === '' && trimmedB !== '') return sortBy.asc ? -1 : 1
-  if (trimmedA !== '' && trimmedB === '') return sortBy.asc ? 1 : -1
+  // empty string should always come last no matter the asc
+  if (trimmedA === '' && trimmedB === '') return 0
+  if (trimmedA === '' && trimmedB !== '') return 1
+  if (trimmedA !== '' && trimmedB === '') return -1
 
   // Both are numbers: Compare numerically
   if (isNumA && isNumB) {

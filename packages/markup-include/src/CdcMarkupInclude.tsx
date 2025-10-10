@@ -24,19 +24,27 @@ import './scss/main.scss'
 type CdcMarkupIncludeProps = {
   config: MarkupIncludeConfig
   configUrl: string
+  datasets: Datasets
   isDashboard: boolean
   isEditor: boolean
   setConfig: any
+  interactionLabel?: string
 }
 
 import Title from '@cdc/core/components/ui/Title'
+import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
+import { Datasets } from '@cdc/core/types/DataSet'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   configUrl,
   config: configObj,
+  datasets,
   isDashboard = true,
   isEditor = false,
-  setConfig: setParentConfig
+  setConfig: setParentConfig,
+  interactionLabel = 'no link provided'
 }) => {
   const initialState = {
     config: configObj,
@@ -56,6 +64,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config || {})
   const { contentEditor, theme } = config || {}
+  const { showNoDataMessage, allowHideSection, noDataMessageText } = contentEditor || {}
   const data = configObj?.data
 
   const { inlineHTML, markupVariables, srcUrl, title, useInlineHTML } = contentEditor || {}
@@ -162,6 +171,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   }
 
   const emptyVariableChecker = []
+  const noDataMessageChecker = []
 
   const convertVariablesInMarkup = inlineMarkup => {
     if (_.isEmpty(markupVariables)) return inlineMarkup
@@ -196,9 +206,14 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
       if (length > 2) {
         variableValues[length - 1] = `${listConjunction} ${variableValues[length - 1]}`
       }
+
       variableDisplay.push(variableValues.join(', '))
 
       const finalDisplay = variableDisplay[0]
+
+      if (showNoDataMessage && finalDisplay === '') {
+        noDataMessageChecker.push(true)
+      }
 
       if (finalDisplay === '' && contentEditor.allowHideSection) {
         emptyVariableChecker.push(true)
@@ -226,7 +241,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   //Load initial config
   useEffect(() => {
-    loadConfig().catch(err => console.log(err))
+    loadConfig().catch(err => console.error(err))
     publish('cove_loaded', { loadConfigHasRun: true })
   }, [])
 
@@ -234,12 +249,19 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     if (config && !coveLoadedHasRan && container) {
       publish('cove_loaded', { config: config })
       dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
+      publishAnalyticsEvent({
+        vizType: 'markup-include',
+        eventType: 'markup-include_ready',
+        eventAction: 'load',
+        eventLabel: interactionLabel,
+        vizTitle: getVizTitle(config)
+      })
     }
   }, [config, container])
 
   //Reload any functions when config is updated
   useEffect(() => {
-    loadConfigMarkupData().catch(err => console.log(err))
+    loadConfigMarkupData().catch(err => console.error(err))
   }, [config])
 
   let content = <Loading />
@@ -247,11 +269,13 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const markup = useInlineHTML ? convertVariablesInMarkup(inlineHTML) : parseBodyMarkup(urlMarkup)
 
   const hideMarkupInclude = contentEditor?.allowHideSection && emptyVariableChecker.length > 0 && !isEditor
+  const _showNoDataMessage = showNoDataMessage && noDataMessageChecker.length > 0 && !isEditor
 
   if (loading === false) {
     content = (
       <>
-        {isEditor && <EditorPanel />}
+        {isEditor && <EditorPanel datasets={datasets} />}
+
         {!hideMarkupInclude && (
           <Layout.Responsive isEditor={isEditor}>
             <div className='markup-include-content-container cove-component__content no-borders'>
@@ -259,11 +283,17 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
                 <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
                 <div className={`${innerContainerClasses.join(' ')}`}>
                   <div className='cove-component__content-wrap'>
-                    {!markupError && <Markup allowElements={!!urlMarkup} content={markup} />}
-                    {markupError && srcUrl && <div className='warning'>{errorMessage}</div>}
+                    {_showNoDataMessage && (
+                      <div className='no-data-message'>
+                        <p>{`${noDataMessageText}`}</p>
+                      </div>
+                    )}
+                    {!markupError && !_showNoDataMessage && <Markup allowElements={!!urlMarkup} content={markup} />}
+                    {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
                   </div>
                 </div>
               </div>
+              <FootnotesStandAlone config={configObj?.footnotes} filters={[]} />
             </div>
           </Layout.Responsive>
         )}

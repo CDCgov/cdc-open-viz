@@ -7,6 +7,7 @@ import {
   AccordionItemButton
 } from 'react-accessible-accordion'
 import ConfigContext from '../../../../context'
+import { useLegendMemoContext } from '../../../../context/LegendMemoContext'
 import { type MapContext } from '../../../../types/MapContext'
 import Button from '@cdc/core/components/elements/Button'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
@@ -14,23 +15,23 @@ import Icon from '@cdc/core/components/ui/Icon'
 import './Panel.PatternSettings-style.css'
 import Alert from '@cdc/core/components/Alert'
 import _ from 'lodash'
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 
 // topojson helpers for checking color contrasts
 import { feature } from 'topojson-client'
-import { checkColorContrast, getContrastColor, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
-import useApplyLegendToRow from '../../../../hooks/useApplyLegendToRow'
-import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import { checkColorContrast, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
+import { applyLegendToRow } from '../../../../helpers/applyLegendToRow'
+import { PatternSelection } from '../../../../types/MapConfig'
 
 type PanelProps = {
   name: string
 }
 
 const PatternSettings = ({ name }: PanelProps) => {
-  const { config, setConfig, runtimeData, legendMemo, legendSpecialClassLastMemo } =
-    useContext<MapContext>(ConfigContext)
+  const { config, setConfig, runtimeData, runtimeLegend } = useContext<MapContext>(ConfigContext)
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const defaultPattern = 'circles'
   const patternTypes = ['circles', 'waves', 'lines']
-  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
 
   const {
     map: { patterns },
@@ -65,75 +66,92 @@ const PatternSettings = ({ name }: PanelProps) => {
     })
   }
 
-  /** Updates the map pattern at a given index */
-  const handleUpdateGeoPattern = (
-    value: string,
-    index: number,
-    keyToUpdate: 'dataKey' | 'pattern' | 'dataValue' | 'size' | 'label' | 'color'
+  // Checks contrast and logs warning if needed
+  const checkAndLogContrast = (fill: string, patternColor: string, geoName: string, dataKey: string): boolean => {
+    const contrastCheck = checkColorContrast(fill, patternColor)
+
+    if (!contrastCheck) {
+      console.error(
+        `COVE: pattern contrast check failed on ${geoName} for ${dataKey} with:
+      pattern color: ${patternColor}
+      contrast: ${getColorContrast(fill, patternColor)}`
+      )
+    }
+
+    return contrastCheck
+  }
+
+  // Gets legend colors for a geo
+  const getGeoLegendColors = (geoKey: string, runtimeData: any) => {
+    return geoKey && runtimeData?.[geoKey]
+      ? applyLegendToRow(runtimeData[geoKey], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+      : null
+  }
+
+  // Processes contrast check for a single geo
+  const processGeoContrast = (
+    geo: any,
+    pattern: PatternSelection,
+    updatedPatterns: PatternSelection[],
+    patternIndex: number,
+    color: string
   ) => {
-    const updatedPatterns = _.cloneDeep(config.map.patterns)
+    const geoKey = geo.properties.iso
+    const legendColors = getGeoLegendColors(geoKey, runtimeData)
+    const currentFill = legendColors?.[0]
 
-    // Update the specific pattern with the new value
-    updatedPatterns[index] = { ...updatedPatterns[index], [keyToUpdate]: value }
+    if (!currentFill) return
 
-    // Iterate over each state feature
-    unitedStates.forEach(geo => {
-      const geoKey = geo.properties.iso
-      if (!geoKey || !runtimeData) return
-      const geoData = runtimeData[geoKey]
-      if (!geoData) return
+    const hasMatchingValues = pattern.dataValue === runtimeData[geoKey]?.[pattern.dataKey]
 
-      const legendColors = runtimeData[geoKey] ? applyLegendToRow(runtimeData[geoKey]) : undefined
+    if (hasMatchingValues) {
+      const contrastCheck = checkAndLogContrast(
+        currentFill,
+        color,
+        runtimeData[geoKey]?.[config.columns.geo.name],
+        pattern.dataKey
+      )
+      updatedPatterns[patternIndex].contrastCheck = contrastCheck
+    }
+  }
 
-      // Iterate over each pattern
-      config.map.patterns.forEach((patternData, patternIndex) => {
-        const hasMatchingValues = patternData.dataValue === geoData[patternData.dataKey]
-        if (!hasMatchingValues) return
-
-        const currentFill = legendColors[0]
-        const patternColor =
-          keyToUpdate === 'color' && value !== '' ? value : getContrastColor(APP_FONT_COLOR, currentFill)
-        const contrastCheck = checkColorContrast(currentFill, patternColor)
-
-        // Log a warning if the contrast check fails
-        if (!contrastCheck) {
-          console.warn(`COVE: pattern contrast check failed on ${geoData?.[config.columns.geo.name]} for ${
-            patternData.dataKey
-          } with:
-          pattern color: ${patternColor}
-          contrast: ${getColorContrast(currentFill, patternColor)}
-        `)
-        }
-
-        updatedPatterns[index] = { ...updatedPatterns[index], [keyToUpdate]: value, contrastCheck }
-      })
-    })
-
-    const hasContrastErrors = updatedPatterns.some(pattern => pattern.contrastCheck === false)
-
-    // Update the state with the new patterns and error message
-    const newConfig = _.cloneDeep(config)
-    newConfig.map.patterns = updatedPatterns
-    newConfig.runtime.editorErrorMessage = hasContrastErrors
-      ? 'One or more patterns do not pass the WCAG 2.1 contrast ratio of 3:1.'
-      : '' // Clear the error message if all patterns pass
-    setConfig(newConfig)
+  const handlePatternFieldUpdate = (field: string, color: string, patternIndex: number) => {
+    const _newConfig = cloneConfig(config)
+    _newConfig.map.patterns[patternIndex][field] = color
+    reviewColorContrast(_newConfig, patternIndex)
+    setConfig(_newConfig)
   }
 
   const handleRemovePattern = index => {
+    const _newConfig = cloneConfig(config)
     const updatedPatterns = config.map.patterns.filter((pattern, i) => i !== index)
-
-    setConfig({
-      ...config,
-      map: {
-        ...config.map,
-        patterns: updatedPatterns
-      }
-    })
+    _newConfig.map.patterns = updatedPatterns
+    if (checkPatternContrasts()) {
+      _newConfig.runtime.editorErrorMessage = ''
+    }
+    setConfig(_newConfig)
   }
 
   const checkPatternContrasts = () => {
     return config.map.patterns.every(pattern => pattern.contrastCheck !== false)
+  }
+
+  const reviewColorContrast = (_newConfig, patternIndex) => {
+    // Process each geo's contrast
+    unitedStates.forEach(geo => {
+      processGeoContrast(
+        geo,
+        _newConfig.map.patterns[patternIndex],
+        _newConfig.map.patterns,
+        patternIndex,
+        _newConfig.map.patterns[patternIndex].color
+      )
+    })
+
+    // Update error message
+    _newConfig.runtime.editorErrorMessage = _newConfig.map.patterns.some(p => p.contrastCheck === false)
+      ? 'One or more patterns do not pass the WCAG 2.1 contrast ratio of 3:1.'
+      : ''
   }
 
   return (
@@ -145,7 +163,7 @@ const PatternSettings = ({ name }: PanelProps) => {
         {patterns.length > 0 && (
           <Alert
             type={checkPatternContrasts() ? 'success' : 'danger'}
-            message='Pattern colors must comply with <br /> <a href="https://www.w3.org/TR/WCAG21/">WCAG 2.1</a> 3:1 contrast ratio.'
+            message='Pattern colors must comply with <a href="https://www.w3.org/TR/WCAG21/">WCAG 2.1</a> 3:1 contrast ratio.'
           />
         )}
         <br />
@@ -182,7 +200,7 @@ const PatternSettings = ({ name }: PanelProps) => {
                       <select
                         id={`pattern-dataKey--${patternIndex}`}
                         value={pattern.dataKey !== '' ? pattern.dataKey : 'Select'}
-                        onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'dataKey')}
+                        onChange={e => handlePatternFieldUpdate('dataKey', e.target.value, patternIndex)}
                       >
                         {/* TODO: sort these? */}
                         {dataKeyOptions.map((d, index) => {
@@ -197,7 +215,7 @@ const PatternSettings = ({ name }: PanelProps) => {
                         Data Value:
                         <input
                           type='text'
-                          onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'dataValue')}
+                          onChange={e => handlePatternFieldUpdate('dataValue', e.target.value, patternIndex)}
                           id={`pattern-dataValue--${patternIndex}`}
                           value={pattern.dataValue === '' ? '' : pattern.dataValue}
                         />
@@ -206,7 +224,7 @@ const PatternSettings = ({ name }: PanelProps) => {
                         Label (optional):
                         <input
                           type='text'
-                          onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'label')}
+                          onChange={e => handlePatternFieldUpdate('label', e.target.value, patternIndex)}
                           id={`pattern-dataValue--${patternIndex}`}
                           value={pattern.label === '' ? '' : pattern.label}
                         />
@@ -215,7 +233,7 @@ const PatternSettings = ({ name }: PanelProps) => {
                       <select
                         id={`pattern-type--${patternIndex}`}
                         value={pattern?.pattern}
-                        onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'pattern')}
+                        onChange={e => handlePatternFieldUpdate('pattern', e.target.value, patternIndex)}
                       >
                         {patternTypes.map((patternName, index) => (
                           <option value={patternName} key={index}>
@@ -227,7 +245,7 @@ const PatternSettings = ({ name }: PanelProps) => {
                       <select
                         id={`pattern-size--${patternIndex}`}
                         value={pattern?.size}
-                        onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'size')}
+                        onChange={e => handlePatternFieldUpdate('size', e.target.value, patternIndex)}
                       >
                         {['small', 'medium', 'large'].map((size, index) => (
                           <option value={size} key={index}>
@@ -254,7 +272,7 @@ const PatternSettings = ({ name }: PanelProps) => {
                             value={pattern.color || ''}
                             id='patternColor'
                             name='patternColor'
-                            onChange={e => handleUpdateGeoPattern(e.target.value, patternIndex, 'color')}
+                            onChange={e => handlePatternFieldUpdate('color', e.target.value, patternIndex)}
                           />
                         </label>
                       </div>

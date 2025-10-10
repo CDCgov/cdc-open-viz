@@ -3,12 +3,17 @@ import MapIcon from '../../assets/map-folded.svg'
 import ChartIcon from '../../assets/icon-chart-bar.svg'
 import MarkupIncludeIcon from '../../assets/icon-code.svg'
 import { FilterFunction, JsonEditor, UpdateFunction } from 'json-edit-react'
-import { formatConfigBeforeSave as stripConfig } from '../../helpers/formatConfigBeforeSave'
 import './advanced-editor-styles.css'
 import _ from 'lodash'
 import Tooltip from '../ui/Tooltip'
 
-export const AdvancedEditor = ({ loadConfig, config, convertStateToConfig, onExpandCollapse = () => {} }) => {
+export const AdvancedEditor = ({
+  loadConfig,
+  config,
+  convertStateToConfig,
+  stripConfig = config => config,
+  onExpandCollapse = () => {}
+}) => {
   const [advancedToggle, _setAdvancedToggle] = useState(false)
   const [configTextboxValue, setConfigTextbox] = useState<Record<string, any>>({})
   const setAdvancedToggle = val => {
@@ -26,13 +31,29 @@ export const AdvancedEditor = ({ loadConfig, config, convertStateToConfig, onExp
   }
 
   useEffect(() => {
-    let parsedConfig = stripConfig(config)
-    if (config.type !== 'dashboard') {
-      parsedConfig = convertStateToConfig()
-    }
+    // Only process config when advanced editor is open to improve performance
+    if (advancedToggle) {
+      let parsedConfig = stripConfig(config)
+      if (config.type !== 'dashboard') {
+        parsedConfig = convertStateToConfig()
+      }
 
-    setConfigTextbox(parsedConfig)
-  }, [config])
+      setConfigTextbox(parsedConfig)
+    }
+  }, [config, advancedToggle])
+
+  // Initialize config when advanced editor is first opened
+  const handleToggleOpen = () => {
+    if (!advancedToggle) {
+      // Process config only when opening for the first time
+      let parsedConfig = stripConfig(config)
+      if (config.type !== 'dashboard') {
+        parsedConfig = convertStateToConfig()
+      }
+      setConfigTextbox(parsedConfig)
+    }
+    setAdvancedToggle(!advancedToggle)
+  }
 
   const typeLookup = {
     chart: ['Charts', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
@@ -58,7 +79,7 @@ export const AdvancedEditor = ({ loadConfig, config, convertStateToConfig, onExp
         </div>
       </a>
       <div className='advanced'>
-        <span className='advanced-toggle-link' onClick={() => setAdvancedToggle(!advancedToggle)}>
+        <span className='advanced-toggle-link' onClick={handleToggleOpen}>
           <span>{advancedToggle ? `— ` : `+ `}</span>Advanced Options
         </span>
         {advancedToggle && (

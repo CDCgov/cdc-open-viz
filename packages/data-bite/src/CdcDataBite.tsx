@@ -28,9 +28,25 @@ import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { Config } from './types/Config'
 import dataBiteReducer from './store/db.reducer'
+import {
+  DATA_FUNCTION_COUNT,
+  DATA_FUNCTION_MAX,
+  DATA_FUNCTION_MEAN,
+  DATA_FUNCTION_MEDIAN,
+  DATA_FUNCTION_MIN,
+  DATA_FUNCTION_MODE,
+  DATA_FUNCTION_RANGE,
+  DATA_FUNCTION_SUM,
+  IMAGE_POSITION_LEFT,
+  IMAGE_POSITION_RIGHT,
+  IMAGE_POSITION_TOP,
+  IMAGE_POSITION_BOTTOM
+} from './constants'
 
 // styles
 import './scss/main.scss'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 type CdcDataBiteProps = {
   config: Config
@@ -39,6 +55,7 @@ type CdcDataBiteProps = {
   isEditor: boolean
   setConfig: () => {}
   link: any
+  interactionLabel: string
 }
 
 const CdcDataBite = (props: CdcDataBiteProps) => {
@@ -48,7 +65,8 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     isDashboard = false,
     isEditor = false,
     setConfig: setParentConfig,
-    link
+    link,
+    interactionLabel = ''
   } = props
 
   const initialState = {
@@ -107,7 +125,25 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
   //@ts-ignore
   const loadConfig = async () => {
-    let response = configObj || (await (await fetch(configUrl)).json())
+    let response = configObj
+
+    if (!response && configUrl) {
+      try {
+        const fetchResponse = await fetch(configUrl)
+        if (fetchResponse.ok) {
+          const text = await fetchResponse.text()
+          response = text ? JSON.parse(text) : {}
+        } else {
+          console.warn(`Failed to fetch config from ${configUrl}: ${fetchResponse.status}`)
+          response = {}
+        }
+      } catch (error) {
+        console.warn(`Error loading config from ${configUrl}:`, error)
+        response = {}
+      }
+    } else if (!response) {
+      response = {}
+    }
 
     // If data is included through a URL, fetch that and store
     let responseData = response.data ?? []
@@ -131,6 +167,14 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     const processedConfig = { ...coveUpdateWorker(response) }
 
     updateConfig({ ...defaults, ...processedConfig })
+    publishAnalyticsEvent({
+      vizType: 'data-bite',
+      vizSubType: getVizSubType(processedConfig),
+      eventType: 'data-bite_ready',
+      eventAction: 'load',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(processedConfig)
+    })
     dispatch({ type: 'SET_LOADING', payload: false })
   }
 
@@ -340,7 +384,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
           config.dataFormat.suffix
         break
       default:
-        console.warn('Data bite function not recognized: ' + dataFunction)
+        console.warn('Data bite function not recognized: ' + dataFunction) // eslint-disable-line no-console
     }
 
     // If not the range, then round and format here
@@ -612,7 +656,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   }
 
   return (
-    <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
+    <Context.Provider
+      value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, isEditor }}
+    >
       {biteStyle !== 'gradient' && (
         <Layout.VisualizationWrapper
           ref={outerContainerRef}
@@ -643,57 +689,3 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 }
 
 export default CdcDataBite
-
-/* Constant */
-export const DATA_FUNCTION_MAX = 'Max'
-export const DATA_FUNCTION_COUNT = 'Count'
-export const DATA_FUNCTION_MEAN = 'Mean (Average)'
-export const DATA_FUNCTION_MEDIAN = 'Median'
-export const DATA_FUNCTION_MIN = 'Min'
-export const DATA_FUNCTION_MODE = 'Mode'
-export const DATA_FUNCTION_RANGE = 'Range'
-export const DATA_FUNCTION_SUM = 'Sum'
-export const DATA_FUNCTIONS = [
-  DATA_FUNCTION_COUNT,
-  DATA_FUNCTION_MAX,
-  DATA_FUNCTION_MEAN,
-  DATA_FUNCTION_MEDIAN,
-  DATA_FUNCTION_MIN,
-  DATA_FUNCTION_MODE,
-  DATA_FUNCTION_RANGE,
-  DATA_FUNCTION_SUM
-]
-
-export const BITE_LOCATION_TITLE = 'title'
-export const BITE_LOCATION_BODY = 'body'
-export const BITE_LOCATION_GRAPHIC = 'graphic'
-export const BITE_LOCATIONS = {
-  graphic: 'Graphic',
-  split: 'Split Graphic and Message',
-  title: 'Value above Message',
-  body: 'Value before Message',
-  end: 'Value after Message',
-  gradient: 'Gradient'
-}
-
-export const IMAGE_POSITION_LEFT = 'Left'
-export const IMAGE_POSITION_RIGHT = 'Right'
-export const IMAGE_POSITION_TOP = 'Top'
-export const IMAGE_POSITION_BOTTOM = 'Bottom'
-export const IMAGE_POSITIONS = [IMAGE_POSITION_LEFT, IMAGE_POSITION_RIGHT, IMAGE_POSITION_TOP, IMAGE_POSITION_BOTTOM]
-
-export const DATA_OPERATOR_LESS = '<'
-export const DATA_OPERATOR_GREATER = '>'
-export const DATA_OPERATOR_LESSEQUAL = '<='
-export const DATA_OPERATOR_GREATEREQUAL = '>='
-export const DATA_OPERATOR_EQUAL = '='
-export const DATA_OPERATOR_NOTEQUAL = '≠'
-
-export const DATA_OPERATORS = [
-  DATA_OPERATOR_LESS,
-  DATA_OPERATOR_GREATER,
-  DATA_OPERATOR_LESSEQUAL,
-  DATA_OPERATOR_GREATEREQUAL,
-  DATA_OPERATOR_EQUAL,
-  DATA_OPERATOR_NOTEQUAL
-]

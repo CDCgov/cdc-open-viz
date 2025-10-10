@@ -1,0 +1,13 @@
+diff --git a/node_modules/@visx/vendor/vendor-cjs/d3-time/src/ticks.js b/node_modules/@visx/vendor/vendor-cjs/d3-time/src/ticks.js
+index 611151f..46d97d4 100644
+--- a/node_modules/@visx/vendor/vendor-cjs/d3-time/src/ticks.js
++++ b/node_modules/@visx/vendor/vendor-cjs/d3-time/src/ticks.js
+@@ -15,7 +15,7 @@ var _week = require("./week.js");
+ var _month = require("./month.js");
+ var _year = require("./year.js");
+ function ticker(year, month, week, day, hour, minute) {
+-  const tickIntervals = [[_second.second, 1, _duration.durationSecond], [_second.second, 5, 5 * _duration.durationSecond], [_second.second, 15, 15 * _duration.durationSecond], [_second.second, 30, 30 * _duration.durationSecond], [minute, 1, _duration.durationMinute], [minute, 5, 5 * _duration.durationMinute], [minute, 15, 15 * _duration.durationMinute], [minute, 30, 30 * _duration.durationMinute], [hour, 1, _duration.durationHour], [hour, 3, 3 * _duration.durationHour], [hour, 6, 6 * _duration.durationHour], [hour, 12, 12 * _duration.durationHour], [day, 1, _duration.durationDay], [day, 2, 2 * _duration.durationDay], [week, 1, _duration.durationWeek], [month, 1, _duration.durationMonth], [month, 3, 3 * _duration.durationMonth], [year, 1, _duration.durationYear]];
++  const tickIntervals = [[_second.second, 1, _duration.durationSecond], [_second.second, 5, 5 * _duration.durationSecond], [_second.second, 15, 15 * _duration.durationSecond], [_second.second, 30, 30 * _duration.durationSecond], [minute, 1, _duration.durationMinute], [minute, 5, 5 * _duration.durationMinute], [minute, 15, 15 * _duration.durationMinute], [minute, 30, 30 * _duration.durationMinute], [hour, 1, _duration.durationHour], [hour, 3, 3 * _duration.durationHour], [hour, 6, 6 * _duration.durationHour], [hour, 12, 12 * _duration.durationHour], [day, 1, _duration.durationDay], [day, 2, 2 * _duration.durationDay], [week, 1, _duration.durationWeek], [month, 1, _duration.durationMonth], [month, 3, 3 * _duration.durationMonth], [month, 4, 4 * _duration.durationMonth], [month, 6, 6 * _duration.durationMonth], [year, 1, _duration.durationYear]];
+   function ticks(start, stop, count) {
+     const reverse = stop < start;
+     if (reverse) [start, stop] = [stop, start];

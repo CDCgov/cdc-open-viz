@@ -1,8 +1,12 @@
 import _ from 'lodash'
+import cloneConfig from '../cloneConfig'
 
 const remapTableDownloadCSV = config => {
   if (config.general?.showDownloadButton !== undefined) {
-    const download = config.general.showDownloadButton
+    let download = config.general.showDownloadButton
+    if (config.type === 'chart') {
+      download = config.table.download || config.general.showDownloadButton
+    }
     delete config.general.showDownloadButton
     config.table.download = download
   }
@@ -29,7 +33,7 @@ const migrateAreaChart = config => {
 
 const update_4_25_3 = config => {
   const ver = '4.25.3'
-  const newConfig = _.cloneDeep(config)
+  const newConfig = cloneConfig(config)
   handleVisualizations(newConfig)
   remapTableDownloadCSV(newConfig)
   migrateAreaChart(newConfig)

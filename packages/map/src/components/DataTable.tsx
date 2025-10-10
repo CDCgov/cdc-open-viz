@@ -12,8 +12,10 @@ import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Loading from '@cdc/core/components/Loading'
 import { navigationHandler } from '../helpers'
 import ConfigContext, { MapDispatchContext } from '../context'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getPatternForRow } from '../helpers/getPatternForRow'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const DataTable = props => {
   const {
     state,
@@ -29,11 +31,12 @@ const DataTable = props => {
     applyLegendToRow,
     displayGeoName,
     formatLegendLocation,
-    tabbingId
+    tabbingId,
+    interactionLabel
   } = props
 
   const dispatch = useContext(MapDispatchContext)
-  const { currentViewport: viewport } = useContext(ConfigContext)
+  const { currentViewport: viewport, mapId } = useContext(ConfigContext)
   const [expanded, setExpanded] = useState(expandDataTable)
   const [sortBy, setSortBy] = useState({ column: 'geo', asc: false })
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
@@ -123,7 +126,7 @@ const DataTable = props => {
           role='link'
           tabIndex='0'
           onKeyDown={e => {
-            if (e.keyCode === 13) {
+            if (e.key === 'Enter') {
               navigationHandler(state.general.navigationTarget, row[columns.navigate.name])
             }
           }}
@@ -176,7 +179,17 @@ const DataTable = props => {
       <a
         download={fileName}
         type='button'
-        onClick={saveBlob}
+        onClick={() => {
+          saveBlob
+          publishAnalyticsEvent({
+            vizType: state.type,
+            vizSubType: getVizSubType(state),
+            eventType: 'data_downloaded',
+            eventAction: 'click',
+            eventLabel: interactionLabel,
+            vizTitle: getVizTitle(state)
+          })
+        }}
         href={URL.createObjectURL(blob)}
         aria-label='Download this data in a CSV file format.'
         className={`${headerColor} no-border`}
@@ -192,8 +205,8 @@ const DataTable = props => {
   const TableMediaControls = ({ belowTable }) => {
     return (
       <MediaControls.Section classes={['download-links']}>
-        <MediaControls.Link config={state} />
-        {state.table.download && <DownloadButton />}
+        <MediaControls.Link config={state} interactionLabel={interactionLabel} />
+        {state.table.download && <DownloadButton config={state} />}
       </MediaControls.Section>
     )
   }
@@ -245,7 +258,7 @@ const DataTable = props => {
           }}
           tabIndex='0'
           onKeyDown={e => {
-            if (e.keyCode === 13) {
+            if (e.key === 'Enter') {
               setExpanded(!expanded)
             }
           }}
@@ -293,7 +306,7 @@ const DataTable = props => {
                           setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
                         }}
                         onKeyDown={e => {
-                          if (e.keyCode === 13) {
+                          if (e.key === 'Enter') {
                             setSortBy({ column, asc: sortBy.column === column ? !sortBy.asc : false })
                           }
                         }}
@@ -337,9 +350,28 @@ const DataTable = props => {
 
                           labelValue = getCellAnchor(labelValue, rowObj)
 
+                          // Check for pattern information
+                          const patternInfo = getPatternForRow(rowObj, state)
+
+                          const legendShape = patternInfo ? (
+                            <LegendShape
+                              fill={legendColor[0]}
+                              patternInfo={{
+                                pattern: patternInfo.pattern,
+                                patternId: `${mapId}--${String(patternInfo.dataKey).replace(' ', '-')}--${
+                                  patternInfo.patternIndex
+                                }--table`,
+                                size: patternInfo.size,
+                                color: patternInfo.color
+                              }}
+                            />
+                          ) : (
+                            <LegendShape fill={legendColor[0]} />
+                          )
+
                           cellValue = (
                             <>
-                              <LegendShape fill={legendColor[0]} />
+                              {legendShape}
                               {labelValue}
                             </>
                           )
@@ -349,9 +381,9 @@ const DataTable = props => {
 
                         return (
                           <td
-                            tabIndex='0'
+                            tabIndex={0}
                             role='gridcell'
-                            onClick={e =>
+                            onClick={() =>
                               state.general.type === 'bubble' &&
                               state.general.allowMapZoom &&
                               state.general.geoType === 'world'

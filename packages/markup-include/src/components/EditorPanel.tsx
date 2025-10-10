@@ -3,6 +3,8 @@ import React, { useState, useEffect, memo, useContext, useRef, useMemo, useReduc
 // Third Party
 import _ from 'lodash'
 
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
+
 // Context
 import { Variable } from '../types/Variable'
 import ConfigContext from '../ConfigContext'
@@ -24,6 +26,8 @@ import '@cdc/core/styles/v2/components/editor.scss'
 import './editorPanel.style.css'
 import VariableSection from './Variables'
 import { CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
+import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
+import { Datasets } from '@cdc/core/types/DataSet'
 
 const headerColors = [
   'theme-blue',
@@ -39,13 +43,17 @@ const headerColors = [
   'theme-amber'
 ]
 
-const EditorPanel: React.FC = () => {
+type MarkupIncludeEditorPanelProps = {
+  datasets?: Datasets
+}
+
+const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
   const { config, data, isDashboard, loading, setParentConfig, updateConfig } = useContext(ConfigContext)
   const { contentEditor, theme, visual } = config
   const { inlineHTML, markupVariables, srcUrl, title, useInlineHTML, allowHideSection } = contentEditor
   const [displayPanel, setDisplayPanel] = useState(true)
   const updateField = updateFieldFactory(config, updateConfig, true)
-  const hasData = data?.[0] !== undefined ?? false
+  const hasData = data?.[0] !== undefined
 
   const openVariableControls = useState<boolean[]>([])
 
@@ -73,7 +81,7 @@ const EditorPanel: React.FC = () => {
   }
 
   const convertStateToConfig = () => {
-    const strippedState = _.cloneDeep(config)
+    const strippedState = cloneConfig(config)
     delete strippedState.newViz
     delete strippedState.runtime
 
@@ -217,6 +225,14 @@ const EditorPanel: React.FC = () => {
                       </Tooltip>
                     }
                   />
+
+                  <CheckBox
+                    value={contentEditor.showNoDataMessage}
+                    section='contentEditor'
+                    fieldName='showNoDataMessage'
+                    label='Add No Data Message'
+                    updateField={updateField}
+                  />
                 </div>
 
                 <div className='mb-1 d-flex'>
@@ -296,6 +312,11 @@ const EditorPanel: React.FC = () => {
           />
         </div>
       </Accordion.Section>
+      {isDashboard && (
+        <Accordion.Section title='Footnotes'>
+          <FootnotesEditor config={config} updateField={updateField} datasets={datasets} />
+        </Accordion.Section>
+      )}
     </Accordion>
   )
 

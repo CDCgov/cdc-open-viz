@@ -118,9 +118,17 @@ const CheckBox = memo((props: CheckboxProps) => {
     return <></>
   }
   return (
-    <label className='checkbox column-heading'>
+    <label
+      className='checkbox column-heading'
+      onClick={e => {
+        if (!['SPAN', 'INPUT'].includes(e.target.nodeName)) {
+          e.preventDefault()
+        }
+      }}
+    >
       <input
         type='checkbox'
+        className='edit-checkbox'
         name={fieldName}
         checked={value}
         onChange={e => {

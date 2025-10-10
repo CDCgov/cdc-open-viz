@@ -7,13 +7,17 @@ import Loading from '@cdc/core/components/Loading'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
+import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { drawShape, createShapeProperties } from '../helpers/shapes'
-import { getGeoStrokeColor, handleMapAriaLabels, displayGeoName } from '../../../helpers'
+import { getGeoStrokeColor, handleMapAriaLabels, displayGeoName, isLegendItemDisabled } from '../../../helpers'
+import { supportedStatesFipsCodes } from '../../../data/supported-geos'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
-import useApplyLegendToRow from '../../../hooks/useApplyLegendToRow'
+import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import { MapConfig } from '../../../types/MapConfig'
 import { DEFAULT_MAP_BACKGROUND } from '../../../helpers/constants'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -130,21 +134,21 @@ const CountyMap = () => {
   const {
     container,
     containerEl,
-    data,
+    runtimeData,
     runtimeFilters,
     runtimeLegend,
     setConfig,
     config,
     tooltipId,
     tooltipRef,
-    legendMemo,
-    legendSpecialClassLastMemo
+    interactionLabel
   } = useContext(ConfigContext)
+
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
   // CREATE STATE LINES
   const geoStrokeColor = getGeoStrokeColor(config)
   const { geoClickHandler } = useGeoClickHandler()
-  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const [focus, setFocus] = useState({})
   const [topoData, setTopoData] = useState({})
@@ -199,7 +203,7 @@ const CountyMap = () => {
   const canvasRef = useRef()
 
   // If runtimeData is not defined, show loader
-  if (!data || !isTopoReady(topoData, config, runtimeFilters)) {
+  if (!runtimeData || !isTopoReady(topoData, config, runtimeFilters)) {
     return (
       <div style={{ height: 300 }}>
         <Loading />
@@ -207,10 +211,18 @@ const CountyMap = () => {
     )
   }
 
-  const runtimeKeys = Object.keys(data)
+  const runtimeKeys = Object.keys(runtimeData)
   const lineWidth = 1
 
   const onReset = () => {
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: 'map_reset_zoom_level',
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config)
+    })
     setConfig({
       ...config,
       mapPosition: { coordinates: [0, 30], zoom: 1 }
@@ -254,8 +266,8 @@ const CountyMap = () => {
             break
           }
         }
-        if (county && data[county.id]) {
-          geoClickHandler(displayGeoName(county.id), data[county.id])
+        if (county && runtimeData[county.id]) {
+          geoClickHandler(displayGeoName(county.id), runtimeData[county.id])
         }
       }
 
@@ -269,17 +281,36 @@ const CountyMap = () => {
 
       // Redraw with focus on state
       setFocus({ id: clickedState.id, index: focusIndex, center: geoCentroid(clickedState), feature: clickedState })
+      publishAnalyticsEvent({
+        vizType: config.type,
+        vizSubType: getVizSubType(config),
+        eventType: `zoom_in`,
+        eventAction: 'click',
+        eventLabel: interactionLabel,
+        vizTitle: getVizTitle(config),
+        specifics: `zoom_level: 3, location: ${clickedState.properties.name}`
+      })
     }
     if (config.general.type === 'us-geocode') {
       const geoRadius = (config.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
       let clickedGeo
       for (let i = 0; i < runtimeKeys.length; i++) {
         const pixelCoords = topoData.projection([
-          data[runtimeKeys[i]][config.columns.longitude.name],
-          data[runtimeKeys[i]][config.columns.latitude.name]
+          runtimeData[runtimeKeys[i]][config.columns.longitude.name],
+          runtimeData[runtimeKeys[i]][config.columns.latitude.name]
         ])
-        if (pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
-          clickedGeo = data[runtimeKeys[i]]
+        if (
+          pixelCoords &&
+          Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius &&
+          !isLegendItemDisabled(
+            runtimeData[runtimeKeys[i]],
+            runtimeLegend,
+            legendMemo,
+            legendSpecialClassLastMemo,
+            config
+          )
+        ) {
+          clickedGeo = runtimeData[runtimeKeys[i]]
           break
         }
       }
@@ -317,8 +348,23 @@ const CountyMap = () => {
     if (config.general.type !== 'us-geocode') {
       //If no tooltip is shown, or if the current geo associated with the tooltip shown is no longer containing the mouse, then rerender the tooltip
       if (isNaN(currentTooltipIndex) || !geoContains(topoData.mapData[currentTooltipIndex], pointCoordinates)) {
-        if (!isNaN(currentTooltipIndex) && applyLegendToRow(data[topoData.mapData[currentTooltipIndex].id], config)) {
-          context.fillStyle = applyLegendToRow(data[topoData.mapData[currentTooltipIndex].id], config)[0]
+        if (
+          !isNaN(currentTooltipIndex) &&
+          applyLegendToRow(
+            runtimeData[topoData.mapData[currentTooltipIndex].id],
+            config,
+            runtimeLegend,
+            legendMemo,
+            legendSpecialClassLastMemo
+          )
+        ) {
+          context.fillStyle = applyLegendToRow(
+            runtimeData[topoData.mapData[currentTooltipIndex].id],
+            config,
+            runtimeLegend,
+            legendMemo,
+            legendSpecialClassLastMemo
+          )[0]
           context.strokeStyle = geoStrokeColor
           context.lineWidth = lineWidth
           context.beginPath()
@@ -350,9 +396,15 @@ const CountyMap = () => {
         }
 
         // If the hovered county is found, show the tooltip for that county, otherwise hide the tooltip
-        if (county && data[county.id]) {
-          if (applyLegendToRow(data[county.id], config)) {
-            let fillColor = applyLegendToRow(data[county.id], config)[0]
+        if (county && runtimeData[county.id]) {
+          if (applyLegendToRow(runtimeData[county.id], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)) {
+            let fillColor = applyLegendToRow(
+              runtimeData[county.id],
+              config,
+              runtimeLegend,
+              legendMemo,
+              legendSpecialClassLastMemo
+            )[0]
             if (fillColor === '#000000') return
             context.globalAlpha = 1
             context.fillStyle = fillColor
@@ -364,6 +416,24 @@ const CountyMap = () => {
             context.stroke()
           }
 
+          // Track hover analytics event if this is a new location
+          if (isNaN(currentTooltipIndex) || currentTooltipIndex !== countyIndex) {
+            const countyName = displayGeoName(county.id).replace(/[^a-zA-Z0-9]/g, ' ')
+            const stateFips = county.id.slice(0, 2)
+            const stateName = supportedStatesFipsCodes[stateFips]?.replace(/[^a-zA-Z0-9]/g, '_') || 'unknown'
+            const locationName = `${countyName}, ${stateName}`
+            publishAnalyticsEvent({
+              vizType: config.type,
+              vizSubType: getVizSubType(config),
+              eventType: `map_hover`,
+              eventAction: 'hover',
+              eventLabel: interactionLabel,
+              vizTitle: getVizTitle(config),
+              location: displayGeoName(county.id),
+              specifics: `location: ${locationName?.toLowerCase()}`
+            })
+          }
+
           tooltipRef.current.style.display = 'block'
           tooltipRef.current.style.top = tooltipY + 'px'
           if (tooltipX > containerBounds.width / 2) {
@@ -373,7 +443,7 @@ const CountyMap = () => {
             tooltipRef.current.style.transform = 'translate(0, -50%)'
             tooltipRef.current.style.left = tooltipX + 5 + 'px'
           }
-          tooltipRef.current.innerHTML = applyTooltipsToGeo(displayGeoName(county.id), data[county.id])
+          tooltipRef.current.innerHTML = applyTooltipsToGeo(displayGeoName(county.id), runtimeData[county.id])
           tooltipRef.current.setAttribute('data-index', countyIndex)
         } else {
           tooltipRef.current.style.display = 'none'
@@ -384,8 +454,8 @@ const CountyMap = () => {
       // Handle geo map hover
       if (!isNaN(currentTooltipIndex)) {
         const pixelCoords = topoData.projection([
-          data[runtimeKeys[currentTooltipIndex]][config.columns.longitude.name],
-          data[runtimeKeys[currentTooltipIndex]][config.columns.latitude.name]
+          runtimeData[runtimeKeys[currentTooltipIndex]][config.columns.longitude.name],
+          runtimeData[runtimeKeys[currentTooltipIndex]][config.columns.latitude.name]
         ])
         if (pixelCoords && Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius) {
           return // The user is still hovering over the previous geo point, don't redraw tooltip
@@ -399,25 +469,42 @@ const CountyMap = () => {
       let hoveredGeoIndex
       for (let i = 0; i < runtimeKeys.length; i++) {
         const pixelCoords = topoData.projection([
-          data[runtimeKeys[i]][config.columns.longitude.name],
-          data[runtimeKeys[i]][config.columns.latitude.name]
+          runtimeData[runtimeKeys[i]][config.columns.longitude.name],
+          runtimeData[runtimeKeys[i]][config.columns.latitude.name]
         ])
         let includedShapes = ['circle', 'diamond', 'star', 'triangle', 'square'].includes(config.visual.cityStyle)
         if (
           includedShapes &&
           pixelCoords &&
           Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius &&
-          applyLegendToRow(data[runtimeKeys[i]], config)
+          applyLegendToRow(
+            runtimeData[runtimeKeys[i]],
+            config,
+            runtimeLegend,
+            legendMemo,
+            legendSpecialClassLastMemo
+          ) &&
+          !isLegendItemDisabled(
+            runtimeData[runtimeKeys[i]],
+            runtimeLegend,
+            legendMemo,
+            legendSpecialClassLastMemo,
+            config
+          )
         ) {
-          hoveredGeo = data[runtimeKeys[i]]
+          hoveredGeo = runtimeData[runtimeKeys[i]]
           hoveredGeoIndex = i
           break
         }
 
         if (config.visual.cityStyle === 'pin' && pixelCoords) {
           const distance = Math.hypot(pixelCoords[0] - x, pixelCoords[1] - y)
-          if (distance < 15 && applyLegendToRow(data[runtimeKeys[i]], config)) {
-            hoveredGeo = data[runtimeKeys[i]]
+          if (
+            distance < 15 &&
+            applyLegendToRow(data[runtimeKeys[i]], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo) &&
+            !isLegendItemDisabled(data[runtimeKeys[i]], runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
+          ) {
+            hoveredGeo = runtimeData[runtimeKeys[i]]
             hoveredGeoIndex = i
             break
           }
@@ -425,6 +512,21 @@ const CountyMap = () => {
       }
 
       if (hoveredGeo) {
+        // Track hover analytics event if this is a new location
+        if (isNaN(currentTooltipIndex) || currentTooltipIndex !== hoveredGeoIndex) {
+          const locationName = displayGeoName(hoveredGeo[config.columns.geo.name]).replace(/[^a-zA-Z0-9]/g, '_')
+          publishAnalyticsEvent({
+            vizType: config.type,
+            vizSubType: getVizSubType(config),
+            eventType: `map_hover`,
+            eventAction: 'hover',
+            eventLabel: interactionLabel,
+            vizTitle: getVizTitle(config),
+            location: displayGeoName(hoveredGeo[config.columns.geo.name]),
+            specifics: `location: ${locationName?.toLowerCase()}`
+          })
+        }
+
         tooltipRef.current.style.display = 'block'
         tooltipRef.current.style.top = tooltipY + 'px'
         if (tooltipX > containerBounds.width / 2) {
@@ -501,10 +603,13 @@ const CountyMap = () => {
         if (!focus.id && config.general.type === 'us-geocode' && geo.id.length > 2) return
 
         // Gets numeric data associated with the topo data for this state/county
-        const geoData = data[geo.id]
+        const geoData = runtimeData[geo.id]
 
         // Renders state/county
-        const legendValues = geoData !== undefined ? applyLegendToRow(geoData, config) : false
+        const legendValues =
+          geoData !== undefined
+            ? applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+            : false
         context.fillStyle =
           legendValues && config.general.type !== 'us-geocode'
             ? legendValues[0] === '#000000'
@@ -543,7 +648,7 @@ const CountyMap = () => {
         context.strokeStyle = geoStrokeColor
         const geoRadius = (config.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
         const { additionalCityStyles } = config.visual || []
-        const cityStyles = Object.values(data)
+        const cityStyles = Object.values(runtimeData)
           .filter(d => additionalCityStyles.some(style => String(d[style.column]) === String(style.value)))
           .map(d => {
             const conditionsMatched = additionalCityStyles.find(
@@ -560,7 +665,13 @@ const CountyMap = () => {
           ])
 
           if (cityPixelCoords) {
-            const legendValues = applyLegendToRow(data[city?.value], config)
+            const legendValues = applyLegendToRow(
+              runtimeData[city?.value],
+              config,
+              runtimeLegend,
+              legendMemo,
+              legendSpecialClassLastMemo
+            )
             if (legendValues) {
               if (legendValues?.[0] === '#000000') return
               const shapeType = city?.shape?.toLowerCase()
@@ -576,13 +687,16 @@ const CountyMap = () => {
           const citiesList = new Set(cityStyles.map(item => item.value))
 
           const pixelCoords = topoData.projection([
-            data[key][config.columns.longitude.name],
-            data[key][config.columns.latitude.name]
+            runtimeData[key][config.columns.longitude.name],
+            runtimeData[key][config.columns.latitude.name]
           ])
           if (pixelCoords && !citiesList.has(key)) {
-            const legendValues = data[key] !== undefined ? applyLegendToRow(data[key], config) : false
+            const legendValues =
+              runtimeData[key] !== undefined
+                ? applyLegendToRow(runtimeData[key], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+                : false
             if (legendValues) {
-              if (legendValues?.[0] === '#000000') return
+              if (legendValues?.[0] === '#000000' || legendValues?.[0] === DEFAULT_MAP_BACKGROUND) return
               const shapeType = config.visual.cityStyle.toLowerCase()
               const shapeProperties = createShapeProperties(shapeType, pixelCoords, legendValues, config, geoRadius)
               if (shapeProperties) {

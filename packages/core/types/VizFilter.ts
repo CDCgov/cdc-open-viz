@@ -30,6 +30,9 @@ export type GeneralFilter = FilterBase & {
   setByQueryParameter: string
   subGrouping: SubGrouping
   type: 'url'
+  filterFootnotes?: boolean
+  defaultValue?: string
+  resetLabel?: string
 }
 
 export type MultiSelectFilter = {
@@ -43,6 +46,7 @@ export type SubGrouping = {
   setByQueryParameter: string
   order?: OrderBy
   valuesLookup: Record<string, { orderedValues?: string[]; values: string[] }>
+  defaultValue?: string
 }
 
 export type VizFilter = GeneralFilter | MultiSelectFilter

@@ -6,7 +6,17 @@ import { Runtime } from '@cdc/core/types/Runtime'
 import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 import { Table } from '@cdc/core/types/Table'
 import { BoxPlot } from '@cdc/core/types/BoxPlot'
-import { General } from '@cdc/core/types/General'
+import { General as CoreGeneral } from '@cdc/core/types/General'
+
+// Extend the core General type to include palette information for charts
+export type General = CoreGeneral & {
+  palette?: {
+    name?: string
+    version?: string
+    isReversed?: boolean
+    customColors?: string[]
+  }
+}
 import { type Link } from './../components/Sankey/types'
 import { type DataDescription } from '@cdc/core/types/DataDescription'
 import { type Legend as CoreLegend } from '@cdc/core/types/Legend'
@@ -16,6 +26,7 @@ import { Region } from '@cdc/core/types/Region'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { Version } from '@cdc/core/types/Version'
+import Footnotes from '@cdc/core/types/Footnotes'
 
 export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 export type ChartColumns = Record<string, Column>
@@ -43,7 +54,7 @@ export interface PreliminaryDataItem {
   iconCode: string
   label: string
   lineCode: string
-  seriesKey: string
+  seriesKeys: string[]
   style: string
   symbol: string
   type: 'effect' | 'suppression'
@@ -69,7 +80,7 @@ type DataFormat = {
   rightSuffix: string
   roundTo: number
   suffix: string
-  onlyShowTopPrefixSuffix?: boolean
+  showPiePercent: boolean
 }
 
 type Exclusions = {
@@ -94,6 +105,18 @@ export type Legend = CoreLegend & {
     topBottom: boolean
   }
   groupBy: string
+  separators?: string
+  patterns?: {
+    [key: string]: {
+      label?: string
+      color?: string
+      shape?: string
+      dataKey?: string
+      dataValue?: string
+      contrastCheck?: boolean
+      patternSize?: number
+    }
+  }
 }
 
 type Visual = {
@@ -118,16 +141,11 @@ export type AllChartsConfig = {
   barStyle: 'lollipop' | 'rounded' | 'flat'
   barThickness: number
   boxplot: BoxPlot
-  brush: {
-    active: boolean
-    height: number
-  }
   chartMessage: { noData?: string }
   color: string
   colorMatchLineSeriesLabels: boolean
   columns: ChartColumns
   confidenceKeys: ConfidenceInterval
-  customColors: string[]
   data: Object[]
   dataUrl: string
   dataCutoff: number
@@ -139,7 +157,8 @@ export type AllChartsConfig = {
   exclusions: Exclusions
   filters: VizFilter[]
   filterBehavior: FilterBehavior
-  footnotes: string
+  legacyFootnotes: string // this footnote functionality should be moved to the Footnotes component
+  footnotes: Footnotes
   forestPlot: ForestPlotConfigSettings
   formattedData: Object[] & { urlFiltered: boolean }
   heights: {

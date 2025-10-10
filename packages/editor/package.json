@@ -1,6 +1,6 @@
 {
   "name": "@cdc/editor",
-  "version": "4.25.3",
+  "version": "4.25.7-2",
   "description": "React component for generating a new component entry",
   "moduleName": "CdcEditor",
   "main": "dist/cdceditor",
@@ -25,21 +25,28 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@cdc/chart": "^4.25.3",
-    "@cdc/core": "^4.25.3",
-    "@cdc/dashboard": "^4.25.3",
-    "@cdc/data-bite": "^4.25.3",
-    "@cdc/map": "^4.25.3",
-    "@cdc/markup-include": "^4.25.3",
-    "@cdc/waffle-chart": "^4.25.3",
-    "axios": "^1.6.0",
-    "d3": "^7.0.0",
-    "react-dropzone": "^11.2.4",
-    "use-debounce": "^5.2.0"
+    "@cdc/chart": "^4.25.7",
+    "@cdc/core": "^4.25.7",
+    "@cdc/dashboard": "^4.25.7-2",
+    "@cdc/data-bite": "^4.25.7",
+    "@cdc/map": "^4.25.7-2",
+    "@cdc/markup-include": "^4.25.7",
+    "@cdc/waffle-chart": "^4.25.7",
+    "axios": "^1.9.0",
+    "d3": "^7.9.0",
+    "react-dropzone": "^14.3.8",
+    "use-debounce": "^10.0.5"
   },
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "gitHead": "c4b0402afe6ed209a85b7078711549b9fd7dae7d"
+  "devDependencies": {
+    "vite": "^4.4.11",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite-plugin-css-injected-by-js": "^2.4.0",
+    "vite-plugin-svgr": "^2.4.0",
+    "@rollup/plugin-dsv": "^3.0.2"
+  },
+  "gitHead": "6097de1ff814001880d9ac64bd66becdc092d63c"
 }

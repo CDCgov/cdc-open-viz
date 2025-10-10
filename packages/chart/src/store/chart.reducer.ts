@@ -4,31 +4,7 @@ import { ChartConfig, type ViewportSize } from '../types/ChartConfig'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import _ from 'lodash'
 
-export const getInitialState = (configObj: ChartConfig) => {
-  return {
-    isLoading: true,
-    config: defaults,
-    stateData: _.cloneDeep(configObj?.data) || [],
-    colorScale: null,
-    excludedData: undefined,
-    filteredData: undefined,
-    seriesHighlight:
-      configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : [],
-    currentViewport: 'lg',
-    dimensions: [0, 0],
-    container: null,
-    coveLoadedEventRan: false,
-    isDraggingAnnotation: false,
-    imageId: `cove-${Math.random().toString(16).slice(-4)}`,
-    brushConfig: {
-      data: [],
-      isActive: false,
-      isBrushing: false
-    }
-  }
-}
-
-type State = {
+type ChartState = {
   isLoading: boolean
   config: ChartConfig
   stateData: object[]
@@ -42,14 +18,30 @@ type State = {
   coveLoadedEventRan: boolean
   isDraggingAnnotation: boolean
   imageId: string
-  brushConfig: {
-    data: object[]
-    isActive: boolean
-    isBrushing: boolean
+  brushData: object[] | []
+}
+
+export const getInitialState = (configObj: ChartConfig): ChartState => {
+  return {
+    isLoading: true,
+    config: defaults,
+    stateData: configObj?.data || [],
+    colorScale: null,
+    excludedData: undefined,
+    filteredData: undefined,
+    seriesHighlight:
+      configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : [],
+    currentViewport: 'lg',
+    dimensions: [0, 0],
+    container: null,
+    coveLoadedEventRan: false,
+    isDraggingAnnotation: false,
+    imageId: `cove-${Math.random().toString(16).slice(-4)}`,
+    brushData: []
   }
 }
 
-export const reducer = (state: State, action: ChartActions) => {
+export const reducer = (state: ChartState, action: ChartActions): ChartState => {
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, isLoading: action.payload }
@@ -77,7 +69,7 @@ export const reducer = (state: State, action: ChartActions) => {
       return { ...state, coveLoadedEventRan: action.payload }
     case 'SET_DRAG_ANNOTATIONS':
       return { ...state, isDraggingAnnotation: action.payload }
-    case 'SET_BRUSH_CONFIG':
-      return { ...state, brushConfig: action.payload }
+    case 'SET_BRUSH_DATA':
+      return { ...state, brushData: action.payload }
   }
 }

@@ -46,7 +46,6 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
 
   min = enteredMinValue && isMinValid ? Number(enteredMinValue) : minValue
   max = enteredMaxValue && isMaxValid ? Number(enteredMaxValue) : Number.MIN_VALUE
-
   const { lower, upper } = config?.confidenceKeys || {}
 
   if (lower && upper && config.visualizationType === 'Bar') {
@@ -167,35 +166,28 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
   }
 
   if (config.visualizationType === 'Line' && !convertLineToBarGraph) {
-    const isMinValid = isLogarithmicAxis
-      ? Number(enteredMinValue) >= 0 && Number(enteredMinValue) < minValue
-      : Number(enteredMinValue) < minValue
-    // update minValue for (0) Suppression points
-    const suppressedMinValue = tableData?.some((dataItem, index) => {
-      return config.preliminaryData?.some(pd => {
-        if (pd.type !== 'suppression' || !pd.style) return false
+    const numEnteredMin = Number(enteredMinValue)
+    const isMinValid = isLogarithmicAxis ? numEnteredMin >= 0 && numEnteredMin < minValue : numEnteredMin < minValue
 
-        // Filter data item based on current series keys and check if pd.value is present
-        const relevantData = _.pick(dataItem, config.runtime?.seriesKeys)
-        const isValuePresent = _.values(relevantData).includes(pd.value)
+    const suppressedMinValue = tableData?.some((item, i, arr) =>
+      config.preliminaryData?.some(({ type, style, column, value }) => {
+        if (type !== 'suppression' || !style) return false
 
-        // Check for value match condition
-        const valueMatch = pd.column ? dataItem[pd.column] === pd.value : isValuePresent
+        const values = _.values(_.pick(item, config.runtime?.seriesKeys))
+        const dynamicCategory = config.series[0].dynamicCategory
 
-        // Return true if the value matches and it's either the first or the last item
-        return valueMatch && (index === 0 || index === tableData.length - 1)
+        const match = column ? item[column] === value : values.includes(value)
+        const dynamic = dynamicCategory && (item[dynamicCategory] === column || !column)
+
+        return (match || dynamic) && (i === 0 || i === arr.length - 1)
       })
-    })
-    let isCategoricalAxis = config.yAxis.type === 'categorical'
-    min =
-      enteredMinValue !== '' && isMinValid
-        ? Number(enteredMinValue)
-        : suppressedMinValue
-        ? 0
-        : isCategoricalAxis
-        ? 0
-        : minValue
+    )
+
+    const isCategorical = config.yAxis.type === 'categorical'
+
+    min = enteredMinValue !== '' && isMinValid ? numEnteredMin : suppressedMinValue ? 0 : isCategorical ? 0 : minValue
   }
+
   //If data value max wasn't provided, calculate it
   if (max === Number.MIN_VALUE) {
     // if all values in data are negative set max = 0
@@ -241,6 +233,7 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
 
   if (config.visualizationType === 'Scatter Plot') {
     max = max * 1.1
+    min = min / 1.1
   }
 
   return { min, max, leftMax, rightMax }

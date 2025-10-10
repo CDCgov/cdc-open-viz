@@ -1,11 +1,32 @@
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
+import { Visualization } from '../../../types/Visualization'
 import Icon from '../../ui/Icon'
+import parse from 'html-react-parser'
 
-const ExpandCollapse = ({ expanded, setExpanded, tableTitle, fontSize, viewport }) => {
+interface ExpandCollapseProps {
+  expanded: boolean
+  setExpanded: (expanded: boolean) => void
+  tableTitle: string
+  config?: Visualization
+  interactionLabel?: string
+}
+
+const ExpandCollapse = ({ expanded, setExpanded, tableTitle, config, interactionLabel = '' }: ExpandCollapseProps) => {
   return (
     <div
       role='button'
       className={expanded ? 'data-table-heading p-3' : 'collapsed data-table-heading p-3'}
       onClick={() => {
+        publishAnalyticsEvent({
+          vizType: config?.type,
+          vizSubType: getVizSubType(config),
+          eventType: 'expand_collapse_toggled',
+          eventAction: 'click',
+          eventLabel: interactionLabel,
+          vizTitle: getVizTitle(config),
+          specifics: expanded ? 'collapsed' : 'expanded'
+        })
         setExpanded(!expanded)
       }}
       tabIndex={0}
@@ -16,7 +37,7 @@ const ExpandCollapse = ({ expanded, setExpanded, tableTitle, fontSize, viewport 
       }}
     >
       <Icon display={expanded ? 'minus' : 'plus'} base />
-      {tableTitle}
+      {parse(tableTitle)}
     </div>
   )
 }

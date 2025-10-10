@@ -14,9 +14,17 @@ import update_4_24_11 from './ver/4.24.11'
 import update_4_25_1 from './ver/4.25.1'
 import update_4_25_3 from './ver/4.25.3'
 import update_4_25_4 from './ver/4.25.4'
+import update_4_25_6 from './ver/4.25.6'
+import update_4_25_7 from './ver/4.25.7'
+import update_4_25_8 from './ver/4.25.8'
+import update_4_25_9 from './ver/4.25.9'
+
+import { stripDataFromConfig, restoreDataToConfig } from './configDataHelpers'
 
 export const coveUpdateWorker = (config, multiDashboardVersion?) => {
-  let genConfig = config
+  // Strip data from config for performance
+  const { strippedConfig, extractedData } = stripDataFromConfig(config)
+  let genConfig = strippedConfig
 
   if (multiDashboardVersion) genConfig.version = multiDashboardVersion
 
@@ -31,6 +39,10 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
     ['4.25.1', update_4_25_1],
     ['4.25.3', update_4_25_3],
     ['4.25.4', update_4_25_4],
+    ['4.25.6', update_4_25_6],
+    ['4.25.7', update_4_25_7],
+    ['4.25.8', update_4_25_8],
+    ['4.25.9', update_4_25_9]
   ]
 
   versions.forEach(([version, updateFunction, alwaysRun]: [string, UpdateFunction, boolean?]) => {
@@ -48,7 +60,9 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
 
   // config version is stored at the root level of the config.
   if (multiDashboardVersion) delete genConfig.version
-  return genConfig
+
+  // Restore data arrays after all updates are complete
+  return restoreDataToConfig(genConfig, extractedData)
 }
 
 export default coveUpdateWorker

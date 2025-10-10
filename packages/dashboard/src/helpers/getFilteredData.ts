@@ -12,7 +12,6 @@ export const getApplicableFilters = (dashboard: Dashboard, key: string | number)
   )
   return c?.length > 0 ? c : false
 }
-
 export const getFilteredData = (
   state: DashboardState,
   initialFilteredData?: Record<string, any>,

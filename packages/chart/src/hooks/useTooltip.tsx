@@ -1,14 +1,17 @@
 import { useContext } from 'react'
 // Local imports
+import parse from 'html-react-parser'
 import ConfigContext from '../ConfigContext'
 import { type ChartContext } from '../types/ChartContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 // Third-party library imports
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
-import _ from 'lodash'
+import _, { get } from 'lodash'
 import { getHorizontalBarHeights } from '../components/BarChart/helpers/getBarHeights'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 export const useTooltip = props => {
   const {
@@ -22,7 +25,7 @@ export const useTooltip = props => {
     setSharedFilter,
     isDraggingAnnotation
   } = useContext<ChartContext>(ConfigContext)
-  const { xScale, yScale, seriesScale, showTooltip, hideTooltip } = props
+  const { xScale, yScale, seriesScale, showTooltip, hideTooltip, interactionLabel = '' } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
 
   const Y_AXIS_SIZE = Number(config.yAxis.size || 0)
@@ -82,7 +85,7 @@ export const useTooltip = props => {
     const { x, y } = eventSvgCoords
 
     const resolvedScaleValues = getResolvedScaleValues([x, y])
-
+    const singleSeriesValue = getYValueFromCoordinate(y, resolvedScaleValues)
     const columnsWithTooltips = []
     const tooltipItems = [] as any[][]
     for (const [colKey, column] of Object.entries(config.columns)) {
@@ -94,7 +97,12 @@ export const useTooltip = props => {
       }
 
       const pieColumnData = additionalChartData?.arc?.data[column.name]
-      const columnData = resolvedScaleValues[0]?.[colKey]
+      const columnData =
+        config.tooltips.singleSeries && visualizationType === 'Line'
+          ? resolvedScaleValues.filter(
+              value => value[config.runtime.series[0].dynamicCategory] === singleSeriesValue
+            )[0][colKey]
+          : resolvedScaleValues[0]?.[colKey]
       const closestValue = config.visualizationType === 'Pie' ? pieColumnData : columnData
 
       const formattedValue = formatColNumber(closestValue, 'left', true, config, formattingParams)
@@ -111,19 +119,44 @@ export const useTooltip = props => {
 
     if (visualizationType === 'Pie') {
       const roundTo = Number(config.dataFormat.roundTo) || 0
-      const { endAngle, startAngle, data: pieData } = additionalChartData?.arc || {}
+
+      const pieData = additionalChartData?.data ?? {}
+      const startAngle = additionalChartData?.startAngle ?? 0
+      const endAngle = additionalChartData?.endAngle ?? 0
+      const actualPieValue = Number(additionalChartData.data[config?.yAxis?.dataKey])
+
       const degrees = ((endAngle - startAngle) * 180) / Math.PI
+      const pctOf360 = (degrees / 360) * 100
+      const pctString = value => value.toFixed(roundTo) + '%'
+      const showPiePercent = config.dataFormat.showPiePercent || false
 
-      // Calculate the percentage of the full circle (360 degrees)
-      const percentageOfCircle = (degrees / 360) * 100
-      const roundedPercentage = percentageOfCircle.toFixed(roundTo)
+      if (showPiePercent && pieData[config.xAxis.dataKey] === 'Calculated Area') {
+        tooltipItems.push(['', 'Calculated Area'])
+      } else {
+        // Track hover analytics event for pie chart series
+        if (pieData[config.xAxis.dataKey] && interactionLabel) {
+          const seriesName = String(pieData[config.xAxis.dataKey]).replace(/[^a-zA-Z0-9]/g, '_')
+          publishAnalyticsEvent({
+            vizType: config?.type,
+            vizSubType: getVizSubType(config),
+            eventType: `chart_hover`,
+            eventAction: 'hover',
+            eventLabel: interactionLabel,
+            vizTitle: getVizTitle(config),
+            series: pieData[config.xAxis.dataKey],
+            specifics: `hovered on: ${String(seriesName).toLowerCase()}`
+          })
+        }
 
-      tooltipItems.push(
-        // ignore
-        [config.xAxis.dataKey, pieData],
-        [config.runtime.yAxis.dataKey, formatNumber(pieData[config.runtime.yAxis.dataKey])],
-        ['Percent', `${roundedPercentage + '%'}`]
-      )
+        tooltipItems.push(
+          [config.xAxis.dataKey, pieData[config.xAxis.dataKey]],
+          [
+            config.runtime.yAxis.dataKey,
+            showPiePercent ? pctString(actualPieValue) : formatNumber(pieData[config.runtime.yAxis.dataKey])
+          ],
+          showPiePercent ? [] : ['Percent', pctString(pctOf360)]
+        )
+      }
     }
 
     if (visualizationType === 'Forest Plot') {
@@ -137,8 +170,7 @@ export const useTooltip = props => {
         const position = seriesObj?.axis ? String(seriesObj.axis).toLowerCase() : 'left'
         return position
       }
-      if (!config.tooltips.singleSeries) {
-        // Show All Series in One Tooltip
+      if (!config.tooltips.singleSeries || visualizationType === 'Line') {
         tooltipItems.push(
           ...getIncludedTooltipSeries()
             ?.filter(seriesKey => {
@@ -153,6 +185,23 @@ export const useTooltip = props => {
               const seriesObjWithName = config.runtime.series.find(
                 series => series.dataKey === seriesKey && series.name !== undefined
               )
+
+              // Track hover analytics event for linear chart series
+              if (interactionLabel && seriesKey && seriesKey !== config.xAxis?.dataKey && value) {
+                const seriesName = seriesObjWithName?.name || seriesKey
+                const safeSeriesName = String(seriesName).replace(/[^a-zA-Z0-9]/g, '_')
+                publishAnalyticsEvent({
+                  vizType: config?.type,
+                  vizSubType: getVizSubType(config),
+                  eventType: `chart_hover`,
+                  eventAction: 'hover',
+                  eventLabel: interactionLabel,
+                  vizTitle: getVizTitle(config),
+                  series: seriesName,
+                  specifics: `key: ${String(safeSeriesName).toLowerCase()}, value: ${value}`
+                })
+              }
+
               if (
                 (value === null || value === undefined || value === '' || formattedValue === 'N/A') &&
                 config.general.hideNullValue
@@ -166,7 +215,12 @@ export const useTooltip = props => {
             })
         )
 
-        config.runtime.series?.forEach(series => {
+        const runtimeSeries =
+          config.tooltips.singleSeries && visualizationType === 'Line'
+            ? [_.find(config.runtime.series, d => d.dataKey === singleSeriesValue)]
+            : config.runtime.series
+
+        runtimeSeries?.forEach(series => {
           if (series?.dynamicCategory) {
             const seriesKey = series.dataKey
             const resolvedScaleValue = resolvedScaleValues.find(v => v[series.dynamicCategory] === seriesKey)
@@ -178,6 +232,8 @@ export const useTooltip = props => {
           }
         })
       } else {
+        const dynamicSeries = config.series.find(s => s.dynamicCategory)
+
         // Show Only the Hovered Series in Tooltip
         const dataColumn = resolvedScaleValues[0]
         const [seriesKey, value] = findDataKeyByThreshold(y, dataColumn)
@@ -188,7 +244,7 @@ export const useTooltip = props => {
           tooltipItems.push([config.xAxis.dataKey, closestXScaleValue || xVal])
           const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
           tooltipItems.push([seriesKey, formattedValue])
-        } else {
+        } else if (dynamicSeries) {
           Object.keys(dataColumn).forEach(key => {
             tooltipItems.push([key, dataColumn[key]])
           })
@@ -264,10 +320,11 @@ export const useTooltip = props => {
       let minDistance = Number.MAX_VALUE
       let offset = x
 
+      const barThicknessOffset = config.xAxis.type === 'date' ? xScale.bandwidth() / 2 : 0
       data.forEach(d => {
         const xPosition = isDateScale(xAxis) ? xScale(parseDate(d[xAxis.dataKey])) : xScale(d[xAxis.dataKey])
         let bwOffset = config.barHeight
-        const distance = Math.abs(Number(xPosition - offset + (isClick ? bwOffset * 2 : 0)))
+        const distance = Math.abs(Number(xPosition + barThicknessOffset - offset + (isClick ? bwOffset * 2 : 0)))
 
         if (distance <= minDistance) {
           minDistance = distance
@@ -296,6 +353,23 @@ export const useTooltip = props => {
       dataColumn = d
     })
     return dataColumn
+  }
+
+  const getYValueFromCoordinate = (y, xData) => {
+    let closestYSeriesValue = null
+    let minDistance = Number.MAX_VALUE
+    let offset = y
+
+    xData.forEach(d => {
+      const yPosition = yScale(d[config.runtime.series[0].originalDataKey])
+      const distance = Math.abs(Number(yPosition - offset))
+
+      if (distance <= minDistance) {
+        minDistance = distance
+        closestYSeriesValue = d[config.runtime.series[0].dynamicCategory]
+      }
+    })
+    return closestYSeriesValue
   }
 
   const getClosestYValueHorizontalChart = mouseY => {
@@ -422,7 +496,7 @@ export const useTooltip = props => {
 
     let dataToSearch = (data || []).filter(d => d[xAxis.dataKey] === closestXScaleValue)
 
-    if (config.tooltips.singleSeries) {
+    if (config.tooltips.singleSeries && config.visualizationType !== 'Line') {
       const dynamicSeries = config.series.find(s => s.dynamicCategory)
       if (dynamicSeries) {
         const dataWithXScale = dataToSearch.map(
@@ -519,7 +593,9 @@ export const useTooltip = props => {
           config.runtime.yAxis.label ? `${config.runtime.yAxis.label}: ` : ''
         )} ${config.xAxis.type === 'date' ? formattedDate : value}`}</li>
       )
-
+    if (visualizationType === 'Pie' && config.dataFormat.showPiePercent && value === 'Calculated Area') {
+      return <li className='tooltip-heading'>{`${capitalize('Calculated Area')} `}</li>
+    }
     if (key === config.xAxis.dataKey)
       return (
         <li className='tooltip-heading'>{`${capitalize(
@@ -529,30 +605,38 @@ export const useTooltip = props => {
 
     // TOOLTIP BODY
     // handle suppressed tooltip items
-    const { label, displayGray } =
-      (config.visualizationSubType !== 'stacked' &&
-        config.general.showSuppressedSymbol &&
-        config.preliminaryData?.find(
-          pd =>
-            pd.label &&
-            pd.type === 'suppression' &&
-            pd.displayTooltip &&
-            value === pd.value &&
-            (!pd.column || key === pd.column)
-        )) ||
-      {}
+    const shouldCheckSuppression = config.visualizationSubType !== 'stacked'
+    let suppressionEntry
+    if (shouldCheckSuppression && config.preliminaryData) {
+      suppressionEntry = config.preliminaryData.find(
+        pd =>
+          pd.label &&
+          pd.type === 'suppression' &&
+          pd.displayTooltip &&
+          value === pd.value &&
+          (!pd.column || key === pd.column)
+      )
+    }
+
+    // Remove suppressed items entirely if not showing symbols
+    if (suppressionEntry && !config.general.showSuppressedSymbol) {
+      return null
+    }
+
+    const { label, displayGray } = suppressionEntry || {}
+
     let newValue = label || value
     const style = displayGray ? { color: '#8b8b8a' } : {}
 
-    if (index == 1 && config.dataFormat.onlyShowTopPrefixSuffix) {
+    if (index == 1 && config.yAxis?.inlineLabel) {
       newValue = `${config.dataFormat.prefix}${newValue}${config.dataFormat.suffix}`
     }
     const activeLabel = getSeriesNameFromLabel(key)
     const displayText = activeLabel ? `${activeLabel}: ${newValue}` : newValue
 
     return (
-      <li style={style} className='tooltip-body'>
-        {displayText}
+      <li style={style} className='tooltip-body mb-1'>
+        {displayText !== undefined ? parse(String(displayText)) : displayText}
       </li>
     )
   }

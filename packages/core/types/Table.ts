@@ -8,6 +8,7 @@ export type Table = {
   cellMinWidth?: number
   collapsible?: boolean
   dateDisplayFormat?: string
+  showNonGeoData?: boolean
   download?: boolean
   downloadVisibleDataOnly?: boolean
   downloadImageButton?: boolean
@@ -22,6 +23,7 @@ export type Table = {
   pivot?: Pivot
   show?: boolean
   sharedFilterColumns?: string[] // added at runtime by Dashboard
+  showBottomCollapse?: boolean // if true, the table will have a button to collapse at bottom of the expanded table
   showDataTableLink?: boolean
   showDownloadImgButton?: boolean
   showDownloadLinkBelow?: boolean

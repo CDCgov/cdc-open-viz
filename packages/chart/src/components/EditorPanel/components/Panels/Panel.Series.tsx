@@ -5,9 +5,12 @@ import ConfigContext from '../../../../ConfigContext'
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import Check from '@cdc/core/assets/icon-check.svg'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
-import { sequentialPalettes } from '@cdc/core/data/colorPalettes'
+import { colorPalettesChartV1, colorPalettesChartV2, sequentialPalettes } from '@cdc/core/data/colorPalettes'
+import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
+import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import Icon from '@cdc/core/components/ui/Icon'
 import { Select } from '@cdc/core/components/EditorPanel/Inputs'
+import { buildForecastPaletteOptions } from '../../../../helpers/buildForecastPaletteOptions'
 
 // Third Party
 import {
@@ -25,7 +28,7 @@ const SeriesContext = React.createContext({})
 const SeriesWrapper = props => {
   const { updateConfig, config, rawData } = useContext(ConfigContext)
 
-  const { getColumns, selectComponent } = props
+  const { getColumns, selectComponent, handleForecastPaletteSelection } = props
 
   const supportedRightAxisTypes = ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg']
 
@@ -57,7 +60,9 @@ const SeriesWrapper = props => {
   }
 
   return (
-    <SeriesContext.Provider value={{ updateSeries, supportedRightAxisTypes, getColumns, selectComponent }}>
+    <SeriesContext.Provider
+      value={{ updateSeries, supportedRightAxisTypes, getColumns, selectComponent, handleForecastPaletteSelection }}
+    >
       {props.children}
     </SeriesContext.Provider>
   )
@@ -240,7 +245,8 @@ const SeriesDropdownAxisPosition = props => {
 }
 
 const SeriesDropdownForecastColor = props => {
-  const { config, updateConfig } = useContext(ConfigContext)
+  const { config } = useContext(ConfigContext)
+  const { handleForecastPaletteSelection } = useContext(SeriesContext)
 
   const { index, series } = props
 
@@ -249,30 +255,32 @@ const SeriesDropdownForecastColor = props => {
   // Hide AxisPositionDropdown in certain cases.
   if (!series) return
 
-  const allowedForecastingColors = () => {
-    return Object.keys(sequentialPalettes)
-  }
+  // Determine palette version and use appropriate palette set
+  // Forecasting charts use sequentialPalettes for v1, sequential-only palettes for v2
+  const paletteVersion = getColorPaletteVersion(config)
+
+  // Get version-appropriate palettes (v1 uses sequentialPalettes, v2 uses filtered v2 palettes)
+  const forecastPalettes =
+    paletteVersion === 1
+      ? sequentialPalettes
+      : Object.fromEntries(Object.entries(colorPalettesChartV2).filter(([key]) => key.startsWith('sequential')))
+
+  // For dropdown options, only show version-specific palettes
+  const processedPalettes = updatePaletteNames(forecastPalettes)
+  const paletteOptions = buildForecastPaletteOptions(processedPalettes, paletteVersion)
 
   return series?.stages?.map((stage, stageIndex) => (
     <InputSelect
       key={`${stage}--${stageIndex}`}
       initial='Select an option'
-      value={
-        config.series?.[index].stages?.[stageIndex].color ? config.series?.[index].stages?.[stageIndex].color : 'Select'
-      }
+      value={config.series?.[index].stages?.[stageIndex].color || 'Select'}
       label={`${stage.key} Series Color`}
       onChange={event => {
-        const copyOfSeries = [...config.series] // copy the entire series array
-        const copyOfStages = copyOfSeries[index].stages
-        copyOfStages[stageIndex].color = event.target.value
-        copyOfSeries[index] = { ...copyOfSeries[index], stages: copyOfStages }
-
-        updateConfig({
-          ...config,
-          series: copyOfSeries
-        })
+        if (handleForecastPaletteSelection) {
+          handleForecastPaletteSelection(event.target.value, index, stageIndex)
+        }
       }}
-      options={Object.keys(sequentialPalettes)}
+      options={paletteOptions}
     />
   ))
 }
@@ -281,6 +289,7 @@ const SeriesDropdownConfidenceInterval = props => {
   const { config, updateConfig } = useContext(ConfigContext)
   const { series, index } = props
   const { getColumns } = useContext(SeriesContext)
+
   if (series.type !== 'Forecasting') return
 
   return (
@@ -289,18 +298,6 @@ const SeriesDropdownConfidenceInterval = props => {
       <fieldset>
         <Accordion allowZeroExpanded>
           {series?.confidenceIntervals?.map((ciGroup, ciIndex) => {
-            const showInTooltip = ciGroup.showInTooltip ? ciGroup.showInTooltip : false
-
-            const updateShowInTooltip = (e, seriesIndex, ciIndex) => {
-              e.preventDefault()
-              let copiedSeries = [...config.series]
-              copiedSeries[seriesIndex].confidenceIntervals[ciIndex].showInTooltip = !showInTooltip
-              updateConfig({
-                ...config,
-                series: copiedSeries
-              })
-            }
-
             return (
               <AccordionItem className='series-item series-item--chart' key={`${ciIndex}`}>
                 <AccordionItemHeading className='series-item__title'>
@@ -312,6 +309,7 @@ const SeriesDropdownConfidenceInterval = props => {
                         onClick={e => {
                           e.preventDefault()
                           const copiedIndex = [...config.series[index].confidenceIntervals]
+
                           copiedIndex.splice(ciIndex, 1)
                           const copyOfSeries = [...config.series] // copy the entire series array
                           copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: [...copiedIndex] }
@@ -327,28 +325,6 @@ const SeriesDropdownConfidenceInterval = props => {
                   </>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <div className='input-group'>
-                    <label htmlFor='showInTooltip'>Show In Tooltip</label>
-                    <div
-                      className={'cove-input__checkbox--small'}
-                      onClick={e => updateShowInTooltip(e, index, ciIndex)}
-                    >
-                      <div
-                        className={`cove-input__checkbox-box${'blue' ? ' custom-color' : ''}`}
-                        style={{ backgroundColor: '' }}
-                      >
-                        {showInTooltip && <Check className='' style={{ fill: '#025eaa' }} />}
-                      </div>
-                      <input
-                        className='cove-input--hidden'
-                        type='checkbox'
-                        name={'showInTooltip'}
-                        checked={showInTooltip ? showInTooltip : false}
-                        readOnly
-                      />
-                    </div>
-                  </div>
-
                   <InputSelect
                     initial='Select an option'
                     value={
@@ -627,6 +603,7 @@ const SeriesItem = props => {
     ['Bar', 'Line'].includes(config.visualizationType) &&
     config.visualizationSubType !== 'Stacked' &&
     !config.series.find(s => s.dynamicCategory && s.dataKey !== series.dataKey)
+  const SELECT = '- Select -'
   return (
     <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
       {(provided, snapshot) => (
@@ -661,9 +638,9 @@ const SeriesItem = props => {
                       <Select
                         label='Dynamic Category'
                         value={series.dynamicCategory}
-                        options={['- Select - ', ...getColumns().filter(col => series.dataKey !== col)]}
+                        options={[SELECT, ...getColumns().filter(col => series.dataKey !== col)]}
                         updateField={(_section, _subsection, _fieldName, value) => {
-                          if (value === '- Select -') value = ''
+                          if (value === SELECT) value = ''
                           updateSeries(i, value, 'dynamicCategory')
                         }}
                         tooltip={

@@ -28,6 +28,8 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import './scss/main.scss'
 import Title from '@cdc/core/components/ui/Title'
 import Layout from '@cdc/core/components/Layout'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 type CdcWaffleChartProps = {
   configUrl?: string
@@ -36,6 +38,7 @@ type CdcWaffleChartProps = {
   isEditor?: boolean
   link?: string
   setConfig?: () => void
+  interactionLabel?: string
 }
 
 const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateConfig }) => {
@@ -438,7 +441,8 @@ const CdcWaffleChart = ({
   config: configObj,
   isDashboard = false,
   isEditor = false,
-  setConfig: setParentConfig
+  setConfig: setParentConfig,
+  interactionLabel = ''
 }: CdcWaffleChartProps) => {
   // Default States
   const [state, dispatch] = useReducer(chartReducer, {
@@ -506,6 +510,14 @@ const CdcWaffleChart = ({
   useEffect(() => {
     if (config && !coveLoadedHasRan && container) {
       publish('cove_loaded', { config: config })
+      publishAnalyticsEvent({
+        vizType: 'waffle-chart',
+        vizSubType: getVizSubType(config),
+        eventType: 'waffle-chart_ready',
+        eventAction: 'load',
+        eventLabel: interactionLabel,
+        vizTitle: getVizTitle(config)
+      })
       dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
     }
   }, [config, container])

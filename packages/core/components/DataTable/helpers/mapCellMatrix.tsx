@@ -4,7 +4,9 @@ import { DataTableProps } from '../DataTable'
 import { ReactNode } from 'react'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import _ from 'lodash'
-import useApplyLegendToRow from '@cdc/map/src/hooks/useApplyLegendToRow'
+import { applyLegendToRow } from '@cdc/map/src/helpers/applyLegendToRow'
+import { hashObj } from '@cdc/map/src/helpers'
+import { getPatternForRow } from '@cdc/map/src/helpers/getPatternForRow'
 
 type MapRowsProps = DataTableProps & {
   rows: string[]
@@ -78,7 +80,8 @@ const mapCellArray = ({
   navigationHandler,
   setFilteredCountryCode,
   legendMemo,
-  legendSpecialClassLastMemo
+  legendSpecialClassLastMemo,
+  runtimeLegend
 }: MapRowsProps): ReactNode[][] => {
   const { allowMapZoom, geoType, type } = config.general
   return rows.map(row =>
@@ -91,9 +94,8 @@ const mapCellArray = ({
             throw new Error('No row object found')
           }
 
-          const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
-
-          const legendColor = applyLegendToRow(rowObj)
+          const legendColor = applyLegendToRow(rowObj, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+          const noColor = !legendMemo.current.has(hashObj(rowObj))
 
           if (!legendColor) {
             console.error('No legend color found') // eslint-disable-line no-console
@@ -101,11 +103,32 @@ const mapCellArray = ({
           const labelValue = getGeoLabel(config, row, formatLegendLocation, displayGeoName)
           const mapZoomHandler =
             type === 'bubble' && allowMapZoom && geoType === 'world' ? () => setFilteredCountryCode(row) : undefined
+
+          const validColor = legendColor && legendColor.length > 0 && !noColor
+          
+          // Check for pattern information
+          const patternInfo = getPatternForRow(rowObj, config)
+          const mapId = config.runtime?.uniqueId || 'map'
+          
           return (
             <div className='col-12'>
-              {legendColor && legendColor.length > 0 && (
-                <LegendShape fill={legendColor[0]} />
-            )}
+              {validColor ? (
+                patternInfo ? (
+                  <LegendShape
+                    fill={legendColor[0]}
+                    patternInfo={{
+                      pattern: patternInfo.pattern,
+                      patternId: `${mapId}--${patternInfo.dataKey}--${patternInfo.patternIndex}--table`,
+                      size: patternInfo.size,
+                      color: patternInfo.color
+                    }}
+                  />
+                ) : (
+                  <LegendShape fill={legendColor[0]} />
+                )
+              ) : (
+                <div className='d-inline-block me-2' style={{ width: '1rem', height: '1rem' }} />
+              )}
               <CellAnchor
                 markup={labelValue}
                 row={rowObj}

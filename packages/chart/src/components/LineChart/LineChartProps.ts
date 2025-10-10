@@ -29,9 +29,11 @@ export interface StyleProps {
   handleLineType: Function
   lineType: string
   preliminaryData: PreliminaryDataItem[]
-  seriesKey: 'string'
+  seriesKey: string
   stroke: string
   strokeWidth: number
+  dynamicCategory: string
+  originalSeriesKey: string
 }
 export interface Style {
   stroke: string

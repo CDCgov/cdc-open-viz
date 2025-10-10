@@ -197,7 +197,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsTooltipLines = () => {
-    const enabledCharts = ['Combo', 'Forecasting', 'Area Chart', 'Line', 'Bar']
+    const enabledCharts = ['Combo', 'Forecasting', 'Area Chart', 'Line', 'Bar', 'Scatter Plot']
     if (enabledCharts.includes(visualizationType)) return true
     return false
   }
@@ -357,8 +357,11 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsReactTooltip = () => {
-    if (config.yAxis.type === 'categorical') return true
-    if (['Deviation Bar', 'Box Plot', 'Scatter Plot', 'Paired Bar'].includes(visualizationType)) {
+    if (config.yAxis.type === 'categorical' && config.tooltips.singleSeries) return true
+    if (
+      ['Deviation Bar', 'Box Plot', 'Scatter Plot', 'Paired Bar', 'Bar'].includes(visualizationType) &&
+      config.tooltips.singleSeries
+    ) {
       return true
     }
   }
@@ -381,7 +384,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsYPadding = () => {
-    return !config.dataFormat.onlyShowTopPrefixSuffix || !config.dataFormat.suffix?.includes(' ')
+    return !config.yAxis.inlineLabel || !config.yAxis.inlineLabel?.includes(' ')
   }
 
   const visHasSingleSeriesTooltip = () => {

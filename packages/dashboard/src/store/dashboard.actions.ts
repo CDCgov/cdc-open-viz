@@ -3,10 +3,8 @@ import { type Action } from '@cdc/core/types/Action'
 import { Tab } from '../types/Tab'
 import { ConfigRow } from '../types/ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
-import Footnotes from '@cdc/core/types/Footnotes'
 import { SharedFilter } from '../types/SharedFilter'
 
-type ADD_FOOTNOTE = Action<'ADD_FOOTNOTE', { id: string; rowIndex: number; config: Footnotes }>
 type ADD_VISUALIZATION = Action<'ADD_VISUALIZATION', { rowIdx: number; colIdx: number; newViz: AnyVisualization }>
 type APPLY_CONFIG = Action<'APPLY_CONFIG', [Config, Object?]>
 type DELETE_WIDGET = Action<'DELETE_WIDGET', { uid: string }>
@@ -34,9 +32,9 @@ type RESET_VISUALIZATION = Action<'RESET_VISUALIZATION', { vizKey: string }>
 type UPDATE_VISUALIZATION = Action<'UPDATE_VISUALIZATION', { vizKey: string; configureData: Partial<AnyVisualization> }>
 type UPDATE_ROW = Action<'UPDATE_ROW', { rowIndex: number; rowData: Partial<ConfigRow> }>
 type UPDATE_TOGGLE_NAME = Action<'UPDATE_TOGGLE_NAME', { rowIndex: number; columnIndex: number; toggleName: string }>
+type SET_FILTERS_APPLIED = Action<'SET_FILTERS_APPLIED', boolean>
 
 type DashboardActions =
-  | ADD_FOOTNOTE
   | ADD_VISUALIZATION
   | APPLY_CONFIG
   | ADD_NEW_DASHBOARD
@@ -61,4 +59,5 @@ type DashboardActions =
   | UPDATE_VISUALIZATION
   | UPDATE_ROW
   | UPDATE_TOGGLE_NAME
+  | SET_FILTERS_APPLIED
 export default DashboardActions

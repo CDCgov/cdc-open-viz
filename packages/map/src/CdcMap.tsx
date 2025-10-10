@@ -5,34 +5,42 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import initialState from './data/initial-state'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { addUIDs, validateFipsCodeLength } from './helpers'
-import EditorContext from '@cdc/editor/src/ConfigContext'
+import EditorContext from '@cdc/core/contexts/EditorContext'
+import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 import { MapConfig } from './types/MapConfig'
+import _, { get } from 'lodash'
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type CdcMapProps = {
   config: MapConfig
   configUrl?: string
   isEditor?: boolean
+  isDashboard?: boolean
   link?: string
   logo?: string
   navigationHandler: Function
   setConfig: Function
+  interactionLabel?: string
 }
 
 const CdcMap: React.FC<CdcMapProps> = ({
   navigationHandler: customNavigationHandler,
   isEditor,
+  isDashboard,
   configUrl,
   logo = '',
   link,
   config: editorsConfig,
-  setConfig: setEditorsConfig
+  interactionLabel = ''
 }) => {
   const editorContext = useContext(EditorContext)
-  const [config, _setConfig] = useState(null)
+  const [config, _setConfig] = useState(editorsConfig ?? null)
 
   const setConfig = newConfig => {
     _setConfig(newConfig)
-    if (isEditor) {
+    if (isEditor && !isDashboard) {
       editorContext.setTempConfig(newConfig)
     }
   }
@@ -42,15 +50,18 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
   const loadConfig = async configObj => {
     if (!loading) setLoading(true)
-    const configToLoad = editorsConfig || configObj
+    const configToLoad = editorsConfig ?? configObj
 
     let newState = {
       ...initialState,
       ...configToLoad
     }
-
     if (newState.dataUrl) {
       let newData = await fetchRemoteData(newState.dataUrl, 'map')
+
+      if (newState.vegaConfig) {
+        newData = extractCoveData(updateVegaData(newState.vegaConfig, newData))
+      }
 
       if (newData && newState.dataDescription) {
         newData = transform.autoStandardize(newData)
@@ -93,22 +104,26 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
     setTimeout(() => {
       setConfig(processedConfig)
+      publishAnalyticsEvent({
+        vizType: 'map',
+        vizSubType: getVizSubType(processedConfig),
+        eventType: 'map_ready',
+        eventAction: 'load',
+        eventLabel: interactionLabel,
+        vizTitle: getVizTitle(processedConfig)
+      })
       setLoading(false)
     }, 10)
   }
 
   const init = async () => {
-    let configData = null
-
-    if (config) {
-      configData = config
-    }
+    let _newConfig = cloneConfig(config ?? initialState)
 
     if (configUrl) {
-      configData = await fetchRemoteData(configUrl)
+      _newConfig = await fetchRemoteData(configUrl)
     }
-    if ('object' === typeof configData) {
-      loadConfig(configData)
+    if ('object' === typeof _newConfig) {
+      loadConfig(_newConfig)
     }
   }
 
@@ -116,16 +131,26 @@ const CdcMap: React.FC<CdcMapProps> = ({
     init()
   }, [])
 
+  useEffect(() => {
+    init()
+  }, [configUrl])
+
+  useEffect(() => {
+    setConfig(editorsConfig)
+  }, [editorsConfig])
+
   if (loading) return null
 
   return (
     <CdcMapComponent
       config={config}
-      setEditorConfig={setEditorsConfig}
       navigationHandler={customNavigationHandler}
       isEditor={isEditor}
+      isDashboard={isDashboard}
       logo={logo}
       link={link}
+      loadConfig={loadConfig}
+      interactionLabel={interactionLabel}
     />
   )
 }

@@ -1,8 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import CdcMap from '../CdcMap'
 import UsGradient from './_mock/usa-state-gradient.json'
 import WastewaterMap from './_mock/wastewater-map.json'
-import { editConfigKeys } from '@cdc/chart/src/helpers/configHelpers'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map/Legend/Gradient',
@@ -28,6 +28,16 @@ export const Gradient_With_Box: Story = {
   args: {
     config: editConfigKeys(UsGradient, [
       { path: ['legend', 'subStyle'], value: 'linear blocks' },
+      { path: ['legend', 'hideBorder'], value: false }
+    ])
+  }
+}
+
+export const Gradient_With_Space: Story = {
+  args: {
+    config: editConfigKeys(UsGradient, [
+      { path: ['legend', 'subStyle'], value: 'linear blocks' },
+      { path: ['legend', 'spaces'], value: '2' },
       { path: ['legend', 'hideBorder'], value: false }
     ])
   }
@@ -61,7 +71,7 @@ export const Gradient_Reversed: Story = {
   args: {
     config: editConfigKeys(WastewaterMap, [
       {
-        path: ['customColors'],
+        path: ['general', 'palette', 'customColors'],
         value: undefined
       },
       { path: ['legend', 'specialClasses'], value: ['No Data'] },

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ViewPort } from '../../types/ViewPort'
+import Footnotes from '../../types/Footnotes'
 import EditorWrapper from '../EditorWrapper/EditorWrapper'
 import DataTable from './DataTable'
 import DataTableEditorPanel from './components/DataTableEditorPanel'
@@ -7,6 +8,8 @@ import Filters from '../Filters'
 import { TableConfig } from './types/TableConfig'
 import { filterVizData } from '../../helpers/filterVizData'
 import { addValuesToFilters } from '../../helpers/addValuesToFilters'
+import FootnotesStandAlone from '../Footnotes/FootnotesStandAlone'
+import { Datasets } from '@cdc/core/types/DataSet'
 
 type StandAloneProps = {
   visualizationKey: string
@@ -14,6 +17,8 @@ type StandAloneProps = {
   viewport?: ViewPort
   isEditor?: boolean
   updateConfig?: (Visualization) => void
+  datasets?: Datasets
+  interactionLabel?: string
 }
 
 const DataTableStandAlone: React.FC<StandAloneProps> = ({
@@ -21,7 +26,9 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
   config,
   updateConfig,
   viewport,
-  isEditor
+  isEditor,
+  datasets,
+  interactionLabel = ''
 }) => {
   const [filteredData, setFilteredData] = useState<Record<string, any>[]>(
     filterVizData(config.filters, config.formattedData || config.data)
@@ -33,6 +40,12 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
     setFilteredData(filterVizData(filters, config?.formattedData?.length > 0 ? config.formattedData : config.data))
   }, [config.filters])
 
+  const setFilters = (newFilters: any) => {
+    const filters = addValuesToFilters(newFilters, config.data)
+    updateConfig({ ...config, filters })
+    setFilteredData(filterVizData(filters, config?.formattedData?.length > 0 ? config.formattedData : config.data))
+  }
+
   if (isEditor)
     return (
       <EditorWrapper
@@ -43,19 +56,13 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
         type={'Table'}
         viewport={viewport}
       >
-        <DataTableEditorPanel key={visualizationKey} config={config} updateConfig={updateConfig} />
+        <DataTableEditorPanel key={visualizationKey} config={config} updateConfig={updateConfig} datasets={datasets} />
       </EditorWrapper>
     )
 
   return (
     <>
-      <Filters
-        config={config}
-        setConfig={updateConfig}
-        setFilteredData={setFilteredData}
-        filteredData={filteredData}
-        excludedData={config.formattedData}
-      />
+      <Filters config={config} setFilters={setFilters} excludedData={config.formattedData} />
       <DataTable
         expandDataTable={config.table.expanded}
         config={config}
@@ -64,7 +71,9 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
         tabbingId={visualizationKey}
         tableTitle={config.table.label}
         viewport={viewport || 'lg'}
+        interactionLabel={interactionLabel}
       />
+      <FootnotesStandAlone config={config.footnotes} filters={config.filters?.filter(f => f.filterFootnotes)} />
     </>
   )
 }

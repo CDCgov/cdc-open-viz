@@ -76,11 +76,6 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           ]
         )
 
-        const activeSubGroupValue = _.get(
-          filter?.subGrouping?.valuesLookup,
-          [filter?.active as string, 'values', 0],
-          null // Default to null if the path is invalid
-        )
         if (_key && apiFilterDropdowns[_key]) {
           // URL Filter
           if (filter.filterStyle !== FILTER_STYLE.nestedDropdown) {
@@ -150,7 +145,9 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
             ) : filter.filterStyle === FILTER_STYLE.nestedDropdown ? (
               <NestedDropdown
                 activeGroup={(filter.queuedActive?.[0] || filter.active) as string}
-                activeSubGroup={_key ? filter.queuedActive?.[1] || filter.subGrouping?.active : activeSubGroupValue}
+                activeSubGroup={
+                  _key ? filter.queuedActive?.[1] || filter.subGrouping?.active : filter.subGrouping?.active
+                }
                 filterIndex={filterIndex}
                 options={_key ? getNestedDropdownOptions(apiFilterDropdowns[_key]) : nestedOptions}
                 listLabel={label}

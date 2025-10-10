@@ -59,7 +59,7 @@ const Alert: React.FC<AlertProps> = ({
         <span dangerouslySetInnerHTML={sanitizedData()} />
       </div>
       {showCloseButton && (
-        <button type='button' className='close pl-5' aria-label='Close' onClick={() => onDismiss()}>
+        <button type='button' className='close ps-5' aria-label='Close' onClick={() => onDismiss()}>
           X
         </button>
       )}

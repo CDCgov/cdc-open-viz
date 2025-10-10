@@ -41,4 +41,16 @@ export const GEOCODE_TYPES = {
   US: 'us-geocode'
 } as const
 
-export const DEFAULT_MAP_BACKGROUND = '#EEE'
+export const DEFAULT_MAP_BACKGROUND = '#DFE1E2'
+
+// Component constants
+export const LOGO_MAX_WIDTH = '50px'
+export const STORYBOOK_PORT = 6006
+
+// CSV Parsing Configuration
+export const CSV_PARSE_CONFIG = {
+  header: true,
+  dynamicTyping: true,
+  skipEmptyLines: true,
+  encoding: 'utf-8'
+} as const

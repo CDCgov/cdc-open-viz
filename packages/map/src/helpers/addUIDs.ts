@@ -4,20 +4,19 @@ import {
   supportedCountries,
   supportedRegions,
   supportedStates,
-  supportedTerritories
+  supportedTerritories,
+  stateKeys,
+  territoryKeys,
+  regionKeys,
+  countryKeys,
+  countyKeys,
+  cityKeys
 } from './../data/supported-geos'
 
 import { SUPPORTED_DC_NAMES, GEO_TYPES, GEOCODE_TYPES } from './constants'
 import { DataRow, MapConfig } from '../types/MapConfig'
-import { memoize } from 'lodash'
 
-// Data props
-const stateKeys = Object.keys(supportedStates)
-const territoryKeys = Object.keys(supportedTerritories)
-const regionKeys = Object.keys(supportedRegions)
-const countryKeys = Object.keys(supportedCountries)
-const countyKeys = Object.keys(supportedCounties)
-const cityKeys = Object.keys(supportedCities)
+// Note: Key arrays are now imported from supported-geos for better performance
 
 const geoLookups: Record<string, GeoLookup> = {
   state: { keys: stateKeys, data: supportedStates },
@@ -26,10 +25,10 @@ const geoLookups: Record<string, GeoLookup> = {
   country: { keys: countryKeys, data: supportedCountries }
 }
 
-const memoizedFindUID = memoize((geoName: string, type: keyof typeof geoLookups): string | undefined => {
+const memoizedFindUID = (geoName: string, type: keyof typeof geoLookups): string | undefined => {
   const lookup = geoLookups[type]
   return lookup.keys.find(key => lookup.data[key].includes(geoName))
-})
+}
 
 const hasValidCoordinates = (row: Row, columns: GeoConfig['columns']): boolean => {
   return !!(
@@ -61,9 +60,12 @@ const handleUSLocation = (row: DataRow, geoColumn: string, displayAsHex: boolean
   const geoName = normalizeGeoName(row[geoColumn])
 
   let uid = memoizedFindUID(geoName, 'state')
-  if (!uid) uid = memoizedFindUID(geoName, 'territory')
-  if (!uid) uid = findCityUID(geoName)
+  if (!uid) {
+    uid = memoizedFindUID(geoName, 'territory')
+  }
+
   if (!uid) uid = handleDCDisplay(geoName, displayAsHex)
+  if (!uid) uid = findCityUID(geoName)
 
   return uid
 }
@@ -105,7 +107,9 @@ export const addUIDs = (configObj: MapConfig, fromColumn: string) => {
 
   data.forEach(row => {
     let uid = null
-    row.uid = null // Reset existing UID
+    if (row.uid) {
+      row.uid = null // Reset existing UID
+    }
 
     if (!geo.name) return
 

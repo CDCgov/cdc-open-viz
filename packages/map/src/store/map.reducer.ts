@@ -1,11 +1,24 @@
-import { MapConfig } from '../types/MapConfig'
+import { MapConfig, RuntimeFilters } from '../types/MapConfig'
 import MapActions from './map.actions'
 import defaults from './../data/initial-state'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
+import _ from 'lodash'
+import { Modal } from '../types/Modal'
+import { GeneratedLegend } from '../helpers/generateRuntimeLegend'
+import { RuntimeData } from '../types/RuntimeData'
 
-export const getInitialState = (configObj): MapConfig => {
+export const getInitialState = (configObj = {}): MapState => {
+  // Create defaults without palette version to avoid overriding legacy configs
+  const defaultsWithoutPaletteaName = { ...defaults }
+
+  // Only apply palette defaults if the loaded config explicitly has general.palette
+  // if (!configObj?.general?.palette?.name) {
+  //   delete defaultsWithoutPaletteaName.general?.palette.name
+  // }
+
   return {
-    config: configObj,
+    dataUrl: configObj.dataUrl || '',
+    config: _.merge({}, defaultsWithoutPaletteaName, configObj),
     loading: false,
     accessibleStatus: '',
     coveLoadedHasRan: false,
@@ -22,8 +35,7 @@ export const getInitialState = (configObj): MapConfig => {
     runtimeData: { init: true },
     runtimeFilters: [],
     runtimeLegend: [],
-    stateToShow: '',
-    ...defaults
+    statesToShow: []
   }
 }
 
@@ -41,11 +53,11 @@ export type MapState = {
   projection: object | null
   requiredColumns: string[]
   scale: number
-  modal: object | null
-  runtimeData: object
-  runtimeFilters: object[]
-  runtimeLegend: object[]
-  stateToShow: string
+  modal: Modal | null
+  runtimeData: RuntimeData | { init: boolean }
+  runtimeFilters: RuntimeFilters
+  runtimeLegend: GeneratedLegend | []
+  statesToShow: string[]
   dataUrl: string
 }
 
@@ -83,8 +95,8 @@ const reducer = (state: MapState, action: MapActions): MapState => {
       return { ...state, runtimeFilters: action.payload }
     case 'SET_RUNTIME_LEGEND':
       return { ...state, runtimeLegend: action.payload }
-    case 'SET_STATE_TO_SHOW':
-      return { ...state, stateToShow: action.payload }
+    case 'SET_STATES_TO_SHOW':
+      return { ...state, statesToShow: action.payload }
     default:
       return state
   }

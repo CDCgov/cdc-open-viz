@@ -1,25 +1,38 @@
 import _ from 'lodash'
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { MultiDashboardConfig } from '../types/MultiDashboard'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { getApplicableFilters } from './getFilteredData'
 import { filterData } from './filterData'
-import Footnotes from '@cdc/core/types/Footnotes'
+import { AnyVisualization } from '@cdc/core/types/Visualization'
 
 const transform = new DataTransform()
 
-export const getFootnotesVizConfig = (vizKey: string, rowNumber: number, config: MultiDashboardConfig) => {
-  const visualizationConfig = _.cloneDeep(config.visualizations[vizKey])
-
-  const data = config.datasets[visualizationConfig.dataKey]?.data
+export const getFootnotesVizConfig = (
+  visualizationConfig: AnyVisualization,
+  rowNumber: number,
+  config: MultiDashboardConfig,
+  visualizationKey: string
+) => {
+  if (!visualizationConfig?.footnotes) return visualizationConfig
+  const data = _.cloneDeep(config.datasets[visualizationConfig.footnotes.dataKey]?.data)
   const dataColumns = data?.length ? Object.keys(data[0]) : []
   const filters = (getApplicableFilters(config.dashboard, rowNumber) || []).filter(filter =>
     dataColumns.includes(filter.columnName)
   )
-  if (filters.length) {
-    visualizationConfig.formattedData = filterData(filters, data)
+  // check if shared filters has viz key
+  const sharedFilters = config.dashboard.sharedFilters
+  const matchingFilters = sharedFilters.filter(f => f.usedBy?.includes(visualizationKey))
+
+  if (matchingFilters.length && visualizationConfig.footnotes.data) {
+    visualizationConfig.footnotes.data = filterData(matchingFilters, data)
+  } else {
+    if (visualizationConfig.footnotes.data) {
+      visualizationConfig.footnotes.data = data
+    }
   }
-  visualizationConfig.data = data
-  return visualizationConfig as Footnotes
+
+  return visualizationConfig
 }
 
 export const getVizConfig = (
@@ -27,35 +40,37 @@ export const getVizConfig = (
   rowNumber: number,
   config: MultiDashboardConfig,
   data: Object,
-  filteredData?: Object
-) => {
-  if (rowNumber === undefined) return {}
-  const visualizationConfig = _.cloneDeep(config.visualizations[visualizationKey])
+  filteredData?: Object,
+  filteredDataOverride?: Object[],
+  multiVizColumn?: string
+): AnyVisualization => {
+  if (rowNumber === undefined) return {} as AnyVisualization
+  const visualizationConfig = cloneConfig(config.visualizations[visualizationKey])
   const rowData = config.rows[rowNumber]
-  if (rowData.footnotesId && rowData.footnotesId === visualizationKey) {
-    // return the footnotes visualization config with filtered data
-    return getFootnotesVizConfig(visualizationKey, rowNumber, config)
+  if (visualizationConfig.footnotes?.dataKey) {
+    visualizationConfig.footnotes.data = config.datasets[visualizationConfig.footnotes.dataKey]?.data
   }
   if (rowData?.dataKey) {
     // data configured on the row
     Object.assign(visualizationConfig, _.pick(rowData, ['dataKey', 'dataDescription', 'formattedData', 'data']))
   }
 
-  if (visualizationConfig.table && config.dashboard.sharedFilters.length) {
-    // Download CSV button needs to know to include shared filter columns
-    const sharedFilterColumns = config.dashboard.sharedFilters.reduce((acc, filter) => {
-      if (!filter.usedBy?.length || filter.usedBy?.includes(visualizationKey)) {
-        const apiFilter = filter.apiFilter
-        const colName = apiFilter?.textSelector || apiFilter?.valueSelector || filter.columnName
-        acc.push(colName)
-        const subGrouping =
-          apiFilter?.subgroupTextSelector || apiFilter?.subgroupValueSelector || filter.subGrouping?.columnName
-        if (subGrouping) {
-          acc.push(subGrouping)
-        }
+  const sharedFilterColumns = config.dashboard.sharedFilters.reduce((acc, filter) => {
+    if (!filter.usedBy?.length || filter.usedBy?.includes(visualizationKey)) {
+      const apiFilter = filter.apiFilter
+      const colName = apiFilter?.textSelector || apiFilter?.valueSelector || filter.columnName
+      acc.push(colName)
+      const subGrouping =
+        apiFilter?.subgroupTextSelector || apiFilter?.subgroupValueSelector || filter.subGrouping?.columnName
+      if (subGrouping) {
+        acc.push(subGrouping)
       }
-      return acc
-    }, [])
+    }
+    return acc
+  }, [])
+
+  // Download CSV button needs to know to include shared filter columns
+  if (visualizationConfig.table && config.dashboard.sharedFilters.length) {
     visualizationConfig.table.sharedFilterColumns = sharedFilterColumns
   }
 
@@ -69,12 +84,30 @@ export const getVizConfig = (
     }
   } else {
     const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
-    visualizationConfig.data = data[dataKey] || []
+    visualizationConfig.data = sharedFilterColumns.length ? [] : data[dataKey] || []
     if (visualizationConfig.formattedData) {
       visualizationConfig.formattedData =
         transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) ||
         visualizationConfig.data
     }
   }
-  return visualizationConfig
+
+  if (filteredDataOverride) {
+    visualizationConfig.data = filteredDataOverride
+  }
+
+  if (visualizationConfig.footnotes) {
+    const visConfigWithFootnotes = getFootnotesVizConfig(visualizationConfig, rowNumber, config, visualizationKey)
+    if (multiVizColumn && filteredDataOverride && filteredDataOverride.length > 0) {
+      const vizCategory = filteredDataOverride?.[0]?.[multiVizColumn]
+      // the multiViz filtering is applied after the dashboard filters
+      if (vizCategory !== undefined && visConfigWithFootnotes.footnotes.data) {
+        const categoryFootnote = visConfigWithFootnotes.footnotes.data.filter(d => d[multiVizColumn] === vizCategory)
+        visConfigWithFootnotes.footnotes.data = categoryFootnote
+      }
+    }
+    return visConfigWithFootnotes
+  }
+
+  return visualizationConfig as AnyVisualization
 }

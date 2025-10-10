@@ -4,19 +4,25 @@ import { ChartConfig } from './types/ChartConfig'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import Papa from 'papaparse'
-import 'react-tooltip/dist/react-tooltip.css'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import Loading from '@cdc/core/components/Loading'
 import _ from 'lodash'
-import EditorContext from '../../editor/src/ConfigContext'
+import EditorContext from '@cdc/core/contexts/EditorContext'
 interface CdcChartProps {
   configUrl?: string
   isEditor?: boolean
   isDebug?: boolean
   config?: ChartConfig
+  interactionLabel?: string
 }
 
-const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug, config: editorsConfig }) => {
+const CdcChartWrapper: React.FC<CdcChartProps> = ({
+  configUrl,
+  isEditor,
+  isDebug,
+  config: editorsConfig,
+  interactionLabel = ''
+}) => {
   const editorContext = useContext(EditorContext)
   const [config, _setConfig] = useState<ChartConfig>({} as ChartConfig)
   const setConfig = newConfig => {
@@ -89,7 +95,7 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({ configUrl, isEditor, isDebug
 
   if (isLoading) return <Loading />
 
-  return <CdcChart config={config} isEditor={isEditor} isDebug={isDebug} />
+  return <CdcChart config={config} isEditor={isEditor} isDebug={isDebug} interactionLabel={interactionLabel} />
 }
 
 export default CdcChartWrapper

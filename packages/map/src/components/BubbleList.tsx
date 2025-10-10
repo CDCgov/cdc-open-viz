@@ -3,9 +3,10 @@ import { scaleLinear } from 'd3-scale'
 import { countryCoordinates } from '../data/country-coordinates'
 import stateCoordinates from '../data/state-coordinates'
 import ConfigContext, { MapDispatchContext } from '../context'
+import { useLegendMemoContext } from '../context/LegendMemoContext'
 import { type Coordinate, DataRow } from '../types/MapConfig'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
-import useApplyLegendToRow from '../hooks/useApplyLegendToRow'
+import { applyLegendToRow } from '../helpers/applyLegendToRow'
 import { displayGeoName, SVG_HEIGHT, SVG_WIDTH } from '../helpers'
 import { geoMercator, geoAlbersUsa, type GeoProjection } from 'd3-geo'
 import { getColumnNames } from '../helpers/getColumnNames'
@@ -17,8 +18,8 @@ type BubbleListProps = {
 }
 
 export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
-  const { config, tooltipId, legendMemo, legendSpecialClassLastMemo, setRuntimeData, runtimeData } =
-    useContext<MapContext>(ConfigContext)
+  const { config, tooltipId, runtimeData, runtimeLegend } = useContext<MapContext>(ConfigContext)
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const { columns, data, general, visual } = config
   const { geoType, allowMapZoom } = general
   const { minBubbleSize, maxBubbleSize, showBubbleZeros, extraBubbleBorder } = visual
@@ -28,7 +29,6 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
   const { geoClickHandler } = useGeoClickHandler()
 
   // hooks
-  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const { primaryColumnName, geoColumnName } = getColumnNames(columns)
 
@@ -66,7 +66,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
     dispatch({ type: 'SET_POSITION', payload: { coordinates: reversedCoordinates, zoom: 3 } })
 
     // ...and show the data for the clicked country
-    setRuntimeData(_tempRuntimeData)
+    dispatch({ type: 'SET_RUNTIME_DATA', payload: _tempRuntimeData })
   }
 
   const sortedRuntimeData: DataRow = Object.values(runtimeData).sort((a, b) =>
@@ -78,14 +78,14 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
   if (geoType === 'world') {
     return (
       sortedRuntimeData &&
-      sortedRuntimeData.map(country => {
+      sortedRuntimeData.map((country, index) => {
         let coordinates = countryCoordinates[country.uid]
 
         if (!coordinates) return true
 
         const countryName = displayGeoName(country[geoColumnName])
         const toolTip = applyTooltipsToGeo(countryName, country)
-        const legendColors = applyLegendToRow(country)
+        const legendColors = applyLegendToRow(country, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
 
         if (
           (Math.floor(Number(country[primaryColumnName])) === 0 || country[primaryColumnName] === '') &&
@@ -100,10 +100,9 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
         if (!projection(coordinates)) return true
 
         const circle = (
-          <>
+          <React.Fragment key={`circle-fragment-${countryName.replace(' ', '')}`}>
             <circle
               tabIndex={-1}
-              key={`circle-${countryName.replace(' ', '')}`}
               className={`bubble country--${countryName}`}
               cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0}
               cy={Number(projection(coordinates[1], coordinates[0])[1]) || 0}
@@ -112,6 +111,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
               stroke={legendColors[0]}
               strokeWidth={1.25}
               fillOpacity={0.4}
+              onMouseEnter={() => {}}
               onPointerDown={e => {
                 pointerX = e.clientX
                 pointerY = e.clientY
@@ -139,7 +139,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
             {extraBubbleBorder && (
               <circle
                 tabIndex={-1}
-                key={`circle-${countryName.replace(' ', '')}`}
+                key={`circle-border-${countryName.replace(' ', '')}`}
                 className='bubble'
                 cx={Number(projection(coordinates[1], coordinates[0])[0]) || 0}
                 cy={Number(projection(coordinates[1], coordinates[0])[1]) || 0}
@@ -147,6 +147,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
                 fill={'transparent'}
                 stroke={'white'}
                 strokeWidth={0.5}
+                onMouseEnter={() => {}}
                 onPointerDown={e => {
                   pointerX = e.clientX
                   pointerY = e.clientY
@@ -171,11 +172,11 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
                 data-tooltip-html={toolTip}
               />
             )}
-          </>
+          </React.Fragment>
         )
 
         return (
-          <g key={`group-${countryName.replace(' ', '')}`} tabIndex={-1}>
+          <g key={`group-${index}-${countryName.replace(' ', '')}`} tabIndex={-1}>
             {circle}
           </g>
         )
@@ -186,7 +187,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
   if (geoType === 'us') {
     return (
       sortedRuntimeData &&
-      sortedRuntimeData.map(item => {
+      sortedRuntimeData.map((item, index) => {
         let stateData = stateCoordinates[item.uid]
         if (Number(size(item[primaryColumnName])) === 0) return
 
@@ -204,7 +205,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
 
         stateName = displayGeoName(stateName)
         const toolTip = applyTooltipsToGeo(stateName, item)
-        const legendColors = applyLegendToRow(item, config)
+        const legendColors = applyLegendToRow(item, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
 
         let transform = `translate(${projection([coordinates[1], coordinates[0]])})`
 
@@ -224,6 +225,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
               stroke={legendColors[0]}
               strokeWidth={1.25}
               fillOpacity={0.4}
+              onMouseEnter={() => {}}
               onPointerDown={e => {
                 pointerX = e.clientX
                 pointerY = e.clientY
@@ -250,7 +252,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
             {extraBubbleBorder && (
               <circle
                 tabIndex={-1}
-                key={`circle-${stateName.replace(' ', '')}`}
+                key={`circle-border-${stateName.replace(' ', '')}`}
                 className='bubble'
                 cx={projection(coordinates)[0] || 0}
                 cy={projection(coordinates)[1] || 0}
@@ -259,6 +261,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
                 stroke={'white'}
                 strokeWidth={0.5}
                 fillOpacity={0.4}
+                onMouseEnter={() => {}}
                 onPointerDown={e => {
                   pointerX = e.clientX
                   pointerY = e.clientY
@@ -286,7 +289,7 @@ export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
           </>
         )
 
-        return <g key={`group-${stateName.replace(' ', '')}`}>{circle}</g>
+        return <g key={`group-${index}-${stateName.replace(' ', '')}`}>{circle}</g>
       })
     )
   }

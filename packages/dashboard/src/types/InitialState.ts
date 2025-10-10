@@ -8,4 +8,5 @@ export type InitialState = {
   filteredData: Object
   preview: boolean
   tabSelected: Tab
+  filtersApplied: boolean
 }

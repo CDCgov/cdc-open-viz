@@ -1,6 +1,7 @@
 import DynamicSeriesConfig from './_mock/dynamic_series_config.json'
 import DynamicSeriesBarConfig from './_mock/dynamic_series_bar_config.json'
-import { Meta, StoryObj } from '@storybook/react'
+import DynamicSeriesSuppression from './_mock/dynamic_series_suppression_mock.json'
+import { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChartComponent'
 
 const meta: Meta<typeof Chart> = {
@@ -25,6 +26,13 @@ export const LineShowPoints: Story = {
   }
 }
 
+export const LineSuppression: Story = {
+  args: {
+    config: DynamicSeriesSuppression,
+    isEditor: false
+  }
+}
+
 export const LineHoverPoints: Story = {
   args: {
     config: DynamicSeriesConfig,
@@ -35,7 +43,7 @@ export const LineHoverPoints: Story = {
 export const Bar_Vertical: Story = {
   args: {
     config: DynamicSeriesBarConfig,
-    isEditor: false
+    isEditor: true
   }
 }
 

@@ -1,4 +1,4 @@
-import { DataSet } from './DataSet'
+import { DataSet } from '@cdc/core/types/DataSet'
 import { SharedFilter } from './SharedFilter'
 
 export type Dashboard = {

@@ -2,11 +2,12 @@
 @import '../themes/index';
 
 .cove-editor {
-  @import './../base/reset';
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-areas: 'panel content';
   height: 100vh;
+
+  @import './../base/reset';
 
   .cove-editor__panel {
     grid-area: panel;

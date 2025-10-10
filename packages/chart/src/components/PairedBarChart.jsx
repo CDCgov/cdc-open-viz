@@ -113,7 +113,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 const textFits = textWidth < barWidth - 5 // minus padding dx(5)
 
                 return (
-                  <>
+                  <React.Fragment key={`fragment-group1-${groupOne.dataKey}-${index}`}>
                     <Group key={`group-${groupOne.dataKey}-${d[config.xAxis.dataKey]}`} className='horizontal'>
                       <Bar
                         id={`bar-${groupOne.dataKey}-${d[config.dataDescription?.xKey]}`}
@@ -124,6 +124,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                         width={xScale(d[config.series[0].dataKey])}
                         height={barHeight}
                         fill={groupOne.color}
+                        onMouseEnter={() => {}}
                         data-tooltip-html={dataTipOne(d)}
                         data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                         stroke='#333'
@@ -145,7 +146,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                         </Text>
                       )}
                     </Group>
-                  </>
+                  </React.Fragment>
                 )
               })}
             {data
@@ -171,7 +172,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 const isTextFits = textWidth < barWidth - 5 // minus padding dx(5)
 
                 return (
-                  <>
+                  <React.Fragment key={`fragment-group2-${groupTwo.dataKey}-${index}`}>
                     <style>
                       {`
                       .bar-${groupTwo.dataKey}-${d[config.xAxis.dataKey]} {
@@ -189,6 +190,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                         width={xScale(d[config.series[1].dataKey])}
                         height={barHeight}
                         fill={groupTwo.color}
+                        onMouseEnter={() => {}}
                         data-tooltip-html={dataTipTwo(d)}
                         data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
                         strokeWidth={borderWidth}
@@ -210,7 +212,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                         </Text>
                       )}
                     </Group>
-                  </>
+                  </React.Fragment>
                 )
               })}
           </Group>

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import Chart from '../CdcChart'
 import lineChartTwoPointsRegressionTest from './_mock/line_chart_two_points_regression_test.json'
@@ -9,10 +9,10 @@ import pairedBar from './_mock/paired-bar.json'
 import horizontalBarConfig from './_mock/horizontal_bar.json'
 import barChartLabels from './_mock/barchart_labels.mock.json'
 import pieConfig from './_mock/pie_with_data.json'
-import boxPlotConfig from './_mock/boxplot_multiseries.json'
+import pieCalculatedArea from './_mock/pie_calculated_area.json'
 import areaChartStacked from './_mock/area_chart_stacked.json'
 import multipleLines from './_mock/short_dates.json'
-import { editConfigKeys } from '../helpers/configHelpers'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart',
@@ -67,19 +67,21 @@ export const BarChart_Labels: Story = {
 
 export const Pie: Story = {
   args: {
-    config: pieConfig
+    config: pieConfig,
+    isEditor: true
+  }
+}
+export const Pie_Calculated_Area: Story = {
+  args: {
+    config: pieCalculatedArea,
+    isEditor: true
   }
 }
 
 export const Paired_Bar: Story = {
   args: {
-    config: pairedBar
-  }
-}
-export const BoxPlot_Multiseries: Story = {
-  args: {
-    config: boxPlotConfig,
-    isEditor: false
+    config: pairedBar,
+    isEditor: true
   }
 }
 

@@ -1,9 +1,13 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import ConfigContext from '../../../../context'
+import { useLegendMemoContext } from '../../../../context/LegendMemoContext'
 import { MapContext } from '../../../../types/MapContext'
 import { getGeoFillColor, displayGeoName } from '../../../../helpers'
-import useApplyLegendToRow from '../../../../hooks/useApplyLegendToRow'
 import useApplyTooltipsToGeo from '../../../../hooks/useApplyTooltipsToGeo'
+import { applyLegendToRow } from '../../../../helpers/applyLegendToRow'
+import useGeoClickHandler, { geoClickHandler } from '././../../../../hooks/useGeoClickHandler'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 interface CountyOutputProps {
   counties: any[]
@@ -14,13 +18,15 @@ interface CountyOutputProps {
 }
 
 const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoStrokeColor, tooltipId }) => {
-  const { config, data, geoClickHandler, legendMemo, legendSpecialClassLastMemo } = useContext<MapContext>(ConfigContext)
+  const { config, runtimeData, runtimeLegend, interactionLabel } = useContext<MapContext>(ConfigContext)
+  const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const geoFillColor = getGeoFillColor(config)
-  const { applyLegendToRow } = useApplyLegendToRow(legendMemo, legendSpecialClassLastMemo)
+  const { geoClickHandler } = useGeoClickHandler()
+
   return (
     <>
-      {counties.map(county => {
+      {counties.map((county, countyIndex) => {
         // Map the name from the geo data with the appropriate key for the processed data
         const geoKey = county.id
 
@@ -28,12 +34,12 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
 
         const countyPath = path(county)
 
-        const geoData = data[county.id]
+        const geoData = runtimeData[county.id]
         let legendColors
 
         // Once we receive data for this geographic item, setup variables.
         if (geoData !== undefined) {
-          legendColors = applyLegendToRow(geoData, config)
+          legendColors = applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
         }
 
         const geoDisplayName = displayGeoName(geoKey)
@@ -73,6 +79,20 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
               onClick={() => geoClickHandler(geoDisplayName, geoData)}
               data-tooltip-id={`tooltip__${tooltipId}`}
               data-tooltip-html={toolTip}
+              onMouseEnter={() => {
+                // Track hover analytics event if this is a new location
+                const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
+                publishAnalyticsEvent({
+                  vizType: config.type,
+                  vizSubType: getVizSubType(config),
+                  eventType: `map_hover`,
+                  eventAction: 'hover',
+                  eventLabel: interactionLabel,
+                  vizTitle: getVizTitle(config),
+                  location: geoDisplayName,
+                  specifics: `location: ${locationName?.toLowerCase()}`
+                })
+              }}
             >
               <path
                 tabIndex={-1}

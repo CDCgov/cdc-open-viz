@@ -20,7 +20,7 @@ type SET_RUNTIME_DATA = Action<'SET_RUNTIME_DATA', RuntimeData>
 type SET_RUNTIME_FILTERS = Action<'SET_RUNTIME_FILTERS', VizFilter[]>
 type SET_RUNTIME_LEGEND = Action<'SET_RUNTIME_LEGEND', GeneratedLegend | []>
 type SET_SCALE = Action<'SET_SCALE', number>
-type SET_STATE_TO_SHOW = Action<'SET_STATE_TO_SHOW', string>
+type SET_STATES_TO_SHOW = Action<'SET_STATES_TO_SHOW', string[]>
 type SET_TOPO_DATA = Action<'SET_TOPO_DATA', any>
 type SET_TRANSLATE = Action<'SET_TRANSLATE', [number, number]>
 
@@ -39,7 +39,7 @@ export type MapActions =
   | SET_RUNTIME_FILTERS
   | SET_RUNTIME_LEGEND
   | SET_SCALE
-  | SET_STATE_TO_SHOW
+  | SET_STATES_TO_SHOW
   | SET_TOPO_DATA
   | SET_TRANSLATE
 

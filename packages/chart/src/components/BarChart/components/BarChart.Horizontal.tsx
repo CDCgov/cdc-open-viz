@@ -8,16 +8,16 @@ import { useHighlightedBars } from '../../../hooks/useHighlightedBars'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import { BarGroup } from '@visx/shape'
+import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 
 // CDC core components and helpers
 import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import createBarElement from '@cdc/core/components/createBarElement'
-import { getBarConfig, testZeroValue } from '../helpers'
+import { getBarConfig, testZeroValue, getLollipopStemColor, getLollipopHeadColor } from '../helpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
-
-// Third party libraries
-import chroma from 'chroma-js'
+import isNumber from '@cdc/core/helpers/isNumber'
 
 // Local context and types
 import BarChartContext, { BarChartContextValues } from './context'
@@ -54,12 +54,83 @@ export const BarChartHorizontal = () => {
     formatDate,
     parseDate,
     setSharedFilter,
-    isNumber
+    currentViewport
   } = useContext<ChartContext>(ConfigContext)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
-  const hasConfidenceInterval = Object.keys(config.confidenceKeys).length > 0
+  const LABEL_FONT_SIZE = isMobileFontViewport(currentViewport) ? 13 : 16
+
+  const hasConfidenceInterval = [config.confidenceKeys?.upper, config.confidenceKeys?.lower].every(
+    v => v != null && String(v).trim() !== ''
+  )
+
+  // Pattern helper function
+  const renderPatternDefs = () => {
+    if (!config.legend.patterns || Object.keys(config.legend.patterns).length === 0) {
+      return null
+    }
+
+    return (
+      <defs>
+        {Object.entries(config.legend.patterns).map(([key, pattern]) => {
+          const patternId = `chart-pattern-${key}`
+          const size = pattern.patternSize || 8
+
+          switch (pattern.shape) {
+            case 'circles':
+              return (
+                <PatternCircles
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  fill={pattern.color}
+                  radius={1.25}
+                />
+              )
+            case 'lines':
+              return (
+                <PatternLines
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  stroke={pattern.color}
+                  strokeWidth={0.75}
+                  orientation={['horizontal']}
+                />
+              )
+            case 'diagonalLines':
+              return (
+                <PatternLines
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  stroke={pattern.color}
+                  strokeWidth={0.75}
+                  orientation={['diagonalRightToLeft']}
+                />
+              )
+            case 'waves':
+              return (
+                <PatternWaves
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  fill={pattern.color}
+                  strokeWidth={0.25}
+                />
+              )
+            default:
+              return null
+          }
+        })}
+      </defs>
+    )
+  }
 
   const _data = getBarData(config, data, hasConfidenceInterval)
 
@@ -68,6 +139,7 @@ export const BarChartHorizontal = () => {
     config.visualizationType === 'Bar' &&
     config.orientation === 'horizontal' && (
       <Group>
+        {renderPatternDefs()}
         <BarGroup
           data={config.preliminaryData?.some(pd => pd.value && pd.type === 'suppression') ? tableData : _data}
           keys={config.runtime.barSeriesKeys || config.runtime.seriesKeys}
@@ -113,8 +185,14 @@ export const BarChartHorizontal = () => {
                     numbericBarHeight = 25
                   }
                   let barY = bar.value >= 0 && isNumber(bar.value) ? bar.y : yScale(scaleVal)
-                  const defaultBarWidth = Math.abs(xScale(bar.value) - xScale(scaleVal))
+                  let defaultBarWidth = Math.abs(xScale(bar.value) - xScale(scaleVal))
                   const isPositiveBar = bar.value >= 0 && isNumber(bar.value)
+
+                  const MINIMUM_BAR_HEIGHT = 3
+                  if (isPositiveBar && barGroup.bars.length === 1 && defaultBarWidth < MINIMUM_BAR_HEIGHT) {
+                    defaultBarWidth = MINIMUM_BAR_HEIGHT
+                    barY = yScale(0) - MINIMUM_BAR_HEIGHT
+                  }
 
                   const barX = bar.value < 0 ? Math.abs(xScale(bar.value)) : xScale(scaleVal)
                   const yAxisValue = formatNumber(bar.value, 'left')
@@ -124,10 +202,19 @@ export const BarChartHorizontal = () => {
                     barWidthHorizontal: barWidth,
                     isSuppressed,
                     absentDataLabel
-                  } = getBarConfig({ bar, defaultBarWidth, config, isNumber, isVertical: false, yAxisValue })
+                  } = getBarConfig({
+                    bar,
+                    defaultBarWidth,
+                    config,
+                    isVertical: false,
+                    yAxisValue,
+                    barWidth: 0,
+                    labelFontSize: LABEL_FONT_SIZE
+                  })
+
                   const barPosition = !isPositiveBar ? 'below' : 'above'
 
-                  const barDefaultLabel = !config.yAxis.displayNumbersOnBar ? '' : yAxisValue
+                  const barDefaultLabel = !config.yAxis.displayNumbersOnBar || absentDataLabel ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
                   const textWidth = getTextWidth(barDefaultLabel)
@@ -163,14 +250,14 @@ export const BarChartHorizontal = () => {
                     </li></ul>`
 
                   // configure colors
-                  let labelColor = '#000000'
+                  let labelColor = APP_FONT_COLOR
                   labelColor = HighLightedBarUtils.checkFontColor(yAxisValue, highlightedBarValues, labelColor) // Set if background is transparent'
                   let barColor =
                     config.runtime.seriesLabels && config.runtime.seriesLabels[bar.key]
                       ? colorScale(config.runtime.seriesLabels[bar.key])
                       : colorScale(bar.key)
                   const hasDynamicCategory = config.series.find(s => s.dynamicCategory)
-                  if (!hasDynamicCategory) {
+                  if (!hasDynamicCategory && config.legend.colorCode) {
                     barColor = assignColorsToValues(barGroups.length, barGroup.index, barColor) // Color code by category
                   }
                   const isRegularLollipopColor = config.isLollipopChart && config.lollipopColorStyle === 'regular'
@@ -181,7 +268,7 @@ export const BarChartHorizontal = () => {
                   const borderColor = isHighlightedBar
                     ? highlightedBarColor
                     : config.barHasBorder === 'true'
-                    ? '#000'
+                    ? APP_FONT_COLOR
                     : 'transparent'
                   const borderWidth = isHighlightedBar
                     ? highlightedBar.borderWidth
@@ -191,6 +278,11 @@ export const BarChartHorizontal = () => {
                     ? barBorderWidth
                     : 0
                   const displaylollipopShape = testZeroValue(bar.value) ? 'none' : 'block'
+                  const hideGroup =
+                    (!isNumber(bar.value) && !config.general.showMissingDataLabel) ||
+                    (String(bar.value) === '0' && !config.general.showZeroValueData)
+                      ? 'none'
+                      : 'block' // hide bar group if no value or zero value
 
                   // update label color
                   if (barColor && labelColor && textFits) {
@@ -201,11 +293,21 @@ export const BarChartHorizontal = () => {
                       labelColor = '#fff'
                     }
                   }
-                  const background = () => {
+                  const getBarBackgroundColor = () => {
                     if (isRegularLollipopColor) return barColor
-                    if (isTwoToneLollipopColor) return chroma(barColor).brighten(1)
+                    if (isTwoToneLollipopColor) {
+                      return getLollipopStemColor(barColor)
+                    }
                     if (isHighlightedBar) return 'transparent'
                     return barColor
+                  }
+
+                  // Function to get the lollipop head color (should be darker than stem)
+                  const getLocalLollipopHeadColor = (): string => {
+                    if (!isTwoToneLollipopColor) {
+                      return barColor
+                    }
+                    return getLollipopHeadColor(barColor)
                   }
 
                   // Confidence Interval Variables
@@ -222,16 +324,46 @@ export const BarChartHorizontal = () => {
                     const d = datum[config.confidenceKeys[position]]
                     return xScale(d)
                   })
-                  // End Confidence Interval Variables
+
+                  // Check if this bar should use a pattern
+                  const getPatternUrl = (): string | null => {
+                    if (!config.legend.patterns || Object.keys(config.legend.patterns).length === 0) {
+                      return null
+                    }
+
+                    // Find a pattern that matches this specific bar
+                    for (const [patternKey, pattern] of Object.entries(config.legend.patterns)) {
+                      if (pattern.dataKey && pattern.dataValue) {
+                        // For grouped bar charts, check if the pattern's dataKey matches the current bar's series key
+                        // and if the pattern's dataValue matches the current bar's value
+                        if (pattern.dataKey === bar.key && String(bar.value) === String(pattern.dataValue)) {
+                          return `url(#chart-pattern-${patternKey})`
+                        }
+                        // Fallback for non-grouped charts: check datum field value
+                        else if (!config.series || config.series.length <= 1) {
+                          const dataFieldValue = datum[pattern.dataKey]
+                          if (String(dataFieldValue) === String(pattern.dataValue)) {
+                            return `url(#chart-pattern-${patternKey})`
+                          }
+                        }
+                      }
+                    }
+
+                    return null
+                  }
+
+                  const patternUrl = getPatternUrl()
+                  const baseBackground = getBarBackgroundColor()
 
                   return (
-                    <Group key={`${barGroup.index}--${index}`}>
+                    <Group display={hideGroup} key={`${barGroup.index}--${index}`}>
                       <Group key={`bar-sub-group-${barGroup.index}-${barGroup.x0}-${barY}--${index}`}>
+                        {/* Base colored bar */}
                         {createBarElement({
                           config: config,
                           index: newIndex,
                           id: `barGroup${barGroup.index}`,
-                          background: background(),
+                          background: baseBackground,
                           borderColor,
                           borderStyle: 'solid',
                           borderWidth: `${borderWidth}px`,
@@ -256,6 +388,48 @@ export const BarChartHorizontal = () => {
                             display: displayBar ? 'block' : 'none'
                           }
                         })}
+
+                        {/* Pattern overlay if pattern exists */}
+                        {patternUrl &&
+                          createBarElement({
+                            config: config,
+                            index: newIndex,
+                            background: patternUrl, // Use pattern as background
+                            borderColor: 'transparent',
+                            borderStyle: 'none',
+                            borderWidth: '0px',
+                            width: barWidth,
+                            height: numbericBarHeight,
+                            x: barX,
+                            y: barHeight * bar.index,
+                            onMouseOver: () => {}, // No interaction
+                            onMouseLeave: () => {}, // No interaction
+                            tooltipHtml: '',
+                            tooltipId: '',
+                            onClick: () => {}, // No interaction
+                            styleOverrides: {
+                              transformOrigin: `0 ${barY + barHeight}px`,
+                              opacity: transparentBar ? 0.2 : 1,
+                              display: displayBar ? 'block' : 'none',
+                              pointerEvents: 'none' // Let clicks pass through to base bar
+                            }
+                          })}
+
+                        {(absentDataLabel || isSuppressed) && (
+                          <rect
+                            x={barX}
+                            y={0}
+                            width={yMax}
+                            height={numbericBarHeight}
+                            fill='transparent'
+                            data-tooltip-place='top'
+                            data-tooltip-offset='{"top":3}'
+                            style={{ pointerEvents: 'all', cursor: 'pointer' }}
+                            data-tooltip-html={tooltip}
+                            data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
+                          />
+                        )}
+
                         {config.preliminaryData?.map((pd, index) => {
                           // check if user selected column
                           const selectedSuppressionColumn = !pd.column || pd.column === bar.key
@@ -269,17 +443,11 @@ export const BarChartHorizontal = () => {
 
                           const hasAsterisk = String(pd.symbol).includes('Asterisk')
                           const verticalAnchor = hasAsterisk ? 'middle' : 'end'
-                          const iconSize =
-                            pd.symbol === 'Asterisk'
-                              ? barHeight * 1.2
-                              : pd.symbol === 'Double Asterisk'
-                              ? barHeight
-                              : barHeight / 1.5
-                          const fillColor = pd.displayGray ? '#8b8b8a' : '#000'
+                          const fillColor = pd.displayGray ? '#8b8b8a' : APP_FONT_COLOR
                           return (
                             <Text // prettier-ignore
                               key={index}
-                              fontSize={iconSize}
+                              fontSize={LABEL_FONT_SIZE}
                               display={displayBar ? 'block' : 'none'}
                               opacity={transparentBar ? 0.5 : 1}
                               x={barX}
@@ -295,7 +463,7 @@ export const BarChartHorizontal = () => {
                           )
                         })}
 
-                        {!config.isLollipopChart && (
+                        {!config.isLollipopChart && !hasConfidenceInterval && (
                           <Text // prettier-ignore
                             display={displayBar ? 'block' : 'none'}
                             x={bar.y}
@@ -305,6 +473,21 @@ export const BarChartHorizontal = () => {
                             dx={textPadding}
                             verticalAnchor='middle'
                             textAnchor={textAnchor}
+                          >
+                            {testZeroValue(bar.value) ? '' : barDefaultLabel}
+                          </Text>
+                        )}
+
+                        {!config.isLollipopChart && hasConfidenceInterval && (
+                          <Text // prettier-ignore
+                            display={displayBar ? 'block' : 'none'}
+                            x={bar.value < 0 ? bar.y + barWidth : bar.y - barWidth}
+                            opacity={transparentBar ? 0.5 : 1}
+                            y={config.barHeight / 2 + config.barHeight * bar.index}
+                            fill={labelColor}
+                            dx={-textPadding}
+                            verticalAnchor='middle'
+                            textAnchor={bar.value < 0 ? 'end' : 'start'}
                           >
                             {testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
@@ -328,7 +511,7 @@ export const BarChartHorizontal = () => {
                             display={displayBar ? 'block' : 'none'}
                             x={bar.y}
                             y={0}
-                            fill={'#000000'}
+                            fill={APP_FONT_COLOR}
                             dx={textPaddingLollipop}
                             textAnchor={textAnchorLollipop}
                             verticalAnchor='middle'
@@ -359,7 +542,7 @@ export const BarChartHorizontal = () => {
                             cx={bar.y}
                             cy={barHeight * bar.index + lollipopBarWidth / 2}
                             r={lollipopShapeSize / 2}
-                            fill={barColor}
+                            fill={getLocalLollipopHeadColor()}
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
@@ -373,7 +556,7 @@ export const BarChartHorizontal = () => {
                             y={0 - lollipopBarWidth / 2}
                             width={lollipopShapeSize}
                             height={lollipopShapeSize}
-                            fill={barColor}
+                            fill={getLocalLollipopHeadColor()}
                             key={`circle--${bar.index}`}
                             data-tooltip-html={tooltip}
                             data-tooltip-id={`cdc-open-viz-tooltip-${config.runtime.uniqueId}`}
@@ -382,7 +565,7 @@ export const BarChartHorizontal = () => {
                             <animate attributeName='height' values={`0, ${lollipopShapeSize}`} dur='2.5s' />
                           </rect>
                         )}
-                        {hasConfidenceInterval && (
+                        {hasConfidenceInterval && displayBar && (
                           <path
                             key={`confidence-interval-h-${yPos}-${datum[config.runtime.originalXAxis.dataKey]}`}
                             stroke={APP_FONT_COLOR}

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChartComponent'
 import config from './_mock/line_chart_symbols.json'
 const meta: Meta<typeof Chart> = {
