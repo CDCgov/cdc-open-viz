@@ -293,7 +293,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                     {parse(
                       config.enableMarkupVariables && config.markupVariables?.length > 0
                         ? processMarkupVariables(legend.title, config.data || [], config.markupVariables, {
-                            isEditor: false
+                            isEditor: false,
+                            filters: config.filters || []
                           }).processedContent
                         : legend.title
                     )}
@@ -304,7 +305,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                     {parse(
                       config.enableMarkupVariables && config.markupVariables?.length > 0
                         ? processMarkupVariables(legend.description, config.data || [], config.markupVariables, {
-                            isEditor: false
+                            isEditor: false,
+                            filters: config.filters || []
                           }).processedContent
                         : legend.description
                     )}

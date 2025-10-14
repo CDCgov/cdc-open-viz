@@ -1,5 +1,7 @@
 import _ from 'lodash'
 import { MarkupVariable, MarkupCondition } from '../types/MarkupVariable'
+import { VizFilter } from '../types/VizFilter'
+import { filterVizData } from './filterVizData'
 
 /**
  * Replaces {{variable}} tags in content with actual data values.
@@ -7,7 +9,7 @@ import { MarkupVariable, MarkupCondition } from '../types/MarkupVariable'
  * @param content - Content string with markup variables
  * @param data - Dataset to extract values from
  * @param markupVariables - Variable configurations
- * @param options - isEditor, showNoDataMessage, allowHideSection
+ * @param options - isEditor, showNoDataMessage, allowHideSection, filters
  * @returns Processed content and state flags
  *
  * @security Returns plain text - must be parsed with html-react-parser before rendering
@@ -20,13 +22,14 @@ export const processMarkupVariables = (
     isEditor?: boolean
     showNoDataMessage?: boolean
     allowHideSection?: boolean
+    filters?: VizFilter[]
   } = {}
 ): {
   processedContent: string
   shouldHideSection: boolean
   shouldShowNoDataMessage: boolean
 } => {
-  const { isEditor = false, showNoDataMessage = false, allowHideSection = false } = options
+  const { isEditor = false, showNoDataMessage = false, allowHideSection = false, filters = [] } = options
 
   // Early return for invalid inputs
   if (_.isEmpty(markupVariables) || !content) {
@@ -35,6 +38,12 @@ export const processMarkupVariables = (
       shouldHideSection: false,
       shouldShowNoDataMessage: false
     }
+  }
+
+  // Apply filters to data if filters are present
+  let workingData = data
+  if (filters && filters.length > 0) {
+    workingData = filterVizData(filters, data)
   }
 
   try {
@@ -55,15 +64,15 @@ export const processMarkupVariables = (
           return variableTag
         }
 
-        // Filter data with error handling
-        const workingData =
+        // Filter data with error handling (apply conditions on top of already filtered data)
+        const conditionFilteredData =
           workingVariable.conditions.length === 0
-            ? data
-            : filterDataByConditions(data, [...workingVariable.conditions])
+            ? workingData
+            : filterDataByConditions(workingData, [...workingVariable.conditions])
 
         // Extract values with error handling
         const variableValues: string[] = _.uniq(
-          (workingData || []).map(dataObject => {
+          (conditionFilteredData || []).map(dataObject => {
             try {
               const dataObjectValue = dataObject[workingVariable.columnName]
 

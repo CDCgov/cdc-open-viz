@@ -273,28 +273,41 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   // Process markup variables if enabled
   if (config.enableMarkupVariables && config.markupVariables?.length > 0) {
+    const markupOptions = { isEditor, filters: config.filters || [] }
     if (title) {
-      title = processMarkupVariables(title, config.data || [], config.markupVariables, { isEditor }).processedContent
+      title = processMarkupVariables(title, config.data || [], config.markupVariables, markupOptions).processedContent
     }
     if (general.superTitle) {
-      processedSuperTitle = processMarkupVariables(general.superTitle, config.data || [], config.markupVariables, {
-        isEditor
-      }).processedContent
+      processedSuperTitle = processMarkupVariables(
+        general.superTitle,
+        config.data || [],
+        config.markupVariables,
+        markupOptions
+      ).processedContent
     }
     if (subtext) {
-      processedSubtext = processMarkupVariables(subtext, config.data || [], config.markupVariables, {
-        isEditor
-      }).processedContent
+      processedSubtext = processMarkupVariables(
+        subtext,
+        config.data || [],
+        config.markupVariables,
+        markupOptions
+      ).processedContent
     }
     if (introText) {
-      processedIntroText = processMarkupVariables(introText, config.data || [], config.markupVariables, {
-        isEditor
-      }).processedContent
+      processedIntroText = processMarkupVariables(
+        introText,
+        config.data || [],
+        config.markupVariables,
+        markupOptions
+      ).processedContent
     }
     if (general.footnotes) {
-      processedFootnotes = processMarkupVariables(general.footnotes, config.data || [], config.markupVariables, {
-        isEditor
-      }).processedContent
+      processedFootnotes = processMarkupVariables(
+        general.footnotes,
+        config.data || [],
+        config.markupVariables,
+        markupOptions
+      ).processedContent
     }
   }
 

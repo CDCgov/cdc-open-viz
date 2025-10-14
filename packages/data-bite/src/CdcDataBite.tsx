@@ -184,7 +184,8 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     const result = processMarkupVariables(content, config.data, markupVariables, {
       isEditor,
       showNoDataMessage: false,
-      allowHideSection: false
+      allowHideSection: false,
+      filters: config.filters || []
     })
 
     return result.processedContent

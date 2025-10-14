@@ -170,29 +170,41 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     return {
       title: title
-        ? processMarkupVariables(title, config.data || [], config.markupVariables, { isEditor }).processedContent
+        ? processMarkupVariables(title, config.data || [], config.markupVariables, {
+            isEditor,
+            filters: config.filters || []
+          }).processedContent
         : title,
       superTitle: config.superTitle
-        ? processMarkupVariables(config.superTitle, config.data || [], config.markupVariables, { isEditor })
-            .processedContent
+        ? processMarkupVariables(config.superTitle, config.data || [], config.markupVariables, {
+            isEditor,
+            filters: config.filters || []
+          }).processedContent
         : config.superTitle,
       introText: config.introText
-        ? processMarkupVariables(config.introText, config.data || [], config.markupVariables, { isEditor })
-            .processedContent
+        ? processMarkupVariables(config.introText, config.data || [], config.markupVariables, {
+            isEditor,
+            filters: config.filters || []
+          }).processedContent
         : config.introText,
       legacyFootnotes: config.legacyFootnotes
-        ? processMarkupVariables(config.legacyFootnotes, config.data || [], config.markupVariables, { isEditor })
-            .processedContent
+        ? processMarkupVariables(config.legacyFootnotes, config.data || [], config.markupVariables, {
+            isEditor,
+            filters: config.filters || []
+          }).processedContent
         : config.legacyFootnotes,
       description: config.description
-        ? processMarkupVariables(config.description, config.data || [], config.markupVariables, { isEditor })
-            .processedContent
+        ? processMarkupVariables(config.description, config.data || [], config.markupVariables, {
+            isEditor,
+            filters: config.filters || []
+          }).processedContent
         : config.description
     }
   }, [
     config.enableMarkupVariables,
     config.markupVariables,
     config.data,
+    config.filters,
     title,
     config.superTitle,
     config.introText,
@@ -207,6 +219,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const processedIntroText = processedTextFields.introText
   const processedLegacyFootnotes = processedTextFields.legacyFootnotes
   const processedDescription = processedTextFields.description
+  // Note: Axis labels are processed within updateConfig to ensure they use the correct data
 
   // set defaults on titles if blank AND only in editor
   if (isEditor) {
@@ -266,6 +279,25 @@ const CdcChart: React.FC<CdcChartProps> = ({
     let data = dataOverride || stateData
 
     data = handleRankByValue(data, newConfig)
+
+    // Process axis labels for markup variables if enabled
+    let processedXAxis = newConfig.xAxis?.label
+    let processedYAxis = newConfig.yAxis?.label
+
+    if (newConfig.enableMarkupVariables && newConfig.markupVariables?.length) {
+      if (newConfig.xAxis?.label) {
+        processedXAxis = processMarkupVariables(newConfig.xAxis.label, data || [], newConfig.markupVariables, {
+          isEditor,
+          filters: newConfig.filters || []
+        }).processedContent
+      }
+      if (newConfig.yAxis?.label) {
+        processedYAxis = processMarkupVariables(newConfig.yAxis.label, data || [], newConfig.markupVariables, {
+          isEditor,
+          filters: newConfig.filters || []
+        }).processedContent
+      }
+    }
 
     // Deeper copy
     Object.keys(defaults).forEach(key => {
@@ -365,8 +397,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
         newConfig.orientation === 'horizontal') ||
       ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)
     ) {
-      newConfig.runtime.xAxis = _.cloneDeep(newConfig.yAxis.yAxis || newConfig.yAxis)
-      newConfig.runtime.yAxis = _.cloneDeep(newConfig.xAxis.xAxis || newConfig.xAxis)
+      // For horizontal charts, axes are swapped, so processedYAxis goes to runtime.xAxis and vice versa
+      newConfig.runtime.xAxis = {
+        ..._.cloneDeep(newConfig.yAxis.yAxis || newConfig.yAxis),
+        label: processedYAxis || (newConfig.yAxis.yAxis || newConfig.yAxis).label
+      }
+      newConfig.runtime.yAxis = {
+        ..._.cloneDeep(newConfig.xAxis.xAxis || newConfig.xAxis),
+        label: processedXAxis || (newConfig.xAxis.xAxis || newConfig.xAxis).label
+      }
       newConfig.runtime.yAxis.labelOffset *= -1
 
       newConfig.runtime.horizontal = false
@@ -377,13 +416,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
       ['Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType) &&
       !convertLineToBarGraph
     ) {
-      newConfig.runtime.xAxis = newConfig.xAxis
-      newConfig.runtime.yAxis = newConfig.yAxis
+      newConfig.runtime.xAxis = { ...newConfig.xAxis, label: processedXAxis || newConfig.xAxis.label }
+      newConfig.runtime.yAxis = { ...newConfig.yAxis, label: processedYAxis || newConfig.yAxis.label }
       newConfig.runtime.horizontal = false
       newConfig.orientation = 'vertical'
     } else {
-      newConfig.runtime.xAxis = newConfig.xAxis
-      newConfig.runtime.yAxis = newConfig.yAxis
+      newConfig.runtime.xAxis = { ...newConfig.xAxis, label: processedXAxis || newConfig.xAxis.label }
+      newConfig.runtime.yAxis = { ...newConfig.yAxis, label: processedYAxis || newConfig.yAxis.label }
       newConfig.runtime.horizontal = false
     }
 

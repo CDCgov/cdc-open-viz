@@ -8,6 +8,7 @@ import axios from 'axios'
 import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 import { publish } from '@cdc/core/helpers/events'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
+import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import ConfigContext from './ConfigContext'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import EditorPanel from '../src/components/EditorPanel'
@@ -15,6 +16,7 @@ import defaults from './data/initial-state'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
+import Filters from '@cdc/core/components/Filters'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import markupIncludeReducer from './store/markupInclude.reducer'
 import Layout from '@cdc/core/components/Layout'
@@ -35,6 +37,7 @@ type CdcMarkupIncludeProps = {
 import Title from '@cdc/core/components/ui/Title'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import { Datasets } from '@cdc/core/types/DataSet'
+import { VizFilter } from '@cdc/core/types/VizFilter'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
@@ -63,9 +66,17 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const container = useRef()
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config || {})
-  const { contentEditor, theme, markupVariables } = config || {}
-  const { showNoDataMessage, allowHideSection, noDataMessageText } = contentEditor || {}
-  const data = configObj?.data
+  const { contentEditor, theme } = config || {}
+  const {
+    showNoDataMessage,
+    allowHideSection,
+    noDataMessageText,
+    markupVariables: contentEditorMarkupVariables
+  } = contentEditor || {}
+  const data = config?.data
+
+  // Support markupVariables at root level or inside contentEditor
+  const markupVariables = config?.markupVariables || contentEditorMarkupVariables || []
 
   const { inlineHTML, srcUrl, title, useInlineHTML } = contentEditor || {}
 
@@ -84,6 +95,15 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
   }
 
+  const setFilters = (newFilters: VizFilter[]) => {
+    const _newFilters = addValuesToFilters(newFilters, data || [])
+    const updatedConfig = {
+      ...config,
+      filters: _newFilters
+    }
+    dispatch({ type: 'SET_CONFIG', payload: updatedConfig })
+  }
+
   const loadConfig = async () => {
     let response = configObj || (await (await fetch(configUrl)).json())
     let responseData = response.data ?? {}
@@ -95,6 +115,11 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
     response.data = responseData
     const processedConfig = { ...coveUpdateWorker(response) }
+
+    // Add filter values if filters are present
+    if (processedConfig.filters && processedConfig.filters.length > 0) {
+      processedConfig.filters = addValuesToFilters(processedConfig.filters, responseData)
+    }
 
     updateConfig({ ...configObj, ...processedConfig })
     dispatch({ type: 'SET_LOADING', payload: false })
@@ -201,7 +226,8 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     ? processMarkupVariables(inlineHTML, data || [], markupVariables || [], {
         isEditor,
         showNoDataMessage,
-        allowHideSection
+        allowHideSection,
+        filters: config?.filters || []
       })
     : { processedContent: parseBodyMarkup(urlMarkup), shouldHideSection: false, shouldShowNoDataMessage: false }
 
@@ -221,6 +247,16 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
               <div className={`markup-include-component ${contentClasses.join(' ')}`}>
                 <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
                 <div className={`${innerContainerClasses.join(' ')}`}>
+                  {/* Filters */}
+                  {config.filters && config.filters.length > 0 && (
+                    <Filters
+                      config={config}
+                      setFilters={setFilters}
+                      excludedData={data || []}
+                      dimensions={[0, 0]}
+                      interactionLabel={interactionLabel || 'markup-include'}
+                    />
+                  )}
                   <div className='cove-component__content-wrap'>
                     {_showNoDataMessage && (
                       <div className='no-data-message'>
@@ -232,7 +268,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
                   </div>
                 </div>
               </div>
-              <FootnotesStandAlone config={configObj?.footnotes} filters={[]} />
+              <FootnotesStandAlone config={configObj?.footnotes} filters={config?.filters || []} />
             </div>
           </Layout.Responsive>
         )}

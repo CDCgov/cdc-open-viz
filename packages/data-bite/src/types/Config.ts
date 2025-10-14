@@ -1,5 +1,6 @@
 import { Version } from '@cdc/core/types/Version'
 import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
+import { VizFilter } from '@cdc/core/types/VizFilter'
 
 export type Config = {
   type: string
@@ -24,7 +25,7 @@ export type Config = {
     suffix: string
   }
   biteStyle: string
-  filters: Object[]
+  filters: VizFilter[]
   subtext: string
   title: string
   theme: string
