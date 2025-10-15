@@ -41,7 +41,7 @@ const SingleStateMap: React.FC = () => {
   } = useContext<MapContext>(ConfigContext)
 
   const dispatch = useContext(MapDispatchContext)
-  const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset, projection } = useStateZoom(topoData)
+  const { handleMoveEnd, handleZoomIn, handleZoomOut, handleZoomReset, projection } = useStateZoom(topoData)
 
   // Memoize statesPicked to prevent creating new arrays on every render
   const statesPicked = useMemo(() => {
@@ -270,7 +270,7 @@ const SingleStateMap: React.FC = () => {
         // prettier-ignore
         handleZoomIn={handleZoomIn}
         handleZoomOut={handleZoomOut}
-        handleReset={handleReset}
+        handleZoomReset={handleZoomReset}
       />
     </ErrorBoundary>
   )
