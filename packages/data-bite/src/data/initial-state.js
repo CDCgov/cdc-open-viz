@@ -36,5 +36,7 @@ export default {
   },
   general: {
     isCompactStyle: false
-  }
+  },
+  markupVariables: [],
+  enableMarkupVariables: false
 }

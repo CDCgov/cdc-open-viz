@@ -29,6 +29,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import InputToggle from '@cdc/core/components/inputs/InputToggle'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
+import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 
 // Assets
 import UsaGraphic from '@cdc/core/assets/icon-map-usa.svg'
@@ -3365,6 +3366,14 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           </AccordionItem>
           {config.general.geoType === 'us' && <Panels.PatternSettings name='Pattern Settings' />}
           {config.general.geoType !== 'us-county' && <Panels.Annotate name='Text Annotations' />}
+          <PanelMarkup
+            name='Markup Variables'
+            markupVariables={config.markupVariables || []}
+            data={config.data || []}
+            enableMarkupVariables={config.enableMarkupVariables || false}
+            onMarkupVariablesChange={variables => setConfig({ ...config, markupVariables: variables })}
+            onToggleEnable={enabled => setConfig({ ...config, enableMarkupVariables: enabled })}
+          />
         </Accordion>
         <AdvancedEditor loadConfig={setConfig} config={config} convertStateToConfig={convertStateToConfig} />
       </Layout.Sidebar>

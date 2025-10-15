@@ -7,6 +7,8 @@ import axios from 'axios'
 // cdc
 import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 import { publish } from '@cdc/core/helpers/events'
+import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
+import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import ConfigContext from './ConfigContext'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import EditorPanel from '../src/components/EditorPanel'
@@ -14,6 +16,7 @@ import defaults from './data/initial-state'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
+import Filters from '@cdc/core/components/Filters'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import markupIncludeReducer from './store/markupInclude.reducer'
 import Layout from '@cdc/core/components/Layout'
@@ -34,6 +37,7 @@ type CdcMarkupIncludeProps = {
 import Title from '@cdc/core/components/ui/Title'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import { Datasets } from '@cdc/core/types/DataSet'
+import { VizFilter } from '@cdc/core/types/VizFilter'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
@@ -64,10 +68,18 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config || {})
   const { contentEditor, theme } = config || {}
-  const { showNoDataMessage, allowHideSection, noDataMessageText } = contentEditor || {}
-  const data = configObj?.data
+  const {
+    showNoDataMessage,
+    allowHideSection,
+    noDataMessageText,
+    markupVariables: contentEditorMarkupVariables
+  } = contentEditor || {}
+  const data = config?.data
 
-  const { inlineHTML, markupVariables, srcUrl, title, useInlineHTML } = contentEditor || {}
+  // Support markupVariables at root level or inside contentEditor
+  const markupVariables = config?.markupVariables || contentEditorMarkupVariables || []
+
+  const { inlineHTML, srcUrl, title, useInlineHTML } = contentEditor || {}
 
   // Default Functions
   const updateConfig = newConfig => {
@@ -84,6 +96,15 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
   }
 
+  const setFilters = (newFilters: VizFilter[]) => {
+    const _newFilters = addValuesToFilters(newFilters, data || [])
+    const updatedConfig = {
+      ...config,
+      filters: _newFilters
+    }
+    dispatch({ type: 'SET_CONFIG', payload: updatedConfig })
+  }
+
   const loadConfig = async () => {
     let response = configObj || (await (await fetch(configUrl)).json())
     let responseData = response.data ?? {}
@@ -95,6 +116,11 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
     response.data = responseData
     const processedConfig = { ...coveUpdateWorker(response) }
+
+    // Add filter values if filters are present
+    if (processedConfig.filters && processedConfig.filters.length > 0) {
+      processedConfig.filters = addValuesToFilters(processedConfig.filters, responseData)
+    }
 
     updateConfig({ ...configObj, ...processedConfig })
     dispatch({ type: 'SET_LOADING', payload: false })
@@ -158,71 +184,6 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     }
   }
 
-  const filterOutConditions = (workingData, conditionList) => {
-    const { columnName, isOrIsNotEqualTo, value } = conditionList[0]
-
-    const newWorkingData =
-      isOrIsNotEqualTo === 'is'
-        ? workingData?.filter(dataObject => dataObject[columnName] === value)
-        : workingData?.filter(dataObject => dataObject[columnName] !== value)
-
-    conditionList.shift()
-    return conditionList.length === 0 ? newWorkingData : filterOutConditions(newWorkingData, conditionList)
-  }
-
-  const emptyVariableChecker = []
-  const noDataMessageChecker = []
-
-  const convertVariablesInMarkup = inlineMarkup => {
-    if (_.isEmpty(markupVariables)) return inlineMarkup
-    const variableRegexPattern = /{{(.*?)}}/g
-    const convertedInlineMarkup = inlineMarkup.replace(variableRegexPattern, variableTag => {
-      if (emptyVariableChecker.length > 0) return
-      const workingVariable = markupVariables.filter(variable => variable.tag === variableTag)[0]
-      if (workingVariable === undefined) return [variableTag]
-      const workingData =
-        workingVariable && workingVariable.conditions.length === 0
-          ? data
-          : filterOutConditions(data, [...workingVariable.conditions])
-
-      const variableValues: string[] = _.uniq(
-        (workingData || []).map(dataObject => {
-          const dataObjectValue = dataObject[workingVariable.columnName]
-          return workingVariable.addCommas && !isNaN(parseFloat(dataObjectValue))
-            ? parseFloat(dataObjectValue).toLocaleString('en-US', { useGrouping: true })
-            : dataObjectValue
-        })
-      )
-
-      const variableDisplay = []
-
-      const listConjunction = !isEditor ? 'and' : 'or'
-
-      const length = variableValues.length
-      if (length === 2) {
-        const newVariableValues = variableValues.join(` ${listConjunction} `)
-        variableValues.splice(0, 2, newVariableValues)
-      }
-      if (length > 2) {
-        variableValues[length - 1] = `${listConjunction} ${variableValues[length - 1]}`
-      }
-
-      variableDisplay.push(variableValues.join(', '))
-
-      const finalDisplay = variableDisplay[0]
-
-      if (showNoDataMessage && finalDisplay === '') {
-        noDataMessageChecker.push(true)
-      }
-
-      if (finalDisplay === '' && contentEditor.allowHideSection) {
-        emptyVariableChecker.push(true)
-      }
-      return finalDisplay
-    })
-    return convertedInlineMarkup
-  }
-
   const parseBodyMarkup = markup => {
     let parse
     let hasBody = false
@@ -266,10 +227,19 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   let content = <Loading />
 
-  const markup = useInlineHTML ? convertVariablesInMarkup(inlineHTML) : parseBodyMarkup(urlMarkup)
+  const processedMarkup = useInlineHTML
+    ? processMarkupVariables(inlineHTML, data || [], markupVariables || [], {
+        isEditor,
+        showNoDataMessage,
+        allowHideSection,
+        filters: config?.filters || []
+      })
+    : { processedContent: parseBodyMarkup(urlMarkup), shouldHideSection: false, shouldShowNoDataMessage: false }
 
-  const hideMarkupInclude = contentEditor?.allowHideSection && emptyVariableChecker.length > 0 && !isEditor
-  const _showNoDataMessage = showNoDataMessage && noDataMessageChecker.length > 0 && !isEditor
+  const markup = processedMarkup.processedContent
+
+  const hideMarkupInclude = processedMarkup.shouldHideSection
+  const _showNoDataMessage = processedMarkup.shouldShowNoDataMessage
 
   if (loading === false) {
     content = (
@@ -282,6 +252,16 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
               <div className={`markup-include-component ${contentClasses.join(' ')}`}>
                 <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
                 <div className={`${innerContainerClasses.join(' ')}`}>
+                  {/* Filters */}
+                  {config.filters && config.filters.length > 0 && (
+                    <Filters
+                      config={config}
+                      setFilters={setFilters}
+                      excludedData={data || []}
+                      dimensions={[0, 0]}
+                      interactionLabel={interactionLabel || 'markup-include'}
+                    />
+                  )}
                   <div className='cove-component__content-wrap'>
                     {_showNoDataMessage && (
                       <div className='no-data-message'>
@@ -293,7 +273,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
                   </div>
                 </div>
               </div>
-              <FootnotesStandAlone config={configObj?.footnotes} filters={[]} />
+              <FootnotesStandAlone config={configObj?.footnotes} filters={config?.filters || []} />
             </div>
           </Layout.Responsive>
         )}
