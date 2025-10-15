@@ -970,28 +970,39 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           legend.position === 'top' ||
                           visualizationType === 'Sankey' ||
                           visualizationType === 'Spark Line'
-                          ? 'w-100'
-                          : 'w-75'
+                        ? 'w-100'
+                        : 'w-75'
                     }
                   >
-                    {/* All charts with LinearChart */}
-                    {!['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
-                      <div ref={parentRef} style={{ width: `100%` }}>
-                        <ParentSize>
-                          {parent => (
-                            <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
-                          )}
-                        </ParentSize>
+                    {/* Check if there is data to display */}
+                    {(!filteredData || filteredData.length === 0) && (
+                      <div className='no-data-message' style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
+                        {config.chartMessage?.noData || 'No Data Available'}
                       </div>
                     )}
 
-                    {config.visualizationType === 'Pie' && (
+                    {/* All charts with LinearChart */}
+                    {filteredData &&
+                      filteredData.length > 0 &&
+                      !['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
+                        <div ref={parentRef} style={{ width: `100%` }}>
+                          <ParentSize>
+                            {parent => (
+                              <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
+                            )}
+                          </ParentSize>
+                        </div>
+                      )}
+
+                    {filteredData && filteredData.length > 0 && config.visualizationType === 'Pie' && (
                       <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
                         {parent => <PieChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />}
                       </ParentSize>
                     )}
                     {/* Line Chart */}
-                    {config.visualizationType === 'Line' &&
+                    {filteredData &&
+                      filteredData.length > 0 &&
+                      config.visualizationType === 'Line' &&
                       (convertLineToBarGraph ? (
                         <div ref={parentRef} style={{ width: `100%` }}>
                           <ParentSize>
@@ -1007,7 +1018,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                               const labelMargin = 120
                               const widthReduction =
                                 config.showLineSeriesLabels &&
-                                  (config.legend.position !== 'right' || config.legend.hide)
+                                (config.legend.position !== 'right' || config.legend.hide)
                                   ? labelMargin
                                   : 0
                               return (
@@ -1103,33 +1114,33 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   config.visualizationType !== 'Spark Line' &&
                   config.visualizationType !== 'Sankey') ||
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
-                    <DataTable
-                      /* changing the "key" will force the table to re-render
+                  <DataTable
+                    /* changing the "key" will force the table to re-render
                                 when the default sort changes while editing */
-                      key={dataTableDefaultSortBy}
-                      config={pivotDynamicSeries(config)}
-                      rawData={
-                        config.visualizationType === 'Sankey'
-                          ? config?.data?.[0]?.tableData
-                          : config.table.customTableConfig
-                            ? filterVizData(config.filters, config.data)
-                            : config.data
-                      }
-                      runtimeData={getTableRuntimeData()}
-                      expandDataTable={config.table.expanded}
-                      columns={config.columns}
-                      defaultSortBy={dataTableDefaultSortBy}
-                      displayGeoName={name => name}
-                      applyLegendToRow={applyLegendToRow}
-                      tableTitle={config.table.label}
-                      indexTitle={config.table.indexLabel}
-                      vizTitle={title}
-                      viewport={currentViewport}
-                      tabbingId={handleChartTabbing(config, legendId)}
-                      colorScale={colorScale}
-                      interactionLabel={interactionLabel}
-                    />
-                  )}
+                    key={dataTableDefaultSortBy}
+                    config={pivotDynamicSeries(config)}
+                    rawData={
+                      config.visualizationType === 'Sankey'
+                        ? config?.data?.[0]?.tableData
+                        : config.table.customTableConfig
+                        ? filterVizData(config.filters, config.data)
+                        : config.data
+                    }
+                    runtimeData={getTableRuntimeData()}
+                    expandDataTable={config.table.expanded}
+                    columns={config.columns}
+                    defaultSortBy={dataTableDefaultSortBy}
+                    displayGeoName={name => name}
+                    applyLegendToRow={applyLegendToRow}
+                    tableTitle={config.table.label}
+                    indexTitle={config.table.indexLabel}
+                    vizTitle={title}
+                    viewport={currentViewport}
+                    tabbingId={handleChartTabbing(config, legendId)}
+                    colorScale={colorScale}
+                    interactionLabel={interactionLabel}
+                  />
+                )}
                 {config?.annotations?.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
                 {config?.legacyFootnotes && (

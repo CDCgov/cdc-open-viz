@@ -141,10 +141,31 @@ const Filters: React.FC<FilterProps> = ({
         filter.values = getUniqueValues(visualizationConfig.data, filter.columnName)
       }
 
-      newFilters[i].active = handleSorting(filter).values[0]
+      // Determine reset value based on filter configuration
+      let resetValue
 
-      if (filter.setByQueryParameter && queryParams[filter.setByQueryParameter] !== filter.active) {
-        queryParams[filter.setByQueryParameter] = filter.active
+      // If filter has a resetLabel, reset to empty state (shows "- Select -")
+      if (filter.resetLabel) {
+        resetValue = filter.resetLabel
+      }
+      // If filter has a defaultValue, use that
+      else if (filter.defaultValue) {
+        resetValue = filter.defaultValue
+      }
+      // Otherwise, use first value in sorted values array
+      else if (filter.values && filter.values.length > 0) {
+        resetValue = handleSorting(filter).values[0]
+      }
+
+      // Handle multi-select filters
+      if (filter.filterStyle === 'multi-select') {
+        newFilters[i].active = resetValue ? [resetValue] : []
+      } else {
+        newFilters[i].active = resetValue
+      }
+
+      if (filter.setByQueryParameter && queryParams[filter.setByQueryParameter] !== newFilters[i].active) {
+        queryParams[filter.setByQueryParameter] = newFilters[i].active
         needsQueryUpdate = true
       }
     })

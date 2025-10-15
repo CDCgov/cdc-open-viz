@@ -1,0 +1,602 @@
+[
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2020",
+    "state": "Alabama",
+    "value": 23.2,
+    "population": 4903185
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2020",
+    "state": "Alaska",
+    "value": 21.5,
+    "population": 731545
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2020",
+    "state": "Arizona",
+    "value": 17.3,
+    "population": 7151502
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2020",
+    "state": "California",
+    "value": 12.8,
+    "population": 39538223
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2020",
+    "state": "Florida",
+    "value": 18.1,
+    "population": 21538187
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2021",
+    "state": "Alabama",
+    "value": 22.8,
+    "population": 4963095
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2021",
+    "state": "Alaska",
+    "value": 21.1,
+    "population": 732673
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2021",
+    "state": "Arizona",
+    "value": 16.9,
+    "population": 7151502
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2021",
+    "state": "California",
+    "value": 12.1,
+    "population": 39538223
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2021",
+    "state": "Florida",
+    "value": 17.5,
+    "population": 21538187
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2022",
+    "state": "Alabama",
+    "value": 22.1,
+    "population": 5024279
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2022",
+    "state": "Alaska",
+    "value": 20.4,
+    "population": 733391
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2022",
+    "state": "Arizona",
+    "value": 16.2,
+    "population": 7151502
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2022",
+    "state": "California",
+    "value": 11.7,
+    "population": 39538223
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2022",
+    "state": "Florida",
+    "value": 17.0,
+    "population": 21538187
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2023",
+    "state": "Alabama",
+    "value": 21.5,
+    "population": 5024279
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2023",
+    "state": "Alaska",
+    "value": 19.8,
+    "population": 733391
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2023",
+    "state": "Arizona",
+    "value": 15.6,
+    "population": 7151502
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2023",
+    "state": "California",
+    "value": 11.3,
+    "population": 39538223
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2023",
+    "state": "Florida",
+    "value": 16.4,
+    "population": 21538187
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2024",
+    "state": "Alabama",
+    "value": 20.9,
+    "population": 5024279
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2024",
+    "state": "Alaska",
+    "value": 19.2,
+    "population": 733391
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2024",
+    "state": "Arizona",
+    "value": 15.1,
+    "population": 7151502
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2024",
+    "state": "California",
+    "value": 10.9,
+    "population": 39538223
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Tobacco Use",
+    "year": "2024",
+    "state": "Florida",
+    "value": 15.9,
+    "population": 21538187
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2020",
+    "state": "Alabama",
+    "value": 30.5,
+    "population": 4903185
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2020",
+    "state": "Alaska",
+    "value": 26.3,
+    "population": 731545
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2020",
+    "state": "Arizona",
+    "value": 27.9,
+    "population": 7151502
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2020",
+    "state": "California",
+    "value": 24.8,
+    "population": 39538223
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2020",
+    "state": "Florida",
+    "value": 28.7,
+    "population": 21538187
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2021",
+    "state": "Alabama",
+    "value": 29.8,
+    "population": 4963095
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2021",
+    "state": "Alaska",
+    "value": 25.7,
+    "population": 732673
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2021",
+    "state": "Arizona",
+    "value": 27.2,
+    "population": 7151502
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2021",
+    "state": "California",
+    "value": 24.1,
+    "population": 39538223
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2021",
+    "state": "Florida",
+    "value": 28.2,
+    "population": 21538187
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2022",
+    "state": "Alabama",
+    "value": 29.1,
+    "population": 5024279
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2022",
+    "state": "Alaska",
+    "value": 25.0,
+    "population": 733391
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2022",
+    "state": "Arizona",
+    "value": 26.5,
+    "population": 7151502
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2022",
+    "state": "California",
+    "value": 23.5,
+    "population": 39538223
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2022",
+    "state": "Florida",
+    "value": 27.6,
+    "population": 21538187
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2023",
+    "state": "Alabama",
+    "value": 28.3,
+    "population": 5024279
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2023",
+    "state": "Alaska",
+    "value": 24.1,
+    "population": 733391
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2023",
+    "state": "Arizona",
+    "value": 25.8,
+    "population": 7151502
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2023",
+    "state": "California",
+    "value": 22.7,
+    "population": 39538223
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2023",
+    "state": "Florida",
+    "value": 26.9,
+    "population": 21538187
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2024",
+    "state": "Alabama",
+    "value": 27.6,
+    "population": 5024279
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2024",
+    "state": "Alaska",
+    "value": 23.5,
+    "population": 733391
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2024",
+    "state": "Arizona",
+    "value": 25.2,
+    "population": 7151502
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2024",
+    "state": "California",
+    "value": 22.1,
+    "population": 39538223
+  },
+  {
+    "category": "Health Risk Behaviors",
+    "topic": "Physical Activity",
+    "year": "2024",
+    "state": "Florida",
+    "value": 26.3,
+    "population": 21538187
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2020",
+    "state": "Alabama",
+    "value": 15.1,
+    "population": 4903185
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2020",
+    "state": "Alaska",
+    "value": 9.5,
+    "population": 731545
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2020",
+    "state": "Arizona",
+    "value": 12.1,
+    "population": 7151502
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2020",
+    "state": "California",
+    "value": 11.5,
+    "population": 39538223
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2020",
+    "state": "Florida",
+    "value": 13.4,
+    "population": 21538187
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2021",
+    "state": "Alabama",
+    "value": 14.8,
+    "population": 4963095
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2021",
+    "state": "Alaska",
+    "value": 9.3,
+    "population": 732673
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2021",
+    "state": "Arizona",
+    "value": 11.9,
+    "population": 7151502
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2021",
+    "state": "California",
+    "value": 11.3,
+    "population": 39538223
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2021",
+    "state": "Florida",
+    "value": 13.2,
+    "population": 21538187
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2022",
+    "state": "Alabama",
+    "value": 14.5,
+    "population": 5024279
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2022",
+    "state": "Alaska",
+    "value": 9.1,
+    "population": 733391
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2022",
+    "state": "Arizona",
+    "value": 11.7,
+    "population": 7151502
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2022",
+    "state": "California",
+    "value": 11.1,
+    "population": 39538223
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2022",
+    "state": "Florida",
+    "value": 12.9,
+    "population": 21538187
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2023",
+    "state": "Alabama",
+    "value": 14.2,
+    "population": 5024279
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2023",
+    "state": "Alaska",
+    "value": 8.9,
+    "population": 733391
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2023",
+    "state": "Arizona",
+    "value": 11.4,
+    "population": 7151502
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2023",
+    "state": "California",
+    "value": 10.8,
+    "population": 39538223
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2023",
+    "state": "Florida",
+    "value": 12.6,
+    "population": 21538187
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2024",
+    "state": "Alabama",
+    "value": 13.9,
+    "population": 5024279
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2024",
+    "state": "Alaska",
+    "value": 8.7,
+    "population": 733391
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2024",
+    "state": "Arizona",
+    "value": 11.2,
+    "population": 7151502
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2024",
+    "state": "California",
+    "value": 10.6,
+    "population": 39538223
+  },
+  {
+    "category": "Chronic Diseases",
+    "topic": "Diabetes",
+    "year": "2024",
+    "state": "Florida",
+    "value": 12.4,
+    "population": 21538187
+  }
+]
