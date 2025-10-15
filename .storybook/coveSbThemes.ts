@@ -1,6 +1,6 @@
 // COVE Storybook Themes
 import { create } from 'storybook/theming'
-import logo from './assets/cove-logo-long.svg'
+import logo from './assets/cove-logo-long.svg?react'
 
 export const managerTheme = create({
   brandTitle: 'COVE - Component Documentation',

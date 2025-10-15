@@ -3,7 +3,7 @@ import ConfigContext from '../../../../ConfigContext'
 
 // Core
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
-import Check from '@cdc/core/assets/icon-check.svg'
+import Check from '@cdc/core/assets/icon-check.svg?react'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 import { colorPalettesChartV1, colorPalettesChartV2, sequentialPalettes } from '@cdc/core/data/colorPalettes'
 import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'

@@ -5,7 +5,7 @@ import useTooltip from './useTooltip'
 import { supportedStatesFipsCodes } from './../data/supported-geos'
 import parse from 'html-react-parser'
 import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
-import ExternalIcon from './../images/external-link.svg'
+import ExternalIcon from './../images/external-link.svg?react'
 
 const useApplyTooltipsToGeo = () => {
   const { config, customNavigationHandler } = useContext(ConfigContext)

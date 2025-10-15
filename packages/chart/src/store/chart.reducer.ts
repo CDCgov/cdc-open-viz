@@ -1,6 +1,7 @@
 import ChartActions from './chart.actions'
 import defaults from '../data/initial-state.js'
-import { ChartConfig, type ViewportSize } from '../types/ChartConfig'
+import { ChartConfig } from '../types/ChartConfig'
+import { type ViewportSize } from '@cdc/core/types/ViewportSize'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import _ from 'lodash'
 
