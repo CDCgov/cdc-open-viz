@@ -18,6 +18,7 @@ import update_4_25_6 from './ver/4.25.6'
 import update_4_25_7 from './ver/4.25.7'
 import update_4_25_8 from './ver/4.25.8'
 import update_4_25_9 from './ver/4.25.9'
+import update_4_25_10 from './ver/4.25.10'
 
 import { stripDataFromConfig, restoreDataToConfig } from './configDataHelpers'
 
@@ -42,7 +43,8 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
     ['4.25.6', update_4_25_6],
     ['4.25.7', update_4_25_7],
     ['4.25.8', update_4_25_8],
-    ['4.25.9', update_4_25_9]
+    ['4.25.9', update_4_25_9],
+    ['4.25.10', update_4_25_10]
   ]
 
   versions.forEach(([version, updateFunction, alwaysRun]: [string, UpdateFunction, boolean?]) => {

@@ -1,6 +1,7 @@
 //TODO: Move legends to core
 import { forwardRef, useContext, useMemo } from 'react'
 import parse from 'html-react-parser'
+import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 
 //types
 import { DimensionsType } from '@cdc/core/types/Dimensions'
@@ -301,9 +302,29 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
             {(legend.title || legend.description || legend.dynamicDescription) && (
               <div className='mb-3'>
-                {legend.title && <h3 className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</h3>}
+                {legend.title && (
+                  <h3 className={legendClasses.title.join(' ') || ''}>
+                    {parse(
+                      config.enableMarkupVariables && config.markupVariables?.length > 0
+                        ? processMarkupVariables(legend.title, config.data || [], config.markupVariables, {
+                            isEditor: false,
+                            filters: config.filters || []
+                          }).processedContent
+                        : legend.title
+                    )}
+                  </h3>
+                )}
                 {legend.dynamicDescription === false && legend.description && (
-                  <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>
+                  <p className={legendClasses.description.join(' ') || ''}>
+                    {parse(
+                      config.enableMarkupVariables && config.markupVariables?.length > 0
+                        ? processMarkupVariables(legend.description, config.data || [], config.markupVariables, {
+                            isEditor: false,
+                            filters: config.filters || []
+                          }).processedContent
+                        : legend.description
+                    )}
+                  </p>
                 )}
                 {legend.dynamicDescription === true &&
                   runtimeFilters.map((filter, idx) => {
