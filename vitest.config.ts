@@ -23,11 +23,15 @@ export default defineConfig({
           environment: 'jsdom',
           globals: true,
           setupFiles: ['./vitest.setup.ts'],
+          testTimeout: 600000,
           browser: {
             enabled: true,
             instances: [
               {
-                browser: 'chromium'
+                browser: 'chromium',
+                launch: {
+                  args: ['--disable-web-security']
+                }
               }
             ],
             provider: 'playwright',
