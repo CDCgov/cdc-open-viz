@@ -13,12 +13,13 @@ type ToggleProps = {
 }
 const Toggle: React.FC<ToggleProps> = ({ active, row, visualizations, setToggled, text }) => {
   const selectItem = (colIndex, e = null) => {
-    if (e?.key && e.key !== 'Enter') return
+    if (e?.key && e.key !== 'Enter' && e.key !== ' ') return
+    if (e?.key === ' ') e.preventDefault() // Prevent page scroll
     setToggled(colIndex)
   }
 
   return (
-    <div className='toggle-component'>
+    <div className='toggle-component' role='radiogroup' aria-label='Visualization options'>
       {row.columns.map((col, colIndex) => {
         if (!col.widget) return null
         const type = visualizations[col.widget].type
@@ -36,7 +37,7 @@ const Toggle: React.FC<ToggleProps> = ({ active, row, visualizations, setToggled
             tabIndex={0}
             aria-label={`Toggle ${type}`}
           >
-            {getIcon(visualizations[col.widget])} <span>{text}</span>
+            <span aria-hidden='true'>{getIcon(visualizations[col.widget])}</span> <span>{text}</span>
           </div>
         )
       })}
