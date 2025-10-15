@@ -5,9 +5,12 @@ import ConfigContext from '../../../../ConfigContext'
 import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import Check from '@cdc/core/assets/icon-check.svg'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
-import { sequentialPalettes } from '@cdc/core/data/colorPalettes'
+import { colorPalettesChartV1, colorPalettesChartV2, sequentialPalettes } from '@cdc/core/data/colorPalettes'
+import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
+import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import Icon from '@cdc/core/components/ui/Icon'
 import { Select } from '@cdc/core/components/EditorPanel/Inputs'
+import { buildForecastPaletteOptions } from '../../../../helpers/buildForecastPaletteOptions'
 
 // Third Party
 import {
@@ -25,7 +28,7 @@ const SeriesContext = React.createContext({})
 const SeriesWrapper = props => {
   const { updateConfig, config, rawData } = useContext(ConfigContext)
 
-  const { getColumns, selectComponent } = props
+  const { getColumns, selectComponent, handleForecastPaletteSelection } = props
 
   const supportedRightAxisTypes = ['Line', 'dashed-sm', 'dashed-md', 'dashed-lg']
 
@@ -57,7 +60,9 @@ const SeriesWrapper = props => {
   }
 
   return (
-    <SeriesContext.Provider value={{ updateSeries, supportedRightAxisTypes, getColumns, selectComponent }}>
+    <SeriesContext.Provider
+      value={{ updateSeries, supportedRightAxisTypes, getColumns, selectComponent, handleForecastPaletteSelection }}
+    >
       {props.children}
     </SeriesContext.Provider>
   )
@@ -240,7 +245,8 @@ const SeriesDropdownAxisPosition = props => {
 }
 
 const SeriesDropdownForecastColor = props => {
-  const { config, updateConfig } = useContext(ConfigContext)
+  const { config } = useContext(ConfigContext)
+  const { handleForecastPaletteSelection } = useContext(SeriesContext)
 
   const { index, series } = props
 
@@ -249,30 +255,32 @@ const SeriesDropdownForecastColor = props => {
   // Hide AxisPositionDropdown in certain cases.
   if (!series) return
 
-  const allowedForecastingColors = () => {
-    return Object.keys(sequentialPalettes)
-  }
+  // Determine palette version and use appropriate palette set
+  // Forecasting charts use sequentialPalettes for v1, sequential-only palettes for v2
+  const paletteVersion = getColorPaletteVersion(config)
+
+  // Get version-appropriate palettes (v1 uses sequentialPalettes, v2 uses filtered v2 palettes)
+  const forecastPalettes =
+    paletteVersion === 1
+      ? sequentialPalettes
+      : Object.fromEntries(Object.entries(colorPalettesChartV2).filter(([key]) => key.startsWith('sequential')))
+
+  // For dropdown options, only show version-specific palettes
+  const processedPalettes = updatePaletteNames(forecastPalettes)
+  const paletteOptions = buildForecastPaletteOptions(processedPalettes, paletteVersion)
 
   return series?.stages?.map((stage, stageIndex) => (
     <InputSelect
       key={`${stage}--${stageIndex}`}
       initial='Select an option'
-      value={
-        config.series?.[index].stages?.[stageIndex].color ? config.series?.[index].stages?.[stageIndex].color : 'Select'
-      }
+      value={config.series?.[index].stages?.[stageIndex].color || 'Select'}
       label={`${stage.key} Series Color`}
       onChange={event => {
-        const copyOfSeries = [...config.series] // copy the entire series array
-        const copyOfStages = copyOfSeries[index].stages
-        copyOfStages[stageIndex].color = event.target.value
-        copyOfSeries[index] = { ...copyOfSeries[index], stages: copyOfStages }
-
-        updateConfig({
-          ...config,
-          series: copyOfSeries
-        })
+        if (handleForecastPaletteSelection) {
+          handleForecastPaletteSelection(event.target.value, index, stageIndex)
+        }
       }}
-      options={Object.keys(sequentialPalettes)}
+      options={paletteOptions}
     />
   ))
 }

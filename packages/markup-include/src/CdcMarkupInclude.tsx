@@ -39,6 +39,7 @@ import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAl
 import { Datasets } from '@cdc/core/types/DataSet'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   configUrl,
@@ -209,8 +210,12 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     if (config && !coveLoadedHasRan && container) {
       publish('cove_loaded', { config: config })
       dispatch({ type: 'SET_COVE_LOADED_HAS_RAN', payload: true })
-      publishAnalyticsEvent('markup-include_loaded', 'load', interactionLabel, 'markup-include', {
-        title: config?.title
+      publishAnalyticsEvent({
+        vizType: 'markup-include',
+        eventType: 'markup-include_ready',
+        eventAction: 'load',
+        eventLabel: interactionLabel,
+        vizTitle: getVizTitle(config)
       })
     }
   }, [config, container])

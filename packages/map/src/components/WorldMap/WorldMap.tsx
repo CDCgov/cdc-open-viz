@@ -29,6 +29,7 @@ import { applyLegendToRow } from '../../helpers/applyLegendToRow'
 
 import './worldMap.styles.css'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 let projection = geoMercator()
 
@@ -65,38 +66,97 @@ const WorldMap = () => {
     return <></>
   }
 
-  const handleReset = () => {
+  const handleFiltersReset = () => {
     const newRuntimeData = generateRuntimeData(config)
-    publishAnalyticsEvent('map_reset_zoom_level', 'click', interactionLabel, 'map')
-    dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: 'map_filter_reset',
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config)
+    })
     dispatch({ type: 'SET_FILTERED_COUNTRY_CODE', payload: '' })
     dispatch({ type: 'SET_RUNTIME_DATA', payload: newRuntimeData })
   }
 
+  const handleZoomReset = _setRuntimeData => {
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: 'map_reset_zoom_level',
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config)
+    })
+    dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
+  }
+
   const handleZoomIn = position => {
     if (position.zoom >= 4) return
-    publishAnalyticsEvent(
-      `map_zoomed_in|zoom_level_${Math.floor(position.zoom * 1.5)}|${position.coordinates}`,
-      'click',
-      `${interactionLabel}`,
-      'map'
-    )
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: `zoom_in`,
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config),
+      specifics: `zoom_level: ${Math.floor(position.zoom * 1.5)}`
+    })
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: `zoom_in`,
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config),
+      specifics: `location: ${position.coordinates}`
+    })
     dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: position.zoom * 1.5 } })
   }
 
   const handleZoomOut = position => {
     if (position.zoom <= 1) return
-    publishAnalyticsEvent(
-      `map_zoomed_out|zoom_level_${Math.floor(position.zoom / 1.5)}|${position.coordinates}`,
-      'click',
-      `${interactionLabel}`,
-      'map'
-    )
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: `zoom_out`,
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config),
+      specifics: `zoom_level: ${Math.floor(position.zoom / 1.5)}`
+    })
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: `zoom_out`,
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config),
+      specifics: `location: ${position.coordinates}`
+    })
     dispatch({ type: 'SET_POSITION', payload: { coordinates: position.coordinates, zoom: position.zoom / 1.5 } })
   }
 
   const handleMoveEnd = position => {
-    publishAnalyticsEvent('map_panned', 'drag', interactionLabel, 'map')
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: 'map_panned',
+      eventAction: 'drag',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config),
+      specifics: `zoom: ${position.zoom}`
+    })
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: 'map_panned',
+      eventAction: 'drag',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config),
+      specifics: `coordinates: ${position.coordinates}`
+    })
     dispatch({ type: 'SET_POSITION', payload: position })
   }
 
@@ -172,9 +232,15 @@ const WorldMap = () => {
             onMouseEnter={() => {
               // Track hover analytics event if this is a new location
               const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
-              publishAnalyticsEvent(`map_hover_${locationName?.toLowerCase()}`, 'hover', interactionLabel, 'map', {
-                title: config?.title || config?.general?.title,
-                location: geoDisplayName
+              publishAnalyticsEvent({
+                vizType: config.type,
+                vizSubType: getVizSubType(config),
+                eventType: `map_hover`,
+                eventAction: 'hover',
+                eventLabel: interactionLabel,
+                vizTitle: getVizTitle(config),
+                location: geoDisplayName,
+                specifics: `location: ${locationName?.toLowerCase()}`
               })
             }}
             data-tooltip-id={`tooltip__${tooltipId}`}
@@ -197,9 +263,15 @@ const WorldMap = () => {
           onMouseEnter={() => {
             // Track hover analytics event if this is a new location
             const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
-            publishAnalyticsEvent(`map_hover_${locationName?.toLowerCase()}`, 'hover', interactionLabel, 'map', {
-              title: config?.title || config?.general?.title,
-              location: geoDisplayName
+            publishAnalyticsEvent({
+              vizType: config.type,
+              vizSubType: getVizSubType(config),
+              eventType: `map_hover`,
+              eventAction: 'hover',
+              eventLabel: interactionLabel,
+              vizTitle: getVizTitle(config),
+              location: geoDisplayName,
+              specifics: `location: ${locationName?.toLowerCase()}`
             })
           }}
           data-tooltip-id={`tooltip__${tooltipId}`}
@@ -223,7 +295,7 @@ const WorldMap = () => {
     <ErrorBoundary component='WorldMap'>
       {allowMapZoom ? (
         <svg viewBox={SVG_VIEWBOX} role='img' aria-label={handleMapAriaLabels(config)}>
-          <rect height={SVG_HEIGHT} width={SVG_WIDTH} onClick={handleReset} fill='white' />
+          <rect height={SVG_HEIGHT} width={SVG_WIDTH} onClick={handleFiltersReset} fill='white' />
           <ZoomableGroup
             zoom={position.zoom}
             center={position.coordinates}
@@ -252,7 +324,7 @@ const WorldMap = () => {
         </svg>
       )}
       {(type === 'data' || (type === 'world-geocode' && allowMapZoom) || (type === 'bubble' && allowMapZoom)) && (
-        <ZoomControls handleZoomIn={handleZoomIn} handleZoomOut={handleZoomOut} handleReset={handleReset} />
+        <ZoomControls handleZoomIn={handleZoomIn} handleZoomOut={handleZoomOut} handleZoomReset={handleZoomReset} />
       )}
     </ErrorBoundary>
   )
