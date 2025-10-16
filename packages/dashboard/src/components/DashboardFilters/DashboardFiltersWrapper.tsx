@@ -12,6 +12,7 @@ import DashboardFiltersEditor from './DashboardFiltersEditor'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import { hasDashboardApplyBehavior } from '../../helpers/hasDashboardApplyBehavior'
 import * as apiFilterHelpers from '../../helpers/apiFilterHelpers'
+import * as filterResetHelpers from '../../helpers/filterResetHelpers'
 import { applyQueuedActive } from '@cdc/core/components/Filters/helpers/applyQueuedActive'
 import './dashboardfilter.styles.css'
 import { updateChildFilters } from '../../helpers/updateChildFilters'
@@ -72,8 +73,8 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       }
     })
     if (allRequiredFiltersSelected) {
-      if (hasDashboardApplyBehavior(state.config.visualizations)) {
-        dispatch({ type: 'SET_FILTERS_APPLIED', payload: true })
+      const hasApplyBehavior = hasDashboardApplyBehavior(state.config.visualizations)
+      if (hasApplyBehavior) {
         const queryParams = getQueryParams()
         let needsQueryUpdate = false
         dashboardConfig.sharedFilters.forEach(sharedFilter => {
@@ -97,17 +98,15 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       dispatch({ type: 'SET_SHARED_FILTERS', payload: dashboardConfig.sharedFilters })
 
       loadAPIFilters(dashboardConfig.sharedFilters, apiFilterDropdowns)
-        .then(newFilters => {
+        .then(async newFilters => {
           // First try to reload URL data (for filters that actually change the API call)
-          reloadURLData(newFilters).then(() => {
-            // After data is loaded, update filtered data with client-side filtering
-            const clonedState = _.cloneDeep(state)
-            // Use the updated filters from dashboardConfig (with applyQueuedActive already applied)
-            clonedState.config.dashboard.sharedFilters = dashboardConfig.sharedFilters
-            const newFilteredData = getFilteredData(clonedState)
-            dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
-            setAPILoading(false)
-          })
+          await reloadURLData(newFilters)
+
+          // Set filters applied AFTER data is loaded to prevent "no data" flash
+          if (hasApplyBehavior) {
+            dispatch({ type: 'SET_FILTERS_APPLIED', payload: true })
+          }
+          setAPILoading(false)
         })
         .catch(e => {
           console.error(e)
@@ -131,8 +130,8 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
 
     // Reset each filter to its default value
     dashboardConfig.sharedFilters.forEach((filter, i) => {
-      const resetValue = apiFilterHelpers.getFilterResetValue(filter, apiFilterDropdowns)
-      apiFilterHelpers.resetFilterToValue(dashboardConfig.sharedFilters[i], resetValue, apiFilterDropdowns)
+      const resetValue = filterResetHelpers.getFilterResetValue(filter, apiFilterDropdowns)
+      filterResetHelpers.resetFilterToValue(dashboardConfig.sharedFilters[i], resetValue, apiFilterDropdowns)
 
       // Update query parameters if needed
       if (
@@ -149,7 +148,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
     }
 
     // Clear dropdown cache for child filters that depend on parents
-    const updatedDropdowns = apiFilterHelpers.clearChildFilterDropdowns(
+    const updatedDropdowns = filterResetHelpers.clearChildFilterDropdowns(
       dashboardConfig.sharedFilters,
       apiFilterDropdowns
     )
