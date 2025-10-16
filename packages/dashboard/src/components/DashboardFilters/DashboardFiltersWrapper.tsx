@@ -102,6 +102,8 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
           reloadURLData(newFilters).then(() => {
             // After data is loaded, update filtered data with client-side filtering
             const clonedState = _.cloneDeep(state)
+            // Use the updated filters from dashboardConfig (with applyQueuedActive already applied)
+            clonedState.config.dashboard.sharedFilters = dashboardConfig.sharedFilters
             const newFilteredData = getFilteredData(clonedState)
             dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
             setAPILoading(false)
