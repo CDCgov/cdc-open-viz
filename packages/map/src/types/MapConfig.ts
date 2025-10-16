@@ -3,6 +3,7 @@ import { type Visualization } from '@cdc/core/types/Visualization'
 import { type EditorColumnProperties } from '@cdc/core/types/EditorColumnProperties'
 import { type Version } from '@cdc/core/types/Version'
 import { type VizFilter } from '@cdc/core/types/VizFilter'
+import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 
 // Runtime data types
 export type RuntimeFilters = VizFilter[] & { fromHash?: number }
@@ -204,4 +205,4 @@ export type MapConfig = Visualization & {
   type: 'map'
   // version of the map
   version: Version
-}
+} & MarkupConfig

@@ -79,25 +79,42 @@ const Widget = ({
   }
 
   const changeDataLimit = (dataUrl, limit) => {
-    const url = new URL(dataUrl)
-    url.searchParams.set('$limit', limit)
-    // Replace encoded $ with actual $ for the URL
-    return url.href.replace(/%24/g, '$')
+    if (!dataUrl || typeof dataUrl !== 'string') {
+      console.error('Invalid dataUrl provided to changeDataLimit:', dataUrl)
+      return null
+    }
+
+    try {
+      // Handle relative URLs by resolving them against the current base URL
+      const url = new URL(dataUrl, window.location.origin)
+      url.searchParams.set('$limit', limit)
+      // Replace encoded $ with actual $ for the URL
+      return url.href.replace(/%24/g, '$')
+    } catch (error) {
+      console.error('Failed to construct URL from dataUrl:', dataUrl, error)
+      return null
+    }
   }
 
   const loadSampleData = () => {
     const dataKey = config.rows[widgetConfig.rowIdx]?.dataKey || widgetConfig?.dataKey
     const dataset = config.datasets[dataKey]
     const _data = data[dataKey]
-    if (dataKey && !_data?.length) {
+    if (dataKey && !_data?.length && dataset?.dataUrl) {
       const url = changeDataLimit(dataset.dataUrl, 100)
-      fetchRemoteData(url).then(responseData => {
-        // this sample data is temporary.
-        // the HEADER component removes the data when you toggle to the main viz panel.
-        // data will be cached only when it's loaded via dashboard preview.
-        responseData.sample = true
-        dispatch({ type: 'SET_DATA', payload: { ...data, [dataKey]: responseData } })
-      })
+      if (url) {
+        fetchRemoteData(url)
+          .then(responseData => {
+            // this sample data is temporary.
+            // the HEADER component removes the data when you toggle to the main viz panel.
+            // data will be cached only when it's loaded via dashboard preview.
+            responseData.sample = true
+            dispatch({ type: 'SET_DATA', payload: { ...data, [dataKey]: responseData } })
+          })
+          .catch(error => {
+            console.error('Failed to fetch sample data:', error)
+          })
+      }
     }
   }
 

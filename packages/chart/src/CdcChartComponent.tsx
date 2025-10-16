@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useId, useContext, useReducer } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useId, useContext, useReducer, useMemo } from 'react'
 
 // IE11
 import ResizeObserver from 'resize-observer-polyfill'
@@ -47,6 +47,7 @@ import { lineOptions } from './helpers/lineOptions'
 import { handleLineType } from './helpers/handleLineType'
 import { handleRankByValue } from './helpers/handleRankByValue'
 import { generateColorsArray } from '@cdc/core/helpers/generateColorsArray'
+import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
@@ -154,6 +155,73 @@ const CdcChart: React.FC<CdcChartProps> = ({
   // Destructure items from config for more readable JSX
   let { legend, title } = config
 
+  // Process markup variables for text fields (memoized to prevent re-processing on every render)
+  // Note: XSS Safety - The processed content is parsed using html-react-parser which sanitizes
+  // HTML input by default. The markup processor returns plain text with user data substituted.
+  const processedTextFields = useMemo(() => {
+    if (!config.enableMarkupVariables || !config.markupVariables?.length) {
+      return {
+        title,
+        superTitle: config.superTitle,
+        introText: config.introText,
+        legacyFootnotes: config.legacyFootnotes,
+        description: config.description
+      }
+    }
+
+    return {
+      title: title
+        ? processMarkupVariables(title, config.data || [], config.markupVariables, {
+            isEditor,
+            filters: config.filters || []
+          }).processedContent
+        : title,
+      superTitle: config.superTitle
+        ? processMarkupVariables(config.superTitle, config.data || [], config.markupVariables, {
+            isEditor,
+            filters: config.filters || []
+          }).processedContent
+        : config.superTitle,
+      introText: config.introText
+        ? processMarkupVariables(config.introText, config.data || [], config.markupVariables, {
+            isEditor,
+            filters: config.filters || []
+          }).processedContent
+        : config.introText,
+      legacyFootnotes: config.legacyFootnotes
+        ? processMarkupVariables(config.legacyFootnotes, config.data || [], config.markupVariables, {
+            isEditor,
+            filters: config.filters || []
+          }).processedContent
+        : config.legacyFootnotes,
+      description: config.description
+        ? processMarkupVariables(config.description, config.data || [], config.markupVariables, {
+            isEditor,
+            filters: config.filters || []
+          }).processedContent
+        : config.description
+    }
+  }, [
+    config.enableMarkupVariables,
+    config.markupVariables,
+    config.data,
+    config.filters,
+    title,
+    config.superTitle,
+    config.introText,
+    config.legacyFootnotes,
+    config.description,
+    isEditor
+  ])
+
+  // Destructure processed values
+  title = processedTextFields.title
+  const processedSuperTitle = processedTextFields.superTitle
+  const processedIntroText = processedTextFields.introText
+  const processedLegacyFootnotes = processedTextFields.legacyFootnotes
+  const processedDescription = processedTextFields.description
+  // Note: Axis labels are processed within updateConfig to ensure they use the correct data
+
   // set defaults on titles if blank AND only in editor
   if (isEditor) {
     if (!title || title === '') title = 'Chart Title'
@@ -212,6 +280,25 @@ const CdcChart: React.FC<CdcChartProps> = ({
     let data = dataOverride || stateData
 
     data = handleRankByValue(data, newConfig)
+
+    // Process axis labels for markup variables if enabled
+    let processedXAxis = newConfig.xAxis?.label
+    let processedYAxis = newConfig.yAxis?.label
+
+    if (newConfig.enableMarkupVariables && newConfig.markupVariables?.length) {
+      if (newConfig.xAxis?.label) {
+        processedXAxis = processMarkupVariables(newConfig.xAxis.label, data || [], newConfig.markupVariables, {
+          isEditor,
+          filters: newConfig.filters || []
+        }).processedContent
+      }
+      if (newConfig.yAxis?.label) {
+        processedYAxis = processMarkupVariables(newConfig.yAxis.label, data || [], newConfig.markupVariables, {
+          isEditor,
+          filters: newConfig.filters || []
+        }).processedContent
+      }
+    }
 
     // Deeper copy
     Object.keys(defaults).forEach(key => {
@@ -311,8 +398,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
         newConfig.orientation === 'horizontal') ||
       ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)
     ) {
-      newConfig.runtime.xAxis = _.cloneDeep(newConfig.yAxis.yAxis || newConfig.yAxis)
-      newConfig.runtime.yAxis = _.cloneDeep(newConfig.xAxis.xAxis || newConfig.xAxis)
+      // For horizontal charts, axes are swapped, so processedYAxis goes to runtime.xAxis and vice versa
+      newConfig.runtime.xAxis = {
+        ..._.cloneDeep(newConfig.yAxis.yAxis || newConfig.yAxis),
+        label: processedYAxis || (newConfig.yAxis.yAxis || newConfig.yAxis).label
+      }
+      newConfig.runtime.yAxis = {
+        ..._.cloneDeep(newConfig.xAxis.xAxis || newConfig.xAxis),
+        label: processedXAxis || (newConfig.xAxis.xAxis || newConfig.xAxis).label
+      }
       newConfig.runtime.yAxis.labelOffset *= -1
 
       newConfig.runtime.horizontal = false
@@ -323,13 +417,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
       ['Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType) &&
       !convertLineToBarGraph
     ) {
-      newConfig.runtime.xAxis = newConfig.xAxis
-      newConfig.runtime.yAxis = newConfig.yAxis
+      newConfig.runtime.xAxis = { ...newConfig.xAxis, label: processedXAxis || newConfig.xAxis.label }
+      newConfig.runtime.yAxis = { ...newConfig.yAxis, label: processedYAxis || newConfig.yAxis.label }
       newConfig.runtime.horizontal = false
       newConfig.orientation = 'vertical'
     } else {
-      newConfig.runtime.xAxis = newConfig.xAxis
-      newConfig.runtime.yAxis = newConfig.yAxis
+      newConfig.runtime.xAxis = { ...newConfig.xAxis, label: processedXAxis || newConfig.xAxis.label }
+      newConfig.runtime.yAxis = { ...newConfig.yAxis, label: processedYAxis || newConfig.yAxis.label }
       newConfig.runtime.horizontal = false
     }
 
@@ -446,8 +540,16 @@ const CdcChart: React.FC<CdcChartProps> = ({
       } else if (newConfig.formattedData) {
         newConfig.data = newConfig.formattedData
       } else if (newConfig.dataDescription) {
-        newConfig.data = transform.autoStandardize(newConfig.data)
-        newConfig.data = transform.developerStandardize(newConfig.data, newConfig.dataDescription)
+        // For dashboard contexts, get data from datasets if config.data is undefined
+        let dataToProcess = newConfig.data
+        if (!dataToProcess && isDashboard && datasets && newConfig.dataKey) {
+          dataToProcess = datasets[newConfig.dataKey]?.data
+        }
+
+        if (dataToProcess) {
+          newConfig.data = transform.autoStandardize(dataToProcess)
+          newConfig.data = transform.developerStandardize(newConfig.data, newConfig.dataDescription)
+        }
       }
     } catch (err) {
       console.error('Error on prepareData function ', err)
@@ -930,7 +1032,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 showTitle={config.showTitle}
                 isDashboard={isDashboard}
                 title={title}
-                superTitle={config.superTitle}
+                superTitle={processedSuperTitle}
                 classes={['chart-title', `${config.theme}`, 'cove-component__header', 'mb-3']}
                 style={undefined}
                 config={config}
@@ -939,8 +1041,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
               {/* Visualization Wrapper */}
               <div className={getChartWrapperClasses().join(' ')}>
                 {/* Intro Text/Message */}
-                {config?.introText && config.visualizationType !== 'Spark Line' && (
-                  <section className={`introText mb-4`}>{parse(config.introText)}</section>
+                {processedIntroText && config.visualizationType !== 'Spark Line' && (
+                  <section className={`introText mb-4`}>{parse(processedIntroText)}</section>
                 )}
 
                 {/* Filters */}
@@ -1031,9 +1133,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           dimensions={dimensions}
                           interactionLabel={interactionLabel}
                         />
-                        {config?.introText && (
+                        {processedIntroText && (
                           <section className='introText mb-4' style={{ padding: '0px 0 35px' }}>
-                            {parse(config.introText)}
+                            {parse(processedIntroText)}
                           </section>
                         )}
                         <div style={{ height: `100px`, width: `100%`, ...sparkLineStyles }}>
@@ -1070,8 +1172,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   : link && link}
                 {/* Description */}
 
-                {config.description && config.visualizationType !== 'Spark Line' && (
-                  <div className={getChartSubTextClasses().join(' ')}>{parse(config.description)}</div>
+                {processedDescription && config.visualizationType !== 'Spark Line' && (
+                  <div className={getChartSubTextClasses().join(' ')}>{parse(processedDescription)}</div>
                 )}
 
                 {/* buttons */}
@@ -1132,8 +1234,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 )}
                 {config?.annotations?.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
-                {config?.legacyFootnotes && (
-                  <section className='footnotes pt-2 mt-4'>{parse(config.legacyFootnotes)}</section>
+                {processedLegacyFootnotes && (
+                  <section className='footnotes pt-2 mt-4'>{parse(processedLegacyFootnotes)}</section>
                 )}
               </div>
               <FootnotesStandAlone
