@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useContext, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 
 // Libraries
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -40,6 +40,7 @@ import useMinMax from '../hooks/useMinMax'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import useScales, { getTickValues } from '../hooks/useScales'
+import { useProgrammaticTooltip } from '../hooks/useProgrammaticTooltip'
 
 import getTopAxis from '../helpers/getTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
@@ -48,6 +49,8 @@ import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
 import HoverLine from './HoverLine/HoverLine'
+import { SmallMultiples } from './SmallMultiples'
+import { calculateYAxisWithAutoPadding } from '../helpers/calculateYAxisWithAutoPadding'
 
 type LinearChartProps = {
   parentWidth: number
@@ -99,7 +102,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     tableData,
     transformedData: data,
     seriesHighlight,
-
+    handleSmallMultipleHover
   } = useContext(ConfigContext)
 
   // CONFIG
@@ -118,6 +121,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     dataFormat,
     debugSvg
   } = config
+
   const { labelsAboveGridlines, hideAxis, inlineLabel } = config.yAxis
 
   // HOOKS  % STATES
@@ -128,7 +132,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const [showHoverLine, setShowHoverLine] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
-  const [yAxisAutoPadding, setYAxisAutoPadding] = useState(0)
 
   // REFS
   const axisBottomRef = useRef(null)
@@ -138,7 +141,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
-  const lastMaxValue = useRef(maxValue)
   const gridLineRefs = useRef([])
   const tooltipRef = useRef(null)
 
@@ -215,17 +217,27 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const getYAxisData = (d, seriesKey) => d[seriesKey]
   const xAxisDataMapped = data.map(d => getXAxisData(d))
   const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
+
+  // Check if auto-padding should be applied to decide which config to use with useMinMax
+  const shouldApplyAutoPadding = inlineLabel && !inlineLabelHasNoSpace
+
+  // Create config that disables scale padding when auto-padding will be applied
+  const configForMinMax = shouldApplyAutoPadding
+    ? {
+        ...config,
+        yAxis: {
+          ...config.yAxis,
+          enablePadding: false,
+          scalePadding: 0
+        }
+      }
+    : config
+
+  // Get Y-axis values from useMinMax
   const properties = {
     data,
     tableData,
-    config: {
-      ...config,
-      yAxis: {
-        ...config.yAxis,
-        scalePadding: labelsOverflow ? yAxisAutoPadding : config.yAxis.scalePadding,
-        enablePadding: labelsOverflow || config.yAxis.enablePadding
-      }
-    },
+    config: configForMinMax,
     minValue,
     maxValue,
     isAllLine,
@@ -234,7 +246,12 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     xMax,
     yMax
   }
-  const { min, max, leftMax, rightMax } = useMinMax(properties)
+  const { min: baseMin, max: baseMax, leftMax, rightMax } = useMinMax(properties)
+
+  // Apply auto-padding only if needed (on raw values), otherwise use scale-padded values
+  const { min, max } = shouldApplyAutoPadding
+    ? calculateYAxisWithAutoPadding(baseMin, baseMax, config, data, parentHeight, currentViewport)
+    : { min: baseMin, max: baseMax }
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
   const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleAnnotation } = useScales({
     ...properties,
@@ -265,6 +282,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleTooltipClick,
     handleTooltipMouseOff,
     TooltipListItem,
+    getXValueFromCoordinate,
+    getCoordinateFromXValue,
   } = useCoveTooltip({
     xScale,
     yScale,
@@ -351,7 +370,32 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       x,
       y
     })
+
+    if (handleSmallMultipleHover) {
+      const xAxisValue = getXValueFromCoordinate(x - Number(config.yAxis.size || 0))
+      if (xAxisValue !== null && xAxisValue !== undefined) {
+        handleSmallMultipleHover(xAxisValue, y)
+      }
+    }
   }
+
+  const onMouseLeave = () => {
+    setShowHoverLine(false)
+    if (handleSmallMultipleHover) {
+      handleSmallMultipleHover(null, null)
+    }
+  }
+
+  // Use custom hook to provide programmatic tooltip control for small multiples
+  const internalSvgRef = useProgrammaticTooltip({
+    svgRef,
+    getCoordinateFromXValue,
+    config,
+    setPoint,
+    setShowHoverLine,
+    handleTooltipMouseOver,
+    hideTooltip
+  })
 
   // EFFECTS
   // Adjust padding on the right side of the chart to accommodate for overflow
@@ -441,7 +485,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     if (!topLabelOnGridlineHeight) return
 
     // Adjust the viewBox for the svg
-    const svg = svgRef.current
+    const svg = internalSvgRef.current
     if (!svg) return
     const parentWidthFromRef = parentRef.current.getBoundingClientRect().width
     svg.setAttribute('viewBox', `0 ${-topLabelOnGridlineHeight} ${parentWidthFromRef} ${newHeight}`)
@@ -462,45 +506,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   ])
 
   useEffect(() => {
-    if (lastMaxValue.current === maxValue) return
-    lastMaxValue.current = maxValue
-
-    if (!yAxisAutoPadding) return
-    setYAxisAutoPadding(0)
-  }, [maxValue])
-
-  useEffect(() => {
-    if (!yScale?.ticks) return
-    const ticks = yScale.ticks(handleNumTicks)
-    if (orientation === 'horizontal' || !labelsOverflow || config.yAxis?.max || ticks.length === 0) {
-      setYAxisAutoPadding(0)
-      return
-    }
-
-    // minimum percentage of the max value that the distance should be from the top grid line
-    const MINIMUM_DISTANCE_PERCENTAGE = 0.025
-
-    const topGridLine = Math.max(...ticks)
-    const needsPaddingThreshold = topGridLine - maxValue * MINIMUM_DISTANCE_PERCENTAGE
-    const maxValueIsGreaterThanThreshold = maxValue > needsPaddingThreshold
-
-    if (!maxValueIsGreaterThanThreshold) return
-
-    const tickGap = ticks.length === 1 ? ticks[0] : ticks[1] - ticks[0]
-    const nextTick = Math.max(...yScale.ticks(handleNumTicks)) + tickGap
-    const divideBy = minValue < 0 ? maxValue / 2 : maxValue
-    const calculatedPadding = (nextTick - maxValue) / divideBy
-
-    // if auto padding is too close to next tick, add one more ticks worth of padding
-    const newPadding =
-      calculatedPadding > MINIMUM_DISTANCE_PERCENTAGE ? calculatedPadding : calculatedPadding + tickGap / divideBy
-
-    /* sometimes even though the padding is getting to the next tick exactly,
-    d3 still doesn't show the tick. we add 0.1 to ensure to tip it over the edge */
-    setYAxisAutoPadding(newPadding * 100 + 0.1)
-  }, [maxValue, labelsOverflow, yScale, handleNumTicks])
-
-  useEffect(() => {
     if (!tooltipOpen) return
     if (!tooltipRef.current) return
 
@@ -516,6 +521,19 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const maxWidth = rightSide ? dataXPosition - 10 : parentWidth - (dataXPosition + 6)
     tooltipRef.current.node.style.maxWidth = `${maxWidth}px`
   }, [tooltipOpen, tooltipData])
+
+  // Check if small multiples are enabled - if so, render SmallMultiples instead
+  if (config.smallMultiples?.mode) {
+    return (
+      <SmallMultiples
+        config={config}
+        data={data}
+        svgRef={svgRef}
+        parentWidth={parentWidth}
+        parentHeight={parentHeight}
+      />
+    )
+  }
 
   // Render Functions
   const generatePairedBarAxis = () => {
@@ -671,7 +689,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
         className='tooltip-boundary'
       >
         <svg
-          ref={svgRef}
+          ref={internalSvgRef}
           onMouseMove={onMouseMove}
           width={parentWidth + config.yAxis.rightAxisSize}
           height={isNoDataAvailable ? 1 : parentHeight}
@@ -681,7 +699,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           role='img'
           aria-label={handleChartAriaLabels(config)}
           style={{ overflow: 'visible' }}
-          onMouseLeave={() => setShowHoverLine(false)}
+          onMouseLeave={onMouseLeave}
           onMouseEnter={() => setShowHoverLine(true)}
         >
           {!isDraggingAnnotation && <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>}{' '}
