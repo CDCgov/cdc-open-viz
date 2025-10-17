@@ -165,9 +165,13 @@ export default function CdcDashboard({
             }
 
             if (filter.apiFilter && filter.active) {
-              updatedQSParams[filter.apiFilter.valueSelector] = filter.active
-              if (filter.apiFilter.subgroupValueSelector && filter.subGrouping.active) {
-                updatedQSParams[filter.apiFilter.subgroupValueSelector] = filter.subGrouping.active
+              // Don't add filter to query params if it's set to its resetLabel
+              const isResetLabel = filter.resetLabel && filter.active === filter.resetLabel
+              if (!isResetLabel) {
+                updatedQSParams[filter.apiFilter.valueSelector] = filter.active
+                if (filter.apiFilter.subgroupValueSelector && filter.subGrouping.active) {
+                  updatedQSParams[filter.apiFilter.subgroupValueSelector] = filter.subGrouping.active
+                }
               }
             }
           }

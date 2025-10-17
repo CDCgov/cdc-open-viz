@@ -10,7 +10,7 @@ type DropdownProps = {
 }
 
 const Dropdown: React.FC<DropdownProps> = ({ index: outerIndex, label, filter, changeFilterActive }) => {
-  const { active, queuedActive } = filter
+  const { active, queuedActive, resetLabel } = filter
 
   return (
     <select
@@ -25,6 +25,11 @@ const Dropdown: React.FC<DropdownProps> = ({ index: outerIndex, label, filter, c
         changeFilterActive(outerIndex, e.target.value)
       }}
     >
+      {resetLabel && (
+        <option key='reset-option' value={resetLabel} aria-label={resetLabel}>
+          {resetLabel}
+        </option>
+      )}
       {filter.values?.map((value, index) => {
         return (
           <option key={index} value={value} aria-label={value}>

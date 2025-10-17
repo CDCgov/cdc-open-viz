@@ -12,7 +12,7 @@ type LoaderProps = {
 
 const Spinner = ({ spinnerType }: { spinnerType: SpinnerType }) => (
   <div className={`spinner-border ${spinnerType}`} role='status'>
-    <span className='sr-only'>Loading...</span>
+    <span className='sr-only' style={{ display: 'none' }}>Loading...</span>
   </div>
 )
 
