@@ -192,7 +192,17 @@ export const waitForEditor = async (canvas: any) => {
  * @param sectionName Name of the accordion section (case-insensitive)
  */
 export const openAccordion = async (canvas: any, sectionName: string) => {
-  const accordion = canvas.getByRole('button', { name: new RegExp(sectionName, 'i') })
+  // Get all buttons with matching name and filter to only accordion buttons
+  const allButtons = canvas.getAllByRole('button', { name: new RegExp(sectionName, 'i') })
+  const accordion = allButtons.find(
+    (button: HTMLElement) =>
+      button.classList.contains('accordion__button') || button.closest('.editor-panel, .accordion')
+  )
+
+  if (!accordion) {
+    throw new Error(`Could not find accordion button for "${sectionName}"`)
+  }
+
   await userEvent.click(accordion)
   await waitForWithDelay(() => {
     const accordionContent = accordion.closest('.accordion-item, .accordion-section, [class*="accordion"]')

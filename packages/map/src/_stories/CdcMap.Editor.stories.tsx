@@ -1705,5 +1705,1176 @@ export const FiltersSectionTests: Story = {
         return after.hasFilterSelect && after.selectedValue === 'Alabama' && after.labelCount === 1
       }
     )
+
+    // ==========================================================================
+    // TEST: Filter Label
+    // ==========================================================================
+    const labelInput = Array.from(updatedFilterBlock?.querySelectorAll('input[type="text"]') || []).find(input => {
+      const label = input.closest('label')
+      const labelSpan = label?.querySelector('.edit-label')
+      return labelSpan?.textContent?.includes('Label') && !labelSpan?.textContent?.includes('Query')
+    }) as HTMLInputElement
+
+    await performAndAssert(
+      'Filter Label → Set custom label',
+      () => {
+        const filtersSection = canvasElement.querySelector('.filters-section')
+        const filterLabel = filtersSection?.querySelector('.form-group label')
+        return {
+          labelText: filterLabel?.textContent?.trim() || ''
+        }
+      },
+      async () => {
+        await userEvent.clear(labelInput)
+        await userEvent.type(labelInput, 'Select State')
+      },
+      (before, after) => {
+        return after.labelText.includes('Select State')
+      }
+    )
+  }
+}
+
+export const DataTableSectionTests: Story = {
+  args: {
+    ...DEFAULT_ARGS
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await waitForPresence('.map-container', canvasElement)
+
+    await openAccordion(canvas, 'Data Table')
+
+    // ==========================================================================
+    // TEST: Data Table Title
+    // ==========================================================================
+    const dataTableTitleInput = canvasElement.querySelector('#dataTableTitle') as HTMLInputElement
+
+    await performAndAssert(
+      'Data Table Title → Set custom title',
+      () => {
+        const dataTableHeading = canvasElement.querySelector('.data-table-heading')
+        return {
+          titleText: dataTableHeading?.textContent?.trim() || ''
+        }
+      },
+      async () => {
+        await userEvent.clear(dataTableTitleInput)
+        await userEvent.type(dataTableTitleInput, 'State Population Data')
+      },
+      (before, after) => {
+        return after.titleText.includes('State Population Data')
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Wrap Data Table Columns
+    // ==========================================================================
+    // First expand the data table if it's collapsed
+    const dataTableHeadingButton = canvasElement.querySelector('.data-table-heading') as HTMLElement
+    const dataTableContainer = canvasElement.querySelector('.data-table-container')
+    const isCollapsed = dataTableHeadingButton?.classList.contains('collapsed')
+    if (isCollapsed) {
+      await userEvent.click(dataTableHeadingButton)
+      await new Promise(resolve => setTimeout(resolve, 200))
+    }
+
+    const wrapColumnsCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(checkbox => {
+      const label = checkbox.closest('label')
+      return label?.textContent?.includes('WRAP DATA TABLE COLUMNS')
+    }) as HTMLInputElement
+
+    await performAndAssert(
+      'Wrap Columns → Toggle wrapping',
+      () => {
+        const dataTable = canvasElement.querySelector('.data-table')
+        const firstCell = dataTable?.querySelector('tbody td')
+        const whiteSpace = firstCell ? window.getComputedStyle(firstCell).whiteSpace : ''
+        return {
+          whiteSpace,
+          hasCells: Boolean(firstCell)
+        }
+      },
+      async () => {
+        await userEvent.click(wrapColumnsCheckbox)
+      },
+      (before, after) => {
+        // When wrap is enabled, white-space should be 'normal' or 'unset', not 'nowrap'
+        return after.hasCells && before.whiteSpace === 'nowrap' && after.whiteSpace !== 'nowrap'
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Show Data Table
+    // ==========================================================================
+    const showDataTableCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(
+      checkbox => {
+        const label = checkbox.closest('label')
+        return label?.textContent?.includes('Show Data Table') && !label?.textContent?.includes('Non Geographic')
+      }
+    ) as HTMLInputElement
+
+    await performAndAssert(
+      'Show Data Table → Hide data table',
+      () => {
+        const dataTableContainer = canvasElement.querySelector('.data-table-container')
+        const isVisible = dataTableContainer && window.getComputedStyle(dataTableContainer).display !== 'none'
+        return {
+          isVisible: Boolean(isVisible)
+        }
+      },
+      async () => {
+        await userEvent.click(showDataTableCheckbox)
+      },
+      (before, after) => {
+        // Should hide the data table
+        return before.isVisible && !after.isVisible
+      }
+    )
+
+    // Toggle it back on for the next test
+    await userEvent.click(showDataTableCheckbox)
+
+    // ==========================================================================
+    // TEST: Show Non Geographic Data
+    // ==========================================================================
+    const showNonGeoDataCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(
+      checkbox => {
+        const label = checkbox.closest('label')
+        return label?.textContent?.includes('Show Non Geographic Data')
+      }
+    ) as HTMLInputElement
+
+    await performAndAssert(
+      'Show Non Geographic Data → Toggle visibility',
+      () => {
+        const dataTable = canvasElement.querySelector('.data-table')
+        const rows = Array.from(dataTable?.querySelectorAll('tbody tr') || [])
+        const rowCount = rows.length
+        return {
+          rowCount
+        }
+      },
+      async () => {
+        await userEvent.click(showNonGeoDataCheckbox)
+      },
+      (before, after) => {
+        // Toggling non-geographic data should add rows to the table (overall data object)
+        return after.rowCount > before.rowCount
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Index Column Header
+    // ==========================================================================
+    const indexColumnHeaderInput = Array.from(canvasElement.querySelectorAll('input[type="text"]')).find(input => {
+      const label = input.closest('label')
+      return label?.textContent?.includes('Index Column Header')
+    }) as HTMLInputElement
+
+    await performAndAssert(
+      'Index Column Header → Set custom header',
+      () => {
+        const dataTable = canvasElement.querySelector('.data-table')
+        const firstHeader = dataTable?.querySelector('thead th')
+        return {
+          headerText: firstHeader?.textContent?.trim() || ''
+        }
+      },
+      async () => {
+        await userEvent.clear(indexColumnHeaderInput)
+        await userEvent.type(indexColumnHeaderInput, 'State/Territory')
+      },
+      (before, after) => {
+        return after.headerText.includes('State/Territory')
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Screen Reader Description
+    // ==========================================================================
+    const screenReaderDescTextarea = Array.from(canvasElement.querySelectorAll('textarea')).find(textarea => {
+      const label = textarea.closest('label')
+      return label?.textContent?.includes('Screen Reader Description')
+    }) as HTMLTextAreaElement
+
+    await performAndAssert(
+      'Screen Reader Description → Set custom description',
+      () => {
+        const dataTable = canvasElement.querySelector('.data-table')
+        const caption = dataTable?.querySelector('caption')
+        return {
+          captionText: caption?.textContent?.trim() || ''
+        }
+      },
+      async () => {
+        await userEvent.clear(screenReaderDescTextarea)
+        await userEvent.type(screenReaderDescTextarea, 'Table showing state population data by region')
+      },
+      (before, after) => {
+        return after.captionText.includes('Table showing state population data')
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Limit Table Height
+    // ==========================================================================
+    const limitHeightCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(checkbox => {
+      const label = checkbox.closest('label')
+      return label?.textContent?.includes('Limit Table Height')
+    }) as HTMLInputElement
+
+    await performAndAssert(
+      'Limit Table Height → Enable height limit',
+      () => {
+        // Check if the "Data Table Height" input field appears (conditional rendering)
+        const heightInput = Array.from(canvasElement.querySelectorAll('input[type="number"]')).find(input => {
+          const label = input.closest('label')
+          return label?.textContent?.includes('Data Table Height')
+        })
+        return {
+          hasHeightInput: Boolean(heightInput)
+        }
+      },
+      async () => {
+        await userEvent.click(limitHeightCheckbox)
+      },
+      (before, after) => {
+        // After enabling, the "Data Table Height" input field should appear
+        return !before.hasHeightInput && after.hasHeightInput
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Table Cell Min Width
+    // ==========================================================================
+    const cellMinWidthInput = Array.from(canvasElement.querySelectorAll('input[type="number"]')).find(input => {
+      const label = input.closest('label')
+      return label?.textContent?.includes('Table Cell Min Width')
+    }) as HTMLInputElement
+
+    await performAndAssert(
+      'Table Cell Min Width → Set minimum width',
+      () => {
+        const dataTable = canvasElement.querySelector('.data-table')
+        const firstCell = dataTable?.querySelector('thead th')
+        const minWidth = firstCell ? window.getComputedStyle(firstCell).minWidth : ''
+        return {
+          minWidth
+        }
+      },
+      async () => {
+        await userEvent.clear(cellMinWidthInput)
+        await userEvent.type(cellMinWidthInput, '150')
+      },
+      (before, after) => {
+        // After setting min width to 150px, cells should have minWidth of 150px
+        return before.minWidth !== after.minWidth && after.minWidth === '150px'
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Show Download CSV Link
+    // ==========================================================================
+    const showDownloadCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(checkbox => {
+      const label = checkbox.closest('label')
+      return label?.textContent?.includes('Show Download CSV Link')
+    }) as HTMLInputElement
+
+    // First toggle it off, then back on
+    await performAndAssert(
+      'Show Download CSV Link → Toggle off',
+      () => {
+        const downloadLink = Array.from(canvasElement.querySelectorAll('a')).find(link =>
+          link.textContent?.includes('Download Data')
+        )
+        return {
+          hasDownloadLink: Boolean(downloadLink)
+        }
+      },
+      async () => {
+        await userEvent.click(showDownloadCheckbox)
+      },
+      (before, after) => {
+        // After disabling, the download link should disappear
+        return before.hasDownloadLink && !after.hasDownloadLink
+      }
+    )
+
+    await performAndAssert(
+      'Show Download CSV Link → Toggle back on',
+      () => {
+        const downloadLink = Array.from(canvasElement.querySelectorAll('a')).find(link =>
+          link.textContent?.includes('Download Data')
+        )
+        return {
+          hasDownloadLink: Boolean(downloadLink)
+        }
+      },
+      async () => {
+        await userEvent.click(showDownloadCheckbox)
+      },
+      (before, after) => {
+        // After re-enabling, the download link should reappear
+        return !before.hasDownloadLink && after.hasDownloadLink
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Show Link Below Table
+    // ==========================================================================
+    const showLinkBelowCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(
+      checkbox => {
+        const label = checkbox.closest('label')
+        return label?.textContent?.includes('Show Link Below Table')
+      }
+    ) as HTMLInputElement
+
+    // First toggle it off (move link above), then back on (move link below)
+    await performAndAssert(
+      'Show Link Below Table → Toggle off (move above)',
+      () => {
+        const dataTableContainer = canvasElement.querySelector('.data-table-container')
+        const downloadSection = canvasElement.querySelector('.download-links')
+        // Check if download link is positioned after the data table
+        const containerRect = dataTableContainer?.getBoundingClientRect()
+        const downloadRect = downloadSection?.getBoundingClientRect()
+        const isBelow = downloadRect && containerRect && downloadRect.top > containerRect.bottom
+        return {
+          isBelow: Boolean(isBelow)
+        }
+      },
+      async () => {
+        await userEvent.click(showLinkBelowCheckbox)
+      },
+      (before, after) => {
+        // After disabling, download link should move above the table
+        return before.isBelow && !after.isBelow
+      }
+    )
+
+    await performAndAssert(
+      'Show Link Below Table → Toggle back on (move below)',
+      () => {
+        const dataTableContainer = canvasElement.querySelector('.data-table-container')
+        const downloadSection = canvasElement.querySelector('.download-links')
+        const containerRect = dataTableContainer?.getBoundingClientRect()
+        const downloadRect = downloadSection?.getBoundingClientRect()
+        const isBelow = downloadRect && containerRect && downloadRect.top > containerRect.bottom
+        return {
+          isBelow: Boolean(isBelow)
+        }
+      },
+      async () => {
+        await userEvent.click(showLinkBelowCheckbox)
+      },
+      (before, after) => {
+        // After re-enabling, download link should move back below the table
+        return !before.isBelow && after.isBelow
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Enable Image Download
+    // ==========================================================================
+    const enableImageDownloadCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(
+      checkbox => {
+        const label = checkbox.closest('label')
+        return label?.textContent?.includes('Enable Image Download')
+      }
+    ) as HTMLInputElement
+
+    await performAndAssert(
+      'Enable Image Download → Enable button',
+      () => {
+        const downloadImgButton = Array.from(canvasElement.querySelectorAll('button')).find(
+          btn => btn.textContent?.includes('Download Image') || btn.classList.contains('download-image')
+        )
+        return {
+          hasDownloadImgButton: Boolean(downloadImgButton)
+        }
+      },
+      async () => {
+        await userEvent.click(enableImageDownloadCheckbox)
+      },
+      (before, after) => {
+        // After enabling, the download image button should appear
+        return !before.hasDownloadImgButton && after.hasDownloadImgButton
+      }
+    )
+  }
+}
+
+// =================================================================================================
+// Visual Section Tests
+// =================================================================================================
+export const VisualSectionTests: StoryObj<typeof CdcMap> = {
+  name: 'Visual Section Tests',
+  args: {
+    ...DEFAULT_ARGS
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    // Wait for the editor to load
+    await waitForEditor(canvas)
+
+    // Open the Visual accordion
+    await openAccordion(canvas, 'Visual')
+
+    // ==========================================================================
+    // TEST: Header Theme
+    // ==========================================================================
+    await performAndAssert(
+      'Header Theme → Select purple theme',
+      () => {
+        const innerContainer = canvasElement.querySelector('.cdc-map-inner-container')
+        const currentTheme = Array.from(innerContainer?.classList || []).find(cls => cls.startsWith('theme-'))
+        return {
+          currentTheme: currentTheme || ''
+        }
+      },
+      async () => {
+        // Find the color palette list and click on the purple theme
+        const colorPalette = canvasElement.querySelector('.color-palette')
+        const purpleTheme = Array.from(colorPalette?.querySelectorAll('li') || []).find(li =>
+          li.classList.contains('theme-purple')
+        ) as HTMLElement
+        await userEvent.click(purpleTheme)
+      },
+      (before, after) => {
+        // After clicking, the header should have the purple theme
+        return after.currentTheme === 'theme-purple'
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Show Title
+    // ==========================================================================
+    const showTitleCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(checkbox => {
+      const label = checkbox.closest('label')
+      return label?.textContent?.includes('Show Title')
+    }) as HTMLInputElement
+
+    await performAndAssert(
+      'Show Title → Toggle off',
+      () => {
+        const title = canvasElement.querySelector('.map-title')
+        const isVisible = title?.classList.contains('visible')
+        return {
+          isVisible: Boolean(isVisible)
+        }
+      },
+      async () => {
+        await userEvent.click(showTitleCheckbox)
+      },
+      (before, after) => {
+        // After toggling off, title should be hidden
+        return before.isVisible && !after.isVisible
+      }
+    )
+
+    await performAndAssert(
+      'Show Title → Toggle back on',
+      () => {
+        const title = canvasElement.querySelector('.map-title')
+        const isVisible = title?.classList.contains('visible')
+        return {
+          isVisible: Boolean(isVisible)
+        }
+      },
+      async () => {
+        await userEvent.click(showTitleCheckbox)
+      },
+      (before, after) => {
+        // After toggling back on, title should be visible
+        return !before.isVisible && after.isVisible
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Geo Border Color
+    // ==========================================================================
+    const geoBorderColorSelect = Array.from(canvasElement.querySelectorAll('select')).find(select => {
+      const label = select.closest('label')
+      return label?.textContent?.includes('Geo Border Color')
+    }) as HTMLSelectElement
+
+    await performAndAssert(
+      'Geo Border Color → Change to White',
+      () => {
+        // Check the stroke attribute on SVG paths with class 'single-geo'
+        const geoPaths = canvasElement.querySelectorAll('path.single-geo')
+        const firstPath = geoPaths[0] as SVGPathElement
+        // Get the actual stroke value - could be in attribute, style, or computed
+        const strokeAttr = firstPath?.getAttribute('stroke') || ''
+        const strokeStyle = firstPath?.style?.stroke || ''
+        const computedStroke = firstPath ? window.getComputedStyle(firstPath).stroke : ''
+        return {
+          strokeAttr,
+          strokeStyle,
+          computedStroke,
+          pathCount: geoPaths.length
+        }
+      },
+      async () => {
+        await userEvent.selectOptions(geoBorderColorSelect, 'sameAsBackground')
+      },
+      (before, after) => {
+        // After changing to white, one of the stroke values should change
+        const beforeStroke = before.strokeAttr || before.strokeStyle || before.computedStroke
+        const afterStroke = after.strokeAttr || after.strokeStyle || after.computedStroke
+        return beforeStroke !== '' && afterStroke !== '' && beforeStroke !== afterStroke
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Map Color Palette - Sequential Palette Selection
+    // ==========================================================================
+    await performAndAssert(
+      'Map Color Palette → Select different sequential palette',
+      () => {
+        // Check the fill colors of actual map path elements (same as we use for stroke)
+        const geoPaths = canvasElement.querySelectorAll('path.single-geo')
+        const firstPath = geoPaths[0] as SVGPathElement
+        // Get the fill value from any available source
+        const fillAttr = firstPath?.getAttribute('fill') || ''
+        const fillStyle = firstPath?.style?.fill || ''
+        const computedFill = firstPath ? window.getComputedStyle(firstPath).fill : ''
+        const firstColor = fillAttr || fillStyle || computedFill
+        return {
+          firstColor,
+          pathCount: geoPaths.length
+        }
+      },
+      async () => {
+        // Find the Sequential palette section
+        const spans = Array.from(canvasElement.querySelectorAll('span'))
+        const sequentialLabel = spans.find(span => span.textContent?.trim() === 'Sequential')
+        const paletteContainer = sequentialLabel?.nextElementSibling
+        const palettes = Array.from(paletteContainer?.querySelectorAll('li') || []) as HTMLElement[]
+
+        // Select a different palette (skip the first one as it might be selected)
+        const alternativePalette = palettes.find((li, idx) => idx > 0 && !li.classList.contains('selected'))
+        if (alternativePalette) {
+          await userEvent.click(alternativePalette)
+
+          // Wait for and handle the conversion modal
+          await waitForPresence('.modal-overlay', canvasElement)
+          const confirmButton = Array.from(canvasElement.querySelectorAll('button')).find(btn =>
+            btn.textContent?.includes('Convert to New Palette')
+          )
+          if (confirmButton) {
+            await userEvent.click(confirmButton)
+          }
+        }
+      },
+      (before, after) => {
+        // After selecting a different palette, the map fill colors should change
+        return before.firstColor !== '' && after.firstColor !== '' && before.firstColor !== after.firstColor
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Map Color Palette - Reverse Order
+    // ==========================================================================
+    // The reverse toggle is an InputToggle component which renders as a div slider
+    // Find it via the hidden checkbox with name containing "isReversed"
+    const reversePaletteCheckbox = canvasElement.querySelector('input[name*="isReversed"]') as HTMLInputElement
+    const reversePaletteToggle = reversePaletteCheckbox?.parentElement as HTMLElement
+
+    expect(reversePaletteToggle).toBeTruthy()
+
+    await performAndAssert(
+      'Map Color Palette → Reverse palette order',
+      () => {
+        // Check the fill colors of map paths
+        const geoPaths = canvasElement.querySelectorAll('path.single-geo')
+        const firstPath = geoPaths[0] as SVGPathElement
+        const fillAttr = firstPath?.getAttribute('fill') || ''
+        const fillStyle = firstPath?.style?.fill || ''
+        const computedFill = firstPath ? window.getComputedStyle(firstPath).fill : ''
+        const firstColor = fillAttr || fillStyle || computedFill
+        return {
+          firstColor,
+          pathCount: geoPaths.length
+        }
+      },
+      async () => {
+        await userEvent.click(reversePaletteToggle)
+        // No modal should appear - reversing doesn't trigger conversion modal
+      },
+      (before, after) => {
+        // After reversing, the first color should be different
+        return before.firstColor !== '' && after.firstColor !== '' && before.firstColor !== after.firstColor
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Geocode Circle Size
+    // ==========================================================================
+    const geocodeCircleSizeInput = Array.from(canvasElement.querySelectorAll('input[type="number"]')).find(input => {
+      const label = input.closest('label')
+      return label?.textContent?.includes('Geocode Circle Size')
+    }) as HTMLInputElement
+
+    expect(geocodeCircleSizeInput).toBeTruthy()
+
+    await performAndAssert(
+      'Geocode Circle Size → Set to 15',
+      () => {
+        // Check the actual visualization - DC appears as a glyph on the map
+        // The glyph class element is a path or circle, look for actual circle element
+        const geoPoints = canvasElement.querySelectorAll('g.geo-point')
+        const firstGeoPoint = geoPoints[0]
+        const circle = firstGeoPoint?.querySelector('circle')
+        const r = circle?.getAttribute('r') || ''
+        // Also check path elements that might have size in their d attribute
+        const path = firstGeoPoint?.querySelector('path')
+        const d = path?.getAttribute('d') || ''
+        return {
+          r,
+          d,
+          inputValue: geocodeCircleSizeInput.value
+        }
+      },
+      async () => {
+        await userEvent.clear(geocodeCircleSizeInput)
+        await userEvent.type(geocodeCircleSizeInput, '15')
+        await userEvent.tab() // Trigger blur/change event
+      },
+      (before, after) => {
+        // Verify the input value changed to 15
+        expect(after.inputValue).toBe('15')
+        // After changing the size, either the radius or path data should change
+        return (
+          (before.r !== '' && after.r !== '' && before.r !== after.r) ||
+          (before.d !== '' && after.d !== '' && before.d !== after.d)
+        )
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Default City Style
+    // ==========================================================================
+    const cityStyleSelect = Array.from(canvasElement.querySelectorAll('select')).find(select => {
+      const label = select.closest('label')
+      return label?.textContent?.includes('Default City Style')
+    }) as HTMLSelectElement
+
+    if (cityStyleSelect) {
+      await performAndAssert(
+        'Default City Style → Change to Triangle',
+        () => {
+          // Check the actual visualization - look for glyph shapes
+          const circles = canvasElement.querySelectorAll('.visx-glyph-circle')
+          const triangles = canvasElement.querySelectorAll('.visx-glyph-triangle')
+          return {
+            circleCount: circles.length,
+            triangleCount: triangles.length
+          }
+        },
+        async () => {
+          await userEvent.selectOptions(cityStyleSelect, 'triangle')
+        },
+        (before, after) => {
+          // After changing to triangle, should have triangles instead of circles
+          return before.triangleCount !== after.triangleCount || before.circleCount !== after.circleCount
+        }
+      )
+    }
+
+    // ==========================================================================
+    // TEST: Label (Optional)
+    // ==========================================================================
+    const cityStyleLabelInput = Array.from(canvasElement.querySelectorAll('input[type="text"]')).find(input => {
+      const label = input.closest('label')
+      return label?.textContent?.includes('Label (Optional)')
+    }) as HTMLInputElement
+
+    if (cityStyleLabelInput) {
+      await performAndAssert(
+        'Label (Optional) → Set custom label',
+        () => {
+          // Check if the label appears in the legend
+          const legend = canvasElement.querySelector('.legends')
+          const legendText = legend?.textContent || ''
+          return {
+            legendText
+          }
+        },
+        async () => {
+          await userEvent.clear(cityStyleLabelInput)
+          await userEvent.type(cityStyleLabelInput, 'City Locations')
+        },
+        (before, after) => {
+          // After setting the label, it should appear in the legend
+          return after.legendText.includes('City Locations')
+        }
+      )
+    }
+  }
+}
+
+/**
+ * Pattern Settings Section Tests
+ * Tests controls in the Pattern Settings accordion (only visible for US maps)
+ */
+export const PatternSettingsSectionTests: Story = {
+  args: {
+    config: usaStateGradientConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    // Wait for editor to load
+    await waitForEditor(canvas)
+
+    // ==========================================================================
+    // TEST: Wait for Pattern Settings accordion to load (US topo JSON)
+    // ==========================================================================
+    let patternSettingsButton: HTMLElement | null = null
+
+    await performAndAssert(
+      'Pattern Settings → Wait for accordion to appear',
+      () => {
+        // Check if Pattern Settings accordion exists
+        const buttons = Array.from(canvasElement.querySelectorAll('.accordion__button'))
+        const button = buttons.find(btn => btn.textContent?.includes('Pattern Settings')) as HTMLElement
+        if (button) {
+          patternSettingsButton = button
+        }
+        return {
+          accordionExists: !!button
+        }
+      },
+      async () => {
+        // No action needed - just let performAndAssert's built-in polling wait for the accordion
+      },
+      (before, after) => {
+        // After waiting, the accordion should exist
+        return after.accordionExists
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Open Pattern Settings accordion and verify controls appear
+    // ==========================================================================
+    await performAndAssert(
+      'Pattern Settings → Open accordion',
+      () => {
+        // Check if the accordion panel is expanded (aria-expanded attribute)
+        const isExpanded = patternSettingsButton.getAttribute('aria-expanded') === 'true'
+        // Also check if the Add Geo Pattern button is visible
+        const buttons = Array.from(canvasElement.querySelectorAll('button'))
+        const addPatternButton = buttons.find(btn => btn.textContent?.includes('Add Geo Pattern'))
+        return {
+          isExpanded,
+          hasAddButton: !!addPatternButton
+        }
+      },
+      async () => {
+        await userEvent.click(patternSettingsButton)
+      },
+      (before, after) => {
+        // After clicking, accordion should be expanded and button should be visible
+        return !before.isExpanded && after.isExpanded && after.hasAddButton
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Add a geo pattern and verify pattern appears on map
+    // ==========================================================================
+    await performAndAssert(
+      'Pattern Settings → Add geo pattern',
+      () => {
+        // Look for pattern elements in ALL SVGs (there might be multiple)
+        // Pattern definitions are <pattern> elements, and they're used by paths with fill="url(#...)"
+        const allSvgs = canvasElement.querySelectorAll('svg')
+        let patternDefCount = 0
+        let patternPathCount = 0
+
+        allSvgs.forEach(svg => {
+          const patternDefs = svg.querySelectorAll('pattern')
+          patternDefCount += patternDefs.length
+
+          const allPaths = Array.from(svg.querySelectorAll('path'))
+          const patternPaths = allPaths.filter(path => {
+            const fill = path.getAttribute('fill')
+            return fill && fill.startsWith('url(#')
+          })
+          patternPathCount += patternPaths.length
+        })
+
+        return {
+          patternDefCount,
+          patternPathCount,
+          svgCount: allSvgs.length
+        }
+      },
+      async () => {
+        // Click "Add Geo Pattern" button
+        const buttons = Array.from(canvasElement.querySelectorAll('button'))
+        const addPatternButton = buttons.find(btn => btn.textContent?.includes('Add Geo Pattern'))
+        if (!addPatternButton) {
+          throw new Error('Add Geo Pattern button not found')
+        }
+        await userEvent.click(addPatternButton)
+      },
+      (before, after) => {
+        // After clicking, pattern definitions and paths should appear on all states
+        // Default pattern is 'circles' with empty dataKey, which matches all states (undefined === undefined)
+        return after.patternDefCount > before.patternDefCount && after.patternPathCount > before.patternPathCount
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Change pattern color to #111
+    // ==========================================================================
+    // First, open the pattern accordion
+    let patternAccordionButton: HTMLElement | null = null
+    await performAndAssert(
+      'Pattern Settings → Open pattern accordion',
+      () => {
+        const allButtons = Array.from(canvasElement.querySelectorAll('.accordion__button'))
+        const button = allButtons.find(btn => btn.textContent?.includes('Select Column')) as HTMLElement
+        if (button) {
+          patternAccordionButton = button
+        }
+        return {
+          isExpanded: button ? button.getAttribute('aria-expanded') === 'true' : false
+        }
+      },
+      async () => {
+        if (!patternAccordionButton) {
+          throw new Error('Pattern accordion not found')
+        }
+        await userEvent.click(patternAccordionButton)
+      },
+      (before, after) => {
+        return !before.isExpanded && after.isExpanded
+      }
+    )
+
+    // Now change the pattern color
+    await performAndAssert(
+      'Pattern Settings → Change pattern color to #111',
+      () => {
+        // Check pattern color in the SVG - look for circle elements inside pattern definitions
+        const allSvgs = canvasElement.querySelectorAll('svg')
+        let patternCircleColors: string[] = []
+
+        allSvgs.forEach(svg => {
+          const patterns = svg.querySelectorAll('pattern')
+          patterns.forEach(pattern => {
+            const circles = pattern.querySelectorAll('circle')
+            circles.forEach(circle => {
+              const fill = circle.getAttribute('fill')
+              if (fill) patternCircleColors.push(fill)
+            })
+          })
+        })
+
+        return {
+          patternColors: patternCircleColors
+        }
+      },
+      async () => {
+        // Find the pattern color input and change it to #111
+        const input = canvasElement.querySelector('input[name="patternColor"]') as HTMLInputElement
+        if (!input) {
+          throw new Error('Pattern color input not found')
+        }
+        await userEvent.clear(input)
+        // Use paste to enter the entire value at once, avoiding intermediate contrast check warnings
+        await userEvent.paste('#111')
+        // Blur to commit the change
+        await userEvent.tab()
+      },
+      (before, after) => {
+        // Pattern circles should now have fill color #111
+        return after.patternColors.some(color => color === '#111')
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Set dataKey to STATE and dataValue to Colorado
+    // ==========================================================================
+    await performAndAssert(
+      'Pattern Settings → Set dataKey/dataValue to STATE/Colorado',
+      () => {
+        // Count pattern paths (paths with fill="url(#...)")
+        const allSvgs = canvasElement.querySelectorAll('svg')
+        let patternPathCount = 0
+
+        allSvgs.forEach(svg => {
+          const allPaths = Array.from(svg.querySelectorAll('path'))
+          const patternPaths = allPaths.filter(path => {
+            const fill = path.getAttribute('fill')
+            return fill && fill.startsWith('url(#')
+          })
+          patternPathCount += patternPaths.length
+        })
+
+        return {
+          patternPathCount
+        }
+      },
+      async () => {
+        // Select "STATE" from the dataKey dropdown
+        const dataKeySelect = canvasElement.querySelector('select[id^="pattern-dataKey--"]') as HTMLSelectElement
+        if (!dataKeySelect) {
+          throw new Error('DataKey select not found')
+        }
+        await userEvent.selectOptions(dataKeySelect, 'STATE')
+
+        // Type "Colorado" in the dataValue input
+        const dataValueInput = canvasElement.querySelector('input[id^="pattern-dataValue--"]') as HTMLInputElement
+        if (!dataValueInput) {
+          throw new Error('DataValue input not found')
+        }
+        await userEvent.clear(dataValueInput)
+        await userEvent.type(dataValueInput, 'Colorado')
+        // Tab to commit the change
+        await userEvent.tab()
+      },
+      (before, after) => {
+        // After setting to Colorado only, pattern paths should decrease significantly
+        // Before: all states (~50+), After: just Colorado (should be 1-2)
+        return after.patternPathCount < before.patternPathCount && after.patternPathCount > 0
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Set label to "Colorado Pattern"
+    // ==========================================================================
+    await performAndAssert(
+      'Pattern Settings → Set label to "Colorado Pattern"',
+      () => {
+        // Check if the label appears in the legend
+        const legendText = canvasElement.textContent || ''
+        return {
+          hasLabelInLegend: legendText.includes('Colorado Pattern')
+        }
+      },
+      async () => {
+        // Find the label input - it's in a label element containing "Label (optional)"
+        const labels = Array.from(canvasElement.querySelectorAll('label'))
+        const labelElement = labels.find(l => l.textContent?.includes('Label (optional)'))
+        const labelInput = labelElement?.querySelector('input[type="text"]') as HTMLInputElement
+
+        if (!labelInput) {
+          throw new Error('Label input not found')
+        }
+        await userEvent.clear(labelInput)
+        await userEvent.type(labelInput, 'Colorado Pattern')
+        await userEvent.tab()
+      },
+      (before, after) => {
+        // After setting the label, it should appear in the legend
+        return !before.hasLabelInLegend && after.hasLabelInLegend
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Change pattern type to "lines"
+    // ==========================================================================
+    await performAndAssert(
+      'Pattern Settings → Change pattern type to lines',
+      () => {
+        // Check what type of pattern elements exist - lines patterns have <line> elements
+        const allSvgs = canvasElement.querySelectorAll('svg')
+        let hasCirclePattern = false
+        let hasLinePattern = false
+
+        allSvgs.forEach(svg => {
+          const patterns = svg.querySelectorAll('pattern')
+          patterns.forEach(pattern => {
+            if (pattern.querySelector('circle')) hasCirclePattern = true
+            if (pattern.querySelector('line')) hasLinePattern = true
+          })
+        })
+
+        return {
+          hasCirclePattern,
+          hasLinePattern
+        }
+      },
+      async () => {
+        // Find the pattern type dropdown and select "lines"
+        const patternTypeSelect = canvasElement.querySelector('select[id^="pattern-type--"]') as HTMLSelectElement
+        if (!patternTypeSelect) {
+          throw new Error('Pattern type select not found')
+        }
+        await userEvent.selectOptions(patternTypeSelect, 'lines')
+      },
+      (before, after) => {
+        // Before: has circle pattern, no line pattern
+        // After: has line pattern (may or may not still have circle pattern from other elements)
+        return before.hasCirclePattern && !before.hasLinePattern && after.hasLinePattern
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Change pattern size to "large"
+    // ==========================================================================
+    await performAndAssert(
+      'Pattern Settings → Change pattern size to large',
+      () => {
+        // Check the pattern element's width/height attributes
+        const allSvgs = canvasElement.querySelectorAll('svg')
+        let patternSizes: number[] = []
+
+        allSvgs.forEach(svg => {
+          const patterns = svg.querySelectorAll('pattern')
+          patterns.forEach(pattern => {
+            const width = pattern.getAttribute('width')
+            if (width) patternSizes.push(parseFloat(width))
+          })
+        })
+
+        return {
+          patternSizes
+        }
+      },
+      async () => {
+        // Find the pattern size dropdown and select "large"
+        const patternSizeSelect = canvasElement.querySelector('select[id^="pattern-size--"]') as HTMLSelectElement
+        if (!patternSizeSelect) {
+          throw new Error('Pattern size select not found')
+        }
+        await userEvent.selectOptions(patternSizeSelect, 'large')
+      },
+      (before, after) => {
+        // After changing to large, pattern sizes should increase
+        const beforeMax = Math.max(...before.patternSizes)
+        const afterMax = Math.max(...after.patternSizes)
+        return afterMax > beforeMax
+      }
+    )
+  }
+}
+
+/**
+ * Text Annotations Section Tests
+ * Tests controls in the Text Annotations accordion
+ */
+export const TextAnnotationsSectionTests: Story = {
+  args: {
+    config: usaStateGradientConfig,
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    // Wait for editor to load
+    await waitForEditor(canvas)
+
+    // Open the Text Annotations accordion
+    await openAccordion(canvas, 'Text Annotations')
+
+    // ==========================================================================
+    // TEST: Add Annotation
+    // ==========================================================================
+    const addAnnotationButton = Array.from(canvasElement.querySelectorAll('button')).find(btn => {
+      return btn.textContent?.includes('Add Annotation')
+    }) as HTMLButtonElement
+
+    expect(addAnnotationButton).toBeTruthy()
+
+    await performAndAssert(
+      'Add Annotation → Click to add default annotation',
+      () => {
+        // Check the actual visualization - annotations appear as divs with aria-label
+        // Default annotation text is "New Annotation"
+        const annotationElements = canvasElement.querySelectorAll('div[aria-label*="Annotation text"]')
+        return {
+          annotationCount: annotationElements.length
+        }
+      },
+      async () => {
+        await userEvent.click(addAnnotationButton)
+      },
+      (before, after) => {
+        // After clicking, a new annotation should appear in the visualization
+        return after.annotationCount > before.annotationCount
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Change Annotation Text
+    // ==========================================================================
+    // Wait for the annotation sub-accordion to appear and find the button with "New Annotation" or "Select Column"
+    await waitForPresence('.cove-accordion__button', canvasElement)
+    const annotationAccordionButtons = canvasElement.querySelectorAll('.cove-accordion__button')
+    const annotationAccordionButton = Array.from(annotationAccordionButtons).find(
+      btn => btn.textContent?.includes('New Annotation') || btn.textContent?.includes('Select Column')
+    ) as HTMLElement
+
+    expect(annotationAccordionButton).toBeTruthy()
+
+    // Open the annotation's sub-accordion
+    await userEvent.click(annotationAccordionButton)
+
+    // Find the annotation text textarea
+    const annotationTextarea = Array.from(canvasElement.querySelectorAll('textarea')).find(textarea => {
+      const label = textarea.closest('label')
+      return label?.textContent?.includes('Annotation Text')
+    }) as HTMLTextAreaElement
+
+    expect(annotationTextarea).toBeTruthy()
+
+    await performAndAssert(
+      'Annotation Text → Change to "Important Note"',
+      () => {
+        // Check the actual visualization - the annotation div should contain the text
+        const annotationDivs = canvasElement.querySelectorAll('div[aria-label*="Annotation text"]')
+        const texts = Array.from(annotationDivs).map(div => div.innerHTML)
+        return {
+          annotationTexts: texts.join('|')
+        }
+      },
+      async () => {
+        // Select all text and replace it
+        await userEvent.click(annotationTextarea)
+        await userEvent.keyboard('{Control>}a{/Control}')
+        await userEvent.type(annotationTextarea, 'Important Note')
+        await userEvent.tab() // Trigger blur to commit the change
+      },
+      (before, after) => {
+        // After changing the text, the annotation should display the new text
+        return after.annotationTexts.includes('Important Note')
+      }
+    )
+
+    // ==========================================================================
+    // TEST: Delete Annotation
+    // ==========================================================================
+    const deleteButton = Array.from(canvasElement.querySelectorAll('button')).find(btn => {
+      return btn.textContent?.includes('Delete Annotation')
+    }) as HTMLButtonElement
+
+    expect(deleteButton).toBeTruthy()
+
+    await performAndAssert(
+      'Delete Annotation → Remove annotation from map',
+      () => {
+        // Check the visualization - count the annotations
+        const annotationDivs = canvasElement.querySelectorAll('div[aria-label*="Annotation text"]')
+        return {
+          annotationCount: annotationDivs.length
+        }
+      },
+      async () => {
+        await userEvent.click(deleteButton)
+      },
+      (before, after) => {
+        // After deleting, annotation count should decrease
+        return after.annotationCount < before.annotationCount
+      }
+    )
   }
 }
