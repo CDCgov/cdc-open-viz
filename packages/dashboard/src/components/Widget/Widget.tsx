@@ -15,6 +15,7 @@ import './widget.styles.css'
 type WidgetConfig = AnyVisualization & { rowIdx: number; colIdx: number }
 type WidgetProps = {
   title: string
+  columnData?: any
   widgetConfig?: WidgetConfig
   addVisualization?: Function
   type: string
@@ -134,7 +135,7 @@ const Widget = ({
   } else {
     if (widgetConfig?.formattedData) {
       isConfigurationReady = true
-    } else if (widgetConfig?.dataKey && widgetConfig?.dataDescription && config.datasets[widgetConfig.dataKey]) {
+    } else if (widgetConfig?.dataKey && widgetConfig?.dataDescription && config.datasets[widgetConfig.dataKey]?.data) {
       const formattedDataAttempt = transform.autoStandardize(config.datasets[widgetConfig.dataKey].data)
       const canFormatData = !!transform.developerStandardize(formattedDataAttempt, widgetConfig.dataDescription)
       if (canFormatData) {
