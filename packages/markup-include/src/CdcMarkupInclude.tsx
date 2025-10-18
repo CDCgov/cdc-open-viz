@@ -74,7 +74,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     noDataMessageText,
     markupVariables: contentEditorMarkupVariables
   } = contentEditor || {}
-  const data = config?.data
+  const data = configObj?.data
 
   // Support markupVariables at root level or inside contentEditor
   const markupVariables = config?.markupVariables || contentEditorMarkupVariables || []
@@ -229,11 +229,11 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   const processedMarkup = useInlineHTML
     ? processMarkupVariables(inlineHTML, data || [], markupVariables || [], {
-        isEditor,
-        showNoDataMessage,
-        allowHideSection,
-        filters: config?.filters || []
-      })
+      isEditor,
+      showNoDataMessage,
+      allowHideSection,
+      filters: config?.filters || []
+    })
     : { processedContent: parseBodyMarkup(urlMarkup), shouldHideSection: false, shouldShowNoDataMessage: false }
 
   const markup = processedMarkup.processedContent
