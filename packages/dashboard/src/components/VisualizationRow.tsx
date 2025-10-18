@@ -280,6 +280,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                     updateChildConfig(col.widget, newConfig)
                   }}
                   isDashboard={true}
+                  interactionLabel={interactionLabel}
                 />
               )}
               {type === 'waffle-chart' && (
@@ -302,6 +303,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                   setConfig={newConfig => {
                     updateChildConfig(col.widget, newConfig)
                   }}
+                  interactionLabel={interactionLabel}
                 />
               )}
               {type === 'filtered-text' && (
