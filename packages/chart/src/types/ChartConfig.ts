@@ -192,6 +192,7 @@ export type AllChartsConfig = {
   runtimeDataUrl: string
   series: Series
   showLineSeriesLabels: boolean
+  showAreaUnderLine?: boolean
   showSidebar: boolean
   showTitle: boolean
   smallMultiples?: {
@@ -205,6 +206,7 @@ export type AllChartsConfig = {
     tileTitles?: { [key: string]: string }
     colorMode?: 'same' | 'different'
     synchronizedTooltips?: boolean
+    showAreaUnderLine?: boolean
   }
   sortData: 'ascending' | 'descending'
   stackedAreaChartLineType: string
