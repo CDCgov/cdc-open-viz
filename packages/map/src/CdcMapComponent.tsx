@@ -274,7 +274,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   // Process markup variables if enabled
   if (config.enableMarkupVariables && config.markupVariables?.length > 0) {
-    const markupOptions = { isEditor, filters: config.filters || [] }
+    // Combine viz filters with dashboard filters for markup processing
+    const combinedFilters = [...(config.filters || []), ...(config.dashboardFilters || [])]
+
+    const markupOptions = { isEditor, filters: combinedFilters }
+
     if (title) {
       title = processMarkupVariables(title, config.data || [], config.markupVariables, markupOptions).processedContent
     }

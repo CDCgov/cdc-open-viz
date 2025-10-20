@@ -69,6 +69,20 @@ export const getVizConfig = (
     return acc
   }, [])
 
+  // Collect active dashboard filters for markup variable processing
+  // This allows markup variables to filter even when the viz isn't in usedBy
+  const activeDashboardFilters = config.dashboard.sharedFilters
+    .filter(filter => filter.active !== undefined && filter.active !== null && filter.active !== '')
+    .map(filter => ({
+      columnName: filter.columnName,
+      active: filter.active,
+      values: filter.values || []
+    }))
+
+  if (activeDashboardFilters.length > 0) {
+    visualizationConfig.dashboardFilters = activeDashboardFilters
+  }
+
   // Download CSV button needs to know to include shared filter columns
   if (visualizationConfig.table && config.dashboard.sharedFilters.length) {
     visualizationConfig.table.sharedFilterColumns = sharedFilterColumns
