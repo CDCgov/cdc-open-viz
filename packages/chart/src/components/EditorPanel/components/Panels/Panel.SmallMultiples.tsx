@@ -409,6 +409,26 @@ const PanelSmallMultiples: FC<PanelProps> = props => {
                     </Tooltip>
                   }
                 />
+
+                {config.visualizationType === 'Line' && (
+                  <CheckBox
+                    value={config.smallMultiples?.showAreaUnderLine}
+                    fieldName='showAreaUnderLine'
+                    section='smallMultiples'
+                    label='Shade Area Under Lines'
+                    updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>When checked, each tile chart will display a shaded area underneath the line.</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
+                )}
               </>
             )}
           </AccordionItemPanel>

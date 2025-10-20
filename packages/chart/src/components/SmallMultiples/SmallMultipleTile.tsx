@@ -128,7 +128,8 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
     legend: {
       ...tileConfig.legend,
       hide: true
-    }
+    },
+    showAreaUnderLine: config.smallMultiples?.showAreaUnderLine || false
   }
 
   const displayTitle = getTileDisplayTitle(mode, seriesKey, tileValue, tileKey, config)
