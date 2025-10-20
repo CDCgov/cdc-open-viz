@@ -33,7 +33,7 @@ const Widget = ({
   toggleRow = false
 }: WidgetProps) => {
   const { overlay } = useGlobalContext()
-  const { config, data } = useContext(DashboardContext)
+  const { config, data, isEditor } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
 
   const [isEditing, setIsEditing] = useState(false)
@@ -135,11 +135,22 @@ const Widget = ({
   } else {
     if (widgetConfig?.formattedData) {
       isConfigurationReady = true
-    } else if (widgetConfig?.dataKey && widgetConfig?.dataDescription && config.datasets[widgetConfig.dataKey]?.data) {
-      const formattedDataAttempt = transform.autoStandardize(config.datasets[widgetConfig.dataKey].data)
-      const canFormatData = !!transform.developerStandardize(formattedDataAttempt, widgetConfig.dataDescription)
-      if (canFormatData) {
-        isConfigurationReady = true
+    } else if (widgetConfig?.dataKey && widgetConfig?.dataDescription) {
+      // In editor mode, having a dataKey and dataDescription is sufficient
+      // In non-editor mode, also check if data is actually loaded
+      if (isEditor || config.datasets[widgetConfig.dataKey]?.data) {
+        const dataToCheck = config.datasets[widgetConfig.dataKey]?.data
+        if (dataToCheck) {
+          const formattedDataAttempt = transform.autoStandardize(dataToCheck)
+          const canFormatData = !!transform.developerStandardize(formattedDataAttempt, widgetConfig.dataDescription)
+          if (canFormatData) {
+            isConfigurationReady = true
+          }
+        } else {
+          // In editor mode, if dataKey and dataDescription are configured but data isn't loaded yet,
+          // still mark as ready so the tools icon shows
+          isConfigurationReady = true
+        }
       }
     }
   }

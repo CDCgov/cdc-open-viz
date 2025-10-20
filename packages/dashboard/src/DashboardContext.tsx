@@ -10,6 +10,7 @@ type ConfigCTX = DashboardState & {
   outerContainerRef: (node: any) => void
   setParentConfig: any
   isDebug: boolean
+  isEditor: boolean
   reloadURLData: (newFilters?: SharedFilter[]) => void
   loadAPIFilters: (
     sharedFilters: SharedFilter[],
@@ -39,6 +40,7 @@ const initialContext: ConfigCTX = {
   reloadURLData: () => {},
   loadAPIFilters: () => Promise.resolve([]),
   isDebug: false,
+  isEditor: false,
   config: {} as MultiDashboardConfig,
   ...initialState
 }
