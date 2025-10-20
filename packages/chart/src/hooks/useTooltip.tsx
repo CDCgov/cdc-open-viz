@@ -108,8 +108,8 @@ export const useTooltip = props => {
       const columnData =
         config.tooltips.singleSeries && visualizationType === 'Line'
           ? resolvedScaleValues.filter(
-            value => value[config.runtime.series[0].dynamicCategory] === singleSeriesValue
-          )[0][colKey]
+              value => value[config.runtime.series[0].dynamicCategory] === singleSeriesValue
+            )[0][colKey]
           : resolvedScaleValues[0]?.[colKey]
       const closestValue = config.visualizationType === 'Pie' ? pieColumnData : columnData
 
@@ -328,13 +328,12 @@ export const useTooltip = props => {
       let minDistance = Number.MAX_VALUE
       let offset = x
 
-      const barThicknessOffset = config.xAxis.type === 'date' ? xScaleRef.current.bandwidth() / 2 : 0
       data.forEach(d => {
         const xPosition = isDateScale(xAxis)
           ? xScaleRef.current(parseDate(d[xAxis.dataKey]))
           : xScaleRef.current(d[xAxis.dataKey])
         let bwOffset = config.barHeight
-        const distance = Math.abs(Number(xPosition + barThicknessOffset - offset + (isClick ? bwOffset * 2 : 0)))
+        const distance = Math.abs(Number(xPosition - offset + (isClick ? bwOffset * 2 : 0)))
 
         if (distance <= minDistance) {
           minDistance = distance
@@ -602,8 +601,9 @@ export const useTooltip = props => {
     if (visualizationType === 'Forest Plot') {
       if (key === config.xAxis.dataKey)
         return (
-          <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value
-            }`}</li>
+          <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${
+            isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value
+          }`}</li>
         )
       return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
     }
