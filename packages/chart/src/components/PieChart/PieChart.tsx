@@ -190,7 +190,16 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
 
     // Handle normal pie chart case
     return createPieColorScale(_data, config)
-  }, [_data, dataNeedsPivot, colorScale, showPercentage, config.xAxis.dataKey, config.general?.palette, config.palette])
+  }, [
+    _data,
+    dataNeedsPivot,
+    colorScale,
+    showPercentage,
+    config.xAxis.dataKey,
+    config.general?.palette?.name,
+    config.general?.palette?.isReversed,
+    config.palette
+  ])
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -333,7 +342,15 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     if (_colorScale && config.visualizationType === 'Pie') {
       dispatch({ type: 'SET_COLOR_SCALE', payload: _colorScale })
     }
-  }, [config.visualizationType, config.xAxis.dataKey, config.general?.palette?.name, config.palette, dispatch])
+  }, [
+    config.visualizationType,
+    config.xAxis.dataKey,
+    config.general?.palette?.name,
+    config.general?.palette?.isReversed,
+    config.palette,
+    dispatch,
+    _colorScale
+  ])
 
   const getSvgClasses = () => {
     let classes = ['animated-pie', 'group']
