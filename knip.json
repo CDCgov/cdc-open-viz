@@ -39,10 +39,11 @@
     "packages/core": {
       "entry": [
         "components/**/*.tsx",
-        "contexts/**/*.tsx",
+        "contexts/**/*.ts",
         "helpers/**/*.ts",
         "hooks/**/*.ts",
-        "types/**/*.ts"
+        "types/**/*.ts",
+        "templates/**/*.jsx"
       ],
       "project": [
         "components/**/*.{js,ts,tsx}",
@@ -51,13 +52,13 @@
         "hooks/**/*.{js,ts,tsx}",
         "types/**/*.{js,ts,tsx}",
         "data/**/*.{js,ts,tsx}",
-        "templates/**/*.{js,ts,tsx}",
-        "**/*.d.ts"
+        "templates/**/*.jsx"
       ]
     },
     "packages/data-bite": {
       "entry": [
-        "src/CdcDataBite.tsx"
+        "src/CdcDataBite.tsx",
+        "src/index.jsx"
       ],
       "project": [
         "src/**/*.{js,ts,tsx}"
@@ -65,7 +66,8 @@
     },
     "packages/data-table": {
       "entry": [
-        "src/CdcDataTable.tsx"
+        "src/CdcDataTable.tsx",
+        "src/index.tsx"
       ],
       "project": [
         "src/**/*.{js,ts,tsx}"
@@ -73,7 +75,8 @@
     },
     "packages/editor": {
       "entry": [
-        "src/CdcEditor.tsx"
+        "src/CdcEditor.tsx",
+        "src/index.jsx"
       ],
       "project": [
         "src/**/*.{js,ts,tsx}"
@@ -81,7 +84,8 @@
     },
     "packages/filtered-text": {
       "entry": [
-        "src/CdcFilteredText.tsx"
+        "src/CdcFilteredText.tsx",
+        "src/index.jsx"
       ],
       "project": [
         "src/**/*.{js,ts,tsx}"
@@ -89,7 +93,8 @@
     },
     "packages/map": {
       "entry": [
-        "src/CdcMap.tsx"
+        "src/CdcMap.tsx",
+        "src/index.jsx"
       ],
       "project": [
         "src/**/*.{js,ts,tsx}"
@@ -97,7 +102,8 @@
     },
     "packages/markup-include": {
       "entry": [
-        "src/CdcMarkupInclude.tsx"
+        "src/CdcMarkupInclude.tsx",
+        "src/index.jsx"
       ],
       "project": [
         "src/**/*.{js,ts,tsx}"
@@ -105,7 +111,8 @@
     },
     "packages/waffle-chart": {
       "entry": [
-        "src/CdcWaffleChart.tsx"
+        "src/CdcWaffleChart.tsx",
+        "src/index.jsx"
       ],
       "project": [
         "src/**/*.{js,ts,tsx}"
