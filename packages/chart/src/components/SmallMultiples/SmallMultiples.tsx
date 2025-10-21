@@ -11,6 +11,7 @@ import {
   createTileColorScale
 } from '../../helpers/smallMultiplesHelpers'
 import { calculateYAxisWithAutoPadding } from '../../helpers/calculateYAxisWithAutoPadding'
+import { isMobileSmallMultiplesViewport } from '@cdc/core/helpers/viewports'
 import './SmallMultiples.css'
 
 interface SmallMultiplesProps {
@@ -25,7 +26,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
   const { currentViewport, colorScale, parentRef } = useContext(ConfigContext)
   const { mode, tileColumn, tilesPerRowDesktop, tilesPerRowMobile } = config.smallMultiples || {}
 
-  const isMobile = currentViewport === 'xs' || currentViewport === 'sm'
+  const isMobile = isMobileSmallMultiplesViewport(currentViewport)
   const tilesPerRow = isMobile ? tilesPerRowMobile || 2 : tilesPerRowDesktop || 3
 
   // Figure out what objects to iterate over based on mode - memoized to prevent recalculation
