@@ -51,6 +51,7 @@
     "html-react-parser": "5.2.3",
     "husky": "^8.0.0",
     "jsdom": "^22.1.0",
+    "knip": "^5.66.2",
     "lerna": "^7.1.3",
     "lint-staged": "^15.5.1",
     "lodash": "^4.17.21",
@@ -101,7 +102,12 @@
     "predeploy": "storybook build --output-dir .storybook_build && touch .storybook_build/.nojekyll",
     "deploy": "gh-pages -d .storybook_build -t true",
     "lint": "eslint packages/*/src/**/*.{js,jsx,ts,tsx}",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "knip": "knip",
+    "knip:production": "knip --production",
+    "knip:unused-files": "knip --include files",
+    "knip:unused-deps": "knip --include dependencies,devDependencies",
+    "knip:unused-exports": "knip --include exports,types"
   },
   "dependencies": {
     "@visx/annotation": "^3.3.0",

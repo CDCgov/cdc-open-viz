@@ -1,0 +1,167 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": [
+        ".storybook/**/*.{js,ts}",
+        "_stories/**/*.{js,ts,tsx}"
+      ],
+      "project": [
+        "!packages/**"
+      ],
+      "ignore": [
+        "storybook-static/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/*.stories.{js,ts,tsx}",
+        "**/*.test.{js,ts,tsx}",
+        "**/*.spec.{js,ts,tsx}"
+      ]
+    },
+    "packages/chart": {
+      "entry": [
+        "src/CdcChart.tsx",
+        "src/index.jsx"
+      ],
+      "project": [
+        "src/**/*.{js,ts,tsx}"
+      ]
+    },
+    "packages/dashboard": {
+      "entry": [
+        "src/CdcDashboard.tsx",
+        "src/index.tsx"
+      ],
+      "project": [
+        "src/**/*.{js,ts,tsx}"
+      ]
+    },
+    "packages/core": {
+      "entry": [
+        "components/**/*.tsx",
+        "contexts/**/*.tsx",
+        "helpers/**/*.ts",
+        "hooks/**/*.ts",
+        "types/**/*.ts"
+      ],
+      "project": [
+        "components/**/*.{js,ts,tsx}",
+        "contexts/**/*.{js,ts,tsx}",
+        "helpers/**/*.{js,ts,tsx}",
+        "hooks/**/*.{js,ts,tsx}",
+        "types/**/*.{js,ts,tsx}",
+        "data/**/*.{js,ts,tsx}",
+        "templates/**/*.{js,ts,tsx}",
+        "**/*.d.ts"
+      ]
+    },
+    "packages/data-bite": {
+      "entry": [
+        "src/CdcDataBite.tsx"
+      ],
+      "project": [
+        "src/**/*.{js,ts,tsx}"
+      ]
+    },
+    "packages/data-table": {
+      "entry": [
+        "src/CdcDataTable.tsx"
+      ],
+      "project": [
+        "src/**/*.{js,ts,tsx}"
+      ]
+    },
+    "packages/editor": {
+      "entry": [
+        "src/CdcEditor.tsx"
+      ],
+      "project": [
+        "src/**/*.{js,ts,tsx}"
+      ]
+    },
+    "packages/filtered-text": {
+      "entry": [
+        "src/CdcFilteredText.tsx"
+      ],
+      "project": [
+        "src/**/*.{js,ts,tsx}"
+      ]
+    },
+    "packages/map": {
+      "entry": [
+        "src/CdcMap.tsx"
+      ],
+      "project": [
+        "src/**/*.{js,ts,tsx}"
+      ]
+    },
+    "packages/markup-include": {
+      "entry": [
+        "src/CdcMarkupInclude.tsx"
+      ],
+      "project": [
+        "src/**/*.{js,ts,tsx}"
+      ]
+    },
+    "packages/waffle-chart": {
+      "entry": [
+        "src/CdcWaffleChart.tsx"
+      ],
+      "project": [
+        "src/**/*.{js,ts,tsx}"
+      ]
+    }
+  },
+  "ignore": [
+    "**/*.stories.{js,ts,tsx}",
+    "**/*.test.{js,ts,tsx}",
+    "**/*.spec.{js,ts,tsx}",
+    "**/dist/**",
+    "**/build/**",
+    "**/node_modules/**",
+    "storybook-static/**",
+    ".storybook_build/**",
+    "patches/**",
+    "**/examples/**",
+    "**/tests/**",
+    "**/tests-examples/**",
+    "**/uploads/**",
+    "**/topojson-updater/**",
+    "**/_stories/**"
+  ],
+  "ignoreBinaries": [
+    "patch-package",
+    "husky",
+    "gh-pages"
+  ],
+  "ignoreDependencies": [
+    "@types/*",
+    "patch-package",
+    "postinstall-postinstall",
+    "husky",
+    "gh-pages",
+    "lint-staged",
+    "prettier",
+    "eslint*",
+    "@typescript-eslint/*",
+    "@storybook/*",
+    "storybook*",
+    "@vitest/*",
+    "vitest",
+    "playwright",
+    "jsdom"
+  ],
+  "rules": {
+    "files": "error",
+    "dependencies": "error",
+    "devDependencies": "warn",
+    "unlisted": "error",
+    "exports": "error",
+    "nsExports": "error",
+    "classMembers": "error",
+    "types": "error",
+    "nsTypes": "error",
+    "enumMembers": "error",
+    "duplicates": "error"
+  }
+}
