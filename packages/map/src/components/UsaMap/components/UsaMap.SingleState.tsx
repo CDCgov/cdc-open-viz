@@ -13,6 +13,7 @@ import ZoomControls from '../../ZoomControls'
 import { MapContext } from '../../../types/MapContext'
 import useStateZoom from '../../../hooks/useStateZoom'
 import { Text } from '@visx/text'
+import SmallMultiples from '../../SmallMultiples/SmallMultiples'
 
 import './UsaMap.SingleState.styles.css'
 
@@ -78,6 +79,11 @@ const SingleStateMap: React.FC = () => {
         <Loading />
       </div>
     )
+  }
+
+  // Early return for small multiples rendering
+  if (config.smallMultiples?.mode) {
+    return <SmallMultiples />
   }
 
   const checkForNoData = () => {
