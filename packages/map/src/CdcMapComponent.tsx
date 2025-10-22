@@ -46,6 +46,7 @@ import { reloadURLData } from './helpers/urlDataHelpers'
 import { observeMapSvgLoaded } from './helpers/mapObserverHelpers'
 import { buildSectionClassNames } from './helpers/componentHelpers'
 import { shouldShowDataTable } from './helpers/dataTableHelpers'
+import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 
 // Child Components
 import Annotation from './components/Annotation'
@@ -386,6 +387,17 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     </a>
   )
 
+  // Prepare data table props (pivot if small multiples mode is enabled)
+  let dataTableConfig = config
+  let dataTableColumns = columns
+  let dataTableRuntimeData = runtimeData
+  if (config.smallMultiples?.mode) {
+    const prepared = prepareSmallMultiplesDataTable(config, columns, runtimeData)
+    dataTableConfig = prepared.config
+    dataTableColumns = prepared.columns
+    dataTableRuntimeData = prepared.runtimeData
+  }
+
   return (
     <LegendMemoProvider legendMemo={legendMemo} legendSpecialClassLastMemo={legendSpecialClassLastMemo}>
       <ConfigContext.Provider value={mapProps}>
@@ -494,13 +506,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
                   {shouldShowDataTable(config, table, general, loading) && (
                     <DataTable
-                      columns={columns}
-                      config={config}
+                      columns={dataTableColumns}
+                      config={dataTableConfig}
                       currentViewport={currentViewport}
                       displayGeoName={displayGeoName}
                       expandDataTable={table.expanded}
                       formatLegendLocation={key =>
-                        formatLegendLocation(key, runtimeData?.[key]?.[config.columns.geo.name])
+                        formatLegendLocation(key, dataTableRuntimeData?.[key]?.[config.columns.geo.name])
                       }
                       headerColor={general.headerColor}
                       imageRef={imageId}
@@ -510,8 +522,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       legendSpecialClassLastMemo={legendSpecialClassLastMemo}
                       navigationHandler={navigationHandler}
                       outerContainerRef={outerContainerRef}
-                      rawData={config.data}
-                      runtimeData={runtimeData}
+                      rawData={dataTableConfig.data}
+                      runtimeData={dataTableRuntimeData}
                       runtimeLegend={runtimeLegend}
                       showDownloadImgButton={showDownloadImgButton}
                       showDownloadPdfButton={showDownloadPdfButton}

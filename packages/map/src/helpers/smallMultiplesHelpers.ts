@@ -122,3 +122,238 @@ export const getTileKeys = (config: MapConfig, data: DataRow[]): (string | numbe
 
   return getTileValues(data, config.smallMultiples.tileColumn)
 }
+
+/**
+ * Pivot data from long format to wide format for DataTable display
+ * Transforms data so each unique tileColumn value becomes its own column
+ *
+ * Example:
+ * From: [{geo: "AL", value: 100, pathogen: "COVID"}, {geo: "AL", value: 50, pathogen: "Flu"}]
+ * To:   [{geo: "AL", COVID: 100, Flu: 50}]
+ *
+ * @param data - Original data in long format
+ * @param tileColumn - Column to pivot on (e.g., "pathogen")
+ * @param valueColumn - Column containing values to pivot (e.g., "value")
+ * @param geoColumn - Geography column name (e.g., "geo")
+ * @param tileValues - Ordered array of tile values (determines column order)
+ * @returns Pivoted data in wide format
+ */
+export const pivotDataForDataTable = (
+  data: DataRow[],
+  tileColumn: string,
+  valueColumn: string,
+  geoColumn: string,
+  tileValues: (string | number)[]
+): DataRow[] => {
+  if (!data || !tileColumn || !valueColumn || !geoColumn) return []
+
+  // Group data by geography
+  const geoGroups = new Map<string, DataRow[]>()
+
+  data.forEach(row => {
+    const geoKey = String(row[geoColumn])
+    if (!geoGroups.has(geoKey)) {
+      geoGroups.set(geoKey, [])
+    }
+    geoGroups.get(geoKey)!.push(row)
+  })
+
+  // Create pivoted rows
+  const pivotedData: DataRow[] = []
+
+  geoGroups.forEach((rows, geoKey) => {
+    const pivotedRow: DataRow = {
+      [geoColumn]: geoKey
+    }
+
+    // Copy non-value, non-tile columns from first row (they should be the same for all rows of this geo)
+    const firstRow = rows[0]
+    Object.keys(firstRow).forEach(key => {
+      if (key !== tileColumn && key !== valueColumn && key !== geoColumn) {
+        pivotedRow[key] = firstRow[key]
+      }
+    })
+
+    // Add a column for each tile value
+    rows.forEach(row => {
+      const tileValue = row[tileColumn]
+      if (tileValue != null && tileValue !== '') {
+        pivotedRow[String(tileValue)] = row[valueColumn]
+      }
+    })
+
+    pivotedData.push(pivotedRow)
+  })
+
+  return pivotedData
+}
+
+/**
+ * Pivot runtimeData from long format to wide format
+ * RuntimeData is an object keyed by UID, so we need to pivot the values within each UID
+ *
+ * @param runtimeData - Original runtimeData object keyed by UID
+ * @param tileColumn - Column to pivot on (e.g., "pathogen")
+ * @param valueColumn - Column containing values to pivot (e.g., "activity_level_label")
+ * @param geoColumn - Geography column name (e.g., "State")
+ * @param allData - Full dataset to find all rows for each geo
+ * @param tileValues - Ordered array of tile values
+ * @returns Pivoted runtimeData
+ */
+export const pivotRuntimeDataForDataTable = (
+  runtimeData: { [uid: string]: any },
+  tileColumn: string,
+  valueColumn: string,
+  geoColumn: string,
+  allData: DataRow[],
+  tileValues: (string | number)[]
+): { [uid: string]: any } => {
+  if (!runtimeData || !tileColumn || !valueColumn || !geoColumn || !allData) return runtimeData
+
+  const pivotedRuntimeData: { [uid: string]: any } = {}
+
+  // For each UID in runtimeData
+  Object.keys(runtimeData).forEach(uid => {
+    const baseRow = runtimeData[uid]
+    const geoValue = baseRow[geoColumn]
+
+    // Find all rows in allData for this geo
+    const rowsForThisGeo = allData.filter(row => row[geoColumn] === geoValue)
+
+    // Create pivoted row starting with base row
+    const pivotedRow = { ...baseRow }
+
+    // Add a property for each tile value
+    rowsForThisGeo.forEach(row => {
+      const tileValue = row[tileColumn]
+      if (tileValue != null && tileValue !== '') {
+        pivotedRow[String(tileValue)] = row[valueColumn]
+      }
+    })
+
+    // Remove the original value column and tile column
+    delete pivotedRow[valueColumn]
+    delete pivotedRow[tileColumn]
+
+    pivotedRuntimeData[uid] = pivotedRow
+  })
+
+  return pivotedRuntimeData
+}
+
+/**
+ * Create column configurations for pivoted data table
+ * Generates one column config for each tile value, copying formatting from the original value column
+ * Preserves column order by inserting new columns where the value column was
+ *
+ * @param originalColumns - Original columns configuration
+ * @param valueColumnName - Name of the value column to clone config from
+ * @param tileColumnName - Name of the tile column to remove
+ * @param tileValues - Array of tile values (becomes new column names)
+ * @param tileTitles - Custom titles for columns
+ * @returns New columns configuration with geo column + one column per tile value
+ */
+export const createPivotedColumns = (
+  originalColumns: any,
+  valueColumnName: string,
+  tileColumnName: string,
+  tileValues: (string | number)[],
+  tileTitles?: { [key: string]: string }
+): any => {
+  // Find the original value column config to clone its formatting
+  // Need to search by column.name, not by key
+  let valueColumnConfig = {}
+  let valueColumnKey = null
+
+  Object.keys(originalColumns).forEach(key => {
+    if (originalColumns[key].name === valueColumnName) {
+      valueColumnConfig = originalColumns[key]
+      valueColumnKey = key
+    }
+  })
+
+  // Create new columns object preserving order
+  const newColumns = {}
+
+  // Iterate through original columns
+  Object.keys(originalColumns).forEach(key => {
+    const column = originalColumns[key]
+
+    // Check if this column's name matches the value column
+    if (column.name === valueColumnName) {
+      // Replace value column with pivoted columns
+      tileValues.forEach(tileValue => {
+        const columnKey = String(tileValue)
+        newColumns[columnKey] = {
+          ...valueColumnConfig,
+          name: columnKey,
+          label: getTileDisplayTitle(tileValue, tileTitles),
+          dataTable: true
+        }
+      })
+    } else if (column.name === tileColumnName) {
+      // Skip tile column - don't add it to new columns
+      return
+    } else {
+      // Keep all other columns
+      newColumns[key] = originalColumns[key]
+    }
+  })
+
+  return newColumns
+}
+
+/**
+ * Prepare data table props for small multiples display
+ * If small multiples is enabled, pivots data and columns. Otherwise returns originals.
+ *
+ * @param config - Map configuration
+ * @param columns - Original columns configuration
+ * @param runtimeData - Original runtime data
+ * @returns Object with modified config, columns, and runtimeData (or originals if not small multiples)
+ */
+export const prepareSmallMultiplesDataTable = (
+  config: MapConfig,
+  columns: any,
+  runtimeData: any
+): { config: MapConfig; columns: any; runtimeData: any } => {
+  const { tileColumn, tileOrderType, tileOrder, tileTitles } = config.smallMultiples
+  const valueColumn = config.columns.primary?.name
+  const geoColumn = config.columns.geo?.name
+
+  // If required columns aren't configured, return originals
+  if (!valueColumn || !geoColumn) {
+    return { config, columns, runtimeData }
+  }
+
+  // Get ordered tile values
+  const rawTileValues = getTileValues(config.data, tileColumn)
+  const orderedTileValues = applyTileOrder(rawTileValues, tileOrderType, tileOrder, tileTitles)
+
+  // Pivot data
+  const pivotedData = pivotDataForDataTable(config.data, tileColumn, valueColumn, geoColumn, orderedTileValues)
+
+  // Pivot runtimeData
+  const pivotedRuntimeData = pivotRuntimeDataForDataTable(
+    runtimeData,
+    tileColumn,
+    valueColumn,
+    geoColumn,
+    config.data,
+    orderedTileValues
+  )
+
+  // Create pivoted columns
+  const pivotedColumns = createPivotedColumns(columns, valueColumn, tileColumn, orderedTileValues, tileTitles)
+
+  // Return modified config with pivoted data and columns
+  return {
+    config: {
+      ...config,
+      data: pivotedData,
+      columns: pivotedColumns
+    },
+    columns: pivotedColumns,
+    runtimeData: pivotedRuntimeData
+  }
+}
