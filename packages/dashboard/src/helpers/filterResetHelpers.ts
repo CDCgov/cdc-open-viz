@@ -55,7 +55,13 @@ export const resetFilterToValue = (
     // For nested dropdowns, reset both group and subgroup
     const _key = filter.apiFilter?.apiEndpoint
     const options = apiFilterDropdowns[_key]
-    if (options && options.length > 0) {
+
+    // When resetValue is explicitly empty/undefined, clear both group and subgroup
+    if (resetValue === '' || resetValue === undefined) {
+      filter.active = resetValue || ''
+      filter.subGrouping.active = ''
+    } else if (options && options.length > 0) {
+      // Otherwise, use resetValue or fall back to first option
       const firstOption = options[0]
       filter.active = resetValue || firstOption.value
       if (firstOption.subOptions && firstOption.subOptions.length > 0) {
