@@ -65,8 +65,6 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
     color = mapPaletteNameMigrations[color]
   }
 
-  const specialClasses = legend?.specialClasses ?? []
-
   // Try multiple approaches to find the palette
   let mapColorPalette = general?.palette?.customColors
 
@@ -99,21 +97,33 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
     config.general.palette.isReversed ? mapColorPalette.unshift(newColor) : mapColorPalette.push(newColor)
   }
 
-  const colorIdx = legendIdx - specialClasses.length
+  // Count actual special classes in the result array
+  const actualSpecialClassCount = result.filter(item => item.special).length
+  const colorIdx = legendIdx - actualSpecialClassCount
 
   // Handle special classes coloring
   if (result[legendIdx]?.special) {
-    const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(specialClasses.length)
-    return specialClassColors[legendIdx]
+    const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(actualSpecialClassCount)
+    const specialClassIdx = result.slice(0, legendIdx + 1).filter(item => item.special).length - 1
+    return specialClassColors[specialClassIdx]
   }
 
   // Use qualitative color palettes directly
-  if (color.includes('qualitative')) return mapColorPalette[colorIdx]
+  if (color.includes('qualitative')) {
+    return mapColorPalette[colorIdx]
+  }
 
-  // Determine color distribution
+  // Determine color distribution based on non-special items
+  // For numeric legends, use the configured numberOfItems for consistent color distribution
+  // For category legends, use the actual result length
+  const isNumericLegend = legend && ['equalnumber', 'equalinterval'].includes(legend.type)
+  const nonSpecialItemCount = isNumericLegend
+    ? legend.numberOfItems || result.length
+    : result.length - actualSpecialClassCount
+
   const amt =
-    Math.max(result.length - specialClasses.length, 1) < 10
-      ? Math.max(result.length - specialClasses.length, 1)
+    Math.max(nonSpecialItemCount, 1) < 10
+      ? Math.max(nonSpecialItemCount, 1)
       : Object.keys(mapV1ColorDistribution).length
   const distributionArray = mapV1ColorDistribution[amt] ?? []
 
@@ -124,17 +134,15 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
   }
 
   const specificColor =
-    distributionArray[legendIdx - specialClasses.length] ??
-    mapColorPalette[colorIdx] ??
-    mapColorPalette[mapColorPalette.length - 1]
+    distributionArray[colorIdx] ?? mapColorPalette[colorIdx] ?? mapColorPalette[mapColorPalette.length - 1]
 
   if (typeof specificColor === 'number') {
-    if (specificColor < mapColorPalette.length) {
-      return mapColorPalette[specificColor]
-    } else {
-      return mapColorPalette[mapColorPalette.length - 1]
-    }
-  } else if (typeof specificColor === 'string') {
+    return specificColor < mapColorPalette.length
+      ? mapColorPalette[specificColor]
+      : mapColorPalette[mapColorPalette.length - 1]
+  }
+
+  if (typeof specificColor === 'string') {
     return specificColor
   }
 

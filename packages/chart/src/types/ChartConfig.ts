@@ -1,4 +1,5 @@
 import { Axis } from '@cdc/core/types/Axis'
+import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 import { type ForestPlotConfigSettings } from './ForestPlot'
 import { type Column } from '@cdc/core/types/Column'
 import { type Series } from '@cdc/core/types/Series'
@@ -245,12 +246,13 @@ export type AllChartsConfig = {
       default: string
     }
   }
-}
+} & MarkupConfig
 
 export type ForestPlotConfig = {
   visualizationType: 'Forest Plot'
   forestPlot: ForestPlotConfigSettings
-} & AllChartsConfig
+} & AllChartsConfig &
+  MarkupConfig
 
 export type LineChartConfig = {
   allowLineToBarGraph: boolean
@@ -258,7 +260,8 @@ export type LineChartConfig = {
   isolatedDotsSameSize: boolean
   lineDatapointStyle: 'hidden' | 'always show' | 'hover'
   visualizationType: 'Line'
-} & AllChartsConfig
+} & AllChartsConfig &
+  MarkupConfig
 
 export type SankeyLink = {
   depth: number
@@ -299,6 +302,7 @@ export type SankeyChartConfig = {
     }
   ]
   visualizationType: 'Sankey'
-} & AllChartsConfig
+} & AllChartsConfig &
+  MarkupConfig
 
 export type ChartConfig = SankeyChartConfig | LineChartConfig | ForestPlotConfig | AllChartsConfig

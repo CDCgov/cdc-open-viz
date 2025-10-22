@@ -27,6 +27,7 @@ import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { generateRuntimeFilters } from './helpers/generateRuntimeFilters'
 import { type MapReducerType, MapState } from './store/map.reducer'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
+import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 
 // Map Helpers
 import {
@@ -266,6 +267,54 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const { closeModal } = useModal()
 
   let title = config.general.title
+  let processedSuperTitle = general.superTitle
+  let processedSubtext = subtext
+  let processedIntroText = introText
+  let processedFootnotes = general.footnotes
+
+  // Process markup variables if enabled
+  if (config.enableMarkupVariables && config.markupVariables?.length > 0) {
+    // Combine viz filters with dashboard filters for markup processing
+    const combinedFilters = [...(config.filters || []), ...(config.dashboardFilters || [])]
+
+    const markupOptions = { isEditor, filters: combinedFilters }
+
+    if (title) {
+      title = processMarkupVariables(title, config.data || [], config.markupVariables, markupOptions).processedContent
+    }
+    if (general.superTitle) {
+      processedSuperTitle = processMarkupVariables(
+        general.superTitle,
+        config.data || [],
+        config.markupVariables,
+        markupOptions
+      ).processedContent
+    }
+    if (subtext) {
+      processedSubtext = processMarkupVariables(
+        subtext,
+        config.data || [],
+        config.markupVariables,
+        markupOptions
+      ).processedContent
+    }
+    if (introText) {
+      processedIntroText = processMarkupVariables(
+        introText,
+        config.data || [],
+        config.markupVariables,
+        markupOptions
+      ).processedContent
+    }
+    if (general.footnotes) {
+      processedFootnotes = processMarkupVariables(
+        general.footnotes,
+        config.data || [],
+        config.markupVariables,
+        markupOptions
+      ).processedContent
+    }
+  }
 
   if (isEditor) {
     if (!title || title === '') title = 'Map Title'
@@ -360,7 +409,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   {config?.runtime?.editorErrorMessage.length > 0 && <Error />}
                   <Title
                     title={title}
-                    superTitle={general.superTitle}
+                    superTitle={processedSuperTitle}
                     config={config}
                     classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${headerColor}`]}
                   />
@@ -369,7 +418,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
                   )}
 
-                  {introText && <section className='introText mb-4'>{parse(introText)}</section>}
+                  {processedIntroText && <section className='introText mb-4'>{parse(processedIntroText)}</section>}
 
                   {config?.filters?.length > 0 && (
                     <Filters
@@ -432,7 +481,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     ? tableLink
                     : link && link}
 
-                  {subtext.length > 0 && <p className='subtext mt-4'>{parse(subtext)}</p>}
+                  {processedSubtext.length > 0 && <p className='subtext mt-4'>{parse(processedSubtext)}</p>}
 
                   <MapControls config={config} imageId={imageId} interactionLabel={interactionLabel} />
 
@@ -469,7 +518,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
                   {config.annotations?.length > 0 && <Annotation.Dropdown />}
 
-                  {general.footnotes && <section className='footnotes pt-2 mt-4'>{parse(general.footnotes)}</section>}
+                  {processedFootnotes && <section className='footnotes pt-2 mt-4'>{parse(processedFootnotes)}</section>}
                 </section>
               )}
 

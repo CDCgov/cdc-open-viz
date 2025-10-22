@@ -129,7 +129,7 @@ const Filters: React.FC<FilterProps> = ({
     setShowApplyButton(false)
   }
 
-  const handleReset = e => {
+  const handleFiltersReset = e => {
     let newFilters = [...filters]
     e.preventDefault()
 
@@ -316,7 +316,7 @@ const Filters: React.FC<FilterProps> = ({
               >
                 Apply
               </Button>
-              <Button secondary disabled={initialFiltersActive} onClick={handleReset}>
+              <Button secondary disabled={initialFiltersActive} onClick={handleFiltersReset}>
                 Clear Filters
               </Button>
             </div>

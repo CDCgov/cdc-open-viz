@@ -74,15 +74,6 @@ type Story = StoryObj<typeof CdcMarkupInclude>
 const testConfig = {
   contentEditor: {
     inlineHTML: '<h2>Test Markup Include</h2><p>{{test_variable}}</p>',
-    markupVariables: [
-      {
-        name: 'test_variable',
-        columnName: 'value',
-        tag: '{{test_variable}}',
-        conditions: [],
-        addCommas: false
-      }
-    ],
     showHeader: true,
     srcUrl: '',
     title: 'Test Markup Include Title',
@@ -106,6 +97,16 @@ const testConfig = {
     hideBackgroundColor: false,
     borderColorTheme: false
   },
+  markupVariables: [
+    {
+      name: 'test_variable',
+      columnName: 'value',
+      tag: '{{test_variable}}',
+      conditions: [],
+      addCommas: false
+    }
+  ],
+  enableMarkupVariables: false,
   version: '1.0.0'
 }
 

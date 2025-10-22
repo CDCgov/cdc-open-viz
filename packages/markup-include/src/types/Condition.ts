@@ -1,5 +1,5 @@
 export type Condition = {
   columnName: string
-  isOrIsNotEqualTo: string
+  isOrIsNotEqualTo: 'is' | 'is not'
   value: string
 }

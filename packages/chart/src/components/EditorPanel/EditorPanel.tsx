@@ -23,6 +23,7 @@ import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/In
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { viewports } from '@cdc/core/helpers/getViewport'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
+import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 
 // chart components
 import Panels from './components/Panels'
@@ -905,8 +906,36 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
   const getColumns = (filter = true) => {
     let columns = {}
-    unfilteredData.forEach(row => {
-      Object.keys(row).forEach(columnName => (columns[columnName] = true))
+
+    // Try multiple data sources in order of preference
+    let dataToUse = []
+
+    if (unfilteredData && unfilteredData.length > 0) {
+      // First preference: unfilteredData from context
+      dataToUse = unfilteredData
+    } else if (isDashboard && datasets && config.dataKey && datasets[config.dataKey]?.data?.length > 0) {
+      // Second preference: data from datasets in dashboard mode
+      dataToUse = datasets[config.dataKey].data
+    } else if (rawData && rawData.length > 0) {
+      // Third preference: rawData from context
+      dataToUse = rawData
+    } else if (data && data.length > 0) {
+      // Fourth preference: transformedData from context
+      dataToUse = data
+    } else if (config.data && config.data.length > 0) {
+      // Fifth preference: data directly from config
+      dataToUse = config.data
+    }
+
+    // If we still don't have data, return empty array
+    if (!dataToUse || dataToUse.length === 0) {
+      return []
+    }
+
+    dataToUse.forEach(row => {
+      if (row && typeof row === 'object') {
+        Object.keys(row).forEach(columnName => (columns[columnName] = true))
+      }
     })
 
     if (filter) {
@@ -4424,6 +4453,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             )}
             <Panels.Annotate name='Text Annotations' />
             {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
+            <PanelMarkup
+              name='Markup Variables'
+              markupVariables={config.markupVariables || []}
+              data={rawData}
+              enableMarkupVariables={config.enableMarkupVariables || false}
+              onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
+              onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
+            />
           </Accordion>
           {config.type !== 'Spark Line' && (
             <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />

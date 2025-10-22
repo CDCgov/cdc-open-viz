@@ -41,7 +41,7 @@ const SingleStateMap: React.FC = () => {
   } = useContext<MapContext>(ConfigContext)
 
   const dispatch = useContext(MapDispatchContext)
-  const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset, projection } = useStateZoom(topoData)
+  const { handleMoveEnd, handleZoomIn, handleZoomOut, handleZoomReset, projection } = useStateZoom(topoData)
 
   // Memoize statesPicked to prevent creating new arrays on every render
   const statesPicked = useMemo(() => {
@@ -176,8 +176,9 @@ const SingleStateMap: React.FC = () => {
                 return (
                   <g
                     id='mapGroup'
-                    className={`countyMapGroup ${config.general.geoType === 'single-state' ? `countyMapGroup--no-transition` : ''
-                      }`}
+                    className={`countyMapGroup ${
+                      config.general.geoType === 'single-state' ? `countyMapGroup--no-transition` : ''
+                    }`}
                     transform={`translate(${translate}) scale(${scale})`}
                     data-scale=''
                     key='countyMapGroup'
@@ -228,8 +229,9 @@ const SingleStateMap: React.FC = () => {
               return (
                 <g
                   id='mapGroup'
-                  className={`countyMapGroup ${config.general.geoType === 'single-state' ? `countyMapGroup--no-transition` : ''
-                    }`}
+                  className={`countyMapGroup ${
+                    config.general.geoType === 'single-state' ? `countyMapGroup--no-transition` : ''
+                  }`}
                   transform={`translate(${translate}) scale(${scale})`}
                   data-scale=''
                   key='countyMapGroup'
@@ -268,7 +270,7 @@ const SingleStateMap: React.FC = () => {
         // prettier-ignore
         handleZoomIn={handleZoomIn}
         handleZoomOut={handleZoomOut}
-        handleReset={handleReset}
+        handleZoomReset={handleZoomReset}
       />
     </ErrorBoundary>
   )

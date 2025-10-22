@@ -640,6 +640,7 @@ export default function CdcDashboard({
           setParentConfig: editorContext.setTempConfig,
           outerContainerRef,
           isDebug,
+          isEditor: isEditor && !isPreview,
           loadAPIFilters,
           setAPIFilterDropdowns,
           reloadURLData,

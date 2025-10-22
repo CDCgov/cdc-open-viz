@@ -104,10 +104,10 @@ export const createFormatLabels =
         palette = distributionIndices.map(index => palette[index])
       } else {
         // Use existing logic for v1 palettes and other cases
-        while (tableData.length > palette.length) {
+        while (tableData.length > palette?.length) {
           palette = palette.concat(palette)
         }
-        palette = palette.slice(0, data.length)
+        palette = palette?.slice(0, data.length)
       }
       //store unique values to Set by colorCode
       const set = new Set()
@@ -120,7 +120,7 @@ export const createFormatLabels =
           datum: val,
           index: i,
           text: val,
-          value: palette[i]
+          value: palette?.[i]
         }
         return newLabel
       })

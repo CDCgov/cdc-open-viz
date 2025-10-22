@@ -1406,7 +1406,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   : yMax
               }
               left={config.visualizationType !== 'Forest Plot' ? Number(runtime.yAxis.size) : 0}
-              label={config[section].label}
+              label={runtime[section].label}
               tickFormat={handleBottomTickFormatting}
               scale={xScale}
               stroke='#333'

@@ -223,11 +223,12 @@ const VisualizationRow: React.FC<VizRowProps> = ({
             type === 'dashboardFilters' &&
             sharedFilterIndexes &&
             sharedFilterIndexes.filter(idx => config.dashboard.sharedFilters?.[idx]?.showDropdown === false).length ===
-            sharedFilterIndexes.length
+              sharedFilterIndexes.length
           const hasMarginBottom = !isLastRow && !hiddenDashboardFilters
 
-          const vizWrapperClass = `col-12 col-md-${col.width}${!shouldShow ? ' d-none' : ''}${hideVisualization ? ' hide-parent-visualization' : hasMarginBottom ? ' mb-4' : ''
-            }`
+          const vizWrapperClass = `col-12 col-md-${col.width}${!shouldShow ? ' d-none' : ''}${
+            hideVisualization ? ' hide-parent-visualization' : hasMarginBottom ? ' mb-4' : ''
+          }`
           const link =
             config.table && config.table.show && config.datasets && table && table.showDataTableLink
               ? tableLink
@@ -280,6 +281,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                     updateChildConfig(col.widget, newConfig)
                   }}
                   isDashboard={true}
+                  interactionLabel={interactionLabel}
                 />
               )}
               {type === 'waffle-chart' && (
@@ -297,10 +299,12 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                 <CdcMarkupInclude
                   key={col.widget}
                   config={visualizationConfig}
+                  datasets={config.datasets}
                   isDashboard={true}
                   setConfig={newConfig => {
                     updateChildConfig(col.widget, newConfig)
                   }}
+                  interactionLabel={interactionLabel}
                 />
               )}
               {type === 'filtered-text' && (
