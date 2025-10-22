@@ -26,6 +26,7 @@ import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { MapContext } from '../../../types/MapContext'
 import { checkColorContrast, getContrastColor, outlinedTextColor } from '@cdc/core/helpers/cove/accessibility'
 import TerritoriesSection from './TerritoriesSection'
+import SmallMultiples from '../../SmallMultiples'
 
 import { isMobileStateLabelViewport } from '@cdc/core/helpers/viewports'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
@@ -80,6 +81,7 @@ const UsaMap = () => {
     mapId,
     logo,
     currentViewport,
+    dimensions,
     translate,
     runtimeLegend,
     interactionLabel
@@ -164,6 +166,10 @@ const UsaMap = () => {
 
   const geoStrokeColor = getGeoStrokeColor(config)
   const geoFillColor = getGeoFillColor(config)
+
+  // Chrome needs wider stroke for small maps or it doesn't render the pattern
+  const mapWidth = dimensions?.[0] || 880
+  const patternLinesStrokeWidth = mapWidth < 375 ? 1.25 : 0.75
 
   const territories = territoriesData.map((territory, territoryIndex) => {
     const Shape = displayAsHex ? Territory.Hexagon : Territory.Rectangle
@@ -254,6 +260,10 @@ const UsaMap = () => {
 
   if (!focusedStates) {
     return <></>
+  }
+
+  if (config.smallMultiples?.mode) {
+    return <SmallMultiples />
   }
 
   // Constructs and displays markup for all geos on the map (except territories right now)
@@ -499,7 +509,7 @@ const UsaMap = () => {
                         height={patternSizes[size] ?? 6}
                         width={patternSizes[size] ?? 6}
                         stroke={patternColor}
-                        strokeWidth={0.75}
+                        strokeWidth={patternLinesStrokeWidth}
                         orientation={['diagonalRightToLeft']}
                       />
                     )}

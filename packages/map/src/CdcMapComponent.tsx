@@ -229,7 +229,10 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     } else {
       if (hashLegend !== runtimeLegend?.fromHash && undefined === runtimeData?.init) {
         const legend = generateRuntimeLegend(
-          config,
+          {
+            ...config,
+            legend: { ...config.legend, unified: config.smallMultiples?.mode ? true : config.legend?.unified }
+          },
           runtimeData,
           hashLegend,
           setConfig,
@@ -245,7 +248,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   useEffect(() => {
     const hashLegend = generateRuntimeLegendHash(config, runtimeFilters)
     const legend = generateRuntimeLegend(
-      { ...config, data: configObj.data },
+      {
+        ...config,
+        data: configObj.data,
+        legend: { ...config.legend, unified: config.smallMultiples?.mode ? true : config.legend?.unified }
+      },
       runtimeData,
       hashLegend,
       setConfig,

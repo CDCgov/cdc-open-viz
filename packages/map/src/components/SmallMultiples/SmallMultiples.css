@@ -1,0 +1,31 @@
+.small-multiples-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.small-multiples-grid {
+  display: grid;
+  width: 100%;
+  flex: 1;
+}
+
+.small-multiple-tile {
+  display: flex;
+  flex-direction: column;
+}
+
+.tile-header {
+  margin-bottom: 0.5rem;
+}
+
+.tile-title {
+  margin: 0;
+  font-weight: 700;
+  text-align: left;
+}
+
+.tile-map {
+  width: 100%;
+  flex-shrink: 0;
+}
