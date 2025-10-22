@@ -32,11 +32,22 @@ function getMaxTierAndSetFilterTiers(filters: SharedFilter[]): number {
 }
 
 /**
- * Checks if a filter is currently at its reset state.
- * A filter is at reset state if it has a resetLabel and the active value equals it.
+ * Checks if a filter is currently at its reset/incomplete state.
+ * A filter is incomplete if it's visible AND:
+ * - The active value is empty/null/undefined, OR
+ * - The active value equals the resetLabel (if one is defined)
  */
 export const isFilterAtResetState = (filter: SharedFilter): boolean => {
-  return !!(filter.resetLabel && filter.resetLabel === filter.active)
+  // Only check filters that are visible to the user
+  if (!filter.showDropdown) return false
+
+  // Check if active value is empty/null/undefined
+  const isEmptyValue = filter.active === '' || filter.active === null || filter.active === undefined
+
+  // Check if active value equals the resetLabel
+  const equalsResetLabel = filter.resetLabel && filter.resetLabel === filter.active
+
+  return isEmptyValue || equalsResetLabel
 }
 
 /**
@@ -72,8 +83,8 @@ function filterDataByTier(data = [], filters: SharedFilter[], tier: number) {
       }
 
       const isMatchingTier = filter.tier === tier
-      // Apply filtering for both datafilter and urlfilter types (urlfilter now supports client-side filtering)
-      if (isMatchingTier && isNotTheSelectedValue) {
+      // Only apply client-side filtering for datafilter (urlfilters modify the API endpoint instead)
+      if (filter.type !== 'urlfilter' && isMatchingTier && isNotTheSelectedValue) {
         return true
       }
     })
@@ -83,7 +94,7 @@ function filterDataByTier(data = [], filters: SharedFilter[], tier: number) {
 
 /**
  * Filters data based on shared filter configurations.
- * Returns empty array if any filter is at its reset state.
+ * Returns empty array if any filter is at its reset state (incomplete selection).
  * Otherwise applies filters hierarchically by tier to handle parent-child dependencies.
  */
 export const filterData = (filters: SharedFilter[], _data: Object[]): Object[] => {
@@ -92,7 +103,7 @@ export const filterData = (filters: SharedFilter[], _data: Object[]): Object[] =
   // Check if any filters are currently at their reset state
   const hasResetFilters = filters.some(isFilterAtResetState)
 
-  // If any filter is at reset state, return empty data
+  // If any filter is at reset state, return empty data to show "no data" message
   if (hasResetFilters) {
     return []
   }

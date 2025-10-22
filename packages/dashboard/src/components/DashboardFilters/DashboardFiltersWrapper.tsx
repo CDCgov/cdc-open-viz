@@ -128,9 +128,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
     const queryParams = getQueryParams()
     let needsQueryUpdate = false
 
-    // Reset each filter to its default value
+    // Reset each filter to empty/resetLabel state (forceEmpty = true)
     dashboardConfig.sharedFilters.forEach((filter, i) => {
-      const resetValue = filterResetHelpers.getFilterResetValue(filter, apiFilterDropdowns)
+      const resetValue = filterResetHelpers.getFilterResetValue(filter, apiFilterDropdowns, true)
       filterResetHelpers.resetFilterToValue(dashboardConfig.sharedFilters[i], resetValue, apiFilterDropdowns)
 
       // Update query parameters if needed
