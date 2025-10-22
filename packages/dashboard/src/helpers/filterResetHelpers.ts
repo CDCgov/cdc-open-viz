@@ -16,7 +16,7 @@ export const getFilterResetValue = (
 ): string | undefined => {
   // When clearing filters, always reset to empty/resetLabel state
   if (forceEmpty) {
-    return filter.resetLabel ? '' : undefined
+    return typeof filter.resetLabel === 'string' ? '' : undefined
   }
 
   // If filter has a defaultValue, use that (for initial load)
@@ -24,7 +24,7 @@ export const getFilterResetValue = (
     return filter.defaultValue
   }
   // If filter has a resetLabel, return empty string so placeholder renders
-  if (filter.resetLabel) {
+  if (typeof filter.resetLabel === 'string') {
     return ''
   }
   // Otherwise, use first available value if API filter
