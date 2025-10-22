@@ -182,7 +182,7 @@
     "mode": "by-column",
     "tileColumn": "pathogen",
     "tilesPerRowDesktop": 3,
-    "tilesPerRowMobile": 1,
+    "tilesPerRowMobile": "",
     "tileOrderType": "custom",
     "tileOrder": ["Influenza A", "RSV", "COVID-19"],
     "tileTitles": {
