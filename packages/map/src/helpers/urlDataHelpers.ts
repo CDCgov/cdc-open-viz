@@ -6,7 +6,7 @@ import { MapConfig } from '../types/MapConfig'
 import { CSV_PARSE_CONFIG } from './constants'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 
-export const buildQueryString = (params: Record<string, string>): string =>
+const buildQueryString = (params: Record<string, string>): string =>
   Object.keys(params)
     .map((param, i) => {
       let qs = i === 0 ? '?' : '&'

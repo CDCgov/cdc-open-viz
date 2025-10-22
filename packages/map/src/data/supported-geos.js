@@ -99,74 +99,6 @@ export const supportedRegions = {
 }
 
 /**
- * State Name to ISO Code Mapping
- *
- * Maps proper case state names to their corresponding ISO 3166-2 codes.
- * Provides reverse lookup capability for the supportedStates table.
- *
- * Structure: { 'State Name': 'US-XX' }
- * - Key: Proper case state name (e.g., 'California')
- * - Value: ISO 3166-2 state code (e.g., 'US-CA')
- *
- * Used in:
- * - Data processing when state names need to be converted to ISO codes
- * - Validation and normalization of state data
- */
-export const stateToIso = {
-  // States
-  Alabama: 'US-AL',
-  Alaska: 'US-AK',
-  Arizona: 'US-AZ',
-  Arkansas: 'US-AR',
-  California: 'US-CA',
-  Colorado: 'US-CO',
-  Connecticut: 'US-CT',
-  Delaware: 'US-DE',
-  Florida: 'US-FL',
-  Georgia: 'US-GA',
-  Hawaii: 'US-HI',
-  Idaho: 'US-ID',
-  Illinois: 'US-IL',
-  Indiana: 'US-IN',
-  Iowa: 'US-IA',
-  Kansas: 'US-KS',
-  Kentucky: 'US-KY',
-  Louisiana: 'US-LA',
-  Maine: 'US-ME',
-  Maryland: 'US-MD',
-  Massachusetts: 'US-MA',
-  Michigan: 'US-MI',
-  Minnesota: 'US-MN',
-  Mississippi: 'US-MS',
-  Missouri: 'US-MO',
-  Montana: 'US-MT',
-  Nebraska: 'US-NE',
-  Nevada: 'US-NV',
-  'New Hampshire': 'US-NH',
-  'New Jersey': 'US-NJ',
-  'New Mexico': 'US-NM',
-  'New York': 'US-NY',
-  'North Carolina': 'US-NC',
-  'North Dakota': 'US-ND',
-  Ohio: 'US-OH',
-  Oklahoma: 'US-OK',
-  Oregon: 'US-OR',
-  Pennsylvania: 'US-PA',
-  'Rhode Island': 'US-RI',
-  'South Carolina': 'US-SC',
-  'South Dakota': 'US-SD',
-  Tennessee: 'US-TN',
-  Texas: 'US-TX',
-  Utah: 'US-UT',
-  Vermont: 'US-VT',
-  Virginia: 'US-VA',
-  Washington: 'US-WA',
-  'West Virginia': 'US-WV',
-  Wisconsin: 'US-WI',
-  Wyoming: 'US-WY'
-}
-
-/**
  * State FIPS Code to Two-Letter Abbreviation Mapping
  *
  * Maps FIPS (Federal Information Processing Standards) state codes to two-letter abbreviations.
@@ -750,7 +682,7 @@ export const supportedCities = {
   'GREAT PLAINS TRIBAL LEADERS HEALTH BOARD': [-103.22444, 44.083054],
   'GREENSBORO': [-79.791977, 36.072636],
   'HENDERSON': [-114.981720, 36.039524],
-  'HERSHEY': [-76.6779444, 40.2849997 ],
+  'HERSHEY': [-76.6779444, 40.2849997],
   'HIALEAH': [-80.278107, 25.857595],
   'HONOLULU': [-157.858337, 21.306944],
   'HOPI TRIBE': [-110.5035, 35.7833],
@@ -783,7 +715,7 @@ export const supportedCities = {
   'LUBBOCK': [-101.855164, 33.577862],
   'MADISON': [-89.401230, 43.073051],
   'MARION COUNTY, INDIANA': [-86.136543, 39.781029],
-  'MARION':[-88.9330556,37.7305556],
+  'MARION': [-88.9330556, 37.7305556],
   'MEMPHIS': [-90.048981, 35.149532],
   'MESA': [-111.831474, 33.415184],
   'MIAMI': [-80.191788, 25.761681],
@@ -808,7 +740,7 @@ export const supportedCities = {
   'OLYMPIA': [-122.9382403, 47.0394791],
   'OMAHA': [-95.934502, 41.256538],
   'ORLANDO': [-81.379234, 28.538336],
-  'PASADENA':[-95.209099,29.691063],
+  'PASADENA': [-95.209099, 29.691063],
   'PHILADELPHIA': [-75.165222, 39.952583],
   'PHOENIX': [-112.074036, 33.448376],
   'PITTSBURGH': [-79.995888, 40.440624],
@@ -828,9 +760,9 @@ export const supportedCities = {
   'SACRAMENTO': [-121.494400, 38.581573],
   'SAINT PAUL': [-93.089958, 44.953705],
   'SALEM, ALABAMA': [-85.2386, 32.5968],
-  'SALEM, CONNECTICUT': [-72.2754,41.4904],
+  'SALEM, CONNECTICUT': [-72.2754, 41.4904],
   'SALEM, FLORIDA': [-83.4129, 29.8869],
-  'SALEM, ILLINOIS':[-88.945618,38.626991],
+  'SALEM, ILLINOIS': [-88.945618, 38.626991],
   'SALEM, MASSACHUSETTS': [-70.8955, 42.5197],
   'SALEM, OR': [-123.0351, 44.9429],
   'SALEM, OREGON': [-123.0351, 44.9429],
@@ -839,19 +771,19 @@ export const supportedCities = {
   'SALUDA, VIRGINIA': [-76.5950, 37.6064],
   'SAN ANTONIO': [-98.493629, 29.424122],
   'SAN BENITO': [-97.6311, 26.1326],
-  'SAN BERNARDINO':[-117.302399,34.115784],
+  'SAN BERNARDINO': [-117.302399, 34.115784],
   'SAN DIEGO': [-117.161087, 32.715736],
   'SAN FRANCISCO': [-122.419418, 37.774929],
   'SAN JOSE': [-121.886330, 37.338207],
   'SANTA ANA': [-117.867653, 33.745472],
-  'SANTA CLARA':[-121.955238,37.354107],
+  'SANTA CLARA': [-121.955238, 37.354107],
   'SCOTTSDALE': [-111.926048, 33.494171],
   'SEATTLE': [-122.332069, 47.606209],
   'SOUTH PUGET INTERTRIBAL PLANNING AGENCY': [-123.0832, 47.1241],
   'SOUTHCENTRAL FOUNDATION': [-149.7971, 61.1821],
   'SOUTHEAST ALASKA REGIONAL HEALTH CONSORTIUM': [-135.3369, 57.05479],
   'SPOKANE': [-117.426048, 47.658779],
-  'ST PAUL': [ -93.089958, 44.953705],
+  'ST PAUL': [-93.089958, 44.953705],
   'ST. LOUIS': [-90.199402, 38.627003],
   'ST. PETERSBURG': [-82.640289, 27.767601],
   'STOCKTON': [-121.290779, 37.957703],
