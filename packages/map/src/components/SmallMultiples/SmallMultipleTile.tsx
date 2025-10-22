@@ -99,6 +99,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({ tileValue, tileCo
         <ConfigContext.Provider value={tileContext}>
           {config.general.geoType === 'us' && <UsaMap.State />}
           {config.general.geoType === 'single-state' && <UsaMap.SingleState />}
+          {config.general.geoType === 'us-region' && <UsaMap.Region />}
         </ConfigContext.Provider>
       </div>
     </div>

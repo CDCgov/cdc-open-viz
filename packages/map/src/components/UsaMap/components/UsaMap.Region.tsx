@@ -12,6 +12,7 @@ import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import ConfigContext from '../../../context'
 import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import Annotation from '../../Annotation'
+import SmallMultiples from '../../SmallMultiples/SmallMultiples'
 
 // Data
 import { supportedTerritories } from '../../../data/supported-geos'
@@ -86,6 +87,11 @@ const UsaRegionMap = () => {
 
   if (!focusedStates) {
     return <></>
+  }
+
+  // Early return for small multiples rendering
+  if (config.smallMultiples?.mode) {
+    return <SmallMultiples />
   }
 
   const geoStrokeColor = getGeoStrokeColor(config)

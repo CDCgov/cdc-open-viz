@@ -63,11 +63,6 @@ const PanelSmallMultiples: FC<PanelSmallMultiplesProps> = props => {
     setConfig(newConfig)
   }
 
-  // Only show for US state maps and single-state (which can be multi-state) maps
-  if (general.geoType !== 'us' && general.geoType !== 'single-state') {
-    return null
-  }
-
   const handleColumnChange = (section, subsection, fieldName, value) => {
     const newConfig = { ...config }
 
