@@ -169,10 +169,10 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                   disabled={loading || isDisabled}
                 >
                   {loading && <option value='Loading...'>Loading...</option>}
-                  {/* For API filters with resetLabel, always show the reset option */}
-                  {_key && filter.resetLabel && (
-                    <option key={`reset-label`} value={filter.resetLabel}>
-                      {filter.resetLabel}
+                  {/* For API filters, show placeholder when no value is selected */}
+                  {_key && nullVal(filter) && (
+                    <option key={`reset-label`} value=''>
+                      {filter.resetLabel || '- Select One -'}
                     </option>
                   )}
                   {/* For non-API filters or when no value is selected, show empty option */}
