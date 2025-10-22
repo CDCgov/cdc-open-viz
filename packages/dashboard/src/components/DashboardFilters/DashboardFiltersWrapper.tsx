@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useState, useRef } from 'react'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
 import Filters from './DashboardFilters'
 import { changeFilterActive } from '../../helpers/changeFilterActive'
@@ -50,6 +50,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   const { config: dashboardConfig, reloadURLData, loadAPIFilters, setAPIFilterDropdowns, setAPILoading } = state
   const dispatch = useContext(DashboardDispatchContext)
 
+  // Track filter version to prevent stale async updates from overwriting cleared filters
+  const filterVersionRef = useRef(0)
+
   const applyFilters = e => {
     e.preventDefault() // prevent form submission
 
@@ -97,8 +100,15 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       setAPILoading(true)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: dashboardConfig.sharedFilters })
 
-      loadAPIFilters(dashboardConfig.sharedFilters, apiFilterDropdowns)
+      // Capture current version for this operation
+      const operationVersion = filterVersionRef.current
+      const isStale = () => filterVersionRef.current !== operationVersion
+
+      loadAPIFilters(dashboardConfig.sharedFilters, apiFilterDropdowns, undefined, undefined, isStale)
         .then(async newFilters => {
+          // Skip if operation is stale
+          if (isStale()) return
+
           // First try to reload URL data (for filters that actually change the API call)
           await reloadURLData(newFilters)
 
@@ -119,6 +129,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
 
   const handleReset = e => {
     e.preventDefault()
+
+    // Increment version to invalidate any pending async filter operations
+    filterVersionRef.current += 1
 
     const dashboardConfig = {
       ...state.config.dashboard,
@@ -219,12 +232,18 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         apiFilterDropdowns,
         changedFilterIndexes
       )
+      // Capture current version for this operation
+      const operationVersion = filterVersionRef.current
+      const isStale = () => filterVersionRef.current !== operationVersion
+
       if (isAutoSelectFilter && !missingFilterSelections) {
         // a dropdown has been selected that doesn't
         // require the Go Button
         setAPIFilterDropdowns(loadingFilterMemo)
-        loadAPIFilters(newSharedFilters, loadingFilterMemo).then(filters => {
-          reloadURLData(filters)
+        loadAPIFilters(newSharedFilters, loadingFilterMemo, undefined, undefined, isStale).then(filters => {
+          if (!isStale()) {
+            reloadURLData(filters)
+          }
         })
       } else {
         newSharedFilters[index].queuedActive = value
@@ -232,7 +251,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         // Don't clear data immediately - keep existing data until new data loads
         // Only update the filter dropdowns and prepare for reload
         setAPIFilterDropdowns(loadingFilterMemo)
-        loadAPIFilters(newSharedFilters, loadingFilterMemo)
+        loadAPIFilters(newSharedFilters, loadingFilterMemo, undefined, undefined, isStale)
       }
     } else {
       if (newSharedFilters[index].type === 'urlfilter' && newSharedFilters[index].apiFilter) {
