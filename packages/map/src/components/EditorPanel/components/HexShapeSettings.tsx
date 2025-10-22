@@ -9,24 +9,16 @@ import {
 import ConfigContext from '../../../context'
 import _ from 'lodash'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
-
-const shapeOptions = ['Arrow Up', 'Arrow Down', 'Arrow Right', 'Arrow Left', 'None']
-
-// todo: Move duplicated operators to CORE
-export const DATA_OPERATOR_LESS = '<'
-export const DATA_OPERATOR_GREATER = '>'
-export const DATA_OPERATOR_LESSEQUAL = '<='
-export const DATA_OPERATOR_GREATEREQUAL = '>='
-export const DATA_OPERATOR_EQUAL = '='
-export const DATA_OPERATOR_NOTEQUAL = '≠'
-export const DATA_OPERATORS = [
+import {
   DATA_OPERATOR_LESS,
   DATA_OPERATOR_GREATER,
   DATA_OPERATOR_LESSEQUAL,
   DATA_OPERATOR_GREATEREQUAL,
   DATA_OPERATOR_EQUAL,
   DATA_OPERATOR_NOTEQUAL
-]
+} from '@cdc/core/helpers/constants'
+
+const shapeOptions = ['Arrow Up', 'Arrow Down', 'Arrow Right', 'Arrow Left', 'None']
 
 /**
  * Notice: each shape Col has a legend title and description should the title/desc need to be different for different shapes.

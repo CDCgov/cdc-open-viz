@@ -13,6 +13,7 @@ import ResizeObserver from 'resize-observer-polyfill'
 import { Config } from './types/Config'
 import getViewport from '@cdc/core/helpers/getViewport'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
+import { DATA_OPERATORS } from '@cdc/core/helpers/constants'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
@@ -404,8 +405,9 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
           )}
           {config.visualizationType !== 'Gauge' && (
             <div
-              className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${config.overallFontSize ? ' font-' + config.overallFontSize : ''
-                }`}
+              className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${
+                config.overallFontSize ? ' font-' + config.overallFontSize : ''
+              }`}
             >
               <div className='cove-waffle-chart__chart' style={{ width: setRatio() }}>
                 <svg width={setRatio()} height={setRatio()}>
@@ -588,18 +590,5 @@ export const DATA_FUNCTIONS = [
   DATA_FUNCTION_SUM
 ]
 
-export const DATA_OPERATOR_LESS = '<'
-export const DATA_OPERATOR_GREATER = '>'
-export const DATA_OPERATOR_LESSEQUAL = '<='
-export const DATA_OPERATOR_GREATEREQUAL = '>='
-export const DATA_OPERATOR_EQUAL = '='
-export const DATA_OPERATOR_NOTEQUAL = '≠'
-
-export const DATA_OPERATORS = [
-  DATA_OPERATOR_LESS,
-  DATA_OPERATOR_GREATER,
-  DATA_OPERATOR_LESSEQUAL,
-  DATA_OPERATOR_GREATEREQUAL,
-  DATA_OPERATOR_EQUAL,
-  DATA_OPERATOR_NOTEQUAL
-]
+// Re-export DATA_OPERATORS for backward compatibility
+export { DATA_OPERATORS }

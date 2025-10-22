@@ -1,6 +1,6 @@
 import { MapConfig } from '../types/MapConfig'
 
-export interface PatternInfo {
+interface PatternInfo {
   pattern?: string
   dataKey: string
   size?: string
@@ -8,10 +8,7 @@ export interface PatternInfo {
   color?: string
 }
 
-export const getPatternForRow = (
-  rowObj: Record<string, any>,
-  config: MapConfig
-): PatternInfo | null => {
+export const getPatternForRow = (rowObj: Record<string, any>, config: MapConfig): PatternInfo | null => {
   if (!config.map?.patterns || !rowObj) {
     return null
   }
