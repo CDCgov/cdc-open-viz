@@ -348,8 +348,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     config.general?.palette?.name,
     config.general?.palette?.isReversed,
     config.palette,
-    dispatch,
-    _colorScale
+    dispatch
   ])
 
   const getSvgClasses = () => {
