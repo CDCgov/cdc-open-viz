@@ -16,7 +16,9 @@ export const getFilterResetValue = (
 ): string | undefined => {
   // When clearing filters, always reset to empty/resetLabel state
   if (forceEmpty) {
-    return typeof filter.resetLabel === 'string' ? '' : undefined
+    // For API filters, always return empty string to show placeholder
+    // For data filters, return empty string if resetLabel exists, otherwise undefined
+    return filter.apiFilter || typeof filter.resetLabel === 'string' ? '' : undefined
   }
 
   // If filter has a defaultValue, use that (for initial load)
@@ -62,10 +64,11 @@ export const resetFilterToValue = (
       filter.subGrouping.active = ''
     } else if (options && options.length > 0) {
       // Otherwise, use resetValue or fall back to first option
-      const firstOption = options[0]
-      filter.active = resetValue || firstOption.value
-      if (firstOption.subOptions && firstOption.subOptions.length > 0) {
-        filter.subGrouping.active = firstOption.subOptions[0].value
+      const selectedOption = resetValue ? options.find(opt => opt.value === resetValue) || options[0] : options[0]
+
+      filter.active = resetValue || selectedOption.value
+      if (selectedOption.subOptions && selectedOption.subOptions.length > 0) {
+        filter.subGrouping.active = selectedOption.subOptions[0].value
       }
     }
     filter.queuedActive = undefined
