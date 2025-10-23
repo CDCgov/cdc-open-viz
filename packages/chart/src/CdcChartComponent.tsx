@@ -495,6 +495,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       const newViewport = getViewport(width)
 
       dispatch({ type: 'SET_VIEWPORT', payload: newViewport })
+      dispatch({ type: 'SET_VIZ_VIEWPORT', payload: newViewport })
 
       if (entry.target.dataset.lollipop === 'true') {
         width = width - 2.5

@@ -17,6 +17,7 @@ type SharedChartContext = {
   colorScale?: ColorScale
   config: ChartConfig
   currentViewport?: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
+  vizViewport?: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   dashboardConfig?: DashboardConfig
   // process top level chart aria label for each chart type
   handleChartAriaLabels: (config: any) => string

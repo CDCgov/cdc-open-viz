@@ -5,6 +5,7 @@ import ConfigContext from '../../ConfigContext'
 import { ColorScale } from '../../types/ChartContext'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { getTileDisplayTitle } from '../../helpers/smallMultiplesHelpers'
+import getViewport from '@cdc/core/helpers/getViewport'
 
 interface SmallMultipleTileProps {
   mode: 'by-series' | 'by-column'
@@ -194,6 +195,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
               value={{
                 ...tileContextValues,
                 dimensions: [parent.width, parent.height], // Override with tile-specific dimensions
+                vizViewport: getViewport(parent.width), // Override with tile-specific viewport
                 handleSmallMultipleHover: onChartHover
               }}
             >
