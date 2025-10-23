@@ -193,11 +193,11 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
   }, [
     _data,
     dataNeedsPivot,
-    colorScale,
     showPercentage,
     config.xAxis.dataKey,
     config.general?.palette?.name,
     config.general?.palette?.isReversed,
+    config.general?.palette?.customColors,
     config.palette
   ])
 
@@ -337,19 +337,11 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
 
   // Update the context colorScale when the pie chart's colorScale changes
   // This ensures the Legend component uses the same colors as the pie chart
-  // Only update when specific color-related properties change, not the entire colorScale
   useEffect(() => {
     if (_colorScale && config.visualizationType === 'Pie') {
       dispatch({ type: 'SET_COLOR_SCALE', payload: _colorScale })
     }
-  }, [
-    config.visualizationType,
-    config.xAxis.dataKey,
-    config.general?.palette?.name,
-    config.general?.palette?.isReversed,
-    config.palette,
-    dispatch
-  ])
+  }, [_colorScale, config.visualizationType, dispatch])
 
   const getSvgClasses = () => {
     let classes = ['animated-pie', 'group']
