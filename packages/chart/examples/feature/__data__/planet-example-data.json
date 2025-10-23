@@ -17,34 +17,4 @@
     "Diameter": "18",
     "distance": "40"
   },
-  {
-    "name": "Neptune",
-    "Radius": "700",
-    "Diameter": "18",
-    "distance": "0"
-  },
-  {
-    "name": "Venus",
-    "Radius": "500",
-    "Diameter": "18",
-    "distance": "0"
-  },
-  {
-    "name": "Mars",
-    "Radius": "400",
-    "Diameter": "18",
-    "distance": "0"
-  },
-  {
-    "name": "Mercury",
-    "Radius": "300",
-    "Diameter": "22",
-    "distance": "0"
-  },
-  {
-    "name": "Pluto",
-    "Radius": "200",
-    "Diameter": "22",
-    "distance": "0"
-  }
 ]

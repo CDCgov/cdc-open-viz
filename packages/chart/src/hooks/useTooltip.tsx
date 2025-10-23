@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useRef } from 'react'
 // Local imports
 import parse from 'html-react-parser'
 import ConfigContext from '../ConfigContext'
@@ -29,6 +29,9 @@ export const useTooltip = props => {
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
 
   const Y_AXIS_SIZE = Number(config.yAxis.size || 0)
+
+  // Track currently hovered series to detect when hover changes
+  const currentlyHoveredRef = useRef<string | null>(null)
 
   // function handles only Single series hovered data tooltips
   const findDataKeyByThreshold = (mouseY, datapoint) => {
@@ -86,6 +89,11 @@ export const useTooltip = props => {
 
     const resolvedScaleValues = getResolvedScaleValues([x, y])
     const singleSeriesValue = getYValueFromCoordinate(y, resolvedScaleValues)
+
+    // Track the current x-axis value for linear charts to detect position changes
+    const currentXValue = resolvedScaleValues[0]?.[config.xAxis.dataKey]
+    const hasXValueChanged = currentXValue !== currentlyHoveredRef.current
+
     const columnsWithTooltips = []
     const tooltipItems = [] as any[][]
     for (const [colKey, column] of Object.entries(config.columns)) {
@@ -100,8 +108,8 @@ export const useTooltip = props => {
       const columnData =
         config.tooltips.singleSeries && visualizationType === 'Line'
           ? resolvedScaleValues.filter(
-            value => value[config.runtime.series[0].dynamicCategory] === singleSeriesValue
-          )[0][colKey]
+              value => value[config.runtime.series[0].dynamicCategory] === singleSeriesValue
+            )[0][colKey]
           : resolvedScaleValues[0]?.[colKey]
       const closestValue = config.visualizationType === 'Pie' ? pieColumnData : columnData
 
@@ -135,17 +143,22 @@ export const useTooltip = props => {
       } else {
         // Track hover analytics event for pie chart series
         if (pieData[config.xAxis.dataKey] && interactionLabel) {
-          const seriesName = String(pieData[config.xAxis.dataKey]).replace(/[^a-zA-Z0-9]/g, '_')
-          publishAnalyticsEvent({
-            vizType: config?.type,
-            vizSubType: getVizSubType(config),
-            eventType: `chart_hover`,
-            eventAction: 'hover',
-            eventLabel: interactionLabel,
-            vizTitle: getVizTitle(config),
-            series: pieData[config.xAxis.dataKey],
-            specifics: `hovered on: ${String(seriesName).toLowerCase()}`
-          })
+          const currentSeries = pieData[config.xAxis.dataKey]
+          // Only publish event if hovering on a different series than before
+          if (currentSeries !== currentlyHoveredRef.current) {
+            const seriesName = String(currentSeries).replace(/[^a-zA-Z0-9]/g, '_')
+            publishAnalyticsEvent({
+              vizType: config?.type,
+              vizSubType: getVizSubType(config),
+              eventType: `chart_hover`,
+              eventAction: 'hover',
+              eventLabel: interactionLabel,
+              vizTitle: getVizTitle(config),
+              series: currentSeries,
+              specifics: `hovered on: ${String(seriesName).toLowerCase()}`
+            })
+            currentlyHoveredRef.current = currentSeries
+          }
         }
 
         tooltipItems.push(
@@ -187,7 +200,8 @@ export const useTooltip = props => {
               )
 
               // Track hover analytics event for linear chart series
-              if (interactionLabel && seriesKey && seriesKey !== config.xAxis?.dataKey && value) {
+              // Only fire when x-axis position changes to avoid duplicate events
+              if (interactionLabel && seriesKey && seriesKey !== config.xAxis?.dataKey && value && hasXValueChanged) {
                 const seriesName = seriesObjWithName?.name || seriesKey
                 const safeSeriesName = String(seriesName).replace(/[^a-zA-Z0-9]/g, '_')
                 publishAnalyticsEvent({
@@ -265,6 +279,14 @@ export const useTooltip = props => {
       }
     }
     showTooltip(tooltipInformation)
+
+    // Update the tracked x-value for linear charts
+    if (visualizationType === 'Pie') {
+      // Pie charts track by series name (already updated inline)
+    } else {
+      // Linear charts track by x-axis position
+      currentlyHoveredRef.current = currentXValue
+    }
   }
 
   /**
@@ -273,6 +295,9 @@ export const useTooltip = props => {
    * @returns {void} - The tooltip information is hidden
    */
   const handleTooltipMouseOff = () => {
+    // Reset hover tracking when tooltip is hidden
+    currentlyHoveredRef.current = null
+
     if (config.visualizationType === 'Area Chart') {
       setTimeout(() => {
         hideTooltip()
@@ -576,8 +601,9 @@ export const useTooltip = props => {
     if (visualizationType === 'Forest Plot') {
       if (key === config.xAxis.dataKey)
         return (
-          <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value
-            }`}</li>
+          <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${
+            isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value
+          }`}</li>
         )
       return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
     }

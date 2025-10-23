@@ -1089,7 +1089,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
                     {config.visualizationType === 'Pie' && (
                       <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
-                        {parent => <PieChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />}
+                        {parent => (
+                          <PieChart
+                            ref={svgRef}
+                            parentWidth={parent.width}
+                            parentHeight={parent.height}
+                            interactionLabel={interactionLabel}
+                          />
+                        )}
                       </ParentSize>
                     )}
                     {/* Line Chart */}
