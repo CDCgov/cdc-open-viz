@@ -154,8 +154,7 @@ export const useTooltip = props => {
               eventAction: 'hover',
               eventLabel: interactionLabel,
               vizTitle: getVizTitle(config),
-              series: currentSeries,
-              specifics: `hovered on: ${String(seriesName).toLowerCase()}`
+              series: currentSeries
             })
             currentlyHoveredRef.current = currentSeries
           }
@@ -211,8 +210,7 @@ export const useTooltip = props => {
                   eventAction: 'hover',
                   eventLabel: interactionLabel,
                   vizTitle: getVizTitle(config),
-                  series: seriesName,
-                  specifics: `key: ${String(safeSeriesName).toLowerCase()}, value: ${value}`
+                  series: seriesName
                 })
               }
 

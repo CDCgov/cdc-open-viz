@@ -68,6 +68,7 @@ export const publishAnalyticsEvent = <T extends ANALYTICS_EVENT_TYPES>({
   // Format: APP|VIZTYPE_VIZSUBTYPE|VIZ_TITLE|INTERACTION_EVENT_NAME|INTERACTION_TYPE|SPECIFICS
   const vizTypeSubType = vizSubType ? `${vizType}_${vizSubType}` : vizType
   const formattedEvent = `${app}|${vizTypeSubType}|${vizTitle || 'unknown'}|${eventType}|${eventAction}|${specifics || 'no details'}`
+  console.log('formattedEvent', formattedEvent)
   return publish('cove:analytics', {
     formattedEvent
   })

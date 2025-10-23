@@ -337,9 +337,22 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
 
   // Update the context colorScale when the pie chart's colorScale changes
   // This ensures the Legend component uses the same colors as the pie chart
+  const prevColorScaleRef = useRef<{ domain: string; range: string } | null>(null)
+
   useEffect(() => {
     if (_colorScale && config.visualizationType === 'Pie') {
-      dispatch({ type: 'SET_COLOR_SCALE', payload: _colorScale })
+      // Only dispatch if the domain or range has actually changed
+      const currentDomain = JSON.stringify(_colorScale.domain())
+      const currentRange = JSON.stringify(_colorScale.range())
+      const colorScaleKey = `${currentDomain}|${currentRange}`
+      const prevKey = prevColorScaleRef.current
+        ? `${prevColorScaleRef.current.domain}|${prevColorScaleRef.current.range}`
+        : null
+
+      if (colorScaleKey !== prevKey) {
+        prevColorScaleRef.current = { domain: currentDomain, range: currentRange }
+        dispatch({ type: 'SET_COLOR_SCALE', payload: _colorScale })
+      }
     }
   }, [_colorScale, config.visualizationType, dispatch])
 
