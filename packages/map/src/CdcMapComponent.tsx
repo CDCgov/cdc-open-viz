@@ -170,7 +170,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const tooltipId = 'tooltipId'
 
   // hooks
-  const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
+  const { currentViewport, vizViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
 
   useEffect(() => {
     if (!mapSvg.current || coveLoadedHasRan) return
@@ -335,6 +335,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     container,
     content: modal,
     currentViewport,
+    vizViewport,
     customNavigationHandler,
     dimensions,
     filteredCountryCode,

@@ -81,6 +81,7 @@ const UsaMap = () => {
     mapId,
     logo,
     currentViewport,
+    vizViewport,
     dimensions,
     translate,
     runtimeLegend,
@@ -169,7 +170,7 @@ const UsaMap = () => {
 
   // Chrome needs wider stroke for small maps or it doesn't render the pattern
   const mapWidth = dimensions?.[0] || 880
-  const patternLinesStrokeWidth = mapWidth < 375 ? 1.25 : 0.75
+  const patternLinesStrokeWidth = mapWidth < 200 ? 1.75 : mapWidth < 375 ? 1.25 : 0.75
 
   const territories = territoriesData.map((territory, territoryIndex) => {
     const Shape = displayAsHex ? Territory.Hexagon : Territory.Rectangle
@@ -600,7 +601,7 @@ const UsaMap = () => {
           <text
             x={x}
             y={y}
-            fontSize={isMobileStateLabelViewport(currentViewport) ? 16 : 13}
+            fontSize={isMobileStateLabelViewport(vizViewport) ? 16 : 13}
             fontWeight={900}
             strokeWidth='1'
             paintOrder='stroke'

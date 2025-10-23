@@ -8,6 +8,7 @@ import { DimensionsType } from '@cdc/core/types/Dimensions'
 import generateRuntimeData from '../../helpers/generateRuntimeData'
 import UsaMap from '../UsaMap'
 import ResizeObserver from 'resize-observer-polyfill'
+import getViewport from '@cdc/core/helpers/getViewport'
 
 interface SmallMultipleTileProps {
   tileValue: string | number
@@ -85,7 +86,8 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({ tileValue, tileCo
       ...parentContext,
       config: tileConfig,
       runtimeData: tileRuntimeData as any,
-      dimensions: tileDimensions
+      dimensions: tileDimensions,
+      vizViewport: getViewport(tileDimensions[0])
     }),
     [parentContext, tileConfig, tileRuntimeData, tileDimensions]
   )

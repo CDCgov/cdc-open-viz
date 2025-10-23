@@ -11,4 +11,5 @@ export type TerritoryShape = {
   territory: string
   territoryData: object
   textColor: string
+  svgStyle?: React.CSSProperties
 }

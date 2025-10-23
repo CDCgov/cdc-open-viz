@@ -5,6 +5,7 @@ import { VizFilter } from '@cdc/core/types/VizFilter'
 
 export type MapContext = {
   currentViewport: ViewPort
+  vizViewport?: ViewPort
   content: { geoName: string; keyedData: Record<string, any> }
   dimensions: DimensionsType
   displayDataAsText: string | number
