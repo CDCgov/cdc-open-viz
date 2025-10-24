@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useRef } from 'react'
 // Local imports
 import parse from 'html-react-parser'
 import ConfigContext from '../ConfigContext'
@@ -12,6 +12,8 @@ import _, { get } from 'lodash'
 import { getHorizontalBarHeights } from '../components/BarChart/helpers/getBarHeights'
 
 export const useTooltip = props => {
+  // Track the last X-axis value to prevent duplicate analytics events
+  const lastAnalyticsXValue = useRef<string | number | null>(null)
   const {
     tableData: data,
     config,
@@ -155,6 +157,10 @@ export const useTooltip = props => {
         return position
       }
       if (!config.tooltips.singleSeries || visualizationType === 'Line') {
+        // Collect analytics data for all series
+        const analyticsSeriesData: string[] = []
+        let xAxisValue: string | number | null = null
+
         tooltipItems.push(
           ...getIncludedTooltipSeries()
             ?.filter(seriesKey => {
@@ -182,6 +188,29 @@ export const useTooltip = props => {
               }
             })
         )
+
+        // Publish a single analytics event with all tooltip data
+        // Only publish if the X-axis value has changed (different from last hover)
+        if (analyticsSeriesData.length > 0 && xAxisValue !== lastAnalyticsXValue.current) {
+          lastAnalyticsXValue.current = xAxisValue
+
+          // Extract series names for the series field
+          const seriesNames = analyticsSeriesData.map(item => item.split(':')[0].trim()).join(', ')
+
+          const specifics = xAxisValue
+            ? `series: ${seriesNames}, x: ${xAxisValue}, ${analyticsSeriesData.join(', ')}`
+            : `series: ${seriesNames}, ${analyticsSeriesData.join(', ')}`
+
+          publishAnalyticsEvent({
+            vizType: config?.type,
+            vizSubType: getVizSubType(config),
+            eventType: `chart_hover`,
+            eventAction: 'hover',
+            eventLabel: interactionLabel || 'unknown',
+            vizTitle: getVizTitle(config),
+            specifics
+          })
+        }
 
         const runtimeSeries =
           config.tooltips.singleSeries && visualizationType === 'Line'
@@ -241,6 +270,9 @@ export const useTooltip = props => {
    * @returns {void} - The tooltip information is hidden
    */
   const handleTooltipMouseOff = () => {
+    // Reset the analytics tracking when mouse leaves
+    lastAnalyticsXValue.current = null
+
     if (config.visualizationType === 'Area Chart') {
       setTimeout(() => {
         hideTooltip()

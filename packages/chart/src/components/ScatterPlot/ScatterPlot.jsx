@@ -86,18 +86,21 @@ const ScatterPlot = ({ xScale, yScale }) => {
               tabIndex={-1}
               onMouseEnter={() => {
                 // Track hover analytics event if this is a new hover
-                if (interactionLabel && (currentHover.dataIndex !== dataIndex || currentHover.seriesKey !== s)) {
+                if ((currentHover.dataIndex !== dataIndex || currentHover.seriesKey !== s)) {
                   const seriesName = config.runtime.seriesLabels?.[s] || s
                   const safeSeriesName = String(seriesName).replace(/[^a-zA-Z0-9]/g, '_')
+                  const xAxisValue = item[config.xAxis.dataKey]
+                  const yAxisValue = item[s]
+
                   publishAnalyticsEvent({
                     vizType: config?.type,
                     vizSubType: getVizSubType(config),
                     eventType: `chart_hover`,
                     eventAction: 'hover',
-                    eventLabel: interactionLabel,
+                    eventLabel: interactionLabel || 'unknown',
                     vizTitle: getVizTitle(config),
                     series: seriesName,
-                    specifics: `hovered on: ${String(safeSeriesName).toLowerCase()}`
+                    specifics: `series: ${String(safeSeriesName).toLowerCase()}, ${config.xAxis.dataKey}: ${xAxisValue}, ${s}: ${yAxisValue}`
                   })
                   setCurrentHover({ dataIndex, seriesKey: s })
                 }
