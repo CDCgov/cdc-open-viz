@@ -43,6 +43,7 @@ import useScales, { getTickValues } from '../hooks/useScales'
 
 import getTopAxis from '../helpers/getTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
+import { useChartHoverAnalytics } from '../hooks/useChartHoverAnalytics'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
@@ -273,6 +274,13 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     hideTooltip,
     interactionLabel
   })
+
+  // Analytics tracking for chart hover
+  const { handleChartMouseEnter, handleChartMouseLeave } = useChartHoverAnalytics({
+    config,
+    interactionLabel
+  })
+
   // get the number of months between the first and last date
   const { dataKey } = runtime.xAxis
   const dateSpanMonths =
@@ -681,8 +689,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           role='img'
           aria-label={handleChartAriaLabels(config)}
           style={{ overflow: 'visible' }}
-          onMouseLeave={() => setShowHoverLine(false)}
-          onMouseEnter={() => setShowHoverLine(true)}
+          onMouseLeave={() => {
+            setShowHoverLine(false)
+            handleChartMouseLeave()
+          }}
+          onMouseEnter={() => {
+            setShowHoverLine(true)
+            handleChartMouseEnter()
+          }}
         >
           {!isDraggingAnnotation && <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>}{' '}
           {/* GRID LINES */}

@@ -18,6 +18,7 @@ import {
 // cove
 import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
 import { useTooltip as useCoveTooltip } from '../../hooks/useTooltip'
+import { useChartHoverAnalytics } from '../../hooks/useChartHoverAnalytics'
 import useIntersectionObserver from '../../hooks/useIntersectionObserver'
 import { handleChartAriaLabels } from '../../helpers/handleChartAriaLabels'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -57,6 +58,13 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     hideTooltip,
     interactionLabel
   })
+
+  // Analytics tracking for chart hover
+  const { handleChartMouseEnter, handleChartMouseLeave } = useChartHoverAnalytics({
+    config,
+    interactionLabel
+  })
+
   const [filteredData, setFilteredData] = useState(undefined)
   const [animatedPie, setAnimatePie] = useState(false)
   const pivotColumns = Object.values(config.columns).filter(column => column.showInViz)
@@ -373,7 +381,11 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
           className={getSvgClasses()}
           role='img'
           aria-label={handleChartAriaLabels(config)}
-          onMouseLeave={handleTooltipMouseOff}
+          onMouseEnter={handleChartMouseEnter}
+          onMouseLeave={() => {
+            handleTooltipMouseOff()
+            handleChartMouseLeave()
+          }}
         >
           <Group top={centerY} left={radius}>
             {/* prettier-ignore */}
