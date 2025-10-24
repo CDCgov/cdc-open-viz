@@ -587,17 +587,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (container && !isLoading && !_.isEmpty(config) && !coveLoadedEventRan) {
       publish('cove_loaded', { config: config })
       dispatch({ type: 'SET_LOADED_EVENT', payload: true })
-      publishAnalyticsEvent({
-        vizType: config?.type,
-        vizSubType: getVizSubType(config),
-        eventType: 'chart_ready',
-        eventAction: 'load',
-        eventLabel: interactionLabel,
-        vizTitle: getVizTitle(config),
-        ...(config.visualizationType === 'Bar' && {
-          specifics: `orientation: ${config.orientation === 'horizontal' ? 'horizontal' : 'vertical'}`
-        })
-      })
     }
   }, [container, config, isLoading]) // eslint-disable-line
 
@@ -1089,7 +1078,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
                     {config.visualizationType === 'Pie' && (
                       <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
-                        {parent => <PieChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />}
+                        {parent => (
+                          <PieChart
+                            ref={svgRef}
+                            parentWidth={parent.width}
+                            parentHeight={parent.height}
+                            interactionLabel={interactionLabel}
+                          />
+                        )}
                       </ParentSize>
                     )}
                     {/* Line Chart */}

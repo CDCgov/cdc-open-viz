@@ -371,7 +371,7 @@ const BarChartHorizontal = () => {
                           height: numbericBarHeight,
                           x: barX,
                           y: barHeight * bar.index,
-                          onMouseOver: e => onMouseOverBar(xAxisValue, bar.key, e, data),
+                          onMouseOver: e => onMouseOverBar(xAxisValue, bar.key, e, data, bar.value),
                           onMouseLeave: onMouseLeaveBar,
                           tooltipHtml: tooltip,
                           tooltipId: `cdc-open-viz-tooltip-${config.runtime.uniqueId}`,

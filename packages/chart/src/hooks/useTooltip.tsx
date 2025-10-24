@@ -1,19 +1,19 @@
-import { useContext } from 'react'
+import { useContext, useRef } from 'react'
 // Local imports
 import parse from 'html-react-parser'
 import ConfigContext from '../ConfigContext'
 import { type ChartContext } from '../types/ChartContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
-import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 // Third-party library imports
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
 import _, { get } from 'lodash'
 import { getHorizontalBarHeights } from '../components/BarChart/helpers/getBarHeights'
-import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 export const useTooltip = props => {
+  // Track the last X-axis value to prevent duplicate analytics events
+  const lastAnalyticsXValue = useRef<string | number | null>(null)
   const {
     tableData: data,
     config,
@@ -86,6 +86,7 @@ export const useTooltip = props => {
 
     const resolvedScaleValues = getResolvedScaleValues([x, y])
     const singleSeriesValue = getYValueFromCoordinate(y, resolvedScaleValues)
+
     const columnsWithTooltips = []
     const tooltipItems = [] as any[][]
     for (const [colKey, column] of Object.entries(config.columns)) {
@@ -100,8 +101,8 @@ export const useTooltip = props => {
       const columnData =
         config.tooltips.singleSeries && visualizationType === 'Line'
           ? resolvedScaleValues.filter(
-            value => value[config.runtime.series[0].dynamicCategory] === singleSeriesValue
-          )[0][colKey]
+              value => value[config.runtime.series[0].dynamicCategory] === singleSeriesValue
+            )[0][colKey]
           : resolvedScaleValues[0]?.[colKey]
       const closestValue = config.visualizationType === 'Pie' ? pieColumnData : columnData
 
@@ -133,21 +134,6 @@ export const useTooltip = props => {
       if (showPiePercent && pieData[config.xAxis.dataKey] === 'Calculated Area') {
         tooltipItems.push(['', 'Calculated Area'])
       } else {
-        // Track hover analytics event for pie chart series
-        if (pieData[config.xAxis.dataKey] && interactionLabel) {
-          const seriesName = String(pieData[config.xAxis.dataKey]).replace(/[^a-zA-Z0-9]/g, '_')
-          publishAnalyticsEvent({
-            vizType: config?.type,
-            vizSubType: getVizSubType(config),
-            eventType: `chart_hover`,
-            eventAction: 'hover',
-            eventLabel: interactionLabel,
-            vizTitle: getVizTitle(config),
-            series: pieData[config.xAxis.dataKey],
-            specifics: `hovered on: ${String(seriesName).toLowerCase()}`
-          })
-        }
-
         tooltipItems.push(
           [config.xAxis.dataKey, pieData[config.xAxis.dataKey]],
           [
@@ -171,6 +157,10 @@ export const useTooltip = props => {
         return position
       }
       if (!config.tooltips.singleSeries || visualizationType === 'Line') {
+        // Collect analytics data for all series
+        const analyticsSeriesData: string[] = []
+        let xAxisValue: string | number | null = null
+
         tooltipItems.push(
           ...getIncludedTooltipSeries()
             ?.filter(seriesKey => {
@@ -186,22 +176,6 @@ export const useTooltip = props => {
                 series => series.dataKey === seriesKey && series.name !== undefined
               )
 
-              // Track hover analytics event for linear chart series
-              if (interactionLabel && seriesKey && seriesKey !== config.xAxis?.dataKey && value) {
-                const seriesName = seriesObjWithName?.name || seriesKey
-                const safeSeriesName = String(seriesName).replace(/[^a-zA-Z0-9]/g, '_')
-                publishAnalyticsEvent({
-                  vizType: config?.type,
-                  vizSubType: getVizSubType(config),
-                  eventType: `chart_hover`,
-                  eventAction: 'hover',
-                  eventLabel: interactionLabel,
-                  vizTitle: getVizTitle(config),
-                  series: seriesName,
-                  specifics: `key: ${String(safeSeriesName).toLowerCase()}, value: ${value}`
-                })
-              }
-
               if (
                 (value === null || value === undefined || value === '' || formattedValue === 'N/A') &&
                 config.general.hideNullValue
@@ -214,6 +188,29 @@ export const useTooltip = props => {
               }
             })
         )
+
+        // Publish a single analytics event with all tooltip data
+        // Only publish if the X-axis value has changed (different from last hover)
+        if (analyticsSeriesData.length > 0 && xAxisValue !== lastAnalyticsXValue.current) {
+          lastAnalyticsXValue.current = xAxisValue
+
+          // Extract series names for the series field
+          const seriesNames = analyticsSeriesData.map(item => item.split(':')[0].trim()).join(', ')
+
+          const specifics = xAxisValue
+            ? `series: ${seriesNames}, x: ${xAxisValue}, ${analyticsSeriesData.join(', ')}`
+            : `series: ${seriesNames}, ${analyticsSeriesData.join(', ')}`
+
+          publishAnalyticsEvent({
+            vizType: config?.type,
+            vizSubType: getVizSubType(config),
+            eventType: `chart_hover`,
+            eventAction: 'hover',
+            eventLabel: interactionLabel || 'unknown',
+            vizTitle: getVizTitle(config),
+            specifics
+          })
+        }
 
         const runtimeSeries =
           config.tooltips.singleSeries && visualizationType === 'Line'
@@ -273,6 +270,9 @@ export const useTooltip = props => {
    * @returns {void} - The tooltip information is hidden
    */
   const handleTooltipMouseOff = () => {
+    // Reset the analytics tracking when mouse leaves
+    lastAnalyticsXValue.current = null
+
     if (config.visualizationType === 'Area Chart') {
       setTimeout(() => {
         hideTooltip()
@@ -576,8 +576,9 @@ export const useTooltip = props => {
     if (visualizationType === 'Forest Plot') {
       if (key === config.xAxis.dataKey)
         return (
-          <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value
-            }`}</li>
+          <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${
+            isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value
+          }`}</li>
         )
       return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
     }

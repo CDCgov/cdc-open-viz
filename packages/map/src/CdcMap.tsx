@@ -10,8 +10,8 @@ import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 import { MapConfig } from './types/MapConfig'
 import _, { get } from 'lodash'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
-import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
 
 type CdcMapProps = {
   config: MapConfig
@@ -37,6 +37,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
 }) => {
   const editorContext = useContext(EditorContext)
   const [config, _setConfig] = useState(editorsConfig ?? null)
+  const [mapReadyEventRan, setMapReadyEventRan] = useState(false)
 
   const setConfig = newConfig => {
     _setConfig(newConfig)
@@ -104,14 +105,6 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
     setTimeout(() => {
       setConfig(processedConfig)
-      publishAnalyticsEvent({
-        vizType: 'map',
-        vizSubType: getVizSubType(processedConfig),
-        eventType: 'map_ready',
-        eventAction: 'load',
-        eventLabel: interactionLabel,
-        vizTitle: getVizTitle(processedConfig)
-      })
       setLoading(false)
     }, 10)
   }
@@ -129,15 +122,28 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
   useEffect(() => {
     init()
-  }, [])
-
-  useEffect(() => {
-    init()
   }, [configUrl])
 
   useEffect(() => {
     setConfig(editorsConfig)
   }, [editorsConfig])
+
+  /**
+   * When map has a config and is not loading, publish the map_ready event.
+   */
+  useEffect(() => {
+    if (!loading && !_.isEmpty(config) && !mapReadyEventRan) {
+      publishAnalyticsEvent({
+        vizType: 'map',
+        vizSubType: getVizSubType(config),
+        eventType: 'map_ready',
+        eventAction: 'load',
+        eventLabel: interactionLabel,
+        vizTitle: getVizTitle(config)
+      })
+      setMapReadyEventRan(true)
+    }
+  }, [loading, config, mapReadyEventRan, interactionLabel])
 
   if (loading) return null
 
