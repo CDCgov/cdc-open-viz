@@ -4452,7 +4452,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
               </AccordionItem>
             )}
             <Panels.Annotate name='Text Annotations' />
-            <Panels.SmallMultiples name='Small Multiples' />
             {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
             <PanelMarkup
               name='Markup Variables'
@@ -4462,6 +4461,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
               onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
               onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
             />
+            <Panels.SmallMultiples name='Small Multiples' />
           </Accordion>
           {config.type !== 'Spark Line' && (
             <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />
