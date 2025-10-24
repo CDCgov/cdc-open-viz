@@ -1,7 +1,7 @@
 import { Config } from '../types/Config'
 import ChartActions from './chart.actions'
 
-export type ChartState = {
+type ChartState = {
   config?: Config
   container: any
   coveLoadedHasRan: boolean

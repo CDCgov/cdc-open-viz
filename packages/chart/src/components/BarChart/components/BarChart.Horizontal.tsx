@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 
 // Local context and hooks
 import ConfigContext from '../../../ConfigContext'
@@ -26,7 +26,7 @@ import _ from 'lodash'
 import { getBarData } from '../helpers/getBarData'
 import { getHorizontalBarHeights } from '../helpers/getBarHeights'
 
-export const BarChartHorizontal = () => {
+const BarChartHorizontal = () => {
   const { xScale, yScale, yMax, seriesScale, barChart } = useContext<BarChartContextValues>(BarChartContext)
   const {
     isHorizontal,

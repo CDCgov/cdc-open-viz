@@ -6,7 +6,7 @@ import ConfigContext from '../../ConfigContext'
 import { Text } from '@visx/text'
 import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
-export interface BrushChartProps {
+interface BrushChartProps {
   xMax: number
   yMax: number
   brushPosition: { start: { x: number }; end: { x: number } }

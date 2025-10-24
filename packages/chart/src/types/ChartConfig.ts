@@ -10,7 +10,7 @@ import { BoxPlot } from '@cdc/core/types/BoxPlot'
 import { General as CoreGeneral } from '@cdc/core/types/General'
 
 // Extend the core General type to include palette information for charts
-export type General = CoreGeneral & {
+type General = CoreGeneral & {
   palette?: {
     name?: string
     version?: string
@@ -30,7 +30,7 @@ import { Version } from '@cdc/core/types/Version'
 import Footnotes from '@cdc/core/types/Footnotes'
 
 export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
-export type ChartColumns = Record<string, Column>
+type ChartColumns = Record<string, Column>
 export type ChartOrientation = 'vertical' | 'horizontal'
 export type VisualizationType =
   | 'Area Chart'
@@ -91,7 +91,7 @@ type Exclusions = {
   dateEnd: string
 }
 
-export type Legend = CoreLegend & {
+type Legend = CoreLegend & {
   seriesHighlight: string[]
   unified: boolean
   hideSuppressionLink: boolean
@@ -248,7 +248,7 @@ export type AllChartsConfig = {
   }
 } & MarkupConfig
 
-export type ForestPlotConfig = {
+type ForestPlotConfig = {
   visualizationType: 'Forest Plot'
   forestPlot: ForestPlotConfigSettings
 } & AllChartsConfig &
@@ -263,7 +263,7 @@ export type LineChartConfig = {
 } & AllChartsConfig &
   MarkupConfig
 
-export type SankeyLink = {
+type SankeyLink = {
   depth: number
   height: number
   id: string
@@ -284,7 +284,7 @@ type StoryNode = {
   segmentTextBefore: string
 }
 
-export type SankeyChartConfig = {
+type SankeyChartConfig = {
   enableTooltips: boolean
   data: [
     {

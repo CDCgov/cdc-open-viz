@@ -295,12 +295,12 @@ const useScales = (properties: useScaleProps) => {
 
 export default useScales
 
-export const getFirstDayOfMonth = ms => {
+const getFirstDayOfMonth = ms => {
   const date = new Date(ms)
   return new Date(date.getFullYear(), date.getMonth(), 1).getTime()
 }
 
-export const dateFormatHasMonthButNoDays = dateFormat => {
+const dateFormatHasMonthButNoDays = dateFormat => {
   return (
     (dateFormat.includes('%b') ||
       dateFormat.includes('%B') ||
@@ -350,28 +350,6 @@ export const getTickValues = (xAxisDataMapped, xScale, num, config) => {
 
     return tickValues
   }
-}
-
-// Ensure that the last tick is shown for charts with a "Date (Linear Scale)" scale
-export const filterAndShiftLinearDateTicks = (config, axisProps, xAxisDataMapped, formatDate) => {
-  let ticks = axisProps.ticks
-  const filteredTickValues = getTicks(axisProps.scale, axisProps.numTicks)
-  if (filteredTickValues.length < xAxisDataMapped.length) {
-    let shift = 0
-    const lastIdx = xAxisDataMapped.indexOf(filteredTickValues[filteredTickValues.length - 1])
-    if (lastIdx < xAxisDataMapped.length - 1) {
-      shift = !config.xAxis.sortByRecentDate
-        ? xAxisDataMapped.length - 1 - lastIdx
-        : xAxisDataMapped.indexOf(filteredTickValues[0]) * -1
-    }
-    ticks = filteredTickValues.map(value => {
-      return axisProps.ticks[axisProps.ticks.findIndex(tick => tick.value === value) + shift]
-    })
-  }
-  ticks.forEach((tick, i) => {
-    tick.formattedValue = formatDate(tick.value, i, ticks)
-  })
-  return ticks
 }
 
 /// helper functions
