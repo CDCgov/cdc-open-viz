@@ -67,7 +67,7 @@
     "displayNumbersOnBar": false,
     "hideLabel": false,
     "hideTicks": true,
-    "size": "50",
+    "size": "30",
     "gridLines": true,
     "enablePadding": true,
     "min": "",
@@ -91,7 +91,7 @@
     "showMissingDataLine": true,
     "categories": [],
     "label": "",
-    "inlineLabel": "%"
+    "inlineLabel": " percent"
   },
   "boxplot": {
     "plots": [],
@@ -278,7 +278,8 @@
       "dataKey": "COVID-19",
       "type": "Line",
       "axis": "Left",
-      "tooltip": true
+      "tooltip": true,
+      "name": "COVID-19 with a very very long title"
     },
     {
       "dataKey": "Influenza",

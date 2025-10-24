@@ -94,6 +94,9 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
   // Refs to all LinearChart instances for tooltip coordination
   const chartRefs = useRef<Record<string, any>>({})
 
+  // Refs to all tile header elements for height alignment
+  const headerRefs = useRef<Record<string, HTMLDivElement | null>>({})
+
   // Create combined data and config for consistent Y-axis calculation
   const combinedDataForYAxis = useMemo(
     () => createCombinedDataForYAxis(config, data, tileItems),
@@ -205,6 +208,49 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     [config.smallMultiples?.synchronizedTooltips]
   )
 
+  // Align tile header heights per row
+  useEffect(() => {
+    const headerEntries = Object.entries(headerRefs.current).filter(([_, ref]) => ref) as Array<
+      [string, HTMLDivElement]
+    >
+    if (headerEntries.length === 0) return
+
+    // Group headers by row based on their index in tileItems
+    const headersByRow: Array<Array<HTMLDivElement>> = []
+
+    tileItems.forEach((item, index) => {
+      const rowIndex = Math.floor(index / tilesPerRow)
+      const header = headerRefs.current[String(item.key)]
+
+      headersByRow[rowIndex] ||= []
+      headersByRow[rowIndex].push(header)
+    })
+
+    // For each row, find the header with longest text and align others to it
+    headersByRow.forEach(rowHeaders => {
+      let longestHeader: HTMLDivElement | null = null
+      let maxTextLength = 0
+
+      rowHeaders.forEach(header => {
+        const textLength = header.textContent?.length || 0
+        if (textLength > maxTextLength) {
+          maxTextLength = textLength
+          longestHeader = header
+        }
+      })
+
+      if (!longestHeader) return
+
+      // Get the height of the longest header in this row
+      const targetHeight = longestHeader.offsetHeight
+
+      // Apply that height to all other headers in this row
+      rowHeaders.forEach(header => {
+        header.style.minHeight = header !== longestHeader ? `${targetHeight}px` : 'auto'
+      })
+    })
+  }, [tileItems, tilesPerRow])
+
   // Calculate container height from measured tile heights
   useEffect(() => {
     if (!parentRef.current) return
@@ -252,6 +298,9 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
               onHeightChange={handleTileHeightChange}
               onChartRef={ref => {
                 chartRefs.current[String(item.key)] = ref
+              }}
+              onHeaderRef={ref => {
+                headerRefs.current[String(item.key)] = ref
               }}
               onChartHover={(xAxisValue, yCoordinate) => handleChartHover(String(item.key), xAxisValue, yCoordinate)}
             />

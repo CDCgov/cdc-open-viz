@@ -24,6 +24,7 @@ interface SmallMultipleTileProps {
   isFirstInRow?: boolean
   onHeightChange?: (tileKey: string, height: number) => void
   onChartRef?: (ref: any) => void
+  onHeaderRef?: (ref: HTMLDivElement | null) => void
   onChartHover?: (xAxisValue: any, yCoordinate: number) => void
 }
 
@@ -43,6 +44,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   isFirstInRow,
   onHeightChange,
   onChartRef,
+  onHeaderRef,
   onChartHover
 }) => {
   let tileConfig = cloneConfig(config)
@@ -181,7 +183,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
 
   return (
     <div ref={fullTileRef} className='small-multiple-tile'>
-      <div className='tile-header'>
+      <div ref={onHeaderRef} className='tile-header'>
         <div className='tile-title'>{displayTitle}</div>
       </div>
       <div ref={tileParentRef} className='tile-chart'>
