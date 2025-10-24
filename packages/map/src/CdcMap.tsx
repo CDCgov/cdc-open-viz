@@ -10,8 +10,6 @@ import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 import { MapConfig } from './types/MapConfig'
 import _, { get } from 'lodash'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
-import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
-import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type CdcMapProps = {
   config: MapConfig
