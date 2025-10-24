@@ -4,378 +4,332 @@ Guidelines for building robust, observable, and performant interaction tests for
 
 ## Core Principles
 
-**Test Like a User**: Interact through UI controls and assert on visualization output, not just control state.
+**Test Visualization Output, Not Control State**: When you interact with a control (e.g., check a checkbox, change a dropdown), assert on the **specific visual change in the visualization** - not just that the control changed. For example, don't just verify a checkbox is checked; verify that a border appears, a class is added, or an element becomes visible.
 
-**Complete Coverage**: Test all visible controls and any conditionally revealed controls.
+**Test Specific Changes**: Assert on specific visual properties (classes added/removed, borders visible, elements present, style changes) - not generic "something changed".
 
-**Deterministic Execution**: Use polling with minimum animation delays instead of arbitrary waits.
+**Use Testing Helpers**: Always use the shared testing helpers from `@cdc/core/helpers/testing`. Never replicate their functionality. The helpers handle timing, polling, and async behavior.
 
-**Change Detection**: Assert that visualization output _changes_ rather than matching exact predetermined values.
+**One Accordion Per Test Story**: Create separate test stories for each accordion section. This keeps tests focused, organized, and easier to debug. Organize tests to match the visual appearance order of controls in the editor for better maintainability and user experience validation:
 
-**Logical Organization**:
+**Complete Coverage**: Test all visible controls within each accordion section, including conditionally revealed controls.
 
-- One accordion per test story
-- Interact with controls in visual top-to-bottom order
-- Centralize shared helpers to avoid duplication
+## Testing Helpers Available
 
-## Required Test Patterns
+The testing helpers handle timing, polling, and async behavior automatically:
 
-### 1. Polling Strategy
+- **`performAndAssert`**: Core pattern for testing control interactions. Use this for most tests.
+- **Environment-aware delays**: 500ms in Storybook UI (for observation), 0ms in automated tests (for speed)
+- **Built-in polling**: 5-second timeout with proper error messages
+- **No manual waits needed**: Never use `setTimeout` or manual delays
 
-Replace fixed timeouts with polling utilities:
-
-```typescript
-const pollUntil = async <T>(
-  read: () => T,
-  predicate: (curr: T, elapsed: number) => boolean,
-  timeout = 5000,
-  interval = 80
-): Promise<T>
-```
-
-**Key Requirements:**
-
-- Minimum 250ms elapsed time before resolving (ensures visual transitions are perceivable)
-- Short polling intervals (60-100ms) for responsiveness
-- Clear timeout errors with diagnostic context
-- Maximum 2-3 second timeouts per control interaction
-
-### 2. Assertion Strategy
-
-Always assert on **visualization changes**, not just control state:
+**Basic usage pattern:**
 
 ```typescript
-const performAndAssert = async (
-  label: string,
-  read: () => T,
-  act: () => Promise<void>,
-  predicate: (before: T, after: T) => boolean
+await performAndAssert(
+  'Descriptive Test Name',
+  () => getCurrentState(), // What to measure
+  async () => await userEvent.click(element), // What to do
+  (before, after) => before.specificProperty !== after.specificProperty // What changed
 )
 ```
 
-**What to Assert:**
+## Required Imports
 
-- ✅ Primary data value text changes
-- ✅ SVG elements added/removed/repositioned
-- ✅ CSS classes toggled
-- ✅ Formatted text structure (prefix/suffix)
-- ❌ Input `value` attributes alone
-- ❌ Checkbox `checked` state alone
-
-### 2a. Boolean/Checkbox Testing Strategy
-
-For boolean controls (checkboxes, toggles), **always verify the intended visual changes occur** for both states to ensure the feature works properly:
+Every editor test file must include these imports:
 
 ```typescript
-// ✅ Visual-first testing: Focus on what the user sees, not just checkbox state
-const getVisualState = () => {
-  // Define what visual changes this control should produce
-  const element = canvasElement.querySelector('.target-element')
+import type { Meta, StoryObj } from '@storybook/react-vite'
+import { within, userEvent, expect } from 'storybook/test'
+import {
+  performAndAssert,
+  waitForPresence,
+  waitForAbsence,
+  waitForTextContent,
+  waitForEditor,
+  openAccordion,
+  getDisplayValue,
+  getTitleText,
+  getVisualState,
+  testBooleanControl,
+  waitForOptionsToPopulate
+} from '@cdc/core/helpers/testing'
+```
+
+## Testing Helpers Reference
+
+| Function                   | Purpose                                   | Example                                                        |
+| -------------------------- | ----------------------------------------- | -------------------------------------------------------------- |
+| `performAndAssert`         | Core testing pattern for all interactions | `await performAndAssert('Border Toggle', getState, act, pred)` |
+| `waitForEditor`            | Wait for editor to load                   | `await waitForEditor(canvas)`                                  |
+| `openAccordion`            | Open accordion section                    | `await openAccordion(canvas, 'Visual')`                        |
+| `waitForPresence`          | Wait for element to appear                | `await waitForPresence('.element', canvasElement)`             |
+| `waitForAbsence`           | Wait for element to disappear             | `await waitForAbsence('.element', canvasElement)`              |
+| `waitForOptionsToPopulate` | Wait for select options to load           | `await waitForOptionsToPopulate(selectEl, 3)`                  |
+| `getVisualState`           | Capture element visual state              | `getVisualState(el, { checkClasses: ['accent'] })`             |
+| `testBooleanControl`       | Test checkbox in both directions          | `await testBooleanControl(checkbox, getState, 'Border')`       |
+| `getDisplayValue`          | Get primary data value from viz           | `const value = getDisplayValue(canvasElement)`                 |
+| `getTitleText`             | Get title text from viz                   | `const title = getTitleText(canvas)`                           |
+
+## Writing Tests: Step by Step
+
+### 1. Basic Test Structure
+
+```typescript
+export const VisualSectionTests: Story = {
+  args: { config: ExampleConfig, isEditor: true },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    // Wait for editor to load
+    await waitForEditor(canvas)
+
+    // Open the accordion section you're testing
+    await openAccordion(canvas, 'Visual')
+
+    // Test controls in visual top-to-bottom order
+    await testControl1()
+    await testControl2()
+  }
+}
+```
+
+### 2. Testing Visual Output Changes (Not Control State)
+
+**Critical: Test what the user sees in the visualization, not just that the control changed.**
+
+When you check a checkbox, change a dropdown, or type in an input, the test should verify **the effect on the visualization output**, not just that the control's value changed.
+
+```typescript
+// ✅ CORRECT: Tests the visualization output change
+const getBorderState = () => {
+  const viz = canvasElement.querySelector('.visualization')
   return {
-    // Specific CSS classes that should be added/removed
-    hasTargetClass: element.classList.contains('component--has-accent'), // example for accent
-    borderStyle: getComputedStyle(element).borderWidth, // example for border toggle
-    backgroundColor: getComputedStyle(element).backgroundColor, // example for background
-    isVisible: element.offsetParent !== null // example for visibility toggle
-    // Focus on the ACTUAL visual properties this control should affect
+    borderWidth: getComputedStyle(viz).borderWidth,
+    hasBorderClass: viz.classList.contains('has-border')
   }
 }
 
-const initialVisualState = getVisualState()
-console.log(`${controlName} - Initial visual state: ${JSON.stringify(initialVisualState)}`)
+await performAndAssert(
+  'Border Toggle',
+  getBorderState,
+  async () => await userEvent.click(borderCheckbox),
+  (before, after) => before.borderWidth !== after.borderWidth && after.hasBorderClass
+)
 
-// First toggle: Enable the feature
-await userEvent.click(checkbox)
-await new Promise(resolve => setTimeout(resolve, 100))
-const enabledVisualState = getVisualState()
-console.log(`${controlName} - After enabling: ${JSON.stringify(enabledVisualState)}`)
+// ❌ WRONG: Only tests control state, not visualization
+await performAndAssert(
+  'Border Toggle',
+  () => borderCheckbox.checked,
+  async () => await userEvent.click(borderCheckbox),
+  (before, after) => before !== after
+)
 
-// ✅ PRIMARY TEST: Verify the feature produces its intended visual effect
-expect(enabledVisualState).not.toEqual(initialVisualState)
-// Add specific assertions for what should change:
-// expect(enabledVisualState.hasTargetClass).toBe(true) // for accent style
-// expect(enabledVisualState.borderStyle).not.toBe('0px') // for border toggle
-
-// Second toggle: Disable the feature
-await userEvent.click(checkbox)
-await new Promise(resolve => setTimeout(resolve, 100))
-const disabledVisualState = getVisualState()
-console.log(`${controlName} - After disabling: ${JSON.stringify(disabledVisualState)}`)
-
-// ✅ RESTORATION TEST: Verify the visual state returns to original
-expect(disabledVisualState).toEqual(initialVisualState)
+// ❌ WRONG: Generic change detection
+await performAndAssert(
+  'Border Toggle',
+  () => canvasElement.innerHTML,
+  async () => await userEvent.click(borderCheckbox),
+  (before, after) => before !== after // Too vague! What changed?
+)
 ```
 
-**Why Focus on Visual Changes:**
+**Examples of what to test:**
 
-- ✅ **Tests the actual user-facing functionality, not just UI state**
-- ✅ **Catches bugs where checkbox works but feature doesn't**
-- ✅ **Verifies feature works in both enabled and disabled states**
-- ✅ **Ensures proper cleanup when feature is disabled**
-- ✅ **Tests what users actually see and experience**
-- ✅ **Provides meaningful feedback about feature behavior**
+- ✅ Border appears/disappears (check `borderWidth` style or `has-border` class)
+- ✅ Element becomes visible (check `display` style or element presence in DOM)
+- ✅ Color changes (check `backgroundColor` or `fill` attribute)
+- ✅ Text appears in visualization (check text content of SVG/DOM element)
+- ✅ SVG elements added/removed (check count or presence of shapes)
+- ❌ Checkbox is checked (this is control state, not visualization output)
+- ❌ Input value changed (this is control state, not visualization output)
 
-**Real Example from DataBite Editor Tests:**
+### 3. Using `getVisualState` Helper
+
+Use `getVisualState` to capture multiple visual properties at once:
 
 ```typescript
-// ✅ Visual-first testing for accent style feature
-const getAccentVisualState = () => {
-  const element = canvasElement.querySelector('.cove-component__content')
+const getComponentState = () => {
+  const element = canvasElement.querySelector('.visualization-container')
+  return getVisualState(element, {
+    checkClasses: ['accent-style', 'has-border'],
+    checkStyles: ['borderWidth', 'backgroundColor'],
+    checkAttributes: ['data-theme']
+  })
+}
+
+await performAndAssert(
+  'Accent Style Toggle',
+  getComponentState,
+  async () => await userEvent.click(accentCheckbox),
+  (before, after) =>
+    before.has_accent_style !== after.has_accent_style && before.style_borderWidth !== after.style_borderWidth
+)
+```
+
+### 4. Testing Boolean Controls (Checkboxes)
+
+Use `testBooleanControl` to automatically test both enable and disable. **Important**: Define a function that captures the visual output change, not the checkbox state.
+
+```typescript
+// ✅ CORRECT: Define what visual changes this checkbox causes in the visualization
+const getFeatureState = () => {
+  const element = canvasElement.querySelector('.feature-container')
+  return getVisualState(element, {
+    checkClasses: ['feature-enabled'],
+    checkStyles: ['display', 'opacity']
+  })
+}
+
+// The helper tests both checkbox directions AND verifies visualization changes
+const featureCheckbox = canvasElement.querySelector('input[name="enable-feature"]') as HTMLInputElement
+await testBooleanControl(featureCheckbox, getFeatureState, 'Feature Toggle')
+
+// ❌ WRONG: Testing checkbox state instead of visualization
+const getCheckboxState = () => featureCheckbox.checked // Don't do this!
+```
+
+### 5. Testing Text Input Changes
+
+Test that the text appears in the visualization:
+
+```typescript
+const getTitleDisplay = () => canvasElement.querySelector('h1')?.textContent?.trim() || ''
+
+const titleInput = canvas.getByDisplayValue(/current title/i)
+await performAndAssert(
+  'Title Update',
+  getTitleDisplay,
+  async () => {
+    await userEvent.clear(titleInput)
+    await userEvent.type(titleInput, 'New Title Text')
+  },
+  (before, after) => after === 'New Title Text'
+)
+```
+
+### 6. Testing Select/Dropdown Changes
+
+Test the visual effect of the selection:
+
+```typescript
+const getChartType = () => {
+  const svg = canvasElement.querySelector('svg')
   return {
-    classes: Array.from(element.classList).sort().join(' '),
-    hasAccentClass: element.classList.contains('component--has-accent'), // The key visual change
-    computedStyles: getComputedStyle(element).borderColor // Additional visual properties
+    hasBars: !!svg?.querySelector('rect'),
+    hasLines: !!svg?.querySelector('path[d*="L"]'),
+    chartClass: svg?.getAttribute('class')
   }
 }
 
-const accentCheckbox = canvasElement.querySelector('input[name="accent"]')
-
-// Test the accent feature's visual impact
-const initialVisualState = getAccentVisualState()
-console.log(`Accent - Initial visual: ${JSON.stringify(initialVisualState)}`)
-
-// Enable accent style
-await userEvent.click(accentCheckbox)
-await new Promise(resolve => setTimeout(resolve, 100))
-const enabledVisualState = getAccentVisualState()
-console.log(`Accent - Enabled visual: ${JSON.stringify(enabledVisualState)}`)
-
-// ✅ PRIMARY TEST: Verify the accent feature actually changes the visualization
-expect(enabledVisualState.hasAccentClass).toBe(true) // Specific assertion for accent
-expect(enabledVisualState).not.toEqual(initialVisualState) // General change detection
-
-// Disable accent style
-await userEvent.click(accentCheckbox)
-await new Promise(resolve => setTimeout(resolve, 100))
-const disabledVisualState = getAccentVisualState()
-
-// ✅ RESTORATION TEST: Verify visual state returns to original
-expect(disabledVisualState).toEqual(initialVisualState)
-expect(disabledVisualState.hasAccentClass).toBe(false)
+const typeSelect = canvasElement.querySelector('select[name="chartType"]') as HTMLSelectElement
+await performAndAssert(
+  'Chart Type Change',
+  getChartType,
+  async () => await userEvent.selectOptions(typeSelect, 'line'),
+  (before, after) => !before.hasLines && after.hasLines
+)
 ```
 
-**Expected Output:**
+## Test Organization
 
-```
-Accent - Initial visual: {"classes":"cove-component__content","hasAccentClass":false,"computedStyles":"rgb(199, 199, 199)"}
-Accent - Enabled visual: {"classes":"cove-component__content component--has-accent","hasAccentClass":true,"computedStyles":"rgb(0, 94, 170)"}
-✅ Accent feature produces expected visual changes: accent styling applied successfully
-```
+### Identifying Accordion Sections
 
-### 3. Fallback Patterns
+**Before writing tests**, check what accordion sections exist in the package:
 
-Handle cases where controls might not trigger changes:
+1. Open `packages/[package-name]/src/components/EditorPanel.tsx`
+2. Find `<AccordionItemButton>` components
+3. Only test sections that exist
 
-- **Already-selected dropdown**: Switch to different option first, then target
-- **Debounced inputs**: Trigger blur/Enter to flush updates
-- **Identical filter results**: Choose narrower category to force difference
-- **Formatting on whole numbers**: Pair with upstream change to create non-integer baseline
+| Package      | Common Sections                    |
+| ------------ | ---------------------------------- |
+| data-table   | "Columns", "Data Table", "Filters" |
+| waffle-chart | "General", "Data", "Visual"        |
+| data-bite    | "general", "Data", "Visual"        |
+| chart        | Varies by chart type               |
 
-## Section-Specific Guidelines
+### Test Story Structure
 
-### Data Accordion
-
-Every control must change the displayed primary data value. Test pattern:
-
-1. Capture current display value
-2. Apply control interaction
-3. Poll until display value differs
-4. Apply fallback if no change detected
-
-**Key Controls:** Column selection, aggregation functions, conditional logic, denominator settings, formatting (prefix/suffix/rounding), filters
-
-### General Accordion
-
-Test configuration controls affecting overall component structure:
-
-- Title/description visibility → header DOM changes
-- Chart type switches → container class/SVG changes
-- Layout toggles → orientation class changes
-
-### Visual Accordion
-
-Assert on rendered style changes:
-
-- Color palette → SVG fill attributes
-- Border settings → CSS class toggles
-- Font sizes → inline style changes
-- Shape changes → SVG primitive type switches
-
-## Code Organization
-
-### Helper Function Structure
-
-```typescript
-// Shared constants
-const MIN_ANIMATION_DELAY_MS = 250
-
-// Generic utilities (top of file)
-const pollUntil = async <T>(...) => { /* shared implementation */ }
-const performAndAssert = async <T>(...) => { /* shared implementation */ }
-
-// Section-specific helpers (near usage)
-const getDisplayValue = () => element.textContent?.trim()
-const getSvgWidth = () => parseInt(svg.getAttribute('width'))
-```
-
-### Test Comments
-
-Use only prominent section headers:
+- One accordion section per test story
+- Test controls in visual top-to-bottom order
+- Use clear section headers for organization
 
 ```typescript
 // ============================================================================
-// TEST 2: Title Update
-// Expectation: Header text updates to new string.
+// TEST: Border Toggle
+// Verifies: Border width changes and 'has-border' class is added
+// ============================================================================
+
+// ============================================================================
+// TEST: Color Palette Selection
+// Verifies: Chart elements use new color scheme
 // ============================================================================
 ```
 
-## Performance Standards
+## Common Patterns by Control Type
 
-- **Individual Control**: < 2.5 seconds per interaction
-- **Section Runtime**: Scales with (controls × poll_interval + min_delay)
-- **No Fixed Waits**: > 150ms sleeps should use polling instead
+### Data-Related Controls
 
-## Running Tests
+- Column selection, aggregation, filters
+- **Test**: Data value changes in visualization
 
-```bash
-npx vitest run --project=storybook packages/[package]/src/_stories/*.Editor.stories.tsx
-```
+### Visual/Styling Controls
+
+- Colors, borders, fonts, shapes
+- **Test**: Specific style properties change (borderWidth, color, fontSize)
+
+### Visibility Controls
+
+- Show/hide toggles, display options
+- **Test**: Elements present/absent, display property, visibility
+
+### Configuration Controls
+
+- Chart type, layout options
+- **Test**: Structural changes (SVG elements, DOM structure)
 
 ## Anti-Patterns to Avoid
 
-❌ **Hard-coded expected values**: `expect(value).toBe('42.5%')`
-✅ **Change detection**: `expect(afterValue).not.toBe(beforeValue)`
+| ❌ Don't Do This                             | ✅ Do This Instead                                                 |
+| -------------------------------------------- | ------------------------------------------------------------------ |
+| `expect(checkbox.checked).toBe(true)`        | Test visualization: border appears, element visible, class added   |
+| `expect(input.value).toBe('text')`           | Test visualization: text appears in chart, label updates           |
+| `(before, after) => before !== after`        | Specific property: `(before, after) => before.borderWidth !== ...` |
+| `await new Promise(r => setTimeout(r, 500))` | Use `performAndAssert` which handles timing                        |
+| Custom polling/waiting functions             | Use provided helpers from `@cdc/core/helpers/testing`              |
+| `if (element) { await click(element) }`      | `await click(canvas.getByRole(...))` - fail fast                   |
+| Console.log debugging in final tests         | Remove before committing                                           |
 
-❌ **Control-only assertions**: `expect(checkbox.checked).toBe(true)`
-✅ **Output assertions**: `expect(chartElement.classList.contains('hidden')).toBe(false)`
+## Creating New Tests: Quick Checklist
 
-❌ **Fixed sleeps**: `await new Promise(r => setTimeout(r, 500))`
-✅ **Polling**: `await pollUntil(() => element.textContent, curr => curr !== initial)`
+1. ✅ Import helpers from `@cdc/core/helpers/testing`
+2. ✅ Use existing config: `import ExampleConfig from '../../examples/example-config.json'`
+3. ✅ Set editor mode: `args: { config: ExampleConfig, isEditor: true }`
+4. ✅ Check EditorPanel.tsx for actual accordion sections
+5. ✅ Create one test story per accordion section
+6. ✅ Test visualization output, not control state (e.g., border appears, not checkbox checked)
+7. ✅ Test specific changes (classes, styles, element presence) not generic "something changed"
+8. ✅ Use `performAndAssert` for interactions (handles timing automatically)
+9. ✅ Never use manual `setTimeout` or delays
+10. ✅ Never replicate helper functionality
 
-❌ **Multiple changes before assert**: Change 3 controls then check output
-✅ **Isolated changes**: Assert after each individual control interaction
+## Verifying Tests
 
-❌ **Defensive if statements**: `if (element) { await userEvent.click(element) }`
-✅ **Assertive element access**: `await userEvent.click(canvas.getByRole('button', { name: /submit/i }))`
+Before considering tests complete:
 
-**Element Access Strategy**: Use assertive queries (`getBy*`) instead of optional queries (`queryBy*`) when elements are expected to exist. Let tests fail fast when required UI elements are missing rather than silently skipping interactions. This reveals actual problems in the component or test setup.
+1. **View in Storybook**: Navigate to your story and watch it run
+2. **Check Console**: Verify no JavaScript errors
+3. **Verify Interactions**: Confirm controls are actually clicked/changed
+4. **Verify Visual Changes**: Confirm visualization updates as expected
+5. **Run Test Suite**: Execute `yarn test-storybook`
 
-```typescript
-// ❌ Defensive - hides missing element issues
-const submitButton = canvas.queryByRole('button', { name: /submit/i })
-if (submitButton) {
-  await userEvent.click(submitButton)
-}
+## Performance Standards
 
-// ✅ Assertive - fails fast if element missing
-const submitButton = canvas.getByRole('button', { name: /submit/i })
-await userEvent.click(submitButton)
-```
+- **Individual Control**: < 5 seconds per interaction
+- **No Manual Waits**: All timing handled by helpers
+- **Fast in CI**: Automated tests run with 0ms delays
+- **Visual in UI**: Storybook shows 500ms delays for observation
 
 ## Summary
 
-Maximize reliability by asserting _visualization output change_ for every control using polling with human-visible minimum delays. This approach ensures tests are fast, deterministic, and maintainable while remaining resilient to data changes and formatting adjustments.
-
-## Advanced Patterns and Component-Specific Learnings
-
-### Visual Order Testing
-
-Organize tests to match the visual appearance order in the editor for better maintainability and user experience validation:
-
-```typescript
-// ✅ Tests organized by visual appearance order in General section:
-// 1. Bite Style (top dropdown)
-// 2. Title (second field)
-// 3. Show Title toggle (next to title)
-// 4. Body Text/Message (third field)
-// 5. Subtext/Citation (bottom field)
-
-export const GeneralSectionTests: Story = {
-  play: async ({ canvasElement }) => {
-    // Follow visual order for intuitive test flow
-    const biteStyleSelect = canvasElement.querySelector('select[name="biteStyle"]')
-    const titleInput = canvas.getByDisplayValue(/test data bite title/i)
-    const showTitleCheckbox = canvasElement.querySelector('input[name="showTitle"]')
-    const bodyTextarea = canvasElement.querySelector('textarea[name="null-null-biteBody"]')
-    const subtextInput = canvasElement.querySelector('input[name="null-null-subtext"]')
-  }
-}
-```
-
-### Form Element Naming Patterns
-
-Based on debugging data-bite components, form controls follow these patterns:
-
-- **Simple fields**: `input[name="fieldName"]` (e.g., `showTitle`, `border`, `accent`)
-- **Nested null fields**: `input[name="null-null-fieldName"]` (e.g., `null-null-title`, `null-null-subtext`)
-- **Data format fields**: `input[name="dataFormat-null-fieldName"]` (e.g., `dataFormat-null-prefix`, `dataFormat-null-suffix`)
-
-### Enhanced Visual Feedback for Storybook
-
-```typescript
-// ✅ Enhanced visual feedback with appropriate delays
-await userEvent.type(input, 'text', { delay: 100 }) // Typing delay
-await visualDelay(1000) // Show the result
-await userEvent.click(button)
-await visualDelay(1500) // Show visual change effect
-
-// ✅ Progressive interaction demonstration
-const currentValue = select.value
-const targetValue = currentValue === 'graphic' ? 'text' : 'graphic'
-
-// Switch to new value
-await userEvent.selectOptions(select, targetValue)
-await visualDelay(1500) // Show the change
-
-// Switch back to show difference
-await userEvent.selectOptions(select, currentValue)
-await visualDelay(1500) // Show original state restored
-```
-
-### Comprehensive Error Handling
-
-```typescript
-// ✅ Comprehensive error handling with detailed logging
-console.log('=== Starting interaction name ===')
-const element = canvasElement.querySelector('selector') as HTMLElementType
-
-if (element) {
-  try {
-    console.log('Element found:', !!element)
-    await userEvent.click(element)
-    await visualDelay(1000)
-    console.log('Interaction completed successfully')
-    console.log('=== Interaction name completed ===')
-  } catch (error) {
-    console.error('Error in interaction name:', error)
-  }
-} else {
-  console.log('Element not found, skipping')
-}
-```
-
-### Debug Form Discovery
-
-```typescript
-// ✅ Debug helper to discover all form controls
-const debugFormControls = (canvasElement: HTMLElement) => {
-  console.log('=== All form controls found ===')
-  const controls = canvasElement.querySelectorAll('input, select, textarea')
-  controls.forEach((control, index) => {
-    const element = control as HTMLInputElement
-    console.log(
-      `${index}: ${element.tagName} name="${element.name}" type="${element.type}" value="${element.value}" placeholder="${element.placeholder}"`
-    )
-  })
-  console.log('=== End debug info ===')
-}
-```
-
-### Storybook Test Execution Notes
-
-- Tests run automatically when navigating to test stories
-- Console output appears in browser developer tools
-- Enhanced visual delays make interactions observable
-- Error boundaries prevent test suite crashes
-- Form debugging helps identify correct selectors
-- Visual order testing improves maintainability and user experience validation
+Test the **visualization output**, not control state. When you interact with a control, verify what changed in the visualization (borders, classes, element presence, colors, text content). Use the shared testing helpers from `@cdc/core/helpers/testing` - they handle timing, polling, and async behavior. Organize tests with one accordion section per test story for clarity and maintainability.

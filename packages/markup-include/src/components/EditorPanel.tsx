@@ -1,12 +1,8 @@
-import React, { useState, useEffect, memo, useContext, useRef, useMemo, useReducer } from 'react'
-
-// Third Party
-import _ from 'lodash'
+import React, { useState, useEffect, useContext, useRef } from 'react'
 
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 
 // Context
-import { Variable } from '../types/Variable'
 import ConfigContext from '../ConfigContext'
 
 // Helpers
@@ -15,19 +11,16 @@ import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 // Components
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import Icon from '@cdc/core/components/ui/Icon'
 import InputText from '@cdc/core/components/inputs/InputText'
 import Layout from '@cdc/core/components/Layout'
-import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Accordion from '@cdc/core/components/ui/Accordion'
+import MarkupVariablesEditor from '@cdc/core/components/EditorPanel/components/MarkupVariablesEditor'
+import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
+import { Datasets } from '@cdc/core/types/DataSet'
 
 // styles
 import '@cdc/core/styles/v2/components/editor.scss'
 import './editorPanel.style.css'
-import VariableSection from './Variables'
-import { CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
-import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
-import { Datasets } from '@cdc/core/types/DataSet'
 
 const headerColors = [
   'theme-blue',
@@ -50,12 +43,11 @@ type MarkupIncludeEditorPanelProps = {
 const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
   const { config, data, isDashboard, loading, setParentConfig, updateConfig } = useContext(ConfigContext)
   const { contentEditor, theme, visual } = config
-  const { inlineHTML, markupVariables, srcUrl, title, useInlineHTML, allowHideSection } = contentEditor
+  const { inlineHTML, srcUrl, title, useInlineHTML } = contentEditor
   const [displayPanel, setDisplayPanel] = useState(true)
   const updateField = updateFieldFactory(config, updateConfig, true)
-  const hasData = data?.[0] !== undefined
 
-  const openVariableControls = useState<boolean[]>([])
+  const textAreaInEditorContainer = useRef(null)
 
   useEffect(() => {
     // Pass up to Editor if needed
@@ -88,45 +80,18 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
     return strippedState
   }
 
-  const [variableArray, setVariableArray] = useState<Variable[]>([...markupVariables])
-  const [isCreatingVariable, setIsCreatingVariable] = useState(false)
-
-  const textAreaInEditorContainer = useRef(null)
-  const [controls, setControls] = openVariableControls
-
-  const handleCreateNewVariableButtonClick = () => {
-    const newVariableArray = [..._.cloneDeep(variableArray)]
-    const newVariable = {
-      columnName: '',
-      conditions: [],
-      name: '',
-      tag: ''
-    }
-
-    setControls({ ...controls, [variableArray.length + 1]: true })
-
-    newVariableArray.push(newVariable)
-    setVariableArray(newVariableArray)
-    setIsCreatingVariable(!isCreatingVariable)
+  const handleMarkupVariablesChange = (variables: any[]) => {
+    updateConfig({
+      ...config,
+      markupVariables: variables
+    })
   }
 
-  const updateVariableArray = (newVariable: Variable, variableIndex: number) => {
-    const newVariableArray = _.cloneDeep(variableArray)
-    newVariableArray[variableIndex] = newVariable
-    setVariableArray(newVariableArray)
-    updateField('contentEditor', null, 'markupVariables', newVariableArray)
-    return
-  }
-
-  const deleteVariable = (variableIndex: number) => {
-    const newVariableArray = _.cloneDeep(variableArray)
-    newVariableArray.splice(variableIndex, 1)
-    setVariableArray(newVariableArray)
-    updateField('contentEditor', null, 'markupVariables', newVariableArray)
-
-    const newControls = _.cloneDeep(controls)
-    delete newControls[variableIndex]
-    setControls(newControls)
+  const handleToggleEnable = (enabled: boolean) => {
+    updateConfig({
+      ...config,
+      enableMarkupVariables: enabled
+    })
   }
 
   const editorContent = (
@@ -166,85 +131,7 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
                   rows={10}
                   updateField={updateField}
                 />
-
-                <hr className='accordion__divider' />
               </div>
-              {/* Create New Variable*/}
-
-              {/* Variable Options List */}
-              <fieldset>
-                <label>
-                  <span className='edit-label'>
-                    Variables
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                      </Tooltip.Target>
-                      <Tooltip.Content>{`To use created variables wrap the variable name in curly brackets, e.g. {{some_variable}}, and place the variable directly in your Inline HTML`}</Tooltip.Content>
-                    </Tooltip>
-                  </span>
-                </label>
-                {hasData === false && (
-                  <span className='need-data-source-prompt'>To use variables, add data source.</span>
-                )}
-                {variableArray && variableArray.length > 0 && (
-                  <div className='section-border'>
-                    {variableArray?.map((variableObject, index) => {
-                      return (
-                        <VariableSection
-                          key={`${variableObject.name}-${index}`}
-                          controls={openVariableControls}
-                          data={data}
-                          deleteVariable={deleteVariable}
-                          updateVariableArray={updateVariableArray}
-                          variableConfig={variableObject}
-                          variableIndex={index}
-                        />
-                      )
-                    })}
-                  </div>
-                )}
-                <div className='pt-2'>
-                  <CheckBox
-                    value={allowHideSection}
-                    section='contentEditor'
-                    fieldName='allowHideSection'
-                    label='Hide Section on Null'
-                    updateField={updateField}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>{`Hide this entire Markup Include section if any variable is null or blank.`}</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-
-                  <CheckBox
-                    value={contentEditor.showNoDataMessage}
-                    section='contentEditor'
-                    fieldName='showNoDataMessage'
-                    label='Add No Data Message'
-                    updateField={updateField}
-                  />
-                </div>
-
-                <div className='mb-1 d-flex'>
-                  <button
-                    className={'btn btn-primary'}
-                    onClick={handleCreateNewVariableButtonClick}
-                    disabled={!hasData}
-                  >
-                    Create New Variable
-                  </button>
-                </div>
-              </fieldset>
             </>
           ) : (
             <InputText
@@ -317,6 +204,15 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
           <FootnotesEditor config={config} updateField={updateField} datasets={datasets} />
         </Accordion.Section>
       )}
+      <Accordion.Section title='Markup Variables'>
+        <MarkupVariablesEditor
+          markupVariables={config.markupVariables || []}
+          data={data || []}
+          onChange={handleMarkupVariablesChange}
+          enableMarkupVariables={config.enableMarkupVariables || false}
+          onToggleEnable={handleToggleEnable}
+        />
+      </Accordion.Section>
     </Accordion>
   )
 

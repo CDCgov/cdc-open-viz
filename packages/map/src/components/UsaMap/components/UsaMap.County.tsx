@@ -302,9 +302,15 @@ const CountyMap = () => {
         if (
           pixelCoords &&
           Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius &&
-          !isLegendItemDisabled(data[runtimeKeys[i]], runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
+          !isLegendItemDisabled(
+            runtimeData[runtimeKeys[i]],
+            runtimeLegend,
+            legendMemo,
+            legendSpecialClassLastMemo,
+            config
+          )
         ) {
-          clickedGeo = data[runtimeKeys[i]]
+          clickedGeo = runtimeData[runtimeKeys[i]]
           break
         }
       }
@@ -471,8 +477,20 @@ const CountyMap = () => {
           includedShapes &&
           pixelCoords &&
           Math.sqrt(Math.pow(pixelCoords[0] - x, 2) + Math.pow(pixelCoords[1] - y, 2)) < geoRadius &&
-          applyLegendToRow(data[runtimeKeys[i]], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo) &&
-          !isLegendItemDisabled(data[runtimeKeys[i]], runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
+          applyLegendToRow(
+            runtimeData[runtimeKeys[i]],
+            config,
+            runtimeLegend,
+            legendMemo,
+            legendSpecialClassLastMemo
+          ) &&
+          !isLegendItemDisabled(
+            runtimeData[runtimeKeys[i]],
+            runtimeLegend,
+            legendMemo,
+            legendSpecialClassLastMemo,
+            config
+          )
         ) {
           hoveredGeo = runtimeData[runtimeKeys[i]]
           hoveredGeoIndex = i
@@ -483,8 +501,8 @@ const CountyMap = () => {
           const distance = Math.hypot(pixelCoords[0] - x, pixelCoords[1] - y)
           if (
             distance < 15 &&
-            applyLegendToRow(data[runtimeKeys[i]], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo) &&
-            !isLegendItemDisabled(data[runtimeKeys[i]], runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
+            applyLegendToRow(runtimeData[runtimeKeys[i]], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo) &&
+            !isLegendItemDisabled(runtimeData[runtimeKeys[i]], runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
           ) {
             hoveredGeo = runtimeData[runtimeKeys[i]]
             hoveredGeoIndex = i

@@ -100,7 +100,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
       if (!_dataSet.data && _dataSet.dataUrl) {
         setDataFiltersLoading(true)
         let data = await fetchRemoteData(_dataSet.dataUrl)
-        if (_dataSet.dataDescription) {
+        if (_dataSet.dataDescription && data && data.length > 0) {
           try {
             data = transform.autoStandardize(data)
             data = transform.developerStandardize(data, _dataSet.dataDescription)
@@ -110,6 +110,9 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
           } finally {
             _dataSet.data = data
           }
+        } else if (data) {
+          // If no dataDescription but we have data, store it directly
+          _dataSet.data = data
         }
       }
 

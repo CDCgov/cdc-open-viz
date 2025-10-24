@@ -91,6 +91,7 @@
   "scripts": {
     "build": "npx lerna run build",
     "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
+    "reset": "lerna clean -y && rm -rf node_modules && yarn install && lerna run build",
     "publish": "npx lerna publish",
     "storybook": "storybook dev -p 6006",
     "test-storybook": "vitest run --project=storybook -t 'Tests'",
