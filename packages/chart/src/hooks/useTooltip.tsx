@@ -5,13 +5,11 @@ import ConfigContext from '../ConfigContext'
 import { type ChartContext } from '../types/ChartContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
-import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 // Third-party library imports
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
 import _, { get } from 'lodash'
 import { getHorizontalBarHeights } from '../components/BarChart/helpers/getBarHeights'
-import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 export const useTooltip = props => {
   // Track the last X-axis value to prevent duplicate analytics events
@@ -88,6 +86,7 @@ export const useTooltip = props => {
 
     const resolvedScaleValues = getResolvedScaleValues([x, y])
     const singleSeriesValue = getYValueFromCoordinate(y, resolvedScaleValues)
+
     const columnsWithTooltips = []
     const tooltipItems = [] as any[][]
     for (const [colKey, column] of Object.entries(config.columns)) {
@@ -102,8 +101,8 @@ export const useTooltip = props => {
       const columnData =
         config.tooltips.singleSeries && visualizationType === 'Line'
           ? resolvedScaleValues.filter(
-            value => value[config.runtime.series[0].dynamicCategory] === singleSeriesValue
-          )[0][colKey]
+              value => value[config.runtime.series[0].dynamicCategory] === singleSeriesValue
+            )[0][colKey]
           : resolvedScaleValues[0]?.[colKey]
       const closestValue = config.visualizationType === 'Pie' ? pieColumnData : columnData
 
@@ -135,36 +134,14 @@ export const useTooltip = props => {
       if (showPiePercent && pieData[config.xAxis.dataKey] === 'Calculated Area') {
         tooltipItems.push(['', 'Calculated Area'])
       } else {
-        const xValue = pieData[config.xAxis.dataKey]
-        const yValue = showPiePercent ? actualPieValue : pieData[config.runtime.yAxis.dataKey]
-        const percentValue = pctOf360
-
         tooltipItems.push(
-          [config.xAxis.dataKey, xValue],
-          [config.runtime.yAxis.dataKey, showPiePercent ? pctString(actualPieValue) : formatNumber(yValue)],
-          showPiePercent ? [] : ['Percent', pctString(percentValue)]
+          [config.xAxis.dataKey, pieData[config.xAxis.dataKey]],
+          [
+            config.runtime.yAxis.dataKey,
+            showPiePercent ? pctString(actualPieValue) : formatNumber(pieData[config.runtime.yAxis.dataKey])
+          ],
+          showPiePercent ? [] : ['Percent', pctString(pctOf360)]
         )
-
-        // Track hover analytics event for pie chart - single event with all data
-        // Only publish if the slice has changed (different from last hover)
-        if (xValue && xValue !== lastAnalyticsXValue.current) {
-          lastAnalyticsXValue.current = xValue
-          const seriesName = String(xValue).replace(/[^a-zA-Z0-9]/g, '_')
-          const specifics = `series: ${String(
-            seriesName
-          ).toLowerCase()}, value: ${yValue}, percent: ${percentValue.toFixed(roundTo)}`
-
-          publishAnalyticsEvent({
-            vizType: config?.type,
-            vizSubType: getVizSubType(config),
-            eventType: `chart_hover`,
-            eventAction: 'hover',
-            eventLabel: interactionLabel || 'unknown',
-            vizTitle: getVizTitle(config),
-            series: xValue,
-            specifics
-          })
-        }
       }
     }
 
@@ -198,18 +175,6 @@ export const useTooltip = props => {
               const seriesObjWithName = config.runtime.series.find(
                 series => series.dataKey === seriesKey && series.name !== undefined
               )
-
-              // Collect x-axis value
-              if (seriesKey === config.xAxis?.dataKey && value) {
-                xAxisValue = value
-              }
-
-              // Collect series data for analytics (only non-x-axis series with values)
-              if (seriesKey && seriesKey !== config.xAxis?.dataKey && value) {
-                const seriesName = seriesObjWithName?.name || seriesKey
-                const safeSeriesName = String(seriesName).replace(/[^a-zA-Z0-9]/g, '_')
-                analyticsSeriesData.push(`${String(safeSeriesName).toLowerCase()}: ${value}`)
-              }
 
               if (
                 (value === null || value === undefined || value === '' || formattedValue === 'N/A') &&
@@ -611,8 +576,9 @@ export const useTooltip = props => {
     if (visualizationType === 'Forest Plot') {
       if (key === config.xAxis.dataKey)
         return (
-          <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value
-            }`}</li>
+          <li className='tooltip-heading'>{`${capitalize(config.xAxis.dataKey ? `${config.xAxis.dataKey}: ` : '')} ${
+            isDateScale(yAxis) ? formatDate(parseDate(key, false)) : value
+          }`}</li>
         )
       return <li className='tooltip-body'>{`${getSeriesNameFromLabel(key)}: ${formatNumber(value, 'left')}`}</li>
     }

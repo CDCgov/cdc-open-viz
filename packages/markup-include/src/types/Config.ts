@@ -6,7 +6,6 @@ export type Config = {
   contentEditor: {
     // Changing the base config object creates an infinite loop, nesting it is a workaround
     inlineHTML: string
-    markupVariables: Variable[]
     showHeader: boolean
     srcUrl: string
     title: string
@@ -29,4 +28,6 @@ export type Config = {
     borderColorTheme: boolean
   }
   version: Version
+  markupVariables: Variable[]
+  enableMarkupVariables: boolean
 }

@@ -18,6 +18,7 @@ import {
 // cove
 import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
 import { useTooltip as useCoveTooltip } from '../../hooks/useTooltip'
+import { useChartHoverAnalytics } from '../../hooks/useChartHoverAnalytics'
 import useIntersectionObserver from '../../hooks/useIntersectionObserver'
 import { handleChartAriaLabels } from '../../helpers/handleChartAriaLabels'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
@@ -57,6 +58,13 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     hideTooltip,
     interactionLabel
   })
+
+  // Analytics tracking for chart hover
+  const { handleChartMouseEnter, handleChartMouseLeave } = useChartHoverAnalytics({
+    config,
+    interactionLabel
+  })
+
   const [filteredData, setFilteredData] = useState(undefined)
   const [animatedPie, setAnimatePie] = useState(false)
   const pivotColumns = Object.values(config.columns).filter(column => column.showInViz)
@@ -190,7 +198,16 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
 
     // Handle normal pie chart case
     return createPieColorScale(_data, config)
-  }, [_data, dataNeedsPivot, colorScale, showPercentage, config.xAxis.dataKey, config.general?.palette, config.palette])
+  }, [
+    _data,
+    dataNeedsPivot,
+    showPercentage,
+    config.xAxis.dataKey,
+    config.general?.palette?.name,
+    config.general?.palette?.isReversed,
+    config.general?.palette?.customColors,
+    config.palette
+  ])
 
   const triggerRef = useRef()
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -328,12 +345,24 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
 
   // Update the context colorScale when the pie chart's colorScale changes
   // This ensures the Legend component uses the same colors as the pie chart
-  // Only update when specific color-related properties change, not the entire colorScale
+  const prevColorScaleRef = useRef<{ domain: string; range: string } | null>(null)
+
   useEffect(() => {
     if (_colorScale && config.visualizationType === 'Pie') {
-      dispatch({ type: 'SET_COLOR_SCALE', payload: _colorScale })
+      // Only dispatch if the domain or range has actually changed
+      const currentDomain = JSON.stringify(_colorScale.domain())
+      const currentRange = JSON.stringify(_colorScale.range())
+      const colorScaleKey = `${currentDomain}|${currentRange}`
+      const prevKey = prevColorScaleRef.current
+        ? `${prevColorScaleRef.current.domain}|${prevColorScaleRef.current.range}`
+        : null
+
+      if (colorScaleKey !== prevKey) {
+        prevColorScaleRef.current = { domain: currentDomain, range: currentRange }
+        dispatch({ type: 'SET_COLOR_SCALE', payload: _colorScale })
+      }
     }
-  }, [config.visualizationType, config.xAxis.dataKey, config.general?.palette?.name, config.palette, dispatch])
+  }, [_colorScale, config.visualizationType, dispatch])
 
   const getSvgClasses = () => {
     let classes = ['animated-pie', 'group']
@@ -352,7 +381,11 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
           className={getSvgClasses()}
           role='img'
           aria-label={handleChartAriaLabels(config)}
-          onMouseLeave={handleTooltipMouseOff}
+          onMouseEnter={handleChartMouseEnter}
+          onMouseLeave={() => {
+            handleTooltipMouseOff()
+            handleChartMouseLeave()
+          }}
         >
           <Group top={centerY} left={radius}>
             {/* prettier-ignore */}

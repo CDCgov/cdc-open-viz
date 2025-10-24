@@ -37,29 +37,6 @@ export const getPackageVersion = () => {
  * @param {string} [params.version] - The version of the package (defaults to package.json version)
  * @returns {void}
  * @description This function is used to publish analytics events for various user interactions and system states.
- *
- * @example
- * // Map hover event with location specifics
- * publishAnalyticsEvent({
- *   vizType: 'map',
- *   vizSubType: 'us-county',
- *   eventType: 'map_hover',
- *   eventAction: 'hover',
- *   eventLabel: interactionLabel,
- *   vizTitle: getVizTitle(config),
- *   specifics: 'location: california_los_angeles'
- * })
- *
- * @example
- * // Table sort event with column and order specifics
- * publishAnalyticsEvent({
- *   vizType: 'chart',
- *   eventType: 'data_table_sort',
- *   eventAction: 'click',
- *   eventLabel: interactionLabel,
- *   vizTitle: getVizTitle(config),
- *   specifics: 'column: population, order: desc'
- * })
  */
 export const publishAnalyticsEvent = <T extends ANALYTICS_EVENT_TYPES>({
   app = 'cove',
@@ -91,7 +68,6 @@ export const publishAnalyticsEvent = <T extends ANALYTICS_EVENT_TYPES>({
   // Format: APP|VIZTYPE_VIZSUBTYPE|VIZ_TITLE|INTERACTION_EVENT_NAME|INTERACTION_TYPE|SPECIFICS
   const vizTypeSubType = vizSubType ? `${vizType}_${vizSubType}` : vizType
   const formattedEvent = `${app}|${vizTypeSubType}|${vizTitle || 'unknown'}|${eventType}|${eventAction}|${specifics || 'no details'}`
-
   return publish('cove:analytics', {
     formattedEvent,
     eventLabel
