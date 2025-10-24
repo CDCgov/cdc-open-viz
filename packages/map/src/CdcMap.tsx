@@ -122,10 +122,6 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
   useEffect(() => {
     init()
-  }, [])
-
-  useEffect(() => {
-    init()
   }, [configUrl])
 
   useEffect(() => {
