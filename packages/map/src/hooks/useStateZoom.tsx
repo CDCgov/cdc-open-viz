@@ -67,7 +67,9 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     const featureCenter = combinedData ? path.centroid(combinedData as any) : [0, 0]
     const stateCenter = newProjection.invert(featureCenter)
 
-    return { projection, newProjection, stateCenter }
+    const bounds = combinedData ? path.bounds(combinedData as any) : null
+
+    return { projection, newProjection, stateCenter, bounds }
   }, [topoData, statesPicked])
 
   const setScaleAndTranslate = useCallback(
@@ -176,7 +178,8 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
     handleZoomOut,
     handleMoveEnd,
     handleZoomReset,
-    projection: projectionData.projection
+    projection: projectionData.projection,
+    bounds: projectionData.bounds
   }
 }
 

@@ -97600,7 +97600,7 @@
   "smallMultiples": {
     "mode": "by-column",
     "tileColumn": "Pathogen",
-    "tilesPerRowDesktop": 2,
+    "tilesPerRowDesktop": 3,
     "tilesPerRowMobile": 1,
     "tileOrderType": "asc",
     "tileOrder": [],

@@ -16,9 +16,17 @@ interface SmallMultipleTileProps {
   config: MapConfig
   data: DataRow[]
   isFirstInRow?: boolean
+  tilesPerRow: number
 }
 
-const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({ tileValue, tileColumn, config, data, isFirstInRow }) => {
+const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
+  tileValue,
+  tileColumn,
+  config,
+  data,
+  isFirstInRow,
+  tilesPerRow
+}) => {
   const parentContext = useContext<MapContext>(ConfigContext)
   const tileMapRef = useRef<HTMLDivElement>(null)
   const [tileDimensions, setTileDimensions] = useState<DimensionsType>([0, 0])
@@ -79,6 +87,8 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({ tileValue, tileCo
     return generateRuntimeData(tileConfig, tileConfig.filters || [], hash, isCategoryLegend, false)
   }, [tileConfig, tileData])
 
+  const useDynamicViewbox = config.general.geoType === 'single-state' && tilesPerRow > 1
+
   // Create tile-specific context with filtered config, filtered runtimeData, and tile dimensions
   // Parent's runtimeLegend is already unified (forced in CdcMapComponent for small multiples)
   const tileContext: MapContext = useMemo(
@@ -87,9 +97,10 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({ tileValue, tileCo
       config: tileConfig,
       runtimeData: tileRuntimeData as any,
       dimensions: tileDimensions,
-      vizViewport: getViewport(tileDimensions[0])
+      vizViewport: getViewport(tileDimensions[0]),
+      useDynamicViewbox
     }),
-    [parentContext, tileConfig, tileRuntimeData, tileDimensions]
+    [parentContext, tileConfig, tileRuntimeData, tileDimensions, useDynamicViewbox]
   )
 
   return (

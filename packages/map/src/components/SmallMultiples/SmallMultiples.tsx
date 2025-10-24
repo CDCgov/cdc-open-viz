@@ -45,6 +45,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = () => {
             config={config}
             data={data}
             isFirstInRow={index % tilesPerRow === 0}
+            tilesPerRow={tilesPerRow}
           />
         ))}
       </div>

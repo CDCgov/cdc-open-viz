@@ -24,6 +24,7 @@ export type MapContext = {
   isDashboard: boolean
   isEditor: boolean
   isFilterValueSupported: boolean
+  useDynamicViewbox?: boolean
   loadConfig: (configObj: MapConfig) => void
   logo: string
   mapId: string
