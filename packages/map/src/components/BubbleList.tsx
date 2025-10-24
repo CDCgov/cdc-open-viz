@@ -17,7 +17,7 @@ type BubbleListProps = {
   customProjection?: GeoProjection
 }
 
-export const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
+const BubbleList: React.FC<BubbleListProps> = ({ customProjection }) => {
   const { config, tooltipId, runtimeData, runtimeLegend } = useContext<MapContext>(ConfigContext)
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const { columns, data, general, visual } = config

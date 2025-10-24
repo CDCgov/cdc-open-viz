@@ -40,7 +40,7 @@ import {
   hashObj,
   navigationHandler
 } from './helpers'
-import generateRuntimeLegend from './helpers/generateRuntimeLegend'
+import { generateRuntimeLegend } from './helpers/generateRuntimeLegend'
 import generateRuntimeData from './helpers/generateRuntimeData'
 import { reloadURLData } from './helpers/urlDataHelpers'
 import { observeMapSvgLoaded } from './helpers/mapObserverHelpers'

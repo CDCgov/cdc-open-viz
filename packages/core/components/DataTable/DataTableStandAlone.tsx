@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ViewPort } from '../../types/ViewPort'
-import Footnotes from '../../types/Footnotes'
-import EditorWrapper from '../EditorWrapper/EditorWrapper'
+import EditorWrapper from '../EditorWrapper'
 import DataTable from './DataTable'
 import DataTableEditorPanel from './components/DataTableEditorPanel'
 import Filters from '../Filters'

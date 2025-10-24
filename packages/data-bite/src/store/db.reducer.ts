@@ -1,7 +1,7 @@
 import { Config } from '../types/Config'
 import DataBiteActions from './db.actions'
 
-export type DataBiteState = {
+type DataBiteState = {
   config?: Config
   loading: boolean
   currentViewport: string

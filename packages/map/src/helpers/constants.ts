@@ -45,7 +45,6 @@ export const DEFAULT_MAP_BACKGROUND = '#DFE1E2'
 
 // Component constants
 export const LOGO_MAX_WIDTH = '50px'
-export const STORYBOOK_PORT = 6006
 
 // CSV Parsing Configuration
 export const CSV_PARSE_CONFIG = {

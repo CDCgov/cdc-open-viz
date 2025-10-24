@@ -23,7 +23,7 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import getViewport from '@cdc/core/helpers/getViewport'
 
 import Grid from './components/Grid'
-import Header from './components/Header/Header'
+import Header from './components/Header'
 import DataTable from '@cdc/core/components/DataTable'
 import MediaControls from '@cdc/core/components/MediaControls'
 

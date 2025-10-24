@@ -1,7 +1,7 @@
 import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 import MarkupIncludeActions from './markupInclude.actions'
 
-export type MarkupIncludeState = {
+type MarkupIncludeState = {
   config?: MarkupIncludeConfig
   loading: boolean
   urlMarkup: string

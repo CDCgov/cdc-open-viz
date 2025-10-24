@@ -21,7 +21,8 @@
     "packages/chart": {
       "entry": [
         "src/CdcChart.tsx",
-        "src/index.jsx"
+        "src/index.jsx",
+        "src/components/BarChart/components/BarChartType.jsx"
       ],
       "project": [
         "src/**/*.{js,ts,tsx}"
@@ -43,7 +44,8 @@
         "helpers/**/*.ts",
         "hooks/**/*.ts",
         "types/**/*.ts",
-        "templates/**/*.jsx"
+        "templates/**/*.jsx",
+        "data/**/*.{js,ts,tsx}"
       ],
       "project": [
         "components/**/*.{js,ts,tsx}",
@@ -62,6 +64,9 @@
       ],
       "project": [
         "src/**/*.{js,ts,tsx}"
+      ],
+      "ignore": [
+        "src/constants.ts"
       ]
     },
     "packages/data-table": {

@@ -2,7 +2,7 @@ import _ from 'lodash'
 import errorMessagesActions from './errorMessage.actions'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 
-export type errorMessagesState = string[]
+type errorMessagesState = string[]
 
 const reducer = (state: errorMessagesState, action: errorMessagesActions): errorMessagesState => {
   switch (action.type) {
