@@ -17,6 +17,7 @@ interface SmallMultipleTileProps {
   data: DataRow[]
   isFirstInRow?: boolean
   tilesPerRow: number
+  onHeaderRef?: (ref: HTMLDivElement | null) => void
 }
 
 const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
@@ -25,7 +26,8 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   config,
   data,
   isFirstInRow,
-  tilesPerRow
+  tilesPerRow,
+  onHeaderRef
 }) => {
   const parentContext = useContext<MapContext>(ConfigContext)
   const tileMapRef = useRef<HTMLDivElement>(null)
@@ -105,7 +107,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
 
   return (
     <div className='small-multiple-tile'>
-      <div className='tile-header'>
+      <div ref={onHeaderRef} className='tile-header'>
         <div className='tile-title'>{tileTitle}</div>
       </div>
       <div className='tile-map' ref={tileMapRef}>
