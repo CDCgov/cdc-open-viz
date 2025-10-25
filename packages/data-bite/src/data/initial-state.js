@@ -24,7 +24,6 @@ export default {
   filters: [],
   subtext: '',
   title: '',
-  theme: 'theme-blue',
   shadow: false,
   visual: {
     border: false,
@@ -35,6 +34,7 @@ export default {
     showTitle: true
   },
   general: {
+    headerColor: 'theme-blue',
     isCompactStyle: false
   },
   markupVariables: [],

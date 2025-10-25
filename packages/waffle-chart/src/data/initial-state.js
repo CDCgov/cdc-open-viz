@@ -28,11 +28,13 @@ export default {
   shape: 'circle',
   nodeWidth: '10',
   nodeSpacer: '2',
-  theme: 'theme-blue',
   type: 'waffle-chart',
   gauge: {
     height: 35,
     width: '100%'
+  },
+  general: {
+    headerColor: 'theme-blue'
   },
   visual: {
     border: true,

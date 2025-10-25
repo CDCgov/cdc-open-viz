@@ -8,16 +8,8 @@ import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 import { Table } from '@cdc/core/types/Table'
 import { BoxPlot } from '@cdc/core/types/BoxPlot'
 import { General as CoreGeneral } from '@cdc/core/types/General'
-
-// Extend the core General type to include palette information for charts
-type General = CoreGeneral & {
-  palette?: {
-    name?: string
-    version?: string
-    isReversed?: boolean
-    customColors?: string[]
-  }
-}
+import { ComponentThemes } from '@cdc/core/types/ComponentThemes'
+import { ComponentStyles } from '@cdc/core/types/ComponentStyles'
 import { type Link } from './../components/Sankey/types'
 import { type DataDescription } from '@cdc/core/types/DataDescription'
 import { type Legend as CoreLegend } from '@cdc/core/types/Legend'
@@ -28,6 +20,17 @@ import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { Version } from '@cdc/core/types/Version'
 import Footnotes from '@cdc/core/types/Footnotes'
+
+// Extend the core General type to include palette information and headerColor for charts
+type General = CoreGeneral & {
+  headerColor?: ComponentThemes
+  palette?: {
+    name?: string
+    version?: string
+    isReversed?: boolean
+    customColors?: string[]
+  }
+}
 
 export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 type ChartColumns = Record<string, Column>
@@ -120,12 +123,8 @@ type Legend = CoreLegend & {
   }
 }
 
-type Visual = {
-  border?: boolean
-  borderColorTheme?: boolean
-  accent?: boolean
-  background?: boolean
-  hideBackgroundColor?: boolean
+// Visual type extends ComponentStyles base with chart-specific properties
+type Visual = ComponentStyles & {
   verticalHoverLine?: boolean
   horizontalHoverLine?: boolean
   lineDatapointSymbol: 'none' | 'standard'
@@ -198,7 +197,6 @@ export type AllChartsConfig = {
   stackedAreaChartLineType: string
   suppressedData?: { label: string; icon: string; value: string }[]
   superTitle: string
-  theme: string
   table: Table
   tipRounding: string
   title: string

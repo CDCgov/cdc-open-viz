@@ -29,7 +29,7 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
   } = props
 
   const getWrappingClasses = () => {
-    let classes = ['cdc-open-viz-module', `${currentViewport}`, `${config?.theme}`]
+    let classes = ['cdc-open-viz-module', `${currentViewport}`, `${config?.general?.headerColor}`]
 
     if (className) {
       classes.push(className)
@@ -65,7 +65,7 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
     }
 
     if (config.type === 'data-bite') {
-      classes.push('cdc-open-viz-module', 'type-data-bite', currentViewport, config.theme, `font-${config.fontSize}`)
+      classes.push('cdc-open-viz-module', 'type-data-bite', currentViewport, config.general?.headerColor, `font-${config.fontSize}`)
       if (isEditor) {
         classes.push('is-editor')
       }
@@ -81,7 +81,7 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
         'cdc-open-viz-module',
         'type-waffle-chart',
         currentViewport,
-        config.theme,
+        config.general?.headerColor,
         'font-' + config.overallFontSize
       )
 

@@ -603,13 +603,13 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
               config={config}
               title={processContentWithMarkup(title)}
               isDashboard={isDashboard}
-              classes={['bite-header', `${config.theme}`]}
+              classes={['bite-header', `${config.general?.headerColor}`]}
             />
             <div className={`bite ${biteClasses.join(' ')}`}>
               <div className={`bite-content-container ${contentClasses.join(' ')}`}>
                 {showBite && 'graphic' === biteStyle && isTop && (
                   <CircleCallout
-                    theme={config.theme}
+                    theme={config.general?.headerColor}
                     text={calculateDataBite()}
                     biteFontSize={biteFontSize}
                     dataFormat={dataFormat}
@@ -651,7 +651,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                 {isBottom && <DataImage />}
                 {showBite && 'graphic' === biteStyle && !isTop && (
                   <CircleCallout
-                    theme={config.theme}
+                    theme={config.general?.headerColor}
                     text={calculateDataBite()}
                     biteFontSize={biteFontSize}
                     dataFormat={dataFormat}

@@ -25,7 +25,6 @@ const createInitialState = () => {
     title: '',
     showTitle: true,
     showDownloadMediaButton: false,
-    theme: 'theme-blue',
     animate: false,
     lineDatapointStyle: 'hover',
     lineDatapointColor: 'Same as Line',
@@ -44,6 +43,7 @@ const createInitialState = () => {
       showSuppressedSymbol: true,
       showZeroValueData: true,
       hideNullValue: true,
+      headerColor: 'theme-blue',
       palette: paletteDefaults
     },
     padding: {

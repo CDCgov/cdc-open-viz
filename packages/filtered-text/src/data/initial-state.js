@@ -1,10 +1,12 @@
 export default {
   title: 'Filtered Text',
   type: 'filtered-text',
-  theme: 'theme-blue',
   fontSize: 'small',
   shadow: false,
   filters: [],
+  general: {
+    headerColor: 'theme-blue'
+  },
   visual: {
     hideBackgroundColor: false,
     background: false,

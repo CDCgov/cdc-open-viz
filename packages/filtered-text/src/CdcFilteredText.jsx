@@ -127,7 +127,7 @@ const CdcFilteredText = ({
       <>
         <Layout.Responsive isEditor={isEditor}>
           <div className={`cove-component__content no-borders`}>
-            <Title classes={[`${config.theme}`]} title={title} style={{ fontSize }} />
+            <Title classes={[`${config.general?.headerColor}`]} title={title} style={{ fontSize }} />
             <div className={`${contentClasses.join(' ')} body`}>
               {filterByTextColumn()
                 .slice(0, 1)

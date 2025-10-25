@@ -43,7 +43,6 @@ type CdcWaffleChartProps = {
 const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateConfig }) => {
   const {
     title,
-    theme,
     shape,
     nodeWidth,
     nodeSpacer,
@@ -65,7 +64,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     roundToPlace
   } = config
 
-  const gaugeColor = config.visual.colors[config.theme]
+  const gaugeColor = config.visual.colors[config.general?.headerColor]
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
   const calculateData = useCallback(() => {
@@ -366,7 +365,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         showTitle={config.showTitle}
         title={title}
         config={config}
-        classes={['chart-title', `${config.theme}`, 'mb-0']}
+        classes={['chart-title', `${config.general?.headerColor}`, 'mb-0']}
       />
       <div className={contentClasses.join(' ')}>
         {!config.newViz && config.runtime && config.runtime.editorErrorMessage && (

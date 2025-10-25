@@ -257,9 +257,9 @@ const PanelVisual: FC<PanelProps> = props => {
                 key={palette}
                 onClick={e => {
                   e.preventDefault()
-                  updateConfig({ ...config, theme: palette })
+                  updateConfig({ ...config, general: { ...config.general, headerColor: palette } })
                 }}
-                className={config.theme === palette ? 'selected ' + palette : palette}
+                className={config.general?.headerColor === palette ? 'selected ' + palette : palette}
               ></button>
             ))}
           </ul>

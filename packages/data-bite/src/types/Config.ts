@@ -1,6 +1,8 @@
 import { Version } from '@cdc/core/types/Version'
 import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 import { VizFilter } from '@cdc/core/types/VizFilter'
+import { ComponentThemes } from '@cdc/core/types/ComponentThemes'
+import { ComponentStyles } from '@cdc/core/types/ComponentStyles'
 
 export type Config = {
   type: string
@@ -28,17 +30,12 @@ export type Config = {
   filters: VizFilter[]
   subtext: string
   title: string
-  theme: string
   shadow: boolean
-  visual: {
-    border: boolean
-    accent: boolean
-    background: boolean
-    hideBackgroundColor: boolean
-    borderColorTheme: boolean
+  visual: ComponentStyles & {
     showTitle: boolean
   }
   general: {
+    headerColor?: ComponentThemes
     isCompactStyle: boolean
   }
   version: Version

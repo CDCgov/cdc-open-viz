@@ -31,12 +31,14 @@ export type Config = {
   showPercent: boolean
   subtext: string
   suffix: string
-  theme: ComponentThemes
   title: string
   showTitle: boolean
   type: 'waffle-chart'
   valueDescription: string
   visual: ComponentStyles
+  general: {
+    headerColor?: ComponentThemes
+  }
   visualizationSubType: 'linear' | ''
   visualizationType: 'Gauge' | 'Waffle'
   version: Version

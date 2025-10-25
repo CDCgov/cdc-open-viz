@@ -1,6 +1,8 @@
 export default {
   dashboard: {
-    theme: 'theme-blue',
+    general: {
+      headerColor: 'theme-blue'
+    },
     sharedFilters: []
   },
   rows: [[{ width: 12 }, {}, {}]],
