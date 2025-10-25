@@ -3,14 +3,17 @@ import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import React, { forwardRef } from 'react'
 import { Config as DataBiteConfig } from '@cdc/data-bite/src/types/Config'
 import { Config as DataTableConfig } from '@cdc/data-table/src/types/Config'
-import './visualizations.scss'
 import { Config as WaffleChartConfig } from '@cdc/waffle-chart/src/types/Config'
 import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
 import { MapConfig } from '@cdc/map/src/types/MapConfig'
 
+// styles
+import './visualizations.css'
+
 type VisualizationWrapper = {
   children: React.ReactNode
+  className?: string
   config: ChartConfig | DataBiteConfig | WaffleChartConfig | MarkupIncludeConfig | DashboardFilters | MapConfig | DataTableConfig
   currentViewport?: string
   imageId?: string
@@ -20,7 +23,7 @@ type VisualizationWrapper = {
 
 const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, ref) => {
   const {
-    config = {},
+    config,
     isEditor = false,
     currentViewport = 'lg',
     imageId = '',
@@ -29,74 +32,76 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
   } = props
 
   const getWrappingClasses = () => {
-    let classes = ['cdc-open-viz-module', `${currentViewport}`, `${config?.general?.headerColor}`]
+    const { general, type } = config
+    const classes = ['cdc-open-viz-module', currentViewport, general?.headerColor]
 
     if (className) {
       classes.push(className)
     }
 
-    isEditor && classes.push('spacing-wrapper')
-    isEditor && classes.push('isEditor')
-
-    if (isEditor && showEditorPanel) {
-      classes = classes.filter(item => item !== 'editor-panel--hidden')
-      classes.push('editor-panel--visible')
+    if (isEditor) {
+      classes.push('spacing-wrapper', 'isEditor')
+      classes.push(showEditorPanel ? 'editor-panel--visible' : 'editor-panel--hidden')
     }
 
-    if (isEditor && !showEditorPanel) {
-      classes = classes.filter(item => item !== 'editor-panel--visible')
-      classes.push('editor-panel--hidden')
-    }
+    switch (type) {
+      case 'filtered-text': {
+        const { fontSize } = config
+        classes.push('type-filtered-text', `font-${fontSize}`)
+        return classes.filter(item => item !== 'cove-component__content')
+      }
 
-    if (config.type === 'filtered-text') {
-      classes.push('type-filtered-text', `font-${config.fontSize}`)
-      classes = classes.filter(item => item !== 'cove-component__content')
-      return classes
-    }
+      case 'chart': {
+        const { visualizationType } = config
+        classes.push('type-chart')
+        if (visualizationType === 'Spark Line') {
+          classes.push('type-sparkline')
+        }
+        return classes
+      }
 
-    if (config.type === 'chart') {
-      classes.push('type-chart')
-      config?.visualizationType === 'Spark Line' && classes.push(`type-sparkline`)
-      return classes
-    }
-    if (config.type === 'map') {
-      classes.push(`type-map`)
-      if (config?.runtime?.editorErrorMessage.length !== 0) classes.push('type-map--has-error')
-    }
+      case 'map': {
+        const { runtime } = config
+        classes.push('type-map')
+        if (runtime?.editorErrorMessage.length !== 0) {
+          classes.push('type-map--has-error')
+        }
+        break
+      }
 
-    if (config.type === 'data-bite') {
-      classes.push('cdc-open-viz-module', 'type-data-bite', currentViewport, config.general?.headerColor, `font-${config.fontSize}`)
-      if (isEditor) {
-        classes.push('is-editor')
+      case 'data-bite': {
+        const { fontSize } = config
+        classes.push('type-data-bite', `font-${fontSize}`)
+        if (isEditor) {
+          classes.push('is-editor')
+        }
+        break
+      }
+
+      case 'markup-include':
+        classes.push('markup-include')
+        break
+
+      case 'waffle-chart': {
+        const { overallFontSize } = config
+        classes.push('cove', 'type-waffle-chart', `font-${overallFontSize}`)
+        if (isEditor) {
+          classes.push('is-editor')
+        }
+        classes.push('cove-component', 'waffle-chart')
+        break
       }
     }
 
-    if (config.type === 'markup-include') {
-      classes.push('markup-include', 'cdc-open-viz-module')
-    }
-
-    if (config.type === 'waffle-chart') {
-      classes.push(
-        'cove',
-        'cdc-open-viz-module',
-        'type-waffle-chart',
-        currentViewport,
-        config.general?.headerColor,
-        'font-' + config.overallFontSize
-      )
-
-      if (isEditor) {
-        classes.push('is-editor')
-      }
-
-      classes.push('cove-component', 'waffle-chart')
-    }
     return classes
   }
 
+  const { type } = config
+  const isLollipopChart = type === 'chart' ? config.isLollipopChart : undefined
+
   return (
     <div
-      {...(config.type === 'chart' ? { 'data-lollipop': config.isLollipopChart } : {})}
+      {...(type === 'chart' ? { 'data-lollipop': isLollipopChart } : {})}
       className={getWrappingClasses().join(' ')}
       data-download-id={imageId}
       ref={ref}

@@ -1,0 +1,38 @@
+.cdc-open-viz-module .cdc-chart-inner-container .cove-component__content {
+  padding: 0 0 27px 0 !important;
+}
+
+.cdc-open-viz-module.isEditor {
+  overflow: auto;
+  display: grid;
+  transition: grid-template-columns 400ms ease-in-out;
+  min-height: 100vh;
+}
+
+.cdc-open-viz-module.isEditor .editor-panel__toggle {
+  transition: left 400ms ease-in-out;
+}
+
+.cdc-open-viz-module.isEditor .sidebar {
+  transition: left 400ms ease-in-out;
+}
+
+.cdc-open-viz-module.isEditor.editor-panel--visible {
+  grid-template-areas: 'panel content';
+  grid-template-columns: 350px calc(100% - 350px);
+  overflow: hidden;
+}
+
+.cdc-open-viz-module.isEditor.editor-panel--hidden {
+  grid-template-areas: 'panel content';
+  grid-template-columns: 0px 100%;
+}
+
+.cdc-open-viz-module.isEditor .cove-editor__content,
+.cdc-open-viz-module.isEditor .cove-component__content {
+  grid-area: content;
+  position: relative;
+  left: 0;
+  width: 100% !important;
+  grid-area: content;
+}
