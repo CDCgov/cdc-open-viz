@@ -270,7 +270,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         shape: shape,
         x: calculatePos(shape, 'x', i, nodeWidthNum, nodeSpacerNum),
         y: calculatePos(shape, 'y', i, nodeWidthNum, nodeSpacerNum),
-        color: config.visual.colors[theme],
+        color: config.visual.colors[config.general?.headerColor],
         opacity: i + 1 > 100 - Math.round(dataPercentage) ? 1 : 0.35
       }
       waffleData.push(newNode)
@@ -314,7 +314,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         />
       )
     )
-  }, [theme, dataPercentage, shape, nodeWidth, nodeSpacer])
+  }, [config.general.headerColor, dataPercentage, shape, nodeWidth, nodeSpacer])
 
   const setRatio = useCallback(() => {
     return nodeWidth * 10 + nodeSpacer * 9
