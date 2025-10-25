@@ -1,0 +1,132 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": [
+      {
+        "key": "Category",
+        "type": "urlfilter",
+        "columnName": "category",
+        "apiFilter": {
+          "apiEndpoint": "http://localhost:8080/examples/api-test/categories.json",
+          "valueSelector": "category",
+          "textSelector": "category"
+        },
+        "queryParameter": "category",
+        "resetLabel": "- Select Category -",
+        "showDropdown": true,
+        "filterStyle": "dropdown",
+        "usedBy": ["chart1"]
+      },
+      {
+        "key": "Topic",
+        "type": "urlfilter",
+        "columnName": "topic",
+        "apiFilter": {
+          "apiEndpoint": "http://localhost:8080/examples/api-test/topics.json",
+          "valueSelector": "topic",
+          "textSelector": "topic"
+        },
+        "queryParameter": "topic",
+        "resetLabel": "- Select Topic -",
+        "showDropdown": true,
+        "parents": [
+          "Category"
+        ],
+        "filterStyle": "dropdown",
+        "usedBy": ["chart1"]
+      },
+      {
+        "key": "Year",
+        "type": "urlfilter",
+        "columnName": "year",
+        "apiFilter": {
+          "apiEndpoint": "http://localhost:8080/examples/api-test/years.json",
+          "valueSelector": "year",
+          "textSelector": "year"
+        },
+        "queryParameter": "year",
+        "resetLabel": "- Select -",
+        "showDropdown": true,
+        "parents": [
+          "Category",
+          "Topic"
+        ],
+        "filterStyle": "dropdown",
+        "usedBy": ["chart1"]
+      }
+    ]
+  },
+  "rows": [
+    [
+      {
+        "width": 12,
+        "widget": "filters"
+      }
+    ],
+    [
+      {
+        "width": 12,
+        "widget": "header"
+      }
+    ],
+    [
+      {
+        "width": 12,
+        "widget": "chart1"
+      }
+    ]
+  ],
+  "visualizations": {
+    "filters": {
+      "type": "dashboardFilters",
+      "visualizationType": "dashboardFilters",
+      "sharedFilterIndexes": [
+        0,
+        1,
+        2
+      ],
+      "filterBehavior": "Apply Button",
+      "applyFiltersButtonText": "Apply Filters"
+    },
+    "header": {
+      "type": "markup-include",
+      "title": "Test API Filter Reset",
+      "contentEditor": {
+        "inlineHTML": "<h2>API Filter Reset Test Dashboard</h2><p>This dashboard tests the 'Clear Filters' button functionality with API filters.</p><ul><li><strong>Category</strong>: Has resetLabel = '- Select Category -'</li><li><strong>Topic</strong>: Has resetLabel = '- Select Topic -' (depends on Category)</li><li><strong>Year</strong>: Has defaultValue = '2023' (depends on Category and Topic)</li></ul><h3>Testing Instructions:</h3><ol><li>Select values for all three filters</li><li>Click 'Apply Filters'</li><li>Click 'Clear Filters'</li><li>Expected behavior:<ul><li>Category and Topic should reset to '- Select Category -' and '- Select Topic -'</li><li>Year should reset to '2023' (its defaultValue)</li></ul></li></ol>",
+        "useInlineHTML": true
+      },
+      "theme": "theme-blue"
+    },
+    "chart1": {
+      "type": "chart",
+      "title": "Sample Chart",
+      "showTitle": true,
+      "theme": "theme-blue",
+      "visualizationType": "Line",
+      "dataKey": "chartData",
+      "xAxis": {
+        "dataKey": "state",
+        "type": "categorical"
+      },
+      "series": [
+        {
+          "dataKey": "value",
+          "type": "Line"
+        }
+      ],
+      "general": {
+        "showDownloadButton": false
+      },
+      "table": {
+        "showTableButton": false
+      }
+    }
+  },
+  "datasets": {
+    "chartData": {
+      "dataUrl": "http://localhost:8080/examples/api-test/chart-data.json"
+    }
+  },
+  "filterBehavior": "Apply Button",
+  "type": "dashboard"
+}

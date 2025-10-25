@@ -1,0 +1,47 @@
+[
+  {
+    "topic": "Tobacco Use",
+    "topic_id": "1",
+    "category": "Health Risk Behaviors"
+  },
+  {
+    "topic": "Physical Activity",
+    "topic_id": "2",
+    "category": "Health Risk Behaviors"
+  },
+  {
+    "topic": "Nutrition",
+    "topic_id": "3",
+    "category": "Health Risk Behaviors"
+  },
+  {
+    "topic": "Diabetes",
+    "topic_id": "4",
+    "category": "Chronic Diseases"
+  },
+  {
+    "topic": "Heart Disease",
+    "topic_id": "5",
+    "category": "Chronic Diseases"
+  },
+  {
+    "topic": "Cancer Screening",
+    "topic_id": "6",
+    "category": "Preventive Services"
+  },
+  {
+    "topic": "Immunization",
+    "topic_id": "7",
+    "category": "Preventive Services"
+  },
+  {
+    "topic": "Age Groups",
+    "topic_id": "8",
+    "category": "Demographics"
+  },
+  {
+    "topic": "Gender",
+    "topic_id": "9",
+    "category": "Demographics"
+  }
+]

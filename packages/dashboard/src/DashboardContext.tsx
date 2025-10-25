@@ -15,7 +15,9 @@ type ConfigCTX = DashboardState & {
   loadAPIFilters: (
     sharedFilters: SharedFilter[],
     dropdowns: APIFilterDropdowns,
-    recursiveLimit?: number
+    loadAll?: boolean,
+    recursiveLimit?: number,
+    isStale?: () => boolean
   ) => Promise<SharedFilter[]>
   setAPIFilterDropdowns: (dropdowns: APIFilterDropdowns) => void
   setAPILoading: (loading: boolean) => void
