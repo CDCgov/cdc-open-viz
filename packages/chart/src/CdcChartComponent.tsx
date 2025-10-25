@@ -1065,18 +1065,27 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         : 'w-75'
                     }
                   >
-                    {/* All charts with LinearChart */}
-                    {!['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
-                      <div ref={parentRef} style={{ width: `100%` }}>
-                        <ParentSize>
-                          {parent => (
-                            <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
-                          )}
-                        </ParentSize>
+                    {/* Check if there is data to display */}
+                    {(!filteredData || filteredData.length === 0) && (
+                      <div className='no-data-message' style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
+                        {config.chartMessage?.noData || 'No Data Available'}
                       </div>
                     )}
 
-                    {config.visualizationType === 'Pie' && (
+                    {/* All charts with LinearChart */}
+                    {filteredData &&
+                      filteredData.length > 0 &&
+                      !['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
+                        <div ref={parentRef} style={{ width: `100%` }}>
+                          <ParentSize>
+                            {parent => (
+                              <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
+                            )}
+                          </ParentSize>
+                        </div>
+                      )}
+
+                    {filteredData && filteredData.length > 0 && config.visualizationType === 'Pie' && (
                       <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
                         {parent => (
                           <PieChart
@@ -1089,7 +1098,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       </ParentSize>
                     )}
                     {/* Line Chart */}
-                    {config.visualizationType === 'Line' &&
+                    {filteredData &&
+                      filteredData.length > 0 &&
+                      config.visualizationType === 'Line' &&
                       (convertLineToBarGraph ? (
                         <div ref={parentRef} style={{ width: `100%` }}>
                           <ParentSize>
