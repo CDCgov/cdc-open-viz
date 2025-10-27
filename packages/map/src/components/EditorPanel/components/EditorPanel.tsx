@@ -47,8 +47,9 @@ import { MapContext } from '../../../types/MapContext.js'
 import Alert from '@cdc/core/components/Alert'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
-import { addUIDs, HEADER_COLORS } from '../../../helpers'
+import { addUIDs } from '../../../helpers'
 import './editorPanel.styles.css'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
@@ -2919,23 +2920,11 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               <AccordionItemButton>Visual</AccordionItemButton>
             </AccordionItemHeading>
             <AccordionItemPanel>
-              <label>
-                <span className='edit-label'>Header Theme</span>
-                <ul className='color-palette'>
-                  {HEADER_COLORS.map(palette => {
-                    return (
-                      <li
-                        title={palette}
-                        key={palette}
-                        onClick={() => {
-                          handleEditorChanges('headerColor', palette)
-                        }}
-                        className={config.general.headerColor === palette ? 'selected ' + palette : palette}
-                      ></li>
-                    )
-                  })}
-                </ul>
-              </label>
+              <HeaderThemeSelector
+                selectedTheme={config.general.headerColor}
+                onThemeSelect={palette => handleEditorChanges('headerColor', palette)}
+                label='Header Theme'
+              />
               <label className='checkbox'>
                 <input
                   type='checkbox'

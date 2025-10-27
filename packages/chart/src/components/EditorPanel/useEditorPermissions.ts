@@ -22,20 +22,6 @@ export const useEditorPermissions = () => {
     'Scatter Plot',
     'Spark Line',
     'Sankey'
-]
-
-  const headerColors = [
-    'theme-blue',
-    'theme-purple',
-    'theme-brown',
-    'theme-teal',
-    'theme-pink',
-    'theme-orange',
-    'theme-slate',
-    'theme-indigo',
-    'theme-cyan',
-    'theme-green',
-    'theme-amber'
   ]
 
   const visSupportsDateCategoryAxis = () => {
@@ -411,7 +397,6 @@ export const useEditorPermissions = () => {
 
   return {
     enabledChartTypes,
-    headerColors,
     visCanAnimate,
     visHasAnchors,
     visHasBarBorders,

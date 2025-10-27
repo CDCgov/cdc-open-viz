@@ -16,25 +16,12 @@ import Layout from '@cdc/core/components/Layout'
 import Accordion from '@cdc/core/components/ui/Accordion'
 import MarkupVariablesEditor from '@cdc/core/components/EditorPanel/components/MarkupVariablesEditor'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
+import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import { Datasets } from '@cdc/core/types/DataSet'
 
 // styles
 import '@cdc/core/styles/v2/components/editor.scss'
 import './editorPanel.style.css'
-
-const headerColors = [
-  'theme-blue',
-  'theme-purple',
-  'theme-brown',
-  'theme-teal',
-  'theme-pink',
-  'theme-orange',
-  'theme-slate',
-  'theme-indigo',
-  'theme-cyan',
-  'theme-green',
-  'theme-amber'
-]
 
 type MarkupIncludeEditorPanelProps = {
   datasets?: Datasets
@@ -146,21 +133,11 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
         </div>
       </Accordion.Section>
       <Accordion.Section title='Visual'>
-        <div className='input-group'>
-          <label>Theme</label>
-          <ul className='color-palette'>
-            {headerColors.map(palette => (
-              <li
-                title={palette}
-                key={palette}
-                onClick={() => {
-                  updateConfig({ ...config, theme: palette })
-                }}
-                className={theme === palette ? 'selected ' + palette : palette}
-              ></li>
-            ))}
-          </ul>
-        </div>
+        <HeaderThemeSelector
+          selectedTheme={theme}
+          onThemeSelect={theme => updateConfig({ ...config, theme })}
+          label='Theme'
+        />
         <div className='cove-accordion__panel-section checkbox-group'>
           <InputCheckbox
             value={visual.border}

@@ -28,6 +28,7 @@ import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 import { LineChartConfig } from '../../../../types/ChartConfig'
 import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
+import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import './panelVisual.styles.css'
 
 const PanelVisual: FC<PanelProps> = props => {
@@ -40,7 +41,6 @@ const PanelVisual: FC<PanelProps> = props => {
     visHasBarBorders,
     visCanAnimate,
     visSupportsNonSequentialPallete,
-    headerColors,
     visSupportsTooltipOpacity,
     visSupportsTooltipLines,
     visSupportsBarSpace,
@@ -247,24 +247,7 @@ const PanelVisual: FC<PanelProps> = props => {
             />
           </>
         )}
-        {/* eslint-disable */}
-        <label className='header'>
-          <span className='edit-label'>Header Theme</span>
-          <ul className='color-palette'>
-            {headerColors.map(palette => (
-              <button
-                title={palette}
-                key={palette}
-                onClick={e => {
-                  e.preventDefault()
-                  updateConfig({ ...config, theme: palette })
-                }}
-                className={config.theme === palette ? 'selected ' + palette : palette}
-              ></button>
-            ))}
-          </ul>
-        </label>
-        {/* eslint-enable */}
+        <HeaderThemeSelector selectedTheme={config.theme} onThemeSelect={theme => updateConfig({ ...config, theme })} />
         {(visSupportsNonSequentialPallete() || visSupportsNonSequentialPallete()) && (
           <>
             <label>
