@@ -16,11 +16,12 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
-import { BITE_LOCATIONS, IMAGE_POSITIONS, HEADER_COLORS } from './../constants'
+import { BITE_LOCATIONS, IMAGE_POSITIONS } from './../constants'
 import Layout from '@cdc/core/components/Layout'
 import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import Button from '@cdc/core/components/elements/Button'
 import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
+import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 
 const EditorPanel = memo(() => {
   const { config, updateConfig, loading, data, setParentConfig, isDashboard, isEditor } = useContext(Context)
@@ -463,22 +464,11 @@ const EditorPanel = memo(() => {
                       updateField={updateField}
                     />
                   </div>
-                  <label>
-                    <span className='edit-label'>Theme</span>
-                    <ul className='color-palette'>
-                      {HEADER_COLORS.map(palette => (
-                        <button
-                          title={palette}
-                          key={palette}
-                          onClick={e => {
-                            e.preventDefault()
-                            updateConfig({ ...config, theme: palette })
-                          }}
-                          className={config.theme === palette ? 'selected ' + palette : palette}
-                        />
-                      ))}
-                    </ul>
-                  </label>
+                  <HeaderThemeSelector
+                    selectedTheme={config.theme}
+                    onThemeSelect={theme => updateConfig({ ...config, theme })}
+                    label='Theme'
+                  />
                 </AccordionItemPanel>
               </AccordionItem>
 

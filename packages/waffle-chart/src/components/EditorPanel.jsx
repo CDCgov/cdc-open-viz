@@ -14,25 +14,12 @@ import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import Layout from '@cdc/core/components/Layout'
+import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 
 import '@cdc/core/styles/v2/components/editor.scss'
 import WarningImage from '../images/warning.svg'
 
 import { DATA_OPERATORS, DATA_FUNCTIONS } from '../CdcWaffleChart'
-
-const headerColors = [
-  'theme-blue',
-  'theme-purple',
-  'theme-brown',
-  'theme-teal',
-  'theme-pink',
-  'theme-orange',
-  'theme-slate',
-  'theme-indigo',
-  'theme-cyan',
-  'theme-green',
-  'theme-amber'
-]
 
 const CheckBox = memo(
   ({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
@@ -554,21 +541,11 @@ const EditorPanel = memo(props => {
           className='cove-input'
         />
 
-        <label>
-          <span className='edit-label cove-input__label'>Theme</span>
-          <ul className='color-palette'>
-            {headerColors.map(palette => (
-              <li
-                title={palette}
-                key={palette}
-                onClick={() => {
-                  updateConfig({ ...config, theme: palette })
-                }}
-                className={config.theme === palette ? 'selected ' + palette : palette}
-              ></li>
-            ))}
-          </ul>
-        </label>
+        <HeaderThemeSelector
+          selectedTheme={config.theme}
+          onThemeSelect={theme => updateConfig({ ...config, theme })}
+          label='Theme'
+        />
 
         <div className='cove-accordion__panel-section reverse-labels'>
           <InputCheckbox
