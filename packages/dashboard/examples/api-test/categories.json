@@ -1,0 +1,18 @@
+[
+  {
+    "category": "Health Risk Behaviors",
+    "category_id": "1"
+  },
+  {
+    "category": "Chronic Diseases",
+    "category_id": "2"
+  },
+  {
+    "category": "Preventive Services",
+    "category_id": "3"
+  },
+  {
+    "category": "Demographics",
+    "category_id": "4"
+  }
+]

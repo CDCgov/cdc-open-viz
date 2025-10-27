@@ -118,7 +118,7 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
   // For category legends, use the actual result length
   const isNumericLegend = legend && ['equalnumber', 'equalinterval'].includes(legend.type)
   const nonSpecialItemCount = isNumericLegend
-    ? (legend.numberOfItems || result.length)
+    ? legend.numberOfItems || result.length
     : result.length - actualSpecialClassCount
 
   const amt =
