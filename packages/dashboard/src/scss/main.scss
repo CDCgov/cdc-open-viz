@@ -121,35 +121,12 @@
     }
   }
 
-  .loader {
-    width: 100%;
-    text-align: center;
-    display: inline-block;
-    animation: spin 1s linear infinite;
-
-    &::before {
-      content: '\21BB';
-    }
-  }
-
   .btn {
     // Expand and Collapse Buttons for Multiviz Dashboard
     &.expand-collapse-buttons {
       background-color: var(--lightestGray);
       border: 1px var(--lightGray) solid;
       color: black;
-    }
-  }
-
-  .warning-icon {
-    position: relative;
-    top: 2px;
-    width: 15px;
-    height: 15px;
-    margin-left: 5px;
-
-    path {
-      fill: #d8000c;
     }
   }
 

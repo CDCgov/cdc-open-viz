@@ -1,0 +1,12 @@
+// Shared loader component
+// Used across: chart, dashboard, data-bite, waffle-chart packages
+.loader {
+  width: 100%;
+  text-align: center;
+  display: inline-block;
+  animation: spin 1s linear infinite;
+
+  &::before {
+    content: '\21BB';
+  }
+}
