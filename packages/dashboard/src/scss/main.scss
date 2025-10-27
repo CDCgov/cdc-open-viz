@@ -1,4 +1,4 @@
-@import 'mixins';
+@import '@cdc/core/styles/v2/utils/breakpoints';
 
 .cdc-open-viz-module.type-dashboard {
   @import 'editor-panel';
