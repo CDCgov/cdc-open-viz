@@ -1,0 +1,462 @@
+// Shared Editor Panel Base Styles
+// Used across: dashboard, map, data-bite packages
+// ~450 lines of common editor panel component styles
+
+.editor-panel {
+  // Form container
+  .form-container {
+    border-right: var(--lightGray) 1px solid;
+    flex-grow: 1;
+  }
+
+  // Guidance link
+  .guidance-link {
+    margin: 2em 1em 0;
+    padding: 0.75em 1em;
+    svg {
+      width: 60px;
+      color: var(--blue);
+      margin-right: 1rem;
+      height: 60px; // IE11
+      path {
+        fill: currentColor;
+      }
+    }
+  }
+
+  // Warning component
+  .warning {
+    color: #d8000c;
+    background-color: #ffd2d2;
+    padding: 0.75em 1em;
+    margin: 1em 0;
+    font-size: 0.8em;
+    border: #d8000c 1px solid;
+    border-radius: 0.4em;
+    strong {
+      font-weight: 600;
+      display: block;
+    }
+  }
+
+  // Accordion styles
+  .accordion__button {
+    cursor: pointer;
+    font-size: 1em;
+    padding: 0.3em 1em;
+    width: 100%;
+    text-align: left;
+    position: relative;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  }
+
+  .accordion__panel:first-child {
+    margin-top: 0;
+  }
+
+  .accordion__button:before {
+    display: inline-block;
+    content: '';
+    height: 7px;
+    width: 7px;
+    margin-right: 1em;
+    border-bottom: 2px solid currentColor;
+    border-right: 2px solid currentColor;
+    transform: rotate(-45deg);
+    right: 0;
+    position: absolute;
+    top: 50%;
+    transform: rotate(-45deg) translateY(-50%);
+    transition: 0.1s all;
+  }
+
+  .accordion__button[aria-expanded='true']::before,
+  .accordion__button[aria-selected='true']::before {
+    transform: rotate(45deg) translateY(-50%);
+    margin-right: 1.3em;
+    transition: 0.1s all;
+  }
+
+  .accordion__panel {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    padding: 1em 1.25em 2em;
+    animation: fadein 0.2s ease-in;
+    h5 {
+      font-size: 0.8em;
+    }
+  }
+
+  // Advanced section
+  .advanced {
+    padding: 0 1em 1em;
+    text-align: left;
+    p {
+      font-size: 0.8rem;
+    }
+    .advanced-toggle-link {
+      padding-top: 1em;
+      display: block;
+      text-align: left;
+      cursor: pointer;
+      text-decoration: underline;
+      span {
+        text-decoration: none;
+        display: inline-block;
+        font-family: monospace;
+        padding-right: 5px;
+      }
+      &:hover {
+        color: rgba(0, 0, 0, 0.7);
+      }
+    }
+    textarea {
+      height: 400px;
+      width: 100%;
+      font-size: 0.9em;
+      padding: 0.5em;
+      font-family: monospace;
+      box-sizing: border-box;
+    }
+  }
+
+  @keyframes fadein {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+
+  // Heading styles
+  .heading-2 {
+    background: #565656;
+    color: #fff;
+    font-size: 1.1em;
+    padding: 0.6em 1em;
+    position: relative;
+    border-bottom: #565656 3px solid;
+    z-index: 3;
+  }
+
+  // Label styles
+  label {
+    text-transform: uppercase;
+    display: block;
+    font-size: 0.8em;
+    font-weight: 600;
+    &:not(:first-child) {
+      margin-top: 1em;
+    }
+    span.edit-label {
+      margin-bottom: 0.3em;
+      display: block;
+    }
+    span.column-heading {
+      font-size: 1em;
+    }
+    &.checkbox {
+      display: flex;
+      span {
+        text-transform: none;
+        font-size: 1em;
+        font-weight: 400;
+      }
+      input {
+        margin-top: 0;
+        margin-right: 0.5em;
+      }
+    }
+  }
+
+  // Input styles
+  input[type='text'],
+  input[role='combobox'],
+  input[type='number'],
+  textarea {
+    padding: 0.5em;
+    width: 100%;
+  }
+
+  // Color palette
+  .header .color-palette li {
+    width: 1.5em;
+    height: 1.5em;
+    display: inline-block;
+  }
+
+  .color-palette {
+    display: flex;
+    li {
+      width: 1.5em;
+      height: 1.5em;
+      display: inline-block;
+      margin-right: 0.5em;
+      cursor: pointer;
+      border: rgba(0, 0, 0, 0.3) 3px solid;
+      &.active {
+        border: rgba(0, 0, 0, 0.8) 3px solid;
+      }
+    }
+    a {
+      display: inline-block;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.8);
+    }
+    &.series-list {
+      flex-direction: column;
+      padding: 0;
+      border: none;
+      li {
+        padding: 0.3em 0.5em;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: auto;
+        height: auto;
+        border: 0;
+        &:not(:last-child) {
+          border-bottom: rgba(0, 0, 0, 0.2) 1px solid;
+        }
+      }
+    }
+  }
+
+  // Fieldset
+  fieldset {
+    padding-left: 0;
+  }
+
+  .primary-fieldset {
+    border-top: rgba(0, 0, 0, 0.3) 2px solid;
+    padding-top: 2em;
+    margin-top: 2em;
+  }
+
+  // Column edit
+  ul.column-edit {
+    list-style: none;
+    li {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      padding: 0.3em 0;
+      label {
+        display: inline-block;
+        width: 48%;
+        &:nth-child(odd) {
+          margin-top: 1em;
+        }
+      }
+    }
+    &.three-col li label {
+      width: 31%;
+    }
+  }
+
+  // Edit block
+  .edit-block {
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    padding: 1em;
+    margin-top: 1em;
+    position: relative;
+    .remove-column {
+      position: absolute;
+      top: 0;
+      right: 0;
+      border: 0;
+      background: rgba(0, 0, 0, 0.1);
+      color: #000;
+      font-size: 0.8em;
+      padding: 0.3em;
+      cursor: pointer;
+    }
+  }
+
+  // Subtext
+  span.subtext {
+    text-transform: none;
+    display: block;
+    font-size: 0.8em;
+    font-weight: 400;
+  }
+
+  // Sort list
+  .sort-list {
+    list-style: none;
+    li {
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      padding: 0.3em;
+      display: flex;
+      align-items: center;
+      cursor: move;
+      margin-bottom: 0.3em;
+      svg {
+        margin-right: 0.5em;
+      }
+    }
+  }
+
+  // Info
+  .info {
+    margin-top: 1em;
+    font-size: 0.9em;
+  }
+
+  // React Tags Component
+  .react-tags__search {
+    width: 100%;
+  }
+
+  .react-tags {
+    position: relative;
+    input.react-tags__search-input {
+      font-size: 0.8rem;
+    }
+    /* clicking anywhere will focus the input */
+    cursor: text;
+    span {
+      display: inline;
+    }
+  }
+
+  .react-tags.is-focused {
+    border-color: rgba(0, 0, 0, 0.7);
+  }
+
+  .react-tags__selected {
+    display: inline;
+  }
+
+  .react-tags__selected-tag {
+    display: inline-block;
+    box-sizing: border-box;
+    border: 1px solid #d1d1d1;
+    border-radius: 2px;
+    background: #f1f1f1;
+    padding: 0.4em 0.6em;
+    font-size: 0.8em;
+    margin-right: 0.3em;
+    margin-bottom: 0.3em;
+  }
+
+  .react-tags__selected-tag:after {
+    content: '\2715';
+    color: #aaa;
+    margin-left: 8px;
+  }
+
+  .react-tags__selected-tag:hover,
+  .react-tags__selected-tag:focus {
+    border-color: #b1b1b1;
+  }
+
+  .react-tags__search {
+    display: inline-block;
+
+    /* prevent autoresize overflowing the container */
+    max-width: 100%;
+  }
+
+  @media screen and (min-width: 30em) {
+    .react-tags__search {
+      /* this will become the offsetParent for suggestions */
+      position: relative;
+    }
+  }
+
+  .react-tags__search input {
+    /* prevent autoresize overflowing the container */
+    max-width: 100%;
+
+    /* remove styles and layout from this element */
+    margin: 0;
+    outline: none;
+    padding: 0.5em 0.3em;
+
+    /* match the font styles */
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  .react-tags__search input::-ms-clear {
+    display: none;
+  }
+
+  .react-tags__suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+  }
+
+  @media screen and (min-width: 30em) {
+    .react-tags__suggestions {
+      width: 240px;
+    }
+  }
+
+  .react-tags__suggestions ul {
+    margin: 4px -1px;
+    padding: 0;
+    list-style: none;
+    background: white;
+    border: 1px solid #d1d1d1;
+    border-radius: 2px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  .react-tags__suggestions li {
+    border-bottom: 1px solid #ddd;
+    padding: 6px 8px;
+  }
+
+  .react-tags__suggestions li mark {
+    text-decoration: underline;
+    background: none;
+    font-weight: 600;
+  }
+
+  .react-tags__suggestions li:hover {
+    cursor: pointer;
+    background: #eee;
+  }
+
+  .react-tags__suggestions li.is-active {
+    background: #b7cfe0;
+  }
+
+  .react-tags__suggestions li.is-disabled {
+    opacity: 0.5;
+    cursor: auto;
+  }
+
+  // Editor Toggle
+  .editor-toggle {
+    position: fixed;
+    top: 1em;
+    right: 1em;
+    background: var(--blue);
+    color: white;
+    border: 0;
+    border-radius: 0.5em;
+    padding: 0.5em 1em;
+    font-size: 1em;
+    cursor: pointer;
+    z-index: 9999999999;
+    display: none;
+    &.active {
+      display: block;
+    }
+    &:hover {
+      background: var(--darkBlue);
+    }
+    svg {
+      height: 1em;
+      width: 1em;
+      path {
+        fill: currentColor;
+      }
+    }
+  }
+}
