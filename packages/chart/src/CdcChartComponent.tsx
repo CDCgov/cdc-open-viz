@@ -330,7 +330,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
     newConfig.runtime.originalXAxis = newConfig.xAxis
 
     if (newConfig.visualizationType === 'Pie') {
-      newConfig.runtime.seriesKeys = (dataOverride || data).map(d => d[newConfig.xAxis.dataKey])
+      // Use the same data that will be passed to PieChart (after exclusions and filters)
+      const pieData = currentData.length > 0 ? currentData : newExcludedData
+      newConfig.runtime.seriesKeys = _.uniq(pieData.map(d => d[newConfig.xAxis.dataKey]))
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
     } else {
       const finalData = dataOverride || newConfig.formattedData || newConfig.data
