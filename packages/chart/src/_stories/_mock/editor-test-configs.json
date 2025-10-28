@@ -1,0 +1,376 @@
+{
+  "area_chart_config": {
+    "type": "chart",
+    "title": "Area Chart Editor Test",
+    "showTitle": true,
+    "visualizationType": "Area Chart",
+    "theme": "theme-blue",
+    "fontSize": "medium",
+    "orientation": "vertical",
+    "xAxis": {
+      "type": "date",
+      "dataKey": "Date",
+      "label": "Date",
+      "dateParseFormat": "%Y-%m-%d",
+      "dateDisplayFormat": "%m/%d/%Y",
+      "size": 50
+    },
+    "yAxis": {
+      "label": "Value",
+      "size": 50,
+      "gridLines": true
+    },
+    "series": [
+      {
+        "dataKey": "Value",
+        "type": "Area Chart"
+      },
+      {
+        "dataKey": "Secondary_Value",
+        "type": "Area Chart"
+      }
+    ],
+    "legend": {
+      "position": "right",
+      "label": "Legend"
+    },
+    "visual": {
+      "border": true,
+      "accent": true,
+      "background": true
+    },
+    "palette": "qualitative-bold",
+    "area": {
+      "isStacked": false
+    }
+  },
+
+  "bar_chart_config": {
+    "type": "chart",
+    "title": "Bar Chart Editor Test",
+    "showTitle": true,
+    "visualizationType": "Bar",
+    "theme": "theme-green",
+    "fontSize": "medium",
+    "orientation": "vertical",
+    "xAxis": {
+      "type": "categorical",
+      "dataKey": "State",
+      "label": "State",
+      "size": 50,
+      "tickRotation": 45
+    },
+    "yAxis": {
+      "label": "Value",
+      "size": 50,
+      "gridLines": true
+    },
+    "series": [
+      {
+        "dataKey": "Value",
+        "type": "Bar"
+      }
+    ],
+    "legend": {
+      "position": "bottom",
+      "label": "Data Series"
+    },
+    "visual": {
+      "border": true,
+      "accent": true,
+      "background": true
+    },
+    "palette": "qualitative-soft",
+    "barThickness": 0.8
+  },
+
+  "line_chart_config": {
+    "type": "chart",
+    "title": "Line Chart Editor Test",
+    "showTitle": true,
+    "visualizationType": "Line",
+    "theme": "theme-purple",
+    "fontSize": "medium",
+    "orientation": "vertical",
+    "xAxis": {
+      "type": "date",
+      "dataKey": "Date",
+      "label": "Date",
+      "dateParseFormat": "%Y-%m-%d",
+      "dateDisplayFormat": "%b %Y",
+      "size": 50
+    },
+    "yAxis": {
+      "label": "Count",
+      "size": 50,
+      "gridLines": true
+    },
+    "series": [
+      {
+        "dataKey": "Count",
+        "type": "Line"
+      },
+      {
+        "dataKey": "Value",
+        "type": "Line"
+      }
+    ],
+    "legend": {
+      "position": "right",
+      "label": "Metrics"
+    },
+    "visual": {
+      "border": true,
+      "accent": true,
+      "background": true
+    },
+    "palette": "qualitative-bold",
+    "lineDatapointStyle": "hover"
+  },
+
+  "pie_chart_config": {
+    "type": "chart",
+    "title": "Pie Chart Editor Test",
+    "showTitle": true,
+    "visualizationType": "Pie",
+    "theme": "theme-orange",
+    "fontSize": "medium",
+    "xAxis": {
+      "dataKey": "Category"
+    },
+    "yAxis": {
+      "dataKey": "Value"
+    },
+    "legend": {
+      "position": "right",
+      "label": "Categories"
+    },
+    "visual": {
+      "border": true,
+      "accent": true,
+      "background": true
+    },
+    "palette": "qualitative-pastel",
+    "pieType": "Pie"
+  },
+
+  "combo_chart_config": {
+    "type": "chart",
+    "title": "Combo Chart Editor Test",
+    "showTitle": true,
+    "visualizationType": "Combo",
+    "theme": "theme-teal",
+    "fontSize": "medium",
+    "orientation": "vertical",
+    "xAxis": {
+      "type": "categorical",
+      "dataKey": "State",
+      "label": "State",
+      "size": 50
+    },
+    "yAxis": {
+      "label": "Primary Values",
+      "size": 50,
+      "gridLines": true,
+      "rightHideAxis": false,
+      "rightLabel": "Secondary Values"
+    },
+    "series": [
+      {
+        "dataKey": "Value",
+        "type": "Bar",
+        "axis": "Left"
+      },
+      {
+        "dataKey": "Rate",
+        "type": "Line",
+        "axis": "Right"
+      }
+    ],
+    "legend": {
+      "position": "bottom",
+      "label": "Data Types"
+    },
+    "visual": {
+      "border": true,
+      "accent": true,
+      "background": true
+    },
+    "palette": "qualitative-bold"
+  },
+
+  "scatter_plot_config": {
+    "type": "chart",
+    "title": "Scatter Plot Editor Test",
+    "showTitle": true,
+    "visualizationType": "Scatter Plot",
+    "theme": "theme-blue",
+    "fontSize": "medium",
+    "orientation": "vertical",
+    "xAxis": {
+      "type": "linear",
+      "dataKey": "X_Value",
+      "label": "X Values",
+      "size": 50
+    },
+    "yAxis": {
+      "dataKey": "Y_Value",
+      "label": "Y Values",
+      "size": 50,
+      "gridLines": true
+    },
+    "legend": {
+      "position": "right",
+      "label": "Categories",
+      "colorCode": "Category"
+    },
+    "visual": {
+      "border": true,
+      "accent": true,
+      "background": true
+    },
+    "palette": "qualitative-bold"
+  },
+
+  "box_plot_config": {
+    "type": "chart",
+    "title": "Box Plot Editor Test",
+    "showTitle": true,
+    "visualizationType": "Box Plot",
+    "theme": "theme-green",
+    "fontSize": "medium",
+    "orientation": "vertical",
+    "xAxis": {
+      "type": "categorical",
+      "dataKey": "Group_Category",
+      "label": "Groups",
+      "size": 75
+    },
+    "yAxis": {
+      "dataKey": "Value",
+      "label": "Observations",
+      "size": 50,
+      "gridLines": true
+    },
+    "boxplot": {
+      "borders": "true",
+      "plotOutlierValues": false,
+      "plotNonOutlierValues": true,
+      "labels": {
+        "q1": "Lower Quartile",
+        "q3": "Upper Quartile",
+        "minimum": "Minimum",
+        "maximum": "Maximum",
+        "mean": "Mean",
+        "median": "Median"
+      }
+    },
+    "legend": {
+      "position": "right"
+    },
+    "visual": {
+      "border": true,
+      "accent": true,
+      "background": true
+    },
+    "palette": "qualitative1"
+  },
+
+  "sankey_config": {
+    "type": "chart",
+    "title": "Sankey Chart Editor Test",
+    "showTitle": true,
+    "visualizationType": "Sankey",
+    "theme": "theme-purple",
+    "fontSize": "medium",
+    "sankey": {
+      "title": {
+        "defaultColor": "black"
+      },
+      "iterations": 1,
+      "rxValue": 0.9,
+      "overallSize": {
+        "width": 900,
+        "height": 700
+      },
+      "margin": {
+        "margin_y": 25,
+        "margin_x": 0
+      },
+      "nodeSize": {
+        "nodeWidth": 26,
+        "nodeHeight": 40
+      },
+      "nodePadding": 55,
+      "nodeFontColor": "black",
+      "nodeColor": {
+        "default": "#ff8500",
+        "inactive": "#808080"
+      },
+      "linkColor": {
+        "default": "#ffc900",
+        "inactive": "#D3D3D3"
+      },
+      "opacity": {
+        "nodeOpacityDefault": 1,
+        "nodeOpacityInactive": 0.1,
+        "LinkOpacityDefault": 1,
+        "LinkOpacityInactive": 0.1
+      }
+    },
+    "visual": {
+      "border": true,
+      "accent": true,
+      "background": true
+    }
+  },
+
+  "forecasting_config": {
+    "type": "chart",
+    "title": "Forecasting Chart Editor Test",
+    "showTitle": true,
+    "visualizationType": "Forecasting",
+    "theme": "theme-teal",
+    "fontSize": "medium",
+    "orientation": "vertical",
+    "xAxis": {
+      "type": "date",
+      "dataKey": "Date",
+      "label": "Date",
+      "dateParseFormat": "%Y-%m-%d",
+      "dateDisplayFormat": "%b %Y",
+      "size": 50
+    },
+    "yAxis": {
+      "label": "Values",
+      "size": 50,
+      "gridLines": true
+    },
+    "series": [
+      {
+        "dataKey": "Actual_Value",
+        "type": "Line"
+      },
+      {
+        "dataKey": "Forecast_Value",
+        "type": "Line"
+      }
+    ],
+    "confidenceKeys": {
+      "lower": "Lower_CI",
+      "upper": "Upper_CI",
+      "forecastLower": "Forecast_Lower",
+      "forecastUpper": "Forecast_Upper"
+    },
+    "legend": {
+      "position": "bottom",
+      "label": "Forecasting Data"
+    },
+    "visual": {
+      "border": true,
+      "accent": true,
+      "background": true
+    },
+    "palette": "qualitative-bold"
+  }
+}
