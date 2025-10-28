@@ -9,9 +9,8 @@ import ConfigContext from '../ConfigContext'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
 // Components
-import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
+import { TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import InputText from '@cdc/core/components/inputs/InputText'
 import Layout from '@cdc/core/components/Layout'
 import Accordion from '@cdc/core/components/ui/Accordion'
 import MarkupVariablesEditor from '@cdc/core/components/EditorPanel/components/MarkupVariablesEditor'
@@ -84,7 +83,7 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
   const editorContent = (
     <Accordion>
       <Accordion.Section title='General'>
-        <InputText
+        <TextField
           value={title || ''}
           section='contentEditor'
           fieldName='title'
@@ -95,8 +94,7 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
       </Accordion.Section>
       <Accordion.Section title='Content Editor'>
         <span className='divider-heading'>Enter Markup</span>
-        <InputCheckbox
-          inline
+        <CheckBox
           value={useInlineHTML}
           section='contentEditor'
           fieldName='useInlineHTML'
@@ -108,20 +106,19 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
             <>
               {/* HTML Textbox */}
               <div ref={textAreaInEditorContainer}>
-                <InputText
+                <TextField
                   value={inlineHTML}
                   section='contentEditor'
                   fieldName='inlineHTML'
                   label='HTML'
                   placeholder='Add HTML here'
                   type='textarea'
-                  rows={10}
                   updateField={updateField}
                 />
               </div>
             </>
           ) : (
-            <InputText
+            <TextField
               value={srcUrl || ''}
               section='contentEditor'
               fieldName='srcUrl'
@@ -139,35 +136,35 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
           label='Theme'
         />
         <div className='cove-accordion__panel-section checkbox-group'>
-          <InputCheckbox
+          <CheckBox
             value={visual.border}
             section='visual'
             fieldName='border'
             label='Display Border&nbsp;'
             updateField={updateField}
           />
-          <InputCheckbox
+          <CheckBox
             value={visual.borderColorTheme}
             section='visual'
             fieldName='borderColorTheme'
             label='Use Border Color Theme&nbsp;'
             updateField={updateField}
           />
-          <InputCheckbox
+          <CheckBox
             value={visual.accent}
             section='visual'
             fieldName='accent'
             label='Use Accent Style&nbsp;'
             updateField={updateField}
           />
-          <InputCheckbox
+          <CheckBox
             value={visual.background}
             section='visual'
             fieldName='background'
             label='Use Theme Background Color&nbsp;'
             updateField={updateField}
           />
-          <InputCheckbox
+          <CheckBox
             value={visual.hideBackgroundColor}
             section='visual'
             fieldName='hideBackgroundColor'
