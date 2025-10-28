@@ -144,7 +144,7 @@ export const setActiveMultiDropdown = (dropdownOptions, sharedFilter) => {
     ? defaultQueryParamValue
     : defaultQueryParamValue?.split(',')
   const multiDefaultValue = defaultQueryParamValue ? multiDefaultQueryParamValue : [dropdownOptions[0]?.value]
-  const currentOption = ((sharedFilter.active as string[]) || []).filter(activeVal =>
+  const currentOption = (Array.isArray(sharedFilter.active) ? sharedFilter.active : []).filter(activeVal =>
     dropdownOptions.find(option => option.value === activeVal)
   )
   sharedFilter.active = currentOption.length ? currentOption : multiDefaultValue
