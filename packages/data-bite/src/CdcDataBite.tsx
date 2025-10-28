@@ -17,6 +17,9 @@ import Layout from '@cdc/core/components/Layout'
 import ResizeObserver from 'resize-observer-polyfill'
 import parse from 'html-react-parser'
 
+// markup processing
+import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
+
 // helpers
 import getViewport from '@cdc/core/helpers/getViewport'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
@@ -45,7 +48,6 @@ import {
 
 // styles
 import './scss/main.scss'
-import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 
 type CdcDataBiteProps = {
   config: Config
@@ -90,7 +92,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     dataFormat,
     biteStyle,
     filters,
-    subtext
+    subtext,
+    markupVariables,
+    enableMarkupVariables
   } = config
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
@@ -124,7 +128,25 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
   //@ts-ignore
   const loadConfig = async () => {
-    let response = configObj || (await (await fetch(configUrl)).json())
+    let response = configObj
+
+    if (!response && configUrl) {
+      try {
+        const fetchResponse = await fetch(configUrl)
+        if (fetchResponse.ok) {
+          const text = await fetchResponse.text()
+          response = text ? JSON.parse(text) : {}
+        } else {
+          console.warn(`Failed to fetch config from ${configUrl}: ${fetchResponse.status}`)
+          response = {}
+        }
+      } catch (error) {
+        console.warn(`Error loading config from ${configUrl}:`, error)
+        response = {}
+      }
+    } else if (!response) {
+      response = {}
+    }
 
     // If data is included through a URL, fetch that and store
     let responseData = response.data ?? []
@@ -148,8 +170,23 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     const processedConfig = { ...coveUpdateWorker(response) }
 
     updateConfig({ ...defaults, ...processedConfig })
-    publishAnalyticsEvent('data-bite_loaded', 'load', interactionLabel, 'data-bite')
     dispatch({ type: 'SET_LOADING', payload: false })
+  }
+
+  // Process markup variables in content
+  const processContentWithMarkup = (content: string) => {
+    if (!enableMarkupVariables || !markupVariables || markupVariables.length === 0) {
+      return content
+    }
+
+    const result = processMarkupVariables(content, config.data, markupVariables, {
+      isEditor,
+      showNoDataMessage: false,
+      allowHideSection: false,
+      filters: config.filters || []
+    })
+
+    return result.processedContent
   }
 
   const calculateDataBite = (includePrefixSuffix = true) => {
@@ -566,7 +603,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
             <Title
               showTitle={config.visual?.showTitle}
               config={config}
-              title={title}
+              title={processContentWithMarkup(title)}
               isDashboard={isDashboard}
               classes={['bite-header', `${config.theme}`]}
             />
@@ -600,14 +637,16 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                             {calculateDataBite()}
                           </span>
                         )}
-                        {parse(biteBody)}
+                        {parse(processContentWithMarkup(biteBody))}
                       </p>
                       {showBite && 'end' === biteStyle && (
                         <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
                           {calculateDataBite()}
                         </span>
                       )}
-                      {subtext && !config.general.isCompactStyle && <p className='bite-subtext'>{parse(subtext)}</p>}
+                      {subtext && !config.general.isCompactStyle && (
+                        <p className='bite-subtext'>{parse(processContentWithMarkup(subtext))}</p>
+                      )}
                     </div>
                   </Fragment>
                 </div>
@@ -630,7 +669,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   }
 
   return (
-    <Context.Provider value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard }}>
+    <Context.Provider
+      value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, isEditor }}
+    >
       {biteStyle !== 'gradient' && (
         <Layout.VisualizationWrapper
           ref={outerContainerRef}

@@ -14,8 +14,13 @@ import _ from 'lodash'
 import * as d3 from 'd3'
 
 // Cdc
-import colorPalettes from '@cdc/core/data/colorPalettes'
+import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { supportedCountries } from '../data/supported-geos'
+import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { v2ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
+
+// Types
+import { MapConfig, DataRow, RuntimeFilters } from '../types/MapConfig'
 
 type LegendItem = {
   special?: boolean
@@ -34,11 +39,11 @@ export type GeneratedLegend = {
 }
 
 export const generateRuntimeLegend = (
-  configObj,
-  runtimeData: object[],
+  configObj: MapConfig,
+  runtimeData: DataRow[],
   hash: string,
-  setConfig: Function,
-  runtimeFilters: object[],
+  setConfig: (newMapConfig: MapConfig) => void,
+  runtimeFilters: RuntimeFilters,
   legendMemo: React.MutableRefObject<Map<string, number>>,
   legendSpecialClassLastMemo: React.MutableRefObject<Map<string, number>>
 ): GeneratedLegend | [] => {
@@ -331,8 +336,35 @@ export const generateRuntimeLegend = (
           numberOfRows -= chunkAmt
         }
       } else {
-        let colors = colorPalettes[configObj.color]
-        let colorRange = colors.slice(0, legend.numberOfItems)
+        const paletteName = configObj.general?.palette?.name || configObj.color
+        const version = getColorPaletteVersion(configObj)
+        let colors = colorPalettes?.[`v${version}`]?.[paletteName]
+        // Fallback to a default palette if none is selected or found
+        if (!colors) {
+          const defaultPalette = version === 1 ? 'sequential_blue_green' : 'sequential_blue'
+          colors = colorPalettes?.[`v${version}`]?.[defaultPalette]
+        }
+
+        if (!colors) {
+          console.warn('No color palette found, using fallback colors')
+          colors = ['#d3d3d3', '#a0a0a0', '#707070', '#404040'] // Gray fallback
+        }
+
+        // Check if we should use v2 distribution logic for better contrast
+        const isSequentialOrDivergent =
+          paletteName && (paletteName.includes('sequential') || paletteName.includes('divergent'))
+        const useV2Distribution =
+          version === 2 && isSequentialOrDivergent && colors.length === 9 && legend.numberOfItems <= 9
+
+        let colorRange
+        if (useV2Distribution && v2ColorDistribution[legend.numberOfItems]) {
+          // Use strategic color distribution for v2 sequential/divergent palettes
+          const distributionIndices = v2ColorDistribution[legend.numberOfItems]
+          colorRange = distributionIndices.map(index => colors[index])
+        } else {
+          // Use existing logic for v1 palettes and other cases
+          colorRange = colors.slice(0, legend.numberOfItems)
+        }
 
         const getDomain = () => {
           // backwards compatibility
@@ -559,7 +591,11 @@ export const generateRuntimeLegend = (
     return result
   } catch (e) {
     console.error(e)
-    return []
+    return {
+      fromHash: null,
+      runtimeDataHash: null,
+      items: []
+    }
   }
 }
 

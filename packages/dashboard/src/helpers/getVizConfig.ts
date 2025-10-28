@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { MultiDashboardConfig } from '../types/MultiDashboard'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { getApplicableFilters } from './getFilteredData'
@@ -23,7 +24,7 @@ export const getFootnotesVizConfig = (
   const sharedFilters = config.dashboard.sharedFilters
   const matchingFilters = sharedFilters.filter(f => f.usedBy?.includes(visualizationKey))
 
-  if (matchingFilters.length) {
+  if (matchingFilters.length && visualizationConfig.footnotes.data) {
     visualizationConfig.footnotes.data = filterData(matchingFilters, data)
   } else {
     if (visualizationConfig.footnotes.data) {
@@ -44,7 +45,7 @@ export const getVizConfig = (
   multiVizColumn?: string
 ): AnyVisualization => {
   if (rowNumber === undefined) return {} as AnyVisualization
-  const visualizationConfig = _.cloneDeep(config.visualizations[visualizationKey])
+  const visualizationConfig = cloneConfig(config.visualizations[visualizationKey])
   const rowData = config.rows[rowNumber]
   if (visualizationConfig.footnotes?.dataKey) {
     visualizationConfig.footnotes.data = config.datasets[visualizationConfig.footnotes.dataKey]?.data
@@ -54,21 +55,36 @@ export const getVizConfig = (
     Object.assign(visualizationConfig, _.pick(rowData, ['dataKey', 'dataDescription', 'formattedData', 'data']))
   }
 
-  if (visualizationConfig.table && config.dashboard.sharedFilters.length) {
-    // Download CSV button needs to know to include shared filter columns
-    const sharedFilterColumns = config.dashboard.sharedFilters.reduce((acc, filter) => {
-      if (!filter.usedBy?.length || filter.usedBy?.includes(visualizationKey)) {
-        const apiFilter = filter.apiFilter
-        const colName = apiFilter?.textSelector || apiFilter?.valueSelector || filter.columnName
-        acc.push(colName)
-        const subGrouping =
-          apiFilter?.subgroupTextSelector || apiFilter?.subgroupValueSelector || filter.subGrouping?.columnName
-        if (subGrouping) {
-          acc.push(subGrouping)
-        }
+  const sharedFilterColumns = config.dashboard.sharedFilters.reduce((acc, filter) => {
+    if (!filter.usedBy?.length || filter.usedBy?.includes(visualizationKey)) {
+      const apiFilter = filter.apiFilter
+      const colName = apiFilter?.textSelector || apiFilter?.valueSelector || filter.columnName
+      acc.push(colName)
+      const subGrouping =
+        apiFilter?.subgroupTextSelector || apiFilter?.subgroupValueSelector || filter.subGrouping?.columnName
+      if (subGrouping) {
+        acc.push(subGrouping)
       }
-      return acc
-    }, [])
+    }
+    return acc
+  }, [])
+
+  // Collect active dashboard filters for markup variable processing
+  // This allows markup variables to filter even when the viz isn't in usedBy
+  const activeDashboardFilters = config.dashboard.sharedFilters
+    .filter(filter => filter.active !== undefined && filter.active !== null && filter.active !== '')
+    .map(filter => ({
+      columnName: filter.columnName,
+      active: filter.active,
+      values: filter.values || []
+    }))
+
+  if (activeDashboardFilters.length > 0) {
+    visualizationConfig.dashboardFilters = activeDashboardFilters
+  }
+
+  // Download CSV button needs to know to include shared filter columns
+  if (visualizationConfig.table && config.dashboard.sharedFilters.length) {
     visualizationConfig.table.sharedFilterColumns = sharedFilterColumns
   }
 
@@ -82,6 +98,8 @@ export const getVizConfig = (
     }
   } else {
     const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
+    // Markup-includes need data even when shared filters exist (for markup variables)
+    const shouldClearData = sharedFilterColumns.length && visualizationConfig.type !== 'markup-include'
     visualizationConfig.data = data[dataKey] || []
     if (visualizationConfig.formattedData) {
       visualizationConfig.formattedData =

@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import cloneConfig from '../cloneConfig'
 
 const addColorMigration = config => {
   // add new property
@@ -9,7 +10,7 @@ const addColorMigration = config => {
 
 const update_4_24_11 = config => {
   const ver = '4.24.11'
-  const newConfig = _.cloneDeep(config)
+  const newConfig = cloneConfig(config)
   addColorMigration(newConfig)
   newConfig.version = ver
   return newConfig

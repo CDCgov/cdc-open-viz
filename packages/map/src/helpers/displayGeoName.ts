@@ -56,6 +56,6 @@ export const displayGeoName = (key: string, convertFipsCodes = true): string => 
   if (value?.length === 2 || value === 'U.S. Virgin Islands') {
     return value
   } else {
-    return titleCase(value)
+    return value
   }
 }

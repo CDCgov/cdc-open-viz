@@ -1,4 +1,5 @@
 import { Axis } from '@cdc/core/types/Axis'
+import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 import { type ForestPlotConfigSettings } from './ForestPlot'
 import { type Column } from '@cdc/core/types/Column'
 import { type Series } from '@cdc/core/types/Series'
@@ -6,7 +7,17 @@ import { Runtime } from '@cdc/core/types/Runtime'
 import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 import { Table } from '@cdc/core/types/Table'
 import { BoxPlot } from '@cdc/core/types/BoxPlot'
-import { General } from '@cdc/core/types/General'
+import { General as CoreGeneral } from '@cdc/core/types/General'
+
+// Extend the core General type to include palette information for charts
+export type General = CoreGeneral & {
+  palette?: {
+    name?: string
+    version?: string
+    isReversed?: boolean
+    customColors?: string[]
+  }
+}
 import { type Link } from './../components/Sankey/types'
 import { type DataDescription } from '@cdc/core/types/DataDescription'
 import { type Legend as CoreLegend } from '@cdc/core/types/Legend'
@@ -96,6 +107,17 @@ export type Legend = CoreLegend & {
   }
   groupBy: string
   separators?: string
+  patterns?: {
+    [key: string]: {
+      label?: string
+      color?: string
+      shape?: string
+      dataKey?: string
+      dataValue?: string
+      contrastCheck?: boolean
+      patternSize?: number
+    }
+  }
 }
 
 type Visual = {
@@ -125,7 +147,6 @@ export type AllChartsConfig = {
   colorMatchLineSeriesLabels: boolean
   columns: ChartColumns
   confidenceKeys: ConfidenceInterval
-  customColors: string[]
   data: Object[]
   dataUrl: string
   dataCutoff: number
@@ -225,12 +246,13 @@ export type AllChartsConfig = {
       default: string
     }
   }
-}
+} & MarkupConfig
 
 export type ForestPlotConfig = {
   visualizationType: 'Forest Plot'
   forestPlot: ForestPlotConfigSettings
-} & AllChartsConfig
+} & AllChartsConfig &
+  MarkupConfig
 
 export type LineChartConfig = {
   allowLineToBarGraph: boolean
@@ -238,7 +260,8 @@ export type LineChartConfig = {
   isolatedDotsSameSize: boolean
   lineDatapointStyle: 'hidden' | 'always show' | 'hover'
   visualizationType: 'Line'
-} & AllChartsConfig
+} & AllChartsConfig &
+  MarkupConfig
 
 export type SankeyLink = {
   depth: number
@@ -279,6 +302,7 @@ export type SankeyChartConfig = {
     }
   ]
   visualizationType: 'Sankey'
-} & AllChartsConfig
+} & AllChartsConfig &
+  MarkupConfig
 
 export type ChartConfig = SankeyChartConfig | LineChartConfig | ForestPlotConfig | AllChartsConfig

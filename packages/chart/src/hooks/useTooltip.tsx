@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useRef } from 'react'
 // Local imports
 import parse from 'html-react-parser'
 import ConfigContext from '../ConfigContext'
@@ -8,10 +8,12 @@ import { isDateScale } from '@cdc/core/helpers/cove/date'
 // Third-party library imports
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
-import _ from 'lodash'
+import _, { get } from 'lodash'
 import { getHorizontalBarHeights } from '../components/BarChart/helpers/getBarHeights'
 
 export const useTooltip = props => {
+  // Track the last X-axis value to prevent duplicate analytics events
+  const lastAnalyticsXValue = useRef<string | number | null>(null)
   const {
     tableData: data,
     config,
@@ -23,7 +25,7 @@ export const useTooltip = props => {
     setSharedFilter,
     isDraggingAnnotation
   } = useContext<ChartContext>(ConfigContext)
-  const { xScale, yScale, seriesScale, showTooltip, hideTooltip } = props
+  const { xScale, yScale, seriesScale, showTooltip, hideTooltip, interactionLabel = '' } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
 
   const Y_AXIS_SIZE = Number(config.yAxis.size || 0)
@@ -84,6 +86,7 @@ export const useTooltip = props => {
 
     const resolvedScaleValues = getResolvedScaleValues([x, y])
     const singleSeriesValue = getYValueFromCoordinate(y, resolvedScaleValues)
+
     const columnsWithTooltips = []
     const tooltipItems = [] as any[][]
     for (const [colKey, column] of Object.entries(config.columns)) {
@@ -154,6 +157,10 @@ export const useTooltip = props => {
         return position
       }
       if (!config.tooltips.singleSeries || visualizationType === 'Line') {
+        // Collect analytics data for all series
+        const analyticsSeriesData: string[] = []
+        let xAxisValue: string | number | null = null
+
         tooltipItems.push(
           ...getIncludedTooltipSeries()
             ?.filter(seriesKey => {
@@ -168,6 +175,7 @@ export const useTooltip = props => {
               const seriesObjWithName = config.runtime.series.find(
                 series => series.dataKey === seriesKey && series.name !== undefined
               )
+
               if (
                 (value === null || value === undefined || value === '' || formattedValue === 'N/A') &&
                 config.general.hideNullValue
@@ -180,6 +188,29 @@ export const useTooltip = props => {
               }
             })
         )
+
+        // Publish a single analytics event with all tooltip data
+        // Only publish if the X-axis value has changed (different from last hover)
+        if (analyticsSeriesData.length > 0 && xAxisValue !== lastAnalyticsXValue.current) {
+          lastAnalyticsXValue.current = xAxisValue
+
+          // Extract series names for the series field
+          const seriesNames = analyticsSeriesData.map(item => item.split(':')[0].trim()).join(', ')
+
+          const specifics = xAxisValue
+            ? `series: ${seriesNames}, x: ${xAxisValue}, ${analyticsSeriesData.join(', ')}`
+            : `series: ${seriesNames}, ${analyticsSeriesData.join(', ')}`
+
+          publishAnalyticsEvent({
+            vizType: config?.type,
+            vizSubType: getVizSubType(config),
+            eventType: `chart_hover`,
+            eventAction: 'hover',
+            eventLabel: interactionLabel || 'unknown',
+            vizTitle: getVizTitle(config),
+            specifics
+          })
+        }
 
         const runtimeSeries =
           config.tooltips.singleSeries && visualizationType === 'Line'
@@ -239,6 +270,9 @@ export const useTooltip = props => {
    * @returns {void} - The tooltip information is hidden
    */
   const handleTooltipMouseOff = () => {
+    // Reset the analytics tracking when mouse leaves
+    lastAnalyticsXValue.current = null
+
     if (config.visualizationType === 'Area Chart') {
       setTimeout(() => {
         hideTooltip()
@@ -571,18 +605,26 @@ export const useTooltip = props => {
 
     // TOOLTIP BODY
     // handle suppressed tooltip items
-    const { label, displayGray } =
-      (config.visualizationSubType !== 'stacked' &&
-        config.general.showSuppressedSymbol &&
-        config.preliminaryData?.find(
-          pd =>
-            pd.label &&
-            pd.type === 'suppression' &&
-            pd.displayTooltip &&
-            value === pd.value &&
-            (!pd.column || key === pd.column)
-        )) ||
-      {}
+    const shouldCheckSuppression = config.visualizationSubType !== 'stacked'
+    let suppressionEntry
+    if (shouldCheckSuppression && config.preliminaryData) {
+      suppressionEntry = config.preliminaryData.find(
+        pd =>
+          pd.label &&
+          pd.type === 'suppression' &&
+          pd.displayTooltip &&
+          value === pd.value &&
+          (!pd.column || key === pd.column)
+      )
+    }
+
+    // Remove suppressed items entirely if not showing symbols
+    if (suppressionEntry && !config.general.showSuppressedSymbol) {
+      return null
+    }
+
+    const { label, displayGray } = suppressionEntry || {}
+
     let newValue = label || value
     const style = displayGray ? { color: '#8b8b8a' } : {}
 

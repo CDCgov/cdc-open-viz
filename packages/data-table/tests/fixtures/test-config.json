@@ -1,0 +1,172 @@
+{
+  "version": "4.25.1",
+  "type": "table",
+  "visualizationType": "Table",
+  "data": [
+    {
+      "year": "2020",
+      "life_expectancy": 77.3,
+      "gender": "Both Sexes",
+      "race_ethnicity": "All Races"
+    },
+    {
+      "year": "2021",
+      "life_expectancy": 76.4,
+      "gender": "Both Sexes",
+      "race_ethnicity": "All Races"
+    },
+    {
+      "year": "2022",
+      "life_expectancy": 76.8,
+      "gender": "Both Sexes",
+      "race_ethnicity": "All Races"
+    },
+    {
+      "year": "2020",
+      "life_expectancy": 74.2,
+      "gender": "Male",
+      "race_ethnicity": "All Races"
+    },
+    {
+      "year": "2021",
+      "life_expectancy": 73.2,
+      "gender": "Male",
+      "race_ethnicity": "All Races"
+    },
+    {
+      "year": "2022",
+      "life_expectancy": 73.8,
+      "gender": "Male",
+      "race_ethnicity": "All Races"
+    },
+    {
+      "year": "2020",
+      "life_expectancy": 80.2,
+      "gender": "Female",
+      "race_ethnicity": "All Races"
+    },
+    {
+      "year": "2021",
+      "life_expectancy": 79.3,
+      "gender": "Female",
+      "race_ethnicity": "All Races"
+    },
+    {
+      "year": "2022",
+      "life_expectancy": 79.7,
+      "gender": "Female",
+      "race_ethnicity": "All Races"
+    }
+  ],
+  "general": {
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true
+  },
+  "table": {
+    "label": "Life Expectancy Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "",
+    "caption": "Life expectancy trends by demographic groups",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "indexLabel": "Year",
+    "download": true,
+    "showVertical": true,
+    "dateDisplayFormat": "%Y",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "show": true
+  },
+  "columns": {
+    "year": {
+      "label": "Year",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": true,
+      "forestPlotStartingPoint": 0,
+      "name": "year"
+    },
+    "life_expectancy": {
+      "label": "Life Expectancy",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": " years",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 1,
+      "commas": false,
+      "showInViz": true,
+      "forestPlotStartingPoint": 0,
+      "name": "life_expectancy"
+    },
+    "gender": {
+      "label": "Gender",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": true,
+      "forestPlotStartingPoint": 0,
+      "name": "gender"
+    },
+    "race_ethnicity": {
+      "label": "Race/Ethnicity",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": true,
+      "forestPlotStartingPoint": 0,
+      "name": "race_ethnicity"
+    }
+  },
+  "dataFormat": {
+    "commas": true,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": false,
+    "roundTo": "1"
+  },
+  "filters": [
+    {
+      "values": ["Male", "Female", "Both Sexes"],
+      "active": "Both Sexes",
+      "filterStyle": "dropdown",
+      "order": "cust",
+      "columnName": "gender",
+      "id": 1732556562584,
+      "orderedValues": ["Both Sexes", "Male", "Female"]
+    },
+    {
+      "values": ["All Races", "White", "Black or African American", "Hispanic or Latino"],
+      "active": "All Races",
+      "filterStyle": "dropdown",
+      "order": "cust",
+      "columnName": "race_ethnicity",
+      "id": 1732556562585,
+      "orderedValues": ["All Races", "White", "Black or African American", "Hispanic or Latino"]
+    }
+  ],
+  "filterBehavior": "Filter Change"
+}

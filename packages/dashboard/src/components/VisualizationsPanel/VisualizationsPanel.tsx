@@ -7,6 +7,7 @@ import { DashboardContext, DashboardDispatchContext } from '../../DashboardConte
 import { mapDataToConfig } from '../../helpers/mapDataToConfig'
 import './visualizations-panel-styles.css'
 import { MultiDashboardConfig } from '../../types/MultiDashboard'
+import { stripConfig } from '../../helpers/formatConfigBeforeSave'
 
 const addVisualization = (type, subType) => {
   const modalWillOpen = type !== 'markup-include'
@@ -123,6 +124,7 @@ const VisualizationsPanel = () => {
         loadConfig={loadConfig}
         config={config}
         convertStateToConfig={() => undefined}
+        stripConfig={stripConfig}
         onExpandCollapse={() => {
           setAdvancedEditing(!advancedEditing)
         }}

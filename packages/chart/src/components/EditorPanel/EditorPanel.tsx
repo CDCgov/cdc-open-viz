@@ -23,9 +23,11 @@ import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/In
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { viewports } from '@cdc/core/helpers/getViewport'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
+import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 
 // chart components
 import Panels from './components/Panels'
+import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
 
 // cdc additional
 import { useEditorPermissions } from './useEditorPermissions'
@@ -45,9 +47,13 @@ import EditorPanelContext from './EditorPanelContext'
 import _ from 'lodash'
 import { adjustedSymbols as symbolCodes } from '@cdc/core/helpers/footnoteSymbols'
 import { updateFieldRankByValue } from './helpers/updateFieldRankByValue'
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
+import { paletteMigrationMap, twoColorPaletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
+import { isV1Palette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
+import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
 
 interface PreliminaryProps {
   config: ChartConfig
@@ -825,6 +831,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
   const [displayPanel, setDisplayPanel] = useState(true)
   const [displayViewportOverrides, setDisplayViewportOverrides] = useState(false)
+  const [showConversionModal, setShowConversionModal] = useState(false)
+  const [pendingPaletteSelection, setPendingPaletteSelection] = useState<{
+    palette: string
+    action: () => void
+    seriesIndex?: number
+    stageIndex?: number
+    type?: 'general' | 'twoColor' | 'forecast'
+  } | null>(null)
 
   const setLollipopShape = shape => {
     updateConfig({
@@ -892,8 +906,36 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
   const getColumns = (filter = true) => {
     let columns = {}
-    unfilteredData.forEach(row => {
-      Object.keys(row).forEach(columnName => (columns[columnName] = true))
+
+    // Try multiple data sources in order of preference
+    let dataToUse = []
+
+    if (unfilteredData && unfilteredData.length > 0) {
+      // First preference: unfilteredData from context
+      dataToUse = unfilteredData
+    } else if (isDashboard && datasets && config.dataKey && datasets[config.dataKey]?.data?.length > 0) {
+      // Second preference: data from datasets in dashboard mode
+      dataToUse = datasets[config.dataKey].data
+    } else if (rawData && rawData.length > 0) {
+      // Third preference: rawData from context
+      dataToUse = rawData
+    } else if (data && data.length > 0) {
+      // Fourth preference: transformedData from context
+      dataToUse = data
+    } else if (config.data && config.data.length > 0) {
+      // Fifth preference: data directly from config
+      dataToUse = config.data
+    }
+
+    // If we still don't have data, return empty array
+    if (!dataToUse || dataToUse.length === 0) {
+      return []
+    }
+
+    dataToUse.forEach(row => {
+      if (row && typeof row === 'object') {
+        Object.keys(row).forEach(columnName => (columns[columnName] = true))
+      }
     })
 
     if (filter) {
@@ -975,18 +1017,18 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
   // prettier-ignore
   const {
-      highlightedBarValues,
-      highlightedSeriesValues,
-      handleUpdateHighlightedBar,
-      handleAddNewHighlightedBar,
-      handleRemoveHighlightedBar,
-      handleUpdateHighlightedBarColor,
-      handleHighlightedBarLegendLabel,
-      handleUpdateHighlightedBorderWidth
-     } = useHighlightedBars(config, updateConfig)
+    highlightedBarValues,
+    highlightedSeriesValues,
+    handleUpdateHighlightedBar,
+    handleAddNewHighlightedBar,
+    handleRemoveHighlightedBar,
+    handleUpdateHighlightedBarColor,
+    handleHighlightedBarLegendLabel,
+    handleUpdateHighlightedBorderWidth
+  } = useHighlightedBars(config, updateConfig)
 
   const convertStateToConfig = () => {
-    let strippedState = _.cloneDeep(config)
+    let strippedState = cloneConfig(config)
     if (false === missingRequiredSections(config)) {
       delete strippedState.newViz
     }
@@ -1092,6 +1134,289 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
   const section = config.orientation === 'horizontal' ? 'xAxis' : 'yAxis'
   const [warningMsg, setWarningMsg] = useState({ maxMsg: '', minMsg: '', rightMaxMessage: '', minMsgRight: '' })
+
+  // Palette migration functions
+  const handlePaletteSelection = (palette: string) => {
+    try {
+      // Check if config exists and has basic structure
+      if (!config) {
+        console.error('COVE: Config is undefined in handlePaletteSelection')
+        return
+      }
+
+      // Check if it's a v1 palette configuration
+      const isV1PaletteConfig = isV1Palette(config)
+
+      const executeSelection = () => {
+        const _newConfig = cloneConfig(config)
+        if (!_newConfig.general.palette) {
+          _newConfig.general.palette = {}
+        }
+
+        // If v2 migration is disabled, use the original palette name and keep v1 version
+        if (!USE_V2_MIGRATION) {
+          _newConfig.general.palette.name = palette
+          _newConfig.general.palette.version = '1.0'
+        } else {
+          // V2 migration logic
+          const migratedName = palette ? migratePaletteWithMap(palette, paletteMigrationMap, false) : undefined
+          _newConfig.general.palette.name = migratedName
+          if (isV1PaletteConfig) {
+            _newConfig.general.palette.version = '2.0'
+          }
+        }
+        updateConfig(_newConfig)
+      }
+
+      if (isV1PaletteConfig) {
+        setPendingPaletteSelection({ palette, action: executeSelection, type: 'general' })
+        setShowConversionModal(true)
+      } else {
+        executeSelection()
+      }
+    } catch (error) {
+      console.error('COVE: Error in handlePaletteSelection:', error)
+    }
+  }
+
+  // Two-color palette migration function
+  const handleTwoColorPaletteSelection = (palette: string) => {
+    try {
+      // Check if config exists and has basic structure
+      if (!config) {
+        console.error('COVE: Config is undefined in handleTwoColorPaletteSelection')
+        return
+      }
+
+      // Check if it's a v1 palette configuration
+      const isV1PaletteConfig = isV1Palette(config)
+
+      const executeSelection = () => {
+        const _newConfig = cloneConfig(config)
+        if (!_newConfig.twoColor) {
+          _newConfig.twoColor = { palette: '', isPaletteReversed: false }
+        }
+
+        // If v2 migration is disabled, use the original palette name and keep v1 version
+        if (!USE_V2_MIGRATION) {
+          _newConfig.twoColor.palette = palette
+          if (!_newConfig.general) {
+            _newConfig.general = {}
+          }
+          if (!_newConfig.general.palette) {
+            _newConfig.general.palette = {}
+          }
+          _newConfig.general.palette.version = '1.0'
+        } else {
+          // V2 migration logic
+          const migratedPaletteName = isV1PaletteConfig
+            ? migratePaletteWithMap(palette, twoColorPaletteMigrationMap, false)
+            : palette
+
+          _newConfig.twoColor.palette = migratedPaletteName
+
+          if (isV1PaletteConfig) {
+            if (!_newConfig.general) {
+              _newConfig.general = {}
+            }
+            if (!_newConfig.general.palette) {
+              _newConfig.general.palette = {}
+            }
+            _newConfig.general.palette.version = '2.0'
+
+            // Create backup for rollback functionality (consistent with standard format)
+            if (!_newConfig.general.palette.backups) {
+              _newConfig.general.palette.backups = []
+            }
+            _newConfig.general.palette.backups.push({
+              name: config.twoColor?.palette || palette,
+              version: '1.0',
+              isReversed: false,
+              type: 'twoColor'
+            })
+          }
+        }
+        updateConfig(_newConfig)
+      }
+
+      if (isV1PaletteConfig) {
+        setPendingPaletteSelection({ palette, action: executeSelection, type: 'twoColor' })
+        setShowConversionModal(true)
+      } else {
+        executeSelection()
+      }
+    } catch (error) {
+      console.error('COVE: Error in handleTwoColorPaletteSelection:', error)
+    }
+  }
+
+  // Forecast palette selection - includes v1/v2 migration modal logic
+  const handleForecastPaletteSelection = (palette: string, seriesIndex: number, stageIndex: number) => {
+    try {
+      if (!config) {
+        console.error('COVE: Config is undefined in handleForecastPaletteSelection')
+        return
+      }
+
+      // Check if it's a v1 palette configuration
+      const isV1PaletteConfig = isV1Palette(config)
+
+      const executeSelection = () => {
+        const copyOfSeries = [...config.series]
+        const copyOfStages = [...(copyOfSeries[seriesIndex].stages || [])]
+        copyOfStages[stageIndex] = { ...copyOfStages[stageIndex], color: palette }
+        copyOfSeries[seriesIndex] = { ...copyOfSeries[seriesIndex], stages: copyOfStages }
+
+        const _newConfig = cloneConfig(config)
+        _newConfig.series = copyOfSeries
+
+        // If this is the first v2 palette selection, upgrade to v2
+        if (isV1PaletteConfig && USE_V2_MIGRATION) {
+          if (!_newConfig.general) {
+            _newConfig.general = {}
+          }
+          if (!_newConfig.general.palette) {
+            _newConfig.general.palette = {}
+          }
+          _newConfig.general.palette.version = '2.0'
+
+          // Forecast-specific migration map for v1 → v2 palette names (all lowercase-hyphen format)
+          const forecastPaletteMigrationMap: Record<string, string> = {
+            // Sequential Blue variants → sequential-blue
+            'sequential-blue': 'sequential-blue',
+            'sequential-blue-two': 'sequential-blue',
+            'sequential-blue-three': 'sequential-blue',
+            'sequential-blue-2-(mpx)': 'sequential-blue',
+            'sequential-blue-2-mpx': 'sequential-blue',
+            // Sequential Orange variants → sequential-orange
+            'sequential-orange': 'sequential-orange',
+            'sequential-orange-two': 'sequential-orange',
+            'sequential-orange-(mpx)': 'sequential-orange',
+            'sequential-orange-mpx': 'sequential-orange',
+            // Other sequential palettes (no variants, just normalize)
+            'sequential-green': 'sequential-green',
+            'sequential-purple': 'sequential-purple',
+            'sequential-teal': 'sequential-teal',
+            // Reverse variants - Sequential Blue
+            'sequential-bluereverse': 'sequential-bluereverse',
+            'sequential-blue-reverse': 'sequential-bluereverse',
+            'sequential-blue-tworeverse': 'sequential-bluereverse',
+            'sequential-blue-two-reverse': 'sequential-bluereverse',
+            'sequential-blue-threereverse': 'sequential-bluereverse',
+            'sequential-blue-three-reverse': 'sequential-bluereverse',
+            'sequential-blue-2-(mpx)reverse': 'sequential-bluereverse',
+            'sequential-blue-2-(mpx)-reverse': 'sequential-bluereverse',
+            'sequential-blue-2-mpxreverse': 'sequential-bluereverse',
+            'sequential-blue-2-mpx-reverse': 'sequential-bluereverse',
+            // Reverse variants - Sequential Orange
+            'sequential-orangereverse': 'sequential-orangereverse',
+            'sequential-orange-reverse': 'sequential-orangereverse',
+            'sequential-orange-tworeverse': 'sequential-orangereverse',
+            'sequential-orange-two-reverse': 'sequential-orangereverse',
+            'sequential-orange-(mpx)reverse': 'sequential-orangereverse',
+            'sequential-orange-(mpx)-reverse': 'sequential-orangereverse',
+            'sequential-orange-mpxreverse': 'sequential-orangereverse',
+            'sequential-orange-mpx-reverse': 'sequential-orangereverse',
+            // Reverse variants - Other sequential palettes
+            'sequential-greenreverse': 'sequential-greenreverse',
+            'sequential-green-reverse': 'sequential-greenreverse',
+            'sequential-purplereverse': 'sequential-purplereverse',
+            'sequential-purple-reverse': 'sequential-purplereverse',
+            'sequential-tealreverse': 'sequential-tealreverse',
+            'sequential-teal-reverse': 'sequential-tealreverse'
+          }
+
+          // Migrate and normalize all forecast stage colors to v2 format
+          _newConfig.series.forEach((series: any) => {
+            if (series.type === 'Forecasting' && series.stages) {
+              series.stages.forEach((stage: any) => {
+                if (stage.color) {
+                  // First, try to migrate using the map
+                  const migrated = forecastPaletteMigrationMap[stage.color] || stage.color
+                  // Then normalize to lowercase with hyphens
+                  stage.color = migrated.toLowerCase().replace(/ /g, '-').replace(/_/g, '-')
+                }
+              })
+            }
+          })
+        }
+
+        updateConfig(_newConfig)
+      }
+
+      if (isV1PaletteConfig) {
+        setPendingPaletteSelection({ palette, action: executeSelection, type: 'forecast', seriesIndex, stageIndex })
+        setShowConversionModal(true)
+      } else {
+        executeSelection()
+      }
+    } catch (error) {
+      console.error('COVE: Error in handleForecastPaletteSelection:', error)
+    }
+  }
+
+  // Modal handlers
+  const handleConversionConfirm = () => {
+    if (pendingPaletteSelection) {
+      pendingPaletteSelection.action()
+    }
+    setShowConversionModal(false)
+    setPendingPaletteSelection(null)
+  }
+
+  const handleConversionCancel = () => {
+    // Don't update config - just close modal and discard pending selection
+    setShowConversionModal(false)
+    setPendingPaletteSelection(null)
+  }
+
+  const handleReturnToV1 = () => {
+    if (pendingPaletteSelection) {
+      const _newConfig = cloneConfig(config)
+      const { palette, type } = pendingPaletteSelection
+
+      // Handle based on palette type
+      if (type === 'forecast') {
+        // Forecast palette selection
+        const { seriesIndex, stageIndex } = pendingPaletteSelection
+        if (seriesIndex !== undefined && stageIndex !== undefined) {
+          const copyOfSeries = [..._newConfig.series]
+          const copyOfStages = [...copyOfSeries[seriesIndex].stages]
+          copyOfStages[stageIndex] = { ...copyOfStages[stageIndex], color: palette }
+          copyOfSeries[seriesIndex] = { ...copyOfSeries[seriesIndex], stages: copyOfStages }
+          _newConfig.series = copyOfSeries
+        }
+      } else if (type === 'twoColor') {
+        // Two-color palette selection
+        if (!_newConfig.twoColor) {
+          _newConfig.twoColor = { palette: '', isPaletteReversed: false }
+        }
+        _newConfig.twoColor.palette = palette
+      } else {
+        // General palette selection (type === 'general' or undefined for backwards compatibility)
+        if (!_newConfig.general) {
+          _newConfig.general = {}
+        }
+        if (!_newConfig.general.palette) {
+          _newConfig.general.palette = {}
+        }
+        _newConfig.general.palette.name = palette
+      }
+
+      // Set version to V1
+      if (!_newConfig.general) {
+        _newConfig.general = {}
+      }
+      if (!_newConfig.general.palette) {
+        _newConfig.general.palette = {}
+      }
+      _newConfig.general.palette.version = '1.0'
+
+      updateConfig(_newConfig)
+    }
+    setShowConversionModal(false)
+    setPendingPaletteSelection(null)
+  }
 
   const validateMaxValue = () => {
     const enteredValue = config[section].max
@@ -1232,18 +1557,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         )
       }
     })
-
-    let columnsByKey = {}
-    config.data.forEach(datum => {
-      Object.keys(datum).forEach(key => {
-        columnsByKey[key] = columnsByKey[key] || []
-        const value = typeof datum[key] === 'number' ? datum[key].toString() : datum[key]
-
-        if (columnsByKey[key].indexOf(value) === -1) {
-          columnsByKey[key].push(value)
-        }
-      })
-    })
   }
 
   // for pie charts
@@ -1260,18 +1573,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
           </option>
         )
       }
-    })
-
-    let columnsByKey = {}
-    data.forEach(datum => {
-      Object.keys(datum).forEach(key => {
-        columnsByKey[key] = columnsByKey[key] || []
-        const value = typeof datum[key] === 'number' ? datum[key].toString() : datum[key]
-
-        if (columnsByKey[key].indexOf(value) === -1) {
-          columnsByKey[key].push(value)
-        }
-      })
     })
   }
 
@@ -1379,11 +1680,14 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     handleHighlightedBarLegendLabel,
     handleUpdateHighlightedBar,
     handleRemoveHighlightedBar,
-    isPaletteReversed: config.isPaletteReversed,
+    isPaletteReversed: config.general?.palette?.isReversed,
     highlightedSeriesValues,
     handleUpdateHighlightedBorderWidth,
     handleUpdateHighlightedBarColor,
-    setLollipopShape
+    setLollipopShape,
+    handlePaletteSelection,
+    handleTwoColorPaletteSelection,
+    handleForecastPaletteSelection
   }
   if (isLoading) {
     return <></>
@@ -1478,7 +1782,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             options={getColumns()}
                           />
                           {config.series && config.series.length !== 0 && (
-                            <Panels.Series.Wrapper getColumns={getColumns}>
+                            <Panels.Series.Wrapper
+                              getColumns={getColumns}
+                              handleForecastPaletteSelection={handleForecastPaletteSelection}
+                            >
                               <fieldset>
                                 <legend className='edit-label float-left'>Displaying</legend>
                                 <Tooltip style={{ textTransform: 'none' }}>
@@ -4126,6 +4433,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
               </>
             )}
             <Panels.Visual name='Visual' />
+            <Panels.PatternSettings name='PatternSettings' />
             {/* Spark Line has no data table */}
             {config.visualizationType !== 'Spark Line' && (
               <AccordionItem>
@@ -4145,11 +4453,28 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
             )}
             <Panels.Annotate name='Text Annotations' />
             {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
+            <PanelMarkup
+              name='Markup Variables'
+              markupVariables={config.markupVariables || []}
+              data={rawData}
+              enableMarkupVariables={config.enableMarkupVariables || false}
+              onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
+              onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
+            />
           </Accordion>
           {config.type !== 'Spark Line' && (
             <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />
           )}
         </Layout.Sidebar>
+
+        {showConversionModal && (
+          <PaletteConversionModal
+            onConfirm={handleConversionConfirm}
+            onCancel={handleConversionCancel}
+            onReturnToV1={handleReturnToV1}
+            paletteName={pendingPaletteSelection?.palette}
+          />
+        )}
       </ErrorBoundary>
     </EditorPanelContext.Provider>
   )

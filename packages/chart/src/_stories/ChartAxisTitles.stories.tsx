@@ -1,8 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChartComponent'
 import longXLabelsConfig from './_mock/large_x_axis_labels.json'
 import pairedBarConfig from './_mock/paired-bar.json'
-import { editConfigKeys } from '../helpers/configHelpers'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import { ChartConfig } from '../types/ChartConfig'
 
 const meta: Meta<typeof Chart> = {

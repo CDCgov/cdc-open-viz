@@ -41,7 +41,7 @@ const SingleStateMap: React.FC = () => {
   } = useContext<MapContext>(ConfigContext)
 
   const dispatch = useContext(MapDispatchContext)
-  const { handleMoveEnd, handleZoomIn, handleZoomOut, handleReset, projection } = useStateZoom(topoData)
+  const { handleMoveEnd, handleZoomIn, handleZoomOut, handleZoomReset, projection } = useStateZoom(topoData)
 
   // Memoize statesPicked to prevent creating new arrays on every render
   const statesPicked = useMemo(() => {
@@ -70,7 +70,7 @@ const SingleStateMap: React.FC = () => {
         dispatch({ type: 'SET_TOPO_DATA', payload: response })
       })
     }
-  }, [runtimeFilters?.length, topoData?.year])
+  }, [config.general.countyCensusYear, config.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
 
   if (!isTopoReady(topoData, config, runtimeFilters)) {
     return (
@@ -129,7 +129,7 @@ const SingleStateMap: React.FC = () => {
   }
   return (
     <ErrorBoundary component='SingleStateMap'>
-      {statesPicked.length && config.general.allowMapZoom && statesPicked.some(sp => sp.fipsCode) && (
+      {!!statesPicked.length && config.general.allowMapZoom && statesPicked.some(sp => sp.fipsCode) && (
         <svg
           viewBox={SVG_VIEWBOX}
           preserveAspectRatio='xMinYMin'
@@ -192,7 +192,7 @@ const SingleStateMap: React.FC = () => {
           </ZoomableGroup>
         </svg>
       )}
-      {statesPicked && !config.general.allowMapZoom && statesPicked.some(sp => sp.fipsCode) && (
+      {!!statesPicked && !config.general.allowMapZoom && statesPicked.some(sp => sp.fipsCode) && (
         <svg
           viewBox={SVG_VIEWBOX}
           preserveAspectRatio='xMinYMin'
@@ -262,7 +262,7 @@ const SingleStateMap: React.FC = () => {
             fontSize={18}
             style={{ fontSize: '28px', height: '18px' }}
           >
-            {config.general.noStateFoundMessage}
+            {config.general.noDataMessage}
           </Text>
         </svg>
       )}
@@ -270,7 +270,7 @@ const SingleStateMap: React.FC = () => {
         // prettier-ignore
         handleZoomIn={handleZoomIn}
         handleZoomOut={handleZoomOut}
-        handleReset={handleReset}
+        handleZoomReset={handleZoomReset}
       />
     </ErrorBoundary>
   )

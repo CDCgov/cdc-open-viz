@@ -1,6 +1,7 @@
 //TODO: Move legends to core
-import { forwardRef, useContext } from 'react'
+import { forwardRef, useContext, useMemo } from 'react'
 import parse from 'html-react-parser'
+import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 
 //types
 import { DimensionsType } from '@cdc/core/types/Dimensions'
@@ -20,11 +21,12 @@ import './index.scss'
 import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { isBelowBreakpoint, isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
-import { toggleLegendActive } from '@cdc/map/src/helpers/toggleLegendActive'
+import { toggleLegendActive } from '../../../helpers/toggleLegendActive'
 import { resetLegendToggles } from '../../../helpers'
 import { MapContext } from '../../../types/MapContext'
 import LegendGroup from './LegendGroup/Legend.Group'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const LEGEND_PADDING = 30
 
@@ -45,8 +47,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     dimensions,
     mapId,
     runtimeFilters,
-    runtimeLegend,
-    setRuntimeLegend
+    runtimeLegend
   } = useContext<MapContext>(ConfigContext)
 
   const dispatch = useContext(MapDispatchContext)
@@ -61,7 +62,10 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const getFormattedLegendItems = () => {
     try {
-      if (!runtimeLegend.items) Error('No runtime legend data')
+      if (!runtimeLegend.items) {
+        console.warn('No runtime legend data available')
+        return []
+      }
       return runtimeLegend.items.map((entry, idx) => {
         const entryMax = displayDataAsText(entry.max, 'primary', config)
 
@@ -120,34 +124,36 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         return classes.join(' ')
       }
 
-      const setAccessibleStatus = (message: string) => {
-        dispatch({ type: 'SET_ACCESSIBLE_STATUS', payload: message })
-      }
-
       return (
         <li
           className={handleListItemClass()}
           key={idx}
           title={`Legend item ${item.label} - Click to disable`}
           onClick={() => {
-            toggleLegendActive(idx, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)
-            publishAnalyticsEvent(
-              `map_legend_item_toggled--isolate-mode`,
-              'click',
-              `${interactionLabel}|${item.label}`,
-              'map'
-            )
+            toggleLegendActive(idx, item.label, runtimeLegend, dispatch)
+            publishAnalyticsEvent({
+              vizType: config.type,
+              vizSubType: getVizSubType(config),
+              eventType: `map_legend_item_toggled`,
+              eventAction: 'click',
+              eventLabel: `${interactionLabel}`,
+              vizTitle: getVizTitle(config),
+              specifics: `mode: isolate, label: ${item.label}`
+            })
           }}
           onKeyDown={e => {
             if (e.key === 'Enter') {
               e.preventDefault()
-              toggleLegendActive(idx, item.label, runtimeLegend, setRuntimeLegend, setAccessibleStatus)
-              publishAnalyticsEvent(
-                `map_legend_item_toggled--isolate-mode`,
-                'keydown',
-                `${interactionLabel}|${item.label}`,
-                'map'
-              )
+              toggleLegendActive(idx, item.label, runtimeLegend, dispatch)
+              publishAnalyticsEvent({
+                vizType: config.type,
+                vizSubType: getVizSubType(config),
+                eventType: `map_legend_item_toggled`,
+                eventAction: 'keydown',
+                eventLabel: `${interactionLabel}`,
+                vizTitle: getVizTitle(config),
+                specifics: `mode: isolate, label: ${item.label}`
+              })
             }
           }}
           tabIndex={0}
@@ -165,9 +171,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         const { pattern, dataKey, size } = patternData
         let defaultPatternColor = 'black'
         const sizes = {
-          small: '8',
-          medium: '10',
-          large: '12'
+          small: 8,
+          medium: 10,
+          large: 12
         }
 
         const legendSize = 16
@@ -240,8 +246,15 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     if (e) {
       e.preventDefault()
     }
-    publishAnalyticsEvent('map_legend_reset', 'click', interactionLabel, 'map')
-    resetLegendToggles(runtimeLegend, setRuntimeLegend)
+    publishAnalyticsEvent({
+      vizType: config.type,
+      vizSubType: getVizSubType(config),
+      eventType: 'map_legend_reset',
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(config)
+    })
+    resetLegendToggles(runtimeLegend, dispatch)
     dispatch({
       type: 'SET_ACCESSIBLE_STATUS',
       payload: 'Legend has been reset, please reference the data table to see updated values.'
@@ -261,14 +274,17 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     />
   )
 
-  const cityStyleShapes = {
-    pin: pin,
-    circle: <GlyphCircle color='#000' size={150} />,
-    square: <GlyphSquare color='#000' size={150} />,
-    diamond: <GlyphDiamond color='#000' size={150} />,
-    star: <GlyphStar color='#000' size={150} />,
-    triangle: <GlyphTriangle color='#000' size={150} />
-  }
+  const cityStyleShapes = useMemo(
+    () => ({
+      pin: pin,
+      circle: <GlyphCircle color='#000' size={150} />,
+      square: <GlyphSquare color='#000' size={150} />,
+      diamond: <GlyphDiamond color='#000' size={150} />,
+      star: <GlyphStar color='#000' size={150} />,
+      triangle: <GlyphTriangle color='#000' size={150} />
+    }),
+    [pin]
+  )
 
   const shouldRenderLegendList = legendListItems.length > 0 && ['Select Option', ''].includes(config.legend.groupBy)
 
@@ -286,9 +302,29 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           <section className={legendClasses.section.join(' ') || ''} aria-label='Map Legend'>
             {(legend.title || legend.description || legend.dynamicDescription) && (
               <div className='mb-3'>
-                {legend.title && <h3 className={legendClasses.title.join(' ') || ''}>{parse(legend.title)}</h3>}
+                {legend.title && (
+                  <h3 className={legendClasses.title.join(' ') || ''}>
+                    {parse(
+                      config.enableMarkupVariables && config.markupVariables?.length > 0
+                        ? processMarkupVariables(legend.title, config.data || [], config.markupVariables, {
+                            isEditor: false,
+                            filters: config.filters || []
+                          }).processedContent
+                        : legend.title
+                    )}
+                  </h3>
+                )}
                 {legend.dynamicDescription === false && legend.description && (
-                  <p className={legendClasses.description.join(' ') || ''}>{parse(legend.description)}</p>
+                  <p className={legendClasses.description.join(' ') || ''}>
+                    {parse(
+                      config.enableMarkupVariables && config.markupVariables?.length > 0
+                        ? processMarkupVariables(legend.description, config.data || [], config.markupVariables, {
+                            isEditor: false,
+                            filters: config.filters || []
+                          }).processedContent
+                        : legend.description
+                    )}
+                  </p>
                 )}
                 {legend.dynamicDescription === true &&
                   runtimeFilters.map((filter, idx) => {
@@ -331,41 +367,41 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
             {((config.visual.additionalCityStyles && config.visual.additionalCityStyles.some(c => c.label)) ||
               config.visual.cityStyleLabel) && (
-              <>
-                <hr />
-                <div className={legendClasses.div.join(' ') || ''}>
-                  {config.visual.cityStyleLabel && (
-                    <div>
-                      <svg>
-                        <Group
-                          top={
-                            config.visual.cityStyle === 'pin' ? 19 : config.visual.cityStyle === 'triangle' ? 13 : 11
-                          }
-                          left={10}
-                        >
-                          {cityStyleShapes[config.visual.cityStyle.toLowerCase()]}
-                        </Group>
-                      </svg>
-                      <p>{config.visual.cityStyleLabel}</p>
-                    </div>
-                  )}
+                <>
+                  <hr />
+                  <div className={legendClasses.div.join(' ') || ''}>
+                    {config.visual.cityStyleLabel && (
+                      <div>
+                        <svg>
+                          <Group
+                            top={
+                              config.visual.cityStyle === 'pin' ? 19 : config.visual.cityStyle === 'triangle' ? 13 : 11
+                            }
+                            left={10}
+                          >
+                            {cityStyleShapes[config.visual.cityStyle.toLowerCase()]}
+                          </Group>
+                        </svg>
+                        <p>{config.visual.cityStyleLabel}</p>
+                      </div>
+                    )}
 
-                  {config.visual.additionalCityStyles.map(
-                    ({ shape, label }) =>
-                      label && (
-                        <div>
-                          <svg>
-                            <Group top={shape === 'Pin' ? 19 : shape === 'Triangle' ? 13 : 11} left={10}>
-                              {cityStyleShapes[shape.toLowerCase()]}
-                            </Group>
-                          </svg>
-                          <p>{label}</p>
-                        </div>
-                      )
-                  )}
-                </div>
-              </>
-            )}
+                    {config.visual.additionalCityStyles.map(
+                      ({ shape, label }, index) =>
+                        label && (
+                          <div key={`additional-city-style-${index}-${shape}`}>
+                            <svg>
+                              <Group top={shape === 'Pin' ? 19 : shape === 'Triangle' ? 13 : 11} left={10}>
+                                {cityStyleShapes[shape.toLowerCase()]}
+                              </Group>
+                            </svg>
+                            <p>{label}</p>
+                          </div>
+                        )
+                    )}
+                  </div>
+                </>
+              )}
             {runtimeLegend.disabledAmt > 0 && (
               <Button className={legendClasses.showAllButton.join(' ')} onClick={handleReset}>
                 Show All

@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 import NestedDropdown from '../NestedDropdown'
 import nestedDropdownStory from './_mocks/nested-dropdown.json'
 import { useState } from 'react'

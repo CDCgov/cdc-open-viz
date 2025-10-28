@@ -2,6 +2,7 @@ import { useId } from 'react'
 
 // Third Party
 import { Tooltip as ReactTooltip } from 'react-tooltip'
+import 'react-tooltip/dist/react-tooltip.css'
 import type { PlacesType } from 'react-tooltip'
 
 // Styles
@@ -44,7 +45,7 @@ const Tooltip: React.FC<ToolTipProps> & { Target; Content } = ({
         className='cove-tooltip--target'
         data-tooltip-float={float}
         data-tooltip-place={place}
-        data-tooltip-isOpen={true}
+        data-tooltip-isopen={true}
       >
         {tooltipTargetChildren ? tooltipTargetChildren.props.children : null}
       </a>

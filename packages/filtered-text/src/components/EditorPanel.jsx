@@ -1,4 +1,5 @@
-import React, { useState, useEffect, memo, useContext } from 'react'
+import React, { memo, useState, useEffect, useContext } from 'react'
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import _ from 'lodash'
 import ConfigContext from '../ConfigContext'
 
@@ -147,7 +148,7 @@ const EditorPanel = memo(props => {
     )
   }
   const convertStateToConfig = () => {
-    let strippedState = _.cloneDeep(config)
+    let strippedState = cloneConfig(config)
     delete strippedState.newViz
     delete strippedState.runtime
 

@@ -8,7 +8,7 @@ import {
   useResizeColumns,
   usePagination
 } from 'react-table'
-import ConfigContext, { EditorDispatchContext } from '../ConfigContext'
+import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
 import { useDebounce } from 'use-debounce'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { MdNavigateNext } from 'react-icons/md'
@@ -17,7 +17,7 @@ import { GrFormPrevious } from 'react-icons/gr'
 // Core
 import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
 import { errorMessages } from '../helpers/errorMessages'
-import { DataSet } from '@cdc/dashboard/src/types/DataSet'
+import { DataSet } from '@cdc/core/types/DataSet'
 import Icon from '@cdc/core/components/ui/Icon'
 
 const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }: any) => {
@@ -262,17 +262,21 @@ const PreviewDataTable = () => {
         <thead>
           {headerGroups.map(headerGroup => (
             <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map(column => (
-                <th
-                  scope='col'
-                  {...column.getHeaderProps(column.getSortByToggleProps())}
-                  className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : ''}
-                  title={column.Header}
-                >
-                  {column.render('Header')}
-                  <div {...column.getResizerProps()} className='resizer' />
-                </th>
-              ))}
+              {headerGroup.headers.map(column => {
+                const { key, ...headerProps } = column.getHeaderProps(column.getSortByToggleProps())
+                return (
+                  <th
+                    key={key}
+                    scope='col'
+                    {...headerProps}
+                    className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : ''}
+                    title={column.Header}
+                  >
+                    {column.render('Header')}
+                    <div {...column.getResizerProps()} className='resizer' />
+                  </th>
+                )
+              })}
             </tr>
           ))}
         </thead>

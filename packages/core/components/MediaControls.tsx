@@ -1,6 +1,7 @@
 import React from 'react'
 // import html2pdf from 'html2pdf.js'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 const buttonText = {
   pdf: 'Download PDF',
@@ -37,6 +38,14 @@ const saveImageAs = (uri, filename) => {
 const generateMedia = (state, type, elementToCapture, interactionLabel) => {
   // Identify Selector
   const baseSvg = document.querySelector(`[data-download-id=${elementToCapture}]`)
+
+  // Extract title from different state structures
+  const getTitle = state => {
+    if (state?.dashboard?.title) return state.dashboard.title
+    if (state?.general?.title) return state.general.title
+    if (state?.title) return state.title
+    return undefined
+  }
 
   // Handles different state title locations between components
   // Apparently some packages use state.title where others use state.general.title
@@ -85,6 +94,23 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
 
       const downloadImage = async () => {
         document.body.appendChild(container) // Append container to the DOM
+
+        // Fix select elements to show their current selected values before screenshot
+        const selectElements = container.querySelectorAll('select')
+        const originalSelects = baseSvg.querySelectorAll('select')
+
+        selectElements.forEach((select, index) => {
+          const originalSelect = originalSelects[index]
+          if (originalSelect && originalSelect.value) {
+            select.value = originalSelect.value
+            // Also update the visual display for browsers that don't update immediately
+            const selectedOption = select.querySelector(`option[value="${originalSelect.value}"]`) as HTMLOptionElement
+            if (selectedOption) {
+              selectedOption.selected = true
+            }
+          }
+        })
+
         import(/* webpackChunkName: "html2canvas" */ 'html2canvas').then(mod => {
           mod
             .default(container, {
@@ -93,8 +119,16 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
                 el.className.search(/download-buttons|download-links|data-table-container/) !== -1
             })
             .then(canvas => {
+              document.body.removeChild(container) // Clean up container
               saveImageAs(canvas.toDataURL(), filename + '.png')
-              publishAnalyticsEvent(`${state.type}_image_downloaded`, 'click', interactionLabel, `${state.type}`)
+              publishAnalyticsEvent({
+                vizType: state.type,
+                vizSubType: getVizSubType(state),
+                eventType: `image_download`,
+                eventAction: 'click',
+                eventLabel: interactionLabel,
+                vizTitle: getTitle(state)
+              })
             })
         })
       }
@@ -151,7 +185,14 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
         title={buttonText.link}
         target='_blank'
         onClick={() => {
-          publishAnalyticsEvent('data_viewed', 'click', `${unknown}`)
+          publishAnalyticsEvent({
+            vizType: config.type,
+            vizSubType: getVizSubType(config),
+            eventType: 'clicked_data_link_to_view',
+            eventAction: 'click',
+            eventLabel: interactionLabel,
+            vizTitle: getVizTitle(config)
+          })
         }}
       >
         {buttonText.link}
@@ -166,7 +207,14 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
       title='Link to view full data set'
       target='_blank'
       onClick={() => {
-        publishAnalyticsEvent('data_viewed', 'click', `${interactionLabel}`)
+        publishAnalyticsEvent({
+          vizType: config.type,
+          vizSubType: getVizSubType(config),
+          eventType: 'data_viewed',
+          eventAction: 'click',
+          eventLabel: interactionLabel,
+          vizTitle: getVizTitle(config)
+        })
       }}
     >
       {buttonText.link}

@@ -1,3 +1,4 @@
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
 import { Visualization } from '../../../types/Visualization'
 import Icon from '../../ui/Icon'
@@ -17,7 +18,15 @@ const ExpandCollapse = ({ expanded, setExpanded, tableTitle, config, interaction
       role='button'
       className={expanded ? 'data-table-heading p-3' : 'collapsed data-table-heading p-3'}
       onClick={() => {
-        publishAnalyticsEvent('data_table_toggled', 'click', interactionLabel, config.type || 'unknown')
+        publishAnalyticsEvent({
+          vizType: config?.type,
+          vizSubType: getVizSubType(config),
+          eventType: 'expand_collapse_toggled',
+          eventAction: 'click',
+          eventLabel: interactionLabel,
+          vizTitle: getVizTitle(config),
+          specifics: expanded ? 'collapsed' : 'expanded'
+        })
         setExpanded(!expanded)
       }}
       tabIndex={0}
