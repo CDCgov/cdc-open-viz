@@ -29,6 +29,7 @@ import { PanelProps } from '../PanelProps'
 import { LineChartConfig } from '../../../../types/ChartConfig'
 import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
+import '@cdc/core/styles/v2/components/editor.scss'
 import './panelVisual.styles.css'
 
 const PanelVisual: FC<PanelProps> = props => {

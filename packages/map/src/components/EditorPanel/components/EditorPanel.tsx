@@ -50,6 +50,8 @@ import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/In
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs } from '../../../helpers'
+
+import '@cdc/core/styles/v2/components/editor.scss'
 import './editorPanel.styles.css'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'

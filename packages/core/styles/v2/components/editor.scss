@@ -1,6 +1,9 @@
 @import '../utils/variables';
 @import '../themes/index';
 
+// Import HeaderThemeSelector styles to ensure consistency across all packages
+@import '../../../components/HeaderThemeSelector/HeaderThemeSelector.css';
+
 .cove-editor {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -91,7 +94,7 @@
     margin-top: 1em;
     justify-content: space-between;
 
-    > label {
+    >label {
       width: 48%;
       margin-top: 0 !important;
     }
@@ -128,7 +131,7 @@
         cursor: pointer;
       }
 
-      + li {
+      +li {
         border-top: $lightGray 1px solid;
       }
     }
@@ -148,6 +151,7 @@
       color: $blue;
       margin-right: 1rem;
       height: 60px; // IE11
+
       path {
         fill: currentColor;
       }
@@ -186,7 +190,7 @@
       display: flex;
       justify-content: space-between;
 
-      > label {
+      >label {
         margin-top: 0;
         width: 30%;
         display: inline-block;
@@ -234,7 +238,7 @@
       margin-top: 0;
     }
 
-    label + label {
+    label+label {
       margin-top: 1em;
     }
 
@@ -254,12 +258,12 @@
   .sort-list {
     list-style: none;
 
-    > li {
+    >li {
       margin-right: 0.3em;
       margin-bottom: 0.3em;
     }
 
-    li > div {
+    li>div {
       display: block;
       box-sizing: border-box;
       border: 1px solid #d1d1d1;
