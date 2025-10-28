@@ -1,4 +1,5 @@
-import { memo, useContext, useEffect, useState } from 'react'
+import React, { memo, useContext, useEffect, useState } from 'react'
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import _ from 'lodash'
 import {
   Accordion,
@@ -18,6 +19,7 @@ import { BITE_LOCATIONS, DATA_FUNCTIONS, IMAGE_POSITIONS, DATA_OPERATORS, HEADER
 import Layout from '@cdc/core/components/Layout'
 import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import Button from '@cdc/core/components/elements/Button'
+import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 
 const EditorPanel = memo(() => {
   const { config, updateConfig, loading, data, setParentConfig, isDashboard, isEditor } = useContext(Context)
@@ -51,7 +53,7 @@ const EditorPanel = memo(() => {
   }
 
   const convertStateToConfig = () => {
-    let strippedState = _.cloneDeep(config)
+    let strippedState = cloneConfig(config)
     //if(false === missingRequiredSections()) {
     //strippedState.newViz
     //}
@@ -239,7 +241,8 @@ const EditorPanel = memo(() => {
                         <Tooltip.Content>
                           <p>
                             Enter supporting text to display below the data visualization, if applicable. The following
-                            HTML tags are supported: strong, em, sup, and sub.
+                            HTML tags are supported: strong, em, sup, and sub. You can also use markup variables like{' '}
+                            {'{{variable-name}}'} to display dynamic data.
                           </p>
                         </Tooltip.Content>
                       </Tooltip>
@@ -688,6 +691,23 @@ const EditorPanel = memo(() => {
                   </AccordionItemPanel>
                 </AccordionItem>
               )}
+
+              <AccordionItem>
+                <AccordionItemHeading>
+                  <AccordionItemButton>Markup Variables</AccordionItemButton>
+                </AccordionItemHeading>
+                <AccordionItemPanel>
+                  <PanelMarkup
+                    name='Markup Variables'
+                    markupVariables={config.markupVariables || []}
+                    data={data}
+                    enableMarkupVariables={config.enableMarkupVariables || false}
+                    onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
+                    onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
+                    withAccordion={false}
+                  />
+                </AccordionItemPanel>
+              </AccordionItem>
             </Accordion>
           </form>
         </section>

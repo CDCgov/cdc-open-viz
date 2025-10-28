@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import barChartCiLabels from './_mock/bar_chart_ci_labels.json'
 import lineChartDynamicCI from './_mock/line_chart_dynamic_ci.json'
 import lineChartNonDynamicCI from './_mock/line_chart_non_dynamic_ci.json'

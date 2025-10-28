@@ -1,0 +1,520 @@
+{
+  "filters": [],
+  "filterBehavior": "Filter Change",
+  "openModal": true,
+  "uid": "chart1750783711238",
+  "type": "chart",
+  "visualizationType": "Bar",
+  "dataKey": "NNDSSTestConditions20162022.csv",
+  "description": "",
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
+  "annotations": [],
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "title": "",
+  "showTitle": false,
+  "showDownloadMediaButton": false,
+  "theme": "theme-blue",
+  "animate": false,
+  "lineDatapointStyle": "hover",
+  "lineDatapointColor": "Same as Line",
+  "barHasBorder": "false",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "stacked",
+  "barStyle": "",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "isResponsiveTicks": false,
+  "general": {
+    "annotationDropdownText": "Annotations",
+    "showMissingDataLabel": false,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": false,
+    "hideNullValue": true
+  },
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "preliminaryData": [],
+  "yAxis": {
+    "hideAxis": true,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": true,
+    "size": 45,
+    "gridLines": true,
+    "enablePadding": false,
+    "min": "",
+    "max": 200,
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "rightHideAxis": false,
+    "rightAxisSize": 0,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#333",
+    "rightAxisTickLabelColor": "#333",
+    "rightAxisTickColor": "#333",
+    "numTicks": "5",
+    "axisPadding": 0,
+    "scalePadding": 10,
+    "tickRotation": 0,
+    "anchors": [],
+    "shoMissingDataLabel": true,
+    "showMissingDataLine": true,
+    "categories": [],
+    "inlineLabel": " cases"
+  },
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "count": "Count",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
+    }
+  },
+  "topAxis": {
+    "hasLine": false
+  },
+  "isLegendValue": false,
+  "barThickness": 0.9,
+  "barHeight": 25,
+  "barSpace": 15,
+  "heights": {
+    "vertical": 300,
+    "horizontal": 750,
+    "mobileVertical": 200
+  },
+  "xAxis": {
+    "sortDates": false,
+    "anchors": [],
+    "type": "date",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 75,
+    "tickRotation": 0,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "labelOffset": 0,
+    "axisPadding": 200,
+    "target": 0,
+    "maxTickRotation": 0,
+    "padding": 5,
+    "showYearsOnce": false,
+    "sortByRecentDate": false,
+    "brushActive": false,
+    "dataKey": "year",
+    "axisBBox": 8,
+    "tickWidthMax": 39,
+    "dateParseFormat": "%Y",
+    "dateDisplayFormat": "%Y",
+    "viewportNumTicks": {
+      "xs": "4",
+      "xxs": "4"
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": false,
+    "showDownloadLinkBelow": true,
+    "indexLabel": "",
+    "download": true,
+    "showVertical": true,
+    "dateDisplayFormat": "",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "show": true
+  },
+  "orientation": "vertical",
+  "color": "pinkpurple",
+  "columns": {
+    "domestic_count": {
+      "label": "Domestic Cases",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": true,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "domestic_count"
+    },
+    "abroad_count": {
+      "label": "Cases Abroad",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": true,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "abroad_count"
+    },
+    "year": {
+      "label": "Year",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "year"
+    }
+  },
+  "legend": {
+    "hide": false,
+    "behavior": "isolate",
+    "axisAlign": true,
+    "singleRow": true,
+    "colorCode": "recon_prov",
+    "reverseLabelOrder": true,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "hideSuppressedLabels": false,
+    "hideSuppressionLink": false,
+    "seriesHighlight": [],
+    "style": "boxes",
+    "subStyle": "linear blocks",
+    "groupBy": "",
+    "shape": "circle",
+    "tickRotation": "",
+    "order": "dataColumn",
+    "hideBorder": {
+      "side": false,
+      "topBottom": true
+    },
+    "position": "top",
+    "orderedValues": [],
+    "unified": true,
+    "patterns": {
+      "Provisional": {
+        "label": "Provisional Data",
+        "color": "#000000",
+        "shape": "diagonalLines",
+        "dataKey": "recon_prov",
+        "dataValue": "Provisional",
+        "patternSize": 10
+      }
+    }
+  },
+  "brush": {
+    "isActive": false,
+    "isBrushing": false,
+    "data": [],
+    "height": 45,
+    "active": false
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "palette": "qualitative-bold",
+  "isPaletteReversed": false,
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
+  "labels": false,
+  "dataFormat": {
+    "commas": true,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": false,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false
+  },
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": true,
+    "horizontalHoverLine": false,
+    "lineDatapointSymbol": "none",
+    "maximumShapeAmount": 7
+  },
+  "useLogScale": false,
+  "highlightedBarValues": [],
+  "series": [
+    {
+      "dataKey": "domestic_count",
+      "type": "Bar",
+      "axis": "Left",
+      "tooltip": true,
+      "name": "Domestic Cases"
+    },
+    {
+      "dataKey": "abroad_count",
+      "type": "Bar",
+      "axis": "Left",
+      "tooltip": true,
+      "name": "Cases Abroad"
+    }
+  ],
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": ""
+  },
+  "forestPlot": {
+    "startAt": 0,
+    "colors": {
+      "line": "",
+      "shape": ""
+    },
+    "lineOfNoEffect": {
+      "show": true
+    },
+    "type": "",
+    "pooledResult": {
+      "diamondHeight": 5,
+      "column": ""
+    },
+    "estimateField": "",
+    "estimateRadius": "",
+    "shape": "square",
+    "rowHeight": 20,
+    "description": {
+      "show": true,
+      "text": "description",
+      "location": 0
+    },
+    "result": {
+      "show": true,
+      "text": "result",
+      "location": 100
+    },
+    "radius": {
+      "min": 2,
+      "max": 10,
+      "scalingColumn": ""
+    },
+    "regression": {
+      "lower": 0,
+      "upper": 0,
+      "estimateField": 0
+    },
+    "leftWidthOffset": 0,
+    "rightWidthOffset": 0,
+    "showZeroLine": false,
+    "leftLabel": "",
+    "rightLabel": ""
+  },
+  "area": {
+    "isStacked": false
+  },
+  "sankey": {
+    "title": {
+      "defaultColor": "black"
+    },
+    "iterations": 1,
+    "rxValue": 0.9,
+    "overallSize": {
+      "width": 900,
+      "height": 700
+    },
+    "margin": {
+      "margin_y": 25,
+      "margin_x": 0
+    },
+    "nodeSize": {
+      "nodeWidth": 26,
+      "nodeHeight": 40
+    },
+    "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": {
+      "default": "#ff8500",
+      "inactive": "#808080"
+    },
+    "linkColor": {
+      "default": "#ffc900",
+      "inactive": "#D3D3D3"
+    },
+    "opacity": {
+      "nodeOpacityDefault": 1,
+      "nodeOpacityInactive": 0.1,
+      "LinkOpacityDefault": 1,
+      "LinkOpacityInactive": 0.1
+    },
+    "storyNodeFontColor": "#006778",
+    "storyNodeText": [],
+    "nodeValueStyle": {
+      "textBefore": "(",
+      "textAfter": ")"
+    },
+    "data": []
+  },
+  "dynamicMarginTop": 0,
+  "dataFileName": "nndss_annual_epi_curve.json",
+  "dataFileSourceType": "file",
+  "allowLineToBarGraph": "__​undefined__",
+  "version": "4.25.6",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "regions": [],
+  "customColors": ["#377eb8", "#9fd4ff"],
+  "data": [
+    {
+      "condition_identifier": "leptospirosis",
+      "na_reason": "",
+      "year": 2025,
+      "domestic_count": 46,
+      "abroad_count": 12,
+      "condition": "Leptospirosis",
+      "category": "Animal-borne diseases",
+      "recon_prov": "Provisional"
+    },
+    {
+      "condition_identifier": "leptospirosis",
+      "na_reason": "",
+      "year": 2024,
+      "domestic_count": 120,
+      "abroad_count": 18,
+      "condition": "Leptospirosis",
+      "category": "Animal-borne diseases",
+      "recon_prov": "Provisional"
+    },
+    {
+      "condition_identifier": "leptospirosis",
+      "na_reason": "",
+      "year": 2023,
+      "domestic_count": 94,
+      "abroad_count": 8,
+      "condition": "Leptospirosis",
+      "category": "Animal-borne diseases",
+      "recon_prov": "Provisional"
+    },
+    {
+      "condition_identifier": "leptospirosis",
+      "na_reason": "",
+      "year": 2022,
+      "domestic_count": 62,
+      "abroad_count": 15,
+      "condition": "Leptospirosis",
+      "category": "Animal-borne diseases",
+      "recon_prov": "Reconciled"
+    },
+    {
+      "condition_identifier": "leptospirosis",
+      "na_reason": "",
+      "year": 2021,
+      "domestic_count": 69,
+      "abroad_count": 22,
+      "condition": "Leptospirosis",
+      "category": "Animal-borne diseases",
+      "recon_prov": "Reconciled"
+    }
+  ],
+  "formattedData": [
+    {
+      "condition_identifier": "leptospirosis",
+      "na_reason": "",
+      "year": 2025,
+      "domestic_count": 46,
+      "abroad_count": 12,
+      "condition": "Leptospirosis",
+      "category": "Animal-borne diseases",
+      "recon_prov": "Provisional"
+    },
+    {
+      "condition_identifier": "leptospirosis",
+      "na_reason": "",
+      "year": 2024,
+      "domestic_count": 120,
+      "abroad_count": 18,
+      "condition": "Leptospirosis",
+      "category": "Animal-borne diseases",
+      "recon_prov": "Provisional"
+    },
+    {
+      "condition_identifier": "leptospirosis",
+      "na_reason": "",
+      "year": 2023,
+      "domestic_count": 94,
+      "abroad_count": 8,
+      "condition": "Leptospirosis",
+      "category": "Animal-borne diseases",
+      "recon_prov": "Provisional"
+    },
+    {
+      "condition_identifier": "leptospirosis",
+      "na_reason": "",
+      "year": 2022,
+      "domestic_count": 62,
+      "abroad_count": 15,
+      "condition": "Leptospirosis",
+      "category": "Animal-borne diseases",
+      "recon_prov": "Reconciled"
+    },
+    {
+      "condition_identifier": "leptospirosis",
+      "na_reason": "",
+      "year": 2021,
+      "domestic_count": 69,
+      "abroad_count": 22,
+      "condition": "Leptospirosis",
+      "category": "Animal-borne diseases",
+      "recon_prov": "Reconciled"
+    }
+  ]
+}

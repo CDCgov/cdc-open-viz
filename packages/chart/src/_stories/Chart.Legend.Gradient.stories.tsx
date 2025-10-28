@@ -1,10 +1,10 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import chartGradientConfig from './_mock/legend.gradient_mock.json'
 import chartGroupedLagend from './_mock/legend_groupBy_mock.json'
 import SimplifiedLineConfig from './_mock/simplified_line.json'
 
 import Chart from '../CdcChartComponent'
-import { editConfigKeys } from '../helpers/configHelpers'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Legend',

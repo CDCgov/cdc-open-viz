@@ -2,9 +2,13 @@ import React, { useContext, useEffect, useState } from 'react'
 import { ChartDispatchContext } from '../../../ConfigContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
 import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
+import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
 
 export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, configContext) => {
-  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, seriesHighlight } = configContext
+  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, seriesHighlight, interactionLabel } =
+    configContext
   const { orientation } = config
   const dispatch = useContext(ChartDispatchContext)
   const [hoveredBar, setHoveredBar] = useState(null)
@@ -98,7 +102,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     if (!config.legend.colorCode && config.series.length > 1) {
       return currentBarColor
     }
-    const palettesArr = config.customColors ?? colorPalettes[config.palette]
+    const palettesArr = getPaletteColors(config, colorPalettes)
     const values = tableData.map(d => {
       return d[config.legend.colorCode]
     })
@@ -189,12 +193,30 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     return additionalTooltipItems
   }
 
-  const onMouseOverBar = (categoryValue, barKey, event, data) => {
+  const onMouseOverBar = (categoryValue, barKey, event, data, barValue) => {
     if (config.legend.highlightOnHover && config.legend.behavior === 'highlight' && barKey) {
       dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [barKey] })
     }
     handleTooltipMouseOver(event, data)
     setHoveredBar(categoryValue)
+
+    if (config.tooltips.singleSeries) {
+      const numericValue = barValue || 'none'
+      publishAnalyticsEvent({
+        vizType: config.type,
+        vizSubType: getVizSubType(config),
+        eventType: `chart_hover`,
+        eventAction: 'hover',
+        eventLabel: interactionLabel,
+        vizTitle: getVizTitle(config),
+        series: barKey || 'none',
+        specifics: `series: ${barKey || 'none'}, yValue: ${
+          orientation === 'horizontal' ? categoryValue : numericValue
+        }, xValue: ${orientation === 'horizontal' ? numericValue : categoryValue}, orientation: ${
+          orientation || 'none'
+        }`
+      })
+    }
   }
   const onMouseLeaveBar = () => {
     if (config.legend.highlightOnHover && config.legend.behavior === 'highlight') {

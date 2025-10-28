@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 import CdcDataTable from '../CdcDataTable'
 
 import DataTableConfig from '../../examples/data-table-example.json'

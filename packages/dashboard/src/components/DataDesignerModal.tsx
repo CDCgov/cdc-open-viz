@@ -34,11 +34,21 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
   }, [vizKey, useRow])
 
   const configureData = useMemo(() => {
+    let baseConfig
     if (isUpdatingVisualization) {
-      return config.visualizations[vizKey]
+      baseConfig = config.visualizations[vizKey]
+    } else {
+      baseConfig = config.rows[rowIndex]
     }
-    return config.rows[rowIndex]
-  }, [config.visualizations, config.rows, rowIndex, isUpdatingVisualization])
+
+    // Directly attach data from datasets
+    const data = baseConfig?.dataKey ? config.datasets[baseConfig.dataKey]?.data : undefined
+
+    return {
+      ...baseConfig,
+      data
+    }
+  }, [config.visualizations, config.datasets, config.rows, rowIndex, isUpdatingVisualization])
 
   const fetchData = async datasetKey => {
     const { data, dataUrl } = config.datasets[datasetKey]

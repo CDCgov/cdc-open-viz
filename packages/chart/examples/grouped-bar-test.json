@@ -1,0 +1,400 @@
+{
+  "annotations": [],
+  "allowLineToBarGraph": "__​undefined__",
+  "type": "chart",
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "title": "Sales Performance by Quarter - Grouped Bar Chart",
+  "showTitle": true,
+  "showDownloadMediaButton": false,
+  "theme": "theme-blue",
+  "animate": true,
+  "lineDatapointStyle": "hover",
+  "lineDatapointColor": "Same as Line",
+  "barHasBorder": "true",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "regular",
+  "barStyle": "",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "isResponsiveTicks": false,
+  "general": {
+    "annotationDropdownText": "Annotations",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": true,
+    "hideNullValue": true,
+    "palette": {
+      "isReversed": true,
+      "version": "2.0",
+      "name": "sequential_bluereverse"
+    }
+  },
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "preliminaryData": [],
+  "yAxis": {
+    "hideAxis": false,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 80,
+    "gridLines": true,
+    "enablePadding": false,
+    "min": "",
+    "max": "",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
+    "rightHideAxis": false,
+    "rightAxisSize": 0,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#1c1d1f",
+    "rightAxisTickLabelColor": "#1c1d1f",
+    "rightAxisTickColor": "#1c1d1f",
+    "numTicks": "",
+    "axisPadding": 0,
+    "scalePadding": 10,
+    "tickRotation": 0,
+    "anchors": [],
+    "shoMissingDataLabel": true,
+    "showMissingDataLine": true,
+    "categories": [],
+    "label": "Sales (thousands)"
+  },
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "count": "Count",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
+    }
+  },
+  "topAxis": {
+    "hasLine": false
+  },
+  "isLegendValue": false,
+  "barThickness": 0.8,
+  "barHeight": 25,
+  "barSpace": 15,
+  "heights": {
+    "vertical": 300,
+    "horizontal": 750
+  },
+  "xAxis": {
+    "sortDates": false,
+    "anchors": [],
+    "type": "categorical",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 60,
+    "tickRotation": 0,
+    "min": "",
+    "max": "",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
+    "numTicks": "",
+    "labelOffset": 0,
+    "axisPadding": 200,
+    "target": 0,
+    "maxTickRotation": 0,
+    "padding": 5,
+    "showYearsOnce": false,
+    "sortByRecentDate": false,
+    "brushActive": false,
+    "dataKey": "Quarter",
+    "label": "Quarter",
+    "axisBBox": 62.279998779296875,
+    "tickWidthMax": 65
+  },
+  "table": {
+    "label": "Sales Data by Quarter",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "indexLabel": "",
+    "download": true,
+    "showVertical": false,
+    "dateDisplayFormat": "",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "collapsible": true,
+    "show": true
+  },
+  "orientation": "vertical",
+  "columns": {},
+  "legend": {
+    "hide": false,
+    "behavior": "isolate",
+    "axisAlign": true,
+    "singleRow": false,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "Product Lines",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "hideSuppressedLabels": false,
+    "hideSuppressionLink": false,
+    "seriesHighlight": [],
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "groupBy": "",
+    "shape": "circle",
+    "tickRotation": "",
+    "order": "dataColumn",
+    "hideBorder": {
+      "side": false,
+      "topBottom": true
+    },
+    "position": "bottom",
+    "orderedValues": [],
+    "patterns": {
+      "Pattern1": {
+        "label": "Pattern1",
+        "color": "#000000",
+        "shape": "circles",
+        "dataKey": "Books",
+        "dataValue": "95",
+        "patternSize": 8,
+        "contrastCheck": false
+      }
+    },
+    "patternField": "",
+    "unified": true
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
+  "labels": false,
+  "dataFormat": {
+    "commas": true,
+    "prefix": "$",
+    "suffix": "K",
+    "abbreviated": false,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false
+  },
+  "filters": [],
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false,
+    "lineDatapointSymbol": "none",
+    "maximumShapeAmount": 7
+  },
+  "useLogScale": false,
+  "filterBehavior": "Filter Change",
+  "highlightedBarValues": [],
+  "series": [
+    {
+      "dataKey": "Electronics",
+      "type": "Bar",
+      "tooltip": true,
+      "axis": "Left"
+    },
+    {
+      "dataKey": "Clothing",
+      "type": "Bar",
+      "tooltip": true,
+      "axis": "Left"
+    },
+    {
+      "dataKey": "HomeGoods",
+      "type": "Bar",
+      "tooltip": true,
+      "axis": "Left"
+    },
+    {
+      "dataKey": "Books",
+      "type": "Bar",
+      "tooltip": true,
+      "axis": "Left"
+    }
+  ],
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": ""
+  },
+  "forestPlot": {
+    "startAt": 0,
+    "colors": {
+      "line": "",
+      "shape": ""
+    },
+    "lineOfNoEffect": {
+      "show": true
+    },
+    "type": "",
+    "pooledResult": {
+      "diamondHeight": 5,
+      "column": ""
+    },
+    "estimateField": "",
+    "estimateRadius": "",
+    "shape": "square",
+    "rowHeight": 20,
+    "description": {
+      "show": true,
+      "text": "description",
+      "location": 0
+    },
+    "result": {
+      "show": true,
+      "text": "result",
+      "location": 100
+    },
+    "radius": {
+      "min": 2,
+      "max": 10,
+      "scalingColumn": ""
+    },
+    "regression": {
+      "lower": 0,
+      "upper": 0,
+      "estimateField": 0
+    },
+    "leftWidthOffset": 0,
+    "rightWidthOffset": 0,
+    "showZeroLine": false,
+    "leftLabel": "",
+    "rightLabel": ""
+  },
+  "area": {
+    "isStacked": false
+  },
+  "sankey": {
+    "title": {
+      "defaultColor": "black"
+    },
+    "iterations": 1,
+    "rxValue": 0.9,
+    "overallSize": {
+      "width": 900,
+      "height": 700
+    },
+    "margin": {
+      "margin_y": 25,
+      "margin_x": 0
+    },
+    "nodeSize": {
+      "nodeWidth": 26,
+      "nodeHeight": 40
+    },
+    "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": {
+      "default": "#ff8500",
+      "inactive": "#808080"
+    },
+    "linkColor": {
+      "default": "#ffc900",
+      "inactive": "#D3D3D3"
+    },
+    "opacity": {
+      "nodeOpacityDefault": 1,
+      "nodeOpacityInactive": 0.1,
+      "LinkOpacityDefault": 1,
+      "LinkOpacityInactive": 0.1
+    },
+    "storyNodeFontColor": "#006778",
+    "storyNodeText": [],
+    "nodeValueStyle": {
+      "textBefore": "(",
+      "textAfter": ")"
+    },
+    "data": []
+  },
+  "visualizationType": "Bar",
+  "height": 400,
+  "fontSize": "medium",
+  "description": "A grouped bar chart showing sales performance across four product lines over five quarters",
+  "version": "4.25.9",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "dynamicMarginTop": 0,
+  "data": [
+    {
+      "Quarter": "Q1 2023",
+      "Electronics": 250,
+      "Clothing": 180,
+      "HomeGoods": 120,
+      "Books": 95
+    },
+    {
+      "Quarter": "Q2 2023",
+      "Electronics": 320,
+      "Clothing": 220,
+      "HomeGoods": 140,
+      "Books": 110
+    },
+    {
+      "Quarter": "Q3 2023",
+      "Electronics": 380,
+      "Clothing": 190,
+      "HomeGoods": 160,
+      "Books": 85
+    },
+    {
+      "Quarter": "Q4 2023",
+      "Electronics": 450,
+      "Clothing": 280,
+      "HomeGoods": 200,
+      "Books": 125
+    },
+    {
+      "Quarter": "Q1 2024",
+      "Electronics": 280,
+      "Clothing": 240,
+      "HomeGoods": 180,
+      "Books": 140
+    }
+  ]
+}

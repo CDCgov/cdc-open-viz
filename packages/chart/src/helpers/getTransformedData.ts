@@ -14,7 +14,7 @@ export const getTransformedData = ({
   const data =
     Array.isArray(brushData) && brushData.length > 0
       ? brushData
-      : Array.isArray(filteredData) && filteredData.length > 0
+      : Array.isArray(filteredData)
       ? filteredData
       : excludedData
 

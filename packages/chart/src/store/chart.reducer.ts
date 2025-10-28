@@ -25,7 +25,7 @@ export const getInitialState = (configObj: ChartConfig): ChartState => {
   return {
     isLoading: true,
     config: defaults,
-    stateData: _.cloneDeep(configObj?.data) || [],
+    stateData: configObj?.data || [],
     colorScale: null,
     excludedData: undefined,
     filteredData: undefined,

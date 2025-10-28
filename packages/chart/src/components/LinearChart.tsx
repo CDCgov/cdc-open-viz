@@ -5,6 +5,7 @@ import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
 import { Group } from '@visx/group'
 import { Line, Bar } from '@visx/shape'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
+import 'react-tooltip/dist/react-tooltip.css'
 import { Text } from '@visx/text'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import _ from 'lodash'
@@ -42,6 +43,7 @@ import useScales, { getTickValues } from '../hooks/useScales'
 
 import getTopAxis from '../helpers/getTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
+import { useChartHoverAnalytics } from '../hooks/useChartHoverAnalytics'
 import { useEditorPermissions } from './EditorPanel/useEditorPermissions'
 import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
@@ -90,6 +92,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleChartAriaLabels,
     handleLineType,
     handleDragStateChange,
+    interactionLabel,
     isDraggingAnnotation,
     legendRef,
     parseDate,
@@ -204,7 +207,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   const yMax = initialHeight + forestRowsHeight
 
-  const isNoDataAvailable = config.filters && config.filters.values.length === 0 && data.length === 0
+  const isNoDataAvailable = config.filters?.length > 0 && data.length === 0
 
   const getXAxisData = d =>
     isDateScale(config.runtime.xAxis)
@@ -268,8 +271,16 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     yScale,
     seriesScale,
     showTooltip,
-    hideTooltip
+    hideTooltip,
+    interactionLabel
   })
+
+  // Analytics tracking for chart hover
+  const { handleChartMouseEnter, handleChartMouseLeave } = useChartHoverAnalytics({
+    config,
+    interactionLabel
+  })
+
   // get the number of months between the first and last date
   const { dataKey } = runtime.xAxis
   const dateSpanMonths =
@@ -678,8 +689,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           role='img'
           aria-label={handleChartAriaLabels(config)}
           style={{ overflow: 'visible' }}
-          onMouseLeave={() => setShowHoverLine(false)}
-          onMouseEnter={() => setShowHoverLine(true)}
+          onMouseLeave={() => {
+            setShowHoverLine(false)
+            handleChartMouseLeave()
+          }}
+          onMouseEnter={() => {
+            setShowHoverLine(true)
+            handleChartMouseEnter()
+          }}
         >
           {!isDraggingAnnotation && <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>}{' '}
           {/* GRID LINES */}
@@ -1403,7 +1420,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   : yMax
               }
               left={config.visualizationType !== 'Forest Plot' ? Number(runtime.yAxis.size) : 0}
-              label={config[section].label}
+              label={runtime[section].label}
               tickFormat={handleBottomTickFormatting}
               scale={xScale}
               stroke='#333'

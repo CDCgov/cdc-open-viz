@@ -3,6 +3,10 @@ import { type Visualization } from '@cdc/core/types/Visualization'
 import { type EditorColumnProperties } from '@cdc/core/types/EditorColumnProperties'
 import { type Version } from '@cdc/core/types/Version'
 import { type VizFilter } from '@cdc/core/types/VizFilter'
+import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
+
+// Runtime data types
+export type RuntimeFilters = VizFilter[] & { fromHash?: number }
 
 export type MapVisualSettings = {
   /** minBubbleSize - Minimum Circle Size when the map has a type of bubble */
@@ -38,14 +42,19 @@ export type PatternSelection = {
   contrastCheck: boolean
 }
 
-export type GeoColumnProperties = Pick<EditorColumnProperties, 'name' | 'label' | 'tooltip' | 'dataTable'>
-export type LatitudeColumnProperties = Pick<EditorColumnProperties, 'name'>
-export type LongitudeColumnProperties = Pick<EditorColumnProperties, 'name'>
-export type NavigateColumnProperties = Pick<EditorColumnProperties, 'name'>
-export type PrimaryColumnProperties = Pick<
-  EditorColumnProperties,
-  'dataTable' | 'label' | 'name' | 'prefix' | 'suffix' | 'tooltip'
->
+// Base column properties with name required, all others optional
+export type BaseColumnProperties = Pick<EditorColumnProperties, 'name'> &
+  Partial<Pick<EditorColumnProperties, 'label' | 'tooltip' | 'dataTable' | 'prefix' | 'suffix'>>
+
+// Simple column type for name-only columns
+export type SimpleColumnProperties = Pick<EditorColumnProperties, 'name'>
+
+// Specific column types for better semantics
+export type GeoColumnProperties = BaseColumnProperties
+export type LatitudeColumnProperties = SimpleColumnProperties
+export type LongitudeColumnProperties = SimpleColumnProperties
+export type NavigateColumnProperties = SimpleColumnProperties
+export type PrimaryColumnProperties = BaseColumnProperties
 
 export type LegendShapeItem = {
   column: string
@@ -70,15 +79,13 @@ export type Coordinate = [number, number]
 
 export type DataRow = {
   uid?: string // optional 'uid' property
-  [key: string]: any // allowing any additional properties with a dynamic key (e.g., for `configPrimaryName`)
+  [key: string]: string | number | boolean | null | undefined // allowing primitive data types for dynamic columns
 }
 
 export type MapConfig = Visualization & {
   annotations: Annotation[]
   // map color palette
   color: string
-  // custom color palette
-  customColors: string[]
   columns: {
     geo: GeoColumnProperties
     primary: PrimaryColumnProperties
@@ -93,6 +100,7 @@ export type MapConfig = Visualization & {
   filters: VizFilter[]
   general: {
     navigationTarget: '_self' | '_blank'
+    noDataMessage: string // single-state no data message
     subtext: string
     introText: string
     allowMapZoom: boolean
@@ -121,6 +129,9 @@ export type MapConfig = Visualization & {
     language: string
     palette: {
       isReversed: boolean
+      name: string
+      version: string
+      customColors?: string[]
     }
     showDownloadMediaButton: boolean
     showDownloadImgButton: boolean
@@ -180,8 +191,6 @@ export type MapConfig = Visualization & {
   }
   runtime: {
     editorErrorMessage: string[]
-    // when a single state map doesn't include a fips code show a message...
-    noStateFoundMessage: string
   }
   mapPosition: { coordinates: Coordinate; zoom: number }
   map: {
@@ -196,4 +205,4 @@ export type MapConfig = Visualization & {
   type: 'map'
   // version of the map
   version: Version
-}
+} & MarkupConfig

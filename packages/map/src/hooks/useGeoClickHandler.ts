@@ -1,9 +1,17 @@
 import ConfigContext, { MapDispatchContext } from '../context'
 import { navigationHandler } from '../helpers'
 import { useContext } from 'react'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle } from '@cdc/core/helpers/metrics/utils'
 
 const useGeoClickHandler = () => {
-  const { config: state, setConfig, setSharedFilter, customNavigationHandler } = useContext(ConfigContext)
+  const {
+    config: state,
+    setConfig,
+    setSharedFilter,
+    customNavigationHandler,
+    interactionLabel
+  } = useContext(ConfigContext)
   const dispatch = useContext(MapDispatchContext)
 
   const geoClickHandler = (geoDisplayName: string, geoData: object): void => {
@@ -30,11 +38,37 @@ const useGeoClickHandler = () => {
       }
       dispatch({ type: 'SET_MODAL', payload: modalData })
 
+      // Track modal click analytics event
+      if (interactionLabel) {
+        const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
+        publishAnalyticsEvent({
+          vizType: 'map',
+          eventType: `modal_trigger` as any,
+          eventAction: 'click',
+          eventLabel: interactionLabel,
+          vizTitle: getVizTitle(state),
+          specifics: `clicked on: ${String(locationName).toLowerCase()}`
+        })
+      }
+
       return
     }
 
     // Otherwise if this item has a link specified for it, do regular navigation.
     if (state.columns.navigate && geoData[state.columns.navigate.name]) {
+      // Track navigation click analytics event
+      if (interactionLabel) {
+        const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
+        publishAnalyticsEvent({
+          vizType: 'map',
+          eventType: `map_trigger` as any,
+          eventAction: 'click',
+          eventLabel: interactionLabel,
+          vizTitle: getVizTitle(state),
+          specifics: `clicked on: ${String(locationName).toLowerCase()}`
+        })
+      }
+
       navigationHandler(state.general.navigationTarget, geoData[state.columns.navigate.name], customNavigationHandler)
     }
   }

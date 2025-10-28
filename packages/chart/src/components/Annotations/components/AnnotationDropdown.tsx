@@ -51,7 +51,7 @@ const AnnotationDropdown = () => {
           }}
           tabIndex={0}
           onKeyDown={e => {
-            if (e.keyCode === 13) {
+            if (e.key === 'Enter') {
               setExpanded(!expanded)
             }
           }}

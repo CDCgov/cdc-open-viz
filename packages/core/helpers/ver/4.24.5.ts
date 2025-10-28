@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import cloneConfig from '../cloneConfig'
 
 const migrateMarkupInclude = newConfig => {
   if (newConfig.type === 'markup-include') {
@@ -21,7 +22,7 @@ const migrateMarkupInclude = newConfig => {
 const update_4_24_5 = config => {
   const ver = '4.24.5'
 
-  const newConfig = _.cloneDeep(config)
+  const newConfig = cloneConfig(config)
 
   migrateMarkupInclude(newConfig)
 

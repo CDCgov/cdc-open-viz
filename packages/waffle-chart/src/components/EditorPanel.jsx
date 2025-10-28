@@ -1,5 +1,5 @@
 import React, { useState, useEffect, memo, useContext } from 'react'
-
+import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import _ from 'lodash'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
@@ -108,7 +108,7 @@ const EditorPanel = memo(props => {
   }
 
   const convertStateToConfig = () => {
-    let strippedState = _.cloneDeep(config)
+    let strippedState = cloneConfig(config)
     delete strippedState.newViz
     delete strippedState.runtime
 

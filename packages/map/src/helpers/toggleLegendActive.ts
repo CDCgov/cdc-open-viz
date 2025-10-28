@@ -1,12 +1,6 @@
 import _ from 'lodash'
 
-export const toggleLegendActive = (
-  i: number,
-  legendLabel: string,
-  runtimeLegend,
-  setRuntimeLegend,
-  setAccessibleStatus: (message: string) => void
-) => {
+export const toggleLegendActive = (i: number, legendLabel: string, runtimeLegend, dispatch) => {
   const runtimeLegendCopy = _.cloneDeep(runtimeLegend)
 
   // Create and toggle the new value
@@ -17,9 +11,10 @@ export const toggleLegendActive = (
 
   runtimeLegendCopy['disabledAmt'] = newValue ? disabledAmt + 1 : disabledAmt - 1
 
-  setRuntimeLegend(runtimeLegendCopy)
+  dispatch({ type: 'SET_RUNTIME_LEGEND', payload: runtimeLegendCopy })
 
-  setAccessibleStatus(
-    `Disabled legend item ${legendLabel ?? ''}. Please reference the data table to see updated values.`
-  )
+  dispatch({
+    type: 'SET_ACCESSIBLE_STATUS',
+    payload: `Disabled legend item ${legendLabel ?? ''}. Please reference the data table to see updated values.`
+  })
 }

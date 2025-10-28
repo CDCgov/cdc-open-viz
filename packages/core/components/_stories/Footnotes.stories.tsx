@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from '@storybook/react'
+import { Meta, StoryObj } from '@storybook/react-vite'
 import Footnotes from '../Footnotes'
 
 const meta: Meta<typeof Footnotes> = {

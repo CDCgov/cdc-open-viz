@@ -103,7 +103,7 @@ export const getVisualizationsWithFormattedData = (visualizations: Record<string
       acc[vizKey].formattedData = newData[dataKey]
     }
     return acc
-  }, _.cloneDeep(visualizations))
+  }, visualizations)
 }
 
 export const filterUsedByDataUrl = (

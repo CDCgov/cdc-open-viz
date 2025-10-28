@@ -5,11 +5,13 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import initialState from './data/initial-state'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { addUIDs, validateFipsCodeLength } from './helpers'
-import EditorContext from '@cdc/editor/src/ConfigContext'
+import EditorContext from '@cdc/core/contexts/EditorContext'
 import { extractCoveData, updateVegaData } from '@cdc/core/helpers/vegaConfig'
 import { MapConfig } from './types/MapConfig'
-import _ from 'lodash'
+import _, { get } from 'lodash'
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 type CdcMapProps = {
   config: MapConfig
@@ -35,6 +37,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
 }) => {
   const editorContext = useContext(EditorContext)
   const [config, _setConfig] = useState(editorsConfig ?? null)
+  const [mapReadyEventRan, setMapReadyEventRan] = useState(false)
 
   const setConfig = newConfig => {
     _setConfig(newConfig)
@@ -107,7 +110,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
   }
 
   const init = async () => {
-    let _newConfig = _.cloneDeep(config ?? initialState)
+    let _newConfig = cloneConfig(config ?? initialState)
 
     if (configUrl) {
       _newConfig = await fetchRemoteData(configUrl)
@@ -119,16 +122,28 @@ const CdcMap: React.FC<CdcMapProps> = ({
 
   useEffect(() => {
     init()
-    publishAnalyticsEvent('map_loaded', 'load', interactionLabel, 'map')
-  }, [])
-
-  useEffect(() => {
-    init()
   }, [configUrl])
 
   useEffect(() => {
     setConfig(editorsConfig)
   }, [editorsConfig])
+
+  /**
+   * When map has a config and is not loading, publish the map_ready event.
+   */
+  useEffect(() => {
+    if (!loading && !_.isEmpty(config) && !mapReadyEventRan) {
+      publishAnalyticsEvent({
+        vizType: 'map',
+        vizSubType: getVizSubType(config),
+        eventType: 'map_ready',
+        eventAction: 'load',
+        eventLabel: interactionLabel,
+        vizTitle: getVizTitle(config)
+      })
+      setMapReadyEventRan(true)
+    }
+  }, [loading, config, mapReadyEventRan, interactionLabel])
 
   if (loading) return null
 
