@@ -426,7 +426,6 @@ const PanelVisual: FC<PanelProps> = props => {
               value={config.dataCutoff}
               type='number'
               fieldName='dataCutoff'
-              className='number-narrow'
               label='Data Cutoff'
               updateField={updateField}
               tooltip={

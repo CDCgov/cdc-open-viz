@@ -41,6 +41,7 @@ import useMinMax from '../../hooks/useMinMax'
 import { type ChartContext } from '../../types/ChartContext'
 import { type ChartConfig } from '../../types/ChartConfig'
 
+import '@cdc/core/components/EditorPanel/EditorPanel.styles.css'
 import './editor-panel.scss'
 import { Anchor } from '@cdc/core/types/Axis'
 import EditorPanelContext from './EditorPanelContext'
@@ -1787,18 +1788,20 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               handleForecastPaletteSelection={handleForecastPaletteSelection}
                             >
                               <fieldset>
-                                <legend className='edit-label float-left'>Displaying</legend>
-                                <Tooltip style={{ textTransform: 'none' }}>
-                                  <Tooltip.Target>
-                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                  </Tooltip.Target>
-                                  <Tooltip.Content>
-                                    <p>
-                                      A data series is a set of related data points plotted in a chart and typically
-                                      represented in the chart legend.
-                                    </p>
-                                  </Tooltip.Content>
-                                </Tooltip>
+                                <legend className='edit-label d-flex align-items-center'>
+                                  Displaying
+                                  <Tooltip style={{ textTransform: 'none' }}>
+                                    <Tooltip.Target>
+                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                    </Tooltip.Target>
+                                    <Tooltip.Content>
+                                      <p>
+                                        A data series is a set of related data points plotted in a chart and typically
+                                        represented in the chart legend.
+                                      </p>
+                                    </Tooltip.Content>
+                                  </Tooltip>
+                                </legend>
                               </fieldset>
 
                               <DragDropContext
