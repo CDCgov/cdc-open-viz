@@ -98,7 +98,7 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
           value={useInlineHTML}
           section='contentEditor'
           fieldName='useInlineHTML'
-          label='Use Inline HTML&nbsp;'
+          label='Use Inline HTML'
           updateField={updateField}
         />
         <div className='column-edit'>
@@ -135,40 +135,40 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
           onThemeSelect={theme => updateConfig({ ...config, theme })}
           label='Theme'
         />
-        <div className='cove-accordion__panel-section checkbox-group'>
+        <div className='checkbox-group'>
           <CheckBox
             value={visual.border}
             section='visual'
             fieldName='border'
-            label='Display Border&nbsp;'
+            label='Display Border'
             updateField={updateField}
           />
           <CheckBox
             value={visual.borderColorTheme}
             section='visual'
             fieldName='borderColorTheme'
-            label='Use Border Color Theme&nbsp;'
+            label='Use Border Color Theme'
             updateField={updateField}
           />
           <CheckBox
             value={visual.accent}
             section='visual'
             fieldName='accent'
-            label='Use Accent Style&nbsp;'
+            label='Use Accent Style'
             updateField={updateField}
           />
           <CheckBox
             value={visual.background}
             section='visual'
             fieldName='background'
-            label='Use Theme Background Color&nbsp;'
+            label='Use Theme Background Color'
             updateField={updateField}
           />
           <CheckBox
             value={visual.hideBackgroundColor}
             section='visual'
             fieldName='hideBackgroundColor'
-            label='Hide Background Color&nbsp;'
+            label='Hide Background Color'
             updateField={updateField}
           />
         </div>

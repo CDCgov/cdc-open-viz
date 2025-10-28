@@ -1,8 +1,7 @@
 @import '../utils/variables';
 @import '../themes/index';
-
-// Import HeaderThemeSelector styles to ensure consistency across all packages
 @import '../../../components/HeaderThemeSelector/HeaderThemeSelector.css';
+@import '../../checkbox-group';
 
 .cove-editor {
   display: grid;
@@ -487,4 +486,9 @@ ul.color-palette {
       margin-right: 2.8px;
     }
   }
+}
+
+// CheckBox component styling for EditorPanel/Inputs
+.edit-checkbox {
+  margin-right: 8px;
 }
