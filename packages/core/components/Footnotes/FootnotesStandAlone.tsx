@@ -8,9 +8,10 @@ import { VizFilter } from '../../types/VizFilter'
 type StandAloneProps = {
   config: FootnotesConfig
   filters?: VizFilter[]
+  isEditor?: boolean
 }
 
-const FootnotesStandAlone: React.FC<StandAloneProps> = ({ config, filters }) => {
+const FootnotesStandAlone: React.FC<StandAloneProps> = ({ config, filters, isEditor = false }) => {
   if (!config) return null
   // get the api footnotes from the config
   const apiFootnotes = useMemo(() => {
@@ -28,7 +29,15 @@ const FootnotesStandAlone: React.FC<StandAloneProps> = ({ config, filters }) => 
   // get static footnotes from the config.footnotes
   const staticFootnotes = config.staticFootnotes || []
 
-  return <Footnotes footnotes={[...apiFootnotes, ...staticFootnotes]} />
+  return (
+    <Footnotes
+      footnotes={[...apiFootnotes, ...staticFootnotes]}
+      data={config.data}
+      markupVariables={config.markupVariables}
+      filters={filters}
+      isEditor={isEditor}
+    />
+  )
 }
 
 export default FootnotesStandAlone

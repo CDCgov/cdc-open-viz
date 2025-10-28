@@ -1,4 +1,5 @@
 import { VizFilter } from './VizFilter'
+import { MarkupVariable } from './MarkupVariable'
 
 export type Footnote = {
   symbol?: string
@@ -15,6 +16,7 @@ type Footnotes = {
     orderColumn?: string
   }
   staticFootnotes?: Footnote[]
+  markupVariables?: MarkupVariable[]
 }
 
 export default Footnotes

@@ -32,6 +32,11 @@ const getFootnotesVizConfig = (
     }
   }
 
+  // Pass markup variables to footnotes if footnotes don't have their own
+  if (!visualizationConfig.footnotes.markupVariables && visualizationConfig['markupVariables']) {
+    visualizationConfig.footnotes.markupVariables = visualizationConfig['markupVariables']
+  }
+
   return visualizationConfig
 }
 
