@@ -1,6 +1,6 @@
 {
   "name": "@cdc/data-bite",
-  "version": "4.25.7",
+  "version": "4.25.8",
   "description": "React component for displaying a single piece of data in a card module",
   "moduleName": "CdcDataBite",
   "main": "dist/cdcdatabite",
