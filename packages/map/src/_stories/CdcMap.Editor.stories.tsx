@@ -2139,8 +2139,8 @@ export const VisualSectionTests: StoryObj<typeof CdcMap> = {
       async () => {
         // Find the color palette list and click on the purple theme
         const colorPalette = canvasElement.querySelector('.color-palette')
-        const purpleTheme = Array.from(colorPalette?.querySelectorAll('li') || []).find(li =>
-          li.classList.contains('theme-purple')
+        const purpleTheme = Array.from(colorPalette?.querySelectorAll('button') || []).find(button =>
+          button.classList.contains('theme-purple')
         ) as HTMLElement
         await userEvent.click(purpleTheme)
       },
