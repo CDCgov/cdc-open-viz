@@ -37,8 +37,15 @@ export const processMarkupVariables = (
   // Helper function to get data for a specific variable
   const getDataForVariable = (variable: MarkupVariable): any[] => {
     // First check if variable has its own dataKey
-    if (variable.dataKey && datasets && datasets[variable.dataKey]) {
-      return datasets[variable.dataKey].data || []
+    if (variable.dataKey) {
+      if (datasets && datasets[variable.dataKey]) {
+        return datasets[variable.dataKey].data || []
+      } else {
+        // Warn if dataset is specified but not found
+        console.warn(
+          `Markup variable "${variable.tag}" references dataset "${variable.dataKey}" which was not found in available datasets`
+        )
+      }
     }
 
     // If data prop is empty, try to use the widget's assigned dataset

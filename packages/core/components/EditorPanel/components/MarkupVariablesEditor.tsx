@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { MarkupVariable, MarkupCondition } from '../../../types/MarkupVariable'
 import Button from '../../elements/Button'
 import { TextField, Select, CheckBox } from '../Inputs'
@@ -44,8 +44,8 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
   // Ensure we always have a valid array
   const safeMarkupVariables = markupVariables || []
 
-  // Get columns from the available data
-  const getAvailableColumns = (): string[] => {
+  // Get columns from the available data (memoized for performance)
+  const getAvailableColumns = useMemo((): string[] => {
     // First try to use the data prop
     if (data && data.length > 0) {
       return Object.keys(data[0])
@@ -68,10 +68,10 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
     }
 
     return []
-  }
+  }, [data, datasets, config?.dataKey])
 
-  // Get column values for a specific column
-  const getColumnValues = (columnName: string): string[] => {
+  // Get column values for a specific column (memoized for performance)
+  const getColumnValues = useCallback((columnName: string): string[] => {
     let targetData = data
 
     // Fallback to assigned dataset using config.dataKey
@@ -99,7 +99,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
       }
     })
     return Array.from(uniqueValues).sort()
-  }
+  }, [data, datasets, config?.dataKey])
 
   // Validate a variable and return array of error messages
   const validateVariable = React.useCallback((variable: MarkupVariable): string[] => {
@@ -317,7 +317,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                               label='Data Column'
                               options={[
                                 { value: '', label: 'Select Column...' },
-                                ...getAvailableColumns().map(col => ({ value: col, label: col }))
+                                ...getAvailableColumns.map(col => ({ value: col, label: col }))
                               ]}
                               updateField={(_section, _subsection, _fieldName, value) => {
                                 updateVariable(index, { columnName: value })
@@ -342,7 +342,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                       label='Column'
                                       options={[
                                         { value: '', label: 'Select Column...' },
-                                        ...getAvailableColumns().map(col => ({ value: col, label: col }))
+                                        ...getAvailableColumns.map(col => ({ value: col, label: col }))
                                       ]}
                                       updateField={(_section, _subsection, _fieldName, newColumnName) => {
                                         // Reset value when column changes
