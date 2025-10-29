@@ -137,7 +137,11 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
           <select className='dataset-selector' value={configureData.dataKey || ''} onChange={changeDataset}>
             <option value=''>Select a dataset</option>
             {config.datasets &&
-              Object.keys(config.datasets).map(datasetKey => <option key={datasetKey}>{datasetKey}</option>)}
+              Object.keys(config.datasets).map(datasetKey => (
+                <option key={datasetKey} value={datasetKey}>
+                  {datasetKey}
+                </option>
+              ))}
           </select>
           {vizKey && (
             // only shows for visualizations
