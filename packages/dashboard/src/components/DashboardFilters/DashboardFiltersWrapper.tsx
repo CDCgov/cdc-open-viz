@@ -56,6 +56,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   const applyFilters = e => {
     e.preventDefault() // prevent form submission
 
+    // Increment version to invalidate any pending async filter operations from handleOnChange
+    filterVersionRef.current += 1
+
     const dashboardConfig = {
       ...state.config.dashboard,
       sharedFilters: [...state.config.dashboard.sharedFilters] // Only clone the array we need to modify
@@ -107,7 +110,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       loadAPIFilters(dashboardConfig.sharedFilters, apiFilterDropdowns, undefined, undefined, isStale)
         .then(async newFilters => {
           // Skip if operation is stale
-          if (isStale()) return
+          if (isStale()) {
+            return
+          }
 
           // First try to reload URL data (for filters that actually change the API call)
           await reloadURLData(newFilters)
@@ -168,6 +173,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
     setAPIFilterDropdowns(updatedDropdowns)
 
     dispatch({ type: 'SET_SHARED_FILTERS', payload: dashboardConfig.sharedFilters })
+
+    // Reset filtersApplied state to false when clearing filters
+    dispatch({ type: 'SET_FILTERS_APPLIED', payload: false })
 
     // Update filtered data immediately after resetting filters
     // Use the updated dashboardConfig filters instead of state

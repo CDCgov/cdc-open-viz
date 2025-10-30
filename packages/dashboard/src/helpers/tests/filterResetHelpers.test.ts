@@ -62,7 +62,7 @@ describe('getFilterResetValue', () => {
       }
 
       const result = getFilterResetValue(filter, mockAPIFilterDropdowns, true)
-      expect(result).toBeUndefined()
+      expect(result).toBe('')
     })
   })
 

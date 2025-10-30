@@ -303,8 +303,6 @@ export default function CdcDashboard({
   }
 
   const setEventData = ({ detail }, data, filteredData) => {
-    // eslint-disable-next-line no-console
-    console.log('Event: cove_set_data', detail)
     try {
       const newDatasets = Object.keys(detail).reduce((acc, key) => {
         if (data[key] !== undefined) {

@@ -34,7 +34,7 @@ export const addValuesToDashboardFilters = (
   data: Record<string, any[]>,
   filtersToSkip: number[] = []
 ): Array<SharedFilter> => {
-  return filters?.map((filter, index) => {
+  const result = filters?.map((filter, index) => {
     if (filtersToSkip.includes(index)) return filter
     if (filter.type === 'urlfilter') return filter
     const filterCopy = _.cloneDeep(filter)
@@ -50,9 +50,26 @@ export const addValuesToDashboardFilters = (
         const active: string[] = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
         filterCopy.active = active.filter(val => defaultValues.includes(val))
       } else {
-        const hasResetLabel = filters.find(filter => filter.resetLabel)
-        const defaultValue = hasResetLabel ? hasResetLabel.resetLabel : filterCopy.active || filterCopy.values[0]
-        filterCopy.active = filterCopy.defaultValue || defaultValue
+        // Preserve existing active value if it's valid in the new filter values
+        const currentActive = filterCopy.active
+        const isCurrentActiveValid = currentActive && filterValues.includes(currentActive)
+
+        // Check if this is an intentional clear (empty string, but not undefined during initial load)
+        const isIntentionalClear = currentActive === ''
+
+        if (isCurrentActiveValid) {
+          // Keep the current active value
+          filterCopy.active = currentActive
+        } else if (isIntentionalClear) {
+          // Don't override intentional clears with defaultValue
+          filterCopy.active = currentActive
+        } else {
+          // Set to default value if current active is undefined (initial load) or invalid
+          const hasResetLabel = filters.find(filter => filter.resetLabel)
+          const defaultValue = hasResetLabel ? hasResetLabel.resetLabel : filterCopy.values[0]
+          const newValue = filterCopy.defaultValue || defaultValue
+          filterCopy.active = newValue
+        }
       }
     }
 
@@ -83,4 +100,5 @@ export const addValuesToDashboardFilters = (
 
     return handleSorting(filterCopy)
   })
+  return result
 }
