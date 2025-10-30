@@ -1,0 +1,39 @@
+/* Common component styles shared across packages */
+/* This file combines loader, warning-icon, and checkbox-group styles */
+
+/* Shared loader component */
+/* Used across: chart, dashboard, data-bite, waffle-chart packages */
+.loader {
+  width: 100%;
+  text-align: center;
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+.loader::before {
+  content: '\21BB';
+}
+
+/* Shared warning icon component */
+/* Used across: chart, dashboard, data-bite packages */
+.warning-icon {
+  position: relative;
+  top: 2px;
+  width: 15px;
+  height: 15px;
+  margin-left: 5px;
+}
+
+.warning-icon path {
+  fill: #d8000c;
+}
+
+/* Shared checkbox group component */
+/* Used across: chart, data-bite, markup-include packages */
+.checkbox-group {
+  padding: 16px;
+  border: 1px solid #c4c4c4;
+  border-radius: 8px;
+  margin-top: 8px;
+  margin-bottom: 24px;
+}

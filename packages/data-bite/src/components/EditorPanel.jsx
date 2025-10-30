@@ -23,6 +23,8 @@ import Button from '@cdc/core/components/elements/Button'
 import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 
+import '@cdc/core/styles/v2/components/editor.scss'
+
 const EditorPanel = memo(() => {
   const { config, updateConfig, loading, data, setParentConfig, isDashboard, isEditor } = useContext(Context)
 

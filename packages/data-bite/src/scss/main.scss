@@ -1,38 +1,5 @@
-@import 'variables';
-
 .cdc-open-viz-module.type-data-bite {
   @import 'bite';
-
-  .checkbox-group {
-    padding: 16px;
-    border: 1px solid #c4c4c4;
-    border-radius: 8px;
-    margin-top: 8px;
-    margin-bottom: 24px;
-  }
-
-  .loader {
-    width: 100%;
-    text-align: center;
-    display: inline-block;
-    animation: spin 1s linear infinite;
-
-    &::before {
-      content: '\21BB';
-    }
-  }
-
-  .warning-icon {
-    position: relative;
-    top: 2px;
-    width: 15px;
-    height: 15px;
-    margin-left: 5px;
-
-    path {
-      fill: #d8000c;
-    }
-  }
 
   .tooltip {
     background-color: #fff;

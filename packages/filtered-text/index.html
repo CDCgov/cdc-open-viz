@@ -1,29 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <style>
-      body {
-        margin: 0;
-      }
-    </style>
-    <style>
-      body {
-        /* max-width: 1000px; */
-        margin: 0 auto !important;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
 
-      .react-container + .react-container {
-        margin-top: 3rem;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="react-container" data-config="/examples/example-config.json"></div>
-    <script type="module" src="./src/index.jsx"></script>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <style type="text/css">
+    body {
+      margin: 0;
+      border-top: none !important;
+    }
+
+    .cdc-map-outer-container {
+      min-height: 100vh;
+    }
+  </style>
+  <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />
+
+  <!-- This is temporary and for testing until Nunito/900 is added to TP -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@900&display=swap" rel="stylesheet" />
+  <style type="text/css">
+    @font-face {
+      font-family: 'Nunito';
+      font-weight: 900;
+      font-display: swap;
+      src: url('https://app.unpkg.com/@fontsource/nunito@5.0.18/files/files/nunito-latin-900-normal.woff2') format('woff2');
+    }
+  </style>
+</head>
+
+<body>
+  <div class="react-container" data-config="/examples/example-config.json"></div>
+  <script type="module" src="./src/index.jsx"></script>
+</body>
+
 </html>

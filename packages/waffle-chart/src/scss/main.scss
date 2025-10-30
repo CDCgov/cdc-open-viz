@@ -2,17 +2,6 @@
 @import 'waffle-chart';
 
 .cdc-open-viz-module.type-waffle-chart {
-  .loader {
-    width: 100%;
-    text-align: center;
-    display: inline-block;
-    animation: spin 1s linear infinite;
-
-    &::before {
-      content: '\21BB';
-    }
-  }
-
   .cove-component__content:not(.component--has-background, .component--hideBackgroundColor) {
     background-color: white;
   }

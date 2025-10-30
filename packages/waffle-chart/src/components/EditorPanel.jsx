@@ -9,9 +9,7 @@ import Accordion from '@cdc/core/components/ui/Accordion'
 import Button from '@cdc/core/components/elements/Button'
 import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
-import InputText from '@cdc/core/components/inputs/InputText'
-import InputSelect from '@cdc/core/components/inputs/InputSelect'
-import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
+import { TextField, Select, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import Layout from '@cdc/core/components/Layout'
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
@@ -20,24 +18,6 @@ import '@cdc/core/styles/v2/components/editor.scss'
 import WarningImage from '../images/warning.svg'
 
 import { DATA_OPERATORS, DATA_FUNCTIONS } from '../CdcWaffleChart'
-
-const CheckBox = memo(
-  ({ label, value, fieldName, section = null, subsection = null, tooltip, updateField, ...attributes }) => (
-    <label className='checkbox'>
-      <input
-        type='checkbox'
-        name={fieldName}
-        checked={value}
-        onChange={() => {
-          updateField(section, subsection, fieldName, !value)
-        }}
-        {...attributes}
-      />
-      <span className='edit-label column-heading'>{label}</span>
-      <span className='cove-icon'>{tooltip}</span>
-    </label>
-  )
-)
 
 const EditorPanel = memo(props => {
   const { config, updateConfig, loading, data, setParentConfig, isDashboard } = useContext(ConfigContext)
@@ -148,43 +128,31 @@ const EditorPanel = memo(props => {
   const editorContent = (
     <Accordion>
       <Accordion.Section title='General'>
-        <div className='cove-accordion__panel-section'>
-          <div style={{ width: '100%', display: 'block' }} className='cove-input-group'>
-            <InputSelect
-              value={config.visualizationType}
-              fieldName='visualizationType'
-              label='Chart Type'
-              updateField={updateField}
-              options={approvedWaffleChartOptions}
-              className='cove-input'
-            />
-            {config.visualizationType === 'Gauge' && (
-              <InputSelect
-                value={config.visualizationSubType}
-                fieldName='visualizationSubType'
-                label='Chart Subtype'
-                updateField={updateField}
-                options={['Linear']}
-                className='cove-input'
-              />
-            )}
-          </div>
-        </div>
-        <InputText
+        <Select
+          value={config.visualizationType}
+          fieldName='visualizationType'
+          label='Chart Type'
+          updateField={updateField}
+          options={approvedWaffleChartOptions}
+        />
+        {config.visualizationType === 'Gauge' && (
+          <Select
+            value={config.visualizationSubType}
+            fieldName='visualizationSubType'
+            label='Chart Subtype'
+            updateField={updateField}
+            options={['Linear']}
+          />
+        )}
+        <TextField
           value={config.title}
           fieldName='title'
           label='Title'
           placeholder='Chart Title'
           updateField={updateField}
         />
-        <InputCheckbox
-          size='small'
-          label='show title'
-          value={config.showTitle}
-          fieldName='showTitle'
-          updateField={updateField}
-        />
-        <InputText
+        <CheckBox label='show title' value={config.showTitle} fieldName='showTitle' updateField={updateField} />
+        <TextField
           type='textarea'
           value={config.content}
           fieldName='content'
@@ -205,7 +173,7 @@ const EditorPanel = memo(props => {
           }
         />
 
-        <InputText
+        <TextField
           value={config.subtext}
           fieldName='subtext'
           label='Subtext/Citation'
@@ -234,7 +202,7 @@ const EditorPanel = memo(props => {
         <h4 style={{ fontWeight: '600' }}>Numerator</h4>
         <div className='cove-accordion__panel-section'>
           <div className='cove-input-group'>
-            <InputSelect
+            <Select
               style={inputSelectStyle(!config.dataColumn)}
               value={config.dataColumn || ''}
               fieldName='dataColumn'
@@ -242,12 +210,11 @@ const EditorPanel = memo(props => {
               updateField={updateField}
               initial='Select'
               options={getColumns()}
-              className='cove-input'
             />
           </div>
 
           <div className='cove-input-group'>
-            <InputSelect
+            <Select
               style={inputSelectStyle(!config.dataFunction)}
               value={config.dataFunction || ''}
               fieldName='dataFunction'
@@ -255,7 +222,6 @@ const EditorPanel = memo(props => {
               updateField={updateField}
               initial='Select'
               options={DATA_FUNCTIONS}
-              className='cove-input'
             />
           </div>
 
@@ -265,27 +231,25 @@ const EditorPanel = memo(props => {
             </label>
             <div className='cove-accordion__panel-row cove-accordion__small-inputs'>
               <div className='cove-accordion__panel-col'>
-                <InputSelect
+                <Select
                   value={config.dataConditionalColumn || ''}
                   fieldName='dataConditionalColumn'
                   updateField={updateField}
                   initial='Select'
                   options={getColumns()}
-                  className='cove-input'
                 />
               </div>
               <div className='cove-accordion__panel-col'>
-                <InputSelect
+                <Select
                   value={config.dataConditionalOperator || ''}
                   fieldName='dataConditionalOperator'
                   updateField={updateField}
                   initial='Select'
                   options={DATA_OPERATORS}
-                  className='cove-input'
                 />
               </div>
               <div className='cove-accordion__panel-col'>
-                <InputText
+                <TextField
                   value={config.dataConditionalComparate}
                   fieldName={'dataConditionalComparate'}
                   updateField={updateField}
@@ -309,12 +273,7 @@ const EditorPanel = memo(props => {
           <div className='cove-accordion__panel-col'>
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <label className='cove-accordion__panel-label--inline'>Select from data</label>
-              <InputCheckbox
-                size='small'
-                value={config.customDenom}
-                fieldName='customDenom'
-                updateField={updateField}
-              />
+              <CheckBox value={config.customDenom} fieldName='customDenom' updateField={updateField} />
             </div>
           </div>
         </div>
@@ -322,7 +281,7 @@ const EditorPanel = memo(props => {
           {!config.customDenom && (
             <div className='cove-accordion__panel-row align-center'>
               <div className='cove-accordion__panel-col'>
-                <InputText value={config.dataDenom} fieldName='dataDenom' updateField={updateField} />
+                <TextField value={config.dataDenom} fieldName='dataDenom' updateField={updateField} />
               </div>
               <div className='cove-accordion__panel-col' style={{ display: 'flex', alignItems: 'center' }}>
                 <label className='cove-accordion__panel-label--muted'>default (100)</label>
@@ -331,7 +290,7 @@ const EditorPanel = memo(props => {
           )}
           {config.customDenom && (
             <>
-              <InputSelect
+              <Select
                 value={config.dataDenomColumn || ''}
                 fieldName='dataDenomColumn'
                 label='Data Column'
@@ -339,7 +298,7 @@ const EditorPanel = memo(props => {
                 initial='Select'
                 options={getColumns()}
               />
-              <InputSelect
+              <Select
                 value={config.dataDenomFunction || ''}
                 fieldName='dataDenomFunction'
                 label='Data Function'
@@ -353,13 +312,13 @@ const EditorPanel = memo(props => {
         <ul className='column-edit'>
           <li className='three-col'>
             <div style={{ marginRight: '1rem' }}>
-              <InputText value={config.prefix} fieldName='prefix' label='Prefix' updateField={updateField} />
+              <TextField value={config.prefix} fieldName='prefix' label='Prefix' updateField={updateField} />
             </div>
             <div style={{ marginRight: '1rem' }}>
-              <InputText value={config.suffix} fieldName='suffix' label='Suffix' updateField={updateField} />
+              <TextField value={config.suffix} fieldName='suffix' label='Suffix' updateField={updateField} />
             </div>
             <div>
-              <InputText
+              <TextField
                 type='number'
                 value={config.roundToPlace}
                 fieldName='roundToPlace'
@@ -373,25 +332,19 @@ const EditorPanel = memo(props => {
           <>
             <hr className='cove-accordion__divider' />
             <div className='cove-accordion__panel-section reverse-labels'>
-              <InputText
-                inline
-                size='small'
+              <TextField
                 value={config.valueDescription}
                 label='Value Descriptor'
                 fieldName='valueDescription'
                 updateField={updateField}
               />
-              <InputCheckbox
-                inline
-                size='small'
+              <CheckBox
                 value={config.showPercent}
                 label='Show Percentage'
                 fieldName='showPercent'
                 updateField={updateField}
               />
-              <InputCheckbox
-                inline
-                size='small'
+              <CheckBox
                 label='Show Denominator'
                 value={config.showDenominator}
                 fieldName='showDenominator'
@@ -401,18 +354,20 @@ const EditorPanel = memo(props => {
           </>
         )}
         <label style={{ marginBottom: '1rem' }}>
-          <span className='edit-label'>Data Point Filters</span>
-          <Tooltip style={{ textTransform: 'none' }}>
-            <Tooltip.Target>
-              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-            </Tooltip.Target>
-            <Tooltip.Content>
-              <p>
-                To refine the highlighted data point, specify one or more filters (e.g., "Male" and "Female" for a
-                column called "Sex").
-              </p>
-            </Tooltip.Content>
-          </Tooltip>
+          <span className='edit-label'>
+            Data Point Filters
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>
+                  To refine the highlighted data point, specify one or more filters (e.g., "Male" and "Female" for a
+                  column called "Sex").
+                </p>
+              </Tooltip.Content>
+            </Tooltip>
+          </span>
         </label>
 
         {config.filters && (
@@ -428,38 +383,24 @@ const EditorPanel = memo(props => {
                 >
                   Remove
                 </button>
-                <label>
-                  <span className='edit-label column-heading'>Column</span>
-                  <select
-                    value={filter.columnName}
-                    onChange={e => {
-                      updateFilterProp('columnName', index, e.target.value)
-                    }}
-                  >
-                    <option value=''>- Select Option -</option>
-                    {getColumns().map((dataKey, index) => (
-                      <option value={dataKey} key={index}>
-                        {dataKey}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  <span className='edit-label column-heading'>Column Value</span>
-                  <select
-                    value={filter.columnValue}
-                    onChange={e => {
-                      updateFilterProp('columnValue', index, e.target.value)
-                    }}
-                  >
-                    <option value=''>- Select Option -</option>
-                    {getFilterColumnValues(index).map((dataKey, index) => (
-                      <option value={dataKey} key={index}>
-                        {dataKey}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                <Select
+                  label='Column'
+                  value={filter.columnName || ''}
+                  options={getColumns()}
+                  initial='- Select Option -'
+                  onChange={e => {
+                    updateFilterProp('columnName', index, e.target.value)
+                  }}
+                />
+                <Select
+                  label='Column Value'
+                  value={filter.columnValue || ''}
+                  options={getFilterColumnValues(index)}
+                  initial='- Select Option -'
+                  onChange={e => {
+                    updateFilterProp('columnValue', index, e.target.value)
+                  }}
+                />
               </fieldset>
             ))}
           </ul>
@@ -470,13 +411,12 @@ const EditorPanel = memo(props => {
       </Accordion.Section>
       <Accordion.Section title='Visual'>
         {config.visualizationType !== 'Gauge' && (
-          <InputSelect
+          <Select
             value={config.shape}
             fieldName='shape'
             label='Shape'
             updateField={updateField}
             options={['circle', 'square', 'person']}
-            className='cove-input'
           />
         )}
         {config.visualizationType !== 'Gauge' && (
@@ -485,7 +425,7 @@ const EditorPanel = memo(props => {
             style={{ marginTop: '1rem', marginBottom: '1rem' }}
           >
             <div className='cove-accordion__panel-col'>
-              <InputText
+              <TextField
                 type='number'
                 value={config.nodeWidth}
                 fieldName='nodeWidth'
@@ -494,7 +434,7 @@ const EditorPanel = memo(props => {
               />
             </div>
             <div className='cove-accordion__panel-col'>
-              <InputText
+              <TextField
                 type='number'
                 value={config.nodeSpacer}
                 fieldName='nodeSpacer'
@@ -507,12 +447,11 @@ const EditorPanel = memo(props => {
 
         <div className='cove-input-group'>
           {config.visualizationType !== 'Gauge' && (
-            <InputSelect
+            <Select
               value={config.orientation}
               fieldName='orientation'
               label='Layout'
               updateField={updateField}
-              className='cove-input'
               options={['horizontal', 'vertical']}
             />
           )}
@@ -524,7 +463,7 @@ const EditorPanel = memo(props => {
           </label>
           <div className='cove-accordion__panel-row cove-accordion__small-inputs align-center'>
             <div className='cove-accordion__panel-col'>
-              <InputText type='number' value={config.fontSize} fieldName='fontSize' updateField={updateField} />
+              <TextField type='number' value={config.fontSize} fieldName='fontSize' updateField={updateField} />
             </div>
             <div className='cove-accordion__panel-col' style={{ display: 'flex', alignItems: 'center' }}>
               <label className='accordion__panel-label--muted'> default (50px)</label>
@@ -532,13 +471,12 @@ const EditorPanel = memo(props => {
           </div>
         </div>
 
-        <InputSelect
+        <Select
           value={config.overallFontSize}
           fieldName='overallFontSize'
           label='Overall Font Size'
           updateField={updateField}
           options={['small', 'medium', 'large']}
-          className='cove-input'
         />
 
         <HeaderThemeSelector
@@ -548,42 +486,35 @@ const EditorPanel = memo(props => {
         />
 
         <div className='cove-accordion__panel-section reverse-labels'>
-          <InputCheckbox
-            inline
-            size='small'
+          <CheckBox
             value={config.visual.border}
             section='visual'
             fieldName='border'
             label='Display Border'
             updateField={updateField}
           />
-          <InputCheckbox
-            inline
-            size='small'
+          <CheckBox
             value={config.visual.borderColorTheme}
             section='visual'
             fieldName='borderColorTheme'
             label='Use theme border color'
             updateField={updateField}
           />
-          <InputCheckbox
-            size='small'
+          <CheckBox
             value={config.visual.accent}
             section='visual'
             fieldName='accent'
             label='Use Accent Style'
             updateField={updateField}
           />
-          <InputCheckbox
-            size='small'
+          <CheckBox
             value={config.visual.background}
             section='visual'
             fieldName='background'
             label='Use Theme Background Color'
             updateField={updateField}
           />
-          <InputCheckbox
-            size='small'
+          <CheckBox
             value={config.visual.hideBackgroundColor}
             section='visual'
             fieldName='hideBackgroundColor'
