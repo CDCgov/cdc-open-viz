@@ -182,6 +182,8 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
         <MarkupVariablesEditor
           markupVariables={config.markupVariables || []}
           data={data || []}
+          datasets={datasets}
+          config={config}
           onChange={handleMarkupVariablesChange}
           enableMarkupVariables={config.enableMarkupVariables || false}
           onToggleEnable={handleToggleEnable}
