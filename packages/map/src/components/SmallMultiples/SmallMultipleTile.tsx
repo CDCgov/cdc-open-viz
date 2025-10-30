@@ -9,6 +9,8 @@ import generateRuntimeData from '../../helpers/generateRuntimeData'
 import UsaMap from '../UsaMap'
 import ResizeObserver from 'resize-observer-polyfill'
 import getViewport from '@cdc/core/helpers/getViewport'
+import { MapRefInterface } from '../../hooks/useProgrammaticMapTooltip'
+import SynchronizedTooltip from './SynchronizedTooltip'
 
 interface SmallMultipleTileProps {
   tileValue: string | number
@@ -18,6 +20,8 @@ interface SmallMultipleTileProps {
   isFirstInRow?: boolean
   tilesPerRow: number
   onHeaderRef?: (ref: HTMLDivElement | null) => void
+  onMapRef?: (ref: MapRefInterface | null) => void
+  onMapHover?: (geoId: string | null, yCoordinate?: number) => void
 }
 
 const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
@@ -27,11 +31,19 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   data,
   isFirstInRow,
   tilesPerRow,
-  onHeaderRef
+  onHeaderRef,
+  onMapRef,
+  onMapHover
 }) => {
   const parentContext = useContext<MapContext>(ConfigContext)
   const tileMapRef = useRef<HTMLDivElement>(null)
   const [tileDimensions, setTileDimensions] = useState<DimensionsType>([0, 0])
+  const mapRefForSync = useRef<MapRefInterface | null>(null)
+
+  // Generate unique tooltip ID for this tile to ensure each tile has its own ReactTooltip instance
+  const tileTooltipId = useMemo(() => {
+    return `${parentContext.tooltipId}-tile-${String(tileValue).replace(/[^a-zA-Z0-9]/g, '_')}`
+  }, [parentContext.tooltipId, tileValue])
 
   // Measure this tile's actual dimensions for pattern stroke calculation
   useEffect(() => {
@@ -91,6 +103,18 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
 
   const useDynamicViewbox = config.general.geoType === 'single-state' && tilesPerRow > 1
 
+  // Notify parent when map ref is ready
+  useEffect(() => {
+    if (onMapRef && mapRefForSync.current) {
+      onMapRef(mapRefForSync.current)
+    }
+    return () => {
+      if (onMapRef) {
+        onMapRef(null)
+      }
+    }
+  }, [onMapRef, tileValue])
+
   // Create tile-specific context with filtered config, filtered runtimeData, and tile dimensions
   // Parent's runtimeLegend is already unified (forced in CdcMapComponent for small multiples)
   const tileContext: MapContext = useMemo(
@@ -100,9 +124,15 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
       runtimeData: tileRuntimeData as any,
       dimensions: tileDimensions,
       vizViewport: getViewport(tileDimensions[0]),
-      useDynamicViewbox
+      useDynamicViewbox,
+      // Override tooltipId with unique tile-specific ID
+      tooltipId: tileTooltipId,
+      // Small multiples synchronization: pass wrapped callback
+      handleSmallMultipleHover: onMapHover,
+      // Internal: ref for programmatic tooltip control
+      mapRefForSync
     }),
-    [parentContext, tileConfig, tileRuntimeData, tileDimensions, useDynamicViewbox]
+    [parentContext, tileConfig, tileRuntimeData, tileDimensions, useDynamicViewbox, tileTooltipId, onMapHover]
   )
 
   return (
@@ -116,6 +146,15 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
           {config.general.geoType === 'single-state' && <UsaMap.SingleState />}
           {config.general.geoType === 'us-region' && <UsaMap.Region />}
         </ConfigContext.Provider>
+
+        {/* Custom tooltip component that responds to both natural and synthetic events */}
+        {!window.matchMedia('(any-hover: none)').matches && config.tooltips.appearanceType === 'hover' && (
+          <SynchronizedTooltip
+            tileTooltipId={tileTooltipId}
+            opacity={config.tooltips.opacity}
+            containerRef={tileMapRef}
+          />
+        )}
       </div>
     </div>
   )

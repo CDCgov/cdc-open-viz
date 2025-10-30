@@ -651,6 +651,7 @@
     "tilesPerRowMobile": 1,
     "tileOrderType": "asc",
     "tileOrder": [],
-    "tileTitles": {}
+    "tileTitles": {},
+    "synchronizedTooltips": true
   }
 }

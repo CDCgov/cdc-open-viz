@@ -91,6 +91,7 @@ export type SmallMultiples = {
   tileOrderType?: 'asc' | 'desc' | 'custom'
   tileOrder?: string[]
   tileTitles?: { [key: string]: string }
+  synchronizedTooltips?: boolean
 }
 
 export type MapConfig = Visualization & {

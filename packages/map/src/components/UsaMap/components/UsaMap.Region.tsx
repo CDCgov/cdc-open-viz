@@ -24,6 +24,7 @@ import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import './UsaMap.Region.styles.css'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
+import { useSynchronizedGeographies } from '../../../hooks/useSynchronizedGeographies'
 
 type TerritoryRectProps = {
   posX?: number
@@ -60,6 +61,7 @@ const UsaRegionMap = () => {
   const [focusedStates, setFocusedStates] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
+  const { getSyncProps, syncHandlers } = useSynchronizedGeographies()
   const { general } = config
   const { displayStateLabels, territoriesLabel, displayAsHex, type } = general
   const tooltipInteractionType = config.tooltips.appearanceType
@@ -218,6 +220,7 @@ const UsaRegionMap = () => {
 
         return (
           <g
+            {...getSyncProps(geoKey)}
             key={key}
             className='geo-group'
             style={styles}
@@ -225,7 +228,7 @@ const UsaRegionMap = () => {
             data-tooltip-id={`tooltip__${tooltipId}`}
             data-tooltip-html={toolTip}
             tabIndex={-1}
-            onMouseEnter={() => {
+            onMouseEnter={e => {
               // Track hover analytics event if this is a new location
               const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
               publishAnalyticsEvent({
@@ -238,6 +241,10 @@ const UsaRegionMap = () => {
                 location: geoDisplayName,
                 specifics: `location: ${locationName?.toLowerCase()}`
               })
+              syncHandlers.onMouseEnter(geoKey, e.clientY)
+            }}
+            onMouseLeave={() => {
+              syncHandlers.onMouseLeave()
             }}
           >
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1} d={path} />

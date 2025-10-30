@@ -189,7 +189,8 @@
       "COVID-19": "COVID-19",
       "Influenza A": "Influenza AAA",
       "RSV": "RSV"
-    }
+    },
+    "synchronizedTooltips": true
   },
   "filterBehavior": "Filter Change",
   "filterIntro": "",

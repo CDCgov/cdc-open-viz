@@ -6,6 +6,7 @@ import HexIcon from '../HexIcon'
 import { Text } from '@visx/text'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import { useSynchronizedGeographies } from '../../../../hooks/useSynchronizedGeographies'
 
 const offsets = {
   'US-VT': [50, -8],
@@ -48,6 +49,12 @@ const TerritoryHexagon = ({
   const { config } = useContext<MapContext>(ConfigContext)
 
   const isHex = config.general.displayAsHex
+
+  // Small multiples synchronization
+  const { getSyncProps, syncHandlers } = useSynchronizedGeographies()
+
+  // Construct geography key: use territory prop if available, otherwise construct from label
+  const geoKey = territory || `US-${label}`
 
   // Labels
   const hexagonLabel = (geo, bgColor = '#FFFFFF', projection) => {
@@ -133,17 +140,25 @@ const TerritoryHexagon = ({
             fontSize={14}
             x={'50%'}
             y={y}
-            style={{ fill: 'currentColor', stroke: strokeColor, fontWeight: 900, opacity: 1, fillOpacity: 1 }}
+            style={{
+              fill: 'currentColor',
+              stroke: strokeColor,
+              fontWeight: 900,
+              opacity: 1,
+              fillOpacity: 1,
+              pointerEvents: 'none'
+            }}
             paintOrder='stroke'
             textAnchor='middle'
             verticalAnchor='middle'
-            onClick={handleShapeClick}
             data-tooltip-id={dataTooltipId}
             data-tooltip-html={dataTooltipHtml}
           >
             {abbr.substring(3)}
           </Text>
-          {config.general.displayAsHex && config.hexMap.type === 'shapes' && getArrowDirection(territoryData, geo, true)}
+          {config.general.displayAsHex &&
+            config.hexMap.type === 'shapes' &&
+            getArrowDirection(territoryData, geo, true)}
         </>
       )
     }
@@ -151,7 +166,7 @@ const TerritoryHexagon = ({
     let [dx, dy] = offsets[abbr]
 
     return (
-      <g>
+      <g style={{ pointerEvents: 'none' }}>
         <line
           x1={centroid[0]}
           y1={centroid[1]}
@@ -167,7 +182,6 @@ const TerritoryHexagon = ({
           style={{ fill: APP_FONT_COLOR }}
           alignmentBaseline='middle'
           transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
-          onClick={handleShapeClick}
           data-tooltip-id={dataTooltipId}
           data-tooltip-html={dataTooltipHtml}
         >
@@ -179,11 +193,24 @@ const TerritoryHexagon = ({
 
   return (
     <svg viewBox='-1 -1 46 53' className='territory-wrapper--hex'>
-      <g {...props} data-tooltip-html={dataTooltipHtml} data-tooltip-id={dataTooltipId} onClick={handleShapeClick}>
+      <g
+        {...getSyncProps(geoKey)}
+        {...props}
+        data-tooltip-html={dataTooltipHtml}
+        data-tooltip-id={dataTooltipId}
+        onClick={handleShapeClick}
+        onMouseEnter={e => {
+          syncHandlers.onMouseEnter(geoKey, e.clientY)
+        }}
+        onMouseLeave={() => {
+          syncHandlers.onMouseLeave()
+        }}
+      >
         <polygon
           stroke={stroke}
           strokeWidth={strokeWidth}
           points='22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702'
+          style={{ pointerEvents: 'none' }}
         />
         {config.general.displayAsHex && hexagonLabel(territoryData, stroke, false)}
       </g>

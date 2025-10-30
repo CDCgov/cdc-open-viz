@@ -97609,6 +97609,7 @@
       "Influenza": "Influenza",
       "RSV": "RSV",
       "Measles": "Measles"
-    }
+    },
+    "synchronizedTooltips": true
   }
 }

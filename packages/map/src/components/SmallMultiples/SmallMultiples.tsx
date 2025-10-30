@@ -1,9 +1,10 @@
-import React, { useContext, useMemo, useRef, useEffect } from 'react'
+import React, { useContext, useMemo, useRef, useEffect, useCallback } from 'react'
 import SmallMultipleTile from './SmallMultipleTile'
 import ConfigContext from '../../context'
 import { MapContext } from '../../types/MapContext'
 import { getTileValues, applyTileOrder } from '../../helpers/smallMultiplesHelpers'
 import { isMobileSmallMultiplesViewport } from '@cdc/core/helpers/viewports'
+import { MapRefInterface } from '../../hooks/useProgrammaticMapTooltip'
 import './SmallMultiples.css'
 
 interface SmallMultiplesProps {}
@@ -29,6 +30,41 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = () => {
 
   // Refs to all tile header elements for height alignment
   const headerRefs = useRef<Record<string, HTMLDivElement | null>>({})
+
+  // Refs to all tile map components for tooltip synchronization
+  const tileMapRefs = useRef<Record<string, MapRefInterface | null>>({})
+
+  // Handle tooltip synchronization across small multiple tiles
+  // This follows the chart package pattern where we manage the source tile key here
+  const handleMapHover = useCallback(
+    (sourceTileKey: string, geoId: string | null, yCoordinate?: number) => {
+      if (!config.smallMultiples?.synchronizedTooltips) {
+        return
+      }
+
+      // If geoId is null, mouse left the geography - hide all tooltips
+      if (geoId === null) {
+        Object.entries(tileMapRefs.current).forEach(([tileKey, mapRef]) => {
+          if (tileKey !== sourceTileKey && mapRef?.hideTooltip) {
+            mapRef.hideTooltip()
+          }
+        })
+        return
+      }
+
+      // Show tooltip for same geography on all other tiles
+      Object.entries(tileMapRefs.current).forEach(([tileKey, mapRef]) => {
+        if (tileKey === sourceTileKey || !mapRef) {
+          return
+        }
+
+        if (mapRef.triggerTooltipAtGeo && yCoordinate !== undefined) {
+          mapRef.triggerTooltipAtGeo(geoId, yCoordinate)
+        }
+      })
+    },
+    [config.smallMultiples?.synchronizedTooltips]
+  )
 
   // Align tile header heights per row
   useEffect(() => {
@@ -83,20 +119,27 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = () => {
   return (
     <div className='small-multiples-container mt-4'>
       <div className='small-multiples-grid' style={gridStyle}>
-        {orderedTileValues.map((tileValue, index) => (
-          <SmallMultipleTile
-            key={String(tileValue)}
-            tileValue={tileValue}
-            tileColumn={tileColumn}
-            config={config}
-            data={data}
-            isFirstInRow={index % tilesPerRow === 0}
-            tilesPerRow={tilesPerRow}
-            onHeaderRef={ref => {
-              headerRefs.current[String(tileValue)] = ref
-            }}
-          />
-        ))}
+        {orderedTileValues.map((tileValue, index) => {
+          const tileKey = String(tileValue)
+          return (
+            <SmallMultipleTile
+              key={tileKey}
+              tileValue={tileValue}
+              tileColumn={tileColumn}
+              config={config}
+              data={data}
+              isFirstInRow={index % tilesPerRow === 0}
+              tilesPerRow={tilesPerRow}
+              onHeaderRef={ref => {
+                headerRefs.current[tileKey] = ref
+              }}
+              onMapRef={ref => {
+                tileMapRefs.current[tileKey] = ref
+              }}
+              onMapHover={(geoId, yCoordinate) => handleMapHover(tileKey, geoId, yCoordinate)}
+            />
+          )
+        })}
       </div>
     </div>
   )

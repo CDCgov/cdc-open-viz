@@ -8,7 +8,7 @@ import {
 } from 'react-accessible-accordion'
 
 // core
-import { TextField, Select } from '@cdc/core/components/EditorPanel/Inputs'
+import { TextField, Select, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 
@@ -323,6 +323,27 @@ const PanelSmallMultiples: FC<PanelSmallMultiplesProps> = props => {
                 )
               })()}
             </div>
+
+            <CheckBox
+              value={config.smallMultiples?.synchronizedTooltips}
+              fieldName='synchronizedTooltips'
+              section='smallMultiples'
+              label='Synchronized Tooltips'
+              updateField={updateField}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>
+                      When checked, hovering over a geography in one map will show synchronized tooltips for that same
+                      geography on all other maps at the same position.
+                    </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
           </>
         )}
       </AccordionItemPanel>
