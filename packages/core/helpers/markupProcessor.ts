@@ -190,17 +190,12 @@ export const validateMarkupVariables = (
     return errors
   }
 
-  // Helper function to get available columns for a variable
-  const getAvailableColumns = (): string[] => {
-    return data.length > 0 ? Object.keys(data[0]) : []
-  }
+  const availableColumns = data.length > 0 ? Object.keys(data[0]) : []
 
   markupVariables.forEach((variable, index) => {
     if (!variable.tag || !variable.tag.match(/^{{.+}}$/)) {
       errors.push(`Variable ${index + 1}: Tag must be in format {{tagName}}`)
     }
-
-    const availableColumns = getAvailableColumns()
 
     if (!variable.columnName) {
       errors.push(`Variable ${index + 1}: Column name is required`)

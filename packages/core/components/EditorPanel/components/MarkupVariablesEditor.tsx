@@ -44,53 +44,34 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
   // Ensure we always have a valid array
   const safeMarkupVariables = markupVariables || []
 
-  // Get columns from the available data (memoized for performance)
-  const getAvailableColumns = useMemo((): string[] => {
+  // Get the target dataset with fallback logic (memoized for performance)
+  const getTargetData = useCallback((): any[] => {
     // First try to use the data prop
     if (data && data.length > 0) {
-      return Object.keys(data[0])
+      return data
     }
 
     // Fallback to assigned dataset using config.dataKey
     if (datasets && config?.dataKey) {
       const assignedDataset = datasets[config.dataKey]
       if (assignedDataset?.data?.length > 0) {
-        return Object.keys(assignedDataset.data[0])
-      }
-    }
-
-    // Last resort: use first available dataset
-    if (datasets) {
-      const firstDatasetKey = Object.keys(datasets)[0]
-      if (firstDatasetKey && datasets[firstDatasetKey]?.data?.length > 0) {
-        return Object.keys(datasets[firstDatasetKey].data[0])
+        return assignedDataset.data
       }
     }
 
     return []
   }, [data, datasets, config?.dataKey])
 
+  // Get columns from the available data (memoized for performance)
+  const getAvailableColumns = useMemo((): string[] => {
+    const targetData = getTargetData()
+    return targetData.length > 0 ? Object.keys(targetData[0]) : []
+  }, [getTargetData])
+
   // Get column values for a specific column (memoized for performance)
   const getColumnValues = useCallback((columnName: string): string[] => {
-    let targetData = data
-
-    // Fallback to assigned dataset using config.dataKey
-    if ((!data || data.length === 0) && datasets && config?.dataKey) {
-      const assignedDataset = datasets[config.dataKey]
-      if (assignedDataset?.data?.length > 0) {
-        targetData = assignedDataset.data
-      }
-    }
-
-    // Last resort: use first available dataset
-    if ((!targetData || targetData.length === 0) && datasets) {
-      const firstDatasetKey = Object.keys(datasets)[0]
-      if (firstDatasetKey && datasets[firstDatasetKey]?.data?.length > 0) {
-        targetData = datasets[firstDatasetKey].data
-      }
-    }
-
-    if (!targetData || targetData.length === 0) return []
+    const targetData = getTargetData()
+    if (targetData.length === 0) return []
 
     const uniqueValues = new Set<string>()
     targetData.forEach(row => {
