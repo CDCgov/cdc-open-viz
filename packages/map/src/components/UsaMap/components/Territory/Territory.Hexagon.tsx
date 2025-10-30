@@ -6,7 +6,6 @@ import HexIcon from '../HexIcon'
 import { Text } from '@visx/text'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
-import { useSynchronizedGeographies } from '../../../../hooks/useSynchronizedGeographies'
 
 const offsets = {
   'US-VT': [50, -8],
@@ -44,14 +43,13 @@ const TerritoryHexagon = ({
   territory,
   territoryData,
   textColor,
+  getSyncProps,
+  syncHandlers,
   ...props
 }) => {
   const { config } = useContext<MapContext>(ConfigContext)
 
   const isHex = config.general.displayAsHex
-
-  // Small multiples synchronization
-  const { getSyncProps, syncHandlers } = useSynchronizedGeographies()
 
   // Construct geography key: use territory prop if available, otherwise construct from label
   const geoKey = territory || `US-${label}`
@@ -194,23 +192,22 @@ const TerritoryHexagon = ({
   return (
     <svg viewBox='-1 -1 46 53' className='territory-wrapper--hex'>
       <g
-        {...getSyncProps(geoKey)}
+        {...(getSyncProps ? getSyncProps(geoKey) : {})}
         {...props}
         data-tooltip-html={dataTooltipHtml}
         data-tooltip-id={dataTooltipId}
         onClick={handleShapeClick}
-        onMouseEnter={e => {
-          syncHandlers.onMouseEnter(geoKey, e.clientY)
-        }}
-        onMouseLeave={() => {
-          syncHandlers.onMouseLeave()
-        }}
       >
         <polygon
           stroke={stroke}
           strokeWidth={strokeWidth}
           points='22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702'
-          style={{ pointerEvents: 'none' }}
+          onMouseEnter={e => {
+            syncHandlers?.onMouseEnter(geoKey, e.clientY)
+          }}
+          onMouseLeave={() => {
+            syncHandlers?.onMouseLeave()
+          }}
         />
         {config.general.displayAsHex && hexagonLabel(territoryData, stroke, false)}
       </g>
