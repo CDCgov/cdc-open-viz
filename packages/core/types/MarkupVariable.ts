@@ -11,7 +11,6 @@ export type MarkupVariable = {
   tag: string
   addCommas?: boolean
   hideOnNull?: boolean
-  dataKey?: string
 }
 
 export type MarkupConfig = {

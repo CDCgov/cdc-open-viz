@@ -36,18 +36,6 @@ export const processMarkupVariables = (
 
   // Helper function to get data for a specific variable
   const getDataForVariable = (variable: MarkupVariable): any[] => {
-    // First check if variable has its own dataKey
-    if (variable.dataKey) {
-      if (datasets && datasets[variable.dataKey]) {
-        return datasets[variable.dataKey].data || []
-      } else {
-        // Warn if dataset is specified but not found
-        console.warn(
-          `Markup variable "${variable.tag}" references dataset "${variable.dataKey}" which was not found in available datasets`
-        )
-      }
-    }
-
     // If data prop is empty, try to use the widget's assigned dataset
     if ((!data || data.length === 0) && configDataKey && datasets && datasets[configDataKey]) {
       return datasets[configDataKey].data || []
@@ -194,8 +182,7 @@ const formatValuesList = (values: string[], conjunction: string): string[] => {
  */
 export const validateMarkupVariables = (
   markupVariables: MarkupVariable[],
-  data: any[],
-  datasets?: Datasets
+  data: any[]
 ): string[] => {
   const errors: string[] = []
 
@@ -204,11 +191,7 @@ export const validateMarkupVariables = (
   }
 
   // Helper function to get available columns for a variable
-  const getAvailableColumns = (variable: MarkupVariable): string[] => {
-    if (variable.dataKey && datasets && datasets[variable.dataKey]) {
-      const datasetData = datasets[variable.dataKey].data || []
-      return datasetData.length > 0 ? Object.keys(datasetData[0]) : []
-    }
+  const getAvailableColumns = (): string[] => {
     return data.length > 0 ? Object.keys(data[0]) : []
   }
 
@@ -217,17 +200,12 @@ export const validateMarkupVariables = (
       errors.push(`Variable ${index + 1}: Tag must be in format {{tagName}}`)
     }
 
-    const availableColumns = getAvailableColumns(variable)
+    const availableColumns = getAvailableColumns()
 
     if (!variable.columnName) {
       errors.push(`Variable ${index + 1}: Column name is required`)
     } else if (availableColumns.length > 0 && !availableColumns.includes(variable.columnName)) {
       errors.push(`Variable ${index + 1}: Column "${variable.columnName}" not found in data`)
-    }
-
-    // Validate dataKey if specified
-    if (variable.dataKey && datasets && !datasets[variable.dataKey]) {
-      errors.push(`Variable ${index + 1}: Dataset "${variable.dataKey}" not found in available datasets`)
     }
 
     variable.conditions.forEach((condition, condIndex) => {
