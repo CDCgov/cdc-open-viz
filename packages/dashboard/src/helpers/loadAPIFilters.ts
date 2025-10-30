@@ -21,14 +21,18 @@ export const loadAPIFiltersFactory = (
     if (!sharedFilters) return
     const allIndexes = sharedFilters.map((_, index) => index)
     const _autoLoadFilterIndexes = loadAll ? allIndexes : autoLoadFilterIndexes
-    sharedFilters = sharedFilters.map((filter, index) =>
-      apiFilterHelpers.setAutoLoadDefaultValue(
+    sharedFilters = sharedFilters.map((filter, index) => {
+      // For data filters (no API endpoint), return unchanged to preserve user selections
+      if (!filter.apiFilter?.apiEndpoint) {
+        return filter
+      }
+      return apiFilterHelpers.setAutoLoadDefaultValue(
         index,
-        dropdowns[filter.apiFilter?.apiEndpoint],
+        dropdowns[filter.apiFilter.apiEndpoint],
         sharedFilters,
         _autoLoadFilterIndexes
       )
-    )
+    })
     const sharedAPIFilters = sharedFilters.filter(f => f.apiFilter)
     const filterLookup = new Map(sharedAPIFilters.map(filter => [filter.apiFilter.apiEndpoint, filter.apiFilter]))
     const toFetch = apiFilterHelpers.getToFetch(sharedFilters, dropdowns)
