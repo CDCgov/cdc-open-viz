@@ -1,5 +1,5 @@
 const getVizTitle = (config) => {
-  if (config.type === 'dashboard') {
+  if (config?.type === 'dashboard') {
     return String(config?.dashboard?.title).toLowerCase()
   }
   if (config?.title) {
@@ -12,7 +12,7 @@ const getVizTitle = (config) => {
 }
 
 const getVizSubType = config => {
-  if (config.type === 'markup-include') {
+  if (config?.type === 'markup-include') {
     return `${config?.contentEditor?.title}`
   }
   if (config?.general?.geoType) {
