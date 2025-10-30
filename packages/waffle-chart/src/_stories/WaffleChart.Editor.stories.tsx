@@ -100,8 +100,12 @@ export const GeneralSectionTests: Story = {
     // TEST 3: Show Title Toggle
     // Expectation: Header region appears / disappears (DOM visibility change).
     // ============================================================================
-    const showTitleCheckbox = canvasElement.querySelector('input[name*="showTitle"]') as HTMLInputElement
-    const checkboxWrapper = showTitleCheckbox?.closest('.cove-input__checkbox--small')
+    // Find show title checkbox by label text
+    const showTitleCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(input => {
+      const label = input.closest('label')
+      return label?.textContent?.includes('show title')
+    }) as HTMLInputElement
+    const checkboxWrapper = showTitleCheckbox?.closest('label.checkbox')
     expect(showTitleCheckbox).toBeTruthy()
     expect(checkboxWrapper).toBeTruthy()
 
@@ -110,7 +114,7 @@ export const GeneralSectionTests: Story = {
       'Title Toggle',
       () => showTitleCheckbox.checked,
       async () => {
-        await userEvent.click(checkboxWrapper as HTMLElement)
+        await userEvent.click(showTitleCheckbox)
       },
       (before, after) => after === !wasChecked
     )
@@ -128,7 +132,7 @@ export const GeneralSectionTests: Story = {
       'Title Toggle Reset',
       () => showTitleCheckbox.checked,
       async () => {
-        await userEvent.click(checkboxWrapper as HTMLElement)
+        await userEvent.click(showTitleCheckbox)
       },
       (before, after) => after === wasChecked
     )
@@ -253,7 +257,15 @@ export const DataSectionTests: Story = {
       'Clear Conditional Value',
       getValueText,
       async () => {
+        // Clear the conditional column to fully reset the filter
+        const conditionalColumnSelect = canvasElement.querySelector(
+          'select[name="dataConditionalColumn"]'
+        ) as HTMLSelectElement
+        await userEvent.selectOptions(conditionalColumnSelect, '')
         await userEvent.clear(conditionalValueInput)
+        conditionalValueInput.blur() // Trigger change event
+        // Wait for debounced input processing (TextField uses 500ms debounce)
+        await new Promise(resolve => setTimeout(resolve, 600))
       },
       (before, after) => after !== before
     )
@@ -312,7 +324,7 @@ export const DataSectionTests: Story = {
       'Custom Denominator Toggle',
       getValueText,
       async () => {
-        await userEvent.click(customDenomWrapper)
+        await userEvent.click(customDenomCheckbox)
       },
       (before, after) => after !== before
     )
@@ -638,9 +650,13 @@ export const VisualSectionTests: Story = {
     // ============================================================================
     const contentClassSig = () => Array.from(contentContainer().classList).sort().join(' ')
 
-    const borderCheckbox = canvasElement.querySelector('input[name="visual-null-border"]') as HTMLInputElement
+    // Find border checkbox by label text instead of name attribute
+    const borderCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(input => {
+      const label = input.closest('label')
+      return label?.textContent?.includes('Display Border')
+    }) as HTMLInputElement
     expect(borderCheckbox).toBeTruthy()
-    const borderWrapper = borderCheckbox.closest('.cove-input__checkbox--small') as HTMLElement
+    const borderWrapper = borderCheckbox.closest('label.checkbox') as HTMLElement
     expect(borderWrapper).toBeTruthy()
     const borderStyleSig = () => {
       const el = contentContainer()
@@ -656,7 +672,7 @@ export const VisualSectionTests: Story = {
       'Border Toggle',
       borderStyleSig,
       async () => {
-        await userEvent.click(borderWrapper)
+        await userEvent.click(borderCheckbox)
       },
       (before, after) =>
         before.classes !== after.classes ||
@@ -669,17 +685,21 @@ export const VisualSectionTests: Story = {
     // TEST 9: Theme Border Color Toggle
     // Expectation: Class 'component--has-borderColorTheme' toggles.
     // ============================================================================
-    const borderColorThemeCheckbox = canvasElement.querySelector(
-      'input[name="visual-null-borderColorTheme"]'
+    // Find border color theme checkbox by label text
+    const borderColorThemeCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(
+      input => {
+        const label = input.closest('label')
+        return label?.textContent?.includes('Use theme border color')
+      }
     ) as HTMLInputElement
     expect(borderColorThemeCheckbox).toBeTruthy()
-    const borderColorThemeWrapper = borderColorThemeCheckbox.closest('.cove-input__checkbox--small') as HTMLElement
+    const borderColorThemeWrapper = borderColorThemeCheckbox.closest('label.checkbox') as HTMLElement
     expect(borderColorThemeWrapper).toBeTruthy()
     await performAndAssert(
       'Border Color Theme Toggle',
       contentClassSig,
       async () => {
-        await userEvent.click(borderColorThemeWrapper)
+        await userEvent.click(borderColorThemeCheckbox)
       },
       (before, after) => before !== after && (after.includes('borderColorTheme') || before.includes('borderColorTheme'))
     )
@@ -688,15 +708,19 @@ export const VisualSectionTests: Story = {
     // TEST 10: Accent Style Toggle
     // Expectation: Class 'component--has-accent' toggles.
     // ============================================================================
-    const accentCheckbox = canvasElement.querySelector('input[name="visual-null-accent"]') as HTMLInputElement
+    // Find accent checkbox by label text
+    const accentCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(input => {
+      const label = input.closest('label')
+      return label?.textContent?.includes('Use Accent Style')
+    }) as HTMLInputElement
     expect(accentCheckbox).toBeTruthy()
-    const accentWrapper = accentCheckbox.closest('.cove-input__checkbox--small') as HTMLElement
+    const accentWrapper = accentCheckbox.closest('label.checkbox') as HTMLElement
     expect(accentWrapper).toBeTruthy()
     await performAndAssert(
       'Accent Toggle',
       contentClassSig,
       async () => {
-        await userEvent.click(accentWrapper)
+        await userEvent.click(accentCheckbox)
       },
       (before, after) => before !== after
     )
@@ -705,15 +729,19 @@ export const VisualSectionTests: Story = {
     // TEST 11: Theme Background Color Toggle
     // Expectation: Class 'component--has-background' toggles.
     // ============================================================================
-    const backgroundCheckbox = canvasElement.querySelector('input[name="visual-null-background"]') as HTMLInputElement
+    // Find background checkbox by label text
+    const backgroundCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(input => {
+      const label = input.closest('label')
+      return label?.textContent?.includes('Use Theme Background Color')
+    }) as HTMLInputElement
     expect(backgroundCheckbox).toBeTruthy()
-    const backgroundWrapper = backgroundCheckbox.closest('.cove-input__checkbox--small') as HTMLElement
+    const backgroundWrapper = backgroundCheckbox.closest('label.checkbox') as HTMLElement
     expect(backgroundWrapper).toBeTruthy()
     await performAndAssert(
       'Background Toggle',
       contentClassSig,
       async () => {
-        await userEvent.click(backgroundWrapper)
+        await userEvent.click(backgroundCheckbox)
       },
       (before, after) => before !== after
     )
@@ -722,17 +750,19 @@ export const VisualSectionTests: Story = {
     // TEST 12: Hide Background Color Toggle
     // Expectation: Class 'component--hideBackgroundColor' toggles.
     // ============================================================================
-    const hideBackgroundCheckbox = canvasElement.querySelector(
-      'input[name="visual-null-hideBackgroundColor"]'
-    ) as HTMLInputElement
+    // Find hide background checkbox by label text
+    const hideBackgroundCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(input => {
+      const label = input.closest('label')
+      return label?.textContent?.includes('Hide Background Color')
+    }) as HTMLInputElement
     expect(hideBackgroundCheckbox).toBeTruthy()
-    const hideBackgroundWrapper = hideBackgroundCheckbox.closest('.cove-input__checkbox--small') as HTMLElement
+    const hideBackgroundWrapper = hideBackgroundCheckbox.closest('label.checkbox') as HTMLElement
     expect(hideBackgroundWrapper).toBeTruthy()
     await performAndAssert(
       'Hide Background Toggle',
       contentClassSig,
       async () => {
-        await userEvent.click(hideBackgroundWrapper)
+        await userEvent.click(hideBackgroundCheckbox)
       },
       (before, after) => before !== after
     )

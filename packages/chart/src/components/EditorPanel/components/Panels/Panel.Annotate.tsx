@@ -4,6 +4,7 @@ import ConfigContext from '../../../../ConfigContext.js'
 // CDC Core
 import Accordion from '@cdc/core/components/ui/Accordion'
 import Button from '@cdc/core/components/elements/Button'
+import { CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import _ from 'lodash'
 
 // types
@@ -13,6 +14,29 @@ import './../panels.scss'
 
 const PanelAnnotate: React.FC<PanelProps> = props => {
   const { updateConfig, config, svgRef } = useContext(ConfigContext)
+
+  const updateField = (section, subsection, fieldName, value) => {
+    if (subsection) {
+      updateConfig({
+        ...config,
+        [section]: {
+          ...config[section],
+          [subsection]: {
+            ...config[section][subsection],
+            [fieldName]: value
+          }
+        }
+      })
+    } else {
+      updateConfig({
+        ...config,
+        [section]: {
+          ...config[section],
+          [fieldName]: value
+        }
+      })
+    }
+  }
 
   const handleAnnotationUpdate = (value, property, index) => {
     const svgContainer = document.querySelector('.chart-container  > svg')?.getBoundingClientRect()
@@ -67,8 +91,8 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
         config.xAxis.type === 'date'
           ? new Date(config?.data?.[0]?.[config.xAxis.dataKey]).getTime()
           : config.xAxis.type === 'categorical'
-            ? '1/15/2016'
-            : '',
+          ? '1/15/2016'
+          : '',
       yKey: '',
       dx: 20,
       dy: -20,
@@ -96,22 +120,14 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   return (
     <Accordion key={props.name}>
       <Accordion.Section title={props.name} key={props.name}>
-        <label key={`key-1`}>
-          Show Annotation Dropdown
-          <input
-            type='checkbox'
-            checked={config?.general?.showAnnotationDropdown || false}
-            onChange={e => {
-              updateConfig({
-                ...config,
-                general: {
-                  ...config.general,
-                  showAnnotationDropdown: e.target.checked
-                }
-              })
-            }}
-          />
-        </label>
+        <CheckBox
+          value={config?.general?.showAnnotationDropdown || false}
+          section='general'
+          subsection={null}
+          fieldName='showAnnotationDropdown'
+          label='Show Annotation Dropdown'
+          updateField={updateField}
+        />
 
         {config.general.showAnnotationDropdown && (
           <label key={`key-2`}>
@@ -164,36 +180,36 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     />
                   </label>
 
-                  <label>
-                    Edit Subject
-                    <input
-                      type='checkbox'
-                      checked={config?.annotations[index]?.edit?.subject || false}
-                      onChange={e => {
-                        const updatedAnnotations = _.cloneDeep(config?.annotations)
-                        updatedAnnotations[index].edit.subject = e.target.checked
-                        updateConfig({
-                          ...config,
-                          annotations: updatedAnnotations
-                        })
-                      }}
-                    />
-                  </label>
-                  <label>
-                    Edit Label
-                    <input
-                      type='checkbox'
-                      checked={config?.annotations[index]?.edit?.label || false}
-                      onChange={e => {
-                        const updatedAnnotations = _.cloneDeep(config?.annotations)
-                        updatedAnnotations[index].edit.label = e.target.checked
-                        updateConfig({
-                          ...config,
-                          annotations: updatedAnnotations
-                        })
-                      }}
-                    />
-                  </label>
+                  <CheckBox
+                    value={config?.annotations[index]?.edit?.subject || false}
+                    section='annotations'
+                    subsection={null}
+                    fieldName={`${index}.edit.subject`}
+                    label='Edit Subject'
+                    updateField={(section, subsection, fieldName, value) => {
+                      const updatedAnnotations = _.cloneDeep(config?.annotations)
+                      updatedAnnotations[index].edit.subject = value
+                      updateConfig({
+                        ...config,
+                        annotations: updatedAnnotations
+                      })
+                    }}
+                  />
+                  <CheckBox
+                    value={config?.annotations[index]?.edit?.label || false}
+                    section='annotations'
+                    subsection={null}
+                    fieldName={`${index}.edit.label`}
+                    label='Edit Label'
+                    updateField={(section, subsection, fieldName, value) => {
+                      const updatedAnnotations = _.cloneDeep(config?.annotations)
+                      updatedAnnotations[index].edit.label = value
+                      updateConfig({
+                        ...config,
+                        annotations: updatedAnnotations
+                      })
+                    }}
+                  />
 
                   <label>
                     Connection Type:
