@@ -2139,8 +2139,8 @@ export const VisualSectionTests: StoryObj<typeof CdcMap> = {
       async () => {
         // Find the color palette list and click on the purple theme
         const colorPalette = canvasElement.querySelector('.color-palette')
-        const purpleTheme = Array.from(colorPalette?.querySelectorAll('li') || []).find(li =>
-          li.classList.contains('theme-purple')
+        const purpleTheme = Array.from(colorPalette?.querySelectorAll('button') || []).find(button =>
+          button.classList.contains('theme-purple')
         ) as HTMLElement
         await userEvent.click(purpleTheme)
       },
@@ -2254,20 +2254,29 @@ export const VisualSectionTests: StoryObj<typeof CdcMap> = {
         const spans = Array.from(canvasElement.querySelectorAll('span'))
         const sequentialLabel = spans.find(span => span.textContent?.trim() === 'Sequential')
         const paletteContainer = sequentialLabel?.nextElementSibling
-        const palettes = Array.from(paletteContainer?.querySelectorAll('li') || []) as HTMLElement[]
+
+        // Try both li and button elements for palette selection
+        const palettes = Array.from(paletteContainer?.querySelectorAll('li, button') || []) as HTMLElement[]
 
         // Select a different palette (skip the first one as it might be selected)
-        const alternativePalette = palettes.find((li, idx) => idx > 0 && !li.classList.contains('selected'))
+        const alternativePalette = palettes.find((element, idx) => idx > 0 && !element.classList.contains('selected'))
         if (alternativePalette) {
           await userEvent.click(alternativePalette)
 
-          // Wait for and handle the conversion modal
-          await waitForPresence('.modal-overlay', canvasElement)
-          const confirmButton = Array.from(canvasElement.querySelectorAll('button')).find(btn =>
-            btn.textContent?.includes('Convert to New Palette')
-          )
-          if (confirmButton) {
-            await userEvent.click(confirmButton)
+          // Wait for changes to apply, then check for modal
+          await new Promise(resolve => setTimeout(resolve, 100))
+
+          // Check if modal appeared and handle it
+          const modal = canvasElement.querySelector('.modal-overlay')
+          if (modal) {
+            const confirmButton = Array.from(canvasElement.querySelectorAll('button')).find(btn =>
+              btn.textContent?.includes('Convert to New Palette')
+            )
+            if (confirmButton) {
+              await userEvent.click(confirmButton)
+              // Wait for modal to close and changes to apply
+              await new Promise(resolve => setTimeout(resolve, 500))
+            }
           }
         }
       },

@@ -2,9 +2,28 @@
 /* Shared styles for palette color swatches across all visualization types */
 
 .color-palette {
-  /* Button-based palette selector (used by charts) */
+  display: flex;
 }
 
+/* List item-based palette selector (used by maps) */
+.color-palette li {
+  width: 1.5em;
+  height: 1.5em;
+  display: inline-block;
+  margin-right: 0.5em;
+  cursor: pointer;
+  border: rgba(0, 0, 0, 0.3) 3px solid;
+}
+
+.color-palette li.active {
+  border: rgba(0, 0, 0, 0.8) 3px solid;
+}
+
+.color-palette li.selected {
+  border: black 2px solid;
+}
+
+/* Button-based palette selector (used by charts) */
 .color-palette button:not(.selected) {
   border: var(--cool-gray-30) 2px solid !important;
 }
@@ -13,13 +32,37 @@
   border: black 2px solid !important;
 }
 
-/* List item-based palette selector (used by maps) */
-.color-palette li {
-  border: var(--cool-gray-30) 2px solid;
+.color-palette a {
+  display: inline-block;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.8);
 }
 
-.color-palette li.selected {
-  border: black 2px solid;
+/* Series list variant */
+.color-palette.series-list {
+  flex-direction: column;
+  padding: 0;
+  border: none;
+}
+
+.color-palette.series-list li {
+  padding: 0.3em 0.5em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: auto;
+  height: auto;
+  border: 0;
+}
+
+.color-palette.series-list li:not(:last-child) {
+  border-bottom: rgba(0, 0, 0, 0.2) 1px solid;
+}
+
+/* Header variant */
+.header .color-palette li {
+  width: 1.5em;
+  height: 1.5em;
+  display: inline-block;
 }
 
 /* Developer rollback component styles */

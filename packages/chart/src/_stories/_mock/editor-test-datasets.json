@@ -1,0 +1,477 @@
+{
+  "universal_test_data": [
+    {
+      "Date": "2020-01-15",
+      "State": "Alabama",
+      "Category": "Category A",
+      "Value": 156,
+      "Secondary_Value": 89,
+      "Percentage": 23.5,
+      "Count": 1560,
+      "Rate": 45.2,
+      "Gender": "Male",
+      "Age_Group": "18-24",
+      "Status": "Active"
+    },
+    {
+      "Date": "2020-02-15",
+      "State": "Alaska",
+      "Category": "Category B",
+      "Value": 234,
+      "Secondary_Value": 156,
+      "Percentage": 34.8,
+      "Count": 2340,
+      "Rate": 67.8,
+      "Gender": "Female",
+      "Age_Group": "25-34",
+      "Status": "Inactive"
+    },
+    {
+      "Date": "2020-03-15",
+      "State": "Arizona",
+      "Category": "Category A",
+      "Value": 189,
+      "Secondary_Value": 123,
+      "Percentage": 28.9,
+      "Count": 1890,
+      "Rate": 52.1,
+      "Gender": "Male",
+      "Age_Group": "35-44",
+      "Status": "Active"
+    },
+    {
+      "Date": "2020-04-15",
+      "State": "Arkansas",
+      "Category": "Category C",
+      "Value": 298,
+      "Secondary_Value": 201,
+      "Percentage": 42.3,
+      "Count": 2980,
+      "Rate": 78.9,
+      "Gender": "Female",
+      "Age_Group": "45-54",
+      "Status": "Pending"
+    },
+    {
+      "Date": "2020-05-15",
+      "State": "California",
+      "Category": "Category B",
+      "Value": 167,
+      "Secondary_Value": 98,
+      "Percentage": 31.2,
+      "Count": 1670,
+      "Rate": 43.8,
+      "Gender": "Male",
+      "Age_Group": "55-64",
+      "Status": "Active"
+    },
+    {
+      "Date": "2020-06-15",
+      "State": "Colorado",
+      "Category": "Category A",
+      "Value": 245,
+      "Secondary_Value": 178,
+      "Percentage": 38.7,
+      "Count": 2450,
+      "Rate": 61.2,
+      "Gender": "Female",
+      "Age_Group": "65+",
+      "Status": "Inactive"
+    },
+    {
+      "Date": "2020-07-15",
+      "State": "Connecticut",
+      "Category": "Category C",
+      "Value": 312,
+      "Secondary_Value": 234,
+      "Percentage": 45.9,
+      "Count": 3120,
+      "Rate": 87.3,
+      "Gender": "Male",
+      "Age_Group": "18-24",
+      "Status": "Active"
+    },
+    {
+      "Date": "2020-08-15",
+      "State": "Delaware",
+      "Category": "Category B",
+      "Value": 198,
+      "Secondary_Value": 134,
+      "Percentage": 33.6,
+      "Count": 1980,
+      "Rate": 54.7,
+      "Gender": "Female",
+      "Age_Group": "25-34",
+      "Status": "Pending"
+    },
+    {
+      "Date": "2020-09-15",
+      "State": "Florida",
+      "Category": "Category A",
+      "Value": 278,
+      "Secondary_Value": 189,
+      "Percentage": 41.1,
+      "Count": 2780,
+      "Rate": 73.4,
+      "Gender": "Male",
+      "Age_Group": "35-44",
+      "Status": "Active"
+    },
+    {
+      "Date": "2020-10-15",
+      "State": "Georgia",
+      "Category": "Category C",
+      "Value": 134,
+      "Secondary_Value": 87,
+      "Percentage": 26.8,
+      "Count": 1340,
+      "Rate": 38.9,
+      "Gender": "Female",
+      "Age_Group": "45-54",
+      "Status": "Inactive"
+    },
+    {
+      "Date": "2020-11-15",
+      "State": "Hawaii",
+      "Category": "Category B",
+      "Value": 356,
+      "Secondary_Value": 267,
+      "Percentage": 48.7,
+      "Count": 3560,
+      "Rate": 94.6,
+      "Gender": "Male",
+      "Age_Group": "55-64",
+      "Status": "Active"
+    },
+    {
+      "Date": "2020-12-15",
+      "State": "Idaho",
+      "Category": "Category A",
+      "Value": 223,
+      "Secondary_Value": 156,
+      "Percentage": 36.4,
+      "Count": 2230,
+      "Rate": 59.8,
+      "Gender": "Female",
+      "Age_Group": "65+",
+      "Status": "Pending"
+    }
+  ],
+
+  "boxplot_test_data": [
+    {
+      "Group_Category": "Group A",
+      "Value": 19,
+      "Additional_Info": "Sample 1"
+    },
+    {
+      "Group_Category": "Group A",
+      "Value": 21,
+      "Additional_Info": "Sample 2"
+    },
+    {
+      "Group_Category": "Group A",
+      "Value": 23,
+      "Additional_Info": "Sample 3"
+    },
+    {
+      "Group_Category": "Group A",
+      "Value": 24,
+      "Additional_Info": "Sample 4"
+    },
+    {
+      "Group_Category": "Group B",
+      "Value": 10,
+      "Additional_Info": "Sample 5"
+    },
+    {
+      "Group_Category": "Group B",
+      "Value": 12,
+      "Additional_Info": "Sample 6"
+    },
+    {
+      "Group_Category": "Group B",
+      "Value": 18,
+      "Additional_Info": "Sample 7"
+    },
+    {
+      "Group_Category": "Group B",
+      "Value": 19,
+      "Additional_Info": "Sample 8"
+    },
+    {
+      "Group_Category": "Group C",
+      "Value": 30,
+      "Additional_Info": "Sample 9"
+    },
+    {
+      "Group_Category": "Group C",
+      "Value": 35,
+      "Additional_Info": "Sample 10"
+    },
+    {
+      "Group_Category": "Group C",
+      "Value": 36,
+      "Additional_Info": "Sample 11"
+    },
+    {
+      "Group_Category": "Group C",
+      "Value": 46,
+      "Additional_Info": "Sample 12"
+    },
+    {
+      "Group_Category": "Group D",
+      "Value": 21,
+      "Additional_Info": "Sample 13"
+    },
+    {
+      "Group_Category": "Group D",
+      "Value": 30,
+      "Additional_Info": "Sample 14"
+    },
+    {
+      "Group_Category": "Group D",
+      "Value": 40,
+      "Additional_Info": "Sample 15"
+    },
+    {
+      "Group_Category": "Group D",
+      "Value": 41,
+      "Additional_Info": "Sample 16"
+    },
+    {
+      "Group_Category": "Group D",
+      "Value": 42,
+      "Additional_Info": "Sample 17"
+    },
+    {
+      "Group_Category": "Group D",
+      "Value": 43,
+      "Additional_Info": "Sample 18"
+    },
+    {
+      "Group_Category": "Group D",
+      "Value": 50,
+      "Additional_Info": "Sample 19"
+    },
+    {
+      "Group_Category": "Group D",
+      "Value": 50,
+      "Additional_Info": "Sample 20"
+    },
+    {
+      "Group_Category": "Group D",
+      "Value": 82,
+      "Additional_Info": "Sample 21"
+    },
+    {
+      "Group_Category": "Group D",
+      "Value": 85,
+      "Additional_Info": "Sample 22"
+    }
+  ],
+
+  "scatterplot_test_data": [
+    {
+      "X_Value": 12.5,
+      "Y_Value": 23.1,
+      "Size_Value": 150,
+      "Category": "Type A",
+      "Label": "Point 1"
+    },
+    {
+      "X_Value": 15.2,
+      "Y_Value": 31.8,
+      "Size_Value": 200,
+      "Category": "Type B",
+      "Label": "Point 2"
+    },
+    {
+      "X_Value": 18.7,
+      "Y_Value": 28.4,
+      "Size_Value": 175,
+      "Category": "Type A",
+      "Label": "Point 3"
+    },
+    {
+      "X_Value": 22.3,
+      "Y_Value": 45.6,
+      "Size_Value": 250,
+      "Category": "Type C",
+      "Label": "Point 4"
+    },
+    {
+      "X_Value": 26.1,
+      "Y_Value": 38.9,
+      "Size_Value": 180,
+      "Category": "Type B",
+      "Label": "Point 5"
+    },
+    {
+      "X_Value": 29.8,
+      "Y_Value": 52.3,
+      "Size_Value": 300,
+      "Category": "Type A",
+      "Label": "Point 6"
+    },
+    {
+      "X_Value": 33.4,
+      "Y_Value": 41.7,
+      "Size_Value": 220,
+      "Category": "Type C",
+      "Label": "Point 7"
+    },
+    {
+      "X_Value": 37.2,
+      "Y_Value": 58.2,
+      "Size_Value": 275,
+      "Category": "Type B",
+      "Label": "Point 8"
+    },
+    {
+      "X_Value": 41.6,
+      "Y_Value": 47.8,
+      "Size_Value": 190,
+      "Category": "Type A",
+      "Label": "Point 9"
+    },
+    {
+      "X_Value": 45.3,
+      "Y_Value": 63.1,
+      "Size_Value": 320,
+      "Category": "Type C",
+      "Label": "Point 10"
+    }
+  ],
+
+  "sankey_test_data": [
+    {
+      "links": [
+        {
+          "source": "Initial Population",
+          "target": "Screened",
+          "value": 10000
+        },
+        {
+          "source": "Initial Population",
+          "target": "Not Screened",
+          "value": 5000
+        },
+        {
+          "source": "Screened",
+          "target": "Positive Result",
+          "value": 1500
+        },
+        {
+          "source": "Screened",
+          "target": "Negative Result",
+          "value": 8500
+        },
+        {
+          "source": "Positive Result",
+          "target": "Treated",
+          "value": 1200
+        },
+        {
+          "source": "Positive Result",
+          "target": "Not Treated",
+          "value": 300
+        },
+        {
+          "source": "Treated",
+          "target": "Recovery",
+          "value": 1000
+        },
+        {
+          "source": "Treated",
+          "target": "No Recovery",
+          "value": 200
+        }
+      ]
+    }
+  ],
+
+  "forecasting_test_data": [
+    {
+      "Date": "2020-01-01",
+      "Actual_Value": 145,
+      "Lower_CI": 135,
+      "Upper_CI": 155,
+      "Forecast_Value": null,
+      "Forecast_Lower": null,
+      "Forecast_Upper": null
+    },
+    {
+      "Date": "2020-02-01",
+      "Actual_Value": 167,
+      "Lower_CI": 152,
+      "Upper_CI": 182,
+      "Forecast_Value": null,
+      "Forecast_Lower": null,
+      "Forecast_Upper": null
+    },
+    {
+      "Date": "2020-03-01",
+      "Actual_Value": 189,
+      "Lower_CI": 171,
+      "Upper_CI": 207,
+      "Forecast_Value": null,
+      "Forecast_Lower": null,
+      "Forecast_Upper": null
+    },
+    {
+      "Date": "2020-04-01",
+      "Actual_Value": 156,
+      "Lower_CI": 142,
+      "Upper_CI": 170,
+      "Forecast_Value": null,
+      "Forecast_Lower": null,
+      "Forecast_Upper": null
+    },
+    {
+      "Date": "2020-05-01",
+      "Actual_Value": 178,
+      "Lower_CI": 163,
+      "Upper_CI": 193,
+      "Forecast_Value": null,
+      "Forecast_Lower": null,
+      "Forecast_Upper": null
+    },
+    {
+      "Date": "2020-06-01",
+      "Actual_Value": 203,
+      "Lower_CI": 186,
+      "Upper_CI": 220,
+      "Forecast_Value": null,
+      "Forecast_Lower": null,
+      "Forecast_Upper": null
+    },
+    {
+      "Date": "2020-07-01",
+      "Actual_Value": null,
+      "Lower_CI": null,
+      "Upper_CI": null,
+      "Forecast_Value": 215,
+      "Forecast_Lower": 195,
+      "Forecast_Upper": 235
+    },
+    {
+      "Date": "2020-08-01",
+      "Actual_Value": null,
+      "Lower_CI": null,
+      "Upper_CI": null,
+      "Forecast_Value": 228,
+      "Forecast_Lower": 205,
+      "Forecast_Upper": 251
+    },
+    {
+      "Date": "2020-09-01",
+      "Actual_Value": null,
+      "Lower_CI": null,
+      "Upper_CI": null,
+      "Forecast_Value": 241,
+      "Forecast_Lower": 215,
+      "Forecast_Upper": 267
+    }
+  ]
+}

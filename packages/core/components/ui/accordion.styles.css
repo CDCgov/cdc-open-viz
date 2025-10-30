@@ -1,3 +1,60 @@
+/* Accordion component styles */
+
 .accordion__heading {
   background: var(--lightestGray);
+}
+
+.accordion__button {
+  cursor: pointer;
+  font-size: 1em;
+  padding: 0.3em 1em;
+  width: 100%;
+  text-align: left;
+  position: relative;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.accordion__panel:first-child {
+  margin-top: 0;
+}
+
+.accordion__button:before {
+  display: inline-block;
+  content: '';
+  height: 7px;
+  width: 7px;
+  margin-right: 1em;
+  border-bottom: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: rotate(-45deg) translateY(-50%);
+  right: 0;
+  position: absolute;
+  top: 50%;
+  transition: 0.1s all;
+}
+
+.accordion__button[aria-expanded='true']::before,
+.accordion__button[aria-selected='true']::before {
+  transform: rotate(45deg) translateY(-50%);
+  margin-right: 1.3em;
+  transition: 0.1s all;
+}
+
+.accordion__panel {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  padding: 1em 1.25em 2em;
+  animation: fadein 0.2s ease-in;
+}
+
+.accordion__panel h5 {
+  font-size: 0.8em;
+}
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
