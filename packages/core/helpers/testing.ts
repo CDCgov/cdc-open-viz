@@ -39,7 +39,7 @@ export const MIN_ANIMATION_DELAY_MS = (() => {
   return 500
 })()
 
-const WAIT_FOR_TIMEOUT_MS = 5000
+const WAIT_FOR_TIMEOUT_MS = 10000
 
 // ============================================================================
 // CORE POLLING UTILITIES
