@@ -79,6 +79,21 @@ const LineChart = (props: LineChartProps) => {
             ? data.filter(d => d[seriesData.dynamicCategory] === seriesKey)
             : data
           const circleData = filterCircles(config?.preliminaryData, tableData, _seriesKey)
+
+          // Prepare sorted data for line and area rendering
+          const sortedData =
+            config.visualizationType == 'Bump Chart'
+              ? _data
+              : config.xAxis.type === 'date-time' || config.xAxis.type === 'date'
+              ? _data.sort((d1, d2) => {
+                  let x1 = getXAxisData(d1)
+                  let x2 = getXAxisData(d2)
+                  if (x1 < x2) return -1
+                  if (x2 < x1) return 1
+                  return 0
+                })
+              : _data
+
           return (
             <Group
               key={`series-${seriesKey}-${index}`}
@@ -310,19 +325,7 @@ const LineChart = (props: LineChartProps) => {
                   {/* STANDARD LINE */}
                   <LinePath
                     curve={allCurves[seriesData.lineType]}
-                    data={
-                      config.visualizationType == 'Bump Chart'
-                        ? _data
-                        : config.xAxis.type === 'date-time' || config.xAxis.type === 'date'
-                        ? _data.sort((d1, d2) => {
-                            let x1 = getXAxisData(d1)
-                            let x2 = getXAxisData(d2)
-                            if (x1 < x2) return -1
-                            if (x2 < x1) return 1
-                            return 0
-                          })
-                        : _data
-                    }
+                    data={sortedData}
                     x={d => xPos(d)}
                     y={d =>
                       seriesAxis === 'Right'
@@ -338,6 +341,26 @@ const LineChart = (props: LineChartProps) => {
                       return item[_seriesKey] !== '' && item[_seriesKey] !== null && item[_seriesKey] !== undefined
                     }}
                   />
+
+                  {/* SHADED AREA UNDER LINE */}
+                  {config.showAreaUnderLine && (
+                    <AreaClosed
+                      curve={allCurves[seriesData.lineType]}
+                      data={sortedData}
+                      x={d => xPos(d)}
+                      y={d =>
+                        seriesAxis === 'Right'
+                          ? yScaleRight(getYAxisData(d, _seriesKey))
+                          : yScale(Number(getYAxisData(d, _seriesKey)))
+                      }
+                      yScale={seriesAxis === 'Right' ? yScaleRight : yScale}
+                      fill={colorScale(config.runtime.seriesLabels[seriesKey])}
+                      fillOpacity={0.3}
+                      defined={(item, i) => {
+                        return item[_seriesKey] !== '' && item[_seriesKey] !== null && item[_seriesKey] !== undefined
+                      }}
+                    />
+                  )}
                 </>
               )}
 

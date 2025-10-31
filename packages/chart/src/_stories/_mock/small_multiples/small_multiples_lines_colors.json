@@ -1,0 +1,1305 @@
+{
+  "annotations": [],
+  "allowLineToBarGraph": "__​undefined__",
+  "type": "chart",
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "title": "",
+  "showTitle": true,
+  "showDownloadMediaButton": false,
+  "theme": "theme-blue",
+  "animate": false,
+  "lineDatapointStyle": "hover",
+  "lineDatapointColor": "Same as Line",
+  "barHasBorder": "false",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "regular",
+  "barStyle": "flat",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "isResponsiveTicks": false,
+  "general": {
+    "annotationDropdownText": "Annotations",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": true,
+    "hideNullValue": true,
+    "palette": {
+      "name": "qualitative_bold",
+      "version": "1.0",
+      "backups": [
+        {
+          "name": "pinkpurple",
+          "version": "1.0",
+          "isReversed": "__​undefined__"
+        },
+        {
+          "name": "qualitative_bold",
+          "version": "1.0",
+          "isReversed": "__​undefined__"
+        }
+      ],
+      "customColors": [
+        "#f06f19",
+        "#0a58d6",
+        "#890664",
+        "#000000",
+        "#89bf13",
+        "#94036f",
+        "#87b6f9",
+        "#867a77",
+        "#000000"
+      ]
+    },
+    "showZeroValueDataLabel": true
+  },
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "preliminaryData": [],
+  "yAxis": {
+    "hideAxis": true,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": true,
+    "size": "30",
+    "gridLines": true,
+    "enablePadding": true,
+    "min": "",
+    "max": "",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
+    "rightHideAxis": true,
+    "rightAxisSize": 0,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#1c1d1f",
+    "rightAxisTickLabelColor": "#1c1d1f",
+    "rightAxisTickColor": "#1c1d1f",
+    "numTicks": "8",
+    "axisPadding": 0,
+    "scalePadding": 10,
+    "tickRotation": "",
+    "anchors": [],
+    "shoMissingDataLabel": true,
+    "showMissingDataLine": true,
+    "categories": [],
+    "label": "",
+    "inlineLabel": " percent"
+  },
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "total": "Total",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds",
+      "count": "Count"
+    },
+    "firstQuartilePercentage": 25,
+    "thirdQuartilePercentage": 75,
+    "boxWidthPercentage": 40,
+    "legend": {
+      "showHowToReadText": false,
+      "howToReadText": ""
+    }
+  },
+  "topAxis": {
+    "hasLine": false
+  },
+  "isLegendValue": false,
+  "barThickness": 0.35,
+  "barHeight": 25,
+  "barSpace": 15,
+  "heights": {
+    "vertical": "250",
+    "horizontal": 750,
+    "mobileVertical": "150"
+  },
+  "xAxis": {
+    "sortDates": false,
+    "anchors": [],
+    "type": "date-time",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "0",
+    "tickRotation": "0",
+    "min": "",
+    "max": "",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
+    "numTicks": "6",
+    "labelOffset": 0,
+    "axisPadding": 0,
+    "target": 0,
+    "maxTickRotation": 0,
+    "padding": "0",
+    "showYearsOnce": true,
+    "sortByRecentDate": false,
+    "brushActive": false,
+    "dataKey": "week_end",
+    "label": "",
+    "dateParseFormat": "%Y-%m-%d",
+    "dateDisplayFormat": "%b. %Y",
+    "tickWidthMax": 75,
+    "axisBBox": 45.86000061035156,
+    "viewportNumTicks": {
+      "xxs": ""
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "indexLabel": "Week Ending",
+    "download": true,
+    "showVertical": true,
+    "dateDisplayFormat": "%B %-d, %Y",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "collapsible": true,
+    "show": true,
+    "showDownloadImgButton": false
+  },
+  "orientation": "vertical",
+  "columns": {},
+  "legend": {
+    "hide": true,
+    "behavior": "isolate",
+    "axisAlign": true,
+    "singleRow": true,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "hideSuppressedLabels": false,
+    "hideSuppressionLink": false,
+    "seriesHighlight": [],
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "groupBy": "",
+    "shape": "circle",
+    "tickRotation": "",
+    "order": "dataColumn",
+    "hideBorder": {
+      "side": false,
+      "topBottom": true
+    },
+    "position": "top",
+    "orderedValues": [],
+    "patterns": {},
+    "patternField": "",
+    "showLegendValuesTooltip": false,
+    "unified": true
+  },
+  "smallMultiples": {
+    "mode": "by-series",
+    "tileColumn": "",
+    "tilesPerRowDesktop": 3,
+    "tilesPerRowMobile": 2,
+    "independentYAxis": false,
+    "tileOrder": [],
+    "tileOrderType": "asc",
+    "tileTitles": {},
+    "colorMode": "different",
+    "synchronizedTooltips": true,
+    "showAreaUnderLine": true
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
+  "labels": false,
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": true,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false,
+    "roundTo": "1"
+  },
+  "filters": [],
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": true,
+    "horizontalHoverLine": false,
+    "lineDatapointSymbol": "none",
+    "maximumShapeAmount": 7
+  },
+  "useLogScale": false,
+  "filterBehavior": "Filter Change",
+  "highlightedBarValues": [],
+  "series": [
+    {
+      "dataKey": "COVID-19",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true,
+      "name": "COVID-19 with a very very long title"
+    },
+    {
+      "dataKey": "Influenza",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "RSV",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    }
+  ],
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": "%B %-d, %Y"
+  },
+  "forestPlot": {
+    "startAt": 0,
+    "colors": {
+      "line": "",
+      "shape": ""
+    },
+    "lineOfNoEffect": {
+      "show": true
+    },
+    "type": "",
+    "pooledResult": {
+      "diamondHeight": 5,
+      "column": ""
+    },
+    "estimateField": "",
+    "estimateRadius": "",
+    "shape": "",
+    "rowHeight": 20,
+    "description": {
+      "show": true,
+      "text": "description",
+      "location": 0
+    },
+    "result": {
+      "show": true,
+      "text": "result",
+      "location": 100
+    },
+    "radius": {
+      "min": 1,
+      "max": 8,
+      "scalingColumn": ""
+    },
+    "regression": {
+      "lower": 0,
+      "upper": 0,
+      "estimateField": 0
+    },
+    "leftWidthOffset": 0,
+    "rightWidthOffset": 0,
+    "showZeroLine": false,
+    "leftLabel": "",
+    "rightLabel": "",
+    "hideDateCategoryCol": false,
+    "width": "auto",
+    "lowerCiField": "",
+    "upperCiField": ""
+  },
+  "area": {
+    "isStacked": false
+  },
+  "sankey": {
+    "title": {
+      "defaultColor": "black"
+    },
+    "iterations": 1,
+    "rxValue": 0.9,
+    "overallSize": {
+      "width": 900,
+      "height": 700
+    },
+    "margin": {
+      "margin_y": 25,
+      "margin_x": 0
+    },
+    "nodeSize": {
+      "nodeWidth": 26,
+      "nodeHeight": 40
+    },
+    "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": {
+      "default": "#ff8500",
+      "inactive": "#808080"
+    },
+    "linkColor": {
+      "default": "#ffc900",
+      "inactive": "#D3D3D3"
+    },
+    "opacity": {
+      "nodeOpacityDefault": 1,
+      "nodeOpacityInactive": 0.1,
+      "LinkOpacityDefault": 1,
+      "LinkOpacityInactive": 0.1
+    },
+    "storyNodeFontColor": "#006778",
+    "storyNodeText": [],
+    "nodeValueStyle": {
+      "textBefore": "(",
+      "textAfter": ")"
+    },
+    "data": []
+  },
+  "fontSize": "medium",
+  "isPaletteReversed": false,
+  "suppressedData": [],
+  "showChartBrush": false,
+  "visualizationType": "Line",
+  "dataFileName": "https://www.cdc.gov/wcms/vizdata/Respitory_Viruses/NREVSSWeeklyPercentPositive.json",
+  "dataFileSourceType": "url",
+  "dataDescription": {
+    "horizontal": false,
+    "series": true,
+    "singleRow": false,
+    "xKey": "week_end",
+    "valueKeys": ["percent_test_positivity"],
+    "seriesKey": "pathogen"
+  },
+  "validated": "4.24.3",
+  "dynamicMarginTop": 0,
+  "description": "<div class=\"text-left\">Data last updated on <span data-timestamp=\"NREVSSWeeklyPercentPositive:Data_as_of\"></span> and presented through <span  data-timestamp=\"NREVSSWeeklyPercentPositive:Data_Presented_Through\"></span>. <a href=\"https://data.cdc.gov/Public-Health-Surveillance/2023-Respiratory-Virus-Response-Percent-of-Tests-P/seuz-s2cv/about_data\">View this dataset</a> on data.cdc.gov.</div>",
+  "regions": [],
+  "version": "4.25.9",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "data": [
+    {
+      "week_end": "2024-10-05",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "7.4",
+      "RSV": "1.1",
+      "Influenza": "0.7",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-10-12",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "6.3",
+      "RSV": "1.2",
+      "Influenza": "0.7",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-10-19",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "5.3",
+      "RSV": "1.9",
+      "Influenza": "0.7",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-10-26",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "5.0",
+      "RSV": "2.1",
+      "Influenza": "1.0",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-11-02",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "4.7",
+      "RSV": "2.9",
+      "Influenza": "1.2",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-11-09",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "4.2",
+      "RSV": "3.6",
+      "Influenza": "1.5",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-11-16",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "4.1",
+      "RSV": "5.5",
+      "Influenza": "2.1",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-11-23",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "4.2",
+      "RSV": "6.1",
+      "Influenza": "2.8",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-11-30",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "4.4",
+      "RSV": "8.4",
+      "Influenza": "3.9",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-12-07",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "4.8",
+      "RSV": "8.4",
+      "Influenza": "5.2",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-12-14",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "5.4",
+      "RSV": "9.7",
+      "Influenza": "8.6",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-12-21",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "6.0",
+      "RSV": "11.0",
+      "Influenza": "14.2",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-12-28",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "6.5",
+      "RSV": "10.9",
+      "Influenza": "18.2",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-01-04",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "6.7",
+      "RSV": "10.8",
+      "Influenza": "18.2",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-01-11",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "6.4",
+      "RSV": "8.9",
+      "Influenza": "18.4",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-01-18",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "5.6",
+      "RSV": "8.1",
+      "Influenza": "23.8",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-01-25",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "5.2",
+      "RSV": "7.8",
+      "Influenza": "28.7",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-02-01",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "4.6",
+      "RSV": "6.8",
+      "Influenza": "31.6",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-02-08",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "4.5",
+      "RSV": "6.7",
+      "Influenza": "31.4",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-02-15",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "4.4",
+      "RSV": "6.3",
+      "Influenza": "27.8",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-02-22",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "4.0",
+      "RSV": "6.4",
+      "Influenza": "23.9",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-03-01",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "3.8",
+      "RSV": "6.1",
+      "Influenza": "19.5",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-03-08",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "3.7",
+      "RSV": "5.6",
+      "Influenza": "15.9",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-03-15",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "3.7",
+      "RSV": "5.0",
+      "Influenza": "13.3",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-03-22",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "3.7",
+      "RSV": "4.2",
+      "Influenza": "10.7",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-03-29",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "3.8",
+      "RSV": "3.8",
+      "Influenza": "9.2",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-04-05",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "3.7",
+      "RSV": "2.9",
+      "Influenza": "7.6",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-04-12",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "3.5",
+      "RSV": "2.4",
+      "Influenza": "6.2",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-04-19",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "3.5",
+      "RSV": "1.8",
+      "Influenza": "5.3",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-04-26",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "3.3",
+      "RSV": "1.5",
+      "Influenza": "4.4",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-05-03",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "3.0",
+      "RSV": "1.1",
+      "Influenza": "3.3",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-05-10",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "3.0",
+      "RSV": "0.9",
+      "Influenza": "2.6",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-05-17",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "2.8",
+      "RSV": "0.8",
+      "Influenza": "2.1",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-05-24",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "2.7",
+      "RSV": "0.6",
+      "Influenza": "1.9",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-05-31",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "2.7",
+      "RSV": "0.5",
+      "Influenza": "1.9",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-06-07",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "2.9",
+      "RSV": "0.5",
+      "Influenza": "1.6",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-06-14",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "2.9",
+      "RSV": "0.5",
+      "Influenza": "1.2",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-06-21",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "3.1",
+      "RSV": "0.3",
+      "Influenza": "1.1",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-06-28",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "3.3",
+      "RSV": "0.3",
+      "Influenza": "0.9",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-07-05",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "3.9",
+      "RSV": "0.4",
+      "Influenza": "0.8",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-07-12",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "4.9",
+      "RSV": "0.4",
+      "Influenza": "0.8",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-07-19",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "5.1",
+      "RSV": "0.4",
+      "Influenza": "0.5",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-07-26",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "6.9",
+      "RSV": "0.3",
+      "Influenza": "0.4",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-08-02",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "8.1",
+      "RSV": "0.4",
+      "Influenza": "0.4",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-08-09",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "8.9",
+      "RSV": "0.4",
+      "Influenza": "0.4",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-08-16",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "10.5",
+      "RSV": "0.3",
+      "Influenza": "0.3",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-08-23",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "11.7",
+      "RSV": "0.3",
+      "Influenza": "0.4",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-08-30",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "11.2",
+      "RSV": "0.3",
+      "Influenza": "0.4",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-09-06",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "A",
+      "COVID-19": "10.8",
+      "RSV": "0.3",
+      "Influenza": "0.4",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-10-05",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "7.4",
+      "RSV": "1.1",
+      "Influenza": "0.7",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-10-12",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "6.3",
+      "RSV": "1.2",
+      "Influenza": "0.7",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-10-19",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "5.3",
+      "RSV": "1.9",
+      "Influenza": "0.7",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-10-26",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "5.0",
+      "RSV": "2.1",
+      "Influenza": "1.0",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-11-02",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "4.7",
+      "RSV": "2.9",
+      "Influenza": "1.2",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-11-09",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "4.2",
+      "RSV": "3.6",
+      "Influenza": "1.5",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-11-16",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "4.1",
+      "RSV": "5.5",
+      "Influenza": "2.1",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-11-23",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "4.2",
+      "RSV": "6.1",
+      "Influenza": "2.8",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-11-30",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "4.4",
+      "RSV": "8.4",
+      "Influenza": "3.9",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-12-07",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "4.8",
+      "RSV": "8.4",
+      "Influenza": "5.2",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-12-14",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "5.4",
+      "RSV": "9.7",
+      "Influenza": "8.6",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-12-21",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "6.0",
+      "RSV": "11.0",
+      "Influenza": "14.2",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2024-12-28",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "6.5",
+      "RSV": "10.9",
+      "Influenza": "18.2",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-01-04",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "6.7",
+      "RSV": "10.8",
+      "Influenza": "18.2",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-01-11",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "6.4",
+      "RSV": "8.9",
+      "Influenza": "18.4",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-01-18",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "5.6",
+      "RSV": "8.1",
+      "Influenza": "23.8",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-01-25",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "5.2",
+      "RSV": "7.8",
+      "Influenza": "28.7",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-02-01",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "4.6",
+      "RSV": "6.8",
+      "Influenza": "31.6",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-02-08",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "4.5",
+      "RSV": "6.7",
+      "Influenza": "31.4",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-02-15",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "4.4",
+      "RSV": "6.3",
+      "Influenza": "27.8",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-02-22",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "4.0",
+      "RSV": "6.4",
+      "Influenza": "23.9",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-03-01",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "3.8",
+      "RSV": "6.1",
+      "Influenza": "19.5",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-03-08",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "3.7",
+      "RSV": "5.6",
+      "Influenza": "15.9",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-03-15",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "3.7",
+      "RSV": "5.0",
+      "Influenza": "13.3",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-03-22",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "3.7",
+      "RSV": "4.2",
+      "Influenza": "10.7",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-03-29",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "3.8",
+      "RSV": "3.8",
+      "Influenza": "9.2",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-04-05",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "3.7",
+      "RSV": "2.9",
+      "Influenza": "7.6",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-04-12",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "3.5",
+      "RSV": "2.4",
+      "Influenza": "6.2",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-04-19",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "3.5",
+      "RSV": "1.8",
+      "Influenza": "5.3",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-04-26",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "3.3",
+      "RSV": "1.5",
+      "Influenza": "4.4",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-05-03",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "3.0",
+      "RSV": "1.1",
+      "Influenza": "3.3",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-05-10",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "3.0",
+      "RSV": "0.9",
+      "Influenza": "2.6",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-05-17",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "2.8",
+      "RSV": "0.8",
+      "Influenza": "2.1",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-05-24",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "2.7",
+      "RSV": "0.6",
+      "Influenza": "1.9",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-05-31",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "2.7",
+      "RSV": "0.5",
+      "Influenza": "1.9",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-06-07",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "2.9",
+      "RSV": "0.5",
+      "Influenza": "1.6",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-06-14",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "2.9",
+      "RSV": "0.5",
+      "Influenza": "1.2",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-06-21",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "3.1",
+      "RSV": "0.3",
+      "Influenza": "1.1",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-06-28",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "3.3",
+      "RSV": "0.3",
+      "Influenza": "0.9",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-07-05",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "3.9",
+      "RSV": "0.4",
+      "Influenza": "0.8",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-07-12",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "4.9",
+      "RSV": "0.4",
+      "Influenza": "0.8",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-07-19",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "5.1",
+      "RSV": "0.4",
+      "Influenza": "0.5",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-07-26",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "6.9",
+      "RSV": "0.3",
+      "Influenza": "0.4",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-08-02",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "8.1",
+      "RSV": "0.4",
+      "Influenza": "0.4",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-08-09",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "8.9",
+      "RSV": "0.4",
+      "Influenza": "0.4",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-08-16",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "10.5",
+      "RSV": "0.3",
+      "Influenza": "0.3",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-08-23",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "11.7",
+      "RSV": "0.3",
+      "Influenza": "0.4",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-08-30",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "11.2",
+      "RSV": "0.3",
+      "Influenza": "0.4",
+      "undefined": "__​undefined__"
+    },
+    {
+      "week_end": "2025-09-06",
+      "**Numeric Value Property**": "percent_test_positivity",
+      "grouping": "B",
+      "COVID-19": "10.8",
+      "RSV": "0.3",
+      "Influenza": "0.4",
+      "undefined": "__​undefined__"
+    }
+  ],
+  "datasets": {}
+}

@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, useContext } from 'react'
+import React, { useContext } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import { ChartContext } from '../../../types/ChartContext'
 import { Text } from '@visx/text'
@@ -10,27 +10,10 @@ type RegionsProps = {
   yMax: number
   barWidth?: number
   totalBarsInGroup?: number
-  handleTooltipMouseOff: MouseEventHandler<SVGElement>
-  handleTooltipMouseOver: MouseEventHandler<SVGElement>
-  handleTooltipClick: MouseEventHandler<SVGElement>
-  tooltipData: unknown
-  showTooltip: Function
-  hideTooltip: Function
 }
 
 // TODO: should regions be removed on categorical axis?
-const Regions: React.FC<RegionsProps> = ({
-  xScale,
-  barWidth = 0,
-  totalBarsInGroup = 1,
-  yMax,
-  handleTooltipMouseOff,
-  handleTooltipMouseOver,
-  handleTooltipClick,
-  tooltipData,
-  showTooltip,
-  hideTooltip
-}) => {
+const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax }) => {
   const { parseDate, config } = useContext<ChartContext>(ConfigContext)
 
   const { runtime, regions, visualizationType, orientation, xAxis } = config
@@ -181,11 +164,7 @@ const Regions: React.FC<RegionsProps> = ({
           fill='red'
           className='regions regions-group--line zzz'
           key={region.label}
-          onMouseMove={handleTooltipMouseOver}
-          onMouseLeave={handleTooltipMouseOff}
-          handleTooltipClick={handleTooltipClick}
-          tooltipData={JSON.stringify(tooltipData)}
-          showTooltip={showTooltip}
+          pointerEvents='none'
         >
           <HighlightedArea />
           <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>

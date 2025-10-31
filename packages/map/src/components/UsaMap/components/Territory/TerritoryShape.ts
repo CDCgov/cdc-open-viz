@@ -11,4 +11,10 @@ export type TerritoryShape = {
   territory: string
   territoryData: object
   textColor: string
+  svgStyle?: React.CSSProperties
+  getSyncProps?: (geoKey: string) => any
+  syncHandlers?: {
+    onMouseEnter: (geoKey: string, clientY: number) => void
+    onMouseLeave: () => void
+  }
 }

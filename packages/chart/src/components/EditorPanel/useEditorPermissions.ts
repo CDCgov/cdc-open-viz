@@ -369,6 +369,12 @@ export const useEditorPermissions = () => {
     )
   }
 
+  const visSupportsSmallMultiples = () => {
+    const enabledCharts = ['Line', 'Bar', 'Area Chart', 'Combo', 'Box Plot', 'Scatter Plot']
+    if (enabledCharts.includes(visualizationType)) return true
+    return false
+  }
+
   const visSupportsYPadding = () => {
     return !config.yAxis.inlineLabel || !config.yAxis.inlineLabel?.includes(' ')
   }
@@ -445,6 +451,7 @@ export const useEditorPermissions = () => {
     visSupportsValueAxisMax,
     visSupportsValueAxisMin,
     visSupportsDynamicSeries,
+    visSupportsSmallMultiples,
     visSupportsYPadding,
     visHasSingleSeriesTooltip,
     visHasCategoricalAxis

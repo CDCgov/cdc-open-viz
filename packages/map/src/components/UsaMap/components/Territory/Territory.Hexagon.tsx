@@ -43,11 +43,16 @@ const TerritoryHexagon = ({
   territory,
   territoryData,
   textColor,
+  getSyncProps,
+  syncHandlers,
   ...props
 }) => {
   const { config } = useContext<MapContext>(ConfigContext)
 
   const isHex = config.general.displayAsHex
+
+  // Construct geography key: use territory prop if available, otherwise construct from label
+  const geoKey = territory || `US-${label}`
 
   // Labels
   const hexagonLabel = (geo, bgColor = '#FFFFFF', projection) => {
@@ -133,7 +138,14 @@ const TerritoryHexagon = ({
             fontSize={14}
             x={'50%'}
             y={y}
-            style={{ fill: 'currentColor', stroke: strokeColor, fontWeight: 900, opacity: 1, fillOpacity: 1 }}
+            style={{
+              fill: 'currentColor',
+              stroke: strokeColor,
+              fontWeight: 900,
+              opacity: 1,
+              fillOpacity: 1,
+              pointerEvents: 'none'
+            }}
             paintOrder='stroke'
             textAnchor='middle'
             verticalAnchor='middle'
@@ -143,7 +155,9 @@ const TerritoryHexagon = ({
           >
             {abbr.substring(3)}
           </Text>
-          {config.general.displayAsHex && config.hexMap.type === 'shapes' && getArrowDirection(territoryData, geo, true)}
+          {config.general.displayAsHex &&
+            config.hexMap.type === 'shapes' &&
+            getArrowDirection(territoryData, geo, true)}
         </>
       )
     }
@@ -151,7 +165,7 @@ const TerritoryHexagon = ({
     let [dx, dy] = offsets[abbr]
 
     return (
-      <g>
+      <g style={{ pointerEvents: 'none' }}>
         <line
           x1={centroid[0]}
           y1={centroid[1]}
@@ -179,11 +193,23 @@ const TerritoryHexagon = ({
 
   return (
     <svg viewBox='-1 -1 46 53' className='territory-wrapper--hex'>
-      <g {...props} data-tooltip-html={dataTooltipHtml} data-tooltip-id={dataTooltipId} onClick={handleShapeClick}>
+      <g
+        {...(getSyncProps ? getSyncProps(geoKey) : {})}
+        {...props}
+        data-tooltip-html={dataTooltipHtml}
+        data-tooltip-id={dataTooltipId}
+        onClick={handleShapeClick}
+      >
         <polygon
           stroke={stroke}
           strokeWidth={strokeWidth}
           points='22 0 44 12.702 44 38.105 22 50.807 0 38.105 0 12.702'
+          onMouseEnter={e => {
+            syncHandlers?.onMouseEnter(geoKey, e.clientY)
+          }}
+          onMouseLeave={() => {
+            syncHandlers?.onMouseLeave()
+          }}
         />
         {config.general.displayAsHex && hexagonLabel(territoryData, stroke, false)}
       </g>

@@ -26,6 +26,8 @@ import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { MapContext } from '../../../types/MapContext'
 import { checkColorContrast, getContrastColor, outlinedTextColor } from '@cdc/core/helpers/cove/accessibility'
 import TerritoriesSection from './TerritoriesSection'
+import SmallMultiples from '../../SmallMultiples'
+import { useSynchronizedGeographies } from '../../../hooks/useSynchronizedGeographies'
 
 import { isMobileStateLabelViewport } from '@cdc/core/helpers/viewports'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
@@ -80,12 +82,16 @@ const UsaMap = () => {
     mapId,
     logo,
     currentViewport,
+    vizViewport,
+    dimensions,
     translate,
     runtimeLegend,
     interactionLabel
   } = useContext<MapContext>(ConfigContext)
 
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
+
+  const { getSyncProps, syncHandlers } = useSynchronizedGeographies()
 
   let isFilterValueSupported = false
   const { general, columns, tooltips, hexMap, map, annotations } = config
@@ -165,6 +171,10 @@ const UsaMap = () => {
   const geoStrokeColor = getGeoStrokeColor(config)
   const geoFillColor = getGeoFillColor(config)
 
+  // Chrome needs wider stroke for small maps or it doesn't render the pattern
+  const mapWidth = dimensions?.[0] || 880
+  const patternLinesStrokeWidth = mapWidth < 200 ? 1.75 : mapWidth < 375 ? 1.25 : 0.75
+
   const territories = territoriesData.map((territory, territoryIndex) => {
     const Shape = displayAsHex ? Territory.Hexagon : Territory.Rectangle
 
@@ -190,6 +200,8 @@ const UsaMap = () => {
           strokeColor='#fff'
           territoryData={territoryData}
           backgroundColor={styles.fill}
+          getSyncProps={getSyncProps}
+          syncHandlers={syncHandlers}
         />
       )
 
@@ -242,6 +254,8 @@ const UsaMap = () => {
           territoryData={territoryData}
           tabIndex={-1}
           backgroundColor={styles.fill}
+          getSyncProps={getSyncProps}
+          syncHandlers={syncHandlers}
         />
       )
     }
@@ -254,6 +268,10 @@ const UsaMap = () => {
 
   if (!focusedStates) {
     return <></>
+  }
+
+  if (config.smallMultiples?.mode) {
+    return <SmallMultiples />
   }
 
   // Constructs and displays markup for all geos on the map (except territories right now)
@@ -437,6 +455,7 @@ const UsaMap = () => {
         return (
           <g data-name={geoName} key={key} tabIndex={-1}>
             <g
+              {...getSyncProps(geoKey)}
               className='geo-group'
               style={styles}
               onClick={() => geoClickHandler(geoDisplayName, geoData)}
@@ -444,7 +463,7 @@ const UsaMap = () => {
               data-tooltip-id={`tooltip__${tooltipId}`}
               data-tooltip-html={tooltip}
               tabIndex={-1}
-              onMouseEnter={() => {
+              onMouseEnter={e => {
                 // Track hover analytics event if this is a new location
                 const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
                 publishAnalyticsEvent({
@@ -457,6 +476,10 @@ const UsaMap = () => {
                   location: geoDisplayName,
                   specifics: `location: ${locationName?.toLowerCase()}`
                 })
+                syncHandlers.onMouseEnter(geoKey, e.clientY)
+              }}
+              onMouseLeave={() => {
+                syncHandlers.onMouseLeave()
               }}
             >
               {/* state path */}
@@ -499,7 +522,7 @@ const UsaMap = () => {
                         height={patternSizes[size] ?? 6}
                         width={patternSizes[size] ?? 6}
                         stroke={patternColor}
-                        strokeWidth={0.75}
+                        strokeWidth={patternLinesStrokeWidth}
                         orientation={['diagonalRightToLeft']}
                       />
                     )}
@@ -590,7 +613,7 @@ const UsaMap = () => {
           <text
             x={x}
             y={y}
-            fontSize={isMobileStateLabelViewport(currentViewport) ? 16 : 13}
+            fontSize={isMobileStateLabelViewport(vizViewport) ? 16 : 13}
             fontWeight={900}
             strokeWidth='1'
             paintOrder='stroke'
