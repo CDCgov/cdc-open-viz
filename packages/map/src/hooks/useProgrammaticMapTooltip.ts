@@ -39,11 +39,7 @@ export const useProgrammaticMapTooltip = ({ mapRef, tooltipId }: UseProgrammatic
    * Call this in the ref callback of each geography element
    */
   const registerGeoElement = (geoId: string, element: SVGElement | null) => {
-    if (element) {
-      geoElementRefs.current[geoId] = element
-    } else {
-      delete geoElementRefs.current[geoId]
-    }
+    geoElementRefs.current[geoId] = element
   }
 
   const unregisterGeoElement = (geoId: string) => {

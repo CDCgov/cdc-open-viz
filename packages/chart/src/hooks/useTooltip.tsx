@@ -317,7 +317,7 @@ export const useTooltip = props => {
    * @function getXValueFromCoordinate
    * @returns {String} - the closest x value to the cursor position
    */
-  const getXValueFromCoordinate = (x, isClick = false) => {
+  const getXValueFromCoordinate = x => {
     if (visualizationType === 'Pie') return
     if (orientation === 'horizontal') return
 
@@ -333,7 +333,7 @@ export const useTooltip = props => {
           ? xScaleRef.current(parseDate(d[xAxis.dataKey]))
           : xScaleRef.current(d[xAxis.dataKey])
         let bwOffset = config.barHeight
-        const distance = Math.abs(Number(xPosition - offset + (isClick ? bwOffset * 2 : 0)))
+        const distance = Math.abs(Number(xPosition - offset))
 
         if (distance <= minDistance) {
           minDistance = distance
@@ -456,7 +456,7 @@ export const useTooltip = props => {
       const eventSvgCoords = localPoint(e)
       const { x } = eventSvgCoords
       if (!x) throw new Error('COVE: no x value in handleTooltipClick.')
-      let closestXScaleValue = getXValueFromCoordinate(x, true)
+      let closestXScaleValue = getXValueFromCoordinate(x)
       let datum = config.data?.filter(item => item[config.xAxis.dataKey] === closestXScaleValue)
       if (!closestXScaleValue) throw new Error('COVE: no closest x scale value in handleTooltipClick')
       if (isDateScale(xAxis) && closestXScaleValue) {

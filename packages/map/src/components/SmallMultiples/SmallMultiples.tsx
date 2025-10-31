@@ -7,6 +7,10 @@ import { isMobileSmallMultiplesViewport } from '@cdc/core/helpers/viewports'
 import { MapRefInterface } from '../../hooks/useProgrammaticMapTooltip'
 import './SmallMultiples.css'
 
+type TileHeaderRows = Array<Array<HTMLDivElement>>
+
+type TileHeaderEntries = Array<[string, HTMLDivElement]>
+
 interface SmallMultiplesProps {}
 
 const SmallMultiples: React.FC<SmallMultiplesProps> = () => {
@@ -68,13 +72,11 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = () => {
 
   // Align tile header heights per row
   useEffect(() => {
-    const headerEntries = Object.entries(headerRefs.current).filter(([_, ref]) => ref) as Array<
-      [string, HTMLDivElement]
-    >
+    const headerEntries = Object.entries(headerRefs.current).filter(([_, ref]) => ref) as TileHeaderEntries
     if (headerEntries.length === 0) return
 
     // Group headers by row based on their index in orderedTileValues
-    const headersByRow: Array<Array<HTMLDivElement>> = []
+    const headersByRow: TileHeaderRows = []
 
     orderedTileValues.forEach((tileValue, index) => {
       const rowIndex = Math.floor(index / tilesPerRow)

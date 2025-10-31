@@ -13,14 +13,32 @@ import {
 import { calculateYAxisWithAutoPadding } from '../../helpers/calculateYAxisWithAutoPadding'
 import { isMobileSmallMultiplesViewport } from '@cdc/core/helpers/viewports'
 import './SmallMultiples.css'
+import { ChartConfig } from '../../types/ChartConfig'
 
 interface SmallMultiplesProps {
-  config: any
-  data: any[]
+  config: ChartConfig
+  data: object[]
   svgRef?: React.RefObject<SVGAElement>
   parentWidth?: number
   parentHeight?: number
 }
+
+type TileItem = {
+  key: string | number
+  mode: 'by-series' | 'by-column'
+  seriesKey?: string
+  tileValue?: any
+  tileColumn?: string
+}
+
+type ChartRefWithTooltipMethods = {
+  triggerTooltipAtDataValue?: (xAxisValue: any, yCoordinate: number) => void
+  hideTooltip?: () => void
+}
+
+type TileHeaderRows = Array<Array<HTMLDivElement>>
+
+type TileHeaderEntries = Array<[string, HTMLDivElement]>
 
 const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, parentWidth, parentHeight }) => {
   const { currentViewport, colorScale, parentRef } = useContext(ConfigContext)
@@ -30,22 +48,8 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
   const tilesPerRow = isMobile ? tilesPerRowMobile || 2 : tilesPerRowDesktop || 3
 
   // Figure out what objects to iterate over based on mode - memoized to prevent recalculation
-  const tileItems = useMemo<
-    Array<{
-      key: string | number
-      mode: 'by-series' | 'by-column'
-      seriesKey?: string
-      tileValue?: any
-      tileColumn?: string
-    }>
-  >(() => {
-    let items: Array<{
-      key: string | number
-      mode: 'by-series' | 'by-column'
-      seriesKey?: string
-      tileValue?: any
-      tileColumn?: string
-    }> = []
+  const tileItems = useMemo<Array<TileItem>>(() => {
+    let items: Array<TileItem> = []
 
     if (mode === 'by-series') {
       items = config.series.map(series => ({
@@ -92,7 +96,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
   const [tileHeights, setTileHeights] = useState<Record<string, number>>({})
 
   // Refs to all LinearChart instances for tooltip coordination
-  const chartRefs = useRef<Record<string, any>>({})
+  const chartRefs = useRef<Record<string, ChartRefWithTooltipMethods>>({})
 
   // Refs to all tile header elements for height alignment
   const headerRefs = useRef<Record<string, HTMLDivElement | null>>({})
@@ -210,13 +214,11 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
 
   // Align tile header heights per row
   useEffect(() => {
-    const headerEntries = Object.entries(headerRefs.current).filter(([_, ref]) => ref) as Array<
-      [string, HTMLDivElement]
-    >
+    const headerEntries = Object.entries(headerRefs.current).filter(([_, ref]) => ref) as TileHeaderEntries
     if (headerEntries.length === 0) return
 
     // Group headers by row based on their index in tileItems
-    const headersByRow: Array<Array<HTMLDivElement>> = []
+    const headersByRow: TileHeaderRows = []
 
     tileItems.forEach((item, index) => {
       const rowIndex = Math.floor(index / tilesPerRow)

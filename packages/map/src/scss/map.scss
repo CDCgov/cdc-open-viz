@@ -43,8 +43,8 @@ $medium: 768px;
 .territories {
   gap: 0.5em;
   svg {
-    max-width: var(--territory-svg-max-width);
-    min-width: var(--territory-svg-min-width);
+    max-width: var(--territory-svg-max-width, 30px);
+    min-width: var(--territory-svg-min-width, 30px);
     transition: 0.3s all;
 
     text {

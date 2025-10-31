@@ -149,6 +149,7 @@ const TerritoryHexagon = ({
             paintOrder='stroke'
             textAnchor='middle'
             verticalAnchor='middle'
+            onClick={handleShapeClick}
             data-tooltip-id={dataTooltipId}
             data-tooltip-html={dataTooltipHtml}
           >
@@ -180,6 +181,7 @@ const TerritoryHexagon = ({
           style={{ fill: APP_FONT_COLOR }}
           alignmentBaseline='middle'
           transform={`translate(${centroid[0] + dx}, ${centroid[1] + dy})`}
+          onClick={handleShapeClick}
           data-tooltip-id={dataTooltipId}
           data-tooltip-html={dataTooltipHtml}
         >

@@ -6,14 +6,15 @@ import { ColorScale } from '../../types/ChartContext'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { getTileDisplayTitle } from '../../helpers/smallMultiplesHelpers'
 import getViewport from '@cdc/core/helpers/getViewport'
+import { ChartConfig } from '../../types/ChartConfig'
 
 interface SmallMultipleTileProps {
   mode: 'by-series' | 'by-column'
-  config: any
-  data: any[]
+  config: ChartConfig
+  data: object[]
   tileKey: string
   seriesKey?: string
-  tileValue?: any
+  tileValue?: string | number
   tileColumn?: string
   customColorScale?: ColorScale
   svgRef?: React.RefObject<SVGAElement>
