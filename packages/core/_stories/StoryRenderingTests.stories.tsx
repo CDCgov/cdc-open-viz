@@ -26,8 +26,9 @@ type Story = StoryObj<typeof ChartRenderingValidator>
  * @returns Promise that resolves to an array of story URLs to test
  */
 const getVisualizationStoryUrls = async (): Promise<string[]> => {
+  let response
   try {
-    const response = await fetch('http://localhost:6006/index.json')
+    response = await fetch('http://localhost:6006/index.json')
   } catch (error) {
     console.error('Error fetching visualization story URLs:', error)
     return []
