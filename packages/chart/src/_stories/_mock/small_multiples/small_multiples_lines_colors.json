@@ -238,7 +238,9 @@
     "tileOrder": [],
     "tileOrderType": "asc",
     "tileTitles": {},
-    "colorMode": "different"
+    "colorMode": "different",
+    "synchronizedTooltips": true,
+    "showAreaUnderLine": true
   },
   "exclusions": {
     "active": false,

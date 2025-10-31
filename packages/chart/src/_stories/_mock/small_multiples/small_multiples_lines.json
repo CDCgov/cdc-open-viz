@@ -228,7 +228,8 @@
     "tileOrder": [],
     "tileOrderType": "asc",
     "tileTitles": {},
-    "colorMode": "same"
+    "colorMode": "same",
+    "synchronizedTooltips": true
   },
   "exclusions": {
     "active": false,
