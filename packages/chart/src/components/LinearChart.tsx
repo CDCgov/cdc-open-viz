@@ -389,7 +389,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   }
 
   const onMouseLeave = () => {
-    setShowHoverLine(false)
     if (handleSmallMultipleHover) {
       handleSmallMultipleHover(null, null)
     }
@@ -711,6 +710,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           onMouseLeave={() => {
             setShowHoverLine(false)
             handleChartMouseLeave()
+            onMouseLeave()
           }}
           onMouseEnter={() => {
             setShowHoverLine(true)
