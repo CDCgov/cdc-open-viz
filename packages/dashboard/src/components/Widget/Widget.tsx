@@ -15,6 +15,7 @@ import './widget.styles.css'
 interface WidgetConfig extends BaseVisualizationConfig {
   rowIdx: number
   colIdx: number
+  newViz?: boolean
 }
 
 type WidgetProps = {

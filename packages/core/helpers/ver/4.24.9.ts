@@ -4,6 +4,16 @@ import { BaseVisualizationConfig } from '../../types/BaseVisualizationConfig'
 import { VizFilter } from '../../types/VizFilter'
 import versionNeedsUpdate from './versionNeedsUpdate'
 
+// Legacy interfaces for migration compatibility
+interface LegacyMapGeneral {
+  geoType?: string
+  allowMapZoom?: boolean
+}
+
+interface LegacyMapConfig extends BaseVisualizationConfig {
+  general?: LegacyMapGeneral
+}
+
 /**
  * Updates the configuration object to disable map zooming for single state maps in a dashboard.
  * when the config is below version 4.24.9
@@ -11,17 +21,19 @@ import versionNeedsUpdate from './versionNeedsUpdate'
 const patchSingleStateZoom = config => {
   if (config.type === 'dashboard') {
     Object.values(config?.visualizations || {}).forEach((viz: BaseVisualizationConfig) => {
-      if (viz.type === 'map' && viz.general?.geoType === 'single-state') {
+      const mapViz = viz as LegacyMapConfig
+      if (mapViz.type === 'map' && mapViz.general?.geoType === 'single-state') {
         // if the version is less that 4.24.7 then allowMapZoom should be false
-        let allowZoom = versionNeedsUpdate(config.version, '4.24.9') ? false : viz.general.allowMapZoom
-        viz.general.allowMapZoom = allowZoom
+        let allowZoom = versionNeedsUpdate(config.version, '4.24.9') ? false : mapViz.general.allowMapZoom
+        mapViz.general.allowMapZoom = allowZoom
       }
     })
   }
-  if (config.type === 'map' && config.general?.geoType === 'single-state') {
+  const mapConfig = config as LegacyMapConfig
+  if (mapConfig.type === 'map' && mapConfig.general?.geoType === 'single-state') {
     // if the version is less that 4.24.7 then allowMapZoom should be false
-    let allowZoom = versionNeedsUpdate(config.version, '4.24.9') ? false : config.general.allowMapZoom
-    config.general.allowMapZoom = allowZoom
+    let allowZoom = versionNeedsUpdate(config.version, '4.24.9') ? false : mapConfig.general.allowMapZoom
+    mapConfig.general.allowMapZoom = allowZoom
   }
 }
 

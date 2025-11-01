@@ -5,6 +5,24 @@ import { MultiDashboardConfig } from '@cdc/dashboard/src/types/MultiDashboard'
 import { BaseVisualizationConfig } from '../../types/BaseVisualizationConfig'
 import versionNeedsUpdate from './versionNeedsUpdate'
 
+// Legacy interfaces for migration compatibility
+interface LegacyAPIFilter {
+  autoLoad?: boolean
+  defaultValue?: string
+}
+
+interface LegacySharedFilter {
+  apiFilter?: LegacyAPIFilter
+  usedBy?: string[]
+}
+
+interface LegacyProperties {
+  hide?: number[]
+  autoLoad?: boolean
+}
+
+type MigrationVisualization = DashboardFilters & LegacyProperties
+
 /**
  * Migrates the dashboard configuration to the new format.
  *
@@ -26,11 +44,12 @@ export const dashboardFiltersMigrate = config => {
   const newVisualizations = {}
   // autoload was removed from APIFilter type
   const newSharedFilters = (dashboardConfig.dashboard.sharedFilters || []).map(sf => {
-    if (sf.apiFilter?.autoLoad !== undefined) {
-      delete sf.apiFilter.autoLoad
+    const legacyFilter = sf as LegacySharedFilter
+    if (legacyFilter.apiFilter?.autoLoad !== undefined) {
+      delete legacyFilter.apiFilter.autoLoad
     }
-    if (sf.apiFilter?.defaultValue !== undefined) {
-      delete sf.apiFilter.defaultValue
+    if (legacyFilter.apiFilter?.defaultValue !== undefined) {
+      delete legacyFilter.apiFilter.defaultValue
     }
     return sf
   })
@@ -38,20 +57,21 @@ export const dashboardFiltersMigrate = config => {
 
   Object.keys(dashboardConfig.visualizations).forEach(vizKey => {
     const viz = dashboardConfig.visualizations[vizKey] as DashboardFilters
+    const migrationViz = viz as MigrationVisualization
     // hide was removed from visualizations
-    if (viz.hide !== undefined) {
-      viz.sharedFilterIndexes = newSharedFilters.map((_sf, i) => i).filter(i => !viz.hide.includes(i))
+    if (migrationViz.hide !== undefined) {
+      viz.sharedFilterIndexes = newSharedFilters.map((_sf, i) => i).filter(i => !migrationViz.hide!.includes(i))
       viz.type = 'dashboardFilters'
-      if (viz.autoLoad) {
+      if (migrationViz.autoLoad) {
         viz.filterBehavior = 'Filter Change'
       } else {
         viz.filterBehavior = 'Apply Button'
       }
 
-      delete viz.hide
+      delete migrationViz.hide
     }
     // 'filter-dropdowns' was renamed to 'dashboardFilters' for clarity
-    if (viz.type === 'filter-dropdowns') {
+    if ((migrationViz as unknown as { type: string }).type === 'filter-dropdowns') {
       viz.type = 'dashboardFilters'
       viz.visualizationType = 'dashboardFilters'
       if (!viz.sharedFilterIndexes) {

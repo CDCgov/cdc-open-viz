@@ -95,6 +95,8 @@ type IconProps = {
   color?: string
   style?: object
   className?: string // className attribute will be ignored.
+  /* Click handler for the icon */
+  onClick?: (event: React.MouseEvent<HTMLElement>) => void
 }
 
 const Icon: React.FC<IconProps> = ({
@@ -104,6 +106,7 @@ const Icon: React.FC<IconProps> = ({
   size = undefined,
   color = undefined,
   style = undefined,
+  onClick = undefined,
   ...attributes
 }) => {
   const IconObj = iconHash[display] || null
@@ -114,7 +117,7 @@ const Icon: React.FC<IconProps> = ({
   const styles = {
     color: color ? color : null,
     width: size ? size + 'px' : null,
-    cursor: display === 'move' ? 'move' : 'default',
+    cursor: display === 'move' ? 'move' : onClick ? 'pointer' : 'default',
     ...style
   }
 
@@ -126,6 +129,7 @@ const Icon: React.FC<IconProps> = ({
         <span
           className={`cove-icon${attributes.className ? ' ' + attributes.className : ''}`}
           style={styles}
+          onClick={onClick}
           {...filteredAttrs}
         >
           <IconObj title={alt || display} />

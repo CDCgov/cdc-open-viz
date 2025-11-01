@@ -8,8 +8,40 @@ import { BaseVisualizationConfig } from '../../types/BaseVisualizationConfig'
 import _ from 'lodash'
 import { Column } from '../../types/Column'
 
+/**
+ * Configuration interface for DataTableEditor component.
+ * Extends BaseVisualizationConfig with the additional properties needed by the data table editor.
+ */
+interface DataTableEditorConfig extends BaseVisualizationConfig {
+  columns?: Record<string, Partial<Column>>
+  table?: {
+    label?: string
+    show?: boolean
+    showVertical?: boolean
+    indexLabel?: string
+    caption?: string
+    limitHeight?: boolean
+    height?: string
+    collapsible?: boolean
+    expanded?: boolean
+    showBottomCollapse?: boolean
+    download?: boolean
+    showDownloadLinkBelow?: boolean
+    downloadVisibleDataOnly?: boolean
+    showDataTableLink?: boolean
+    showDownloadUrl?: boolean
+    showDownloadImgButton?: boolean
+    cellMinWidth?: string | number
+    groupBy?: string
+    pivot?: {
+      columnName?: string
+      valueColumns?: string[]
+    }
+  }
+}
+
 interface DataTableProps {
-  config: Partial<BaseVisualizationConfig>
+  config: Partial<DataTableEditorConfig>
   updateField: UpdateFieldFunc<string | boolean | string[] | number | Record<string, Partial<Column>>>
   isDashboard: boolean
   columns: string[]

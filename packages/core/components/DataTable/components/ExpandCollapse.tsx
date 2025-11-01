@@ -1,6 +1,7 @@
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
 import { BaseVisualizationConfig } from '../../../types/BaseVisualizationConfig'
+import { COVE_VISUALIZATION_TYPES } from '../../../helpers/metrics/types'
 import Icon from '../../ui/Icon'
 import parse from 'html-react-parser'
 
@@ -19,7 +20,7 @@ const ExpandCollapse = ({ expanded, setExpanded, tableTitle, config, interaction
       className={expanded ? 'data-table-heading p-3' : 'collapsed data-table-heading p-3'}
       onClick={() => {
         publishAnalyticsEvent({
-          vizType: config?.type,
+          vizType: (config?.type as COVE_VISUALIZATION_TYPES) || 'unknown',
           vizSubType: getVizSubType(config),
           eventType: 'expand_collapse_toggled',
           eventAction: 'click',

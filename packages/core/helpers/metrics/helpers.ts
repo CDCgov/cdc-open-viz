@@ -6,7 +6,6 @@ import {
   ANALYTICS_EVENT_TYPES,
   EventSpecifics
 } from './types'
-import { GetLabelForEvent } from './getLabelForEvent'
 
 /**
  * Retrieves the version of the package from its package.json file.
@@ -56,7 +55,7 @@ export const publishAnalyticsEvent = <T extends ANALYTICS_EVENT_TYPES>({
   vizTitle?: string
   eventType: T
   eventAction?: ANALYTICS_EVENT_ACTIONS
-  eventLabel?: GetLabelForEvent<T>
+  eventLabel?: string
   specifics?: T extends keyof EventSpecifics ? EventSpecifics[T] : string
   version?: string
   [key: string]: any

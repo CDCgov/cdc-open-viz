@@ -8,8 +8,26 @@ import _ from 'lodash'
 import React, { useState } from 'react'
 import FieldSetWrapper from './FieldSetWrapper'
 
+/**
+ * Configuration interface for ColumnsEditor component.
+ * Extends BaseVisualizationConfig with the additional properties needed by the columns editor.
+ * Avoids circular dependencies by only adding the specific properties used by this component.
+ */
+interface ColumnsEditorConfig extends BaseVisualizationConfig {
+  columns?: Record<string, Partial<Column>>
+  series?: { dataKey: string }[]
+  table?: {
+    groupBy?: string
+    showVertical?: boolean
+  }
+  legend?: {
+    type?: string
+    additionalCategories?: string[]
+  }
+}
+
 interface ColumnsEditorProps {
-  config: Partial<BaseVisualizationConfig>
+  config: ColumnsEditorConfig
   updateField: UpdateFieldFunc<string | boolean | string[] | number | Column | Record<string, Partial<Column>>>
   deleteColumn: (colName: string) => void
 }

@@ -6,7 +6,7 @@ import {
   AccordionItemPanel
 } from 'react-accessible-accordion'
 import DataTableEditor from '../../EditorPanel/DataTableEditor'
-import { Visualization } from '@cdc/core/types/Visualization'
+import { BaseVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { useMemo } from 'react'
 import ColumnsEditor from '../../EditorPanel/ColumnsEditor'
@@ -14,9 +14,19 @@ import VizFilterEditor from '../../EditorPanel/VizFilterEditor'
 import _ from 'lodash'
 import FootnotesEditor from '../../EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
+import { Column } from '@cdc/core/types/Column'
+
+/**
+ * Configuration interface for DataTableEditorPanel component.
+ * Extends BaseVisualizationConfig with the additional properties needed by the data table editor.
+ */
+interface DataTableEditorConfig extends BaseVisualizationConfig {
+  columns?: Record<string, Partial<Column>>
+  originalFormattedData?: Record<string, any>[]
+}
 
 type DataTableEditorProps = {
-  config: Visualization
+  config: DataTableEditorConfig
   updateConfig: Function
   datasets?: Datasets
 }

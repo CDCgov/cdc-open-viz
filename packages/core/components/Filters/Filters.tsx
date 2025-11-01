@@ -22,6 +22,23 @@ import Dropdown from './components/Dropdown'
 import { publishAnalyticsEvent } from '../../helpers/metrics/helpers'
 import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
 
+/**
+ * Configuration interface for Filters component.
+ * Extends BaseVisualizationConfig with the additional properties needed by the filters component.
+ */
+interface FiltersConfig extends BaseVisualizationConfig {
+  filterIntro?: string
+  general?: {
+    headerColor?: string
+    [key: string]: any
+  }
+  legend?: {
+    hide?: boolean
+    position?: string
+    [key: string]: any
+  }
+}
+
 export const VIZ_FILTER_STYLE = {
   dropdown: 'dropdown',
   nestedDropdown: 'nested-dropdown',
@@ -38,7 +55,7 @@ export const filterStyleOptions = Object.values(VIZ_FILTER_STYLE)
 
 type FilterProps = {
   dimensions?: DimensionsType
-  config: BaseVisualizationConfig
+  config: FiltersConfig
   setFilters: Function
   standaloneMap?: boolean
   excludedData?: Object[]
@@ -196,7 +213,8 @@ const Filters: React.FC<FilterProps> = ({
   const vizFiltersWithValues = useMemo(() => {
     // Here charts is using config.filters where maps is using a runtime value
     if (!filters) return []
-    if (filters.fromHash) delete filters.fromHash // support for Maps config
+    // Support for Maps config - handle special fromHash property
+    if ((filters as any).fromHash) delete (filters as any).fromHash
     return addValuesToFilters(filters as VizFilter[], visualizationConfig.data)
   }, [filters])
 

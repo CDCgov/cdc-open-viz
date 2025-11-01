@@ -15,8 +15,12 @@ import { useMemo, useState } from 'react'
 import MultiSelect from '../../MultiSelect'
 import NestedDropdownEditor from './NestedDropdownEditor'
 
+interface VizFilterEditorConfig extends BaseVisualizationConfig {
+  filterIntro?: string
+}
+
 type VizFilterProps = {
-  config: BaseVisualizationConfig
+  config: VizFilterEditorConfig
   updateField: UpdateFieldFunc<string | VizFilter[] | VizFilter>
   rawData: Object[]
   hasFootnotes?: boolean
