@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react'
-import type { AnyVisualization } from '@cdc/core/types/Visualization'
+import { type BaseVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig'
 import Widget from '../Widget/Widget'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import { Table } from '@cdc/core/types/Table'
@@ -11,7 +11,7 @@ import { stripConfig } from '../../helpers/formatConfigBeforeSave'
 
 const addVisualization = (type, subType) => {
   const modalWillOpen = type !== 'markup-include'
-  const newVisualizationConfig: Partial<AnyVisualization> = {
+  const newVisualizationConfig: Partial<BaseVisualizationConfig> & Record<string, any> = {
     filters: [],
     filterBehavior: 'Filter Change',
     newViz: type !== 'table',
@@ -28,7 +28,9 @@ const addVisualization = (type, subType) => {
       newVisualizationConfig.general = {}
       newVisualizationConfig.general.geoType = subType
       break
-    case 'data-bite' || 'waffle-chart' || 'filtered-text':
+    case 'data-bite':
+    case 'waffle-chart':
+    case 'filtered-text':
       newVisualizationConfig.visualizationType = type
       break
     case 'table':
@@ -100,25 +102,45 @@ const VisualizationsPanel = () => {
       <p style={{ fontSize: '14px' }}>Click and drag an item onto the grid to add it to your dashboard.</p>
       <span className='subheading-3'>Chart</span>
       <div className='drag-grid'>
-        <Widget addVisualization={() => addVisualization('chart', 'Bar')} type='Bar' />
-        <Widget addVisualization={() => addVisualization('chart', 'Line')} type='Line' />
-        <Widget addVisualization={() => addVisualization('chart', 'Pie')} type='Pie' />
-        <Widget addVisualization={() => addVisualization('chart', 'Sankey')} type='Sankey' />
+        <Widget addVisualization={() => addVisualization('chart', 'Bar')} type='Bar' title='Bar Chart' />
+        <Widget addVisualization={() => addVisualization('chart', 'Line')} type='Line' title='Line Chart' />
+        <Widget addVisualization={() => addVisualization('chart', 'Pie')} type='Pie' title='Pie Chart' />
+        <Widget addVisualization={() => addVisualization('chart', 'Sankey')} type='Sankey' title='Sankey Chart' />
       </div>
       <span className='subheading-3'>Map</span>
       <div className='drag-grid'>
-        <Widget addVisualization={() => addVisualization('map', 'us')} type='us' />
-        <Widget addVisualization={() => addVisualization('map', 'world')} type='world' />
-        <Widget addVisualization={() => addVisualization('map', 'single-state')} type='single-state' />
+        <Widget addVisualization={() => addVisualization('map', 'us')} type='us' title='US Map' />
+        <Widget addVisualization={() => addVisualization('map', 'world')} type='world' title='World Map' />
+        <Widget
+          addVisualization={() => addVisualization('map', 'single-state')}
+          type='single-state'
+          title='State Map'
+        />
       </div>
       <span className='subheading-3'>Misc.</span>
       <div className='drag-grid'>
-        <Widget addVisualization={() => addVisualization('data-bite', '')} type='data-bite' />
-        <Widget addVisualization={() => addVisualization('waffle-chart', '')} type='waffle-chart' />
-        <Widget addVisualization={() => addVisualization('markup-include', '')} type='markup-include' />
-        <Widget addVisualization={() => addVisualization('filtered-text', '')} type='filtered-text' />
-        <Widget addVisualization={() => addVisualization('dashboardFilters', '')} type='dashboardFilters' />
-        <Widget addVisualization={() => addVisualization('table', '')} type='table' />
+        <Widget addVisualization={() => addVisualization('data-bite', '')} type='data-bite' title='Data Bite' />
+        <Widget
+          addVisualization={() => addVisualization('waffle-chart', '')}
+          type='waffle-chart'
+          title='Waffle Chart'
+        />
+        <Widget
+          addVisualization={() => addVisualization('markup-include', '')}
+          type='markup-include'
+          title='Markup Include'
+        />
+        <Widget
+          addVisualization={() => addVisualization('filtered-text', '')}
+          type='filtered-text'
+          title='Filtered Text'
+        />
+        <Widget
+          addVisualization={() => addVisualization('dashboardFilters', '')}
+          type='dashboardFilters'
+          title='Dashboard Filters'
+        />
+        <Widget addVisualization={() => addVisualization('table', '')} type='table' title='Data Table' />
       </div>
       <AdvancedEditor
         loadConfig={loadConfig}

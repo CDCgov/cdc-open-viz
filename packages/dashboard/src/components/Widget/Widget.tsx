@@ -5,14 +5,18 @@ import { DashboardContext, DashboardDispatchContext } from '../../DashboardConte
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import Icon from '@cdc/core/components/ui/Icon'
-import { AnyVisualization } from '@cdc/core/types/Visualization'
+import { BaseVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig'
 import { iconHash } from '../../helpers/iconHash'
 import _ from 'lodash'
 import { DataDesignerModal } from '../DataDesignerModal'
 import { labelHash } from '@cdc/core/helpers/labelHash'
 import './widget.styles.css'
 
-type WidgetConfig = AnyVisualization & { rowIdx: number; colIdx: number }
+interface WidgetConfig extends BaseVisualizationConfig {
+  rowIdx: number
+  colIdx: number
+}
+
 type WidgetProps = {
   title: string
   columnData?: any
@@ -177,7 +181,7 @@ const Widget = ({
                 className='btn btn-configure'
                 onClick={() => {
                   overlay?.actions.openOverlay(
-                    <DataDesignerModal rowIndex={widgetConfig.rowIdx} vizKey={widgetConfig.uid} />
+                    <DataDesignerModal rowIndex={widgetConfig.rowIdx} vizKey={String(widgetConfig.uid)} />
                   )
                 }}
               >

@@ -1,6 +1,6 @@
 import { ConfigureData } from '@cdc/core/types/ConfigureData'
 
-export type DataSet = ConfigureData & {
+export interface DataSet extends ConfigureData {
   dataFileFormat?: string
   dataFileName?: string
   dataFileSize?: number

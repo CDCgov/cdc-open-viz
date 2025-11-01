@@ -15,10 +15,10 @@ import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state.js'
 import { processData } from './helpers/dataHelpers'
 import { getInitialState, reducer, State } from './store/dataTable.reducer'
-import { Config } from './types/Config'
+import { DataTableConfig } from './types/DataTableConfig'
 
 type CdcDataTableProps = {
-  config?: Config
+  config?: DataTableConfig
   configUrl?: string
   isEditor: boolean
 }
@@ -47,7 +47,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
   const invalidData = data === null
 
   // processes initial config and sets state
-  const initConfig = (newConfig: Config) => {
+  const initConfig = (newConfig: DataTableConfig) => {
     const updatedConfig = { ...coveUpdateWorker(newConfig), ...defaults }
     dispatch({ type: 'SET_CONFIG', payload: updatedConfig })
     dispatch({ type: 'SET_TABLE', payload: updatedConfig.table })
@@ -99,7 +99,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
       .catch(() => dispatch({ type: 'SET_DATA', payload: null }))
   }
 
-  const updateFilters = (newConfig: Config) => {
+  const updateFilters = (newConfig: DataTableConfig) => {
     const { filters: newFilters } = newConfig
     dispatch({ type: 'SET_FILTERS', payload: newFilters })
   }

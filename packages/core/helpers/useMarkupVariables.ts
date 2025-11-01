@@ -1,4 +1,4 @@
-import { MarkupVariable } from '../types/MarkupVariable'
+import { MarkupVariable } from '../types/EditorPanel_MarkupVariables'
 
 export type MarkupContext = {
   markupVariables: MarkupVariable[]

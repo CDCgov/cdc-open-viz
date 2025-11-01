@@ -16,7 +16,7 @@ import Accordion from '@cdc/core/components/ui/Accordion'
 import MarkupVariablesEditor from '@cdc/core/components/EditorPanel/components/MarkupVariablesEditor'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
-import { Datasets } from '@cdc/core/types/DataSet'
+import { type Datasets } from '@cdc/core/types/DataSet'
 
 // styles
 import '@cdc/core/styles/v2/components/editor.scss'

@@ -1,7 +1,7 @@
 import Tooltip from '../ui/Tooltip'
 import Icon from '../ui/Icon'
 import { Select, TextField } from './Inputs'
-import { Visualization } from '../../types/Visualization'
+import { BaseVisualizationConfig } from '../../types/BaseVisualizationConfig'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import { Column } from '../../types/Column'
 import _ from 'lodash'
@@ -9,7 +9,7 @@ import React, { useState } from 'react'
 import FieldSetWrapper from './FieldSetWrapper'
 
 interface ColumnsEditorProps {
-  config: Partial<Visualization>
+  config: Partial<BaseVisualizationConfig>
   updateField: UpdateFieldFunc<string | boolean | string[] | number | Column | Record<string, Partial<Column>>>
   deleteColumn: (colName: string) => void
 }

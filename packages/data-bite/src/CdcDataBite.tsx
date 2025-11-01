@@ -29,7 +29,7 @@ import { publish } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import { Config } from './types/Config'
+import { DataBiteConfig } from './types/DataBiteConfig'
 import dataBiteReducer from './store/db.reducer'
 import { IMAGE_POSITION_LEFT, IMAGE_POSITION_RIGHT, IMAGE_POSITION_TOP, IMAGE_POSITION_BOTTOM } from './constants'
 
@@ -48,7 +48,7 @@ import {
 import './scss/main.scss'
 
 type CdcDataBiteProps = {
-  config: Config
+  config: DataBiteConfig
   configUrl: string
   isDashboard: boolean
   isEditor: boolean

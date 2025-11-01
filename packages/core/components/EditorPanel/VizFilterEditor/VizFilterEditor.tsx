@@ -1,7 +1,7 @@
 import { Select, TextField } from '../Inputs'
 import Tooltip from '../../ui/Tooltip'
 import Icon from '../../ui/Icon'
-import { Visualization } from '../../../types/Visualization'
+import { BaseVisualizationConfig } from '../../../types/BaseVisualizationConfig'
 import { UpdateFieldFunc } from '../../../types/UpdateFieldFunc'
 import _ from 'lodash'
 import { MultiSelectFilter, VizFilter, VizFilterStyle } from '../../../types/VizFilter'
@@ -16,7 +16,7 @@ import MultiSelect from '../../MultiSelect'
 import NestedDropdownEditor from './NestedDropdownEditor'
 
 type VizFilterProps = {
-  config: Visualization
+  config: BaseVisualizationConfig
   updateField: UpdateFieldFunc<string | VizFilter[] | VizFilter>
   rawData: Object[]
   hasFootnotes?: boolean

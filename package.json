@@ -113,10 +113,7 @@
     "deploy": "gh-pages -d .storybook_build -t true",
     "lint": "eslint packages/*/src/**/*.{js,jsx,ts,tsx}",
     "prepare": "husky install",
-    "knip": "knip",
-    "knip:production": "knip --production",
     "knip:unused-files": "knip --include files",
-    "knip:unused-deps": "knip --include dependencies,devDependencies",
     "knip:unused-exports": "knip --include exports,types"
   },
   "dependencies": {

@@ -1,6 +1,6 @@
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
-import { Visualization } from '../../../types/Visualization'
+import { BaseVisualizationConfig } from '../../../types/BaseVisualizationConfig'
 import Icon from '../../ui/Icon'
 import parse from 'html-react-parser'
 
@@ -8,7 +8,7 @@ interface ExpandCollapseProps {
   expanded: boolean
   setExpanded: (expanded: boolean) => void
   tableTitle: string
-  config?: Visualization
+  config?: BaseVisualizationConfig
   interactionLabel?: string
 }
 

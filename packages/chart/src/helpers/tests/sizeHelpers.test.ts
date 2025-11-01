@@ -1,6 +1,6 @@
 import { calcInitialHeight, getOrientation } from '../sizeHelpers'
 import { describe, expect, it } from 'vitest'
-import { ChartOrientation, VisualizationType } from '../../types/ChartConfig'
+import { ChartOrientation, ChartVisualizationType } from '../../types/ChartConfig'
 
 describe('sizeHelpers', () => {
   describe('getOrientation', () => {
@@ -8,7 +8,7 @@ describe('sizeHelpers', () => {
       const config = {
         orientation: 'vertical' as ChartOrientation,
         heights: { mobileVertical: 0, vertical: 0, horizontal: 0 },
-        visualizationType: 'Bar' as VisualizationType
+        visualizationType: 'Bar' as ChartVisualizationType
       }
       expect(getOrientation(config, 'md')).toBe('vertical')
     })
@@ -17,7 +17,7 @@ describe('sizeHelpers', () => {
       const config = {
         orientation: 'horizontal' as ChartOrientation,
         heights: { mobileVertical: 0, vertical: 0, horizontal: 0 },
-        visualizationType: 'Bar' as VisualizationType
+        visualizationType: 'Bar' as ChartVisualizationType
       }
       expect(getOrientation(config, 'md')).toBe('horizontal')
     })
@@ -25,7 +25,7 @@ describe('sizeHelpers', () => {
       const config = {
         orientation: 'horizontal' as ChartOrientation,
         heights: { mobileVertical: 0, vertical: 0, horizontal: 0 },
-        visualizationType: 'Forest Plot' as VisualizationType
+        visualizationType: 'Forest Plot' as ChartVisualizationType
       }
       expect(getOrientation(config, 'md')).toBe('vertical')
     })
@@ -34,7 +34,7 @@ describe('sizeHelpers', () => {
       const config = {
         orientation: 'vertical' as ChartOrientation,
         heights: { mobileVertical: 100, vertical: 0, horizontal: 0 },
-        visualizationType: 'Bar' as VisualizationType
+        visualizationType: 'Bar' as ChartVisualizationType
       }
       expect(getOrientation(config, 'xxs')).toBe('mobileVertical')
     })
@@ -46,7 +46,7 @@ describe('calcInitialHeight', () => {
     const config = {
       heights: undefined,
       orientation: 'vertical' as ChartOrientation,
-      visualizationType: 'Bar' as VisualizationType
+      visualizationType: 'Bar' as ChartVisualizationType
     }
     expect(calcInitialHeight(config, 'md')).toBe(0)
   })
@@ -55,7 +55,7 @@ describe('calcInitialHeight', () => {
     const config = {
       orientation: 'vertical' as ChartOrientation,
       heights: { mobileVertical: 0, vertical: 100, horizontal: 0 },
-      visualizationType: 'Bar' as VisualizationType
+      visualizationType: 'Bar' as ChartVisualizationType
     }
     expect(calcInitialHeight(config, 'md')).toBe(100)
   })
@@ -64,7 +64,7 @@ describe('calcInitialHeight', () => {
     const config = {
       orientation: 'horizontal' as ChartOrientation,
       heights: { mobileVertical: 0, vertical: 0, horizontal: 100 },
-      visualizationType: 'Bar' as VisualizationType
+      visualizationType: 'Bar' as ChartVisualizationType
     }
     expect(calcInitialHeight(config, 'md')).toBe(100)
   })
@@ -73,7 +73,7 @@ describe('calcInitialHeight', () => {
     const config = {
       heights: { mobileVertical: 100, vertical: 0, horizontal: 0 },
       orientation: 'vertical' as ChartOrientation,
-      visualizationType: 'Bar' as VisualizationType
+      visualizationType: 'Bar' as ChartVisualizationType
     }
     expect(calcInitialHeight(config, 'xxs')).toBe(100)
   })

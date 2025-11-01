@@ -3,11 +3,11 @@ import { SubGrouping, VizFilter, OrderBy } from '../../../types/VizFilter'
 import { handleSorting } from '../../Filters/helpers/handleSorting'
 import { filterOrderOptions } from '../../../helpers/filterOrderOptions'
 import FilterOrder from './components/FilterOrder'
-import { Visualization } from '../../../types/Visualization'
+import { BaseVisualizationConfig } from '../../../types/BaseVisualizationConfig'
 import { useMemo } from 'react'
 
 type NestedDropdownEditorProps = {
-  config: Visualization
+  config: BaseVisualizationConfig
   dataColumns: string[]
   filterIndex: number
   handleNameChange: Function

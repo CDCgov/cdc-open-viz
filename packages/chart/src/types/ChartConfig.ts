@@ -1,38 +1,40 @@
+import { BaseVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig'
 import { Axis } from '@cdc/core/types/Axis'
-import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
+import { EditorPanel_MarkupVariables } from '@cdc/core/types/EditorPanel_MarkupVariables'
+import { ChartVisual } from './ChartVisual'
 import { type ForestPlotConfigSettings } from './ForestPlot'
 import { type Column } from '@cdc/core/types/Column'
 import { type Series } from '@cdc/core/types/Series'
-import { Runtime } from '@cdc/core/types/Runtime'
-import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
-import { Table } from '@cdc/core/types/Table'
-import { BoxPlot } from '@cdc/core/types/BoxPlot'
-import { General as CoreGeneral } from '@cdc/core/types/General'
-
-// Extend the core General type to include palette information for charts
-type General = CoreGeneral & {
-  palette?: {
-    name?: string
-    version?: string
-    isReversed?: boolean
-    customColors?: string[]
-  }
-}
+import { type Runtime } from '@cdc/core/types/Runtime'
+import { type FilterBehavior } from '@cdc/core/types/FilterBehavior'
+import { type Table } from '@cdc/core/types/Table'
+import { type BoxPlot } from '@cdc/core/types/BoxPlot'
 import { type Link } from './../components/Sankey/types'
-import { type DataDescription } from '@cdc/core/types/DataDescription'
-import { type Legend as CoreLegend } from '@cdc/core/types/Legend'
+import { ChartLegend } from './ChartLegend'
+import { ChartDataFormat } from './ChartDataFormat'
 import { Label } from './Label'
 import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
-import { Version } from '@cdc/core/types/Version'
 import Footnotes from '@cdc/core/types/Footnotes'
+import { BaseGeneral } from '@cdc/core/types/General'
+
+/**
+ * Chart-specific general configuration
+ * Extends BaseGeneral with chart-specific settings
+ */
+interface ChartGeneral extends BaseGeneral {
+  /** Whether to show annotation dropdown menu */
+  showAnnotationDropdown?: boolean
+  /** Custom text for annotation dropdown button */
+  annotationDropdownText?: string
+}
 
 export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 type ChartColumns = Record<string, Column>
 export type ChartOrientation = 'vertical' | 'horizontal'
-export type VisualizationType =
+export type ChartVisualizationType =
   | 'Area Chart'
   | 'Bar'
   | 'Box Plot'
@@ -66,24 +68,6 @@ export interface PreliminaryDataItem {
   displayGray: boolean
 }
 
-type DataFormat = {
-  abbreviated: boolean
-  bottomAbbreviated: boolean
-  bottomCommas: boolean
-  bottomPrefix: string
-  bottomRoundTo: number
-  bottomSuffix: string
-  commas: boolean
-  prefix: string
-  rightCommas: boolean
-  rightPrefix: string
-  rightRoundTo: number
-  rightSuffix: string
-  roundTo: number
-  suffix: string
-  showPiePercent: boolean
-}
-
 type Exclusions = {
   keys: string[]
   active: boolean
@@ -91,51 +75,24 @@ type Exclusions = {
   dateEnd: string
 }
 
-type Legend = CoreLegend & {
-  seriesHighlight: string[]
-  unified: boolean
-  hideSuppressionLink: boolean
-  style: 'circles' | 'boxes' | 'gradient' | 'lines'
-  subStyle: 'linear blocks' | 'smooth'
-  hasShape: boolean
-  order: 'dataColumn' | 'asc' | 'desc'
-  orderedValues: Label[]
-  tickRotation: string
-  hideBorder: {
-    side: boolean
-    topBottom: boolean
-  }
-  groupBy: string
-  separators?: string
-  patterns?: {
-    [key: string]: {
-      label?: string
-      color?: string
-      shape?: string
-      dataKey?: string
-      dataValue?: string
-      contrastCheck?: boolean
-      patternSize?: number
-    }
-  }
-}
+/**
+ * Base configuration interface for all chart visualizations.
+ * Extends BaseVisualizationConfig with chart-specific properties.
+ */
+export interface AllChartsConfig extends BaseVisualizationConfig, EditorPanel_MarkupVariables {
+  // Override base properties to be more specific or required
+  type: 'chart' | 'dashboard'
+  data: Object[]
+  filters: VizFilter[]
 
-type Visual = {
-  border?: boolean
-  borderColorTheme?: boolean
-  accent?: boolean
-  background?: boolean
-  hideBackgroundColor?: boolean
-  verticalHoverLine?: boolean
-  horizontalHoverLine?: boolean
-  lineDatapointSymbol: 'none' | 'standard'
-  maximumShapeAmount: 7
-}
+  // Override visual to use chart-specific visual configuration
+  visual: ChartVisual
 
-export type AllChartsConfig = {
+  // Chart-specific properties
+  newViz?: boolean
   annotations: Annotation[]
   animate: boolean
-  general: General
+  general: ChartGeneral
   barHasBorder: 'true' | 'false'
   barHeight: number
   barSpace: number
@@ -147,16 +104,12 @@ export type AllChartsConfig = {
   colorMatchLineSeriesLabels: boolean
   columns: ChartColumns
   confidenceKeys: ConfidenceInterval
-  data: Object[]
-  dataUrl: string
   dataCutoff: number
-  dataDescription: Partial<DataDescription>
-  dataFormat: DataFormat
+  dataFormat: ChartDataFormat
   dataKey: string
   description: string
   dynamicMarginTop: number
   exclusions: Exclusions
-  filters: VizFilter[]
   filterBehavior: FilterBehavior
   legacyFootnotes: string // this footnote functionality should be moved to the Footnotes component
   footnotes: Footnotes
@@ -174,18 +127,17 @@ export type AllChartsConfig = {
   isResponsiveTicks: boolean
   isPaletteReversed: boolean
   labels: boolean
-  legend: Legend
+  legend: ChartLegend
   lineDatapointColor: 'Same as Line' | 'Lighter than Line'
   lineDatapointStyle: 'hidden' | 'always show' | 'hover'
   lollipopColorStyle: 'regular' | 'two-tone'
   lollipopShape: string
   lollipopSize: 'small' | 'medium' | 'large'
-  newViz: boolean
   orientation: ChartOrientation
   palette: string
   pieType?: string
   preliminaryData: PreliminaryDataItem[]
-  primary?: DataFormat
+  primary?: ChartDataFormat
   rankByValue: 'asc' | 'desc'
   roundingStyle: string
   runtime: Runtime
@@ -193,7 +145,6 @@ export type AllChartsConfig = {
   series: Series
   showLineSeriesLabels: boolean
   showSidebar: boolean
-  showTitle: boolean
   sortData: 'ascending' | 'descending'
   stackedAreaChartLineType: string
   suppressedData?: { label: string; icon: string; value: string }[]
@@ -201,7 +152,6 @@ export type AllChartsConfig = {
   theme: string
   table: Table
   tipRounding: string
-  title: string
   tooltips: {
     singleSeries: boolean
     opacity: number
@@ -209,11 +159,7 @@ export type AllChartsConfig = {
   }
   topAxis: { hasLine: boolean }
   twoColor: { palette: string }
-  type: 'chart' | 'dashboard'
-  uid: string | number
-  version: Version
-  visual: Visual
-  visualizationType: VisualizationType
+  visualizationType: ChartVisualizationType
   visualizationSubType: string
   xAxis: Axis
   yAxis: Axis
@@ -246,22 +192,20 @@ export type AllChartsConfig = {
       default: string
     }
   }
-} & MarkupConfig
+}
 
-type ForestPlotConfig = {
+interface ForestPlotConfig extends AllChartsConfig, EditorPanel_MarkupVariables {
   visualizationType: 'Forest Plot'
   forestPlot: ForestPlotConfigSettings
-} & AllChartsConfig &
-  MarkupConfig
+}
 
-export type LineChartConfig = {
+export interface LineChartConfig extends AllChartsConfig, EditorPanel_MarkupVariables {
   allowLineToBarGraph: boolean
   convertLineToBarGraph: boolean
   isolatedDotsSameSize: boolean
   lineDatapointStyle: 'hidden' | 'always show' | 'hover'
   visualizationType: 'Line'
-} & AllChartsConfig &
-  MarkupConfig
+}
 
 type SankeyLink = {
   depth: number
@@ -284,7 +228,7 @@ type StoryNode = {
   segmentTextBefore: string
 }
 
-type SankeyChartConfig = {
+interface SankeyChartConfig extends AllChartsConfig, EditorPanel_MarkupVariables {
   enableTooltips: boolean
   data: [
     {
@@ -302,7 +246,6 @@ type SankeyChartConfig = {
     }
   ]
   visualizationType: 'Sankey'
-} & AllChartsConfig &
-  MarkupConfig
+}
 
 export type ChartConfig = SankeyChartConfig | LineChartConfig | ForestPlotConfig | AllChartsConfig

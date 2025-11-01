@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { MarkupVariable, MarkupCondition } from '../types/MarkupVariable'
+import { MarkupVariable, MarkupCondition } from '../types/EditorPanel_MarkupVariables'
 import { VizFilter } from '../types/VizFilter'
 import { filterVizData } from './filterVizData'
 

@@ -5,7 +5,7 @@ import parse from 'html-react-parser'
 // CDC
 import Button from '../elements/Button'
 import MultiSelect from '../MultiSelect'
-import { Visualization } from '../../types/Visualization'
+import { BaseVisualizationConfig } from '../../types/BaseVisualizationConfig'
 import { MultiSelectFilter, VizFilter } from '../../types/VizFilter'
 import { addValuesToFilters } from '../../helpers/addValuesToFilters'
 import { DimensionsType } from '../../types/Dimensions'
@@ -38,7 +38,7 @@ export const filterStyleOptions = Object.values(VIZ_FILTER_STYLE)
 
 type FilterProps = {
   dimensions?: DimensionsType
-  config: Visualization
+  config: BaseVisualizationConfig
   setFilters: Function
   standaloneMap?: boolean
   excludedData?: Object[]

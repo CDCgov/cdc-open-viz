@@ -1,5 +1,5 @@
 import { processMarkupVariables, validateMarkupVariables } from '../markupProcessor'
-import { MarkupVariable } from '../../types/MarkupVariable'
+import { MarkupVariable } from '../../types/EditorPanel_MarkupVariables'
 import { expect, describe, it } from 'vitest'
 
 describe('processMarkupVariables', () => {

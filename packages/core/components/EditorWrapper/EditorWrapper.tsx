@@ -1,5 +1,5 @@
 import React from 'react'
-import { Visualization } from '../../types/Visualization'
+import { BaseVisualizationConfig } from '../../types/BaseVisualizationConfig'
 import { ViewPort } from '../../types/ViewPort'
 import './editor-wrapper.style.css'
 
@@ -19,8 +19,8 @@ type EditorProps = {
   component: React.JSXElementConstructor<StandAloneComponentProps>
   type: string
   visualizationKey: string
-  visualizationConfig: Visualization
-  updateConfig: (Visualization) => void
+  visualizationConfig: BaseVisualizationConfig
+  updateConfig: (BaseVisualizationConfig) => void
   viewport?: ViewPort
 }
 

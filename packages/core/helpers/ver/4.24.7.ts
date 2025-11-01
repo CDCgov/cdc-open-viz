@@ -2,7 +2,7 @@ import _ from 'lodash'
 import cloneConfig from '../cloneConfig'
 import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
 import { MultiDashboardConfig } from '@cdc/dashboard/src/types/MultiDashboard'
-import { AnyVisualization } from '../../types/Visualization'
+import { BaseVisualizationConfig } from '../../types/BaseVisualizationConfig'
 import versionNeedsUpdate from './versionNeedsUpdate'
 
 /**
@@ -70,7 +70,7 @@ export const dashboardFiltersMigrate = config => {
 
   if (
     config.dashboard.sharedFilters.length &&
-    !Object.values(newVisualizations).find((v: AnyVisualization) => v.type === 'dashboardFilters')
+    !Object.values(newVisualizations).find((v: BaseVisualizationConfig) => v.type === 'dashboardFilters')
   ) {
     const newViz = {
       type: 'dashboardFilters',

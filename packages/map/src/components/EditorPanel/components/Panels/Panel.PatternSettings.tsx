@@ -21,7 +21,7 @@ import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { feature } from 'topojson-client'
 import { checkColorContrast, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
 import { applyLegendToRow } from '../../../../helpers/applyLegendToRow'
-import { PatternSelection } from '../../../../types/MapConfig'
+import { PatternSelection } from '../../../../types/MapPattern'
 
 type PanelProps = {
   name: string

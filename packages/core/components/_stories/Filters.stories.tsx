@@ -4,7 +4,7 @@ import Filters from '../Filters'
 import { VizFilter } from '../../types/VizFilter'
 import { faker } from '@faker-js/faker'
 import _ from 'lodash'
-import { Visualization } from '../../types/Visualization'
+import { Visualization } from '../../types/BaseVisualizationConfig'
 
 const meta: Meta<typeof Filters> = {
   title: 'Components/Molecules/Visualization Filters',
@@ -27,18 +27,18 @@ const generateFilters = filterStyle => {
 }
 
 const generateConfig = filterStyle =>
-  ({
-    args: {
-      config: {
-        filters: generateFilters(filterStyle),
-        data: animalData
-      } as Visualization,
-      filteredData: animalData,
-      setFilteredData: () => {},
-      setConfig: () => {},
-      exclusions: []
-    }
-  } as Story)
+({
+  args: {
+    config: {
+      filters: generateFilters(filterStyle),
+      data: animalData
+    } as Visualization,
+    filteredData: animalData,
+    setFilteredData: () => { },
+    setConfig: () => { },
+    exclusions: []
+  }
+} as Story)
 
 export const Dropdown: Story = generateConfig('dropdown')
 

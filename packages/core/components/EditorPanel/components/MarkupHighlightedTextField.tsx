@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useState, useRef, useMemo } from 'react'
 import { useDebounce } from 'use-debounce'
-import { MarkupVariable } from '../../../types/MarkupVariable'
+import { EditorPanel_MarkupVariables } from '../../../types/EditorPanel_MarkupVariables'
 
 type MarkupHighlightedTextFieldProps = {
   className?: string
@@ -12,7 +12,7 @@ type MarkupHighlightedTextFieldProps = {
   section?: any
   subsection?: any
   updateField?: (section: any, subsection: any, fieldName: string, value: string) => void
-  markupVariables?: MarkupVariable[]
+  markupVariables?: EditorPanel_MarkupVariables[]
   isEditor?: boolean
 }
 

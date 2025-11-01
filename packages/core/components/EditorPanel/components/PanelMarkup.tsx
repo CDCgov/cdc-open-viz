@@ -1,7 +1,7 @@
 import React from 'react'
 import MarkupVariablesEditor from './MarkupVariablesEditor'
 import Accordion from '../../ui/Accordion'
-import { MarkupVariable } from '../../../types/MarkupVariable'
+import { MarkupVariable } from '../../../types/EditorPanel_MarkupVariables'
 
 type PanelMarkupProps = {
   /** Display name for the panel */

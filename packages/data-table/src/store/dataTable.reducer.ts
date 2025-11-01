@@ -1,6 +1,6 @@
 import DataTableActions from './dataTable.actions'
 import defaults from '../data/initial-state.js'
-import { Config } from '../types/Config'
+import { DataTableConfig } from '../types/DataTableConfig'
 import { Column } from '@cdc/core/types/Column'
 import { Table } from '@cdc/core/types/Table'
 import { VizFilter } from '@cdc/core/types/VizFilter'
@@ -22,7 +22,7 @@ export const getInitialState = (isEditor: boolean): State => {
 }
 
 export type State = {
-  config: Config
+  config: DataTableConfig
   showEditorPanel: boolean
   columns: Record<string, Column>
   data: object[]

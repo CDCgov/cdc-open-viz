@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import cloneConfig from '../cloneConfig'
-import { AnyVisualization } from '../../types/Visualization'
+import { BaseVisualizationConfig } from '../../types/BaseVisualizationConfig'
 import { VizFilter } from '../../types/VizFilter'
 import versionNeedsUpdate from './versionNeedsUpdate'
 
@@ -10,7 +10,7 @@ import versionNeedsUpdate from './versionNeedsUpdate'
  */
 const patchSingleStateZoom = config => {
   if (config.type === 'dashboard') {
-    Object.values(config?.visualizations || {}).forEach((viz: AnyVisualization) => {
+    Object.values(config?.visualizations || {}).forEach((viz: BaseVisualizationConfig) => {
       if (viz.type === 'map' && viz.general?.geoType === 'single-state') {
         // if the version is less that 4.24.7 then allowMapZoom should be false
         let allowZoom = versionNeedsUpdate(config.version, '4.24.9') ? false : viz.general.allowMapZoom
@@ -30,7 +30,7 @@ const doesNotHaveIds = (filters: VizFilter[]) => filters?.some(f => !f.id)
 export const addIdsToVisFilters = config => {
   if (config.type === 'dashboard') {
     config.visualizations = Object.keys(config.visualizations).reduce((acc, curr) => {
-      const viz: AnyVisualization & { filters: VizFilter[] } = config.visualizations[curr]
+      const viz: BaseVisualizationConfig & { filters: VizFilter[] } = config.visualizations[curr]
       if (viz.filters?.length && doesNotHaveIds(viz.filters)) {
         acc[curr].filters = viz.filters.map((filter, i) => ({ ...filter, id: Date.now() + i }))
       }

@@ -1,7 +1,7 @@
 import React from 'react'
 import parse from 'html-react-parser'
 import './title.styles.css'
-import { Visualization } from '../../../types/Visualization'
+import { BaseVisualizationConfig } from '../../../types/BaseVisualizationConfig'
 
 type HeaderProps = {
   title?: string
@@ -11,7 +11,7 @@ type HeaderProps = {
   style?: React.CSSProperties
   showTitle?: boolean
   ariaLevel?: number
-  config: Visualization
+  config: BaseVisualizationConfig
   theme?: string
 }
 

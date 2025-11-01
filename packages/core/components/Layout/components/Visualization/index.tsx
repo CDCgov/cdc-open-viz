@@ -1,11 +1,11 @@
 // main visualization wrapper
 import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import React, { forwardRef } from 'react'
-import { Config as DataBiteConfig } from '@cdc/data-bite/src/types/Config'
-import { Config as DataTableConfig } from '@cdc/data-table/src/types/Config'
+import { DataBiteConfig } from '@cdc/data-bite/src/types/DataBiteConfig'
+import { DataTableConfig } from '@cdc/data-table/src/types/DataTableConfig'
 import './visualizations.scss'
-import { Config as WaffleChartConfig } from '@cdc/waffle-chart/src/types/Config'
-import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
+import { WaffleChartConfig } from '@cdc/waffle-chart/src/types/WaffleChartConfig'
+import { MarkupIncludeConfig } from '@cdc/core/types/MarkupIncludeConfig'
 import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
 import { MapConfig } from '@cdc/map/src/types/MapConfig'
 

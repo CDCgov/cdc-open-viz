@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { MarkupVariable, MarkupCondition } from '../../../types/MarkupVariable'
+import { MarkupVariable, MarkupCondition } from '../../../types/EditorPanel_MarkupVariables'
 import Button from '../../elements/Button'
 import { TextField, Select, CheckBox } from '../Inputs'
 import Icon from '../../ui/Icon'

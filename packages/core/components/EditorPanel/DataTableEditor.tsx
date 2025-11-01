@@ -4,12 +4,12 @@ import Icon from '../ui/Icon'
 import { CheckBox, TextField, Select } from './Inputs'
 import MultiSelect from '../MultiSelect'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
-import { Visualization } from '../../types/Visualization'
+import { BaseVisualizationConfig } from '../../types/BaseVisualizationConfig'
 import _ from 'lodash'
 import { Column } from '../../types/Column'
 
 interface DataTableProps {
-  config: Partial<Visualization>
+  config: Partial<BaseVisualizationConfig>
   updateField: UpdateFieldFunc<string | boolean | string[] | number | Record<string, Partial<Column>>>
   isDashboard: boolean
   columns: string[]

@@ -10,7 +10,7 @@ import parse from 'html-react-parser'
 import ResizeObserver from 'resize-observer-polyfill'
 
 // cdc
-import { Config } from './types/Config'
+import { WaffleChartConfig } from './types/WaffleChartConfig'
 import getViewport from '@cdc/core/helpers/getViewport'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { DATA_OPERATORS } from '@cdc/core/helpers/constants'
@@ -32,7 +32,7 @@ import Layout from '@cdc/core/components/Layout'
 
 type CdcWaffleChartProps = {
   configUrl?: string
-  config?: Config
+  config?: WaffleChartConfig
   isDashboard?: boolean
   isEditor?: boolean
   link?: string
