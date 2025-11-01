@@ -9,10 +9,8 @@ import { type Runtime } from '@cdc/core/types/Runtime'
 import { type FilterBehavior } from '@cdc/core/types/FilterBehavior'
 import { type Table } from '@cdc/core/types/Table'
 import { type BoxPlot } from '@cdc/core/types/BoxPlot'
-import { type Link } from './../components/Sankey/types'
 import { ChartLegend } from './ChartLegend'
 import { ChartDataFormat } from './ChartDataFormat'
-import { Label } from './Label'
 import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
 import { VizFilter } from '@cdc/core/types/VizFilter'
@@ -30,6 +28,8 @@ interface ChartGeneral extends BaseGeneral {
   /** Custom text for annotation dropdown button */
   annotationDropdownText?: string
 }
+
+type Link = { source: string; target: string; value: number; id: string }
 
 export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 type ChartColumns = Record<string, Column>
@@ -191,6 +191,12 @@ export interface AllChartsConfig extends BaseVisualizationConfig, EditorPanel_Ma
     }
     linkColor: {
       inactive: string
+      default: string
+    }
+    storyNodeFontColor: string
+    storyNodeFillColor: {
+      active: string
+      hover: string
       default: string
     }
   }

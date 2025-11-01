@@ -17,7 +17,9 @@ type SharedChartContext = {
   colorScale?: ColorScale
   config: ChartConfig
   currentViewport?: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
+  convertLineToBarGraph?: boolean
   dashboardConfig?: DashboardConfig
+  getTextWidth: Function
   // process top level chart aria label for each chart type
   handleChartAriaLabels: (config: any) => string
   handleDragStateChange: (isDragging: any) => void

@@ -1222,7 +1222,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
                   <DataTable
                     /* changing the "key" will force the table to re-render
-                                  when the default sort changes while editing */
+                                    when the default sort changes while editing */
                     key={dataTableDefaultSortBy}
                     config={pivotDynamicSeries(config)}
                     rawData={
@@ -1232,7 +1232,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         ? filterVizData(config.filters, config.data)
                         : config.data
                     }
-                    runtimeData={getTableRuntimeData()}
+                    runtimeData={getTableRuntimeData() as Object[] & Record<string, Object>}
                     expandDataTable={config.table.expanded}
                     columns={config.columns}
                     defaultSortBy={dataTableDefaultSortBy}

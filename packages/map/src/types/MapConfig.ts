@@ -29,7 +29,7 @@ export type DataRow = {
 export interface MapConfig extends BaseVisualizationConfig, EditorPanel_MarkupVariables {
   // Override base properties to be more specific or required
   type: 'map'
-  data: DataRow[]
+  data: (DataRow[] & { fromColumn?: string }) | DataRow[]
   filters: VizFilter[]
 
   // Override visual to use map-specific visual configuration

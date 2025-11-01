@@ -30,7 +30,6 @@ interface LegendProps {
   formatLabels: (labels: Label[]) => Label[]
   highlight: Function
   handleShowAll: Function
-  ref: React.Ref<() => void>
   seriesHighlight: string[]
   skipId: string
   dimensions: DimensionsType // for responsive width legend
@@ -38,7 +37,7 @@ interface LegendProps {
   interactionLabel: string
 }
 
-const Legend: React.FC<LegendProps> = forwardRef(
+const Legend = forwardRef<HTMLElement, LegendProps>(
   (
     {
       config,
@@ -71,7 +70,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
       marginTop: getMarginTop(isLegendBottom, config)
     }
 
-    const { HighLightedBarUtils } = useHighlightedBars(config)
+    const { HighLightedBarUtils } = useHighlightedBars(config, null)
     let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
 
     if (!legend) return null

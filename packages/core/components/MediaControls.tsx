@@ -16,7 +16,7 @@ const saveImageAs = (uri, filename) => {
   const ieEdge = navigator.userAgent.match(/Edge/g)
   const ieVer = ie ? ie[1] : ie11 ? 11 : ieEdge ? 12 : -1
 
-  if (ieVer > -1) {
+  if (Number(ieVer) > -1) {
     const fileAsBlob = new Blob([uri], {
       type: 'image/png'
     })

@@ -15,8 +15,6 @@ import useSankeyAlert from '../useSankeyAlert'
 import { getSankeyTooltip } from '../helpers/getSankeyTooltip'
 import { SankeyChartConfig } from '../../../types/ChartConfig'
 
-export type Link = { source: string; target: string; value: number; id: string }
-
 export type SankeyNode = {
   id: string
 }
@@ -28,8 +26,8 @@ interface SankeyProps {
 }
 
 const Sankey = ({ width, height, runtime }: SankeyProps) => {
-  const { config } = useContext<ChartContext>(ConfigContext)
-  const { sankey: sankeyConfig } = config
+  const { config: configFromContext } = useContext<ChartContext>(ConfigContext)
+  const { sankey: sankeyConfig } = configFromContext
   const [largestGroupWidth, setLargestGroupWidth] = useState(0)
   const [tooltipID, setTooltipID] = useState<string>('')
   const { showAlert, alert } = useSankeyAlert()
@@ -62,6 +60,12 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
     })
     setLargestGroupWidth(largest)
   }, [groupRefs, sankeyConfig, window.innerWidth])
+
+  // Type guard and assertion to ensure we have SankeyChartConfig
+  if (configFromContext.visualizationType !== 'Sankey') {
+    return null // Early return if not a Sankey chart
+  }
+  const config = configFromContext as SankeyChartConfig
 
   if (config.visualizationType !== 'Sankey') return
 

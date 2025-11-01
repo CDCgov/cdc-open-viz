@@ -12,7 +12,7 @@ import BarChartContext from './context'
 import { useBarChart } from '../helpers/useBarChart'
 import { PositionScale } from '@visx/shape/lib/types'
 
-type BarChartProps = {
+interface BarChartProps {
   xScale: PositionScale
   yScale: PositionScale
   seriesScale: PositionScale
@@ -50,7 +50,7 @@ const BarChart: React.FC<BarChartProps> = ({
   return (
     <ErrorBoundary component='BarChart'>
       <BarChartContext.Provider value={contextValues}>
-        <Group left={parseFloat(config.runtime.yAxis.size)}>
+        <Group left={parseFloat(String(config.runtime.yAxis.size))}>
           <BarChartType.StackedVertical />
           <BarChartType.StackedHorizontal />
           <BarChartType.Vertical />

@@ -8,7 +8,7 @@ interface LegendProps {
   interactionLabel?: string
 }
 
-const Legend = forwardRef((props: LegendProps, ref) => {
+const Legend = forwardRef<HTMLElement, LegendProps>((props, ref) => {
   const {
     config,
     colorScale,
@@ -31,7 +31,6 @@ const Legend = forwardRef((props: LegendProps, ref) => {
   return (
     <Fragment>
       <LegendComponent
-        getTextWidth={getTextWidth}
         dimensions={dimensions}
         ref={ref}
         transformedData={transformedData}

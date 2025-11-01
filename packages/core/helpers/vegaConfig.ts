@@ -89,7 +89,7 @@ export const getVegaWarnings = (vegaOrVegaLiteConfig, vegaConfig) => {
   const configType = getVegaConfigType(vegaConfig)
   const allMarks = getMarks(vegaConfig)
   const comboMarks = getComboMarks(vegaConfig)
-  const allMarksTypeCount = [...new Set(allMarks.map(m => m.type))].length
+  const allMarksTypeCount = Array.from(new Set(allMarks.map((m: any) => m.type))).length
   if (
     (configType !== 'Combo Chart' && allMarksTypeCount > 1) ||
     (configType === 'Combo Chart' && allMarks.length > comboMarks.length)
@@ -119,7 +119,7 @@ export const getVegaConfigType = vegaConfig => {
   }
 
   const comboMarks = getComboMarks(vegaConfig)
-  const typeCount = [...new Set(comboMarks.map(m => m.type))].length
+  const typeCount = Array.from(new Set(comboMarks.map((m: any) => m.type))).length
   if (comboMarks.length > 1 && typeCount > 1) {
     return 'Combo Chart'
   }
@@ -210,7 +210,7 @@ export const extractCoveData = vegaConfig => {
   if (data.length === 0) return data
 
   if (!facetName) {
-    const otherNames = [...new Set(getMarks(vegaConfig).map(m => m.from?.data))].filter(n => n)
+    const otherNames = Array.from(new Set(getMarks(vegaConfig).map((m: any) => m.from?.data))).filter(n => n)
     _.difference(otherNames, [name]).forEach(on => {
       let mergedData
       const otherData = getVegaData(vegaConfig, on)
@@ -235,7 +235,7 @@ export const extractCoveData = vegaConfig => {
         d[k] = new Date(d[k])
       }
       if (d[k] instanceof Date) {
-        d[k] = formatDate('%Y-%m-%d', d[k] - 1000 * 60 * 60 * 10)
+        d[k] = formatDate('%Y-%m-%d', Number(d[k]) - 1000 * 60 * 60 * 10)
       }
     })
   })
@@ -258,7 +258,7 @@ const getGroupMark = vegaConfig => {
 }
 
 const isValidSeriesKey = (seriesKey, data) => {
-  const seriesVals = [...new Set(data.map(d => d[seriesKey]))]
+  const seriesVals = Array.from(new Set(data.map((d: any) => d[seriesKey])))
   const maxGroupSize = getMaxGroupSize(data, [seriesKey])
   return seriesVals.length > 1 && seriesVals.length <= 10 && maxGroupSize > 1
 }
@@ -566,7 +566,7 @@ export const loadedVegaConfigData = (config: any) => {
   const seriesKey = config.dataDescription?.seriesKey
   if (seriesKey) {
     if (!config.series) {
-      const seriesVals = [...new Set(config.data.map(d => d[seriesKey]))].sort((a, b) => (a > b ? 1 : -1))
+      const seriesVals = Array.from(new Set(config.data.map((d: any) => d[seriesKey]))).sort((a, b) => (a > b ? 1 : -1))
       config.series = seriesVals.map(val => {
         return {
           dataKey: val,
