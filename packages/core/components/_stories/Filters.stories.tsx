@@ -4,7 +4,11 @@ import Filters from '../Filters'
 import { VizFilter } from '../../types/VizFilter'
 import { faker } from '@faker-js/faker'
 import _ from 'lodash'
-import { Visualization } from '../../types/BaseVisualizationConfig'
+import { BaseVisualizationConfig } from '../../types/BaseVisualizationConfig'
+
+interface VisualizationConfig extends BaseVisualizationConfig {
+  filters: VizFilter[]
+}
 
 const meta: Meta<typeof Filters> = {
   title: 'Components/Molecules/Visualization Filters',
@@ -30,9 +34,10 @@ const generateConfig = filterStyle =>
 ({
   args: {
     config: {
+      type: null,
       filters: generateFilters(filterStyle),
       data: animalData
-    } as Visualization,
+    } as VisualizationConfig,
     filteredData: animalData,
     setFilteredData: () => { },
     setConfig: () => { },

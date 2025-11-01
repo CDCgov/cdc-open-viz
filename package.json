@@ -114,7 +114,18 @@
     "lint": "eslint packages/*/src/**/*.{js,jsx,ts,tsx}",
     "prepare": "husky install",
     "knip:unused-files": "knip --include files",
-    "knip:unused-exports": "knip --include exports,types"
+    "knip:unused-exports": "knip --include exports,types",
+    "types:all": "yarn types:core && yarn types:chart && yarn types:dashboard && yarn types:data-bite && yarn types:data-table && yarn types:editor && yarn types:filtered-text && yarn types:map && yarn types:markup-include && yarn types:waffle-chart",
+    "types:core": "echo '🔍 Checking @cdc/core...' && cd packages/core && npx tsc",
+    "types:chart": "echo '🔍 Checking @cdc/chart...' && cd packages/chart && npx tsc",
+    "types:dashboard": "echo '🔍 Checking @cdc/dashboard...' && cd packages/dashboard && npx tsc",
+    "types:data-bite": "echo '🔍 Checking @cdc/data-bite...' && cd packages/data-bite && npx tsc",
+    "types:data-table": "echo '🔍 Checking @cdc/data-table...' && cd packages/data-table && npx tsc",
+    "types:editor": "echo '🔍 Checking @cdc/editor...' && cd packages/editor && npx tsc",
+    "types:filtered-text": "echo '🔍 Checking @cdc/filtered-text...' && cd packages/filtered-text && npx tsc",
+    "types:map": "echo '🔍 Checking @cdc/map...' && cd packages/map && npx tsc",
+    "types:markup-include": "echo '🔍 Checking @cdc/markup-include...' && cd packages/markup-include && npx tsc",
+    "types:waffle-chart": "echo '🔍 Checking @cdc/waffle-chart...' && cd packages/waffle-chart && npx tsc"
   },
   "dependencies": {
     "@visx/annotation": "^3.3.0",

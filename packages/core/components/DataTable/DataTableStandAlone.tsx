@@ -33,14 +33,29 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
     filterVizData(config.filters, config.formattedData || config.data)
   )
 
+  // Helper function to safely extract array data for filtering
+  const getFilterableData = (data: any) => {
+    if (Array.isArray(data)) {
+      return data
+    }
+    // Handle Sankey data format - extract tableData if available
+    if (data && typeof data === 'object' && data[0]?.tableData) {
+      return data[0].tableData
+    }
+    // Fallback to empty array if data format is not recognized
+    return []
+  }
+
   useEffect(() => {
     // when using editor changes to filter should update the data
-    const filters = addValuesToFilters(config.filters, config.data)
+    const filterableData = getFilterableData(config.data)
+    const filters = addValuesToFilters(config.filters, filterableData)
     setFilteredData(filterVizData(filters, config?.formattedData?.length > 0 ? config.formattedData : config.data))
   }, [config.filters])
 
   const setFilters = (newFilters: any) => {
-    const filters = addValuesToFilters(newFilters, config.data)
+    const filterableData = getFilterableData(config.data)
+    const filters = addValuesToFilters(newFilters, filterableData)
     updateConfig({ ...config, filters })
     setFilteredData(filterVizData(filters, config?.formattedData?.length > 0 ? config.formattedData : config.data))
   }
@@ -61,12 +76,16 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
 
   return (
     <>
-      <Filters config={config} setFilters={setFilters} excludedData={config.formattedData} />
+      <Filters
+        config={config}
+        setFilters={setFilters}
+        excludedData={Array.isArray(config.formattedData) ? config.formattedData : getFilterableData(config.data)}
+      />
       <DataTable
         expandDataTable={config.table.expanded}
         config={config}
-        rawData={config.data}
-        runtimeData={filteredData}
+        rawData={getFilterableData(config.data)}
+        runtimeData={filteredData as Object[] & Record<string, Object>}
         tabbingId={visualizationKey}
         tableTitle={config.table.label}
         viewport={viewport || 'lg'}

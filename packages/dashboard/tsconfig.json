@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "skipLibCheck": true,
+    "allowJs": false,
+    "noResolve": false
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "../../globals.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "../*/src/**/*"
+  ]
+}

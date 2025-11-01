@@ -105,7 +105,7 @@ const Options: React.FC<{
   )
 }
 
-type NestedDropdownProps = {
+interface NestedDropdownProps {
   activeGroup: string
   activeSubGroup?: string
   filterIndex: number

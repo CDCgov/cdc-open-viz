@@ -1,7 +1,7 @@
 import React from 'react'
 import '../styles/waiting.scss'
 
-const styles = {
+const styles: React.CSSProperties = {
   position: 'relative',
   height: '100vh',
   width: '100%',
@@ -11,7 +11,12 @@ const styles = {
   gridArea: 'content'
 }
 
-export default ({ requiredColumns, className }) => (
+interface WaitingProps {
+  requiredColumns: string[]
+  className?: string
+}
+
+export default ({ requiredColumns, className }: WaitingProps) => (
   <section className={className} style={styles}>
     <section className='waiting-container'>
       <h3>Configuration Required</h3>

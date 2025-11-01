@@ -464,7 +464,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const setFilters = (newFilters: VizFilter[]) => {
-    if (!config.dynamicSeries) {
+    const hasDynamicSeries =
+      config.series && Array.isArray(config.series) ? config.series.some(series => !!series.dynamicCategory) : false
+
+    if (!hasDynamicSeries) {
       const _newFilters = addValuesToFilters(newFilters, excludedData)
       setConfig({
         ...config,
@@ -476,7 +479,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       const newFilteredData = filterVizData(newFilters, excludedData)
 
       dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
-      if (config.dynamicSeries) {
+      if (hasDynamicSeries) {
         const runtime = getNewRuntime(config, newFilteredData)
         setConfig({
           ...config,
@@ -673,7 +676,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const handleShowAll = () => {
     try {
       const legend = legendRef.current
-      if (!legend) throw new Error('No legend available to set previous focus on.')
+      if (!legend) console.error('No legend available to set previous focus on.')
       legend.focus()
     } catch (e) {
       console.error('COVE:', e.message)
@@ -904,14 +907,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   // then they do a lookup based on the bin number as index into here (TT)
   const applyLegendToRow = rowObj => {
     try {
-      if (!rowObj) throw new Error('COVE: No rowObj in applyLegendToRow')
-      // Navigation map
-      if ('navigation' === config.type) {
-        let mapColorPalette = colorPalettes[config.color] || colorPalettes['bluegreenreverse']
-        return generateColorsArray(mapColorPalette[3])
-      }
+      if (!rowObj) console.error('COVE: No rowObj in applyLegendToRow')
 
-      // Fail state
       return generateColorsArray()
     } catch (e) {
       console.error('COVE: ', e) // eslint-disable-line
@@ -933,8 +930,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return config?.xAxis?.dataKey ? transform.cleanData(data, excludedKey, keysToClean) : data
   }
 
+  // Helper function to safely extract tableData from Sankey data
+  const getSankeyTableData = configData => {
+    const firstDataItem = configData?.[0]
+    const hasTableData = (item: any): item is { tableData: Object[] } => {
+      return item && typeof item === 'object' && 'tableData' in item
+    }
+    return hasTableData(firstDataItem) ? firstDataItem.tableData : []
+  }
+
   const getTableRuntimeData = () => {
-    if (visualizationType === 'Sankey') return config?.data?.[0]?.tableData
+    if (visualizationType === 'Sankey') return getSankeyTableData(config?.data)
     const data = filteredData || excludedData
     if (config.visualizationType === 'Pie' && !config.dataFormat?.showPiePercent) {
       return getPiePercent(data, config?.yAxis?.dataKey)
@@ -1216,12 +1222,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
                   <DataTable
                     /* changing the "key" will force the table to re-render
-                                when the default sort changes while editing */
+                                  when the default sort changes while editing */
                     key={dataTableDefaultSortBy}
                     config={pivotDynamicSeries(config)}
                     rawData={
                       config.visualizationType === 'Sankey'
-                        ? config?.data?.[0]?.tableData
+                        ? getSankeyTableData(config?.data)
                         : config.table.customTableConfig
                         ? filterVizData(config.filters, config.data)
                         : config.data

@@ -9,4 +9,4 @@ export type Series = {
     high: string
     low: string
   }[]
-}[]
+}

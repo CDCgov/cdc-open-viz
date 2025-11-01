@@ -63,10 +63,10 @@ const BarChart: React.FC<BarChartProps> = ({
             fill={'transparent'}
             fillOpacity={0.05}
             onMouseMove={e => {
-              handleTooltipMouseOver(e, data)
+              handleTooltipMouseOver(e)
             }}
             onMouseOut={handleTooltipMouseOff}
-            onClick={e => handleTooltipClick(e, data)}
+            onClick={e => handleTooltipClick(e)}
           />
         </Group>
       </BarChartContext.Provider>

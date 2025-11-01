@@ -107,7 +107,7 @@ const ChartHeader = ({
             <th
               style={{
                 minWidth: (config.table.cellMinWidth || 0) + 'px',
-                textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
+                textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : 'left',
                 paddingRight: isSortedCol ? '1.3em' : ''
               }}
               key={`col-header-${column}__${index}`}
@@ -174,7 +174,7 @@ const ChartHeader = ({
             <th
               style={{
                 minWidth: (config.table.cellMinWidth || 0) + 'px',
-                textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
+                textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : 'left',
                 paddingRight: isSortedCol ? '1.3em' : ''
               }}
               key={`col-header-${text}__${index}`}

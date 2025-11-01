@@ -1,0 +1,28 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "skipLibCheck": true,
+    "allowJs": false
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "components/**/*.ts",
+    "components/**/*.tsx",
+    "helpers/**/*.ts",
+    "helpers/**/*.tsx",
+    "types/**/*.ts",
+    "types/**/*.tsx",
+    "contexts/**/*.ts",
+    "contexts/**/*.tsx",
+    "../../globals.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "../*/src/**/*"
+  ]
+}

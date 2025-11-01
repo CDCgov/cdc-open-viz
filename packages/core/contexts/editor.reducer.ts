@@ -1,12 +1,21 @@
 import _ from 'lodash'
 import EditorActions from './editor.actions'
-import { Visualization } from '@cdc/core/types/Visualization'
+import { BaseVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig'
+import { Datasets } from '@cdc/core/types/DataSet'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 
+// Config type that can have datasets (for dashboards)
+type ConfigWithDatasets = BaseVisualizationConfig & {
+  datasets?: Datasets
+  multiDashboards?: any[]
+  rows?: any[]
+  visualizations?: Record<string, any>
+}
+
 export type EditorState = {
-  config?: Visualization
-  tempConfig?: Visualization | null
+  config?: ConfigWithDatasets
+  tempConfig?: ConfigWithDatasets | null
   errors: string[]
   currentViewport: string
   globalActive: number
@@ -40,7 +49,7 @@ const reducer = (state: EditorState, action: EditorActions): EditorState => {
         applyMultiDashboards(config, changeDatasets)
         delete config.datasets[oldDatasetKey]
       }
-      Object.values(config.datasets).forEach(dataset => {
+      Object.values(config.datasets).forEach((dataset: any) => {
         dataset.preview = false
       })
       config.datasets[datasetKey] = { ...oldDataset, ...dataset }

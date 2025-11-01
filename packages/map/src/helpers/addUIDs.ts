@@ -15,8 +15,14 @@ import {
 
 import { SUPPORTED_DC_NAMES, GEO_TYPES, GEOCODE_TYPES } from './constants'
 import { DataRow, MapConfig } from '../types/MapConfig'
+import { MapColumns } from '../types/MapColumns'
 
 // Note: Key arrays are now imported from supported-geos for better performance
+
+type GeoLookup = {
+  keys: string[]
+  data: Record<string, string[]>
+}
 
 const geoLookups: Record<string, GeoLookup> = {
   state: { keys: stateKeys, data: supportedStates },
@@ -30,7 +36,7 @@ const memoizedFindUID = (geoName: string, type: keyof typeof geoLookups): string
   return lookup.keys.find(key => lookup.data[key].includes(geoName))
 }
 
-const hasValidCoordinates = (row: Row, columns: GeoConfig['columns']): boolean => {
+const hasValidCoordinates = (row: DataRow, columns: MapColumns): boolean => {
   return !!(
     columns.latitude?.name &&
     columns.longitude?.name &&
@@ -50,7 +56,7 @@ const findCityUID = (geoName: string): string | undefined => {
 }
 
 const handleDCDisplay = (geoName: string, displayAsHex: boolean): string | null => {
-  if (displayAsHex && SUPPORTED_DC_NAMES.includes(geoName)) {
+  if (displayAsHex && SUPPORTED_DC_NAMES.includes(geoName as (typeof SUPPORTED_DC_NAMES)[number])) {
     return 'US-DC'
   }
   return null
@@ -71,7 +77,7 @@ const handleUSLocation = (row: DataRow, geoColumn: string, displayAsHex: boolean
 }
 
 const handleWorldLocation = (row: DataRow, geoColumn: string, isWorldGeocodeType: boolean): string | null => {
-  const geoName = row[geoColumn]
+  const geoName = normalizeGeoName(row[geoColumn])
   let uid = memoizedFindUID(geoName, 'country')
   if (!uid && (isWorldGeocodeType || geoName)) {
     uid = findCityUID(geoName)

@@ -1,9 +1,14 @@
-import { AnyVisualization } from '@cdc/core/types/Visualization'
+import { BaseVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig'
 import { Dashboard } from './Dashboard'
 import { DashboardConfig } from './DashboardConfig'
 import { ConfigRow } from './ConfigRow'
 
-export type MultiDashboard = { dashboard: Dashboard; rows: ConfigRow[]; visualizations: Record<string, AnyVisualization>; label: string }
+export type MultiDashboard = {
+  dashboard: Dashboard
+  rows: ConfigRow[]
+  visualizations: Record<string, BaseVisualizationConfig>
+  label: string
+}
 
 export type MultiDashboardConfig = DashboardConfig & {
   multiDashboards?: MultiDashboard[]

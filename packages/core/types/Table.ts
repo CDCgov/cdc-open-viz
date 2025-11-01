@@ -30,4 +30,6 @@ export type Table = {
   showDownloadPdfButton?: boolean
   showDownloadUrl?: boolean
   showVertical?: boolean
+  showFullGeoNameInCSV?: boolean
+  customTableConfig?: boolean
 }

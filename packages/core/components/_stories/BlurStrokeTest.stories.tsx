@@ -1,4 +1,3 @@
-import { a } from 'vitest/dist/suite-IbNSsUWN'
 import { BlurStrokeText } from '../BlurStrokeText'
 import { Meta, StoryObj } from '@storybook/react-vite'
 

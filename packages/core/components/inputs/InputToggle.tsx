@@ -23,6 +23,11 @@ type InputSliderProps = {
   onClick?: Function
   /** Current value of the input, usually the current config option value */
   value: boolean
+  i: number | null
+  /** Minimum value of the input (for range inputs) */
+  min?: number | null
+  /** Maximum value of the input (for range inputs) */
+  max?: number | null
 }
 
 const InputSlider: React.FC<InputSliderProps> = ({

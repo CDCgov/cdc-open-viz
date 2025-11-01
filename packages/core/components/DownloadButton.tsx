@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import Papa from 'papaparse'
 import { publishAnalyticsEvent } from '../helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { COVE_VISUALIZATION_TYPES } from '../helpers/metrics/types'
 
 type DownloadButtonProps = {
   rawData: any[]
@@ -11,6 +12,7 @@ type DownloadButtonProps = {
   configUrl?: string
   interactionLabel?: string
   title?: string
+  config?: { type: COVE_VISUALIZATION_TYPES;[key: string]: any }
 }
 
 const DownloadButton = ({ rawData, fileName, headerColor, skipId, interactionLabel, configUrl, title, config }: DownloadButtonProps) => {
@@ -43,14 +45,16 @@ const DownloadButton = ({ rawData, fileName, headerColor, skipId, interactionLab
       document.body.removeChild(downloadLink)
     }
     URL.revokeObjectURL(url)
-    publishAnalyticsEvent({
-      vizType: config.type,
-      vizSubType: getVizSubType(config),
-      eventType: 'data_downloaded',
-      eventAction: 'click',
-      eventLabel: interactionLabel || configUrl,
-      vizTitle: getVizTitle(config)
-    })
+    if (config) {
+      publishAnalyticsEvent({
+        vizType: config.type as COVE_VISUALIZATION_TYPES,
+        vizSubType: getVizSubType(config),
+        eventType: 'data_downloaded',
+        eventAction: 'click',
+        eventLabel: interactionLabel || configUrl,
+        vizTitle: getVizTitle(config)
+      })
+    }
   }
 
   return (

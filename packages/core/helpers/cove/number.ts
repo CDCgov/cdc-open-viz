@@ -18,20 +18,6 @@ const abbreviateNumber = num => {
   return num + unit
 }
 
-// Format numeric data based on settings in config
-type formatNumberProps = {
-  num: number | string
-  axis: 'left' | 'right' | 'bottom'
-  shouldAbbreviate?: boolean
-  config: CdcChartConfig
-  addColParams: {
-    addColCommas: boolean
-    addColRoundTo: number
-    addColPrefix: string
-    addColSuffix: string
-  }
-}
-
 const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addColParams = null): string | number => {
   if (!config) console.error('no config found in formatNumber')
   // if num is NaN return num

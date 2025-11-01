@@ -3,11 +3,13 @@ import ConfigContext from '../../ConfigContext'
 import LegendComponent from './Legend.Component'
 import { createFormatLabels } from './helpers/createFormatLabels'
 
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
-const Legend = forwardRef((props, ref) => {
-  // prettier-ignore
+interface LegendProps {
+  skipId?: string
+  interactionLabel?: string
+}
+
+const Legend = forwardRef((props: LegendProps, ref) => {
   const {
-    // prettier-ignore
     config,
     colorScale,
     seriesHighlight,

@@ -1,6 +1,6 @@
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { formatDate } from '@cdc/core/helpers/cove/date.js'
-import { _ } from 'lodash'
+import _ from 'lodash'
 import { compile as vegaLiteCompile } from 'vega-lite'
 import { parse as vegaParse, View as vegaView } from 'vega'
 
@@ -98,8 +98,8 @@ export const getVegaWarnings = (vegaOrVegaLiteConfig, vegaConfig) => {
       `This Vega config contains multiple types of marks (${allMarks
         .map(m => m.type)
         .join(', ')}), but COVE's combo charts only support these types of marks: (${Object.keys(COMBO_MARKS).join(
-        ', '
-      )}). Not all marks were imported.`
+          ', '
+        )}). Not all marks were imported.`
     )
   }
 
@@ -109,7 +109,7 @@ export const getVegaWarnings = (vegaOrVegaLiteConfig, vegaConfig) => {
 export const parseVegaConfig = vegaConfig => {
   try {
     vegaConfig = vegaLiteCompile(vegaConfig).spec
-  } catch {}
+  } catch { }
   return vegaConfig
 }
 

@@ -11,9 +11,21 @@ import './../sankey.scss'
 import 'react-tooltip/dist/react-tooltip.css'
 import ConfigContext from '../../../ConfigContext'
 import type { ChartContext } from '../../../types/ChartContext'
-import type { SankeyNode, SankeyProps } from '../types'
 import useSankeyAlert from '../useSankeyAlert'
 import { getSankeyTooltip } from '../helpers/getSankeyTooltip'
+import { SankeyChartConfig } from '../../../types/ChartConfig'
+
+export type Link = { source: string; target: string; value: number; id: string }
+
+export type SankeyNode = {
+  id: string
+}
+
+interface SankeyProps {
+  width: number
+  height: number
+  runtime: any
+}
 
 const Sankey = ({ width, height, runtime }: SankeyProps) => {
   const { config } = useContext<ChartContext>(ConfigContext)
@@ -53,7 +65,11 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
 
   if (config.visualizationType !== 'Sankey') return
 
-  const data = config?.data[0]
+  const data = config?.data?.[0] as {
+    links?: { source: string; target: string; value: number }[]
+    storyNodeText?: { StoryNode: string; segmentTextBefore: string; segmentTextAfter: string }[]
+    tooltips?: Object[]
+  }
 
   //Retrieve all the unique values for the Nodes
   const uniqueNodes = Array.from(new Set(data?.links?.flatMap(link => [link.source, link.target])))
@@ -139,12 +155,12 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
     let { textPositionHorizontal, textPositionVertical, classStyle, storyNodes } = nodeStyle(node.id)
     let { sourceNodes } = activeConnection(tooltipID)
 
-    let opacityValue = sankeyConfig.opacity.nodeOpacityDefault
-    let nodeColor = sankeyConfig.nodeColor.default
+    let opacityValue = sankeyConfig.opacity.nodeOpacityDefault as unknown as number
+    let nodeColor = sankeyConfig.nodeColor.default as unknown as string
 
     if (tooltipID !== node.id && tooltipID !== '' && !sourceNodes.includes(node.id)) {
-      nodeColor = sankeyConfig.nodeColor.inactive
-      opacityValue = sankeyConfig.opacity.nodeOpacityInactive
+      nodeColor = sankeyConfig.nodeColor.inactive as unknown as string
+      opacityValue = sankeyConfig.opacity.nodeOpacityInactive as unknown as number
     }
 
     const maxNodeWidth = sankeyGenerator.nodeWidth()
@@ -333,12 +349,12 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
     let { textPositionHorizontal, textPositionVertical, classStyle, storyNodes } = nodeStyle(node.id)
     let { sourceNodes } = activeConnection(tooltipID)
 
-    let opacityValue = sankeyConfig.opacity.nodeOpacityDefault
-    let nodeColor = sankeyConfig.nodeColor.default
+    let opacityValue = sankeyConfig.opacity.nodeOpacityDefault as unknown as number
+    let nodeColor = sankeyConfig.nodeColor.default as unknown as string
 
     if (tooltipID !== node.id && tooltipID !== '' && !sourceNodes.includes(node.id)) {
-      nodeColor = sankeyConfig.nodeColor.inactive
-      opacityValue = sankeyConfig.opacity.nodeOpacityInactive
+      nodeColor = sankeyConfig.nodeColor.inactive as unknown as string
+      opacityValue = sankeyConfig.opacity.nodeOpacityInactive as unknown as number
     }
 
     return (

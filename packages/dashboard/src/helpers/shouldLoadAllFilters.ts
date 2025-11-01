@@ -1,5 +1,9 @@
 import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
-import { Visualization } from '@cdc/core/types/Visualization'
+import { BaseVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig'
+
+interface Visualization extends BaseVisualizationConfig {
+  autoLoad?: boolean
+}
 
 export const shouldLoadAllFilters = (config, isEditorPanel): boolean => {
   const autoLoad = Boolean(getQueryParam('cove-auto-load'))

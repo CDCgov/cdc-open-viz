@@ -20,13 +20,14 @@ import removeNullColumns from './helpers/removeNullColumns'
 import { TableConfig } from './types/TableConfig'
 import { Column } from '../../types/Column'
 import { pivotData } from '../../helpers/pivotData'
+import { COVE_VISUALIZATION_TYPES } from '../../helpers/metrics/types'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import isRightAlignedTableValue from '@cdc/core/helpers/isRightAlignedTableValue'
 import './data-table.css'
 import _ from 'lodash'
 import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
 
-export type DataTableProps = {
+export interface DataTableProps {
   colorScale?: Function
   columns?: Record<string, Column>
   config: TableConfig
@@ -57,6 +58,7 @@ export type DataTableProps = {
   legendMemo?: React.MutableRefObject<Map<any, any>>
   legendSpecialClassLastMemo?: React.MutableRefObject<Map<any, any>>
   runtimeLegend?: any
+  applyLegendToRow?: (row: Object) => string[] | string
 }
 
 const DataTable = (props: DataTableProps) => {
@@ -198,17 +200,23 @@ const DataTable = (props: DataTableProps) => {
   })
 
   // prettier-ignore
-  const tableData = useMemo(() => (
-    config.data?.[0]?.tableData
-      ? config.data?.[0]?.tableData
-      : config.visualizationType === 'Sankey'
-        ? config.data?.[0]?.tableData
+  const tableData = useMemo(() => {
+    const firstDataItem = config.data?.[0]
+    // Type guard to check if the data item has tableData property
+    const hasTableData = (item: any): item is { tableData: Object[] } => {
+      return item && typeof item === 'object' && 'tableData' in item
+    }
+
+    return hasTableData(firstDataItem)
+      ? firstDataItem.tableData
+      : config.visualizationType === 'Sankey' && hasTableData(firstDataItem)
+        ? firstDataItem.tableData
         : config.visualizationType === 'Pie'
           ? [config.yAxis.dataKey]
           : config.visualizationType === 'Box Plot'
             ? config?.boxplot?.plots?.[0] ? Object.entries(config.boxplot.plots[0]) : []
-            : config.runtime?.seriesKeys),
-    [config.runtime?.seriesKeys]) // eslint-disable-line
+            : config.runtime?.seriesKeys
+  }, [config.runtime?.seriesKeys]) // eslint-disable-line
 
   const hasNoData = runtimeData.length === 0
   const getClassNames = (): string => {
@@ -242,8 +250,8 @@ const DataTable = (props: DataTableProps) => {
           ? getMapRowData(
             rows,
             columns,
-            config,
-            formatLegendLocation,
+            config as unknown as Record<string, Object>,
+            (row: string) => formatLegendLocation?.(row, '') || row,
             runtimeData as Record<string, Object>,
             displayGeoName,
             filterColumns
@@ -258,7 +266,7 @@ const DataTable = (props: DataTableProps) => {
         // Add column for full Geo name along with State
         return csvData.map(row => {
           return {
-            FullGeoName: formatLegendLocation(row[config.columns.geo.name]),
+            FullGeoName: formatLegendLocation?.(row[config.columns.geo.name], '') || row[config.columns.geo.name],
             ...row
           }
         })
@@ -323,7 +331,8 @@ const DataTable = (props: DataTableProps) => {
               fileName={`${vizTitle || 'data-table'}.csv`}
               headerColor={headerColor}
               interactionLabel={interactionLabel}
-              config={config}
+              skipId={skipId}
+              config={{ ...config, type: config.type as COVE_VISUALIZATION_TYPES }}
             />
           )}
         </MediaControls.Section>
@@ -334,7 +343,7 @@ const DataTable = (props: DataTableProps) => {
       <ErrorBoundary component='DataTable'>
         {!config.table.showDownloadLinkBelow && (
           <div className='w-100 d-flex justify-content-end'>
-            <TableMediaControls />
+            <TableMediaControls belowTable={false} />
           </div>
         )}
         <section id={tabbingId.replace('#', '')} className={getClassNames()} aria-label={accessibilityLabel}>
@@ -387,7 +396,7 @@ const DataTable = (props: DataTableProps) => {
                 className: `table table-striped table-width-unset ${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
                   }${isVertical ? '' : ' horizontal'}`,
                 'aria-live': 'assertive',
-                'aria-rowcount': config?.data?.length ? config.data.length : -1,
+                'aria-rowcount': Array.isArray(config?.data) ? config.data.length : -1,
                 hidden: !expanded,
                 cellMinWidth: 100
               }}
@@ -413,6 +422,7 @@ const DataTable = (props: DataTableProps) => {
                       <th>End Date</th>
                     </tr>
                   }
+                  rightAlignedCols={{}}
                   tableOptions={{ className: 'table table-striped region-table data-table' }}
                 />
               )}
@@ -457,6 +467,7 @@ const DataTable = (props: DataTableProps) => {
               caption={caption}
               stickyHeader
               headContent={<BoxplotHeader categories={config.boxplot.categories} />}
+              rightAlignedCols={{}}
               tableOptions={{
                 className: `table table-striped ${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'}`,
                 'aria-live': 'assertive',

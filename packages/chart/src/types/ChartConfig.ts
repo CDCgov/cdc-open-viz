@@ -109,6 +109,8 @@ export interface AllChartsConfig extends BaseVisualizationConfig, EditorPanel_Ma
   dataKey: string
   description: string
   dynamicMarginTop: number
+  dynamicSeriesType?: string
+  dynamicSeriesLineType?: string
   exclusions: Exclusions
   filterBehavior: FilterBehavior
   legacyFootnotes: string // this footnote functionality should be moved to the Footnotes component
@@ -142,7 +144,7 @@ export interface AllChartsConfig extends BaseVisualizationConfig, EditorPanel_Ma
   roundingStyle: string
   runtime: Runtime
   runtimeDataUrl: string
-  series: Series
+  series: Series[]
   showLineSeriesLabels: boolean
   showSidebar: boolean
   sortData: 'ascending' | 'descending'
@@ -207,44 +209,8 @@ export interface LineChartConfig extends AllChartsConfig, EditorPanel_MarkupVari
   visualizationType: 'Line'
 }
 
-type SankeyLink = {
-  depth: number
-  height: number
-  id: string
-  index: number
-  layer: number
-  sourceLinks: SankeyLink[]
-  targetLinks: SankeyLink[]
-  value: number
-  x0: number
-  x1: number
-  y0: number
-  y1: number
-}
-
-type StoryNode = {
-  StoryNode: string
-  segmentTextAfter: string
-  segmentTextBefore: string
-}
-
-interface SankeyChartConfig extends AllChartsConfig, EditorPanel_MarkupVariables {
+export interface SankeyChartConfig extends AllChartsConfig, EditorPanel_MarkupVariables {
   enableTooltips: boolean
-  data: [
-    {
-      tooltips: Object[]
-      // data to display in the sankey chart tooltips
-      tooltipData: Object[]
-      // data to display in the data table, bypasses the default data table output
-      tableData: Object[]
-      links: {
-        source: SankeyLink
-        target: SankeyLink
-        value: number
-      }[]
-      storyNodeText: StoryNode[]
-    }
-  ]
   visualizationType: 'Sankey'
 }
 

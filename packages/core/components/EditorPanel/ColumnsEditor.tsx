@@ -71,7 +71,16 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
   }
 
   const getColumns = () => {
-    const columns: string[] = config.data.flatMap(row => {
+    // Ensure we have array data to work with
+    let dataArray: any[] = []
+    if (Array.isArray(config.data)) {
+      dataArray = config.data
+    } else if (config.data && typeof config.data === 'object' && config.data[0]?.tableData) {
+      // Handle Sankey data format - extract tableData if available
+      dataArray = config.data[0].tableData || []
+    }
+
+    const columns: string[] = dataArray.flatMap(row => {
       return Object.keys(row).map(columnName => columnName)
     })
     const configuredColumns = Object.values(config.columns).map(col => col.name)

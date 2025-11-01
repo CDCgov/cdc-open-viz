@@ -4,11 +4,13 @@ import { SortIcon } from './SortIcon'
 import { getNewSortBy } from '../helpers/getNewSortBy'
 import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { COVE_VISUALIZATION_TYPES } from '../../../helpers/metrics/types'
 
-type MapHeaderProps = DataTableProps & {
+interface MapHeaderProps extends DataTableProps {
   sortBy: { column; asc }
   setSortBy: Function
   interactionLabel: string
+  rightAlignedCols: boolean[]
 }
 
 const ColumnHeadingText = ({ text, config }) => {
@@ -48,7 +50,7 @@ const MapHeader = ({
             <th
               style={{
                 minWidth: (config.table.cellMinWidth || 0) + 'px',
-                textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
+                textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : 'left',
                 paddingRight: '1.3em'
               }}
               key={`col-header-${column}__${index}`}
@@ -58,7 +60,7 @@ const MapHeader = ({
               scope='col'
               onClick={() => {
                 publishAnalyticsEvent({
-                  vizType: config.type,
+                  vizType: config.type as COVE_VISUALIZATION_TYPES,
                   vizSubType: getVizSubType(config),
                   eventType: `data_table_sort`,
                   eventAction: 'click',
@@ -71,7 +73,7 @@ const MapHeader = ({
               onKeyDown={e => {
                 if (e.key === 'Enter') {
                   publishAnalyticsEvent({
-                    vizType: config.type,
+                    vizType: config.type as COVE_VISUALIZATION_TYPES,
                     vizSubType: getVizSubType(config),
                     eventType: `data_table_sort`,
                     eventAction: 'keyboard',

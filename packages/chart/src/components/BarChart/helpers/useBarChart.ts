@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { ChartDispatchContext } from '../../../ConfigContext'
 import { formatNumber as formatColNumber } from '@cdc/core/helpers/cove/number'
-import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'

@@ -9,7 +9,7 @@ type TabsProps = {
 }
 
 const Tabs: React.FC<TabsProps> = ({ filter, index: outerIndex, changeFilterActive, theme }) => {
-  const [selectedFilter, setSelectedFilter] = useState<EventTarget>(null)
+  const [selectedFilter, setSelectedFilter] = useState<HTMLElement | null>(null)
 
   const id = useId()
 
@@ -46,12 +46,12 @@ const Tabs: React.FC<TabsProps> = ({ filter, index: outerIndex, changeFilterActi
         className={getClassList(value)}
         onClick={e => {
           changeFilterActive(outerIndex, value)
-          setSelectedFilter(e.target)
+          setSelectedFilter(e.target as HTMLElement)
         }}
         onKeyDown={e => {
           if (e.keyCode === 13) {
             changeFilterActive(outerIndex, value)
-            setSelectedFilter(e.target)
+            setSelectedFilter(e.target as HTMLElement)
           }
         }}
       >

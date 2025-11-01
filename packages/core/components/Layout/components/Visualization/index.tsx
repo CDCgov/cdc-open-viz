@@ -1,26 +1,31 @@
 // main visualization wrapper
-import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import React, { forwardRef } from 'react'
-import { DataBiteConfig } from '@cdc/data-bite/src/types/DataBiteConfig'
-import { DataTableConfig } from '@cdc/data-table/src/types/DataTableConfig'
-import './visualizations.scss'
-import { WaffleChartConfig } from '@cdc/waffle-chart/src/types/WaffleChartConfig'
-import { MarkupIncludeConfig } from '@cdc/core/types/MarkupIncludeConfig'
-import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
-import { MapConfig } from '@cdc/map/src/types/MapConfig'
+import { BaseVisualizationConfig } from '../../../../types/BaseVisualizationConfig'
 
-type VisualizationWrapper = {
+// styles
+import './visualizations.scss'
+
+interface VisualizationWrapper {
   children: React.ReactNode
-  config: ChartConfig | DataBiteConfig | WaffleChartConfig | MarkupIncludeConfig | DashboardFilters | MapConfig | DataTableConfig
+  config: BaseVisualizationConfig & {
+    // Additional properties that may exist on specific visualization configs
+    fontSize?: string
+    overallFontSize?: string
+    isLollipopChart?: boolean
+    runtime?: {
+      editorErrorMessage?: string | any[]
+    }
+  }
   currentViewport?: string
   imageId?: string
   isEditor: boolean
   showEditorPanel?: boolean
+  className?: string
 }
 
 const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, ref) => {
   const {
-    config = {},
+    config = { type: '' },
     isEditor = false,
     currentViewport = 'lg',
     imageId = '',

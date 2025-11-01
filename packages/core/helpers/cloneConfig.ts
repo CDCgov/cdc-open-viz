@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { stripDataFromConfig, restoreDataToConfig } from './configDataHelpers'
+import { BaseVisualizationConfig } from '../types/BaseVisualizationConfig'
 
 /**
  * Performs a deep clone of a config by temporarily
@@ -9,7 +10,7 @@ import { stripDataFromConfig, restoreDataToConfig } from './configDataHelpers'
  * @param config - The config object to clone
  * @returns A deep clone of the config with all data arrays preserved
  */
-export const cloneConfig = (config: any): any => {
+export const cloneConfig = (config: BaseVisualizationConfig): any => {
   try {
     const { strippedConfig, extractedData } = stripDataFromConfig(config)
     const clonedConfig = _.cloneDeep(strippedConfig)
