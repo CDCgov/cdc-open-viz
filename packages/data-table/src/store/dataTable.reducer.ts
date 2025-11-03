@@ -9,7 +9,7 @@ import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 
 export const getInitialState = (isEditor: boolean): State => {
   return {
-    config: defaults,
+    config: undefined,
     showEditorPanel: isEditor,
     columns: undefined,
     data: undefined,
@@ -22,7 +22,7 @@ export const getInitialState = (isEditor: boolean): State => {
 }
 
 export type State = {
-  config: Config
+  config: Config | undefined
   showEditorPanel: boolean
   columns: Record<string, Column>
   data: object[]
@@ -40,7 +40,7 @@ export const reducer = (state: State, action: DataTableActions) => {
     case 'SET_SHOW_EDITOR_PANEL':
       return { ...state, showEditorPanel: action.payload }
     case 'SET_CONFIG':
-      return { ...state, config: { ...state.config, ...action.payload } }
+      return { ...state, config: action.payload }
     case 'SET_COLUMNS':
       return { ...state, columns: action.payload, config: { ...state.config, columns: action.payload } }
     case 'SET_DATA':
