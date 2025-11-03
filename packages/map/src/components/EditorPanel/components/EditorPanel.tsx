@@ -3305,6 +3305,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
             onMarkupVariablesChange={variables => setConfig({ ...config, markupVariables: variables })}
             onToggleEnable={enabled => setConfig({ ...config, enableMarkupVariables: enabled })}
           />
+          <Panels.SmallMultiples name='Small Multiples' />
         </Accordion>
         <AdvancedEditor loadConfig={setConfig} config={config} convertStateToConfig={convertStateToConfig} />
       </Layout.Sidebar>

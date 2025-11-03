@@ -24,7 +24,7 @@ const findNearestDatum = ({ data, xScale, yScale, config, xMax, annotationSeries
     return domain[index]
   }
 
-  const getXValueFromCoordinate = (x, isClick = false) => {
+  const getXValueFromCoordinate = x => {
     if (visualizationType === 'Pie') return
     if (orientation === 'horizontal') return
 

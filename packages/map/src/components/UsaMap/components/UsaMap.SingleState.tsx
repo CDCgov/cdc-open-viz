@@ -13,6 +13,7 @@ import ZoomControls from '../../ZoomControls'
 import { MapContext } from '../../../types/MapContext'
 import useStateZoom from '../../../hooks/useStateZoom'
 import { Text } from '@visx/text'
+import SmallMultiples from '../../SmallMultiples/SmallMultiples'
 
 import './UsaMap.SingleState.styles.css'
 
@@ -37,11 +38,12 @@ const SingleStateMap: React.FC = () => {
     position,
     topoData,
     scale,
-    translate
+    translate,
+    useDynamicViewbox
   } = useContext<MapContext>(ConfigContext)
 
   const dispatch = useContext(MapDispatchContext)
-  const { handleMoveEnd, handleZoomIn, handleZoomOut, handleZoomReset, projection } = useStateZoom(topoData)
+  const { handleMoveEnd, handleZoomIn, handleZoomOut, handleZoomReset, projection, bounds } = useStateZoom(topoData)
 
   // Memoize statesPicked to prevent creating new arrays on every render
   const statesPicked = useMemo(() => {
@@ -62,6 +64,19 @@ const SingleStateMap: React.FC = () => {
   const geoStrokeColor = getGeoStrokeColor(config)
   const path = geoPath().projection(projection)
 
+  const dynamicViewBox = useMemo(() => {
+    if (!useDynamicViewbox || !bounds) {
+      return SVG_VIEWBOX
+    }
+
+    const x = Math.floor(bounds[0][0] - SVG_PADDING)
+    const y = Math.floor(bounds[0][1] - SVG_PADDING)
+    const width = Math.ceil(bounds[1][0] - bounds[0][0] + SVG_PADDING * 2)
+    const height = Math.ceil(bounds[1][1] - bounds[0][1] + SVG_PADDING * 2)
+
+    return `${x} ${y} ${width} ${height}`
+  }, [useDynamicViewbox, bounds])
+
   useEffect(() => {
     let currentYear = getCurrentTopoYear(config, runtimeFilters)
 
@@ -78,6 +93,11 @@ const SingleStateMap: React.FC = () => {
         <Loading />
       </div>
     )
+  }
+
+  // Early return for small multiples rendering
+  if (config.smallMultiples?.mode) {
+    return <SmallMultiples />
   }
 
   const checkForNoData = () => {
@@ -131,7 +151,7 @@ const SingleStateMap: React.FC = () => {
     <ErrorBoundary component='SingleStateMap'>
       {!!statesPicked.length && config.general.allowMapZoom && statesPicked.some(sp => sp.fipsCode) && (
         <svg
-          viewBox={SVG_VIEWBOX}
+          viewBox={dynamicViewBox}
           preserveAspectRatio='xMinYMin'
           className='svg-container'
           role='img'
@@ -194,7 +214,7 @@ const SingleStateMap: React.FC = () => {
       )}
       {!!statesPicked && !config.general.allowMapZoom && statesPicked.some(sp => sp.fipsCode) && (
         <svg
-          viewBox={SVG_VIEWBOX}
+          viewBox={dynamicViewBox}
           preserveAspectRatio='xMinYMin'
           className='svg-container'
           role='img'
@@ -247,7 +267,7 @@ const SingleStateMap: React.FC = () => {
 
       {checkForNoData() && (
         <svg
-          viewBox={SVG_VIEWBOX}
+          viewBox={dynamicViewBox}
           preserveAspectRatio='xMinYMin'
           className='svg-container'
           role='img'

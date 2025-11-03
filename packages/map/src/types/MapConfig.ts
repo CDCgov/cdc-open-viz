@@ -83,6 +83,17 @@ export type DataRow = {
   [key: string]: string | number | boolean | null | undefined // allowing primitive data types for dynamic columns
 }
 
+export type SmallMultiples = {
+  mode?: 'by-column'
+  tileColumn?: string
+  tilesPerRowDesktop?: number
+  tilesPerRowMobile?: number
+  tileOrderType?: 'asc' | 'desc' | 'custom'
+  tileOrder?: string[]
+  tileTitles?: { [key: string]: string }
+  synchronizedTooltips?: boolean
+}
+
 export type MapConfig = Visualization & {
   annotations: Annotation[]
   // map color palette
@@ -202,6 +213,7 @@ export type MapConfig = Visualization & {
   filterBehavior: string
   filterIntro: string
   visual: MapVisualSettings
+  smallMultiples?: SmallMultiples
   // visualization type
   type: 'map'
   // version of the map
