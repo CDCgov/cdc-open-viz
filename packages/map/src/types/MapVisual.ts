@@ -1,5 +1,4 @@
 import { EditorPanel_Visual } from '@cdc/core/types/EditorPanel_Visual'
-import { E } from 'vitest/dist/chunks/environment.d.cL3nLXbE'
 
 /**
  * Map-specific visual configuration.
