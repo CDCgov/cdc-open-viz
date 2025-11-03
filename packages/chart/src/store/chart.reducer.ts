@@ -13,6 +13,7 @@ type ChartState = {
   filteredData: object[]
   seriesHighlight: string[]
   currentViewport: ViewportSize
+  vizViewport: ViewportSize
   dimensions: DimensionsType
   container: HTMLElement | null
   coveLoadedEventRan: boolean
@@ -43,6 +44,7 @@ export const getInitialState = (configObj: ChartConfig): ChartState => {
     seriesHighlight:
       configObj && configObj?.legend?.seriesHighlight?.length ? [...configObj?.legend?.seriesHighlight] : [],
     currentViewport: 'lg',
+    vizViewport: 'lg',
     dimensions: [0, 0],
     container: null,
     coveLoadedEventRan: false,
@@ -72,6 +74,8 @@ export const reducer = (state: ChartState, action: ChartActions): ChartState => 
       return { ...state, seriesHighlight: action.payload }
     case 'SET_VIEWPORT':
       return { ...state, currentViewport: action.payload }
+    case 'SET_VIZ_VIEWPORT':
+      return { ...state, vizViewport: action.payload }
     case 'SET_DIMENSIONS':
       return { ...state, dimensions: action.payload }
     case 'SET_CONTAINER':

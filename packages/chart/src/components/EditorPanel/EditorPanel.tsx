@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, memo, useContext } from 'react'
-import { DragDropContext, Droppable } from '@hello-pangea/dnd'
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import chroma from 'chroma-js'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import {
@@ -4445,6 +4445,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
               onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
               onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
             />
+            <Panels.SmallMultiples name='Small Multiples' />
           </Accordion>
           {config.type !== 'Spark Line' && (
             <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />

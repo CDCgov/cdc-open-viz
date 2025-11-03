@@ -140,6 +140,15 @@ const createInitialState = () => {
     },
     filterBehavior: 'Filter Change',
     filterIntro: '',
+    smallMultiples: {
+      mode: '',
+      tileColumn: '',
+      tilesPerRowDesktop: 3,
+      tilesPerRowMobile: 1,
+      tileOrderType: 'asc',
+      tileOrder: [],
+      tileTitles: {}
+    },
     markupVariables: [],
     enableMarkupVariables: false
   }

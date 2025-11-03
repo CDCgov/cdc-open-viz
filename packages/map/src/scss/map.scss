@@ -36,22 +36,15 @@ $medium: 768px;
 }
 
 .territories-label {
-  font-size: 0.8rem;
   font-weight: 700;
-}
-
-@include breakpointClass(sm) {
-  .territories-label {
-    font-size: 1rem;
-  }
 }
 
 // Cities and Territories
 .territories {
   gap: 0.5em;
   svg {
-    max-width: 30px;
-    min-width: 30px;
+    max-width: var(--territory-svg-max-width, 30px);
+    min-width: var(--territory-svg-min-width, 30px);
     transition: 0.3s all;
 
     text {
@@ -73,11 +66,6 @@ $medium: 768px;
       width: 2.5em;
     }
   }
-  .territories {
-    svg {
-      max-width: 45px;
-    }
-  }
 }
 
 .state {
@@ -97,7 +85,6 @@ $medium: 768px;
   right: 10px;
   display: none;
 }
-
 
 .county-borders {
   fill: none;

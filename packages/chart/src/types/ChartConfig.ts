@@ -134,7 +134,23 @@ export interface AllChartsConfig extends BaseVisualizationConfig, EditorPanel_Ma
   runtime: Runtime
   runtimeDataUrl: string
   series: Series[]
+  showLineSeriesLabels: boolean
+  showAreaUnderLine?: boolean
   showSidebar: boolean
+  showTitle: boolean
+  smallMultiples?: {
+    mode?: 'by-column' | 'by-series'
+    tileColumn?: string
+    tilesPerRowDesktop?: number
+    tilesPerRowMobile?: number
+    independentYAxis?: boolean
+    tileOrderType?: 'asc' | 'desc' | 'custom'
+    tileOrder?: string[]
+    tileTitles?: { [key: string]: string }
+    colorMode?: 'same' | 'different'
+    synchronizedTooltips?: boolean
+    showAreaUnderLine?: boolean
+  }
   sortData: 'ascending' | 'descending'
   suppressedData?: { label: string; icon: string; value: string }[]
   superTitle: string

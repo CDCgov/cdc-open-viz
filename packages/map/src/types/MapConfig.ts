@@ -2,7 +2,6 @@ import { type BaseVisualizationConfig } from '@cdc/core/types/BaseVisualizationC
 import { type VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { EditorPanel_MarkupVariables } from '@cdc/core/types/EditorPanel_MarkupVariables'
-import { MapVisual } from './MapVisual'
 import { MapLegend } from './MapLegend'
 import { MapTable } from './MapTable'
 import { MapColumns } from './MapColumns'
@@ -10,6 +9,8 @@ import { MapGeneral } from './MapGeneral'
 import { HexMapSettings } from './MapHexSettings'
 import { PatternSelection } from './MapPattern'
 import { MapTooltips } from './MapTooltips'
+import { MapVisual as MapVisualSettings } from './MapVisual'
+import { Version } from '@cdc/core/types/Version'
 
 // Runtime data types
 export type RuntimeFilters = VizFilter[] & { fromHash?: number }
@@ -22,18 +23,21 @@ export type DataRow = {
   [key: string]: string | number | boolean | null | undefined // allowing primitive data types for dynamic columns
 }
 
-/**
- * Configuration interface for Map visualizations.
- * Extends BaseVisualizationConfig with map-specific properties.
- */
-export interface MapConfig extends BaseVisualizationConfig, EditorPanel_MarkupVariables {
-  // Override base properties to be more specific or required
-  type: 'map'
-  data: (DataRow[] & { fromColumn?: string }) | DataRow[]
-  filters: VizFilter[]
+export type SmallMultiples = {
+  mode?: 'by-column'
+  tileColumn?: string
+  tilesPerRowDesktop?: number
+  tilesPerRowMobile?: number
+  tileOrderType?: 'asc' | 'desc' | 'custom'
+  tileOrder?: string[]
+  tileTitles?: { [key: string]: string }
+  synchronizedTooltips?: boolean
+}
 
-  // Override visual to use map-specific visual configuration
-  visual: MapVisual
+export interface MapConfig extends BaseVisualizationConfig, EditorPanel_MarkupVariables {
+  dataUrl: string
+  data: DataRow[]
+  filters: VizFilter[]
 
   // Map-specific properties
   annotations: Annotation[]
@@ -68,4 +72,11 @@ export interface MapConfig extends BaseVisualizationConfig, EditorPanel_MarkupVa
   filterBehavior: string
   /** Intro text for filters */
   filterIntro: string
+  visual: MapVisualSettings
+  smallMultiples?: SmallMultiples
+  // visualization type
+  type: 'map'
+  // version of the map
+  mapVisual: MapVisualSettings
+  version: Version
 }
