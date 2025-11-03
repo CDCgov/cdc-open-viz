@@ -59,7 +59,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
       }
     })
     setLargestGroupWidth(largest)
-  }, [groupRefs, sankeyConfig, window.innerWidth])
+  }, [groupRefs, window.innerWidth])
 
   // Type guard and assertion - we know this is going to eventually be a sankey config
   if (configFromContext.visualizationType !== 'Sankey') {
