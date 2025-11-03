@@ -202,10 +202,10 @@ export type AllChartsConfig = {
     tileColumn?: string
     tilesPerRowDesktop?: number
     tilesPerRowMobile?: number
-    independentYAxis?: boolean
     tileOrderType?: 'asc' | 'desc' | 'custom'
     tileOrder?: string[]
     tileTitles?: { [key: string]: string }
+    independentYAxis?: boolean
     colorMode?: 'same' | 'different'
     synchronizedTooltips?: boolean
     showAreaUnderLine?: boolean
