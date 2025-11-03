@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { MarkupIncludeConfig } from '@cdc/core/types/MarkupIncludeConfig'
+import { MarkupIncludeConfig } from './types/MarkupIncludeConfig'
 
 type ConfigCTX = {
   config: MarkupIncludeConfig

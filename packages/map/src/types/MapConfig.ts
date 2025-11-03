@@ -23,6 +23,9 @@ export type DataRow = {
   [key: string]: string | number | boolean | null | undefined // allowing primitive data types for dynamic columns
 }
 
+/** Map data with metadata about the source column */
+export type MapData = DataRow[] & { fromColumn?: string }
+
 export type SmallMultiples = {
   mode?: 'by-column'
   tileColumn?: string
@@ -36,7 +39,7 @@ export type SmallMultiples = {
 
 export interface MapConfig extends BaseVisualizationConfig, EditorPanel_MarkupVariables {
   dataUrl: string
-  data: DataRow[]
+  data: MapData
   filters: VizFilter[]
 
   // Map-specific properties

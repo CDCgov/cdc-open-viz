@@ -1,7 +1,7 @@
-type RuntimeData = Object[] & Record<string, Object>
+import { RuntimeData } from '../../../types/RuntimeData'
 
 // removes null and excluded columns
-const removeNullColumns = (runtimeData: Object[] | RuntimeData): RuntimeData => {
+const removeNullColumns = (runtimeData: RuntimeData): RuntimeData => {
   if (!Array.isArray(runtimeData)) {
     // currently we don't support Record types
     return runtimeData
@@ -20,7 +20,7 @@ const removeNullColumns = (runtimeData: Object[] | RuntimeData): RuntimeData => 
         if (runtimeDataMemo[key] === true) row[key] = d[key]
       })
       return row
-    }) as RuntimeData
+    })
   }
 }
 

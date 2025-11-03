@@ -36,6 +36,8 @@ export type ChartLegend = CoreLegend & {
   groupBy: string
   /** Separator characters between legend items */
   separators?: string
+  /** Default size for pattern items */
+  patternSize?: number
   /** Pattern configurations for legend items */
   patterns?: {
     [key: string]: {

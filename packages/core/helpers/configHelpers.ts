@@ -1,4 +1,5 @@
 import cloneConfig from './cloneConfig'
+import { BaseVisualizationConfig } from '../types/BaseVisualizationConfig'
 
 /* editConfigKeys
  * Add edit or update config keys
@@ -7,7 +8,7 @@ import cloneConfig from './cloneConfig'
  * value is the new value to be set
  * if the key does not exist, it will be created
  */
-export function editConfigKeys<T = any>(config: T, keyUpdates: { path: string[]; value: any }[]): T {
+export function editConfigKeys<T extends BaseVisualizationConfig = BaseVisualizationConfig>(config: T, keyUpdates: { path: string[]; value: any }[]): T {
   const configDeepCopy = cloneConfig(config)
 
   const newConfig = keyUpdates.reduce((acc, { path, value }) => {

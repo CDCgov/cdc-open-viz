@@ -4,42 +4,6 @@ import Footnotes from './Footnotes'
 import { Version } from './Version'
 import { DataDescription } from './DataDescription'
 
-type SankeyLink = {
-  depth: number
-  height: number
-  id: string
-  index: number
-  layer: number
-  sourceLinks: SankeyLink[]
-  targetLinks: SankeyLink[]
-  value: number
-  x0: number
-  x1: number
-  y0: number
-  y1: number
-}
-
-type StoryNode = {
-  StoryNode: string
-  segmentTextAfter: string
-  segmentTextBefore: string
-}
-
-/** Data object that may contain tableData property for complex visualizations like Sankey */
-interface SankeyDataFormat {
-  [index: number]: {
-    tooltips?: Object[]
-    tooltipData?: Object[]
-    tableData?: Object[]
-    links?: {
-      source: string // These are strings, not SankeyLink objects
-      target: string
-      value: number
-    }[]
-    storyNodeText?: StoryNode[]
-  }
-}
-
 /**
  * Base configuration interface for all COVE visualizations.
  * Contains properties shared across all visualization types.
@@ -56,7 +20,7 @@ export interface BaseVisualizationConfig {
   /** Version information for the visualization config */
   version?: Version
   /** Optional data array for the visualization */
-  data?: Object[] | SankeyDataFormat
+  data?: Object[]
   /** Optional filters applied to the visualization */
   filters?: VizFilter[]
   /** Optional unique identifier for the visualization */

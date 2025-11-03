@@ -150,9 +150,8 @@ const Legend = forwardRef<HTMLElement, LegendProps>(
                                 eventLabel: interactionLabel,
                                 specifics:
                                   config.visualizationType === 'Bar'
-                                    ? `label: ${label.text}, orientation: ${
-                                        config.orientation === 'horizontal' ? 'horizontal' : 'vertical'
-                                      }, mode: ${legend.behavior}`
+                                    ? `label: ${label.text}, orientation: ${config.orientation === 'horizontal' ? 'horizontal' : 'vertical'
+                                    }, mode: ${legend.behavior}`
                                     : `label: ${label.text}, mode: ${legend.behavior}`
                               })
                               highlight(label)
@@ -168,9 +167,8 @@ const Legend = forwardRef<HTMLElement, LegendProps>(
                               eventLabel: interactionLabel,
                               specifics:
                                 config.visualizationType === 'Bar'
-                                  ? `label: ${label.text}, orientation: ${
-                                      config.orientation === 'horizontal' ? 'horizontal' : 'vertical'
-                                    }, mode: ${legend.behavior}`
+                                  ? `label: ${label.text}, orientation: ${config.orientation === 'horizontal' ? 'horizontal' : 'vertical'
+                                  }, mode: ${legend.behavior}`
                                   : `label: ${label.text}, mode: ${legend.behavior}`,
 
                               vizTitle: getVizTitle(config)
@@ -243,9 +241,8 @@ const Legend = forwardRef<HTMLElement, LegendProps>(
                 {/* Pattern Legend Items */}
                 {config.legend.patterns && Object.keys(config.legend.patterns).length > 0 && (
                   <div
-                    className={`legend-patterns d-flex ${
-                      ['top', 'bottom'].includes(config.legend.position) ? 'flex-row flex-wrap' : 'flex-column'
-                    }`}
+                    className={`legend-patterns d-flex ${['top', 'bottom'].includes(config.legend.position) ? 'flex-row flex-wrap' : 'flex-column'
+                      }`}
                   >
                     {Object.entries(config.legend.patterns).map(([key, pattern]) => {
                       const patternId = `legend-pattern-${key}`

@@ -17,6 +17,17 @@ import { SankeyChartConfig } from '../../../types/ChartConfig'
 
 export type SankeyNode = {
   id: string
+  // Properties added by d3-sankey layout computation
+  x0?: number
+  x1?: number
+  y0?: number
+  y1?: number
+  value?: number
+  index?: number
+  depth?: number
+  height?: number
+  sourceLinks?: any[]
+  targetLinks?: any[]
 }
 
 interface SankeyProps {
@@ -179,10 +190,14 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
      *
      * @returns {number} The length of the link.
      */
-    const linkLength = () =>
-      Math.sqrt(
-        Math.pow(links[0].target.x0! - links[0].source.x1!, 2) + Math.pow(links[0].target.y0! - links[0].source.y1!, 2)
+    const linkLength = () => {
+      // After sankey layout, source and target are node objects (not numbers)
+      const target = links[0].target as SankeyNode
+      const source = links[0].source as SankeyNode
+      return Math.sqrt(
+        Math.pow(target.x0! - source.x1!, 2) + Math.pow(target.y0! - source.y1!, 2)
       ) - largestGroupWidth
+    }
 
     return (
       <Group className='' key={i}>
@@ -337,7 +352,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
         strokeOpacity={opacityValue}
         strokeWidth={link.width! + 2}
         style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Enable pointer events
-        onClick={() => handleNodeClick(link.target.id || null)}
+        onClick={() => handleNodeClick((link.target as SankeyNode).id || null)}
         data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
         data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
       />

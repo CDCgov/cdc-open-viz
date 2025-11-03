@@ -80,8 +80,8 @@ type CdcMapComponent = {
   link?: string
   logo?: string
   navigationHandler: Function
-  setSharedFilter: Function
-  setSharedFilterValue: Function
+  setSharedFilter?: Function
+  setSharedFilterValue?: Function
   setConfig?: Function
   loadConfig?: Function
   datasets?: Datasets

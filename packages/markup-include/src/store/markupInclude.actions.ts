@@ -1,4 +1,4 @@
-import type { MarkupIncludeConfig } from '@cdc/core/types/MarkupIncludeConfig'
+import type { MarkupIncludeConfig } from '../types/MarkupIncludeConfig'
 
 type Action<T, P> = { type: T; payload: P }
 

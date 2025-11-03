@@ -19,6 +19,7 @@ import boxplotCellMatrix from './helpers/boxplotCellMatrix'
 import removeNullColumns from './helpers/removeNullColumns'
 import { TableConfig } from './types/TableConfig'
 import { Column } from '../../types/Column'
+import { RuntimeData } from '../../types/RuntimeData'
 import { pivotData } from '../../helpers/pivotData'
 import { COVE_VISUALIZATION_TYPES } from '../../helpers/metrics/types'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
@@ -45,7 +46,7 @@ export interface DataTableProps {
   navigationHandler?: Function
   outerContainerRef?: Function
   rawData: Object[]
-  runtimeData: Object[] & Record<string, Object>
+  runtimeData: RuntimeData
   setFilteredCountryCode?: string // used for Maps only
   tabbingId: string
   tableTitle: string
@@ -83,11 +84,11 @@ const DataTable = (props: DataTableProps) => {
   const runtimeData = useMemo(() => {
     const data = removeNullColumns(parentRuntimeData)
     const { columnName, valueColumns } = config.table.pivot || {}
-    if (columnName && valueColumns) {
+    if (columnName && valueColumns && Array.isArray(data)) {
       const excludeColumns = Object.values(config.columns || {})
         .filter(column => column.dataTable === false)
         .map(col => col.name)
-      return pivotData(data, columnName, valueColumns, excludeColumns)
+      return pivotData(data as Record<string, any>[], columnName, valueColumns, excludeColumns)
     }
     return data
   }, [parentRuntimeData, config.table.pivot?.columnName, config.table.pivot?.valueColumns])
@@ -256,9 +257,11 @@ const DataTable = (props: DataTableProps) => {
             displayGeoName,
             filterColumns
           )
-          : runtimeData.map(d => {
-            return _.pick(d, [...filterColumns, ...dataSeriesColumns])
-          })
+          : Array.isArray(runtimeData)
+            ? runtimeData.map(d => {
+              return _.pick(d, [...filterColumns, ...dataSeriesColumns])
+            })
+            : []
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
 
       // only use fullGeoName on County maps and no other
@@ -309,7 +312,7 @@ const DataTable = (props: DataTableProps) => {
     const useBottomExpandCollapse = config.table.showBottomCollapse && expanded && Array.isArray(childrenMatrix)
 
     // If every value in a column is a number, record the column index so the header and cells can be right-aligned
-    const rightAlignedCols = childrenMatrix.length
+    const rightAlignedCols = Array.isArray(childrenMatrix) && childrenMatrix.length
       ? Object.fromEntries(
         Object.keys(childrenMatrix[0])
           .filter(

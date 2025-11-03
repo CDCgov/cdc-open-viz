@@ -80,3 +80,7 @@ export type ANALYTICS_EVENT_TYPES =
 
   // Image/export events
   | 'image_download' // generic image download event
+
+  // Load/ready events
+  | `${COVE_VISUALIZATION_TYPES}_ready` // visualization loaded and ready
+  | `${COVE_VISUALIZATION_TYPES}_loaded` // visualization loaded

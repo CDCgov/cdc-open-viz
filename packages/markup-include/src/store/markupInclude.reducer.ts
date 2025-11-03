@@ -1,4 +1,4 @@
-import { MarkupIncludeConfig } from '@cdc/core/types/MarkupIncludeConfig'
+import { MarkupIncludeConfig } from '../types/MarkupIncludeConfig'
 import MarkupIncludeActions from './markupInclude.actions'
 
 type MarkupIncludeState = {

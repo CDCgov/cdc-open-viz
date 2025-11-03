@@ -39,7 +39,8 @@ export const useTooltip = props => {
     return []
   }
   const { xScale, yScale, seriesScale, showTooltip, hideTooltip, interactionLabel = '' } = props
-  const { xAxis, visualizationType, orientation, yAxis, runtime } = config
+  const { xAxis, visualizationType, yAxis, runtime } = config
+  const orientation = 'orientation' in config ? config.orientation : undefined
 
   // Track the latest xScale in a ref to prevent stale closures
   const xScaleRef = useRef(xScale)
@@ -320,8 +321,8 @@ export const useTooltip = props => {
       const configDataArray = getConfigDataAsArray()
       const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
       const x0 = xScaleRef.current.invert(xScaleRef.current(x))
-      const index = bisectDate(config.data, x0, 1)
-      const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
+      const index = bisectDate(configDataArray, x0, 1)
+      const val = parseDate(configDataArray[index - 1][config.xAxis.dataKey])
       return val
     }
   }

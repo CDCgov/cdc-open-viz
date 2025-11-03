@@ -1,9 +1,18 @@
 import { TableConfig } from '../types/TableConfig'
+import { RuntimeData } from '../../../types/RuntimeData'
 import _ from 'lodash'
 import { Column } from '../../../types/Column'
 
-export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, runtimeData: Object[]): string[] => {
-  if (config.visualizationType === 'Sankey') return Object.keys(config?.data?.[0]?.tableData[0])
+export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, runtimeData: RuntimeData): string[] => {
+  // Type guard to check if data has tableData property (Sankey)
+  const hasTableData = (data: any): data is { tableData: Object[] }[] => {
+    return Array.isArray(data) && data[0] && 'tableData' in data[0]
+  }
+
+  if (config.visualizationType === 'Sankey' && hasTableData(config.data)) {
+    return Object.keys(config.data[0].tableData[0])
+  }
+
   const configColumns = _.cloneDeep(config.columns) || ({} as Record<string, Column>)
   const excludeColumns = Object.values(configColumns)
     .filter(column => column.dataTable === false)
@@ -15,14 +24,14 @@ export const getDataSeriesColumns = (config: TableConfig, isVertical: boolean, r
       config.runtime?.series.forEach(element => {
         tmpSeriesColumns.push(element.dataKey)
       })
-    } else if (runtimeData && runtimeData.length > 0) {
+    } else if (Array.isArray(runtimeData) && runtimeData.length > 0) {
       tmpSeriesColumns = Object.keys(runtimeData[0])
     }
   } else {
     tmpSeriesColumns = isVertical ? [config.xAxis?.dataKey, config.yAxis?.dataKey] : [config.yAxis?.dataKey]
   }
 
-  const dataColumns = Object.keys(runtimeData[0] || {})
+  const dataColumns = Array.isArray(runtimeData) && runtimeData[0] ? Object.keys(runtimeData[0]) : []
 
   // then add the additional Columns
   Object.values(configColumns).forEach(function (value) {

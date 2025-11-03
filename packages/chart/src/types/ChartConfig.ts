@@ -31,6 +31,30 @@ interface ChartGeneral extends BaseGeneral {
 
 type Link = { source: string; target: string; value: number; id: string }
 
+type StoryNode = {
+  StoryNode: string
+  segmentTextAfter: string
+  segmentTextBefore: string
+}
+
+/**
+ * Sankey-specific data format with links, tooltips, and table data
+ * Only used for Sankey chart visualizations
+ */
+export interface SankeyDataFormat {
+  [index: number]: {
+    tooltips?: Object[]
+    tooltipData?: Object[]
+    tableData?: Object[]
+    links?: {
+      source: string
+      target: string
+      value: number
+    }[]
+    storyNodeText?: StoryNode[]
+  }
+}
+
 export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 type ChartColumns = Record<string, Column>
 export type ChartOrientation = 'vertical' | 'horizontal'
@@ -247,7 +271,9 @@ interface PieChartConfig extends Omit<AllChartsConfig, 'orientation'> {
   // Pie charts don't have traditional orientation, so we omit it
 }
 
-export interface SankeyChartConfig extends AllChartsConfig {
+export interface SankeyChartConfig extends Omit<AllChartsConfig, 'data'> {
+  // Override data to allow Sankey-specific format
+  data?: SankeyDataFormat
   enableTooltips: boolean
   visualizationType: 'Sankey'
   sankey: {
