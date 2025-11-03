@@ -8,8 +8,10 @@ import { isDateScale } from '@cdc/core/helpers/cove/date'
 // Third-party library imports
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
-import _, { get } from 'lodash'
+import _, { capitalize } from 'lodash'
 import { getHorizontalBarHeights } from '../components/BarChart/helpers/getBarHeights'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 export const useTooltip = props => {
   // Track the last X-axis value to prevent duplicate analytics events
@@ -18,13 +20,24 @@ export const useTooltip = props => {
     tableData: data,
     config,
     formatNumber,
-    capitalize,
     formatDate,
     formatTooltipsDate,
     parseDate,
     setSharedFilter,
     isDraggingAnnotation
   } = useContext<ChartContext>(ConfigContext)
+
+  // Helper function to safely get data as array for various operations
+  const getConfigDataAsArray = () => {
+    if (!config.data) return []
+    // If it's an array, return as is
+    if (Array.isArray(config.data)) return config.data
+    // If it's SankeyDataFormat, try to extract tableData from first item
+    if (config.data[0] && typeof config.data[0] === 'object' && 'tableData' in config.data[0]) {
+      return config.data[0].tableData || []
+    }
+    return []
+  }
   const { xScale, yScale, seriesScale, showTooltip, hideTooltip, interactionLabel = '' } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
 
@@ -296,10 +309,11 @@ export const useTooltip = props => {
     }
 
     if (isDateScale(config.xAxis) && config.visualizationType !== 'Combo') {
+      const configDataArray = getConfigDataAsArray()
       const bisectDate = bisector(d => parseDate(d[config.xAxis.dataKey])).left
       const x0 = xScale.invert(xScale(x))
-      const index = bisectDate(config.data, x0, 1)
-      const val = parseDate(config.data[index - 1][config.xAxis.dataKey])
+      const index = bisectDate(configDataArray, x0, 1)
+      const val = parseDate(configDataArray[index - 1][config.xAxis.dataKey])
       return val
     }
   }
@@ -432,12 +446,13 @@ export const useTooltip = props => {
       const { x } = eventSvgCoords
       if (!x) throw new Error('COVE: no x value in handleTooltipClick.')
       let closestXScaleValue = getXValueFromCoordinate(x, true)
-      let datum = config.data?.filter(item => item[config.xAxis.dataKey] === closestXScaleValue)
+      const configDataArray = getConfigDataAsArray()
+      let datum = configDataArray?.filter(item => item[config.xAxis.dataKey] === closestXScaleValue)
       if (!closestXScaleValue) throw new Error('COVE: no closest x scale value in handleTooltipClick')
       if (isDateScale(xAxis) && closestXScaleValue) {
         closestXScaleValue = new Date(closestXScaleValue)
         closestXScaleValue = formatDate(closestXScaleValue)
-        datum = config.data?.filter(item => formatDate(new Date(item[config.xAxis.dataKey])) === closestXScaleValue)
+        datum = configDataArray?.filter(item => formatDate(new Date(item[config.xAxis.dataKey])) === closestXScaleValue)
       }
 
       if (!datum[0]) {

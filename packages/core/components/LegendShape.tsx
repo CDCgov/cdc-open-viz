@@ -12,7 +12,8 @@ interface LegendShapeProps {
   borderColor?: string
   display?: 'inline-block' | 'block' | 'inline'
   shape?: 'circle' | 'square'
-  patternInfo?: PatternInfo
+  patternInfo?: PatternInfo,
+  style?: React.CSSProperties
 }
 
 const LegendShape: React.FC<LegendShapeProps> = props => {

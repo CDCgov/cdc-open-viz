@@ -9,4 +9,5 @@ export type Series = {
     high: string
     low: string
   }[]
+  originalDataKey?: string
 }

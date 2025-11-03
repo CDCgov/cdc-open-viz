@@ -27,7 +27,7 @@ interface SankeyProps {
 
 const Sankey = ({ width, height, runtime }: SankeyProps) => {
   const { config: configFromContext } = useContext<ChartContext>(ConfigContext)
-  const { sankey: sankeyConfig } = configFromContext
+
   const [largestGroupWidth, setLargestGroupWidth] = useState(0)
   const [tooltipID, setTooltipID] = useState<string>('')
   const { showAlert, alert } = useSankeyAlert()
@@ -61,10 +61,13 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
     setLargestGroupWidth(largest)
   }, [groupRefs, sankeyConfig, window.innerWidth])
 
-  // Type guard and assertion to ensure we have SankeyChartConfig
+  // Type guard and assertion - we know this is going to eventually be a sankey config
   if (configFromContext.visualizationType !== 'Sankey') {
     return null // Early return if not a Sankey chart
   }
+  const sankeyConfig = (configFromContext as SankeyChartConfig).sankey
+
+  // Get the config as SankeyChartConfig for type safety
   const config = configFromContext as SankeyChartConfig
 
   if (config.visualizationType !== 'Sankey') return

@@ -22,10 +22,21 @@ type ChartState = {
 }
 
 export const getInitialState = (configObj: ChartConfig): ChartState => {
+  // Helper to get data as array for state initialization
+  const getDataAsArray = () => {
+    if (!configObj?.data) return []
+    if (Array.isArray(configObj.data)) return configObj.data
+    // Handle SankeyDataFormat
+    if (configObj.data[0] && typeof configObj.data[0] === 'object' && 'tableData' in configObj.data[0]) {
+      return configObj.data[0].tableData || []
+    }
+    return []
+  }
+
   return {
     isLoading: true,
     config: defaults,
-    stateData: configObj?.data || [],
+    stateData: getDataAsArray(),
     colorScale: null,
     excludedData: undefined,
     filteredData: undefined,

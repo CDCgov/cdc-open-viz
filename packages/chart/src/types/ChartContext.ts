@@ -12,7 +12,6 @@ export type TransformedData = {
 
 type SharedChartContext = {
   animatedChart?: boolean
-  capitalize: (value: string) => string
   clean: Function
   colorScale?: ColorScale
   config: ChartConfig

@@ -48,6 +48,7 @@ import { handleLineType } from './helpers/handleLineType'
 import { handleRankByValue } from './helpers/handleRankByValue'
 import { generateColorsArray } from '@cdc/core/helpers/generateColorsArray'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
+import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
@@ -155,6 +156,18 @@ const CdcChart: React.FC<CdcChartProps> = ({
   // Destructure items from config for more readable JSX
   let { legend, title } = config
 
+  // Helper function to safely get data as array for markup processing
+  const getDataAsArray = () => {
+    if (!config.data) return []
+    // If it's an array, return as is
+    if (Array.isArray(config.data)) return config.data
+    // If it's SankeyDataFormat, try to extract tableData from first item
+    if (config.data[0] && typeof config.data[0] === 'object' && 'tableData' in config.data[0]) {
+      return config.data[0].tableData || []
+    }
+    return []
+  }
+
   // Process markup variables for text fields (memoized to prevent re-processing on every render)
   // Note: XSS Safety - The processed content is parsed using html-react-parser which sanitizes
   // HTML input by default. The markup processor returns plain text with user data substituted.
@@ -169,33 +182,35 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
     }
 
+    const dataArray = getDataAsArray()
+
     return {
       title: title
-        ? processMarkupVariables(title, config.data || [], config.markupVariables, {
+        ? processMarkupVariables(title, dataArray, config.markupVariables, {
             isEditor,
             filters: config.filters || []
           }).processedContent
         : title,
       superTitle: config.superTitle
-        ? processMarkupVariables(config.superTitle, config.data || [], config.markupVariables, {
+        ? processMarkupVariables(config.superTitle, dataArray, config.markupVariables, {
             isEditor,
             filters: config.filters || []
           }).processedContent
         : config.superTitle,
       introText: config.introText
-        ? processMarkupVariables(config.introText, config.data || [], config.markupVariables, {
+        ? processMarkupVariables(config.introText, dataArray, config.markupVariables, {
             isEditor,
             filters: config.filters || []
           }).processedContent
         : config.introText,
       legacyFootnotes: config.legacyFootnotes
-        ? processMarkupVariables(config.legacyFootnotes, config.data || [], config.markupVariables, {
+        ? processMarkupVariables(config.legacyFootnotes, dataArray, config.markupVariables, {
             isEditor,
             filters: config.filters || []
           }).processedContent
         : config.legacyFootnotes,
       description: config.description
-        ? processMarkupVariables(config.description, config.data || [], config.markupVariables, {
+        ? processMarkupVariables(config.description, dataArray, config.markupVariables, {
             isEditor,
             filters: config.filters || []
           }).processedContent
@@ -318,7 +333,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       dispatch({ type: 'SET_FILTERED_DATA', payload: currentData })
     }
 
-    if (newConfig.xAxis.type === 'date-time' && config.orientation === 'horizontal') {
+    if (newConfig.xAxis.type === 'date-time' && 'orientation' in config && config.orientation === 'horizontal') {
       newConfig.xAxis.type = 'date'
     }
 
@@ -583,7 +598,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     load()
-  }, [configObj?.data?.length ? configObj.data : null])
+  }, [Array.isArray(configObj?.data) ? configObj.data.length : configObj?.data ? 1 : 0])
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.
@@ -695,7 +710,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [] })
   }
 
-  const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
+  const section = 'orientation' in config && config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
 
   const parseDate = (dateString, showError = true) => {
     let date = timeParse(config.runtime[section].dateParseFormat)(dateString)
@@ -722,7 +737,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       const year = formattedDate.match(/\d{4}/)
       const prevYear = prevFormattedDate.match(/\d{4}/)
       if (year && prevYear && year[0] === prevYear[0]) {
-        formattedDate = formattedDate.replace(year, '')
+        formattedDate = formattedDate.replace(year[0], '')
       }
     }
     return formattedDate
@@ -807,7 +822,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     const resolveBottomTickRounding = () => {
-      if (config.forestPlot.type === 'Logarithmic' && !bottomRoundTo) return 2
+      if ('forestPlot' in config && config.forestPlot.type === 'Logarithmic' && !bottomRoundTo) return 2
       if (Number(bottomRoundTo)) return Number(bottomRoundTo)
       return 0
     }
@@ -986,7 +1001,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
     if (legend?.hide) classes.push('legend-hidden')
     if (lineDatapointClass) classes.push(lineDatapointClass)
-    if (!config.barHasBorder) classes.push('chart-bar--no-border')
+    if ('barHasBorder' in config && !config.barHasBorder) classes.push('chart-bar--no-border')
     if (config.xAxis.brushActive && dashboardConfig?.type === 'dashboard' && (!isLegendOnBottom || legend.hide))
       classes.push('dashboard-brush')
     classes.push(...contentClasses)
@@ -1123,6 +1138,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                             {parent => {
                               const labelMargin = 120
                               const widthReduction =
+                                'showLineSeriesLabels' in config &&
                                 config.showLineSeriesLabels &&
                                 (config.legend.position !== 'right' || config.legend.hide)
                                   ? labelMargin
@@ -1222,7 +1238,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   (config.visualizationType === 'Sankey' && config.table.show)) && (
                   <DataTable
                     /* changing the "key" will force the table to re-render
-                                    when the default sort changes while editing */
+                                      when the default sort changes while editing */
                     key={dataTableDefaultSortBy}
                     config={pivotDynamicSeries(config)}
                     rawData={
@@ -1270,16 +1286,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
       : d[config.runtime.originalXAxis.dataKey]
   const getYAxisData = (d, seriesKey) => d[seriesKey]
 
-  const capitalize = str => {
-    return str.charAt(0).toUpperCase() + str.slice(1)
-  }
-
   // Get version-specific color palettes based on current config
   const colorPalettes = filterChartColorPalettes(config)
 
   const contextValues = {
     ...state,
-    capitalize,
     convertLineToBarGraph,
     clean,
     colorPalettes,
@@ -1288,6 +1299,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     formatDate,
     formatNumber,
     formatTooltipsDate,
+    getTextWidth,
     getXAxisData,
     getYAxisData,
     handleChartAriaLabels,

@@ -82,8 +82,9 @@ type Exclusions = {
 export interface AllChartsConfig extends BaseVisualizationConfig, EditorPanel_MarkupVariables {
   // Override base properties to be more specific or required
   type: 'chart' | 'dashboard'
-  data: Object[]
   filters: VizFilter[]
+  barHeight: number
+  barSpace: number
 
   // Override visual to use chart-specific visual configuration
   visual: ChartVisual
@@ -93,12 +94,8 @@ export interface AllChartsConfig extends BaseVisualizationConfig, EditorPanel_Ma
   annotations: Annotation[]
   animate: boolean
   general: ChartGeneral
-  barHasBorder: 'true' | 'false'
-  barHeight: number
-  barSpace: number
-  barStyle: 'lollipop' | 'rounded' | 'flat'
-  barThickness: number
-  boxplot: BoxPlot
+
+  // Common properties for all charts
   chartMessage: { noData?: string }
   color: string
   colorMatchLineSeriesLabels: boolean
@@ -115,7 +112,6 @@ export interface AllChartsConfig extends BaseVisualizationConfig, EditorPanel_Ma
   filterBehavior: FilterBehavior
   legacyFootnotes: string // this footnote functionality should be moved to the Footnotes component
   footnotes: Footnotes
-  forestPlot: ForestPlotConfigSettings
   formattedData: Object[] & { urlFiltered: boolean }
   heights: {
     vertical: number
@@ -124,20 +120,13 @@ export interface AllChartsConfig extends BaseVisualizationConfig, EditorPanel_Ma
   }
   highlightedBarValues: { value: any; color: string; borderWidth: number; legendLabel: string }[]
   introText: string
-  isLollipopChart: boolean
   isLegendValue: boolean
   isResponsiveTicks: boolean
   isPaletteReversed: boolean
   labels: boolean
   legend: ChartLegend
-  lineDatapointColor: 'Same as Line' | 'Lighter than Line'
-  lineDatapointStyle: 'hidden' | 'always show' | 'hover'
-  lollipopColorStyle: 'regular' | 'two-tone'
-  lollipopShape: string
-  lollipopSize: 'small' | 'medium' | 'large'
-  orientation: ChartOrientation
+  orientation?: ChartOrientation
   palette: string
-  pieType?: string
   preliminaryData: PreliminaryDataItem[]
   primary?: ChartDataFormat
   rankByValue: 'asc' | 'desc'
@@ -145,10 +134,8 @@ export interface AllChartsConfig extends BaseVisualizationConfig, EditorPanel_Ma
   runtime: Runtime
   runtimeDataUrl: string
   series: Series[]
-  showLineSeriesLabels: boolean
   showSidebar: boolean
   sortData: 'ascending' | 'descending'
-  stackedAreaChartLineType: string
   suppressedData?: { label: string; icon: string; value: string }[]
   superTitle: string
   theme: string
@@ -168,6 +155,85 @@ export interface AllChartsConfig extends BaseVisualizationConfig, EditorPanel_Ma
   xScale: Function
   yScale: Function
   regions: Region[]
+}
+
+interface AreaChartConfig extends AllChartsConfig {
+  visualizationType: 'Area Chart'
+  stackedAreaChartLineType: string
+  visualizationSubType: 'stacked'
+}
+
+interface BarChartConfig extends AllChartsConfig {
+  visualizationType: 'Bar'
+  barHasBorder: 'true' | 'false'
+  barHeight: number
+  barSpace: number
+  barStyle: 'lollipop' | 'rounded' | 'flat'
+  barThickness: number
+  isLollipopChart: boolean
+  lollipopColorStyle: 'regular' | 'two-tone'
+  lollipopShape: string
+  lollipopSize: 'small' | 'medium' | 'large'
+  // Bar charts can be both vertical and horizontal
+  orientation: ChartOrientation
+}
+
+interface BoxPlotConfig extends AllChartsConfig {
+  visualizationType: 'Box Plot'
+  boxplot: BoxPlot
+}
+
+interface BumpChartConfig extends AllChartsConfig {
+  visualizationType: 'Bump Chart'
+}
+
+interface ComboChartConfig extends AllChartsConfig {
+  visualizationType: 'Combo'
+}
+
+interface DeviationBarConfig extends AllChartsConfig {
+  visualizationType: 'Deviation Bar'
+  orientation: 'horizontal'
+}
+
+interface ForecastingConfig extends AllChartsConfig {
+  visualizationType: 'Forecasting'
+  // Forecasting charts are typically vertical like line charts
+  orientation: 'vertical'
+}
+
+interface ForestPlotConfig extends AllChartsConfig {
+  visualizationType: 'Forest Plot'
+  forestPlot: ForestPlotConfigSettings
+  orientation: 'horizontal'
+}
+
+export interface LineChartConfig extends AllChartsConfig {
+  allowLineToBarGraph: boolean
+  convertLineToBarGraph: boolean
+  isolatedDotsSameSize: boolean
+  lineDatapointColor: 'Same as Line' | 'Lighter than Line'
+  lineDatapointStyle: 'hidden' | 'always show' | 'hover'
+  showLineSeriesLabels: boolean
+  visualizationType: 'Line'
+  // Line charts are typically vertical
+  orientation: 'vertical'
+}
+
+interface PairedBarConfig extends AllChartsConfig {
+  visualizationType: 'Paired Bar'
+  orientation: 'horizontal'
+}
+
+interface PieChartConfig extends Omit<AllChartsConfig, 'orientation'> {
+  visualizationType: 'Pie'
+  pieType?: string
+  // Pie charts don't have traditional orientation, so we omit it
+}
+
+export interface SankeyChartConfig extends AllChartsConfig {
+  enableTooltips: boolean
+  visualizationType: 'Sankey'
   sankey: {
     data: { links: Link[]; storyNodeText: Object[]; tooltips: Object[] }[]
     nodePadding: number
@@ -202,22 +268,31 @@ export interface AllChartsConfig extends BaseVisualizationConfig, EditorPanel_Ma
   }
 }
 
-interface ForestPlotConfig extends AllChartsConfig, EditorPanel_MarkupVariables {
-  visualizationType: 'Forest Plot'
-  forestPlot: ForestPlotConfigSettings
+interface ScatterPlotConfig extends AllChartsConfig {
+  visualizationType: 'Scatter Plot'
+  // Scatter plots are typically vertical
+  orientation: 'vertical'
 }
 
-export interface LineChartConfig extends AllChartsConfig, EditorPanel_MarkupVariables {
-  allowLineToBarGraph: boolean
-  convertLineToBarGraph: boolean
-  isolatedDotsSameSize: boolean
-  lineDatapointStyle: 'hidden' | 'always show' | 'hover'
-  visualizationType: 'Line'
+interface SparkLineConfig extends AllChartsConfig {
+  visualizationType: 'Spark Line'
+  // Spark lines are typically horizontal but in a vertical layout
+  orientation: 'vertical'
 }
 
-export interface SankeyChartConfig extends AllChartsConfig, EditorPanel_MarkupVariables {
-  enableTooltips: boolean
-  visualizationType: 'Sankey'
-}
-
-export type ChartConfig = SankeyChartConfig | LineChartConfig | ForestPlotConfig | AllChartsConfig
+export type ChartConfig =
+  | AreaChartConfig
+  | BarChartConfig
+  | BoxPlotConfig
+  | BumpChartConfig
+  | ComboChartConfig
+  | DeviationBarConfig
+  | ForecastingConfig
+  | ForestPlotConfig
+  | LineChartConfig
+  | PairedBarConfig
+  | PieChartConfig
+  | SankeyChartConfig
+  | ScatterPlotConfig
+  | SparkLineConfig
+  | AllChartsConfig
