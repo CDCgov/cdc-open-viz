@@ -12,7 +12,7 @@ type TerritoriesSectionProps = {
 }
 
 const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, logo, config, territoriesData }) => {
-  const { currentViewport } = useContext<MapContext>(ConfigContext)
+  const { currentViewport, vizViewport } = useContext<MapContext>(ConfigContext)
 
   // filter territioriesData into the two groups below
   const freelyAssociatedKeys = territoriesData.filter(territory => {
@@ -38,7 +38,7 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
       return a.props.label.localeCompare(b.props.label)
     })
 
-  const isMobileViewport = isMobileTerritoryViewport(currentViewport)
+  const isMobileViewport = isMobileTerritoryViewport(vizViewport)
   const SVG_GAP = 9
   const SVG_WIDTH = isMobileViewport ? 30 : 45
 
@@ -55,10 +55,18 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
           <div className='d-flex flex-wrap' style={{ columnGap: '1.5rem' }}>
             {(usTerritories.length > 0 || config.general.territoriesAlwaysShow) && (
               <div>
-                <span className='territories-label'>U.S. territories</span>
+                <span className='territories-label' style={{ fontSize: isMobileViewport ? '0.8rem' : '1rem' }}>
+                  U.S. territories
+                </span>
                 <span
-                  className={`mt-2 ${isMobileViewport ? 'mb-3' : 'mb-4'} d-flex territories`}
-                  style={{ minWidth: `${usTerritories.length * SVG_WIDTH + (usTerritories.length - 1) * SVG_GAP}px` }}
+                  className={`${isMobileViewport ? 'mt-1 mb-3' : 'mt-2 mb-4'} d-flex territories`}
+                  style={
+                    {
+                      minWidth: `${usTerritories.length * SVG_WIDTH + (usTerritories.length - 1) * SVG_GAP}px`,
+                      '--territory-svg-max-width': `${SVG_WIDTH}px`,
+                      '--territory-svg-min-width': `${SVG_WIDTH}px`
+                    } as React.CSSProperties
+                  }
                 >
                   {usTerritories}
                 </span>
@@ -66,14 +74,20 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
             )}
             {(freelyAssociatedStates.length > 0 || config.general.territoriesAlwaysShow) && (
               <div>
-                <span className='territories-label'>Freely associated states</span>
+                <span className='territories-label' style={{ fontSize: isMobileViewport ? '0.8rem' : '1rem' }}>
+                  Freely associated states
+                </span>
                 <span
-                  className={`mt-2 ${isMobileViewport ? 'mb-3' : 'mb-4'} d-flex territories`}
-                  style={{
-                    minWidth: `${
-                      freelyAssociatedStates.length * SVG_WIDTH + (freelyAssociatedStates.length - 1) * SVG_GAP
-                    }px`
-                  }}
+                  className={`${isMobileViewport ? 'mt-1 mb-3' : 'mt-2 mb-4'} d-flex territories`}
+                  style={
+                    {
+                      minWidth: `${
+                        freelyAssociatedStates.length * SVG_WIDTH + (freelyAssociatedStates.length - 1) * SVG_GAP
+                      }px`,
+                      '--territory-svg-max-width': `${SVG_WIDTH}px`,
+                      '--territory-svg-min-width': `${SVG_WIDTH}px`
+                    } as React.CSSProperties
+                  }
                 >
                   {freelyAssociatedStates}
                 </span>

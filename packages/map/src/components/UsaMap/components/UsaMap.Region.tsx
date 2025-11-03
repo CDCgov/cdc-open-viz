@@ -12,6 +12,7 @@ import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import ConfigContext from '../../../context'
 import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import Annotation from '../../Annotation'
+import SmallMultiples from '../../SmallMultiples/SmallMultiples'
 
 // Data
 import { supportedTerritories } from '../../../data/supported-geos'
@@ -23,6 +24,7 @@ import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import './UsaMap.Region.styles.css'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
+import { useSynchronizedGeographies } from '../../../hooks/useSynchronizedGeographies'
 
 type TerritoryRectProps = {
   posX?: number
@@ -59,6 +61,7 @@ const UsaRegionMap = () => {
   const [focusedStates, setFocusedStates] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
+  const { getSyncProps, syncHandlers } = useSynchronizedGeographies()
   const { general } = config
   const { displayStateLabels, territoriesLabel, displayAsHex, type } = general
   const tooltipInteractionType = config.tooltips.appearanceType
@@ -86,6 +89,11 @@ const UsaRegionMap = () => {
 
   if (!focusedStates) {
     return <></>
+  }
+
+  // Early return for small multiples rendering
+  if (config.smallMultiples?.mode) {
+    return <SmallMultiples />
   }
 
   const geoStrokeColor = getGeoStrokeColor(config)
@@ -212,6 +220,7 @@ const UsaRegionMap = () => {
 
         return (
           <g
+            {...getSyncProps(geoKey)}
             key={key}
             className='geo-group'
             style={styles}
@@ -219,7 +228,7 @@ const UsaRegionMap = () => {
             data-tooltip-id={`tooltip__${tooltipId}`}
             data-tooltip-html={toolTip}
             tabIndex={-1}
-            onMouseEnter={() => {
+            onMouseEnter={e => {
               // Track hover analytics event if this is a new location
               const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
               publishAnalyticsEvent({
@@ -232,6 +241,10 @@ const UsaRegionMap = () => {
                 location: geoDisplayName,
                 specifics: `location: ${locationName?.toLowerCase()}`
               })
+              syncHandlers.onMouseEnter(geoKey, e.clientY)
+            }}
+            onMouseLeave={() => {
+              syncHandlers.onMouseLeave()
             }}
           >
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1} d={path} />

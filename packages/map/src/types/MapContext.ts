@@ -2,9 +2,12 @@ import { DataRow, type MapConfig } from './MapConfig'
 import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { VizFilter } from '@cdc/core/types/VizFilter'
+import { MapRefInterface } from '../hooks/useProgrammaticMapTooltip'
+import { MutableRefObject } from 'react'
 
 export type MapContext = {
   currentViewport: ViewPort
+  vizViewport?: ViewPort
   content: { geoName: string; keyedData: Record<string, any> }
   dimensions: DimensionsType
   displayDataAsText: string | number
@@ -23,6 +26,7 @@ export type MapContext = {
   isDashboard: boolean
   isEditor: boolean
   isFilterValueSupported: boolean
+  useDynamicViewbox?: boolean
   loadConfig: (configObj: MapConfig) => void
   logo: string
   mapId: string
@@ -43,4 +47,6 @@ export type MapContext = {
   runtimeData: Object[]
   tooltipId: string
   interactionLabel?: string
+  handleSmallMultipleHover?: (geoId: string | null, yCoordinate?: number) => void
+  mapRefForSync?: MutableRefObject<MapRefInterface | null>
 }

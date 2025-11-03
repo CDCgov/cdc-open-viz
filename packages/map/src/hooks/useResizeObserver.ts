@@ -8,6 +8,7 @@ import ResizeObserver from 'resize-observer-polyfill'
 export const useResizeObserver = (isEditor: boolean) => {
   const [dimensions, setDimensions] = useState<DimensionsType>([0, 0])
   const [currentViewport, setCurrentViewport] = useState<ViewPort>(null)
+  const [vizViewport, setVizViewport] = useState<ViewPort>(null)
   const [container, setContainer] = useState<HTMLElement | null>(null)
 
   const resizeObserver = new ResizeObserver(entries => {
@@ -19,6 +20,7 @@ export const useResizeObserver = (isEditor: boolean) => {
       const newViewport = getViewport(width)
 
       setCurrentViewport(newViewport)
+      setVizViewport(newViewport)
 
       setDimensions([width, height])
     }
@@ -35,7 +37,7 @@ export const useResizeObserver = (isEditor: boolean) => {
     }
   }, [])
 
-  return { resizeObserver, dimensions, currentViewport, outerContainerRef, container }
+  return { resizeObserver, dimensions, currentViewport, vizViewport, outerContainerRef, container }
 }
 
 export default useResizeObserver
