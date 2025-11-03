@@ -5,7 +5,7 @@ import { Markup } from 'interweave'
 import axios from 'axios'
 
 // cdc
-import { type MarkupIncludeConfig } from '@cdc/core/types/MarkupIncludeConfig'
+import { type MarkupIncludeConfig } from './types/MarkupIncludeConfig'
 import { publish } from '@cdc/core/helpers/events'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'

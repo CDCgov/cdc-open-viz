@@ -1,8 +1,8 @@
-import { BaseVisualizationConfig } from './BaseVisualizationConfig'
-import { EditorPanel_Visual } from './EditorPanel_Visual'
+import { BaseVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig'
+import { EditorPanel_Visual } from '@cdc/core/types/EditorPanel_Visual'
 import { Runtime } from '@cdc/core/types/Runtime'
 import { Variable } from '@cdc/markup-include/src/types/Variable'
-import { EditorPanel_MarkupVariables } from './EditorPanel_MarkupVariables'
+import { EditorPanel_MarkupVariables } from '@cdc/core/types/EditorPanel_MarkupVariables'
 
 /**
  * Configuration interface for Markup Include visualizations.
