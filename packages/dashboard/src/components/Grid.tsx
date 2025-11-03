@@ -6,9 +6,9 @@ import { ConfigRow } from '../types/ConfigRow'
 
 const Grid = () => {
   const { config } = useContext(DashboardContext)
+  const dispatch = useContext(DashboardDispatchContext)
   if (!config) return null
   const rows = config.rows
-  const dispatch = useContext(DashboardDispatchContext)
   const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
   const addRow = () => {
     const blankRow: Partial<ConfigRow> = { columns: [{ width: 12 }] }

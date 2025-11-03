@@ -1,6 +1,7 @@
 import { parseDate, formatDate } from '@cdc/core/helpers/cove/date'
 import { formatNumber } from '../../../helpers/cove/number'
 import { TableConfig } from '../types/TableConfig'
+import { RuntimeData } from '../../../types/RuntimeData'
 import _ from 'lodash'
 
 const isPivotColumn = (columnName, config) => {
@@ -31,7 +32,7 @@ const isAdditionalColumn = (column: string, config, rowData) => {
   return formattingParams
 }
 
-export const getChartCellValue = (row: string, column: string, config: TableConfig, runtimeData: Object[], rightAxisItemsMap) => {
+export const getChartCellValue = (row: string, column: string, config: TableConfig, runtimeData: RuntimeData, rightAxisItemsMap) => {
 
   // Variables for xAxis config
   const { type, dateDisplayFormat, dateParseFormat, dataKey: xAxisDataKey } = config.xAxis || {}
@@ -66,7 +67,8 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
 
     let piePercent = 0
     if (config.visualizationType === 'Pie' && !config.dataFormat.showPiePercent) {
-      piePercent = (_.toNumber(runtimeData[row][column]) / _.sumBy(runtimeData, d => _.toNumber(d[column]))) * 100 || 0
+      const dataArray = Array.isArray(runtimeData) ? runtimeData : Object.values(runtimeData)
+      piePercent = (_.toNumber(runtimeData[row][column]) / _.sumBy(dataArray, d => _.toNumber(d[column]))) * 100 || 0
     }
 
     const valueToFormat = config.visualizationType === 'Pie' && !config.dataFormat.showPiePercent

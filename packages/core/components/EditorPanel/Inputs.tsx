@@ -121,7 +121,8 @@ const CheckBox = memo((props: CheckboxProps) => {
     <label
       className='checkbox column-heading'
       onClick={e => {
-        if (!['SPAN', 'INPUT'].includes(e.target.nodeName)) {
+        const target = e.target as HTMLElement
+        if (target.nodeName && !['SPAN', 'INPUT'].includes(target.nodeName)) {
           e.preventDefault()
         }
       }}

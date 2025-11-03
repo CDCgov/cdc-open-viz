@@ -11,6 +11,7 @@ import { EditorPanel_MarkupVariables } from '@cdc/core/types/EditorPanel_MarkupV
 export interface MarkupIncludeConfig extends BaseVisualizationConfig, EditorPanel_MarkupVariables {
   // Override base properties to be more specific
   type: 'markup-include'
+  newViz?: boolean
 
   // Markup Include uses base visual properties
   visual: EditorPanel_Visual

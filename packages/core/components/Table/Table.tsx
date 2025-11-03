@@ -7,7 +7,7 @@ import { PreliminaryDataItem } from '@cdc/chart/src/types/ChartConfig'
 import './table.styles.css'
 
 type TableProps = {
-  childrenMatrix: CellMatrix | Map<string, CellMatrix>
+  childrenMatrix
   noData?: boolean
   tableName: string
   caption: string
@@ -24,7 +24,7 @@ type TableProps = {
   hasRowType?: boolean // if it has row type then the first column is the row type which will explain how to render the row
   viewport: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   preliminaryData?: PreliminaryDataItem[]
-  rightAlignedCols: object
+  rightAlignedCols
 }
 
 type Position = 'sticky'
@@ -60,80 +60,80 @@ const Table = ({
           <thead style={headStyle}>{headContent}</thead>
           <tbody>
             {isGroupedMatrix
-              ? Array.from(childrenMatrix.keys()).flatMap(groupName => {
-                  let colSpan = 0
-                  const rows = childrenMatrix.get(groupName).map((row, i) => {
-                    colSpan = row.length
-                    const key = `${tableName}-${groupName}-row-${i}`
-                    return (
-                      <Row
-                        preliminaryData={preliminaryData}
-                        key={key}
-                        rowKey={key}
-                        childRow={row}
-                        wrapColumns={wrapColumns}
-                        cellMinWidth={tableOptions.cellMinWidth}
-                        viewport={viewport}
-                        rightAlignedCols={rightAlignedCols}
-                      />
-                    )
-                  })
-                  return [<GroupRow label={groupName} colSpan={colSpan} key={`${tableName}-${groupName}`} />, ...rows]
+              ? Array.from(childrenMatrix.keys()).flatMap((groupName: string) => {
+                let colSpan = 0
+                const rows = childrenMatrix.get(groupName).map((row, i) => {
+                  colSpan = row.length
+                  const key = `${tableName}-${groupName}-row-${i}`
+                  return (
+                    <Row
+                      preliminaryData={preliminaryData}
+                      key={key}
+                      rowKey={key}
+                      childRow={row}
+                      wrapColumns={wrapColumns}
+                      cellMinWidth={tableOptions.cellMinWidth}
+                      viewport={viewport}
+                      rightAlignedCols={rightAlignedCols}
+                    />
+                  )
                 })
+                return [<GroupRow label={groupName} colSpan={colSpan} key={`${tableName}-${groupName}`} />, ...rows]
+              })
               : childrenMatrix.map((childRow, i) => {
-                  let childRowCopy = [...childRow]
-                  let rowType = undefined
-                  if (hasRowType) rowType = childRowCopy.shift()
-                  const key = `${tableName}-row-${i}`
-                  if (rowType === undefined) {
-                    return (
-                      <Row
-                        preliminaryData={preliminaryData}
-                        key={key}
-                        rowKey={key}
-                        childRow={childRow}
-                        wrapColumns={wrapColumns}
-                        cellMinWidth={tableOptions.cellMinWidth}
-                        viewport={viewport}
-                        rightAlignedCols={rightAlignedCols}
-                      />
-                    )
-                  } else {
-                    switch (rowType) {
-                      case RowType.row_group:
-                        return <GroupRow label={childRowCopy[0]} colSpan={childRowCopy.length} key={key} />
-                      case RowType.total:
-                        return (
-                          <Row
-                            preliminaryData={preliminaryData}
-                            key={key}
-                            rowKey={key}
-                            childRow={childRowCopy}
-                            isTotal={true}
-                            wrapColumns={wrapColumns}
-                            cellMinWidth={tableOptions.cellMinWidth}
-                            viewport={viewport}
-                            rightAlignedCols={rightAlignedCols}
-                          />
-                        )
-                      case RowType.row_group_total:
-                        return <GroupRow label={childRowCopy[0]} colSpan={1} key={key} data={childRowCopy.slice(1)} />
-                      default:
-                        return (
-                          <Row
-                            preliminaryData={preliminaryData}
-                            key={key}
-                            rowKey={key}
-                            childRow={childRowCopy}
-                            wrapColumns={wrapColumns}
-                            cellMinWidth={tableOptions.cellMinWidth}
-                            viewport={viewport}
-                            rightAlignedCols={rightAlignedCols}
-                          />
-                        )
-                    }
+                let childRowCopy = [...childRow]
+                let rowType = undefined
+                if (hasRowType) rowType = childRowCopy.shift()
+                const key = `${tableName}-row-${i}`
+                if (rowType === undefined) {
+                  return (
+                    <Row
+                      preliminaryData={preliminaryData}
+                      key={key}
+                      rowKey={key}
+                      childRow={childRow}
+                      wrapColumns={wrapColumns}
+                      cellMinWidth={tableOptions.cellMinWidth}
+                      viewport={viewport}
+                      rightAlignedCols={rightAlignedCols}
+                    />
+                  )
+                } else {
+                  switch (rowType) {
+                    case RowType.row_group:
+                      return <GroupRow label={childRowCopy[0]} colSpan={childRowCopy.length} key={key} />
+                    case RowType.total:
+                      return (
+                        <Row
+                          preliminaryData={preliminaryData}
+                          key={key}
+                          rowKey={key}
+                          childRow={childRowCopy}
+                          isTotal={true}
+                          wrapColumns={wrapColumns}
+                          cellMinWidth={tableOptions.cellMinWidth}
+                          viewport={viewport}
+                          rightAlignedCols={rightAlignedCols}
+                        />
+                      )
+                    case RowType.row_group_total:
+                      return <GroupRow label={childRowCopy[0]} colSpan={1} key={key} data={childRowCopy.slice(1)} />
+                    default:
+                      return (
+                        <Row
+                          preliminaryData={preliminaryData}
+                          key={key}
+                          rowKey={key}
+                          childRow={childRowCopy}
+                          wrapColumns={wrapColumns}
+                          cellMinWidth={tableOptions.cellMinWidth}
+                          viewport={viewport}
+                          rightAlignedCols={rightAlignedCols}
+                        />
+                      )
                   }
-                })}
+                }
+              })}
           </tbody>
         </>
       )}

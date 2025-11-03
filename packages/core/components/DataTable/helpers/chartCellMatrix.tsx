@@ -35,9 +35,9 @@ const chartCellArray = ({
     if (!sortBy && sortBy.colIndex === null) return dataSeriesColumns
     return dataSeriesColumns.sort((a, b) => {
       if (sortBy.column === '__series__') return customSort(a, b, sortBy, config)
-      let row = runtimeData.find(d => d[config.xAxis?.dataKey] === sortBy.column)
+      let row = Array.isArray(runtimeData) ? runtimeData.find(d => d[config.xAxis?.dataKey] === sortBy.column) : null
 
-      const rowIndex = runtimeData[sortBy.colIndex - 1]
+      const rowIndex = Array.isArray(runtimeData) ? runtimeData[sortBy.colIndex - 1] : null
       if (row) {
         return customSort(row[a], row[b], sortBy, config)
       }
@@ -89,11 +89,11 @@ const chartCellArray = ({
       let nodes: ReactNode[] =
         config.visualizationType !== 'Pie'
           ? [
-              <>
-                {colorScale && colorScale(seriesName) && <LegendShape fill={colorScale(seriesName)} />}
-                {parse(String(seriesName))}
-              </>
-            ]
+            <>
+              {colorScale && colorScale(seriesName) && <LegendShape fill={colorScale(seriesName)} />}
+              {parse(String(seriesName))}
+            </>
+          ]
           : []
       return nodes.concat(rows.map((row, i) => getChartCellValue(row, column, config, runtimeData, rightAxisItemsMap)))
     })

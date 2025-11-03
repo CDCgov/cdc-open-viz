@@ -10,7 +10,7 @@ interface MapHeaderProps extends DataTableProps {
   sortBy: { column; asc }
   setSortBy: Function
   interactionLabel: string
-  rightAlignedCols: boolean[]
+  rightAlignedCols
 }
 
 const ColumnHeadingText = ({ text, config }) => {

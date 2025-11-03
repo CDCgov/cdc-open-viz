@@ -8,10 +8,24 @@ const meta: Meta<typeof NestedDropdown> = {
   component: NestedDropdown
 }
 
-const Template = args => {
+interface TemplateProps {
+  listLabel: string
+}
+
+const Template = (args: TemplateProps) => {
   const [currentStoryFilter, setCurrentStoryFilter] = useState({
     ...nestedDropdownStory
   })
+
+  // Convert mock data structure to NestedOptions format
+  const options = (nestedDropdownStory.values || []).map(groupValue => {
+    const subValues = nestedDropdownStory.subGrouping?.valuesLookup?.[groupValue]?.values || []
+    return [
+      [groupValue, groupValue], // [value, text] for group
+      subValues.map(subValue => [subValue, subValue]) // [[value, text], ...] for subgroups
+    ]
+  })
+
   return (
     <NestedDropdown
       listLabel='Age'
@@ -22,7 +36,10 @@ const Template = args => {
           subGrouping: { ...currentStoryFilter.subGrouping, active: subGroup }
         })
       }}
-      currentFilter={currentStoryFilter}
+      activeGroup={currentStoryFilter.active}
+      activeSubGroup={currentStoryFilter.subGrouping?.active}
+      options={options}
+      filterIndex={0}
     />
   )
 }

@@ -108,6 +108,7 @@ const Options: React.FC<{
 interface NestedDropdownProps {
   activeGroup: string
   activeSubGroup?: string
+  currentFilter?: any
   filterIndex: number
   listLabel: string
   handleSelectedItems: ([group, subgroup]: [string, string]) => void

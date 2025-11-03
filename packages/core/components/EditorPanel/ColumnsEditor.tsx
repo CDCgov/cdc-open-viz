@@ -75,9 +75,12 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
     let dataArray: any[] = []
     if (Array.isArray(config.data)) {
       dataArray = config.data
-    } else if (config.data && typeof config.data === 'object' && config.data[0]?.tableData) {
+    } else if (config.data && typeof config.data === 'object') {
       // Handle Sankey data format - extract tableData if available
-      dataArray = config.data[0].tableData || []
+      const dataObj = config.data as any
+      if (dataObj[0]?.tableData) {
+        dataArray = dataObj[0].tableData || []
+      }
     }
 
     const columns: string[] = dataArray.flatMap(row => {

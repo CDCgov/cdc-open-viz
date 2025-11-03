@@ -55,7 +55,7 @@ export const displayDataAsText = (value: string | number, columnName, state: Map
     }
 
     // Check if it's a special value. If it is not, apply the designated prefix and suffix
-    if (false === state.legend.specialClasses.includes(String(value))) {
+    if (!state.legend.specialClasses?.some(sc => sc.value === String(value))) {
       formattedValue = (columnObj.prefix || '') + formattedValue + (columnObj.suffix || '')
     }
   }

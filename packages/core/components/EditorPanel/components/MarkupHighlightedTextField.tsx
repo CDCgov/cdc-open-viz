@@ -200,7 +200,7 @@ const MarkupHighlightedTextField: React.FC<MarkupHighlightedTextFieldProps> = me
         </div>
       </label>
 
-      <style jsx>{`
+      <style>{`
         .markup-highlight-overlay .markup-variable-valid {
           background-color: #e6f3ff;
           color: #0066cc;
