@@ -10,6 +10,7 @@ import Geo from '../Geo'
 import CityList from '../CityList'
 import BubbleList from '../BubbleList'
 import ZoomControls from '../ZoomControls'
+import SmallMultiples from '../SmallMultiples'
 import { supportedCountries } from '../../data/supported-geos'
 import {
   getGeoFillColor,
@@ -64,6 +65,11 @@ const WorldMap = () => {
 
   if (!world) {
     return <></>
+  }
+
+  // Early return for small multiples rendering
+  if (config.smallMultiples?.mode) {
+    return <SmallMultiples />
   }
 
   const handleFiltersReset = () => {

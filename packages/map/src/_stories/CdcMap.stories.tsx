@@ -45,37 +45,43 @@ export const Scale_Based: Story = {
 }
 export const Qualitative: Story = {
   args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/page-elements/qualitative-map.json'
+    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/page-elements/qualitative-map.json',
+    isEditor: true
   }
 }
 
 export const World_Map: Story = {
   args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/world-data-map-example.json'
+    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/world-data-map-example.json',
+    isEditor: true
   }
 }
 
 export const Filterable_Map: Story = {
   args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/page-elements/gender-rate-map.json'
+    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/page-elements/gender-rate-map.json',
+    isEditor: true
   }
 }
 
 export const Hex_Map: Story = {
   args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Hex_Map.json'
+    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Hex_Map.json',
+    isEditor: true
   }
 }
 
 export const County_Map: Story = {
   args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/US-County-Level-Map.json'
+    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/US-County-Level-Map.json',
+    isEditor: true
   }
 }
 
 export const Single_State: Story = {
   args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-data-map-counties.json'
+    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-data-map-counties.json',
+    isEditor: true
   }
 }
 
@@ -87,13 +93,15 @@ export const Multi_State: Story = {
 
 export const Bubble_Map: Story = {
   args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-Bubble-Map-world.json'
+    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-Bubble-Map-world.json',
+    isEditor: true
   }
 }
 
 export const HHS_Region_Map: Story = {
   args: {
-    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-hhs-regions-data.json'
+    configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-hhs-regions-data.json',
+    isEditor: true
   }
 }
 

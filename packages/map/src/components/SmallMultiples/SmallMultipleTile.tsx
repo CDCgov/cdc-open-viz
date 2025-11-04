@@ -7,6 +7,7 @@ import { MapContext } from '../../types/MapContext'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import generateRuntimeData from '../../helpers/generateRuntimeData'
 import UsaMap from '../UsaMap'
+import WorldMap from '../WorldMap'
 import ResizeObserver from 'resize-observer-polyfill'
 import getViewport from '@cdc/core/helpers/getViewport'
 import { MapRefInterface } from '../../hooks/useProgrammaticMapTooltip'
@@ -145,6 +146,8 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
           {config.general.geoType === 'us' && <UsaMap.State />}
           {config.general.geoType === 'single-state' && <UsaMap.SingleState />}
           {config.general.geoType === 'us-region' && <UsaMap.Region />}
+          {config.general.geoType === 'us-county' && <UsaMap.County />}
+          {config.general.geoType === 'world' && <WorldMap />}
         </ConfigContext.Provider>
 
         {/* Custom tooltip component that responds to both natural and synthetic events */}
