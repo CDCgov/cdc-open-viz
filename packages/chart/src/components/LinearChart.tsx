@@ -677,7 +677,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                     verticalAnchor='start'
                     fontSize={axisLabelFontSize}
                   >
-                    {runtime.xAxis.label}
+                    {!config.hideXAxisLabel ? runtime.xAxis.label : null}
                   </Text>
                 </Group>
               </>
@@ -763,7 +763,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       fill={config.yAxis.labelColor}
                       fontSize={axisLabelFontSize}
                     >
-                      {props.label}
+                      {!config.hideYAxisLabel ? props.label : null}
                     </Text>
                   </Group>
                 )
@@ -1325,7 +1325,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       fill={config.yAxis.labelColor}
                       fontSize={axisLabelFontSize}
                     >
-                      {props.label}
+                      {!config.hideYAxisLabel ? props.label : null}
                     </Text>
                   </Group>
                 )
@@ -1598,7 +1598,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       fill={config.xAxis.labelColor}
                       fontSize={axisLabelFontSize}
                     >
-                      {props.label}
+                      {!config.hideXAxisLabel ? props.label : null}
                     </Text>
                   </Group>
                 )

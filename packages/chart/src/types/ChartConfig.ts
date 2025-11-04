@@ -233,6 +233,8 @@ export type AllChartsConfig = {
   visualizationSubType: string
   xAxis: Axis
   yAxis: Axis
+  hideXAxisLabel?: boolean
+  hideYAxisLabel?: boolean
   xScale: Function
   yScale: Function
   regions: Region[]
