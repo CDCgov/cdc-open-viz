@@ -144,6 +144,7 @@ export type MapConfig = Visualization & {
       name: string
       version: string
       customColors?: string[]
+      customColorsOrdered?: string[]
     }
     showDownloadMediaButton: boolean
     showDownloadImgButton: boolean
