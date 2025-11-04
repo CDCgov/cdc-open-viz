@@ -42,17 +42,21 @@ export const reducer = (state: State, action: DataTableActions) => {
     case 'SET_CONFIG':
       return { ...state, config: action.payload }
     case 'SET_COLUMNS':
-      return { ...state, columns: action.payload, config: { ...state.config, columns: action.payload } }
+      return { ...state, columns: action.payload, config: { ...(state.config || {}), columns: action.payload } }
     case 'SET_DATA':
-      return { ...state, data: action.payload, config: { ...state.config, data: action.payload } }
+      return { ...state, data: action.payload, config: { ...(state.config || {}), data: action.payload } }
     case 'SET_TABLE':
-      return { ...state, table: action.payload, config: { ...state.config, table: action.payload } }
+      return { ...state, table: action.payload, config: { ...(state.config || {}), table: action.payload } }
     case 'SET_FILTERS':
-      return { ...state, filters: action.payload, config: { ...state.config, filters: action.payload } }
+      return { ...state, filters: action.payload, config: { ...(state.config || {}), filters: action.payload } }
     case 'SET_FILTER_BEHAVIOR':
-      return { ...state, filterBehavior: action.payload, config: { ...state.config, filterBehavior: action.payload } }
+      return {
+        ...state,
+        filterBehavior: action.payload,
+        config: { ...(state.config || {}), filterBehavior: action.payload }
+      }
     case 'SET_FILTER_INTRO':
-      return { ...state, filterIntro: action.payload, config: { ...state.config, filterIntro: action.payload } }
+      return { ...state, filterIntro: action.payload, config: { ...(state.config || {}), filterIntro: action.payload } }
     default:
       throw new Error('Unknown action type')
   }
