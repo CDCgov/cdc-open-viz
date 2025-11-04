@@ -130,7 +130,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
     if (isEditor && config && editorContext?.setTempConfig) {
       editorContext.setTempConfig(config)
     }
-  }, [config, isEditor])
+  }, [config, isEditor, editorContext])
 
   /* HANDLE LOADING/ERROR STATES */
   if (configLoading || dataLoading) return <Loading />
