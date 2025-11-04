@@ -2499,33 +2499,31 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     </Tooltip>
                   </label>
                 )}
-                {(config.filters.length > 0 || config.general.type === 'bubble' || config.general.geoType === 'us') && (
-                  <span className='d-flex mt-2'>
-                    <CheckBox
-                      value={legend.unified}
-                      section='legend'
-                      subsection={null}
-                      fieldName='unified'
-                      label='Unified Legend'
-                      updateField={updateField}
-                      onChange={event => handleEditorChanges('unifiedLegend', event.target.checked)}
-                    />
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon
-                          display='question'
-                          style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                        />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>
-                          For a map with filters, check this option if you want the high and low values in the legend to
-                          be based on <em>all</em> mapped values.
-                        </p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  </span>
-                )}
+                <span className='d-flex mt-2'>
+                  <CheckBox
+                    value={legend.unified}
+                    section='legend'
+                    subsection={null}
+                    fieldName='unified'
+                    label='Unified Legend'
+                    updateField={updateField}
+                    onChange={event => handleEditorChanges('unifiedLegend', event.target.checked)}
+                  />
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon
+                        display='question'
+                        style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                      />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p>
+                        Check this option if you want the high and low values in the legend to be based on <em>all</em>{' '}
+                        mapped values (useful for maps with filters or small multiples).
+                      </p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                </span>
               </AccordionItemPanel>
             </AccordionItem>
           )}
