@@ -144,7 +144,7 @@ const CustomColorsEditor: React.FC<CustomColorsEditorProps> = ({
                     handleColorChange(index, value)
                   }}
                   placeholder="#000000"
-                  maxLength={7}
+                  maxLength={15}
                   className="color-text-input"
                 />
               </div>

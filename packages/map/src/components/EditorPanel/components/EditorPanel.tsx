@@ -59,6 +59,7 @@ import MultiSelect from '@cdc/core/components/MultiSelect'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { isV1Palette, getCurrentPaletteName, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
+import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
 import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
 import { CustomColorsEditor } from '@cdc/core/components/CustomColorsEditor'
@@ -2990,62 +2991,68 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 }}
               />
 
-              <div className='mt-3'>
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={!!config.general.palette.customColorsOrdered}
-                    onChange={e => {
-                      const _state = cloneConfig(config)
-                      if (e.target.checked) {
-                        // Extract actual colors from runtime legend if available
-                        if (runtimeLegend?.items && runtimeLegend.items.length > 0) {
-                          const extractedColors = []
-                          for (const item of runtimeLegend.items) {
-                            // Skip special classes (like "No Data")
-                            if (item.special) continue
-                            // Add the color if it exists and hasn't been added yet
-                            if (item.color && !extractedColors.includes(item.color)) {
-                              extractedColors.push(item.color)
+              {isCoveDeveloperMode() && (
+                <>
+                  <div className='mt-3'>
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={!!config.general.palette.customColorsOrdered}
+                        onChange={e => {
+                          const _state = cloneConfig(config)
+                          if (e.target.checked) {
+                            // Extract actual colors from runtime legend if available
+                            if (runtimeLegend?.items && runtimeLegend.items.length > 0) {
+                              const extractedColors = []
+                              for (const item of runtimeLegend.items) {
+                                // Skip special classes (like "No Data")
+                                if (item.special) continue
+                                // Add the color if it exists and hasn't been added yet
+                                if (item.color && !extractedColors.includes(item.color)) {
+                                  extractedColors.push(item.color)
+                                }
+                              }
+                              _state.general.palette.customColorsOrdered =
+                                extractedColors.length > 0
+                                  ? extractedColors
+                                  : ['#3366cc', '#5588dd', '#77aaee', '#99ccff']
+                            } else {
+                              // Fallback to default colors if runtime legend not available
+                              _state.general.palette.customColorsOrdered = ['#3366cc', '#5588dd', '#77aaee', '#99ccff']
+                            }
+                          } else {
+                            // Remove custom colors and revert to default palette
+                            delete _state.general.palette.customColorsOrdered
+                            delete _state.general.palette.customColors
+                            // Set default palette if none exists
+                            if (!_state.general.palette.name) {
+                              _state.general.palette.name = 'sequential_blue_green'
+                              _state.general.palette.version = '2.0'
                             }
                           }
-                          _state.general.palette.customColorsOrdered =
-                            extractedColors.length > 0 ? extractedColors : ['#3366cc', '#5588dd', '#77aaee', '#99ccff']
-                        } else {
-                          // Fallback to default colors if runtime legend not available
-                          _state.general.palette.customColorsOrdered = ['#3366cc', '#5588dd', '#77aaee', '#99ccff']
-                        }
-                      } else {
-                        // Remove custom colors and revert to default palette
-                        delete _state.general.palette.customColorsOrdered
-                        delete _state.general.palette.customColors
-                        // Set default palette if none exists
-                        if (!_state.general.palette.name) {
-                          _state.general.palette.name = 'sequential_blue_green'
-                          _state.general.palette.version = '2.0'
-                        }
-                      }
-                      setConfig(_state)
-                    }}
-                  />
-                  Use Custom Colors
-                </label>
-              </div>
+                          setConfig(_state)
+                        }}
+                      />
+                      Use Custom Colors
+                    </label>
+                  </div>
 
-              {config.general.palette.customColorsOrdered && (
-                <div className='mt-2'>
-                  <CustomColorsEditor
-                    colors={config.general.palette.customColorsOrdered}
-                    onChange={newColors => {
-                      const _state = cloneConfig(config)
-                      _state.general.palette.customColorsOrdered = newColors
-                      setConfig(_state)
-                    }}
-                    label='Custom Color Order'
-                    minColors={1}
-                    maxColors={20}
-                  />
-                </div>
+                  {config.general.palette.customColorsOrdered && (
+                    <div className='mt-2'>
+                      <CustomColorsEditor
+                        colors={config.general.palette.customColorsOrdered}
+                        onChange={newColors => {
+                          const _state = cloneConfig(config)
+                          _state.general.palette.customColorsOrdered = newColors
+                          setConfig(_state)
+                        }}
+                        label='Custom Color Order'
+                        minColors={1}
+                        maxColors={20}
+                      />
+                    </div>
+                  )}
+                </>
               )}
 
               <label>
