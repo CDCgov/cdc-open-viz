@@ -16,12 +16,19 @@
 
 /* Shared warning icon component */
 /* Used across: chart, dashboard, data-bite packages */
+.accordion__button svg.warning-icon {
+  position: absolute;
+  right: 35px;
+  left: auto;
+  top: 50%;
+  transform: translateY(-50%);
+
+}
+
 .warning-icon {
-  position: relative;
-  top: 2px;
+  color: #d72f00;
   width: 15px;
   height: 15px;
-  margin-left: 5px;
 }
 
 .warning-icon path {
