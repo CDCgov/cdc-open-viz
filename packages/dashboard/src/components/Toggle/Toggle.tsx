@@ -35,7 +35,7 @@ const Toggle: React.FC<ToggleProps> = ({ active, row, visualizations, setToggled
             onKeyUp={e => selectItem(colIndex, e)}
             aria-checked={selected}
             tabIndex={0}
-            aria-label={`Toggle ${type}`}
+            aria-label={`Toggle ${text}`}
           >
             <span aria-hidden='true'>{getIcon(visualizations[col.widget])}</span> <span>{text}</span>
           </div>
