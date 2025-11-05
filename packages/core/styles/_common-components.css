@@ -15,8 +15,9 @@
 }
 
 /* Shared warning icon component */
-/* Used across: chart, dashboard, data-bite packages */
-.accordion__button svg.warning-icon {
+/* TODO: Currently different panel classes on different packages */
+.accordion__button svg.warning-icon,
+.cove-accordion__button svg.warning-icon {
   position: absolute;
   right: 35px;
   left: auto;
