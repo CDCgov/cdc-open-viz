@@ -1,6 +1,6 @@
 {
   "name": "@cdc/filtered-text",
-  "version": "4.25.7",
+  "version": "4.25.8",
   "description": "React component for adding filtered text on dashboards.",
   "moduleName": "CdcFilteredText",
   "main": "dist/cdcfilteredtext",
