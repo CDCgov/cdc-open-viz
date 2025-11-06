@@ -55,6 +55,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
       bottomComas,
       commas,
       prefix,
+      preserveOriginalDecimals,
       rightPrefix,
       rightRoundTo,
       rightSuffix,
@@ -89,26 +90,46 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
     } else {
       useCommas = config.dataFormat.commas ? true : false
     }
-    stringFormattingOptions = {
-      useGrouping: useCommas,
-      minimumFractionDigits: roundToPlace,
-      maximumFractionDigits: roundToPlace
+
+    // If preserveOriginalDecimals is enabled, don't force decimal places
+    if (preserveOriginalDecimals) {
+      stringFormattingOptions = {
+        useGrouping: useCommas
+      }
+    } else {
+      stringFormattingOptions = {
+        useGrouping: useCommas,
+        minimumFractionDigits: roundToPlace,
+        maximumFractionDigits: roundToPlace
+      }
     }
   }
 
   if (axis === 'right') {
-    stringFormattingOptions = {
-      useGrouping: config.dataFormat.rightCommas ? true : false,
-      minimumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0,
-      maximumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0
+    if (preserveOriginalDecimals) {
+      stringFormattingOptions = {
+        useGrouping: config.dataFormat.rightCommas ? true : false
+      }
+    } else {
+      stringFormattingOptions = {
+        useGrouping: config.dataFormat.rightCommas ? true : false,
+        minimumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0,
+        maximumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0
+      }
     }
   }
 
   if (axis === 'bottom') {
-    stringFormattingOptions = {
-      useGrouping: config.dataFormat.bottomCommas ? true : false,
-      minimumFractionDigits: bottomRoundTo ? Number(bottomRoundTo) : 0,
-      maximumFractionDigits: bottomRoundTo ? Number(bottomRoundTo) : 0
+    if (preserveOriginalDecimals) {
+      stringFormattingOptions = {
+        useGrouping: config.dataFormat.bottomCommas ? true : false
+      }
+    } else {
+      stringFormattingOptions = {
+        useGrouping: config.dataFormat.bottomCommas ? true : false,
+        minimumFractionDigits: bottomRoundTo ? Number(bottomRoundTo) : 0,
+        maximumFractionDigits: bottomRoundTo ? Number(bottomRoundTo) : 0
+      }
     }
   }
 
