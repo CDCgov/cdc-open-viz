@@ -2874,7 +2874,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               {!['Bump Chart', 'Forecasting'].includes(config.visualizationType) && (
                                 <option value='categorical'>Categorical (Linear Scale)</option>
                               )}
-                              {config.visualizationType !== 'Bump Chart' && (
+                              {!['Bump Chart'].includes(config.visualizationType) && (
                                 <option value='date'>Date (Linear Scale)</option>
                               )}
                               <option value='date-time'>Date (Date Time Scale)</option>
