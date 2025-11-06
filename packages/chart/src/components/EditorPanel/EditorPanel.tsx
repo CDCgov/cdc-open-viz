@@ -2871,7 +2871,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 })
                               }
                             >
-                              {config.visualizationType !== 'Bump Chart' && (
+                              {!['Bump Chart', 'Forecasting'].includes(config.visualizationType) && (
                                 <option value='categorical'>Categorical (Linear Scale)</option>
                               )}
                               {config.visualizationType !== 'Bump Chart' && (
