@@ -364,7 +364,12 @@ export const useTooltip = props => {
     if (orientation === 'horizontal') return 0
 
     // Convert data value to pixel coordinate using current xScale
-    const pixelX = isDateScale(xAxis) ? xScaleRef.current(parseDate(xAxisValue)) : xScaleRef.current(xAxisValue)
+    let pixelX = isDateScale(xAxis) ? xScaleRef.current(parseDate(xAxisValue)) : xScaleRef.current(xAxisValue)
+
+    // For band scales (bar charts, categorical axes), add bandwidth offset to point to center of bar
+    if (xScaleRef.current.bandwidth) {
+      pixelX += xScaleRef.current.bandwidth() / 2
+    }
 
     return pixelX
   }
