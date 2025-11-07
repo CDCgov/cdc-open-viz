@@ -2231,6 +2231,30 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     updateField={updateFieldDeprecated}
                     min={0}
                   />{' '}
+                  <CheckBox
+                    value={config.dataFormat.preserveOriginalDecimals}
+                    section='dataFormat'
+                    fieldName='preserveOriginalDecimals'
+                    label='Preserve Original Decimal Places'
+                    updateField={updateFieldDeprecated}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display='question'
+                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>
+                            When enabled, numbers will display with their original decimal places from the data source,
+                            bypassing the "Round to decimal point" setting above. This is useful when you have mixed
+                            data (e.g., whole numbers in one column and percentages with decimals in another).
+                          </p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                   <div className='two-col-inputs'>
                     <TextField
                       value={config.dataFormat.prefix}

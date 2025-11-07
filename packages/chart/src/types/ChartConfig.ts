@@ -76,6 +76,7 @@ type DataFormat = {
   bottomSuffix: string
   commas: boolean
   prefix: string
+  preserveOriginalDecimals?: boolean
   rightCommas: boolean
   rightPrefix: string
   rightRoundTo: number

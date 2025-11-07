@@ -770,7 +770,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
         rightSuffix,
         bottomPrefix,
         bottomSuffix,
-        bottomAbbreviated
+        bottomAbbreviated,
+        preserveOriginalDecimals
       }
     } = config
 
@@ -789,32 +790,52 @@ const CdcChart: React.FC<CdcChartProps> = ({
       } else {
         roundToPlace = roundTo ? Number(roundTo) : 0
       }
-      stringFormattingOptions = {
-        useGrouping: addColRoundTo ? true : config.dataFormat.commas ? true : false,
-        minimumFractionDigits: roundToPlace,
-        maximumFractionDigits: roundToPlace
+
+      // If preserveOriginalDecimals is enabled, don't force decimal places
+      if (preserveOriginalDecimals) {
+        stringFormattingOptions = {
+          useGrouping: addColRoundTo ? true : config.dataFormat.commas ? true : false
+        }
+      } else {
+        stringFormattingOptions = {
+          useGrouping: addColRoundTo ? true : config.dataFormat.commas ? true : false,
+          minimumFractionDigits: roundToPlace,
+          maximumFractionDigits: roundToPlace
+        }
       }
     }
 
     if (axis === 'right') {
-      stringFormattingOptions = {
-        useGrouping: config.dataFormat.rightCommas ? true : false,
-        minimumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0,
-        maximumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0
+      if (preserveOriginalDecimals) {
+        stringFormattingOptions = {
+          useGrouping: config.dataFormat.rightCommas ? true : false
+        }
+      } else {
+        stringFormattingOptions = {
+          useGrouping: config.dataFormat.rightCommas ? true : false,
+          minimumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0,
+          maximumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0
+        }
       }
     }
 
     const resolveBottomTickRounding = () => {
-      if (config.forestPlot.type === 'Logarithmic' && !bottomRoundTo) return 2
+      if (config.forestPlot?.type === 'Logarithmic' && !bottomRoundTo) return 2
       if (Number(bottomRoundTo)) return Number(bottomRoundTo)
       return 0
     }
 
     if (axis === 'bottom') {
-      stringFormattingOptions = {
-        useGrouping: config.dataFormat.bottomCommas ? true : false,
-        minimumFractionDigits: resolveBottomTickRounding(),
-        maximumFractionDigits: resolveBottomTickRounding()
+      if (preserveOriginalDecimals) {
+        stringFormattingOptions = {
+          useGrouping: config.dataFormat.bottomCommas ? true : false
+        }
+      } else {
+        stringFormattingOptions = {
+          useGrouping: config.dataFormat.bottomCommas ? true : false,
+          minimumFractionDigits: resolveBottomTickRounding(),
+          maximumFractionDigits: resolveBottomTickRounding()
+        }
       }
     }
 
