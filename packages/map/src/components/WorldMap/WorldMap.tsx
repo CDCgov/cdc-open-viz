@@ -221,7 +221,7 @@ const WorldMap = () => {
 
       const isGreyedOut = Boolean(
         countriesPicked.length > 0 &&
-          config.general.showWholeMap === true &&
+          config.general.hideUnselectedCountries !== true &&
           !countriesPicked.some(country => country.iso === geo.properties.iso || country.name === geoDisplayName)
       )
 
@@ -229,7 +229,7 @@ const WorldMap = () => {
       const isSelected = countriesPicked.some(
         country => country.iso === geo.properties.iso || country.name === geoDisplayName
       )
-      const isHidden = countriesPicked.length > 0 && config.general.showWholeMap !== true && !isSelected
+      const isHidden = countriesPicked.length > 0 && config.general.hideUnselectedCountries === true && !isSelected
 
       // Build CSS class names for TDD tests
       let geoClassName = ''

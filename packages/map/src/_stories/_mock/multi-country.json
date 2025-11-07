@@ -21,7 +21,7 @@
       { "iso": "ESP", "name": "Spain" },
       { "iso": "GBR", "name": "United Kingdom" }
     ],
-    "showWholeMap": true
+    "hideUnselectedCountries": false
   },
   "type": "map",
   "color": "bluegreen",

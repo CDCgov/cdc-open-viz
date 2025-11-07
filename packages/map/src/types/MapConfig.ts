@@ -159,7 +159,7 @@ export type MapConfig = Visualization & {
       iso: string
       name: string
     }[]
-    showWholeMap?: boolean // Only relevant when countriesPicked is populated
+    hideUnselectedCountries?: boolean // When true, hide unselected countries; when false (default), gray them out
     territoriesAlwaysShow: boolean
     territoriesLabel: string
     title: string

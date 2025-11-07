@@ -20,7 +20,7 @@
       { "iso": "SGP", "name": "Singapore" },
       { "iso": "AUS", "name": "Australia" }
     ],
-    "showWholeMap": false
+    "hideUnselectedCountries": true
   },
   "type": "map",
   "color": "orangered",

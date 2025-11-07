@@ -3046,29 +3046,31 @@ export const MultiCountryWorldMapTests: Story = {
     )
 
     // ==========================================================================
-    // TEST: Show Whole Map Toggle (Grey-out vs Hide behavior)
+    // TEST: Hide Unselected Countries Toggle (Grey-out vs Hide behavior)
     // ==========================================================================
     // Ensure map has fully rendered with country paths before testing toggle
     await waitForPresence('path[data-country-code]', canvasElement)
 
     // InputToggle renders as a div with a hidden checkbox
-    const showWholeMapToggle = Array.from(canvasElement.querySelectorAll('input[name*="showWholeMap"]')).find(input => {
+    const hideUnselectedToggle = Array.from(
+      canvasElement.querySelectorAll('input[name*="hideUnselectedCountries"]')
+    ).find(input => {
       const label = input.closest('label') || input.parentElement?.querySelector('label')
-      return label?.textContent?.includes('Show Whole Map')
+      return label?.textContent?.includes('Hide Unselected Countries')
     }) as HTMLInputElement
-    expect(showWholeMapToggle).toBeTruthy()
+    expect(hideUnselectedToggle).toBeTruthy()
 
-    // Test unchecking "Show Whole Map" (should hide unselected countries)
-    // First, ensure the toggle is checked (Show Whole Map = true)
-    if (!showWholeMapToggle.checked) {
-      await userEvent.click(showWholeMapToggle)
+    // By default (unchecked), unselected countries should be grayed out
+    // First, ensure the toggle is unchecked (hideUnselectedCountries = false, so countries are grayed)
+    if (hideUnselectedToggle.checked) {
+      await userEvent.click(hideUnselectedToggle)
       await new Promise(resolve => setTimeout(resolve, 100))
     }
 
     const beforeState = getCountryVisualState()
 
-    // Now uncheck it (should hide countries)
-    await userEvent.click(showWholeMapToggle)
+    // Now check it (should hide unselected countries)
+    await userEvent.click(hideUnselectedToggle)
     await new Promise(resolve => setTimeout(resolve, 100)) // Give time for re-render
 
     const afterState = getCountryVisualState()
@@ -3080,18 +3082,18 @@ export const MultiCountryWorldMapTests: Story = {
 
     expect(testResult).toBe(true)
 
-    // Test checking "Show Whole Map" again (should grey-out unselected countries)
+    // Test unchecking "Hide Unselected Countries" again (should grey-out unselected countries)
     await performAndAssert(
-      'Show Whole Map → Grey-out unselected countries',
+      'Hide Unselected Countries → Grey-out unselected countries',
       getCountryVisualState,
       async () => {
-        await userEvent.click(showWholeMapToggle)
+        await userEvent.click(hideUnselectedToggle)
       },
       (before, after) => {
-        // When showing whole map, unselected countries should be grayed out
+        // When not hiding (default), unselected countries should be grayed out
         return (
           after.grayedCountries > before.grayedCountries &&
-          after.hiddenCountries === 0 && // No hidden countries when showing whole map
+          after.hiddenCountries === 0 && // No hidden countries when showing grayed
           after.selectedCountryCodes.length === 3 // Our 3 selected countries remain visible (by unique ISO codes)
         )
       }

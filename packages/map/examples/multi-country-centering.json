@@ -32,7 +32,7 @@
       { "iso": "CA", "name": "Canada" },
       { "iso": "MX", "name": "Mexico" }
     ],
-    "showWholeMap": false,
+    "hideUnselectedCountries": true,
     "allowMapZoom": true
   },
   "legend": {

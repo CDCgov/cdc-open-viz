@@ -1317,9 +1317,9 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   </label>
                   {config.general.countriesPicked && config.general.countriesPicked.length > 0 && (
                     <CheckBox
-                      value={config.general.showWholeMap || false}
-                      fieldName='showWholeMap'
-                      label='Show Whole Map'
+                      value={config.general.hideUnselectedCountries || false}
+                      fieldName='hideUnselectedCountries'
+                      label='Hide Unselected Countries'
                       updateField={updateField}
                       section='general'
                     />

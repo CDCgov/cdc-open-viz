@@ -92,12 +92,12 @@ export const isMultiCountryActive = (config: MapConfig): boolean => {
 
 /**
  * Helper to determine display mode for unselected countries
- * Returns 'hidden' if showWholeMap is false, 'grayed' if true
+ * Returns 'hidden' if hideUnselectedCountries is true, 'grayed' if false (default)
  */
 export const getUnselectedCountryDisplayMode = (config: MapConfig): 'hidden' | 'grayed' | 'normal' => {
   if (!isMultiCountryActive(config)) {
     return 'normal' // Show all countries normally when none are specifically selected
   }
 
-  return config.general.showWholeMap ? 'grayed' : 'hidden'
+  return config.general.hideUnselectedCountries ? 'hidden' : 'grayed'
 }
