@@ -177,7 +177,7 @@ section.footnotes {
 
 // after migration to TP5 this declaration should be removed and all references
 // to it should be replaced with .form-select
-.cove-form-select {
+.post-type-cdc_visualization .wcms-viz-container select.cove-form-select {
   font-family: var(--app-font-secondary);
   font-weight: 300;
   font-size: var(--filter-select-font-size);
