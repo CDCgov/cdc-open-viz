@@ -155,6 +155,11 @@ export type MapConfig = Visualization & {
       fipsCode: string
       stateName: string
     }[]
+    countriesPicked?: {
+      iso: string
+      name: string
+    }[]
+    showWholeMap?: boolean // Only relevant when countriesPicked is populated
     territoriesAlwaysShow: boolean
     territoriesLabel: string
     title: string
