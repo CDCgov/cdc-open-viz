@@ -184,8 +184,8 @@ section.footnotes {
   line-height: normal;
   padding-right: 3rem;
   border-radius: 0.333rem;
-  border: 1px solid var(--colors-gray-cool-10);
-  color: var(--colors-primary-text);
+  border: 1px solid var(--cool-gray-10);
+  color: var(--cool-gray-90);
   // recreate caret using svg
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
   background-repeat: no-repeat;
