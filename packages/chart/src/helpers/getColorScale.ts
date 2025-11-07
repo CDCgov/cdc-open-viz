@@ -32,6 +32,16 @@ export const getColorScale = (config: ChartConfig): ((value: string) => string) 
   // Migrate old palette name if needed
   const migratedPaletteName = configPalette ? configPalette : getFallbackColorPalette(config)
 
+  // Check for customColorsOrdered first (direct 1-to-1 mapping, no distribution needed)
+  if (config.general?.palette?.customColorsOrdered && Array.isArray(config.general.palette.customColorsOrdered)) {
+    const customColorsOrdered = config.general.palette.customColorsOrdered
+    return scaleOrdinal({
+      domain: config.runtime.seriesLabelsAll,
+      range: customColorsOrdered,
+      unknown: null
+    })
+  }
+
   let palette =
     config.general?.palette?.customColors ||
     palettesSource[migratePaletteWithMap(migratedPaletteName, paletteMigrationMap, false)] ||

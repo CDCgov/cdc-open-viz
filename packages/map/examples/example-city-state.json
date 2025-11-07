@@ -19,7 +19,15 @@
     "displayStateLabels": false,
     "fullBorder": false,
     "palette": {
-      "isReversed": false
+      "isReversed": false,
+      "customColors": [
+        "red",
+        "red",
+        "orange",
+        "orange",
+        "yellow",
+        "yellow"
+      ]
     },
     "allowMapZoom": true,
     "hideGeoColumnInTooltip": false,

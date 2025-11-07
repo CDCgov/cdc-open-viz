@@ -20,6 +20,7 @@ import InputToggle from '@cdc/core/components/inputs/InputToggle'
 import { useColorPalette } from '@cdc/core/hooks/useColorPalette'
 import { getCurrentPaletteName } from '@cdc/core/helpers/palettes/utils'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
+import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { ChartContext } from './../../../../types/ChartContext.js'
 
 import { useEditorPermissions } from '../../useEditorPermissions.js'
@@ -29,6 +30,8 @@ import { PanelProps } from '../PanelProps'
 import { LineChartConfig } from '../../../../types/ChartConfig'
 import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
+import { CustomColorsEditor } from '@cdc/core/components/CustomColorsEditor'
+import { getColorScale } from '../../../../helpers/getColorScale'
 import '@cdc/core/styles/v2/components/editor.scss'
 import './panelVisual.styles.css'
 
@@ -326,6 +329,74 @@ const PanelVisual: FC<PanelProps> = props => {
                   colorIndices={[2, 3, 5]}
                   className='color-palette'
                 />
+              </>
+            )}
+
+            {isCoveDeveloperMode() && (visSupportsSequentialPallete() || visSupportsNonSequentialPallete()) && (
+              <>
+                <div className='mt-3'>
+                  <label className='checkbox'>
+                    <input
+                      type='checkbox'
+                      checked={
+                        !!(config.general?.palette?.customColorsOrdered || config.general?.palette?.customColors)
+                      }
+                      onChange={e => {
+                        const _state = cloneConfig(config)
+                        // Ensure palette object exists
+                        if (!_state.general.palette) {
+                          _state.general.palette = {}
+                        }
+                        if (e.target.checked) {
+                          // Extract colors from current color scale if runtime data available
+                          if (config.runtime?.seriesLabelsAll && config.runtime.seriesLabelsAll.length > 0) {
+                            const colorScale = getColorScale(config)
+                            const extractedColors = config.runtime.seriesLabelsAll.map((label: string) =>
+                              colorScale(label)
+                            )
+                            _state.general.palette.customColorsOrdered =
+                              extractedColors.length > 0
+                                ? extractedColors
+                                : ['#3366cc', '#5588dd', '#77aaee', '#99ccff']
+                          } else {
+                            // Fallback to default colors if runtime not available
+                            _state.general.palette.customColorsOrdered = ['#3366cc', '#5588dd', '#77aaee', '#99ccff']
+                          }
+                        } else {
+                          // Remove custom colors and revert to default palette
+                          delete _state.general.palette.customColorsOrdered
+                          delete _state.general.palette.customColors
+                          // Set default palette if none exists
+                          if (!_state.general.palette.name) {
+                            _state.general.palette.name = 'qualitative_standard'
+                            _state.general.palette.version = '2.0'
+                          }
+                        }
+                        updateConfig(_state)
+                      }}
+                    />
+                    Use Custom Colors
+                  </label>
+                </div>
+
+                {(config.general?.palette?.customColorsOrdered || config.general?.palette?.customColors) && (
+                  <div className='mt-2'>
+                    <CustomColorsEditor
+                      colors={config.general.palette.customColorsOrdered || config.general.palette.customColors}
+                      onChange={newColors => {
+                        const _state = cloneConfig(config)
+                        if (!_state.general.palette) {
+                          _state.general.palette = {}
+                        }
+                        _state.general.palette.customColorsOrdered = newColors
+                        updateConfig(_state)
+                      }}
+                      label='Custom Color Order'
+                      minColors={1}
+                      maxColors={20}
+                    />
+                  </div>
+                )}
               </>
             )}
           </>

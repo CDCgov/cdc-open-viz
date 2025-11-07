@@ -16,6 +16,7 @@ type General = CoreGeneral & {
     version?: string
     isReversed?: boolean
     customColors?: string[]
+    customColorsOrdered?: string[]
   }
 }
 import { type Link } from './../components/Sankey/types'

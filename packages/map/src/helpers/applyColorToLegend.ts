@@ -65,6 +65,30 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
     color = mapPaletteNameMigrations[color]
   }
 
+  // Check for customColorsOrdered first (direct 1-to-1 mapping, no distribution)
+  if (general?.palette?.customColorsOrdered && Array.isArray(general.palette.customColorsOrdered)) {
+    const customColorsOrdered = general.palette.customColorsOrdered
+
+    // Count actual special classes in the result array
+    const actualSpecialClassCount = result.filter(item => item.special).length
+    const colorIdx = legendIdx - actualSpecialClassCount
+
+    // Handle special classes coloring
+    if (result[legendIdx]?.special) {
+      const specialClassColors = chroma.scale(['#D4D4D4', '#939393']).colors(actualSpecialClassCount)
+      const specialClassIdx = result.slice(0, legendIdx + 1).filter(item => item.special).length - 1
+      return specialClassColors[specialClassIdx]
+    }
+
+    // Direct 1-to-1 mapping with customColorsOrdered (no distribution array)
+    if (colorIdx >= 0 && colorIdx < customColorsOrdered.length) {
+      return customColorsOrdered[colorIdx]
+    }
+
+    // Fallback to last color if index out of bounds
+    return customColorsOrdered[customColorsOrdered.length - 1] || '#d3d3d3'
+  }
+
   // Try multiple approaches to find the palette
   let mapColorPalette = general?.palette?.customColors
 
