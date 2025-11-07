@@ -72,7 +72,8 @@
     "anchors": [],
     "shoMissingDataLabel": true,
     "showMissingDataLine": true,
-    "categories": []
+    "categories": [],
+    "inlineLabel": " percent"
   },
   "boxplot": {
     "plots": [],

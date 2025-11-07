@@ -2,14 +2,8 @@ import React, { useContext, useEffect, useRef, useState, useMemo, useCallback } 
 import SmallMultipleTile from './SmallMultipleTile'
 import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
-import getMinMax from '../../helpers/getMinMax'
-import {
-  getTileData,
-  getTileConfig,
-  createCombinedDataForYAxis,
-  applyTileOrder,
-  createTileColorScale
-} from '../../helpers/smallMultiplesHelpers'
+import useScales from '../../hooks/useScales'
+import { createCombinedDataForYAxis, applyTileOrder, createTileColorScale } from '../../helpers/smallMultiplesHelpers'
 import { isMobileSmallMultiplesViewport } from '@cdc/core/helpers/viewports'
 import './SmallMultiples.css'
 import { ChartConfig } from '../../types/ChartConfig'
@@ -111,23 +105,24 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     combinedDataForYAxis.data
   )
 
-  const yAxisProperties = useMemo(
-    () => ({
-      data: combinedDataForYAxis.data,
-      tableData: combinedDataForYAxis.data,
-      config: combinedDataForYAxis.config,
-      minValue,
-      maxValue,
-      isAllLine,
-      existPositiveValue,
-      xAxisDataMapped: [],
-      xMax: parentWidth,
-      yMax: parentHeight
-    }),
-    [combinedDataForYAxis, minValue, maxValue, isAllLine, existPositiveValue, parentWidth, parentHeight]
-  )
+  const inlineLabel = config.yAxis?.inlineLabel
+  const inlineLabelHasNoSpace = !inlineLabel?.includes(' ')
+  const needsYAxisAutoPadding = inlineLabel && !inlineLabelHasNoSpace
 
-  const { min, max } = getMinMax(yAxisProperties)
+  const { min, max } = useScales({
+    config: combinedDataForYAxis.config,
+    data: combinedDataForYAxis.data,
+    tableData: combinedDataForYAxis.data,
+    minValue,
+    maxValue,
+    existPositiveValue,
+    isAllLine,
+    xAxisDataMapped: [],
+    xMax: parentWidth,
+    yMax: parentHeight,
+    needsYAxisAutoPadding,
+    currentViewport
+  })
 
   // Use consistent Y-axis if the feature is enabled and we have valid values
   const globalYAxisValues = useMemo(() => {
