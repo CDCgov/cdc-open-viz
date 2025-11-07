@@ -51,7 +51,6 @@ import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
 import HoverLine from './HoverLine/HoverLine'
 import { SmallMultiples } from './SmallMultiples'
-import { calculateYAxisWithAutoPadding } from '../helpers/calculateYAxisWithAutoPadding'
 
 type LinearChartProps = {
   parentWidth: number
@@ -134,6 +133,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const [showHoverLine, setShowHoverLine] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
+  const [yAxisAutoPadding, setYAxisAutoPadding] = useState(0)
 
   // REFS
   const axisBottomRef = useRef(null)
@@ -143,6 +143,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
+  const lastMaxValue = useRef(maxValue)
   const gridLineRefs = useRef([])
   const tooltipRef = useRef(null)
 
@@ -219,27 +220,17 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const getYAxisData = (d, seriesKey) => d[seriesKey]
   const xAxisDataMapped = data.map(d => getXAxisData(d))
   const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
-
-  // Check if auto-padding should be applied to decide which config to use with useMinMax
-  const shouldApplyAutoPadding = inlineLabel && !inlineLabelHasNoSpace
-
-  // Create config that disables scale padding when auto-padding will be applied
-  const configForMinMax = shouldApplyAutoPadding
-    ? {
-        ...config,
-        yAxis: {
-          ...config.yAxis,
-          enablePadding: false,
-          scalePadding: 0
-        }
-      }
-    : config
-
-  // Get Y-axis values from useMinMax
   const properties = {
     data,
     tableData,
-    config: configForMinMax,
+    config: {
+      ...config,
+      yAxis: {
+        ...config.yAxis,
+        scalePadding: labelsOverflow ? yAxisAutoPadding : config.yAxis.scalePadding,
+        enablePadding: labelsOverflow || config.yAxis.enablePadding
+      }
+    },
     minValue,
     maxValue,
     isAllLine,
@@ -248,12 +239,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     xMax,
     yMax
   }
-  const { min: baseMin, max: baseMax, leftMax, rightMax } = useMinMax(properties)
-
-  // Apply auto-padding only if needed (on raw values), otherwise use scale-padded values
-  const { min, max } = shouldApplyAutoPadding
-    ? calculateYAxisWithAutoPadding(baseMin, baseMax, config, data, parentHeight, currentViewport)
-    : { min: baseMin, max: baseMax }
+  const { min, max, leftMax, rightMax } = useMinMax(properties)
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
   const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleAnnotation } = useScales({
     ...properties,
@@ -512,6 +498,45 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     topYLabelRef.current,
     initialHeight
   ])
+
+  useEffect(() => {
+    if (lastMaxValue.current === maxValue) return
+    lastMaxValue.current = maxValue
+
+    if (!yAxisAutoPadding) return
+    setYAxisAutoPadding(0)
+  }, [maxValue])
+
+  useEffect(() => {
+    if (!yScale?.ticks) return
+    const ticks = yScale.ticks(handleNumTicks)
+    if (orientation === 'horizontal' || !labelsOverflow || config.yAxis?.max || ticks.length === 0) {
+      setYAxisAutoPadding(0)
+      return
+    }
+
+    // minimum percentage of the max value that the distance should be from the top grid line
+    const MINIMUM_DISTANCE_PERCENTAGE = 0.025
+
+    const topGridLine = Math.max(...ticks)
+    const needsPaddingThreshold = topGridLine - maxValue * MINIMUM_DISTANCE_PERCENTAGE
+    const maxValueIsGreaterThanThreshold = maxValue > needsPaddingThreshold
+
+    if (!maxValueIsGreaterThanThreshold) return
+
+    const tickGap = ticks.length === 1 ? ticks[0] : ticks[1] - ticks[0]
+    const nextTick = Math.max(...yScale.ticks(handleNumTicks)) + tickGap
+    const divideBy = minValue < 0 ? maxValue / 2 : maxValue
+    const calculatedPadding = (nextTick - maxValue) / divideBy
+
+    // if auto padding is too close to next tick, add one more ticks worth of padding
+    const newPadding =
+      calculatedPadding > MINIMUM_DISTANCE_PERCENTAGE ? calculatedPadding : calculatedPadding + tickGap / divideBy
+
+    /* sometimes even though the padding is getting to the next tick exactly,
+    d3 still doesn't show the tick. we add 0.1 to ensure to tip it over the edge */
+    setYAxisAutoPadding(newPadding * 100 + 0.1)
+  }, [maxValue, labelsOverflow, yScale, handleNumTicks])
 
   useEffect(() => {
     if (!tooltipOpen) return
