@@ -138,13 +138,15 @@ let exampleCityStateStandardColors = editConfigKeys(exampleCityState, [
 ])
 export const Custom_Color_Distributions_With_Special_Classes: Story = {
   args: {
-    config: newConfig
+    config: newConfig,
+    isEditor: true
   }
 }
 
 export const Custom_Color_Distributions_Without_Special_Classes: Story = {
   args: {
-    config: editConfigKeys(newConfig, [{ path: ['legend', 'specialClasses'], value: [] }])
+    config: editConfigKeys(newConfig, [{ path: ['legend', 'specialClasses'], value: [] }]),
+    isEditor: true
   }
 }
 
@@ -157,13 +159,15 @@ export const Standard_Color_Distributions_With_Special_Classes: Story = {
 
 export const Standard_Color_Distributions_Without_Special_Classes: Story = {
   args: {
-    config: editConfigKeys(exampleCityStateStandardColors, [{ path: ['legend', 'specialClasses'], value: [] }])
+    config: editConfigKeys(exampleCityStateStandardColors, [{ path: ['legend', 'specialClasses'], value: [] }]),
+    isEditor: true
   }
 }
 
 export const Custom_Color_Distributions_With_Update_Needed: Story = {
   args: {
-    config: editConfigKeys(newConfig, [{ path: ['version'], value: '4.24.10' }])
+    config: editConfigKeys(newConfig, [{ path: ['version'], value: '4.24.10' }]),
+    isEditor: true
   }
 }
 
