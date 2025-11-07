@@ -36,7 +36,6 @@ import { calcInitialHeight, handleAutoPaddingRight } from '../helpers/sizeHelper
 import { filterAndShiftLinearDateTicks } from '../helpers/filterAndShiftLinearDateTicks'
 
 // Hooks
-import useMinMax from '../hooks/useMinMax'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import useScales, { getTickValues } from '../hooks/useScales'
@@ -133,7 +132,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const [showHoverLine, setShowHoverLine] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
-  const [yAxisAutoPadding, setYAxisAutoPadding] = useState(0)
 
   // REFS
   const axisBottomRef = useRef(null)
@@ -143,7 +141,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
-  const lastMaxValue = useRef(maxValue)
   const gridLineRefs = useRef([])
   const tooltipRef = useRef(null)
 
@@ -158,7 +155,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const isForestPlot = visualizationType === 'Forest Plot'
   const isDateTime = config.xAxis.type === 'date-time'
   const inlineLabelHasNoSpace = !inlineLabel?.includes(' ')
-  const labelsOverflow = inlineLabel && !inlineLabelHasNoSpace
+  const needsYAxisAutoPadding = inlineLabel && !inlineLabelHasNoSpace
   const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
   const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
   const tickLabelFontSize = isMobileFontViewport(vizViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
@@ -220,38 +217,37 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const getYAxisData = (d, seriesKey) => d[seriesKey]
   const xAxisDataMapped = data.map(d => getXAxisData(d))
   const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
-  const properties = {
+  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
+
+  const {
+    xScale,
+    yScale,
+    seriesScale,
+    g1xScale,
+    g2xScale,
+    xScaleNoPadding,
+    xScaleAnnotation,
+    min,
+    max,
+    leftMax,
+    rightMax
+  } = useScales({
     data,
     tableData,
-    config: {
-      ...config,
-      yAxis: {
-        ...config.yAxis,
-        scalePadding: labelsOverflow ? yAxisAutoPadding : config.yAxis.scalePadding,
-        enablePadding: labelsOverflow || config.yAxis.enablePadding
-      }
-    },
+    config,
     minValue,
     maxValue,
     isAllLine,
     existPositiveValue,
     xAxisDataMapped,
-    xMax,
-    yMax
-  }
-  const { min, max, leftMax, rightMax } = useMinMax(properties)
-  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
-  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleAnnotation } = useScales({
-    ...properties,
-    min,
-    max,
-    leftMax,
-    rightMax,
+    yMax,
     dimensions,
     xMax:
       parentWidth -
       Number(config.orientation === 'horizontal' ? config.xAxis.size : config.yAxis.size) -
-      (hasRightAxis ? config.yAxis.rightAxisSize : 0)
+      (hasRightAxis ? config.yAxis.rightAxisSize : 0),
+    needsYAxisAutoPadding,
+    currentViewport
   })
 
   const [yTickCount, xTickCount] = ['yAxis', 'xAxis'].map(axis =>
@@ -498,45 +494,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     topYLabelRef.current,
     initialHeight
   ])
-
-  useEffect(() => {
-    if (lastMaxValue.current === maxValue) return
-    lastMaxValue.current = maxValue
-
-    if (!yAxisAutoPadding) return
-    setYAxisAutoPadding(0)
-  }, [maxValue])
-
-  useEffect(() => {
-    if (!yScale?.ticks) return
-    const ticks = yScale.ticks(handleNumTicks)
-    if (orientation === 'horizontal' || !labelsOverflow || config.yAxis?.max || ticks.length === 0) {
-      setYAxisAutoPadding(0)
-      return
-    }
-
-    // minimum percentage of the max value that the distance should be from the top grid line
-    const MINIMUM_DISTANCE_PERCENTAGE = 0.025
-
-    const topGridLine = Math.max(...ticks)
-    const needsPaddingThreshold = topGridLine - maxValue * MINIMUM_DISTANCE_PERCENTAGE
-    const maxValueIsGreaterThanThreshold = maxValue > needsPaddingThreshold
-
-    if (!maxValueIsGreaterThanThreshold) return
-
-    const tickGap = ticks.length === 1 ? ticks[0] : ticks[1] - ticks[0]
-    const nextTick = Math.max(...yScale.ticks(handleNumTicks)) + tickGap
-    const divideBy = minValue < 0 ? maxValue / 2 : maxValue
-    const calculatedPadding = (nextTick - maxValue) / divideBy
-
-    // if auto padding is too close to next tick, add one more ticks worth of padding
-    const newPadding =
-      calculatedPadding > MINIMUM_DISTANCE_PERCENTAGE ? calculatedPadding : calculatedPadding + tickGap / divideBy
-
-    /* sometimes even though the padding is getting to the next tick exactly,
-    d3 still doesn't show the tick. we add 0.1 to ensure to tip it over the edge */
-    setYAxisAutoPadding(newPadding * 100 + 0.1)
-  }, [maxValue, labelsOverflow, yScale, handleNumTicks])
 
   useEffect(() => {
     if (!tooltipOpen) return

@@ -13,6 +13,9 @@ import ConfigContext from '../ConfigContext'
 import { ChartConfig } from '../types/ChartConfig'
 import { ChartContext } from '../types/ChartContext'
 import _ from 'lodash'
+import { getYAxisAutoPadding } from '../helpers/getYAxisAutoPadding'
+import getMinMax from '../helpers/getMinMax'
+import { countNumOfTicks } from '../helpers/countNumOfTicks'
 
 const scaleTypes = {
   TIME: 'time',
@@ -27,23 +30,87 @@ export const TOP_PADDING = 10
 type useScaleProps = {
   config: ChartConfig // standard chart config
   data: Object[] // standard data array
-  max: number // maximum value from useMinMax hook
-  min: number // minimum value from useMinMax hook
+  tableData: Object[] // table data for getMinMax
+  minValue: number // raw minimum value from data
+  maxValue: number // raw maximum value from data
+  existPositiveValue: boolean // whether data contains positive values
+  isAllLine: boolean // whether all series are line type
   xAxisDataMapped: Object[] // array of x axis date/category items
   xMax: number // chart svg width
   yMax: number // chart svg height
+  needsYAxisAutoPadding?: boolean // whether Y-axis needs auto padding for label overflow
+  currentViewport?: string // current viewport for tick calculation
 }
 
 const useScales = (properties: useScaleProps) => {
-  let { xAxisDataMapped, xMax, yMax, min, max, config, data } = properties
+  let {
+    xAxisDataMapped,
+    xMax,
+    yMax,
+    config,
+    data,
+    tableData,
+    minValue,
+    maxValue,
+    existPositiveValue,
+    isAllLine,
+    needsYAxisAutoPadding,
+    currentViewport
+  } = properties
 
-  const { rawData, dimensions } = useContext<ChartContext>(ConfigContext)
+  const context = useContext<ChartContext>(ConfigContext)
+  const { rawData, dimensions, convertLineToBarGraph = false } = context
 
   const [screenWidth] = dimensions
+  const isHorizontal = config.orientation === 'horizontal'
+  const { visualizationType, xAxis, forestPlot, runtime } = config
+  const isForestPlot = visualizationType === 'Forest Plot'
+
+  const minMaxProps = {
+    config,
+    minValue,
+    maxValue,
+    existPositiveValue,
+    data,
+    isAllLine,
+    tableData,
+    convertLineToBarGraph
+  }
+  let { min, max, leftMax, rightMax } = getMinMax(minMaxProps)
+
+  const yTickCount = countNumOfTicks({
+    axis: 'yAxis',
+    max,
+    runtime,
+    currentViewport,
+    isHorizontal,
+    data,
+    config,
+    min
+  })
+  const handleNumTicks = isForestPlot ? config.data.length : yTickCount
+
+  // Apply auto-padding if needed
+  if (needsYAxisAutoPadding && !isHorizontal) {
+    for (let i = 0; i < 2; i++) {
+      const scale = composeYScale({ min, max, yMax, config, leftMax })
+      const padding = getYAxisAutoPadding(scale, handleNumTicks, maxValue, minValue, config)
+
+      if (padding > 0) {
+        const adjustedConfig = { ...config, yAxis: { ...config.yAxis, scalePadding: padding, enablePadding: true } }
+        const result = getMinMax({ ...minMaxProps, config: adjustedConfig })
+        min = result.min
+        max = result.max
+        leftMax = result.leftMax
+        rightMax = result.rightMax
+      } else {
+        break
+      }
+    }
+  }
+
   const seriesDomain = config.runtime.barSeriesKeys || config.runtime.seriesKeys
   const xAxisType = config.runtime.xAxis.type
-  const isHorizontal = config.orientation === 'horizontal'
-  const { visualizationType, xAxis, forestPlot } = config
   const paddingRange = ['Area Chart', 'Forecasting'].includes(config.visualizationType) ? 1 : 1 - config.barThickness
   //  define scales
   let xScale = null
@@ -59,7 +126,7 @@ const useScales = (properties: useScaleProps) => {
 
   // handle  Horizontal bars
   if (isHorizontal) {
-    xScale = composeXScale({ min: min * 1.03, ...properties })
+    xScale = composeXScale({ min: min * 1.03, max, xMax, config })
     xScale.type = config.yAxis.type === 'logarithmic' ? scaleTypes.LOG : scaleTypes.LINEAR
     yScale = getYScaleFunction(xAxisType, xAxisDataMapped)
     yScale.rangeRound([0, yMax])
@@ -69,7 +136,7 @@ const useScales = (properties: useScaleProps) => {
   // handle  Vertical bars
   if (!isHorizontal) {
     xScale = composeScaleBand(xAxisDataMapped, [0, xMax], paddingRange)
-    yScale = composeYScale(properties)
+    yScale = composeYScale({ min, max, yMax, config, leftMax })
     seriesScale = composeScaleBand(seriesDomain, [0, xScale.bandwidth()], 0)
   }
 
@@ -290,7 +357,19 @@ const useScales = (properties: useScaleProps) => {
       }
     }
   }
-  return { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleAnnotation }
+  return {
+    xScale,
+    yScale,
+    seriesScale,
+    g1xScale,
+    g2xScale,
+    xScaleNoPadding,
+    xScaleAnnotation,
+    min,
+    max,
+    leftMax,
+    rightMax
+  }
 }
 
 export default useScales

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState, useMemo, useCallback } 
 import SmallMultipleTile from './SmallMultipleTile'
 import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
-import useMinMax from '../../hooks/useMinMax'
+import getMinMax from '../../helpers/getMinMax'
 import {
   getTileData,
   getTileConfig,
@@ -127,7 +127,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     [combinedDataForYAxis, minValue, maxValue, isAllLine, existPositiveValue, parentWidth, parentHeight]
   )
 
-  const { min, max } = useMinMax(yAxisProperties)
+  const { min, max } = getMinMax(yAxisProperties)
 
   // Use consistent Y-axis if the feature is enabled and we have valid values
   const globalYAxisValues = useMemo(() => {
