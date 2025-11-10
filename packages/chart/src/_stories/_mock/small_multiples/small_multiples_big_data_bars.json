@@ -136,7 +136,8 @@
     "brushActive": false,
     "dataKey": "index",
     "axisBBox": 29.860000610351562,
-    "tickWidthMax": 20
+    "tickWidthMax": 20,
+    "label": "Target"
   },
   "table": {
     "label": "Data Table",
