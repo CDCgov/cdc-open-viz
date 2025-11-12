@@ -5,6 +5,7 @@ import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import ConfigContext from '../ConfigContext'
 
+import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import Accordion from '@cdc/core/components/ui/Accordion'
 import Button from '@cdc/core/components/elements/Button'
 import Icon from '@cdc/core/components/ui/Icon'
@@ -538,7 +539,12 @@ const EditorPanel = memo(props => {
           title='Configure Waffle Chart'
           showEditorPanel={displayPanel}
         >
-          {editorContent}
+          {config.visualizationType === 'Gauge'
+            ? [
+                editorContent,
+                <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />
+              ]
+            : [editorContent]}
         </Layout.Sidebar>
         {props.children}
       </>
