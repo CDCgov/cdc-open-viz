@@ -582,7 +582,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   display: 'none' // can't use d-none here
                 }}
               ></div>
-              <FootnotesStandAlone config={config.footnotes} filters={config.filters?.filter(f => f.filterFootnotes)} />
+              <FootnotesStandAlone
+                config={config.footnotes}
+                filters={config.filters?.filter(f => f.filterFootnotes)}
+                markupVariables={config.markupVariables}
+                enableMarkupVariables={config.enableMarkupVariables}
+                data={config.data}
+              />
             </Layout.Responsive>
           </Layout.VisualizationWrapper>
         </MapDispatchContext.Provider>
