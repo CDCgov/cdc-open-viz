@@ -20,7 +20,8 @@ import Layout from '@cdc/core/components/Layout'
 
 // Data
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
-import { supportedStatesFipsCodes } from '../../../data/supported-geos.js'
+import { supportedStatesFipsCodes, supportedCountries } from '../../../data/supported-geos.js'
+import { getSupportedCountryOptions } from '../../../helpers/getCountriesPicked'
 
 // Components - Core
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
@@ -50,6 +51,7 @@ import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/In
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs } from '../../../helpers'
+import generateRuntimeData from '../../../helpers/generateRuntimeData'
 
 import '@cdc/core/styles/v2/components/editor.scss'
 import './editorPanel.styles.css'
@@ -708,7 +710,26 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
         })
 
         if (config) {
-          const newData = generateRuntimeData(config)
+          const newData = generateRuntimeData(config, [], 0, legend.type === 'category')
+          dispatch({ type: 'SET_RUNTIME_DATA', payload: newData })
+        }
+        break
+      case 'chooseCountry':
+        let countryData = value.map(countryName => ({
+          iso: Object.keys(supportedCountries).find(key => supportedCountries[key][0] === countryName),
+          name: countryName
+        }))
+
+        setConfig({
+          ...config,
+          general: {
+            ...config.general,
+            countriesPicked: countryData
+          }
+        })
+
+        if (config) {
+          const newData = generateRuntimeData(config, [], 0, legend.type === 'category')
           dispatch({ type: 'SET_RUNTIME_DATA', payload: newData })
         }
         break
@@ -1061,6 +1082,16 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     return options
   }
 
+  const CountryOptionList = () => {
+    const countryOptions = getSupportedCountryOptions()
+
+    return countryOptions.map(({ value, label }) => (
+      <option key={value} value={label}>
+        {label}
+      </option>
+    ))
+  }
+
   const filterValueOptionList = []
 
   if (runtimeFilters.length > 0) {
@@ -1266,6 +1297,34 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     }}
                   />
                 </label>
+              )}
+              {/* Country Selection for World Maps */}
+              {config.general.geoType === 'world' && (
+                <>
+                  <label>
+                    <span>Countries Selector</span>
+                    <MultiSelect
+                      selected={(config.general.countriesPicked || []).map(country => country.name)}
+                      options={CountryOptionList().map(option => ({
+                        value: option.props.value,
+                        label: option.props.children
+                      }))}
+                      fieldName={'countriesPicked'}
+                      updateField={(_, __, ___, selectedOptions) => {
+                        handleEditorChanges('chooseCountry', selectedOptions)
+                      }}
+                    />
+                  </label>
+                  {config.general.countriesPicked && config.general.countriesPicked.length > 0 && (
+                    <CheckBox
+                      value={config.general.hideUnselectedCountries || false}
+                      fieldName='hideUnselectedCountries'
+                      label='Hide Unselected Countries'
+                      updateField={updateField}
+                      section='general'
+                    />
+                  )}
+                </>
               )}
               {/* Type */}
               <Select

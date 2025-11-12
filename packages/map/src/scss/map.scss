@@ -33,6 +33,16 @@ $medium: 768px;
   &:focus {
     outline: 0;
   }
+
+  // Multi-country map states - use higher specificity
+  &.hidden {
+    display: none !important;
+  }
+
+  &.grayed-out {
+    opacity: 0.3;
+    fill: #d3d3d3 !important;
+  }
 }
 
 .territories-label {
