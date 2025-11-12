@@ -35,16 +35,23 @@ import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 let projection = geoMercator()
 
+const GRAYED_OUT_COLOR = '#d3d3d3'
+
+type MapPosition = { coordinates: number[]; zoom: number }
+
 const WorldMap = () => {
   // prettier-ignore
   const {
     runtimeData,
-    position,
+    position: mapPosition,
     config,
     tooltipId,
     runtimeLegend,
     interactionLabel
   } = useContext(ConfigContext)
+
+  // Type assertion: position from context is actually the map viewport position, not legend position
+  const position = mapPosition as unknown as MapPosition
 
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
@@ -217,7 +224,7 @@ const WorldMap = () => {
       const geoFillColor = getGeoFillColor(config)
 
       // Check if this country should be greyed out for multi-country selection
-      const countriesPicked = getCountriesPicked(config, supportedCountries)
+      const countriesPicked = getCountriesPicked(config)
 
       const isGreyedOut = Boolean(
         countriesPicked.length > 0 &&
@@ -244,7 +251,7 @@ const WorldMap = () => {
       }
 
       let styles: Record<string, string | Record<string, string>> = {
-        fill: isGreyedOut ? '#d3d3d3' : geoFillColor,
+        fill: isGreyedOut ? GRAYED_OUT_COLOR : geoFillColor,
         cursor: 'default',
         ...(isGreyedOut && { opacity: '0.3' })
       }
@@ -260,13 +267,13 @@ const WorldMap = () => {
       if (legendColors && legendColors[0] !== '#000000' && type !== 'bubble') {
         styles = {
           ...styles,
-          fill: isGreyedOut ? '#d3d3d3' : type !== 'world-geocode' ? legendColors[0] : geoFillColor,
+          fill: isGreyedOut ? GRAYED_OUT_COLOR : type !== 'world-geocode' ? legendColors[0] : geoFillColor,
           cursor: 'default',
           '&:hover': {
-            fill: isGreyedOut ? '#d3d3d3' : type !== 'world-geocode' ? legendColors[1] : geoFillColor
+            fill: isGreyedOut ? GRAYED_OUT_COLOR : type !== 'world-geocode' ? legendColors[1] : geoFillColor
           },
           '&:active': {
-            fill: isGreyedOut ? '#d3d3d3' : type !== 'world-geocode' ? legendColors[2] : geoFillColor
+            fill: isGreyedOut ? GRAYED_OUT_COLOR : type !== 'world-geocode' ? legendColors[2] : geoFillColor
           }
         }
 
