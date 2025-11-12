@@ -3,6 +3,8 @@ import CdcMap from '../CdcMap'
 import EqualNumberOptInExample from './_mock/DEV-7286.json'
 import EqualNumberMap from './_mock/equal-number.json'
 import MultiState from './_mock/multi-state.json'
+import MultiCountry from './_mock/multi-country.json'
+import MultiCountryHide from './_mock/multi-country-hide.json'
 import SingleStateWithFilters from './_mock/DEV-8942.json'
 import exampleCityState from './_mock/example-city-state.json'
 import USBubbleCities from './_mock/us-bubble-cities.json'
@@ -82,6 +84,18 @@ export const Single_State: Story = {
 export const Multi_State: Story = {
   args: {
     config: MultiState
+  }
+}
+
+export const Multi_Country: Story = {
+  args: {
+    config: MultiCountry
+  }
+}
+
+export const Multi_Country_Hide_Mode: Story = {
+  args: {
+    config: MultiCountryHide
   }
 }
 

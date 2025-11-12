@@ -155,6 +155,11 @@ export type MapConfig = Visualization & {
       fipsCode: string
       stateName: string
     }[]
+    countriesPicked?: {
+      iso: string
+      name: string
+    }[]
+    hideUnselectedCountries?: boolean // When true, hide unselected countries; when false (default), gray them out
     territoriesAlwaysShow: boolean
     territoriesLabel: string
     title: string
