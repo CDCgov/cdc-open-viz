@@ -138,6 +138,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
     ...originalContextValues,
     config: tileConfig,
     transformedData: tileData,
+    tableData: tileData, // Override with tile-specific filtered data (important for tooltip data lookup)
     parentRef: tileParentRef, // Override with tile-specific parentRef
     updateConfig: () => {}, // Prevent tile hooks from modifying global config
     ...(customColorScale && { colorScale: customColorScale }) // Override colorScale if provided

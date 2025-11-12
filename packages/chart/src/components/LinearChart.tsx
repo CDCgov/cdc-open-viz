@@ -40,6 +40,7 @@ import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import useScales, { getTickValues } from '../hooks/useScales'
 import { useProgrammaticTooltip } from '../hooks/useProgrammaticTooltip'
+import { useSmallMultipleSynchronization } from '../hooks/useSmallMultipleSynchronization'
 
 import getTopAxis from '../helpers/getTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
@@ -101,8 +102,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     parentRef,
     tableData,
     transformedData: data,
-    seriesHighlight,
-    handleSmallMultipleHover
+    seriesHighlight
   } = useContext(ConfigContext)
 
   // CONFIG
@@ -352,6 +352,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     return manualStep
   }
 
+  const smallMultiplesSync = useSmallMultipleSynchronization(xMax, yMax, getXValueFromCoordinate)
+
   const onMouseMove = event => {
     const svgRect = event.currentTarget.getBoundingClientRect()
     const x = event.clientX - svgRect.left
@@ -362,18 +364,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       y
     })
 
-    if (handleSmallMultipleHover) {
-      const xAxisValue = getXValueFromCoordinate(x - Number(config.yAxis.size || 0))
-      if (xAxisValue !== null && xAxisValue !== undefined) {
-        handleSmallMultipleHover(xAxisValue, y)
-      }
-    }
+    smallMultiplesSync.onMouseMove?.(event)
   }
 
   const onMouseLeave = () => {
-    if (handleSmallMultipleHover) {
-      handleSmallMultipleHover(null, null)
-    }
+    smallMultiplesSync.onMouseLeave?.()
   }
 
   // Use custom hook to provide programmatic tooltip control for small multiples
