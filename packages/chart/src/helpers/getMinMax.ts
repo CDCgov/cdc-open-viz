@@ -1,9 +1,7 @@
 import { ChartConfig } from '../types/ChartConfig'
 import _ from 'lodash'
-import ConfigContext from '../ConfigContext'
-import { useContext } from 'react'
 
-type UseMinMaxProps = {
+type GetMinMaxProps = {
   /** config - standard chart config */
   config: ChartConfig
   /** minValue - starting minimum value */
@@ -18,17 +16,26 @@ type UseMinMaxProps = {
   tableData: Object[]
   /** isAllLine: if all series are line type including dashed lines */
   isAllLine: boolean
+  /** convertLineToBarGraph - whether line charts should be rendered as bar graphs */
+  convertLineToBarGraph?: boolean
 }
 
-const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAllLine, tableData }: UseMinMaxProps) => {
+const getMinMax = ({
+  config,
+  minValue,
+  maxValue,
+  existPositiveValue,
+  data,
+  isAllLine,
+  tableData,
+  convertLineToBarGraph
+}: GetMinMaxProps) => {
   let min = 0
   let max = 0
 
   // Implementation for left and right axis
   let leftMax = 0
   let rightMax = 0
-
-  const { convertLineToBarGraph } = useContext(ConfigContext)
 
   if (!data) {
     return { min, max }
@@ -238,4 +245,4 @@ const useMinMax = ({ config, minValue, maxValue, existPositiveValue, data, isAll
 
   return { min, max, leftMax, rightMax }
 }
-export default useMinMax
+export default getMinMax

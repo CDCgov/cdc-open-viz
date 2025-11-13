@@ -110,25 +110,8 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   // Small multiples-specific modifications
   tileConfig = {
     ...tileConfig,
-    xAxis: {
-      ...tileConfig.xAxis,
-      label: isFirstInRow ? tileConfig.xAxis?.label : undefined
-    },
-    yAxis: {
-      ...tileConfig.yAxis,
-      label: isFirstInRow ? tileConfig.yAxis?.label : undefined
-    },
-    runtime: {
-      ...tileConfig.runtime,
-      xAxis: {
-        ...tileConfig.runtime?.xAxis,
-        label: isFirstInRow ? tileConfig.xAxis?.label : undefined
-      },
-      yAxis: {
-        ...tileConfig.runtime?.yAxis,
-        label: isFirstInRow ? tileConfig.yAxis?.label : undefined
-      }
-    },
+    hideXAxisLabel: !isFirstInRow,
+    hideYAxisLabel: !isFirstInRow,
     legend: {
       ...tileConfig.legend,
       hide: true
@@ -155,6 +138,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
     ...originalContextValues,
     config: tileConfig,
     transformedData: tileData,
+    tableData: tileData, // Override with tile-specific filtered data (important for tooltip data lookup)
     parentRef: tileParentRef, // Override with tile-specific parentRef
     updateConfig: () => {}, // Prevent tile hooks from modifying global config
     ...(customColorScale && { colorScale: customColorScale }) // Override colorScale if provided

@@ -16,6 +16,7 @@ type SharedChartContext = {
   clean: Function
   colorScale?: ColorScale
   config: ChartConfig
+  convertLineToBarGraph?: boolean
   currentViewport?: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   vizViewport?: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   dashboardConfig?: DashboardConfig

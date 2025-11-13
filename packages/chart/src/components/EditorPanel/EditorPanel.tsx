@@ -36,7 +36,7 @@ import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
 import useRightAxis from '../../hooks/useRightAxis'
 import WarningImage from '../../images/warning.svg'
-import useMinMax from '../../hooks/useMinMax'
+import getMinMax from '../../helpers/getMinMax'
 
 import { type ChartContext } from '../../types/ChartContext'
 import { type ChartConfig } from '../../types/ChartConfig'
@@ -634,8 +634,16 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   } = useContext<ChartContext>(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
-  const properties = { data, config }
-  const { leftMax, rightMax } = useMinMax(properties)
+  const properties = {
+    data,
+    tableData: data,
+    config,
+    minValue,
+    maxValue,
+    existPositiveValue,
+    isAllLine
+  }
+  const { leftMax, rightMax } = getMinMax(properties)
 
   const {
     visHasAnchors,

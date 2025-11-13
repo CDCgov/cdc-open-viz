@@ -143,11 +143,12 @@ const createInitialState = () => {
     smallMultiples: {
       mode: '',
       tileColumn: '',
-      tilesPerRowDesktop: 3,
+      tilesPerRowDesktop: 2,
       tilesPerRowMobile: 1,
       tileOrderType: 'asc',
       tileOrder: [],
-      tileTitles: {}
+      tileTitles: {},
+      synchronizedTooltips: true
     },
     markupVariables: [],
     enableMarkupVariables: false
