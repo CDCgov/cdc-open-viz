@@ -158,7 +158,25 @@
     "show": true
   },
   "orientation": "vertical",
-  "columns": {},
+  "columns": {
+    "weight": {
+      "label": "weightx",
+      "dataTable": true,
+      "tooltips": true,
+      "prefix": "$",
+      "suffix": "*",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "weight",
+      "series": "",
+      "order": null
+    }
+  },
   "legend": {
     "hide": true,
     "behavior": "isolate",
