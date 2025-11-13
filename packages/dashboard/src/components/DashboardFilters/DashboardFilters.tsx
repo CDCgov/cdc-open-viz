@@ -203,7 +203,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
             {applyFiltersButtonText || 'GO!'}
           </button>
           {handleReset && (
-            <button className='btn btn-secondary mb-1' onClick={handleReset}>
+            <button className='btn btn-link mb-1' onClick={handleReset}>
               Clear Filters
             </button>
           )}
