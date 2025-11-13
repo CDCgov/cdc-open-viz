@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import Chart from '../CdcChart'
-import forecastComboWithGaps from '../../examples/private/na.json'
+import forecastComboWithGaps from './_mock/forecast_combo_with_gaps.json'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Forecast Chart',
