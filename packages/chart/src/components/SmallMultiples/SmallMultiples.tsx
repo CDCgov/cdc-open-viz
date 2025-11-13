@@ -2,15 +2,8 @@ import React, { useContext, useEffect, useRef, useState, useMemo, useCallback } 
 import SmallMultipleTile from './SmallMultipleTile'
 import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
-import useMinMax from '../../hooks/useMinMax'
-import {
-  getTileData,
-  getTileConfig,
-  createCombinedDataForYAxis,
-  applyTileOrder,
-  createTileColorScale
-} from '../../helpers/smallMultiplesHelpers'
-import { calculateYAxisWithAutoPadding } from '../../helpers/calculateYAxisWithAutoPadding'
+import useScales from '../../hooks/useScales'
+import { createCombinedDataForYAxis, applyTileOrder, createTileColorScale } from '../../helpers/smallMultiplesHelpers'
 import { isMobileSmallMultiplesViewport } from '@cdc/core/helpers/viewports'
 import './SmallMultiples.css'
 import { ChartConfig } from '../../types/ChartConfig'
@@ -112,62 +105,24 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     combinedDataForYAxis.data
   )
 
-  // Check if auto-padding should be applied to unified Y-axis
-  const shouldApplyUnifiedAutoPadding = !config.smallMultiples?.independentYAxis
-  const inlineLabel = combinedDataForYAxis.config.yAxis?.inlineLabel
+  const inlineLabel = config.yAxis?.inlineLabel
   const inlineLabelHasNoSpace = !inlineLabel?.includes(' ')
-  const shouldApplyAutoPadding = shouldApplyUnifiedAutoPadding && inlineLabel && !inlineLabelHasNoSpace
+  const needsYAxisAutoPadding = inlineLabel && !inlineLabelHasNoSpace
 
-  // Create config that disables scale padding when auto-padding will be applied
-  const configForMinMax = shouldApplyAutoPadding
-    ? {
-        ...combinedDataForYAxis.config,
-        yAxis: {
-          ...combinedDataForYAxis.config.yAxis,
-          enablePadding: false,
-          scalePadding: 0
-        }
-      }
-    : combinedDataForYAxis.config
-
-  const yAxisProperties = useMemo(
-    () => ({
-      data: combinedDataForYAxis.data,
-      tableData: combinedDataForYAxis.data,
-      config: configForMinMax,
-      minValue,
-      maxValue,
-      isAllLine,
-      existPositiveValue,
-      xAxisDataMapped: [],
-      xMax: parentWidth,
-      yMax: parentHeight
-    }),
-    [
-      combinedDataForYAxis.data,
-      configForMinMax,
-      minValue,
-      maxValue,
-      isAllLine,
-      existPositiveValue,
-      parentWidth,
-      parentHeight
-    ]
-  )
-
-  const { min: baseMin, max: baseMax } = useMinMax(yAxisProperties)
-
-  // Apply auto-padding only if needed (on raw values), otherwise use scale-padded values
-  const { min, max } = shouldApplyAutoPadding
-    ? calculateYAxisWithAutoPadding(
-        baseMin,
-        baseMax,
-        combinedDataForYAxis.config,
-        combinedDataForYAxis.data,
-        parentHeight,
-        currentViewport
-      )
-    : { min: baseMin, max: baseMax }
+  const { min, max } = useScales({
+    config: combinedDataForYAxis.config,
+    data: combinedDataForYAxis.data,
+    tableData: combinedDataForYAxis.data,
+    minValue,
+    maxValue,
+    existPositiveValue,
+    isAllLine,
+    xAxisDataMapped: [],
+    xMax: parentWidth,
+    yMax: parentHeight,
+    needsYAxisAutoPadding,
+    currentViewport
+  })
 
   // Use consistent Y-axis if the feature is enabled and we have valid values
   const globalYAxisValues = useMemo(() => {

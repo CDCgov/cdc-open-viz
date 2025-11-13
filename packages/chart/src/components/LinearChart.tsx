@@ -36,11 +36,11 @@ import { calcInitialHeight, handleAutoPaddingRight } from '../helpers/sizeHelper
 import { filterAndShiftLinearDateTicks } from '../helpers/filterAndShiftLinearDateTicks'
 
 // Hooks
-import useMinMax from '../hooks/useMinMax'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import useScales, { getTickValues } from '../hooks/useScales'
 import { useProgrammaticTooltip } from '../hooks/useProgrammaticTooltip'
+import { useSmallMultipleSynchronization } from '../hooks/useSmallMultipleSynchronization'
 
 import getTopAxis from '../helpers/getTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
@@ -51,7 +51,6 @@ import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
 import HoverLine from './HoverLine/HoverLine'
 import { SmallMultiples } from './SmallMultiples'
-import { calculateYAxisWithAutoPadding } from '../helpers/calculateYAxisWithAutoPadding'
 
 type LinearChartProps = {
   parentWidth: number
@@ -103,8 +102,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     parentRef,
     tableData,
     transformedData: data,
-    seriesHighlight,
-    handleSmallMultipleHover
+    seriesHighlight
   } = useContext(ConfigContext)
 
   // CONFIG
@@ -157,7 +155,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const isForestPlot = visualizationType === 'Forest Plot'
   const isDateTime = config.xAxis.type === 'date-time'
   const inlineLabelHasNoSpace = !inlineLabel?.includes(' ')
-  const labelsOverflow = inlineLabel && !inlineLabelHasNoSpace
+  const needsYAxisAutoPadding = inlineLabel && !inlineLabelHasNoSpace
   const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
   const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
   const tickLabelFontSize = isMobileFontViewport(vizViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
@@ -219,53 +217,37 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const getYAxisData = (d, seriesKey) => d[seriesKey]
   const xAxisDataMapped = data.map(d => getXAxisData(d))
   const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
+  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
 
-  // Check if auto-padding should be applied to decide which config to use with useMinMax
-  const shouldApplyAutoPadding = inlineLabel && !inlineLabelHasNoSpace
-
-  // Create config that disables scale padding when auto-padding will be applied
-  const configForMinMax = shouldApplyAutoPadding
-    ? {
-        ...config,
-        yAxis: {
-          ...config.yAxis,
-          enablePadding: false,
-          scalePadding: 0
-        }
-      }
-    : config
-
-  // Get Y-axis values from useMinMax
-  const properties = {
+  const {
+    xScale,
+    yScale,
+    seriesScale,
+    g1xScale,
+    g2xScale,
+    xScaleNoPadding,
+    xScaleAnnotation,
+    min,
+    max,
+    leftMax,
+    rightMax
+  } = useScales({
     data,
     tableData,
-    config: configForMinMax,
+    config,
     minValue,
     maxValue,
     isAllLine,
     existPositiveValue,
     xAxisDataMapped,
-    xMax,
-    yMax
-  }
-  const { min: baseMin, max: baseMax, leftMax, rightMax } = useMinMax(properties)
-
-  // Apply auto-padding only if needed (on raw values), otherwise use scale-padded values
-  const { min, max } = shouldApplyAutoPadding
-    ? calculateYAxisWithAutoPadding(baseMin, baseMax, config, data, parentHeight, currentViewport)
-    : { min: baseMin, max: baseMax }
-  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
-  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleAnnotation } = useScales({
-    ...properties,
-    min,
-    max,
-    leftMax,
-    rightMax,
+    yMax,
     dimensions,
     xMax:
       parentWidth -
       Number(config.orientation === 'horizontal' ? config.xAxis.size : config.yAxis.size) -
-      (hasRightAxis ? config.yAxis.rightAxisSize : 0)
+      (hasRightAxis ? config.yAxis.rightAxisSize : 0),
+    needsYAxisAutoPadding,
+    currentViewport
   })
 
   const [yTickCount, xTickCount] = ['yAxis', 'xAxis'].map(axis =>
@@ -370,6 +352,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     return manualStep
   }
 
+  const smallMultiplesSync = useSmallMultipleSynchronization(xMax, yMax, getXValueFromCoordinate)
+
   const onMouseMove = event => {
     const svgRect = event.currentTarget.getBoundingClientRect()
     const x = event.clientX - svgRect.left
@@ -380,18 +364,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       y
     })
 
-    if (handleSmallMultipleHover) {
-      const xAxisValue = getXValueFromCoordinate(x - Number(config.yAxis.size || 0))
-      if (xAxisValue !== null && xAxisValue !== undefined) {
-        handleSmallMultipleHover(xAxisValue, y)
-      }
-    }
+    smallMultiplesSync.onMouseMove?.(event)
   }
 
   const onMouseLeave = () => {
-    if (handleSmallMultipleHover) {
-      handleSmallMultipleHover(null, null)
-    }
+    smallMultiplesSync.onMouseLeave?.()
   }
 
   // Use custom hook to provide programmatic tooltip control for small multiples
@@ -677,7 +654,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                     verticalAnchor='start'
                     fontSize={axisLabelFontSize}
                   >
-                    {runtime.xAxis.label}
+                    {!config.hideXAxisLabel ? runtime.xAxis.label : null}
                   </Text>
                 </Group>
               </>
@@ -763,7 +740,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       fill={config.yAxis.labelColor}
                       fontSize={axisLabelFontSize}
                     >
-                      {props.label}
+                      {!config.hideYAxisLabel ? props.label : null}
                     </Text>
                   </Group>
                 )
@@ -1325,7 +1302,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       fill={config.yAxis.labelColor}
                       fontSize={axisLabelFontSize}
                     >
-                      {props.label}
+                      {!config.hideYAxisLabel ? props.label : null}
                     </Text>
                   </Group>
                 )
@@ -1598,7 +1575,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       fill={config.xAxis.labelColor}
                       fontSize={axisLabelFontSize}
                     >
-                      {props.label}
+                      {!config.hideXAxisLabel ? props.label : null}
                     </Text>
                   </Group>
                 )
