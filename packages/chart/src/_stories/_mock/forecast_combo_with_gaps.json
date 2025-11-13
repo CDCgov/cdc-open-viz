@@ -1,0 +1,913 @@
+{
+  "annotations": [],
+  "allowLineToBarGraph": "__​undefined__",
+  "type": "chart",
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "title": "Figure 1: National Ensemble Forecasts",
+  "showTitle": true,
+  "showDownloadMediaButton": false,
+  "theme": "theme-blue",
+  "animate": false,
+  "lineDatapointStyle": "always show",
+  "lineDatapointColor": "Lighter than Line",
+  "barHasBorder": "true",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "regular",
+  "barStyle": "",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "isResponsiveTicks": false,
+  "general": {
+    "annotationDropdownText": "Annotations",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": true,
+    "hideNullValue": true,
+    "palette": {
+      "name": "qualitative1reverse",
+      "customColors": [
+        "#000000",
+        "#006166"
+      ],
+      "version": "1.0",
+      "backups": [
+        {
+          "name": "qualitative1reverse",
+          "version": "1.0",
+          "isReversed": "__​undefined__"
+        }
+      ]
+    }
+  },
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "preliminaryData": [],
+  "yAxis": {
+    "hideAxis": false,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "85",
+    "gridLines": true,
+    "enablePadding": false,
+    "min": "",
+    "max": "70000",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
+    "rightHideAxis": false,
+    "rightAxisSize": 0,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#1c1d1f",
+    "rightAxisTickLabelColor": "#1c1d1f",
+    "rightAxisTickColor": "#1c1d1f",
+    "numTicks": "",
+    "axisPadding": 0,
+    "scalePadding": 10,
+    "tickRotation": 0,
+    "anchors": [],
+    "shoMissingDataLabel": true,
+    "showMissingDataLine": true,
+    "categories": [],
+    "label": "Weekly hospital admissions",
+    "labelOffset": "15"
+  },
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "count": "Count",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
+    }
+  },
+  "topAxis": {
+    "hasLine": true
+  },
+  "isLegendValue": false,
+  "barThickness": 0.35,
+  "barHeight": 25,
+  "barSpace": 15,
+  "heights": {
+    "vertical": "350",
+    "horizontal": 750
+  },
+  "xAxis": {
+    "sortDates": false,
+    "anchors": [],
+    "type": "date",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 75,
+    "tickRotation": "45",
+    "min": "",
+    "max": "",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
+    "numTicks": "",
+    "labelOffset": 0,
+    "axisPadding": 200,
+    "target": 0,
+    "maxTickRotation": 0,
+    "padding": 5,
+    "showYearsOnce": false,
+    "sortByRecentDate": false,
+    "brushActive": false,
+    "dataKey": "Target End Date",
+    "dateParseFormat": "%m/%d/%Y",
+    "dateDisplayFormat": "%m/%d/%Y",
+    "tickWidthMax": 86,
+    "axisBBox": 85.48712158203125
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "indexLabel": "",
+    "download": true,
+    "showVertical": true,
+    "dateDisplayFormat": "",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "collapsible": true,
+    "show": true
+  },
+  "orientation": "vertical",
+  "columns": {
+    "Month": {
+      "name": "Month",
+      "dataTable": false
+    },
+    "Lower 50%": {
+      "label": "Lower 50%",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "Lower 50%"
+    },
+    "Upper 50%": {
+      "label": "Upper 50%",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "Upper 50%"
+    },
+    "Lower 95%": {
+      "label": "Lower 95%",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "Lower 95%"
+    },
+    "Upper 95%": {
+      "label": "Upper 95%",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "Upper 95%"
+    }
+  },
+  "legend": {
+    "hide": true,
+    "behavior": "isolate",
+    "axisAlign": true,
+    "singleRow": true,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "hideSuppressedLabels": false,
+    "hideSuppressionLink": false,
+    "seriesHighlight": [],
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "groupBy": "",
+    "shape": "circle",
+    "tickRotation": "",
+    "order": "dataColumn",
+    "hideBorder": {
+      "side": false,
+      "topBottom": true
+    },
+    "position": "right",
+    "orderedValues": [],
+    "patterns": {},
+    "patternField": "",
+    "unified": true
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
+  "labels": false,
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": true,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false
+  },
+  "filters": [],
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": true,
+    "horizontalHoverLine": false,
+    "lineDatapointSymbol": "none",
+    "maximumShapeAmount": 7
+  },
+  "useLogScale": false,
+  "filterBehavior": "Filter Change",
+  "highlightedBarValues": [],
+  "series": [
+    {
+      "dataKey": "Month",
+      "type": "Forecasting",
+      "axis": "Left",
+      "tooltip": false,
+      "stages": [
+        {
+          "key": "11",
+          "color": "sequential-green"
+        },
+        {
+          "key": "12",
+          "color": "sequential-green"
+        },
+        {
+          "key": "1",
+          "color": "sequential-green"
+        },
+        {
+          "key": "2",
+          "color": "sequential-green"
+        },
+        {
+          "key": "3",
+          "color": "sequential-green"
+        },
+        {
+          "key": "4",
+          "color": "sequential-green"
+        }
+      ],
+      "stageColumn": "Month",
+      "confidenceIntervals": [
+        {
+          "high": "Upper 50%",
+          "low": "Lower 50%",
+          "showInTooltip": true
+        },
+        {
+          "high": "Upper 95%",
+          "low": "Lower 95%",
+          "showInTooltip": true
+        }
+      ]
+    },
+    {
+      "dataKey": "Forecasted",
+      "type": "dashed-sm",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Observed",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    }
+  ],
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": ""
+  },
+  "forestPlot": {
+    "startAt": 0,
+    "colors": {
+      "line": "",
+      "shape": ""
+    },
+    "lineOfNoEffect": {
+      "show": true
+    },
+    "type": "",
+    "pooledResult": {
+      "diamondHeight": 5,
+      "column": ""
+    },
+    "estimateField": "",
+    "estimateRadius": "",
+    "shape": "square",
+    "rowHeight": 20,
+    "description": {
+      "show": true,
+      "text": "description",
+      "location": 0
+    },
+    "result": {
+      "show": true,
+      "text": "result",
+      "location": 100
+    },
+    "radius": {
+      "min": 2,
+      "max": 10,
+      "scalingColumn": ""
+    },
+    "regression": {
+      "lower": 0,
+      "upper": 0,
+      "estimateField": 0
+    },
+    "leftWidthOffset": 0,
+    "rightWidthOffset": 0,
+    "showZeroLine": false,
+    "leftLabel": "",
+    "rightLabel": ""
+  },
+  "area": {
+    "isStacked": false
+  },
+  "sankey": {
+    "title": {
+      "defaultColor": "black"
+    },
+    "iterations": 1,
+    "rxValue": 0.9,
+    "overallSize": {
+      "width": 900,
+      "height": 700
+    },
+    "margin": {
+      "margin_y": 25,
+      "margin_x": 0
+    },
+    "nodeSize": {
+      "nodeWidth": 26,
+      "nodeHeight": 40
+    },
+    "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": {
+      "default": "#ff8500",
+      "inactive": "#808080"
+    },
+    "linkColor": {
+      "default": "#ffc900",
+      "inactive": "#D3D3D3"
+    },
+    "opacity": {
+      "nodeOpacityDefault": 1,
+      "nodeOpacityInactive": 0.1,
+      "LinkOpacityDefault": 1,
+      "LinkOpacityInactive": 0.1
+    },
+    "storyNodeFontColor": "#006778",
+    "storyNodeText": [],
+    "nodeValueStyle": {
+      "textBefore": "(",
+      "textAfter": ")"
+    },
+    "data": []
+  },
+  "markupVariables": [],
+  "enableMarkupVariables": false,
+  "dataFileName": "./forecast_chart_data_ex_2.csv",
+  "dataFileSourceType": "file",
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
+  "id": 3,
+  "category": "Charts",
+  "label": "Combo Chart",
+  "subType": "Combo",
+  "icon": {
+    "key": null,
+    "ref": null,
+    "props": {},
+    "_owner": null
+  },
+  "content": "Use bars to show comparisons between data categories.",
+  "visualizationType": "Combo",
+  "activeVizButtonID": 3,
+  "brush": {
+    "isActive": false,
+    "isBrushing": false,
+    "data": [],
+    "height": 45,
+    "active": false
+  },
+  "isPaletteReversed": true,
+  "version": "4.25.10",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "dynamicMarginTop": 0,
+  "description": "<div class=\"psuedolegend\">\n<p><strong>Prediction Interval</strong><br/>\n<span class=\"ci50\"></span> 50%<br/>\n<span class=\"ci95\"></span> 95%<br/>\n</p>\n<p><strong>Weekly Admissions</strong><br/>\n<span class=\"forecasted\"></span> Forecasted<br/>\n<span class=\"observed\"></span> Observed<br/>\n</p>\n<div class=\"cb\"></div>\n<div>",
+  "introText": "National median ensemble with 50 and 95% prediction intervals alongside observed weekly hospital admissions.",
+  "data": [
+    {
+      "Location": "US",
+      "Target": "NA",
+      "Target End Date": "11/23/2024",
+      "Forecast Date": "NA",
+      "Model": "NA",
+      "Location Name": "National",
+      "Month": "11",
+      "Forecasted": "Intentionally left blank for visualization purposes",
+      "Lower 50%": "NA",
+      "Upper 50%": "NA",
+      "Lower 95%": "NA",
+      "Upper 95%": "NA",
+      "Observed": "3092"
+    },
+    {
+      "Location": "US",
+      "Target": "0 wk inc flu hosp",
+      "Target End Date": "11/30/2024",
+      "Forecast Date": "11/30/2024",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "11",
+      "Forecasted": "3947",
+      "Lower 50%": "3576",
+      "Upper 50%": "4579",
+      "Lower 95%": "2701",
+      "Upper 95%": "6252",
+      "Observed": "4277"
+    },
+    {
+      "Location": "US",
+      "Target": "1 wk inc flu hosp",
+      "Target End Date": "12/7/2024",
+      "Forecast Date": "11/30/2024",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "12",
+      "Forecasted": "4727",
+      "Lower 50%": "3916",
+      "Upper 50%": "5796",
+      "Lower 95%": "2042",
+      "Upper 95%": "8353",
+      "Observed": "6288"
+    },
+    {
+      "Location": "US",
+      "Target": "2 wk inc flu hosp",
+      "Target End Date": "12/14/2024",
+      "Forecast Date": "11/30/2024",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "12",
+      "Forecasted": "5415",
+      "Lower 50%": "4031",
+      "Upper 50%": "6929",
+      "Lower 95%": "2403",
+      "Upper 95%": "10724",
+      "Observed": "9166"
+    },
+    {
+      "Location": "US",
+      "Target": "3 wk inc flu hosp",
+      "Target End Date": "12/21/2024",
+      "Forecast Date": "11/30/2024",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "12",
+      "Forecasted": "6248",
+      "Lower 50%": "4224",
+      "Upper 50%": "8271",
+      "Lower 95%": "2323",
+      "Upper 95%": "13970",
+      "Observed": "15429"
+    },
+    {
+      "Location": "US",
+      "Target": "NA",
+      "Target End Date": "12/28/2024",
+      "Forecast Date": "NA",
+      "Model": "NA",
+      "Location Name": "National",
+      "Month": "12",
+      "Forecasted": "Intentionally left blank for visualization purposes",
+      "Lower 50%": "NA",
+      "Upper 50%": "NA",
+      "Lower 95%": "NA",
+      "Upper 95%": "NA",
+      "Observed": "27681"
+    },
+    {
+      "Location": "US",
+      "Target": "0 wk inc flu hosp",
+      "Target End Date": "1/4/2025",
+      "Forecast Date": "1/4/2025",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "1",
+      "Forecasted": "25891",
+      "Lower 50%": "22477",
+      "Upper 50%": "28513",
+      "Lower 95%": "17196",
+      "Upper 95%": "36169",
+      "Observed": "38690"
+    },
+    {
+      "Location": "US",
+      "Target": "1 wk inc flu hosp",
+      "Target End Date": "1/11/2025",
+      "Forecast Date": "1/4/2025",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "1",
+      "Forecasted": "26451",
+      "Lower 50%": "22761",
+      "Upper 50%": "31409",
+      "Lower 95%": "16729",
+      "Upper 95%": "40846",
+      "Observed": "30750"
+    },
+    {
+      "Location": "US",
+      "Target": "2 wk inc flu hosp",
+      "Target End Date": "1/18/2025",
+      "Forecast Date": "1/4/2025",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "1",
+      "Forecasted": "24083",
+      "Lower 50%": "19270",
+      "Upper 50%": "29355",
+      "Lower 95%": "13372",
+      "Upper 95%": "42595",
+      "Observed": "32984"
+    },
+    {
+      "Location": "US",
+      "Target": "3 wk inc flu hosp",
+      "Target End Date": "1/25/2025",
+      "Forecast Date": "1/4/2025",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "1",
+      "Forecasted": "23735",
+      "Lower 50%": "18711",
+      "Upper 50%": "29913",
+      "Lower 95%": "11087",
+      "Upper 95%": "42719",
+      "Observed": "40604"
+    },
+    {
+      "Location": "US",
+      "Target": "NA",
+      "Target End Date": "2/1/2025",
+      "Forecast Date": "NA",
+      "Model": "NA",
+      "Location Name": "National",
+      "Month": "2",
+      "Forecasted": "Intentionally left blank for visualization purposes",
+      "Lower 50%": "NA",
+      "Upper 50%": "NA",
+      "Lower 95%": "NA",
+      "Upper 95%": "NA",
+      "Observed": "51206"
+    },
+    {
+      "Location": "US",
+      "Target": "NA",
+      "Target End Date": "2/8/2025",
+      "Forecast Date": "NA",
+      "Model": "NA",
+      "Location Name": "National",
+      "Month": "2",
+      "Forecasted": "Intentionally left blank for visualization purposes",
+      "Lower 50%": "NA",
+      "Upper 50%": "NA",
+      "Lower 95%": "NA",
+      "Upper 95%": "NA",
+      "Observed": "54271"
+    },
+    {
+      "Location": "US",
+      "Target": "0 wk inc flu hosp",
+      "Target End Date": "2/15/2025",
+      "Forecast Date": "2/15/2025",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "2",
+      "Forecasted": "45052",
+      "Lower 50%": "38273",
+      "Upper 50%": "51097",
+      "Lower 95%": "30423",
+      "Upper 95%": "60355",
+      "Observed": "46327"
+    },
+    {
+      "Location": "US",
+      "Target": "1 wk inc flu hosp",
+      "Target End Date": "2/22/2025",
+      "Forecast Date": "2/15/2025",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "2",
+      "Forecasted": "40726",
+      "Lower 50%": "32448",
+      "Upper 50%": "48077",
+      "Lower 95%": "24458",
+      "Upper 95%": "63101",
+      "Observed": "37871"
+    },
+    {
+      "Location": "US",
+      "Target": "2 wk inc flu hosp",
+      "Target End Date": "3/1/2025",
+      "Forecast Date": "2/15/2025",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "3",
+      "Forecasted": "37235",
+      "Lower 50%": "27006",
+      "Upper 50%": "42977",
+      "Lower 95%": "19599",
+      "Upper 95%": "63413",
+      "Observed": "30809"
+    },
+    {
+      "Location": "US",
+      "Target": "3 wk inc flu hosp",
+      "Target End Date": "3/8/2025",
+      "Forecast Date": "2/15/2025",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "3",
+      "Forecasted": "34093",
+      "Lower 50%": "25110",
+      "Upper 50%": "39141",
+      "Lower 95%": "15825",
+      "Upper 95%": "60260",
+      "Observed": "23986"
+    },
+    {
+      "Location": "US",
+      "Target": "NA",
+      "Target End Date": "3/15/2025",
+      "Forecast Date": "NA",
+      "Model": "NA",
+      "Location Name": "National",
+      "Month": "3",
+      "Forecasted": "Intentionally left blank for visualization purposes",
+      "Lower 50%": "NA",
+      "Upper 50%": "NA",
+      "Lower 95%": "NA",
+      "Upper 95%": "NA",
+      "Observed": "18389"
+    },
+    {
+      "Location": "US",
+      "Target": "0 wk inc flu hosp",
+      "Target End Date": "3/22/2025",
+      "Forecast Date": "3/22/2025",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "3",
+      "Forecasted": "14018",
+      "Lower 50%": "11909",
+      "Upper 50%": "15787",
+      "Lower 95%": "7856",
+      "Upper 95%": "20887",
+      "Observed": "13640"
+    },
+    {
+      "Location": "US",
+      "Target": "1 wk inc flu hosp",
+      "Target End Date": "3/29/2025",
+      "Forecast Date": "3/22/2025",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "3",
+      "Forecasted": "11058",
+      "Lower 50%": "8460",
+      "Upper 50%": "14184",
+      "Lower 95%": "5182",
+      "Upper 95%": "20711",
+      "Observed": "9684"
+    },
+    {
+      "Location": "US",
+      "Target": "2 wk inc flu hosp",
+      "Target End Date": "4/5/2025",
+      "Forecast Date": "3/22/2025",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "4",
+      "Forecasted": "9409",
+      "Lower 50%": "7002",
+      "Upper 50%": "12120",
+      "Lower 95%": "3631",
+      "Upper 95%": "20207",
+      "Observed": "6802"
+    },
+    {
+      "Location": "US",
+      "Target": "3 wk inc flu hosp",
+      "Target End Date": "4/12/2025",
+      "Forecast Date": "3/22/2025",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "4",
+      "Forecasted": "7607",
+      "Lower 50%": "5511",
+      "Upper 50%": "9998",
+      "Lower 95%": "2233",
+      "Upper 95%": "20432",
+      "Observed": "4917"
+    },
+    {
+      "Location": "US",
+      "Target": "NA",
+      "Target End Date": "4/19/2025",
+      "Forecast Date": "NA",
+      "Model": "NA",
+      "Location Name": "National",
+      "Month": "4",
+      "Forecasted": "Intentionally left blank for visualization purposes",
+      "Lower 50%": "NA",
+      "Upper 50%": "NA",
+      "Lower 95%": "NA",
+      "Upper 95%": "NA",
+      "Observed": "3871"
+    },
+    {
+      "Location": "US",
+      "Target": "0 wk inc flu hosp",
+      "Target End Date": "4/26/2025",
+      "Forecast Date": "4/26/2025",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "4",
+      "Forecasted": "2702",
+      "Lower 50%": "2063",
+      "Upper 50%": "3542",
+      "Lower 95%": "1066",
+      "Upper 95%": "5178",
+      "Observed": "3242"
+    },
+    {
+      "Location": "US",
+      "Target": "1 wk inc flu hosp",
+      "Target End Date": "5/3/2025",
+      "Forecast Date": "4/26/2025",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "5",
+      "Forecasted": "2141",
+      "Lower 50%": "1358",
+      "Upper 50%": "3178",
+      "Lower 95%": "502",
+      "Upper 95%": "4879",
+      "Observed": "2442"
+    },
+    {
+      "Location": "US",
+      "Target": "2 wk inc flu hosp",
+      "Target End Date": "5/10/2025",
+      "Forecast Date": "4/26/2025",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "5",
+      "Forecasted": "1574",
+      "Lower 50%": "915",
+      "Upper 50%": "2828",
+      "Lower 95%": "277",
+      "Upper 95%": "5080",
+      "Observed": "2116"
+    },
+    {
+      "Location": "US",
+      "Target": "3 wk inc flu hosp",
+      "Target End Date": "5/17/2025",
+      "Forecast Date": "4/26/2025",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "5",
+      "Forecasted": "1294",
+      "Lower 50%": "675",
+      "Upper 50%": "2749",
+      "Lower 95%": "189",
+      "Upper 95%": "5202",
+      "Observed": "1837"
+    },
+    {
+      "Location": "US",
+      "Target": "NA",
+      "Target End Date": "5/24/2025",
+      "Forecast Date": "NA",
+      "Model": "NA",
+      "Location Name": "National",
+      "Month": "5",
+      "Forecasted": "Intentionally left blank for visualization purposes",
+      "Lower 50%": "NA",
+      "Upper 50%": "NA",
+      "Lower 95%": "NA",
+      "Upper 95%": "NA",
+      "Observed": "1686"
+    },
+    {
+      "Location": "US",
+      "Target": "0 wk inc flu hosp",
+      "Target End Date": "5/31/2025",
+      "Forecast Date": "5/31/2025",
+      "Model": "FluSight-ensemble",
+      "Location Name": "National",
+      "Month": "5",
+      "Forecasted": "1463",
+      "Lower 50%": "1126",
+      "Upper 50%": "1710",
+      "Lower 95%": "752",
+      "Upper 95%": "2540",
+      "Observed": "1806"
+    }
+  ],
+  "datasets": {}
+}
