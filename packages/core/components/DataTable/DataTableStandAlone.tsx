@@ -72,7 +72,13 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
         viewport={viewport || 'lg'}
         interactionLabel={interactionLabel}
       />
-      <FootnotesStandAlone config={config.footnotes} filters={config.filters?.filter(f => f.filterFootnotes)} />
+      <FootnotesStandAlone
+        config={config.footnotes}
+        filters={config.filters?.filter(f => f.filterFootnotes)}
+        markupVariables={config['markupVariables']}
+        enableMarkupVariables={config['enableMarkupVariables']}
+        data={config.data}
+      />
     </>
   )
 }

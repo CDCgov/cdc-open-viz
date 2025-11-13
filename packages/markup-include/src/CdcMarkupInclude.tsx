@@ -266,7 +266,13 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
                   </div>
                 </div>
               </div>
-              <FootnotesStandAlone config={configObj?.footnotes} filters={config?.filters || []} />
+              <FootnotesStandAlone
+                config={configObj?.footnotes}
+                filters={config?.filters || []}
+                markupVariables={markupVariables}
+                enableMarkupVariables={config?.enableMarkupVariables}
+                data={data}
+              />
             </div>
           </Layout.Responsive>
         )}
