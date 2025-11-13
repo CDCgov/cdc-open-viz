@@ -239,3 +239,291 @@ export const createTileColorScale = (tileItem, config, originalColorScale, tileI
     }
   }
 }
+
+/**
+ * Pivot data from long format to wide format for DataTable display
+ * Transforms data so each unique tileColumn value becomes its own column
+ * Works for both regular data and runtimeData
+ *
+ * Example:
+ * From: [{index: "1", value: 100, smell: "sweet"}, {index: "1", value: 50, smell: "bitter"}]
+ * To:   [{index: "1", sweet: 100, bitter: 50}]
+ *
+ * @param data - Original data in long format
+ * @param tileColumn - Column to pivot on (e.g., "smell")
+ * @param valueColumn - Column containing values to pivot (e.g., "value")
+ * @param xAxisColumn - X-axis column name (e.g., "index")
+ * @param tileValues - Ordered array of tile values (determines column order)
+ * @returns Pivoted data in wide format
+ */
+export const pivotDataForDataTable = (data, tileColumn, valueColumn, xAxisColumn, tileValues) => {
+  if (!data || !tileColumn || !valueColumn || !xAxisColumn) return []
+
+  // Group data by x-axis value
+  const xAxisGroups = new Map()
+
+  data.forEach(row => {
+    const xAxisKey = String(row[xAxisColumn])
+    if (!xAxisGroups.has(xAxisKey)) {
+      xAxisGroups.set(xAxisKey, [])
+    }
+    xAxisGroups.get(xAxisKey).push(row)
+  })
+
+  // Create pivoted rows
+  const pivotedData = []
+
+  xAxisGroups.forEach((rows, xAxisKey) => {
+    const pivotedRow = {
+      [xAxisColumn]: xAxisKey
+    }
+
+    // Add tile value columns in the correct order
+    tileValues.forEach(tileValue => {
+      const columnKey = String(tileValue)
+      const matchingRow = rows.find(row => String(row[tileColumn]) === columnKey)
+      if (matchingRow) {
+        pivotedRow[columnKey] = matchingRow[valueColumn]
+      }
+    })
+
+    // Copy non-value, non-tile columns from first row
+    const firstRow = rows[0]
+    Object.keys(firstRow).forEach(key => {
+      if (key !== tileColumn && key !== valueColumn && key !== xAxisColumn) {
+        pivotedRow[key] = firstRow[key]
+      }
+    })
+
+    pivotedData.push(pivotedRow)
+  })
+
+  return pivotedData
+}
+
+/**
+ * Create a single column config for a tile value
+ * Helper function to avoid duplication
+ */
+const createTileColumnConfig = (tileValue, valueColumnConfig, tileTitles) => {
+  const columnKey = String(tileValue)
+  return {
+    ...valueColumnConfig,
+    name: columnKey,
+    label: tileTitles?.[tileValue] || String(tileValue),
+    dataTable: true
+  }
+}
+
+/**
+ * Create column configurations for pivoted data table
+ * Generates one column config for each tile value, copying formatting from the original value column
+ * Preserves column order by inserting new columns where the value column was
+ *
+ * @param originalColumns - Original columns configuration
+ * @param valueColumnName - Name of the value column to clone config from
+ * @param tileColumnName - Name of the tile column to remove
+ * @param tileValues - Array of tile values (becomes new column names)
+ * @param tileTitles - Custom titles for columns
+ * @returns New columns configuration with xAxis column + one column per tile value
+ */
+export const createPivotedColumns = (originalColumns, valueColumnName, tileColumnName, tileValues, tileTitles) => {
+  const newColumns = {}
+  let valueColumnConfig = {}
+  let addedPivotedColumns = false
+
+  const hasOriginalColumns = originalColumns && Object.keys(originalColumns).length > 0
+
+  const addPivotedColumns = () => {
+    if (addedPivotedColumns) return
+    tileValues.forEach(tileValue => {
+      const columnKey = String(tileValue)
+      newColumns[columnKey] = createTileColumnConfig(tileValue, valueColumnConfig, tileTitles)
+    })
+    addedPivotedColumns = true
+  }
+
+  if (hasOriginalColumns) {
+    Object.keys(originalColumns).forEach(key => {
+      const column = originalColumns[key]
+
+      if (column.name === valueColumnName) {
+        // Found value column - save its config and replace with pivoted columns
+        valueColumnConfig = column
+        addPivotedColumns()
+      } else if (column.name !== tileColumnName) {
+        newColumns[key] = column
+      }
+    })
+  }
+
+  // Only added if not previously added
+  addPivotedColumns()
+
+  return newColumns
+}
+
+/**
+ * Get ordered tile values/keys for data table display
+ * Works for both by-series and by-column modes
+ */
+const getOrderedTileValues = (config, rawValues, mode) => {
+  const { tileOrderType, tileOrder } = config.smallMultiples || {}
+
+  if (!tileOrderType) {
+    return rawValues
+  }
+
+  // Create minimal tile items for ordering
+  const tileItems = rawValues.map(value => ({
+    mode,
+    ...(mode === 'by-series' ? { seriesKey: value } : { tileValue: value }),
+    key: value
+  }))
+
+  // Apply ordering
+  const orderedItems = applyTileOrder(tileItems, tileOrderType, tileOrder, config)
+
+  // Extract values back
+  return orderedItems.map(item => (mode === 'by-series' ? item.seriesKey : item.tileValue))
+}
+
+/**
+ * Create runtime series objects for pivoted data
+ * Each tile value becomes a series in the data table
+ */
+const createPivotedRuntimeSeries = (tileValues, originalSeries) => {
+  return tileValues.map(tileValue => ({
+    dataKey: String(tileValue),
+    type: originalSeries[0]?.type || 'Bar',
+    axis: originalSeries[0]?.axis || 'Left',
+    tooltip: true
+  }))
+}
+
+/**
+ * Handle by-series mode for data table
+ * Reorders series based on tile ordering settings
+ */
+const handleBySeriesMode = (config, columns, runtimeData) => {
+  const rawSeriesKeys = config.series?.map(s => s.dataKey) || []
+  const orderedSeriesKeys = getOrderedTileValues(config, rawSeriesKeys, 'by-series')
+
+  if (!config.runtime?.series) {
+    return { config, columns, runtimeData }
+  }
+
+  // Reorder runtime series
+  const reorderedRuntimeSeries = orderedSeriesKeys
+    .map(seriesKey => config.runtime.series.find(s => s.dataKey === seriesKey))
+    .filter(Boolean)
+
+  return {
+    config: {
+      ...config,
+      runtime: {
+        ...config.runtime,
+        series: reorderedRuntimeSeries
+      }
+    },
+    columns,
+    runtimeData
+  }
+}
+
+/**
+ * Handle by-column mode for data table
+ * Two scenarios:
+ * 1. Single-series: Pivot data and create columns per tile value
+ * 2. Multi-series (stacked/grouped): Add tileColumn to data table, no pivoting
+ */
+const handleByColumnMode = (config, columns, runtimeData) => {
+  const xAxisColumn = config.xAxis?.dataKey
+  const { tileColumn, tileTitles } = config.smallMultiples
+
+  // Validate required columns
+  if (!xAxisColumn || !tileColumn) {
+    return { config, columns, runtimeData }
+  }
+
+  if (config.series && config.series.length > 1) {
+    const updatedColumns = {
+      ...columns
+    }
+
+    const tileColumnKey = tileColumn
+    if (!updatedColumns[tileColumnKey]) {
+      updatedColumns[tileColumnKey] = {
+        name: tileColumn,
+        label: tileColumn,
+        dataTable: true,
+        order: 2
+      }
+    }
+
+    return {
+      config: {
+        ...config,
+        columns: updatedColumns
+      },
+      columns: updatedColumns,
+      runtimeData
+    }
+  }
+
+  const valueColumn = config.series?.[0]?.dataKey
+
+  if (!valueColumn) {
+    return { config, columns, runtimeData }
+  }
+
+  // Get ordered tile values
+  const rawTileValues = getTileKeys(config, config.data)
+  const orderedTileValues = getOrderedTileValues(config, rawTileValues, 'by-column')
+
+  // Pivot data and runtimeData
+  const pivotedData = pivotDataForDataTable(config.data, tileColumn, valueColumn, xAxisColumn, orderedTileValues)
+  const pivotedRuntimeData = Array.isArray(runtimeData)
+    ? pivotDataForDataTable(runtimeData, tileColumn, valueColumn, xAxisColumn, orderedTileValues)
+    : runtimeData
+
+  // Create pivoted columns and runtime series
+  const pivotedColumns = createPivotedColumns(columns, valueColumn, tileColumn, orderedTileValues, tileTitles)
+  const pivotedRuntimeSeries = createPivotedRuntimeSeries(orderedTileValues, config.series)
+
+  return {
+    config: {
+      ...config,
+      data: pivotedData,
+      columns: pivotedColumns,
+      runtime: {
+        ...config.runtime,
+        series: pivotedRuntimeSeries,
+        seriesKeys: orderedTileValues.map(String)
+      }
+    },
+    columns: pivotedColumns,
+    runtimeData: pivotedRuntimeData
+  }
+}
+
+/**
+ * Prepare data table props for small multiples display
+ * Handles both by-column and by-series modes
+ *
+ * @param config - Chart configuration
+ * @param columns - Original columns configuration
+ * @param runtimeData - Original runtime data
+ * @returns Object with modified config, columns, and runtimeData (or originals if not applicable)
+ */
+export const prepareSmallMultiplesDataTable = (config, columns, runtimeData) => {
+  const mode = config.smallMultiples?.mode
+
+  if (!mode) {
+    return { config, columns, runtimeData }
+  }
+
+  return mode === 'by-series'
+    ? handleBySeriesMode(config, columns, runtimeData)
+    : handleByColumnMode(config, columns, runtimeData)
+}

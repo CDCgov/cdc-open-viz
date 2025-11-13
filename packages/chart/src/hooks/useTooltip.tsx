@@ -328,12 +328,13 @@ export const useTooltip = props => {
       let minDistance = Number.MAX_VALUE
       let offset = x
 
+      const barThicknessOffset = config.xAxis.type === 'date' ? xScale.bandwidth() / 2 : 0
       data.forEach(d => {
         const xPosition = isDateScale(xAxis)
           ? xScaleRef.current(parseDate(d[xAxis.dataKey]))
           : xScaleRef.current(d[xAxis.dataKey])
         let bwOffset = config.barHeight
-        const distance = Math.abs(Number(xPosition - offset))
+        const distance = Math.abs(Number(xPosition + barThicknessOffset - offset))
 
         if (distance <= minDistance) {
           minDistance = distance
@@ -343,13 +344,26 @@ export const useTooltip = props => {
       return closestX
     }
 
+    // For band scales, find which band the mouse x-coordinate falls within
     if (config.xAxis.type === 'categorical' || visualizationType === 'Combo') {
-      let range = xScaleRef.current.range()[1] - xScaleRef.current.range()[0]
-      let eachBand = range / (xScaleRef.current.domain().length + 1)
+      const domain = xScaleRef.current.domain()
+      const bandwidth = xScaleRef.current.bandwidth()
 
-      let numerator = x
-      const index = Math.floor((Number(numerator) - eachBand / 2) / eachBand)
-      return xScaleRef.current.domain()[index] // fixes off by 1 error
+      let closestValue = null
+      let minDistance = Number.MAX_VALUE
+
+      domain.forEach(value => {
+        const bandStart = xScaleRef.current(value)
+        const bandCenter = bandStart + bandwidth / 2
+        const distance = Math.abs(x - bandCenter)
+
+        if (distance < minDistance) {
+          minDistance = distance
+          closestValue = value
+        }
+      })
+
+      return closestValue
     }
   }
 
@@ -364,7 +378,12 @@ export const useTooltip = props => {
     if (orientation === 'horizontal') return 0
 
     // Convert data value to pixel coordinate using current xScale
-    const pixelX = isDateScale(xAxis) ? xScaleRef.current(parseDate(xAxisValue)) : xScaleRef.current(xAxisValue)
+    let pixelX = isDateScale(xAxis) ? xScaleRef.current(parseDate(xAxisValue)) : xScaleRef.current(xAxisValue)
+
+    // For band scales (bar charts, categorical axes), add bandwidth offset to point to center of bar
+    if (xScaleRef.current.bandwidth) {
+      pixelX += xScaleRef.current.bandwidth() / 2
+    }
 
     return pixelX
   }

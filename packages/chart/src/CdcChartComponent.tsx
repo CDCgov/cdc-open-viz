@@ -75,6 +75,7 @@ import { getExcludedData } from './helpers/getExcludedData'
 import { getColorScale } from './helpers/getColorScale'
 import { getTransformedData } from './helpers/getTransformedData'
 import { getPiePercent } from './helpers/getPiePercent'
+import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 
 // styles
 import './scss/main.scss'
@@ -1235,34 +1236,51 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   config.table.show &&
                   config.visualizationType !== 'Spark Line' &&
                   config.visualizationType !== 'Sankey') ||
-                  (config.visualizationType === 'Sankey' && config.table.show)) && (
-                  <DataTable
-                    /* changing the "key" will force the table to re-render
-                                when the default sort changes while editing */
-                    key={dataTableDefaultSortBy}
-                    config={pivotDynamicSeries(config)}
-                    rawData={
+                  (config.visualizationType === 'Sankey' && config.table.show)) &&
+                  (() => {
+                    let dataTableConfig = pivotDynamicSeries(config)
+                    let dataTableColumns = config.columns
+                    let dataTableRuntimeData = getTableRuntimeData()
+                    let dataTableRawData =
                       config.visualizationType === 'Sankey'
                         ? config?.data?.[0]?.tableData
                         : config.table.customTableConfig
                         ? filterVizData(config.filters, config.data)
                         : config.data
+
+                    if (config.smallMultiples?.mode) {
+                      const prepared = prepareSmallMultiplesDataTable(config, config.columns, dataTableRuntimeData)
+                      dataTableConfig = prepared.config
+                      dataTableColumns = prepared.columns
+                      dataTableRuntimeData = prepared.runtimeData
+                      if (config.smallMultiples.mode === 'by-column') {
+                        dataTableRawData = prepared.config.data
+                      }
                     }
-                    runtimeData={getTableRuntimeData()}
-                    expandDataTable={config.table.expanded}
-                    columns={config.columns}
-                    defaultSortBy={dataTableDefaultSortBy}
-                    displayGeoName={name => name}
-                    applyLegendToRow={applyLegendToRow}
-                    tableTitle={config.table.label}
-                    indexTitle={config.table.indexLabel}
-                    vizTitle={title}
-                    viewport={currentViewport}
-                    tabbingId={handleChartTabbing(config, legendId)}
-                    colorScale={colorScale}
-                    interactionLabel={interactionLabel}
-                  />
-                )}
+
+                    return (
+                      <DataTable
+                        /* changing the "key" will force the table to re-render
+                                    when the default sort changes while editing */
+                        key={dataTableDefaultSortBy}
+                        config={dataTableConfig}
+                        rawData={dataTableRawData}
+                        runtimeData={dataTableRuntimeData}
+                        expandDataTable={config.table.expanded}
+                        columns={dataTableColumns}
+                        defaultSortBy={dataTableDefaultSortBy}
+                        displayGeoName={name => name}
+                        applyLegendToRow={applyLegendToRow}
+                        tableTitle={config.table.label}
+                        indexTitle={config.table.indexLabel}
+                        vizTitle={title}
+                        viewport={currentViewport}
+                        tabbingId={handleChartTabbing(config, legendId)}
+                        colorScale={colorScale}
+                        interactionLabel={interactionLabel}
+                      />
+                    )
+                  })()}
                 {config?.annotations?.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
                 {processedLegacyFootnotes && (

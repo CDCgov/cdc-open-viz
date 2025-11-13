@@ -4,6 +4,7 @@ import { performAndAssert, waitForEditor, openAccordion, MIN_ANIMATION_DELAY_MS 
 
 import Chart from '../CdcChartComponent'
 import mockScatterPlot from './_mock/scatterplot_mock.json'
+import smallMultiplesLinesColorsConfig from './_mock/small_multiples/small_multiples_lines_colors.json'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Editor Tests',
@@ -435,5 +436,223 @@ export const GeneralSectionTests: Story = {
 
 // NOTE: Data Series tests have been moved to Bar/Bar.Editor.stories.tsx
 // since series behavior is chart-type-specific
+
+// ============================================================================
+// SMALL MULTIPLES SECTION TESTS
+// Tests the Small Multiples accordion section following best practices:
+// - Tests visualization output changes, not control state
+// - Uses performAndAssert pattern for all interactions
+// - Tests specific visual changes in small multiples layout and tiles
+// - Focuses on testing what reliably works
+// ============================================================================
+
+export const SmallMultiplesSectionTests: Story = {
+  name: 'Small Multiples Section Tests',
+  parameters: {},
+  args: {
+    config: {
+      ...smallMultiplesLinesColorsConfig,
+      title: 'Line Chart Small Multiples Test',
+      smallMultiples: {
+        ...smallMultiplesLinesColorsConfig.smallMultiples,
+        mode: '',
+        showAreaUnderLine: false
+      }
+    },
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+
+    await openAccordion(canvas, 'Small Multiples')
+
+    // ============================================================================
+    // TEST: Enable Small Multiples Mode
+    // Verifies: Chart visualization changes from single chart to multiple tiles
+    // ============================================================================
+
+    const getChartCounts = () => {
+      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const tiles = canvasElement.querySelectorAll('.small-multiple-tile, [class*="tile"]')
+      const svgElements = chartContainer?.querySelectorAll('svg[role="img"], svg.chart') || []
+
+      return {
+        svgCount: svgElements.length,
+        tileCount: tiles.length
+      }
+    }
+
+    const modeSelect = canvas.getByLabelText(/tile mode/i) as HTMLSelectElement
+
+    await performAndAssert(
+      'Enable Small Multiples Mode - Chart splits into multiple tiles',
+      getChartCounts,
+      async () => {
+        await userEvent.selectOptions(modeSelect, 'by-series')
+      },
+      (before, after) => {
+        return before.svgCount === 1 && before.tileCount === 0 && after.svgCount > 1 && after.tileCount > 1
+      }
+    )
+
+    // ============================================================================
+    // TEST: Tiles Per Row Desktop
+    // Verifies: Grid layout changes from 3 tiles per row to 2 tiles per row
+    // ============================================================================
+
+    const getTilesInFirstRow = () => {
+      const tiles = Array.from(canvasElement.querySelectorAll('.small-multiples-grid > .small-multiple-tile'))
+      if (tiles.length === 0) return { tilesInFirstRow: 0 }
+
+      const firstTileTop = tiles[0].getBoundingClientRect().top
+      const tilesInFirstRow = tiles.filter(tile => {
+        const tileTop = tile.getBoundingClientRect().top
+        return Math.abs(tileTop - firstTileTop) < 5
+      }).length
+
+      return { tilesInFirstRow }
+    }
+
+    const tilesPerRowInput = canvas.getByLabelText(/tiles per row/i) as HTMLInputElement
+
+    await performAndAssert(
+      'Tiles Per Row Desktop - Layout changes from 3 to 2 tiles per row',
+      getTilesInFirstRow,
+      async () => {
+        await userEvent.clear(tilesPerRowInput)
+        await userEvent.type(tilesPerRowInput, '2')
+        tilesPerRowInput.blur()
+      },
+      (before, after) => {
+        return before.tilesInFirstRow === 3 && after.tilesInFirstRow === 2
+      }
+    )
+
+    // ============================================================================
+    // TEST: Tile Order
+    // Verifies: Changing tile order from ascending to descending reverses tile titles
+    // ============================================================================
+
+    const getTileTitles = () => {
+      const tiles = canvasElement.querySelectorAll('.small-multiples-grid > .small-multiple-tile')
+      const titles = Array.from(tiles).map(tile => {
+        const titleElement = tile.querySelector('.tile-title')
+        return titleElement?.textContent?.trim() || ''
+      })
+      return { titles }
+    }
+
+    const tileOrderSelect = canvas.getByLabelText(/tile order/i) as HTMLSelectElement
+
+    await performAndAssert(
+      'Tile Order - Descending reverses tile titles',
+      getTileTitles,
+      async () => {
+        await userEvent.selectOptions(tileOrderSelect, 'desc')
+      },
+      (before, after) => {
+        const beforeTitles = before.titles.join(',')
+        const afterTitlesReversed = after.titles.slice().reverse().join(',')
+        return beforeTitles === afterTitlesReversed && before.titles.length > 0
+      }
+    )
+
+    // ============================================================================
+    // TEST: Color Mode
+    // Verifies: Same color mode makes all line colors match
+    // ============================================================================
+
+    const getLineColors = () => {
+      const svgElements = canvasElement.querySelectorAll('svg[role="img"], svg.chart')
+      const lineColors = Array.from(svgElements).map(svg => {
+        const linePath = svg.querySelector('path[class*="visx-linepath"], path[stroke]')
+        return linePath?.getAttribute('stroke') || ''
+      })
+      const allSameColor = lineColors.length > 1 && lineColors.every(color => color === lineColors[0])
+      return { lineColors, allSameColor }
+    }
+
+    const colorModeSelect = canvas.getByLabelText(/color mode/i) as HTMLSelectElement
+
+    await performAndAssert(
+      'Color Mode - Same color makes all lines match',
+      getLineColors,
+      async () => {
+        await userEvent.selectOptions(colorModeSelect, 'same')
+      },
+      (before, after) => {
+        return before.allSameColor === false && after.allSameColor === true
+      }
+    )
+
+    // ============================================================================
+    // TEST: Independent Y-Axis
+    // Verifies: Y-axis scales differ across tiles when enabled
+    // ============================================================================
+
+    const getYAxisScales = () => {
+      const svgElements = canvasElement.querySelectorAll('svg[role="img"], svg.chart')
+      const yAxisMaxValues = Array.from(svgElements).map(svg => {
+        const yAxisTicks = svg.querySelectorAll('g.visx-axis-left g.visx-axis-tick text, g[class*="axis"] text')
+        const tickValues = Array.from(yAxisTicks)
+          .map(tick => parseFloat(tick.textContent || '0'))
+          .filter(val => !isNaN(val))
+        return tickValues.length > 0 ? Math.max(...tickValues) : 0
+      })
+
+      const allSameScale = yAxisMaxValues.length > 1 && yAxisMaxValues.every(val => val === yAxisMaxValues[0])
+      const hasDifferentScales = yAxisMaxValues.length > 1 && !allSameScale
+
+      return {
+        yAxisMaxValues,
+        allSameScale,
+        hasDifferentScales
+      }
+    }
+
+    const independentYAxisCheckbox = canvas.getByLabelText(/independent y-axis scales/i) as HTMLInputElement
+
+    await performAndAssert(
+      'Independent Y-Axis Toggle - Y-axis scales become different across tiles',
+      getYAxisScales,
+      async () => {
+        await userEvent.click(independentYAxisCheckbox)
+      },
+      (before, after) => {
+        return before.allSameScale === true && after.hasDifferentScales === true
+      }
+    )
+
+    // ============================================================================
+    // TEST: Shade Area Under Lines
+    // Verifies: Area path elements appear under lines when enabled
+    // ============================================================================
+
+    const getAreaUnderLineCount = () => {
+      const svgElements = canvasElement.querySelectorAll('svg[role="img"], svg.chart')
+      let areaPathCount = 0
+      svgElements.forEach(svg => {
+        const areaPaths = svg.querySelectorAll('path[fill-opacity="0.3"]')
+        areaPathCount += areaPaths.length
+      })
+      return { areaPathCount }
+    }
+
+    const shadeAreaCheckbox = canvas.getByLabelText(/shade area under lines/i) as HTMLInputElement
+
+    await performAndAssert(
+      'Shade Area Under Lines - Area paths appear when enabled',
+      getAreaUnderLineCount,
+      async () => {
+        await userEvent.click(shadeAreaCheckbox)
+      },
+      (before, after) => {
+        return before.areaPathCount === 0 && after.areaPathCount > 0
+      }
+    )
+  }
+}
 
 export default meta

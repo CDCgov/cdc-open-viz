@@ -202,10 +202,10 @@ export type AllChartsConfig = {
     tileColumn?: string
     tilesPerRowDesktop?: number
     tilesPerRowMobile?: number
-    independentYAxis?: boolean
     tileOrderType?: 'asc' | 'desc' | 'custom'
     tileOrder?: string[]
     tileTitles?: { [key: string]: string }
+    independentYAxis?: boolean
     colorMode?: 'same' | 'different'
     synchronizedTooltips?: boolean
     showAreaUnderLine?: boolean
@@ -233,6 +233,8 @@ export type AllChartsConfig = {
   visualizationSubType: string
   xAxis: Axis
   yAxis: Axis
+  hideXAxisLabel?: boolean
+  hideYAxisLabel?: boolean
   xScale: Function
   yScale: Function
   regions: Region[]

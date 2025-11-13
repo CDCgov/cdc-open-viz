@@ -72,7 +72,8 @@
     "anchors": [],
     "shoMissingDataLabel": true,
     "showMissingDataLine": true,
-    "categories": []
+    "categories": [],
+    "inlineLabel": " percent"
   },
   "boxplot": {
     "plots": [],
@@ -135,7 +136,8 @@
     "brushActive": false,
     "dataKey": "index",
     "axisBBox": 29.860000610351562,
-    "tickWidthMax": 20
+    "tickWidthMax": 20,
+    "label": "Target"
   },
   "table": {
     "label": "Data Table",
@@ -156,7 +158,25 @@
     "show": true
   },
   "orientation": "vertical",
-  "columns": {},
+  "columns": {
+    "weight": {
+      "label": "weightx",
+      "dataTable": true,
+      "tooltips": true,
+      "prefix": "$",
+      "suffix": "*",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "weight",
+      "series": "",
+      "order": null
+    }
+  },
   "legend": {
     "hide": true,
     "behavior": "isolate",

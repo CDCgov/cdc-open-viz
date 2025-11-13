@@ -202,13 +202,14 @@ const createInitialState = () => {
       mode: '',
       tileColumn: '',
       tilesPerRowDesktop: 3,
-      tilesPerRowMobile: 2,
-      independentYAxis: false,
+      tilesPerRowMobile: 1,
       tileOrder: [],
       tileOrderType: 'asc',
       tileTitles: {},
+      independentYAxis: false,
       colorMode: 'same',
-      synchronizedTooltips: false
+      synchronizedTooltips: true,
+      showAreaUnderLine: true
     },
     exclusions: {
       active: false,
