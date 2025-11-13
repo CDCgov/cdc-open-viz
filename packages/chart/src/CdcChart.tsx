@@ -3,7 +3,7 @@ import CdcChart from './CdcChartComponent'
 import { ChartConfig } from './types/ChartConfig'
 import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
-import Papa from 'papaparse'
+import { parseCsvWithQuotes } from '@cdc/core/helpers/parseCsvWithQuotes'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import Loading from '@cdc/core/components/Loading'
 import _ from 'lodash'
@@ -49,8 +49,9 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({
       let isUpdateNeeded = false
 
       config.filters?.forEach(filter => {
-        if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(filter.active)) {
-          qsParams[filter.queryParameter] = filter.active
+        const activeValue = Array.isArray(filter.active) ? filter.active.join(',') : filter.active
+        if (filter.type === 'url' && qsParams[filter.queryParameter] !== decodeURIComponent(activeValue)) {
+          qsParams[filter.queryParameter] = activeValue
           isUpdateNeeded = true
         }
       })
@@ -101,14 +102,10 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({
 export default CdcChartWrapper
 
 const parseCsv = (responseText: string, delimiter = '|') => {
-  const sanitizedText = responseText.replace(/(".*?")|,/g, (...m) => m[1] || delimiter).replace(/["]+/g, '')
-
-  return Papa.parse(sanitizedText, {
-    header: true,
-    dynamicTyping: true,
-    skipEmptyLines: true,
-    delimiter
-  }).data
+  return parseCsvWithQuotes(responseText, {
+    delimiter,
+    dynamicTyping: true
+  })
 }
 
 const fetchAndParseData = async (url: string, ext: string) => {

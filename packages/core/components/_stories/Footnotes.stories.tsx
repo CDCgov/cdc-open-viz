@@ -6,7 +6,14 @@ import CdcMap from '@cdc/map'
 
 const meta: Meta<typeof Footnotes> = {
   title: 'Components/Organisms/Footnotes',
-  component: Footnotes
+  component: Footnotes,
+  parameters: {
+    docs: {
+      description: {
+        component: 'Renders footnotes with support for symbols, HTML tags, and newlines. See "CSV Features" stories for dynamic footnotes from CSV data.'
+      }
+    }
+  }
 }
 
 export default meta
@@ -21,6 +28,57 @@ export const Primary: Story = {
         { symbol: '*', text: 'This is a footnote' },
         { symbol: '†', text: 'This is another footnote' },
         { text: 'This is a third footnote' }
+      ]
+    },
+    data: [],
+    markupVariables: [],
+    enableMarkupVariables: false,
+    filters: []
+  }
+}
+
+export const WithHTMLTags: Story = {
+  render: args => <FootnotesStandAlone {...args} />,
+  args: {
+    config: {
+      staticFootnotes: [
+        { symbol: '*', text: 'This footnote has a <br> tag for line break' },
+        { symbol: '†', text: 'This has <strong>bold text</strong> and <em>italic text</em>' },
+        { symbol: '**', text: 'Multiple tags: <strong>bold</strong>, <em>italic</em>, and <br>line break' }
+      ]
+    },
+    data: [],
+    markupVariables: [],
+    enableMarkupVariables: false,
+    filters: []
+  }
+}
+
+export const WithNewlines: Story = {
+  render: args => <FootnotesStandAlone {...args} />,
+  args: {
+    config: {
+      staticFootnotes: [
+        { symbol: '*', text: 'This footnote has a newline\nbetween these two lines' },
+        { symbol: '†', text: 'This footnote has multiple\nnewlines\ncreating three lines' },
+        { symbol: '**', text: 'This footnote has a newline\nand continues on the next line' }
+      ]
+    },
+    data: [],
+    markupVariables: [],
+    enableMarkupVariables: false,
+    filters: []
+  }
+}
+
+export const WithNewlinesAndHTML: Story = {
+  render: args => <FootnotesStandAlone {...args} />,
+  args: {
+    config: {
+      staticFootnotes: [
+        { symbol: '*', text: 'Line 1\nLine 2 with <strong>bold</strong> text' },
+        { symbol: '†', text: 'First line\nSecond line with <em>italic</em>\nThird line with <br>HTML tag' },
+        { symbol: '**', text: 'Start\nMiddle with <strong>bold</strong>\nEnd' }
       ]
     },
     data: [],
