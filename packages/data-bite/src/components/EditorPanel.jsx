@@ -10,6 +10,7 @@ import {
   AccordionItemPanel
 } from 'react-accessible-accordion'
 
+import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import Context from '../context'
 import WarningImage from '@cdc/core/assets/icon-warning-circle.svg'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
@@ -701,6 +702,7 @@ const EditorPanel = memo(() => {
                   />
                 </AccordionItemPanel>
               </AccordionItem>
+              <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />
             </Accordion>
           </form>
         </section>
