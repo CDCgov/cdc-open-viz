@@ -39,7 +39,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "vite": "^4.4.11",
+    "vite": "^5.4.21",
     "@vitejs/plugin-react": "^4.3.4",
     "vite-plugin-css-injected-by-js": "^2.4.0",
     "vite-plugin-svgr": "^2.4.0",
