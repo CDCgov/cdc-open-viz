@@ -539,12 +539,12 @@ const EditorPanel = memo(props => {
           title='Configure Waffle Chart'
           showEditorPanel={displayPanel}
         >
-          {config.visualizationType === 'Gauge'
-            ? [
-                editorContent,
-                <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />
-              ]
-            : [editorContent]}
+          <>
+            {editorContent}
+            {config.visualizationType === 'Gauge' && (
+              <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />
+            )}
+          </>
         </Layout.Sidebar>
         {props.children}
       </>
