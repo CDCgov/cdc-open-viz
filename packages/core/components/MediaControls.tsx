@@ -56,7 +56,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
         state.dashboard.title.replace(/\s+/g, '-').toLowerCase() +
         '-' +
         date.getDate() +
-        date.getMonth() +
+        (date.getMonth() + 1) +
         date.getFullYear()
       )
 
@@ -66,14 +66,14 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
         state.general.title.replace(/\s+/g, '-').toLowerCase() +
         '-' +
         date.getDate() +
-        date.getMonth() +
+        (date.getMonth() + 1) +
         date.getFullYear()
       )
 
     // chart titles
     if (state?.title)
       return (
-        state.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+        state.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + (date.getMonth() + 1) + date.getFullYear()
       )
 
     return 'no-title'
