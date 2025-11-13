@@ -268,7 +268,6 @@ export const useEditorPermissions = () => {
 
   const visSupportsValueAxisGridLines = () => {
     const disabledCharts = ['Forest Plot']
-    if (orientation === 'horizontal') return false
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
