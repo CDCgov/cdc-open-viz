@@ -704,6 +704,22 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               }}
             </AxisLeft>
           )}
+          {/* Horizontal chart grid lines */}
+          {runtime.xAxis.gridLines && orientation === 'horizontal' && (
+            <Group left={Number(runtime.yAxis.size)}>
+              {xScale.ticks(xTickCount).map((tickValue, i) => {
+                const tickPosition = xScale(tickValue)
+                return (
+                  <Line
+                    key={`horizontal-gridline-${tickValue}-${i}`}
+                    from={{ x: tickPosition, y: 0 }}
+                    to={{ x: tickPosition, y: yMax }}
+                    stroke='#d6d6d6'
+                  />
+                )
+              })}
+            </Group>
+          )}
           {visualizationType === 'Paired Bar' && generatePairedBarAxis()}
           {visualizationType === 'Deviation Bar' && config.runtime.series?.length === 1 && (
             <DeviationBar animatedChart={animatedChart} xScale={xScale} yScale={yScale} width={xMax} height={yMax} />
