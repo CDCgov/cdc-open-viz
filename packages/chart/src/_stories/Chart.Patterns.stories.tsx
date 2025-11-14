@@ -12,7 +12,8 @@ type Story = StoryObj<typeof Chart>
 
 export const Stacked_Bar_Pattern: Story = {
   args: {
-    config: StackedPattern
+    config: StackedPattern,
+    isEditor: true
   }
 }
 
