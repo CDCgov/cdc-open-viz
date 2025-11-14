@@ -2878,9 +2878,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     <>
                       {config.visualizationType !== 'Forest Plot' && (
                         <>
-                          <label>
-                            <span className='edit-label'>
-                              Data Scaling Type
+                          <Select
+                            label='Data Scaling Type'
+                            tooltip={
                               <Tooltip style={{ textTransform: 'none', display: 'inline-block' }}>
                                 <Tooltip.Target>
                                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -2890,31 +2890,32 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                   time-series data.
                                 </Tooltip.Content>
                               </Tooltip>
-                            </span>
-                            <select
-                              value={config.xAxis.type}
-                              onChange={e =>
-                                updateConfig({
-                                  ...config,
-                                  xAxis: {
-                                    ...config.xAxis,
-                                    type: e.target.value
-                                  }
-                                })
-                              }
-                            >
-                              {!['Bump Chart', 'Forecasting'].includes(config.visualizationType) && (
-                                <option value='categorical'>Categorical (Linear Scale)</option>
-                              )}
-                              {!['Bump Chart'].includes(config.visualizationType) && (
-                                <option value='date'>Date (Linear Scale)</option>
-                              )}
-                              <option value='date-time'>Date (Date Time Scale)</option>
-                              {config.visualizationType === 'Scatter Plot' && (
-                                <option value={'continuous'}>Continuous</option>
-                              )}
-                            </select>
-                          </label>
+                            }
+                            value={config.xAxis.type}
+                            options={[
+                              ...(!['Bump Chart', 'Forecasting'].includes(config.visualizationType)
+                                ? [{ label: 'Categorical (Linear Scale)', value: 'categorical' }]
+                                : []),
+                              ...(!['Bump Chart'].includes(config.visualizationType)
+                                ? [{ label: 'Date (Linear Scale)', value: 'date' }]
+                                : []),
+                              { label: 'Date (Date Time Scale)', value: 'date-time' },
+                              ...(config.visualizationType === 'Scatter Plot'
+                                ? [{ label: 'Continuous', value: 'continuous' }]
+                                : [])
+                            ]}
+                            section='xAxis'
+                            fieldName='type'
+                            updateField={(_section, _subsection, _fieldName, value) => {
+                              updateConfig({
+                                ...config,
+                                xAxis: {
+                                  ...config.xAxis,
+                                  type: value
+                                }
+                              })
+                            }}
+                          />
                           <CheckBox
                             value={config.xAxis.manual}
                             section='xAxis'
