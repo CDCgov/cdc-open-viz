@@ -16,8 +16,7 @@ type RowProps = {
 }
 
 const Row: FC<RowProps> = props => {
-  const { childRow, rowKey, wrapColumns, cellMinWidth = 0, isTotal, preliminaryData, rightAlignedCols } = props
-  const whiteSpace = wrapColumns ? 'unset' : 'nowrap'
+  const { childRow, rowKey, cellMinWidth = 0, isTotal, preliminaryData, rightAlignedCols } = props
   const minWidth = cellMinWidth + 'px'
   const isHtmlString = (str: any): str is string => typeof str === 'string' && /<\/?[a-z][\s\S]*>/i.test(str)
   const isReactNode = (val: any): boolean => React.isValidElement(val) || typeof val === 'object'
@@ -46,7 +45,7 @@ const Row: FC<RowProps> = props => {
           <Cell
             ariaLabel={style?.color ? 'suppressed data' : ''}
             key={rowKey + '__' + i}
-            style={{ whiteSpace, minWidth, textAlign, textOverflow: 'ellipsis', ...style }}
+            style={{ minWidth, textAlign, ...style }}
             isBold={isTotal}
           >
             {content}
