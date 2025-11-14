@@ -134,7 +134,11 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
         {loadingAPIData && <Loader fullScreen />}
         <div className='dataset-selector-container'>
           Select a dataset:&nbsp;
-          <select className='dataset-selector' value={configureData.dataKey || ''} onChange={changeDataset}>
+          <select
+            className='dataset-selector cove-form-select'
+            value={configureData.dataKey || ''}
+            onChange={changeDataset}
+          >
             <option value=''>Select a dataset</option>
             {config.datasets &&
               Object.keys(config.datasets).map(datasetKey => (
