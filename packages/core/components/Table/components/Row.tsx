@@ -16,7 +16,7 @@ type RowProps = {
 }
 
 const Row: FC<RowProps> = props => {
-  const { childRow, rowKey, cellMinWidth = 0, isTotal, preliminaryData, rightAlignedCols } = props
+  const { childRow, rowKey, cellMinWidth = 0, isTotal, preliminaryData, rightAlignedCols, wrapColumns } = props
   const minWidth = cellMinWidth + 'px'
   const isHtmlString = (str: any): str is string => typeof str === 'string' && /<\/?[a-z][\s\S]*>/i.test(str)
   const isReactNode = (val: any): boolean => React.isValidElement(val) || typeof val === 'object'
@@ -31,6 +31,9 @@ const Row: FC<RowProps> = props => {
           {}
 
         const textAlign = rightAlignedCols && rightAlignedCols[i] ? 'right' : ''
+        // Set whiteSpace based on wrapColumns prop (default to wrapping for backwards compatibility)
+        const whiteSpace = wrapColumns === false ? 'nowrap' : 'normal'
+
         // handle Parsing
         let content: ReactNode
         if (isHtmlString(child)) {
@@ -45,7 +48,7 @@ const Row: FC<RowProps> = props => {
           <Cell
             ariaLabel={style?.color ? 'suppressed data' : ''}
             key={rowKey + '__' + i}
-            style={{ minWidth, textAlign, ...style }}
+            style={{ minWidth, textAlign, whiteSpace, ...style }}
             isBold={isTotal}
           >
             {content}

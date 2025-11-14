@@ -1,6 +1,9 @@
 const Cell = ({ children, style, isBold = false, ariaLabel }) => {
+  // Use whiteSpace from style prop, defaulting to 'pre-line' for backwards compatibility
+  const whiteSpace = style?.whiteSpace || 'pre-line'
+
   const contentWrapperStyle = {
-    whiteSpace: 'pre-line' as const,
+    whiteSpace: whiteSpace as any,
     lineHeight: '1.4',
     display: 'block' as const,
     margin: 0,
@@ -11,9 +14,8 @@ const Cell = ({ children, style, isBold = false, ariaLabel }) => {
   // Only include aria-label if it has a value
   const ariaProps = ariaLabel ? { 'aria-label': ariaLabel } : {}
 
-  // Remove whiteSpace from td style since we're applying it to the wrapper
+  // Keep whiteSpace on td style so it can be detected by tests and for proper rendering
   const tdStyle = { ...style }
-  delete tdStyle.whiteSpace
   delete tdStyle.textOverflow
 
   return (
