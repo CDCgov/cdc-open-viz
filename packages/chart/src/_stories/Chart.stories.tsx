@@ -7,6 +7,7 @@ import lollipop from './_mock/lollipop.json'
 import forestPlot from '../../examples/feature/forest-plot/forest-plot.json'
 import pairedBar from './_mock/paired-bar.json'
 import horizontalBarConfig from './_mock/horizontal_bar.json'
+import horizontalBarsDynamicYAxis from './_mock/horizontal-bars-dynamic-y-axis.json'
 import barChartLabels from './_mock/barchart_labels.mock.json'
 import pieConfig from './_mock/pie_with_data.json'
 import pieCalculatedArea from './_mock/pie_calculated_area.json'
@@ -56,6 +57,13 @@ export const Forest_Plot: Story = {
 export const Horizontal_Bar: Story = {
   args: {
     config: horizontalBarConfig
+  }
+}
+
+export const Horizontal_Bars_Dynamic_Y_Axis: Story = {
+  args: {
+    config: horizontalBarsDynamicYAxis,
+    isEditor: false
   }
 }
 
