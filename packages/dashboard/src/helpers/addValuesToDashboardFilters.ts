@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { SharedFilter } from '../types/SharedFilter'
 import { handleSorting } from '@cdc/core/components/Filters'
+import { mergeCustomOrderValues } from '@cdc/core/helpers/mergeCustomOrderValues'
 
 // Gets filter values from dataset
 const generateValuesForFilter = (columnName: string, data: Record<string, any[]>) => {
@@ -40,6 +41,9 @@ export const addValuesToDashboardFilters = (
     const filterCopy = _.cloneDeep(filter)
     const filterValues = generateValuesForFilter(getSelector(filter), data)
     filterCopy.values = filterValues
+
+    // Merge new values with existing custom order (fixes DEV-11740 & DEV-11376)
+    filterCopy.orderedValues = mergeCustomOrderValues(filterValues, filterCopy.orderedValues, filterCopy.order)
 
     if (filterValues.length > 0) {
       const queryStringFilterValue = getQueryStringFilterValue(filterCopy)
