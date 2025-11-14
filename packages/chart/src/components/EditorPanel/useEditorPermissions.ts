@@ -334,6 +334,7 @@ export const useEditorPermissions = () => {
     const disabledCharts = ['Spark Line', 'Sankey', 'Bump Chart']
     if (disabledCharts.includes(visualizationType)) return false
     if (config.orientation !== 'horizontal') return false
+    if (config.orientation === 'horizontal' && visualizationType === 'Bar' && !config.isLollipopChart) return false
     return true
   }
 
