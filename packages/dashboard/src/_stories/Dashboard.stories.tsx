@@ -28,6 +28,7 @@ import TopSpacing_1 from './_mock/data-bite-dash-test.json'
 import TopSpacing_2 from './_mock/data-bite-dash-test_1.json'
 import TopSpacing_3 from './_mock/data-bite-dash-test_1_1.json'
 import TopSpacing_4 from './_mock/data-bite-dash-test_1_1_1.json'
+import CustomOrderNewValues from './_mock/custom-order-new-values.json'
 
 // Dashboard Filter Updates for Ascending, Descending, and Custom Order
 import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
@@ -38,6 +39,7 @@ DashboardFilterCust.dashboard.sharedFilters[0].order = 'cust'
 
 // On DashboardFilterCust change the sharedFilters[0].values and orderedValues to be in a custom order
 const customOrder = ['American Samoa', 'Alaska', 'Alabama', 'Arizona', 'Arkansas']
+DashboardFilterCust.dashboard.sharedFilters[0].orderedValues = customOrder
 
 const meta: Meta<typeof Dashboard> = {
   title: 'Components/Pages/Dashboard',
@@ -63,6 +65,13 @@ export const Dashboard_Filter_Desc: Story = {
 export const Dashboard_Filter_Cust: Story = {
   args: {
     config: DashboardFilterCust,
+    isEditor: false
+  }
+}
+
+export const CustomOrder_NewValues_AutoAppend: Story = {
+  args: {
+    config: CustomOrderNewValues,
     isEditor: false
   }
 }
