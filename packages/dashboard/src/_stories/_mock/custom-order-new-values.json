@@ -1,0 +1,116 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "title": "Custom Order Filter - New Values Auto-Append Demo",
+    "sharedFilters": [
+      {
+        "key": "Location",
+        "columnName": "Location",
+        "showDropdown": true,
+        "type": "datafilter",
+        "order": "cust",
+        "orderedValues": [
+          "California",
+          "Texas",
+          "Florida"
+        ],
+        "usedBy": [
+          "data-bite-demo",
+          "chart-demo"
+        ],
+        "tier": 1
+      }
+    ]
+  },
+  "datasets": {
+    "custom-order-demo-data.csv": {
+      "dataUrl": "http://localhost:6006/custom-order-demo-data.csv"
+    }
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "legacySharedFilters"
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 6,
+          "widget": "data-bite-demo"
+        },
+        {
+          "width": 6,
+          "widget": "chart-demo"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "data-bite-demo": {
+      "type": "data-bite",
+      "dataKey": "custom-order-demo-data.csv",
+      "dataFunction": "Sum",
+      "dataColumn": "Amount",
+      "bitePosition": "Left",
+      "biteFontSize": 36,
+      "fontSize": "large",
+      "biteBody": "<h3>Total Amount for Selected Location</h3><p><strong>Custom Order Demo:</strong> The filter has custom order: <em>California, Texas, Florida</em>. But the CSV data includes <strong>New York</strong> and <strong>Illinois</strong> which should auto-append to the end of the dropdown.</p><p>Select different locations from the dropdown above to see the total amount update.</p>",
+      "dataFormat": {
+        "roundToPlace": 0,
+        "commas": true,
+        "prefix": "$",
+        "suffix": ""
+      },
+      "biteStyle": "graphic",
+      "theme": "theme-blue",
+      "shadow": true,
+      "uid": "data-bite-demo",
+      "visualizationType": "data-bite"
+    },
+    "chart-demo": {
+      "type": "chart",
+      "title": "Amount by Year",
+      "theme": "theme-blue",
+      "fontSize": "medium",
+      "height": "250",
+      "yAxis": {
+        "label": "Amount",
+        "gridLines": true
+      },
+      "xAxis": {
+        "dataKey": "Year",
+        "label": "Year"
+      },
+      "table": {
+        "show": true,
+        "label": "Data Table"
+      },
+      "legend": {
+        "hide": true
+      },
+      "visualizationType": "Bar",
+      "series": [
+        {
+          "dataKey": "Amount",
+          "type": "Bar"
+        }
+      ],
+      "dataKey": "custom-order-demo-data.csv",
+      "uid": "chart-demo"
+    },
+    "legacySharedFilters": {
+      "type": "dashboardFilters",
+      "visualizationType": "dashboardFilters",
+      "sharedFilterIndexes": [
+        0
+      ],
+      "filterBehavior": "Filter Change",
+      "uid": "legacySharedFilters"
+    }
+  },
+  "type": "dashboard"
+}
