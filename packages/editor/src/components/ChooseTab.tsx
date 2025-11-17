@@ -26,6 +26,7 @@ import SankeyIcon from '@cdc/core/assets/icon-sankey.svg'
 import ComboChartIcon from '@cdc/core/assets/icon-combo-chart.svg'
 import EpiChartIcon from '@cdc/core/assets/icon-epi-chart.svg'
 import TableIcon from '@cdc/core/assets/icon-table.svg'
+import WarmingStripesIcon from '@cdc/core/assets/icon-warming-stripes.svg'
 import Icon from '@cdc/core/components/ui/Icon'
 
 import {
@@ -433,6 +434,16 @@ const buttons = [
     orientation: 'Pie',
     icon: <DeviationIcon />,
     content: 'Use deviation bars to display how individual values differ from a target'
+  },
+  {
+    id: 25,
+    category: 'Charts',
+    label: 'Warming Stripes',
+    type: 'chart',
+    subType: 'Warming Stripes',
+    orientation: 'vertical',
+    icon: <WarmingStripesIcon />,
+    content: 'Display temperature anomalies over time using color-coded vertical stripes.'
   },
   {
     id: 15,

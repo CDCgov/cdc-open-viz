@@ -28,6 +28,7 @@ import useIntersectionObserver from '../hooks/useIntersectionObserver'
 import Regions from './Regions'
 import CategoricalYAxis from './Axis/Categorical.Axis'
 import BrushChart from './Brush/BrushController'
+import WarmingStripes from './WarmingStripes'
 
 // Helpers
 import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/viewports'
@@ -766,6 +767,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               showTooltip={showTooltip}
             />
           )}
+          {visualizationType === 'Warming Stripes' && (
+            <WarmingStripes xScale={xScale} yScale={yScale} xMax={xMax} yMax={yMax} />
+          )}
           {visualizationType === 'Box Plot' && config.orientation === 'vertical' && (
             <BoxPlotVertical
               seriesScale={seriesScale}
@@ -841,9 +845,16 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           )}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
-          {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(
-            visualizationType
-          ) &&
+          {![
+            'Paired Bar',
+            'Box Plot',
+            'Area Chart',
+            'Scatter Plot',
+            'Deviation Bar',
+            'Forecasting',
+            'Bar',
+            'Warming Stripes'
+          ].includes(visualizationType) &&
             !convertLineToBarGraph && (
               <>
                 <LineChart
@@ -899,9 +910,16 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           {config.xAxis.brushActive && config.xAxis.type !== 'categorical' && <BrushChart xMax={xMax} yMax={yMax} />}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
-          {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(
-            visualizationType
-          ) &&
+          {![
+            'Paired Bar',
+            'Box Plot',
+            'Area Chart',
+            'Scatter Plot',
+            'Deviation Bar',
+            'Forecasting',
+            'Bar',
+            'Warming Stripes'
+          ].includes(visualizationType) &&
             !convertLineToBarGraph && (
               <>
                 <LineChart
