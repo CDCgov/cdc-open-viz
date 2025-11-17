@@ -189,38 +189,28 @@ const EditorPanel = memo(props => {
                 >
                   Remove
                 </button>
-                <label>
-                  <span className='edit-label column-heading'>Column</span>
-                  <select
-                    value={filter.columnName}
-                    onChange={e => {
-                      updateFilterProp('columnName', index, e.target.value)
-                    }}
-                  >
-                    <option value=''>- Select Option -</option>
-                    {getColumns().map((dataKey, index) => (
-                      <option value={dataKey} key={index}>
-                        {dataKey}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  <span className='edit-label column-heading'>Column Value</span>
-                  <select
-                    value={filter.columnValue}
-                    onChange={e => {
-                      updateFilterProp('columnValue', index, e.target.value)
-                    }}
-                  >
-                    <option value=''>- Select Option -</option>
-                    {getFilterColumnValues(index).map((dataKey, index) => (
-                      <option value={dataKey} key={index}>
-                        {dataKey}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                <Select
+                  label='Column'
+                  value={filter.columnName || ''}
+                  options={[
+                    { value: '', label: '- Select Option -' },
+                    ...getColumns().map(col => ({ value: col, label: col }))
+                  ]}
+                  onChange={e => {
+                    updateFilterProp('columnName', index, e.target.value)
+                  }}
+                />
+                <Select
+                  label='Column Value'
+                  value={filter.columnValue || ''}
+                  options={[
+                    { value: '', label: '- Select Option -' },
+                    ...getFilterColumnValues(index).map(val => ({ value: val, label: val }))
+                  ]}
+                  onChange={e => {
+                    updateFilterProp('columnValue', index, e.target.value)
+                  }}
+                />
               </fieldset>
             ))}
           </ul>

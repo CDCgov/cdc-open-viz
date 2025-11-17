@@ -149,6 +149,7 @@ export type SelectProps = {
   options?: string[] | { label: string; value: string }[]
   required?: boolean
   initial?: string
+  disabled?: boolean
 
   // all other props
   [x: string]: any
@@ -167,6 +168,8 @@ const Select = memo((props: SelectProps) => {
     tooltip,
     updateField,
     initial: initialValue,
+    disabled = false,
+    onChange: onChangeProp,
     ...attributes
   } = props
   const optionsJsx = options?.map((option, index) => {
@@ -197,7 +200,7 @@ const Select = memo((props: SelectProps) => {
   }
 
   return (
-    <label>
+    <label style={disabled ? { opacity: 0.6, pointerEvents: 'none' } : {}}>
       <span className='edit-label'>
         {label}
         {tooltip}
@@ -206,9 +209,16 @@ const Select = memo((props: SelectProps) => {
         className={`cove-form-select ${required && !value ? 'warning' : ''} ${DROPDOWN_STYLES}`}
         name={fieldName}
         value={value}
+        disabled={disabled}
         onChange={event => {
-          updateField(section, subsection, fieldName, event.target.value)
+          if (updateField) {
+            updateField(section, subsection, fieldName, event.target.value)
+          }
+          if (onChangeProp) {
+            onChangeProp(event)
+          }
         }}
+        style={disabled ? { cursor: 'not-allowed', backgroundColor: '#e9ecef' } : {}}
         {...attributes}
       >
         {optionsJsx}

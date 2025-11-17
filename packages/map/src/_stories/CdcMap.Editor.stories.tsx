@@ -2636,7 +2636,7 @@ export const PatternSettingsSectionTests: Story = {
       },
       async () => {
         // Select "STATE" from the dataKey dropdown
-        const dataKeySelect = canvasElement.querySelector('select[id^="pattern-dataKey--"]') as HTMLSelectElement
+        const dataKeySelect = canvasElement.querySelector('select[name^="pattern-dataKey--"]') as HTMLSelectElement
         if (!dataKeySelect) {
           throw new Error('DataKey select not found')
         }
@@ -2716,7 +2716,7 @@ export const PatternSettingsSectionTests: Story = {
       },
       async () => {
         // Find the pattern type dropdown and select "lines"
-        const patternTypeSelect = canvasElement.querySelector('select[id^="pattern-type--"]') as HTMLSelectElement
+        const patternTypeSelect = canvasElement.querySelector('select[name^="pattern-type--"]') as HTMLSelectElement
         if (!patternTypeSelect) {
           throw new Error('Pattern type select not found')
         }
@@ -2753,7 +2753,7 @@ export const PatternSettingsSectionTests: Story = {
       },
       async () => {
         // Find the pattern size dropdown and select "large"
-        const patternSizeSelect = canvasElement.querySelector('select[id^="pattern-size--"]') as HTMLSelectElement
+        const patternSizeSelect = canvasElement.querySelector('select[name^="pattern-size--"]') as HTMLSelectElement
         if (!patternSizeSelect) {
           throw new Error('Pattern size select not found')
         }

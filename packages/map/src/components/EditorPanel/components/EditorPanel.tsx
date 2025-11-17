@@ -1780,14 +1780,14 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         </Tooltip.Content>
                       </Tooltip>
                     </span>
-                    <select
-                      value={config.columns.categorical ? config.columns.categorical.name : columnsOptions[0]}
+                    <Select
+                      label=''
+                      value={config.columns.categorical ? config.columns.categorical.name : columnsOptions[0]?.key}
+                      options={columnsOptions.map(c => c.key)}
                       onChange={event => {
                         editColumn('categorical', 'name', event.target.value)
                       }}
-                    >
-                      {columnsOptions}
-                    </select>
+                    />
                   </label>
                 </fieldset>
               )}
@@ -2225,18 +2225,14 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   />
                 )}
                 {'navigation' !== config.general.type && config.legend.style === 'gradient' && (
-                  <label>
-                    <span className='edit-label'>Gradient Style</span>
-                    <select
-                      value={legend.subStyle || ''}
-                      onChange={event => {
-                        handleEditorChanges('legendSubStyle', event.target.value)
-                      }}
-                    >
-                      <option value='linear blocks'>linear blocks</option>
-                      <option value='smooth'>smooth</option>
-                    </select>
-                  </label>
+                  <Select
+                    label='Gradient Style'
+                    value={legend.subStyle || ''}
+                    options={['linear blocks', 'smooth']}
+                    onChange={event => {
+                      handleEditorChanges('legendSubStyle', event.target.value)
+                    }}
+                  />
                 )}
                 {allowLegendSeparators && (
                   <TextField
@@ -3194,22 +3190,21 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 config.general.geoType === 'us-county' ||
                 config.general.geoType === 'world') && (
                 <>
-                  <label>
-                    <span className='edit-label'>Default City Style</span>
-                    <select
-                      value={config.visual.cityStyle || false}
-                      onChange={event => {
-                        handleEditorChanges('handleCityStyle', event.target.value)
-                      }}
-                    >
-                      <option value='circle'>Circle</option>
-                      <option value='pin'>Pin</option>
-                      <option value='square'>Square</option>
-                      <option value='triangle'>Triangle</option>
-                      <option value='diamond'>Diamond</option>
-                      <option value='star'>Star</option>
-                    </select>
-                  </label>
+                  <Select
+                    label='Default City Style'
+                    value={config.visual.cityStyle || 'circle'}
+                    options={[
+                      { value: 'circle', label: 'Circle' },
+                      { value: 'pin', label: 'Pin' },
+                      { value: 'square', label: 'Square' },
+                      { value: 'triangle', label: 'Triangle' },
+                      { value: 'diamond', label: 'Diamond' },
+                      { value: 'star', label: 'Star' }
+                    ]}
+                    onChange={event => {
+                      handleEditorChanges('handleCityStyle', event.target.value)
+                    }}
+                  />
                   <TextField
                     value={config.visual.cityStyleLabel}
                     section='visual'
@@ -3245,17 +3240,14 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           Remove
                         </button>
                         <p>City Style {i + 1}</p>
-                        <label>
-                          <span className='edit-label column-heading'>Column with configuration value</span>
-                          <select
-                            value={column}
-                            onChange={e => {
-                              editCityStyles('update', i, 'column', e.target.value)
-                            }}
-                          >
-                            {columnsOptions}
-                          </select>
-                        </label>
+                        <Select
+                          label='Column with configuration value'
+                          value={column}
+                          options={columnsOptions.map(c => c.key)}
+                          onChange={e => {
+                            editCityStyles('update', i, 'column', e.target.value)
+                          }}
+                        />
                         <label>
                           <span className='edit-label column-heading'>Value to Trigger</span>
                           <input
@@ -3266,17 +3258,19 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             }}
                           ></input>
                         </label>
-                        <label>
-                          <span className='edit-label column-heading'>Shape</span>
-                          <select
-                            value={shape}
-                            onChange={e => {
-                              editCityStyles('update', i, 'shape', e.target.value)
-                            }}
-                          >
-                            {getCityStyleOptions('value')}
-                          </select>
-                        </label>
+                        <Select
+                          label='Shape'
+                          value={shape}
+                          options={[
+                            { value: '', label: '- Select Option -' },
+                            ...['Circle', 'Square', 'Triangle', 'Diamond', 'Star', 'Pin']
+                              .filter(val => String(config.visual.cityStyle).toLowerCase() !== val.toLowerCase())
+                              .map(val => ({ value: val, label: val }))
+                          ]}
+                          onChange={e => {
+                            editCityStyles('update', i, 'shape', e.target.value)
+                          }}
+                        />
                         <label>
                           <span className='edit-label column-heading'>Label</span>
                           <input

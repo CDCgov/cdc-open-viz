@@ -10,6 +10,7 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import Button from '@cdc/core/components/elements/Button'
 import Alert from '@cdc/core/components/Alert'
+import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 import ConfigContext from '../../../../ConfigContext'
 import { ChartContext } from '../../../../types/ChartContext'
 import { PanelProps } from '../PanelProps'
@@ -294,19 +295,16 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                     />
                   )}
 
-                  <label htmlFor={`pattern-datakey-${patternKey}`}>Data Key:</label>
-                  <select
-                    id={`pattern-datakey-${patternKey}`}
-                    value={p.dataKey || 'Select'}
-                    onChange={e => handlePatternUpdate(patternKey, 'dataKey', e.target.value)}
-                  >
-                    <option value='Select'>Select Data Key</option>
-                    {fieldOptions.map((option, index) => (
-                      <option value={option.value} key={index}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  <Select
+                    label='Data Key:'
+                    value={p.dataKey || ''}
+                    options={fieldOptions}
+                    initial='Select Data Key'
+                    fieldName={`pattern-datakey-${patternKey}`}
+                    updateField={(section, subsection, fieldName, value) =>
+                      handlePatternUpdate(patternKey, 'dataKey', value)
+                    }
+                  />
 
                   {p.dataKey && (
                     <>
@@ -333,33 +331,25 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                     />
                   </label>
 
-                  <label htmlFor={`pattern-type-${patternKey}`}>Pattern Type:</label>
-                  <select
-                    id={`pattern-type-${patternKey}`}
+                  <Select
+                    label='Pattern Type:'
                     value={p.shape || 'circles'}
-                    onChange={e => handlePatternUpdate(patternKey, 'shape', e.target.value)}
-                  >
-                    {patternTypes.map((patternType, index) => (
-                      <option value={patternType.value} key={index}>
-                        {patternType.label}
-                      </option>
-                    ))}
-                  </select>
-
-                  <label htmlFor={`pattern-size-${patternKey}`}>Pattern Size:</label>
-                  <select
-                    id={`pattern-size-${patternKey}`}
-                    value={getPatternSizeText(p.patternSize || 8)}
-                    onChange={e =>
-                      handlePatternUpdate(patternKey, 'patternSize', getPatternSizeNumeric(e.target.value))
+                    options={patternTypes}
+                    fieldName={`pattern-type-${patternKey}`}
+                    updateField={(section, subsection, fieldName, value) =>
+                      handlePatternUpdate(patternKey, 'shape', value)
                     }
-                  >
-                    {patternSizes.map((size, index) => (
-                      <option value={size.value} key={index}>
-                        {size.label}
-                      </option>
-                    ))}
-                  </select>
+                  />
+
+                  <Select
+                    label='Pattern Size:'
+                    value={getPatternSizeText(p.patternSize || 8)}
+                    options={patternSizes}
+                    fieldName={`pattern-size-${patternKey}`}
+                    updateField={(section, subsection, fieldName, value) =>
+                      handlePatternUpdate(patternKey, 'patternSize', getPatternSizeNumeric(value))
+                    }
+                  />
 
                   <div className='mt-3'>
                     <label htmlFor={`pattern-color-${patternKey}`}>

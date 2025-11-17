@@ -1,6 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react-vite'
 
-import InputSelect from '../inputs/InputSelect'
+import { Select as SelectInput } from '../EditorPanel/Inputs'
 import { useState } from 'react'
 
 const Inputs: React.FC = ({ config }: any) => {
@@ -16,7 +16,7 @@ const Inputs: React.FC = ({ config }: any) => {
   }
   return (
     <div>
-      <InputSelect label='Select' options={['apple', 'banana', 'orange']} fieldName='inputselect' updateField={updateField} />
+      <SelectInput label='Select' options={['apple', 'banana', 'orange']} fieldName='inputselect' updateField={updateField} />
     </div>
   )
 }
