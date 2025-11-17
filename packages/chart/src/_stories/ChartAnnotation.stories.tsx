@@ -13,19 +13,22 @@ type Story = StoryObj<typeof Chart>
 
 export const Chart_Annotation_Categorical: Story = {
   args: {
-    config: annotationConfig
+    config: annotationConfig,
+    isEditor: true
   }
 }
 
 export const Chart_Annotation_Date_Linear: Story = {
   args: {
-    config: annotationConfigDateLinear
+    config: annotationConfigDateLinear,
+    isEditor: true
   }
 }
 
 export const Chart_Annotation_Date_Time: Story = {
   args: {
-    config: annotationConfigDateTime
+    config: annotationConfigDateTime,
+    isEditor: true
   }
 }
 

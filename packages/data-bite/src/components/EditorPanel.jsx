@@ -565,19 +565,14 @@ const EditorPanel = memo(() => {
                                     <div className='accordion__panel-row align-center'>
                                       <div className='accordion__panel-col flex-auto'>If Value</div>
                                       <div className='accordion__panel-col flex-auto'>
-                                        <select
+                                        <Select
+                                          label=''
                                           value={option.arguments[0]?.operator || ''}
+                                          options={DATA_OPERATORS}
                                           onChange={e => {
                                             updateDynamicImage('operator', index, 0, e.target.value)
                                           }}
-                                        >
-                                          <option value='' disabled />
-                                          {DATA_OPERATORS.map((operator, index) => (
-                                            <option value={operator} key={index}>
-                                              {operator}
-                                            </option>
-                                          ))}
-                                        </select>
+                                        />
                                       </div>
                                       <div className='accordion__panel-col flex-grow flex-shrink'>
                                         <input
@@ -592,9 +587,13 @@ const EditorPanel = memo(() => {
 
                                     <div className='accordion__panel-row mb-2 align-center'>
                                       <div className='accordion__panel-col flex-grow'>
-                                        <select
-                                          className='border-dashed text-center'
+                                        <Select
+                                          label=''
                                           value={option.secondArgument ? 'and' : 'then'}
+                                          options={[
+                                            { value: 'then', label: 'Then' },
+                                            { value: 'and', label: 'And' }
+                                          ]}
                                           onChange={e => {
                                             if ('then' === e.target.value) {
                                               updateDynamicImage('secondArgument', index, null, false)
@@ -604,10 +603,7 @@ const EditorPanel = memo(() => {
                                               updateDynamicImage('secondArgument', index, null, true)
                                             }
                                           }}
-                                        >
-                                          <option value={'then'}>Then</option>
-                                          <option value={'and'}>And</option>
-                                        </select>
+                                        />
                                       </div>
                                     </div>
 
@@ -616,19 +612,14 @@ const EditorPanel = memo(() => {
                                         <div className='accordion__panel-row align-center'>
                                           <div className='accordion__panel-col flex-auto'>If Value</div>
                                           <div className='accordion__panel-col flex-auto'>
-                                            <select
+                                            <Select
+                                              label=''
                                               value={option.arguments[1]?.operator || ''}
+                                              options={DATA_OPERATORS}
                                               onChange={e => {
                                                 setDynamicArgument(index, 'operator', e.target.value)
                                               }}
-                                            >
-                                              <option value='' disabled />
-                                              {DATA_OPERATORS.map((operator, index) => (
-                                                <option value={operator} key={index}>
-                                                  {operator}
-                                                </option>
-                                              ))}
-                                            </select>
+                                            />
                                           </div>
                                           <div className='accordion__panel-col flex-grow flex-shrink'>
                                             <input

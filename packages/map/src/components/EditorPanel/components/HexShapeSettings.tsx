@@ -6,6 +6,7 @@ import {
   AccordionItemPanel,
   AccordionItemButton
 } from 'react-accessible-accordion'
+import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 import ConfigContext from '../../../context'
 import _ from 'lodash'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
@@ -127,23 +128,18 @@ const HexSettingShapeColumns = props => {
                                   </AccordionItemHeading>
                                   <AccordionItemPanel>
                                     <>
-                                      <label>
-                                        <span className='edit-label column-heading'>Shape Column</span>
-                                        <select
-                                          value={
-                                            config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].shape
-                                              ? config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].shape
-                                              : 'select'
-                                          }
-                                          onChange={e => {
-                                            handleItemUpdate('shape', e.target.value, shapeGroupIndex, itemIndex)
-                                          }}
-                                        >
-                                          {shapeOptions.map(shape => (
-                                            <option value={shape}>{shape}</option>
-                                          ))}
-                                        </select>
-                                      </label>
+                                      <Select
+                                        label='Shape Column'
+                                        value={
+                                          config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].shape ||
+                                          'Arrow Up'
+                                        }
+                                        options={shapeOptions}
+                                        fieldName={`shape-${shapeGroupIndex}-${itemIndex}`}
+                                        updateField={(section, subsection, fieldName, value) => {
+                                          handleItemUpdate('shape', value, shapeGroupIndex, itemIndex)
+                                        }}
+                                      />
 
                                       <div className='cove-input-group'>
                                         <label className=''>
@@ -151,51 +147,40 @@ const HexSettingShapeColumns = props => {
                                         </label>
                                         <div className='cove-accordion__panel-row cove-accordion__small-inputs'>
                                           <div className='cove-accordion__panel-col cove-input'>
-                                            <select
+                                            <Select
+                                              label=''
                                               value={
                                                 config.hexMap.shapeGroups[shapeGroupIndex].key === ''
                                                   ? 'Select'
                                                   : config.hexMap.shapeGroups[shapeGroupIndex].key
                                               }
-                                              className='cove-input'
-                                              onChange={e =>
-                                                handleItemUpdate('key', e.target.value, shapeGroupIndex, itemIndex)
+                                              options={columnsOptions}
+                                              fieldName={`key-${shapeGroupIndex}-${itemIndex}`}
+                                              updateField={(section, subsection, fieldName, value) =>
+                                                handleItemUpdate('key', value, shapeGroupIndex, itemIndex)
                                               }
-                                            >
-                                              {columnsOptions}
-                                            </select>
+                                            />
                                           </div>
                                           <div className='cove-accordion__panel-col cove-input'>
-                                            <select
+                                            <Select
+                                              label=''
                                               value={
                                                 config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].operator ||
-                                                '-SELECT-'
+                                                '='
                                               }
-                                              initial='Select'
-                                              className='cove-input'
-                                              onChange={e =>
-                                                handleItemUpdate('operator', e.target.value, shapeGroupIndex, itemIndex)
+                                              options={[
+                                                DATA_OPERATOR_EQUAL,
+                                                DATA_OPERATOR_NOTEQUAL,
+                                                DATA_OPERATOR_LESS,
+                                                DATA_OPERATOR_GREATER,
+                                                DATA_OPERATOR_LESSEQUAL,
+                                                DATA_OPERATOR_GREATEREQUAL
+                                              ]}
+                                              fieldName={`operator-${shapeGroupIndex}-${itemIndex}`}
+                                              updateField={(section, subsection, fieldName, value) =>
+                                                handleItemUpdate('operator', value, shapeGroupIndex, itemIndex)
                                               }
-                                            >
-                                              {[DATA_OPERATOR_EQUAL].map(option => {
-                                                return <option value={option}>{option}</option>
-                                              })}
-                                              {[DATA_OPERATOR_NOTEQUAL].map(option => {
-                                                return <option value={option}>{option}</option>
-                                              })}
-                                              {[DATA_OPERATOR_LESS].map(option => {
-                                                return <option value={option}>{option}</option>
-                                              })}
-                                              {[DATA_OPERATOR_GREATER].map(option => {
-                                                return <option value={option}>{option}</option>
-                                              })}
-                                              {[DATA_OPERATOR_LESSEQUAL].map(option => {
-                                                return <option value={option}>{option}</option>
-                                              })}
-                                              {[DATA_OPERATOR_GREATEREQUAL].map(option => {
-                                                return <option value={option}>{option}</option>
-                                              })}
-                                            </select>
+                                            />
                                           </div>
                                           <div className='cove-accordion__panel-col cove-input'>
                                             <input

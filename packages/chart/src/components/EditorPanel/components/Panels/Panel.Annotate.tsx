@@ -4,7 +4,7 @@ import ConfigContext from '../../../../ConfigContext.js'
 // CDC Core
 import Accordion from '@cdc/core/components/ui/Accordion'
 import Button from '@cdc/core/components/elements/Button'
-import { CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
+import { CheckBox, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import _ from 'lodash'
 
 // types
@@ -211,30 +211,22 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     }}
                   />
 
-                  <label>
-                    Connection Type:
-                    <select
-                      key='annotation-connection-type'
-                      onChange={e => {
-                        const updatedAnnotations = _.cloneDeep(config?.annotations)
-                        updatedAnnotations[index].connectionType = e.target.value
-                        updateConfig({
-                          ...config,
-                          annotations: updatedAnnotations
-                        })
-                      }}
-                      value={config?.annotations[index]?.connectionType}
-                    >
-                      <option key='select' value='select'>
-                        Select
-                      </option>
-                      {['curve', 'line', 'elbow', 'none'].map((side, index) => (
-                        <option key={side} value={side}>
-                          {side}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                  <Select
+                    label='Connection Type:'
+                    value={config?.annotations[index]?.connectionType}
+                    options={['Select', 'curve', 'line', 'elbow', 'none']}
+                    section='annotations'
+                    subsection={null}
+                    fieldName='connectionType'
+                    updateField={(section, subsection, fieldName, value) => {
+                      const updatedAnnotations = _.cloneDeep(config?.annotations)
+                      updatedAnnotations[index].connectionType = value
+                      updateConfig({
+                        ...config,
+                        annotations: updatedAnnotations
+                      })
+                    }}
+                  />
 
                   {annotation.connectionType === 'curve' && (
                     <>
@@ -259,45 +251,22 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     </>
                   )}
 
-                  {/* <label>
-                    Connection Location:
-                    <select
-                      onChange={e => {
-                        const updatedAnnotations = _.cloneDeep(config?.annotations)
-                        updatedAnnotations[index].connectionLocation = e.target.value
-                        updateConfig({
-                          ...config,
-                          annotations: updatedAnnotations
-                        })
-                      }}
-                    >
-                      {['auto', 'left', 'top', 'bottom', 'right'].map((side, index) => (
-                        <option key={side} value={side}>
-                          {side}
-                        </option>
-                      ))}
-                    </select>
-                  </label> */}
-
-                  <label>
-                    Marker
-                    <select
-                      key='annotation-marker'
-                      value={annotation.marker}
-                      onChange={e => {
-                        const updatedAnnotations = _.cloneDeep(config?.annotations)
-                        updatedAnnotations[index].marker = e.target.value
-                        updateConfig({
-                          ...config,
-                          annotations: updatedAnnotations
-                        })
-                      }}
-                    >
-                      {['arrow', 'circle'].map((column, columnIndex) => {
-                        return <option key={`col-${columnIndex}`}>{column}</option>
-                      })}
-                    </select>
-                  </label>
+                  <Select
+                    label='Marker'
+                    value={annotation.marker}
+                    options={['arrow', 'circle']}
+                    section='annotations'
+                    subsection={null}
+                    fieldName='marker'
+                    updateField={(section, subsection, fieldName, value) => {
+                      const updatedAnnotations = _.cloneDeep(config?.annotations)
+                      updatedAnnotations[index].marker = value
+                      updateConfig({
+                        ...config,
+                        annotations: updatedAnnotations
+                      })
+                    }}
+                  />
 
                   <Button className='btn btn-danger full-width' onClick={() => handleRemoveAnnotation(index)}>
                     Delete Annotation
