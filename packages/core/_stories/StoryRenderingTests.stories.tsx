@@ -111,16 +111,17 @@ const testIframeVisualization = async (iframeUrl: string) => {
           const svgCount = iframeDoc.querySelectorAll('svg').length
           const hasCoveModule = !!iframeDoc.querySelector('.cdc-open-viz-module')
           const isDataBite = !!iframeDoc.querySelector('.bite-content')
+          const isDataTable = !!iframeDoc.querySelector('.data-table')
 
-          return { svgCount, hasCoveModule, isDataBite, error: null }
+          return { svgCount, hasCoveModule, isDataBite, isDataTable, error: null }
         } catch (error: any) {
           console.log('Error waiting for SVG elements to render in iframe:', error.message)
-          return { svgCount: 0, hasCoveModule: false, isDataBite: false, error: error.message }
+          return { svgCount: 0, hasCoveModule: false, isDataBite: false, isDataTable: false, error: error.message }
         }
       },
       async () => {},
       (before, after) => {
-        return (after.svgCount > 0 && after.hasCoveModule) || after.isDataBite
+        return (after.svgCount > 0 && after.hasCoveModule) || after.isDataBite || after.isDataTable
       }
     )
   } finally {
