@@ -166,6 +166,12 @@ table.data-table {
     text-decoration: none;
   }
 
+  td div a {
+    position: relative;
+    padding: 0;
+    display: inline;
+  }
+
   td span.table-link {
     text-decoration: underline;
     cursor: pointer;

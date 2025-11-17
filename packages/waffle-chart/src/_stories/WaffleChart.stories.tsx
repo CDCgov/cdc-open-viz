@@ -75,12 +75,29 @@ export const Person: Story = {
       showDenominator: false,
       showPercent: true,
       valueDescription: 'testing',
+      gauge: {
+        height: 35,
+        width: 400
+      },
       visual: {
         border: true,
         accent: true,
         background: true,
         hideBackgroundColor: true,
-        borderColorTheme: true
+        borderColorTheme: true,
+        colors: {
+          'theme-blue': '#005eaa',
+          'theme-purple': '#712177',
+          'theme-brown': '#705043',
+          'theme-teal': '#00695c',
+          'theme-pink': '#af4448',
+          'theme-orange': '#bb4d00',
+          'theme-slate': '#29434e',
+          'theme-indigo': '#26418f',
+          'theme-cyan': '#006778',
+          'theme-green': '#4b830d',
+          'theme-amber': '#fbab18'
+        }
       }
     }
   },
