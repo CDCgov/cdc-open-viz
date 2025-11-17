@@ -147,19 +147,19 @@ const HexSettingShapeColumns = props => {
                                         </label>
                                         <div className='cove-accordion__panel-row cove-accordion__small-inputs'>
                                           <div className='cove-accordion__panel-col cove-input'>
-                                            <select
+                                            <Select
+                                              label=''
                                               value={
                                                 config.hexMap.shapeGroups[shapeGroupIndex].key === ''
                                                   ? 'Select'
                                                   : config.hexMap.shapeGroups[shapeGroupIndex].key
                                               }
-                                              className='cove-input'
-                                              onChange={e =>
-                                                handleItemUpdate('key', e.target.value, shapeGroupIndex, itemIndex)
+                                              options={columnsOptions}
+                                              fieldName={`key-${shapeGroupIndex}-${itemIndex}`}
+                                              updateField={(section, subsection, fieldName, value) =>
+                                                handleItemUpdate('key', value, shapeGroupIndex, itemIndex)
                                               }
-                                            >
-                                              {columnsOptions}
-                                            </select>
+                                            />
                                           </div>
                                           <div className='cove-accordion__panel-col cove-input'>
                                             <Select
