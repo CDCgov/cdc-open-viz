@@ -86,11 +86,96 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
   switch (type) {
     case 'image':
       const container = document.createElement('div')
-      // On screenshots without a title (like some charts), add padding around the chart svg
-      if (!state.showTitle) {
-        container.style.padding = '35px'
+
+      // Set container properties for optimal layout preservation
+      container.style.display = 'inline-block'
+      container.style.position = 'relative'
+      container.style.overflow = 'visible'
+
+      // Use configurable padding instead of fixed 35px
+      // Only add minimal padding if specifically configured or if no title
+      const downloadPadding = state.downloadImagePadding !== undefined ? state.downloadImagePadding : (!state.showTitle ? 10 : 0)
+      if (downloadPadding > 0) {
+        container.style.padding = `${downloadPadding}px`
       }
-      container.appendChild(baseSvg.cloneNode(true)) // Clone baseSvg to avoid modifying the original
+
+      // Clone element with improved style preservation
+      const clonedElement = baseSvg.cloneNode(true) as HTMLElement
+
+      // Preserve original dimensions to prevent layout shifts
+      if (baseSvg instanceof HTMLElement) {
+        const originalRect = baseSvg.getBoundingClientRect()
+        const originalStyles = window.getComputedStyle(baseSvg)
+
+        // Preserve key layout properties
+        clonedElement.style.width = originalRect.width > 0 ? `${originalRect.width}px` : originalStyles.width
+        clonedElement.style.height = originalRect.height > 0 ? `${originalRect.height}px` : originalStyles.height
+        clonedElement.style.minWidth = originalStyles.minWidth
+        clonedElement.style.minHeight = originalStyles.minHeight
+        clonedElement.style.maxWidth = originalStyles.maxWidth
+        clonedElement.style.maxHeight = originalStyles.maxHeight
+
+        // Preserve positioning and spacing
+        clonedElement.style.margin = originalStyles.margin
+        clonedElement.style.padding = originalStyles.padding
+        clonedElement.style.display = originalStyles.display
+        clonedElement.style.position = 'relative' // Ensure consistent positioning in container
+      }
+
+      container.appendChild(clonedElement)
+
+      // Fix potential layout issues in cloned content
+      const optimizeClonedContent = () => {
+        // Fix SVG scaling and text positioning issues
+        const svgElements = clonedElement.querySelectorAll('svg')
+        svgElements.forEach((svg) => {
+          if (svg instanceof SVGElement) {
+            // Preserve SVG viewBox and dimensions
+            const originalSvg = baseSvg.querySelector('svg')
+            if (originalSvg instanceof SVGElement) {
+              // Copy critical attributes that might affect rendering
+              const preserveAttributes = ['viewBox', 'width', 'height', 'preserveAspectRatio']
+              preserveAttributes.forEach(attr => {
+                const value = originalSvg.getAttribute(attr)
+                if (value) {
+                  svg.setAttribute(attr, value)
+                }
+              })
+            }
+
+            // Ensure text elements are positioned correctly
+            const textElements = svg.querySelectorAll('text, tspan')
+            textElements.forEach((text) => {
+              // Preserve text positioning attributes
+              const positionAttrs = ['x', 'y', 'dx', 'dy', 'transform']
+              positionAttrs.forEach(attr => {
+                const originalText = originalSvg?.querySelector(`text[${attr}="${text.getAttribute(attr)}"], tspan[${attr}="${text.getAttribute(attr)}"]`)
+                if (originalText && originalText.getAttribute(attr)) {
+                  text.setAttribute(attr, originalText.getAttribute(attr))
+                }
+              })
+            })
+          }
+        })
+
+        // Fix flex layout issues that might cause spacing problems
+        const flexContainers = clonedElement.querySelectorAll('[class*="flex"], [class*="d-flex"]')
+        flexContainers.forEach((container) => {
+          if (container instanceof HTMLElement) {
+            const originalContainer = baseSvg.querySelector(`.${container.className.split(' ').join('.')}`)
+            if (originalContainer instanceof HTMLElement) {
+              const originalStyles = window.getComputedStyle(originalContainer)
+              container.style.width = originalStyles.width
+              container.style.height = originalStyles.height
+              container.style.flexDirection = originalStyles.flexDirection
+              container.style.justifyContent = originalStyles.justifyContent
+              container.style.alignItems = originalStyles.alignItems
+            }
+          }
+        })
+      }
+
+      optimizeClonedContent()
 
       const downloadImage = async () => {
         document.body.appendChild(container) // Append container to the DOM
@@ -112,11 +197,36 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
         })
 
         import(/* webpackChunkName: "html2canvas" */ 'html2canvas').then(mod => {
+          // Calculate optimal dimensions for capture
+          const containerRect = container.getBoundingClientRect()
+          const contentRect = clonedElement.getBoundingClientRect()
+
           mod
             .default(container, {
+              // Ignore download buttons and other UI elements
               ignoreElements: el =>
                 el.className?.indexOf &&
-                el.className.search(/download-buttons|download-links|data-table-container/) !== -1
+                el.className.search(/download-buttons|download-links|data-table-container/) !== -1,
+
+              // Improved rendering options
+              useCORS: true,
+              allowTaint: true,
+              scale: 2, // Higher DPI for better quality
+              logging: false, // Disable console logs
+
+              // Dimension controls for better layout preservation
+              width: Math.max(containerRect.width, contentRect.width),
+              height: Math.max(containerRect.height, contentRect.height),
+
+              // Positioning controls
+              scrollX: 0,
+              scrollY: 0,
+              x: 0,
+              y: 0,
+
+              // Canvas optimization
+              backgroundColor: null, // Preserve transparency
+              removeContainer: true // Clean up after capture
             })
             .then(canvas => {
               document.body.removeChild(container) // Clean up container
