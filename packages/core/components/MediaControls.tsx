@@ -169,7 +169,12 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
         const flexContainers = clonedElement.querySelectorAll('[class*="flex"], [class*="d-flex"]')
         flexContainers.forEach((container) => {
           if (container instanceof HTMLElement) {
-            const originalContainer = baseSvg.querySelector(`.${container.className.split(' ').join('.')}`)
+            const classNames = (typeof container.className === 'string' && container.className.trim().length > 0)
+              ? container.className.split(/\s+/).map(cls => CSS.escape(cls)).join('.')
+              : '';
+            const originalContainer = classNames
+              ? baseSvg.querySelector(`.${classNames}`)
+              : null;
             if (originalContainer instanceof HTMLElement) {
               const originalStyles = window.getComputedStyle(originalContainer)
               container.style.width = originalStyles.width
