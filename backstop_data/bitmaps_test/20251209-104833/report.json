@@ -1,0 +1,83 @@
+{
+  "testSuite": "BackstopJS",
+  "tests": [
+    {
+      "pair": {
+        "reference": "../bitmaps_reference/cdc-open-viz-storybook_Charts_Gallery_-_Bar_Chart_Time_Based_0_document_0_phone.png",
+        "test": "../bitmaps_test/20251209-104833/cdc-open-viz-storybook_Charts_Gallery_-_Bar_Chart_Time_Based_0_document_0_phone.png",
+        "selector": "document",
+        "fileName": "cdc-open-viz-storybook_Charts_Gallery_-_Bar_Chart_Time_Based_0_document_0_phone.png",
+        "label": "Charts Gallery - Bar Chart Time Based",
+        "requireSameDimensions": true,
+        "misMatchThreshold": 0.1,
+        "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--bar-chart-time-based&viewMode=story",
+        "expect": 0,
+        "viewportLabel": "phone",
+        "diff": {
+          "isSameDimensions": false,
+          "dimensionDifference": {
+            "width": 0,
+            "height": -1
+          },
+          "rawMisMatchPercentage": 1.033024017467249,
+          "misMatchPercentage": "1.03",
+          "analysisTime": 8
+        },
+        "diffImage": "../bitmaps_test/20251209-104833/failed_diff_cdc-open-viz-storybook_Charts_Gallery_-_Bar_Chart_Time_Based_0_document_0_phone.png"
+      },
+      "status": "fail"
+    },
+    {
+      "pair": {
+        "reference": "../bitmaps_reference/cdc-open-viz-storybook_Charts_Gallery_-_Bar_Chart_Time_Based_0_document_1_tablet.png",
+        "test": "../bitmaps_test/20251209-104833/cdc-open-viz-storybook_Charts_Gallery_-_Bar_Chart_Time_Based_0_document_1_tablet.png",
+        "selector": "document",
+        "fileName": "cdc-open-viz-storybook_Charts_Gallery_-_Bar_Chart_Time_Based_0_document_1_tablet.png",
+        "label": "Charts Gallery - Bar Chart Time Based",
+        "requireSameDimensions": true,
+        "misMatchThreshold": 0.1,
+        "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--bar-chart-time-based&viewMode=story",
+        "expect": 0,
+        "viewportLabel": "tablet",
+        "diff": {
+          "isSameDimensions": true,
+          "dimensionDifference": {
+            "width": 0,
+            "height": 0
+          },
+          "rawMisMatchPercentage": 0.3326416015625,
+          "misMatchPercentage": "0.33",
+          "analysisTime": 19
+        },
+        "diffImage": "../bitmaps_test/20251209-104833/failed_diff_cdc-open-viz-storybook_Charts_Gallery_-_Bar_Chart_Time_Based_0_document_1_tablet.png"
+      },
+      "status": "fail"
+    },
+    {
+      "pair": {
+        "reference": "../bitmaps_reference/cdc-open-viz-storybook_Charts_Gallery_-_Bar_Chart_Time_Based_0_document_2_desktop.png",
+        "test": "../bitmaps_test/20251209-104833/cdc-open-viz-storybook_Charts_Gallery_-_Bar_Chart_Time_Based_0_document_2_desktop.png",
+        "selector": "document",
+        "fileName": "cdc-open-viz-storybook_Charts_Gallery_-_Bar_Chart_Time_Based_0_document_2_desktop.png",
+        "label": "Charts Gallery - Bar Chart Time Based",
+        "requireSameDimensions": true,
+        "misMatchThreshold": 0.1,
+        "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--bar-chart-time-based&viewMode=story",
+        "expect": 0,
+        "viewportLabel": "desktop",
+        "diff": {
+          "isSameDimensions": true,
+          "dimensionDifference": {
+            "width": 0,
+            "height": 0
+          },
+          "rawMisMatchPercentage": 0.0977325439453125,
+          "misMatchPercentage": "0.10",
+          "analysisTime": 28
+        }
+      },
+      "status": "pass"
+    }
+  ],
+  "id": "cdc-open-viz-storybook"
+}
