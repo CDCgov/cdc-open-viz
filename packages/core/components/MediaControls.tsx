@@ -169,10 +169,10 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
         flexContainers.forEach((container) => {
           if (container instanceof HTMLElement) {
             const classNames = (typeof container.className === 'string' && container.className.trim().length > 0)
-              ? container.className.split(/\s+/).map(cls => CSS.escape(cls)).join('.')
+              ? container.className.split(/\s+/).map(cls => `[class~="${CSS.escape(cls)}"]`).join('')
               : '';
             const originalContainer = classNames
-              ? baseSvg.querySelector(`.${classNames}`)
+              ? baseSvg.querySelector(`${classNames}`)
               : null;
             if (originalContainer instanceof HTMLElement) {
               const originalStyles = window.getComputedStyle(originalContainer)
