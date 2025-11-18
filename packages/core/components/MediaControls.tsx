@@ -94,14 +94,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
 
       // Use configurable padding instead of fixed 35px
       // Only add minimal padding if specifically configured or if no title
-      let downloadPadding;
-      if (state.downloadImagePadding !== undefined) {
-        downloadPadding = state.downloadImagePadding;
-      } else if (!state.showTitle) {
-        downloadPadding = 10;
-      } else {
-        downloadPadding = 0;
-      }
+      const downloadPadding = state.downloadImagePadding !== undefined ? state.downloadImagePadding : (!state.showTitle ? 10 : 0);
       if (downloadPadding > 0) {
         container.style.padding = `${downloadPadding}px`
       }
