@@ -10,7 +10,7 @@ const step = async (description: string, fn: () => Promise<void> | void) => {
 }
 
 const meta: Meta = {
-  title: 'Gallery/Maps',
+  title: 'Regression Tests/Gallery/Maps',
   parameters: {
     layout: 'fullscreen',
     docs: {

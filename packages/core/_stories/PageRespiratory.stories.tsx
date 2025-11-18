@@ -12,7 +12,7 @@ const step = async (description: string, fn: () => Promise<void> | void) => {
 }
 
 const meta: Meta = {
-  title: 'Regression Tests/Respiratory Viruses Activity Levels',
+  title: 'Regression Tests/Pages/Respiratory',
   parameters: {
     layout: 'fullscreen',
     docs: {
