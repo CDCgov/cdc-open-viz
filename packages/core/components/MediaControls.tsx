@@ -156,9 +156,15 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
               // Preserve text positioning attributes
               const positionAttrs = ['x', 'y', 'dx', 'dy', 'transform']
               positionAttrs.forEach(attr => {
-                const originalText = originalSvg?.querySelector(`text[${attr}="${text.getAttribute(attr)}"], tspan[${attr}="${text.getAttribute(attr)}"]`)
+                const tagName = text.tagName.toLowerCase();
+                const attrValue = text.getAttribute(attr);
+                let originalText = null;
+                if (attrValue !== null && originalSvg) {
+                  const candidates = originalSvg.querySelectorAll(tagName);
+                  originalText = Array.from(candidates).find(el => el.getAttribute(attr) === attrValue);
+                }
                 if (originalText && originalText.getAttribute(attr)) {
-                  text.setAttribute(attr, originalText.getAttribute(attr))
+                  text.setAttribute(attr, originalText.getAttribute(attr));
                 }
               })
             })
