@@ -226,8 +226,8 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
               logging: false, // Disable console logs
 
               // Dimension controls for better layout preservation
-              width: Math.max(containerRect.width, contentRect.width),
-              height: Math.max(containerRect.height, contentRect.height),
+              width: containerRect.width,
+              height: containerRect.height,
 
               // Positioning controls
               scrollX: 0,
