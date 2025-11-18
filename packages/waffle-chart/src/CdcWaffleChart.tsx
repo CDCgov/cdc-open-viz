@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useReducer, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 
 // visx
 import { Circle, Bar } from '@visx/shape'
@@ -68,7 +68,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   const gaugeColor = config.visual.colors[config.theme]
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
-  const calculateData = useCallback(() => {
+  const [dataPercentage, waffleDenominator, waffleNumerator] = useMemo(() => {
     //If either the column or function aren't set, do not calculate
     if (!dataColumn || !dataFunction) {
       return ''
@@ -240,21 +240,19 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       applyPrecision(waffleNumerator)
     ]
   }, [
-    dataColumn,
-    dataFunction,
     config.data,
     filters,
+    dataColumn,
+    dataFunction,
     dataConditionalColumn,
     dataConditionalOperator,
     dataConditionalComparate,
     customDenom,
+    dataDenom,
     dataDenomColumn,
     dataDenomFunction,
-    roundToPlace,
-    dataDenom
+    roundToPlace
   ])
-
-  const [dataPercentage, waffleDenominator, waffleNumerator] = calculateData()
 
   const buildWaffle = useCallback(() => {
     let waffleData = []
