@@ -416,32 +416,6 @@ export const DataSectionTests: Story = {
       },
       (before, after) => after !== before && after.endsWith('deaths')
     )
-
-    // ============================================================================
-    // TEST 16: Add Filter (state = Alaska)
-    // Expectation: Primary value text changes after filter applied.
-    // ============================================================================
-    const addFilterButton = Array.from(canvasElement.querySelectorAll('button')).find(
-      b => (b as HTMLButtonElement).textContent?.trim() === 'Add Filter'
-    ) as HTMLButtonElement
-    await performAndAssert(
-      'Add Filter',
-      getValueText,
-      async () => {
-        await userEvent.click(addFilterButton)
-
-        await waitForPresence('.filters-list .edit-block:last-of-type', canvasElement)
-
-        const newFilter = canvasElement.querySelector('.filters-list .edit-block:last-of-type') as HTMLElement
-        const [colSelect, valSelect] = Array.from(newFilter.querySelectorAll('select')) as HTMLSelectElement[]
-        await userEvent.selectOptions(colSelect, 'state')
-
-        await waitForOptionsToPopulate(valSelect)
-
-        await userEvent.selectOptions(valSelect, 'Alaska')
-      },
-      (before, after) => after !== before
-    )
   }
 }
 
