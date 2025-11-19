@@ -234,7 +234,6 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
 
               // Canvas optimization
               backgroundColor: null, // Preserve transparency
-              removeContainer: true // Clean up after capture
             })
             .then(canvas => {
               document.body.removeChild(container) // Clean up container
