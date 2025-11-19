@@ -148,7 +148,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
 
     seriesColors.forEach((barColor, index) => {
       const contrastPasses = checkAndLogContrast(patternColor, barColor, patternKey, `series-${index}`)
-      const contrastRatio = getPatternColorContrast(patternColor, barColor)
+      const contrastRatio = getColorContrast(patternColor, barColor)
 
       contrastResults.push({
         color: barColor,
