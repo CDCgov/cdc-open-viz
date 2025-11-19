@@ -70,9 +70,7 @@ const iframeUrlToStoryUrl = (iframeUrl: string): string => {
  * @param iframeUrl - The complete iframe URL to test (e.g., 'http://localhost:6006/iframe.html?id=...')
  * @returns Promise that resolves with test results
  */
-const testIframeVisualization = async (iframeUrl: string) => {
-  iframeUrl = iframeUrl
-
+const testIframeVisualization = async (iframeUrl: string): Promise<{ success: boolean; error?: string }> => {
   const iframe = document.createElement('iframe')
   iframe.style.width = '1200px'
   iframe.style.height = '800px'
@@ -118,14 +116,88 @@ const testIframeVisualization = async (iframeUrl: string) => {
       },
       async () => {},
       (before, after) => {
-        return (after.svgCount > 0 && after.hasCoveModule) || after.isDataBite || after.isDataTable
+        if (iframeUrl.includes('templates-datatable')) {
+          return after.isDataTable
+        }
+        return (after.svgCount > 0 && after.hasCoveModule) || after.isDataBite
       }
     )
+
+    return { success: true }
+  } catch (error: any) {
+    return { success: false, error: error.message }
   } finally {
     if (iframe.parentNode) {
       document.body.removeChild(iframe)
     }
   }
+}
+
+/**
+ * Process stories using a worker pool
+ * @param storyUrls - Array of story URLs to test
+ * @param concurrency - Number of concurrent workers to run
+ * @returns Promise that resolves to test results
+ */
+const processStoriesWithWorkerPool = async (
+  storyUrls: string[],
+  concurrency: number = 4
+): Promise<{ iframeUrl: string; storyUrl: string; success: boolean; error?: string }[]> => {
+  const results: { iframeUrl: string; storyUrl: string; success: boolean; error?: string }[] = []
+
+  const queue: Array<{ url: string; index: number }> = storyUrls.map((url, index) => ({ url, index }))
+  let completed = 0
+
+  const totalStories = storyUrls.length
+  let lastLoggedProgress = 0
+
+  const logProgress = () => {
+    const currentProgress = Math.floor((completed / totalStories) * 100)
+    if (currentProgress >= lastLoggedProgress + 10 || completed === totalStories) {
+      console.log(`Progress: ${completed}/${totalStories} stories tested (${currentProgress}%)`) // eslint-disable-line no-console
+      lastLoggedProgress = currentProgress
+    }
+  }
+
+  /**
+   * A single worker that continuously processes stories from the queue
+   */
+  const worker = async (workerId: number): Promise<void> => {
+    while (true) {
+      const queueItem = queue.shift()
+      if (!queueItem) break
+
+      const { url: iframeUrl, index: storyIndex } = queueItem
+
+      const storyUrl = iframeUrlToStoryUrl(iframeUrl)
+
+      try {
+        const result = await testIframeVisualization(iframeUrl)
+        results.push({
+          iframeUrl,
+          storyUrl,
+          success: result.success,
+          error: result.error
+        })
+      } catch (error: any) {
+        results.push({
+          iframeUrl,
+          storyUrl,
+          success: false,
+          error: error.message
+        })
+      }
+
+      completed++
+      logProgress()
+    }
+  }
+
+  console.log(`Starting worker pool with ${concurrency} workers for ${totalStories} stories...`) // eslint-disable-line no-console
+  const workers = Array.from({ length: concurrency }, (_, i) => worker(i))
+  await Promise.all(workers)
+
+  return results
 }
 
 export const StoryRenderingTests: Story = {
@@ -140,25 +212,27 @@ export const StoryRenderingTests: Story = {
       return
     }
 
-    const results: { iframeUrl: string; storyUrl: string; success: boolean; error?: string }[] = []
+    console.log(`Starting parallel testing of ${storyUrls.length} visualization stories...`) // eslint-disable-line no-console
+    const startTime = Date.now()
 
-    for (const [i, iframeUrl] of storyUrls.entries()) {
-      const storyUrl = iframeUrlToStoryUrl(iframeUrl)
+    const results = await processStoriesWithWorkerPool(storyUrls, 4)
 
-      try {
-        await testIframeVisualization(iframeUrl)
-        results.push({ iframeUrl, storyUrl, success: true })
-      } catch (error: any) {
-        if (i > 0) {
-          results.push({ iframeUrl, storyUrl, success: false, error: error.message })
-        }
-      }
-    }
+    const endTime = Date.now()
+    const duration = ((endTime - startTime) / 1000).toFixed(2)
+    console.log(`Completed testing ${results.length} stories in ${duration} seconds`) // eslint-disable-line no-console
 
     const failed = results.filter(r => !r.success).length
 
     if (failed > 0) {
+      const failedStories = results.filter(r => !r.success)
+      console.error('*************** Failed stories: ***************')
+      failedStories.forEach(story => {
+        console.error(`- ${story.storyUrl}`)
+      })
+
       throw new Error(`${failed} out of ${storyUrls.length} visualization stories failed to render`)
     }
+
+    console.log(`✅ All ${results.length} visualization stories rendered successfully`) // eslint-disable-line no-console
   }
 }

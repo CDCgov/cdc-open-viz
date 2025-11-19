@@ -10,12 +10,6 @@ const meta: Meta<typeof CdcDataTable> = {
 
 type Story = StoryObj<typeof CdcDataTable>
 
-export const DataTable: Story = {
-  args: {
-    config: { ...DataTableConfig, filters: [] },
-    isEditor: false
-  }
-}
 export const DataTable_Filters: Story = {
   args: {
     config: DataTableConfig,
