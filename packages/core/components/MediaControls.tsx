@@ -169,7 +169,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
         })
 
         // Fix flex layout issues that might cause spacing problems
-        const flexSelector = '[class*="flex"], [class*="d-flex"]';
+        const flexSelector = '[class~="flex"], [class~="d-flex"]';
         const flexContainers = clonedElement.querySelectorAll(flexSelector);
         const originalFlexContainers = baseSvg.querySelectorAll(flexSelector);
         flexContainers.forEach((container, idx) => {
