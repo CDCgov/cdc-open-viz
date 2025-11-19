@@ -87,182 +87,23 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
     case 'image':
       const container = document.createElement('div')
 
-      // Set container properties for optimal layout preservation
-      container.style.display = 'inline-block'
-      container.style.position = 'relative'
-      container.style.overflow = 'visible'
-
-      // Use configurable padding instead of fixed 35px
-      // Only add minimal padding if specifically configured or if no title
-      const downloadPadding = state.downloadImagePadding !== undefined ? state.downloadImagePadding : (!state.showTitle ? 10 : 0);
+      // Simple configurable padding (main fix for spacing issues)
+      const downloadPadding = state.downloadImagePadding !== undefined ? state.downloadImagePadding : (!state.showTitle ? 10 : 0)
       if (downloadPadding > 0) {
         container.style.padding = `${downloadPadding}px`
       }
 
-      // Clone element with improved style preservation
+      // Clone and preserve basic dimensions
       const clonedElement = baseSvg.cloneNode(true) as HTMLElement
-
-      // Preserve original dimensions to prevent layout shifts
       if (baseSvg instanceof HTMLElement) {
-        const originalRect = baseSvg.getBoundingClientRect()
-        const originalStyles = window.getComputedStyle(baseSvg)
-
-        // Preserve key layout properties
-        clonedElement.style.width = originalRect.width > 0 ? `${originalRect.width}px` : originalStyles.width
-        clonedElement.style.height = originalRect.height > 0 ? `${originalRect.height}px` : originalStyles.height
-        clonedElement.style.minWidth = originalStyles.minWidth
-        clonedElement.style.minHeight = originalStyles.minHeight
-        clonedElement.style.maxWidth = originalStyles.maxWidth
-        clonedElement.style.maxHeight = originalStyles.maxHeight
-
-        // Preserve positioning and spacing
-        clonedElement.style.margin = originalStyles.margin
-        clonedElement.style.padding = originalStyles.padding
-        clonedElement.style.display = originalStyles.display
-        clonedElement.style.position = 'relative' // Ensure consistent positioning in container
+        const rect = baseSvg.getBoundingClientRect()
+        if (rect.width > 0 && rect.height > 0) {
+          clonedElement.style.width = `${rect.width}px`
+          clonedElement.style.height = `${rect.height}px`
+        }
       }
 
       container.appendChild(clonedElement)
-
-      // Fix potential layout issues in cloned content
-      const optimizeClonedContent = () => {
-        // Fix SVG scaling and text positioning issues
-        const svgElements = clonedElement.querySelectorAll('svg')
-        svgElements.forEach((svg) => {
-          if (svg instanceof SVGElement) {
-            // Preserve SVG viewBox and dimensions
-            const originalSvg = baseSvg instanceof SVGElement
-              ? baseSvg
-              : baseSvg.querySelector('svg')
-            if (originalSvg instanceof SVGElement) {
-              // Copy critical attributes that might affect rendering
-              const preserveAttributes = ['viewBox', 'width', 'height', 'preserveAspectRatio']
-              preserveAttributes.forEach(attr => {
-                const value = originalSvg.getAttribute(attr)
-                if (value) {
-                  svg.setAttribute(attr, value)
-                }
-              })
-
-              // Ensure text elements are positioned correctly using robust matching
-              const textElements = svg.querySelectorAll('text, tspan')
-              const originalTextElements = originalSvg.querySelectorAll('text, tspan')
-
-              textElements.forEach((text) => {
-                // Find matching original text element using multiple criteria
-                const findMatchingOriginalText = (clonedText) => {
-                  const textContent = clonedText.textContent?.trim()
-                  const className = clonedText.getAttribute('class')
-                  const id = clonedText.getAttribute('id')
-                  const dataKey = clonedText.getAttribute('data-key')
-
-                  // Try to find exact match using multiple identifiers
-                  for (const originalText of Array.from(originalTextElements)) {
-                    // Match by ID (strongest identifier)
-                    if (id && originalText.getAttribute('id') === id) {
-                      return originalText
-                    }
-
-                    // Match by data-key attribute (common in charts)
-                    if (dataKey && originalText.getAttribute('data-key') === dataKey) {
-                      return originalText
-                    }
-
-                    // Match by class + text content combination
-                    if (className && textContent &&
-                        originalText.getAttribute('class') === className &&
-                        originalText.textContent?.trim() === textContent) {
-                      return originalText
-                    }
-
-                    // Match by position attributes + text content (for unique positioning)
-                    if (textContent && originalText.textContent?.trim() === textContent) {
-                      const textX = clonedText.getAttribute('x')
-                      const textY = clonedText.getAttribute('y')
-                      const origX = originalText.getAttribute('x')
-                      const origY = originalText.getAttribute('y')
-
-                      if (textX && textY && origX && origY &&
-                          textX === origX && textY === origY) {
-                        return originalText
-                      }
-                    }
-                  }
-
-                  // Fallback: match by text content only (weakest but still useful)
-                  if (textContent) {
-                    return Array.from(originalTextElements).find(
-                      orig => orig.textContent?.trim() === textContent
-                    )
-                  }
-
-                  return null
-                }
-
-                const originalText = findMatchingOriginalText(text)
-                if (originalText) {
-                  const positionAttrs = ['x', 'y', 'dx', 'dy', 'transform', 'text-anchor', 'dominant-baseline']
-                  positionAttrs.forEach(attr => {
-                    const originalAttrValue = originalText.getAttribute(attr)
-                    if (originalAttrValue) {
-                      text.setAttribute(attr, originalAttrValue)
-                    }
-                  })
-                }
-              })
-            }
-          }
-        })
-
-        // Fix flex layout issues using robust element matching
-        const flexSelector = '[class*="flex"], [class*="d-flex"]';
-        const flexContainers = clonedElement.querySelectorAll(flexSelector);
-        const originalFlexContainers = baseSvg.querySelectorAll(flexSelector);
-
-        flexContainers.forEach((container) => {
-          if (container instanceof HTMLElement) {
-            // Find matching original container using multiple criteria
-            const findMatchingFlexContainer = (clonedContainer) => {
-              const className = clonedContainer.className
-              const id = clonedContainer.getAttribute('id')
-              const dataTestId = clonedContainer.getAttribute('data-testid')
-
-              for (const original of Array.from(originalFlexContainers)) {
-                if (!(original instanceof HTMLElement)) continue
-
-                // Match by ID (strongest)
-                if (id && original.getAttribute('id') === id) {
-                  return original
-                }
-
-                // Match by data-testid
-                if (dataTestId && original.getAttribute('data-testid') === dataTestId) {
-                  return original
-                }
-
-                // Match by exact class name
-                if (className && original.className === className) {
-                  return original
-                }
-              }
-
-              return null
-            }
-
-            const originalContainer = findMatchingFlexContainer(container)
-            if (originalContainer) {
-              const originalStyles = window.getComputedStyle(originalContainer)
-              container.style.width = originalStyles.width
-              container.style.height = originalStyles.height
-              container.style.flexDirection = originalStyles.flexDirection
-              container.style.justifyContent = originalStyles.justifyContent
-              container.style.alignItems = originalStyles.alignItems
-            }
-          }
-        })
-      }
-
-      optimizeClonedContent()
 
       const downloadImage = async () => {
         document.body.appendChild(container) // Append container to the DOM
@@ -284,34 +125,13 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
         })
 
         import(/* webpackChunkName: "html2canvas" */ 'html2canvas').then(mod => {
-          // Calculate optimal dimensions for capture
-          const containerRect = container.getBoundingClientRect()
-
           mod
             .default(container, {
-              // Ignore download buttons and other UI elements
               ignoreElements: el =>
                 el.className?.indexOf &&
                 el.className.search(/download-buttons|download-links|data-table-container/) !== -1,
-
-              // Improved rendering options
               useCORS: true,
-              allowTaint: true,
-              scale: state.downloadImageScale ?? 2, // Configurable DPI for quality/performance
-              logging: false, // Disable console logs
-
-              // Dimension controls for better layout preservation
-              width: containerRect.width,
-              height: containerRect.height,
-
-              // Positioning controls
-              scrollX: 0,
-              scrollY: 0,
-              x: 0,
-              y: 0,
-
-              // Canvas optimization
-              backgroundColor: null, // Preserve transparency
+              scale: 2 // Better quality
             })
             .then(canvas => {
               document.body.removeChild(container) // Clean up container
