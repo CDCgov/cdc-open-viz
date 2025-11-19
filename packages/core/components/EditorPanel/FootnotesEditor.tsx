@@ -3,8 +3,7 @@ import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import _ from 'lodash'
 import Footnotes, { Footnote } from '../../types/Footnotes'
 import { footnotesSymbols } from '../../helpers/footnoteSymbols'
-import InputSelect from '../inputs/InputSelect'
-import { TextField } from './Inputs'
+import { TextField, Select } from './Inputs'
 import { Datasets } from '@cdc/core/types/DataSet'
 import DataTransform from '../../helpers/DataTransform'
 import fetchRemoteData from '../../helpers/fetchRemoteData'
@@ -61,14 +60,14 @@ const FootnotesEditor: React.FC<FootnotesEditorProps> = ({ config, updateField, 
     updateField('footnotes', null, 'staticFootnotes', footnoteCopy)
   }
 
-  const getOptions = (opts: string[]) => {
-    return [['', '--Select--']].concat(opts.map(key => [key, key]))
+  const getSelectOptions = (opts: string[]) => {
+    return [{ value: '', label: '--Select--' }].concat(opts.map(key => ({ value: key, label: key })))
   }
 
   const dataColumns = footnotesConfig.dataKey
-    ? getOptions(Object.keys(datasetsCache[footnotesConfig.dataKey]?.data?.[0] || {}))
+    ? getSelectOptions(Object.keys(datasetsCache[footnotesConfig.dataKey]?.data?.[0] || {}))
     : []
-  const dataSetOptions = getOptions(Object.keys(datasetsCache))
+  const dataSetOptions = getSelectOptions(Object.keys(datasetsCache))
 
   const changeFootnoteDataKey = async value => {
     if (value) {
@@ -87,7 +86,7 @@ const FootnotesEditor: React.FC<FootnotesEditorProps> = ({ config, updateField, 
       {loadingAPIData && <Loader fullScreen />}
       <em>Dynamic Footnotes</em>
       <div className='row border p-2'>
-        <InputSelect
+        <Select
           label='Select a Footnote Dataset'
           value={footnotesConfig.dataKey}
           options={dataSetOptions}
@@ -100,7 +99,7 @@ const FootnotesEditor: React.FC<FootnotesEditorProps> = ({ config, updateField, 
 
         {footnotesConfig.dataKey && (
           <div className='p-3'>
-            <InputSelect
+            <Select
               label='Footnote Symbol Column'
               value={footnotesConfig.dynamicFootnotes?.symbolColumn}
               options={dataColumns}
@@ -109,7 +108,7 @@ const FootnotesEditor: React.FC<FootnotesEditorProps> = ({ config, updateField, 
               fieldName='symbolColumn'
               updateField={updateField}
             />
-            <InputSelect
+            <Select
               label='Footnote Text Column'
               value={footnotesConfig.dynamicFootnotes?.textColumn}
               options={dataColumns}
@@ -118,7 +117,7 @@ const FootnotesEditor: React.FC<FootnotesEditorProps> = ({ config, updateField, 
               fieldName='textColumn'
               updateField={updateField}
             />
-            <InputSelect
+            <Select
               label='Footnote Order Column'
               value={footnotesConfig.dynamicFootnotes?.orderColumn}
               options={dataColumns}
@@ -135,34 +134,42 @@ const FootnotesEditor: React.FC<FootnotesEditorProps> = ({ config, updateField, 
 
       <em>Static Footnotes</em>
 
-      {footnotesConfig.staticFootnotes?.map((note, index) => (
-        <div key={index} className='row border p-2'>
-          <div className='col-8'>
-            <InputSelect
-              label='Symbol'
-              value={note.symbol}
-              options={[['', '--Select--'], ...footnotesSymbols]}
-              fieldName='symbol'
-              updateField={(section, subsection, fieldName, value) =>
-                updateStaticFootnote(index, { ...note, symbol: value })
-              }
-            />{' '}
-            <TextField
-              label='Text'
-              value={note.text}
-              fieldName='text'
-              updateField={(section, subsection, fieldName, value) =>
-                updateStaticFootnote(index, { ...note, text: value })
-              }
-            />
+      {footnotesConfig.staticFootnotes?.map((note, index) => {
+        // Convert tuple format to {value, label} format for Select component
+        const symbolOptions = [
+          { value: '', label: '--Select--' },
+          ...footnotesSymbols.map(([value, label]) => ({ value, label }))
+        ]
+
+        return (
+          <div key={index} className='row border p-2'>
+            <div className='col-8'>
+              <Select
+                label='Symbol'
+                value={note.symbol}
+                options={symbolOptions}
+                fieldName='symbol'
+                updateField={(section, subsection, fieldName, value) =>
+                  updateStaticFootnote(index, { ...note, symbol: value })
+                }
+              />{' '}
+              <TextField
+                label='Text'
+                value={note.text}
+                fieldName='text'
+                updateField={(section, subsection, fieldName, value) =>
+                  updateStaticFootnote(index, { ...note, text: value })
+                }
+              />
+            </div>
+            <div className='col-2 ms-4'>
+              <button className='btn btn-danger p-1' onClick={() => deleteStaticFootnote(index)}>
+                Delete
+              </button>
+            </div>
           </div>
-          <div className='col-2 ms-4'>
-            <button className='btn btn-danger p-1' onClick={() => deleteStaticFootnote(index)}>
-              Delete
-            </button>
-          </div>
-        </div>
-      ))}
+        )
+      })}
       <button className='btn btn-primary' onClick={addStaticFootnote}>
         Add Static Footnote
       </button>

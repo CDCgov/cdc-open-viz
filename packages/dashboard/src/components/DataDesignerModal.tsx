@@ -4,14 +4,13 @@ import { useContext, useMemo, useState } from 'react'
 import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 import Modal from '@cdc/core/components/ui/Modal'
 import Loader from '@cdc/core/components/Loader'
-import { CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
+import { CheckBox, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import _ from 'lodash'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { ConfigureData } from '@cdc/core/types/ConfigureData'
 import Icon from '@cdc/core/components/ui/Icon'
-import InputSelect from '@cdc/core/components/inputs/InputSelect'
 
 type DataDesignerModalProps = {
   rowIndex: number
@@ -134,7 +133,11 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
         {loadingAPIData && <Loader fullScreen />}
         <div className='dataset-selector-container'>
           Select a dataset:&nbsp;
-          <select className='dataset-selector' value={configureData.dataKey || ''} onChange={changeDataset}>
+          <select
+            className='dataset-selector cove-form-select'
+            value={configureData.dataKey || ''}
+            onChange={changeDataset}
+          >
             <option value=''>Select a dataset</option>
             {config.datasets &&
               Object.keys(config.datasets).map(datasetKey => (
@@ -190,7 +193,7 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
             />
           ) : (
             <>
-              <InputSelect
+              <Select
                 options={Object.keys(config.datasets[configureData.dataKey]?.data[0] || {})}
                 value={config.rows[rowIndex].multiVizColumn}
                 label='Multi-Visualization Column'

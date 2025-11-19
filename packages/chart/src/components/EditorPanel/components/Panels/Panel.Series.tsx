@@ -2,7 +2,6 @@ import React, { useContext } from 'react'
 import ConfigContext from '../../../../ConfigContext'
 
 // Core
-import InputSelect from '@cdc/core/components/inputs/InputSelect'
 import Check from '@cdc/core/assets/icon-check.svg'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 import { colorPalettesChartV1, colorPalettesChartV2, sequentialPalettes } from '@cdc/core/data/colorPalettes'
@@ -98,12 +97,12 @@ const SeriesDropdownLineType = props => {
   })
 
   return (
-    <InputSelect
+    <Select
       initial='Select an option'
       value={series.lineType ? series.lineType : 'curveLinear'}
       label='Series Line Type'
-      onChange={event => {
-        changeLineType(index, event.target.value)
+      updateField={(_section, _subsection, _fieldName, value) => {
+        changeLineType(index, value)
       }}
       options={options}
     />
@@ -118,35 +117,35 @@ const SeriesDropdownSeriesType = props => {
 
   const getOptions = () => {
     if (config.visualizationType === 'Combo') {
-      return {
-        Bar: 'Bar',
-        Line: 'Line',
-        'dashed-sm': 'Small Dashed',
-        'dashed-md': 'Medium Dashed',
-        'dashed-lg': 'Large Dashed',
-        'Area Chart': 'Area Chart',
-        Forecasting: 'Forecasting'
-      }
+      return [
+        { value: 'Bar', label: 'Bar' },
+        { value: 'Line', label: 'Line' },
+        { value: 'dashed-sm', label: 'Small Dashed' },
+        { value: 'dashed-md', label: 'Medium Dashed' },
+        { value: 'dashed-lg', label: 'Large Dashed' },
+        { value: 'Area Chart', label: 'Area Chart' },
+        { value: 'Forecasting', label: 'Forecasting' }
+      ]
     }
     if (config.visualizationType === 'Line' || config.visualizationType === 'Bump Chart') {
-      return {
-        Line: 'Line',
-        'dashed-sm': 'Small Dashed',
-        'dashed-md': 'Medium Dashed',
-        'dashed-lg': 'Large Dashed'
-      }
+      return [
+        { value: 'Line', label: 'Line' },
+        { value: 'dashed-sm', label: 'Small Dashed' },
+        { value: 'dashed-md', label: 'Medium Dashed' },
+        { value: 'dashed-lg', label: 'Large Dashed' }
+      ]
     }
   }
 
   // Allowable changes
   if (!['Line', 'Combo', 'Bump Chart'].includes(config.visualizationType)) return
   return (
-    <InputSelect
+    <Select
       initial='Select an option'
       value={series.type}
       label='Series Type'
-      onChange={event => {
-        updateSeries(index, event.target.value, 'type')
+      updateField={(_section, _subsection, _fieldName, value) => {
+        updateSeries(index, value, 'type')
       }}
       options={getOptions()}
     />
@@ -162,13 +161,13 @@ const SeriesDropdownForecastingStage = props => {
   // Only combo charts are allowed to have different options
 
   return (
-    <InputSelect
+    <Select
       initial='Select an option'
       value={series.stageColumn}
       label='Add Forecasting Stages'
-      onChange={e => {
+      updateField={(_section, _subsection, _fieldName, value) => {
         let stageObjects = []
-        let tempGroups = new Set(rawData?.map(item => item[e.target.value])) // [estimate, forecast, etc.]
+        let tempGroups = new Set(rawData?.map(item => item[value])) // [estimate, forecast, etc.]
         tempGroups = Array.from(tempGroups) // convert set to array
 
         tempGroups = tempGroups.filter(group => group !== undefined) // removes undefined
@@ -176,7 +175,7 @@ const SeriesDropdownForecastingStage = props => {
         tempGroups.forEach(group => stageObjects.push({ key: group }))
 
         const copyOfSeries = [...config.series] // copy the entire series array
-        copyOfSeries[index] = { ...copyOfSeries[index], stages: stageObjects, stageColumn: e.target.value }
+        copyOfSeries[index] = { ...copyOfSeries[index], stages: stageObjects, stageColumn: value }
 
         updateConfig({
           ...config,
@@ -200,19 +199,19 @@ const SeriesDropdownForecastingColumn = props => {
   if (!series.stageColumn) return
 
   let tempGroups = new Set(rawData.map(item => item[series.stageColumn])) // [estimate, forecast, etc.]
-  tempGroups = Array.from(tempGroups) // convert set to array
+  let tempGroupsArray = Array.from(tempGroups) // convert set to array
 
-  tempGroups = tempGroups.filter(group => group !== undefined) // removes undefined
+  tempGroupsArray = tempGroupsArray.filter(group => group !== undefined) // removes undefined
 
   return (
-    <InputSelect
+    <Select
       initial='Select an option'
       value={series.stageItem}
       label='Forecasting Item Column'
-      onChange={event => {
-        updateSeries(index, event.target.value, 'stageItem')
+      updateField={(_section, _subsection, _fieldName, value) => {
+        updateSeries(index, value, 'stageItem')
       }}
-      options={tempGroups}
+      options={tempGroupsArray}
     />
   )
 }
@@ -229,17 +228,17 @@ const SeriesDropdownAxisPosition = props => {
     return
   }
   return (
-    <InputSelect
+    <Select
       initial='Select an option'
       value={series.axis ? series.axis : 'Left'}
       label='Series Axis'
-      onChange={event => {
-        updateSeries(index, event.target.value, 'axis')
+      updateField={(_section, _subsection, _fieldName, value) => {
+        updateSeries(index, value, 'axis')
       }}
-      options={{
-        ['Left']: 'Left',
-        ['Right']: 'Right'
-      }}
+      options={[
+        { value: 'Left', label: 'Left' },
+        { value: 'Right', label: 'Right' }
+      ]}
     />
   )
 }
@@ -267,17 +266,23 @@ const SeriesDropdownForecastColor = props => {
 
   // For dropdown options, only show version-specific palettes
   const processedPalettes = updatePaletteNames(forecastPalettes)
-  const paletteOptions = buildForecastPaletteOptions(processedPalettes, paletteVersion)
+  const paletteOptionsObject = buildForecastPaletteOptions(processedPalettes, paletteVersion)
+
+  // Convert object to array format for Select component
+  const paletteOptions = Object.entries(paletteOptionsObject).map(([value, label]) => ({
+    value,
+    label
+  }))
 
   return series?.stages?.map((stage, stageIndex) => (
-    <InputSelect
+    <Select
       key={`${stage}--${stageIndex}`}
       initial='Select an option'
       value={config.series?.[index].stages?.[stageIndex].color || 'Select'}
       label={`${stage.key} Series Color`}
-      onChange={event => {
+      updateField={(_section, _subsection, _fieldName, value) => {
         if (handleForecastPaletteSelection) {
-          handleForecastPaletteSelection(event.target.value, index, stageIndex)
+          handleForecastPaletteSelection(value, index, stageIndex)
         }
       }}
       options={paletteOptions}
@@ -325,7 +330,7 @@ const SeriesDropdownConfidenceInterval = props => {
                   </>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
-                  <InputSelect
+                  <Select
                     initial='Select an option'
                     value={
                       config.series[index].confidenceIntervals[ciIndex].low
@@ -333,9 +338,9 @@ const SeriesDropdownConfidenceInterval = props => {
                         : 'Select'
                     }
                     label='Low Confidence Interval'
-                    onChange={e => {
+                    updateField={(_section, _subsection, _fieldName, value) => {
                       const copiedConfidenceArray = [...config.series[index].confidenceIntervals]
-                      copiedConfidenceArray[ciIndex].low = e.target.value
+                      copiedConfidenceArray[ciIndex].low = value
                       const copyOfSeries = [...config.series] // copy the entire series array
                       copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedConfidenceArray }
                       updateConfig({
@@ -345,7 +350,7 @@ const SeriesDropdownConfidenceInterval = props => {
                     }}
                     options={getColumns()}
                   />
-                  <InputSelect
+                  <Select
                     initial='Select an option'
                     value={
                       config.series[index].confidenceIntervals[ciIndex].high
@@ -353,9 +358,9 @@ const SeriesDropdownConfidenceInterval = props => {
                         : 'Select'
                     }
                     label='High Confidence Interval'
-                    onChange={e => {
+                    updateField={(_section, _subsection, _fieldName, value) => {
                       const copiedConfidenceArray = [...config.series[index].confidenceIntervals]
-                      copiedConfidenceArray[ciIndex].high = e.target.value
+                      copiedConfidenceArray[ciIndex].high = value
                       const copyOfSeries = [...config.series] // copy the entire series array
                       copyOfSeries[index] = { ...copyOfSeries[index], confidenceIntervals: copiedConfidenceArray }
                       updateConfig({
