@@ -155,8 +155,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
                 const attrValue = text.getAttribute(attr);
                 let originalText = null;
                 if (attrValue !== null && originalSvg) {
-                  const candidates = originalSvg.querySelectorAll(tagName);
-                  originalText = Array.from(candidates).find(el => el.getAttribute(attr) === attrValue);
+                  originalText = originalSvg.querySelector(`${tagName}[${attr}="${CSS.escape(attrValue)}"]`);
                 }
                 if (originalText && originalText.getAttribute(attr)) {
                   text.setAttribute(attr, originalText.getAttribute(attr));
