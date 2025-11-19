@@ -212,7 +212,6 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
         import(/* webpackChunkName: "html2canvas" */ 'html2canvas').then(mod => {
           // Calculate optimal dimensions for capture
           const containerRect = container.getBoundingClientRect()
-          const contentRect = clonedElement.getBoundingClientRect()
 
           mod
             .default(container, {
