@@ -72,7 +72,6 @@ const iframeUrlToStoryUrl = (iframeUrl: string): string => {
  */
 const testIframeVisualization = async (iframeUrl: string) => {
   iframeUrl = iframeUrl
-  console.log(`Testing story: ${iframeUrlToStoryUrl(iframeUrl)}`)
 
   const iframe = document.createElement('iframe')
   iframe.style.width = '1200px'
@@ -91,7 +90,6 @@ const testIframeVisualization = async (iframeUrl: string) => {
             readyState: iframeDoc?.readyState || 'unknown'
           }
         } catch (error: any) {
-          console.log('Error loading iframe:', error.message)
           return { loaded: false, readyState: 'error', error: error.message }
         }
       },
@@ -115,7 +113,6 @@ const testIframeVisualization = async (iframeUrl: string) => {
 
           return { svgCount, hasCoveModule, isDataBite, isDataTable, error: null }
         } catch (error: any) {
-          console.log('Error waiting for SVG elements to render in iframe:', error.message)
           return { svgCount: 0, hasCoveModule: false, isDataBite: false, isDataTable: false, error: error.message }
         }
       },
@@ -154,7 +151,6 @@ export const StoryRenderingTests: Story = {
       } catch (error: any) {
         if (i > 0) {
           results.push({ iframeUrl, storyUrl, success: false, error: error.message })
-          console.log(`❌ FAILED: ${storyUrl}`)
         }
       }
     }
