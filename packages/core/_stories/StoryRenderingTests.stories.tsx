@@ -190,6 +190,7 @@ const processStoriesWithWorkerPool = async (
 
       completed++
       logProgress()
+      await new Promise(resolve => setTimeout(resolve, 50))
     }
   }
 
@@ -215,7 +216,7 @@ export const StoryRenderingTests: Story = {
     console.log(`Starting parallel testing of ${storyUrls.length} visualization stories...`) // eslint-disable-line no-console
     const startTime = Date.now()
 
-    const results = await processStoriesWithWorkerPool(storyUrls, 4)
+    const results = await processStoriesWithWorkerPool(storyUrls, 2)
 
     const endTime = Date.now()
     const duration = ((endTime - startTime) / 1000).toFixed(2)
