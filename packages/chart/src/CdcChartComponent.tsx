@@ -324,6 +324,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     //Enforce default values that need to be calculated at runtime
+    // Preserve any existing error message before wiping runtime
+    const existingErrorMessage = _config.runtime?.editorErrorMessage || ''
     newConfig.runtime = {} as Runtime
     newConfig.runtime.series = _.cloneDeep(newConfig.series)
     newConfig.runtime.seriesLabels = {}
@@ -431,13 +433,18 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     newConfig.runtime.uniqueId = Date.now()
-    newConfig.runtime.editorErrorMessage =
-      newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey
-        ? 'Data Key property in Y Axis section must be set for pie charts.'
-        : ''
 
-    // Sankey Description box error message
-    newConfig.runtime.editorErrorMessage = ''
+    // Set error message priority: existing errors take precedence over validation errors
+    if (existingErrorMessage) {
+      // Preserve error messages set by editor panels (e.g., pattern contrast errors)
+      newConfig.runtime.editorErrorMessage = existingErrorMessage
+    } else if (newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey) {
+      // Set validation error for Pie charts
+      newConfig.runtime.editorErrorMessage = 'Data Key property in Y Axis section must be set for pie charts.'
+    } else {
+      // No errors
+      newConfig.runtime.editorErrorMessage = ''
+    }
 
     if (newConfig.legend.seriesHighlight?.length) {
       dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: newConfig.legend?.seriesHighlight })
@@ -1031,9 +1038,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
         {isEditor && <EditorPanel datasets={datasets} />}
         <Layout.Responsive isEditor={isEditor}>
           {config.newViz && <Confirm updateConfig={updateConfig} config={config} />}
-          {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && (
-            <Error errorMessage={config.runtime.editorErrorMessage} />
-          )}
           {!missingRequiredSections(config) && !config.newViz && (
             <div
               className={`cdc-chart-inner-container cove-component__content type-${makeClassName(
@@ -1051,6 +1055,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 style={undefined}
                 config={config}
               />
+
+              {/* Error Message Display - Show at top before visualization wrapper */}
+              {(() => {
+                const hasError = config.runtime?.editorErrorMessage
+                const shouldShow = undefined === config.newViz && isEditor && config.runtime && hasError
+                return shouldShow ? <Error errorMessage={config.runtime.editorErrorMessage} /> : null
+              })()}
 
               {/* Visualization Wrapper */}
               <div className={getChartWrapperClasses().join(' ')}>

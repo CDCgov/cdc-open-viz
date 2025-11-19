@@ -50,30 +50,25 @@ const defaultHeaderColors = [
 ]
 
 export const Default: Story = {
-    args: {
-        onThemeSelect: (theme: string) => console.log('Selected theme:', theme)
-    }
+    args: {}
 }
 
 export const WithSelectedTheme: Story = {
     args: {
-        selectedTheme: 'theme-purple',
-        onThemeSelect: (theme: string) => console.log('Selected theme:', theme)
+        selectedTheme: 'theme-purple'
     }
 }
 
 export const CustomLabel: Story = {
     args: {
         label: 'Choose Color Theme',
-        selectedTheme: 'theme-teal',
-        onThemeSelect: (theme: string) => console.log('Selected theme:', theme)
+        selectedTheme: 'theme-teal'
     }
 }
 
 export const CustomColors: Story = {
     args: {
         headerColors: ['theme-blue', 'theme-purple', 'theme-orange', 'theme-green'],
-        selectedTheme: 'theme-blue',
-        onThemeSelect: (theme: string) => console.log('Selected theme:', theme)
+        selectedTheme: 'theme-blue'
     }
 }
