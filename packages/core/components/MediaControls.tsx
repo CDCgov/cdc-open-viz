@@ -95,7 +95,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
 
       // Clone and preserve basic dimensions
       const clonedElement = baseSvg.cloneNode(true) as HTMLElement
-      if (baseSvg instanceof HTMLElement) {
+      if (baseSvg instanceof Element) {
         const rect = baseSvg.getBoundingClientRect()
         if (rect.width > 0 && rect.height > 0) {
           clonedElement.style.width = `${rect.width}px`
