@@ -297,7 +297,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
               // Improved rendering options
               useCORS: true,
               allowTaint: true,
-              scale: 2, // Higher DPI for better quality
+              scale: state.downloadImageScale ?? 2, // Configurable DPI for quality/performance
               logging: false, // Disable console logs
 
               // Dimension controls for better layout preservation
