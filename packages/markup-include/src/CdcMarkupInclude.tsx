@@ -72,7 +72,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     noDataMessageText,
     markupVariables: contentEditorMarkupVariables
   } = contentEditor || {}
-  const data = config?.data || configObj?.data
+  const data = configObj?.data || config?.data
 
   // Support markupVariables at root level or inside contentEditor
   const markupVariables = config?.markupVariables || contentEditorMarkupVariables || []
