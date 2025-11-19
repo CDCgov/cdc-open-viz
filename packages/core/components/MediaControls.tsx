@@ -166,15 +166,12 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
         })
 
         // Fix flex layout issues that might cause spacing problems
-        const flexContainers = clonedElement.querySelectorAll('[class*="flex"], [class*="d-flex"]')
-        flexContainers.forEach((container) => {
+        const flexSelector = '[class*="flex"], [class*="d-flex"]';
+        const flexContainers = clonedElement.querySelectorAll(flexSelector);
+        const originalFlexContainers = baseSvg.querySelectorAll(flexSelector);
+        flexContainers.forEach((container, idx) => {
           if (container instanceof HTMLElement) {
-            const classNames = (typeof container.className === 'string' && container.className.trim().length > 0)
-              ? container.className.split(/\s+/).map(cls => `[class~="${CSS.escape(cls)}"]`).join('')
-              : '';
-            const originalContainer = classNames
-              ? baseSvg.querySelector(`${classNames}`)
-              : null;
+            const originalContainer = originalFlexContainers[idx];
             if (originalContainer instanceof HTMLElement) {
               const originalStyles = window.getComputedStyle(originalContainer)
               container.style.width = originalStyles.width
