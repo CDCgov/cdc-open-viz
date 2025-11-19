@@ -173,33 +173,33 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return {
       title: title
         ? processMarkupVariables(title, config.data || [], config.markupVariables, {
-          isEditor,
-          filters: config.filters || []
-        }).processedContent
+            isEditor,
+            filters: config.filters || []
+          }).processedContent
         : title,
       superTitle: config.superTitle
         ? processMarkupVariables(config.superTitle, config.data || [], config.markupVariables, {
-          isEditor,
-          filters: config.filters || []
-        }).processedContent
+            isEditor,
+            filters: config.filters || []
+          }).processedContent
         : config.superTitle,
       introText: config.introText
         ? processMarkupVariables(config.introText, config.data || [], config.markupVariables, {
-          isEditor,
-          filters: config.filters || []
-        }).processedContent
+            isEditor,
+            filters: config.filters || []
+          }).processedContent
         : config.introText,
       legacyFootnotes: config.legacyFootnotes
         ? processMarkupVariables(config.legacyFootnotes, config.data || [], config.markupVariables, {
-          isEditor,
-          filters: config.filters || []
-        }).processedContent
+            isEditor,
+            filters: config.filters || []
+          }).processedContent
         : config.legacyFootnotes,
       description: config.description
         ? processMarkupVariables(config.description, config.data || [], config.markupVariables, {
-          isEditor,
-          filters: config.filters || []
-        }).processedContent
+            isEditor,
+            filters: config.filters || []
+          }).processedContent
         : config.description
     }
   }, [
@@ -1060,13 +1060,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
               {(() => {
                 const hasError = config.runtime?.editorErrorMessage
                 const shouldShow = undefined === config.newViz && isEditor && config.runtime && hasError
-                console.log('Chart Error Display Check:', {
-                  hasError,
-                  shouldShow,
-                  isEditor,
-                  newViz: config.newViz,
-                  errorMessage: config.runtime?.editorErrorMessage
-                })
                 return shouldShow ? <Error errorMessage={config.runtime.editorErrorMessage} /> : null
               })()}
 
@@ -1104,8 +1097,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           legend.position === 'top' ||
                           visualizationType === 'Sankey' ||
                           visualizationType === 'Spark Line'
-                          ? 'w-100'
-                          : 'w-75'
+                        ? 'w-100'
+                        : 'w-75'
                     }
                   >
                     {/* Check if there is data to display */}
@@ -1159,7 +1152,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                               const labelMargin = 120
                               const widthReduction =
                                 config.showLineSeriesLabels &&
-                                  (config.legend.position !== 'right' || config.legend.hide)
+                                (config.legend.position !== 'right' || config.legend.hide)
                                   ? labelMargin
                                   : 0
                               return (
@@ -1263,8 +1256,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       config.visualizationType === 'Sankey'
                         ? config?.data?.[0]?.tableData
                         : config.table.customTableConfig
-                          ? filterVizData(config.filters, config.data)
-                          : config.data
+                        ? filterVizData(config.filters, config.data)
+                        : config.data
 
                     if (config.smallMultiples?.mode) {
                       const prepared = prepareSmallMultiplesDataTable(config, config.columns, dataTableRuntimeData)

@@ -89,7 +89,12 @@ const PanelPatternSettings: FC<PanelProps> = props => {
   }
 
   // Checks contrast and logs warning if needed
-  const checkAndLogContrast = (patternColor: string, backgroundColor: string, dataValue: string, dataKey: string): boolean => {
+  const checkAndLogContrast = (
+    patternColor: string,
+    backgroundColor: string,
+    dataValue: string,
+    dataKey: string
+  ): boolean => {
     if (!backgroundColor || !patternColor) return true // Default to true if colors are missing
 
     const contrastCheck = checkColorContrast(patternColor, backgroundColor)
@@ -108,10 +113,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
 
   // Perform contrast check for a specific pattern against actual bar colors
   const performContrastCheck = (patternKey: string, patternColor: string) => {
-    console.log('performContrastCheck called:', { patternKey, patternColor })
-
     if (!patternColor || patternColor === '') {
-      console.log('No pattern color, returning true')
       return true
     }
 
@@ -121,7 +123,6 @@ const PanelPatternSettings: FC<PanelProps> = props => {
     if (config.customColors && config.customColors.length > 0) {
       // Use custom colors if available
       seriesColors = config.customColors
-      console.log('Using custom colors:', seriesColors)
     } else {
       // Use the same color generation logic as the chart
       try {
@@ -129,15 +130,12 @@ const PanelPatternSettings: FC<PanelProps> = props => {
         // Get colors for all series labels (not keys!)
         const seriesLabels = config.runtime?.seriesLabelsAll || []
         seriesColors = seriesLabels.map(label => colorScale(label)).filter(color => color !== null)
-        console.log('Generated series colors:', seriesColors, 'from labels:', seriesLabels)
       } catch (error) {
-        console.log('Error getting color scale:', error)
         return true
       }
     }
 
     if (seriesColors.length === 0) {
-      console.log('No series colors found, returning true')
       return true
     }
 
@@ -161,7 +159,6 @@ const PanelPatternSettings: FC<PanelProps> = props => {
       }
     })
 
-    console.log('Contrast check results:', { allContrastsPass, contrastResults })
     return allContrastsPass
   }
 
@@ -263,27 +260,19 @@ const PanelPatternSettings: FC<PanelProps> = props => {
   const reviewColorContrast = (updatedConfig: any, patternKey: string) => {
     // Re-check the contrast for the updated pattern
     const pattern = updatedConfig.legend.patterns[patternKey]
-    console.log('reviewColorContrast - Before check:', { patternKey, color: pattern?.color })
 
     if (pattern?.color) {
       pattern.contrastCheck = performContrastCheck(patternKey, pattern.color)
-      console.log('reviewColorContrast - After performContrastCheck:', pattern.contrastCheck)
     }
 
     // Update error message based on whether all patterns pass contrast checks
     const allPatterns = Object.values(updatedConfig.legend.patterns || {})
-    console.log('reviewColorContrast - All patterns:', allPatterns.map((p: any) => ({
-      color: p.color,
-      contrastCheck: p.contrastCheck
-    })))
 
     const allPatternsPass = allPatterns.every((p: any) => p.contrastCheck !== false)
-    console.log('reviewColorContrast - allPatternsPass:', allPatternsPass)
 
     const errorMsg = allPatternsPass ? '' : 'One or more patterns do not pass the WCAG 2.1 contrast ratio of 3:1.'
     // Set error message AFTER spreading runtime to avoid it being overwritten
     updatedConfig.runtime.editorErrorMessage = errorMsg
-    console.log('reviewColorContrast - Final error message set:', errorMsg, 'Runtime object:', updatedConfig.runtime)
   }
 
   const handlePatternUpdate = (patternKey: string, field: string, value: any) => {
@@ -318,7 +307,6 @@ const PanelPatternSettings: FC<PanelProps> = props => {
       reviewColorContrast(updatedConfig, patternKey)
     }
 
-    console.log('handlePatternUpdate - About to call updateConfig with runtime.editorErrorMessage:', updatedConfig.runtime?.editorErrorMessage)
     updateConfig(updatedConfig)
   }
 
