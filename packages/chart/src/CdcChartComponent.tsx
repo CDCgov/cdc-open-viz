@@ -276,30 +276,62 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return newConfig
   }
 
+  const getProcessedAxisLabels = useCallback(
+    (targetConfig: AllChartsConfig, dataSource: any[] = []) => {
+      let processedXAxis = targetConfig.xAxis?.label
+      let processedYAxis = targetConfig.yAxis?.label
+
+      if (targetConfig.enableMarkupVariables && targetConfig.markupVariables?.length) {
+        if (targetConfig.xAxis?.label) {
+          processedXAxis = processMarkupVariables(
+            targetConfig.xAxis.label,
+            dataSource || [],
+            targetConfig.markupVariables,
+            {
+              isEditor,
+              filters: targetConfig.filters || []
+            }
+          ).processedContent
+        }
+        if (targetConfig.yAxis?.label) {
+          processedYAxis = processMarkupVariables(
+            targetConfig.yAxis.label,
+            dataSource || [],
+            targetConfig.markupVariables,
+            {
+              isEditor,
+              filters: targetConfig.filters || []
+            }
+          ).processedContent
+        }
+      }
+
+      const isHorizontalVariant =
+        ((targetConfig.visualizationType === 'Bar' || targetConfig.visualizationType === 'Box Plot') &&
+          targetConfig.orientation === 'horizontal') ||
+        ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(targetConfig.visualizationType)
+
+      const runtimeXAxisLabel = isHorizontalVariant
+        ? processedYAxis ?? (targetConfig.yAxis as any)?.yAxis?.label ?? targetConfig.yAxis?.label
+        : processedXAxis ?? targetConfig.xAxis?.label
+
+      const runtimeYAxisLabel = isHorizontalVariant
+        ? processedXAxis ?? (targetConfig.xAxis as any)?.xAxis?.label ?? targetConfig.xAxis?.label
+        : processedYAxis ?? targetConfig.yAxis?.label
+
+      return { processedXAxis, processedYAxis, runtimeXAxisLabel, runtimeYAxisLabel, isHorizontalVariant }
+    },
+    [isEditor]
+  )
+
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
     const newConfig = cloneConfig(_config)
     let data = dataOverride || stateData
 
     data = handleRankByValue(data, newConfig)
 
-    // Process axis labels for markup variables if enabled
-    let processedXAxis = newConfig.xAxis?.label
-    let processedYAxis = newConfig.yAxis?.label
-
-    if (newConfig.enableMarkupVariables && newConfig.markupVariables?.length) {
-      if (newConfig.xAxis?.label) {
-        processedXAxis = processMarkupVariables(newConfig.xAxis.label, data || [], newConfig.markupVariables, {
-          isEditor,
-          filters: newConfig.filters || []
-        }).processedContent
-      }
-      if (newConfig.yAxis?.label) {
-        processedYAxis = processMarkupVariables(newConfig.yAxis.label, data || [], newConfig.markupVariables, {
-          isEditor,
-          filters: newConfig.filters || []
-        }).processedContent
-      }
-    }
+    const { processedXAxis, processedYAxis, runtimeXAxisLabel, runtimeYAxisLabel, isHorizontalVariant } =
+      getProcessedAxisLabels(newConfig, data || [])
 
     // Deeper copy
     Object.keys(defaults).forEach(key => {
@@ -398,19 +430,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
       newConfig.visualizationSubType = 'stacked'
     }
 
-    if (
-      ((newConfig.visualizationType === 'Bar' || newConfig.visualizationType === 'Box Plot') &&
-        newConfig.orientation === 'horizontal') ||
-      ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)
-    ) {
+    if (isHorizontalVariant) {
       // For horizontal charts, axes are swapped, so processedYAxis goes to runtime.xAxis and vice versa
+      const horizontalXAxisSource = _.cloneDeep((newConfig.yAxis as any)?.yAxis || newConfig.yAxis)
+      const horizontalYAxisSource = _.cloneDeep((newConfig.xAxis as any)?.xAxis || newConfig.xAxis)
       newConfig.runtime.xAxis = {
-        ..._.cloneDeep(newConfig.yAxis.yAxis || newConfig.yAxis),
-        label: processedYAxis || (newConfig.yAxis.yAxis || newConfig.yAxis).label
+        ...horizontalXAxisSource,
+        label: runtimeXAxisLabel ?? horizontalXAxisSource?.label
       }
       newConfig.runtime.yAxis = {
-        ..._.cloneDeep(newConfig.xAxis.xAxis || newConfig.xAxis),
-        label: processedXAxis || (newConfig.xAxis.xAxis || newConfig.xAxis).label
+        ...horizontalYAxisSource,
+        label: runtimeYAxisLabel ?? horizontalYAxisSource?.label
       }
       newConfig.runtime.yAxis.labelOffset *= -1
 
@@ -422,13 +452,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
       ['Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType) &&
       !convertLineToBarGraph
     ) {
-      newConfig.runtime.xAxis = { ...newConfig.xAxis, label: processedXAxis || newConfig.xAxis.label }
-      newConfig.runtime.yAxis = { ...newConfig.yAxis, label: processedYAxis || newConfig.yAxis.label }
+      newConfig.runtime.xAxis = { ...newConfig.xAxis, label: runtimeXAxisLabel ?? newConfig.xAxis.label }
+      newConfig.runtime.yAxis = { ...newConfig.yAxis, label: runtimeYAxisLabel ?? newConfig.yAxis.label }
       newConfig.runtime.horizontal = false
       newConfig.orientation = 'vertical'
     } else {
-      newConfig.runtime.xAxis = { ...newConfig.xAxis, label: processedXAxis || newConfig.xAxis.label }
-      newConfig.runtime.yAxis = { ...newConfig.yAxis, label: processedYAxis || newConfig.yAxis.label }
+      newConfig.runtime.xAxis = { ...newConfig.xAxis, label: runtimeXAxisLabel ?? newConfig.xAxis.label }
+      newConfig.runtime.yAxis = { ...newConfig.yAxis, label: runtimeYAxisLabel ?? newConfig.yAxis.label }
       newConfig.runtime.horizontal = false
     }
 
@@ -662,6 +692,49 @@ const CdcChart: React.FC<CdcChartProps> = ({
       stateData.sort(sortData)
     }
   }, [config, stateData]) // eslint-disable-line
+
+  // Updates runtime axis labels when config or data changes when using markup variables
+  useEffect(() => {
+    if (
+      !config?.runtime ||
+      _.isEmpty(config.runtime) ||
+      (!config.runtime.xAxis && !config.runtime.yAxis) ||
+      !config.markupVariables?.length
+    ) {
+      return
+    }
+
+    const dataSource = (stateData && stateData.length ? stateData : config.data) || []
+    const { runtimeXAxisLabel, runtimeYAxisLabel, isHorizontalVariant } = getProcessedAxisLabels(config, dataSource)
+
+    const runtimeClone = _.cloneDeep(config.runtime)
+
+    if (!runtimeClone?.xAxis || !runtimeClone?.yAxis) {
+      return
+    }
+
+    let shouldUpdateLabels = false
+
+    if (typeof runtimeXAxisLabel !== 'undefined' && runtimeClone.xAxis.label !== runtimeXAxisLabel) {
+      runtimeClone.xAxis = { ...runtimeClone.xAxis, label: runtimeXAxisLabel }
+      shouldUpdateLabels = true
+    }
+
+    if (typeof runtimeYAxisLabel !== 'undefined' && runtimeClone.yAxis.label !== runtimeYAxisLabel) {
+      runtimeClone.yAxis = { ...runtimeClone.yAxis, label: runtimeYAxisLabel }
+      shouldUpdateLabels = true
+    }
+
+    if (shouldUpdateLabels) {
+      runtimeClone.uniqueId = Date.now()
+      const updatedConfig = { ...config, runtime: runtimeClone } as ChartConfig
+      dispatch({ type: 'SET_CONFIG', payload: updatedConfig })
+
+      if (isEditor && !isDashboard) {
+        editorContext.setTempConfig(updatedConfig)
+      }
+    }
+  }, [config, stateData, getProcessedAxisLabels, dispatch, editorContext, isEditor, isDashboard])
 
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = (label: Label): void => {

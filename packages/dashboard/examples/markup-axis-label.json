@@ -1,0 +1,4167 @@
+{
+  "dashboard": {
+    "sharedFilters": [
+      {
+        "key": "Year",
+        "type": "datafilter",
+        "columnName": "Year",
+        "showDropdown": true,
+        "setBy": "chart1699383531543",
+        "usedBy": [
+          "map1699383540561"
+        ],
+        "resetLabel": "Reset",
+        "values": [
+          "2019",
+          "2020",
+          "2021"
+        ],
+        "tier": 1,
+        "orderedValues": [
+          "2019",
+          "2020",
+          "2021"
+        ]
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "legacySharedFilters"
+        }
+      ]
+    },
+    {
+      "uuid": "__​undefined__",
+      "toggle": "__​undefined__",
+      "equalHeight": "__​undefined__",
+      "columns": [
+        {
+          "width": 12,
+          "widget": "chart1699383531543"
+        },
+        {},
+        {}
+      ]
+    }
+  ],
+  "visualizations": {
+    "chart1699383531543": {
+      "annotations": [],
+      "allowLineToBarGraph": "__​undefined__",
+      "type": "chart",
+      "debugSvg": false,
+      "chartMessage": {
+        "noData": "No Data Available"
+      },
+      "title": "",
+      "showTitle": true,
+      "showDownloadMediaButton": false,
+      "theme": "theme-blue",
+      "animate": false,
+      "lineDatapointStyle": "hover",
+      "lineDatapointColor": "Same as Line",
+      "barHasBorder": "false",
+      "isLollipopChart": false,
+      "lollipopShape": "circle",
+      "lollipopColorStyle": "two-tone",
+      "visualizationSubType": "regular",
+      "barStyle": "",
+      "roundingStyle": "standard",
+      "tipRounding": "top",
+      "isResponsiveTicks": false,
+      "general": {
+        "annotationDropdownText": "Annotations",
+        "showMissingDataLabel": true,
+        "showSuppressedSymbol": true,
+        "showZeroValueData": true,
+        "hideNullValue": true,
+        "palette": {
+          "name": "qualitative_bold",
+          "version": "1.0"
+        }
+      },
+      "padding": {
+        "left": 5,
+        "right": 5
+      },
+      "preliminaryData": [],
+      "yAxis": {
+        "hideAxis": false,
+        "displayNumbersOnBar": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 50,
+        "gridLines": false,
+        "enablePadding": false,
+        "min": "",
+        "max": "",
+        "labelColor": "#1c1d1f",
+        "tickLabelColor": "#1c1d1f",
+        "tickColor": "#1c1d1f",
+        "rightHideAxis": true,
+        "rightAxisSize": 0,
+        "rightLabel": "",
+        "rightLabelOffsetSize": 0,
+        "rightAxisLabelColor": "#1c1d1f",
+        "rightAxisTickLabelColor": "#1c1d1f",
+        "rightAxisTickColor": "#1c1d1f",
+        "numTicks": "",
+        "axisPadding": 0,
+        "scalePadding": 10,
+        "tickRotation": 0,
+        "anchors": [],
+        "shoMissingDataLabel": true,
+        "showMissingDataLine": true,
+        "categories": [],
+        "label": "{{yaxis}}"
+      },
+      "boxplot": {
+        "plots": [],
+        "borders": "true",
+        "plotOutlierValues": false,
+        "plotNonOutlierValues": true,
+        "labels": {
+          "q1": "Lower Quartile",
+          "q2": "q2",
+          "q3": "Upper Quartile",
+          "q4": "q4",
+          "minimum": "Minimum",
+          "maximum": "Maximum",
+          "mean": "Mean",
+          "median": "Median",
+          "sd": "Standard Deviation",
+          "iqr": "Interquartile Range",
+          "total": "Total",
+          "outliers": "Outliers",
+          "values": "Values",
+          "lowerBounds": "Lower Bounds",
+          "upperBounds": "Upper Bounds"
+        },
+        "firstQuartilePercentage": 25,
+        "thirdQuartilePercentage": 75,
+        "boxWidthPercentage": 40,
+        "legend": {
+          "showHowToReadText": false,
+          "howToReadText": ""
+        }
+      },
+      "topAxis": {
+        "hasLine": false
+      },
+      "isLegendValue": false,
+      "barThickness": 0.35,
+      "barHeight": 25,
+      "barSpace": 15,
+      "heights": {
+        "vertical": 300,
+        "horizontal": 750
+      },
+      "xAxis": {
+        "sortDates": false,
+        "anchors": [],
+        "type": "categorical",
+        "showTargetLabel": true,
+        "targetLabel": "Target",
+        "hideAxis": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 75,
+        "tickRotation": 0,
+        "min": "",
+        "max": "",
+        "labelColor": "#1c1d1f",
+        "tickLabelColor": "#1c1d1f",
+        "tickColor": "#1c1d1f",
+        "numTicks": "",
+        "labelOffset": 65,
+        "axisPadding": 0,
+        "target": 0,
+        "maxTickRotation": 0,
+        "padding": 5,
+        "showYearsOnce": false,
+        "sortByRecentDate": false,
+        "brushActive": false,
+        "dataKey": "Year",
+        "axisBBox": 29.360000610351562,
+        "tickWidthMax": 39
+      },
+      "table": {
+        "label": "Data Table",
+        "expanded": true,
+        "limitHeight": false,
+        "height": "",
+        "caption": "",
+        "showDownloadUrl": false,
+        "showDataTableLink": true,
+        "showDownloadLinkBelow": true,
+        "indexLabel": "",
+        "download": false,
+        "showVertical": true,
+        "dateDisplayFormat": "",
+        "showMissingDataLabel": true,
+        "showSuppressedSymbol": true,
+        "collapsible": true,
+        "show": false,
+        "sharedFilterColumns": []
+      },
+      "orientation": "vertical",
+      "color": "qualitative-bold",
+      "columns": {},
+      "legend": {
+        "hide": false,
+        "behavior": "isolate",
+        "axisAlign": true,
+        "singleRow": false,
+        "colorCode": "",
+        "reverseLabelOrder": false,
+        "description": "",
+        "dynamicLegend": false,
+        "dynamicLegendDefaultText": "Show All",
+        "dynamicLegendItemLimit": 5,
+        "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+        "dynamicLegendChartMessage": "Select Options from the Legend",
+        "label": "",
+        "lineMode": false,
+        "verticalSorted": false,
+        "highlightOnHover": false,
+        "hideSuppressedLabels": false,
+        "hideSuppressionLink": false,
+        "seriesHighlight": [],
+        "style": "circles",
+        "subStyle": "linear blocks",
+        "groupBy": "",
+        "shape": "circle",
+        "tickRotation": "",
+        "order": "dataColumn",
+        "hideBorder": {
+          "side": false,
+          "topBottom": true
+        },
+        "position": "right",
+        "orderedValues": [],
+        "patterns": {},
+        "patternField": "",
+        "unified": true
+      },
+      "smallMultiples": {
+        "mode": "",
+        "tileColumn": "",
+        "tilesPerRowDesktop": 3,
+        "tilesPerRowMobile": 1,
+        "tileOrder": [],
+        "tileOrderType": "asc",
+        "tileTitles": {},
+        "independentYAxis": false,
+        "colorMode": "same",
+        "synchronizedTooltips": true,
+        "showAreaUnderLine": true
+      },
+      "exclusions": {
+        "active": false,
+        "keys": []
+      },
+      "twoColor": {
+        "palette": "monochrome-1",
+        "isPaletteReversed": false
+      },
+      "labels": false,
+      "dataFormat": {
+        "commas": false,
+        "prefix": "",
+        "suffix": "",
+        "abbreviated": false,
+        "bottomSuffix": "",
+        "bottomPrefix": "",
+        "bottomAbbreviated": false
+      },
+      "filters": [
+        {
+          "filterStyle": "dropdown",
+          "columnName": "Location",
+          "label": "Location",
+          "order": "asc",
+          "id": 1763515602693,
+          "orderedValues": "__​undefined__"
+        },
+        {
+          "filterStyle": "dropdown",
+          "columnName": "Type",
+          "label": "Type",
+          "order": "asc",
+          "id": 1763515602694,
+          "orderedValues": "__​undefined__"
+        }
+      ],
+      "confidenceKeys": {},
+      "visual": {
+        "border": true,
+        "accent": true,
+        "background": true,
+        "verticalHoverLine": false,
+        "horizontalHoverLine": false,
+        "lineDatapointSymbol": "none",
+        "maximumShapeAmount": 7
+      },
+      "useLogScale": false,
+      "filterBehavior": "Filter Change",
+      "highlightedBarValues": [],
+      "series": [
+        {
+          "dataKey": "Amount",
+          "type": "Bar",
+          "axis": "Left",
+          "tooltip": true
+        }
+      ],
+      "tooltips": {
+        "opacity": 90,
+        "singleSeries": false,
+        "dateDisplayFormat": ""
+      },
+      "forestPlot": {
+        "startAt": 0,
+        "colors": {
+          "line": "",
+          "shape": ""
+        },
+        "lineOfNoEffect": {
+          "show": true
+        },
+        "type": "",
+        "pooledResult": {
+          "diamondHeight": 5,
+          "column": ""
+        },
+        "estimateField": "",
+        "estimateRadius": "",
+        "shape": "",
+        "rowHeight": 20,
+        "description": {
+          "show": true,
+          "text": "description",
+          "location": 0
+        },
+        "result": {
+          "show": true,
+          "text": "result",
+          "location": 100
+        },
+        "radius": {
+          "min": 1,
+          "max": 8,
+          "scalingColumn": ""
+        },
+        "regression": {
+          "lower": 0,
+          "upper": 0,
+          "estimateField": 0
+        },
+        "leftWidthOffset": 0,
+        "rightWidthOffset": 0,
+        "showZeroLine": false,
+        "leftLabel": "",
+        "rightLabel": "",
+        "width": "auto",
+        "lowerCiField": "",
+        "upperCiField": ""
+      },
+      "area": {
+        "isStacked": false
+      },
+      "sankey": {
+        "title": {
+          "defaultColor": "black"
+        },
+        "iterations": 1,
+        "rxValue": 0.9,
+        "overallSize": {
+          "width": 900,
+          "height": 700
+        },
+        "margin": {
+          "margin_y": 25,
+          "margin_x": 0
+        },
+        "nodeSize": {
+          "nodeWidth": 26,
+          "nodeHeight": 40
+        },
+        "nodePadding": 55,
+        "nodeFontColor": "black",
+        "nodeColor": {
+          "default": "#ff8500",
+          "inactive": "#808080"
+        },
+        "linkColor": {
+          "default": "#ffc900",
+          "inactive": "#D3D3D3"
+        },
+        "opacity": {
+          "nodeOpacityDefault": 1,
+          "nodeOpacityInactive": 0.1,
+          "LinkOpacityDefault": 1,
+          "LinkOpacityInactive": 0.1
+        },
+        "storyNodeFontColor": "#006778",
+        "storyNodeText": [],
+        "nodeValueStyle": {
+          "textBefore": "(",
+          "textAfter": ")"
+        },
+        "data": []
+      },
+      "markupVariables": [
+        {
+          "name": "yaxis",
+          "tag": "{{yaxis}}",
+          "columnName": "AmountUnits",
+          "conditions": [],
+          "addCommas": false,
+          "hideOnNull": false
+        }
+      ],
+      "enableMarkupVariables": true,
+      "showChartBrush": false,
+      "fontSize": "medium",
+      "isPaletteReversed": false,
+      "brush": {
+        "pattern_id": "brush_pattern",
+        "accent_color": "#ddd"
+      },
+      "openModal": false,
+      "uid": "chart1699383531543",
+      "visualizationType": "Bar",
+      "dataKey": "dashboard_aggregate_example_state_type (1).csv",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "validated": 4.23,
+      "dynamicMarginTop": 0,
+      "dashboardFilters": [
+        {
+          "columnName": "Year",
+          "active": "2019",
+          "values": [
+            "2019",
+            "2020",
+            "2021"
+          ]
+        }
+      ]
+    },
+    "runtime": {
+      "editorErrorMessage": [
+        "No data"
+      ]
+    },
+    "legacySharedFilters": {
+      "type": "dashboardFilters",
+      "visualizationType": "dashboardFilters",
+      "sharedFilterIndexes": [
+        0
+      ],
+      "filterBehavior": "Filter Change",
+      "uid": "legacySharedFilters"
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "showVertical": true
+  },
+  "type": "dashboard",
+  "uuid": 1699383537668,
+  "runtime": {},
+  "version": "4.25.11",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "general": {
+    "palette": {
+      "version": "1.0",
+      "backups": [
+        {
+          "name": "__​undefined__",
+          "version": "1.0",
+          "isReversed": "__​undefined__"
+        },
+        {
+          "name": "__​undefined__",
+          "version": "1.0",
+          "isReversed": "__​undefined__"
+        }
+      ]
+    }
+  },
+  "datasets": {
+    "dashboard_aggregate_example_state_type (1).csv": {
+      "data": [
+        {
+          "Location": "Alaska",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1377,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Alaska",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1613,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Alaska",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1495,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Alaska",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1377,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Alaska",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1613,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Alaska",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1495,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Alaska",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1436,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Alaska",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1672,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Alaska",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1554,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1375,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1611,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1493,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1375,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1611,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1493,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1434,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1670,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Alabama",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1552,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1398,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1634,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1516,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1398,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1634,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1516,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1457,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1693,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Arkansas",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1575,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1388,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1624,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1506,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1388,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1624,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1506,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1447,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1683,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "American Samoa",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1565,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1401,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1637,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1519,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1401,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1637,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1519,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1460,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1696,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Arizona",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1578,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "California",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1381,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "California",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1617,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "California",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1499,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "California",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1381,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "California",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1617,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "California",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1499,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "California",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1440,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "California",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1676,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "California",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1558,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Colorado",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1369,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Colorado",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1605,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Colorado",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1487,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Colorado",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1369,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Colorado",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1605,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Colorado",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1487,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Colorado",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1428,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Colorado",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1664,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Colorado",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1546,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Connecticut",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1403,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Connecticut",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1639,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Connecticut",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1521,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Connecticut",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1403,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Connecticut",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1639,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Connecticut",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1521,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Connecticut",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1462,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Connecticut",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1698,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Connecticut",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1580,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "District of Columbia",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1400,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "District of Columbia",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1636,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "District of Columbia",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1518,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "District of Columbia",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1400,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "District of Columbia",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1636,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "District of Columbia",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1518,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "District of Columbia",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1459,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "District of Columbia",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1695,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "District of Columbia",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1577,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Delaware\t",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": "1384",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Delaware\t",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": "1620",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Delaware\t",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": "1502",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Delaware\t",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": "1384",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Delaware\t",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": "1620",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Delaware\t",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": "1502",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Delaware\t",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": "1443",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Delaware\t",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": "1679",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Delaware\t",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": "1561",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Florida\t",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": "1387",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Florida\t",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": "1623",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Florida\t",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": "1505",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Florida\t",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": "1387",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Florida\t",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": "1623",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Florida\t",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": "1505",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Florida\t",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": "1446",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Florida\t",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": "1682",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Florida\t",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": "1564",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Georgia\t",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": "1365",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Georgia\t",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": "1601",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Georgia\t",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": "1483",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Georgia\t",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": "1365",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Georgia\t",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": "1601",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Georgia\t",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": "1483",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Georgia\t",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": "1424",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Georgia\t",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": "1660",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Georgia\t",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": "1542",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Guam",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1356,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Guam",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1592,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Guam",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1474,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Guam",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1356,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Guam",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1592,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Guam",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1474,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Guam",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1415,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Guam",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1651,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Guam",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1533,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Hawaii\t",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": "1362",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Hawaii\t",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": "1598",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Hawaii\t",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": "1480",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Hawaii\t",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": "1362",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Hawaii\t",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": "1598",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Hawaii\t",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": "1480",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Hawaii\t",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": "1421",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Hawaii\t",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": "1657",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Hawaii\t",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": "1539",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Iowa",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1394,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Iowa",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1630,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Iowa",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1512,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Iowa",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1394,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Iowa",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1630,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Iowa",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1512,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Iowa",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1453,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Iowa",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1689,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Iowa",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1571,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Idaho",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1374,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Idaho",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1610,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Idaho",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1492,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Idaho",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1374,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Idaho",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1610,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Idaho",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1492,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Idaho",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1433,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Idaho",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1669,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Idaho",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1551,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Illinois\t",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": "1402",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Illinois\t",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": "1638",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Illinois\t",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": "1520",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Illinois\t",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": "1402",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Illinois\t",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": "1638",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Illinois\t",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": "1520",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Illinois\t",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": "1461",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Illinois\t",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": "1697",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Illinois\t",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": "1579",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Indiana\t",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": "1404",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Indiana\t",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": "1640",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Indiana\t",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": "1522",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Indiana\t",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": "1404",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Indiana\t",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": "1640",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Indiana\t",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": "1522",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Indiana\t",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": "1463",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Indiana\t",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": "1699",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Indiana\t",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": "1581",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Kansas\t",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": "1367",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Kansas\t",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": "1603",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Kansas\t",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": "1485",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Kansas\t",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": "1367",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Kansas\t",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": "1603",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Kansas\t",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": "1485",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Kansas",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1426,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Kansas",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1662,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Kansas",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1544,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Kentucky",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1359,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Kentucky",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1595,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Kentucky",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1477,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Kentucky",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1359,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Kentucky",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1595,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Kentucky",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1477,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Kentucky",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1418,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Kentucky",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1654,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Kentucky",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1536,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Louisiana",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1409,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Louisiana",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1645,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Louisiana",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1527,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Louisiana",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1409,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Louisiana",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1645,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Louisiana",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1527,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Louisiana",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1468,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Louisiana",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1704,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Louisiana",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1586,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Massachusetts",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1366,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Massachusetts",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1602,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Massachusetts",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1484,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Massachusetts",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1366,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Massachusetts",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1602,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Massachusetts",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1484,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Massachusetts",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1425,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Massachusetts",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1661,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Massachusetts",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1543,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Maryland",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1386,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Maryland",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1622,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Maryland",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1504,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Maryland",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1386,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Maryland",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1622,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Maryland",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1504,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Maryland",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1445,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Maryland",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1681,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Maryland",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1563,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Maine\t",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": "1385",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Maine\t",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": "1621",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Maine\t",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": "1503",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Maine\t",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": "1385",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Maine\t",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": "1621",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Maine\t",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": "1503",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Maine\t",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": "1444",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Maine\t",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": "1680",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Maine\t",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": "1562",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Marshall Islands",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1408,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Marshall Islands",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1644,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Marshall Islands",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1526,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Marshall Islands",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1408,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Marshall Islands",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1644,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Marshall Islands",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1526,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Marshall Islands",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1467,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Marshall Islands",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1703,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Marshall Islands",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1585,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Michigan",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1390,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Michigan",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 4011,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Michigan",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1508,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Michigan",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1390,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Michigan",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 4111,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Michigan",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1508,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Michigan",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1449,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Michigan",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1685,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Michigan",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1567,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Minnesota",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1392,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Minnesota",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1628,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Minnesota",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1510,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Minnesota",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1392,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Minnesota",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1628,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Minnesota",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1510,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Minnesota",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1451,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Minnesota",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1687,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Minnesota",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1569,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Missouri",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1378,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Missouri",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1614,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Missouri",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1496,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Missouri",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1378,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Missouri",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1614,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Missouri",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1496,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Missouri",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1437,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Missouri",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1673,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Missouri",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1555,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Northern Mariana Islands",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": "1368",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Northern Mariana Islands",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": "1604",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Northern Mariana Islands",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": "1486",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Northern Mariana Islands",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": "1368",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Northern Mariana Islands",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": "1604",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Northern Mariana Islands",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": "1486",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Northern Mariana Islands",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1427,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Northern Mariana Islands",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1663,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Northern Mariana Islands",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1545,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Mississippi",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1406,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Mississippi",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1642,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Mississippi",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1524,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Mississippi",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1406,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Mississippi",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1642,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Mississippi",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1524,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Mississippi",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1465,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Mississippi",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1701,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Mississippi",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1583,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Montana",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1364,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Montana",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1600,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Montana",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1482,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Montana",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1364,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Montana",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1600,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Montana",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1482,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Montana",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1423,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Montana",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1659,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Montana",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1541,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "North Carolina",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1358,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "North Carolina",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1594,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "North Carolina",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1476,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "North Carolina",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1358,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "North Carolina",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1594,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "North Carolina",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1476,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "North Carolina",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1417,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "North Carolina",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1653,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "North Carolina",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1535,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "North Dakota",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1355,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "North Dakota",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1591,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "North Dakota",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1473,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "North Dakota",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1355,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "North Dakota",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1591,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "North Dakota",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1473,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "North Dakota",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1414,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "North Dakota",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1650,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "North Dakota",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1532,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Nebraska",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1391,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Nebraska",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1627,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Nebraska",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1509,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Nebraska",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1391,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Nebraska",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1627,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Nebraska",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1509,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Nebraska",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1450,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Nebraska",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1686,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Nebraska",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1568,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "New Hampshire",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1405,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Hampshire",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1641,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Hampshire",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1523,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "New Hampshire",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1405,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Hampshire",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1641,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Hampshire",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1523,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "New Hampshire",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1464,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Hampshire",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1700,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Hampshire",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1582,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "New Jersey",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1410,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Jersey",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1646,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Jersey",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1528,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "New Jersey",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1410,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Jersey",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1646,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Jersey",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1528,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "New Jersey",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1469,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Jersey",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1705,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Jersey",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1587,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "New Mexico",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1399,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Mexico",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1635,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Mexico",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1517,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "New Mexico",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1399,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Mexico",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1635,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Mexico",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1517,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "New Mexico",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1458,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Mexico",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1694,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New Mexico",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1576,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Nevada",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1357,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Nevada",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1593,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Nevada",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1475,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Nevada",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1357,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Nevada",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1593,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Nevada",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1475,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Nevada",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1416,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Nevada",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1652,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Nevada",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1534,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "New York",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1360,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New York",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1596,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New York",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1478,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "New York",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1360,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New York",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1596,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New York",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1478,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "New York",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1419,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New York",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1655,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "New York",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1537,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Ohio",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1407,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Ohio",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1643,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Ohio",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1525,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Ohio",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1407,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Ohio",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1643,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Ohio",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1525,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Ohio",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1466,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Ohio",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1702,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Ohio",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1584,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Oklahoma",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1372,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Oklahoma",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1608,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Oklahoma",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1490,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Oklahoma",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1372,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Oklahoma",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1608,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Oklahoma",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1490,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Oklahoma",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1431,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Oklahoma",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1667,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Oklahoma",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1549,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Oregon",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1379,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Oregon",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1615,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Oregon",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1497,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Oregon",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1379,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Oregon",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1615,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Oregon",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1497,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Oregon",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1438,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Oregon",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1674,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Oregon",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1556,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Pennsylvania",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1354,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Pennsylvania",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1590,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Pennsylvania",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1472,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Pennsylvania",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1354,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Pennsylvania",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1590,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Pennsylvania",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1472,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Pennsylvania",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1413,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Pennsylvania",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1649,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Pennsylvania",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1531,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Puerto Rico",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1363,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Puerto Rico",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1599,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Puerto Rico",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1481,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Puerto Rico",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1363,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Puerto Rico",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1599,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Puerto Rico",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1481,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Puerto Rico",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1422,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Puerto Rico",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1658,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Puerto Rico",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1540,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Rhode Island",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1411,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Rhode Island",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1647,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Rhode Island",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1529,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Rhode Island",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1411,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Rhode Island",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1647,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Rhode Island",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1529,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Rhode Island",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1470,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Rhode Island",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1706,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Rhode Island",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1588,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Republic of Palau",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": "1412",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Republic of Palau",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": "1648",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Republic of Palau",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": "1530",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Republic of Palau",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": "1412",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Republic of Palau",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": "1648",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Republic of Palau",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": "1530",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Republic of Palau",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": "1471",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Republic of Palau",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": "1707",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Republic of Palau",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": "1589",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "South Carolina",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1389,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "South Carolina",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1625,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "South Carolina",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1507,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "South Carolina",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1389,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "South Carolina",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1625,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "South Carolina",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1507,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "South Carolina",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1448,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "South Carolina",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1684,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "South Carolina",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1566,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "South Dakota",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1373,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "South Dakota",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1609,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "South Dakota",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1491,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "South Dakota",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1373,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "South Dakota",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1609,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "South Dakota",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1491,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "South Dakota",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1432,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "South Dakota",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1668,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "South Dakota",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1550,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Tennessee",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1376,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Tennessee",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1612,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Tennessee",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1494,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Tennessee",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1376,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Tennessee",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1612,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Tennessee",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1494,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Tennessee",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1435,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Tennessee",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1671,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Tennessee",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1553,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Texas",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1361,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Texas",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1597,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Texas",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1479,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Texas",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1361,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Texas",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1597,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Texas",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1479,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Texas",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1420,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Texas",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1656,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Texas",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1538,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Utah",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1380,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Utah",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1616,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Utah",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1498,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Utah",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1380,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Utah",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1616,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Utah",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1498,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Utah",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1439,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Utah",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1675,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Utah",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1557,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Virginia",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1382,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Virginia",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1618,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Virginia",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1500,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Virginia",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1382,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Virginia",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1618,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Virginia",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1500,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Virginia",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1441,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Virginia",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1677,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Virginia",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1559,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "U.S. Virgin Islands",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": "1383",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "U.S. Virgin Islands",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": "1619",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "U.S. Virgin Islands",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": "1501",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "U.S. Virgin Islands",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": "1383",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "U.S. Virgin Islands",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": "1619",
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "U.S. Virgin Islands",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": "1501",
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "U.S. Virgin Islands",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1442,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "U.S. Virgin Islands",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1678,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "U.S. Virgin Islands",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1560,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Vermont",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1370,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Vermont",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1606,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Vermont",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1488,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Vermont",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1370,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Vermont",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1606,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Vermont",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1488,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Vermont",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1429,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Vermont",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1665,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Vermont",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1547,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Washington",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1393,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Washington",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1629,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Washington",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1511,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Washington",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1393,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Washington",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1629,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Washington",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1511,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Washington",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1452,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Washington",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1688,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Washington",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1570,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Wisconsin",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1371,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Wisconsin",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1607,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Wisconsin",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1489,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Wisconsin",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1371,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Wisconsin",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1607,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Wisconsin",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1489,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Wisconsin",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1430,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Wisconsin",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1666,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Wisconsin",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1548,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "West Virginia",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1397,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "West Virginia",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1633,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "West Virginia",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1515,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "West Virginia",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1397,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "West Virginia",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1633,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "West Virginia",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1515,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "West Virginia",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1456,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "West Virginia",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1692,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "West Virginia",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1574,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Wyoming",
+          "Year": "2019",
+          "Type": "Federal",
+          "Amount": 1395,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Wyoming",
+          "Year": "2019",
+          "Type": "Local",
+          "Amount": 1631,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Wyoming",
+          "Year": "2019",
+          "Type": "State",
+          "Amount": 1513,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Wyoming",
+          "Year": "2020",
+          "Type": "Federal",
+          "Amount": 1395,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Wyoming",
+          "Year": "2020",
+          "Type": "Local",
+          "Amount": 1631,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Wyoming",
+          "Year": "2020",
+          "Type": "State",
+          "Amount": 1513,
+          "AmountUnits": "Number of Cats"
+        },
+        {
+          "Location": "Wyoming",
+          "Year": "2021",
+          "Type": "Federal",
+          "Amount": 1454,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Wyoming",
+          "Year": "2021",
+          "Type": "Local",
+          "Amount": 1690,
+          "AmountUnits": "Number of People"
+        },
+        {
+          "Location": "Wyoming",
+          "Year": "2021",
+          "Type": "State",
+          "Amount": 1572,
+          "AmountUnits": "Number of Cats"
+        }
+      ],
+      "dataFileSize": 14901,
+      "dataFileName": "dashboard_aggregate_example_state_type (1).csv",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "CSV",
+      "preview": true
+    }
+  }
+}
