@@ -56,7 +56,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
         state.dashboard.title.replace(/\s+/g, '-').toLowerCase() +
         '-' +
         date.getDate() +
-        date.getMonth() +
+        (date.getMonth() + 1) +
         date.getFullYear()
       )
 
@@ -66,14 +66,14 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
         state.general.title.replace(/\s+/g, '-').toLowerCase() +
         '-' +
         date.getDate() +
-        date.getMonth() +
+        (date.getMonth() + 1) +
         date.getFullYear()
       )
 
     // chart titles
     if (state?.title)
       return (
-        state.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + date.getMonth() + date.getFullYear()
+        state.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + (date.getMonth() + 1) + date.getFullYear()
       )
 
     return 'no-title'
@@ -86,11 +86,24 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
   switch (type) {
     case 'image':
       const container = document.createElement('div')
-      // On screenshots without a title (like some charts), add padding around the chart svg
-      if (!state.showTitle) {
-        container.style.padding = '35px'
+
+      // Simple configurable padding (main fix for spacing issues)
+      const downloadPadding = state.downloadImagePadding !== undefined ? state.downloadImagePadding : (!state.showTitle ? 10 : 0)
+      if (downloadPadding > 0) {
+        container.style.padding = `${downloadPadding}px`
       }
-      container.appendChild(baseSvg.cloneNode(true)) // Clone baseSvg to avoid modifying the original
+
+      // Clone and preserve basic dimensions
+      const clonedElement = baseSvg.cloneNode(true) as HTMLElement
+      if (baseSvg instanceof Element) {
+        const rect = baseSvg.getBoundingClientRect()
+        if (rect.width > 0 && rect.height > 0) {
+          clonedElement.style.width = `${rect.width}px`
+          clonedElement.style.height = `${rect.height}px`
+        }
+      }
+
+      container.appendChild(clonedElement)
 
       const downloadImage = async () => {
         document.body.appendChild(container) // Append container to the DOM
@@ -116,7 +129,9 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
             .default(container, {
               ignoreElements: el =>
                 el.className?.indexOf &&
-                el.className.search(/download-buttons|download-links|data-table-container/) !== -1
+                el.className.search(/download-buttons|download-links|data-table-container/) !== -1,
+              useCORS: true,
+              scale: 2 // Better quality
             })
             .then(canvas => {
               document.body.removeChild(container) // Clean up container
