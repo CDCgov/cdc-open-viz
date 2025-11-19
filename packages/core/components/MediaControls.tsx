@@ -143,39 +143,114 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
                   svg.setAttribute(attr, value)
                 }
               })
-            }
 
-            // Ensure text elements are positioned correctly
-            const textElements = svg.querySelectorAll('text, tspan')
-            const originalTextElements = originalSvg instanceof SVGElement
-              ? originalSvg.querySelectorAll('text, tspan')
-              : []
+              // Ensure text elements are positioned correctly using robust matching
+              const textElements = svg.querySelectorAll('text, tspan')
+              const originalTextElements = originalSvg.querySelectorAll('text, tspan')
 
-            textElements.forEach((text, index) => {
-              // Preserve text positioning attributes using index-based matching
-              const positionAttrs = ['x', 'y', 'dx', 'dy', 'transform']
-              const originalText = originalTextElements[index]
+              textElements.forEach((text) => {
+                // Find matching original text element using multiple criteria
+                const findMatchingOriginalText = (clonedText) => {
+                  const textContent = clonedText.textContent?.trim()
+                  const className = clonedText.getAttribute('class')
+                  const id = clonedText.getAttribute('id')
+                  const dataKey = clonedText.getAttribute('data-key')
 
-              if (originalText) {
-                positionAttrs.forEach(attr => {
-                  const originalAttrValue = originalText.getAttribute(attr)
-                  if (originalAttrValue) {
-                    text.setAttribute(attr, originalAttrValue)
+                  // Try to find exact match using multiple identifiers
+                  for (const originalText of Array.from(originalTextElements)) {
+                    // Match by ID (strongest identifier)
+                    if (id && originalText.getAttribute('id') === id) {
+                      return originalText
+                    }
+
+                    // Match by data-key attribute (common in charts)
+                    if (dataKey && originalText.getAttribute('data-key') === dataKey) {
+                      return originalText
+                    }
+
+                    // Match by class + text content combination
+                    if (className && textContent &&
+                        originalText.getAttribute('class') === className &&
+                        originalText.textContent?.trim() === textContent) {
+                      return originalText
+                    }
+
+                    // Match by position attributes + text content (for unique positioning)
+                    if (textContent && originalText.textContent?.trim() === textContent) {
+                      const textX = clonedText.getAttribute('x')
+                      const textY = clonedText.getAttribute('y')
+                      const origX = originalText.getAttribute('x')
+                      const origY = originalText.getAttribute('y')
+
+                      if (textX && textY && origX && origY &&
+                          textX === origX && textY === origY) {
+                        return originalText
+                      }
+                    }
                   }
-                })
-              }
-            })
+
+                  // Fallback: match by text content only (weakest but still useful)
+                  if (textContent) {
+                    return Array.from(originalTextElements).find(
+                      orig => orig.textContent?.trim() === textContent
+                    )
+                  }
+
+                  return null
+                }
+
+                const originalText = findMatchingOriginalText(text)
+                if (originalText) {
+                  const positionAttrs = ['x', 'y', 'dx', 'dy', 'transform', 'text-anchor', 'dominant-baseline']
+                  positionAttrs.forEach(attr => {
+                    const originalAttrValue = originalText.getAttribute(attr)
+                    if (originalAttrValue) {
+                      text.setAttribute(attr, originalAttrValue)
+                    }
+                  })
+                }
+              })
+            }
           }
         })
 
-        // Fix flex layout issues that might cause spacing problems
+        // Fix flex layout issues using robust element matching
         const flexSelector = '[class~="flex"], [class~="d-flex"]';
         const flexContainers = clonedElement.querySelectorAll(flexSelector);
         const originalFlexContainers = baseSvg.querySelectorAll(flexSelector);
-        flexContainers.forEach((container, idx) => {
+
+        flexContainers.forEach((container) => {
           if (container instanceof HTMLElement) {
-            const originalContainer = originalFlexContainers[idx];
-            if (originalContainer instanceof HTMLElement) {
+            // Find matching original container using multiple criteria
+            const findMatchingFlexContainer = (clonedContainer) => {
+              const className = clonedContainer.className
+              const id = clonedContainer.getAttribute('id')
+              const dataTestId = clonedContainer.getAttribute('data-testid')
+
+              for (const original of Array.from(originalFlexContainers)) {
+                if (!(original instanceof HTMLElement)) continue
+
+                // Match by ID (strongest)
+                if (id && original.getAttribute('id') === id) {
+                  return original
+                }
+
+                // Match by data-testid
+                if (dataTestId && original.getAttribute('data-testid') === dataTestId) {
+                  return original
+                }
+
+                // Match by exact class name
+                if (className && original.className === className) {
+                  return original
+                }
+              }
+
+              return null
+            }
+
+            const originalContainer = findMatchingFlexContainer(container)
+            if (originalContainer) {
               const originalStyles = window.getComputedStyle(originalContainer)
               container.style.width = originalStyles.width
               container.style.height = originalStyles.height
