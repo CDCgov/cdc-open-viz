@@ -147,20 +147,23 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
 
             // Ensure text elements are positioned correctly
             const textElements = svg.querySelectorAll('text, tspan')
-            textElements.forEach((text) => {
-              // Preserve text positioning attributes
+            const originalTextElements = originalSvg instanceof SVGElement
+              ? originalSvg.querySelectorAll('text, tspan')
+              : []
+
+            textElements.forEach((text, index) => {
+              // Preserve text positioning attributes using index-based matching
               const positionAttrs = ['x', 'y', 'dx', 'dy', 'transform']
-              positionAttrs.forEach(attr => {
-                const tagName = text.tagName.toLowerCase();
-                const attrValue = text.getAttribute(attr);
-                let originalText = null;
-                if (attrValue !== null && originalSvg) {
-                  originalText = originalSvg.querySelector(`${tagName}[${attr}="${CSS.escape(attrValue)}"]`);
-                }
-                if (originalText && originalText.getAttribute(attr)) {
-                  text.setAttribute(attr, originalText.getAttribute(attr));
-                }
-              })
+              const originalText = originalTextElements[index]
+
+              if (originalText) {
+                positionAttrs.forEach(attr => {
+                  const originalAttrValue = originalText.getAttribute(attr)
+                  if (originalAttrValue) {
+                    text.setAttribute(attr, originalAttrValue)
+                  }
+                })
+              }
             })
           }
         })
