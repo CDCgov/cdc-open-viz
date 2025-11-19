@@ -1,6 +1,6 @@
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
-interface CalculateHorizontalBarYAxisWidthProps {
+interface CalculateHorizontalBarCategoryLabelWidthProps {
   yScale: any
   parentWidth: number
   formatDate: Function
@@ -11,12 +11,12 @@ interface CalculateHorizontalBarYAxisWidthProps {
 }
 
 /**
- * Helper function to calculate dynamic Y-axis width for horizontal bar charts
+ * Helper function to calculate category label space for horizontal bar charts
  *
  * @param props Configuration object with chart properties
- * @returns Calculated Y-axis width, capped at 30% of parent width
+ * @returns Calculated category label space, capped at 30% of parent width
  */
-export const calculateHorizontalBarYAxisWidth = ({
+export const calculateHorizontalBarCategoryLabelWidth = ({
   yScale,
   parentWidth,
   formatDate,
@@ -24,7 +24,7 @@ export const calculateHorizontalBarYAxisWidth = ({
   tickLabelFont,
   xAxisType,
   labelPlacement
-}: CalculateHorizontalBarYAxisWidthProps): number => {
+}: CalculateHorizontalBarCategoryLabelWidthProps): number => {
   if (labelPlacement !== 'On Date/Category Axis') return 0
 
   const categoryValues = yScale.domain()

@@ -34,7 +34,7 @@ import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/vi
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { calcInitialHeight } from '../helpers/sizeHelpers'
 import { filterAndShiftLinearDateTicks } from '../helpers/filterAndShiftLinearDateTicks'
-import { calculateHorizontalBarYAxisWidth } from '../helpers/calculateHorizontalBarYAxisWidth'
+import { calculateHorizontalBarCategoryLabelWidth } from '../helpers/calculateHorizontalBarCategoryLabelWidth'
 
 // Hooks
 import useReduceData from '../hooks/useReduceData'
@@ -225,9 +225,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     currentViewport
   })
 
-  // Calculate dynamic Y-axis width for horizontal bar charts
-  const calculatedYAxisWidth = useMemo(() => {
-    return calculateHorizontalBarYAxisWidth({
+  // Calculate category label space for horizontal bar charts
+  const categoryLabelSpace = useMemo(() => {
+    return calculateHorizontalBarCategoryLabelWidth({
       yScale,
       parentWidth,
       formatDate,
@@ -238,8 +238,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     })
   }, [isHorizontal, config.visualizationType, config.yAxis.labelPlacement, yScale, parentWidth])
 
+  const horizontalYAxisLabelSpace = runtime.yAxis.label && !config.hideYAxisLabel ? 30 : 0
   if (isHorizontal && config.visualizationType === 'Bar' && !config.isLollipopChart) {
-    runtime.yAxis.size = calculatedYAxisWidth
+    runtime.yAxis.size = categoryLabelSpace + horizontalYAxisLabelSpace
   }
 
   const [yTickCount, xTickCount] = ['yAxis', 'xAxis'].map(axis =>
@@ -1144,12 +1145,12 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
                               return (
                                 <Text
-                                  x={tick.to.x - Number(runtime.yAxis.size) + 8}
+                                  x={tick.from.x - Number(runtime.yAxis.size) + horizontalYAxisLabelSpace}
                                   y={labelCenterY}
                                   verticalAnchor={'middle'}
                                   textAnchor={'start'}
                                   fontSize={tickLabelFontSize}
-                                  width={Number(runtime.yAxis.size)}
+                                  width={categoryLabelSpace}
                                   lineHeight={'1.2em'}
                                 >
                                   {tick.formattedValue}
