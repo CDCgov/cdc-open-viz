@@ -173,33 +173,33 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return {
       title: title
         ? processMarkupVariables(title, config.data || [], config.markupVariables, {
-            isEditor,
-            filters: config.filters || []
-          }).processedContent
+          isEditor,
+          filters: config.filters || []
+        }).processedContent
         : title,
       superTitle: config.superTitle
         ? processMarkupVariables(config.superTitle, config.data || [], config.markupVariables, {
-            isEditor,
-            filters: config.filters || []
-          }).processedContent
+          isEditor,
+          filters: config.filters || []
+        }).processedContent
         : config.superTitle,
       introText: config.introText
         ? processMarkupVariables(config.introText, config.data || [], config.markupVariables, {
-            isEditor,
-            filters: config.filters || []
-          }).processedContent
+          isEditor,
+          filters: config.filters || []
+        }).processedContent
         : config.introText,
       legacyFootnotes: config.legacyFootnotes
         ? processMarkupVariables(config.legacyFootnotes, config.data || [], config.markupVariables, {
-            isEditor,
-            filters: config.filters || []
-          }).processedContent
+          isEditor,
+          filters: config.filters || []
+        }).processedContent
         : config.legacyFootnotes,
       description: config.description
         ? processMarkupVariables(config.description, config.data || [], config.markupVariables, {
-            isEditor,
-            filters: config.filters || []
-          }).processedContent
+          isEditor,
+          filters: config.filters || []
+        }).processedContent
         : config.description
     }
   }, [
@@ -324,6 +324,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     //Enforce default values that need to be calculated at runtime
+    // Preserve any existing error message before wiping runtime
+    const existingErrorMessage = _config.runtime?.editorErrorMessage || ''
     newConfig.runtime = {} as Runtime
     newConfig.runtime.series = _.cloneDeep(newConfig.series)
     newConfig.runtime.seriesLabels = {}
@@ -431,13 +433,18 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     newConfig.runtime.uniqueId = Date.now()
-    newConfig.runtime.editorErrorMessage =
-      newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey
-        ? 'Data Key property in Y Axis section must be set for pie charts.'
-        : ''
 
-    // Sankey Description box error message
-    newConfig.runtime.editorErrorMessage = ''
+    // Set error message priority: existing errors take precedence over validation errors
+    if (existingErrorMessage) {
+      // Preserve error messages set by editor panels (e.g., pattern contrast errors)
+      newConfig.runtime.editorErrorMessage = existingErrorMessage
+    } else if (newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey) {
+      // Set validation error for Pie charts
+      newConfig.runtime.editorErrorMessage = 'Data Key property in Y Axis section must be set for pie charts.'
+    } else {
+      // No errors
+      newConfig.runtime.editorErrorMessage = ''
+    }
 
     if (newConfig.legend.seriesHighlight?.length) {
       dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: newConfig.legend?.seriesHighlight })
@@ -1031,9 +1038,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
         {isEditor && <EditorPanel datasets={datasets} />}
         <Layout.Responsive isEditor={isEditor}>
           {config.newViz && <Confirm updateConfig={updateConfig} config={config} />}
-          {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && (
-            <Error errorMessage={config.runtime.editorErrorMessage} />
-          )}
           {!missingRequiredSections(config) && !config.newViz && (
             <div
               className={`cdc-chart-inner-container cove-component__content type-${makeClassName(
@@ -1051,6 +1055,20 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 style={undefined}
                 config={config}
               />
+
+              {/* Error Message Display - Show at top before visualization wrapper */}
+              {(() => {
+                const hasError = config.runtime?.editorErrorMessage
+                const shouldShow = undefined === config.newViz && isEditor && config.runtime && hasError
+                console.log('Chart Error Display Check:', {
+                  hasError,
+                  shouldShow,
+                  isEditor,
+                  newViz: config.newViz,
+                  errorMessage: config.runtime?.editorErrorMessage
+                })
+                return shouldShow ? <Error errorMessage={config.runtime.editorErrorMessage} /> : null
+              })()}
 
               {/* Visualization Wrapper */}
               <div className={getChartWrapperClasses().join(' ')}>
@@ -1086,8 +1104,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           legend.position === 'top' ||
                           visualizationType === 'Sankey' ||
                           visualizationType === 'Spark Line'
-                        ? 'w-100'
-                        : 'w-75'
+                          ? 'w-100'
+                          : 'w-75'
                     }
                   >
                     {/* Check if there is data to display */}
@@ -1141,7 +1159,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                               const labelMargin = 120
                               const widthReduction =
                                 config.showLineSeriesLabels &&
-                                (config.legend.position !== 'right' || config.legend.hide)
+                                  (config.legend.position !== 'right' || config.legend.hide)
                                   ? labelMargin
                                   : 0
                               return (
@@ -1245,8 +1263,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       config.visualizationType === 'Sankey'
                         ? config?.data?.[0]?.tableData
                         : config.table.customTableConfig
-                        ? filterVizData(config.filters, config.data)
-                        : config.data
+                          ? filterVizData(config.filters, config.data)
+                          : config.data
 
                     if (config.smallMultiples?.mode) {
                       const prepared = prepareSmallMultiplesDataTable(config, config.columns, dataTableRuntimeData)
