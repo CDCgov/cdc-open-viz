@@ -215,7 +215,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
         })
 
         // Fix flex layout issues using robust element matching
-        const flexSelector = '[class~="flex"], [class~="d-flex"]';
+        const flexSelector = '[class*="flex"], [class*="d-flex"]';
         const flexContainers = clonedElement.querySelectorAll(flexSelector);
         const originalFlexContainers = baseSvg.querySelectorAll(flexSelector);
 
