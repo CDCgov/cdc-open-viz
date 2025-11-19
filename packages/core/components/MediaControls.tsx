@@ -131,7 +131,9 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
         svgElements.forEach((svg) => {
           if (svg instanceof SVGElement) {
             // Preserve SVG viewBox and dimensions
-            const originalSvg = baseSvg.querySelector('svg')
+            const originalSvg = baseSvg instanceof SVGElement
+              ? baseSvg
+              : baseSvg.querySelector('svg')
             if (originalSvg instanceof SVGElement) {
               // Copy critical attributes that might affect rendering
               const preserveAttributes = ['viewBox', 'width', 'height', 'preserveAspectRatio']
