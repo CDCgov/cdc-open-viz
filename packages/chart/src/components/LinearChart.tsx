@@ -216,7 +216,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       : d[config.runtime.originalXAxis.dataKey]
   const getYAxisData = (d, seriesKey) => d[seriesKey]
   const xAxisDataMapped = data.map(d => getXAxisData(d))
-  const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
 
   const {
@@ -706,7 +705,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               {props => {
                 const axisCenter =
                   config.orientation === 'horizontal'
-                    ? (props.axisToPoint.y - props.axisFromPoint.y) / 2
+                    ? Math.abs(props.axisToPoint.y - props.axisFromPoint.y) / 2
                     : (props.axisFromPoint.y - props.axisToPoint.y) / 2
                 return (
                   <Group className='left-axis'>
@@ -1040,7 +1039,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               {props => {
                 const axisCenter =
                   config.orientation === 'horizontal'
-                    ? (props.axisToPoint.y - props.axisFromPoint.y) / 2
+                    ? Math.abs(props.axisToPoint.y - props.axisFromPoint.y) / 2
                     : (props.axisFromPoint.y - props.axisToPoint.y) / 2
                 const horizontalTickOffset =
                   yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
@@ -1416,7 +1415,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   : yMax
               }
               left={config.visualizationType !== 'Forest Plot' ? Number(runtime.yAxis.size) : 0}
-              label={runtime[section].label}
+              label={runtime.xAxis.label}
               tickFormat={handleBottomTickFormatting}
               scale={xScale}
               stroke='#333'
@@ -1550,7 +1549,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                               verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
                               textAnchor={tickRotation ? 'end' : 'middle'}
                               width={
-                                areTicksTouching && !config.isResponsiveTicks && !Number(config[section].tickRotation)
+                                areTicksTouching && !config.isResponsiveTicks && !Number(config.xAxis.tickRotation)
                                   ? limitedWidth
                                   : undefined
                               }
