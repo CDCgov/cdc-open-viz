@@ -290,8 +290,8 @@ const EditorPanel = memo(() => {
                           Array.isArray(DATA_FUNCTIONS)
                             ? DATA_FUNCTIONS
                             : DATA_FUNCTIONS
-                            ? Object.values(DATA_FUNCTIONS)
-                            : []
+                              ? Object.values(DATA_FUNCTIONS)
+                              : []
                         }
                       />
                     </li>
@@ -413,7 +413,7 @@ const EditorPanel = memo(() => {
                 <AccordionItemHeading>
                   <AccordionItemButton>Visual</AccordionItemButton>
                 </AccordionItemHeading>
-                <AccordionItemPanel>
+                <AccordionItemPanel className='panel-visual accordion__panel accordion__panel--visual'>
                   <TextField
                     type='number'
                     value={config.biteFontSize}

@@ -47,10 +47,27 @@
 }
 
 .cove-accordion__panel.panel-visual .checkbox-group label.checkbox,
-.panel-visual .checkbox-group label.checkbox {
-  display: block !important;
+.cove-accordion__panel.panel-visual .reverse-labels label.checkbox,
+.panel-visual .checkbox-group label.checkbox,
+.panel-visual .reverse-labels label.checkbox {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin-bottom: 8px !important;
+}
 
-  span {
-    display: inline-block !important;
-  }
+.cove-accordion__panel.panel-visual .checkbox-group label.checkbox input[type="checkbox"],
+.cove-accordion__panel.panel-visual .reverse-labels label.checkbox input[type="checkbox"],
+.panel-visual .checkbox-group label.checkbox input[type="checkbox"],
+.panel-visual .reverse-labels label.checkbox input[type="checkbox"] {
+  flex-shrink: 0 !important;
+  margin-right: 8px !important;
+}
+
+.cove-accordion__panel.panel-visual .checkbox-group label.checkbox span,
+.cove-accordion__panel.panel-visual .reverse-labels label.checkbox span,
+.panel-visual .checkbox-group label.checkbox span,
+.panel-visual .reverse-labels label.checkbox span {
+  flex: 1 !important;
+  display: inline-block !important;
 }
