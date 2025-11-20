@@ -47,18 +47,17 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
     return undefined
   }
 
+  // Generate timestamp once for consistency
+  const date = new Date()
+  const day = date.getDate()
+  const month = date.getMonth() + 1
+  const year = date.getFullYear()
+  const timestamp = `${day.toString().padStart(2, '0')}${month.toString().padStart(2, '0')}${year}`
+
   // Handles different state title locations between components
   // Apparently some packages use state.title where others use state.general.title
   const handleFileName = state => {
     // dashboard titles
-      // Construct filename with timestamp
-        const date = new Date()
-        const day = date.getDate()
-        const month = date.getMonth() + 1
-        const year = date.getFullYear()
-        const timestamp = `${day.toString().padStart(2, '0')}${month.toString().padStart(2, '0')}${year}`
-
-
     if (state?.dashboard?.title)
       return (
         `${state.dashboard.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
@@ -79,8 +78,6 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
     return 'no-title'
   }
 
-  // Construct filename with timestamp
-  const date = new Date()
   const filename = handleFileName(state)
 
   switch (type) {
