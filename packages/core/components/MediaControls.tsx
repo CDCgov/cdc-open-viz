@@ -61,19 +61,19 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
 
     if (state?.dashboard?.title)
       return (
-        `${state.dashboard.title.replace(/\s+/g, '-').toLowerCase() + timestamp}`
+        `${state.dashboard.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
       )
 
     // map titles
     if (state?.general?.title)
       return (
-        `${state.general.title.replace(/\s+/g, '-').toLowerCase() + timestamp}`
+        `${state.general.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
       )
 
     // chart titles
     if (state?.title)
       return (
-       `${state.title.replace(/\s+/g, '-').toLowerCase() + timestamp}`
+        `${state.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
       )
 
     return 'no-title'
