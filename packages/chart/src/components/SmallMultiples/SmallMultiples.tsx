@@ -38,7 +38,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
   const { mode, tileColumn, tilesPerRowDesktop, tilesPerRowMobile } = config.smallMultiples || {}
 
   const isMobile = isMobileSmallMultiplesViewport(currentViewport)
-  const tilesPerRow = isMobile ? tilesPerRowMobile || 2 : tilesPerRowDesktop || 3
+  const tilesPerRow = isMobile ? tilesPerRowMobile || 1 : tilesPerRowDesktop || 3
 
   // Figure out what objects to iterate over based on mode - memoized to prevent recalculation
   const tileItems = useMemo<Array<TileItem>>(() => {
