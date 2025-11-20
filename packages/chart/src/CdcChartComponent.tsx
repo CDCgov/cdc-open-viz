@@ -173,33 +173,33 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return {
       title: title
         ? processMarkupVariables(title, config.data || [], config.markupVariables, {
-            isEditor,
-            filters: config.filters || []
-          }).processedContent
+          isEditor,
+          filters: config.filters || []
+        }).processedContent
         : title,
       superTitle: config.superTitle
         ? processMarkupVariables(config.superTitle, config.data || [], config.markupVariables, {
-            isEditor,
-            filters: config.filters || []
-          }).processedContent
+          isEditor,
+          filters: config.filters || []
+        }).processedContent
         : config.superTitle,
       introText: config.introText
         ? processMarkupVariables(config.introText, config.data || [], config.markupVariables, {
-            isEditor,
-            filters: config.filters || []
-          }).processedContent
+          isEditor,
+          filters: config.filters || []
+        }).processedContent
         : config.introText,
       legacyFootnotes: config.legacyFootnotes
         ? processMarkupVariables(config.legacyFootnotes, config.data || [], config.markupVariables, {
-            isEditor,
-            filters: config.filters || []
-          }).processedContent
+          isEditor,
+          filters: config.filters || []
+        }).processedContent
         : config.legacyFootnotes,
       description: config.description
         ? processMarkupVariables(config.description, config.data || [], config.markupVariables, {
-            isEditor,
-            filters: config.filters || []
-          }).processedContent
+          isEditor,
+          filters: config.filters || []
+        }).processedContent
         : config.description
     }
   }, [
@@ -356,8 +356,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     //Enforce default values that need to be calculated at runtime
-    // Preserve any existing error message before wiping runtime
+    // Preserve error messages that were set outside of updateConfig (e.g., from pattern settings)
     const existingErrorMessage = _config.runtime?.editorErrorMessage || ''
+    const isPieChartValidationError =
+      existingErrorMessage === 'Data column section must be set for pie charts.' ||
+      existingErrorMessage === 'Segment labels section must be set for pie charts.' ||
+      existingErrorMessage === 'Data column and Segment labels sections must be set for pie charts.'
+    const shouldPreserveError = existingErrorMessage && !isPieChartValidationError
+
     newConfig.runtime = {} as Runtime
     newConfig.runtime.series = _.cloneDeep(newConfig.series)
     newConfig.runtime.seriesLabels = {}
@@ -464,13 +470,24 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     newConfig.runtime.uniqueId = Date.now()
 
-    // Set error message priority: existing errors take precedence over validation errors
-    if (existingErrorMessage) {
+    // Set error messages: preserve external errors (from pattern settings, etc.) or set validation errors
+    if (shouldPreserveError) {
       // Preserve error messages set by editor panels (e.g., pattern contrast errors)
       newConfig.runtime.editorErrorMessage = existingErrorMessage
-    } else if (newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey) {
-      // Set validation error for Pie charts
-      newConfig.runtime.editorErrorMessage = 'Data Key property in Y Axis section must be set for pie charts.'
+    } else if (newConfig.visualizationType === 'Pie') {
+      // Check for Pie chart validation errors
+      const missingDataColumn = !newConfig.yAxis.dataKey || newConfig.yAxis.dataKey === ''
+      const missingSegmentLabels = !newConfig.xAxis.dataKey || newConfig.xAxis.dataKey === ''
+
+      if (missingDataColumn && missingSegmentLabels) {
+        newConfig.runtime.editorErrorMessage = 'Data column and Segment labels sections must be set for pie charts.'
+      } else if (missingDataColumn) {
+        newConfig.runtime.editorErrorMessage = 'Data column section must be set for pie charts.'
+      } else if (missingSegmentLabels) {
+        newConfig.runtime.editorErrorMessage = 'Segment labels section must be set for pie charts.'
+      } else {
+        newConfig.runtime.editorErrorMessage = ''
+      }
     } else {
       // No errors
       newConfig.runtime.editorErrorMessage = ''
@@ -1130,11 +1147,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
               />
 
               {/* Error Message Display - Show at top before visualization wrapper */}
-              {(() => {
-                const hasError = config.runtime?.editorErrorMessage
+              {/* {(() => {
+                const errorMessage = config.runtime?.editorErrorMessage
+                const hasError = errorMessage && typeof errorMessage === 'string' && errorMessage.trim() !== ''
                 const shouldShow = undefined === config.newViz && isEditor && config.runtime && hasError
-                return shouldShow ? <Error errorMessage={config.runtime.editorErrorMessage} /> : null
-              })()}
+                return shouldShow ? <Error errorMessage={errorMessage} /> : null
+              })()} */}
 
               {/* Visualization Wrapper */}
               <div className={getChartWrapperClasses().join(' ')}>
@@ -1170,8 +1188,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           legend.position === 'top' ||
                           visualizationType === 'Sankey' ||
                           visualizationType === 'Spark Line'
-                        ? 'w-100'
-                        : 'w-75'
+                          ? 'w-100'
+                          : 'w-75'
                     }
                   >
                     {/* Check if there is data to display */}
@@ -1225,7 +1243,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                               const labelMargin = 120
                               const widthReduction =
                                 config.showLineSeriesLabels &&
-                                (config.legend.position !== 'right' || config.legend.hide)
+                                  (config.legend.position !== 'right' || config.legend.hide)
                                   ? labelMargin
                                   : 0
                               return (
@@ -1329,8 +1347,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       config.visualizationType === 'Sankey'
                         ? config?.data?.[0]?.tableData
                         : config.table.customTableConfig
-                        ? filterVizData(config.filters, config.data)
-                        : config.data
+                          ? filterVizData(config.filters, config.data)
+                          : config.data
 
                     if (config.smallMultiples?.mode) {
                       const prepared = prepareSmallMultiplesDataTable(config, config.columns, dataTableRuntimeData)
