@@ -40,7 +40,7 @@ const Accordion = ({ children }) => {
                 ) : null}
               </AccordionItemButton>
             </AccordionItemHeading>
-            <AccordionItemPanel className='cove-accordion__panel'>{section.props.children}</AccordionItemPanel>
+            <AccordionItemPanel className={`cove-accordion__panel ${section.props.className || ''}`}>{section.props.children}</AccordionItemPanel>
           </AccordionItem>
         ))}
     </AccordionComponent>

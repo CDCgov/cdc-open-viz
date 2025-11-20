@@ -45,3 +45,12 @@
   margin-top: 8px;
   margin-bottom: 24px;
 }
+
+.cove-accordion__panel.panel-visual .checkbox-group label.checkbox,
+.panel-visual .checkbox-group label.checkbox {
+  display: block !important;
+
+  span {
+    display: inline-block !important;
+  }
+}
