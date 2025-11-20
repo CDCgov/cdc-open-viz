@@ -56,7 +56,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
         const day = date.getDate()
         const month = date.getMonth() + 1
         const year = date.getFullYear()
-        const timestamp = `${day}${month}${year}`
+        const timestamp = `${day.toString().padStart(2, '0')}${month.toString().padStart(2, '0')}${year}`
 
 
     if (state?.dashboard?.title)
