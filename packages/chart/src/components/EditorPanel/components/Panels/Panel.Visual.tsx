@@ -90,7 +90,7 @@ const PanelVisual: FC<PanelProps> = props => {
   }
 
   return (
-    <AccordionItem>
+    <AccordionItem className='panel-visual'>
       <AccordionItemHeading>
         <AccordionItemButton>Visual</AccordionItemButton>
       </AccordionItemHeading>

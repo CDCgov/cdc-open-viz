@@ -129,7 +129,7 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
           )}
         </div>
       </Accordion.Section>
-      <Accordion.Section title='Visual'>
+      <Accordion.Section title='Visual' className='panel-visual'>
         <HeaderThemeSelector
           selectedTheme={theme}
           onThemeSelect={theme => updateConfig({ ...config, theme })}
