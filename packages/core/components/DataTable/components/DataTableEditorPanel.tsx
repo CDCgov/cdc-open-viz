@@ -34,7 +34,17 @@ const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateCo
     })
   }
 
-  const columns = Object.keys(config.originalFormattedData?.[0] || {})
+  const columns = Object.keys(
+    config.originalFormattedData?.[0] || config.formattedData?.[0] || config.data?.[0] || {}
+  )
+  // If no data is available, fallback to column names from config.columns
+  const columnsFromConfig = config.columns
+    ? Object.values(config.columns)
+        .map(col => col.name)
+        .filter(Boolean)
+    : []
+  const finalColumns = columns.length > 0 ? columns : columnsFromConfig
+
   return (
     <Accordion allowZeroExpanded={true}>
       <AccordionItem>
@@ -63,7 +73,7 @@ const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateCo
           <AccordionItemButton>Data Table</AccordionItemButton>
         </AccordionItemHeading>
         <AccordionItemPanel>
-          <DataTableEditor config={config} columns={columns} updateField={updateField} isDashboard={true} />
+          <DataTableEditor config={config} columns={finalColumns} updateField={updateField} isDashboard={true} />
         </AccordionItemPanel>
       </AccordionItem>
       <AccordionItem>
