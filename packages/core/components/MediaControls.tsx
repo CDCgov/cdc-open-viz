@@ -52,7 +52,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
   const day = date.getDate()
   const month = date.getMonth() + 1
   const year = date.getFullYear()
-  const timestamp = `${day.toString().padStart(2, '0')}${month.toString().padStart(2, '0')}${year}`
+  const timestamp = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
 
   // Handles different state title locations between components
   // Apparently some packages use state.title where others use state.general.title
