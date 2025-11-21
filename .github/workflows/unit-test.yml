@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: 20.x
           cache: 'npm'
-      - run: npx yarn install
+      - run: yarn install --production=false
+      - run: cd packages/core && npm link
       - run: lerna run build
-      - run: cd packages/core && npm install --include=dev && npm link
       - run: npm run test --workspaces
