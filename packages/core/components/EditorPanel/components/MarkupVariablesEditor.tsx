@@ -5,6 +5,7 @@ import { TextField, Select, CheckBox } from '../Inputs'
 import Icon from '../../ui/Icon'
 import Accordion from '../../ui/Accordion'
 import { Datasets } from '../../../types/DataSet'
+import _ from 'lodash'
 
 type MarkupVariablesEditorProps = {
   /** Array of markup variable configurations */
@@ -41,8 +42,8 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [validationErrors, setValidationErrors] = useState<Record<number, string[]>>({})
 
-  // Ensure we always have a valid array
-  const safeMarkupVariables = markupVariables || []
+  // Ensure we always have a valid array (memoized with deep equality to prevent unnecessary re-renders)
+  const safeMarkupVariables = useMemo(() => markupVariables || [], [JSON.stringify(markupVariables)])
 
   // Get the target dataset with fallback logic (memoized for performance)
   const getTargetData = useCallback((): any[] => {
@@ -115,7 +116,12 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
         errors[index] = variableErrors
       }
     })
-    setValidationErrors(errors)
+
+    // Only update if errors have actually changed (use deep equality)
+    setValidationErrors(prev => {
+      const errorsChanged = !_.isEqual(prev, errors)
+      return errorsChanged ? errors : prev
+    })
   }, [safeMarkupVariables, validateVariable]) // Re-validate when variables change
 
 
