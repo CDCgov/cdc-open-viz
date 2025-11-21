@@ -28,7 +28,7 @@ export function testStandaloneBuild(pkgDir) {
   copyDirSync(pkgDir, tmpDir)
 
   try {
-    execSync('npm install', { cwd: tmpDir })
+    execSync('npm install --include=dev', { cwd: tmpDir })
     execSync('npm link @cdc/core', { cwd: tmpDir })
     execSync('npm run build', { cwd: tmpDir })
     return true
