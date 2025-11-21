@@ -55,11 +55,12 @@
     "react-icons": "5.5.0",
     "react-tooltip": "5.8.2-beta.3",
     "resize-observer-polyfill": "^1.5.1",
+    "sass": "^1.89.2",
     "topojson-client": "^3.1.0",
     "use-debounce": "^10.0.5",
     "vite": "^5.4.21",
     "vite-plugin-css-injected-by-js": "^2.4.0",
-    "vite-plugin-svgr": "^2.4.0",
+    "vite-plugin-svgr": "^4.2.0",
     "whatwg-fetch": "3.6.20"
   },
   "peerDependencies": {
