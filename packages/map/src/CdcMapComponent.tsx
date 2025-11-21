@@ -561,16 +561,14 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 {accessibleStatus}
               </div>
 
-              {!isDraggingAnnotation &&
-                !window.matchMedia('(any-hover: none)').matches &&
-                'hover' === tooltips.appearanceType && (
-                  <ReactTooltip
-                    id={`tooltip__${tooltipId}`}
-                    float={true}
-                    className={`tooltip tooltip-test`}
-                    style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
-                  />
-                )}
+              {!isDraggingAnnotation && 'hover' === tooltips.appearanceType && (
+                <ReactTooltip
+                  id={`tooltip__${tooltipId}`}
+                  float={true}
+                  className={`tooltip tooltip-test`}
+                  style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
+                />
+              )}
               <div
                 ref={tooltipRef}
                 id={`tooltip__${tooltipId}-canvas`}
