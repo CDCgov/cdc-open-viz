@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useMemo } from 'react'
+import React, { useContext, useEffect, useState, useMemo, useRef } from 'react'
 import { filterColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 
@@ -87,7 +87,28 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
   const dispatch = useContext(MapDispatchContext)
   const { general, columns, legend, table, tooltips } = config
-  const columnsInData = config?.data?.[0] ? Object.keys(config.data[0]) : []
+
+  // Get columns from data with fallback to datasets (for dashboard context)
+  const columnsInData = useMemo(() => {
+    // First try config.data
+    if (config?.data?.[0]) {
+      return Object.keys(config.data[0])
+    }
+
+    // Fallback to datasets using config.dataKey (for dashboard visualizations)
+    if (datasets && config?.dataKey) {
+      const assignedDataset = datasets[config.dataKey]
+      if (assignedDataset?.data?.[0]) {
+        return Object.keys(assignedDataset.data[0])
+      }
+    }
+
+    return []
+  }, [
+    config?.data?.length > 0 ? JSON.stringify(Object.keys(config.data[0])) : null,
+    datasets?.[config?.dataKey as string]?.data?.length,
+    config?.dataKey
+  ])
 
   const [loadedDefault, setLoadedDefault] = useState(false)
   const [displayPanel, setDisplayPanel] = useState(true)
@@ -101,13 +122,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const {
     MapLayerHandlers: { handleMapLayer, handleAddLayer, handleRemoveLayer }
   } = useMapLayers(config, setConfig, false, tooltipId)
-
-  useEffect(() => {
-    // Pass up to Editor if needed
-    if (setParentConfig) {
-      setParentConfig(convertStateToConfig())
-    }
-  }, [config])
 
   const categoryMove = (idx1, idx2) => {
     let categoryValuesOrder = getCategoryValuesOrder()
@@ -1009,17 +1023,19 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     return currentPaletteName === palette ? 'selected' : ''
   }
 
+  const configStringRef = useRef<string>()
+
   useEffect(() => {
     setLoadedDefault(config.defaultData)
     columnsRequiredChecker()
   }, [config])
 
-  useEffect(() => {
-    const newConfig = convertStateToConfig()
-    if (isEditor && setParentConfig) {
-      setParentConfig(newConfig)
-    }
-  }, [config])
+  // Only update parent when config content actually changes (not just reference)
+  const configString = JSON.stringify(convertStateToConfig())
+  if (isEditor && setParentConfig && configStringRef.current !== configString) {
+    configStringRef.current = configString
+    setParentConfig(JSON.parse(configString))
+  }
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
