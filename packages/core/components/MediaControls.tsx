@@ -47,40 +47,37 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
     return undefined
   }
 
+  // Generate timestamp once for consistency
+  const date = new Date()
+  const day = date.getDate()
+  const month = date.getMonth() + 1
+  const year = date.getFullYear()
+  const timestamp = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
+
   // Handles different state title locations between components
   // Apparently some packages use state.title where others use state.general.title
   const handleFileName = state => {
     // dashboard titles
     if (state?.dashboard?.title)
       return (
-        state.dashboard.title.replace(/\s+/g, '-').toLowerCase() +
-        '-' +
-        date.getDate() +
-        (date.getMonth() + 1) +
-        date.getFullYear()
+        `${state.dashboard.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
       )
 
     // map titles
     if (state?.general?.title)
       return (
-        state.general.title.replace(/\s+/g, '-').toLowerCase() +
-        '-' +
-        date.getDate() +
-        (date.getMonth() + 1) +
-        date.getFullYear()
+        `${state.general.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
       )
 
     // chart titles
     if (state?.title)
       return (
-        state.title.replace(/\s+/g, '-').toLowerCase() + '-' + date.getDate() + (date.getMonth() + 1) + date.getFullYear()
+        `${state.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
       )
 
     return 'no-title'
   }
 
-  // Construct filename with timestamp
-  const date = new Date()
   const filename = handleFileName(state)
 
   switch (type) {
@@ -88,7 +85,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
       const container = document.createElement('div')
 
       // Simple configurable padding (main fix for spacing issues)
-      const downloadPadding = state.downloadImagePadding !== undefined ? state.downloadImagePadding : (!state.showTitle ? 10 : 0)
+      const downloadPadding = state.downloadImagePadding !== undefined ? state.downloadImagePadding : (!state.showTitle ? 35 : 0)
       if (downloadPadding > 0) {
         container.style.padding = `${downloadPadding}px`
       }
@@ -131,7 +128,15 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
                 el.className?.indexOf &&
                 el.className.search(/download-buttons|download-links|data-table-container/) !== -1,
               useCORS: true,
-              scale: 2 // Better quality
+              scale: 2, // Better quality
+              allowTaint: true,
+              backgroundColor: null,
+              width: container.offsetWidth,
+              height: container.offsetHeight,
+              scrollX: 0,
+              scrollY: 0,
+              windowWidth: container.offsetWidth,
+              windowHeight: container.offsetHeight
             })
             .then(canvas => {
               document.body.removeChild(container) // Clean up container
