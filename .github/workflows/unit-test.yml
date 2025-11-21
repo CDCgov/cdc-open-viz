@@ -20,4 +20,5 @@ jobs:
           cache: 'npm'
       - run: npx yarn install
       - run: lerna run build
+      - run: cd packages/core && npm install --include=dev && npm link
       - run: npm run test --workspaces
