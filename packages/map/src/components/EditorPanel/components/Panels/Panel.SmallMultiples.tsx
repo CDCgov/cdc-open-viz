@@ -121,7 +121,7 @@ const PanelSmallMultiples: FC<PanelSmallMultiplesProps> = props => {
               label='Tiles Per Row (Desktop)'
               updateField={updateField}
               min={1}
-              max={4}
+              max={3}
               tooltip={
                 <Tooltip style={{ textTransform: 'none' }}>
                   <Tooltip.Target>
