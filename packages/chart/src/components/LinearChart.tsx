@@ -168,8 +168,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   // height before bottom axis
   const initialHeight = useMemo(
-    () => calcInitialHeight(config, currentViewport),
-    [config, currentViewport, parentHeight, config.heights?.vertical, config.heights?.horizontal]
+    () => (visualizationType === 'Warming Stripes' ? 78 : calcInitialHeight(config, currentViewport)),
+    [config, currentViewport, parentHeight, config.heights?.vertical, config.heights?.horizontal, visualizationType]
   )
   const forestHeight = useMemo(() => initialHeight + forestRowsHeight, [initialHeight, forestRowsHeight])
 

@@ -521,28 +521,17 @@ const PanelVisual: FC<PanelProps> = props => {
             />
           </>
         )}
-        {visSupportsBarThickness() &&
-          config.orientation === 'horizontal' &&
-          !config.isLollipopChart &&
-          config.yAxis.labelPlacement !== 'On Bar' && (
+        3
+        {(config.orientation !== 'horizontal' || config.visualizationType === 'Combo') &&
+          config.visualizationType !== 'Warming Stripes' && (
             <TextField
+              value={config.barThickness}
               type='number'
-              value={config.barHeight || '25'}
-              fieldName='barHeight'
-              label=' Bar Thickness'
+              fieldName='barThickness'
+              label='Bar Thickness'
               updateField={updateField}
-              min={15}
             />
           )}
-        {(config.orientation !== 'horizontal' || config.visualizationType === 'Combo') && (
-          <TextField
-            value={config.barThickness}
-            type='number'
-            fieldName='barThickness'
-            label='Bar Thickness'
-            updateField={updateField}
-          />
-        )}
         {visSupportsBarSpace() && (
           <TextField
             type='number'
