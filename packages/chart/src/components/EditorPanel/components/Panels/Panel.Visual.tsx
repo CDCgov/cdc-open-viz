@@ -319,16 +319,21 @@ const PanelVisual: FC<PanelProps> = props => {
                   colorIndices={[2, 4, 6]}
                   className='color-palette'
                 />
-                <span>Colorblind Safe</span>
-                <PaletteSelector
-                  palettes={accessibleColors}
-                  colorPalettes={colorPalettes}
-                  config={config}
-                  onPaletteSelect={handlePaletteSelection}
-                  selectedPalette={getCurrentPaletteName(config)}
-                  colorIndices={[2, 3, 5]}
-                  className='color-palette'
-                />
+
+                {config.visualizationType !== 'Warming Stripes' && (
+                  <>
+                    <span>Colorblind Safe</span>
+                    <PaletteSelector
+                      palettes={accessibleColors}
+                      colorPalettes={colorPalettes}
+                      config={config}
+                      onPaletteSelect={handlePaletteSelection}
+                      selectedPalette={getCurrentPaletteName(config)}
+                      colorIndices={[2, 3, 5]}
+                      className='color-palette'
+                    />
+                  </>
+                )}
               </>
             )}
 
