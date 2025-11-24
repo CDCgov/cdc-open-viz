@@ -6,13 +6,21 @@ This document describes the allowed dependency structure within the CDC Open Viz
 
 The CDC Open Viz monorepo follows a specific dependency architecture to maintain clean separation of concerns and prevent circular dependencies. The standalone build tests enforce these rules to ensure packages can be built independently.
 
+## TL;DR
+
+**Quick Reference:**
+
+- **Core** (`@cdc/core`) → Depends on nothing (foundation)
+- **Visualizations** (`chart`, `map`, `data-table`, etc.) → Depend only on Core
+- **Orchestrators** (`dashboard`, `editor`) → Can depend on everything
+
 ## Dependency Rules
 
 ### ✅ Allowed Dependencies
 
 1. **Core Package (`@cdc/core`)**
 
-   - **Can depend on ANY other package**
+   - **Cannot depend on any other internal packages** (foundation layer)
    - **Any package can depend on `@cdc/core`**
    - Core contains shared utilities, types, components, and helpers used across the monorepo
    - Examples: `import { cloneConfig } from '@cdc/core/helpers/cloneConfig'`
@@ -58,16 +66,33 @@ Individual visualization packages should be self-contained:
 ## Current Package Structure
 
 ```
-@cdc/core              ← Base package (can be imported by all)
-├── @cdc/chart         ← Standalone visualization
-├── @cdc/map           ← Standalone visualization
-├── @cdc/data-table    ← Standalone visualization
-├── @cdc/data-bite     ← Standalone visualization
-├── @cdc/waffle-chart  ← Standalone visualization
-├── @cdc/filtered-text ← Standalone visualization
-├── @cdc/markup-include← Standalone visualization
-├── @cdc/dashboard     ← Orchestrator (can import from all)
-└── @cdc/editor        ← Configuration tool (can import from all)
+┌─────────────────────────────────────────────────────────┐
+│ Tier 3: Orchestrators (can import from all packages)    │
+├─────────────────────────────────────────────────────────┤
+│ @cdc/dashboard    ← Combines multiple visualizations    │
+│ @cdc/editor       ← Configuration tool for all packages │
+└─────────────────────────────────────────────────────────┘
+              │                              │
+              ↓ (depends on)                 │
+┌─────────────────────────────────────────┐  │
+│ Tier 2: Standalone Visualizations       │  │
+│ (depend only on core)                   │  │
+├─────────────────────────────────────────┤  │
+│ @cdc/chart                              │  │
+│ @cdc/map                                │  │
+│ @cdc/data-table                         │  │
+│ @cdc/data-bite                          │  │
+│ @cdc/waffle-chart                       │  │
+│ @cdc/filtered-text                      │  │
+│ @cdc/markup-include                     │  │
+└─────────────────────────────────────────┘  │
+              │                              │
+              ↓ (depends on)                 ↓ (also depends on)
+┌─────────────────────────────────────────────────────────┐
+│ Tier 1: Foundation (no internal package dependencies)   │
+├─────────────────────────────────────────────────────────┤
+│ @cdc/core         ← Shared utilities, types, components │
+└─────────────────────────────────────────────────────────┘
 ```
 
 ## Rationale
@@ -81,9 +106,9 @@ Individual visualization packages should be self-contained:
 
 ### Special Cases
 
-- **Dashboard**: Acts as a composition root, combining multiple visualizations
-- **Editor**: Needs access to all components for configuration UI and live previews
-- **Core**: Provides shared infrastructure (utilities, types, base components)
+- **Core**: Foundation layer providing shared infrastructure (utilities, types, base components). Cannot depend on other packages to prevent circular dependencies.
+- **Dashboard**: Acts as a composition root, combining multiple visualizations. Can import from all packages.
+- **Editor**: Needs access to all components for configuration UI and live previews. Can import from all packages.
 
 ## Exemptions
 
@@ -102,6 +127,32 @@ The dependency rules are enforced by:
 
 1. **Standalone Build Tests**: Each package has a test that verifies it can be built in isolation
 2. **Code Reviews**: Manual verification during pull request reviews
+3. **Monitoring Commands**: Grep-based commands to detect cross-package imports (see Monitoring section)
+
+## Known Limitations
+
+### TypeScript Type-Only Imports
+
+TypeScript type-only imports (using the `type` keyword) can slip through standalone build tests:
+
+```typescript
+// This violates architecture but may not fail builds
+import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
+```
+
+**Why builds still succeed:**
+
+- Type-only imports are stripped during compilation and create no runtime dependency
+- TypeScript may not fail when the imported package isn't installed
+- The package can build successfully in isolation
+
+**Important:** These are still **architectural violations** even if they don't break builds. Type-only imports:
+
+- Create conceptual coupling between packages
+- Can evolve into runtime imports over time
+- Violate the intended dependency hierarchy
+
+**Solution:** Move shared types to `@cdc/core` so both packages can reference them without violating the architecture.
 
 ## Resolving Violations
 
@@ -153,14 +204,20 @@ interface ComponentProps {
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { DataTableConfig } from '@cdc/core/types/DataTable'
 
-// Dashboard can import from anywhere
+// Dashboard can import from anywhere (visualizations + core)
 import CdcChart from '@cdc/chart/src/CdcChartComponent'
-
-// Editor can import from anywhere
 import CdcMap from '@cdc/map/src/CdcMapComponent'
+import { useReduceData } from '@cdc/core/helpers/useReduceData'
+
+// Editor can import from anywhere (visualizations + core + dashboard)
+import CdcChart from '@cdc/chart/src/CdcChart'
+import { stripConfig } from '@cdc/dashboard/src/helpers/formatConfigBeforeSave'
+import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 ```
 
 ### ❌ Invalid Imports
+
+**Example: In the `@cdc/map` package** (or any Tier 2/1 visualization package)
 
 ```typescript
 // Explicit package imports (PROHIBITED)
@@ -186,11 +243,10 @@ To check for dependency violations:
 # Run standalone build tests
 npx lerna run test
 
-# Search for explicit cross-package imports (excluding stories)
-grep -r "from '@cdc/[^c]" packages/*/src --exclude-dir=dashboard --exclude-dir=editor --exclude="*.stories.*" | grep -v "/_stories/"
+# Search for explicit cross-package imports (excluding core, stories, dashboard, and editor)
+grep -r "from '@cdc/" packages/*/src --exclude="*.stories.*" | grep -v "/_stories/" | grep -v "@cdc/core" | grep -v "packages/dashboard/" | grep -v "packages/editor/"
 
-# Search for relative imports that might cross package boundaries (excluding stories)
-# Look for imports with multiple ../ that could reach sibling packages
-grep -r "from '\.\./\.\./\.\." packages/*/src --exclude-dir=dashboard --exclude-dir=editor --exclude="*.stories.*" | grep -v "/_stories/"
-grep -r "from \"\.\./\.\./\.\." packages/*/src --exclude-dir=dashboard --exclude-dir=editor --exclude="*.stories.*" | grep -v "/_stories/"
+# Search for relative imports that explicitly reference other package names
+# These patterns catch imports like: from '../../chart/...' or from '../../../map/src/...'
+grep -rE "from ['\"]\.\..*/(chart|map|data-table|data-bite|waffle-chart|filtered-text|markup-include|dashboard|editor)/" packages/*/src --exclude="*.stories.*" | grep -v "/_stories/" | grep -v "packages/dashboard/" | grep -v "packages/editor/"
 ```
