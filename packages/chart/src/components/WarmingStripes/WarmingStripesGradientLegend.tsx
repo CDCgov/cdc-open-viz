@@ -3,7 +3,7 @@ import ConfigContext from '../../ConfigContext'
 import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 import { getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
-import './WarmingStripesGradientLegend.scss'
+import './WarmingStripesGradientLegend.css'
 
 const WarmingStripesGradientLegend = () => {
   const { transformedData: data, config, formatNumber } = useContext(ConfigContext)
@@ -63,7 +63,9 @@ const WarmingStripesGradientLegend = () => {
   return (
     <div className='warming-stripes-gradient-legend'>
       {config.legend?.label && <h3 className='warming-stripes-gradient-legend__title'>{config.legend.label}</h3>}
-      {config.legend?.description && <p className='warming-stripes-gradient-legend__description'>{config.legend.description}</p>}
+      {config.legend?.description && (
+        <p className='warming-stripes-gradient-legend__description'>{config.legend.description}</p>
+      )}
 
       <div className='warming-stripes-gradient-legend__container'>
         <svg className='warming-stripes-gradient-legend__svg' height='50' width='100%'>
@@ -82,32 +84,18 @@ const WarmingStripesGradientLegend = () => {
           <rect x='1' y='1' width='calc(100% - 2px)' height='23' fill={`url(#${uniqueId})`} />
 
           {/* Min label */}
-          <text
-            x='0'
-            y='40'
-            fontSize='14'
-            textAnchor='start'
-            fill='#333'
-          >
+          <text x='0' y='40' fontSize='14' textAnchor='start' fill='#333'>
             {formatNumber(minValue, 'left')}
           </text>
 
           {/* Max label */}
-          <text
-            x='100%'
-            y='40'
-            fontSize='14'
-            textAnchor='end'
-            fill='#333'
-          >
+          <text x='100%' y='40' fontSize='14' textAnchor='end' fill='#333'>
             {formatNumber(maxValue, 'left')}
           </text>
         </svg>
 
         {/* Series name centered below gradient */}
-        <div className='warming-stripes-gradient-legend__series-label'>
-          {seriesLabel}
-        </div>
+        <div className='warming-stripes-gradient-legend__series-label'>{seriesLabel}</div>
       </div>
     </div>
   )

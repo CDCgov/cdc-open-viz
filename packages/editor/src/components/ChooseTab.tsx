@@ -483,6 +483,9 @@ const buttons = [
     type: 'chart',
     subType: 'Warming Stripes',
     orientation: 'vertical',
+    legend: {
+      position: 'bottom'
+    },
     icon: <WarmingStripesIcon />,
     content: 'Display temperature anomalies over time using color-coded vertical stripes.'
   },

@@ -22,7 +22,13 @@ import { interpolateRgbBasis } from 'd3-interpolate'
 import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 
 export const createFormatLabels =
-  (config: ChartConfig, tableData: Object[], data: TransformedData[], colorScale: ColorScale, formatNumber: (value: any, axis: string) => string) =>
+  (
+    config: ChartConfig,
+    tableData: Object[],
+    data: TransformedData[],
+    colorScale: ColorScale,
+    formatNumber: (value: any, axis: string) => string
+  ) =>
   (defaultLabels: Label[]): Label[] => {
     const { visualizationType, visualizationSubType, series, runtime, legend } = config
 
@@ -109,15 +115,28 @@ export const createFormatLabels =
       const intervalSize = range / numIntervals
 
       const intervalLabels = []
+
       for (let i = 0; i < numIntervals; i++) {
-        const start = minValue + (i * intervalSize)
-        const end = minValue + ((i + 1) * intervalSize)
+        // Calculate interval boundaries
+        // Each interval after the first starts at the exact boundary point
+        const start = minValue + i * intervalSize
+        const end = i === numIntervals - 1 ? maxValue : minValue + (i + 1) * intervalSize
         const midPoint = (start + end) / 2
+
+        // For display, show the actual start for first interval
+        // For subsequent intervals, format the boundary point
+        const displayStart = start
+        const displayEnd = i === numIntervals - 1 ? end : end
 
         intervalLabels.push({
           datum: String(midPoint),
           index: i,
-          text: `${formatNumber(start, 'left')} - ${formatNumber(end, 'left')}`,
+          text:
+            i === 0
+              ? `${formatNumber(displayStart, 'left')} - < ${formatNumber(displayEnd, 'left')}`
+              : i === numIntervals - 1
+              ? `${formatNumber(displayStart, 'left')} - ${formatNumber(displayEnd, 'left')}`
+              : `${formatNumber(displayStart, 'left')} - < ${formatNumber(displayEnd, 'left')}`,
           value: warmingColorScale(midPoint)
         })
       }
