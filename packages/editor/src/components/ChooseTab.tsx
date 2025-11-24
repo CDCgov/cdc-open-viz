@@ -277,6 +277,67 @@ const ChooseTab: React.FC = (): JSX.Element => {
 export default ChooseTab
 
 const buttons = [
+  // General - sorted by label
+  {
+    id: 15,
+    category: 'General',
+    label: 'Dashboard',
+    type: 'dashboard',
+    subType: null,
+    orientation: null,
+    icon: <DashboardIcon />,
+    content: 'Present multiple data visualizations with shared filter controls.'
+  },
+  {
+    id: 16,
+    category: 'General',
+    label: 'Data Bite',
+    type: 'data-bite',
+    subType: null,
+    orientation: null,
+    icon: <DataBiteIcon />,
+    content: 'Highlight a single aggregated value (e.g., sum or median).'
+  },
+  {
+    id: 24,
+    category: 'General',
+    label: 'Data Table',
+    type: 'table',
+    subType: null,
+    icon: <TableIcon />
+  },
+  {
+    id: 18,
+    category: 'General',
+    label: 'Gauge Chart',
+    type: 'waffle-chart',
+    subType: 'Gauge',
+    orientation: null,
+    icon: <GaugeChartIcon />,
+    content: `Specify the calculation of a single data point (such as a percentage value) and present it on a horizontal
+              scale.`
+  },
+  {
+    id: 17,
+    category: 'General',
+    label: 'Waffle Chart',
+    type: 'waffle-chart',
+    subType: 'Waffle',
+    orientation: null,
+    icon: <WaffleChartIcon />,
+    content: 'Highlight a piece of data in relationship to a data set.'
+  },
+  // Charts - sorted by label
+  {
+    id: 6,
+    category: 'Charts',
+    label: 'Area Chart',
+    type: 'chart',
+    subType: 'Area Chart',
+    orientation: 'vertical',
+    icon: <AreaChartIcon />,
+    content: 'Display an area chart to visualize quantities over time.'
+  },
   {
     id: 1,
     category: 'Charts',
@@ -294,6 +355,36 @@ const buttons = [
     },
     icon: <BarIcon />,
     content: 'Use bars to show comparisons between data categories.'
+  },
+  {
+    id: 9,
+    category: 'Charts',
+    label: 'Box Plot',
+    type: 'chart',
+    subType: 'Box Plot',
+    orientation: 'vertical',
+    icon: <BoxPlotIcon />,
+    content: 'Display a box plot to visualize the distribution of numerical data through quartiles.'
+  },
+  {
+    id: 3,
+    category: 'Charts',
+    label: 'Combo Chart',
+    type: 'chart',
+    subType: 'Combo',
+    orientation: 'vertical',
+    icon: <ComboChartIcon />,
+    content: 'Use bars to show comparisons between data categories.'
+  },
+  {
+    id: 14,
+    category: 'Charts',
+    label: 'Deviation Bar',
+    type: 'chart',
+    subType: 'Deviation Bar',
+    orientation: 'Pie',
+    icon: <DeviationIcon />,
+    content: 'Use deviation bars to display how individual values differ from a target'
   },
   {
     id: 2,
@@ -315,13 +406,24 @@ const buttons = [
     content: 'Use bars to show comparisons between data categories.'
   },
   {
-    id: 3,
+    id: 7,
     category: 'Charts',
-    label: 'Combo Chart',
+    label: 'Forecast Chart',
     type: 'chart',
-    subType: 'Combo',
+    subType: 'Forecasting',
     orientation: 'vertical',
-    icon: <ComboChartIcon />,
+    icon: <ForecastIcon />,
+    content: 'Display a forecasting chart to predict future data trends.'
+  },
+  {
+    id: 12,
+    category: 'Charts',
+    label: 'Horizontal Bar (Stacked)',
+    type: 'chart',
+    subType: 'Bar',
+    visualizationSubType: 'stacked',
+    orientation: 'horizontal',
+    icon: <HorizontalStackIcon />,
     content: 'Use bars to show comparisons between data categories.'
   },
   {
@@ -345,44 +447,14 @@ const buttons = [
     content: 'Use paired bars to show comparisons between two different data categories.'
   },
   {
-    id: 6,
+    id: 13,
     category: 'Charts',
-    label: 'Area Chart',
+    label: 'Pie',
     type: 'chart',
-    subType: 'Area Chart',
-    orientation: 'vertical',
-    icon: <AreaChartIcon />,
-    content: 'Display an area chart to visualize quantities over time.'
-  },
-  {
-    id: 7,
-    category: 'Charts',
-    label: 'Forecast Chart',
-    type: 'chart',
-    subType: 'Forecasting',
-    orientation: 'vertical',
-    icon: <ForecastIcon />,
-    content: 'Display a forecasting chart to predict future data trends.'
-  },
-  {
-    id: 8,
-    category: 'Charts',
-    label: 'Scatter Plot',
-    type: 'chart',
-    subType: 'Scatter Plot',
-    orientation: 'vertical',
-    icon: <ScatterPlotIcon />,
-    content: 'Display a scatter plot to explore relationships between numeric variables.'
-  },
-  {
-    id: 9,
-    category: 'Charts',
-    label: 'Box Plot',
-    type: 'chart',
-    subType: 'Box Plot',
-    orientation: 'vertical',
-    icon: <BoxPlotIcon />,
-    content: 'Display a box plot to visualize the distribution of numerical data through quartiles.'
+    subType: 'Pie',
+    orientation: 'Pie',
+    icon: <PieIcon />,
+    content: 'Present the numerical proportions of a data series.'
   },
   {
     id: 10,
@@ -395,45 +467,14 @@ const buttons = [
     content: 'Display a sankey diagram'
   },
   {
-    id: 11,
+    id: 8,
     category: 'Charts',
-    label: 'Forecast Chart',
+    label: 'Scatter Plot',
     type: 'chart',
-    subType: 'Forecasting',
+    subType: 'Scatter Plot',
     orientation: 'vertical',
-    icon: <ForecastIcon />,
-    content: 'Display a forecasting chart'
-  },
-  {
-    id: 12,
-    category: 'Charts',
-    label: 'Horizontal Bar (Stacked)',
-    type: 'chart',
-    subType: 'Bar',
-    visualizationSubType: 'stacked',
-    orientation: 'horizontal',
-    icon: <HorizontalStackIcon />,
-    content: 'Use bars to show comparisons between data categories.'
-  },
-  {
-    id: 13,
-    category: 'Charts',
-    label: 'Pie',
-    type: 'chart',
-    subType: 'Pie',
-    orientation: 'Pie',
-    icon: <PieIcon />,
-    content: 'Present the numerical proportions of a data series.'
-  },
-  {
-    id: 14,
-    category: 'Charts',
-    label: 'Deviation Bar',
-    type: 'chart',
-    subType: 'Deviation Bar',
-    orientation: 'Pie',
-    icon: <DeviationIcon />,
-    content: 'Use deviation bars to display how individual values differ from a target'
+    icon: <ScatterPlotIcon />,
+    content: 'Display a scatter plot to explore relationships between numeric variables.'
   },
   {
     id: 25,
@@ -445,56 +486,25 @@ const buttons = [
     icon: <WarmingStripesIcon />,
     content: 'Display temperature anomalies over time using color-coded vertical stripes.'
   },
+  // Maps - sorted by label
   {
-    id: 15,
-    category: 'General',
-    label: 'Dashboard',
-    type: 'dashboard',
-    subType: null,
-    orientation: null,
-    icon: <DashboardIcon />,
-    content: 'Present multiple data visualizations with shared filter controls.'
-  },
-  {
-    id: 16,
-    category: 'General',
-    label: 'Data Bite',
-    type: 'data-bite',
-    subType: null,
-    orientation: null,
-    icon: <DataBiteIcon />,
-    content: 'Highlight a single aggregated value (e.g., sum or median).'
-  },
-  {
-    id: 17,
-    category: 'General',
-    label: 'Waffle Chart',
-    type: 'waffle-chart',
-    subType: 'Waffle',
-    orientation: null,
-    icon: <WaffleChartIcon />,
-    content: 'Highlight a piece of data in relationship to a data set.'
-  },
-  {
-    id: 18,
-    category: 'General',
-    label: 'Gauge Chart',
-    type: 'waffle-chart',
-    subType: 'Gauge',
-    orientation: null,
-    icon: <GaugeChartIcon />,
-    content: `Specify the calculation of a single data point (such as a percentage value) and present it on a horizontal
-              scale.`
-  },
-  {
-    id: 19,
+    id: 23,
     category: 'Maps',
-    label: 'United States (State- or County-Level)',
+    label: 'U.S. Geocode',
     type: 'map',
-    subType: 'us',
+    subType: 'us-county',
+    generalType: 'us-geocode',
     icon: <UsaIcon />,
-    content: 'Present a U.S. choropleth map at state or county level.',
-    position: 'right'
+    content: 'United States GeoCode'
+  },
+  {
+    id: 22,
+    category: 'Maps',
+    label: 'U.S. State',
+    type: 'map',
+    subType: 'single-state',
+    icon: <AlabamaGraphic />,
+    content: 'Present a choropleth map of an individual U.S. state.'
   },
   {
     id: 20,
@@ -507,6 +517,16 @@ const buttons = [
     position: 'right'
   },
   {
+    id: 19,
+    category: 'Maps',
+    label: 'United States (State- or County-Level)',
+    type: 'map',
+    subType: 'us',
+    icon: <UsaIcon />,
+    content: 'Present a U.S. choropleth map at state or county level.',
+    position: 'right'
+  },
+  {
     id: 21,
     category: 'Maps',
     label: 'World',
@@ -514,32 +534,5 @@ const buttons = [
     subType: 'world',
     icon: <GlobeIcon />,
     content: 'Present a choropleth map of the world.'
-  },
-  {
-    id: 22,
-    category: 'Maps',
-    label: 'U.S. State',
-    type: 'map',
-    subType: 'single-state',
-    icon: <AlabamaGraphic />,
-    content: 'Present a choropleth map of an individual U.S. state.'
-  },
-  {
-    id: 23,
-    category: 'Maps',
-    label: 'U.S. Geocode',
-    type: 'map',
-    subType: 'us-county',
-    generalType: 'us-geocode',
-    icon: <UsaIcon />,
-    content: 'United States GeoCode'
-  },
-  {
-    id: 24,
-    category: 'General',
-    label: 'Data Table',
-    type: 'table',
-    subType: null,
-    icon: <TableIcon />
   }
 ]
