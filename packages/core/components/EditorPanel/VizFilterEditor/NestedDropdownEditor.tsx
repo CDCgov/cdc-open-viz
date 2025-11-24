@@ -5,6 +5,7 @@ import { filterOrderOptions } from '../../../helpers/filterOrderOptions'
 import FilterOrder from './components/FilterOrder'
 import { Visualization } from '../../../types/Visualization'
 import { useMemo } from 'react'
+import { Select } from '../Inputs'
 
 type NestedDropdownEditorProps = {
   config: Visualization
@@ -155,43 +156,26 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
         />
       </label>
 
-      <label>
-        <div className='edit-label column-heading mt-2'>
-          Filter Grouping
-          <span></span>
-        </div>
-        <select value={filter.columnName} onChange={e => handleGroupColumnNameChange(e.target.value)}>
-          <option value=''>- Select Option -</option>
-          {columnNameOptions.map((option, index) => (
-            <option value={option} key={index}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        <div className='edit-label column-heading mt-2'>
-          Filter SubGrouping
-          <span></span>
-        </div>
-        <select
-          value={subGrouping?.columnName ?? ''}
-          onChange={e => {
-            handleSubGroupColumnNameChange(e.target.value)
-          }}
-        >
-          <option value=''>- Select Option -</option>
-          {columnNameOptions.map((option, index) => {
-            if (option !== filter.columnName) {
-              return (
-                <option value={option} key={index}>
-                  {option}
-                </option>
-              )
-            }
-          })}
-        </select>
-      </label>
+      <Select
+        label='Filter Grouping'
+        value={filter.columnName}
+        options={[{ value: '', label: '- Select Option -' }, ...columnNameOptions.map(opt => ({ value: opt, label: opt }))]}
+        onChange={e => handleGroupColumnNameChange(e.target.value)}
+      />
+
+      <Select
+        label='Filter SubGrouping'
+        value={subGrouping?.columnName ?? ''}
+        options={[
+          { value: '', label: '- Select Option -' },
+          ...columnNameOptions
+            .filter(option => option !== filter.columnName)
+            .map(opt => ({ value: opt, label: opt }))
+        ]}
+        onChange={e => {
+          handleSubGroupColumnNameChange(e.target.value)
+        }}
+      />
 
       <label>
         <input
@@ -229,39 +213,28 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
         )}
       </label>
 
-      <label className='mt-2'>
+      <div className='mt-2'>
         <div className='edit-label column-heading float-right'>{filter.columnName} </div>
-        <span className={'edit-filterOrder column-heading '}>Group Order</span>
-        <select value={filter.order} onChange={e => handleGroupingOrderBy(e.target.value as OrderBy)}>
-          {filterOrderOptions.map((option, index) => {
-            return (
-              <option value={option.value} key={`filter-${option.label}-${index}`}>
-                {option.label}
-              </option>
-            )
-          })}
-        </select>
+        <Select
+          label='Group Order'
+          value={filter.order}
+          options={filterOrderOptions}
+          onChange={e => handleGroupingOrderBy(e.target.value as OrderBy)}
+        />
         {filter.order === 'cust' && (
           <FilterOrder orderedValues={filter.orderedValues} handleFilterOrder={handleGroupingCustomOrder} />
         )}
-      </label>
+      </div>
 
       {subGrouping?.columnName && (
-        <label className='mt-2'>
-          <span className={'edit-filterOrder column-heading'}>SubGrouping Order</span>
+        <div className='mt-2'>
           <div className='edit-label column-heading float-right'>{subGrouping.columnName} </div>
-          <select
+          <Select
+            label='SubGrouping Order'
             value={subGrouping.order ? subGrouping.order : 'asc'}
+            options={filterOrderOptions}
             onChange={e => handleSubGroupingOrderBy(e.target.value as OrderBy)}
-          >
-            {filterOrderOptions.map((option, index) => {
-              return (
-                <option value={option.value} key={`filter-${index}`}>
-                  {option.label}
-                </option>
-              )
-            })}
-          </select>
+          />
           {subGrouping?.order === 'cust' &&
             filter.values.map((groupName, i) => {
               const orderedSubGroupValues = subGrouping.valuesLookup[groupName].orderedValues
@@ -278,7 +251,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
                 </div>
               )
             })}
-        </label>
+        </div>
       )}
     </div>
   )

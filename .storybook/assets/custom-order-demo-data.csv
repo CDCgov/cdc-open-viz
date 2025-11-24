@@ -1,0 +1,16 @@
+Location,Year,Type,Amount
+California,2019,Federal,1500
+California,2020,Federal,1520
+California,2021,Federal,1540
+Texas,2019,State,1300
+Texas,2020,State,1320
+Texas,2021,State,1340
+Florida,2019,Local,1100
+Florida,2020,Local,1120
+Florida,2021,Local,1140
+New York,2019,Federal,1600
+New York,2020,Federal,1620
+New York,2021,Federal,1640
+Illinois,2019,State,1200
+Illinois,2020,State,1220
+Illinois,2021,State,1240

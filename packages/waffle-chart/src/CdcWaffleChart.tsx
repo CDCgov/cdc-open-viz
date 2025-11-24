@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useReducer, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
 
 // visx
 import { Circle, Bar } from '@visx/shape'
@@ -13,6 +13,7 @@ import ResizeObserver from 'resize-observer-polyfill'
 import { Config } from './types/Config'
 import getViewport from '@cdc/core/helpers/getViewport'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
+import { DATA_OPERATORS } from '@cdc/core/helpers/constants'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
@@ -67,7 +68,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   const gaugeColor = config.visual.colors[config.theme]
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
-  const calculateData = useCallback(() => {
+  const [dataPercentage, waffleDenominator, waffleNumerator] = useMemo(() => {
     //If either the column or function aren't set, do not calculate
     if (!dataColumn || !dataFunction) {
       return ''
@@ -239,21 +240,19 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       applyPrecision(waffleNumerator)
     ]
   }, [
-    dataColumn,
-    dataFunction,
     config.data,
     filters,
+    dataColumn,
+    dataFunction,
     dataConditionalColumn,
     dataConditionalOperator,
     dataConditionalComparate,
     customDenom,
+    dataDenom,
     dataDenomColumn,
     dataDenomFunction,
-    roundToPlace,
-    dataDenom
+    roundToPlace
   ])
-
-  const [dataPercentage, waffleDenominator, waffleNumerator] = calculateData()
 
   const buildWaffle = useCallback(() => {
     let waffleData = []
@@ -579,18 +578,5 @@ export const DATA_FUNCTIONS = [
   DATA_FUNCTION_SUM
 ]
 
-export const DATA_OPERATOR_LESS = '<'
-export const DATA_OPERATOR_GREATER = '>'
-export const DATA_OPERATOR_LESSEQUAL = '<='
-export const DATA_OPERATOR_GREATEREQUAL = '>='
-export const DATA_OPERATOR_EQUAL = '='
-export const DATA_OPERATOR_NOTEQUAL = '≠'
-
-export const DATA_OPERATORS = [
-  DATA_OPERATOR_LESS,
-  DATA_OPERATOR_GREATER,
-  DATA_OPERATOR_LESSEQUAL,
-  DATA_OPERATOR_GREATEREQUAL,
-  DATA_OPERATOR_EQUAL,
-  DATA_OPERATOR_NOTEQUAL
-]
+// Re-export DATA_OPERATORS for backward compatibility
+export { DATA_OPERATORS }

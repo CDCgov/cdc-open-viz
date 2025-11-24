@@ -5,30 +5,15 @@ import ConfigContext from '../ConfigContext'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Accordion from '@cdc/core/components/ui/Accordion'
-import InputText from '@cdc/core/components/inputs/InputText'
+import { TextField, Select, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import Button from '@cdc/core/components/elements/Button'
 import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
-import InputSelect from '@cdc/core/components/inputs/InputSelect'
-import InputCheckbox from '@cdc/core/components/inputs/InputCheckbox'
 import Layout from '@cdc/core/components/Layout'
+import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
 import '@cdc/core/styles/v2/components/editor.scss'
-
-const headerColors = [
-  'theme-blue',
-  'theme-purple',
-  'theme-brown',
-  'theme-teal',
-  'theme-pink',
-  'theme-orange',
-  'theme-slate',
-  'theme-indigo',
-  'theme-cyan',
-  'theme-green',
-  'theme-amber'
-]
 
 const EditorPanel = memo(props => {
   const { config, updateConfig, loading, stateData: data, setParentConfig, isDashboard } = useContext(ConfigContext)
@@ -157,7 +142,7 @@ const EditorPanel = memo(props => {
   const editorContent = (
     <Accordion>
       <Accordion.Section title='General'>
-        <InputText
+        <TextField
           value={config.title}
           fieldName='title'
           label='Title'
@@ -166,33 +151,30 @@ const EditorPanel = memo(props => {
         />
       </Accordion.Section>
       <Accordion.Section title='Data'>
-        <div className='cove-accordion__panel-section'>
-          <div className='cove-input-group'>
-            <InputSelect
-              value={config.textColumn || ''}
-              fieldName='textColumn'
-              label='Text Column'
-              updateField={updateField}
-              initial='Select'
-              options={getColumns()}
-            />
-          </div>
-        </div>
-        <hr className='cove-accordion__divider' />
+        <Select
+          value={config.textColumn || ''}
+          fieldName='textColumn'
+          label='Text Column'
+          updateField={updateField}
+          initial='Select'
+          options={getColumns()}
+        />
 
         <label style={{ marginBottom: '1rem' }}>
-          <span className='edit-label'>Data Point Filters</span>
-          <Tooltip style={{ textTransform: 'none' }}>
-            <Tooltip.Target>
-              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-            </Tooltip.Target>
-            <Tooltip.Content>
-              <p>
-                To refine the highlighted data point, specify one or more filters (e.g., "Male" and "Female" for a
-                column called "Sex").
-              </p>
-            </Tooltip.Content>
-          </Tooltip>
+          <span className='edit-label'>
+            Data Point Filters
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>
+                  To refine the highlighted data point, specify one or more filters (e.g., "Male" and "Female" for a
+                  column called "Sex").
+                </p>
+              </Tooltip.Content>
+            </Tooltip>
+          </span>
         </label>
         {config.filters && (
           <ul className='filters-list' style={{ paddingLeft: 0, marginBottom: '1rem' }}>
@@ -207,38 +189,28 @@ const EditorPanel = memo(props => {
                 >
                   Remove
                 </button>
-                <label>
-                  <span className='edit-label column-heading'>Column</span>
-                  <select
-                    value={filter.columnName}
-                    onChange={e => {
-                      updateFilterProp('columnName', index, e.target.value)
-                    }}
-                  >
-                    <option value=''>- Select Option -</option>
-                    {getColumns().map((dataKey, index) => (
-                      <option value={dataKey} key={index}>
-                        {dataKey}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  <span className='edit-label column-heading'>Column Value</span>
-                  <select
-                    value={filter.columnValue}
-                    onChange={e => {
-                      updateFilterProp('columnValue', index, e.target.value)
-                    }}
-                  >
-                    <option value=''>- Select Option -</option>
-                    {getFilterColumnValues(index).map((dataKey, index) => (
-                      <option value={dataKey} key={index}>
-                        {dataKey}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                <Select
+                  label='Column'
+                  value={filter.columnName || ''}
+                  options={[
+                    { value: '', label: '- Select Option -' },
+                    ...getColumns().map(col => ({ value: col, label: col }))
+                  ]}
+                  onChange={e => {
+                    updateFilterProp('columnName', index, e.target.value)
+                  }}
+                />
+                <Select
+                  label='Column Value'
+                  value={filter.columnValue || ''}
+                  options={[
+                    { value: '', label: '- Select Option -' },
+                    ...getFilterColumnValues(index).map(val => ({ value: val, label: val }))
+                  ]}
+                  onChange={e => {
+                    updateFilterProp('columnValue', index, e.target.value)
+                  }}
+                />
               </fieldset>
             ))}
           </ul>
@@ -248,32 +220,21 @@ const EditorPanel = memo(props => {
         </Button>
       </Accordion.Section>
       <Accordion.Section title='Visual'>
-        <InputSelect
+        <Select
           value={config.fontSize}
           fieldName='fontSize'
           label='Font Size'
           updateField={updateField}
           options={['small', 'medium', 'large']}
         />
-        <br />
-        <label>
-          <span className='edit-label'>Theme</span>
-          <ul className='color-palette'>
-            {headerColors.map(palette => (
-              <li
-                title={palette}
-                key={palette}
-                onClick={() => {
-                  updateConfig({ ...config, theme: palette })
-                }}
-                className={config.theme === palette ? 'selected ' + palette : palette}
-              ></li>
-            ))}
-          </ul>
-        </label>
+        <HeaderThemeSelector
+          selectedTheme={config.theme}
+          onThemeSelect={theme => updateConfig({ ...config, theme })}
+          label='Theme'
+        />
 
         <div className='cove-accordion__panel-section checkbox-group'>
-          <InputCheckbox
+          <CheckBox
             inline
             size='small'
             value={config.visual.border}
@@ -282,7 +243,7 @@ const EditorPanel = memo(props => {
             label='Display Border'
             updateField={updateField}
           />
-          <InputCheckbox
+          <CheckBox
             inline
             size='small'
             value={config.visual.borderColorTheme}
@@ -291,7 +252,7 @@ const EditorPanel = memo(props => {
             label='Use theme border color'
             updateField={updateField}
           />
-          <InputCheckbox
+          <CheckBox
             size='small'
             value={config.visual.accent}
             section='visual'
@@ -299,7 +260,7 @@ const EditorPanel = memo(props => {
             label='Use Accent Style'
             updateField={updateField}
           />
-          <InputCheckbox
+          <CheckBox
             size='small'
             value={config.visual.background}
             section='visual'
@@ -307,7 +268,7 @@ const EditorPanel = memo(props => {
             label='Use Theme Background Color'
             updateField={updateField}
           />
-          <InputCheckbox
+          <CheckBox
             size='small'
             value={config.visual.hideBackgroundColor}
             section='visual'

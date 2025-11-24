@@ -1,0 +1,255 @@
+{
+  "type": "chart",
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "title": "Bar Chart Editor Test",
+  "showTitle": true,
+  "showDownloadMediaButton": false,
+  "theme": "theme-blue",
+  "animate": false,
+  "fontSize": "medium",
+  "lineDatapointStyle": "hover",
+  "lineDatapointColor": "Same as Line",
+  "barHasBorder": "false",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "regular",
+  "barStyle": "flat",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "isResponsiveTicks": true,
+  "general": {
+    "showDownloadButton": false,
+    "showMissingDataLabel": false,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": false,
+    "hideNullValue": true
+  },
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "yAxis": {
+    "hideAxis": false,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "75",
+    "gridLines": false,
+    "enablePadding": false,
+    "min": "0.1",
+    "max": "3",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "rightHideAxis": true,
+    "rightAxisSize": 0,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#333",
+    "rightAxisTickLabelColor": "#333",
+    "rightAxisTickColor": "#333",
+    "numTicks": "6",
+    "axisPadding": 0,
+    "scalePadding": 10,
+    "tickRotation": 0,
+    "anchors": [],
+    "showMissingDataLabel": true,
+    "showMissingDataLine": true,
+    "categories": [],
+    "label": "Reported cases per 100,000 Population",
+    "type": "linear"
+  },
+  "xAxis": {
+    "sortDates": false,
+    "anchors": [],
+    "type": "categorical",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 75,
+    "tickRotation": 0,
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "labelOffset": 0,
+    "axisPadding": 200,
+    "target": 0,
+    "maxTickRotation": 0,
+    "padding": 5,
+    "showYearsOnce": false,
+    "sortByRecentDate": false,
+    "dataKey": "Year",
+    "label": "Year",
+    "manual": true
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "indexLabel": "",
+    "download": true,
+    "showVertical": false,
+    "dateDisplayFormat": "",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "show": true
+  },
+  "orientation": "vertical",
+  "color": "pinkpurple",
+  "columns": {},
+  "legend": {
+    "hide": false,
+    "behavior": "isolate",
+    "axisAlign": true,
+    "singleRow": true,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "hideSuppressedLabels": false,
+    "hideSuppressionLink": false,
+    "seriesHighlight": [],
+    "style": "boxes",
+    "subStyle": "linear blocks",
+    "shape": "circle",
+    "tickRotation": "",
+    "hideBorder": {
+      "side": false,
+      "topBottom": true
+    },
+    "position": "right"
+  },
+  "brush": {
+    "height": 25,
+    "active": false
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "palette": "qualitative-bold",
+  "isPaletteReversed": false,
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
+  "labels": false,
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": false,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false,
+    "roundTo": "1"
+  },
+  "confidenceKeys": {
+    "upper": "",
+    "lower": ""
+  },
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false,
+    "lineDatapointSymbol": "none",
+    "maximumShapeAmount": 7
+  },
+  "useLogScale": false,
+  "filterBehavior": "Filter Change",
+  "highlightedBarValues": [],
+  "series": [
+    {
+      "dataKey": "White, non-Hispanic",
+      "type": "Bar",
+      "axis": "Left",
+      "tooltip": true
+    }
+  ],
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": ""
+  },
+  "visualizationType": "Bar",
+  "data": [
+    {
+      "Year": "2007",
+      "American Indian/Alaska Native": "1.4",
+      "Asian/Pacific Islander": "0.9",
+      "Black, non-Hispanic": "2.3",
+      "White, non-Hispanic": "1",
+      "Hispanic": "1",
+      "Category": "Low Income"
+    },
+    {
+      "Year": "2008",
+      "American Indian/Alaska Native": "1.8",
+      "Asian/Pacific Islander": "0.8",
+      "Black, non-Hispanic": "2.2",
+      "White, non-Hispanic": "0.9",
+      "Hispanic": "0.8",
+      "Category": "Low Income"
+    },
+    {
+      "Year": "2009",
+      "American Indian/Alaska Native": "1",
+      "Asian/Pacific Islander": "0.7",
+      "Black, non-Hispanic": "1.7",
+      "White, non-Hispanic": "0.8",
+      "Hispanic": "0.7",
+      "Category": "Low Income"
+    },
+    {
+      "Year": "2010",
+      "American Indian/Alaska Native": "1.1",
+      "Asian/Pacific Islander": "0.6",
+      "Black, non-Hispanic": "1.7",
+      "White, non-Hispanic": "1.2",
+      "Hispanic": "0.6",
+      "Category": "High Income"
+    },
+    {
+      "Year": "2011",
+      "American Indian/Alaska Native": "0.5",
+      "Asian/Pacific Islander": "0.4",
+      "Black, non-Hispanic": "1.4",
+      "White, non-Hispanic": "1.1",
+      "Hispanic": "0.4",
+      "Category": "High Income"
+    },
+    {
+      "Year": "2012",
+      "American Indian/Alaska Native": "0.7",
+      "Asian/Pacific Islander": "0.4",
+      "Black, non-Hispanic": "1.1",
+      "White, non-Hispanic": "1.0",
+      "Hispanic": "0.4",
+      "Category": "High Income"
+    }
+  ]
+}

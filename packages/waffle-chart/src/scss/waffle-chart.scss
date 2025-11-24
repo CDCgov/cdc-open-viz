@@ -1,32 +1,13 @@
-@mixin set-theme($property, $color) {
-  @if $property == 'background-color' {
-    background-color: $color;
-  } @else if $property == 'border-color' {
-    border-color: $color;
-  } @else if $property == 'color' {
-    color: $color;
-  }
-}
+// Remove custom theme mixin - use core styles instead
 
-.warning-icon {
-  position: absolute;
-  top: 50%;
-  left: 20%;
-  transform: translate(-50%, -50%);
-  color: red;
-}
 
 .type-dashboard .type-waffle-chart .cove-component__content {
   padding-top: 0;
 }
 
-.cove {
-  &-editor__panel {
-    ul.color-palette {
-      margin: 0;
-    }
-  }
+// Let core styles handle color palette
 
+.cove {
   .cove-gauge-chart {
     &__chart {
       width: 85%;
@@ -38,7 +19,7 @@
       justify-items: center;
       align-items: flex-start;
 
-      & > svg {
+      &>svg {
         margin: 0.7em 0;
       }
     }
@@ -47,6 +28,7 @@
       font-style: italic;
       font-size: 0.9em !important;
     }
+
     &__text {
       line-height: 1.25em;
       font-weight: 400;
@@ -115,11 +97,13 @@
 }
 
 @at-root {
+
   .cove-waffle-chart.font-small,
   .cove-gauge-chart.font-small #{&} {
     .cove-waffle-chart__data--primary {
       font-size: 35px;
     }
+
     .cove-waffle-chart__data--text {
       font-size: 14px;
     }
@@ -130,6 +114,7 @@
     .cove-waffle-chart__data--primary {
       font-size: 50px;
     }
+
     .cove-waffle-chart__data--text {
       font-size: 18px;
     }
@@ -140,6 +125,7 @@
     .cove-waffle-chart__data--primary {
       font-size: 80px;
     }
+
     .cove-waffle-chart__data--text {
       font-size: 20px;
     }

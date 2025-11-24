@@ -1,41 +1,3 @@
-import { timeParse } from 'd3-time-format'
-
-const getXValueFromCoordinate = (x, isClick = false) => {
-  if (visualizationType === 'Pie') return
-  if (orientation === 'horizontal') return
-
-  // Check the type of x equal to point or if the type of xAxis is equal to continuous or date
-  if (config.xAxis.type === 'categorical' || (visualizationType === 'Combo' && orientation !== 'horizontal' && visualizationType !== 'Forest Plot')) {
-    let range = xScale.range()[1] - xScale.range()[0]
-    let eachBand = range / (xScale.domain().length + 1)
-
-    let numerator = x
-    const index = Math.floor((Number(numerator) - eachBand / 2) / eachBand)
-    return xScale.domain()[index] // fixes off by 1 error
-  }
-
-  if (config.xAxis.type === 'date') {
-    const xValue = x // Assuming x is the coordinate on the chart
-    const xTimestamp = convertXValueToTimestamp(x, 0, xMax, xScale.domain())
-
-    // Calculate the closest date to the x coordinate
-    let closestDate = null
-    let minDistance = Number.MAX_VALUE
-
-    xScale.domain().forEach(timestamp => {
-      const distance = Math.abs(xTimestamp - timestamp)
-      if (distance < minDistance) {
-        minDistance = distance
-        closestDate = timestamp
-      }
-    })
-
-    return closestDate
-  }
-
-  return x
-}
-
 const findNearestDatum = ({ data, xScale, yScale, config, xMax, annotationSeriesKey }, xPosition) => {
   const { xAxis, visualizationType, orientation } = config
 
@@ -62,7 +24,7 @@ const findNearestDatum = ({ data, xScale, yScale, config, xMax, annotationSeries
     return domain[index]
   }
 
-  const getXValueFromCoordinate = (x, isClick = false) => {
+  const getXValueFromCoordinate = x => {
     if (visualizationType === 'Pie') return
     if (orientation === 'horizontal') return
 
@@ -85,7 +47,10 @@ const findNearestDatum = ({ data, xScale, yScale, config, xMax, annotationSeries
     }
 
     // Check the type of x equal to point or if the type of xAxis is equal to continuous or date
-    if (config.xAxis.type === 'categorical' || (visualizationType === 'Combo' && orientation !== 'horizontal' && visualizationType !== 'Forest Plot')) {
+    if (
+      config.xAxis.type === 'categorical' ||
+      (visualizationType === 'Combo' && orientation !== 'horizontal' && visualizationType !== 'Forest Plot')
+    ) {
       const range = xScale.range()[1] - xScale.range()[0]
       const eachBand = range / (xScale.domain().length + 1)
 
@@ -135,4 +100,4 @@ const findNearestDatum = ({ data, xScale, yScale, config, xMax, annotationSeries
   return { x, y }
 }
 
-export { findNearestDatum, getXValueFromCoordinate }
+export { findNearestDatum }

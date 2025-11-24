@@ -75,6 +75,7 @@ import { getExcludedData } from './helpers/getExcludedData'
 import { getColorScale } from './helpers/getColorScale'
 import { getTransformedData } from './helpers/getTransformedData'
 import { getPiePercent } from './helpers/getPiePercent'
+import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 
 // styles
 import './scss/main.scss'
@@ -275,30 +276,62 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return newConfig
   }
 
+  const getProcessedAxisLabels = useCallback(
+    (targetConfig: AllChartsConfig, dataSource: any[] = []) => {
+      let processedXAxis = targetConfig.xAxis?.label
+      let processedYAxis = targetConfig.yAxis?.label
+
+      if (targetConfig.enableMarkupVariables && targetConfig.markupVariables?.length) {
+        if (targetConfig.xAxis?.label) {
+          processedXAxis = processMarkupVariables(
+            targetConfig.xAxis.label,
+            dataSource || [],
+            targetConfig.markupVariables,
+            {
+              isEditor,
+              filters: targetConfig.filters || []
+            }
+          ).processedContent
+        }
+        if (targetConfig.yAxis?.label) {
+          processedYAxis = processMarkupVariables(
+            targetConfig.yAxis.label,
+            dataSource || [],
+            targetConfig.markupVariables,
+            {
+              isEditor,
+              filters: targetConfig.filters || []
+            }
+          ).processedContent
+        }
+      }
+
+      const isHorizontalVariant =
+        ((targetConfig.visualizationType === 'Bar' || targetConfig.visualizationType === 'Box Plot') &&
+          targetConfig.orientation === 'horizontal') ||
+        ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(targetConfig.visualizationType)
+
+      const runtimeXAxisLabel = isHorizontalVariant
+        ? processedYAxis ?? (targetConfig.yAxis as any)?.yAxis?.label ?? targetConfig.yAxis?.label
+        : processedXAxis ?? targetConfig.xAxis?.label
+
+      const runtimeYAxisLabel = isHorizontalVariant
+        ? processedXAxis ?? (targetConfig.xAxis as any)?.xAxis?.label ?? targetConfig.xAxis?.label
+        : processedYAxis ?? targetConfig.yAxis?.label
+
+      return { processedXAxis, processedYAxis, runtimeXAxisLabel, runtimeYAxisLabel, isHorizontalVariant }
+    },
+    [isEditor]
+  )
+
   const updateConfig = (_config: AllChartsConfig, dataOverride?: any[]) => {
     const newConfig = cloneConfig(_config)
     let data = dataOverride || stateData
 
     data = handleRankByValue(data, newConfig)
 
-    // Process axis labels for markup variables if enabled
-    let processedXAxis = newConfig.xAxis?.label
-    let processedYAxis = newConfig.yAxis?.label
-
-    if (newConfig.enableMarkupVariables && newConfig.markupVariables?.length) {
-      if (newConfig.xAxis?.label) {
-        processedXAxis = processMarkupVariables(newConfig.xAxis.label, data || [], newConfig.markupVariables, {
-          isEditor,
-          filters: newConfig.filters || []
-        }).processedContent
-      }
-      if (newConfig.yAxis?.label) {
-        processedYAxis = processMarkupVariables(newConfig.yAxis.label, data || [], newConfig.markupVariables, {
-          isEditor,
-          filters: newConfig.filters || []
-        }).processedContent
-      }
-    }
+    const { processedXAxis, processedYAxis, runtimeXAxisLabel, runtimeYAxisLabel, isHorizontalVariant } =
+      getProcessedAxisLabels(newConfig, data || [])
 
     // Deeper copy
     Object.keys(defaults).forEach(key => {
@@ -323,6 +356,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     //Enforce default values that need to be calculated at runtime
+    // Preserve error messages that were set outside of updateConfig (e.g., from pattern settings)
+    const existingErrorMessage = _config.runtime?.editorErrorMessage || ''
+    const isPieChartValidationError =
+      existingErrorMessage === 'Data column section must be set for pie charts.' ||
+      existingErrorMessage === 'Segment labels section must be set for pie charts.' ||
+      existingErrorMessage === 'Data column and Segment labels sections must be set for pie charts.'
+    const shouldPreserveError = existingErrorMessage && !isPieChartValidationError
+
     newConfig.runtime = {} as Runtime
     newConfig.runtime.series = _.cloneDeep(newConfig.series)
     newConfig.runtime.seriesLabels = {}
@@ -395,19 +436,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
       newConfig.visualizationSubType = 'stacked'
     }
 
-    if (
-      ((newConfig.visualizationType === 'Bar' || newConfig.visualizationType === 'Box Plot') &&
-        newConfig.orientation === 'horizontal') ||
-      ['Deviation Bar', 'Paired Bar', 'Forest Plot'].includes(newConfig.visualizationType)
-    ) {
+    if (isHorizontalVariant) {
       // For horizontal charts, axes are swapped, so processedYAxis goes to runtime.xAxis and vice versa
+      const horizontalXAxisSource = _.cloneDeep((newConfig.yAxis as any)?.yAxis || newConfig.yAxis)
+      const horizontalYAxisSource = _.cloneDeep((newConfig.xAxis as any)?.xAxis || newConfig.xAxis)
       newConfig.runtime.xAxis = {
-        ..._.cloneDeep(newConfig.yAxis.yAxis || newConfig.yAxis),
-        label: processedYAxis || (newConfig.yAxis.yAxis || newConfig.yAxis).label
+        ...horizontalXAxisSource,
+        label: runtimeXAxisLabel ?? horizontalXAxisSource?.label
       }
       newConfig.runtime.yAxis = {
-        ..._.cloneDeep(newConfig.xAxis.xAxis || newConfig.xAxis),
-        label: processedXAxis || (newConfig.xAxis.xAxis || newConfig.xAxis).label
+        ...horizontalYAxisSource,
+        label: runtimeYAxisLabel ?? horizontalYAxisSource?.label
       }
       newConfig.runtime.yAxis.labelOffset *= -1
 
@@ -419,24 +458,40 @@ const CdcChart: React.FC<CdcChartProps> = ({
       ['Scatter Plot', 'Area Chart', 'Line', 'Forecasting'].includes(newConfig.visualizationType) &&
       !convertLineToBarGraph
     ) {
-      newConfig.runtime.xAxis = { ...newConfig.xAxis, label: processedXAxis || newConfig.xAxis.label }
-      newConfig.runtime.yAxis = { ...newConfig.yAxis, label: processedYAxis || newConfig.yAxis.label }
+      newConfig.runtime.xAxis = { ...newConfig.xAxis, label: runtimeXAxisLabel ?? newConfig.xAxis.label }
+      newConfig.runtime.yAxis = { ...newConfig.yAxis, label: runtimeYAxisLabel ?? newConfig.yAxis.label }
       newConfig.runtime.horizontal = false
       newConfig.orientation = 'vertical'
     } else {
-      newConfig.runtime.xAxis = { ...newConfig.xAxis, label: processedXAxis || newConfig.xAxis.label }
-      newConfig.runtime.yAxis = { ...newConfig.yAxis, label: processedYAxis || newConfig.yAxis.label }
+      newConfig.runtime.xAxis = { ...newConfig.xAxis, label: runtimeXAxisLabel ?? newConfig.xAxis.label }
+      newConfig.runtime.yAxis = { ...newConfig.yAxis, label: runtimeYAxisLabel ?? newConfig.yAxis.label }
       newConfig.runtime.horizontal = false
     }
 
     newConfig.runtime.uniqueId = Date.now()
-    newConfig.runtime.editorErrorMessage =
-      newConfig.visualizationType === 'Pie' && !newConfig.yAxis.dataKey
-        ? 'Data Key property in Y Axis section must be set for pie charts.'
-        : ''
 
-    // Sankey Description box error message
-    newConfig.runtime.editorErrorMessage = ''
+    // Set error messages: preserve external errors (from pattern settings, etc.) or set validation errors
+    if (shouldPreserveError) {
+      // Preserve error messages set by editor panels (e.g., pattern contrast errors)
+      newConfig.runtime.editorErrorMessage = existingErrorMessage
+    } else if (newConfig.visualizationType === 'Pie') {
+      // Check for Pie chart validation errors
+      const missingDataColumn = !newConfig.yAxis.dataKey || newConfig.yAxis.dataKey === ''
+      const missingSegmentLabels = !newConfig.xAxis.dataKey || newConfig.xAxis.dataKey === ''
+
+      if (missingDataColumn && missingSegmentLabels) {
+        newConfig.runtime.editorErrorMessage = 'Data column and Segment labels sections must be set for pie charts.'
+      } else if (missingDataColumn) {
+        newConfig.runtime.editorErrorMessage = 'Data column section must be set for pie charts.'
+      } else if (missingSegmentLabels) {
+        newConfig.runtime.editorErrorMessage = 'Segment labels section must be set for pie charts.'
+      } else {
+        newConfig.runtime.editorErrorMessage = ''
+      }
+    } else {
+      // No errors
+      newConfig.runtime.editorErrorMessage = ''
+    }
 
     if (newConfig.legend.seriesHighlight?.length) {
       dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: newConfig.legend?.seriesHighlight })
@@ -492,11 +547,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
     for (let entry of entries) {
       let { width, height } = entry.contentRect
 
-      width = isEditor ? width - EDITOR_WIDTH : width
+      const editorIsOpen = isEditor && !!document.querySelector('.editor-panel:not(.hidden)')
+      width = editorIsOpen ? width - EDITOR_WIDTH : width
 
       const newViewport = getViewport(width)
 
       dispatch({ type: 'SET_VIEWPORT', payload: newViewport })
+      dispatch({ type: 'SET_VIZ_VIEWPORT', payload: newViewport })
 
       if (entry.target.dataset.lollipop === 'true') {
         width = width - 2.5
@@ -654,6 +711,49 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
   }, [config, stateData]) // eslint-disable-line
 
+  // Updates runtime axis labels when config or data changes when using markup variables
+  useEffect(() => {
+    if (
+      !config?.runtime ||
+      _.isEmpty(config.runtime) ||
+      (!config.runtime.xAxis && !config.runtime.yAxis) ||
+      !config.markupVariables?.length
+    ) {
+      return
+    }
+
+    const dataSource = (stateData && stateData.length ? stateData : config.data) || []
+    const { runtimeXAxisLabel, runtimeYAxisLabel, isHorizontalVariant } = getProcessedAxisLabels(config, dataSource)
+
+    const runtimeClone = _.cloneDeep(config.runtime)
+
+    if (!runtimeClone?.xAxis || !runtimeClone?.yAxis) {
+      return
+    }
+
+    let shouldUpdateLabels = false
+
+    if (typeof runtimeXAxisLabel !== 'undefined' && runtimeClone.xAxis.label !== runtimeXAxisLabel) {
+      runtimeClone.xAxis = { ...runtimeClone.xAxis, label: runtimeXAxisLabel }
+      shouldUpdateLabels = true
+    }
+
+    if (typeof runtimeYAxisLabel !== 'undefined' && runtimeClone.yAxis.label !== runtimeYAxisLabel) {
+      runtimeClone.yAxis = { ...runtimeClone.yAxis, label: runtimeYAxisLabel }
+      shouldUpdateLabels = true
+    }
+
+    if (shouldUpdateLabels) {
+      runtimeClone.uniqueId = Date.now()
+      const updatedConfig = { ...config, runtime: runtimeClone } as ChartConfig
+      dispatch({ type: 'SET_CONFIG', payload: updatedConfig })
+
+      if (isEditor && !isDashboard) {
+        editorContext.setTempConfig(updatedConfig)
+      }
+    }
+  }, [config, stateData, getProcessedAxisLabels, dispatch, editorContext, isEditor, isDashboard])
+
   // Called on legend click, highlights/unhighlights the data series with the given label
   const highlight = (label: Label): void => {
     if (
@@ -769,7 +869,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
         rightSuffix,
         bottomPrefix,
         bottomSuffix,
-        bottomAbbreviated
+        bottomAbbreviated,
+        preserveOriginalDecimals
       }
     } = config
 
@@ -788,32 +889,52 @@ const CdcChart: React.FC<CdcChartProps> = ({
       } else {
         roundToPlace = roundTo ? Number(roundTo) : 0
       }
-      stringFormattingOptions = {
-        useGrouping: addColRoundTo ? true : config.dataFormat.commas ? true : false,
-        minimumFractionDigits: roundToPlace,
-        maximumFractionDigits: roundToPlace
+
+      // If preserveOriginalDecimals is enabled, don't force decimal places
+      if (preserveOriginalDecimals) {
+        stringFormattingOptions = {
+          useGrouping: addColRoundTo ? true : config.dataFormat.commas ? true : false
+        }
+      } else {
+        stringFormattingOptions = {
+          useGrouping: addColRoundTo ? true : config.dataFormat.commas ? true : false,
+          minimumFractionDigits: roundToPlace,
+          maximumFractionDigits: roundToPlace
+        }
       }
     }
 
     if (axis === 'right') {
-      stringFormattingOptions = {
-        useGrouping: config.dataFormat.rightCommas ? true : false,
-        minimumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0,
-        maximumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0
+      if (preserveOriginalDecimals) {
+        stringFormattingOptions = {
+          useGrouping: config.dataFormat.rightCommas ? true : false
+        }
+      } else {
+        stringFormattingOptions = {
+          useGrouping: config.dataFormat.rightCommas ? true : false,
+          minimumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0,
+          maximumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0
+        }
       }
     }
 
     const resolveBottomTickRounding = () => {
-      if (config.forestPlot.type === 'Logarithmic' && !bottomRoundTo) return 2
+      if (config.forestPlot?.type === 'Logarithmic' && !bottomRoundTo) return 2
       if (Number(bottomRoundTo)) return Number(bottomRoundTo)
       return 0
     }
 
     if (axis === 'bottom') {
-      stringFormattingOptions = {
-        useGrouping: config.dataFormat.bottomCommas ? true : false,
-        minimumFractionDigits: resolveBottomTickRounding(),
-        maximumFractionDigits: resolveBottomTickRounding()
+      if (preserveOriginalDecimals) {
+        stringFormattingOptions = {
+          useGrouping: config.dataFormat.bottomCommas ? true : false
+        }
+      } else {
+        stringFormattingOptions = {
+          useGrouping: config.dataFormat.bottomCommas ? true : false,
+          minimumFractionDigits: resolveBottomTickRounding(),
+          maximumFractionDigits: resolveBottomTickRounding()
+        }
       }
     }
 
@@ -1008,9 +1129,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
         {isEditor && <EditorPanel datasets={datasets} />}
         <Layout.Responsive isEditor={isEditor}>
           {config.newViz && <Confirm updateConfig={updateConfig} config={config} />}
-          {undefined === config.newViz && isEditor && config.runtime && config.runtime?.editorErrorMessage && (
-            <Error errorMessage={config.runtime.editorErrorMessage} />
-          )}
           {!missingRequiredSections(config) && !config.newViz && (
             <div
               className={`cdc-chart-inner-container cove-component__content type-${makeClassName(
@@ -1028,6 +1146,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 style={undefined}
                 config={config}
               />
+
+              {/* Error Message Display - Show at top before visualization wrapper */}
+              {/* {(() => {
+                const errorMessage = config.runtime?.editorErrorMessage
+                const hasError = errorMessage && typeof errorMessage === 'string' && errorMessage.trim() !== ''
+                const shouldShow = undefined === config.newViz && isEditor && config.runtime && hasError
+                return shouldShow ? <Error errorMessage={errorMessage} /> : null
+              })()} */}
 
               {/* Visualization Wrapper */}
               <div className={getChartWrapperClasses().join(' ')}>
@@ -1067,18 +1193,27 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         : 'w-75'
                     }
                   >
-                    {/* All charts with LinearChart */}
-                    {!['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
-                      <div ref={parentRef} style={{ width: `100%` }}>
-                        <ParentSize>
-                          {parent => (
-                            <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
-                          )}
-                        </ParentSize>
+                    {/* Check if there is data to display */}
+                    {(!filteredData || filteredData.length === 0) && (
+                      <div className='no-data-message' style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
+                        {config.chartMessage?.noData || 'No Data Available'}
                       </div>
                     )}
 
-                    {config.visualizationType === 'Pie' && (
+                    {/* All charts with LinearChart */}
+                    {filteredData &&
+                      filteredData.length > 0 &&
+                      !['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
+                        <div ref={parentRef} style={{ width: `100%` }}>
+                          <ParentSize>
+                            {parent => (
+                              <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
+                            )}
+                          </ParentSize>
+                        </div>
+                      )}
+
+                    {filteredData && filteredData.length > 0 && config.visualizationType === 'Pie' && (
                       <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
                         {parent => (
                           <PieChart
@@ -1091,7 +1226,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       </ParentSize>
                     )}
                     {/* Line Chart */}
-                    {config.visualizationType === 'Line' &&
+                    {filteredData &&
+                      filteredData.length > 0 &&
+                      config.visualizationType === 'Line' &&
                       (convertLineToBarGraph ? (
                         <div ref={parentRef} style={{ width: `100%` }}>
                           <ParentSize>
@@ -1202,34 +1339,51 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   config.table.show &&
                   config.visualizationType !== 'Spark Line' &&
                   config.visualizationType !== 'Sankey') ||
-                  (config.visualizationType === 'Sankey' && config.table.show)) && (
-                  <DataTable
-                    /* changing the "key" will force the table to re-render
-                                when the default sort changes while editing */
-                    key={dataTableDefaultSortBy}
-                    config={pivotDynamicSeries(config)}
-                    rawData={
+                  (config.visualizationType === 'Sankey' && config.table.show)) &&
+                  (() => {
+                    let dataTableConfig = pivotDynamicSeries(config)
+                    let dataTableColumns = config.columns
+                    let dataTableRuntimeData = getTableRuntimeData()
+                    let dataTableRawData =
                       config.visualizationType === 'Sankey'
                         ? config?.data?.[0]?.tableData
                         : config.table.customTableConfig
                         ? filterVizData(config.filters, config.data)
                         : config.data
+
+                    if (config.smallMultiples?.mode) {
+                      const prepared = prepareSmallMultiplesDataTable(config, config.columns, dataTableRuntimeData)
+                      dataTableConfig = prepared.config
+                      dataTableColumns = prepared.columns
+                      dataTableRuntimeData = prepared.runtimeData
+                      if (config.smallMultiples.mode === 'by-column') {
+                        dataTableRawData = prepared.config.data
+                      }
                     }
-                    runtimeData={getTableRuntimeData()}
-                    expandDataTable={config.table.expanded}
-                    columns={config.columns}
-                    defaultSortBy={dataTableDefaultSortBy}
-                    displayGeoName={name => name}
-                    applyLegendToRow={applyLegendToRow}
-                    tableTitle={config.table.label}
-                    indexTitle={config.table.indexLabel}
-                    vizTitle={title}
-                    viewport={currentViewport}
-                    tabbingId={handleChartTabbing(config, legendId)}
-                    colorScale={colorScale}
-                    interactionLabel={interactionLabel}
-                  />
-                )}
+
+                    return (
+                      <DataTable
+                        /* changing the "key" will force the table to re-render
+                                    when the default sort changes while editing */
+                        key={dataTableDefaultSortBy}
+                        config={dataTableConfig}
+                        rawData={dataTableRawData}
+                        runtimeData={dataTableRuntimeData}
+                        expandDataTable={config.table.expanded}
+                        columns={dataTableColumns}
+                        defaultSortBy={dataTableDefaultSortBy}
+                        displayGeoName={name => name}
+                        applyLegendToRow={applyLegendToRow}
+                        tableTitle={config.table.label}
+                        indexTitle={config.table.indexLabel}
+                        vizTitle={title}
+                        viewport={currentViewport}
+                        tabbingId={handleChartTabbing(config, legendId)}
+                        colorScale={colorScale}
+                        interactionLabel={interactionLabel}
+                      />
+                    )
+                  })()}
                 {config?.annotations?.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
                 {processedLegacyFootnotes && (
@@ -1239,6 +1393,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
               <FootnotesStandAlone
                 config={configObj.footnotes}
                 filters={config.filters?.filter(f => f.filterFootnotes)}
+                markupVariables={config.markupVariables}
+                enableMarkupVariables={config.enableMarkupVariables}
+                data={config.data}
               />
             </div>
           )}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, memo, useContext } from 'react'
-import { DragDropContext, Droppable } from '@hello-pangea/dnd'
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import chroma from 'chroma-js'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import {
@@ -36,11 +36,12 @@ import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
 import useRightAxis from '../../hooks/useRightAxis'
 import WarningImage from '../../images/warning.svg'
-import useMinMax from '../../hooks/useMinMax'
+import getMinMax from '../../helpers/getMinMax'
 
 import { type ChartContext } from '../../types/ChartContext'
 import { type ChartConfig } from '../../types/ChartConfig'
 
+import '@cdc/core/components/EditorPanel/EditorPanel.styles.css'
 import './editor-panel.scss'
 import { Anchor } from '@cdc/core/types/Axis'
 import EditorPanelContext from './EditorPanelContext'
@@ -633,8 +634,16 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   } = useContext<ChartContext>(ConfigContext)
 
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, unfilteredData)
-  const properties = { data, config }
-  const { leftMax, rightMax } = useMinMax(properties)
+  const properties = {
+    data,
+    tableData: data,
+    config,
+    minValue,
+    maxValue,
+    existPositiveValue,
+    isAllLine
+  }
+  const { leftMax, rightMax } = getMinMax(properties)
 
   const {
     visHasAnchors,
@@ -1787,18 +1796,20 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               handleForecastPaletteSelection={handleForecastPaletteSelection}
                             >
                               <fieldset>
-                                <legend className='edit-label float-left'>Displaying</legend>
-                                <Tooltip style={{ textTransform: 'none' }}>
-                                  <Tooltip.Target>
-                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                  </Tooltip.Target>
-                                  <Tooltip.Content>
-                                    <p>
-                                      A data series is a set of related data points plotted in a chart and typically
-                                      represented in the chart legend.
-                                    </p>
-                                  </Tooltip.Content>
-                                </Tooltip>
+                                <legend className='edit-label d-flex align-items-center'>
+                                  Displaying
+                                  <Tooltip style={{ textTransform: 'none' }}>
+                                    <Tooltip.Target>
+                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                    </Tooltip.Target>
+                                    <Tooltip.Content>
+                                      <p>
+                                        A data series is a set of related data points plotted in a chart and typically
+                                        represented in the chart legend.
+                                      </p>
+                                    </Tooltip.Content>
+                                  </Tooltip>
+                                </legend>
                               </fieldset>
 
                               <DragDropContext
@@ -1913,9 +1924,30 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                   )}
                   {config.visualizationType !== 'Pie' && (
                     <>
-                      <label>
-                        <span className='edit-label'>
-                          Axis Type
+                      <Select
+                        label='Axis Type'
+                        value={config.yAxis.type}
+                        options={[
+                          { value: 'linear', label: 'Numeric (Linear Scale)' },
+                          ...(config.visualizationSubType !== 'stacked'
+                            ? [{ value: 'logarithmic', label: 'Numeric (Logarithmic Scale)' }]
+                            : []),
+                          ...(config.orientation !== 'horizontal'
+                            ? [{ value: 'categorical', label: 'Categorical' }]
+                            : [])
+                        ]}
+                        section='yAxis'
+                        fieldName='type'
+                        updateField={(_section, _subsection, _fieldName, value) => {
+                          updateConfig({
+                            ...config,
+                            yAxis: {
+                              ...config.yAxis,
+                              type: value
+                            }
+                          })
+                        }}
+                        tooltip={
                           <Tooltip style={{ textTransform: 'none', display: 'inline-block' }}>
                             <Tooltip.Target>
                               <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -1925,26 +1957,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               exponential data, or 'Categorical' for discrete categories.
                             </Tooltip.Content>
                           </Tooltip>
-                        </span>
-                        <select
-                          value={config.yAxis.type}
-                          onChange={e =>
-                            updateConfig({
-                              ...config,
-                              yAxis: {
-                                ...config.yAxis,
-                                type: e.target.value
-                              }
-                            })
-                          }
-                        >
-                          <option value='linear'>Numeric (Linear Scale)</option>
-                          {config.visualizationSubType !== 'stacked' && (
-                            <option value='logarithmic'>Numeric (Logarithmic Scale)</option>
-                          )}
-                          {config.orientation !== 'horizontal' && <option value='categorical'>Categorical</option>}
-                        </select>
-                      </label>
+                        }
+                      />
                       <CategoricalAxis
                         config={config}
                         updateConfig={updateConfig}
@@ -1978,25 +1992,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         fieldName='inlineLabel'
                         label='Inline Label'
                         updateField={updateField}
-                        maxLength={35}
-                        tooltip={
-                          <Tooltip style={{ textTransform: 'none' }}>
-                            <Tooltip.Target>
-                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                            </Tooltip.Target>
-                            <Tooltip.Content>
-                              <p>35 character limit</p>
-                            </Tooltip.Content>
-                          </Tooltip>
-                        }
-                      />
-                      <TextField
-                        display={!visHasCategoricalAxis()}
-                        value={config.yAxis.inlineLabel}
-                        section='yAxis'
-                        fieldName='inlineLabel'
-                        label='Inline Label'
-                        updateField={updateFieldDeprecated}
                         maxLength={35}
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
@@ -2247,6 +2242,30 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     updateField={updateFieldDeprecated}
                     min={0}
                   />{' '}
+                  <CheckBox
+                    value={config.dataFormat.preserveOriginalDecimals}
+                    section='dataFormat'
+                    fieldName='preserveOriginalDecimals'
+                    label='Preserve Original Decimal Places'
+                    updateField={updateFieldDeprecated}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display='question'
+                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>
+                            When enabled, numbers will display with their original decimal places from the data source,
+                            bypassing the "Round to decimal point" setting above. This is useful when you have mixed
+                            data (e.g., whole numbers in one column and percentages with decimals in another).
+                          </p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                   <div className='two-col-inputs'>
                     <TextField
                       value={config.dataFormat.prefix}
@@ -2510,28 +2529,25 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 />
                               </label>
 
-                              <label>
-                                Anchor Line Style
-                                <select
-                                  value={config.yAxis.anchors[index].lineStyle || ''}
-                                  onChange={e => {
-                                    const copiedAnchors = [...config.yAxis.anchors]
-                                    copiedAnchors[index].lineStyle = e.target.value
-                                    updateConfig({
-                                      ...config,
-                                      yAxis: {
-                                        ...config.yAxis,
-                                        anchors: copiedAnchors
-                                      }
-                                    })
-                                  }}
-                                >
-                                  <option>Select</option>
-                                  {lineOptions.map(line => (
-                                    <option key={line.key}>{line.value}</option>
-                                  ))}
-                                </select>
-                              </label>
+                              <Select
+                                value={config.yAxis.anchors[index].lineStyle || ''}
+                                label='Anchor Line Style'
+                                onChange={e => {
+                                  const copiedAnchors = [...config.yAxis.anchors]
+                                  copiedAnchors[index].lineStyle = e.target.value
+                                  updateConfig({
+                                    ...config,
+                                    yAxis: {
+                                      ...config.yAxis,
+                                      anchors: copiedAnchors
+                                    }
+                                  })
+                                }}
+                                options={[
+                                  { value: '', label: 'Select' },
+                                  ...lineOptions.map(line => ({ value: line.value, label: line.value }))
+                                ]}
+                              />
                             </AccordionItemPanel>
                           </AccordionItem>
                         ))}
@@ -2635,28 +2651,25 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 />
                               </label>
 
-                              <label>
-                                Anchor Line Style
-                                <select
-                                  value={config.xAxis.anchors[index].lineStyle || ''}
-                                  onChange={e => {
-                                    const copiedAnchors = [...config.xAxis.anchors]
-                                    copiedAnchors[index].lineStyle = e.target.value
-                                    updateConfig({
-                                      ...config,
-                                      xAxis: {
-                                        ...config.xAxis,
-                                        anchors: copiedAnchors
-                                      }
-                                    })
-                                  }}
-                                >
-                                  <option>Select</option>
-                                  {lineOptions.map(line => (
-                                    <option key={line.key}>{line.value}</option>
-                                  ))}
-                                </select>
-                              </label>
+                              <Select
+                                value={config.xAxis.anchors[index].lineStyle || ''}
+                                label='Anchor Line Style'
+                                onChange={e => {
+                                  const copiedAnchors = [...config.xAxis.anchors]
+                                  copiedAnchors[index].lineStyle = e.target.value
+                                  updateConfig({
+                                    ...config,
+                                    xAxis: {
+                                      ...config.xAxis,
+                                      anchors: copiedAnchors
+                                    }
+                                  })
+                                }}
+                                options={[
+                                  { value: '', label: 'Select' },
+                                  ...lineOptions.map(line => ({ value: line.value, label: line.value }))
+                                ]}
+                              />
                             </AccordionItemPanel>
                           </AccordionItem>
                         ))}
@@ -2862,9 +2875,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     <>
                       {config.visualizationType !== 'Forest Plot' && (
                         <>
-                          <label>
-                            <span className='edit-label'>
-                              Data Scaling Type
+                          <Select
+                            label='Data Scaling Type'
+                            tooltip={
                               <Tooltip style={{ textTransform: 'none', display: 'inline-block' }}>
                                 <Tooltip.Target>
                                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -2874,31 +2887,32 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                   time-series data.
                                 </Tooltip.Content>
                               </Tooltip>
-                            </span>
-                            <select
-                              value={config.xAxis.type}
-                              onChange={e =>
-                                updateConfig({
-                                  ...config,
-                                  xAxis: {
-                                    ...config.xAxis,
-                                    type: e.target.value
-                                  }
-                                })
-                              }
-                            >
-                              {config.visualizationType !== 'Bump Chart' && (
-                                <option value='categorical'>Categorical (Linear Scale)</option>
-                              )}
-                              {config.visualizationType !== 'Bump Chart' && (
-                                <option value='date'>Date (Linear Scale)</option>
-                              )}
-                              <option value='date-time'>Date (Date Time Scale)</option>
-                              {config.visualizationType === 'Scatter Plot' && (
-                                <option value={'continuous'}>Continuous</option>
-                              )}
-                            </select>
-                          </label>
+                            }
+                            value={config.xAxis.type}
+                            options={[
+                              ...(!['Bump Chart', 'Forecasting'].includes(config.visualizationType)
+                                ? [{ label: 'Categorical (Linear Scale)', value: 'categorical' }]
+                                : []),
+                              ...(!['Bump Chart'].includes(config.visualizationType)
+                                ? [{ label: 'Date (Linear Scale)', value: 'date' }]
+                                : []),
+                              { label: 'Date (Date Time Scale)', value: 'date-time' },
+                              ...(config.visualizationType === 'Scatter Plot'
+                                ? [{ label: 'Continuous', value: 'continuous' }]
+                                : [])
+                            ]}
+                            section='xAxis'
+                            fieldName='type'
+                            updateField={(_section, _subsection, _fieldName, value) => {
+                              updateConfig({
+                                ...config,
+                                xAxis: {
+                                  ...config.xAxis,
+                                  type: value
+                                }
+                              })
+                            }}
+                          />
                           <CheckBox
                             value={config.xAxis.manual}
                             section='xAxis'
@@ -3613,21 +3627,19 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                     Remove
                                   </button>
                                   <p>Highlighted Bar {i + 1}</p>
-                                  <label>
-                                    <span className='edit-label column-heading'>Value</span>
-                                    <select
-                                      value={config.highlightedBarValues[i].value}
-                                      onChange={e => handleUpdateHighlightedBar(e, i)}
-                                    >
-                                      <option value=''>- Select Value -</option>
-                                      {highlightedSeriesValues &&
-                                        [...new Set(highlightedSeriesValues)]
-                                          .sort()
-                                          .map(option => (
-                                            <option key={`special-class-value-option-${i}-${option}`}>{option}</option>
-                                          ))}
-                                    </select>
-                                  </label>
+                                  <Select
+                                    value={config.highlightedBarValues[i].value}
+                                    label='Value'
+                                    onChange={e => handleUpdateHighlightedBar(e, i)}
+                                    options={[
+                                      { value: '', label: '- Select Value -' },
+                                      ...(highlightedSeriesValues
+                                        ? [...new Set(highlightedSeriesValues)]
+                                            .sort()
+                                            .map(option => ({ value: option, label: option }))
+                                        : [])
+                                    ]}
+                                  />
                                   <label>
                                     <span className='edit-label column-heading'>Color</span>
                                     <input
@@ -3831,28 +3843,25 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 />
                               </label>
 
-                              <label>
-                                Anchor Line Style
-                                <select
-                                  value={config.xAxis.anchors[index].lineStyle || ''}
-                                  onChange={e => {
-                                    const copiedAnchors = [...config.xAxis.anchors]
-                                    copiedAnchors[index].lineStyle = e.target.value
-                                    updateConfig({
-                                      ...config,
-                                      xAxis: {
-                                        ...config.xAxis,
-                                        anchors: copiedAnchors
-                                      }
-                                    })
-                                  }}
-                                >
-                                  <option>Select</option>
-                                  {lineOptions.map(line => (
-                                    <option key={line.key}>{line.value}</option>
-                                  ))}
-                                </select>
-                              </label>
+                              <Select
+                                value={config.xAxis.anchors[index].lineStyle || ''}
+                                label='Anchor Line Style'
+                                onChange={e => {
+                                  const copiedAnchors = [...config.xAxis.anchors]
+                                  copiedAnchors[index].lineStyle = e.target.value
+                                  updateConfig({
+                                    ...config,
+                                    xAxis: {
+                                      ...config.xAxis,
+                                      anchors: copiedAnchors
+                                    }
+                                  })
+                                }}
+                                options={[
+                                  { value: '', label: 'Select' },
+                                  ...lineOptions.map(line => ({ value: line.value, label: line.value }))
+                                ]}
+                              />
                             </AccordionItemPanel>
                           </AccordionItem>
                         ))}
@@ -3960,28 +3969,25 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 />
                               </label>
 
-                              <label>
-                                Anchor Line Style
-                                <select
-                                  value={config.yAxis.anchors[index].lineStyle || ''}
-                                  onChange={e => {
-                                    const copiedAnchors = [...config.yAxis.anchors]
-                                    copiedAnchors[index].lineStyle = e.target.value
-                                    updateConfig({
-                                      ...config,
-                                      yAxis: {
-                                        ...config.yAxis,
-                                        anchors: copiedAnchors
-                                      }
-                                    })
-                                  }}
-                                >
-                                  <option>Select</option>
-                                  {lineOptions.map(line => (
-                                    <option key={line.key}>{line.value}</option>
-                                  ))}
-                                </select>
-                              </label>
+                              <Select
+                                value={config.yAxis.anchors[index].lineStyle || ''}
+                                label='Anchor Line Style'
+                                onChange={e => {
+                                  const copiedAnchors = [...config.yAxis.anchors]
+                                  copiedAnchors[index].lineStyle = e.target.value
+                                  updateConfig({
+                                    ...config,
+                                    yAxis: {
+                                      ...config.yAxis,
+                                      anchors: copiedAnchors
+                                    }
+                                  })
+                                }}
+                                options={[
+                                  { value: '', label: 'Select' },
+                                  ...lineOptions.map(line => ({ value: line.value, label: line.value }))
+                                ]}
+                              />
                             </AccordionItemPanel>
                           </AccordionItem>
                         ))}
@@ -4461,6 +4467,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
               onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
               onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
             />
+            <Panels.SmallMultiples name='Small Multiples' />
           </Accordion>
           {config.type !== 'Spark Line' && (
             <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />

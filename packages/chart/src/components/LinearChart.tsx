@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useContext, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 
 // Libraries
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -36,10 +36,11 @@ import { calcInitialHeight, handleAutoPaddingRight } from '../helpers/sizeHelper
 import { filterAndShiftLinearDateTicks } from '../helpers/filterAndShiftLinearDateTicks'
 
 // Hooks
-import useMinMax from '../hooks/useMinMax'
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
 import useScales, { getTickValues } from '../hooks/useScales'
+import { useProgrammaticTooltip } from '../hooks/useProgrammaticTooltip'
+import { useSmallMultipleSynchronization } from '../hooks/useSmallMultipleSynchronization'
 
 import getTopAxis from '../helpers/getTopAxis'
 import { useTooltip as useCoveTooltip } from '../hooks/useTooltip'
@@ -49,6 +50,7 @@ import Annotation from './Annotations'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
 import HoverLine from './HoverLine/HoverLine'
+import { SmallMultiples } from './SmallMultiples'
 
 type LinearChartProps = {
   parentWidth: number
@@ -86,6 +88,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     config,
     convertLineToBarGraph,
     currentViewport,
+    vizViewport,
     dimensions,
     formatDate,
     formatNumber,
@@ -99,8 +102,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     parentRef,
     tableData,
     transformedData: data,
-    seriesHighlight,
-
+    seriesHighlight
   } = useContext(ConfigContext)
 
   // CONFIG
@@ -119,6 +121,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     dataFormat,
     debugSvg
   } = config
+
   const { labelsAboveGridlines, hideAxis, inlineLabel } = config.yAxis
 
   // HOOKS  % STATES
@@ -129,7 +132,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const [showHoverLine, setShowHoverLine] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
-  const [yAxisAutoPadding, setYAxisAutoPadding] = useState(0)
 
   // REFS
   const axisBottomRef = useRef(null)
@@ -139,7 +141,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
-  const lastMaxValue = useRef(maxValue)
   const gridLineRefs = useRef([])
   const tooltipRef = useRef(null)
 
@@ -154,11 +155,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const isForestPlot = visualizationType === 'Forest Plot'
   const isDateTime = config.xAxis.type === 'date-time'
   const inlineLabelHasNoSpace = !inlineLabel?.includes(' ')
-  const labelsOverflow = inlineLabel && !inlineLabelHasNoSpace
+  const needsYAxisAutoPadding = inlineLabel && !inlineLabelHasNoSpace
   const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
   const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
-  const tickLabelFontSize = isMobileFontViewport(currentViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
-  const axisLabelFontSize = isMobileFontViewport(currentViewport) ? AXIS_LABEL_FONT_SIZE_SMALL : AXIS_LABEL_FONT_SIZE
+  const tickLabelFontSize = isMobileFontViewport(vizViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
+  const axisLabelFontSize = isMobileFontViewport(vizViewport) ? AXIS_LABEL_FONT_SIZE_SMALL : AXIS_LABEL_FONT_SIZE
   const GET_TEXT_WIDTH_FONT = `normal ${tickLabelFontSize}px Nunito, sans-serif`
 
   // zero if not forest plot
@@ -215,39 +216,37 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       : d[config.runtime.originalXAxis.dataKey]
   const getYAxisData = (d, seriesKey) => d[seriesKey]
   const xAxisDataMapped = data.map(d => getXAxisData(d))
-  const section = config.orientation === 'horizontal' || config.visualizationType === 'Forest Plot' ? 'yAxis' : 'xAxis'
-  const properties = {
+  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
+
+  const {
+    xScale,
+    yScale,
+    seriesScale,
+    g1xScale,
+    g2xScale,
+    xScaleNoPadding,
+    xScaleAnnotation,
+    min,
+    max,
+    leftMax,
+    rightMax
+  } = useScales({
     data,
     tableData,
-    config: {
-      ...config,
-      yAxis: {
-        ...config.yAxis,
-        scalePadding: labelsOverflow ? yAxisAutoPadding : config.yAxis.scalePadding,
-        enablePadding: labelsOverflow || config.yAxis.enablePadding
-      }
-    },
+    config,
     minValue,
     maxValue,
     isAllLine,
     existPositiveValue,
     xAxisDataMapped,
-    xMax,
-    yMax
-  }
-  const { min, max, leftMax, rightMax } = useMinMax(properties)
-  const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
-  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleAnnotation } = useScales({
-    ...properties,
-    min,
-    max,
-    leftMax,
-    rightMax,
+    yMax,
     dimensions,
     xMax:
       parentWidth -
       Number(config.orientation === 'horizontal' ? config.xAxis.size : config.yAxis.size) -
-      (hasRightAxis ? config.yAxis.rightAxisSize : 0)
+      (hasRightAxis ? config.yAxis.rightAxisSize : 0),
+    needsYAxisAutoPadding,
+    currentViewport
   })
 
   const [yTickCount, xTickCount] = ['yAxis', 'xAxis'].map(axis =>
@@ -266,6 +265,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleTooltipClick,
     handleTooltipMouseOff,
     TooltipListItem,
+    getXValueFromCoordinate,
+    getCoordinateFromXValue,
   } = useCoveTooltip({
     xScale,
     yScale,
@@ -350,6 +351,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     return manualStep
   }
 
+  const smallMultiplesSync = useSmallMultipleSynchronization(xMax, yMax, getXValueFromCoordinate)
+
   const onMouseMove = event => {
     const svgRect = event.currentTarget.getBoundingClientRect()
     const x = event.clientX - svgRect.left
@@ -359,7 +362,24 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       x,
       y
     })
+
+    smallMultiplesSync.onMouseMove?.(event)
   }
+
+  const onMouseLeave = () => {
+    smallMultiplesSync.onMouseLeave?.()
+  }
+
+  // Use custom hook to provide programmatic tooltip control for small multiples
+  const internalSvgRef = useProgrammaticTooltip({
+    svgRef,
+    getCoordinateFromXValue,
+    config,
+    setPoint,
+    setShowHoverLine,
+    handleTooltipMouseOver,
+    hideTooltip
+  })
 
   // EFFECTS
   // Adjust padding on the right side of the chart to accommodate for overflow
@@ -449,7 +469,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     if (!topLabelOnGridlineHeight) return
 
     // Adjust the viewBox for the svg
-    const svg = svgRef.current
+    const svg = internalSvgRef.current
     if (!svg) return
     const parentWidthFromRef = parentRef.current.getBoundingClientRect().width
     svg.setAttribute('viewBox', `0 ${-topLabelOnGridlineHeight} ${parentWidthFromRef} ${newHeight}`)
@@ -470,45 +490,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   ])
 
   useEffect(() => {
-    if (lastMaxValue.current === maxValue) return
-    lastMaxValue.current = maxValue
-
-    if (!yAxisAutoPadding) return
-    setYAxisAutoPadding(0)
-  }, [maxValue])
-
-  useEffect(() => {
-    if (!yScale?.ticks) return
-    const ticks = yScale.ticks(handleNumTicks)
-    if (orientation === 'horizontal' || !labelsOverflow || config.yAxis?.max || ticks.length === 0) {
-      setYAxisAutoPadding(0)
-      return
-    }
-
-    // minimum percentage of the max value that the distance should be from the top grid line
-    const MINIMUM_DISTANCE_PERCENTAGE = 0.025
-
-    const topGridLine = Math.max(...ticks)
-    const needsPaddingThreshold = topGridLine - maxValue * MINIMUM_DISTANCE_PERCENTAGE
-    const maxValueIsGreaterThanThreshold = maxValue > needsPaddingThreshold
-
-    if (!maxValueIsGreaterThanThreshold) return
-
-    const tickGap = ticks.length === 1 ? ticks[0] : ticks[1] - ticks[0]
-    const nextTick = Math.max(...yScale.ticks(handleNumTicks)) + tickGap
-    const divideBy = minValue < 0 ? maxValue / 2 : maxValue
-    const calculatedPadding = (nextTick - maxValue) / divideBy
-
-    // if auto padding is too close to next tick, add one more ticks worth of padding
-    const newPadding =
-      calculatedPadding > MINIMUM_DISTANCE_PERCENTAGE ? calculatedPadding : calculatedPadding + tickGap / divideBy
-
-    /* sometimes even though the padding is getting to the next tick exactly,
-    d3 still doesn't show the tick. we add 0.1 to ensure to tip it over the edge */
-    setYAxisAutoPadding(newPadding * 100 + 0.1)
-  }, [maxValue, labelsOverflow, yScale, handleNumTicks])
-
-  useEffect(() => {
     if (!tooltipOpen) return
     if (!tooltipRef.current) return
 
@@ -524,6 +505,19 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const maxWidth = rightSide ? dataXPosition - 10 : parentWidth - (dataXPosition + 6)
     tooltipRef.current.node.style.maxWidth = `${maxWidth}px`
   }, [tooltipOpen, tooltipData])
+
+  // Check if small multiples are enabled - if so, render SmallMultiples instead
+  if (config.smallMultiples?.mode) {
+    return (
+      <SmallMultiples
+        config={config}
+        data={data}
+        svgRef={svgRef}
+        parentWidth={parentWidth}
+        parentHeight={parentHeight}
+      />
+    )
+  }
 
   // Render Functions
   const generatePairedBarAxis = () => {
@@ -659,7 +653,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                     verticalAnchor='start'
                     fontSize={axisLabelFontSize}
                   >
-                    {runtime.xAxis.label}
+                    {!config.hideXAxisLabel ? runtime.xAxis.label : null}
                   </Text>
                 </Group>
               </>
@@ -679,7 +673,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
         className='tooltip-boundary'
       >
         <svg
-          ref={svgRef}
+          ref={internalSvgRef}
           onMouseMove={onMouseMove}
           width={parentWidth + config.yAxis.rightAxisSize}
           height={isNoDataAvailable ? 1 : parentHeight}
@@ -692,6 +686,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           onMouseLeave={() => {
             setShowHoverLine(false)
             handleChartMouseLeave()
+            onMouseLeave()
           }}
           onMouseEnter={() => {
             setShowHoverLine(true)
@@ -710,7 +705,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               {props => {
                 const axisCenter =
                   config.orientation === 'horizontal'
-                    ? (props.axisToPoint.y - props.axisFromPoint.y) / 2
+                    ? Math.abs(props.axisToPoint.y - props.axisFromPoint.y) / 2
                     : (props.axisFromPoint.y - props.axisToPoint.y) / 2
                 return (
                   <Group className='left-axis'>
@@ -744,7 +739,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       fill={config.yAxis.labelColor}
                       fontSize={axisLabelFontSize}
                     >
-                      {props.label}
+                      {!config.hideYAxisLabel ? props.label : null}
                     </Text>
                   </Group>
                 )
@@ -1044,7 +1039,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               {props => {
                 const axisCenter =
                   config.orientation === 'horizontal'
-                    ? (props.axisToPoint.y - props.axisFromPoint.y) / 2
+                    ? Math.abs(props.axisToPoint.y - props.axisFromPoint.y) / 2
                     : (props.axisFromPoint.y - props.axisToPoint.y) / 2
                 const horizontalTickOffset =
                   yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
@@ -1306,7 +1301,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       fill={config.yAxis.labelColor}
                       fontSize={axisLabelFontSize}
                     >
-                      {props.label}
+                      {!config.hideYAxisLabel ? props.label : null}
                     </Text>
                   </Group>
                 )
@@ -1420,7 +1415,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   : yMax
               }
               left={config.visualizationType !== 'Forest Plot' ? Number(runtime.yAxis.size) : 0}
-              label={runtime[section].label}
+              label={runtime.xAxis.label}
               tickFormat={handleBottomTickFormatting}
               scale={xScale}
               stroke='#333'
@@ -1554,7 +1549,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                               verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
                               textAnchor={tickRotation ? 'end' : 'middle'}
                               width={
-                                areTicksTouching && !config.isResponsiveTicks && !Number(config[section].tickRotation)
+                                areTicksTouching && !config.isResponsiveTicks && !Number(config.xAxis.tickRotation)
                                   ? limitedWidth
                                   : undefined
                               }
@@ -1579,7 +1574,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       fill={config.xAxis.labelColor}
                       fontSize={axisLabelFontSize}
                     >
-                      {props.label}
+                      {!config.hideXAxisLabel ? props.label : null}
                     </Text>
                   </Group>
                 )

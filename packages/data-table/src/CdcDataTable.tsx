@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer } from 'react'
+import { useCallback, useContext, useEffect, useReducer } from 'react'
 
 import DataTable from '@cdc/core/components/DataTable'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
@@ -10,7 +10,7 @@ import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import getViewport from '@cdc/core/helpers/getViewport'
 import { Visualization } from '@cdc/core/types/Visualization'
-
+import EditorContext from '@cdc/core/contexts/EditorContext'
 import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state.js'
 import { processData } from './helpers/dataHelpers'
@@ -25,6 +25,7 @@ type CdcDataTableProps = {
 
 const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTableProps) => {
   /* STORE */
+  const editorContext = useContext(EditorContext)
   const initialState = getInitialState(isEditor)
   const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -48,7 +49,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
 
   // processes initial config and sets state
   const initConfig = (newConfig: Config) => {
-    const updatedConfig = { ...coveUpdateWorker(newConfig), ...defaults }
+    const updatedConfig = { ...defaults, ...coveUpdateWorker(newConfig) }
     dispatch({ type: 'SET_CONFIG', payload: updatedConfig })
     dispatch({ type: 'SET_TABLE', payload: updatedConfig.table })
     dispatch({ type: 'SET_COLUMNS', payload: updatedConfig.columns })
@@ -124,6 +125,12 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
   useEffect(() => {
     loadData()
   }, [inputData, dataUrl, configLoading, invalidConfig, dataDescription])
+
+  useEffect(() => {
+    if (isEditor && config && editorContext?.setTempConfig) {
+      editorContext.setTempConfig(config)
+    }
+  }, [config, isEditor, editorContext])
 
   /* HANDLE LOADING/ERROR STATES */
   if (configLoading || dataLoading) return <Loading />

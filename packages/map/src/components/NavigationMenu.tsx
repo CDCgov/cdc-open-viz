@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import ConfigContext from '../context'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 
 const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoName, mapTabbingID }) => {
   const { interactionLabel, config } = useContext(ConfigContext)
@@ -65,19 +66,21 @@ const NavigationMenu = ({ data, navigationHandler, options, columns, displayGeoN
   return (
     <section className='navigation-menu'>
       <form onSubmit={handleSubmit} type='get'>
-        <label htmlFor={mapTabbingID.replace('#', '')}>
-          <div className='select-heading'>{navSelect}</div>
-          <div className='d-flex'>
-            <select value={activeGeo} id={mapTabbingID.replace('#', '')} onChange={e => setActiveGeo(e.target.value)}>
-              {Object.keys(dropdownItems).map(key => (
-                <option key={key} value={key}>
-                  {key}
-                </option>
-              ))}
-            </select>
-            <input type='submit' value={navGo} className={`${options.headerColor} btn`} id='cdcnavmap-dropdown-go' />
-          </div>
-        </label>
+        <div className='d-flex' style={{ alignItems: 'flex-end' }}>
+          <Select
+            label={navSelect}
+            value={activeGeo}
+            options={Object.keys(dropdownItems)}
+            onChange={e => setActiveGeo(e.target.value)}
+          />
+          <input
+            type='submit'
+            value={navGo}
+            className={`${options.headerColor} btn`}
+            id='cdcnavmap-dropdown-go'
+            style={{ height: '50px', width: '35%' }}
+          />
+        </div>
       </form>
     </section>
   )

@@ -12,6 +12,7 @@ import { type MapContext } from '../../../../types/MapContext'
 import Button from '@cdc/core/components/elements/Button'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
+import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 import './Panel.PatternSettings-style.css'
 import Alert from '@cdc/core/components/Alert'
 import _ from 'lodash'
@@ -196,21 +197,16 @@ const PatternSettings = ({ name }: PanelProps) => {
                           message='Error: <a href="https://webaim.org/resources/contrastchecker/" target="_blank"> Review Color Contrast</a>'
                         />
                       )}{' '}
-                      <label htmlFor={`pattern-dataKey--${patternIndex}`}>Data Key:</label>
-                      <select
-                        id={`pattern-dataKey--${patternIndex}`}
-                        value={pattern.dataKey !== '' ? pattern.dataKey : 'Select'}
-                        onChange={e => handlePatternFieldUpdate('dataKey', e.target.value, patternIndex)}
-                      >
-                        {/* TODO: sort these? */}
-                        {dataKeyOptions.map((d, index) => {
-                          return (
-                            <option value={d} key={index}>
-                              {d}
-                            </option>
-                          )
-                        })}
-                      </select>
+                      <Select
+                        label='Data Key:'
+                        value={pattern.dataKey}
+                        options={dataKeyOptions.filter(d => d !== 'Select')}
+                        initial='Select'
+                        fieldName={`pattern-dataKey--${patternIndex}`}
+                        updateField={(section, subsection, fieldName, value) =>
+                          handlePatternFieldUpdate('dataKey', value, patternIndex)
+                        }
+                      />
                       <label htmlFor={`pattern-dataValue--${patternIndex}`}>
                         Data Value:
                         <input
@@ -229,30 +225,24 @@ const PatternSettings = ({ name }: PanelProps) => {
                           value={pattern.label === '' ? '' : pattern.label}
                         />
                       </label>
-                      <label htmlFor={`pattern-type--${patternIndex}`}>Pattern Type:</label>
-                      <select
-                        id={`pattern-type--${patternIndex}`}
+                      <Select
+                        label='Pattern Type:'
                         value={pattern?.pattern}
-                        onChange={e => handlePatternFieldUpdate('pattern', e.target.value, patternIndex)}
-                      >
-                        {patternTypes.map((patternName, index) => (
-                          <option value={patternName} key={index}>
-                            {patternName}
-                          </option>
-                        ))}
-                      </select>
-                      <label htmlFor={`pattern-size--${patternIndex}`}>Pattern Size:</label>
-                      <select
-                        id={`pattern-size--${patternIndex}`}
+                        options={patternTypes}
+                        fieldName={`pattern-type--${patternIndex}`}
+                        updateField={(section, subsection, fieldName, value) =>
+                          handlePatternFieldUpdate('pattern', value, patternIndex)
+                        }
+                      />
+                      <Select
+                        label='Pattern Size:'
                         value={pattern?.size}
-                        onChange={e => handlePatternFieldUpdate('size', e.target.value, patternIndex)}
-                      >
-                        {['small', 'medium', 'large'].map((size, index) => (
-                          <option value={size} key={index}>
-                            {size}
-                          </option>
-                        ))}
-                      </select>
+                        options={['small', 'medium', 'large']}
+                        fieldName={`pattern-size--${patternIndex}`}
+                        updateField={(section, subsection, fieldName, value) =>
+                          handlePatternFieldUpdate('size', value, patternIndex)
+                        }
+                      />
                       <div className='pattern-input__color'>
                         <label htmlFor='patternColor'>
                           Pattern Color

@@ -8,7 +8,7 @@ import { AnyVisualization } from '@cdc/core/types/Visualization'
 
 const transform = new DataTransform()
 
-export const getFootnotesVizConfig = (
+const getFootnotesVizConfig = (
   visualizationConfig: AnyVisualization,
   rowNumber: number,
   config: MultiDashboardConfig,

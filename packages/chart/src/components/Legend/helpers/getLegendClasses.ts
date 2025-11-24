@@ -38,4 +38,3 @@ export const getLegendClasses = (config: ChartConfig) => {
     innerClasses
   }
 }
-export default getLegendClasses

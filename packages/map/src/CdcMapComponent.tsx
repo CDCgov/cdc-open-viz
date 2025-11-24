@@ -40,12 +40,14 @@ import {
   hashObj,
   navigationHandler
 } from './helpers'
-import generateRuntimeLegend from './helpers/generateRuntimeLegend'
+import { generateRuntimeLegend } from './helpers/generateRuntimeLegend'
+import { convertCustomColorsToOrdered } from './helpers/convertCustomColorsToOrdered'
 import generateRuntimeData from './helpers/generateRuntimeData'
 import { reloadURLData } from './helpers/urlDataHelpers'
 import { observeMapSvgLoaded } from './helpers/mapObserverHelpers'
 import { buildSectionClassNames } from './helpers/componentHelpers'
 import { shouldShowDataTable } from './helpers/dataTableHelpers'
+import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 
 // Child Components
 import Annotation from './components/Annotation'
@@ -169,7 +171,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const tooltipId = 'tooltipId'
 
   // hooks
-  const { currentViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
+  const { currentViewport, vizViewport, dimensions, container, outerContainerRef } = useResizeObserver(isEditor)
 
   useEffect(() => {
     if (!mapSvg.current || coveLoadedHasRan) return
@@ -229,7 +231,10 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     } else {
       if (hashLegend !== runtimeLegend?.fromHash && undefined === runtimeData?.init) {
         const legend = generateRuntimeLegend(
-          config,
+          {
+            ...config,
+            legend: { ...config.legend, unified: config.smallMultiples?.mode ? true : config.legend?.unified }
+          },
           runtimeData,
           hashLegend,
           setConfig,
@@ -238,6 +243,12 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
           legendSpecialClassLastMemo
         )
         dispatch({ type: 'SET_RUNTIME_LEGEND', payload: legend })
+
+        // Auto-convert customColors to customColorsOrdered based on runtime legend
+        const updatedConfig = convertCustomColorsToOrdered(config, legend)
+        if (updatedConfig) {
+          setConfig(updatedConfig)
+        }
       }
     }
   }, [config, configObj.data])
@@ -245,7 +256,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   useEffect(() => {
     const hashLegend = generateRuntimeLegendHash(config, runtimeFilters)
     const legend = generateRuntimeLegend(
-      { ...config, data: configObj.data },
+      {
+        ...config,
+        data: configObj.data,
+        legend: { ...config.legend, unified: config.smallMultiples?.mode ? true : config.legend?.unified }
+      },
       runtimeData,
       hashLegend,
       setConfig,
@@ -254,6 +269,14 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       legendSpecialClassLastMemo
     )
     dispatch({ type: 'SET_RUNTIME_LEGEND', payload: legend })
+
+    // Auto-convert customColors to customColorsOrdered based on runtime legend
+    // config.general.palette.customColors used random distributions before, so we need to update to use customColorsOrdered
+    // custom colors ordered is an explicit mapping of colors to legend items
+    const updatedConfig = convertCustomColorsToOrdered(config, legend)
+    if (updatedConfig) {
+      setConfig(updatedConfig)
+    }
   }, [runtimeData, config, runtimeFilters])
 
   useEffect(() => {
@@ -327,6 +350,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     container,
     content: modal,
     currentViewport,
+    vizViewport,
     customNavigationHandler,
     dimensions,
     filteredCountryCode,
@@ -378,6 +402,17 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       {config.dataKey} (Go to Table)
     </a>
   )
+
+  // Prepare data table props (pivot if small multiples mode is enabled)
+  let dataTableConfig = config
+  let dataTableColumns = columns
+  let dataTableRuntimeData = runtimeData
+  if (config.smallMultiples?.mode) {
+    const prepared = prepareSmallMultiplesDataTable(config, columns, runtimeData)
+    dataTableConfig = prepared.config
+    dataTableColumns = prepared.columns
+    dataTableRuntimeData = prepared.runtimeData
+  }
 
   return (
     <LegendMemoProvider legendMemo={legendMemo} legendSpecialClassLastMemo={legendSpecialClassLastMemo}>
@@ -487,13 +522,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
                   {shouldShowDataTable(config, table, general, loading) && (
                     <DataTable
-                      columns={columns}
-                      config={config}
+                      columns={dataTableColumns}
+                      config={dataTableConfig}
                       currentViewport={currentViewport}
                       displayGeoName={displayGeoName}
                       expandDataTable={table.expanded}
                       formatLegendLocation={key =>
-                        formatLegendLocation(key, runtimeData?.[key]?.[config.columns.geo.name])
+                        formatLegendLocation(key, dataTableRuntimeData?.[key]?.[config.columns.geo.name])
                       }
                       headerColor={general.headerColor}
                       imageRef={imageId}
@@ -503,8 +538,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       legendSpecialClassLastMemo={legendSpecialClassLastMemo}
                       navigationHandler={navigationHandler}
                       outerContainerRef={outerContainerRef}
-                      rawData={config.data}
-                      runtimeData={runtimeData}
+                      rawData={dataTableConfig.data}
+                      runtimeData={dataTableRuntimeData}
                       runtimeLegend={runtimeLegend}
                       showDownloadImgButton={showDownloadImgButton}
                       showDownloadPdfButton={showDownloadPdfButton}
@@ -526,16 +561,14 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 {accessibleStatus}
               </div>
 
-              {!isDraggingAnnotation &&
-                !window.matchMedia('(any-hover: none)').matches &&
-                'hover' === tooltips.appearanceType && (
-                  <ReactTooltip
-                    id={`tooltip__${tooltipId}`}
-                    float={true}
-                    className={`tooltip tooltip-test`}
-                    style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
-                  />
-                )}
+              {!isDraggingAnnotation && 'hover' === tooltips.appearanceType && (
+                <ReactTooltip
+                  id={`tooltip__${tooltipId}`}
+                  float={true}
+                  className={`tooltip tooltip-test`}
+                  style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
+                />
+              )}
               <div
                 ref={tooltipRef}
                 id={`tooltip__${tooltipId}-canvas`}
@@ -547,7 +580,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   display: 'none' // can't use d-none here
                 }}
               ></div>
-              <FootnotesStandAlone config={config.footnotes} filters={config.filters?.filter(f => f.filterFootnotes)} />
+              <FootnotesStandAlone
+                config={config.footnotes}
+                filters={config.filters?.filter(f => f.filterFootnotes)}
+                markupVariables={config.markupVariables}
+                enableMarkupVariables={config.enableMarkupVariables}
+                data={config.data}
+              />
             </Layout.Responsive>
           </Layout.VisualizationWrapper>
         </MapDispatchContext.Provider>

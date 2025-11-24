@@ -3,6 +3,8 @@ import CdcMap from '../CdcMap'
 import EqualNumberOptInExample from './_mock/DEV-7286.json'
 import EqualNumberMap from './_mock/equal-number.json'
 import MultiState from './_mock/multi-state.json'
+import MultiCountry from './_mock/multi-country.json'
+import MultiCountryHide from './_mock/multi-country-hide.json'
 import SingleStateWithFilters from './_mock/DEV-8942.json'
 import exampleCityState from './_mock/example-city-state.json'
 import USBubbleCities from './_mock/us-bubble-cities.json'
@@ -85,6 +87,18 @@ export const Multi_State: Story = {
   }
 }
 
+export const Multi_Country: Story = {
+  args: {
+    config: MultiCountry
+  }
+}
+
+export const Multi_Country_Hide_Mode: Story = {
+  args: {
+    config: MultiCountryHide
+  }
+}
+
 export const Bubble_Map: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-Bubble-Map-world.json'
@@ -138,13 +152,15 @@ let exampleCityStateStandardColors = editConfigKeys(exampleCityState, [
 ])
 export const Custom_Color_Distributions_With_Special_Classes: Story = {
   args: {
-    config: newConfig
+    config: newConfig,
+    isEditor: true
   }
 }
 
 export const Custom_Color_Distributions_Without_Special_Classes: Story = {
   args: {
-    config: editConfigKeys(newConfig, [{ path: ['legend', 'specialClasses'], value: [] }])
+    config: editConfigKeys(newConfig, [{ path: ['legend', 'specialClasses'], value: [] }]),
+    isEditor: true
   }
 }
 
@@ -157,13 +173,15 @@ export const Standard_Color_Distributions_With_Special_Classes: Story = {
 
 export const Standard_Color_Distributions_Without_Special_Classes: Story = {
   args: {
-    config: editConfigKeys(exampleCityStateStandardColors, [{ path: ['legend', 'specialClasses'], value: [] }])
+    config: editConfigKeys(exampleCityStateStandardColors, [{ path: ['legend', 'specialClasses'], value: [] }]),
+    isEditor: true
   }
 }
 
 export const Custom_Color_Distributions_With_Update_Needed: Story = {
   args: {
-    config: editConfigKeys(newConfig, [{ path: ['version'], value: '4.24.10' }])
+    config: editConfigKeys(newConfig, [{ path: ['version'], value: '4.24.10' }]),
+    isEditor: true
   }
 }
 
