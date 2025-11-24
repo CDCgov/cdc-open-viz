@@ -38,6 +38,7 @@ const BarChartStackedHorizontal = () => {
     hoveredBar,
     isHorizontal,
     isLabelBelowBar,
+    labelFontSize,
     onMouseLeaveBar,
     onMouseOverBar,
     barStackedSeriesKeys
@@ -286,6 +287,7 @@ const BarChartStackedHorizontal = () => {
                           fill={labelColor}
                           textAnchor='middle'
                           verticalAnchor='middle'
+                          fontSize={labelFontSize}
                         >
                           {xAxisValue}
                         </Text>

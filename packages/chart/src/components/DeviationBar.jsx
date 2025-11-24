@@ -9,6 +9,7 @@ import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { isV1Palette } from '@cdc/core/helpers/palettes/utils'
+import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 
 export default function DeviationBar({ height, xScale }) {
   const {
@@ -18,19 +19,20 @@ export default function DeviationBar({ height, xScale }) {
     twoColorPalette,
     parseDate,
     formatDate,
-    currentViewport
+    vizViewport
   } = useContext(ConfigContext)
   const { barStyle, tipRounding, roundingStyle, twoColor } = config
+  const labelFontSize = isMobileFontViewport(vizViewport) ? 13 : 16
   const barRefs = useRef([])
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const radius =
     roundingStyle === 'standard'
       ? '8px'
       : roundingStyle === 'shallow'
-        ? '5px'
-        : roundingStyle === 'finger'
-          ? '15px'
-          : '0px'
+      ? '5px'
+      : roundingStyle === 'finger'
+      ? '15px'
+      : '0px'
   const isRounded = config.barStyle === 'rounded'
   const target = Number(config.xAxis.target)
   const seriesKey = config.series[0].dataKey
@@ -223,7 +225,7 @@ export default function DeviationBar({ height, xScale }) {
                 ></div>
               </foreignObject>
               {config.yAxis.displayNumbersOnBar && (
-                <Text verticalAnchor='middle' x={textX} y={textY} {...textProps[barPosition]}>
+                <Text verticalAnchor='middle' x={textX} y={textY} {...textProps[barPosition]} fontSize={labelFontSize}>
                   {formatNumber(d[seriesKey], 'left')}
                 </Text>
               )}
