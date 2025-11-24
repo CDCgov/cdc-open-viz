@@ -2,6 +2,15 @@ export const getGradientConfig = (config, formatLabels, colorScale) => {
   const defaultValue = [{ datum: '', index: 0, text: '', value: '' }]
 
   const formatted = formatLabels(defaultValue)
+
+  // For Warming Stripes, always use the formatted labels which contain the gradient stops
+  if (config.visualizationType === 'Warming Stripes' && config.legend.style === 'gradient') {
+    // Extract the colors array from the first item (all items have the same color stops)
+    const colors = formatted[0]?.colors || formatted.map(label => label?.value).filter(Boolean)
+    const labels = formatted.map(label => label?.text || label?.datum)
+    return { colors, labels }
+  }
+
   const colors = config.legend.colorCode ? formatted.map(label => label?.value) : colorScale?.range() ?? []
   const labels = config.legend.colorCode
     ? formatted.map(label => label?.text || label?.datum)

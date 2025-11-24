@@ -697,8 +697,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           {!isDraggingAnnotation && <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>}{' '}
           {/* GRID LINES */}
           {/* Actual AxisLeft is drawn after visualization */}
-          {!['Spark Line', 'Forest Plot'].includes(visualizationType) && config.yAxis.type !== 'categorical' && (
-            <AxisLeft
+          {!['Spark Line', 'Forest Plot', 'Warming Stripes'].includes(visualizationType) &&
+            config.yAxis.type !== 'categorical' && (
+              <AxisLeft
               scale={yScale}
               left={Number(runtime.yAxis.size) - config.yAxis.axisPadding}
               numTicks={handleNumTicks}
@@ -1044,8 +1045,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           </Group>
           {/* Highlighted regions */}
           {/* Y axis */}
-          {!['Spark Line', 'Forest Plot'].includes(visualizationType) && config.yAxis.type !== 'categorical' && (
-            <AxisLeft
+          {!['Spark Line', 'Forest Plot', 'Warming Stripes'].includes(visualizationType) &&
+            config.yAxis.type !== 'categorical' && (
+              <AxisLeft
               scale={yScale}
               tickLength={isLogarithmicAxis ? 6 : 8}
               left={Number(runtime.yAxis.size) - config.yAxis.axisPadding}

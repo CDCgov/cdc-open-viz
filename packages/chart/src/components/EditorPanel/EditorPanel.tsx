@@ -978,6 +978,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         ) {
           options.push('gradient')
         }
+        if (config.visualizationType === 'Warming Stripes') {
+          options.push('gradient')
+        }
         if (config.visualizationType === 'Line') {
           options.push('lines')
         }
@@ -4045,7 +4048,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     fieldName='position'
                     label='Position'
                     updateField={updateFieldDeprecated}
-                    options={['right', 'left', 'bottom', 'top']}
+                    options={config.visualizationType === 'Warming Stripes' ? ['bottom'] : ['right', 'left', 'bottom', 'top']}
                   />
                   {(config.legend.position === 'left' ||
                     config.legend.position === 'right' ||

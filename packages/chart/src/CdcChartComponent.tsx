@@ -37,6 +37,7 @@ import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 
 import SparkLine from './components/Sparkline'
 import Legend from './components/Legend'
+import WarmingStripesGradientLegend from './components/WarmingStripes/WarmingStripesGradientLegend'
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import { abbreviateNumber } from './helpers/abbreviateNumber'
@@ -1293,13 +1294,18 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {/* Legend */}
                   {!config.legend.hide &&
                     config.visualizationType !== 'Spark Line' &&
-                    config.visualizationType !== 'Sankey' && (
+                    config.visualizationType !== 'Sankey' &&
+                    !(config.visualizationType === 'Warming Stripes' && config.legend?.style === 'gradient') &&
+                    !(config.visualizationType === 'Warming Stripes' && config.smallMultiples?.mode) && (
                       <Legend
                         ref={legendRef}
                         skipId={handleChartTabbing(config, legendId)}
                         interactionLabel={interactionLabel}
                       />
                     )}
+                  {config.visualizationType === 'Warming Stripes' &&
+                    config.legend?.style === 'gradient' &&
+                    !config.smallMultiples?.mode && <WarmingStripesGradientLegend />}
                 </LegendWrapper>
                 {/* Link */}
                 {isDashboard && config.table && config.table.show && config.table.showDataTableLink

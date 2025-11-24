@@ -32,7 +32,7 @@ const WarmingStripes = ({ xMax, yMax }: WarmingStripesProps) => {
   }
 
   // Determine max stripes based on viewport
-  const isMobile = ['xxs', 'xs', 'sm'].includes(currentViewport)
+  const isMobile = ['xxs', 'xs', 'sm', 'md'].includes(currentViewport)
   const maxStripes = isMobile ? 60 : 200
 
   // Sample data if we have more than the max allowed stripes
