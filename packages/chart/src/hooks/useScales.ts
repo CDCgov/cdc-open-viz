@@ -92,15 +92,17 @@ const useScales = (properties: useScaleProps) => {
 
   // Apply auto-padding if needed
   if (needsYAxisAutoPadding && !isHorizontal) {
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
       const scale = composeYScale({ min, max, yMax, config, leftMax })
       const padding = getYAxisAutoPadding(scale, handleNumTicks, maxValue, minValue, config)
-      const adjustedConfig = { ...config, yAxis: { ...config.yAxis, scalePadding: padding, enablePadding: true } }
-      const result = getMinMax({ ...minMaxProps, config: adjustedConfig })
-      min = result.min
-      max = result.max
-      leftMax = result.leftMax
-      rightMax = result.rightMax
+      if (i === 0 || padding > 0) {
+        const adjustedConfig = { ...config, yAxis: { ...config.yAxis, scalePadding: padding, enablePadding: true } }
+        const result = getMinMax({ ...minMaxProps, config: adjustedConfig })
+        min = result.min
+        max = result.max
+        leftMax = result.leftMax
+        rightMax = result.rightMax
+      }
     }
   }
 
