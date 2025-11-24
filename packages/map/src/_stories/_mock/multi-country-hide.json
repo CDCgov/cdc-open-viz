@@ -1,0 +1,78 @@
+{
+  "general": {
+    "title": "Multi-Country Selection - Hide Mode",
+    "subtext": "Shows only selected countries (others hidden)",
+    "type": "data",
+    "geoType": "world",
+    "headerColor": "theme-green",
+    "geoBorderColor": "darkGray",
+    "showSidebar": true,
+    "showTitle": true,
+    "showDownloadButton": true,
+    "expandDataTable": false,
+    "territoriesLabel": "Territories",
+    "language": "en",
+    "hasRegions": false,
+    "fullBorder": false,
+    "countriesPicked": [
+      { "iso": "JPN", "name": "Japan" },
+      { "iso": "KOR", "name": "South Korea" },
+      { "iso": "SGP", "name": "Singapore" },
+      { "iso": "AUS", "name": "Australia" }
+    ],
+    "hideUnselectedCountries": true
+  },
+  "type": "map",
+  "color": "orangered",
+  "columns": {
+    "geo": {
+      "name": "Country",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "name": "Data",
+      "label": "Sample Data",
+      "prefix": "",
+      "suffix": "%",
+      "dataTable": true,
+      "tooltip": true
+    },
+    "navigate": {
+      "name": "URL",
+      "tooltip": false,
+      "dataTable": false
+    }
+  },
+  "legend": {
+    "numberOfItems": 4,
+    "position": "side",
+    "title": "Sample Data",
+    "description": "Hide mode - only selected countries visible",
+    "type": "equalinterval",
+    "specialClasses": [],
+    "separateZero": false,
+    "unified": false,
+    "singleColumn": false,
+    "singleRow": false
+  },
+  "data": [
+    {
+      "Country": "Japan",
+      "Data": 85.3
+    },
+    {
+      "Country": "South Korea",
+      "Data": 78.9
+    },
+    {
+      "Country": "Singapore",
+      "Data": 92.1
+    },
+    {
+      "Country": "Australia",
+      "Data": 81.7
+    }
+  ]
+}

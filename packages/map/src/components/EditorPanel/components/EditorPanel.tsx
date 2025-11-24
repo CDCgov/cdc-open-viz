@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useMemo } from 'react'
+import React, { useContext, useEffect, useState, useMemo, useRef } from 'react'
 import { filterColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 
@@ -20,7 +20,8 @@ import Layout from '@cdc/core/components/Layout'
 
 // Data
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
-import { supportedStatesFipsCodes } from '../../../data/supported-geos.js'
+import { supportedStatesFipsCodes, supportedCountries } from '../../../data/supported-geos.js'
+import { getSupportedCountryOptions } from '../../../helpers/getCountriesPicked'
 
 // Components - Core
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
@@ -47,8 +48,12 @@ import { MapContext } from '../../../types/MapContext.js'
 import Alert from '@cdc/core/components/Alert'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
-import { addUIDs, HEADER_COLORS } from '../../../helpers'
+import { addUIDs } from '../../../helpers'
+import generateRuntimeData from '../../../helpers/generateRuntimeData'
+
+import '@cdc/core/styles/v2/components/editor.scss'
 import './editorPanel.styles.css'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
@@ -56,8 +61,10 @@ import MultiSelect from '@cdc/core/components/MultiSelect'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { isV1Palette, getCurrentPaletteName, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
+import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
 import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
+import { CustomColorsEditor } from '@cdc/core/components/CustomColorsEditor'
 
 type MapEditorPanelProps = {
   datasets?: Datasets
@@ -80,7 +87,28 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const { columnsRequiredChecker } = useColumnsRequiredChecker()
   const dispatch = useContext(MapDispatchContext)
   const { general, columns, legend, table, tooltips } = config
-  const columnsInData = config?.data?.[0] ? Object.keys(config.data[0]) : []
+
+  // Get columns from data with fallback to datasets (for dashboard context)
+  const columnsInData = useMemo(() => {
+    // First try config.data
+    if (config?.data?.[0]) {
+      return Object.keys(config.data[0])
+    }
+
+    // Fallback to datasets using config.dataKey (for dashboard visualizations)
+    if (datasets && config?.dataKey) {
+      const assignedDataset = datasets[config.dataKey]
+      if (assignedDataset?.data?.[0]) {
+        return Object.keys(assignedDataset.data[0])
+      }
+    }
+
+    return []
+  }, [
+    config?.data?.length > 0 ? JSON.stringify(Object.keys(config.data[0])) : null,
+    datasets?.[config?.dataKey as string]?.data?.length,
+    config?.dataKey
+  ])
 
   const [loadedDefault, setLoadedDefault] = useState(false)
   const [displayPanel, setDisplayPanel] = useState(true)
@@ -94,13 +122,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const {
     MapLayerHandlers: { handleMapLayer, handleAddLayer, handleRemoveLayer }
   } = useMapLayers(config, setConfig, false, tooltipId)
-
-  useEffect(() => {
-    // Pass up to Editor if needed
-    if (setParentConfig) {
-      setParentConfig(convertStateToConfig())
-    }
-  }, [config])
 
   const categoryMove = (idx1, idx2) => {
     let categoryValuesOrder = getCategoryValuesOrder()
@@ -703,7 +724,26 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
         })
 
         if (config) {
-          const newData = generateRuntimeData(config)
+          const newData = generateRuntimeData(config, [], 0, legend.type === 'category')
+          dispatch({ type: 'SET_RUNTIME_DATA', payload: newData })
+        }
+        break
+      case 'chooseCountry':
+        let countryData = value.map(countryName => ({
+          iso: Object.keys(supportedCountries).find(key => supportedCountries[key][0] === countryName),
+          name: countryName
+        }))
+
+        setConfig({
+          ...config,
+          general: {
+            ...config.general,
+            countriesPicked: countryData
+          }
+        })
+
+        if (config) {
+          const newData = generateRuntimeData(config, [], 0, legend.type === 'category')
           dispatch({ type: 'SET_RUNTIME_DATA', payload: newData })
         }
         break
@@ -983,17 +1023,19 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     return currentPaletteName === palette ? 'selected' : ''
   }
 
+  const configStringRef = useRef<string>()
+
   useEffect(() => {
     setLoadedDefault(config.defaultData)
     columnsRequiredChecker()
   }, [config])
 
-  useEffect(() => {
-    const newConfig = convertStateToConfig()
-    if (isEditor && setParentConfig) {
-      setParentConfig(newConfig)
-    }
-  }, [config])
+  // Only update parent when config content actually changes (not just reference)
+  const configString = JSON.stringify(convertStateToConfig())
+  if (isEditor && setParentConfig && configStringRef.current !== configString) {
+    configStringRef.current = configString
+    setParentConfig(JSON.parse(configString))
+  }
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -1054,6 +1096,16 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     })
 
     return options
+  }
+
+  const CountryOptionList = () => {
+    const countryOptions = getSupportedCountryOptions()
+
+    return countryOptions.map(({ value, label }) => (
+      <option key={value} value={label}>
+        {label}
+      </option>
+    ))
   }
 
   const filterValueOptionList = []
@@ -1262,6 +1314,34 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   />
                 </label>
               )}
+              {/* Country Selection for World Maps */}
+              {config.general.geoType === 'world' && (
+                <>
+                  <label>
+                    <span>Countries Selector</span>
+                    <MultiSelect
+                      selected={(config.general.countriesPicked || []).map(country => country.name)}
+                      options={CountryOptionList().map(option => ({
+                        value: option.props.value,
+                        label: option.props.children
+                      }))}
+                      fieldName={'countriesPicked'}
+                      updateField={(_, __, ___, selectedOptions) => {
+                        handleEditorChanges('chooseCountry', selectedOptions)
+                      }}
+                    />
+                  </label>
+                  {config.general.countriesPicked && config.general.countriesPicked.length > 0 && (
+                    <CheckBox
+                      value={config.general.hideUnselectedCountries || false}
+                      fieldName='hideUnselectedCountries'
+                      label='Hide Unselected Countries'
+                      updateField={updateField}
+                      section='general'
+                    />
+                  )}
+                </>
+              )}
               {/* Type */}
               <Select
                 label={
@@ -1339,37 +1419,35 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
               {/* Display as Hex */}
               {general.geoType === 'us' && general.type !== 'navigation' && general.type !== 'bubble' && (
-                <label className='checkbox mt-4'>
-                  <input
-                    type='checkbox'
-                    checked={config.general.displayAsHex}
-                    onChange={event => {
-                      const _newConfig = cloneConfig(config)
-                      _newConfig.general.displayAsHex = event.target.checked
-                      setConfig(_newConfig)
-                    }}
-                  />
-                  <span className='edit-label'>Display As Hex Map</span>
-                </label>
+                <CheckBox
+                  value={config.general.displayAsHex}
+                  section='general'
+                  subsection={null}
+                  fieldName='displayAsHex'
+                  label='Display As Hex Map'
+                  updateField={updateField}
+                  className=''
+                />
               )}
 
               {/* Shapes on Hex */}
-              <label className='checkbox mt-4'>
-                <input
-                  type='checkbox'
-                  checked={config.hexMap.type === 'shapes'}
-                  onChange={event => {
-                    setConfig({
-                      ...config,
-                      hexMap: {
-                        ...config.hexMap,
-                        type: event.target.checked ? 'shapes' : 'standard'
-                      }
-                    })
-                  }}
-                />
-                <span className='edit-label'>Display Shapes on Hex Map</span>
-              </label>
+              <CheckBox
+                value={config.hexMap.type === 'shapes'}
+                section='hexMap'
+                subsection={null}
+                fieldName='type'
+                label='Display Shapes on Hex Map'
+                updateField={updateField}
+                onChange={event => {
+                  setConfig({
+                    ...config,
+                    hexMap: {
+                      ...config.hexMap,
+                      type: event.target.checked ? 'shapes' : 'standard'
+                    }
+                  })
+                }}
+              />
               <HexSetting.ShapeColumns columnsOptions={columnsOptions} />
 
               {'us' === config.general.geoType &&
@@ -1395,18 +1473,14 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 )}
 
               {'us' === config.general.geoType && (
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={general.territoriesAlwaysShow || false}
-                    onChange={event => {
-                      const _newConfig = cloneConfig(config)
-                      _newConfig.general.territoriesAlwaysShow = event.target.checked
-                      setConfig(_newConfig)
-                    }}
-                  />
-                  <span className='edit-label'>Show All Territories</span>
-                </label>
+                <CheckBox
+                  value={general.territoriesAlwaysShow || false}
+                  section='general'
+                  subsection={null}
+                  fieldName='territoriesAlwaysShow'
+                  label='Show All Territories'
+                  updateField={updateField}
+                />
               )}
             </AccordionItemPanel>
           </AccordionItem>
@@ -1439,18 +1513,14 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   </Tooltip>
                 }
               />
-              <label className='checkbox'>
-                <input
-                  type='checkbox'
-                  checked={config.general.showTitle || false}
-                  onChange={event => {
-                    const _newConfig = cloneConfig(config)
-                    _newConfig.general.showTitle = event.target.checked
-                    setConfig(_newConfig)
-                  }}
-                />
-                <span className='edit-label'>Show Title</span>
-              </label>
+              <CheckBox
+                value={config.general.showTitle || false}
+                section='general'
+                subsection={null}
+                fieldName='showTitle'
+                label='Show Title'
+                updateField={updateField}
+              />
               <TextField
                 value={general.superTitle || ''}
                 updateField={updateField}
@@ -1560,41 +1630,28 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     options={columnsOptions.map(c => c.key)}
                     onChange={event => {
                       editColumn('geo', 'name', event.target.value)
-                      checkConfigurationNeeded(config)
                     }}
                   />
                 </label>
                 {config.general.type === 'us-geocode' && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={config.general.convertFipsCodes}
-                      onChange={event => {
-                        setConfig({
-                          ...config,
-                          general: {
-                            ...config.general,
-                            convertFipsCodes: event.target.checked
-                          }
-                        })
-                      }}
-                    />
-                    <span className='edit-label'>Convert FIPS Codes to Geography Name</span>
-                  </label>
+                  <CheckBox
+                    value={config.general.convertFipsCodes}
+                    section='general'
+                    subsection={null}
+                    fieldName='convertFipsCodes'
+                    label='Convert FIPS Codes to Geography Name'
+                    updateField={updateField}
+                  />
                 )}
 
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={config.general.hideGeoColumnInTooltip || false}
-                    onChange={event => {
-                      const _newConfig = cloneConfig(config)
-                      _newConfig.general.hideGeoColumnInTooltip = event.target.checked
-                      setConfig(_newConfig)
-                    }}
-                  />
-                  <span className='edit-label'>Hide Geography Column Name in Tooltip</span>
-                </label>
+                <CheckBox
+                  value={config.general.hideGeoColumnInTooltip || false}
+                  section='general'
+                  subsection={null}
+                  fieldName='hideGeoColumnInTooltip'
+                  label='Hide Geography Column Name in Tooltip'
+                  updateField={updateField}
+                />
                 <TextField
                   value={config.general.geoLabelOverride}
                   section='general'
@@ -1625,7 +1682,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       _state.columns.primary.name = event.target.value
                       _state.columns.primary.label = event.target.value
                       setConfig(_state)
-                      checkConfigurationNeeded(_state)
                     }}
                     tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
@@ -1638,15 +1694,18 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       </Tooltip>
                     }
                   />
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={config.general.hidePrimaryColumnInTooltip || false}
+                  <label>
+                    <CheckBox
+                      value={config.general.hidePrimaryColumnInTooltip || false}
+                      section='general'
+                      subsection={null}
+                      fieldName='hidePrimaryColumnInTooltip'
+                      label='Hide Data Column Name in Tooltip'
+                      updateField={updateField}
                       onChange={event => {
                         handleEditorChanges('hidePrimaryColumnInTooltip', event.target.checked)
                       }}
                     />
-                    <span className='edit-label'>Hide Data Column Name in Tooltip</span>
                   </label>
                   <TextField
                     value={columns.primary.label}
@@ -1695,42 +1754,30 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         min={0}
                       />
                     </li>
-                    <li>
-                      <label className='checkbox'>
-                        <input
-                          type='checkbox'
-                          checked={config.columns.primary.useCommas}
-                          onChange={event => {
-                            editColumn('primary', 'useCommas', event.target.checked)
-                          }}
-                        />
-                        <span className='edit-label'>Add Commas to Numbers</span>
-                      </label>
-                    </li>
-                    <li>
-                      <label className='checkbox'>
-                        <input
-                          type='checkbox'
-                          checked={config.columns.primary.dataTable || false}
-                          onChange={event => {
-                            editColumn('primary', 'dataTable', event.target.checked)
-                          }}
-                        />
-                        <span className='edit-label'>Show in Data Table</span>
-                      </label>
-                    </li>
-                    <li>
-                      <label className='checkbox'>
-                        <input
-                          type='checkbox'
-                          checked={config.columns.primary.tooltip || false}
-                          onChange={event => {
-                            editColumn('primary', 'tooltip', event.target.checked)
-                          }}
-                        />
-                        <span className='edit-label'>Show in Tooltips</span>
-                      </label>
-                    </li>
+                    <CheckBox
+                      value={config.columns.primary.useCommas}
+                      section='columns'
+                      subsection='primary'
+                      fieldName='useCommas'
+                      label='Add Commas to Numbers'
+                      updateField={updateField}
+                    />
+                    <CheckBox
+                      value={config.columns.primary.dataTable || false}
+                      section='columns'
+                      subsection='primary'
+                      fieldName='dataTable'
+                      label='Show in Data Table'
+                      updateField={updateField}
+                    />
+                    <CheckBox
+                      value={config.columns.primary.tooltip || false}
+                      section='columns'
+                      subsection='primary'
+                      fieldName='tooltip'
+                      label='Show in Tooltips'
+                      updateField={updateField}
+                    />
                   </ul>
                 </fieldset>
               )}
@@ -1749,14 +1796,14 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         </Tooltip.Content>
                       </Tooltip>
                     </span>
-                    <select
-                      value={config.columns.categorical ? config.columns.categorical.name : columnsOptions[0]}
+                    <Select
+                      label=''
+                      value={config.columns.categorical ? config.columns.categorical.name : columnsOptions[0]?.key}
+                      options={columnsOptions.map(c => c.key)}
                       onChange={event => {
                         editColumn('categorical', 'name', event.target.value)
                       }}
-                    >
-                      {columnsOptions}
-                    </select>
+                    />
                   </label>
                 </fieldset>
               )}
@@ -1979,42 +2026,39 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             updateField={updateField}
                           />
                         </li>
-                        <li>
-                          <label className='checkbox'>
-                            <input
-                              type='checkbox'
-                              checked={config.columns[val].useCommas}
-                              onChange={event => {
-                                editColumn(val, 'useCommas', event.target.checked)
-                              }}
-                            />
-                            <span className='edit-label'>Add Commas to Numbers</span>
-                          </label>
-                        </li>
-                        <li>
-                          <label className='checkbox'>
-                            <input
-                              type='checkbox'
-                              checked={config.columns[val].dataTable}
-                              onChange={event => {
-                                editColumn(val, 'dataTable', event.target.checked)
-                              }}
-                            />
-                            <span className='edit-label'>Show in Data Table</span>
-                          </label>
-                        </li>
-                        <li>
-                          <label className='checkbox'>
-                            <input
-                              type='checkbox'
-                              checked={config.columns[val].tooltip}
-                              onChange={event => {
-                                editColumn(val, 'tooltip', event.target.checked)
-                              }}
-                            />
-                            <span className='edit-label'>Show in Tooltips</span>
-                          </label>
-                        </li>
+                        <CheckBox
+                          value={config.columns[val].useCommas}
+                          section='columns'
+                          subsection={val}
+                          fieldName='useCommas'
+                          label='Add Commas to Numbers'
+                          updateField={updateField}
+                          onChange={event => {
+                            editColumn(val, 'useCommas', event.target.checked)
+                          }}
+                        />
+                        <CheckBox
+                          value={config.columns[val].dataTable}
+                          section='columns'
+                          subsection={val}
+                          fieldName='dataTable'
+                          label='Show in Data Table'
+                          updateField={updateField}
+                          onChange={event => {
+                            editColumn(val, 'dataTable', event.target.checked)
+                          }}
+                        />
+                        <CheckBox
+                          value={config.columns[val].tooltip}
+                          section='columns'
+                          subsection={val}
+                          fieldName='tooltip'
+                          label='Show in Tooltips'
+                          updateField={updateField}
+                          onChange={event => {
+                            editColumn(val, 'tooltip', event.target.checked)
+                          }}
+                        />
                       </ul>
                     </fieldset>
                   ))}
@@ -2133,18 +2177,14 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   />
                 )}
                 {'navigation' !== config.general.type && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={config.general.showSidebar || false}
-                      onChange={event => {
-                        const _newConfig = cloneConfig(config)
-                        _newConfig.general.showSidebar = event.target.checked
-                        setConfig(_newConfig)
-                      }}
-                    />
-                    <span className='edit-label'>Show Legend</span>
-                  </label>
+                  <CheckBox
+                    value={config.general.showSidebar || false}
+                    section='general'
+                    subsection={null}
+                    fieldName='showSidebar'
+                    label='Show Legend'
+                    updateField={updateField}
+                  />
                 )}
                 {'navigation' !== config.general.type && (
                   <>
@@ -2201,18 +2241,14 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   />
                 )}
                 {'navigation' !== config.general.type && config.legend.style === 'gradient' && (
-                  <label>
-                    <span className='edit-label'>Gradient Style</span>
-                    <select
-                      value={legend.subStyle || ''}
-                      onChange={event => {
-                        handleEditorChanges('legendSubStyle', event.target.value)
-                      }}
-                    >
-                      <option value='linear blocks'>linear blocks</option>
-                      <option value='smooth'>smooth</option>
-                    </select>
-                  </label>
+                  <Select
+                    label='Gradient Style'
+                    value={legend.subStyle || ''}
+                    options={['linear blocks', 'smooth']}
+                    onChange={event => {
+                      handleEditorChanges('legendSubStyle', event.target.value)
+                    }}
+                  />
                 )}
                 {allowLegendSeparators && (
                   <TextField
@@ -2250,61 +2286,66 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   </label>
                 )}
                 {
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={legend.hideBorder}
-                      onChange={event => {
-                        handleEditorChanges('legendBorder', event.target.checked)
-                      }}
-                    />
-                    <span className='edit-label column-heading'>Hide Legend Box</span>
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon
-                          display='question'
-                          style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                        />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p> Default option for top and bottom legends is ‘No Box.’</p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  </label>
+                  <CheckBox
+                    value={legend.hideBorder}
+                    section='legend'
+                    subsection={null}
+                    fieldName='hideBorder'
+                    label='Hide Legend Box'
+                    updateField={updateField}
+                    onChange={event => {
+                      handleEditorChanges('legendBorder', event.target.checked)
+                    }}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display='question'
+                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p> Default option for top and bottom legends is 'No Box.'</p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                 }
                 {'side' === legend.position && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={legend.singleColumn}
-                      onChange={event => {
-                        const _newConfig = cloneConfig(config)
-                        _newConfig.legend.singleColumn = event.target.checked
-                        _newConfig.legend.singleRow = false
-                        _newConfig.legend.verticalSorted = false
+                  <CheckBox
+                    value={legend.singleColumn}
+                    section='legend'
+                    subsection={null}
+                    fieldName='singleColumn'
+                    label='Single Column Legend'
+                    updateField={updateField}
+                    onChange={event => {
+                      const _newConfig = cloneConfig(config)
+                      _newConfig.legend.singleColumn = event.target.checked
+                      _newConfig.legend.singleRow = false
+                      _newConfig.legend.verticalSorted = false
 
-                        setConfig(_newConfig)
-                      }}
-                    />
-                    <span className='edit-label'>Single Column Legend</span>
-                  </label>
+                      setConfig(_newConfig)
+                    }}
+                  />
                 )}
                 {'side' !== legend.position && legend.style !== 'gradient' && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={legend.singleRow}
-                      onChange={event => {
-                        const _newConfig = cloneConfig(config)
-                        _newConfig.legend.singleRow = event.target.checked
-                        _newConfig.legend.singleColumn = false
-                        _newConfig.legend.verticalSorted = false
+                  <CheckBox
+                    value={legend.singleRow}
+                    section='legend'
+                    subsection={null}
+                    fieldName='singleRow'
+                    label='Single Row Legend'
+                    updateField={updateField}
+                    onChange={event => {
+                      const _newConfig = cloneConfig(config)
+                      _newConfig.legend.singleRow = event.target.checked
+                      _newConfig.legend.singleColumn = false
+                      _newConfig.legend.verticalSorted = false
 
-                        setConfig(_newConfig)
-                      }}
-                    />
-                    <span className='edit-label'>Single Row Legend</span>
-                  </label>
+                      setConfig(_newConfig)
+                    }}
+                  />
                 )}
 
                 {'navigation' !== config.general.type && config.legend.type === 'category' && (
@@ -2320,46 +2361,39 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   />
                 )}
                 {config.legend.style !== 'gradient' && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={legend.verticalSorted}
-                      onChange={event => {
-                        const _newConfig = cloneConfig(config)
-                        _newConfig.legend.verticalSorted = event.target.checked
-                        setConfig(_newConfig)
-                      }}
-                    />
-                    <span className='edit-label'>Vertical sorted legend</span>
-                  </label>
+                  <CheckBox
+                    value={legend.verticalSorted}
+                    section='legend'
+                    subsection={null}
+                    fieldName='verticalSorted'
+                    label='Vertical sorted legend'
+                    updateField={updateField}
+                  />
                 )}
 
                 {/* always show */}
                 {
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={legend.showSpecialClassesLast}
-                      onChange={event => {
-                        handleEditorChanges('legendShowSpecialClassesLast', event.target.checked)
-                      }}
-                    />
-                    <span className='edit-label'>Show Special Classes Last</span>
-                  </label>
+                  <CheckBox
+                    value={legend.showSpecialClassesLast}
+                    section='legend'
+                    subsection={null}
+                    fieldName='showSpecialClassesLast'
+                    label='Show Special Classes Last'
+                    updateField={updateField}
+                    onChange={event => {
+                      handleEditorChanges('legendShowSpecialClassesLast', event.target.checked)
+                    }}
+                  />
                 }
                 {'category' !== legend.type && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={legend.separateZero || false}
-                      onChange={event => {
-                        const _newConfig = cloneConfig(config)
-                        _newConfig.legend.separateZero = event.target.checked
-                        return setConfig(_newConfig)
-                      }}
-                    />
-                    <span className='edit-label column-heading'>
-                      Separate Zero
+                  <CheckBox
+                    value={legend.separateZero || false}
+                    section='legend'
+                    subsection={null}
+                    fieldName='separateZero'
+                    label='Separate Zero'
+                    updateField={updateField}
+                    tooltip={
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
                           <Icon
@@ -2371,35 +2405,33 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           <p>For numeric data, you can separate the zero value as its own data class.</p>
                         </Tooltip.Content>
                       </Tooltip>
-                    </span>
-                  </label>
+                    }
+                  />
                 )}
 
                 {/* Temp Checkbox */}
                 {config.legend.type === 'equalnumber' && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={config.general.equalNumberOptIn}
-                      onChange={event => {
-                        const _newConfig = _.clone(config)
-                        _newConfig.general.equalNumberOptIn = event.target.checked
-                        setConfig(_newConfig)
-                      }}
-                    />
-                    <span className='edit-label column-heading'>Use new quantile legend</span>
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon
-                          display='question'
-                          style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                        />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>This prevents numbers from being used in more than one category (ie. 0-1, 1-2, 2-3) </p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  </label>
+                  <CheckBox
+                    value={config.general.equalNumberOptIn}
+                    section='general'
+                    subsection={null}
+                    fieldName='equalNumberOptIn'
+                    label='Use new quantile legend'
+                    updateField={updateField}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon
+                            display='question'
+                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                          />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>This prevents numbers from being used in more than one category (ie. 0-1, 1-2, 2-3) </p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                 )}
 
                 {'category' !== legend.type && (
@@ -2512,59 +2544,59 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   </React.Fragment>
                 )}
                 {config.filters.length > 0 && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={legend.dynamicDescription}
+                  <label className='checkbox column-heading'>
+                    <CheckBox
+                      value={legend.dynamicDescription}
+                      section='legend'
+                      subsection={null}
+                      fieldName='dynamicDescription'
+                      label='Dynamic Legend Description'
+                      updateField={updateField}
                       onChange={() => {
                         handleEditorChanges('dynamicDescription', filterValueOptionList[0])
                       }}
                     />
-                    <span className='edit-label column-heading'>
-                      Dynamic Legend Description
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>
-                            Check this option if the map has multiple filter controls and you want to specify a
-                            description for each filter selection.
-                          </p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    </span>
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon
+                          display='question'
+                          style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                        />
+                      </Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>
+                          Check this option if the map has multiple filter controls and you want to specify a
+                          description for each filter selection.
+                        </p>
+                      </Tooltip.Content>
+                    </Tooltip>
                   </label>
                 )}
-                {(config.filters.length > 0 || config.general.type === 'bubble' || config.general.geoType === 'us') && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={legend.unified}
-                      onChange={event => handleEditorChanges('unifiedLegend', event.target.checked)}
-                    />
-                    <span className='edit-label column-heading'>
-                      Unified Legend
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>
-                            For a map with filters, check this option if you want the high and low values in the legend
-                            to be based on <em>all</em> mapped values.
-                          </p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    </span>
-                  </label>
-                )}
+                <span className='d-flex mt-2'>
+                  <CheckBox
+                    value={legend.unified}
+                    section='legend'
+                    subsection={null}
+                    fieldName='unified'
+                    label='Unified Legend'
+                    updateField={updateField}
+                    onChange={event => handleEditorChanges('unifiedLegend', event.target.checked)}
+                  />
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon
+                        display='question'
+                        style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                      />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p>
+                        Check this option if you want the high and low values in the legend to be based on <em>all</em>{' '}
+                        mapped values (useful for maps with filters or small multiples).
+                      </p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                </span>
               </AccordionItemPanel>
             </AccordionItem>
           )}
@@ -2621,32 +2653,26 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     </Tooltip>
                   }
                 />
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={config.table.wrapColumns}
-                    onChange={event => {
-                      setConfig({
-                        ...config,
-                        table: {
-                          ...config.table,
-                          wrapColumns: event.target.checked
-                        }
-                      })
-                    }}
-                  />
-                  <span className='edit-label column-heading'>WRAP DATA TABLE COLUMNS</span>
-                </label>
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={config.table.forceDisplay !== undefined ? config.table.forceDisplay : !isDashboard}
-                    onChange={event => {
-                      handleEditorChanges('showDataTable', event.target.checked)
-                    }}
-                  />
-                  <span className='edit-label column-heading'>
-                    Show Data Table
+                <CheckBox
+                  value={config.table.wrapColumns}
+                  section='table'
+                  subsection={null}
+                  fieldName='wrapColumns'
+                  label='WRAP DATA TABLE COLUMNS'
+                  updateField={updateField}
+                  className='column-heading'
+                />
+                <CheckBox
+                  value={config.table.forceDisplay !== undefined ? config.table.forceDisplay : !isDashboard}
+                  section='table'
+                  subsection={null}
+                  fieldName='forceDisplay'
+                  label='Show Data Table'
+                  updateField={updateField}
+                  onChange={event => {
+                    handleEditorChanges('showDataTable', event.target.checked)
+                  }}
+                  tooltip={
                     <Tooltip style={{ textTransform: 'none' }}>
                       <Tooltip.Target>
                         <Icon
@@ -2661,24 +2687,17 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         </p>
                       </Tooltip.Content>
                     </Tooltip>
-                  </span>
-                </label>
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={config.table.showNonGeoData}
-                    onChange={event => {
-                      setConfig({
-                        ...config,
-                        table: {
-                          ...config.table,
-                          showNonGeoData: event.target.checked
-                        }
-                      })
-                    }}
-                  />
-                  <span className='edit-label column-heading'>
-                    Show Non Geographic Data
+                  }
+                />
+
+                <CheckBox
+                  value={config.table.showNonGeoData}
+                  section='table'
+                  subsection={null}
+                  fieldName='showNonGeoData'
+                  label='Show Non Geographic Data'
+                  updateField={updateField}
+                  tooltip={
                     <Tooltip style={{ textTransform: 'none' }}>
                       <Tooltip.Target>
                         <Icon
@@ -2690,8 +2709,9 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         <p>Show any data not associated with a geographic location</p>
                       </Tooltip.Content>
                     </Tooltip>
-                  </span>
-                </label>
+                  }
+                />
+
                 <TextField
                   value={table.indexLabel || ''}
                   updateField={updateField}
@@ -2732,16 +2752,17 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   }
                   type='textarea'
                 />
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={config.table.limitHeight}
-                    onChange={event => {
-                      handleEditorChanges('limitDataTableHeight', event.target.checked)
-                    }}
-                  />
-                  <span className='edit-label'>Limit Table Height</span>
-                </label>
+                <CheckBox
+                  value={config.table.limitHeight}
+                  section='table'
+                  subsection={null}
+                  fieldName='limitHeight'
+                  label='Limit Table Height'
+                  updateField={updateField}
+                  onChange={event => {
+                    handleEditorChanges('limitDataTableHeight', event.target.checked)
+                  }}
+                />
                 {config.table.limitHeight && (
                   <TextField
                     value={table.height}
@@ -2767,16 +2788,17 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   max='500'
                 />
 
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={config.table.expanded || false}
-                    onChange={event => {
-                      handleEditorChanges('expandDataTable', event.target.checked)
-                    }}
-                  />
-                  <span className='edit-label'>Map loads with data table expanded</span>
-                </label>
+                <CheckBox
+                  value={config.table.expanded || false}
+                  section='table'
+                  subsection={null}
+                  fieldName='expanded'
+                  label='Map loads with data table expanded'
+                  updateField={updateField}
+                  onChange={event => {
+                    handleEditorChanges('expandDataTable', event.target.checked)
+                  }}
+                />
                 <CheckBox
                   value={config.table.download}
                   fieldName='download'
@@ -2786,17 +2808,18 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 />
                 {config.table.download && (
                   <>
-                    <label className='checkbox'>
-                      <input
-                        type='checkbox'
-                        className='ms-4'
-                        checked={config.table.showDownloadLinkBelow}
-                        onChange={event => {
-                          handleEditorChanges('toggleDownloadLinkBelow', event.target.checked)
-                        }}
-                      />
-                      <span className='edit-label'>Show Link Below Table</span>
-                    </label>
+                    <CheckBox
+                      value={config.table.showDownloadLinkBelow}
+                      section='table'
+                      subsection={null}
+                      fieldName='showDownloadLinkBelow'
+                      label='Show Link Below Table'
+                      updateField={updateField}
+                      className='ms-4'
+                      onChange={event => {
+                        handleEditorChanges('toggleDownloadLinkBelow', event.target.checked)
+                      }}
+                    />
                     <CheckBox
                       value={config.table.downloadVisibleDataOnly}
                       fieldName='downloadVisibleDataOnly'
@@ -2808,53 +2831,47 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   </>
                 )}
                 {isDashboard && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={config.table.showDataTableLink}
-                      onChange={event => {
-                        const _newConfig = cloneConfig(config)
-                        _newConfig.table.showDataTableLink = event.target.checked
-                        setConfig(_newConfig)
-                      }}
-                    />
-                    <span className='edit-label'>Show Data Table Name & Link</span>
-                  </label>
+                  <CheckBox
+                    value={config.table.showDataTableLink}
+                    section='table'
+                    subsection={null}
+                    fieldName='showDataTableLink'
+                    label='Show Data Table Name & Link'
+                    updateField={updateField}
+                  />
                 )}
                 {isLoadedFromUrl && (
-                  <label className='checkbox'>
-                    <input
-                      type='checkbox'
-                      checked={config.table.showDownloadUrl}
-                      onChange={event => {
-                        const _newConfig = cloneConfig(config)
-                        _newConfig.table.showDownloadUrl = event.target.checked
-                        setConfig(_newConfig)
-                      }}
-                    />
-                    <span className='edit-label'>Show URL to Automatically Updated Data</span>
-                  </label>
+                  <CheckBox
+                    value={config.table.showDownloadUrl}
+                    section='table'
+                    subsection={null}
+                    fieldName='showDownloadUrl'
+                    label='Show URL to Automatically Updated Data'
+                    updateField={updateField}
+                  />
                 )}
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={config.table.showFullGeoNameInCSV}
-                    onChange={event => {
-                      handleEditorChanges('toggleShowFullGeoNameInCSV', event.target.checked)
-                    }}
-                  />
-                  <span className='edit-label'>Include Full Geo Name in CSV Download</span>
-                </label>
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={config.general.showDownloadImgButton}
-                    onChange={event => {
-                      handleEditorChanges('toggleDownloadImgButton', event.target.checked)
-                    }}
-                  />
-                  <span className='edit-label'>Enable Image Download</span>
-                </label>
+                <CheckBox
+                  value={config.table.showFullGeoNameInCSV}
+                  section='table'
+                  subsection={null}
+                  fieldName='showFullGeoNameInCSV'
+                  label='Include Full Geo Name in CSV Download'
+                  updateField={updateField}
+                  onChange={event => {
+                    handleEditorChanges('toggleShowFullGeoNameInCSV', event.target.checked)
+                  }}
+                />
+                <CheckBox
+                  value={config.general.showDownloadImgButton}
+                  section='general'
+                  subsection={null}
+                  fieldName='showDownloadImgButton'
+                  label='Enable Image Download'
+                  updateField={updateField}
+                  onChange={event => {
+                    handleEditorChanges('toggleDownloadImgButton', event.target.checked)
+                  }}
+                />
 
                 {/* <label className='checkbox'>
                       <input
@@ -2919,47 +2936,32 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
               <AccordionItemButton>Visual</AccordionItemButton>
             </AccordionItemHeading>
             <AccordionItemPanel>
-              <label>
-                <span className='edit-label'>Header Theme</span>
-                <ul className='color-palette'>
-                  {HEADER_COLORS.map(palette => {
-                    return (
-                      <li
-                        title={palette}
-                        key={palette}
-                        onClick={() => {
-                          handleEditorChanges('headerColor', palette)
-                        }}
-                        className={config.general.headerColor === palette ? 'selected ' + palette : palette}
-                      ></li>
-                    )
-                  })}
-                </ul>
-              </label>
-              <label className='checkbox'>
-                <input
-                  type='checkbox'
-                  checked={config.general.showTitle || false}
-                  onChange={event => {
-                    handleEditorChanges('showTitle', event.target.checked)
-                  }}
-                />
-                <span className='edit-label'>Show Title</span>
-              </label>
+              <HeaderThemeSelector
+                selectedTheme={config.general.headerColor}
+                onThemeSelect={palette => handleEditorChanges('headerColor', palette)}
+                label='Header Theme'
+              />
+              <CheckBox
+                value={config.general.showTitle || false}
+                section='general'
+                subsection={null}
+                fieldName='showTitle'
+                label='Show Title'
+                updateField={updateField}
+                onChange={event => {
+                  handleEditorChanges('showTitle', event.target.checked)
+                }}
+              />
 
               {'navigation' === config.general.type && (
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={config.general.fullBorder || false}
-                    onChange={event => {
-                      const _newConfig = cloneConfig(config)
-                      _newConfig.general.fullBorder = event.target.checked
-                      setConfig(_newConfig)
-                    }}
-                  />
-                  <span className='edit-label'>Add border around map</span>
-                </label>
+                <CheckBox
+                  value={config.general.fullBorder || false}
+                  section='general'
+                  subsection={null}
+                  fieldName='fullBorder'
+                  label='Add border around map'
+                  updateField={updateField}
+                />
               )}
               <Select
                 label='Geo Border Color'
@@ -3018,7 +3020,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 selectedPalette={getCurrentPaletteName(config)}
                 colorIndices={[2, 3, 5]}
                 className='color-palette'
-                element='li'
+                element='button'
                 getItemClassName={getPaletteClassName}
               />
               <span>Non-Sequential</span>
@@ -3030,7 +3032,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 selectedPalette={getCurrentPaletteName(config)}
                 colorIndices={[2, 3, 5]}
                 className='color-palette'
-                element='li'
+                element='button'
                 getItemClassName={getPaletteClassName}
                 minColorsForFilter={(_, paletteAccessor, config) => {
                   if (paletteAccessor.length <= 8 && config.general.geoType === 'us-region') {
@@ -3048,7 +3050,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 selectedPalette={getCurrentPaletteName(config)}
                 colorIndices={[2, 3, 5]}
                 className='color-palette'
-                element='li'
+                element='button'
                 getItemClassName={getPaletteClassName}
                 minColorsForFilter={(_, paletteAccessor, config) => {
                   if (paletteAccessor.length <= 8 && config.general.geoType === 'us-region') {
@@ -3057,6 +3059,71 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   return true
                 }}
               />
+
+              {isCoveDeveloperMode() && (
+                <>
+                  <div className='mt-3'>
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={!!config.general.palette.customColorsOrdered}
+                        onChange={e => {
+                          const _state = cloneConfig(config)
+                          if (e.target.checked) {
+                            // Extract actual colors from runtime legend if available
+                            if (runtimeLegend?.items && runtimeLegend.items.length > 0) {
+                              const extractedColors = []
+                              for (const item of runtimeLegend.items) {
+                                // Skip special classes (like "No Data")
+                                if (item.special) continue
+                                // Add the color if it exists and hasn't been added yet
+                                if (item.color && !extractedColors.includes(item.color)) {
+                                  extractedColors.push(item.color)
+                                }
+                              }
+                              _state.general.palette.customColorsOrdered =
+                                extractedColors.length > 0
+                                  ? extractedColors
+                                  : ['#3366cc', '#5588dd', '#77aaee', '#99ccff']
+                            } else {
+                              // Fallback to default colors if runtime legend not available
+                              _state.general.palette.customColorsOrdered = ['#3366cc', '#5588dd', '#77aaee', '#99ccff']
+                            }
+                          } else {
+                            // Remove custom colors and revert to default palette
+                            delete _state.general.palette.customColorsOrdered
+                            delete _state.general.palette.customColors
+                            // Set default palette if none exists
+                            if (!_state.general.palette.name) {
+                              _state.general.palette.name = 'sequential_blue_green'
+                              _state.general.palette.version = '2.0'
+                            }
+                          }
+                          setConfig(_state)
+                        }}
+                      />
+                      Use Custom Colors
+                    </label>
+                  </div>
+
+                  {config.general.palette.customColorsOrdered && (
+                    <div className='mt-2'>
+                      <CustomColorsEditor
+                        colors={config.general.palette.customColorsOrdered}
+                        onChange={newColors => {
+                          const _state = cloneConfig(config)
+                          _state.general.palette.customColorsOrdered = newColors
+                          setConfig(_state)
+                        }}
+                        label='Custom Color Order'
+                        minColors={1}
+                        maxColors={20}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+
               <label>
                 Geocode Settings
                 <TextField
@@ -3139,22 +3206,21 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                 config.general.geoType === 'us-county' ||
                 config.general.geoType === 'world') && (
                 <>
-                  <label>
-                    <span className='edit-label'>Default City Style</span>
-                    <select
-                      value={config.visual.cityStyle || false}
-                      onChange={event => {
-                        handleEditorChanges('handleCityStyle', event.target.value)
-                      }}
-                    >
-                      <option value='circle'>Circle</option>
-                      <option value='pin'>Pin</option>
-                      <option value='square'>Square</option>
-                      <option value='triangle'>Triangle</option>
-                      <option value='diamond'>Diamond</option>
-                      <option value='star'>Star</option>
-                    </select>
-                  </label>
+                  <Select
+                    label='Default City Style'
+                    value={config.visual.cityStyle || 'circle'}
+                    options={[
+                      { value: 'circle', label: 'Circle' },
+                      { value: 'pin', label: 'Pin' },
+                      { value: 'square', label: 'Square' },
+                      { value: 'triangle', label: 'Triangle' },
+                      { value: 'diamond', label: 'Diamond' },
+                      { value: 'star', label: 'Star' }
+                    ]}
+                    onChange={event => {
+                      handleEditorChanges('handleCityStyle', event.target.value)
+                    }}
+                  />
                   <TextField
                     value={config.visual.cityStyleLabel}
                     section='visual'
@@ -3190,17 +3256,14 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           Remove
                         </button>
                         <p>City Style {i + 1}</p>
-                        <label>
-                          <span className='edit-label column-heading'>Column with configuration value</span>
-                          <select
-                            value={column}
-                            onChange={e => {
-                              editCityStyles('update', i, 'column', e.target.value)
-                            }}
-                          >
-                            {columnsOptions}
-                          </select>
-                        </label>
+                        <Select
+                          label='Column with configuration value'
+                          value={column}
+                          options={columnsOptions.map(c => c.key)}
+                          onChange={e => {
+                            editCityStyles('update', i, 'column', e.target.value)
+                          }}
+                        />
                         <label>
                           <span className='edit-label column-heading'>Value to Trigger</span>
                           <input
@@ -3211,17 +3274,19 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             }}
                           ></input>
                         </label>
-                        <label>
-                          <span className='edit-label column-heading'>Shape</span>
-                          <select
-                            value={shape}
-                            onChange={e => {
-                              editCityStyles('update', i, 'shape', e.target.value)
-                            }}
-                          >
-                            {getCityStyleOptions('value')}
-                          </select>
-                        </label>
+                        <Select
+                          label='Shape'
+                          value={shape}
+                          options={[
+                            { value: '', label: '- Select Option -' },
+                            ...['Circle', 'Square', 'Triangle', 'Diamond', 'Star', 'Pin']
+                              .filter(val => String(config.visual.cityStyle).toLowerCase() !== val.toLowerCase())
+                              .map(val => ({ value: val, label: val }))
+                          ]}
+                          onChange={e => {
+                            editCityStyles('update', i, 'shape', e.target.value)
+                          }}
+                        />
                         <label>
                           <span className='edit-label column-heading'>Label</span>
                           <input
@@ -3374,6 +3439,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
             onMarkupVariablesChange={variables => setConfig({ ...config, markupVariables: variables })}
             onToggleEnable={enabled => setConfig({ ...config, enableMarkupVariables: enabled })}
           />
+          <Panels.SmallMultiples name='Small Multiples' />
         </Accordion>
         <AdvancedEditor loadConfig={setConfig} config={config} convertStateToConfig={convertStateToConfig} />
       </Layout.Sidebar>

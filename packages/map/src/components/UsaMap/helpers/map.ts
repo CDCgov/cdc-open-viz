@@ -1,7 +1,7 @@
 import { feature } from 'topojson-client'
 import usExtendedGeography from './../data/us-extended-geography.json'
 
-export const getCountyTopoURL = year => {
+const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
 }
 
@@ -85,7 +85,7 @@ export const isTopoReady = (topoData, state, runtimeFilters) => {
   return topoData?.year && (!currentYear || currentYear === topoData?.year)
 }
 
-export const hasMoreThanFromHash = (data: { [key: string]: any }): boolean => {
+const hasMoreThanFromHash = (data: { [key: string]: any }): boolean => {
   // Get all keys of the data object
   const keys = Object.keys(data)
 

@@ -1,0 +1,95 @@
+{
+  "general": {
+    "title": "Multi-Country Selection Demo - European Focus",
+    "subtext": "Demonstrates country selection with show whole map toggle",
+    "type": "data",
+    "geoType": "world",
+    "headerColor": "theme-blue",
+    "geoBorderColor": "darkGray",
+    "showSidebar": true,
+    "showTitle": true,
+    "showDownloadButton": true,
+    "expandDataTable": false,
+    "territoriesLabel": "Territories",
+    "language": "en",
+    "hasRegions": false,
+    "fullBorder": false,
+    "countriesPicked": [
+      { "iso": "FRA", "name": "France" },
+      { "iso": "DEU", "name": "Germany" },
+      { "iso": "ITA", "name": "Italy" },
+      { "iso": "ESP", "name": "Spain" },
+      { "iso": "GBR", "name": "United Kingdom" }
+    ],
+    "hideUnselectedCountries": false
+  },
+  "type": "map",
+  "color": "bluegreen",
+  "columns": {
+    "geo": {
+      "name": "Country",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "name": "Data",
+      "label": "Sample Data",
+      "prefix": "",
+      "suffix": "%",
+      "dataTable": true,
+      "tooltip": true
+    },
+    "navigate": {
+      "name": "URL",
+      "tooltip": false,
+      "dataTable": false
+    }
+  },
+  "legend": {
+    "numberOfItems": 4,
+    "position": "side",
+    "title": "Sample Data",
+    "description": "Multi-country selection example",
+    "type": "equalinterval",
+    "specialClasses": [],
+    "separateZero": false,
+    "unified": false,
+    "singleColumn": false,
+    "singleRow": false
+  },
+  "data": [
+    {
+      "Country": "France",
+      "Data": 75.2
+    },
+    {
+      "Country": "Germany",
+      "Data": 82.1
+    },
+    {
+      "Country": "Italy",
+      "Data": 68.9
+    },
+    {
+      "Country": "Spain",
+      "Data": 71.3
+    },
+    {
+      "Country": "United Kingdom",
+      "Data": 79.8
+    },
+    {
+      "Country": "Norway",
+      "Data": 45.2
+    },
+    {
+      "Country": "Sweden",
+      "Data": 52.1
+    },
+    {
+      "Country": "Poland",
+      "Data": 38.7
+    }
+  ]
+}

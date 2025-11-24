@@ -47,17 +47,24 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
     })
   }
 
-  const handleFitlerGroupColumnNameChange = selectedOption => {
-    const selectedOptionDatasetName = selectedOption.selectedOptions[0].dataset.set
-    const newColumnName = selectedOption.value
+  const handleFitlerGroupColumnNameChange = (value: string) => {
+    if (!value) {
+      updateFilterProp('columnName', '')
+      updateFilterProp('defaultValue', '')
+      return
+    }
+    const [newColumnName, selectedOptionDatasetName] = value.split('|')
     updateFilterProp('columnName', newColumnName)
     updateFilterProp('defaultValue', '') // Reset default value when column changes
     populateSubGroupingOptions(selectedOptionDatasetName, newColumnName)
   }
 
-  const handleSubGroupColumnNameChange = selectedOption => {
-    const selectedOptionDatasetName = selectedOption.selectedOptions[0].dataset.set
-    const newColumnName = selectedOption.value
+  const handleSubGroupColumnNameChange = (value: string) => {
+    if (!value) {
+      updateFilterProp('subGrouping', { ...subGrouping, columnName: '', valuesLookup: {}, defaultValue: '' })
+      return
+    }
+    const [newColumnName, selectedOptionDatasetName] = value.split('|')
 
     const valuesLookup = filter.values.reduce((acc, groupName) => {
       const values: string[] = _.uniq(
@@ -94,51 +101,44 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
           updateField={(_section, _subSection, _key, value) => updateFilterProp('key', value)}
         />
       )}
-      <label>
-        <div className='edit-label column-heading mt-2'>
-          Filter Grouping
-          <span></span>
-        </div>
-        <select value={filter.columnName} onChange={e => handleFitlerGroupColumnNameChange(e.target)}>
-          <option value=''>- Select Option -</option>
-          {columnNameOptionsInDataset?.map(option => (
-            <option
-              value={option.columnName}
-              data-set={option.datasetKey}
-              key={`filter_${option.datasetKey}_${option.columnName} `}
-            >
-              {option.columnName}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        <div className='edit-label column-heading mt-2'>
-          Filter SubGrouping
-          <span></span>
-        </div>
-        <select
-          value={subGrouping?.columnName ?? ''}
-          onChange={e => {
-            handleSubGroupColumnNameChange(e.target)
-          }}
-        >
-          <option value=''>- Select Option -</option>
-          {columnNameOptionsInDataset.map(option => {
-            if (option.columnName !== filter.columnName) {
-              return (
-                <option
-                  value={option.columnName}
-                  data-set={option.datasetKey}
-                  key={`subFilter_${option.datasetKey}_${option.columnName} `}
-                >
-                  {option.columnName}
-                </option>
-              )
-            }
-          })}
-        </select>
-      </label>
+      <Select
+        label='Filter Grouping'
+        value={
+          filter.columnName
+            ? `${filter.columnName}|${
+                columnNameOptionsInDataset.find(opt => opt.columnName === filter.columnName)?.datasetKey || ''
+              }`
+            : ''
+        }
+        options={[
+          { value: '', label: '- Select Option -' },
+          ...columnNameOptionsInDataset.map(option => ({
+            value: `${option.columnName}|${option.datasetKey}`,
+            label: option.columnName
+          }))
+        ]}
+        onChange={e => handleFitlerGroupColumnNameChange(e.target.value)}
+      />
+      <Select
+        label='Filter SubGrouping'
+        value={
+          subGrouping?.columnName
+            ? `${subGrouping.columnName}|${
+                columnNameOptionsInDataset.find(opt => opt.columnName === subGrouping.columnName)?.datasetKey || ''
+              }`
+            : ''
+        }
+        options={[
+          { value: '', label: '- Select Option -' },
+          ...columnNameOptionsInDataset
+            .filter(option => option.columnName !== filter.columnName)
+            .map(option => ({
+              value: `${option.columnName}|${option.datasetKey}`,
+              label: option.columnName
+            }))
+        ]}
+        onChange={e => handleSubGroupColumnNameChange(e.target.value)}
+      />
 
       {/* Default Value for Main Group */}
       {filter.columnName && filter.values && filter.values.length > 0 && (

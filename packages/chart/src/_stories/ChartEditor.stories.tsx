@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { userEvent, within } from 'storybook/test'
 import Chart from '../CdcChartComponent'
 import pieChartExample from './_mock/pie_config.json'
-import pieData from './_mock/pie_data.json'
 import urlFilterExample from './_mock/url_filter.json'
 import mockScatterPlot from './_mock/scatterplot_mock.json'
 
@@ -15,7 +14,7 @@ type Story = StoryObj<typeof Chart>
 
 export const Primary: Story = {
   args: {
-    config: { ...pieChartExample, data: pieData, columns: { someCol: { name: 'females', showInViz: true } } },
+    config: { ...pieChartExample },
     isEditor: true
   }
 }

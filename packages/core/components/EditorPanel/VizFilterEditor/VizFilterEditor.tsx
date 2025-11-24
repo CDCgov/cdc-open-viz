@@ -28,6 +28,16 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
     return _.uniq(_.flatten(rawData?.map(row => Object.keys(row))))
   }, [rawData])
 
+  // Helper function to get filter values from various sources
+  const getFilterValues = (filter: VizFilter) => {
+    if (filter.values && filter.values.length > 0) return filter.values
+    if (filter.orderedValues && filter.orderedValues.length > 0) return filter.orderedValues
+    if (filter.columnName && rawData && rawData.length > 0) {
+      return _.uniq(rawData.map(row => row[filter.columnName]))
+    }
+    return []
+  }
+
   const removeFilter = index => {
     let filters = _.cloneDeep(config.filters)
 
@@ -188,8 +198,8 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                           value={filter.defaultValue}
                           options={
                             filter.resetLabel
-                              ? [filter.resetLabel, ...config.filters?.[filterIndex].values]
-                              : config.filters?.[filterIndex].values
+                              ? [filter.resetLabel, ...getFilterValues(filter)]
+                              : getFilterValues(filter)
                           }
                           updateField={(_section, _subSection, _key, value) => {
                             updateFilterDefaultValue(filterIndex, value)

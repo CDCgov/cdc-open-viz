@@ -598,5 +598,3 @@ export const generateRuntimeLegend = (
     }
   }
 }
-
-export default generateRuntimeLegend

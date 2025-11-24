@@ -501,8 +501,20 @@ const CountyMap = () => {
           const distance = Math.hypot(pixelCoords[0] - x, pixelCoords[1] - y)
           if (
             distance < 15 &&
-            applyLegendToRow(runtimeData[runtimeKeys[i]], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo) &&
-            !isLegendItemDisabled(runtimeData[runtimeKeys[i]], runtimeLegend, legendMemo, legendSpecialClassLastMemo, config)
+            applyLegendToRow(
+              runtimeData[runtimeKeys[i]],
+              config,
+              runtimeLegend,
+              legendMemo,
+              legendSpecialClassLastMemo
+            ) &&
+            !isLegendItemDisabled(
+              runtimeData[runtimeKeys[i]],
+              runtimeLegend,
+              legendMemo,
+              legendSpecialClassLastMemo,
+              config
+            )
           ) {
             hoveredGeo = runtimeData[runtimeKeys[i]]
             hoveredGeoIndex = i

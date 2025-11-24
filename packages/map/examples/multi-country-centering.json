@@ -1,0 +1,45 @@
+{
+  "data": [
+    {
+      "geo": "US",
+      "value": 100
+    },
+    {
+      "geo": "CA",
+      "value": 200
+    },
+    {
+      "geo": "MX",
+      "value": 150
+    }
+  ],
+  "columns": {
+    "geo": {
+      "name": "geo"
+    },
+    "primary": {
+      "name": "value"
+    }
+  },
+  "type": "world",
+  "general": {
+    "geoType": "world",
+    "type": "data",
+    "title": "Multi-Country Centering Test",
+    "showTitle": true,
+    "countriesPicked": [
+      { "iso": "US", "name": "United States" },
+      { "iso": "CA", "name": "Canada" },
+      { "iso": "MX", "name": "Mexico" }
+    ],
+    "hideUnselectedCountries": true,
+    "allowMapZoom": true
+  },
+  "legend": {
+    "descriptions": {
+      "US": "United States",
+      "CA": "Canada",
+      "MX": "Mexico"
+    }
+  }
+}

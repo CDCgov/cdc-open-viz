@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 
 // Local context and hooks
 import ConfigContext from '../../../ConfigContext'
@@ -26,7 +26,7 @@ import _ from 'lodash'
 import { getBarData } from '../helpers/getBarData'
 import { getHorizontalBarHeights } from '../helpers/getBarHeights'
 
-export const BarChartHorizontal = () => {
+const BarChartHorizontal = () => {
   const { xScale, yScale, yMax, seriesScale, barChart } = useContext<BarChartContextValues>(BarChartContext)
   const {
     isHorizontal,
@@ -54,12 +54,12 @@ export const BarChartHorizontal = () => {
     formatDate,
     parseDate,
     setSharedFilter,
-    currentViewport
+    vizViewport
   } = useContext<ChartContext>(ConfigContext)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
-  const LABEL_FONT_SIZE = isMobileFontViewport(currentViewport) ? 13 : 16
+  const LABEL_FONT_SIZE = isMobileFontViewport(vizViewport) ? 13 : 16
 
   const hasConfidenceInterval = [config.confidenceKeys?.upper, config.confidenceKeys?.lower].every(
     v => v != null && String(v).trim() !== ''

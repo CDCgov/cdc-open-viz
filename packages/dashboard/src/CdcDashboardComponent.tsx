@@ -23,7 +23,7 @@ import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import getViewport from '@cdc/core/helpers/getViewport'
 
 import Grid from './components/Grid'
-import Header from './components/Header/Header'
+import Header from './components/Header'
 import DataTable from '@cdc/core/components/DataTable'
 import MediaControls from '@cdc/core/components/MediaControls'
 
@@ -32,7 +32,7 @@ import './scss/main.scss'
 import VisualizationsPanel from './components/VisualizationsPanel'
 import dashboardReducer from './store/dashboard.reducer'
 import errorMessagesReducer from './store/errorMessage/errorMessage.reducer'
-import { filterData } from './helpers/filterData'
+import { filterData, isFilterAtResetState } from './helpers/filterData'
 import { getVizKeys } from './helpers/getVizKeys'
 import Title from '@cdc/core/components/ui/Title'
 import { type TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
@@ -89,10 +89,17 @@ export default function CdcDashboard({
       return true
     }
 
+    // Check if any filters are at their reset state (incomplete)
+    const sharedFilters = state.config.dashboard?.sharedFilters || []
+    const hasResetFilters = sharedFilters.some(isFilterAtResetState)
+    if (hasResetFilters) {
+      return true
+    }
+
     const vals = reloadURLHelpers.getDatasetKeys(state.config).map(key => state.data[key])
     if (!vals.length) return true
     return vals.some(val => val === undefined)
-  }, [state.data, state.config.visualizations, state.filtersApplied])
+  }, [state.data, state.config.visualizations, state.config.dashboard?.sharedFilters, state.filtersApplied])
 
   const vizRowColumnLocator = getVizRowColumnLocator(state.config.rows)
 
@@ -165,9 +172,13 @@ export default function CdcDashboard({
             }
 
             if (filter.apiFilter && filter.active) {
-              updatedQSParams[filter.apiFilter.valueSelector] = filter.active
-              if (filter.apiFilter.subgroupValueSelector && filter.subGrouping.active) {
-                updatedQSParams[filter.apiFilter.subgroupValueSelector] = filter.subGrouping.active
+              // Don't add filter to query params if it's set to its resetLabel
+              const isResetLabel = filter.resetLabel && filter.active === filter.resetLabel
+              if (!isResetLabel) {
+                updatedQSParams[filter.apiFilter.valueSelector] = filter.active
+                if (filter.apiFilter.subgroupValueSelector && filter.subGrouping.active) {
+                  updatedQSParams[filter.apiFilter.subgroupValueSelector] = filter.subGrouping.active
+                }
               }
             }
           }
@@ -292,8 +303,6 @@ export default function CdcDashboard({
   }
 
   const setEventData = ({ detail }, data, filteredData) => {
-    // eslint-disable-next-line no-console
-    console.log('Event: cove_set_data', detail)
     try {
       const newDatasets = Object.keys(detail).reduce((acc, key) => {
         if (data[key] !== undefined) {

@@ -1,4 +1,4 @@
-export type RuntimeLegendItem = {
+type RuntimeLegendItem = {
   disabled?: boolean
   bin?: number
   color?: string

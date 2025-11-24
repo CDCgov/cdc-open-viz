@@ -1,9 +1,9 @@
-import { MapConfig, Coordinate } from '../types/MapConfig'
-import { GeneratedLegend } from '../hooks/useGenerateRuntimeLegend'
-import { VizFilter } from '@cdc/core/types/VizFilter'
+import { type MapConfig, type Coordinate } from '../types/MapConfig'
+import { type RuntimeLegend } from '../types/runtimeLegend'
+import { type VizFilter } from '@cdc/core/types/VizFilter'
 import { type Action } from '@cdc/core/types/Action'
-import { RuntimeData } from '../types/RuntimeData'
-import { Modal } from '../types/Modal'
+import { type RuntimeData } from '../types/RuntimeData'
+import { type Modal } from '../types/Modal'
 
 // Action Types
 type SET_ACCESSIBLE_STATUS = Action<'SET_ACCESSIBLE_STATUS', string>
@@ -18,13 +18,13 @@ type SET_POSITION = Action<'SET_POSITION', { coordinates: Coordinate; zoom: numb
 type SET_REQUIRED_COLUMNS = Action<'SET_REQUIRED_COLUMNS', string[]>
 type SET_RUNTIME_DATA = Action<'SET_RUNTIME_DATA', RuntimeData>
 type SET_RUNTIME_FILTERS = Action<'SET_RUNTIME_FILTERS', VizFilter[]>
-type SET_RUNTIME_LEGEND = Action<'SET_RUNTIME_LEGEND', GeneratedLegend | []>
+type SET_RUNTIME_LEGEND = Action<'SET_RUNTIME_LEGEND', RuntimeLegend | []>
 type SET_SCALE = Action<'SET_SCALE', number>
 type SET_STATES_TO_SHOW = Action<'SET_STATES_TO_SHOW', string[]>
 type SET_TOPO_DATA = Action<'SET_TOPO_DATA', any>
 type SET_TRANSLATE = Action<'SET_TRANSLATE', [number, number]>
 
-export type MapActions =
+type MapActions =
   | SET_ACCESSIBLE_STATUS
   | SET_CONFIG
   | SET_COVE_LOADED_HAS_RAN
