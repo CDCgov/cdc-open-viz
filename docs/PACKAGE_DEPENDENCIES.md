@@ -104,12 +104,6 @@ Individual visualization packages should be self-contained:
 3. **Reusability**: Individual packages can be consumed separately without pulling in unnecessary dependencies
 4. **Maintainability**: Clear separation makes the codebase easier to understand and modify
 
-### Special Cases
-
-- **Core**: Foundation layer providing shared infrastructure (utilities, types, base components). Cannot depend on other packages to prevent circular dependencies.
-- **Dashboard**: Acts as a composition root, combining multiple visualizations. Can import from all packages.
-- **Editor**: Needs access to all components for configuration UI and live previews. Can import from all packages.
-
 ## Exemptions
 
 ### Storybook Stories
