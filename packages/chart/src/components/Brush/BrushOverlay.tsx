@@ -130,11 +130,24 @@ MiniChartPreview.displayName = 'MiniChartPreview'
 const BrushOverlay: FC<BrushOverlayProps> = ({ xMax, yMax }) => {
   const brushRef = useRef<BaseBrush>(null)
   const hasInitialized = useRef(false)
+  const mouseDownPos = useRef<{ x: number; y: number } | null>(null)
+  const isMouseDown = useRef<boolean>(false)
+  const previousExtent = useRef<{ x0: number; x1: number } | null>(null)
 
   const { tableData, config, colorScale } = useContext(ConfigContext)
   const dispatch = useContext(ChartDispatchContext)
   const dataKey = config.xAxis.dataKey
   const series = config.series || []
+
+  // Capture initial brush extent after mount
+  useEffect(() => {
+    if (brushRef.current && brushRef.current.state.extent.x0 !== -1 && !previousExtent.current) {
+      previousExtent.current = {
+        x0: brushRef.current.state.extent.x0,
+        x1: brushRef.current.state.extent.x1
+      }
+    }
+  }, [brushRef.current?.state])
 
   // X scale for brush data - ensure positive dimensions
   const xScale = useMemo(() => {
@@ -298,6 +311,161 @@ const BrushOverlay: FC<BrushOverlayProps> = ({ xMax, yMax }) => {
     []
   )
 
+  // Track when brush interaction starts (mouse down) with position
+  const handleBrushStart = (start: any) => {
+    isMouseDown.current = true
+
+    // Store the starting mouse position (from the brush start object)
+    if (start && start.x !== undefined) {
+      mouseDownPos.current = { x: start.x, y: start.y || 0 }
+    }
+
+    // Store the current extent before any changes
+    const brush = brushRef.current
+    if (brush && brush.state.extent.x0 !== -1) {
+      previousExtent.current = {
+        x0: brush.state.extent.x0,
+        x1: brush.state.extent.x1
+      }
+    }
+  }
+
+  // Track when brush interaction ends
+  const handleBrushEnd = (brushState: any) => {
+    isMouseDown.current = false
+  }
+
+  const handleMouseLeave = (event: React.PointerEvent<SVGRectElement>) => {
+    isMouseDown.current = false
+    mouseDownPos.current = null
+  }
+
+  // Handle click to move brush to clicked location
+  const handleClick = (event: React.PointerEvent<SVGRectElement>) => {
+    const DRAG_THRESHOLD = 5 // pixels - if mouse moved less than this, it's a click
+    const HANDLE_WIDTH = 8 // Width of the brush handles
+
+    // Calculate click position relative to the brush area (accounting for BRUSH_PADDING)
+    const svgRect = event.currentTarget.ownerSVGElement?.getBoundingClientRect()
+    if (!svgRect) {
+      return
+    }
+
+    const clickX = event.clientX - svgRect.left - BRUSH_PADDING
+
+    // Check if we have a mouse down position to compare against
+    if (!mouseDownPos.current) {
+      mouseDownPos.current = null
+      return
+    }
+
+    // Calculate distance moved since mouse down
+    const dragDistance = Math.abs(clickX - mouseDownPos.current.x)
+
+    // Reset mouse down position for next interaction
+    mouseDownPos.current = null
+
+    // Only proceed if this was a click (minimal movement), not a drag
+    if (dragDistance > DRAG_THRESHOLD) {
+      return
+    }
+
+    // Use the previous extent (before visx potentially changed it)
+    if (!previousExtent.current) {
+      return
+    }
+
+    const brush = brushRef.current
+    if (!brush || !tableData.length) {
+      return
+    }
+
+    const prevExtent = previousExtent.current
+
+    // Check if click was on a handle (ignore clicks on handles)
+    const currentWidth = Math.abs(prevExtent.x1 - prevExtent.x0)
+    const leftHandleStart = Math.min(prevExtent.x0, prevExtent.x1) - HANDLE_WIDTH / 2
+    const leftHandleEnd = Math.min(prevExtent.x0, prevExtent.x1) + HANDLE_WIDTH / 2
+    const rightHandleStart = Math.max(prevExtent.x0, prevExtent.x1) - HANDLE_WIDTH / 2
+    const rightHandleEnd = Math.max(prevExtent.x0, prevExtent.x1) + HANDLE_WIDTH / 2
+
+    // If click was on a handle, do nothing
+    if (
+      (clickX >= leftHandleStart && clickX <= leftHandleEnd) ||
+      (clickX >= rightHandleStart && clickX <= rightHandleEnd)
+    ) {
+      return
+    }
+
+    // Check if click was inside the current selection (ignore clicks inside selection to allow dragging)
+    const selectionStart = Math.min(prevExtent.x0, prevExtent.x1)
+    const selectionEnd = Math.max(prevExtent.x0, prevExtent.x1)
+
+    if (clickX > selectionStart + HANDLE_WIDTH && clickX < selectionEnd - HANDLE_WIDTH) {
+      return
+    }
+
+    // Calculate the new brush position centered on click
+    const halfWidth = currentWidth / 2
+    let newX0 = clickX - halfWidth
+    let newX1 = clickX + halfWidth
+
+    // Ensure the new position stays within bounds
+    const safeXMax = Math.max(xMax, 100)
+    if (newX0 < 0) {
+      newX0 = 0
+      newX1 = currentWidth
+    } else if (newX1 > safeXMax) {
+      newX1 = safeXMax
+      newX0 = safeXMax - currentWidth
+    }
+
+    // Get the domain values for the new range
+    const domain = xScale.domain()
+    const xValues: string[] = []
+
+    for (const value of domain) {
+      const xPos = xScale(value)
+      if (xPos !== undefined && xPos >= newX0 && xPos < newX1) {
+        xValues.push(value)
+      }
+    }
+
+    // Update the brush position
+    if (xValues.length > 0) {
+      const newBounds: Bounds = {
+        x0: newX0,
+        x1: newX1,
+        y0: 0,
+        y1: BRUSH_HEIGHT,
+        xValues
+      }
+
+      handleBrushChange(newBounds)
+
+      // Update the brush ref state directly to move the visual selection
+      if (brush.updateBrush) {
+        brush.updateBrush(() => ({
+          ...brush.state,
+          extent: {
+            x0: newX0,
+            x1: newX1,
+            y0: 0,
+            y1: BRUSH_HEIGHT
+          },
+          start: { x: newX0, y: 0 },
+          end: { x: newX1, y: BRUSH_HEIGHT }
+        }))
+
+        // Store the new extent as the previous extent for the next click
+        previousExtent.current = {
+          x0: newX0,
+          x1: newX1
+        }
+      }
+    }
+  }
+
   // Ensure positive dimensions to avoid SVG errors
   const safeXMax = Math.max(xMax, 100) // Minimum width of 100px
   const safeYMax = Math.max(yMax, BRUSH_HEIGHT + BRUSH_PADDING * 2) // Minimum height with padding
@@ -353,6 +521,10 @@ const BrushOverlay: FC<BrushOverlayProps> = ({ xMax, yMax }) => {
             innerRef={brushRef}
             renderBrushHandle={props => <BrushHandle {...props} />}
             initialBrushPosition={initialBrushPosition}
+            onClick={handleClick}
+            onBrushStart={handleBrushStart}
+            onBrushEnd={handleBrushEnd}
+            onMouseLeave={handleMouseLeave}
           />
         </Group>
       )}
