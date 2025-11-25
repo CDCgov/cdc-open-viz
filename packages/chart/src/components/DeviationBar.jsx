@@ -167,7 +167,7 @@ export default function DeviationBar({ height, xScale }) {
           config.heights.horizontal = totalheight
 
           // text,labels postiions
-          const textWidth = getTextWidth(formatNumber(barValue, 'left'), `normal ${16}px sans-serif`)
+          const textWidth = getTextWidth(formatNumber(barValue, 'left'), `normal ${labelFontSize}px sans-serif`)
           const textFits = textWidth < barWidth - 6
           const textX = barBaseX
           const textY = barY + barHeight / 2

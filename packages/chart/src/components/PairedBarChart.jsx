@@ -118,7 +118,10 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * data.length
                 config.heights.horizontal = totalheight
                 // check if text fits inside of the  bar including suffix/prefix,comma,fontSize ..etc
-                const textWidth = getTextWidth(formatNumber(d[groupOne.dataKey], 'left'))
+                const textWidth = getTextWidth(
+                  formatNumber(d[groupOne.dataKey], 'left'),
+                  `normal ${labelFontSize}px sans-serif`
+                )
                 const textFits = textWidth < barWidth - 5 // minus padding dx(5)
 
                 return (
@@ -178,7 +181,10 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * data.length
                 config.heights.horizontal = totalheight
                 // check if text fits inside of the  bar including suffix/prefix,comma,fontSize ..etc
-                const textWidth = getTextWidth(formatNumber(d[groupTwo.dataKey], 'left'))
+                const textWidth = getTextWidth(
+                  formatNumber(d[groupTwo.dataKey], 'left'),
+                  `normal ${labelFontSize}px sans-serif`
+                )
                 const isTextFits = textWidth < barWidth - 5 // minus padding dx(5)
 
                 return (
