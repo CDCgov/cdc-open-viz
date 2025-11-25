@@ -25,8 +25,16 @@ const geoLookups: Record<string, GeoLookup> = {
   country: { keys: countryKeys, data: supportedCountries }
 }
 
-const memoizedFindUID = (geoName: string, type: keyof typeof geoLookups): string | undefined => {
+const memoizedFindUID = (
+  geoName: string,
+  type: keyof typeof geoLookups,
+  caseInsensitive = false
+): string | undefined => {
   const lookup = geoLookups[type]
+  if (caseInsensitive) {
+    const lowerGeoName = geoName.toLowerCase()
+    return lookup.keys.find(key => lookup.data[key].some(name => name.toLowerCase() === lowerGeoName))
+  }
   return lookup.keys.find(key => lookup.data[key].includes(geoName))
 }
 
@@ -72,7 +80,8 @@ const handleUSLocation = (row: DataRow, geoColumn: string, displayAsHex: boolean
 
 const handleWorldLocation = (row: DataRow, geoColumn: string, isWorldGeocodeType: boolean): string | null => {
   const geoName = row[geoColumn]
-  let uid = memoizedFindUID(geoName, 'country')
+  // Use case-insensitive matching for world countries to handle various input formats
+  let uid = memoizedFindUID(geoName, 'country', true)
   if (!uid && (isWorldGeocodeType || geoName)) {
     uid = findCityUID(geoName)
   }

@@ -56,6 +56,7 @@ export const displayGeoName = (key: string, convertFipsCodes = true): string => 
   if (value?.length === 2 || value === 'U.S. Virgin Islands') {
     return value
   } else {
-    return value
+    // Apply titleCase to unrecognized values (e.g., "DISTRICT OF COLUMBIA" -> "District of Columbia")
+    return titleCase(value)
   }
 }
