@@ -36,7 +36,7 @@ import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from '../hooks/useIntersectionObserver'
 import Regions from './Regions'
 import CategoricalYAxis from './Axis/Categorical.Axis'
-import BrushOverlay from './Brush/BrushOverlay'
+import BrushSelector from './Brush/BrushSelector'
 
 // Helpers
 import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/viewports'
@@ -1633,7 +1633,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               }}
               className='brush-overlay'
             >
-              <BrushOverlay xMax={Math.max(xMax, 100)} yMax={70} />
+              <BrushSelector xMax={Math.max(xMax, 100)} yMax={70} />
             </div>
           )}
         </div>
