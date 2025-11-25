@@ -496,10 +496,14 @@ const BarChartHorizontal = () => {
                           display={displayBar ? 'block' : 'none'}
                           x={bar.y}
                           opacity={transparentBar ? 0.5 : 1}
-                          y={config.barHeight / 2 + config.barHeight * bar.index}
+                          y={
+                            config.isLollipopChart
+                              ? barHeight * bar.index + lollipopBarWidth / 2
+                              : config.barHeight / 2 + config.barHeight * bar.index
+                          }
                           fill={labelColor}
                           dx={absentDataLabel === 'N/A' ? 20 : textPadding}
-                          dy={config.isLollipopChart ? -10 : 0}
+                          dy={0}
                           verticalAnchor='middle'
                           textAnchor={absentDataLabel === 'N/A' ? 'middle' : textAnchor}
                           fontSize={labelFontSize}
@@ -511,7 +515,7 @@ const BarChartHorizontal = () => {
                           <Text // prettier-ignore
                             display={displayBar ? 'block' : 'none'}
                             x={bar.y}
-                            y={0}
+                            y={barHeight * bar.index + lollipopBarWidth / 2}
                             fill={APP_FONT_COLOR}
                             dx={textPaddingLollipop}
                             textAnchor={textAnchorLollipop}
