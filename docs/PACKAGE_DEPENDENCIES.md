@@ -244,9 +244,9 @@ To check for dependency violations:
 npx lerna run test
 
 # Search for explicit cross-package imports (excluding core, stories, dashboard, and editor)
-grep -r "from '@cdc/" packages/*/src --exclude="*.stories.*" | grep -v "/_stories/" | grep -v "@cdc/core" | grep -v "packages/dashboard/" | grep -v "packages/editor/"
+grep -r "from '@cdc/" packages/ --exclude="*.stories.*" --exclude-dir=node_modules | grep -v "/_stories/" | grep -v "@cdc/core" | grep -v "packages/dashboard/" | grep -v "packages/editor/" | grep -v "/types/" | grep -v "README.md"
 
 # Search for relative imports that explicitly reference other package names
 # These patterns catch imports like: from '../../chart/...' or from '../../../map/src/...'
-grep -rE "from ['\"]\.\..*/(chart|map|data-table|data-bite|waffle-chart|filtered-text|markup-include|dashboard|editor)/" packages/*/src --exclude="*.stories.*" | grep -v "/_stories/" | grep -v "packages/dashboard/" | grep -v "packages/editor/"
+grep -rE "from ['\"]\.\..*/(chart|map|data-table|data-bite|waffle-chart|filtered-text|markup-include|dashboard|editor)/" packages/ --exclude="*.stories.*" --exclude-dir=node_modules | grep -v "/_stories/" | grep -v "packages/dashboard/" | grep -v "packages/editor/"
 ```

@@ -4,11 +4,11 @@ import {
   addUIDs,
   applyColorToLegend,
   getGeoFillColor,
-  hashObj,
   indexOfIgnoreType,
   setBinNumbers,
   sortSpecialClassesLast
 } from '.'
+import { hashObj } from '@cdc/core/helpers/hashObj'
 
 import _ from 'lodash'
 import * as d3 from 'd3'
