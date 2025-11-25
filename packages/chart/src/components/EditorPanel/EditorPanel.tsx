@@ -2904,12 +2904,24 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             section='xAxis'
                             fieldName='type'
                             updateField={(_section, _subsection, _fieldName, value) => {
+                              const newXAxis = {
+                                ...config.xAxis,
+                                type: value
+                              }
+
+                              // Initialize date parsing fields for date types if they don't exist
+                              if (value === 'date' || value === 'date-time') {
+                                if (!newXAxis.dateParseFormat) {
+                                  newXAxis.dateParseFormat = '%Y-%m-%d'
+                                }
+                                if (!newXAxis.dateDisplayFormat) {
+                                  newXAxis.dateDisplayFormat = '%Y-%m-%d'
+                                }
+                              }
+
                               updateConfig({
                                 ...config,
-                                xAxis: {
-                                  ...config.xAxis,
-                                  type: value
-                                }
+                                xAxis: newXAxis
                               })
                             }}
                           />
