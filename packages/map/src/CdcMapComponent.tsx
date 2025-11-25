@@ -37,9 +37,11 @@ import {
   getMapContainerClasses,
   generateRuntimeLegendHash,
   handleMapTabbing,
-  hashObj,
   navigationHandler
 } from './helpers'
+import { hashObj } from '@cdc/core/helpers/hashObj'
+import { applyLegendToRow } from './helpers/applyLegendToRow'
+import { getPatternForRow } from './helpers/getPatternForRow'
 import { generateRuntimeLegend } from './helpers/generateRuntimeLegend'
 import generateRuntimeData from './helpers/generateRuntimeData'
 import { reloadURLData } from './helpers/urlDataHelpers'
@@ -531,6 +533,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       tabbingId={tabId}
                       tableTitle={table.label}
                       vizTitle={general.title}
+                      applyLegendToRow={applyLegendToRow}
+                      getPatternForRow={getPatternForRow}
                       wrapColumns={table.wrapColumns}
                       interactionLabel={interactionLabel}
                     />

@@ -4,7 +4,7 @@ import { type MapConfig } from '@cdc/map/src/types/MapConfig'
 import { type ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import { getTextWidth } from '../../helpers/getTextWidth'
 import { DimensionsType } from '../../types/Dimensions'
-import useLegendSeparators from '@cdc/map/src/hooks/useLegendSeparators'
+import useLegendSeparators from '../../hooks/useLegendSeparators'
 
 const MARGIN = 1
 const BORDER_SIZE = 1

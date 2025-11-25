@@ -27,15 +27,32 @@ export function testStandaloneBuild(pkgDir) {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), `cdc-open-viz-${pkgName}-`))
   copyDirSync(pkgDir, tmpDir)
 
+  let coreTarballPath = null
+
   try {
     execSync('npm install --include=dev', { cwd: tmpDir })
-    execSync('npm link @cdc/core', { cwd: tmpDir })
+
+    // Pack core into tmp directory with unique name then install from package tarball
+    const coreDir = path.join(pkgDir, '..', 'core')
+    const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(7)}`
+    const tarballDir = os.tmpdir()
+    const packOutput = execSync(`npm pack --pack-destination="${tarballDir}"`, { cwd: coreDir, encoding: 'utf-8' })
+    const tarballName = packOutput.trim().split('\n').pop() // Get last line (tarball filename)
+    const originalTarballPath = path.join(tarballDir, tarballName)
+    coreTarballPath = path.join(tarballDir, `cdc-core-${uniqueId}.tgz`)
+    fs.renameSync(originalTarballPath, coreTarballPath)
+    execSync(`npm install "${coreTarballPath}"`, { cwd: tmpDir, stdio: 'inherit' })
+
     execSync('npm run build', { cwd: tmpDir })
     return true
   } catch (err) {
     console.error(`❌ Isolated build for ${pkgName} package failed`)
+    console.error(err.message)
     return false
   } finally {
+    if (coreTarballPath && fs.existsSync(coreTarballPath)) {
+      fs.unlinkSync(coreTarballPath)
+    }
     fs.rmSync(tmpDir, { recursive: true, force: true })
   }
 }

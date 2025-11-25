@@ -1,5 +1,6 @@
 import { generateColorsArray } from '@cdc/core/helpers/generateColorsArray'
-import { hashObj, DEFAULT_MAP_BACKGROUND } from '../helpers'
+import { hashObj } from '@cdc/core/helpers/hashObj'
+import { DEFAULT_MAP_BACKGROUND } from '../helpers'
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { MapConfig } from '../types/MapConfig'
 import { type RuntimeLegend } from '../types/runtimeLegend'

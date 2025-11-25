@@ -1,4 +1,4 @@
-import { hashObj } from './hashObj'
+import { hashObj } from '@cdc/core/helpers/hashObj'
 
 export const isLegendItemDisabled = (
   dataForCheck: any,
