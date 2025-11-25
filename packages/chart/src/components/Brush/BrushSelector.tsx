@@ -9,7 +9,7 @@ import { Bounds } from '@visx/brush/lib/types'
 import type { BrushHandleRenderProps } from '@visx/brush/lib/BrushHandle'
 import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
 
-interface BrushOverlayProps {
+interface BrushSelectorProps {
   xMax: number
   yMax: number
 }
@@ -127,7 +127,7 @@ const MiniChartPreview = memo<{
 
 MiniChartPreview.displayName = 'MiniChartPreview'
 
-const BrushOverlay: FC<BrushOverlayProps> = ({ xMax, yMax }) => {
+const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   const brushRef = useRef<BaseBrush>(null)
   const hasInitialized = useRef(false)
   const mouseDownPos = useRef<{ x: number; y: number } | null>(null)
@@ -532,7 +532,7 @@ const BrushOverlay: FC<BrushOverlayProps> = ({ xMax, yMax }) => {
   )
 }
 
-export default memo(BrushOverlay, (prev, next) => {
+export default memo(BrushSelector, (prev, next) => {
   // Only re-render if dimensions change significantly (avoid micro-changes)
   const xMaxChanged = Math.abs(prev.xMax - next.xMax) > 1
   const yMaxChanged = Math.abs(prev.yMax - next.yMax) > 1
