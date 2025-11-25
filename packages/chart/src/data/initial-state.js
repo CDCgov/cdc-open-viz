@@ -296,6 +296,12 @@ const createInitialState = () => {
     area: {
       isStacked: false
     },
+    brush: {
+      height: 25,
+      active: false,
+      pattern_id: 'brush_pattern',
+      accent_color: '#ddd'
+    },
     sankey: {
       title: {
         defaultColor: 'black'
