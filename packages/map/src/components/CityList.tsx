@@ -216,10 +216,25 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
       triangle: <GlyphTriangle {...shapeProps} />
     }
 
+    // Check if this city matches any additionalCityStyles
+    let shapeToUse = config.visual.cityStyle?.toLowerCase() || 'circle'
+    if (config.visual.additionalCityStyles && config.visual.additionalCityStyles.length > 0) {
+      for (const style of config.visual.additionalCityStyles) {
+        if (style.column && style.value && style.shape) {
+          const columnValue = geoData[style.column]
+          // Convert both to strings for comparison to handle different data types
+          if (String(columnValue) === String(style.value)) {
+            shapeToUse = style.shape.toLowerCase()
+            break
+          }
+        }
+      }
+    }
+
     // Render the city marker
     return (
       <g key={i} transform={transform} style={styles} className='geo-point' tabIndex={-1}>
-        {cityStyleShapes[config.visual.cityStyle?.toLowerCase() || 'circle']}
+        {cityStyleShapes[shapeToUse]}
       </g>
     )
   })
