@@ -2,7 +2,7 @@ import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 
 interface CalculateHorizontalBarCategoryLabelWidthProps {
   yScale: any
-  parentWidth: number
+  chartWidth: number
   formatDate: Function
   parseDate: Function
   tickLabelFont: string
@@ -18,7 +18,7 @@ interface CalculateHorizontalBarCategoryLabelWidthProps {
  */
 export const calculateHorizontalBarCategoryLabelWidth = ({
   yScale,
-  parentWidth,
+  chartWidth,
   formatDate,
   parseDate,
   tickLabelFont,
@@ -30,7 +30,7 @@ export const calculateHorizontalBarCategoryLabelWidth = ({
   const categoryValues = yScale.domain()
 
   if (!categoryValues || categoryValues.length === 0) {
-    return parentWidth * 0.3
+    return chartWidth * 0.3
   }
 
   const formattedLabels = categoryValues.map(value => {
@@ -47,8 +47,11 @@ export const calculateHorizontalBarCategoryLabelWidth = ({
   const labelWidths = formattedLabels.map(label => getTextWidth(label, tickLabelFont))
   const maxLabelWidth = Math.max(...labelWidths)
 
-  const paddedWidth = maxLabelWidth + 20
-  const maxAllowedWidth = parentWidth * 0.3
+  // We need some extra padding or visx will wrap labels too early
+  const paddedWidth = maxLabelWidth + Math.ceil(maxLabelWidth * 0.15)
+
+  // Allocate at most 30% of chart width to category labels
+  const maxAllowedWidth = chartWidth * 0.3
 
   return Math.min(paddedWidth, maxAllowedWidth)
 }
