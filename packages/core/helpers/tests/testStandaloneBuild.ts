@@ -21,6 +21,8 @@ function copyDirSync(src, dest) {
   }
 }
 
+// Tests if a package can be built in isolation
+// See DOCS/PACKAGE_DEPENDENCIES.md for more details
 export function testStandaloneBuild(pkgDir) {
   pkgDir = pkgDir.replace('/src', '')
   const pkgName = pkgDir.split('/')[pkgDir.split('/').length - 1]
