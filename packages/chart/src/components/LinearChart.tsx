@@ -239,7 +239,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   }, [isHorizontal, config.visualizationType, config.yAxis.labelPlacement, yScale, parentWidth])
 
   const horizontalYAxisLabelSpace = runtime.yAxis.label && !config.hideYAxisLabel ? 30 : 0
-  if (isHorizontal && config.visualizationType === 'Bar' && !config.isLollipopChart) {
+  if (isHorizontal && config.visualizationType === 'Bar') {
     runtime.yAxis.size = categoryLabelSpace + horizontalYAxisLabelSpace
   }
 
@@ -1132,13 +1132,22 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
                           {orientation === 'horizontal' &&
                             visualizationType === 'Bar' &&
-                            !config.isLollipopChart &&
                             config.yAxis.labelPlacement === 'On Date/Category Axis' &&
                             !config.yAxis.hideLabel &&
                             (() => {
                               const barGroupCount =
                                 config.visualizationSubType === 'stacked' ? 1 : config.runtime.seriesKeys.length
-                              const barHeight = Number(config.barHeight) * barGroupCount
+
+                              // Calculate barHeight based on chart type (regular bar vs lollipop)
+                              let barHeight
+                              if (config.isLollipopChart) {
+                                const lollipopSizes = { large: 7, medium: 6, small: 5 }
+                                const lollipopBarWidth = lollipopSizes[config.lollipopSize] || 5
+                                barHeight = lollipopBarWidth * barGroupCount
+                              } else {
+                                barHeight = Number(config.barHeight) * barGroupCount
+                              }
+
                               const totalBarHeight = barHeight + Number(config.barSpace)
                               const barGroupY = i === 0 ? 0 : totalBarHeight * i
                               const labelCenterY = barGroupY + barHeight / 2
@@ -1157,24 +1166,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                 </Text>
                               )
                             })()}
-
-                          {orientation === 'horizontal' &&
-                            visualizationType !== 'Box Plot' &&
-                            visualizationSubType !== 'stacked' &&
-                            config.isLollipopChart &&
-                            config.yAxis.labelPlacement === 'On Date/Category Axis' &&
-                            !config.yAxis.hideLabel && (
-                              <Text
-                                transform={`translate(${tick.to.x - 5}, ${tick.to.y - minY}) rotate(-${
-                                  config.runtime.horizontal ? config.runtime.yAxis.tickRotation || 0 : 0
-                                })`}
-                                verticalAnchor={'start'}
-                                textAnchor={'end'}
-                                fontSize={tickLabelFontSize}
-                              >
-                                {tick.formattedValue}
-                              </Text>
-                            )}
 
                           {orientation === 'horizontal' &&
                             visualizationType !== 'Bar' &&
