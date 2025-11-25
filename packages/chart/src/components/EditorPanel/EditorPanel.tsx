@@ -2917,6 +2917,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 if (!newXAxis.dateDisplayFormat) {
                                   newXAxis.dateDisplayFormat = '%Y-%m-%d'
                                 }
+                              } else {
+                                // Clear date parsing fields when switching to non-date types
+                                delete newXAxis.dateParseFormat
+                                delete newXAxis.dateDisplayFormat
+                                delete newXAxis.showYearsOnce
                               }
 
                               updateConfig({
