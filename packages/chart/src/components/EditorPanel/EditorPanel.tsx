@@ -2904,29 +2904,12 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             section='xAxis'
                             fieldName='type'
                             updateField={(_section, _subsection, _fieldName, value) => {
-                              const newXAxis = {
-                                ...config.xAxis,
-                                type: value
-                              }
-
-                              // Initialize date parsing fields for date types if they don't exist
-                              if (value === 'date' || value === 'date-time') {
-                                if (!newXAxis.dateParseFormat) {
-                                  newXAxis.dateParseFormat = '%Y-%m-%d'
-                                }
-                                if (!newXAxis.dateDisplayFormat) {
-                                  newXAxis.dateDisplayFormat = '%Y-%m-%d'
-                                }
-                              } else {
-                                // Clear date parsing fields when switching to non-date types
-                                delete newXAxis.dateParseFormat
-                                delete newXAxis.dateDisplayFormat
-                                delete newXAxis.showYearsOnce
-                              }
-
                               updateConfig({
                                 ...config,
-                                xAxis: newXAxis
+                                xAxis: {
+                                  ...config.xAxis,
+                                  type: value
+                                }
                               })
                             }}
                           />
@@ -3110,7 +3093,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         </>
                       )}
 
-                      {(isDateScale(config.xAxis) || config?.visualizationType === 'Bump Chart') && (
+                      {(isDateScale(config.xAxis) ||
+                        config?.visualizationType === 'Bump Chart' ||
+                        config?.visualizationType === 'Forecasting') && (
                         <>
                           <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
                             Format how charts should parse and display your dates using{' '}
