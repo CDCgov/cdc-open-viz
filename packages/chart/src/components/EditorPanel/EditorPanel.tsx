@@ -3093,7 +3093,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         </>
                       )}
 
-                      {(isDateScale(config.xAxis) || config?.visualizationType === 'Bump Chart') && (
+                      {(isDateScale(config.xAxis) ||
+                        config?.visualizationType === 'Bump Chart' ||
+                        config?.visualizationType === 'Forecasting') && (
                         <>
                           <p style={{ padding: '1.5em 0 0.5em', fontSize: '.9rem', lineHeight: '1rem' }}>
                             Format how charts should parse and display your dates using{' '}
