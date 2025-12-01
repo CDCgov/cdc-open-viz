@@ -55,24 +55,27 @@ export const addValuesToDashboardFilters = (
         filterCopy.active = active.filter(val => defaultValues.includes(val))
       } else {
         // Preserve existing active value if it's valid in the new filter values
-        const currentActive = filterCopy.active
-        const isCurrentActiveValid = currentActive && filterValues.includes(currentActive)
+        const currentActive = filterCopy.active as string
+        const isResetLabelValue = currentActive && currentActive === filterCopy.resetLabel
+        const isCurrentActiveValid = currentActive && (filterValues.includes(currentActive) || isResetLabelValue)
 
         // Check if this is an intentional clear (empty string, but not undefined during initial load)
         const isIntentionalClear = currentActive === ''
 
-        if (isCurrentActiveValid) {
-          // Keep the current active value
+        // Priority: defaultValue > valid current active > reset label > first value
+        if (filterCopy.defaultValue) {
+          // If defaultValue is explicitly set, always use it
+          filterCopy.active = filterCopy.defaultValue
+        } else if (isCurrentActiveValid) {
+          // Keep the current active value if valid
           filterCopy.active = currentActive
         } else if (isIntentionalClear) {
-          // Don't override intentional clears with defaultValue
+          // Don't override intentional clears
           filterCopy.active = currentActive
         } else {
-          // Set to default value if current active is undefined (initial load) or invalid
-          const hasResetLabel = filters.find(filter => filter.resetLabel)
-          const defaultValue = hasResetLabel ? hasResetLabel.resetLabel : filterCopy.values[0]
-          const newValue = filterCopy.defaultValue || defaultValue
-          filterCopy.active = newValue
+          // Set to reset label or first value
+          const defaultValue = filterCopy.resetLabel || filterCopy.values[0]
+          filterCopy.active = defaultValue
         }
       }
     }
