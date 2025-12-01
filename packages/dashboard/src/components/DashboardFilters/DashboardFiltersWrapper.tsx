@@ -325,7 +325,12 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
               showSubmit={visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad}
               applyFilters={applyFilters}
               applyFiltersButtonText={visualizationConfig.applyFiltersButtonText}
-              handleReset={visualizationConfig.filterBehavior === FilterBehavior.Apply ? handleReset : undefined}
+              handleReset={
+                visualizationConfig.filterBehavior === FilterBehavior.Apply &&
+                (visualizationConfig.showClearButton ?? true)
+                  ? handleReset
+                  : undefined
+              }
             />
           </div>
         </Layout.Responsive>
