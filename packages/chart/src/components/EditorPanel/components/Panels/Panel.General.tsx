@@ -21,7 +21,7 @@ import ConfigContext from '../../../../ConfigContext.js'
 import { PanelProps } from '../PanelProps'
 
 const PanelGeneral: FC<PanelProps> = props => {
-  const { config } = useContext(ConfigContext)
+  const { config, updateConfig } = useContext(ConfigContext)
   const { updateField } = useEditorPanelContext()
   const {
     enabledChartTypes,
@@ -62,6 +62,24 @@ const PanelGeneral: FC<PanelProps> = props => {
             label='Chart Type'
             updateField={updateField}
             options={enabledChartTypes}
+            onChange={event => {
+              const newVisType = event.target.value
+
+              updateField(null, null, 'visualizationType', newVisType)
+
+              if (newVisType === 'Forecasting' && config.xAxis.type === 'categorical') {
+                updateConfig({
+                  ...config,
+                  visualizationType: newVisType,
+                  xAxis: {
+                    ...config.xAxis,
+                    type: 'date',
+                    dateParseFormat: config.xAxis.dateParseFormat || '%Y-%m-%d',
+                    dateDisplayFormat: config.xAxis.dateDisplayFormat || '%Y-%m-%d'
+                  }
+                })
+              }
+            }}
           />
         )}
         {visSupportsChartHeight() && config.orientation === 'vertical' && (
