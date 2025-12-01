@@ -90,17 +90,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
         container.style.padding = `${downloadPadding}px`
       }
 
-      // Clone and preserve basic dimensions
-      const clonedElement = baseSvg.cloneNode(true) as HTMLElement
-      if (baseSvg instanceof Element) {
-        const rect = baseSvg.getBoundingClientRect()
-        if (rect.width > 0 && rect.height > 0) {
-          clonedElement.style.width = `${rect.width}px`
-          clonedElement.style.height = `${rect.height}px`
-        }
-      }
-
-      container.appendChild(clonedElement)
+      container.appendChild(baseSvg.cloneNode(true));
 
       const downloadImage = async () => {
         document.body.appendChild(container) // Append container to the DOM
