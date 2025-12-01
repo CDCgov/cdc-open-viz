@@ -12,6 +12,11 @@ export default function isRightAlignedTableValue(value = '') {
     if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(value)) {
       return false
     }
+    // Years like 1995 and 2014 are not considered numbers
+    if (/^(19|20)\d{2}$/.test(value)) {
+      return false
+    }
+
     return numericStrings.includes(value) || /^[\$\d\.\%\,\-\s\(\)CI<>]*$/.test(value)
   }
   return false

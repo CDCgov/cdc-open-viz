@@ -95,7 +95,9 @@ const Filters: React.FC<FilterProps> = ({
       eventAction: 'change',
       eventLabel: interactionLabel,
       vizTitle: getVizTitle(visualizationConfig),
-      specifics: `key: ${String(newFilters?.[index]?.columnName).toLowerCase()}, value: ${String(newFilters?.[index]?.active).toLowerCase()}`
+      specifics: `key: ${String(newFilters?.[index]?.columnName).toLowerCase()}, value: ${String(
+        newFilters?.[index]?.active
+      ).toLowerCase()}`
     })
   }
 
@@ -201,6 +203,9 @@ const Filters: React.FC<FilterProps> = ({
   }, [filters])
 
   if (visualizationConfig?.filters?.length === 0) return <></>
+
+  const hasVisibleFilters = filters?.some(filter => filter.showDropdown !== false)
+  if (!hasVisibleFilters) return <></>
 
   const getClasses = () => {
     const { visualizationType, legend } = visualizationConfig || {}

@@ -32,7 +32,7 @@ import BrushChart from './Brush/BrushController'
 // Helpers
 import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
-import { calcInitialHeight, handleAutoPaddingRight } from '../helpers/sizeHelpers'
+import { calcInitialHeight } from '../helpers/sizeHelpers'
 import { filterAndShiftLinearDateTicks } from '../helpers/filterAndShiftLinearDateTicks'
 
 // Hooks
@@ -97,6 +97,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleDragStateChange,
     interactionLabel,
     isDraggingAnnotation,
+    isEditor,
     legendRef,
     parseDate,
     parentRef,
@@ -204,8 +205,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     return tallestLabel + X_TICK_LABEL_PADDING + DEFAULT_TICK_LENGTH
   }, [dimensions[0], config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation])
 
-  // xMax and yMax
-  const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   const yMax = initialHeight + forestRowsHeight
 
   const isNoDataAvailable = config.filters?.length > 0 && data.length === 0
@@ -217,6 +216,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const getYAxisData = (d, seriesKey) => d[seriesKey]
   const xAxisDataMapped = data.map(d => getXAxisData(d))
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
+
+  const xMax =
+    parentWidth -
+    Number(config.orientation === 'horizontal' ? config.xAxis.size : config.yAxis.size) -
+    (hasRightAxis ? config.yAxis.rightAxisSize : 0)
 
   const {
     xScale,
@@ -241,10 +245,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     xAxisDataMapped,
     yMax,
     dimensions,
-    xMax:
-      parentWidth -
-      Number(config.orientation === 'horizontal' ? config.xAxis.size : config.yAxis.size) -
-      (hasRightAxis ? config.yAxis.rightAxisSize : 0),
+    xMax: xMax,
     needsYAxisAutoPadding,
     currentViewport
   })
@@ -380,23 +381,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleTooltipMouseOver,
     hideTooltip
   })
-
-  // EFFECTS
-  // Adjust padding on the right side of the chart to accommodate for overflow
-  useEffect(() => {
-    if (!parentRef.current || !parentWidth || !gridLineRefs.current.length) return
-
-    const [updatePadding, paddingToAdd] = handleAutoPaddingRight(parentRef, xAxisLabelRefs, parentWidth)
-
-    if (!updatePadding) return
-
-    parentRef.current.style.paddingRight = `${paddingToAdd}px`
-    // subtract padding from grid line's x1 value
-    gridLineRefs.current.forEach(gridLine => {
-      if (!gridLine) return
-      gridLine.setAttribute('x1', xMax - paddingToAdd)
-    })
-  }, [parentWidth, parentHeight, data])
 
   // Make sure the chart is visible if in the editor
   /* eslint-disable react-hooks/exhaustive-deps */
