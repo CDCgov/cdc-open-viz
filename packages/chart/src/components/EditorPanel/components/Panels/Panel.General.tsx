@@ -65,10 +65,8 @@ const PanelGeneral: FC<PanelProps> = props => {
             onChange={event => {
               const newVisType = event.target.value
 
-              // Call the standard updateField first
               updateField(null, null, 'visualizationType', newVisType)
 
-              // If switching to Forecasting and x-axis is categorical, update it to date
               if (newVisType === 'Forecasting' && config.xAxis.type === 'categorical') {
                 updateConfig({
                   ...config,
