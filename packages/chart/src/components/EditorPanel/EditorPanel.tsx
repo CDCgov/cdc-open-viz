@@ -714,6 +714,21 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     }
   }, [])
 
+  // Forecasting charts default to date scaling type
+  useEffect(() => {
+    if (config.visualizationType === 'Forecasting' && config.xAxis.type === 'categorical') {
+      updateConfig({
+        ...config,
+        xAxis: {
+          ...config.xAxis,
+          type: 'date',
+          dateParseFormat: config.xAxis.dateParseFormat || '%Y-%m-%d',
+          dateDisplayFormat: config.xAxis.dateDisplayFormat || '%Y-%m-%d'
+        }
+      })
+    }
+  }, [config.visualizationType]) // Run when visualizationType changes
+
   useEffect(() => {
     if (config.visualizationType !== 'Bar') {
       updateConfig({ ...config, tooltips: { ...config.tooltips, singleSeries: false } })
