@@ -1,6 +1,6 @@
 {
   "name": "@cdc/editor",
-  "version": "4.25.10",
+  "version": "4.25.11",
   "description": "React component for generating a new component entry",
   "moduleName": "CdcEditor",
   "main": "dist/cdceditor",
@@ -25,13 +25,13 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@cdc/chart": "^4.25.10",
-    "@cdc/core": "^4.25.10",
-    "@cdc/dashboard": "^4.25.10",
-    "@cdc/data-bite": "^4.25.10",
-    "@cdc/map": "^4.25.10",
-    "@cdc/markup-include": "^4.25.10",
-    "@cdc/waffle-chart": "^4.25.10",
+    "@cdc/chart": "^4.25.11",
+    "@cdc/core": "^4.25.11",
+    "@cdc/dashboard": "^4.25.11",
+    "@cdc/data-bite": "^4.25.11",
+    "@cdc/map": "^4.25.11",
+    "@cdc/markup-include": "^4.25.11",
+    "@cdc/waffle-chart": "^4.25.11",
     "axios": "^1.9.0",
     "d3": "^7.9.0",
     "react-dropzone": "^14.3.8",
@@ -42,7 +42,6 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "vite": "^5.4.21",
     "@vitejs/plugin-react": "^4.3.4",
     "vite": "^4.4.11",
     "vite-plugin-css-injected-by-js": "^2.4.0",

@@ -1,6 +1,6 @@
 {
   "name": "@cdc/core",
-  "version": "4.25.10",
+  "version": "4.25.11",
   "description": "Core components, styles, hooks, and helpers, for the CDC Open Visualization project",
   "moduleName": "CdcCore",
   "main": "dist/cdccore",
@@ -47,7 +47,6 @@
     "@vitejs/plugin-react": "^4.3.4",
     "sass": "^1.89.2",
     "vite": "^5.4.21",
-    "@vitejs/plugin-react": "^4.3.4",
     "vite-plugin-css-injected-by-js": "^2.4.0",
     "vite-plugin-svgr": "^2.4.0"
   }
