@@ -105,7 +105,7 @@ export const useTooltip = props => {
         addColCommas: column.commas
       }
 
-      const pieColumnData = additionalChartData?.arc?.data[column.name]
+      const pieColumnData = additionalChartData?.data[column.name]
       const columnData =
         config.tooltips.singleSeries && visualizationType === 'Line'
           ? resolvedScaleValues.filter(
@@ -145,7 +145,7 @@ export const useTooltip = props => {
         tooltipItems.push(
           [config.xAxis.dataKey, pieData[config.xAxis.dataKey]],
           [
-            config.runtime.yAxis.dataKey,
+            config.runtime.yAxis.label || config.runtime.yAxis.dataKey,
             showPiePercent ? pctString(actualPieValue) : formatNumber(pieData[config.runtime.yAxis.dataKey])
           ],
           showPiePercent ? [] : ['Percent', pctString(pctOf360)]
