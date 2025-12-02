@@ -521,7 +521,7 @@ const PanelVisual: FC<PanelProps> = props => {
             />
           </>
         )}
-        3
+
         {(config.orientation !== 'horizontal' || config.visualizationType === 'Combo') &&
           config.visualizationType !== 'Warming Stripes' && (
             <TextField
