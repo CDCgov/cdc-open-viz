@@ -18,6 +18,7 @@ type DashboardFilterProps = {
   showSubmit: boolean
   applyFilters: MouseEventHandler<HTMLButtonElement>
   applyFiltersButtonText?: string
+  handleReset?: MouseEventHandler<HTMLButtonElement>
 }
 
 const DashboardFilters: React.FC<DashboardFilterProps> = ({
@@ -27,7 +28,8 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
   handleOnChange,
   showSubmit,
   applyFilters,
-  applyFiltersButtonText
+  applyFiltersButtonText,
+  handleReset
 }) => {
   const nullVal = (filter: SharedFilter) => {
     const val = filter.queuedActive || filter.active
@@ -115,8 +117,8 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         }
 
         const isDisabled = !values.length
-        // push reset label only if it does not includes in filter values  options
-        if (filter.resetLabel && !filter.values.includes(filter.resetLabel)) {
+        // push reset label only if it does not includes in filter values options
+        if (filter.resetLabel && !filter.values.includes(filter.resetLabel) && !_key) {
           values.unshift(
             <option key={`${filter.resetLabel}-option`} value={filter.resetLabel}>
               {filter.resetLabel}
@@ -145,9 +147,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
             ) : filter.filterStyle === FILTER_STYLE.nestedDropdown ? (
               <NestedDropdown
                 activeGroup={(filter.queuedActive?.[0] || filter.active) as string}
-                activeSubGroup={
-                  _key ? filter.queuedActive?.[1] || filter.subGrouping?.active : filter.subGrouping?.active
-                }
+                activeSubGroup={(filter.queuedActive?.[1] || filter.subGrouping?.active) as string}
                 filterIndex={filterIndex}
                 options={_key ? getNestedDropdownOptions(apiFilterDropdowns[_key]) : nestedOptions}
                 listLabel={label}
@@ -167,7 +167,14 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                   disabled={loading || isDisabled}
                 >
                   {loading && <option value='Loading...'>Loading...</option>}
-                  {nullVal(filter) && (
+                  {/* For API filters, show placeholder when no value is selected */}
+                  {_key && nullVal(filter) && (
+                    <option key={`reset-label`} value=''>
+                      {filter.resetLabel || '- Select One -'}
+                    </option>
+                  )}
+                  {/* For non-API filters or when no value is selected, show empty option */}
+                  {!_key && nullVal(filter) && (
                     <option key={`select`} value=''>
                       {filter.resetLabel || '- Select -'}
                     </option>
@@ -181,19 +188,26 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         )
       })}
       {showSubmit && (
-        <button
-          className='btn btn-primary mb-1'
-          onClick={applyFilters}
-          disabled={show.some(filterIndex => {
-            const emptyFilterValues = [undefined, '', '- Select -']
-            return (
-              emptyFilterValues.includes(sharedFilters[filterIndex].queuedActive) &&
-              emptyFilterValues.includes(sharedFilters[filterIndex].active)
-            )
-          })}
-        >
-          {applyFiltersButtonText || 'GO!'}
-        </button>
+        <>
+          <button
+            className='btn btn-primary mb-1 me-2'
+            onClick={applyFilters}
+            disabled={show.some(filterIndex => {
+              const emptyFilterValues = [undefined, '', '- Select -']
+              return (
+                emptyFilterValues.includes(sharedFilters[filterIndex].queuedActive) &&
+                emptyFilterValues.includes(sharedFilters[filterIndex].active)
+              )
+            })}
+          >
+            {applyFiltersButtonText || 'GO!'}
+          </button>
+          {handleReset && (
+            <button className='btn btn-link mb-1' onClick={handleReset}>
+              Clear Filters
+            </button>
+          )}
+        </>
       )}
     </form>
   )

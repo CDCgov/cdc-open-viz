@@ -1,5 +1,6 @@
+@import '../../../styles/v2/utils/variables';
+
 $editorAnimationTimer: 400ms;
-$editorWidth: 350px;
 $mediumGray: #e6e6e6;
 
 @import 'editor-grid-view.scss';

@@ -21,9 +21,9 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
   const isLoadedFromUrl = config.dataKey?.includes('http://') || config?.dataKey?.includes('https://')
   const excludedColumns = useMemo(() => {
     return Object.keys(config.columns)
-      .map<[string, boolean]>(key => [key, config.columns[key].dataTable])
-      .filter(([key, dataTable]) => !dataTable)
-      .map(([key]) => key)
+      .map<[string, boolean]>(key => [config.columns[key].name, config.columns[key].dataTable])
+      .filter(([columnName, dataTable]) => !dataTable && columnName) // also filter out undefined names
+      .map(([columnName]) => columnName)
   }, [config.columns])
 
   const groupPivotColumns = useMemo(() => {

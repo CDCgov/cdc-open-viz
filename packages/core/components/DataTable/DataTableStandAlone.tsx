@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ViewPort } from '../../types/ViewPort'
-import Footnotes from '../../types/Footnotes'
-import EditorWrapper from '../EditorWrapper/EditorWrapper'
+import EditorWrapper from '../EditorWrapper'
 import DataTable from './DataTable'
 import DataTableEditorPanel from './components/DataTableEditorPanel'
 import Filters from '../Filters'
@@ -73,7 +72,13 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
         viewport={viewport || 'lg'}
         interactionLabel={interactionLabel}
       />
-      <FootnotesStandAlone config={config.footnotes} filters={config.filters?.filter(f => f.filterFootnotes)} />
+      <FootnotesStandAlone
+        config={config.footnotes}
+        filters={config.filters?.filter(f => f.filterFootnotes)}
+        markupVariables={config['markupVariables']}
+        enableMarkupVariables={config['enableMarkupVariables']}
+        data={config.data}
+      />
     </>
   )
 }

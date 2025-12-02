@@ -1,6 +1,6 @@
 export type Link = { source: string; target: string; value: number; id: string }
 
-export type Data = {
+type Data = {
   links: Link[]
 }
 

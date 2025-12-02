@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { VizFilter } from '../types/VizFilter'
+import { mergeCustomOrderValues } from './mergeCustomOrderValues'
 
 type Filter = {
   columnName: string
@@ -134,6 +135,10 @@ export const addValuesToFilters = (filters: VizFilter[], data: any[] | MapData):
       filteredData = handleVizParents(filter as VizFilter, data, filtersLookup)
     }
     generateValuesForFilter(filterCopy, filteredData)
+
+    // Merge new values with existing custom order (fixes DEV-11740 & DEV-11376)
+    filterCopy.orderedValues = mergeCustomOrderValues(filterCopy.values, filterCopy.orderedValues, filterCopy.order)
+
     if (filterCopy.values?.length > 0) {
       const queryStringFilterValue = getQueryStringFilterValue(filterCopy)
       if (queryStringFilterValue) {

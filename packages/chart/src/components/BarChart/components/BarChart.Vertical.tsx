@@ -23,7 +23,7 @@ import { type ChartContext } from '../../../types/ChartContext'
 import _ from 'lodash'
 import { getBarData } from '../helpers/getBarData'
 
-export const BarChartVertical = () => {
+const BarChartVertical = () => {
   const { xScale, yScale, xMax, yMax, seriesScale, convertLineToBarGraph, barChart } =
     useContext<BarChartContextValues>(BarChartContext)
   const {
@@ -46,6 +46,7 @@ export const BarChartVertical = () => {
     colorScale,
     config,
     currentViewport,
+    vizViewport,
     dashboardConfig,
     tableData,
     formatDate,
@@ -58,7 +59,7 @@ export const BarChartVertical = () => {
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
 
-  const LABEL_FONT_SIZE = isMobileFontViewport(currentViewport) ? 13 : 16
+  const LABEL_FONT_SIZE = isMobileFontViewport(vizViewport) ? 13 : 16
 
   const root = document.documentElement
 

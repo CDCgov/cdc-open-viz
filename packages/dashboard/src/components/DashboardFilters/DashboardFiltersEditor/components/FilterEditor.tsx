@@ -184,33 +184,25 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
   return (
     <>
       {dataFiltersLoading && <Loading />}
-      <label>
-        <span className='edit-label column-heading'>Filter Type: </span>
-        <select
-          defaultValue={filter.type || ''}
-          onChange={e => selectFilterType(e.target.value)}
-          disabled={!!filter.type}
-        >
-          <option value=''>- Select Option -</option>
-          <option value='urlfilter'>URL</option>
-          <option value='datafilter'>Data</option>
-        </select>
-      </label>
+      <Select
+        label='Filter Type'
+        value={filter.type || ''}
+        options={[
+          { value: '', label: '- Select Option -' },
+          { value: 'urlfilter', label: 'URL' },
+          { value: 'datafilter', label: 'Data' }
+        ]}
+        onChange={e => selectFilterType(e.target.value)}
+        disabled={!!filter.type}
+      />
       {filter.type !== undefined && (
         <>
-          <label>
-            <span className='edit-label column-heading'>Filter Style: </span>
-            <select
-              value={filter.filterStyle || FILTER_STYLE.dropdown}
-              onChange={e => updateFilterProp('filterStyle', e.target.value)}
-            >
-              {filterStyles.map(dataKey => (
-                <option value={dataKey} key={`filter-style-select-item-${dataKey}`}>
-                  {dataKey}
-                </option>
-              ))}
-            </select>
-          </label>
+          <Select
+            label='Filter Style'
+            value={filter.filterStyle || FILTER_STYLE.dropdown}
+            options={filterStyles}
+            onChange={e => updateFilterProp('filterStyle', e.target.value)}
+          />
           {filter.filterStyle === FILTER_STYLE.dropdown && (
             <label>
               <span className='me-1'>Show Dropdown</span>
@@ -254,41 +246,31 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
             <>
               {!hasDashboardApplyBehavior(config.visualizations) && (
                 <>
-                  <label>
-                    <span className='edit-label column-heading'>URL to Filter: </span>
-                    <select
-                      defaultValue={filter.datasetKey || ''}
-                      onChange={e => updateFilterProp('datasetKey', e.target.value)}
-                    >
-                      <option value=''>- Select Option -</option>
-                      {Object.keys(config.datasets).map(datasetKey => {
-                        if (config.datasets[datasetKey].dataUrl) {
-                          return (
-                            <option key={datasetKey} value={datasetKey}>
-                              {config.datasets[datasetKey].dataUrl}
-                            </option>
-                          )
-                        }
-                        return null
-                      })}
-                    </select>
-                  </label>
+                  <Select
+                    label='URL to Filter'
+                    value={filter.datasetKey || ''}
+                    options={[
+                      { value: '', label: '- Select Option -' },
+                      ...Object.keys(config.datasets)
+                        .filter(datasetKey => config.datasets[datasetKey].dataUrl)
+                        .map(datasetKey => ({
+                          value: datasetKey,
+                          label: config.datasets[datasetKey].dataUrl
+                        }))
+                    ]}
+                    onChange={e => updateFilterProp('datasetKey', e.target.value)}
+                  />
 
-                  <label>
-                    <span className='edit-label column-heading'>Filter By: </span>
-                    <select
-                      defaultValue={filter.filterBy || ''}
-                      onChange={e => updateFilterProp('filterBy', e.target.value)}
-                    >
-                      <option value=''>- Select Option -</option>
-                      <option key={'query-string'} value={'Query String'}>
-                        Query String
-                      </option>
-                      <option key={'file-name'} value={'File Name'}>
-                        File Name
-                      </option>
-                    </select>
-                  </label>
+                  <Select
+                    label='Filter By'
+                    value={filter.filterBy || ''}
+                    options={[
+                      { value: '', label: '- Select Option -' },
+                      { value: 'Query String', label: 'Query String' },
+                      { value: 'File Name', label: 'File Name' }
+                    ]}
+                    onChange={e => updateFilterProp('filterBy', e.target.value)}
+                  />
                   {filter.filterBy === 'File Name' && (
                     <>
                       <TextField
@@ -307,9 +289,16 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                         }
                       />
 
-                      <label>
-                        <span className='edit-label column-heading'>
-                          White Space Replacments
+                      <Select
+                        label='White Space Replacments'
+                        value={filter.whitespaceReplacement || 'Keep Spaces'}
+                        options={[
+                          { value: 'Remove Spaces', label: 'Remove Spaces' },
+                          { value: 'Replace With Underscore', label: 'Replace With Underscore' },
+                          { value: 'Keep Spaces', label: 'Keep Spaces' }
+                        ]}
+                        onChange={e => updateFilterProp('whitespaceReplacement', e.target.value)}
+                        tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
                             <Tooltip.Target>
                               <Icon display='question' style={{ marginLeft: '0.5rem' }} />
@@ -318,22 +307,8 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                               <p>{`Set how whitespace characters will be handled in the file request`}</p>
                             </Tooltip.Content>
                           </Tooltip>
-                        </span>
-                        <select
-                          defaultValue={filter.whitespaceReplacement || 'Keep Spaces'}
-                          onChange={e => updateFilterProp('whitespaceReplacement', e.target.value)}
-                        >
-                          <option key={'remove-spaces'} value={'Remove Spaces'}>
-                            Remove Spaces
-                          </option>
-                          <option key={'replace-with-underscore'} value={'Replace With Underscore'}>
-                            Replace With Underscore
-                          </option>
-                          <option key={'keep-spaces'} value={'Keep Spaces'}>
-                            Keep Spaces
-                          </option>
-                        </select>
-                      </label>
+                        }
+                      />
                     </>
                   )}
                 </>
@@ -507,22 +482,17 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
             <>
               {filter.filterStyle !== FILTER_STYLE.nestedDropdown ? (
                 <>
-                  <label>
-                    <span className='edit-label column-heading'>Filter: </span>
-                    <select
-                      value={filter.columnName}
-                      onChange={e => {
-                        updateFilterProp('columnName', e.target.value)
-                      }}
-                    >
-                      <option value=''>- Select Option -</option>
-                      {columns.map(dataKey => (
-                        <option value={dataKey} key={`filter-column-select-item-${dataKey}`}>
-                          {dataKey}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                  <Select
+                    label='Filter'
+                    value={filter.columnName || ''}
+                    options={[
+                      { value: '', label: '- Select Option -' },
+                      ...columns.map(col => ({ value: col, label: col }))
+                    ]}
+                    onChange={e => {
+                      updateFilterProp('columnName', e.target.value)
+                    }}
+                  />
 
                   <Select
                     value={filter.defaultValue}
@@ -647,23 +617,19 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                 updateField={(_section, _subSection, _key, value) => updateFilterProp('resetLabel', value)}
               />
 
-              <label>
-                <span className='edit-label column-heading'>Parent Filter: </span>
-                <select
-                  value={filter.parents || []}
-                  onChange={e => {
-                    updateFilterProp('parents', e.target.value)
-                  }}
-                >
-                  <option value=''>Select a filter</option>
-                  {config.dashboard.sharedFilters &&
-                    config.dashboard.sharedFilters.map(sharedFilter => {
-                      if (sharedFilter.key !== filter.key) {
-                        return <option key={sharedFilter.key}>{sharedFilter.key}</option>
-                      }
-                    })}
-                </select>
-              </label>
+              <Select
+                label='Parent Filter'
+                value={filter.parents || ''}
+                options={[
+                  { value: '', label: 'Select a filter' },
+                  ...(config.dashboard.sharedFilters || [])
+                    .filter(sharedFilter => sharedFilter.key !== filter.key)
+                    .map(sharedFilter => ({ value: sharedFilter.key, label: sharedFilter.key }))
+                ]}
+                onChange={e => {
+                  updateFilterProp('parents', e.target.value)
+                }}
+              />
 
               {!isNestedDropdown && (
                 <TextField

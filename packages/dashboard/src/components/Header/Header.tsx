@@ -1,4 +1,4 @@
-import { useEffect, useContext } from 'react'
+import { useContext, useRef } from 'react'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
 
@@ -56,21 +56,22 @@ const Header = (props: HeaderProps) => {
     return strippedState
   }
 
-  useEffect(() => {
-    const parsedData = convertStateToConfig()
+  const configStringRef = useRef<string>()
+
+  // Only update parent when config content actually changes (not just reference)
+  const configString = JSON.stringify(convertStateToConfig())
+  if (configStringRef.current !== configString) {
+    configStringRef.current = configString
 
     // Emit the data in a regular JS event so it can be consumed by anything.
-    const event = new CustomEvent('updateVizConfig', { detail: JSON.stringify(parsedData) })
-
+    const event = new CustomEvent('updateVizConfig', { detail: configString })
     window.dispatchEvent(event)
 
     // Pass up to Editor if needed
     if (setParentConfig) {
-      setParentConfig(parsedData)
+      setParentConfig(JSON.parse(configString))
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config])
+  }
 
   const handleCheck = e => {
     const { checked } = e.currentTarget

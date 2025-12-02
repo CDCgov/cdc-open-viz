@@ -1,0 +1,265 @@
+{
+  "general": {
+    "title": "Column Wrapping Test Map",
+    "type": "data",
+    "geoType": "us",
+    "headerColor": "theme-blue",
+    "showTitle": true,
+    "language": "en"
+  },
+  "type": "map",
+  "color": "bluegreensequential",
+  "columns": {
+    "geo": {
+      "dataTable": true,
+      "label": "State/Territory",
+      "name": "STATE",
+      "tooltip": false
+    },
+    "primary": {
+      "dataTable": true,
+      "label": "Primary Health Indicator Rate",
+      "name": "PrimaryRate",
+      "prefix": "",
+      "suffix": "%",
+      "tooltip": true,
+      "roundToPlace": 1
+    },
+    "navigate": {
+      "dataTable": false,
+      "name": "",
+      "tooltip": false
+    },
+    "additionalColumn1": {
+      "label": "Secondary Health Indicator",
+      "dataTable": true,
+      "name": "SecondaryIndicator",
+      "tooltip": true
+    },
+    "additionalColumn2": {
+      "label": "Population Demographics Category",
+      "dataTable": true,
+      "name": "DemographicCategory",
+      "tooltip": true
+    },
+    "additionalColumn3": {
+      "label": "Program Implementation Status",
+      "dataTable": true,
+      "name": "ImplementationStatus",
+      "tooltip": true
+    },
+    "additionalColumn4": {
+      "label": "Funding Source and Allocation",
+      "dataTable": true,
+      "name": "FundingSource",
+      "tooltip": true
+    },
+    "additionalColumn5": {
+      "label": "Year of Last Comprehensive Review",
+      "dataTable": true,
+      "name": "LastReviewYear",
+      "tooltip": true
+    }
+  },
+  "legend": {
+    "numberOfItems": 5,
+    "position": "side",
+    "title": "Legend",
+    "type": "equalnumber"
+  },
+  "table": {
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "wrapColumns": false,
+    "label": "Data Table",
+    "expanded": true,
+    "forceDisplay": true,
+    "download": true
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "capitalizeLabels": true
+  },
+  "data": [
+    {
+      "STATE": "AL",
+      "PrimaryRate": 45.3,
+      "SecondaryIndicator": "High Risk Population Segments",
+      "DemographicCategory": "Adults Ages 65 and Older",
+      "ImplementationStatus": "Fully Implemented and Operational",
+      "FundingSource": "Federal Grant with State Matching Funds",
+      "LastReviewYear": "2023"
+    },
+    {
+      "STATE": "AK",
+      "PrimaryRate": 38.7,
+      "SecondaryIndicator": "Moderate Risk with Intervention",
+      "DemographicCategory": "Young Adults Ages 18-34",
+      "ImplementationStatus": "Partially Implemented, Phase 2",
+      "FundingSource": "State Budget Allocation Only",
+      "LastReviewYear": "2022"
+    },
+    {
+      "STATE": "AZ",
+      "PrimaryRate": 52.1,
+      "SecondaryIndicator": "Critical Intervention Required",
+      "DemographicCategory": "Children and Adolescents Under 18",
+      "ImplementationStatus": "Planning Stage, Not Yet Active",
+      "FundingSource": "Private Foundation Grant",
+      "LastReviewYear": "2024"
+    },
+    {
+      "STATE": "AR",
+      "PrimaryRate": 41.9,
+      "SecondaryIndicator": "Low to Moderate Risk Level",
+      "DemographicCategory": "Middle-Aged Adults 35-64",
+      "ImplementationStatus": "Fully Implemented and Operational",
+      "FundingSource": "Mixed Federal and State Funding",
+      "LastReviewYear": "2023"
+    },
+    {
+      "STATE": "CA",
+      "PrimaryRate": 36.4,
+      "SecondaryIndicator": "Stable with Ongoing Monitoring",
+      "DemographicCategory": "Multi-Generational Households",
+      "ImplementationStatus": "Enhanced Implementation Active",
+      "FundingSource": "Federal Grant with State Matching Funds",
+      "LastReviewYear": "2024"
+    },
+    {
+      "STATE": "CO",
+      "PrimaryRate": 29.8,
+      "SecondaryIndicator": "Below Average Risk Profile",
+      "DemographicCategory": "Young Adults Ages 18-34",
+      "ImplementationStatus": "Fully Implemented and Operational",
+      "FundingSource": "State Budget Allocation Only",
+      "LastReviewYear": "2023"
+    },
+    {
+      "STATE": "CT",
+      "PrimaryRate": 33.2,
+      "SecondaryIndicator": "Moderate Risk with Intervention",
+      "DemographicCategory": "Adults Ages 65 and Older",
+      "ImplementationStatus": "Monitoring and Evaluation Phase",
+      "FundingSource": "Private Foundation Grant",
+      "LastReviewYear": "2022"
+    },
+    {
+      "STATE": "DE",
+      "PrimaryRate": 44.6,
+      "SecondaryIndicator": "High Risk Population Segments",
+      "DemographicCategory": "Children and Adolescents Under 18",
+      "ImplementationStatus": "Partially Implemented, Phase 2",
+      "FundingSource": "Mixed Federal and State Funding",
+      "LastReviewYear": "2024"
+    },
+    {
+      "STATE": "FL",
+      "PrimaryRate": 48.3,
+      "SecondaryIndicator": "Critical Intervention Required",
+      "DemographicCategory": "Middle-Aged Adults 35-64",
+      "ImplementationStatus": "Fully Implemented and Operational",
+      "FundingSource": "Federal Grant with State Matching Funds",
+      "LastReviewYear": "2023"
+    },
+    {
+      "STATE": "GA",
+      "PrimaryRate": 50.7,
+      "SecondaryIndicator": "High Risk Population Segments",
+      "DemographicCategory": "Multi-Generational Households",
+      "ImplementationStatus": "Enhanced Implementation Active",
+      "FundingSource": "State Budget Allocation Only",
+      "LastReviewYear": "2024"
+    },
+    {
+      "STATE": "HI",
+      "PrimaryRate": 27.4,
+      "SecondaryIndicator": "Low to Moderate Risk Level",
+      "DemographicCategory": "Young Adults Ages 18-34",
+      "ImplementationStatus": "Fully Implemented and Operational",
+      "FundingSource": "Private Foundation Grant",
+      "LastReviewYear": "2022"
+    },
+    {
+      "STATE": "ID",
+      "PrimaryRate": 35.9,
+      "SecondaryIndicator": "Moderate Risk with Intervention",
+      "DemographicCategory": "Adults Ages 65 and Older",
+      "ImplementationStatus": "Planning Stage, Not Yet Active",
+      "FundingSource": "Mixed Federal and State Funding",
+      "LastReviewYear": "2023"
+    },
+    {
+      "STATE": "IL",
+      "PrimaryRate": 42.1,
+      "SecondaryIndicator": "Stable with Ongoing Monitoring",
+      "DemographicCategory": "Children and Adolescents Under 18",
+      "ImplementationStatus": "Partially Implemented, Phase 2",
+      "FundingSource": "Federal Grant with State Matching Funds",
+      "LastReviewYear": "2024"
+    },
+    {
+      "STATE": "IN",
+      "PrimaryRate": 46.8,
+      "SecondaryIndicator": "High Risk Population Segments",
+      "DemographicCategory": "Middle-Aged Adults 35-64",
+      "ImplementationStatus": "Fully Implemented and Operational",
+      "FundingSource": "State Budget Allocation Only",
+      "LastReviewYear": "2023"
+    },
+    {
+      "STATE": "IA",
+      "PrimaryRate": 31.5,
+      "SecondaryIndicator": "Below Average Risk Profile",
+      "DemographicCategory": "Multi-Generational Households",
+      "ImplementationStatus": "Monitoring and Evaluation Phase",
+      "FundingSource": "Private Foundation Grant",
+      "LastReviewYear": "2022"
+    },
+    {
+      "STATE": "KS",
+      "PrimaryRate": 37.2,
+      "SecondaryIndicator": "Moderate Risk with Intervention",
+      "DemographicCategory": "Young Adults Ages 18-34",
+      "ImplementationStatus": "Enhanced Implementation Active",
+      "FundingSource": "Mixed Federal and State Funding",
+      "LastReviewYear": "2024"
+    },
+    {
+      "STATE": "KY",
+      "PrimaryRate": 49.6,
+      "SecondaryIndicator": "Critical Intervention Required",
+      "DemographicCategory": "Adults Ages 65 and Older",
+      "ImplementationStatus": "Fully Implemented and Operational",
+      "FundingSource": "Federal Grant with State Matching Funds",
+      "LastReviewYear": "2023"
+    },
+    {
+      "STATE": "LA",
+      "PrimaryRate": 51.3,
+      "SecondaryIndicator": "High Risk Population Segments",
+      "DemographicCategory": "Children and Adolescents Under 18",
+      "ImplementationStatus": "Partially Implemented, Phase 2",
+      "FundingSource": "State Budget Allocation Only",
+      "LastReviewYear": "2024"
+    },
+    {
+      "STATE": "ME",
+      "PrimaryRate": 34.7,
+      "SecondaryIndicator": "Low to Moderate Risk Level",
+      "DemographicCategory": "Middle-Aged Adults 35-64",
+      "ImplementationStatus": "Fully Implemented and Operational",
+      "FundingSource": "Private Foundation Grant",
+      "LastReviewYear": "2022"
+    },
+    {
+      "STATE": "MD",
+      "PrimaryRate": 39.4,
+      "SecondaryIndicator": "Moderate Risk with Intervention",
+      "DemographicCategory": "Multi-Generational Households",
+      "ImplementationStatus": "Planning Stage, Not Yet Active",
+      "FundingSource": "Mixed Federal and State Funding",
+      "LastReviewYear": "2023"
+    }
+  ]
+}

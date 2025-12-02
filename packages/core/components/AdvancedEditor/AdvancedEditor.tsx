@@ -59,7 +59,9 @@ export const AdvancedEditor = ({
     chart: ['Charts', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
     dashboard: ['Dashboard', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
     map: ['Maps', 'https://www.cdc.gov/cove/index.html', <MapIcon />],
-    'markup-include': ['Markup Include', 'https://www.cdc.gov/cove/index.html', <MarkupIncludeIcon />]
+    'markup-include': ['Markup Include', 'https://www.cdc.gov/cove/index.html', <MarkupIncludeIcon />],
+    'data-bite': ['Data Bite', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
+    'waffle-chart': ['Waffle Chart', 'https://www.cdc.gov/cove/index.html', <ChartIcon />]
   }
 
   if (!config.type) return <></>

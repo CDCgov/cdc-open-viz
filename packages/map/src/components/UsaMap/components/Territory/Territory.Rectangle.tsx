@@ -18,6 +18,9 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
   territory,
   textColor,
   backgroundColor,
+  svgStyle,
+  getSyncProps,
+  syncHandlers,
   ...props
 }) => {
   const { config } = useContext<MapContext>(ConfigContext)
@@ -25,17 +28,32 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
   const rectanglePath =
     'M42,0.5 C42.8284271,0.5 43.5,1.17157288 43.5,2 L43.5,2 L43.5,26 C43.5,26.8284271 42.8284271,27.5 42,27.5 L42,27.5 L3,27.5 C2.17157288,27.5 1.5,26.8284271 1.5,26 L1.5,26 L1.5,2 C1.5,1.17157288 2.17157288,0.5 3,0.5 L3,0.5 Z'
 
+  const geoKey = territory || `US-${label}`
+
   return (
-    <svg viewBox='0 0 45 29' key={territory} className={territory}>
+    <svg viewBox='0 0 45 29' key={geoKey} className={geoKey} style={svgStyle}>
       <g
+        {...(getSyncProps ? getSyncProps(geoKey) : {})}
         {...otherProps}
         strokeLinejoin='round'
         tabIndex={-1}
         onClick={handleShapeClick}
         data-tooltip-id={dataTooltipId}
         data-tooltip-html={dataTooltipHtml}
+        onMouseEnter={e => {
+          syncHandlers?.onMouseEnter(geoKey, e.clientY)
+        }}
+        onMouseLeave={() => {
+          syncHandlers?.onMouseLeave()
+        }}
       >
-        <path stroke={stroke} strokeWidth={strokeWidth} d={rectanglePath} {...otherProps} />
+        <path
+          stroke={stroke}
+          strokeWidth={strokeWidth}
+          d={rectanglePath}
+          style={{ pointerEvents: 'none' }}
+          {...otherProps}
+        />
         <text
           textAnchor='middle'
           dominantBaseline='middle'
@@ -45,7 +63,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
           stroke={strokeColor}
           className='territory-text'
           paintOrder='stroke'
-          onClick={handleShapeClick}
+          style={{ pointerEvents: 'none' }}
           data-tooltip-id={dataTooltipId}
           data-tooltip-html={dataTooltipHtml}
         >
@@ -97,6 +115,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                 strokeWidth={strokeWidth}
                 d={rectanglePath}
                 fill={`url(#territory-${territory}-${patternData?.dataKey}--${patternIndex})`}
+                style={{ pointerEvents: 'none' }}
                 className={[
                   `territory-pattern-${patternData?.dataKey}`,
                   `territory-pattern-${patternData?.dataKey}--${patternData.dataValue}`
@@ -111,7 +130,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                 stroke={strokeColor}
                 className='territory-text'
                 paintOrder='stroke'
-                onClick={handleShapeClick}
+                style={{ pointerEvents: 'none' }}
                 data-tooltip-id={dataTooltipId}
                 data-tooltip-html={dataTooltipHtml}
               >

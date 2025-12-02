@@ -4,10 +4,12 @@ import {
   supportedTerritories,
   supportedCountries,
   supportedCounties,
+  supportedCities,
   stateKeys,
   territoryKeys,
   countryKeys,
-  countyKeys
+  countyKeys,
+  cityKeys
 } from '../data/supported-geos'
 
 /**
@@ -20,14 +22,17 @@ import {
 export const displayGeoName = (key: string, convertFipsCodes = true): string => {
   if (!convertFipsCodes) return key
   let value = key
+  let wasLookedUp = false
 
   // Map to first item in values array which is the preferred label
   if (stateKeys.includes(value)) {
     value = titleCase(supportedStates[key][0])
+    wasLookedUp = true
   }
 
   if (territoryKeys.includes(value)) {
     value = titleCase(supportedTerritories[key][0])
+    wasLookedUp = true
     if (value === 'U.s. Virgin Islands') {
       value = 'U.S. Virgin Islands'
     }
@@ -35,10 +40,17 @@ export const displayGeoName = (key: string, convertFipsCodes = true): string => 
 
   if (countryKeys.includes(value)) {
     value = titleCase(supportedCountries[key][0])
+    wasLookedUp = true
   }
 
   if (countyKeys.includes(value)) {
     value = titleCase(supportedCounties[key])
+    wasLookedUp = true
+  }
+
+  if (cityKeys.includes(value)) {
+    value = titleCase(String(value) || '')
+    wasLookedUp = true
   }
 
   const dict = {
@@ -51,11 +63,14 @@ export const displayGeoName = (key: string, convertFipsCodes = true): string => 
 
   if (Object.keys(dict).includes(value)) {
     value = dict[value]
+    wasLookedUp = true
   }
-  // if you get here and it's 2 letters then DONT titleCase state abbreviations like "AL"
-  if (value?.length === 2 || value === 'U.S. Virgin Islands') {
+
+  // If value was looked up from our dictionaries and needs formatting, or if it's a 2-letter abbreviation, return as-is
+  if (value?.length === 2 || value === 'U.S. Virgin Islands' || wasLookedUp) {
     return value
   } else {
-    return value
+    // Apply titleCase to unrecognized values (e.g., "DISTRICT OF COLUMBIA" -> "District of Columbia")
+    return titleCase(value)
   }
 }

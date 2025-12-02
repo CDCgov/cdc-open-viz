@@ -3,12 +3,13 @@ import { type Visualization } from '@cdc/core/types/Visualization'
 import { type EditorColumnProperties } from '@cdc/core/types/EditorColumnProperties'
 import { type Version } from '@cdc/core/types/Version'
 import { type VizFilter } from '@cdc/core/types/VizFilter'
+import { type Annotation } from '@cdc/core/types/Annotation'
 import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 
 // Runtime data types
 export type RuntimeFilters = VizFilter[] & { fromHash?: number }
 
-export type MapVisualSettings = {
+type MapVisualSettings = {
   /** minBubbleSize - Minimum Circle Size when the map has a type of bubble */
   minBubbleSize: number
   /** maxBubbleSize - Maximum Circle Size when the map has a type of bubble */
@@ -43,20 +44,20 @@ export type PatternSelection = {
 }
 
 // Base column properties with name required, all others optional
-export type BaseColumnProperties = Pick<EditorColumnProperties, 'name'> &
+type BaseColumnProperties = Pick<EditorColumnProperties, 'name'> &
   Partial<Pick<EditorColumnProperties, 'label' | 'tooltip' | 'dataTable' | 'prefix' | 'suffix'>>
 
 // Simple column type for name-only columns
-export type SimpleColumnProperties = Pick<EditorColumnProperties, 'name'>
+type SimpleColumnProperties = Pick<EditorColumnProperties, 'name'>
 
 // Specific column types for better semantics
-export type GeoColumnProperties = BaseColumnProperties
-export type LatitudeColumnProperties = SimpleColumnProperties
-export type LongitudeColumnProperties = SimpleColumnProperties
-export type NavigateColumnProperties = SimpleColumnProperties
-export type PrimaryColumnProperties = BaseColumnProperties
+type GeoColumnProperties = BaseColumnProperties
+type LatitudeColumnProperties = SimpleColumnProperties
+type LongitudeColumnProperties = SimpleColumnProperties
+type NavigateColumnProperties = SimpleColumnProperties
+type PrimaryColumnProperties = BaseColumnProperties
 
-export type LegendShapeItem = {
+type LegendShapeItem = {
   column: string
   key: string
   operator: '=' | '≠' | '<' | '>' | '<=' | '>='
@@ -64,13 +65,13 @@ export type LegendShapeItem = {
   value: string
 }
 
-export type LegendGrouping = {
+type LegendGrouping = {
   legendTitle: string
   legendDescription: string
   items: LegendShapeItem[]
 }
 
-export type HexMapSettings = {
+type HexMapSettings = {
   type: 'shapes' | 'standard'
   shapeGroups: LegendGrouping[]
 }
@@ -80,6 +81,17 @@ export type Coordinate = [number, number]
 export type DataRow = {
   uid?: string // optional 'uid' property
   [key: string]: string | number | boolean | null | undefined // allowing primitive data types for dynamic columns
+}
+
+export type SmallMultiples = {
+  mode?: 'by-column'
+  tileColumn?: string
+  tilesPerRowDesktop?: number
+  tilesPerRowMobile?: number
+  tileOrderType?: 'asc' | 'desc' | 'custom'
+  tileOrder?: string[]
+  tileTitles?: { [key: string]: string }
+  synchronizedTooltips?: boolean
 }
 
 export type MapConfig = Visualization & {
@@ -132,6 +144,7 @@ export type MapConfig = Visualization & {
       name: string
       version: string
       customColors?: string[]
+      customColorsOrdered?: string[]
     }
     showDownloadMediaButton: boolean
     showDownloadImgButton: boolean
@@ -142,6 +155,11 @@ export type MapConfig = Visualization & {
       fipsCode: string
       stateName: string
     }[]
+    countriesPicked?: {
+      iso: string
+      name: string
+    }[]
+    hideUnselectedCountries?: boolean // When true, hide unselected countries; when false (default), gray them out
     territoriesAlwaysShow: boolean
     territoriesLabel: string
     title: string
@@ -201,6 +219,7 @@ export type MapConfig = Visualization & {
   filterBehavior: string
   filterIntro: string
   visual: MapVisualSettings
+  smallMultiples?: SmallMultiples
   // visualization type
   type: 'map'
   // version of the map

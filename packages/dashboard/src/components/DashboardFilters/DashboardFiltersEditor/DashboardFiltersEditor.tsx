@@ -43,9 +43,10 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
     return config.dashboard.sharedFilters
       ?.map<[number, string]>(({ key }, i) => [i, key])
       .filter(([filterIndex]) => !sharedFilterIndexes.includes(filterIndex)) // filter out already added filters
-      .map(([filterIndex, filterName]) => (
-        <option key={filterIndex} value={filterIndex}>{`${filterIndex} - ${filterName}`}</option>
-      ))
+      .map(([filterIndex, filterName]) => ({
+        value: String(filterIndex),
+        label: `${filterIndex} - ${filterName}`
+      }))
   }, [config.visualizations, vizConfig.uid])
 
   const openControls = useState({})
@@ -189,6 +190,27 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
               }
             />
           )}
+          {vizConfig.filterBehavior === 'Apply Button' && (
+            <CheckBox
+              label='Show Clear Filters Button'
+              value={vizConfig.showClearButton ?? true}
+              updateField={(_section, _subsection, _key, value) => {
+                updateConfig({ ...vizConfig, showClearButton: value })
+              }}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>
+                      When enabled, displays a "Clear Filters" button that allows users to reset all filter selections.
+                    </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
+          )}
         </AccordionItemPanel>
       </AccordionItem>
 
@@ -254,8 +276,10 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
                   </Tooltip.Content>
                 </Tooltip>
               </span>
-              <select
+              <Select
+                label=''
                 value={''}
+                options={[{ value: '', label: 'Select' }, ...(existingOptions || [])]}
                 onChange={e => {
                   updateConfig({
                     ...vizConfig,
@@ -263,14 +287,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
                   })
                   setCanAddExisting(false)
                 }}
-              >
-                {[
-                  <option key='select' value=''>
-                    Select
-                  </option>,
-                  ...existingOptions
-                ]}
-              </select>
+              />
             </label>
           ) : (
             <button onClick={() => setCanAddExisting(true)} className='btn btn-primary full-width mt-2'>

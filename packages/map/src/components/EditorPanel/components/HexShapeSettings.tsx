@@ -6,27 +6,20 @@ import {
   AccordionItemPanel,
   AccordionItemButton
 } from 'react-accessible-accordion'
+import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 import ConfigContext from '../../../context'
 import _ from 'lodash'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
-
-const shapeOptions = ['Arrow Up', 'Arrow Down', 'Arrow Right', 'Arrow Left', 'None']
-
-// todo: Move duplicated operators to CORE
-export const DATA_OPERATOR_LESS = '<'
-export const DATA_OPERATOR_GREATER = '>'
-export const DATA_OPERATOR_LESSEQUAL = '<='
-export const DATA_OPERATOR_GREATEREQUAL = '>='
-export const DATA_OPERATOR_EQUAL = '='
-export const DATA_OPERATOR_NOTEQUAL = '≠'
-export const DATA_OPERATORS = [
+import {
   DATA_OPERATOR_LESS,
   DATA_OPERATOR_GREATER,
   DATA_OPERATOR_LESSEQUAL,
   DATA_OPERATOR_GREATEREQUAL,
   DATA_OPERATOR_EQUAL,
   DATA_OPERATOR_NOTEQUAL
-]
+} from '@cdc/core/helpers/constants'
+
+const shapeOptions = ['Arrow Up', 'Arrow Down', 'Arrow Right', 'Arrow Left', 'None']
 
 /**
  * Notice: each shape Col has a legend title and description should the title/desc need to be different for different shapes.
@@ -135,91 +128,60 @@ const HexSettingShapeColumns = props => {
                                   </AccordionItemHeading>
                                   <AccordionItemPanel>
                                     <>
-                                      <label>
-                                        <span className='edit-label column-heading'>Shape Column</span>
-                                        <select
-                                          value={
-                                            config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].shape
-                                              ? config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].shape
-                                              : 'select'
-                                          }
-                                          onChange={e => {
-                                            handleItemUpdate('shape', e.target.value, shapeGroupIndex, itemIndex)
-                                          }}
-                                        >
-                                          {shapeOptions.map(shape => (
-                                            <option value={shape}>{shape}</option>
-                                          ))}
-                                        </select>
-                                      </label>
+                                      <Select
+                                        label='Shape Column'
+                                        value={
+                                          config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].shape ||
+                                          'Arrow Up'
+                                        }
+                                        options={shapeOptions}
+                                        fieldName={`shape-${shapeGroupIndex}-${itemIndex}`}
+                                        updateField={(section, subsection, fieldName, value) => {
+                                          handleItemUpdate('shape', value, shapeGroupIndex, itemIndex)
+                                        }}
+                                      />
 
-                                      <div className='cove-input-group'>
-                                        <label className=''>
-                                          <span className='edit-label cove-input__label'>Column Conditional</span>
-                                        </label>
-                                        <div className='cove-accordion__panel-row cove-accordion__small-inputs'>
-                                          <div className='cove-accordion__panel-col cove-input'>
-                                            <select
-                                              value={
-                                                config.hexMap.shapeGroups[shapeGroupIndex].key === ''
-                                                  ? 'Select'
-                                                  : config.hexMap.shapeGroups[shapeGroupIndex].key
-                                              }
-                                              className='cove-input'
-                                              onChange={e =>
-                                                handleItemUpdate('key', e.target.value, shapeGroupIndex, itemIndex)
-                                              }
-                                            >
-                                              {columnsOptions}
-                                            </select>
-                                          </div>
-                                          <div className='cove-accordion__panel-col cove-input'>
-                                            <select
-                                              value={
-                                                config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].operator ||
-                                                '-SELECT-'
-                                              }
-                                              initial='Select'
-                                              className='cove-input'
-                                              onChange={e =>
-                                                handleItemUpdate('operator', e.target.value, shapeGroupIndex, itemIndex)
-                                              }
-                                            >
-                                              {[DATA_OPERATOR_EQUAL].map(option => {
-                                                return <option value={option}>{option}</option>
-                                              })}
-                                              {[DATA_OPERATOR_NOTEQUAL].map(option => {
-                                                return <option value={option}>{option}</option>
-                                              })}
-                                              {[DATA_OPERATOR_LESS].map(option => {
-                                                return <option value={option}>{option}</option>
-                                              })}
-                                              {[DATA_OPERATOR_GREATER].map(option => {
-                                                return <option value={option}>{option}</option>
-                                              })}
-                                              {[DATA_OPERATOR_LESSEQUAL].map(option => {
-                                                return <option value={option}>{option}</option>
-                                              })}
-                                              {[DATA_OPERATOR_GREATEREQUAL].map(option => {
-                                                return <option value={option}>{option}</option>
-                                              })}
-                                            </select>
-                                          </div>
-                                          <div className='cove-accordion__panel-col cove-input'>
-                                            <input
-                                              type='text'
-                                              value={
-                                                config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].value || ''
-                                              }
-                                              className='cove-input'
-                                              style={{ height: '100%' }}
-                                              onChange={e =>
-                                                handleItemUpdate('value', e.target.value, shapeGroupIndex, itemIndex)
-                                              }
-                                            />
-                                          </div>
-                                        </div>
-                                      </div>
+                                      <Select
+                                        label='Column'
+                                        value={config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].key || ''}
+                                        options={columnsOptions.map(c => c.key)}
+                                        fieldName={`key-${shapeGroupIndex}-${itemIndex}`}
+                                        updateField={(section, subsection, fieldName, value) =>
+                                          handleItemUpdate('key', value, shapeGroupIndex, itemIndex)
+                                        }
+                                      />
+
+                                      <Select
+                                        label='Operator'
+                                        value={
+                                          config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].operator || '='
+                                        }
+                                        options={[
+                                          DATA_OPERATOR_EQUAL,
+                                          DATA_OPERATOR_NOTEQUAL,
+                                          DATA_OPERATOR_LESS,
+                                          DATA_OPERATOR_GREATER,
+                                          DATA_OPERATOR_LESSEQUAL,
+                                          DATA_OPERATOR_GREATEREQUAL
+                                        ]}
+                                        fieldName={`operator-${shapeGroupIndex}-${itemIndex}`}
+                                        updateField={(section, subsection, fieldName, value) =>
+                                          handleItemUpdate('operator', value, shapeGroupIndex, itemIndex)
+                                        }
+                                      />
+
+                                      <label>
+                                        <span className='edit-label column-heading'>Value</span>
+                                        <input
+                                          type='text'
+                                          value={
+                                            config.hexMap.shapeGroups[shapeGroupIndex].items[itemIndex].value || ''
+                                          }
+                                          onChange={e =>
+                                            handleItemUpdate('value', e.target.value, shapeGroupIndex, itemIndex)
+                                          }
+                                        />
+                                      </label>
                                       <button
                                         className='cove-button cove-button--warn'
                                         style={{

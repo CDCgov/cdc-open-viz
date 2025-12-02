@@ -11,6 +11,7 @@ import CityList from '../CityList'
 import BubbleList from '../BubbleList'
 import ZoomControls from '../ZoomControls'
 import { supportedCountries } from '../../data/supported-geos'
+import { getCountriesPicked } from '../../helpers/getCountriesPicked'
 import {
   getGeoFillColor,
   getGeoStrokeColor,
@@ -24,6 +25,7 @@ import {
 } from '../../helpers'
 import useGeoClickHandler from '../../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../../hooks/useApplyTooltipsToGeo'
+import useCountryZoom from '../../hooks/useCountryZoom'
 import generateRuntimeData from '../../helpers/generateRuntimeData'
 import { applyLegendToRow } from '../../helpers/applyLegendToRow'
 
@@ -33,16 +35,23 @@ import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 let projection = geoMercator()
 
+const GRAYED_OUT_COLOR = '#d3d3d3'
+
+type MapPosition = { coordinates: number[]; zoom: number }
+
 const WorldMap = () => {
   // prettier-ignore
   const {
     runtimeData,
-    position,
+    position: mapPosition,
     config,
     tooltipId,
     runtimeLegend,
     interactionLabel
   } = useContext(ConfigContext)
+
+  // Type assertion: position from context is actually the map viewport position, not legend position
+  const position = mapPosition as unknown as MapPosition
 
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
 
@@ -51,12 +60,16 @@ const WorldMap = () => {
   const [world, setWorld] = useState(null)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
+
+  const { centerOnCountries } = useCountryZoom(world)
+
   const dispatch = useContext(MapDispatchContext)
 
   useEffect(() => {
     const fetchData = async () => {
       import(/* webpackChunkName: "world-topo" */ './data/world-topo.json').then(topoJSON => {
-        setWorld(feature(topoJSON, topoJSON.objects.countries).features)
+        const worldFeatures = feature(topoJSON, topoJSON.objects.countries).features
+        setWorld(worldFeatures)
       })
     }
     fetchData()
@@ -65,6 +78,19 @@ const WorldMap = () => {
   if (!world) {
     return <></>
   }
+
+  // Filter countries based on selection
+  const getFilteredWorld = () => {
+    if (!config.general.countriesPicked || config.general.countriesPicked.length === 0) {
+      return world // Show all countries if none selected
+    }
+
+    // Always show all countries when multi-country mode is active
+    // Individual country styling will handle hide/grayed-out states
+    return world
+  }
+
+  const filteredWorld = getFilteredWorld()
 
   const handleFiltersReset = () => {
     const newRuntimeData = generateRuntimeData(config)
@@ -89,7 +115,15 @@ const WorldMap = () => {
       eventLabel: interactionLabel,
       vizTitle: getVizTitle(config)
     })
-    dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
+
+    // If countries are selected, center on them; otherwise, use default world position
+    const countriesPicked = getCountriesPicked(config)
+
+    if (countriesPicked && countriesPicked.length > 0) {
+      centerOnCountries('reset')
+    } else {
+      dispatch({ type: 'SET_POSITION', payload: { coordinates: [0, 30], zoom: 1 } })
+    }
   }
 
   const handleZoomIn = position => {
@@ -189,25 +223,57 @@ const WorldMap = () => {
       const geoStrokeColor = getGeoStrokeColor(config)
       const geoFillColor = getGeoFillColor(config)
 
-      let styles: Record<string, string | Record<string, string>> = {
-        fill: geoFillColor,
-        cursor: 'default'
+      // Check if this country should be greyed out for multi-country selection
+      const countriesPicked = getCountriesPicked(config)
+
+      const isGreyedOut = Boolean(
+        countriesPicked.length > 0 &&
+          config.general.hideUnselectedCountries !== true &&
+          !countriesPicked.some(country => country.iso === geo.properties.iso || country.name === geoDisplayName)
+      )
+
+      // Determine visual state for TDD tests
+      const isSelected = countriesPicked.some(
+        country => country.iso === geo.properties.iso || country.name === geoDisplayName
+      )
+      const isHidden = countriesPicked.length > 0 && config.general.hideUnselectedCountries === true && !isSelected
+
+      // Build CSS class names for TDD tests
+      let geoClassName = ''
+      if (countriesPicked.length > 0) {
+        if (isSelected) {
+          geoClassName = 'selected'
+        } else if (isGreyedOut) {
+          geoClassName = 'grayed-out'
+        } else if (isHidden) {
+          geoClassName = 'hidden'
+        }
       }
 
-      const strokeWidth = 0.9
+      let styles: Record<string, string | Record<string, string>> = {
+        fill: isGreyedOut ? GRAYED_OUT_COLOR : geoFillColor,
+        cursor: 'default',
+        ...(isGreyedOut && { opacity: '0.3' })
+      }
+
+      // Scale stroke width inversely with zoom level to maintain consistent visual thickness
+      // At zoom=1, use base width of 0.9; at zoom=4, use 0.225; etc.
+      const baseStrokeWidth = 0.9
+      const currentZoom = position?.zoom || 1
+      const strokeWidth = baseStrokeWidth / currentZoom
 
       // If a legend applies, return it with appropriate information.
       const toolTip = applyTooltipsToGeo(geoDisplayName, geoData)
       if (legendColors && legendColors[0] !== '#000000' && type !== 'bubble') {
         styles = {
           ...styles,
-          fill: type !== 'world-geocode' ? legendColors[0] : geoFillColor,
+          fill: isGreyedOut ? GRAYED_OUT_COLOR : type !== 'world-geocode' ? legendColors[0] : geoFillColor,
           cursor: 'default',
           '&:hover': {
-            fill: type !== 'world-geocode' ? legendColors[1] : geoFillColor
+            fill: isGreyedOut ? GRAYED_OUT_COLOR : type !== 'world-geocode' ? legendColors[1] : geoFillColor
           },
           '&:active': {
-            fill: type !== 'world-geocode' ? legendColors[2] : geoFillColor
+            fill: isGreyedOut ? GRAYED_OUT_COLOR : type !== 'world-geocode' ? legendColors[2] : geoFillColor
           }
         }
 
@@ -228,6 +294,7 @@ const WorldMap = () => {
             path={path}
             stroke={geoStrokeColor}
             strokeWidth={strokeWidth}
+            className={geoClassName}
             onClick={() => geoClickHandler(geoDisplayName, geoData)}
             onMouseEnter={() => {
               // Track hover analytics event if this is a new location
@@ -245,6 +312,7 @@ const WorldMap = () => {
             }}
             data-tooltip-id={`tooltip__${tooltipId}`}
             data-tooltip-html={toolTip}
+            data-country-code={geo.properties.iso}
             tabIndex={-1}
           />
         )
@@ -260,6 +328,7 @@ const WorldMap = () => {
           strokeWidth={strokeWidth}
           styles={styles}
           path={path}
+          className={geoClassName}
           onMouseEnter={() => {
             // Track hover analytics event if this is a new location
             const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
@@ -276,6 +345,7 @@ const WorldMap = () => {
           }}
           data-tooltip-id={`tooltip__${tooltipId}`}
           data-tooltip-html={toolTip}
+          data-country-code={geo.properties.iso}
         />
       )
     })
@@ -305,7 +375,7 @@ const WorldMap = () => {
             width={SVG_WIDTH}
             height={SVG_HEIGHT}
           >
-            <Mercator data={world}>{({ features }) => constructGeoJsx(features)}</Mercator>
+            <Mercator data={filteredWorld}>{({ features }) => constructGeoJsx(features)}</Mercator>
           </ZoomableGroup>
         </svg>
       ) : (
@@ -319,7 +389,7 @@ const WorldMap = () => {
             width={SVG_WIDTH}
             height={SVG_HEIGHT}
           >
-            <Mercator data={world}>{({ features }) => constructGeoJsx(features)}</Mercator>
+            <Mercator data={filteredWorld}>{({ features }) => constructGeoJsx(features)}</Mercator>
           </ZoomableGroup>
         </svg>
       )}

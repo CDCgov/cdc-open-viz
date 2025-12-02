@@ -29,7 +29,7 @@ export const handleTooltip = (boxplot, columnCategory, key, q1, q3, median, iqr,
   `
 }
 
-export const calculateBoxPlotStats = (values: number[]) => {
+const calculateBoxPlotStats = (values: number[]) => {
   if (!values || values.length === 0) return {}
 
   // Sort the values
@@ -82,7 +82,7 @@ const getValuesBySeriesKey = (group: string, config, data) => {
 }
 
 // Helper to calculate outliers based on IQR
-export const calculateOutliers = (values: number[], firstQuartile: number, thirdQuartile: number) => {
+const calculateOutliers = (values: number[], firstQuartile: number, thirdQuartile: number) => {
   const iqr = thirdQuartile - firstQuartile
   const lowerBound = firstQuartile - 1.5 * iqr
   const upperBound = thirdQuartile + 1.5 * iqr
@@ -90,7 +90,7 @@ export const calculateOutliers = (values: number[], firstQuartile: number, third
 }
 
 // Helper to calculate non-outliers based on IQR
-export const calculateNonOutliers = (values: number[], firstQuartile: number, thirdQuartile: number): number[] => {
+const calculateNonOutliers = (values: number[], firstQuartile: number, thirdQuartile: number): number[] => {
   const iqr = thirdQuartile - firstQuartile
   const lowerBound = firstQuartile - 1.5 * iqr
   const upperBound = thirdQuartile + 1.5 * iqr

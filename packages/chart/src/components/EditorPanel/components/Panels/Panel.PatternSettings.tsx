@@ -10,6 +10,7 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import Button from '@cdc/core/components/elements/Button'
 import Alert from '@cdc/core/components/Alert'
+import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 import ConfigContext from '../../../../ConfigContext'
 import { ChartContext } from '../../../../types/ChartContext'
 import { PanelProps } from '../PanelProps'
@@ -89,17 +90,22 @@ const PanelPatternSettings: FC<PanelProps> = props => {
   }
 
   // Checks contrast and logs warning if needed
-  const checkAndLogContrast = (fill: string, patternColor: string, dataValue: string, dataKey: string): boolean => {
-    if (!fill || !patternColor) return true // Default to true if colors are missing
+  const checkAndLogContrast = (
+    patternColor: string,
+    backgroundColor: string,
+    dataValue: string,
+    dataKey: string
+  ): boolean => {
+    if (!backgroundColor || !patternColor) return true // Default to true if colors are missing
 
-    const contrastCheck = checkColorContrast(fill, patternColor)
+    const contrastCheck = checkColorContrast(patternColor, backgroundColor)
 
     if (!contrastCheck) {
       console.error(
         `COVE: pattern contrast check failed for ${dataValue} in ${dataKey} with:
       pattern color: ${patternColor}
-      background color: ${fill}
-      contrast: ${getColorContrast(fill, patternColor)}`
+      background color: ${backgroundColor}
+      contrast: ${getColorContrast(patternColor, backgroundColor)}`
       )
     }
 
@@ -108,7 +114,9 @@ const PanelPatternSettings: FC<PanelProps> = props => {
 
   // Perform contrast check for a specific pattern against actual bar colors
   const performContrastCheck = (patternKey: string, patternColor: string) => {
-    if (!patternColor || patternColor === '') return true
+    if (!patternColor || patternColor === '') {
+      return true
+    }
 
     // Get the actual bar colors that the pattern will be overlaid on
     let seriesColors: string[] = []
@@ -138,8 +146,8 @@ const PanelPatternSettings: FC<PanelProps> = props => {
     const contrastResults: Array<{ color: string; passes: boolean; ratio: number | false }> = []
 
     seriesColors.forEach((barColor, index) => {
-      const contrastPasses = checkAndLogContrast(barColor, patternColor, patternKey, `series-${index}`)
-      const contrastRatio = getColorContrast(barColor, patternColor)
+      const contrastPasses = checkAndLogContrast(patternColor, barColor, patternKey, `series-${index}`)
+      const contrastRatio = getColorContrast(patternColor, barColor)
 
       contrastResults.push({
         color: barColor,
@@ -184,26 +192,48 @@ const PanelPatternSettings: FC<PanelProps> = props => {
       }
     }
 
-    updateConfig({
+    const updatedConfig = {
       ...config,
       legend: {
         ...(config.legend || {}),
         patterns: newPatterns
+      },
+      runtime: {
+        ...config.runtime
       }
-    })
+    }
+
+    // Check if all patterns pass and set error message
+    const allPatternsPass = Object.values(newPatterns).every((p: any) => p.contrastCheck !== false)
+    updatedConfig.runtime.editorErrorMessage = allPatternsPass
+      ? ''
+      : 'One or more patterns do not pass the WCAG 2.1 contrast ratio of 3:1.'
+
+    updateConfig(updatedConfig)
   }
 
   const handleRemovePattern = (patternKey: string) => {
     const newPatterns = { ...(legendCfg.patterns || {}) }
     delete newPatterns[patternKey]
 
-    updateConfig({
+    const updatedConfig = {
       ...config,
       legend: {
         ...(config.legend || {}),
         patterns: newPatterns
+      },
+      runtime: {
+        ...config.runtime
       }
-    })
+    }
+
+    // Check if all remaining patterns pass and clear error message if needed
+    const allPatternsPass = Object.values(newPatterns).every((p: any) => p.contrastCheck !== false)
+    if (allPatternsPass || Object.keys(newPatterns).length === 0) {
+      updatedConfig.runtime.editorErrorMessage = ''
+    }
+
+    updateConfig(updatedConfig)
   }
 
   const handlePatternKeyChange = (oldKey: string, newKey: string) => {
@@ -228,15 +258,33 @@ const PanelPatternSettings: FC<PanelProps> = props => {
     })
   }
 
+  const reviewColorContrast = (updatedConfig: any, patternKey: string) => {
+    // Re-check the contrast for the updated pattern
+    const pattern = updatedConfig.legend.patterns[patternKey]
+
+    if (pattern?.color) {
+      pattern.contrastCheck = performContrastCheck(patternKey, pattern.color)
+    }
+
+    // Update error message based on whether all patterns pass contrast checks
+    const allPatterns = Object.values(updatedConfig.legend.patterns || {})
+
+    const allPatternsPass = allPatterns.every((p: any) => p.contrastCheck !== false)
+
+    const errorMsg = allPatternsPass ? '' : 'One or more patterns do not pass the WCAG 2.1 contrast ratio of 3:1.'
+    // Set error message AFTER spreading runtime to avoid it being overwritten
+    updatedConfig.runtime.editorErrorMessage = errorMsg
+  }
+
   const handlePatternUpdate = (patternKey: string, field: string, value: any) => {
     const updatedPattern = {
       ...(legendCfg.patterns?.[patternKey] || {}),
       [field]: value
     }
 
-    // Perform contrast check if color is being updated
-    if (field === 'color') {
-      updatedPattern.contrastCheck = performContrastCheck(patternKey, value)
+    // Clear dataValue if dataKey is being cleared or set to 'Select'
+    if (field === 'dataKey' && (value === 'Select' || value === '')) {
+      updatedPattern.dataValue = ''
     }
 
     const newPatterns = {
@@ -244,13 +292,23 @@ const PanelPatternSettings: FC<PanelProps> = props => {
       [patternKey]: updatedPattern
     }
 
-    updateConfig({
+    const updatedConfig = {
       ...config,
       legend: {
         ...(config.legend || {}),
         patterns: newPatterns
+      },
+      runtime: {
+        ...config.runtime
       }
-    })
+    }
+
+    // Perform contrast check whenever color changes (even if cleared)
+    if (field === 'color') {
+      reviewColorContrast(updatedConfig, patternKey)
+    }
+
+    updateConfig(updatedConfig)
   }
 
   return (
@@ -294,19 +352,16 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                     />
                   )}
 
-                  <label htmlFor={`pattern-datakey-${patternKey}`}>Data Key:</label>
-                  <select
-                    id={`pattern-datakey-${patternKey}`}
-                    value={p.dataKey || 'Select'}
-                    onChange={e => handlePatternUpdate(patternKey, 'dataKey', e.target.value)}
-                  >
-                    <option value='Select'>Select Data Key</option>
-                    {fieldOptions.map((option, index) => (
-                      <option value={option.value} key={index}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  <Select
+                    label='Data Key:'
+                    value={p.dataKey || ''}
+                    options={fieldOptions}
+                    initial='Select Data Key'
+                    fieldName={`pattern-datakey-${patternKey}`}
+                    updateField={(section, subsection, fieldName, value) =>
+                      handlePatternUpdate(patternKey, 'dataKey', value)
+                    }
+                  />
 
                   {p.dataKey && (
                     <>
@@ -333,33 +388,25 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                     />
                   </label>
 
-                  <label htmlFor={`pattern-type-${patternKey}`}>Pattern Type:</label>
-                  <select
-                    id={`pattern-type-${patternKey}`}
+                  <Select
+                    label='Pattern Type:'
                     value={p.shape || 'circles'}
-                    onChange={e => handlePatternUpdate(patternKey, 'shape', e.target.value)}
-                  >
-                    {patternTypes.map((patternType, index) => (
-                      <option value={patternType.value} key={index}>
-                        {patternType.label}
-                      </option>
-                    ))}
-                  </select>
-
-                  <label htmlFor={`pattern-size-${patternKey}`}>Pattern Size:</label>
-                  <select
-                    id={`pattern-size-${patternKey}`}
-                    value={getPatternSizeText(p.patternSize || 8)}
-                    onChange={e =>
-                      handlePatternUpdate(patternKey, 'patternSize', getPatternSizeNumeric(e.target.value))
+                    options={patternTypes}
+                    fieldName={`pattern-type-${patternKey}`}
+                    updateField={(section, subsection, fieldName, value) =>
+                      handlePatternUpdate(patternKey, 'shape', value)
                     }
-                  >
-                    {patternSizes.map((size, index) => (
-                      <option value={size.value} key={index}>
-                        {size.label}
-                      </option>
-                    ))}
-                  </select>
+                  />
+
+                  <Select
+                    label='Pattern Size:'
+                    value={getPatternSizeText(p.patternSize || 8)}
+                    options={patternSizes}
+                    fieldName={`pattern-size-${patternKey}`}
+                    updateField={(section, subsection, fieldName, value) =>
+                      handlePatternUpdate(patternKey, 'patternSize', getPatternSizeNumeric(value))
+                    }
+                  />
 
                   <div className='mt-3'>
                     <label htmlFor={`pattern-color-${patternKey}`}>
@@ -380,7 +427,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                       </Tooltip>
                       <input
                         type='text'
-                        value={p.color || '#666666'}
+                        value={p.color || ''}
                         id={`pattern-color-${patternKey}`}
                         onChange={e => handlePatternUpdate(patternKey, 'color', e.target.value)}
                         placeholder='#666666'

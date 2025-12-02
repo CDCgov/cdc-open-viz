@@ -8,7 +8,14 @@ import { Visualization } from '../../types/Visualization'
 
 const meta: Meta<typeof Filters> = {
   title: 'Components/Molecules/Visualization Filters',
-  component: Filters
+  component: Filters,
+  decorators: [
+    Story => (
+      <div className='cdc-open-viz-module'>
+        <Story />
+      </div>
+    )
+  ]
 }
 
 type Story = StoryObj<typeof Filters>
@@ -53,5 +60,17 @@ export const Pill: Story = generateConfig('pill')
 export const Tab: Story = generateConfig('tab')
 
 export const TabBar: Story = generateConfig('tab bar')
+
+export const WithApplyButton: Story = {
+  args: {
+    config: {
+      filters: generateFilters('dropdown'),
+      data: animalData,
+      filterBehavior: 'Apply Button',
+      type: 'chart'
+    } as any,
+    setFilters: () => {}
+  }
+}
 
 export default meta

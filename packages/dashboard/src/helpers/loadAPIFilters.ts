@@ -15,19 +15,24 @@ export const loadAPIFiltersFactory = (
     sharedFilters: SharedFilter[],
     dropdowns: APIFilterDropdowns,
     loadAll?: boolean,
-    recursiveLimit = 50
+    recursiveLimit = 50,
+    isStale?: () => boolean
   ): Promise<SharedFilter[]> => {
     if (!sharedFilters) return
     const allIndexes = sharedFilters.map((_, index) => index)
     const _autoLoadFilterIndexes = loadAll ? allIndexes : autoLoadFilterIndexes
-    sharedFilters = sharedFilters.map((filter, index) =>
-      apiFilterHelpers.setAutoLoadDefaultValue(
+    sharedFilters = sharedFilters.map((filter, index) => {
+      // For data filters (no API endpoint), return unchanged to preserve user selections
+      if (!filter.apiFilter?.apiEndpoint) {
+        return filter
+      }
+      return apiFilterHelpers.setAutoLoadDefaultValue(
         index,
-        dropdowns[filter.apiFilter?.apiEndpoint],
+        dropdowns[filter.apiFilter.apiEndpoint],
         sharedFilters,
         _autoLoadFilterIndexes
       )
-    )
+    })
     const sharedAPIFilters = sharedFilters.filter(f => f.apiFilter)
     const filterLookup = new Map(sharedAPIFilters.map(filter => [filter.apiFilter.apiEndpoint, filter.apiFilter]))
     const toFetch = apiFilterHelpers.getToFetch(sharedFilters, dropdowns)
@@ -87,11 +92,16 @@ export const loadAPIFiltersFactory = (
         return acc
       }, [])
       if (hasError || !toLoad.length || recursiveLimit === 0) {
+        // Check if this operation is stale before dispatching
+        if (isStale && isStale()) {
+          // Operation is stale (filters were cleared), skip dispatch
+          return sharedFilters
+        }
         setAPIFilterDropdowns(newDropdowns)
         dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFilters })
         return sharedFilters
       } else {
-        return loadAPIFilters(sharedFilters, newDropdowns, loadAll, recursiveLimit - 1)
+        return loadAPIFilters(sharedFilters, newDropdowns, loadAll, recursiveLimit - 1, isStale)
       }
     })
   }

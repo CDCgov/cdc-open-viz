@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useState, useRef } from 'react'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
 import Filters from './DashboardFilters'
 import { changeFilterActive } from '../../helpers/changeFilterActive'
@@ -12,6 +12,7 @@ import DashboardFiltersEditor from './DashboardFiltersEditor'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import { hasDashboardApplyBehavior } from '../../helpers/hasDashboardApplyBehavior'
 import * as apiFilterHelpers from '../../helpers/apiFilterHelpers'
+import * as filterResetHelpers from '../../helpers/filterResetHelpers'
 import { applyQueuedActive } from '@cdc/core/components/Filters/helpers/applyQueuedActive'
 import './dashboardfilter.styles.css'
 import { updateChildFilters } from '../../helpers/updateChildFilters'
@@ -49,8 +50,14 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   const { config: dashboardConfig, reloadURLData, loadAPIFilters, setAPIFilterDropdowns, setAPILoading } = state
   const dispatch = useContext(DashboardDispatchContext)
 
+  // Track filter version to prevent stale async updates from overwriting cleared filters
+  const filterVersionRef = useRef(0)
+
   const applyFilters = e => {
     e.preventDefault() // prevent form submission
+
+    // Increment version to invalidate any pending async filter operations from handleOnChange
+    filterVersionRef.current += 1
 
     const dashboardConfig = {
       ...state.config.dashboard,
@@ -59,18 +66,21 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
 
     const nonAutoLoadFilterIndexes = Object.values(state.config.visualizations)
       .filter(v => v.type === 'dashboardFilters')
-      .reduce((acc, viz: DashboardFilters) => (!viz.autoLoad ? [...acc, viz.sharedFilterIndexes] : acc), [])
+      .reduce((acc, viz: DashboardFilters) => (!viz.autoLoad ? [...acc, ...viz.sharedFilterIndexes] : acc), [])
     const allRequiredFiltersSelected = !dashboardConfig.sharedFilters.some((filter, filterIndex) => {
       if (nonAutoLoadFilterIndexes.includes(filterIndex)) {
-        return !filter.active && !filter.queuedActive
+        const activeValue = filter.queuedActive || filter.active
+        // Check if filter is not selected OR is set to its reset label
+        const isNotSelected = !activeValue || (filter.resetLabel && activeValue === filter.resetLabel)
+        return isNotSelected
       } else {
         // autoload filters don't need to be selected to apply filters
         return false
       }
     })
     if (allRequiredFiltersSelected) {
-      if (hasDashboardApplyBehavior(state.config.visualizations)) {
-        dispatch({ type: 'SET_FILTERS_APPLIED', payload: true })
+      const hasApplyBehavior = hasDashboardApplyBehavior(state.config.visualizations)
+      if (hasApplyBehavior) {
         const queryParams = getQueryParams()
         let needsQueryUpdate = false
         dashboardConfig.sharedFilters.forEach(sharedFilter => {
@@ -93,30 +103,103 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       setAPILoading(true)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: dashboardConfig.sharedFilters })
 
-      // Clear data when applying filters to force fresh reload
-      const emptyData = Object.keys(state.data).reduce((acc, key) => {
-        acc[key] = []
-        return acc
-      }, {})
+      // Capture current version for this operation
+      const operationVersion = filterVersionRef.current
+      const isStale = () => filterVersionRef.current !== operationVersion
 
-      const emptyFilteredData = Object.keys(state.filteredData).reduce((acc, key) => {
-        acc[key] = []
-        return acc
-      }, {})
+      loadAPIFilters(dashboardConfig.sharedFilters, apiFilterDropdowns, undefined, undefined, isStale)
+        .then(async newFilters => {
+          // Skip if operation is stale
+          if (isStale()) {
+            return
+          }
 
-      dispatch({ type: 'SET_DATA', payload: emptyData })
-      dispatch({ type: 'SET_FILTERED_DATA', payload: emptyFilteredData })
+          // First try to reload URL data (for filters that actually change the API call)
+          await reloadURLData(newFilters)
 
-      loadAPIFilters(dashboardConfig.sharedFilters, apiFilterDropdowns)
-        .then(newFilters => {
-          reloadURLData(newFilters)
+          // Set filters applied AFTER data is loaded to prevent "no data" flash
+          if (hasApplyBehavior) {
+            dispatch({ type: 'SET_FILTERS_APPLIED', payload: true })
+          }
+          setAPILoading(false)
         })
         .catch(e => {
           console.error(e)
+          setAPILoading(false)
         })
     } else {
       // TODO noftify of required fields
     }
+  }
+
+  const handleReset = e => {
+    e.preventDefault()
+
+    // Increment version to invalidate any pending async filter operations
+    filterVersionRef.current += 1
+
+    const dashboardConfig = {
+      ...state.config.dashboard,
+      sharedFilters: _.cloneDeep(state.config.dashboard.sharedFilters)
+    }
+
+    const queryParams = getQueryParams()
+    let needsQueryUpdate = false
+
+    // Reset each filter to empty/resetLabel state (forceEmpty = true)
+    dashboardConfig.sharedFilters.forEach((filter, i) => {
+      const resetValue = filterResetHelpers.getFilterResetValue(filter, apiFilterDropdowns, true)
+      filterResetHelpers.resetFilterToValue(dashboardConfig.sharedFilters[i], resetValue, apiFilterDropdowns)
+
+      // Update query parameters if needed
+      if (
+        filter.setByQueryParameter &&
+        queryParams[filter.setByQueryParameter] !== dashboardConfig.sharedFilters[i].active
+      ) {
+        queryParams[filter.setByQueryParameter] = dashboardConfig.sharedFilters[i].active
+        needsQueryUpdate = true
+      }
+    })
+
+    if (needsQueryUpdate) {
+      updateQueryString(queryParams)
+    }
+
+    // Clear dropdown cache for child filters that depend on parents
+    const updatedDropdowns = filterResetHelpers.clearChildFilterDropdowns(
+      dashboardConfig.sharedFilters,
+      apiFilterDropdowns
+    )
+    setAPIFilterDropdowns(updatedDropdowns)
+
+    dispatch({ type: 'SET_SHARED_FILTERS', payload: dashboardConfig.sharedFilters })
+
+    // Reset filtersApplied state to false when clearing filters
+    dispatch({ type: 'SET_FILTERS_APPLIED', payload: false })
+
+    // Update filtered data immediately after resetting filters
+    // Use the updated dashboardConfig filters instead of state
+    const clonedState = {
+      ...state,
+      config: {
+        ...state.config,
+        dashboard: {
+          ...state.config.dashboard,
+          sharedFilters: dashboardConfig.sharedFilters
+        }
+      }
+    }
+    const newFilteredData = getFilteredData(clonedState)
+    dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
+
+    publishAnalyticsEvent({
+      vizType: dashboardConfig.type,
+      vizSubType: getVizSubType(dashboardConfig),
+      eventType: `dashboard_filter_reset`,
+      eventAction: 'click',
+      eventLabel: interactionLabel,
+      vizTitle: getVizTitle(dashboardConfig)
+    })
   }
 
   const handleOnChange = (index: number, value: string | string[]) => {
@@ -157,12 +240,18 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         apiFilterDropdowns,
         changedFilterIndexes
       )
+      // Capture current version for this operation
+      const operationVersion = filterVersionRef.current
+      const isStale = () => filterVersionRef.current !== operationVersion
+
       if (isAutoSelectFilter && !missingFilterSelections) {
         // a dropdown has been selected that doesn't
         // require the Go Button
         setAPIFilterDropdowns(loadingFilterMemo)
-        loadAPIFilters(newSharedFilters, loadingFilterMemo).then(filters => {
-          reloadURLData(filters)
+        loadAPIFilters(newSharedFilters, loadingFilterMemo, undefined, undefined, isStale).then(filters => {
+          if (!isStale()) {
+            reloadURLData(filters)
+          }
         })
       } else {
         newSharedFilters[index].queuedActive = value
@@ -170,7 +259,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         // Don't clear data immediately - keep existing data until new data loads
         // Only update the filter dropdowns and prepare for reload
         setAPIFilterDropdowns(loadingFilterMemo)
-        loadAPIFilters(newSharedFilters, loadingFilterMemo)
+        loadAPIFilters(newSharedFilters, loadingFilterMemo, undefined, undefined, isStale)
       }
     } else {
       if (newSharedFilters[index].type === 'urlfilter' && newSharedFilters[index].apiFilter) {
@@ -224,8 +313,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
       {!displayNone && (
         <Layout.Responsive isEditor={isEditor}>
           <div
-            className={`${isEditor ? ' is-editor' : ''
-              } cove-component__content col-12 cove-dashboard-filters-container`}
+            className={`${
+              isEditor ? ' is-editor' : ''
+            } cove-component__content col-12 cove-dashboard-filters-container`}
           >
             <Filters
               show={visualizationConfig?.sharedFilterIndexes?.map(Number)}
@@ -235,6 +325,12 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
               showSubmit={visualizationConfig.filterBehavior === FilterBehavior.Apply && !visualizationConfig.autoLoad}
               applyFilters={applyFilters}
               applyFiltersButtonText={visualizationConfig.applyFiltersButtonText}
+              handleReset={
+                visualizationConfig.filterBehavior === FilterBehavior.Apply &&
+                (visualizationConfig.showClearButton ?? true)
+                  ? handleReset
+                  : undefined
+              }
             />
           </div>
         </Layout.Responsive>
