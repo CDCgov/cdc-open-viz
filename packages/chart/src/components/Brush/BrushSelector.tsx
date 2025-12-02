@@ -4,10 +4,11 @@ import BaseBrush from '@visx/brush/lib/BaseBrush'
 import { Group } from '@visx/group'
 import { scaleBand, scaleLinear } from '@visx/scale'
 import { LinePath, AreaClosed } from '@visx/shape'
-import { curveMonotoneX } from '@visx/curve'
+import * as allCurves from '@visx/curve'
 import { Bounds } from '@visx/brush/lib/types'
 import type { BrushHandleRenderProps } from '@visx/brush/lib/BrushHandle'
 import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
+import { handleLineType } from '../../helpers/handleLineType'
 
 interface BrushSelectorProps {
   xMax: number
@@ -18,22 +19,34 @@ const BRUSH_HEIGHT = 50
 const BRUSH_PADDING = 10
 const BORDER_RADIUS = 4
 
-// Simple brush handle component
+// Simple brush handle component with wider grab area
 const BrushHandle = memo<BrushHandleRenderProps>(({ x, height, isBrushActive }) => {
   if (!isBrushActive) return null
 
   const pathWidth = 8
   const pathHeight = 15
+  const grabAreaWidth = 20 // Wider invisible grab area
 
   return (
     <Group left={x + pathWidth / 2 - 2} top={(height - pathHeight) / 2}>
+      {/* Invisible wider grab area that extends full height */}
+      <rect
+        x={-grabAreaWidth / 2}
+        y={-(height - pathHeight) / 2}
+        width={grabAreaWidth}
+        height={height}
+        fill='transparent'
+        style={{ cursor: 'ew-resize' }}
+        pointerEvents='all'
+      />
+      {/* Visible handle */}
       <path
         fill='#f2f2f2'
         d='M -4.5 0.5 L 3.5 0.5 L 3.5 15.5 L -4.5 15.5 L -4.5 0.5 M -1.5 4 L -1.5 12 M 0.5 4 L 0.5 12'
         stroke='#999999'
         strokeWidth='1'
         style={{ cursor: 'ew-resize' }}
-        pointerEvents='all'
+        pointerEvents='none'
       />
     </Group>
   )
@@ -61,6 +74,13 @@ const MiniChartPreview = memo<{
         const seriesKey = s.dataKey
         const seriesColor = colorScale?.(config.runtime.seriesLabels?.[seriesKey] || seriesKey) || '#666'
         const isAreaChart = s.type === 'Area Chart' || config.visualizationType === 'Area Chart'
+
+        // Get series-specific styling
+        const seriesWeight = s.weight || 2
+        const seriesLineType = s.lineType || 'curveLinear'
+        const seriesStyle = s.type || 'solid'
+        const curve = allCurves[seriesLineType] || allCurves.curveLinear
+        const strokeDasharray = handleLineType(seriesStyle)
 
         // Enhanced data validation to prevent NaN errors
         const validData = tableData.filter(d => {
@@ -103,8 +123,9 @@ const MiniChartPreview = memo<{
             fill={seriesColor}
             fillOpacity={0.3}
             stroke={seriesColor}
-            strokeWidth={1}
-            curve={curveMonotoneX}
+            strokeWidth={seriesWeight}
+            strokeDasharray={strokeDasharray}
+            curve={curve}
             pointerEvents='none'
           />
         ) : (
@@ -114,9 +135,10 @@ const MiniChartPreview = memo<{
             x={getX}
             y={getY}
             stroke={seriesColor}
-            strokeWidth={2}
+            strokeWidth={seriesWeight}
+            strokeDasharray={strokeDasharray}
             strokeOpacity={0.8}
-            curve={curveMonotoneX}
+            curve={curve}
             pointerEvents='none'
           />
         )
@@ -260,16 +282,18 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     dispatch({ type: 'SET_BRUSH_DATA', payload: filteredData })
   }
 
-  // Set default 20% selection on initial load
+  // Set default 35% selection on initial load (starting from most recent dates)
   useEffect(() => {
     if (hasInitialized.current || !tableData.length || !xScale || xMax <= 0) {
       return
     }
 
     const safeXMax = Math.max(xMax, 100)
-    const initialWidth = safeXMax * 0.2 // 20% of the width
-    const x0 = 0
-    const x1 = initialWidth
+    const safeYMax = Math.max(yMax, BRUSH_HEIGHT + BRUSH_PADDING * 2)
+    const initialWidth = safeXMax * 0.35 // 35% of the width
+    // Start from the end (most recent dates) instead of the beginning
+    const x0 = safeXMax - initialWidth
+    const x1 = safeXMax
 
     // Find all domain values that fall within the initial 20% range
     const domain = xScale.domain()
@@ -288,7 +312,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
         x0,
         x1,
         y0: 0,
-        y1: BRUSH_HEIGHT,
+        y1: safeYMax,
         xValues
       }
 
@@ -299,13 +323,14 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tableData, xScale, xMax, dataKey])
 
-  // Selected box style
+  // Selected box style with dotted border
   const selectedBoxStyle = useMemo(
     () => ({
       fill: 'transparent',
       fillOpacity: 0,
       stroke: '#333',
       strokeWidth: 2,
+      strokeDasharray: '4 4',
       rx: BORDER_RADIUS
     }),
     []
@@ -433,11 +458,12 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
 
     // Update the brush position
     if (xValues.length > 0) {
+      const safeYMax = Math.max(yMax, BRUSH_HEIGHT + BRUSH_PADDING * 2)
       const newBounds: Bounds = {
         x0: newX0,
         x1: newX1,
         y0: 0,
-        y1: BRUSH_HEIGHT,
+        y1: safeYMax,
         xValues
       }
 
@@ -451,7 +477,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
             x0: newX0,
             x1: newX1,
             y0: 0,
-            y1: BRUSH_HEIGHT
+            y1: safeYMax
           },
           start: { x: newX0, y: 0 },
           end: { x: newX1, y: BRUSH_HEIGHT }
@@ -470,16 +496,17 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   const safeXMax = Math.max(xMax, 100) // Minimum width of 100px
   const safeYMax = Math.max(yMax, BRUSH_HEIGHT + BRUSH_PADDING * 2) // Minimum height with padding
 
-  // Calculate initial brush position (20% from the beginning)
+  // Calculate initial brush position (35% from the end, starting at most recent dates)
   const initialBrushPosition = useMemo(() => {
     if (safeXMax > 0 && tableData.length > 0) {
+      const initialWidth = safeXMax * 0.35
       return {
-        start: { x: 0, y: 0 },
-        end: { x: safeXMax * 0.2, y: BRUSH_HEIGHT }
+        start: { x: safeXMax - initialWidth, y: 0 },
+        end: { x: safeXMax, y: safeYMax }
       }
     }
     return undefined
-  }, [safeXMax, tableData.length])
+  }, [safeXMax, safeYMax, tableData.length])
 
   return (
     <svg
@@ -487,7 +514,9 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       height={safeYMax}
       style={{
         display: 'block',
-        overflow: 'visible' // Ensure handles don't get clipped
+        overflow: 'visible', // Ensure handles don't get clipped
+        border: '1px solid #d0d0d0',
+        borderRadius: '4px'
       }}
     >
       {/* Mini chart preview */}
@@ -505,28 +534,26 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
         )}
       </Group>
 
-      {/* Brush component with padding */}
+      {/* Brush component - positioned at the very top, no padding */}
       {safeXMax > 0 && (
-        <Group top={BRUSH_PADDING}>
-          <Brush
-            xScale={xScale}
-            yScale={yScale}
-            width={safeXMax}
-            height={BRUSH_HEIGHT}
-            brushDirection='horizontal'
-            onChange={handleBrushChange}
-            selectedBoxStyle={selectedBoxStyle}
-            useWindowMoveEvents={true} // Track mouse movements outside the brush area
-            resizeTriggerAreas={['left', 'right']} // Enable resize handles on both sides
-            innerRef={brushRef}
-            renderBrushHandle={props => <BrushHandle {...props} />}
-            initialBrushPosition={initialBrushPosition}
-            onClick={handleClick}
-            onBrushStart={handleBrushStart}
-            onBrushEnd={handleBrushEnd}
-            onMouseLeave={handleMouseLeave}
-          />
-        </Group>
+        <Brush
+          xScale={xScale}
+          yScale={yScale}
+          width={safeXMax}
+          height={safeYMax}
+          brushDirection='horizontal'
+          onChange={handleBrushChange}
+          selectedBoxStyle={selectedBoxStyle}
+          useWindowMoveEvents={true} // Track mouse movements outside the brush area
+          resizeTriggerAreas={['left', 'right']} // Enable resize handles on both sides
+          innerRef={brushRef}
+          renderBrushHandle={props => <BrushHandle {...props} />}
+          initialBrushPosition={initialBrushPosition}
+          onClick={handleClick}
+          onBrushStart={handleBrushStart}
+          onBrushEnd={handleBrushEnd}
+          onMouseLeave={handleMouseLeave}
+        />
       )}
     </svg>
   )
