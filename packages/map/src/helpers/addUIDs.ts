@@ -80,6 +80,8 @@ const handleUSLocation = (row: DataRow, geoColumn: string, displayAsHex: boolean
 
 const handleWorldLocation = (row: DataRow, geoColumn: string, isWorldGeocodeType: boolean): string | null => {
   const geoName = row[geoColumn]
+  if (!geoName) return null
+
   // Use case-insensitive matching for world countries to handle various input formats
   let uid = memoizedFindUID(geoName, 'country', true)
   if (!uid && (isWorldGeocodeType || geoName)) {
