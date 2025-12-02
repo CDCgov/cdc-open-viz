@@ -1,6 +1,6 @@
 {
   "name": "@cdc/filtered-text",
-  "version": "4.25.8",
+  "version": "4.25.10",
   "description": "React component for adding filtered text on dashboards.",
   "moduleName": "CdcFilteredText",
   "main": "dist/cdcfilteredtext",
@@ -26,9 +26,9 @@
   "license": "Apache-2.0",
   "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
   "dependencies": {
-    "@cdc/core": "^4.25.7",
-    "lodash": "^4.17.21",
-    "html-react-parser": "5.2.3"
+    "@cdc/core": "^4.25.10",
+    "html-react-parser": "5.2.3",
+    "lodash": "^4.17.21"
   },
   "peerDependencies": {
     "react": "^18.2.0",
@@ -37,9 +37,9 @@
   "devDependencies": {
     "vite": "^5.4.21",
     "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^4.4.11",
     "vite-plugin-css-injected-by-js": "^2.4.0",
-    "vite-plugin-svgr": "^2.4.0",
-    "@rollup/plugin-dsv": "^3.0.2"
+    "vite-plugin-svgr": "^2.4.0"
   },
   "gitHead": "6097de1ff814001880d9ac64bd66becdc092d63c"
 }
