@@ -3280,7 +3280,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           value={config.xAxis.brushActive}
                           section='xAxis'
                           fieldName='brushActive'
-                          label='Brush Slider '
+                          label='Show Brush Slider '
                           updateField={updateFieldDeprecated}
                           tooltip={
                             <Tooltip style={{ textTransform: 'none' }}>
