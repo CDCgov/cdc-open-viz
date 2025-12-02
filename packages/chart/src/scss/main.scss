@@ -261,22 +261,6 @@
     flex-wrap: wrap;
     justify-content: space-between;
 
-    // Fix for brush charts - absolute positioning shouldn't affect flex layout
-    &.has-brush {
-      justify-content: flex-start;
-      overflow: visible; // Ensure brush overlay isn't clipped
-
-      // Remove SVG margins for separated brush - brush overlay handles spacing
-      > svg {
-        margin: 0;
-      }
-
-      // Ensure brush overlay container doesn't get clipped
-      .brush-overlay {
-        overflow: visible !important;
-      }
-    }
-
     &.legend-top:not(.legend-hidden) {
       .legend-wrapper {
         & > div {

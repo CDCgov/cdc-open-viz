@@ -6,7 +6,7 @@
   "visualizationType": "Line",
   "orientation": "vertical",
   "xAxis": {
-    "type": "date",
+    "type": "date-time",
     "dataKey": "Date",
     "dateParseFormat": "%m/%d/%Y",
     "dateDisplayFormat": "%m/%y",
@@ -47,20 +47,26 @@
     {
       "dataKey": "Production",
       "type": "Line",
+      "lineType": "curveMonotoneX",
+      "weight": 3,
       "axis": "Left",
       "name": "Widget Production (1000s)",
       "tooltip": true
     },
     {
       "dataKey": "Quality",
-      "type": "Line",
+      "type": "dashed-md",
+      "lineType": "curveLinear",
+      "weight": 2,
       "axis": "Left",
       "name": "Quality Score",
       "tooltip": true
     },
     {
       "dataKey": "Efficiency",
-      "type": "Line",
+      "type": "dashed-sm",
+      "lineType": "curveStep",
+      "weight": 1,
       "axis": "Left",
       "name": "Efficiency Rating",
       "tooltip": true
@@ -145,8 +151,8 @@
     { "Date": "6/14/2021", "Production": "112", "Quality": "102", "Efficiency": "110" },
     { "Date": "6/21/2021", "Production": "113", "Quality": "103", "Efficiency": "111" },
     { "Date": "6/28/2021", "Production": "113", "Quality": "103", "Efficiency": "111" },
-    { "Date": "7/5/2021", "Production": "119", "Quality": "109", "Efficiency": "117" },
-    { "Date": "7/12/2021", "Production": "119", "Quality": "109", "Efficiency": "117" },
+    { "Date": "7/5/2021", "Production": "180", "Quality": "165", "Efficiency": "175" },
+    { "Date": "7/12/2021", "Production": "185", "Quality": "170", "Efficiency": "180" },
     { "Date": "7/19/2021", "Production": "120", "Quality": "110", "Efficiency": "118" },
     { "Date": "7/26/2021", "Production": "120", "Quality": "110", "Efficiency": "118" },
     { "Date": "8/2/2021", "Production": "126", "Quality": "116", "Efficiency": "124" },
