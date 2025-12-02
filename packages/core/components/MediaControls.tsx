@@ -120,13 +120,6 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
               useCORS: true,
               scale: 2, // Better quality
               allowTaint: true,
-              backgroundColor: null,
-              width: container.offsetWidth,
-              height: container.offsetHeight,
-              scrollX: 0,
-              scrollY: 0,
-              windowWidth: container.offsetWidth,
-              windowHeight: container.offsetHeight
             })
             .then(canvas => {
               document.body.removeChild(container) // Clean up container
