@@ -23,6 +23,7 @@ export type GeneralFilter = FilterBase & {
   queuedActive: string | string[]
   filterStyle: VizFilterStyle
   label: string
+  labels?: Record<string, string>
   order: OrderBy
   orderColumn?: string
   orderedValues?: string[] // should only exist if the order is 'cust'

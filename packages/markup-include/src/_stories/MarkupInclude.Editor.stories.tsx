@@ -323,7 +323,7 @@ export const VisualSectionTests: Story = {
       }
     }
 
-    const themeButtons = Array.from(canvasElement.querySelectorAll('.color-palette li')) as HTMLElement[]
+    const themeButtons = Array.from(canvasElement.querySelectorAll('.color-palette button')) as HTMLElement[]
     expect(themeButtons.length).toBeGreaterThan(1)
 
     await performAndAssert(

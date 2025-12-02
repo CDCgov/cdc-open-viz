@@ -31,7 +31,7 @@ const useGeoClickHandler = () => {
     }
 
     // If modals are set, or we are on a mobile viewport, display modal
-    if (window.matchMedia('(any-hover: none)').matches || 'click' === state.tooltips.appearanceType) {
+    if ('click' === state.tooltips.appearanceType) {
       const modalData = {
         geoName: geoDisplayName,
         keyedData: geoData

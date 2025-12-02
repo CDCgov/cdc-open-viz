@@ -21,9 +21,6 @@ export interface DataItem {
   [key: string]: any
 }
 
-export interface Config {
-  preliminaryData: PreliminaryDataItem[] | []
-}
 export interface StyleProps {
   data: DataItem[]
   handleLineType: Function

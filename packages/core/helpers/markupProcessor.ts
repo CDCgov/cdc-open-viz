@@ -1,15 +1,16 @@
 import _ from 'lodash'
 import { MarkupVariable, MarkupCondition } from '../types/MarkupVariable'
 import { VizFilter } from '../types/VizFilter'
+import { Datasets } from '../types/DataSet'
 import { filterVizData } from './filterVizData'
 
 /**
  * Replaces {{variable}} tags in content with actual data values.
  *
  * @param content - Content string with markup variables
- * @param data - Dataset to extract values from
+ * @param data - Dataset to extract values from (for backward compatibility)
  * @param markupVariables - Variable configurations
- * @param options - isEditor, showNoDataMessage, allowHideSection, filters
+ * @param options - isEditor, showNoDataMessage, allowHideSection, filters, datasets
  * @returns Processed content and state flags
  *
  * @security Returns plain text - must be parsed with html-react-parser before rendering
@@ -23,13 +24,25 @@ export const processMarkupVariables = (
     showNoDataMessage?: boolean
     allowHideSection?: boolean
     filters?: VizFilter[]
+    datasets?: Datasets
+    configDataKey?: string // Add support for widget's assigned dataset
   } = {}
 ): {
   processedContent: string
   shouldHideSection: boolean
   shouldShowNoDataMessage: boolean
 } => {
-  const { isEditor = false, showNoDataMessage = false, allowHideSection = false, filters = [] } = options
+  const { isEditor = false, showNoDataMessage = false, allowHideSection = false, filters = [], datasets, configDataKey } = options
+
+  // Helper function to get data for a specific variable
+  const getDataForVariable = (variable: MarkupVariable): any[] => {
+    // If data prop is empty, try to use the widget's assigned dataset
+    if ((!data || data.length === 0) && configDataKey && datasets && datasets[configDataKey]) {
+      return datasets[configDataKey].data || []
+    }
+
+    return data || []
+  }
 
   // Early return for invalid inputs
   if (_.isEmpty(markupVariables) || !content) {
@@ -38,12 +51,6 @@ export const processMarkupVariables = (
       shouldHideSection: false,
       shouldShowNoDataMessage: false
     }
-  }
-
-  // Apply filters to data if filters are present
-  let workingData = data
-  if (filters && filters.length > 0) {
-    workingData = filterVizData(filters, data)
   }
 
   try {
@@ -64,11 +71,19 @@ export const processMarkupVariables = (
           return variableTag
         }
 
+        // Get the appropriate dataset for this variable
+        let variableData = getDataForVariable(workingVariable)
+
+        // Apply global filters if present
+        if (filters && filters.length > 0) {
+          variableData = filterVizData(filters, variableData)
+        }
+
         // Filter data with error handling (apply conditions on top of already filtered data)
         const conditionFilteredData =
           workingVariable.conditions.length === 0
-            ? workingData
-            : filterDataByConditions(workingData, [...workingVariable.conditions])
+            ? variableData
+            : filterDataByConditions(variableData, [...workingVariable.conditions])
 
         // Extract values with error handling
         const variableValues: string[] = _.uniq(

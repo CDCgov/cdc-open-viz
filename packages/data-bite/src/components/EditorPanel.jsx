@@ -1,4 +1,5 @@
 import React, { memo, useContext, useEffect, useState } from 'react'
+import { DATA_FUNCTIONS, DATA_OPERATORS } from '@cdc/core/helpers/constants'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import _ from 'lodash'
 import {
@@ -9,17 +10,21 @@ import {
   AccordionItemPanel
 } from 'react-accessible-accordion'
 
+import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import Context from '../context'
 import WarningImage from '@cdc/core/assets/icon-warning-circle.svg'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
-import { BITE_LOCATIONS, DATA_FUNCTIONS, IMAGE_POSITIONS, DATA_OPERATORS, HEADER_COLORS } from './../constants'
+import { BITE_LOCATIONS, IMAGE_POSITIONS } from './../constants'
 import Layout from '@cdc/core/components/Layout'
 import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import Button from '@cdc/core/components/elements/Button'
 import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
+import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
+
+import '@cdc/core/styles/v2/components/editor.scss'
 
 const EditorPanel = memo(() => {
   const { config, updateConfig, loading, data, setParentConfig, isDashboard, isEditor } = useContext(Context)
@@ -285,8 +290,8 @@ const EditorPanel = memo(() => {
                           Array.isArray(DATA_FUNCTIONS)
                             ? DATA_FUNCTIONS
                             : DATA_FUNCTIONS
-                            ? Object.values(DATA_FUNCTIONS)
-                            : []
+                              ? Object.values(DATA_FUNCTIONS)
+                              : []
                         }
                       />
                     </li>
@@ -408,7 +413,7 @@ const EditorPanel = memo(() => {
                 <AccordionItemHeading>
                   <AccordionItemButton>Visual</AccordionItemButton>
                 </AccordionItemHeading>
-                <AccordionItemPanel>
+                <AccordionItemPanel className='panel-visual accordion__panel accordion__panel--visual'>
                   <TextField
                     type='number'
                     value={config.biteFontSize}
@@ -462,22 +467,11 @@ const EditorPanel = memo(() => {
                       updateField={updateField}
                     />
                   </div>
-                  <label>
-                    <span className='edit-label'>Theme</span>
-                    <ul className='color-palette'>
-                      {HEADER_COLORS.map(palette => (
-                        <button
-                          title={palette}
-                          key={palette}
-                          onClick={e => {
-                            e.preventDefault()
-                            updateConfig({ ...config, theme: palette })
-                          }}
-                          className={config.theme === palette ? 'selected ' + palette : palette}
-                        />
-                      ))}
-                    </ul>
-                  </label>
+                  <HeaderThemeSelector
+                    selectedTheme={config.theme}
+                    onThemeSelect={theme => updateConfig({ ...config, theme })}
+                    label='Theme'
+                  />
                 </AccordionItemPanel>
               </AccordionItem>
 
@@ -571,19 +565,14 @@ const EditorPanel = memo(() => {
                                     <div className='accordion__panel-row align-center'>
                                       <div className='accordion__panel-col flex-auto'>If Value</div>
                                       <div className='accordion__panel-col flex-auto'>
-                                        <select
+                                        <Select
+                                          label=''
                                           value={option.arguments[0]?.operator || ''}
+                                          options={DATA_OPERATORS}
                                           onChange={e => {
                                             updateDynamicImage('operator', index, 0, e.target.value)
                                           }}
-                                        >
-                                          <option value='' disabled />
-                                          {DATA_OPERATORS.map((operator, index) => (
-                                            <option value={operator} key={index}>
-                                              {operator}
-                                            </option>
-                                          ))}
-                                        </select>
+                                        />
                                       </div>
                                       <div className='accordion__panel-col flex-grow flex-shrink'>
                                         <input
@@ -598,9 +587,13 @@ const EditorPanel = memo(() => {
 
                                     <div className='accordion__panel-row mb-2 align-center'>
                                       <div className='accordion__panel-col flex-grow'>
-                                        <select
-                                          className='border-dashed text-center'
+                                        <Select
+                                          label=''
                                           value={option.secondArgument ? 'and' : 'then'}
+                                          options={[
+                                            { value: 'then', label: 'Then' },
+                                            { value: 'and', label: 'And' }
+                                          ]}
                                           onChange={e => {
                                             if ('then' === e.target.value) {
                                               updateDynamicImage('secondArgument', index, null, false)
@@ -610,10 +603,7 @@ const EditorPanel = memo(() => {
                                               updateDynamicImage('secondArgument', index, null, true)
                                             }
                                           }}
-                                        >
-                                          <option value={'then'}>Then</option>
-                                          <option value={'and'}>And</option>
-                                        </select>
+                                        />
                                       </div>
                                     </div>
 
@@ -622,19 +612,14 @@ const EditorPanel = memo(() => {
                                         <div className='accordion__panel-row align-center'>
                                           <div className='accordion__panel-col flex-auto'>If Value</div>
                                           <div className='accordion__panel-col flex-auto'>
-                                            <select
+                                            <Select
+                                              label=''
                                               value={option.arguments[1]?.operator || ''}
+                                              options={DATA_OPERATORS}
                                               onChange={e => {
                                                 setDynamicArgument(index, 'operator', e.target.value)
                                               }}
-                                            >
-                                              <option value='' disabled />
-                                              {DATA_OPERATORS.map((operator, index) => (
-                                                <option value={operator} key={index}>
-                                                  {operator}
-                                                </option>
-                                              ))}
-                                            </select>
+                                            />
                                           </div>
                                           <div className='accordion__panel-col flex-grow flex-shrink'>
                                             <input
@@ -708,6 +693,7 @@ const EditorPanel = memo(() => {
                   />
                 </AccordionItemPanel>
               </AccordionItem>
+              <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />
             </Accordion>
           </form>
         </section>

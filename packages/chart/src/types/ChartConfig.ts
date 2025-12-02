@@ -10,12 +10,13 @@ import { BoxPlot } from '@cdc/core/types/BoxPlot'
 import { General as CoreGeneral } from '@cdc/core/types/General'
 
 // Extend the core General type to include palette information for charts
-export type General = CoreGeneral & {
+type General = CoreGeneral & {
   palette?: {
     name?: string
     version?: string
     isReversed?: boolean
     customColors?: string[]
+    customColorsOrdered?: string[]
   }
 }
 import { type Link } from './../components/Sankey/types'
@@ -30,7 +31,7 @@ import { Version } from '@cdc/core/types/Version'
 import Footnotes from '@cdc/core/types/Footnotes'
 
 export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
-export type ChartColumns = Record<string, Column>
+type ChartColumns = Record<string, Column>
 export type ChartOrientation = 'vertical' | 'horizontal'
 export type VisualizationType =
   | 'Area Chart'
@@ -75,6 +76,7 @@ type DataFormat = {
   bottomSuffix: string
   commas: boolean
   prefix: string
+  preserveOriginalDecimals?: boolean
   rightCommas: boolean
   rightPrefix: string
   rightRoundTo: number
@@ -91,7 +93,7 @@ type Exclusions = {
   dateEnd: string
 }
 
-export type Legend = CoreLegend & {
+type Legend = CoreLegend & {
   seriesHighlight: string[]
   unified: boolean
   hideSuppressionLink: boolean
@@ -192,8 +194,22 @@ export type AllChartsConfig = {
   runtimeDataUrl: string
   series: Series
   showLineSeriesLabels: boolean
+  showAreaUnderLine?: boolean
   showSidebar: boolean
   showTitle: boolean
+  smallMultiples?: {
+    mode?: 'by-column' | 'by-series'
+    tileColumn?: string
+    tilesPerRowDesktop?: number
+    tilesPerRowMobile?: number
+    tileOrderType?: 'asc' | 'desc' | 'custom'
+    tileOrder?: string[]
+    tileTitles?: { [key: string]: string }
+    independentYAxis?: boolean
+    colorMode?: 'same' | 'different'
+    synchronizedTooltips?: boolean
+    showAreaUnderLine?: boolean
+  }
   sortData: 'ascending' | 'descending'
   stackedAreaChartLineType: string
   suppressedData?: { label: string; icon: string; value: string }[]
@@ -217,6 +233,8 @@ export type AllChartsConfig = {
   visualizationSubType: string
   xAxis: Axis
   yAxis: Axis
+  hideXAxisLabel?: boolean
+  hideYAxisLabel?: boolean
   xScale: Function
   yScale: Function
   regions: Region[]
@@ -248,7 +266,7 @@ export type AllChartsConfig = {
   }
 } & MarkupConfig
 
-export type ForestPlotConfig = {
+type ForestPlotConfig = {
   visualizationType: 'Forest Plot'
   forestPlot: ForestPlotConfigSettings
 } & AllChartsConfig &
@@ -263,7 +281,7 @@ export type LineChartConfig = {
 } & AllChartsConfig &
   MarkupConfig
 
-export type SankeyLink = {
+type SankeyLink = {
   depth: number
   height: number
   id: string
@@ -284,7 +302,7 @@ type StoryNode = {
   segmentTextBefore: string
 }
 
-export type SankeyChartConfig = {
+type SankeyChartConfig = {
   enableTooltips: boolean
   data: [
     {

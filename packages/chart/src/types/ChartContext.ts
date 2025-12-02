@@ -16,7 +16,9 @@ type SharedChartContext = {
   clean: Function
   colorScale?: ColorScale
   config: ChartConfig
+  convertLineToBarGraph?: boolean
   currentViewport?: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
+  vizViewport?: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   dashboardConfig?: DashboardConfig
   // process top level chart aria label for each chart type
   handleChartAriaLabels: (config: any) => string
@@ -33,6 +35,7 @@ type SharedChartContext = {
   parentRef?: React.RefObject<HTMLDivElement>
   setLegendIsolateValues?: Function
   svgRef?: React.RefObject<SVGSVGElement>
+  handleSmallMultipleHover?: (xAxisValue: any, yCoordinate: number) => void
 }
 
 // Line Chart Specific Context

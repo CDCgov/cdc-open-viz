@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
 import { SharedFilter } from '../types/SharedFilter'
 import { handleSorting } from '@cdc/core/components/Filters'
+import { mergeCustomOrderValues } from '@cdc/core/helpers/mergeCustomOrderValues'
 
 // Gets filter values from dataset
 const generateValuesForFilter = (columnName: string, data: Record<string, any[]>) => {
@@ -34,12 +35,15 @@ export const addValuesToDashboardFilters = (
   data: Record<string, any[]>,
   filtersToSkip: number[] = []
 ): Array<SharedFilter> => {
-  return filters?.map((filter, index) => {
+  const result = filters?.map((filter, index) => {
     if (filtersToSkip.includes(index)) return filter
     if (filter.type === 'urlfilter') return filter
     const filterCopy = _.cloneDeep(filter)
     const filterValues = generateValuesForFilter(getSelector(filter), data)
     filterCopy.values = filterValues
+
+    // Merge new values with existing custom order (fixes DEV-11740 & DEV-11376)
+    filterCopy.orderedValues = mergeCustomOrderValues(filterValues, filterCopy.orderedValues, filterCopy.order)
 
     if (filterValues.length > 0) {
       const queryStringFilterValue = getQueryStringFilterValue(filterCopy)
@@ -50,9 +54,29 @@ export const addValuesToDashboardFilters = (
         const active: string[] = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
         filterCopy.active = active.filter(val => defaultValues.includes(val))
       } else {
-        const hasResetLabel = filters.find(filter => filter.resetLabel)
-        const defaultValue = hasResetLabel ? hasResetLabel.resetLabel : filterCopy.active || filterCopy.values[0]
-        filterCopy.active = filterCopy.defaultValue || defaultValue
+        // Preserve existing active value if it's valid in the new filter values
+        const currentActive = filterCopy.active as string
+        const isResetLabelValue = currentActive && currentActive === filterCopy.resetLabel
+        const isCurrentActiveValid = currentActive && (filterValues.includes(currentActive) || isResetLabelValue)
+
+        // Check if this is an intentional clear (empty string, but not undefined during initial load)
+        const isIntentionalClear = currentActive === ''
+
+        // Priority: defaultValue > valid current active > reset label > first value
+        if (filterCopy.defaultValue) {
+          // If defaultValue is explicitly set, always use it
+          filterCopy.active = filterCopy.defaultValue
+        } else if (isCurrentActiveValid) {
+          // Keep the current active value if valid
+          filterCopy.active = currentActive
+        } else if (isIntentionalClear) {
+          // Don't override intentional clears
+          filterCopy.active = currentActive
+        } else {
+          // Set to reset label or first value
+          const defaultValue = filterCopy.resetLabel || filterCopy.values[0]
+          filterCopy.active = defaultValue
+        }
       }
     }
 
@@ -83,4 +107,5 @@ export const addValuesToDashboardFilters = (
 
     return handleSorting(filterCopy)
   })
+  return result
 }

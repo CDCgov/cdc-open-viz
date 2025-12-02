@@ -72,7 +72,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     noDataMessageText,
     markupVariables: contentEditorMarkupVariables
   } = contentEditor || {}
-  const data = configObj?.data
+  const data = configObj?.data || config?.data
 
   // Support markupVariables at root level or inside contentEditor
   const markupVariables = config?.markupVariables || contentEditorMarkupVariables || []
@@ -223,7 +223,9 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         isEditor,
         showNoDataMessage,
         allowHideSection,
-        filters: config?.filters || []
+        filters: config?.filters || [],
+        datasets,
+        configDataKey: config?.dataKey
       })
     : { processedContent: parseBodyMarkup(urlMarkup), shouldHideSection: false, shouldShowNoDataMessage: false }
 
@@ -264,7 +266,13 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
                   </div>
                 </div>
               </div>
-              <FootnotesStandAlone config={configObj?.footnotes} filters={config?.filters || []} />
+              <FootnotesStandAlone
+                config={configObj?.footnotes}
+                filters={config?.filters || []}
+                markupVariables={markupVariables}
+                enableMarkupVariables={config?.enableMarkupVariables}
+                data={data}
+              />
             </div>
           </Layout.Responsive>
         )}

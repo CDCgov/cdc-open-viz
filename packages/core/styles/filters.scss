@@ -1,9 +1,12 @@
+@import 'v2/utils/breakpoints';
+
 .filters-section {
   &__wrapper {
     flex-wrap: wrap;
     display: flex;
     gap: 1rem 1.5rem;
     margin-bottom: 2rem;
+
     label {
       display: inherit;
       margin-bottom: 5px;
@@ -35,8 +38,9 @@ div.single-filters {
       border-bottom-left-radius: 15px;
     }
   }
-  & > select.cove-form-select,
-  & > div.nested-dropdown {
+
+  &>select.cove-form-select,
+  &>div.nested-dropdown {
     width: fit-content;
   }
 }
@@ -89,6 +93,7 @@ div.single-filters {
       color: var(--colors-blue-vivid-60, #005ea2);
       background: var(--colors-cyan-cool-10, #eff9fa);
     }
+
     // TODO - focus styles have to be heavy handed to override the project's global styles
     &:focus:not(:focus-visible) {
       outline: none !important;
@@ -101,6 +106,7 @@ div.single-filters {
     }
   }
 }
+
 .cdc-open-viz-module {
   @include breakpointClass(xs) {
     .single-filters--tab-simple .tab-simple-container .tab.tab--simple {
@@ -147,6 +153,7 @@ div.single-filters {
     padding: 10px;
     background: none;
     transition: background 2s;
+
     &--active {
       background: #fff;
       border-radius: 15px;

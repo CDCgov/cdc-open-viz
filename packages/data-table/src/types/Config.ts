@@ -26,6 +26,7 @@ type DataFormat = {
   abbreviated: boolean
   commas: boolean
   prefix: string
+  preserveOriginalDecimals?: boolean
   roundTo: number
   suffix: string
 }

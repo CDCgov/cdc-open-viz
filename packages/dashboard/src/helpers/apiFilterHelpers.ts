@@ -53,7 +53,31 @@ export const getParentParams = (
   })
 }
 
-export const notAllParentsSelected = parentParams => parentParams?.some(({ value }) => value === '')
+/**
+ * Checks if any parent filters are unselected or at their reset state.
+ * Returns true if at least one parent is not properly selected.
+ */
+export const hasUnselectedParents = (parentParams, sharedFilters?: SharedFilter[]): boolean => {
+  if (!parentParams) return false
+
+  return parentParams.some(({ key, value }) => {
+    // Check if value is empty
+    if (value === '') return true
+
+    // Check if value equals the parent filter's resetLabel
+    if (sharedFilters) {
+      const parentFilter = sharedFilters.find(f => f.queryParameter === key || f.apiFilter?.valueSelector === key)
+      if (parentFilter?.resetLabel && value === parentFilter.resetLabel) {
+        return true
+      }
+    }
+
+    return false
+  })
+}
+
+// Keep old name for backward compatibility
+export const notAllParentsSelected = hasUnselectedParents
 
 export const getFilterValues = (data: Array<Object>, apiFilter: APIFilter): DropdownOptions => {
   const { textSelector, valueSelector, subgroupTextSelector, subgroupValueSelector } = apiFilter
@@ -86,7 +110,7 @@ export const getToFetch = (
     if (apiFilterDropdowns[_key]) return // don't reload cached filter
     const parentParams = getParentParams(filter, sharedFilters)
 
-    if (notAllParentsSelected(parentParams)) return // don't send request for dependent children filter options
+    if (notAllParentsSelected(parentParams, sharedFilters)) return // don't send request for dependent children filter options
 
     const endpoint = baseEndpoint + (parentParams ? gatherQueryParams(baseEndpoint, parentParams) : '')
     toFetch[endpoint] = [_key, index]

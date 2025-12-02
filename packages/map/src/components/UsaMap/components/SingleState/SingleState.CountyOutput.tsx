@@ -8,6 +8,7 @@ import { applyLegendToRow } from '../../../../helpers/applyLegendToRow'
 import useGeoClickHandler, { geoClickHandler } from '././../../../../hooks/useGeoClickHandler'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { useSynchronizedGeographies } from '../../../../hooks/useSynchronizedGeographies'
 
 interface CountyOutputProps {
   counties: any[]
@@ -23,6 +24,7 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const geoFillColor = getGeoFillColor(config)
   const { geoClickHandler } = useGeoClickHandler()
+  const { getSyncProps, syncHandlers } = useSynchronizedGeographies()
 
   return (
     <>
@@ -71,14 +73,16 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
 
           return (
             <g
+              {...getSyncProps(geoKey)}
               key={`key--${county.id}`}
-              className={`county county--${geoDisplayName.split(' ').join('')} county--${geoData[config.columns.geo.name]
-                }`}
+              className={`county county--${geoDisplayName.split(' ').join('')} county--${
+                geoData[config.columns.geo.name]
+              }`}
               style={styles}
               onClick={() => geoClickHandler(geoDisplayName, geoData)}
               data-tooltip-id={`tooltip__${tooltipId}`}
               data-tooltip-html={toolTip}
-              onMouseEnter={() => {
+              onMouseEnter={e => {
                 // Track hover analytics event if this is a new location
                 const locationName = geoDisplayName.replace(/[^a-zA-Z0-9]/g, '_')
                 publishAnalyticsEvent({
@@ -91,6 +95,10 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
                   location: geoDisplayName,
                   specifics: `location: ${locationName?.toLowerCase()}`
                 })
+                syncHandlers.onMouseEnter(geoKey, e.clientY)
+              }}
+              onMouseLeave={() => {
+                syncHandlers.onMouseLeave()
               }}
             >
               <path
@@ -105,11 +113,18 @@ const CountyOutput: React.FC<CountyOutputProps> = ({ path, counties, scale, geoS
         } else {
           return (
             <g
+              {...getSyncProps(geoKey)}
               key={`key--${county.id}`}
               className={`county county--${geoDisplayName.split(' ').join('')}`}
               style={{ fill: geoFillColor }}
               data-tooltip-id={`tooltip__${tooltipId}`}
               data-tooltip-html={toolTip}
+              onMouseEnter={e => {
+                syncHandlers.onMouseEnter(geoKey, e.clientY)
+              }}
+              onMouseLeave={() => {
+                syncHandlers.onMouseLeave()
+              }}
             >
               <path
                 tabIndex={-1}

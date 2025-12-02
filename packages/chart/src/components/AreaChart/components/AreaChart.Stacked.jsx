@@ -13,17 +13,21 @@ import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 
 const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, handleTooltipMouseOff }) => {
   // import data from context
-  let { transformedData, config, seriesHighlight, colorScale, rawData } = useContext(ConfigContext)
+  let { transformedData, config, seriesHighlight, colorScale, rawData, parseDate } = useContext(ConfigContext)
   const data = config.brush?.active && config.brush.data?.length ? config.brush.data : transformedData
   // Draw transparent bars over the chart to get tooltip data
   // Turn DEBUG on for additional context.
   if (!data) return
 
   const handleDateCategory = value => {
-    if (config.xAxis.type === 'categorical') return xScale(value)
+    if (config.xAxis.type === 'categorical') {
+      return xScale(value) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+    }
     if (isDateScale(config.xAxis)) {
-      let date = new Date(value)
-      return xScale(date)
+      const scaledValue = xScale(parseDate(value, false))
+      // Add bandwidth offset to center on band scales (date type)
+      // For date-time (time scale), bandwidth doesn't exist so no offset added
+      return scaledValue + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
     }
   }
 
@@ -65,7 +69,7 @@ const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, 
                       key={stack.key}
                       d={path(stack) || ''}
                       strokeWidth={2}
-                      stroke={displayArea ?  colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[stack.key] : stack.key) : '#000' : 'transparent'}
+                      stroke={displayArea ? colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[stack.key] : stack.key) : '#000' : 'transparent'}
                       fillOpacity={transparentArea ? 0.2 : 1}
                       fill={displayArea ? colorScale ? colorScale(config.runtime.seriesLabels ? config.runtime.seriesLabels[stack.key] : stack.key) : '#000' : 'transparent'}
                     />
@@ -74,7 +78,7 @@ const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, 
               }}
             </AreaStack>
             {/* prettier-ignore */}
-            <Bar width={Number(xMax)} height={Number(yMax)} fill={'transparent'}   onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />
+            <Bar width={Number(xMax)} height={Number(yMax)} fill={'transparent'} onMouseMove={e => handleTooltipMouseOver(e, rawData)} onMouseLeave={handleTooltipMouseOff} />
           </Group>
         </ErrorBoundary>
       </svg>

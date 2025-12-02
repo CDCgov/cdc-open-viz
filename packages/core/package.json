@@ -24,6 +24,7 @@
   "dependencies": {
     "chroma-js": "3.1.2",
     "dompurify": "^3.2.4",
+    "html-react-parser": "5.2.3",
     "html2canvas": "^1.4.1",
     "json-edit-react": "^1.27.0",
     "papaparse": "5.5.2",
@@ -45,7 +46,8 @@
     "@rollup/plugin-dsv": "^3.0.2",
     "@vitejs/plugin-react": "^4.3.4",
     "sass": "^1.89.2",
-    "vite": "^4.4.11",
+    "vite": "^5.4.21",
+    "@vitejs/plugin-react": "^4.3.4",
     "vite-plugin-css-injected-by-js": "^2.4.0",
     "vite-plugin-svgr": "^2.4.0"
   }

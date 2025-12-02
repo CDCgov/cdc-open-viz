@@ -198,7 +198,19 @@ const createInitialState = () => {
       patterns: {},
       patternField: ''
     },
-
+    smallMultiples: {
+      mode: '',
+      tileColumn: '',
+      tilesPerRowDesktop: 3,
+      tilesPerRowMobile: 1,
+      tileOrder: [],
+      tileOrderType: 'asc',
+      tileTitles: {},
+      independentYAxis: false,
+      colorMode: 'same',
+      synchronizedTooltips: true,
+      showAreaUnderLine: true
+    },
     exclusions: {
       active: false,
       keys: []

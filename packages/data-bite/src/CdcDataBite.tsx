@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useReducer } from 'react'
+import { useEffect, useCallback, useReducer } from 'react'
 import { Fragment } from 'react'
 
 // contexts & initial state
@@ -31,20 +31,18 @@ import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { Config } from './types/Config'
 import dataBiteReducer from './store/db.reducer'
+import { IMAGE_POSITION_LEFT, IMAGE_POSITION_RIGHT, IMAGE_POSITION_TOP, IMAGE_POSITION_BOTTOM } from './constants'
+
 import {
   DATA_FUNCTION_COUNT,
   DATA_FUNCTION_MAX,
   DATA_FUNCTION_MEAN,
   DATA_FUNCTION_MEDIAN,
-  DATA_FUNCTION_MIN,
   DATA_FUNCTION_MODE,
+  DATA_FUNCTION_MIN,
   DATA_FUNCTION_RANGE,
-  DATA_FUNCTION_SUM,
-  IMAGE_POSITION_LEFT,
-  IMAGE_POSITION_RIGHT,
-  IMAGE_POSITION_TOP,
-  IMAGE_POSITION_BOTTOM
-} from './constants'
+  DATA_FUNCTION_SUM
+} from '@cdc/core/helpers/constants'
 
 // styles
 import './scss/main.scss'

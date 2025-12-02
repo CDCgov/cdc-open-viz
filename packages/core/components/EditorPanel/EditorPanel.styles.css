@@ -1,0 +1,423 @@
+/* EditorPanel component styles */
+/* Shared editor panel component styles used across all visualization packages */
+
+/* Color palette in editor panel context */
+.editor-panel .header .color-palette li {
+  width: 1.5em;
+  height: 1.5em;
+  display: inline-block;
+}
+
+.editor-panel .color-palette {
+  display: flex;
+}
+
+.editor-panel .color-palette li {
+  width: 1.5em;
+  height: 1.5em;
+  display: inline-block;
+  margin-right: 0.5em;
+  cursor: pointer;
+  border: rgba(0, 0, 0, 0.3) 3px solid;
+}
+
+.editor-panel .color-palette li.active {
+  border: rgba(0, 0, 0, 0.8) 3px solid;
+}
+
+.editor-panel .color-palette a {
+  display: inline-block;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.8);
+}
+
+.editor-panel .color-palette.series-list {
+  flex-direction: column;
+  padding: 0;
+  border: none;
+}
+
+.editor-panel .color-palette.series-list li {
+  padding: 0.3em 0.5em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: auto;
+  height: auto;
+  border: 0;
+}
+
+.editor-panel .color-palette.series-list li:not(:last-child) {
+  border-bottom: rgba(0, 0, 0, 0.2) 1px solid;
+}
+
+.editor-panel .form-container {
+  border-right: var(--lightGray) 1px solid;
+  flex-grow: 1;
+}
+
+.editor-panel .guidance-link {
+  margin: 2em 1em 0;
+  padding: 0.75em 1em;
+}
+
+.editor-panel .guidance-link svg {
+  width: 60px;
+  color: var(--blue);
+  margin-right: 1rem;
+  height: 60px;
+}
+
+.editor-panel .guidance-link svg path {
+  fill: currentColor;
+}
+
+.editor-panel .warning {
+  color: #d8000c;
+  background-color: #ffd2d2;
+  padding: 0.75em 1em;
+  margin: 1em 0;
+  font-size: 0.8em;
+  border: #d8000c 1px solid;
+  border-radius: 0.4em;
+}
+
+.editor-panel .warning strong {
+  font-weight: 600;
+  display: block;
+}
+
+.editor-panel .advanced {
+  padding: 0 1em 1em;
+  text-align: left;
+}
+
+.editor-panel .advanced p {
+  font-size: 0.8rem;
+}
+
+.editor-panel .advanced .advanced-toggle-link {
+  padding-top: 1em;
+  display: block;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.editor-panel .advanced .advanced-toggle-link span {
+  text-decoration: none;
+  display: inline-block;
+  font-family: monospace;
+  padding-right: 5px;
+}
+
+.editor-panel .advanced .advanced-toggle-link:hover {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.editor-panel .advanced textarea {
+  height: 400px;
+  width: 100%;
+  font-size: 0.9em;
+  padding: 0.5em;
+  font-family: monospace;
+  box-sizing: border-box;
+}
+
+.editor-panel .heading-2 {
+  background: #565656;
+  color: #fff;
+  font-size: 1.1em;
+  padding: 0.6em 1em;
+  position: relative;
+  border-bottom: #565656 3px solid;
+  z-index: 3;
+}
+
+.editor-panel label {
+  text-transform: uppercase;
+  display: block;
+  font-size: 0.8em;
+  font-weight: 600;
+}
+
+.editor-panel label:not(:first-child) {
+  margin-top: 1em;
+}
+
+.editor-panel label span.edit-label {
+  margin-bottom: 0.3em;
+  display: block;
+}
+
+.editor-panel label span.column-heading {
+  font-size: 1em;
+}
+
+.editor-panel label.checkbox {
+  display: flex;
+}
+
+.editor-panel label.checkbox span {
+  text-transform: none;
+  font-size: 1em;
+  font-weight: 400;
+}
+
+.editor-panel label.checkbox input {
+  margin-top: 0;
+  margin-right: 0.5em;
+}
+
+.editor-panel input[type='checkbox'],
+.editor-panel input[type='radio'] {
+  display: inline-block;
+  width: auto !important;
+  height: auto !important;
+  padding: 0;
+  margin-right: 0.5em;
+  cursor: pointer;
+  user-select: none;
+}
+
+.editor-panel input[type='text'],
+.editor-panel input[role='combobox'],
+.editor-panel input[type='number'],
+.editor-panel textarea {
+  padding: 0.5em;
+  width: 100%;
+}
+
+.editor-panel fieldset {
+  padding-left: 0;
+}
+
+.editor-panel .primary-fieldset {
+  border-top: rgba(0, 0, 0, 0.3) 2px solid;
+  padding-top: 2em;
+  margin-top: 2em;
+}
+
+.editor-panel ul.column-edit {
+  list-style: none;
+}
+
+.editor-panel ul.column-edit li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 0.3em 0;
+}
+
+.editor-panel ul.column-edit li label {
+  display: inline-block;
+  width: 48%;
+}
+
+.editor-panel ul.column-edit li label:nth-child(odd) {
+  margin-top: 1em;
+}
+
+.editor-panel ul.column-edit.three-col li label {
+  width: 31%;
+}
+
+.editor-panel .edit-block {
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  padding: 1em;
+  margin-top: 1em;
+  position: relative;
+}
+
+.editor-panel .edit-block .remove-column {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.1);
+  color: #000;
+  font-size: 0.8em;
+  padding: 0.3em;
+  cursor: pointer;
+}
+
+.editor-panel span.subtext {
+  text-transform: none;
+  display: block;
+  font-size: 0.8em;
+  font-weight: 400;
+}
+
+.editor-panel .sort-list {
+  list-style: none;
+}
+
+.editor-panel .sort-list li {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  padding: 0.3em;
+  display: flex;
+  align-items: center;
+  cursor: move;
+  margin-bottom: 0.3em;
+}
+
+.editor-panel .sort-list li svg {
+  margin-right: 0.5em;
+}
+
+.editor-panel .info {
+  margin-top: 1em;
+  font-size: 0.9em;
+}
+
+/* React Tags Component styles (third-party library) */
+.editor-panel .react-tags__search {
+  width: 100%;
+}
+
+.editor-panel .react-tags {
+  position: relative;
+  cursor: text;
+}
+
+.editor-panel .react-tags input.react-tags__search-input {
+  font-size: 0.8rem;
+}
+
+.editor-panel .react-tags span {
+  display: inline;
+}
+
+.editor-panel .react-tags.is-focused {
+  border-color: rgba(0, 0, 0, 0.7);
+}
+
+.editor-panel .react-tags__selected {
+  display: inline;
+}
+
+.editor-panel .react-tags__selected-tag {
+  display: inline-block;
+  box-sizing: border-box;
+  border: 1px solid #d1d1d1;
+  border-radius: 2px;
+  background: #f1f1f1;
+  padding: 0.4em 0.6em;
+  font-size: 0.8em;
+  margin-right: 0.3em;
+  margin-bottom: 0.3em;
+}
+
+.editor-panel .react-tags__selected-tag:after {
+  content: '\2715';
+  color: #aaa;
+  margin-left: 8px;
+}
+
+.editor-panel .react-tags__selected-tag:hover,
+.editor-panel .react-tags__selected-tag:focus {
+  border-color: #b1b1b1;
+}
+
+.editor-panel .react-tags__search {
+  display: inline-block;
+  max-width: 100%;
+}
+
+@media screen and (min-width: 30em) {
+  .editor-panel .react-tags__search {
+    position: relative;
+  }
+}
+
+.editor-panel .react-tags__search input {
+  max-width: 100%;
+  margin: 0;
+  outline: none;
+  padding: 0.5em 0.3em;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.editor-panel .react-tags__search input::-ms-clear {
+  display: none;
+}
+
+.editor-panel .react-tags__suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+}
+
+@media screen and (min-width: 30em) {
+  .editor-panel .react-tags__suggestions {
+    width: 240px;
+  }
+}
+
+.editor-panel .react-tags__suggestions ul {
+  margin: 4px -1px;
+  padding: 0;
+  list-style: none;
+  background: white;
+  border: 1px solid #d1d1d1;
+  border-radius: 2px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.editor-panel .react-tags__suggestions li {
+  border-bottom: 1px solid #ddd;
+  padding: 6px 8px;
+}
+
+.editor-panel .react-tags__suggestions li mark {
+  text-decoration: underline;
+  background: none;
+  font-weight: 600;
+}
+
+.editor-panel .react-tags__suggestions li:hover {
+  cursor: pointer;
+  background: #eee;
+}
+
+.editor-panel .react-tags__suggestions li.is-active {
+  background: #b7cfe0;
+}
+
+.editor-panel .react-tags__suggestions li.is-disabled {
+  opacity: 0.5;
+  cursor: auto;
+}
+
+.editor-toggle {
+  position: fixed;
+  top: 1em;
+  right: 1em;
+  background: var(--blue);
+  color: white;
+  border: 0;
+  border-radius: 0.5em;
+  padding: 0.5em 1em;
+  font-size: 1em;
+  cursor: pointer;
+  z-index: 9999999999;
+  display: none;
+}
+
+.editor-toggle.active {
+  display: block;
+}
+
+.editor-toggle:hover {
+  background: var(--darkBlue);
+}
+
+.editor-toggle svg {
+  height: 1em;
+  width: 1em;
+}
+
+.editor-toggle svg path {
+  fill: currentColor;
+}

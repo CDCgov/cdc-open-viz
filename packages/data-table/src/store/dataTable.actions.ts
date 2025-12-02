@@ -6,18 +6,6 @@ type Action<T, P = undefined> = {
   payload?: P
 }
 
-// Action Types
-export type ActionType =
-  | 'SET_CONFIG'
-  | 'SET_SHOW_EDITOR_PANEL'
-  | 'SET_COLUMNS'
-  | 'SET_DATA'
-  | 'SET_TABLE'
-  | 'SET_FILTERS'
-  | 'SET_FILTER_BEHAVIOR'
-  | 'SET_CURRENT_VIEWPORT'
-  | 'SET_FILTER_INTRO'
-
 type SET_CONFIG = Action<'SET_CONFIG', Config>
 type SET_SHOW_EDITOR_PANEL = Action<'SET_SHOW_EDITOR_PANEL', boolean>
 type SET_COLUMNS = Action<'SET_COLUMNS', Record<string, unknown>>

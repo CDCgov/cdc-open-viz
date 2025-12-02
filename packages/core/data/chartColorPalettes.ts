@@ -60,7 +60,7 @@ const chartColorPalettesData = {
   }
 }
 
-export const twoColorPaletteData = {
+const twoColorPaletteData = {
   v1: {
     'monochrome-1': ['#a6cee3', '#15017a'],
     'monochrome-2': ['#c2c0fc', '#15017a'],

@@ -8,7 +8,7 @@ import { AnyVisualization } from '@cdc/core/types/Visualization'
 
 const transform = new DataTransform()
 
-export const getFootnotesVizConfig = (
+const getFootnotesVizConfig = (
   visualizationConfig: AnyVisualization,
   rowNumber: number,
   config: MultiDashboardConfig,
@@ -100,7 +100,7 @@ export const getVizConfig = (
     const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
     // Markup-includes need data even when shared filters exist (for markup variables)
     const shouldClearData = sharedFilterColumns.length && visualizationConfig.type !== 'markup-include'
-    visualizationConfig.data = data[dataKey] || []
+    visualizationConfig.data = shouldClearData ? [] : data[dataKey] || []
     if (visualizationConfig.formattedData) {
       visualizationConfig.formattedData =
         transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) ||
