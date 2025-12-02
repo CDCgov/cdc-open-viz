@@ -70,7 +70,7 @@ export const displayGeoName = (key: string, convertFipsCodes = true): string => 
   if (value?.length === 2 || value === 'U.S. Virgin Islands' || wasLookedUp) {
     return value
   } else {
-    // Value is user data that wasn't in our lookups - return as-is to preserve original formatting
-    return value
+    // Apply titleCase to unrecognized values (e.g., "DISTRICT OF COLUMBIA" -> "District of Columbia")
+    return titleCase(value)
   }
 }

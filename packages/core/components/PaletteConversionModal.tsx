@@ -43,11 +43,14 @@ const PaletteConversionModal: React.FC<PaletteConversionModalProps> = ({
         <div
           className='modal-header'
           style={{
-            padding: '20px 20px 0 20px',
-            borderBottom: '1px solid #e0e0e0'
+            padding: '15px',
+            borderBottom: '1px solid #e0e0e0',
+            backgroundColor: '#005eaa',
+            display: 'flex',
+            justifyContent: 'center',
           }}
         >
-          <h3 style={{ margin: '0 0 20px 0' }}>Color Palette Conversion</h3>
+          <h3 style={{ color: 'white', textAlign: 'center' }}>Color Palette Conversion</h3>
         </div>
 
         <div className='modal-body' style={{ padding: '20px' }}>

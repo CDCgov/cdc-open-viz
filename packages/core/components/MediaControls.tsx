@@ -90,17 +90,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
         container.style.padding = `${downloadPadding}px`
       }
 
-      // Clone and preserve basic dimensions
-      const clonedElement = baseSvg.cloneNode(true) as HTMLElement
-      if (baseSvg instanceof Element) {
-        const rect = baseSvg.getBoundingClientRect()
-        if (rect.width > 0 && rect.height > 0) {
-          clonedElement.style.width = `${rect.width}px`
-          clonedElement.style.height = `${rect.height}px`
-        }
-      }
-
-      container.appendChild(clonedElement)
+      container.appendChild(baseSvg.cloneNode(true));
 
       const downloadImage = async () => {
         document.body.appendChild(container) // Append container to the DOM
@@ -130,13 +120,6 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
               useCORS: true,
               scale: 2, // Better quality
               allowTaint: true,
-              backgroundColor: null,
-              width: container.offsetWidth,
-              height: container.offsetHeight,
-              scrollX: 0,
-              scrollY: 0,
-              windowWidth: container.offsetWidth,
-              windowHeight: container.offsetHeight
             })
             .then(canvas => {
               document.body.removeChild(container) // Clean up container
