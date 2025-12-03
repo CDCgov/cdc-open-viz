@@ -639,7 +639,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
       <div
         style={{ width: `${parentWidth}px`, overflow: 'visible', position: 'relative' }}
-        className={`tooltip-boundary ${config.xAxis.brushActive ? 'has-brush' : ''}`}
+        className="tooltip-boundary"
       >
         <svg
           ref={internalSvgRef}
