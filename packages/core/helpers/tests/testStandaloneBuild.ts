@@ -37,12 +37,13 @@ export function testStandaloneBuild(pkgDir) {
     // Pack core into tmp directory with unique name then install from package tarball
     const coreDir = path.join(pkgDir, '..', 'core')
     const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(7)}`
-    const tarballDir = os.tmpdir()
-    const packOutput = execSync(`npm pack --pack-destination="${tarballDir}"`, { cwd: coreDir, encoding: 'utf-8' })
-    const tarballName = packOutput.trim().split('\n').pop() // Get last line (tarball filename)
-    const originalTarballPath = path.join(tarballDir, tarballName)
-    coreTarballPath = path.join(tarballDir, `cdc-core-${uniqueId}.tgz`)
-    fs.renameSync(originalTarballPath, coreTarballPath)
+    const uniqueTarballDir = fs.mkdtempSync(path.join(os.tmpdir(), `cdc-pack-${uniqueId}-`))
+    const packOutput = execSync(`npm pack --pack-destination="${uniqueTarballDir}"`, {
+      cwd: coreDir,
+      encoding: 'utf-8'
+    })
+    const tarballName = packOutput.trim().split('\n').pop()
+    coreTarballPath = path.join(uniqueTarballDir, tarballName)
     execSync(`npm install "${coreTarballPath}"`, { cwd: tmpDir, stdio: 'inherit' })
 
     execSync('npm run build', { cwd: tmpDir })
@@ -53,7 +54,8 @@ export function testStandaloneBuild(pkgDir) {
     return false
   } finally {
     if (coreTarballPath && fs.existsSync(coreTarballPath)) {
-      fs.unlinkSync(coreTarballPath)
+      const uniqueTarballDir = path.dirname(coreTarballPath)
+      fs.rmSync(uniqueTarballDir, { recursive: true, force: true })
     }
     fs.rmSync(tmpDir, { recursive: true, force: true })
   }
