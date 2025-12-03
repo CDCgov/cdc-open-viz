@@ -8,6 +8,7 @@ import { Dashboard } from '../types/Dashboard'
 import { ConfigRow } from '../types/ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { initialState } from '../DashboardContext'
+import { getFilteredData } from '../helpers/getFilteredData'
 
 type BlankMultiConfig = {
   dashboard: Partial<Dashboard>
@@ -149,7 +150,10 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const slot = action.payload
       const newConfigFields = state.config.multiDashboards[slot]
       const _newDatasets = _.cloneDeep(state.data)
-      return { ...state, data: _newDatasets, config: { ...state.config, ...newConfigFields, activeDashboard: slot } }
+      const newConfig = { ...state.config, ...newConfigFields, activeDashboard: slot }
+      // Recalculate filtered data for the new dashboard config
+      const newFilteredData = getFilteredData({ ...state, config: newConfig }, {}, _newDatasets)
+      return { ...state, data: _newDatasets, config: newConfig, filteredData: newFilteredData }
     }
     case 'TOGGLE_ROW': {
       const { rowIndex, colIndex } = action.payload
