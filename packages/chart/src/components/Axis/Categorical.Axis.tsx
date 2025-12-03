@@ -145,9 +145,11 @@ const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
                       />
                     )}
                     {/* White background spacing between stackes */}
-                    {!isLastIndex && <rect x={bar.x} y={bar.y} width={bar.width} height={1} fill={'#fff'}></rect>}
+                    {!isLastIndex && (
+                      <rect x={bar.x} y={bar.y} width={Math.max(0, bar.width)} height={1} fill={'#fff'}></rect>
+                    )}
                     {/* Right side Axis line */}
-                    <rect x={bar.x + bar.width} y={0} width={1} height={yMax} fill={'#000'}></rect>
+                    <rect x={bar.x + Math.max(0, bar.width)} y={0} width={1} height={yMax} fill={'#000'}></rect>
                   </Group>
                 </Group>
               )

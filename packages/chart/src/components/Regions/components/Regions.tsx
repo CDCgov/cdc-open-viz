@@ -143,7 +143,7 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
     return to
   }
 
-  const getWidth = (to, from) => to - from
+  const getWidth = (to, from) => Math.max(0, to - from)
 
   if (regions && orientation === 'vertical') {
     return regions.map(region => {
