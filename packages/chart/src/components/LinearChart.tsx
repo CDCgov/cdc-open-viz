@@ -91,15 +91,6 @@ type UseTooltipReturn<T = TooltipData> = {
 }
 
 const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, parentWidth }, svgRef) => {
-  // Simple render monitoring
-  const renderCountRef = useRef(0)
-  const renderStartTime = performance.now()
-
-  useEffect(() => {
-    renderCountRef.current++
-    const renderTime = performance.now() - renderStartTime
-  })
-
   // prettier-ignore
   const {
     colorScale,
