@@ -62,16 +62,16 @@ export const addValuesToDashboardFilters = (
         // Check if this is an intentional clear (empty string, but not undefined during initial load)
         const isIntentionalClear = currentActive === ''
 
-        // Priority: defaultValue > valid current active > reset label > first value
-        if (filterCopy.defaultValue) {
-          // If defaultValue is explicitly set, always use it
-          filterCopy.active = filterCopy.defaultValue
-        } else if (isCurrentActiveValid) {
+        // Priority: valid current active > defaultValue (only on initial load) > reset label > first value
+        if (isCurrentActiveValid) {
           // Keep the current active value if valid
           filterCopy.active = currentActive
         } else if (isIntentionalClear) {
           // Don't override intentional clears
           filterCopy.active = currentActive
+        } else if (filterCopy.defaultValue && !currentActive) {
+          // Use defaultValue only on initial load (when there's no current active value)
+          filterCopy.active = filterCopy.defaultValue
         } else {
           // Set to reset label or first value
           const defaultValue = filterCopy.resetLabel || filterCopy.values[0]
