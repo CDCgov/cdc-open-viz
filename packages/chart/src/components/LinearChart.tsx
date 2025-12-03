@@ -32,7 +32,7 @@ import BrushChart from './Brush/BrushController'
 // Helpers
 import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
-import { calcInitialHeight, handleAutoPaddingRight } from '../helpers/sizeHelpers'
+import { calcInitialHeight } from '../helpers/sizeHelpers'
 import { filterAndShiftLinearDateTicks } from '../helpers/filterAndShiftLinearDateTicks'
 
 // Hooks
@@ -97,6 +97,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleDragStateChange,
     interactionLabel,
     isDraggingAnnotation,
+    isEditor,
     legendRef,
     parseDate,
     parentRef,
@@ -141,7 +142,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
-  const gridLineRefs = useRef([])
   const tooltipRef = useRef(null)
 
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -172,30 +172,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   )
   const forestHeight = useMemo(() => initialHeight + forestRowsHeight, [initialHeight, forestRowsHeight])
 
-  // width
-  const width = useMemo(() => {
-    const initialWidth = dimensions[0]
-    const legendHidden = legend?.hide
-    const legendOnTopOrBottom = ['bottom', 'top'].includes(config.legend?.position)
-    const legendWrapped = isLegendWrapViewport(currentViewport)
-
-    const legendShowingLeftOrRight = !isForestPlot && !legendHidden && !legendOnTopOrBottom && !legendWrapped
-
-    if (!legendShowingLeftOrRight) return initialWidth
-
-    if (legendRef.current) {
-      const legendStyle = getComputedStyle(legendRef.current)
-      return (
-        initialWidth -
-        legendRef.current.getBoundingClientRect().width -
-        parseInt(legendStyle.marginLeft) -
-        parseInt(legendStyle.marginRight)
-      )
-    }
-
-    return initialWidth * 0.73
-  }, [dimensions[0], config.legend, currentViewport, legendRef.current])
-
   // Used to calculate the y position of the x-axis title
   const bottomLabelStart = useMemo(() => {
     xAxisLabelRefs.current = xAxisLabelRefs.current?.filter(label => label)
@@ -204,8 +180,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     return tallestLabel + X_TICK_LABEL_PADDING + DEFAULT_TICK_LENGTH
   }, [dimensions[0], config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation])
 
-  // xMax and yMax
-  const xMax = width - runtime.yAxis.size - (visualizationType === 'Combo' ? config.yAxis.rightAxisSize : 0)
   const yMax = initialHeight + forestRowsHeight
 
   const isNoDataAvailable = config.filters?.length > 0 && data.length === 0
@@ -217,6 +191,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const getYAxisData = (d, seriesKey) => d[seriesKey]
   const xAxisDataMapped = data.map(d => getXAxisData(d))
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
+
+  const xMax =
+    parentWidth -
+    Number(config.orientation === 'horizontal' ? config.xAxis.size : config.yAxis.size) -
+    (hasRightAxis ? config.yAxis.rightAxisSize : 0)
 
   const {
     xScale,
@@ -241,10 +220,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     xAxisDataMapped,
     yMax,
     dimensions,
-    xMax:
-      parentWidth -
-      Number(config.orientation === 'horizontal' ? config.xAxis.size : config.yAxis.size) -
-      (hasRightAxis ? config.yAxis.rightAxisSize : 0),
+    xMax: xMax,
     needsYAxisAutoPadding,
     currentViewport
   })
@@ -380,23 +356,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleTooltipMouseOver,
     hideTooltip
   })
-
-  // EFFECTS
-  // Adjust padding on the right side of the chart to accommodate for overflow
-  useEffect(() => {
-    if (!parentRef.current || !parentWidth || !gridLineRefs.current.length) return
-
-    const [updatePadding, paddingToAdd] = handleAutoPaddingRight(parentRef, xAxisLabelRefs, parentWidth)
-
-    if (!updatePadding) return
-
-    parentRef.current.style.paddingRight = `${paddingToAdd}px`
-    // subtract padding from grid line's x1 value
-    gridLineRefs.current.forEach(gridLine => {
-      if (!gridLine) return
-      gridLine.setAttribute('x1', xMax - paddingToAdd)
-    })
-  }, [parentWidth, parentHeight, data])
 
   // Make sure the chart is visible if in the editor
   /* eslint-disable react-hooks/exhaustive-deps */
@@ -663,7 +622,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       </>
     )
   }
-  return isNaN(width) ? (
+  return isNaN(parentWidth) ? (
     <React.Fragment></React.Fragment>
   ) : (
     <ErrorBoundary component='LinearChart'>
@@ -717,7 +676,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                           {runtime.yAxis.gridLines && !hideFirstGridLine ? (
                             <Line
-                              innerRef={el => (gridLineRefs.current[i] = el)}
                               key={`${tick.value}--hide-hideGridLines`}
                               display={(isLogarithmicAxis && showTicks).toString()}
                               from={{ x: tick.from.x + xMax, y: tick.from.y }}
@@ -750,7 +708,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           {visualizationType === 'Deviation Bar' && config.runtime.series?.length === 1 && (
             <DeviationBar animatedChart={animatedChart} xScale={xScale} yScale={yScale} width={xMax} height={yMax} />
           )}
-          {visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={width} width={xMax} height={yMax} />}
+          {visualizationType === 'Paired Bar' && (
+            <PairedBarChart originalWidth={parentWidth} width={xMax} height={yMax} />
+          )}
           {visualizationType === 'Scatter Plot' && (
             <ScatterPlot
               xScale={xScale}
@@ -879,7 +839,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               xScale={xScale}
               yScale={yScale}
               seriesScale={seriesScale}
-              width={width}
+              width={parentWidth}
               height={forestHeight}
               getXAxisData={getXAxisData}
               getYAxisData={getYAxisData}
@@ -942,8 +902,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   strokeDasharray={handleLineType(anchor.lineStyle)}
                   stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   className='anchor-y'
-                  from={{ x: 0 + padding, y: position - middleOffset }}
-                  to={{ x: width - config.yAxis.rightAxisSize, y: position - middleOffset }}
+                  from={{ x: runtime.yAxis.size, y: position - middleOffset }}
+                  to={{ x: runtime.yAxis.size + xMax, y: position - middleOffset }}
                 />
               )
             })}
@@ -996,7 +956,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               hideTooltip={hideTooltip}
               tooltipData={tooltipData}
               yMax={yMax}
-              width={width}
             />
           )}
           {isNoDataAvailable && (
@@ -1322,7 +1281,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           {hasRightAxis && (
             <AxisRight
               scale={yScaleRight}
-              left={Number(width - config.yAxis.rightAxisSize)}
+              left={Number(runtime.yAxis.size + xMax)}
               label={config.yAxis.rightLabel}
               tickFormat={tick => formatNumber(tick, 'right')}
               numTicks={runtime.yAxis.rightNumTicks || undefined}
@@ -1478,7 +1437,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 const sumOfTickWidth = textWidths.reduce((a, b) => a + b, accumulator)
                 const spaceBetweenEachTick = (xMax - sumOfTickWidth) / (filteredTicks.length - 1)
                 const bufferBetweenTicks = 40
-                const maxLengthOfTick = width / filteredTicks.length - X_TICK_LABEL_PADDING * 2 - bufferBetweenTicks
+                const maxLengthOfTick =
+                  parentWidth / filteredTicks.length - X_TICK_LABEL_PADDING * 2 - bufferBetweenTicks
 
                 // Determine the position of each tick
                 let positions = [0] // The first tick is at position 0
