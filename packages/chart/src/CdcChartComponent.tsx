@@ -636,13 +636,19 @@ const CdcChart: React.FC<CdcChartProps> = ({
     const len = configObj.data.length
     if (len === 0) return 'empty'
 
+    // Include filters structure to ensure re-initialization when filters change
+    // This is important for tab switching where the same data is used but filters differ
+    const filtersKey = configObj?.filters
+      ? JSON.stringify(configObj.filters.map(f => ({ id: f.id, columnName: f.columnName })))
+      : ''
+
     // For small datasets (<=10 rows), create a hash of the entire dataset
     if (len <= 10) {
       try {
-        return `${len}-${JSON.stringify(configObj.data)}`
+        return `${filtersKey}-${len}-${JSON.stringify(configObj.data)}`
       } catch {
         // Fallback if data isn't serializable
-        return `${len}-${Date.now()}`
+        return `${filtersKey}-${len}-${Date.now()}`
       }
     }
 
@@ -650,12 +656,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
     // This is more efficient than hashing the entire dataset
     try {
       const sample = [configObj.data[0], configObj.data[Math.floor(len / 2)], configObj.data[len - 1]]
-      return `${len}-${JSON.stringify(sample)}`
+      return `${filtersKey}-${len}-${JSON.stringify(sample)}`
     } catch {
       // Fallback if data isn't serializable
-      return `${len}-${Date.now()}`
+      return `${filtersKey}-${len}-${Date.now()}`
     }
-  }, [configObj?.data])
+  }, [configObj?.data, configObj?.filters])
 
   useEffect(() => {
     const load = async () => {
