@@ -1,0 +1,272 @@
+[
+  {
+    "geography": "United States",
+    "year": "2021",
+    "category": "Category A",
+    "value": 100
+  },
+  {
+    "geography": "United States",
+    "year": "2021",
+    "category": "Category B",
+    "value": 200
+  },
+  {
+    "geography": "United States",
+    "year": "2021",
+    "category": "Category C",
+    "value": 300
+  },
+  {
+    "geography": "United States",
+    "year": "2022",
+    "category": "Category A",
+    "value": 400
+  },
+  {
+    "geography": "United States",
+    "year": "2022",
+    "category": "Category B",
+    "value": 500
+  },
+  {
+    "geography": "United States",
+    "year": "2022",
+    "category": "Category C",
+    "value": 600
+  },
+  {
+    "geography": "United States",
+    "year": "2023",
+    "category": "Category A",
+    "value": 700
+  },
+  {
+    "geography": "United States",
+    "year": "2023",
+    "category": "Category B",
+    "value": 800
+  },
+  {
+    "geography": "United States",
+    "year": "2023",
+    "category": "Category C",
+    "value": 900
+  },
+  {
+    "geography": "California",
+    "year": "2021",
+    "category": "Category A",
+    "value": 1000
+  },
+  {
+    "geography": "California",
+    "year": "2021",
+    "category": "Category B",
+    "value": 2000
+  },
+  {
+    "geography": "California",
+    "year": "2021",
+    "category": "Category C",
+    "value": 3000
+  },
+  {
+    "geography": "California",
+    "year": "2022",
+    "category": "Category A",
+    "value": 4000
+  },
+  {
+    "geography": "California",
+    "year": "2022",
+    "category": "Category B",
+    "value": 5000
+  },
+  {
+    "geography": "California",
+    "year": "2022",
+    "category": "Category C",
+    "value": 6000
+  },
+  {
+    "geography": "California",
+    "year": "2023",
+    "category": "Category A",
+    "value": 7000
+  },
+  {
+    "geography": "California",
+    "year": "2023",
+    "category": "Category B",
+    "value": 8000
+  },
+  {
+    "geography": "California",
+    "year": "2023",
+    "category": "Category C",
+    "value": 9000
+  },
+  {
+    "geography": "Texas",
+    "year": "2021",
+    "category": "Category A",
+    "value": 10000
+  },
+  {
+    "geography": "Texas",
+    "year": "2021",
+    "category": "Category B",
+    "value": 20000
+  },
+  {
+    "geography": "Texas",
+    "year": "2021",
+    "category": "Category C",
+    "value": 30000
+  },
+  {
+    "geography": "Texas",
+    "year": "2022",
+    "category": "Category A",
+    "value": 40000
+  },
+  {
+    "geography": "Texas",
+    "year": "2022",
+    "category": "Category B",
+    "value": 50000
+  },
+  {
+    "geography": "Texas",
+    "year": "2022",
+    "category": "Category C",
+    "value": 60000
+  },
+  {
+    "geography": "Texas",
+    "year": "2023",
+    "category": "Category A",
+    "value": 70000
+  },
+  {
+    "geography": "Texas",
+    "year": "2023",
+    "category": "Category B",
+    "value": 80000
+  },
+  {
+    "geography": "Texas",
+    "year": "2023",
+    "category": "Category C",
+    "value": 90000
+  },
+  {
+    "geography": "New York",
+    "year": "2021",
+    "category": "Category A",
+    "value": 15000
+  },
+  {
+    "geography": "New York",
+    "year": "2021",
+    "category": "Category B",
+    "value": 25000
+  },
+  {
+    "geography": "New York",
+    "year": "2021",
+    "category": "Category C",
+    "value": 35000
+  },
+  {
+    "geography": "New York",
+    "year": "2022",
+    "category": "Category A",
+    "value": 45000
+  },
+  {
+    "geography": "New York",
+    "year": "2022",
+    "category": "Category B",
+    "value": 55000
+  },
+  {
+    "geography": "New York",
+    "year": "2022",
+    "category": "Category C",
+    "value": 65000
+  },
+  {
+    "geography": "New York",
+    "year": "2023",
+    "category": "Category A",
+    "value": 75000
+  },
+  {
+    "geography": "New York",
+    "year": "2023",
+    "category": "Category B",
+    "value": 85000
+  },
+  {
+    "geography": "New York",
+    "year": "2023",
+    "category": "Category C",
+    "value": 95000
+  },
+  {
+    "geography": "Florida",
+    "year": "2021",
+    "category": "Category A",
+    "value": 12000
+  },
+  {
+    "geography": "Florida",
+    "year": "2021",
+    "category": "Category B",
+    "value": 22000
+  },
+  {
+    "geography": "Florida",
+    "year": "2021",
+    "category": "Category C",
+    "value": 32000
+  },
+  {
+    "geography": "Florida",
+    "year": "2022",
+    "category": "Category A",
+    "value": 42000
+  },
+  {
+    "geography": "Florida",
+    "year": "2022",
+    "category": "Category B",
+    "value": 52000
+  },
+  {
+    "geography": "Florida",
+    "year": "2022",
+    "category": "Category C",
+    "value": 62000
+  },
+  {
+    "geography": "Florida",
+    "year": "2023",
+    "category": "Category A",
+    "value": 72000
+  },
+  {
+    "geography": "Florida",
+    "year": "2023",
+    "category": "Category B",
+    "value": 82000
+  },
+  {
+    "geography": "Florida",
+    "year": "2023",
+    "category": "Category C",
+    "value": 92000
+  }
+]
