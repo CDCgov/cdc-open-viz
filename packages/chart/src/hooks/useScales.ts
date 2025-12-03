@@ -393,11 +393,34 @@ const dateFormatHasMonthButNoDays = dateFormat => {
 export const getTickValues = (xAxisDataMapped, xScale, num, config) => {
   const xDomain = xScale.domain()
 
+  // Cap the number of ticks to never exceed the actual data points
+  // This prevents duplicate ticks when data is filtered (e.g., brush selection)
+  // Handle undefined/null num by using data length as the cap
+  const requestedNum = num || xAxisDataMapped.length
+  const effectiveNum = Math.min(requestedNum, xAxisDataMapped.length)
+
   if (xScale.type === 'time') {
     const xDomainMax = xAxisDataMapped[xAxisDataMapped.length - 1]
     const xDomainMin = xAxisDataMapped[0]
 
-    const step = (xDomainMax - xDomainMin) / (num - 1)
+    // If we have fewer or equal data points than requested ticks, show all data points
+    if (xAxisDataMapped.length <= effectiveNum) {
+      let tickValues = [...xAxisDataMapped]
+      // Use first days of months when showing months without days
+      if (dateFormatHasMonthButNoDays(config.xAxis.dateDisplayFormat)) {
+        tickValues = tickValues.map(tv => getFirstDayOfMonth(tv))
+      }
+      // Remove duplicates that can occur after month transformation
+      const seenValues = new Set()
+      tickValues = tickValues.filter(v => {
+        if (seenValues.has(v)) return false
+        seenValues.add(v)
+        return true
+      })
+      return tickValues
+    }
+
+    const step = (xDomainMax - xDomainMin) / (effectiveNum - 1)
     let tickValues = []
     for (let i = xDomainMax; i >= xDomainMin; i -= step) {
       tickValues.push(i)
@@ -412,15 +435,30 @@ export const getTickValues = (xAxisDataMapped, xScale, num, config) => {
       tickValues = tickValues.map(tv => getFirstDayOfMonth(tv))
     }
 
+    // Remove duplicates that can occur due to rounding or month transformation
+    const seenValues = new Set()
+    tickValues = tickValues.filter(v => {
+      if (seenValues.has(v)) return false
+      seenValues.add(v)
+      return true
+    })
+
     return tickValues
   }
 
   if (xDomain.length > 2) {
-    const step = num || 1
+    const step = effectiveNum || 1
     const tickValues = []
+    const seenValues = new Set()
+
     for (let i = xDomain.length; i > 0; i -= step) {
       const adjustedIndex = Math.max(Math.round(i) - 1, 0)
-      tickValues.push(xDomain[adjustedIndex])
+      const value = xDomain[adjustedIndex]
+      // Prevent duplicate ticks
+      if (!seenValues.has(value)) {
+        seenValues.add(value)
+        tickValues.push(value)
+      }
     }
     tickValues.reverse()
 
