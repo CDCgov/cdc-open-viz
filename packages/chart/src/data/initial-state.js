@@ -300,7 +300,8 @@ const createInitialState = () => {
       height: 25,
       active: false,
       pattern_id: 'brush_pattern',
-      accent_color: '#ddd'
+      accent_color: '#ddd',
+      defaultRecentDateCount: undefined
     },
     sankey: {
       title: {
