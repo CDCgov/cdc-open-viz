@@ -155,6 +155,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   const mouseDownPos = useRef<{ x: number; y: number } | null>(null)
   const isMouseDown = useRef<boolean>(false)
   const previousExtent = useRef<{ x0: number; x1: number } | null>(null)
+  const previousDefaultCount = useRef<number | undefined>(undefined)
 
   const { tableData, config, colorScale } = useContext(ConfigContext)
   const dispatch = useContext(ChartDispatchContext)
@@ -282,7 +283,8 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     dispatch({ type: 'SET_BRUSH_DATA', payload: filteredData })
   }
 
-  // Set default 35% selection on initial load (starting from most recent dates)
+  // Set default selection on initial load
+  // Uses either the last X data points (if defaultRecentDateCount is set) or 35% of width
   useEffect(() => {
     if (hasInitialized.current || !tableData.length || !xScale || xMax <= 0) {
       return
@@ -290,19 +292,39 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
 
     const safeXMax = Math.max(xMax, 100)
     const safeYMax = Math.max(yMax, BRUSH_HEIGHT + BRUSH_PADDING * 2)
-    const initialWidth = safeXMax * 0.35 // 35% of the width
-    // Start from the end (most recent dates) instead of the beginning
-    const x0 = safeXMax - initialWidth
-    const x1 = safeXMax
-
-    // Find all domain values that fall within the initial 20% range
     const domain = xScale.domain()
-    const xValues: string[] = []
+    const defaultRecentDateCount = config?.brush?.defaultRecentDateCount
 
-    for (const value of domain) {
-      const xPos = xScale(value)
-      if (xPos !== undefined && xPos >= x0 && xPos < x1) {
-        xValues.push(value)
+    let x0: number
+    let x1: number
+    let xValues: string[] = []
+
+    if (defaultRecentDateCount && defaultRecentDateCount > 0 && domain.length > 0) {
+      // Use exact count of most recent data points
+      const countToSelect = Math.min(defaultRecentDateCount, domain.length)
+      // Get the last N values from the domain (most recent dates)
+      const selectedValues = domain.slice(-countToSelect)
+      xValues = selectedValues
+
+      // Calculate x0 and x1 based on the selected values' positions
+      const firstSelectedPos = xScale(selectedValues[0])
+      const lastSelectedPos = xScale(selectedValues[selectedValues.length - 1])
+      const bandwidth = xScale.bandwidth()
+
+      x0 = firstSelectedPos !== undefined ? firstSelectedPos : safeXMax * 0.65
+      x1 = lastSelectedPos !== undefined ? lastSelectedPos + bandwidth : safeXMax
+    } else {
+      // Default: 35% of the width, starting from most recent dates
+      const initialWidth = safeXMax * 0.35
+      x0 = safeXMax - initialWidth
+      x1 = safeXMax
+
+      // Find all domain values that fall within the initial range
+      for (const value of domain) {
+        const xPos = xScale(value)
+        if (xPos !== undefined && xPos >= x0 && xPos < x1) {
+          xValues.push(value)
+        }
       }
     }
 
@@ -321,7 +343,98 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       hasInitialized.current = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tableData, xScale, xMax, dataKey])
+  }, [tableData, xScale, xMax, dataKey, config?.brush?.defaultRecentDateCount])
+
+  // Update brush selection when defaultRecentDateCount changes in the editor
+  useEffect(() => {
+    const currentCount = config?.brush?.defaultRecentDateCount
+
+    // Skip if not initialized yet (let the initial effect handle it)
+    if (!hasInitialized.current) {
+      previousDefaultCount.current = currentCount
+      return
+    }
+
+    // Skip if the value hasn't actually changed
+    if (currentCount === previousDefaultCount.current) {
+      return
+    }
+
+    // Update the previous value
+    previousDefaultCount.current = currentCount
+
+    // Skip if we don't have the necessary data
+    if (!tableData.length || !xScale || xMax <= 0) {
+      return
+    }
+
+    const safeXMax = Math.max(xMax, 100)
+    const safeYMax = Math.max(yMax, BRUSH_HEIGHT + BRUSH_PADDING * 2)
+    const domain = xScale.domain()
+
+    let x0: number
+    let x1: number
+    let xValues: string[] = []
+
+    if (currentCount && currentCount > 0 && domain.length > 0) {
+      // Use exact count of most recent data points
+      const countToSelect = Math.min(currentCount, domain.length)
+      const selectedValues = domain.slice(-countToSelect)
+      xValues = selectedValues
+
+      const firstSelectedPos = xScale(selectedValues[0])
+      const lastSelectedPos = xScale(selectedValues[selectedValues.length - 1])
+      const bandwidth = xScale.bandwidth()
+
+      x0 = firstSelectedPos !== undefined ? firstSelectedPos : safeXMax * 0.65
+      x1 = lastSelectedPos !== undefined ? lastSelectedPos + bandwidth : safeXMax
+    } else {
+      // Default: 35% of the width, starting from most recent dates
+      const initialWidth = safeXMax * 0.35
+      x0 = safeXMax - initialWidth
+      x1 = safeXMax
+
+      for (const value of domain) {
+        const xPos = xScale(value)
+        if (xPos !== undefined && xPos >= x0 && xPos < x1) {
+          xValues.push(value)
+        }
+      }
+    }
+
+    if (xValues.length > 0) {
+      const newBounds: Bounds = {
+        x0,
+        x1,
+        y0: 0,
+        y1: safeYMax,
+        xValues
+      }
+
+      // Update the brush data
+      handleBrushChange(newBounds)
+
+      // Update the visual brush position
+      const brush = brushRef.current
+      if (brush && brush.updateBrush) {
+        brush.updateBrush(() => ({
+          ...brush.state,
+          extent: {
+            x0,
+            x1,
+            y0: 0,
+            y1: safeYMax
+          },
+          start: { x: x0, y: 0 },
+          end: { x: x1, y: BRUSH_HEIGHT }
+        }))
+
+        // Store the new extent
+        previousExtent.current = { x0, x1 }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [config?.brush?.defaultRecentDateCount])
 
   // Selected box style with dotted border
   const selectedBoxStyle = useMemo(
@@ -496,9 +609,32 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   const safeXMax = Math.max(xMax, 100) // Minimum width of 100px
   const safeYMax = Math.max(yMax, BRUSH_HEIGHT + BRUSH_PADDING * 2) // Minimum height with padding
 
-  // Calculate initial brush position (35% from the end, starting at most recent dates)
+  // Calculate initial brush position
+  // Uses either the last X data points (if defaultRecentDateCount is set) or 35% of width
   const initialBrushPosition = useMemo(() => {
-    if (safeXMax > 0 && tableData.length > 0) {
+    if (safeXMax > 0 && tableData.length > 0 && xScale) {
+      const domain = xScale.domain()
+      const defaultRecentDateCount = config?.brush?.defaultRecentDateCount
+
+      if (defaultRecentDateCount && defaultRecentDateCount > 0 && domain.length > 0) {
+        // Use exact count of most recent data points
+        const countToSelect = Math.min(defaultRecentDateCount, domain.length)
+        const selectedValues = domain.slice(-countToSelect)
+
+        const firstSelectedPos = xScale(selectedValues[0])
+        const lastSelectedPos = xScale(selectedValues[selectedValues.length - 1])
+        const bandwidth = xScale.bandwidth()
+
+        const x0 = firstSelectedPos !== undefined ? firstSelectedPos : safeXMax * 0.65
+        const x1 = lastSelectedPos !== undefined ? lastSelectedPos + bandwidth : safeXMax
+
+        return {
+          start: { x: x0, y: 0 },
+          end: { x: x1, y: safeYMax }
+        }
+      }
+
+      // Default: 35% of the width
       const initialWidth = safeXMax * 0.35
       return {
         start: { x: safeXMax - initialWidth, y: 0 },
@@ -506,7 +642,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       }
     }
     return undefined
-  }, [safeXMax, safeYMax, tableData.length])
+  }, [safeXMax, safeYMax, tableData.length, xScale, config?.brush?.defaultRecentDateCount])
 
   return (
     <svg
