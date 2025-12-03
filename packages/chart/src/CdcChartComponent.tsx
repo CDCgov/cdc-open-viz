@@ -611,21 +611,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
       } else if (newConfig.formattedData) {
         newConfig.data = newConfig.formattedData
       } else if (newConfig.dataDescription) {
-        // For dashboard contexts, prioritize data from config (dashboard-filtered data)
-        // Only fall back to datasets if no data is present
+        // In dashboard context, data is already processed and passed via config
+        // In non-dashboard context, we need to process it here
         let dataToProcess = newConfig.data
-        if (!dataToProcess && isDashboard && datasets && newConfig.dataKey) {
-          dataToProcess = datasets[newConfig.dataKey]?.data
-        }
 
         if (dataToProcess) {
           newConfig.data = transform.autoStandardize(dataToProcess)
           newConfig.data = transform.developerStandardize(newConfig.data, newConfig.dataDescription)
         }
-      } else if (isDashboard && newConfig.data) {
-        // Dashboard case where data is already set (filtered data from dashboard context)
-        // This ensures dashboard-filtered data is used even without dataDescription
-        // The data doesn't need transformation because it's already been processed
       }
     } catch (err) {
       console.error('Error on prepareData function ', err)
