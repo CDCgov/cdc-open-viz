@@ -242,24 +242,13 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       if (brushRef.current?.state?.isBrushing) {
         const brush = brushRef.current
 
-        // Approach 1: Use reset method if available to clear the brush
+        // Use reset method if available to clear the brush.
+        // If the visx Brush API is insufficient, consider filing an issue upstream.
         if (typeof brush.reset === 'function') {
           brush.reset()
           return
         }
-
-        // Approach 2: Try to find the brush SVG element and dispatch mouseup
-        const brushContainer = document.querySelector('.brush-overlay')
-        if (brushContainer) {
-          const svgElements = brushContainer.querySelectorAll('rect, path')
-          svgElements.forEach(element => {
-            const mouseUpEvent = new MouseEvent('mouseup', {
-              bubbles: true,
-              cancelable: true
-            })
-            element.dispatchEvent(mouseUpEvent)
-          })
-        }
+        // No reliable fallback: avoid DOM manipulation. If issues persist, document and address upstream.
       }
     }
 
