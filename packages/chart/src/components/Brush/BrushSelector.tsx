@@ -1,4 +1,4 @@
-import React, { FC, useContext, useMemo, memo, useRef, useEffect } from 'react'
+import React, { FC, useContext, useMemo, memo, useRef, useEffect, useState, useCallback } from 'react'
 import { Brush } from '@visx/brush'
 import BaseBrush from '@visx/brush/lib/BaseBrush'
 import { Group } from '@visx/group'
@@ -18,6 +18,10 @@ interface BrushSelectorProps {
 const BRUSH_HEIGHT = 50
 const BRUSH_PADDING = 10
 const BORDER_RADIUS = 4
+const KEYBOARD_STEP = 10 // pixels to move per arrow key press
+const KEYBOARD_STEP_LARGE = 50 // pixels to move with Shift+arrow
+
+type FocusedElement = 'left-handle' | 'selection' | 'right-handle' | null
 
 // Simple brush handle component with wider grab area
 const BrushHandle = memo<BrushHandleRenderProps>(({ x, height, isBrushActive }) => {
@@ -157,18 +161,27 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   const previousExtent = useRef<{ x0: number; x1: number } | null>(null)
   const previousDefaultCount = useRef<number | undefined>(undefined)
 
+  // Keyboard accessibility state
+  const [focusedElement, setFocusedElement] = useState<FocusedElement>(null)
+  const [accessibleExtent, setAccessibleExtent] = useState<{ x0: number; x1: number } | null>(null)
+  const leftHandleRef = useRef<HTMLButtonElement>(null)
+  const selectionRef = useRef<HTMLButtonElement>(null)
+  const rightHandleRef = useRef<HTMLButtonElement>(null)
+
   const { tableData, config, colorScale } = useContext(ConfigContext)
   const dispatch = useContext(ChartDispatchContext)
   const dataKey = config.xAxis.dataKey
   const series = config.series || []
 
-  // Capture initial brush extent after mount
+  // Capture initial brush extent after mount and sync accessible extent
   useEffect(() => {
-    if (brushRef.current && brushRef.current.state.extent.x0 !== -1 && !previousExtent.current) {
-      previousExtent.current = {
-        x0: brushRef.current.state.extent.x0,
-        x1: brushRef.current.state.extent.x1
+    if (brushRef.current && brushRef.current.state.extent.x0 !== -1) {
+      const { x0, x1 } = brushRef.current.state.extent
+      if (!previousExtent.current) {
+        previousExtent.current = { x0, x1 }
       }
+      // Also sync accessible extent for keyboard navigation
+      setAccessibleExtent({ x0, x1 })
     }
   }, [brushRef.current?.state])
 
@@ -264,24 +277,30 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   }, [])
 
   // Handle brush changes
-  const handleBrushChange = (bounds: Bounds | null) => {
-    if (!bounds) {
-      dispatch({ type: 'SET_BRUSH_DATA', payload: [] })
-      return
-    }
+  const handleBrushChange = useCallback(
+    (bounds: Bounds | null) => {
+      if (!bounds) {
+        dispatch({ type: 'SET_BRUSH_DATA', payload: [] })
+        return
+      }
 
-    const filteredValues = bounds.xValues?.filter(val => val !== undefined) || []
-    if (filteredValues.length === 0) {
-      dispatch({ type: 'SET_BRUSH_DATA', payload: [] })
-      return
-    }
+      const filteredValues = bounds.xValues?.filter(val => val !== undefined) || []
+      if (filteredValues.length === 0) {
+        dispatch({ type: 'SET_BRUSH_DATA', payload: [] })
+        return
+      }
 
-    // Create filtered dataset
-    const selectedSet = new Set(filteredValues)
-    const filteredData = tableData.filter(row => selectedSet.has(row[dataKey]))
+      // Create filtered dataset
+      const selectedSet = new Set(filteredValues)
+      const filteredData = tableData.filter(row => selectedSet.has(row[dataKey]))
 
-    dispatch({ type: 'SET_BRUSH_DATA', payload: filteredData })
-  }
+      dispatch({ type: 'SET_BRUSH_DATA', payload: filteredData })
+
+      // Update accessible extent for keyboard controls positioning
+      setAccessibleExtent({ x0: bounds.x0, x1: bounds.x1 })
+    },
+    [dispatch, tableData, dataKey]
+  )
 
   // Set default selection on initial load
   // Uses either the last X data points (if defaultRecentDateCount is set) or 35% of width
@@ -426,7 +445,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
             y1: safeYMax
           },
           start: { x: x0, y: 0 },
-          end: { x: x1, y: BRUSH_HEIGHT }
+          end: { x: x1, y: safeYMax }
         }))
 
         // Store the new extent
@@ -448,6 +467,172 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     }),
     []
   )
+
+  // Helper to update brush position programmatically
+  const updateBrushPosition = useCallback(
+    (newX0: number, newX1: number) => {
+      const brush = brushRef.current
+      if (!brush || !tableData.length) return
+
+      const safeXMax = Math.max(xMax, 100)
+      const safeYMax = Math.max(yMax, BRUSH_HEIGHT + BRUSH_PADDING * 2)
+
+      // Clamp values to valid range
+      newX0 = Math.max(0, Math.min(safeXMax, newX0))
+      newX1 = Math.max(0, Math.min(safeXMax, newX1))
+
+      // Ensure x0 < x1
+      if (newX0 > newX1) {
+        ;[newX0, newX1] = [newX1, newX0]
+      }
+
+      // Get the domain values for the new range
+      const domain = xScale.domain()
+      const xValues: string[] = []
+
+      for (const value of domain) {
+        const xPos = xScale(value)
+        if (xPos !== undefined && xPos >= newX0 && xPos < newX1) {
+          xValues.push(value)
+        }
+      }
+
+      if (xValues.length > 0) {
+        const newBounds: Bounds = {
+          x0: newX0,
+          x1: newX1,
+          y0: 0,
+          y1: safeYMax,
+          xValues
+        }
+
+        handleBrushChange(newBounds)
+
+        if (brush.updateBrush) {
+          brush.updateBrush(() => ({
+            ...brush.state,
+            extent: {
+              x0: newX0,
+              x1: newX1,
+              y0: 0,
+              y1: safeYMax
+            },
+            start: { x: newX0, y: 0 },
+            end: { x: newX1, y: safeYMax }
+          }))
+
+          previousExtent.current = { x0: newX0, x1: newX1 }
+          // For keyboard navigation, update state immediately so buttons move
+          setAccessibleExtent({ x0: newX0, x1: newX1 })
+        }
+      }
+    },
+    [xMax, yMax, tableData, xScale, handleBrushChange]
+  )
+
+  // Keyboard event handler for brush navigation
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent, element: FocusedElement) => {
+      if (!element) return
+
+      const brush = brushRef.current
+      if (!brush || brush.state.extent.x0 === -1) return
+
+      const { x0, x1 } = brush.state.extent
+      const step = event.shiftKey ? KEYBOARD_STEP_LARGE : KEYBOARD_STEP
+      const safeXMax = Math.max(xMax, 100)
+      const minSelectionWidth = 20 // Minimum selection width in pixels
+
+      let newX0 = x0
+      let newX1 = x1
+      let handled = false
+
+      switch (event.key) {
+        case 'ArrowLeft':
+          if (element === 'left-handle') {
+            // Move left handle left (expand selection)
+            newX0 = Math.max(0, x0 - step)
+          } else if (element === 'right-handle') {
+            // Move right handle left (shrink selection)
+            newX1 = Math.max(x0 + minSelectionWidth, x1 - step)
+          } else if (element === 'selection') {
+            // Move entire selection left
+            const width = x1 - x0
+            newX0 = Math.max(0, x0 - step)
+            newX1 = newX0 + width
+          }
+          handled = true
+          break
+
+        case 'ArrowRight':
+          if (element === 'left-handle') {
+            // Move left handle right (shrink selection)
+            newX0 = Math.min(x1 - minSelectionWidth, x0 + step)
+          } else if (element === 'right-handle') {
+            // Move right handle right (expand selection)
+            newX1 = Math.min(safeXMax, x1 + step)
+          } else if (element === 'selection') {
+            // Move entire selection right
+            const width = x1 - x0
+            newX1 = Math.min(safeXMax, x1 + step)
+            newX0 = newX1 - width
+          }
+          handled = true
+          break
+
+        case 'Home':
+          if (element === 'selection') {
+            // Move selection to start
+            const width = x1 - x0
+            newX0 = 0
+            newX1 = width
+          } else if (element === 'left-handle') {
+            newX0 = 0
+          }
+          handled = true
+          break
+
+        case 'End':
+          if (element === 'selection') {
+            // Move selection to end
+            const width = x1 - x0
+            newX1 = safeXMax
+            newX0 = safeXMax - width
+          } else if (element === 'right-handle') {
+            newX1 = safeXMax
+          }
+          handled = true
+          break
+      }
+
+      if (handled) {
+        event.preventDefault()
+        event.stopPropagation()
+        updateBrushPosition(newX0, newX1)
+      }
+    },
+    [xMax, updateBrushPosition]
+  )
+
+  // Get current brush extent for positioning accessible controls
+  const getCurrentExtent = useCallback(() => {
+    const brush = brushRef.current
+    if (brush && brush.state.extent.x0 !== -1) {
+      return {
+        x0: brush.state.extent.x0,
+        x1: brush.state.extent.x1
+      }
+    }
+    // Fallback to previousExtent or default
+    if (previousExtent.current) {
+      return previousExtent.current
+    }
+    const safeXMax = Math.max(xMax, 100)
+    return {
+      x0: safeXMax * 0.65,
+      x1: safeXMax
+    }
+  }, [xMax])
 
   // Track when brush interaction starts (mouse down) with position
   const handleBrushStart = (start: any) => {
@@ -593,7 +778,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
             y1: safeYMax
           },
           start: { x: newX0, y: 0 },
-          end: { x: newX1, y: BRUSH_HEIGHT }
+          end: { x: newX1, y: safeYMax }
         }))
 
         // Store the new extent as the previous extent for the next click
@@ -644,54 +829,165 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     return undefined
   }, [safeXMax, safeYMax, tableData.length, xScale, config?.brush?.defaultRecentDateCount])
 
+  // Calculate positions for accessible controls
+  const extent = accessibleExtent || getCurrentExtent()
+  const handleWidth = 24
+  // Selection spans from right edge of left handle to left edge of right handle
+  const selectionWidth = Math.max(extent.x1 - extent.x0 - handleWidth, 20)
+
   return (
-    <svg
-      width={safeXMax}
-      height={safeYMax}
-      style={{
-        display: 'block',
-        overflow: 'visible', // Ensure handles don't get clipped
-        border: '1px solid #d0d0d0',
-        borderRadius: '4px'
-      }}
+    <div
+      style={{ position: 'relative', width: safeXMax, height: safeYMax }}
+      role='group'
+      aria-label='Date range selector'
     >
-      {/* Mini chart preview */}
-      <Group top={BRUSH_PADDING}>
-        {safeXMax > 0 && tableData.length > 0 && (
-          <MiniChartPreview
-            series={series}
-            tableData={tableData}
-            dataKey={dataKey}
+      <svg
+        width={safeXMax}
+        height={safeYMax}
+        style={{
+          display: 'block',
+          overflow: 'visible', // Ensure handles don't get clipped
+          border: '1px solid #d0d0d0',
+          borderRadius: '4px'
+        }}
+        aria-hidden='true'
+      >
+        {/* Mini chart preview */}
+        <Group top={BRUSH_PADDING}>
+          {safeXMax > 0 && tableData.length > 0 && (
+            <MiniChartPreview
+              series={series}
+              tableData={tableData}
+              dataKey={dataKey}
+              xScale={xScale}
+              miniYScale={miniYScale}
+              colorScale={colorScale}
+              config={config}
+            />
+          )}
+        </Group>
+
+        {/* Brush component - positioned at the very top, no padding */}
+        {safeXMax > 0 && (
+          <Brush
             xScale={xScale}
-            miniYScale={miniYScale}
-            colorScale={colorScale}
-            config={config}
+            yScale={yScale}
+            width={safeXMax}
+            height={safeYMax}
+            brushDirection='horizontal'
+            onChange={handleBrushChange}
+            selectedBoxStyle={selectedBoxStyle}
+            useWindowMoveEvents={true} // Track mouse movements outside the brush area
+            resizeTriggerAreas={['left', 'right']} // Enable resize handles on both sides
+            innerRef={brushRef}
+            renderBrushHandle={props => <BrushHandle {...props} />}
+            initialBrushPosition={initialBrushPosition}
+            onClick={handleClick}
+            onBrushStart={handleBrushStart}
+            onBrushEnd={handleBrushEnd}
+            onMouseLeave={handleMouseLeave}
           />
         )}
-      </Group>
+      </svg>
 
-      {/* Brush component - positioned at the very top, no padding */}
-      {safeXMax > 0 && (
-        <Brush
-          xScale={xScale}
-          yScale={yScale}
-          width={safeXMax}
-          height={safeYMax}
-          brushDirection='horizontal'
-          onChange={handleBrushChange}
-          selectedBoxStyle={selectedBoxStyle}
-          useWindowMoveEvents={true} // Track mouse movements outside the brush area
-          resizeTriggerAreas={['left', 'right']} // Enable resize handles on both sides
-          innerRef={brushRef}
-          renderBrushHandle={props => <BrushHandle {...props} />}
-          initialBrushPosition={initialBrushPosition}
-          onClick={handleClick}
-          onBrushStart={handleBrushStart}
-          onBrushEnd={handleBrushEnd}
-          onMouseLeave={handleMouseLeave}
-        />
+      {/* Accessible keyboard controls - visually hidden but focusable, appear when focused */}
+      {safeXMax > 0 && hasInitialized.current && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: 0,
+            height: 0,
+            overflow: 'visible'
+          }}
+        >
+          {/* Left handle control - visually hidden until focused */}
+          <button
+            ref={leftHandleRef}
+            type='button'
+            aria-label='Left handle: Use arrow keys to adjust start of selection'
+            style={{
+              position: 'absolute',
+              left: `${extent.x0 - handleWidth / 2}px`,
+              top: 0,
+              width: focusedElement === 'left-handle' ? `${handleWidth}px` : '1px',
+              height: focusedElement === 'left-handle' ? `${safeYMax}px` : '1px',
+              background: focusedElement === 'left-handle' ? 'rgba(0, 102, 204, 0.3)' : 'transparent',
+              border: focusedElement === 'left-handle' ? '2px solid #0066cc' : 'none',
+              borderRadius: '4px',
+              pointerEvents: 'none',
+              outline: 'none',
+              padding: 0,
+              opacity: focusedElement === 'left-handle' ? 1 : 0,
+              clip: focusedElement === 'left-handle' ? 'auto' : 'rect(0, 0, 0, 0)'
+            }}
+            onFocus={() => setFocusedElement('left-handle')}
+            onBlur={() => setFocusedElement(null)}
+            onKeyDown={e => handleKeyDown(e, 'left-handle')}
+            tabIndex={0}
+          />
+
+          {/* Selection/center control - visually hidden until focused */}
+          <button
+            ref={selectionRef}
+            type='button'
+            aria-label='Selection: Use arrow keys to move entire selection'
+            style={{
+              position: 'absolute',
+              left: `${extent.x0 + handleWidth / 2}px`,
+              top: 0,
+              width: focusedElement === 'selection' ? `${selectionWidth}px` : '1px',
+              height: focusedElement === 'selection' ? `${safeYMax}px` : '1px',
+              background: focusedElement === 'selection' ? 'rgba(0, 102, 204, 0.2)' : 'transparent',
+              border: focusedElement === 'selection' ? '2px solid #0066cc' : 'none',
+              borderRadius: '4px',
+              pointerEvents: 'none',
+              outline: 'none',
+              padding: 0,
+              opacity: focusedElement === 'selection' ? 1 : 0,
+              clip: focusedElement === 'selection' ? 'auto' : 'rect(0, 0, 0, 0)'
+            }}
+            onFocus={() => setFocusedElement('selection')}
+            onBlur={() => setFocusedElement(null)}
+            onKeyDown={e => handleKeyDown(e, 'selection')}
+            tabIndex={0}
+          />
+
+          {/* Right handle control - visually hidden until focused */}
+          <button
+            ref={rightHandleRef}
+            type='button'
+            aria-label='Right handle: Use arrow keys to adjust end of selection'
+            style={{
+              position: 'absolute',
+              left: `${extent.x1 - handleWidth / 2}px`,
+              top: 0,
+              width: focusedElement === 'right-handle' ? `${handleWidth}px` : '1px',
+              height: focusedElement === 'right-handle' ? `${safeYMax}px` : '1px',
+              background: focusedElement === 'right-handle' ? 'rgba(0, 102, 204, 0.3)' : 'transparent',
+              border: focusedElement === 'right-handle' ? '2px solid #0066cc' : 'none',
+              borderRadius: '4px',
+              pointerEvents: 'none',
+              outline: 'none',
+              padding: 0,
+              opacity: focusedElement === 'right-handle' ? 1 : 0,
+              clip: focusedElement === 'right-handle' ? 'auto' : 'rect(0, 0, 0, 0)'
+            }}
+            onFocus={() => setFocusedElement('right-handle')}
+            onBlur={() => setFocusedElement(null)}
+            onKeyDown={e => handleKeyDown(e, 'right-handle')}
+            tabIndex={0}
+          />
+        </div>
       )}
-    </svg>
+
+      {/* Screen reader instructions */}
+      <div className='sr-only' style={{ position: 'absolute', left: '-9999px' }}>
+        Use Tab to navigate between left handle, selection, and right handle. Use Arrow keys to adjust. Hold Shift for
+        larger steps. Press Home to move to start, End to move to end.
+      </div>
+    </div>
   )
 }
 
