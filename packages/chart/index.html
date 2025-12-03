@@ -1,36 +1,28 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <style>
+      body {
+        margin: 0;
+        border-top: none !important;
+      }
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <style>
-    body {
-      margin: 0;
-      border-top: none !important;
-    }
+      /* Add 1rem padding to mimic DFE when editor is not visible */
+      .cdc-open-viz-module:not(.isEditor) {
+        padding: 1rem;
+      }
+    </style>
+    <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />
+  </head>
 
-    .cdc-map-outer-container {
-      min-height: 100vh;
-    }
+  <body>
+    <!-- GENERIC CHART TYPES -->
+    <div class="react-container" data-config="/examples/feature/combo/planet-combo-example-config.json"></div>
 
-    /* .react-container + .react-container {
-        margin-top: 3rem;
-      } */
-  </style>
-  <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />
-</head>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
 
-<body>
-
-  <!-- GENERIC CHART TYPES -->
-  <div class="react-container" data-config="/examples/feature/combo/planet-combo-example-config.json"></div>
-
-
-
-  <noscript>You need to enable JavaScript to run this app.</noscript>
-
-  <script type="module" src="./src/index.jsx"></script>
-</body>
-
+    <script type="module" src="./src/index.jsx"></script>
+  </body>
 </html>

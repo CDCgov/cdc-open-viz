@@ -559,7 +559,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     for (let entry of entries) {
       let { width, height } = entry.contentRect
 
-      const editorIsOpen = isEditor && !!document.querySelector('.editor-panel:not(.hidden)')
+      const editorIsOpen = isEditor
       width = editorIsOpen ? width - EDITOR_WIDTH : width
 
       const newViewport = getViewport(width)
