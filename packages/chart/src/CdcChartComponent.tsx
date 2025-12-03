@@ -611,10 +611,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
       } else if (newConfig.formattedData) {
         newConfig.data = newConfig.formattedData
       } else if (newConfig.dataDescription) {
-        // For dashboard contexts, use filtered data if already set, otherwise get from datasets
+        // For dashboard contexts, prioritize data from config (dashboard-filtered data)
+        // Only fall back to datasets if no data is present
         let dataToProcess = newConfig.data
-        // Only pull from datasets if we don't already have filtered data from the dashboard
-        if (isDashboard && datasets && newConfig.dataKey && !newConfig.data) {
+        if (!dataToProcess && isDashboard && datasets && newConfig.dataKey) {
           dataToProcess = datasets[newConfig.dataKey]?.data
         }
 
@@ -636,24 +636,27 @@ const CdcChart: React.FC<CdcChartProps> = ({
   // Create a stable data change key to detect when data actually changes
   // This prevents unnecessary re-renders while ensuring we catch filter changes
   const dataChangeKey = useMemo(() => {
-    // Prioritize configObj.data which contains dashboard-filtered data
-    // Fall back to datasets for cases where data hasn't been set on the config yet
-    const sourceData =
-      configObj?.data || (isDashboard && datasets && configObj?.dataKey ? datasets[configObj.dataKey]?.data : undefined)
+    // Priority order for data sources:
+    // 1. configObj.data - Contains dashboard-filtered data from multi-viz API filters
+    // 2. datasets[dataKey] - Fallback for dashboard context when no filtered data exists
+    // Using configObj.data when available ensures multi-viz API filters work correctly
+    const sourceData = configObj?.data
+      ? configObj.data
+      : isDashboard && datasets && configObj?.dataKey
+      ? datasets[configObj.dataKey]?.data
+      : undefined
 
     if (!sourceData) return 'no-data'
 
     const len = sourceData.length
     if (len === 0) return 'empty'
 
-    // Include filters structure AND active values to ensure re-initialization when filters change
-    // This is important for tab switching and dashboard filter changes where the same data is used but filters differ
+    // Include viz-level filters (active values important for tab switching)
     const filtersKey = configObj?.filters
       ? JSON.stringify(configObj.filters.map(f => ({ id: f.id, columnName: f.columnName, active: f.active })))
       : ''
 
-    // Include dashboard filters to detect filter changes
-    // dashboardFilters is added dynamically by the dashboard when filters are active
+    // Include dashboard-level filters (added by dashboard when multi-viz filters are active)
     const dashboardFiltersKey = (configObj as any)?.dashboardFilters
       ? JSON.stringify((configObj as any).dashboardFilters.map(f => ({ columnName: f.columnName, active: f.active })))
       : ''
