@@ -229,14 +229,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const categoryLabelSpace = useMemo(() => {
     return calculateHorizontalBarCategoryLabelWidth({
       yScale,
-      chartWidth: width,
+      chartWidth: parentWidth,
       formatDate,
       parseDate,
       tickLabelFont: GET_TEXT_WIDTH_FONT,
       xAxisType: config.runtime.xAxis?.type,
       labelPlacement: config.yAxis.labelPlacement
     })
-  }, [isHorizontal, config.visualizationType, config.yAxis.labelPlacement, yScale, width])
+  }, [isHorizontal, config.visualizationType, config.yAxis.labelPlacement, yScale, parentWidth])
 
   const horizontalYAxisLabelSpace = runtime.yAxis.label && !config.hideYAxisLabel ? 30 : 0
   if (isHorizontal && config.visualizationType === 'Bar') {
