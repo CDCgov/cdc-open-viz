@@ -611,9 +611,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
       } else if (newConfig.formattedData) {
         newConfig.data = newConfig.formattedData
       } else if (newConfig.dataDescription) {
-        // For dashboard contexts, always get fresh data from datasets
+        // For dashboard contexts, use filtered data if already set, otherwise get from datasets
         let dataToProcess = newConfig.data
-        if (isDashboard && datasets && newConfig.dataKey) {
+        // Only pull from datasets if we don't already have filtered data from the dashboard
+        if (isDashboard && datasets && newConfig.dataKey && !newConfig.data) {
           dataToProcess = datasets[newConfig.dataKey]?.data
         }
 
@@ -621,6 +622,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
           newConfig.data = transform.autoStandardize(dataToProcess)
           newConfig.data = transform.developerStandardize(newConfig.data, newConfig.dataDescription)
         }
+      } else if (isDashboard && newConfig.data) {
+        // Dashboard case where data is already set (filtered data from dashboard context)
+        // This ensures dashboard-filtered data is used even without dataDescription
+        // The data doesn't need transformation because it's already been processed
       }
     } catch (err) {
       console.error('Error on prepareData function ', err)
@@ -631,9 +636,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
   // Create a stable data change key to detect when data actually changes
   // This prevents unnecessary re-renders while ensuring we catch filter changes
   const dataChangeKey = useMemo(() => {
-    // For dashboard context with datasets, use the dataset data instead of config data
+    // Prioritize configObj.data which contains dashboard-filtered data
+    // Fall back to datasets for cases where data hasn't been set on the config yet
     const sourceData =
-      isDashboard && datasets && configObj?.dataKey ? datasets[configObj.dataKey]?.data : configObj?.data
+      configObj?.data || (isDashboard && datasets && configObj?.dataKey ? datasets[configObj.dataKey]?.data : undefined)
 
     if (!sourceData) return 'no-data'
 
@@ -646,13 +652,19 @@ const CdcChart: React.FC<CdcChartProps> = ({
       ? JSON.stringify(configObj.filters.map(f => ({ id: f.id, columnName: f.columnName, active: f.active })))
       : ''
 
+    // Include dashboard filters to detect filter changes
+    // dashboardFilters is added dynamically by the dashboard when filters are active
+    const dashboardFiltersKey = (configObj as any)?.dashboardFilters
+      ? JSON.stringify((configObj as any).dashboardFilters.map(f => ({ columnName: f.columnName, active: f.active })))
+      : ''
+
     // For small datasets (<=10 rows), create a hash of the entire dataset
     if (len <= 10) {
       try {
-        return `${filtersKey}-${len}-${JSON.stringify(sourceData)}`
+        return `${filtersKey}-${dashboardFiltersKey}-${len}-${JSON.stringify(sourceData)}`
       } catch {
         // Fallback if data isn't serializable
-        return `${filtersKey}-${len}-${Date.now()}`
+        return `${filtersKey}-${dashboardFiltersKey}-${len}-${Date.now()}`
       }
     }
 
@@ -660,12 +672,19 @@ const CdcChart: React.FC<CdcChartProps> = ({
     // This is more efficient than hashing the entire dataset
     try {
       const sample = [sourceData[0], sourceData[Math.floor(len / 2)], sourceData[len - 1]]
-      return `${filtersKey}-${len}-${JSON.stringify(sample)}`
+      return `${filtersKey}-${dashboardFiltersKey}-${len}-${JSON.stringify(sample)}`
     } catch {
       // Fallback if data isn't serializable
-      return `${filtersKey}-${len}-${Date.now()}`
+      return `${filtersKey}-${dashboardFiltersKey}-${len}-${Date.now()}`
     }
-  }, [configObj?.data, configObj?.filters, configObj?.dataKey, isDashboard, datasets])
+  }, [
+    configObj?.data,
+    configObj?.filters,
+    configObj?.dataKey,
+    (configObj as any)?.dashboardFilters,
+    isDashboard,
+    datasets
+  ])
 
   useEffect(() => {
     const load = async () => {
