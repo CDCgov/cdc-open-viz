@@ -179,7 +179,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     if (!xAxisLabelRefs.current.length) return
     const tallestLabel = Math.max(...xAxisLabelRefs.current.map(label => label.getBBox().height))
     return tallestLabel + X_TICK_LABEL_PADDING + DEFAULT_TICK_LENGTH
-  }, [dimensions[0], config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation])
+  }, [parentWidth, config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation])
 
   const yMax = initialHeight + forestRowsHeight
 
@@ -193,10 +193,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const xAxisDataMapped = data.map(d => getXAxisData(d))
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
 
-  const xMax =
-    parentWidth -
-    Number(config.orientation === 'horizontal' ? config.xAxis.size : config.yAxis.size) -
-    (hasRightAxis ? config.yAxis.rightAxisSize : 0)
+  const xMax = parentWidth - Number(runtime.yAxis.size) - (hasRightAxis ? config.yAxis.rightAxisSize : 0)
 
   const {
     xScale,
@@ -1520,7 +1517,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 config.xAxis.tickWidthMax = longestTickLength
 
                 return (
-                  <Group className='bottom-axis' width={dimensions[0]}>
+                  <Group className='bottom-axis' width={parentWidth}>
                     {filteredTicks.map((tick, i, propsTicks) => {
                       // when using LogScale show major ticks values only
                       const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
