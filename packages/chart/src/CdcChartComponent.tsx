@@ -628,6 +628,35 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return newConfig
   }
 
+  // Create a stable data change key to detect when data actually changes
+  // This prevents unnecessary re-renders while ensuring we catch filter changes
+  const dataChangeKey = useMemo(() => {
+    if (!configObj?.data) return 'no-data'
+
+    const len = configObj.data.length
+    if (len === 0) return 'empty'
+
+    // For small datasets (<=10 rows), create a hash of the entire dataset
+    if (len <= 10) {
+      try {
+        return `${len}-${JSON.stringify(configObj.data)}`
+      } catch {
+        // Fallback if data isn't serializable
+        return `${len}-${Date.now()}`
+      }
+    }
+
+    // For larger datasets, sample first, middle, and last rows to detect changes
+    // This is more efficient than hashing the entire dataset
+    try {
+      const sample = [configObj.data[0], configObj.data[Math.floor(len / 2)], configObj.data[len - 1]]
+      return `${len}-${JSON.stringify(sample)}`
+    } catch {
+      // Fallback if data isn't serializable
+      return `${len}-${Date.now()}`
+    }
+  }, [configObj?.data])
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -649,7 +678,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
 
     load()
-  }, [configObj?.data?.length ? configObj.data : null])
+  }, [dataChangeKey])
 
   /**
    * When cove has a config and container ref publish the cove_loaded event.
