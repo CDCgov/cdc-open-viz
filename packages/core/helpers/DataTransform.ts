@@ -6,7 +6,7 @@ export class DataTransform {
   constants: any
   constructor() {
     this.constants = {
-      errorMessageEmtpyData: 'Your data file is empty.',
+      errorMessageEmptyData: 'Your data file is empty.',
       errorMessageFormat: 'Your datatype is not supported.',
       descriptionHeader: 1,
       descriptionRoot: 2,
