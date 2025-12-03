@@ -15,8 +15,11 @@ export const useResizeObserver = (isEditor: boolean) => {
     for (let entry of entries) {
       let { width, height } = entry.contentRect
 
-      const editorIsOpen = isEditor
+      const editorIsOpen = isEditor && !!document.querySelector('.editor-panel:not(.hidden)')
       width = editorIsOpen ? width - EDITOR_WIDTH : width
+
+      // Account for 1rem padding in editor mode
+      width = width - (isEditor ? 36 : 0)
 
       const newViewport = getViewport(width)
 

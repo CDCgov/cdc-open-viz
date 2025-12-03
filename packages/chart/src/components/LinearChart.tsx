@@ -142,7 +142,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
-  const gridLineRefs = useRef([])
   const tooltipRef = useRef(null)
 
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -677,7 +676,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                         <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
                           {runtime.yAxis.gridLines && !hideFirstGridLine ? (
                             <Line
-                              innerRef={el => (gridLineRefs.current[i] = el)}
                               key={`${tick.value}--hide-hideGridLines`}
                               display={(isLogarithmicAxis && showTicks).toString()}
                               from={{ x: tick.from.x + xMax, y: tick.from.y }}
