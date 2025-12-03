@@ -611,9 +611,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
       } else if (newConfig.formattedData) {
         newConfig.data = newConfig.formattedData
       } else if (newConfig.dataDescription) {
-        // For dashboard contexts, get data from datasets if config.data is undefined
+        // For dashboard contexts, always get fresh data from datasets
         let dataToProcess = newConfig.data
-        if (!dataToProcess && isDashboard && datasets && newConfig.dataKey) {
+        if (isDashboard && datasets && newConfig.dataKey) {
           dataToProcess = datasets[newConfig.dataKey]?.data
         }
 
@@ -631,9 +631,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
   // Create a stable data change key to detect when data actually changes
   // This prevents unnecessary re-renders while ensuring we catch filter changes
   const dataChangeKey = useMemo(() => {
-    if (!configObj?.data) return 'no-data'
+    // For dashboard context with datasets, use the dataset data instead of config data
+    const sourceData =
+      isDashboard && datasets && configObj?.dataKey ? datasets[configObj.dataKey]?.data : configObj?.data
 
-    const len = configObj.data.length
+    if (!sourceData) return 'no-data'
+
+    const len = sourceData.length
     if (len === 0) return 'empty'
 
     // Include filters structure to ensure re-initialization when filters change
@@ -645,7 +649,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     // For small datasets (<=10 rows), create a hash of the entire dataset
     if (len <= 10) {
       try {
-        return `${filtersKey}-${len}-${JSON.stringify(configObj.data)}`
+        return `${filtersKey}-${len}-${JSON.stringify(sourceData)}`
       } catch {
         // Fallback if data isn't serializable
         return `${filtersKey}-${len}-${Date.now()}`
@@ -655,13 +659,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
     // For larger datasets, sample first, middle, and last rows to detect changes
     // This is more efficient than hashing the entire dataset
     try {
-      const sample = [configObj.data[0], configObj.data[Math.floor(len / 2)], configObj.data[len - 1]]
+      const sample = [sourceData[0], sourceData[Math.floor(len / 2)], sourceData[len - 1]]
       return `${filtersKey}-${len}-${JSON.stringify(sample)}`
     } catch {
       // Fallback if data isn't serializable
       return `${filtersKey}-${len}-${Date.now()}`
     }
-  }, [configObj?.data, configObj?.filters])
+  }, [configObj?.data, configObj?.filters, configObj?.dataKey, isDashboard, datasets])
 
   useEffect(() => {
     const load = async () => {
