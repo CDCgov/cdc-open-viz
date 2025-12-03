@@ -3,7 +3,7 @@ import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { MultiDashboardConfig } from '../types/MultiDashboard'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { getApplicableFilters } from './getFilteredData'
-import { filterData } from './filterData'
+import { filterData, isFilterAtResetState } from './filterData'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 
 const transform = new DataTransform()
@@ -91,16 +91,28 @@ export const getVizConfig = (
   if (visualizationConfig.formattedData) visualizationConfig.originalFormattedData = visualizationConfig.formattedData
   const filteredVizData = filteredData?.[rowNumber] ?? filteredData?.[visualizationKey]
 
-  if (filteredVizData) {
+  if (filteredVizData !== undefined) {
+    // filteredVizData exists (could be [] for reset filters, or actual filtered data)
     visualizationConfig.data = filteredVizData || []
     if (visualizationConfig.formattedData) {
       visualizationConfig.formattedData = visualizationConfig.data
     }
   } else {
     const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
-    // Markup-includes need data even when shared filters exist (for markup variables)
-    const shouldClearData = sharedFilterColumns.length && visualizationConfig.type !== 'markup-include'
-    visualizationConfig.data = shouldClearData ? [] : data[dataKey] || []
+    // filteredVizData is undefined - check if we should have filtered data
+    const applicableFilters = config.dashboard.sharedFilters.filter(
+      filter => !filter.usedBy?.length || filter.usedBy?.includes(visualizationKey)
+    )
+    const hasApplicableFilters = applicableFilters.some(f => !isFilterAtResetState(f))
+
+    if (hasApplicableFilters && visualizationConfig.type !== 'markup-include') {
+      // Filters are active but filtered data is missing - show empty to prevent confusion
+      visualizationConfig.data = []
+    } else {
+      // No active filters OR markup-include - show unfiltered data
+      visualizationConfig.data = data[dataKey] || []
+    }
+
     if (visualizationConfig.formattedData) {
       visualizationConfig.formattedData =
         transform.developerStandardize(visualizationConfig.data, visualizationConfig.dataDescription) ||
