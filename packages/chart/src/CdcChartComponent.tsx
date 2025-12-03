@@ -640,10 +640,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
     const len = sourceData.length
     if (len === 0) return 'empty'
 
-    // Include filters structure to ensure re-initialization when filters change
-    // This is important for tab switching where the same data is used but filters differ
+    // Include filters structure AND active values to ensure re-initialization when filters change
+    // This is important for tab switching and dashboard filter changes where the same data is used but filters differ
     const filtersKey = configObj?.filters
-      ? JSON.stringify(configObj.filters.map(f => ({ id: f.id, columnName: f.columnName })))
+      ? JSON.stringify(configObj.filters.map(f => ({ id: f.id, columnName: f.columnName, active: f.active })))
       : ''
 
     // For small datasets (<=10 rows), create a hash of the entire dataset
