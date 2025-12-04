@@ -52,7 +52,7 @@ export const loadAPIFiltersFactory = (
             const controller = new AbortController()
             const timeoutId = setTimeout(() => {
               controller.abort()
-            }, 10000) // 30 second timeout
+            }, 30000) // 30 second timeout
 
             fetch(endpoint, { signal: controller.signal })
               .then(resp => {

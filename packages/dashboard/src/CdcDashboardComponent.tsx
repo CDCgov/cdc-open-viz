@@ -79,6 +79,7 @@ export default function CdcDashboard({
   const [imageId] = useState(`cove-${Math.random().toString(16).slice(-4)}`)
   const [allExpanded, setAllExpanded] = useState(true)
   const [apiLoading, setAPILoading] = useState(false)
+  const dataVersionRef = React.useRef(0)
 
   const isPreview = state.tabSelected === 'Dashboard Preview'
 
@@ -124,11 +125,12 @@ export default function CdcDashboard({
     const filters = newFilters || config.dashboard.sharedFilters
     const datasetKeys = reloadURLHelpers.getDatasetKeys(config)
 
-    const emptyData = {}
-    const emptyFilteredData = {}
-    dispatch({ type: 'SET_DATA', payload: emptyData })
-    dispatch({ type: 'SET_FILTERED_DATA', payload: emptyFilteredData })
+    // Increment version to track this operation
+    dataVersionRef.current += 1
+    const currentVersion = dataVersionRef.current
+    const isStale = () => dataVersionRef.current !== currentVersion
 
+    // Keep existing data until new data loads (don't clear prematurely)
     const newData = {} // Start with empty object instead of cloning existing data
     const newDatasets = config.datasets
     let dataWasFetched = false
@@ -231,6 +233,12 @@ export default function CdcDashboard({
     const datasetsWithFiles = _.pickBy(newDatasets, dataset => !dataset.dataUrl)
 
     if (dataWasFetched || Object.keys(datasetsWithFiles).length) {
+      // Check if this operation is stale before updating state
+      if (isStale()) {
+        setAPILoading(false)
+        return
+      }
+
       const dataFiles = Object.keys(datasetsWithFiles).reduce((acc, key) => {
         acc[key] = datasetsWithFiles[key].data
         return acc

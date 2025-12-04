@@ -88,10 +88,15 @@ const VisualizationRow: React.FC<VizRowProps> = ({
 }) => {
   const { config, filteredData: dashboardFilteredData, data: rawData } = useContext(DashboardContext)
   const [toggledRow, setToggled] = React.useState<number>(0)
+  const prevActiveDashboard = React.useRef(config.activeDashboard)
 
   useEffect(() => {
-    if (row.toggle) setToggled(0)
-  }, [config.activeDashboard, index])
+    // Only reset toggle when actually switching dashboard tabs, not on filter changes
+    if (row.toggle && prevActiveDashboard.current !== config.activeDashboard) {
+      setToggled(0)
+      prevActiveDashboard.current = config.activeDashboard
+    }
+  }, [config.activeDashboard, row.toggle])
 
   const show = useMemo(() => {
     if (row.toggle) {
