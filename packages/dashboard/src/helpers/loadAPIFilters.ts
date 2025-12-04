@@ -48,8 +48,20 @@ export const loadAPIFiltersFactory = (
       Object.keys(toFetch).map(
         endpoint =>
           new Promise<{ error: boolean }>(resolve => {
-            fetch(endpoint)
-              .then(resp => resp.json())
+            // Create an AbortController for timeout
+            const controller = new AbortController()
+            const timeoutId = setTimeout(() => {
+              controller.abort()
+            }, 10000) // 30 second timeout
+
+            fetch(endpoint, { signal: controller.signal })
+              .then(resp => {
+                clearTimeout(timeoutId)
+                if (!resp.ok) {
+                  throw new Error(`HTTP error! status: ${resp.status}`)
+                }
+                return resp.json()
+              })
               .then(data => {
                 if (!Array.isArray(data)) {
                   console.error('COVE only supports response data in the shape Array<Object>')
@@ -66,16 +78,20 @@ export const loadAPIFiltersFactory = (
                   _autoLoadFilterIndexes
                 )
                 sharedFilters[index] = newDefaultSelectedFilter
+                resolve({ error: false })
               })
-              .catch(() => {
+              .catch(err => {
+                clearTimeout(timeoutId)
+                const errorMessage =
+                  err.name === 'AbortError'
+                    ? 'Request timed out. Please try again.'
+                    : 'There was a problem returning data. Please try again.'
+                console.error('API Filter fetch error:', err)
                 dispatchErrorMessages({
                   type: 'ADD_ERROR_MESSAGE',
-                  payload: 'There was a problem returning data. Please try again.'
+                  payload: errorMessage
                 })
                 resolve({ error: true })
-              })
-              .finally(() => {
-                resolve({ error: false })
               })
           })
       )
