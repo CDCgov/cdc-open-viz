@@ -18,17 +18,21 @@ export class DataTransform {
   autoStandardize(data): Object[] | undefined {
     const errorsFound: string[] = []
 
-    // Empty data
-    if (!data || 0 === data.length) {
+    // Null or undefined data
+    if (!data) {
       errorsFound.push(this.constants.errorMessageEmptyData)
+      console.error(errorsFound)
+      return undefined
+    }
+
+    // Empty array is valid - return it as-is
+    if (data.length === 0) {
+      return data
     }
 
     // Does it have the correct data structure?
     if (!data?.filter || data.filter(row => typeof row !== 'object').length > 0) {
       errorsFound.push(this.constants.errorMessageFormat)
-    }
-
-    if (errorsFound.length > 0) {
       console.error(errorsFound)
       return undefined
     }
