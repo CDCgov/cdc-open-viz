@@ -1,12 +1,14 @@
 import { SharedFilter } from '../types/SharedFilter'
 import _ from 'lodash'
+import { mergeCustomOrderValues } from '@cdc/core/helpers/mergeCustomOrderValues'
+import { handleSorting } from '@cdc/core/components/Filters'
 
 export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Record<string, any>): SharedFilter[] => {
   const dataSet = Object.values(data).flat()
 
   // Find indexes of all child filters
   const childFilterIndexes: number[] = newSharedFilters
-    .map((filter, index) => (filter.type === 'datafilter' && filter.parents ? index : -1))
+    .map((filter, index) => (filter.type === 'datafilter' && filter.parents?.length ? index : -1))
     .filter(index => index !== -1)
   if (childFilterIndexes.length === 0) return newSharedFilters
 
@@ -16,33 +18,54 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
   // Update each child filter
   childFilterIndexes.forEach(childIndex => {
     const childFilter: SharedFilter = newSharedFilters[childIndex]
-    const parentFilter: SharedFilter = newSharedFilters.find(
-      filter => String(childFilter.parents) === String(filter.key)
-    )
 
-    if (parentFilter) {
-      // Filter dataset based on parent's active value
-      const parentsActiveValues: string[] = dataSet.filter((d: Record<string, any>) => {
-        return parentFilter.active?.includes(d[parentFilter.columnName])
+    // Get all parent filters for this child
+    const parentFilters: SharedFilter[] = newSharedFilters.filter(filter => childFilter.parents?.includes(filter.key))
+
+    if (parentFilters.length > 0) {
+      const filteredDataSet = dataSet.filter((d: Record<string, any>) => {
+        return parentFilters.every(parentFilter => {
+          const parentActive = parentFilter.active
+          if (Array.isArray(parentActive)) {
+            return parentActive.includes(d[parentFilter.columnName])
+          }
+          return parentActive == d[parentFilter.columnName]
+        })
       })
-      // Get unique active values for the child filter
-      const childFilterValues = _.uniq(parentsActiveValues.map(d => d[childFilter.columnName]).filter(Boolean))
 
-      // Update the child filter if unique values exist
-      if (childFilterValues.length > 0) {
-        const isChildMultiSelect = childFilter.filterStyle === 'multi-select'
-        const activeValue = isChildMultiSelect
-          ? childFilterValues
-          : childFilter.active
-          ? childFilter.active
-          : childFilter.defaultValue
-          ? childFilter.defaultValue
-          : childFilterValues[0]
-        updatedFilters[childIndex] = {
-          ...childFilter,
-          values: childFilterValues,
-          active: activeValue
-        }
+      // Get unique active values for the child filter from the filtered dataset
+      const childFilterValues = _.uniq(filteredDataSet.map(d => d[childFilter.columnName]).filter(Boolean))
+
+      // Prepare filter with values and orderedValues for sorting
+      const filterToSort = {
+        ...childFilter,
+        values: childFilterValues,
+        orderedValues: mergeCustomOrderValues(childFilterValues, childFilter.orderedValues, childFilter.order)
+      }
+
+      // Use handleSorting to apply proper sorting logic (handles asc/desc/cust/column)
+      const sortedFilter = handleSorting(filterToSort)
+
+      // Update the child filter with new values (even if empty)
+      const isChildMultiSelect = childFilter.filterStyle === 'multi-select'
+      const activeValue =
+        sortedFilter.values.length > 0
+          ? isChildMultiSelect
+            ? sortedFilter.values
+            : childFilter.active && sortedFilter.values.includes(childFilter.active)
+            ? childFilter.active
+            : childFilter.defaultValue && sortedFilter.values.includes(childFilter.defaultValue)
+            ? childFilter.defaultValue
+            : sortedFilter.values[0]
+          : isChildMultiSelect
+          ? []
+          : childFilter.active || ''
+
+      updatedFilters[childIndex] = {
+        ...childFilter,
+        values: sortedFilter.values,
+        orderedValues: sortedFilter.orderedValues,
+        active: activeValue
       }
     }
   })
