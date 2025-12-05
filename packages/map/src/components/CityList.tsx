@@ -4,8 +4,7 @@ import { GlyphCircle, GlyphDiamond, GlyphSquare, GlyphStar, GlyphTriangle } from
 import ConfigContext from '../context'
 import { useLegendMemoContext } from '../context/LegendMemoContext'
 import { supportedCities } from '../data/supported-geos'
-import { getFilterControllingStatesPicked } from './UsaMap/helpers/map'
-import { displayGeoName, getGeoStrokeColor, SVG_HEIGHT, SVG_PADDING, SVG_WIDTH, isLegendItemDisabled } from '../helpers'
+import { displayGeoName, getGeoStrokeColor, isLegendItemDisabled } from '../helpers'
 import useGeoClickHandler from '../hooks/useGeoClickHandler'
 import useApplyTooltipsToGeo from '../hooks/useApplyTooltipsToGeo'
 import { applyLegendToRow } from '../helpers/applyLegendToRow'
@@ -19,7 +18,7 @@ type CityListProps = {
 }
 
 const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValueSupported, tooltipId, projection }) => {
-  const { config, topoData, runtimeData, position, runtimeLegend } = useContext(ConfigContext)
+  const { config, runtimeData, position, runtimeLegend } = useContext(ConfigContext)
   const { legendMemo, legendSpecialClassLastMemo } = useLegendMemoContext()
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
@@ -146,20 +145,12 @@ const CityList: React.FC<CityListProps> = ({ setSharedFilterValue, isFilterValue
     }
 
     if (geoData?.[longitudeColumnName] && geoData?.[latitudeColumnName] && config.general.geoType === 'single-state') {
-      const statesPicked = getFilterControllingStatesPicked(config, runtimeData)
-      const _statesPickedData = (topoData as any)?.states?.find(s => statesPicked.includes(s.properties.name))
-
-      const newProjection = projection.fitExtent(
-        [
-          [SVG_PADDING, SVG_PADDING],
-          [SVG_WIDTH - SVG_PADDING, SVG_HEIGHT - SVG_PADDING]
-        ],
-        _statesPickedData
-      )
-      let coords = [Number(geoData?.[longitudeColumnName]), Number(geoData?.[latitudeColumnName])]
-      transform = `translate(${newProjection(coords)}) scale(${
-        config.visual.geoCodeCircleSize / ((position as any).zoom > 1 ? (position as any).zoom : 1)
-      })`
+      // For single-state maps, the projection passed in is already fitted from CustomProjection
+      // We just need to project the coordinates and apply zoom adjustment
+      const coords = [Number(geoData?.[longitudeColumnName]), Number(geoData?.[latitudeColumnName])]
+      const projectedCoords = projection(coords)
+      const zoomScale = (position as any).zoom > 1 ? 1 / (position as any).zoom : 1
+      transform = `translate(${projectedCoords}) scale(${zoomScale})`
       needsPointer = true
     }
 
