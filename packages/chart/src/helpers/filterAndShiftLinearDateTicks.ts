@@ -20,14 +20,8 @@ export const filterAndShiftLinearDateTicks = (
     return axisProps.ticks
   }
 
-  // Cap the number of ticks to never exceed the actual data points
-  // This prevents duplicate ticks when data is filtered (e.g., brush selection)
-  // Handle undefined/null numTicks by using data length as the cap
-  const requestedNumTicks = axisProps.numTicks || xAxisDataMapped.length
-  const effectiveNumTicks = Math.min(requestedNumTicks, xAxisDataMapped.length)
-
   // get our filtered tick *values*
-  const filteredTickValues = getTicks(axisProps.scale, effectiveNumTicks) || []
+  const filteredTickValues = getTicks(axisProps.scale, axisProps.numTicks) || []
 
   let ticks = axisProps.ticks
 
@@ -51,17 +45,6 @@ export const filterAndShiftLinearDateTicks = (
       return axisProps.ticks[safeIndex]
     })
   }
-
-  // Remove duplicate ticks based on their value
-  // This can happen when requested tick count exceeds available unique data points
-  const seenValues = new Set()
-  ticks = ticks.filter(tick => {
-    if (!tick || tick.value == null) return false
-    const valueKey = typeof tick.value === 'number' ? tick.value : tick.value.getTime?.() ?? tick.value
-    if (seenValues.has(valueKey)) return false
-    seenValues.add(valueKey)
-    return true
-  })
 
   // Finally, format all ticks
   ticks.forEach((tick, i) => {

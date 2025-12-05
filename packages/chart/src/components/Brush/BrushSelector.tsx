@@ -24,15 +24,23 @@ const KEYBOARD_STEP_LARGE = 50 // pixels to move with Shift+arrow
 type FocusedElement = 'left-handle' | 'selection' | 'right-handle' | null
 
 // Simple brush handle component with wider grab area
-const BrushHandle = memo<BrushHandleRenderProps>(({ x, height, isBrushActive }) => {
+const BrushHandle = memo<BrushHandleRenderProps>(({ x, height, isBrushActive, className }) => {
   if (!isBrushActive) return null
 
-  const pathWidth = 8
-  const pathHeight = 15
-  const grabAreaWidth = 20 // Wider invisible grab area
+  const pathWidth = 14
+  const pathHeight = 28
+  const grabAreaWidth = 28 // Wider invisible grab area
+
+  // Determine if this is the left or right handle from className
+  const isLeftHandle = className?.includes('left')
+
+  // Arrow path: "<" for left handle, ">" for right handle
+  const arrowPath = isLeftHandle
+    ? 'M 2 7 L -3 14 L 2 21' // "<" chevron (points left)
+    : 'M -2 7 L 3 14 L -2 21' // ">" chevron (points right)
 
   return (
-    <Group left={x + pathWidth / 2 - 2} top={(height - pathHeight) / 2}>
+    <Group left={x + pathWidth / 2 - 7} top={(height - pathHeight) / 2}>
       {/* Invisible wider grab area that extends full height */}
       <rect
         x={-grabAreaWidth / 2}
@@ -43,12 +51,26 @@ const BrushHandle = memo<BrushHandleRenderProps>(({ x, height, isBrushActive }) 
         style={{ cursor: 'ew-resize' }}
         pointerEvents='all'
       />
-      {/* Visible handle */}
-      <path
-        fill='#f2f2f2'
-        d='M -4.5 0.5 L 3.5 0.5 L 3.5 15.5 L -4.5 15.5 L -4.5 0.5 M -1.5 4 L -1.5 12 M 0.5 4 L 0.5 12'
-        stroke='#999999'
+      {/* Visible handle background */}
+      <rect
+        x={-pathWidth / 2}
+        y={0}
+        width={pathWidth}
+        height={pathHeight}
+        fill='white'
+        stroke='rgb(51, 51, 51)'
         strokeWidth='1'
+        style={{ cursor: 'ew-resize' }}
+        pointerEvents='none'
+      />
+      {/* Arrow icon */}
+      <path
+        d={arrowPath}
+        fill='none'
+        stroke='rgb(51, 51, 51)'
+        strokeWidth='2'
+        strokeLinecap='round'
+        strokeLinejoin='round'
         style={{ cursor: 'ew-resize' }}
         pointerEvents='none'
       />
@@ -301,15 +323,15 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     const safeXMax = Math.max(xMax, 100)
     const safeYMax = Math.max(yMax, BRUSH_HEIGHT + BRUSH_PADDING * 2)
     const domain = xScale.domain()
-    const defaultRecentDateCount = config?.brush?.defaultRecentDateCount
+    const brushDefaultRecentDateCount = config.xAxis.brushDefaultRecentDateCount
 
     let x0: number
     let x1: number
     let xValues: string[] = []
 
-    if (defaultRecentDateCount && defaultRecentDateCount > 0 && domain.length > 0) {
+    if (brushDefaultRecentDateCount && brushDefaultRecentDateCount > 0 && domain.length > 0) {
       // Use exact count of most recent data points
-      const countToSelect = Math.min(defaultRecentDateCount, domain.length)
+      const countToSelect = Math.min(brushDefaultRecentDateCount, domain.length)
       // Get the last N values from the domain (most recent dates)
       const selectedValues = domain.slice(-countToSelect)
       xValues = selectedValues
@@ -351,11 +373,11 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       hasInitialized.current = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tableData, xScale, xMax, dataKey, config?.brush?.defaultRecentDateCount])
+  }, [tableData, xScale, xMax, dataKey, config.xAxis.brushDefaultRecentDateCount])
 
-  // Update brush selection when defaultRecentDateCount changes in the editor
+  // Update brush selection when brushDefaultRecentDateCount changes in the editor
   useEffect(() => {
-    const currentCount = config?.brush?.defaultRecentDateCount
+    const currentCount = config.xAxis.brushDefaultRecentDateCount
 
     // Skip if not initialized yet (let the initial effect handle it)
     if (!hasInitialized.current) {
@@ -442,17 +464,14 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config?.brush?.defaultRecentDateCount])
+  }, [config.xAxis.brushDefaultRecentDateCount])
 
-  // Selected box style with dotted border
+  // Selected box style with solid border and pattern fill
   const selectedBoxStyle = useMemo(
     () => ({
-      fill: 'transparent',
-      fillOpacity: 0,
+      fill: 'url(#brush_pattern)',
       stroke: '#333',
-      strokeWidth: 2,
-      strokeDasharray: '4 4',
-      rx: BORDER_RADIUS
+      strokeWidth: 1
     }),
     []
   )
@@ -784,15 +803,15 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   const safeYMax = Math.max(yMax, BRUSH_HEIGHT + BRUSH_PADDING * 2) // Minimum height with padding
 
   // Calculate initial brush position
-  // Uses either the last X data points (if defaultRecentDateCount is set) or 35% of width
+  // Uses either the last X data points (if brushDefaultRecentDateCount is set) or 35% of width
   const initialBrushPosition = useMemo(() => {
     if (safeXMax > 0 && tableData.length > 0 && xScale) {
       const domain = xScale.domain()
-      const defaultRecentDateCount = config?.brush?.defaultRecentDateCount
+      const brushDefaultRecentDateCount = config.xAxis.brushDefaultRecentDateCount
 
-      if (defaultRecentDateCount && defaultRecentDateCount > 0 && domain.length > 0) {
+      if (brushDefaultRecentDateCount && brushDefaultRecentDateCount > 0 && domain.length > 0) {
         // Use exact count of most recent data points
-        const countToSelect = Math.min(defaultRecentDateCount, domain.length)
+        const countToSelect = Math.min(brushDefaultRecentDateCount, domain.length)
         const selectedValues = domain.slice(-countToSelect)
 
         const firstSelectedPos = xScale(selectedValues[0])
@@ -816,7 +835,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       }
     }
     return undefined
-  }, [safeXMax, safeYMax, tableData.length, xScale, config?.brush?.defaultRecentDateCount])
+  }, [safeXMax, safeYMax, tableData.length, xScale, config.xAxis.brushDefaultRecentDateCount])
 
   // Calculate positions for accessible controls
   const extent = accessibleExtent || getCurrentExtent()
@@ -835,12 +854,23 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
         height={safeYMax}
         style={{
           display: 'block',
-          overflow: 'visible', // Ensure handles don't get clipped
-          border: '1px solid #d0d0d0',
-          borderRadius: '4px'
+          overflow: 'visible' // Ensure handles don't get clipped
         }}
         aria-hidden='true'
       >
+        {/* Pattern definition for brush selection */}
+        <defs>
+          <pattern id='brush_pattern' width='8' height='8' patternUnits='userSpaceOnUse'>
+            <path
+              d='M 0,8 l 8,-8 M -2,2 l 4,-4 M 6,10 l 4,-4'
+              stroke='#bdbdbd'
+              strokeWidth='1'
+              strokeLinecap='square'
+              shapeRendering='auto'
+            />
+          </pattern>
+        </defs>
+
         {/* Mini chart preview */}
         <Group top={BRUSH_PADDING}>
           {safeXMax > 0 && tableData.length > 0 && (

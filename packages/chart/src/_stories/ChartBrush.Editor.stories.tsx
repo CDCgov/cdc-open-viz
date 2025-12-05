@@ -37,13 +37,9 @@ export const BrushDefaultSelectionTests: Story = {
       ...brushEnabledConfig,
       xAxis: {
         ...brushEnabledConfig.xAxis,
-        brushActive: true
-      },
-      brush: {
-        ...brushEnabledConfig.brush,
-        active: true,
+        brushActive: true,
         // New property: when set, shows last X data points instead of 35%
-        defaultRecentDateCount: undefined
+        brushDefaultRecentDateCount: undefined
       }
     },
     isEditor: true
