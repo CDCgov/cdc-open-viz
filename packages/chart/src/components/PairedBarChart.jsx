@@ -8,12 +8,21 @@ import ConfigContext from '../ConfigContext'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
+import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 
 const PairedBarChart = ({ width, height, originalWidth }) => {
-  const { config, colorScale, transformedData: data, formatNumber, seriesHighlight } = useContext(ConfigContext)
+  const {
+    config,
+    colorScale,
+    transformedData: data,
+    formatNumber,
+    seriesHighlight,
+    vizViewport
+  } = useContext(ConfigContext)
 
   if (!config || config?.series?.length < 2) return
 
+  const labelFontSize = isMobileFontViewport(vizViewport) ? 13 : 16
   const borderWidth = config.barHasBorder === 'true' ? 1 : 0
   const halfWidth = width / 2
   const offset = 1.02 // Offset of the left bar from the Axis
@@ -109,7 +118,10 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * data.length
                 config.heights.horizontal = totalheight
                 // check if text fits inside of the  bar including suffix/prefix,comma,fontSize ..etc
-                const textWidth = getTextWidth(formatNumber(d[groupOne.dataKey], 'left'))
+                const textWidth = getTextWidth(
+                  formatNumber(d[groupOne.dataKey], 'left'),
+                  `normal ${labelFontSize}px sans-serif`
+                )
                 const textFits = textWidth < barWidth - 5 // minus padding dx(5)
 
                 return (
@@ -141,6 +153,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                           x={halfWidth - barWidth}
                           y={y + config.barHeight / 2}
                           fill={textFits ? groupOne.labelColor : '#000'}
+                          fontSize={labelFontSize}
                         >
                           {formatNumber(d[groupOne.dataKey], 'left')}
                         </Text>
@@ -168,7 +181,10 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                 const totalheight = (Number(config.barSpace) + barHeight + borderWidth) * data.length
                 config.heights.horizontal = totalheight
                 // check if text fits inside of the  bar including suffix/prefix,comma,fontSize ..etc
-                const textWidth = getTextWidth(formatNumber(d[groupTwo.dataKey], 'left'))
+                const textWidth = getTextWidth(
+                  formatNumber(d[groupTwo.dataKey], 'left'),
+                  `normal ${labelFontSize}px sans-serif`
+                )
                 const isTextFits = textWidth < barWidth - 5 // minus padding dx(5)
 
                 return (
@@ -207,6 +223,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
                           x={halfWidth + barWidth}
                           y={y + config.barHeight / 2}
                           fill={isTextFits ? groupTwo.labelColor : '#000'}
+                          fontSize={labelFontSize}
                         >
                           {formatNumber(d[groupTwo.dataKey], 'left')}
                         </Text>

@@ -18,6 +18,7 @@ export type BarChartContextValues = {
     getHighlightedBarColorByValue: Function
     lollipopBarWidth: number
     lollipopShapeSize: number
+    labelFontSize: number
     onMouseLeaveBar: Function
     onMouseOverBar: Function
     section: string
