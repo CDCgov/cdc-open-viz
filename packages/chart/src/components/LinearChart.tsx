@@ -1,4 +1,13 @@
-import React, { forwardRef, useContext, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import React, {
+  forwardRef,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+  useCallback
+} from 'react'
 
 // Libraries
 import { AxisLeft, AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -27,7 +36,7 @@ import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from '../hooks/useIntersectionObserver'
 import Regions from './Regions'
 import CategoricalYAxis from './Axis/Categorical.Axis'
-import BrushChart from './Brush/BrushController'
+import BrushSelector from './Brush/BrushSelector'
 
 // Helpers
 import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/viewports'
@@ -128,12 +137,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   // HOOKS  % STATES
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
+
   const { visSupportsReactTooltip } = useEditorPermissions()
   const { hasTopAxis } = getTopAxis(config)
   const [animatedChart, setAnimatedChart] = useState(false)
   const [showHoverLine, setShowHoverLine] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
+  const [calculatedSvgHeight, setCalculatedSvgHeight] = useState<number | null>(null)
 
   // REFS
   const axisBottomRef = useRef(null)
@@ -423,16 +434,24 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const topLabelOnGridline = topYLabelRef.current && yAxis.labelsAboveGridlines
 
     // Heights to add
-
-    const brushHeight = 25
-    const brushHeightWithMargin = config.xAxis.brushActive ? brushHeight + brushHeight : 0
     const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
     const topLabelOnGridlineHeight = topLabelOnGridline ? topYLabelRef.current.getBBox().height : 0
-    const additionalHeight = axisBottomHeight + brushHeightWithMargin + forestRowsHeight + topLabelOnGridlineHeight
-    const newHeight = initialHeight + additionalHeight
-    if (!parentRef.current) return
 
-    parentRef.current.style.height = `${newHeight}px`
+    // SVG height (without brush)
+    const svgAdditionalHeight = axisBottomHeight + forestRowsHeight + topLabelOnGridlineHeight
+    const svgHeight = initialHeight + svgAdditionalHeight
+
+    // Parent container height (includes brush if active)
+    const brushHeight = 70
+    const brushMargin = 10
+    const brushHeightWithMargin = config.xAxis.brushActive ? brushHeight + brushMargin : 0
+    const parentHeight = svgHeight + brushHeightWithMargin
+
+    if (!parentRef.current) return
+    parentRef.current.style.height = `${parentHeight}px`
+
+    // Set the calculated SVG height via state to ensure it's used on render
+    setCalculatedSvgHeight(svgHeight)
 
     /* Adding text above the top gridline overflows the bounds of the svg.
     To accommodate for this we need to...
@@ -446,7 +465,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const svg = internalSvgRef.current
     if (!svg) return
     const parentWidthFromRef = parentRef.current.getBoundingClientRect().width
-    svg.setAttribute('viewBox', `0 ${-topLabelOnGridlineHeight} ${parentWidthFromRef} ${newHeight}`)
+    svg.setAttribute('viewBox', `0 ${-topLabelOnGridlineHeight} ${parentWidthFromRef} ${svgHeight}`)
 
     // translate legend match viewBox-adjusted height
     if (!legendRef.current) return
@@ -650,7 +669,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           ref={internalSvgRef}
           onMouseMove={onMouseMove}
           width={parentWidth + config.yAxis.rightAxisSize}
-          height={isNoDataAvailable ? 1 : parentHeight}
+          height={isNoDataAvailable ? 1 : calculatedSvgHeight ?? parentHeight}
           className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${
             debugSvg && 'debug'
           } ${isDraggingAnnotation && 'dragging-annotation'}`}
@@ -886,8 +905,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               forestPlotRightLabelRef={forestPlotRightLabelRef}
             />
           )}
-          {/*Brush chart */}
-          {config.xAxis.brushActive && config.xAxis.type !== 'categorical' && <BrushChart xMax={xMax} yMax={yMax} />}
+          {/* Brush moved to separate overlay - no longer in main SVG */}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
           {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(
@@ -1433,6 +1451,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   ? getTickValues(xAxisDataMapped, xScale, isDateTime ? xTickCount : getManualStep(), config)
                   : config.runtime.xAxis.type === 'date'
                   ? xAxisDataMapped
+                  : // For date-time with small datasets (e.g., brush-filtered), use explicit tick values
+                  // to ensure each data point can have a tick. Otherwise, visx may generate too few.
+                  isDateTime && xAxisDataMapped.length > 0 && xAxisDataMapped.length <= (xTickCount || 15)
+                  ? xAxisDataMapped
                   : undefined
               }
             >
@@ -1457,7 +1479,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                     .reduce((acc, curr) => curr - acc)
 
                 // filter out every [distanceBetweenTicks] tick starting from the end, so the last tick is always labeled
-                const filteredTicks = useDateSpanMonths
+                let filteredTicks = useDateSpanMonths
                   ? [...props.ticks]
                       .reverse()
                       .filter((_, i) => i % distanceBetweenTicks === 0)
@@ -1468,6 +1490,22 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                         formattedValue: handleBottomTickFormatting(tick.value, i, arr)
                       }))
                   : props.ticks
+
+                // Remove duplicate ticks based on the actual underlying value (not formatted display)
+                // This prevents showing duplicate ticks when the scale generates more ticks than data points
+                const seenValues = new Set()
+                filteredTicks = filteredTicks.filter(tick => {
+                  // Get the actual value - for dates, use getTime() to compare timestamps
+                  const valueKey =
+                    tick.value instanceof Date
+                      ? tick.value.getTime()
+                      : typeof tick.value === 'number'
+                      ? tick.value
+                      : String(tick.value)
+                  if (seenValues.has(valueKey)) return false
+                  seenValues.add(valueKey)
+                  return true
+                })
 
                 const axisMaxHeight = bottomLabelStart + BOTTOM_LABEL_PADDING
 
@@ -1639,6 +1677,23 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           />
         )}
         <div className='animation-trigger' ref={triggerRef} />
+        {/* SEPARATED BRUSH - Independent SVG overlay */}
+        {config.xAxis.brushActive && config.xAxis.type !== 'categorical' && xMax > 0 && (
+          <div
+            style={{
+              position: 'relative',
+              marginTop: '10px',
+              left: `${runtime.yAxis.size || 0}px`,
+              width: `${Math.max(xMax, 100)}px`,
+              height: '70px',
+              pointerEvents: 'auto',
+              zIndex: 15
+            }}
+            className='brush-overlay'
+          >
+            <BrushSelector xMax={Math.max(xMax, 100)} yMax={70} />
+          </div>
+        )}
       </div>
     </ErrorBoundary>
   )

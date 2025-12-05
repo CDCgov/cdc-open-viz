@@ -139,7 +139,8 @@ const createInitialState = () => {
       padding: 5,
       showYearsOnce: false,
       sortByRecentDate: false,
-      brushActive: false
+      brushActive: false,
+      brushDefaultRecentDateCount: undefined
     },
     table: {
       label: 'Data Table',
