@@ -139,6 +139,15 @@ const MiniChartPreview = memo<{
           return isNaN(scaled) || !isFinite(scaled) ? 0 : scaled
         }
 
+        // Define function to skip points with invalid values
+        const defined = (d: Object) => {
+          const xVal = xScale(d[dataKey])
+          const yVal = parseFloat(d[s.dataKey])
+          if (xVal === undefined || isNaN(yVal) || !isFinite(yVal)) return false
+          const scaledY = miniYScale(yVal)
+          return !isNaN(scaledY) && isFinite(scaledY)
+        }
+
         return isAreaChart ? (
           <AreaClosed
             key={`mini-area-${seriesKey}-${i}`}
@@ -153,6 +162,7 @@ const MiniChartPreview = memo<{
             strokeDasharray={strokeDasharray}
             curve={curve}
             pointerEvents='none'
+            defined={defined}
           />
         ) : (
           <LinePath
@@ -166,6 +176,7 @@ const MiniChartPreview = memo<{
             strokeOpacity={0.8}
             curve={curve}
             pointerEvents='none'
+            defined={defined}
           />
         )
       })}
@@ -177,11 +188,27 @@ MiniChartPreview.displayName = 'MiniChartPreview'
 
 const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   const brushRef = useRef<BaseBrush>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const hasInitialized = useRef(false)
   const mouseDownPos = useRef<{ x: number; y: number } | null>(null)
   const isMouseDown = useRef<boolean>(false)
   const previousExtent = useRef<{ x0: number; x1: number } | null>(null)
   const previousDefaultCount = useRef<number | undefined>(undefined)
+
+  // Custom touch handling state
+  const touchState = useRef<{
+    active: boolean
+    startX: number
+    currentX: number
+    startExtent: { x0: number; x1: number }
+    dragType: 'selection' | 'left-handle' | 'right-handle' | 'new-selection' | null
+  }>({
+    active: false,
+    startX: 0,
+    currentX: 0,
+    startExtent: { x0: 0, x1: 0 },
+    dragType: null
+  })
 
   // Keyboard accessibility state
   const [focusedElement, setFocusedElement] = useState<FocusedElement>(null)
@@ -241,12 +268,20 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       if (!s.dataKey) continue
       for (const row of tableData) {
         const value = parseFloat(row[s.dataKey])
-        if (!isNaN(value)) {
+        if (!isNaN(value) && isFinite(value)) {
           hasValidValues = true
           minValue = Math.min(minValue, value)
           maxValue = Math.max(maxValue, value)
         }
       }
+    }
+
+    // Handle edge case where all values are the same
+    if (hasValidValues && minValue === maxValue) {
+      // Create a domain with some padding around the single value
+      const padding = Math.abs(minValue) * 0.1 || 10
+      minValue = minValue - padding
+      maxValue = maxValue + padding
     }
 
     if (!hasValidValues) {
@@ -286,6 +321,166 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       window.removeEventListener('mouseleave', handleWindowMouseUp)
     }
   }, [])
+
+  // Custom touch handling for mobile - bypasses broken @visx/brush touch support
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const HANDLE_WIDTH = 24 // Width of the drag handles
+
+    const getRelativeX = (touch: Touch): number => {
+      const rect = container.getBoundingClientRect()
+      return touch.clientX - rect.left
+    }
+
+    const getDragType = (x: number): 'selection' | 'left-handle' | 'right-handle' | 'new-selection' => {
+      const brush = brushRef.current
+      if (!brush || brush.state.extent.x0 === -1) return 'new-selection'
+
+      const { x0, x1 } = brush.state.extent
+
+      // Check if touch is on handles (with some tolerance)
+      if (Math.abs(x - x0) < HANDLE_WIDTH) return 'left-handle'
+      if (Math.abs(x - x1) < HANDLE_WIDTH) return 'right-handle'
+
+      // Check if touch is on selection
+      if (x >= x0 && x <= x1) return 'selection'
+
+      // Touch is outside selection - create new selection
+      return 'new-selection'
+    }
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return
+
+      const touch = e.touches[0]
+      const x = getRelativeX(touch)
+      const dragType = getDragType(x)
+
+      e.preventDefault()
+      e.stopPropagation()
+
+      const brush = brushRef.current
+      const startExtent =
+        brush && brush.state.extent.x0 !== -1
+          ? { x0: brush.state.extent.x0, x1: brush.state.extent.x1 }
+          : { x0: x, x1: x } // For new selection, start at touch point
+
+      touchState.current = {
+        active: true,
+        startX: x,
+        currentX: x,
+        startExtent,
+        dragType
+      }
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!touchState.current.active || e.touches.length !== 1) return
+
+      e.preventDefault()
+      e.stopPropagation()
+
+      const touch = e.touches[0]
+      const x = getRelativeX(touch)
+      touchState.current.currentX = x
+      const delta = x - touchState.current.startX
+      const { startExtent, dragType, startX } = touchState.current
+      const safeXMax = Math.max(xMax, 100)
+      const safeYMax = Math.max(yMax, BRUSH_HEIGHT + BRUSH_PADDING * 2)
+      const minSelectionWidth = 20
+
+      let newX0 = startExtent.x0
+      let newX1 = startExtent.x1
+
+      if (dragType === 'selection') {
+        // Move entire selection
+        const width = startExtent.x1 - startExtent.x0
+        newX0 = Math.max(0, Math.min(safeXMax - width, startExtent.x0 + delta))
+        newX1 = newX0 + width
+      } else if (dragType === 'left-handle') {
+        // Resize from left
+        newX0 = Math.max(0, Math.min(startExtent.x1 - minSelectionWidth, startExtent.x0 + delta))
+      } else if (dragType === 'right-handle') {
+        // Resize from right
+        newX1 = Math.max(startExtent.x0 + minSelectionWidth, Math.min(safeXMax, startExtent.x1 + delta))
+      } else if (dragType === 'new-selection') {
+        // Create new selection from start point to current point
+        newX0 = Math.max(0, Math.min(startX, x))
+        newX1 = Math.min(safeXMax, Math.max(startX, x))
+        // Ensure minimum width
+        if (newX1 - newX0 < minSelectionWidth) {
+          if (x > startX) {
+            newX1 = Math.min(safeXMax, newX0 + minSelectionWidth)
+          } else {
+            newX0 = Math.max(0, newX1 - minSelectionWidth)
+          }
+        }
+      }
+
+      // Update brush position
+      const brush = brushRef.current
+      if (brush?.updateBrush) {
+        brush.updateBrush(() => ({
+          ...brush.state,
+          extent: { x0: newX0, x1: newX1, y0: 0, y1: safeYMax },
+          start: { x: newX0, y: 0 },
+          end: { x: newX1, y: safeYMax }
+        }))
+      }
+    }
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (!touchState.current.active) return
+
+      e.preventDefault()
+      e.stopPropagation()
+
+      // Get final brush state and update data
+      const brush = brushRef.current
+      if (brush) {
+        const { x0, x1 } = brush.state.extent
+        const domain = xScale.domain()
+        const xValues: string[] = []
+
+        for (const value of domain) {
+          const xPos = xScale(value)
+          if (xPos !== undefined && xPos >= x0 && xPos < x1) {
+            xValues.push(value)
+          }
+        }
+
+        if (xValues.length > 0) {
+          const selectedSet = new Set(xValues)
+          const filteredData = tableData.filter(row => selectedSet.has(row[dataKey]))
+          dispatch({ type: 'SET_BRUSH_DATA', payload: filteredData })
+          previousExtent.current = { x0, x1 }
+          setAccessibleExtent({ x0, x1 })
+        }
+      }
+
+      // Reset touch state
+      touchState.current = {
+        active: false,
+        startX: 0,
+        currentX: 0,
+        startExtent: { x0: 0, x1: 0 },
+        dragType: null
+      }
+    }
+
+    // Attach native event listeners with passive: false to allow preventDefault
+    container.addEventListener('touchstart', handleTouchStart, { passive: false })
+    container.addEventListener('touchmove', handleTouchMove, { passive: false })
+    container.addEventListener('touchend', handleTouchEnd, { passive: false })
+
+    return () => {
+      container.removeEventListener('touchstart', handleTouchStart)
+      container.removeEventListener('touchmove', handleTouchMove)
+      container.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [xMax, yMax, xScale, tableData, dataKey, dispatch])
 
   // Handle brush changes
   const handleBrushChange = useCallback(
@@ -662,11 +857,16 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   }
 
   // Track when brush interaction ends
-  const handleBrushEnd = (brushState: any) => {
+  const handleBrushEnd = () => {
     isMouseDown.current = false
   }
 
   const handleMouseLeave = (event: React.PointerEvent<SVGRectElement>) => {
+    // Don't cancel brush on touch devices - touch interactions trigger pointer leave
+    // when finger moves, which would cancel the brush prematurely
+    if (event.pointerType === 'touch') {
+      return
+    }
     isMouseDown.current = false
     mouseDownPos.current = null
   }
@@ -845,7 +1045,16 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
 
   return (
     <div
-      style={{ position: 'relative', width: safeXMax, height: safeYMax }}
+      ref={containerRef}
+      style={{
+        position: 'relative',
+        width: safeXMax,
+        height: safeYMax,
+        touchAction: 'none',
+        WebkitTouchCallout: 'none',
+        WebkitUserSelect: 'none',
+        userSelect: 'none'
+      }}
       role='group'
       aria-label='Date range selector'
     >
@@ -854,7 +1063,11 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
         height={safeYMax}
         style={{
           display: 'block',
-          overflow: 'visible' // Ensure handles don't get clipped
+          overflow: 'visible', // Ensure handles don't get clipped
+          touchAction: 'none', // Enable touch interactions for brush
+          WebkitTouchCallout: 'none',
+          WebkitUserSelect: 'none',
+          userSelect: 'none'
         }}
         aria-hidden='true'
       >

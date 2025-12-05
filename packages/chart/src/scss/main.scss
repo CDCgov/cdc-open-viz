@@ -322,6 +322,23 @@
       margin-bottom: 2.5em;
     }
 
+    // Brush touch support
+    .brush-overlay {
+      touch-action: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+
+      .visx-brush,
+      .visx-brush-overlay,
+      .visx-brush-selection,
+      .visx-brush-handle-left,
+      .visx-brush-handle-right {
+        touch-action: none;
+        cursor: pointer;
+      }
+    }
+
     svg.dragging-annotation * {
       user-select: none;
     }
