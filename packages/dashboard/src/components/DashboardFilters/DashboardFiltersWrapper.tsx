@@ -177,15 +177,18 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
     // Reset filtersApplied state to false when clearing filters
     dispatch({ type: 'SET_FILTERS_APPLIED', payload: false })
 
+    // Update child filter values before filtering data
+    const updatedFilters = updateChildFilters(dashboardConfig.sharedFilters, state.data)
+
     // Update filtered data immediately after resetting filters
-    // Use the updated dashboardConfig filters instead of state
+    // Use the updated filters instead of state
     const clonedState = {
       ...state,
       config: {
         ...state.config,
         dashboard: {
           ...state.config.dashboard,
-          sharedFilters: dashboardConfig.sharedFilters
+          sharedFilters: updatedFilters
         }
       }
     }
@@ -262,8 +265,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
         loadAPIFilters(newSharedFilters, loadingFilterMemo, undefined, undefined, isStale)
       }
     } else {
+      const updatedFilters = updateChildFilters(newSharedFilters, state.data)
       if (newSharedFilters[index].type === 'urlfilter' && newSharedFilters[index].apiFilter) {
-        reloadURLData(newSharedFilters)
+        reloadURLData(updatedFilters)
       } else {
         const clonedState = {
           ...state,
@@ -271,13 +275,13 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
             ...state.config,
             dashboard: {
               ...state.config.dashboard,
-              sharedFilters: newSharedFilters
+              sharedFilters: updatedFilters
             }
           }
         }
         const newFilteredData = getFilteredData(clonedState)
         dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
-        dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
+        dispatch({ type: 'SET_SHARED_FILTERS', payload: updatedFilters })
       }
     }
   }
