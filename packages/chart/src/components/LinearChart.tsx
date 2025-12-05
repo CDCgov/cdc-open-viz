@@ -34,6 +34,7 @@ import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/vi
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { calcInitialHeight } from '../helpers/sizeHelpers'
 import { filterAndShiftLinearDateTicks } from '../helpers/filterAndShiftLinearDateTicks'
+import { calculateHorizontalBarCategoryLabelWidth } from '../helpers/calculateHorizontalBarCategoryLabelWidth'
 
 // Hooks
 import useReduceData from '../hooks/useReduceData'
@@ -178,7 +179,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     if (!xAxisLabelRefs.current.length) return
     const tallestLabel = Math.max(...xAxisLabelRefs.current.map(label => label.getBBox().height))
     return tallestLabel + X_TICK_LABEL_PADDING + DEFAULT_TICK_LENGTH
-  }, [dimensions[0], config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation])
+  }, [parentWidth, config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation])
 
   const yMax = initialHeight + forestRowsHeight
 
@@ -192,10 +193,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const xAxisDataMapped = data.map(d => getXAxisData(d))
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
 
-  const xMax =
-    parentWidth -
-    Number(config.orientation === 'horizontal' ? config.xAxis.size : config.yAxis.size) -
-    (hasRightAxis ? config.yAxis.rightAxisSize : 0)
+  const xMax = parentWidth - Number(runtime.yAxis.size) - (hasRightAxis ? config.yAxis.rightAxisSize : 0)
 
   const {
     xScale,
@@ -219,11 +217,28 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     existPositiveValue,
     xAxisDataMapped,
     yMax,
-    dimensions,
-    xMax: xMax,
+    xMax,
     needsYAxisAutoPadding,
     currentViewport
   })
+
+  // Calculate category label space for horizontal bar charts
+  const categoryLabelSpace = useMemo(() => {
+    return calculateHorizontalBarCategoryLabelWidth({
+      yScale,
+      chartWidth: parentWidth,
+      formatDate,
+      parseDate,
+      tickLabelFont: GET_TEXT_WIDTH_FONT,
+      xAxisType: config.runtime.xAxis?.type,
+      labelPlacement: config.yAxis.labelPlacement
+    })
+  }, [isHorizontal, config.visualizationType, config.yAxis.labelPlacement, yScale, parentWidth])
+
+  const horizontalYAxisLabelSpace = runtime.yAxis.label && !config.hideYAxisLabel ? 30 : 0
+  if (isHorizontal && config.visualizationType === 'Bar') {
+    runtime.yAxis.size = categoryLabelSpace + horizontalYAxisLabelSpace
+  }
 
   const [yTickCount, xTickCount] = ['yAxis', 'xAxis'].map(axis =>
     countNumOfTicks({ axis, max, runtime, currentViewport, isHorizontal, data, config, min })
@@ -704,6 +719,22 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               }}
             </AxisLeft>
           )}
+          {/* Horizontal chart grid lines */}
+          {runtime.xAxis.gridLines && orientation === 'horizontal' && (
+            <Group left={Number(runtime.yAxis.size)}>
+              {xScale.ticks(xTickCount).map((tickValue, i) => {
+                const tickPosition = xScale(tickValue)
+                return (
+                  <Line
+                    key={`horizontal-gridline-${tickValue}-${i}`}
+                    from={{ x: tickPosition, y: 0 }}
+                    to={{ x: tickPosition, y: yMax }}
+                    stroke='#d6d6d6'
+                  />
+                )
+              })}
+            </Group>
+          )}
           {visualizationType === 'Paired Bar' && generatePairedBarAxis()}
           {visualizationType === 'Deviation Bar' && config.runtime.series?.length === 1 && (
             <DeviationBar animatedChart={animatedChart} xScale={xScale} yScale={yScale} width={xMax} height={yMax} />
@@ -960,7 +991,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           )}
           {isNoDataAvailable && (
             <Text
-              x={Number(config.yAxis.size) + Number(xMax / 2)}
+              x={Number(runtime.yAxis.size) + Number(xMax / 2)}
               y={initialHeight / 2 - (config.xAxis.padding || 0) / 2}
               textAnchor='middle'
             >
@@ -1097,27 +1128,44 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                             )}
 
                           {orientation === 'horizontal' &&
-                            visualizationType !== 'Box Plot' &&
-                            visualizationSubType !== 'stacked' &&
+                            visualizationType === 'Bar' &&
                             config.yAxis.labelPlacement === 'On Date/Category Axis' &&
-                            !config.yAxis.hideLabel && (
-                              <Text
-                                transform={`translate(${tick.to.x - 5}, ${
-                                  config.isLollipopChart
-                                    ? tick.to.y - minY
-                                    : tick.to.y -
-                                      minY +
-                                      (Number(config.barHeight * config.runtime.series.length) - barMinHeight) / 2
-                                }) rotate(-${config.runtime.horizontal ? config.runtime.yAxis.tickRotation || 0 : 0})`}
-                                verticalAnchor={'start'}
-                                textAnchor={'end'}
-                                fontSize={tickLabelFontSize}
-                              >
-                                {tick.formattedValue}
-                              </Text>
-                            )}
+                            !config.yAxis.hideLabel &&
+                            (() => {
+                              const barGroupCount =
+                                config.visualizationSubType === 'stacked' ? 1 : config.runtime.seriesKeys.length
+
+                              // Calculate barHeight based on chart type (regular bar vs lollipop)
+                              let barHeight
+                              if (config.isLollipopChart) {
+                                const lollipopSizes = { large: 7, medium: 6, small: 5 }
+                                const lollipopBarWidth = lollipopSizes[config.lollipopSize] || 5
+                                barHeight = lollipopBarWidth * barGroupCount
+                              } else {
+                                barHeight = Number(config.barHeight) * barGroupCount
+                              }
+
+                              const totalBarHeight = barHeight + Number(config.barSpace)
+                              const barGroupY = i === 0 ? 0 : totalBarHeight * i
+                              const labelCenterY = barGroupY + barHeight / 2
+
+                              return (
+                                <Text
+                                  x={tick.from.x - Number(runtime.yAxis.size) + horizontalYAxisLabelSpace}
+                                  y={labelCenterY}
+                                  verticalAnchor={'middle'}
+                                  textAnchor={'start'}
+                                  fontSize={tickLabelFontSize}
+                                  width={categoryLabelSpace}
+                                  lineHeight={'1.2em'}
+                                >
+                                  {tick.formattedValue}
+                                </Text>
+                              )
+                            })()}
 
                           {orientation === 'horizontal' &&
+                            visualizationType !== 'Bar' &&
                             visualizationSubType === 'stacked' &&
                             config.yAxis.labelPlacement === 'On Date/Category Axis' &&
                             !config.yAxis.hideLabel && (
@@ -1187,9 +1235,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                     config.runtime.seriesLabelsAll[tick.formattedValue - 1]
                                   )) && (
                                   <rect
-                                    x={0 - Number(config.yAxis.size)}
+                                    x={0 - Number(runtime.yAxis.size)}
                                     y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)}
-                                    width={Number(config.yAxis.size) + xScale(xScale.domain()[0])}
+                                    width={Number(runtime.yAxis.size) + xScale(xScale.domain()[0])}
                                     height='2'
                                     fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])}
                                   />
@@ -1469,7 +1517,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 config.xAxis.tickWidthMax = longestTickLength
 
                 return (
-                  <Group className='bottom-axis' width={dimensions[0]}>
+                  <Group className='bottom-axis' width={parentWidth}>
                     {filteredTicks.map((tick, i, propsTicks) => {
                       // when using LogScale show major ticks values only
                       const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'

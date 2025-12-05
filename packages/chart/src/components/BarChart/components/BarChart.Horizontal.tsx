@@ -13,7 +13,6 @@ import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 // CDC core components and helpers
 import { getColorContrast, getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
-import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { getBarConfig, testZeroValue, getLollipopStemColor, getLollipopHeadColor } from '../helpers'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
@@ -36,6 +35,7 @@ const BarChartHorizontal = () => {
     isLabelBelowBar,
     lollipopBarWidth,
     lollipopShapeSize,
+    labelFontSize,
     getHighlightedBarColorByValue,
     getHighlightedBarByValue,
     getAdditionalColumn,
@@ -58,8 +58,6 @@ const BarChartHorizontal = () => {
   } = useContext<ChartContext>(ConfigContext)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
-
-  const LABEL_FONT_SIZE = isMobileFontViewport(vizViewport) ? 13 : 16
 
   const hasConfidenceInterval = [config.confidenceKeys?.upper, config.confidenceKeys?.lower].every(
     v => v != null && String(v).trim() !== ''
@@ -209,7 +207,7 @@ const BarChartHorizontal = () => {
                     isVertical: false,
                     yAxisValue,
                     barWidth: 0,
-                    labelFontSize: LABEL_FONT_SIZE
+                    labelFontSize: labelFontSize
                   })
 
                   const barPosition = !isPositiveBar ? 'below' : 'above'
@@ -217,7 +215,7 @@ const BarChartHorizontal = () => {
                   const barDefaultLabel = !config.yAxis.displayNumbersOnBar || absentDataLabel ? '' : yAxisValue
 
                   // check if bar text/value string fits into  each bars.
-                  const textWidth = getTextWidth(barDefaultLabel)
+                  const textWidth = getTextWidth(barDefaultLabel, `normal ${labelFontSize}px sans-serif`)
                   const textFits = Number(textWidth) < defaultBarWidth - 5
 
                   // control text position
@@ -447,7 +445,7 @@ const BarChartHorizontal = () => {
                           return (
                             <Text // prettier-ignore
                               key={index}
-                              fontSize={LABEL_FONT_SIZE}
+                              fontSize={labelFontSize}
                               display={displayBar ? 'block' : 'none'}
                               opacity={transparentBar ? 0.5 : 1}
                               x={barX}
@@ -473,6 +471,7 @@ const BarChartHorizontal = () => {
                             dx={textPadding}
                             verticalAnchor='middle'
                             textAnchor={textAnchor}
+                            fontSize={labelFontSize}
                           >
                             {testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
@@ -488,6 +487,7 @@ const BarChartHorizontal = () => {
                             dx={-textPadding}
                             verticalAnchor='middle'
                             textAnchor={bar.value < 0 ? 'end' : 'start'}
+                            fontSize={labelFontSize}
                           >
                             {testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
@@ -496,12 +496,17 @@ const BarChartHorizontal = () => {
                           display={displayBar ? 'block' : 'none'}
                           x={bar.y}
                           opacity={transparentBar ? 0.5 : 1}
-                          y={config.barHeight / 2 + config.barHeight * bar.index}
+                          y={
+                            config.isLollipopChart
+                              ? barHeight * bar.index + lollipopBarWidth / 2
+                              : config.barHeight / 2 + config.barHeight * bar.index
+                          }
                           fill={labelColor}
                           dx={absentDataLabel === 'N/A' ? 20 : textPadding}
-                          dy={config.isLollipopChart ? -10 : 0}
+                          dy={0}
                           verticalAnchor='middle'
                           textAnchor={absentDataLabel === 'N/A' ? 'middle' : textAnchor}
+                          fontSize={labelFontSize}
                         >
                           {absentDataLabel}
                         </Text>
@@ -510,12 +515,13 @@ const BarChartHorizontal = () => {
                           <Text // prettier-ignore
                             display={displayBar ? 'block' : 'none'}
                             x={bar.y}
-                            y={0}
+                            y={barHeight * bar.index + lollipopBarWidth / 2}
                             fill={APP_FONT_COLOR}
                             dx={textPaddingLollipop}
                             textAnchor={textAnchorLollipop}
                             verticalAnchor='middle'
                             fontWeight={'normal'}
+                            fontSize={labelFontSize}
                           >
                             {testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
