@@ -662,29 +662,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }, [container, config, isLoading]) // eslint-disable-line
 
   /**
-   * Handle editor panel visibility changes
-   * When the editor panel collapses/expands, recalculate dimensions
-   * The ResizeObserver might not fire because the outer container width doesn't change
-   */
-  useEffect(() => {
-    if (!container || !isEditor) return
-
-    // Give the CSS transition time to complete (400ms in visualizations.scss)
-    const timeoutId = setTimeout(() => {
-      const rect = container.getBoundingClientRect()
-      let width = rect.width
-
-      // Adjust width based on editor panel visibility
-      const editorIsOpen = config?.showEditorPanel !== false
-      width = editorIsOpen ? width - EDITOR_WIDTH : width
-
-      dispatch({ type: 'SET_DIMENSIONS', payload: [width, rect.height] })
-    }, 450) // Slightly longer than the 400ms CSS transition
-
-    return () => clearTimeout(timeoutId)
-  }, [config?.showEditorPanel, container, isEditor])
-
-  /**
    * Handles filter change events outside of COVE
    * Updates externalFilters state
    * Another useEffect listens to externalFilterChanges and updates the config.
@@ -1148,8 +1125,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
 
     if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
-    if (config.xAxis.brushActive && !isLegendOnBottom) classes.push('subtext--brush-active ')
-    if (config.xAxis.brushActive && config.legend.hide) classes.push('subtext--brush-active ')
+    // Brush is now relatively positioned in document flow, no extra margin needed
     return classes
   }
 

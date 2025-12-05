@@ -150,68 +150,6 @@
     "lineMode": false,
     "verticalSorted": false
   },
-  "brush": {
-    "height": 25,
-    "data": [
-      {
-        "Date": "1/15/2016",
-        "Data 1": "900",
-        "Data 2": "135",
-        "Data 3": "300",
-        "Data 4": "95",
-        "Data 5": "120",
-        "Data 6": "310"
-      },
-      {
-        "Date": "2/15/2016",
-        "Data 1": "4000",
-        "Data 2": "90",
-        "Data 3": "240",
-        "Data 4": "60",
-        "Data 5": "160",
-        "Data 6": "2000"
-      },
-      {
-        "Date": "3/15/2016",
-        "Data 1": "500",
-        "Data 2": "300",
-        "Data 3": "290",
-        "Data 4": "100",
-        "Data 5": "200",
-        "Data 6": "250"
-      },
-      {
-        "Date": "4/15/2016",
-        "Data 1": "1200",
-        "Data 2": "160",
-        "Data 3": "230",
-        "Data 4": "180",
-        "Data 5": "160",
-        "Data 6": "220"
-      },
-      {
-        "Date": "5/15/2016",
-        "Data 1": "8000",
-        "Data 2": "350",
-        "Data 3": "300",
-        "Data 4": "150",
-        "Data 5": "130",
-        "Data 6": "100"
-      },
-      {
-        "Date": "6/15/2016",
-        "Data 1": "9000",
-        "Data 2": "220",
-        "Data 3": "320",
-        "Data 4": "100",
-        "Data 5": "220",
-        "Data 6": "300"
-      }
-    ],
-    "active": true,
-    "pattern_id": "brush_pattern",
-    "accent_color": "#ddd"
-  },
   "exclusions": {
     "active": false,
     "keys": []
@@ -319,12 +257,7 @@
     "isStacked": false
   },
   "showChartBrush": false,
-  "customColors": [
-    "red",
-    "orange",
-    "yellow",
-    "teal"
-  ],
+  "customColors": ["red", "orange", "yellow", "teal"],
   "visualizationType": "Area Chart",
   "data": [
     {

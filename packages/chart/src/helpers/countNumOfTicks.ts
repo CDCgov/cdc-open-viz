@@ -36,12 +36,6 @@ export const countNumOfTicks = ({ axis, max, runtime, currentViewport, isHorizon
     if (config.visualizationType === 'Forest Plot') {
       tickCount = config.yAxis.numTicks !== '' ? config.yAxis.numTicks : 4
     }
-
-    // Cap tick count at data length to prevent duplicate ticks
-    // This is especially important when brush filters data to few points
-    if (tickCount && data && data.length > 0 && tickCount > data.length) {
-      tickCount = data.length
-    }
   }
 
   return tickCount

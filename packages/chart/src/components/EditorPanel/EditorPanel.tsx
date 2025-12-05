@@ -3280,12 +3280,12 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           />
                           {config.xAxis.brushActive && (
                             <TextField
-                              value={config.brush?.defaultRecentDateCount ?? ''}
+                              value={config.xAxis.brushDefaultRecentDateCount ?? ''}
                               placeholder='Default (35%)'
                               type='number'
                               min={1}
-                              section='brush'
-                              fieldName='defaultRecentDateCount'
+                              section='xAxis'
+                              fieldName='brushDefaultRecentDateCount'
                               label='Show Last X Dates by Default'
                               className='number-narrow'
                               updateField={updateFieldDeprecated}

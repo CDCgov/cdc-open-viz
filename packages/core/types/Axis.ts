@@ -52,4 +52,5 @@ export type Axis = {
   maxValue: string
   sortByRecentDate: boolean
   brushActive: boolean
+  brushDefaultRecentDateCount?: number
 }

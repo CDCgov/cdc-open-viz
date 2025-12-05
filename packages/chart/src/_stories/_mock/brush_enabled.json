@@ -29,11 +29,6 @@
     "tickLabelColor": "#333",
     "tickColor": "#333"
   },
-  "brush": {
-    "height": 25,
-    "active": true,
-    "pattern_id": "brush_pattern"
-  },
   "legend": {
     "hide": false,
     "behavior": "isolate",

@@ -139,7 +139,8 @@ const createInitialState = () => {
       padding: 5,
       showYearsOnce: false,
       sortByRecentDate: false,
-      brushActive: false
+      brushActive: false,
+      brushDefaultRecentDateCount: undefined
     },
     table: {
       label: 'Data Table',
@@ -295,13 +296,6 @@ const createInitialState = () => {
     },
     area: {
       isStacked: false
-    },
-    brush: {
-      height: 25,
-      active: false,
-      pattern_id: 'brush_pattern',
-      accent_color: '#ddd',
-      defaultRecentDateCount: undefined
     },
     sankey: {
       title: {

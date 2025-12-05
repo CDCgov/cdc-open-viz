@@ -143,6 +143,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const [showHoverLine, setShowHoverLine] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
+  const [calculatedSvgHeight, setCalculatedSvgHeight] = useState<number | null>(null)
 
   // REFS
   const axisBottomRef = useRef(null)
@@ -418,16 +419,24 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const topLabelOnGridline = topYLabelRef.current && yAxis.labelsAboveGridlines
 
     // Heights to add
-
-    const brushHeight = 25
-    const brushHeightWithMargin = config.xAxis.brushActive ? brushHeight + brushHeight : 0
     const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
     const topLabelOnGridlineHeight = topLabelOnGridline ? topYLabelRef.current.getBBox().height : 0
-    const additionalHeight = axisBottomHeight + brushHeightWithMargin + forestRowsHeight + topLabelOnGridlineHeight
-    const newHeight = initialHeight + additionalHeight
-    if (!parentRef.current) return
 
-    parentRef.current.style.height = `${newHeight}px`
+    // SVG height (without brush)
+    const svgAdditionalHeight = axisBottomHeight + forestRowsHeight + topLabelOnGridlineHeight
+    const svgHeight = initialHeight + svgAdditionalHeight
+
+    // Parent container height (includes brush if active)
+    const brushHeight = 70
+    const brushMargin = 10
+    const brushHeightWithMargin = config.xAxis.brushActive ? brushHeight + brushMargin : 0
+    const parentHeight = svgHeight + brushHeightWithMargin
+
+    if (!parentRef.current) return
+    parentRef.current.style.height = `${parentHeight}px`
+
+    // Set the calculated SVG height via state to ensure it's used on render
+    setCalculatedSvgHeight(svgHeight)
 
     /* Adding text above the top gridline overflows the bounds of the svg.
     To accommodate for this we need to...
@@ -441,7 +450,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const svg = internalSvgRef.current
     if (!svg) return
     const parentWidthFromRef = parentRef.current.getBoundingClientRect().width
-    svg.setAttribute('viewBox', `0 ${-topLabelOnGridlineHeight} ${parentWidthFromRef} ${newHeight}`)
+    svg.setAttribute('viewBox', `0 ${-topLabelOnGridlineHeight} ${parentWidthFromRef} ${svgHeight}`)
 
     // translate legend match viewBox-adjusted height
     if (!legendRef.current) return
@@ -639,13 +648,13 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
       <div
         style={{ width: `${parentWidth}px`, overflow: 'visible', position: 'relative' }}
-        className="tooltip-boundary"
+        className='tooltip-boundary'
       >
         <svg
           ref={internalSvgRef}
           onMouseMove={onMouseMove}
           width={parentWidth + config.yAxis.rightAxisSize}
-          height={isNoDataAvailable ? 1 : parentHeight}
+          height={isNoDataAvailable ? 1 : calculatedSvgHeight ?? parentHeight}
           className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${
             debugSvg && 'debug'
           } ${isDraggingAnnotation && 'dragging-annotation'}`}
@@ -1624,14 +1633,13 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
         {config.xAxis.brushActive && config.xAxis.type !== 'categorical' && xMax > 0 && (
           <div
             style={{
-              position: 'absolute',
-              bottom: '-30px',
+              position: 'relative',
+              marginTop: '10px',
               left: `${runtime.yAxis.size || 0}px`,
               width: `${Math.max(xMax, 100)}px`,
-              height: '80px',
+              height: '70px',
               pointerEvents: 'auto',
-              zIndex: 15,
-              overflow: 'visible'
+              zIndex: 15
             }}
             className='brush-overlay'
           >
