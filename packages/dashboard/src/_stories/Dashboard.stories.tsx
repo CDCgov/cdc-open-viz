@@ -30,6 +30,7 @@ import TopSpacing_3 from './_mock/data-bite-dash-test_1_1.json'
 import TopSpacing_4 from './_mock/data-bite-dash-test_1_1_1.json'
 import CustomOrderNewValues from './_mock/custom-order-new-values.json'
 import APIFilterResetConfig from '../../examples/test-api-filter-reset.json'
+import CascadingDataFilters from './_mock/filter-cascade.json'
 
 // Dashboard Filter Updates for Ascending, Descending, and Custom Order
 import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
@@ -486,6 +487,21 @@ export const Clear_Filters_Button: Story = {
   args: {
     config: APIFilterResetConfig as unknown as Config,
     isEditor: false
+  }
+}
+
+export const Cascading_Multi_Parent_Data_Filters: Story = {
+  args: {
+    config: CascadingDataFilters as unknown as Config,
+    isEditor: false
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Demonstrates cascading data filters with multiple parent relationships. The size filter depends on color, and weight depends on both color and size, creating a multi-tier cascading filter system with deterministic test data.'
+      }
+    }
   }
 }
 
