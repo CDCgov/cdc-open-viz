@@ -44,9 +44,9 @@ import {
   displayGeoName,
   SVG_HEIGHT,
   SVG_VIEWBOX,
-  SVG_WIDTH,
-  hashObj
+  SVG_WIDTH
 } from '../../../helpers'
+import { hashObj } from '@cdc/core/helpers/hashObj'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
