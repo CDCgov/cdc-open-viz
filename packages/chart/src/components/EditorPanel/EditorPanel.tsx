@@ -978,6 +978,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
         ) {
           options.push('gradient')
         }
+        if (config.visualizationType === 'Warming Stripes') {
+          options.push('gradient')
+        }
         if (config.visualizationType === 'Line') {
           options.push('lines')
         }
@@ -4047,7 +4050,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     fieldName='position'
                     label='Position'
                     updateField={updateFieldDeprecated}
-                    options={['right', 'left', 'bottom', 'top']}
+                    options={config.visualizationType === 'Warming Stripes' ? ['bottom'] : ['right', 'left', 'bottom', 'top']}
                   />
                   {(config.legend.position === 'left' ||
                     config.legend.position === 'right' ||
@@ -4084,15 +4087,17 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     options={getLegendStyleOptions('style')}
                   />
 
-                  <Select
-                    value={config.legend.groupBy}
-                    section='legend'
-                    fieldName='groupBy'
-                    initial='Select'
-                    label='Legend Group By:'
-                    updateField={updateFieldDeprecated}
-                    options={getLegendStyleOptions('groupBy')}
-                  />
+                  {config.visualizationType !== 'Warming Stripes' && (
+                    <Select
+                      value={config.legend.groupBy}
+                      section='legend'
+                      fieldName='groupBy'
+                      initial='Select'
+                      label='Legend Group By:'
+                      updateField={updateFieldDeprecated}
+                      options={getLegendStyleOptions('groupBy')}
+                    />
+                  )}
 
                   <CheckBox
                     tooltip={
@@ -4181,12 +4186,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       </Tooltip>
                     }
                   />
-                  {/* {config.visualizationType === 'Box Plot' &&
-                    <>
-                      <CheckBox value={config.boxplot.legend.displayHowToReadText} fieldName='displayHowToReadText' section='boxplot' subsection='legend' label='Display How To Read Text' updateField={updateFieldDeprecated} />
-                      <TextField type='textarea' value={config.boxplot.legend.howToReadText} updateField={updateFieldDeprecated} fieldName='howToReadText' section='boxplot' subsection='legend' label='How to read text' />
-                    </>
-                  } */}
+
                   <Select
                     display={hasDynamicCategory || hasMultipleSeries}
                     value={config.legend.behavior}
@@ -4196,6 +4196,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     updateField={(...[section, , fieldName, value]) => updateBehavior(section, fieldName, value)}
                     options={['highlight', 'isolate']}
                   />
+
                   <Select
                     display={visHasLegendColorCategory()}
                     value={config.legend.colorCode}
@@ -4302,32 +4303,34 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     label='Reverse Labels'
                     updateField={updateFieldDeprecated}
                   />
-                  <CheckBox
-                    display={!config.legend.hide}
-                    value={
-                      ['left', 'right'].includes(config.legend.position)
-                        ? config.legend.hideBorder.side
-                        : config.legend.hideBorder.topBottom
-                    }
-                    section='legend'
-                    subsection='hideBorder'
-                    fieldName={['left', 'right'].includes(config.legend.position) ? 'side' : 'topBottom'}
-                    label='Hide Legend Box'
-                    updateField={updateFieldDeprecated}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Default option for top and bottom legends is ‘No Box.’.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
+                  {config.visualizationType !== 'Warming Stripes' && (
+                    <CheckBox
+                      display={!config.legend.hide}
+                      value={
+                        ['left', 'right'].includes(config.legend.position)
+                          ? config.legend.hideBorder.side
+                          : config.legend.hideBorder.topBottom
+                      }
+                      section='legend'
+                      subsection='hideBorder'
+                      fieldName={['left', 'right'].includes(config.legend.position) ? 'side' : 'topBottom'}
+                      label='Hide Legend Box'
+                      updateField={updateFieldDeprecated}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon
+                              display='question'
+                              style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                            />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Default option for top and bottom legends is ‘No Box.’.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                  )}
                   <CheckBox
                     display={
                       !config.legend.hide &&
@@ -4354,26 +4357,29 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     label='Vertical sorted Legend'
                     updateField={updateFieldDeprecated}
                   />
-                  <CheckBox
-                    value={config.legend.hide ? true : false}
-                    section='legend'
-                    fieldName='hide'
-                    label='Hide Legend'
-                    updateField={updateFieldDeprecated}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
+
+                  {config.visualizationType !== 'Warming Stripes' && (
+                    <CheckBox
+                      value={config.legend.hide ? true : false}
+                      section='legend'
+                      fieldName='hide'
+                      label='Hide Legend'
+                      updateField={updateFieldDeprecated}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon
+                              display='question'
+                              style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                            />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>With a single-series chart, consider hiding the legend to reduce visual clutter.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                  )}
                   <TextField
                     value={config.legend.label}
                     section='legend'
@@ -4389,29 +4395,32 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     fieldName='description'
                     label='Legend Description'
                   />
-                  <CheckBox
-                    value={config.legend.unified}
-                    section='legend'
-                    fieldName='unified'
-                    label='Unified Legend'
-                    updateField={updateFieldDeprecated}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>
-                            For a chart with filters, check this option if you want the legend to contain an item for
-                            every series in the data set, including those that are filtered.
-                          </p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
+
+                  {config.visualizationType !== 'Warming Stripes' && (
+                    <CheckBox
+                      value={config.legend.unified}
+                      section='legend'
+                      fieldName='unified'
+                      label='Unified Legend'
+                      updateField={updateFieldDeprecated}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon
+                              display='question'
+                              style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                            />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>
+                              For a chart with filters, check this option if you want the legend to contain an item for
+                              every series in the data set, including those that are filtered.
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                  )}
                 </AccordionItemPanel>
               </AccordionItem>
             )}

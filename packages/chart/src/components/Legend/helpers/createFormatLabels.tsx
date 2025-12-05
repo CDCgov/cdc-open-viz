@@ -5,7 +5,7 @@ import {
   twoColorPalette
 } from '@cdc/core/data/colorPalettes'
 import { getCurrentPaletteName, getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
-import { chartPaletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
+import { chartPaletteMigrationMap, paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { getPaletteAccessor } from '@cdc/core/helpers/getPaletteAccessor'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import { isV1Palette } from '@cdc/core/helpers/palettes/utils'
@@ -17,11 +17,133 @@ import { Label } from '../../../types/Label'
 import { ColorScale, TransformedData } from '../../../types/ChartContext'
 import { ChartConfig } from '../../../types/ChartConfig'
 import _ from 'lodash'
+import { scaleSequential } from 'd3-scale'
+import { interpolateRgbBasis } from 'd3-interpolate'
+import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 
 export const createFormatLabels =
-  (config: ChartConfig, tableData: Object[], data: TransformedData[], colorScale: ColorScale) =>
+  (
+    config: ChartConfig,
+    tableData: Object[],
+    data: TransformedData[],
+    colorScale: ColorScale,
+    formatNumber: (value: any, axis: string) => string
+  ) =>
   (defaultLabels: Label[]): Label[] => {
     const { visualizationType, visualizationSubType, series, runtime, legend } = config
+
+    // Handle Warming Stripes legend
+    if (visualizationType === 'Warming Stripes') {
+      const valueKey = runtime.seriesKeys?.[0]
+      if (!valueKey || !data || data.length === 0) {
+        return []
+      }
+
+      // Calculate min and max values
+      const values = data.map(d => Number(d[valueKey])).filter(v => !isNaN(v))
+      const minValue = Math.min(...values)
+      const maxValue = Math.max(...values)
+
+      // Get the color palette from config (same logic as WarmingStripes component)
+      const colorPalettesFiltered = filterChartColorPalettes(config)
+      const configPalette = config.general?.palette?.name
+      const migratedPaletteName = configPalette ? configPalette : getFallbackColorPalette(config)
+
+      const isReversedPalette = migratedPaletteName?.endsWith('reverse')
+      const basePaletteName = isReversedPalette ? migratedPaletteName.slice(0, -7) : migratedPaletteName
+
+      let palette =
+        colorPalettesFiltered[migratePaletteWithMap(basePaletteName, paletteMigrationMap, false)] ||
+        colorPalettesFiltered[basePaletteName] ||
+        colorPalettesFiltered[configPalette]
+
+      if (!palette || palette.length < 2) {
+        palette = [
+          '#053061',
+          '#2166ac',
+          '#4393c3',
+          '#92c5de',
+          '#d1e5f0',
+          '#f7f7f7',
+          '#fddbc7',
+          '#f4a582',
+          '#d6604d',
+          '#b2182b',
+          '#67001f'
+        ]
+      }
+
+      const shouldReverse = config.general?.palette?.isReversed || isReversedPalette
+      const finalPalette = shouldReverse ? [...palette].reverse() : palette
+      const warmingColorScale = scaleSequential(interpolateRgbBasis(finalPalette)).domain([minValue, maxValue])
+
+      // For gradient style, create smooth gradient with min/max labels only
+      if (legend?.style === 'gradient') {
+        // Create many color stops for smooth gradient (these are used for the gradient fill)
+        const numColorStops = 20
+        const colorStops = []
+        for (let i = 0; i < numColorStops; i++) {
+          const t = i / (numColorStops - 1)
+          const value = minValue + t * (maxValue - minValue)
+          colorStops.push(warmingColorScale(value))
+        }
+
+        // Create multiple stops for proper spacing, but only show labels at first and last
+        // This ensures the first label appears at the left edge and last at the right edge
+        const numPositions = 5 // Number of tick positions for spacing
+        const labels = []
+        for (let i = 0; i < numPositions; i++) {
+          const t = i / (numPositions - 1)
+          const value = minValue + t * (maxValue - minValue)
+          const isFirstOrLast = i === 0 || i === numPositions - 1
+
+          labels.push({
+            datum: String(value),
+            index: i,
+            text: isFirstOrLast ? formatNumber(value, 'left') : '',
+            value: colorStops[Math.floor(t * (numColorStops - 1))],
+            colors: colorStops
+          })
+        }
+
+        return labels
+      }
+
+      // For interval style, create ranges
+      const numIntervals = legend?.warmingStripesIntervals || 5
+      const range = maxValue - minValue
+      const intervalSize = range / numIntervals
+
+      const intervalLabels = []
+
+      for (let i = 0; i < numIntervals; i++) {
+        // Calculate interval boundaries
+        // Each interval after the first starts at the exact boundary point
+        const start = minValue + i * intervalSize
+        const end = i === numIntervals - 1 ? maxValue : minValue + (i + 1) * intervalSize
+        const midPoint = (start + end) / 2
+
+        // For display, show the actual start for first interval
+        // For subsequent intervals, format the boundary point
+        const displayStart = start
+        const displayEnd = i === numIntervals - 1 ? end : end
+
+        intervalLabels.push({
+          datum: String(midPoint),
+          index: i,
+          text:
+            i === 0
+              ? `${formatNumber(displayStart, 'left')} - < ${formatNumber(displayEnd, 'left')}`
+              : i === numIntervals - 1
+              ? `${formatNumber(displayStart, 'left')} - ${formatNumber(displayEnd, 'left')}`
+              : `${formatNumber(displayStart, 'left')} - < ${formatNumber(displayEnd, 'left')}`,
+          value: warmingColorScale(midPoint)
+        })
+      }
+
+      return intervalLabels
+    }
+
     const sortVertical = labels =>
       legend.verticalSorted
         ? _.sortBy(_.cloneDeep(labels), label => {
