@@ -48,6 +48,7 @@ export type VisualizationType =
   | 'Forecasting'
   | 'Sankey'
   | 'Bump Chart'
+  | 'Warming Stripes'
 export interface PreliminaryDataItem {
   column: string
   displayLegend: boolean

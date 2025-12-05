@@ -21,7 +21,8 @@ export const useEditorPermissions = () => {
     'Pie',
     'Scatter Plot',
     'Spark Line',
-    'Sankey'
+    'Sankey',
+    'Warming Stripes'
   ]
 
   const visSupportsDateCategoryAxis = () => {
@@ -63,7 +64,8 @@ export const useEditorPermissions = () => {
       'Forest Plot',
       'Spark Line',
       'Sankey',
-      'Bump Chart'
+      'Bump Chart',
+      'Warming Stripes'
     ]
     if (disabledCharts.includes(visualizationType)) return false
     return true
@@ -77,7 +79,8 @@ export const useEditorPermissions = () => {
       'Forest Plot',
       'Spark Line',
       'Sankey',
-      'Bump Chart'
+      'Bump Chart',
+      'Warming Stripes'
     ]
     if (disabledCharts.includes(visualizationType)) return false
     return true
@@ -92,6 +95,8 @@ export const useEditorPermissions = () => {
       case 'Spark Line':
         return false
       case 'Sankey':
+        return false
+      case 'Warming Stripes':
         return false
       default:
         return true
