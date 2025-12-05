@@ -1661,7 +1661,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               width: `${Math.max(xMax, 100)}px`,
               height: '70px',
               pointerEvents: 'auto',
-              zIndex: 15
+              zIndex: 15,
+              touchAction: 'none', // Enable touch interactions for brush
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none',
+              userSelect: 'none'
             }}
             className='brush-overlay'
           >
