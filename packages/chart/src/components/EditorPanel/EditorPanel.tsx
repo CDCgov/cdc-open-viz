@@ -1901,26 +1901,46 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 </AccordionItemHeading>
                 <AccordionItemPanel>
                   {config.visualizationType === 'Pie' && (
-                    <Select
-                      value={config.yAxis.dataKey || ''}
-                      section='yAxis'
-                      fieldName='dataKey'
-                      label='Data Column'
-                      initial='Select'
-                      required={true}
-                      updateField={updateFieldDeprecated}
-                      options={getColumns(false)}
-                      tooltip={
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>Select the source data to be visually represented.</p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      }
-                    />
+                    <>
+                      <Select
+                        value={config.yAxis.dataKey || ''}
+                        section='yAxis'
+                        fieldName='dataKey'
+                        label='Data Column'
+                        initial='Select'
+                        required={true}
+                        updateField={updateFieldDeprecated}
+                        options={getColumns(false)}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Select the source data to be visually represented.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                      <TextField
+                        value={config.yAxis.label}
+                        section='yAxis'
+                        fieldName='label'
+                        label='Data Label'
+                        updateField={updateFieldDeprecated}
+                        maxLength={35}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Override the data column name shown in tooltips and data table (35 character limit)</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                    </>
                   )}
                   {config.visualizationType !== 'Pie' && (
                     <>

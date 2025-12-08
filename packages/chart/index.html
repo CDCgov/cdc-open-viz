@@ -1,28 +1,36 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <style>
-      body {
-        margin: 0;
-        border-top: none !important;
-      }
 
-      /* Add 1rem padding to mimic DFE when editor is not visible */
-      .cdc-open-viz-module:not(.isEditor) {
-        padding: 1rem;
-      }
-    </style>
-    <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />
-  </head>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <style>
+    body {
+      margin: 0;
+      border-top: none !important;
+    }
 
-  <body>
-    <!-- GENERIC CHART TYPES -->
-    <div class="react-container" data-config="/examples/feature/combo/planet-combo-example-config.json"></div>
+    .cdc-map-outer-container {
+      min-height: 100vh;
+    }
 
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    /* .react-container + .react-container {
+        margin-top: 3rem;
+      } */
+  </style>
+  <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />
+</head>
 
-    <script type="module" src="./src/index.jsx"></script>
-  </body>
+<body>
+
+  <!-- GENERIC CHART TYPES -->
+  <div class="react-container" data-config="/examples/feature/pie/planet-pie-example-config.json"></div>
+
+
+
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+
+  <script type="module" src="./src/index.jsx"></script>
+</body>
+
 </html>
