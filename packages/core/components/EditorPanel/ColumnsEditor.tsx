@@ -92,7 +92,11 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
           fieldName={'series'}
           section='columns'
           initial={'Select series'}
-          options={config.series?.map(series => series.dataKey) || []}
+          options={
+            config.visualizationType === 'Pie'
+              ? config.runtime?.seriesKeys || []
+              : config.series?.map(series => series.dataKey) || []
+          }
           updateField={(_section, _subsection, _fieldName, value) => editColumn('series', value)}
         />
       )}
