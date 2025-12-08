@@ -12,11 +12,22 @@ type MapRowsProps = DataTableProps & {
   rows: string[]
 }
 
-const getGeoLabel = (config, row, formatLegendLocation, displayGeoName) => {
+const getGeoLabel = (config, row, formatLegendLocation, displayGeoName, runtimeData = null) => {
   const { geoType, type } = config.general
+
   let labelValue
   if (!['single-state', 'us-county'].includes(geoType) || type === 'us-geocode') {
+    // Use the row (UID) for lookup - this allows "US-AL" to become "Alabama"
     labelValue = displayGeoName(row)
+
+    // If displayGeoName returned the same value (not found in lookups), use the raw imported data
+    if (labelValue === row && runtimeData && config.columns?.geo?.name) {
+      const rawGeoValue = runtimeData[row]?.[config.columns.geo.name]
+      if (rawGeoValue && rawGeoValue !== row) {
+        labelValue = rawGeoValue
+      }
+    }
+
     labelValue = String(labelValue).startsWith('region') ? _.capitalize(labelValue) : labelValue
   } else {
     labelValue = formatLegendLocation(row)
@@ -58,7 +69,7 @@ export const getMapRowData = (
     ].map(column => {
       const label = columns[column]?.label || columns[column]?.name || column
       if (column === 'geo') {
-        dataRow[label] = getGeoLabel(config, row, formatLegendLocation, displayGeoName)
+        dataRow[label] = getGeoLabel(config, row, formatLegendLocation, displayGeoName, runtimeData)
       } else if (filterColumns.includes(column)) {
         dataRow[label] = runtimeData[row][column]
       } else {
@@ -100,7 +111,7 @@ const mapCellArray = ({
           if (!legendColor) {
             console.error('No legend color found') // eslint-disable-line no-console
           }
-          const labelValue = getGeoLabel(config, row, formatLegendLocation, displayGeoName)
+          const labelValue = getGeoLabel(config, row, formatLegendLocation, displayGeoName, runtimeData)
           const mapZoomHandler =
             type === 'bubble' && allowMapZoom && geoType === 'world' ? () => setFilteredCountryCode(row) : undefined
 

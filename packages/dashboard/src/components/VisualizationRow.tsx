@@ -93,6 +93,16 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     if (row.toggle) setToggled(0)
   }, [config.activeDashboard, index])
 
+  useEffect(() => {
+    // Trigger window resize event when tab changes to force chart re-render
+    if (row.toggle && toggledRow !== undefined) {
+      // Use setTimeout to ensure the d-none class has been removed first
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'))
+      }, 50)
+    }
+  }, [toggledRow, row.toggle])
+
   const show = useMemo(() => {
     if (row.toggle) {
       return row.columns.map((col, i) => i === toggledRow)

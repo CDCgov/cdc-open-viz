@@ -541,9 +541,7 @@ const EditorPanel = memo(props => {
         >
           <>
             {editorContent}
-            {config.visualizationType === 'Gauge' && (
-              <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />
-            )}
+            <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />
           </>
         </Layout.Sidebar>
         {props.children}

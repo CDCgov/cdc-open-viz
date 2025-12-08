@@ -17,7 +17,6 @@ import { isDateScale } from '@cdc/core/helpers/cove/date'
 import isNumber from '@cdc/core/helpers/isNumber'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
-import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 // Types
 import { type ChartContext } from '../../../types/ChartContext'
 import _ from 'lodash'
@@ -32,6 +31,7 @@ const BarChartVertical = () => {
     getAdditionalColumn,
     getHighlightedBarByValue,
     getHighlightedBarColorByValue,
+    labelFontSize,
     lollipopBarWidth,
     lollipopShapeSize,
     onMouseLeaveBar,
@@ -58,8 +58,6 @@ const BarChartVertical = () => {
   } = useContext<ChartContext>(ConfigContext)
 
   const { HighLightedBarUtils } = useHighlightedBars(config)
-
-  const LABEL_FONT_SIZE = isMobileFontViewport(vizViewport) ? 13 : 16
 
   const root = document.documentElement
 
@@ -242,7 +240,7 @@ const BarChartVertical = () => {
                     barWidth,
                     isVertical: true,
                     yAxisValue,
-                    labelFontSize: LABEL_FONT_SIZE
+                    labelFontSize: labelFontSize
                   })
                   // configure colors
                   let labelColor = APP_FONT_COLOR
@@ -481,7 +479,7 @@ const BarChartVertical = () => {
                               verticalAnchor={verticalAnchor}
                               fill={fillColor}
                               textAnchor='middle'
-                              fontSize={LABEL_FONT_SIZE}
+                              fontSize={labelFontSize}
                             >
                               {pd.iconCode}
                             </Text>
@@ -494,7 +492,7 @@ const BarChartVertical = () => {
                           y={barY - BAR_LABEL_PADDING}
                           fill={labelColor}
                           textAnchor='middle'
-                          fontSize={LABEL_FONT_SIZE}
+                          fontSize={labelFontSize}
                         >
                           {testZeroValue(bar.value) ? '' : barDefaultLabel}
                         </Text>
@@ -505,7 +503,7 @@ const BarChartVertical = () => {
                           y={barY - BAR_LABEL_PADDING}
                           fill={labelColor}
                           textAnchor='middle'
-                          fontSize={config.isLollipopChart ? null : LABEL_FONT_SIZE}
+                          fontSize={config.isLollipopChart ? null : labelFontSize}
                         >
                           {absentDataLabel}
                         </Text>

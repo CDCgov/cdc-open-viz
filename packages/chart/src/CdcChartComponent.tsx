@@ -425,6 +425,18 @@ const CdcChart: React.FC<CdcChartProps> = ({
           newConfig.runtime.forecastingSeriesKeys.push(series)
         }
       })
+
+      // Default to date scaling type for Forecasting charts
+      if (newConfig.xAxis.type === 'categorical') {
+        newConfig.xAxis.type = 'date'
+        // Initialize date parsing formats if they don't exist
+        if (!newConfig.xAxis.dateParseFormat) {
+          newConfig.xAxis.dateParseFormat = '%Y-%m-%d'
+        }
+        if (!newConfig.xAxis.dateDisplayFormat) {
+          newConfig.xAxis.dateDisplayFormat = '%Y-%m-%d'
+        }
+      }
     }
 
     if (newConfig.visualizationType === 'Area Chart' && newConfig.series) {
@@ -547,7 +559,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     for (let entry of entries) {
       let { width, height } = entry.contentRect
 
-      const editorIsOpen = isEditor && !!document.querySelector('.editor-panel:not(.hidden)')
+      const editorIsOpen = isEditor
       width = editorIsOpen ? width - EDITOR_WIDTH : width
 
       const newViewport = getViewport(width)

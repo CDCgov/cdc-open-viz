@@ -5,10 +5,20 @@ import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
+import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 
 export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, configContext) => {
-  const { config, colorPalettes, tableData, updateConfig, parseDate, formatDate, seriesHighlight, interactionLabel } =
-    configContext
+  const {
+    config,
+    colorPalettes,
+    tableData,
+    updateConfig,
+    parseDate,
+    formatDate,
+    seriesHighlight,
+    interactionLabel,
+    vizViewport
+  } = configContext
   const { orientation } = config
   const dispatch = useContext(ChartDispatchContext)
   const [hoveredBar, setHoveredBar] = useState(null)
@@ -20,6 +30,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
   const isLabelBelowBar = config.yAxis.labelPlacement === 'Below Bar'
   const displayNumbersOnBar = config.yAxis.displayNumbersOnBar
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'
+  const labelFontSize = isMobileFontViewport(vizViewport) ? 13 : 16
 
   const isRounded = config.barStyle === 'rounded'
   const isStacked = config.visualizationSubType === 'stacked'
@@ -241,6 +252,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     stackCount,
     barStackedSeriesKeys,
     hasMultipleSeries,
+    labelFontSize,
     applyRadius,
     assignColorsToValues,
     getHighlightedBarColorByValue,

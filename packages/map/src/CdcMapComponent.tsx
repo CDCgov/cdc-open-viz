@@ -41,7 +41,6 @@ import {
   navigationHandler
 } from './helpers'
 import { generateRuntimeLegend } from './helpers/generateRuntimeLegend'
-import { convertCustomColorsToOrdered } from './helpers/convertCustomColorsToOrdered'
 import generateRuntimeData from './helpers/generateRuntimeData'
 import { reloadURLData } from './helpers/urlDataHelpers'
 import { observeMapSvgLoaded } from './helpers/mapObserverHelpers'
@@ -243,12 +242,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
           legendSpecialClassLastMemo
         )
         dispatch({ type: 'SET_RUNTIME_LEGEND', payload: legend })
-
-        // Auto-convert customColors to customColorsOrdered based on runtime legend
-        const updatedConfig = convertCustomColorsToOrdered(config, legend)
-        if (updatedConfig) {
-          setConfig(updatedConfig)
-        }
       }
     }
   }, [config, configObj.data])
@@ -269,14 +262,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       legendSpecialClassLastMemo
     )
     dispatch({ type: 'SET_RUNTIME_LEGEND', payload: legend })
-
-    // Auto-convert customColors to customColorsOrdered based on runtime legend
-    // config.general.palette.customColors used random distributions before, so we need to update to use customColorsOrdered
-    // custom colors ordered is an explicit mapping of colors to legend items
-    const updatedConfig = convertCustomColorsToOrdered(config, legend)
-    if (updatedConfig) {
-      setConfig(updatedConfig)
-    }
   }, [runtimeData, config, runtimeFilters])
 
   useEffect(() => {

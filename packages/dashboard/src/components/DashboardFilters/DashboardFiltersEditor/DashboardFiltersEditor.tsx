@@ -190,6 +190,27 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
               }
             />
           )}
+          {vizConfig.filterBehavior === 'Apply Button' && (
+            <CheckBox
+              label='Show Clear Filters Button'
+              value={vizConfig.showClearButton ?? true}
+              updateField={(_section, _subsection, _key, value) => {
+                updateConfig({ ...vizConfig, showClearButton: value })
+              }}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>
+                      When enabled, displays a "Clear Filters" button that allows users to reset all filter selections.
+                    </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
+          )}
         </AccordionItemPanel>
       </AccordionItem>
 

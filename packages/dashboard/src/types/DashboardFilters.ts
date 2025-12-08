@@ -4,5 +4,6 @@ export type DashboardFilters = {
   sharedFilterIndexes: number[]
   applyFiltersButtonText: string
   autoLoad?: boolean
+  showClearButton?: boolean
   type: 'dashboardFilters'
 } & CommonVisualizationProperties

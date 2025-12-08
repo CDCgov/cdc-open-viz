@@ -1,0 +1,503 @@
+{
+  "dashboard": {
+    "sharedFilters": [
+      {
+        "key": "Geography",
+        "type": "datafilter",
+        "columnName": "geography",
+        "showDropdown": true,
+        "filterStyle": "dropdown",
+        "defaultValue": "United States",
+        "usedBy": [
+          "chart1"
+        ]
+      },
+      {
+        "key": "Year",
+        "type": "datafilter",
+        "columnName": "year",
+        "showDropdown": true,
+        "filterStyle": "dropdown",
+        "defaultValue": "2023",
+        "usedBy": [
+          "chart1"
+        ]
+      }
+    ]
+  },
+  "rows": [
+    {
+      "uuid": "__​undefined__",
+      "toggle": "__​undefined__",
+      "equalHeight": "__​undefined__",
+      "columns": [
+        {
+          "width": 12,
+          "widget": "filters",
+          "toggleName": "Filter Dropdowns"
+        }
+      ]
+    },
+    {
+      "uuid": "__​undefined__",
+      "toggle": "__​undefined__",
+      "equalHeight": "__​undefined__",
+      "columns": [
+        {
+          "width": 12,
+          "widget": "chart1",
+          "toggleName": "Chart"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "filters": {
+      "type": "dashboardFilters",
+      "visualizationType": "dashboardFilters",
+      "uid": "filters",
+      "sharedFilterIndexes": [
+        0,
+        1
+      ],
+      "filterBehavior": "Apply Button",
+      "dashboardFilters": [
+        {
+          "columnName": "geography",
+          "active": "United States",
+          "values": [
+            "California",
+            "Texas",
+            "United States"
+          ]
+        },
+        {
+          "columnName": "year",
+          "active": "2021",
+          "values": [
+            "2021",
+            "2022",
+            "2023"
+          ]
+        }
+      ]
+    },
+    "chart1": {
+      "annotations": [],
+      "allowLineToBarGraph": "__​undefined__",
+      "type": "chart",
+      "debugSvg": false,
+      "chartMessage": {
+        "noData": "No Data Available"
+      },
+      "title": "Test Chart",
+      "showTitle": true,
+      "showDownloadMediaButton": false,
+      "theme": "theme-blue",
+      "animate": false,
+      "lineDatapointStyle": "hover",
+      "lineDatapointColor": "Same as Line",
+      "barHasBorder": "true",
+      "isLollipopChart": false,
+      "lollipopShape": "circle",
+      "lollipopColorStyle": "two-tone",
+      "visualizationSubType": "regular",
+      "barStyle": "",
+      "roundingStyle": "standard",
+      "tipRounding": "top",
+      "isResponsiveTicks": false,
+      "general": {
+        "annotationDropdownText": "Annotations",
+        "showMissingDataLabel": true,
+        "showSuppressedSymbol": true,
+        "showZeroValueData": true,
+        "hideNullValue": true,
+        "palette": {
+          "name": "sequential_blue",
+          "version": "2.0",
+          "isReversed": false
+        }
+      },
+      "padding": {
+        "left": 5,
+        "right": 5
+      },
+      "preliminaryData": [],
+      "yAxis": {
+        "hideAxis": false,
+        "displayNumbersOnBar": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 50,
+        "gridLines": false,
+        "enablePadding": false,
+        "min": "",
+        "max": "",
+        "labelColor": "#1c1d1f",
+        "tickLabelColor": "#1c1d1f",
+        "tickColor": "#1c1d1f",
+        "rightHideAxis": false,
+        "rightAxisSize": 0,
+        "rightLabel": "",
+        "rightLabelOffsetSize": 0,
+        "rightAxisLabelColor": "#1c1d1f",
+        "rightAxisTickLabelColor": "#1c1d1f",
+        "rightAxisTickColor": "#1c1d1f",
+        "numTicks": "",
+        "axisPadding": 0,
+        "scalePadding": 10,
+        "tickRotation": 0,
+        "anchors": [],
+        "shoMissingDataLabel": true,
+        "showMissingDataLine": true,
+        "categories": [],
+        "label": "Value"
+      },
+      "boxplot": {
+        "plots": [],
+        "borders": "true",
+        "plotOutlierValues": false,
+        "plotNonOutlierValues": true,
+        "labels": {
+          "q1": "Lower Quartile",
+          "q2": "q2",
+          "q3": "Upper Quartile",
+          "q4": "q4",
+          "minimum": "Minimum",
+          "maximum": "Maximum",
+          "mean": "Mean",
+          "median": "Median",
+          "sd": "Standard Deviation",
+          "iqr": "Interquartile Range",
+          "count": "Count",
+          "outliers": "Outliers",
+          "values": "Values",
+          "lowerBounds": "Lower Bounds",
+          "upperBounds": "Upper Bounds"
+        }
+      },
+      "topAxis": {
+        "hasLine": false
+      },
+      "isLegendValue": false,
+      "barThickness": 0.35,
+      "barHeight": 25,
+      "barSpace": 15,
+      "heights": {
+        "vertical": 300,
+        "horizontal": 750
+      },
+      "xAxis": {
+        "sortDates": false,
+        "anchors": [],
+        "type": "categorical",
+        "showTargetLabel": true,
+        "targetLabel": "Target",
+        "hideAxis": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 75,
+        "tickRotation": 0,
+        "min": "",
+        "max": "",
+        "labelColor": "#1c1d1f",
+        "tickLabelColor": "#1c1d1f",
+        "tickColor": "#1c1d1f",
+        "numTicks": "",
+        "labelOffset": 0,
+        "axisPadding": 200,
+        "target": 0,
+        "maxTickRotation": 0,
+        "padding": 5,
+        "showYearsOnce": false,
+        "sortByRecentDate": false,
+        "brushActive": false,
+        "dataKey": "category",
+        "axisBBox": 29.360000610351562,
+        "tickWidthMax": 82
+      },
+      "table": {
+        "label": "Data Table",
+        "expanded": false,
+        "limitHeight": false,
+        "height": "",
+        "caption": "",
+        "showDownloadUrl": false,
+        "showDataTableLink": true,
+        "showDownloadLinkBelow": true,
+        "indexLabel": "",
+        "download": false,
+        "showVertical": false,
+        "dateDisplayFormat": "",
+        "showMissingDataLabel": true,
+        "showSuppressedSymbol": true,
+        "collapsible": true,
+        "sharedFilterColumns": [
+          "geography",
+          "year"
+        ],
+        "show": false
+      },
+      "orientation": "vertical",
+      "columns": {},
+      "legend": {
+        "hide": false,
+        "behavior": "isolate",
+        "axisAlign": true,
+        "singleRow": true,
+        "colorCode": "",
+        "reverseLabelOrder": false,
+        "description": "",
+        "dynamicLegend": false,
+        "dynamicLegendDefaultText": "Show All",
+        "dynamicLegendItemLimit": 5,
+        "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+        "dynamicLegendChartMessage": "Select Options from the Legend",
+        "label": "",
+        "lineMode": false,
+        "verticalSorted": false,
+        "highlightOnHover": false,
+        "hideSuppressedLabels": false,
+        "hideSuppressionLink": false,
+        "seriesHighlight": [],
+        "style": "circles",
+        "subStyle": "linear blocks",
+        "groupBy": "",
+        "shape": "circle",
+        "tickRotation": "",
+        "order": "dataColumn",
+        "hideBorder": {
+          "side": false,
+          "topBottom": true
+        },
+        "position": "right",
+        "orderedValues": [],
+        "patterns": {},
+        "patternField": "",
+        "unified": true
+      },
+      "smallMultiples": {
+        "mode": "",
+        "tileColumn": "",
+        "tilesPerRowDesktop": 3,
+        "tilesPerRowMobile": 1,
+        "tileOrder": [],
+        "tileOrderType": "asc",
+        "tileTitles": {},
+        "independentYAxis": false,
+        "colorMode": "same",
+        "synchronizedTooltips": true,
+        "showAreaUnderLine": true
+      },
+      "exclusions": {
+        "active": false,
+        "keys": []
+      },
+      "twoColor": {
+        "palette": "monochrome-1",
+        "isPaletteReversed": false
+      },
+      "labels": false,
+      "dataFormat": {
+        "commas": false,
+        "prefix": "",
+        "suffix": "",
+        "abbreviated": false,
+        "bottomSuffix": "",
+        "bottomPrefix": "",
+        "bottomAbbreviated": false
+      },
+      "filters": [],
+      "confidenceKeys": {},
+      "visual": {
+        "border": true,
+        "accent": true,
+        "background": true,
+        "verticalHoverLine": false,
+        "horizontalHoverLine": false,
+        "lineDatapointSymbol": "none",
+        "maximumShapeAmount": 7
+      },
+      "useLogScale": false,
+      "filterBehavior": "Filter Change",
+      "highlightedBarValues": [],
+      "series": [
+        {
+          "dataKey": "value",
+          "type": "Bar",
+          "axis": "Left",
+          "tooltip": true
+        }
+      ],
+      "tooltips": {
+        "opacity": 90,
+        "singleSeries": false,
+        "dateDisplayFormat": ""
+      },
+      "forestPlot": {
+        "startAt": 0,
+        "colors": {
+          "line": "",
+          "shape": ""
+        },
+        "lineOfNoEffect": {
+          "show": true
+        },
+        "type": "",
+        "pooledResult": {
+          "diamondHeight": 5,
+          "column": ""
+        },
+        "estimateField": "",
+        "estimateRadius": "",
+        "shape": "square",
+        "rowHeight": 20,
+        "description": {
+          "show": true,
+          "text": "description",
+          "location": 0
+        },
+        "result": {
+          "show": true,
+          "text": "result",
+          "location": 100
+        },
+        "radius": {
+          "min": 2,
+          "max": 10,
+          "scalingColumn": ""
+        },
+        "regression": {
+          "lower": 0,
+          "upper": 0,
+          "estimateField": 0
+        },
+        "leftWidthOffset": 0,
+        "rightWidthOffset": 0,
+        "showZeroLine": false,
+        "leftLabel": "",
+        "rightLabel": ""
+      },
+      "area": {
+        "isStacked": false
+      },
+      "sankey": {
+        "title": {
+          "defaultColor": "black"
+        },
+        "iterations": 1,
+        "rxValue": 0.9,
+        "overallSize": {
+          "width": 900,
+          "height": 700
+        },
+        "margin": {
+          "margin_y": 25,
+          "margin_x": 0
+        },
+        "nodeSize": {
+          "nodeWidth": 26,
+          "nodeHeight": 40
+        },
+        "nodePadding": 55,
+        "nodeFontColor": "black",
+        "nodeColor": {
+          "default": "#ff8500",
+          "inactive": "#808080"
+        },
+        "linkColor": {
+          "default": "#ffc900",
+          "inactive": "#D3D3D3"
+        },
+        "opacity": {
+          "nodeOpacityDefault": 1,
+          "nodeOpacityInactive": 0.1,
+          "LinkOpacityDefault": 1,
+          "LinkOpacityInactive": 0.1
+        },
+        "storyNodeFontColor": "#006778",
+        "storyNodeText": [],
+        "nodeValueStyle": {
+          "textBefore": "(",
+          "textAfter": ")"
+        },
+        "data": []
+      },
+      "markupVariables": [],
+      "enableMarkupVariables": false,
+      "uid": "chart1",
+      "visualizationType": "Bar",
+      "dataKey": "chartData",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "dashboardFilters": [
+        {
+          "columnName": "geography",
+          "active": "United States",
+          "values": [
+            "California",
+            "Texas",
+            "United States"
+          ]
+        },
+        {
+          "columnName": "year",
+          "active": "2021",
+          "values": [
+            "2021",
+            "2022",
+            "2023"
+          ]
+        }
+      ],
+      "dynamicMarginTop": 0
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "showDownloadLinkBelow": true,
+    "showVertical": true
+  },
+  "type": "dashboard",
+  "runtime": {},
+  "version": "4.25.11",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "general": {
+    "palette": {
+      "version": "1.0",
+      "backups": [
+        {
+          "name": "__​undefined__",
+          "version": "1.0",
+          "isReversed": "__​undefined__"
+        },
+        {
+          "name": "__​undefined__",
+          "version": "1.0",
+          "isReversed": "__​undefined__"
+        },
+        {
+          "name": "__​undefined__",
+          "version": "1.0",
+          "isReversed": "__​undefined__"
+        },
+        {
+          "name": "__​undefined__",
+          "version": "1.0",
+          "isReversed": "__​undefined__"
+        }
+      ]
+    }
+  },
+  "datasets": {
+    "chartData": {
+      "dataUrl": "http://localhost:8080/examples/api-dashboard-data.json"
+    }
+  }
+}
