@@ -28,6 +28,7 @@ import useIntersectionObserver from '../hooks/useIntersectionObserver'
 import Regions from './Regions'
 import CategoricalYAxis from './Axis/Categorical.Axis'
 import BrushChart from './Brush/BrushController'
+import WarmingStripes from './WarmingStripes'
 
 // Helpers
 import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/viewports'
@@ -168,8 +169,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   // height before bottom axis
   const initialHeight = useMemo(
-    () => calcInitialHeight(config, currentViewport),
-    [config, currentViewport, parentHeight, config.heights?.vertical, config.heights?.horizontal]
+    () => (visualizationType === 'Warming Stripes' ? 78 : calcInitialHeight(config, currentViewport)),
+    [config, currentViewport, parentHeight, config.heights?.vertical, config.heights?.horizontal, visualizationType]
   )
   const forestHeight = useMemo(() => initialHeight + forestRowsHeight, [initialHeight, forestRowsHeight])
 
@@ -670,8 +671,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           {!isDraggingAnnotation && <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>}{' '}
           {/* GRID LINES */}
           {/* Actual AxisLeft is drawn after visualization */}
-          {!['Spark Line', 'Forest Plot'].includes(visualizationType) && config.yAxis.type !== 'categorical' && (
-            <AxisLeft
+          {!['Spark Line', 'Forest Plot', 'Warming Stripes'].includes(visualizationType) &&
+            config.yAxis.type !== 'categorical' && (
+              <AxisLeft
               scale={yScale}
               left={Number(runtime.yAxis.size) - config.yAxis.axisPadding}
               numTicks={handleNumTicks}
@@ -757,6 +759,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               showTooltip={showTooltip}
             />
           )}
+          {visualizationType === 'Warming Stripes' && (
+            <WarmingStripes xScale={xScale} yScale={yScale} xMax={xMax} yMax={yMax} />
+          )}
           {visualizationType === 'Box Plot' && config.orientation === 'vertical' && (
             <BoxPlotVertical
               seriesScale={seriesScale}
@@ -832,9 +837,16 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           )}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
-          {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(
-            visualizationType
-          ) &&
+          {![
+            'Paired Bar',
+            'Box Plot',
+            'Area Chart',
+            'Scatter Plot',
+            'Deviation Bar',
+            'Forecasting',
+            'Bar',
+            'Warming Stripes'
+          ].includes(visualizationType) &&
             !convertLineToBarGraph && (
               <>
                 <LineChart
@@ -890,9 +902,16 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           {config.xAxis.brushActive && config.xAxis.type !== 'categorical' && <BrushChart xMax={xMax} yMax={yMax} />}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
-          {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(
-            visualizationType
-          ) &&
+          {![
+            'Paired Bar',
+            'Box Plot',
+            'Area Chart',
+            'Scatter Plot',
+            'Deviation Bar',
+            'Forecasting',
+            'Bar',
+            'Warming Stripes'
+          ].includes(visualizationType) &&
             !convertLineToBarGraph && (
               <>
                 <LineChart
@@ -1016,8 +1035,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           </Group>
           {/* Highlighted regions */}
           {/* Y axis */}
-          {!['Spark Line', 'Forest Plot'].includes(visualizationType) && config.yAxis.type !== 'categorical' && (
-            <AxisLeft
+          {!['Spark Line', 'Forest Plot', 'Warming Stripes'].includes(visualizationType) &&
+            config.yAxis.type !== 'categorical' && (
+              <AxisLeft
               scale={yScale}
               tickLength={isLogarithmicAxis ? 6 : 8}
               left={Number(runtime.yAxis.size) - config.yAxis.axisPadding}
