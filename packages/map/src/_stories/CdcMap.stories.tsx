@@ -199,4 +199,39 @@ export const US_Bubble_Cities_Test: Story = {
   }
 }
 
+export const City_Styles_By_Variable: Story = {
+  args: {
+    config: editConfigKeys(exampleCityState, [
+      {
+        path: ['visual', 'additionalCityStyles'],
+        value: [
+          {
+            label: 'High Risk (Rate > 20)',
+            column: 'Rate',
+            value: '22',
+            shape: 'Star'
+          },
+          {
+            label: 'School Location',
+            column: 'Location',
+            value: 'School',
+            shape: 'Triangle'
+          },
+          {
+            label: 'Vehicle Location',
+            column: 'Location',
+            value: 'Vehicle',
+            shape: 'Diamond'
+          }
+        ]
+      },
+      {
+        path: ['visual', 'cityStyle'],
+        value: 'circle'
+      }
+    ]),
+    isEditor: true
+  }
+}
+
 export default meta
