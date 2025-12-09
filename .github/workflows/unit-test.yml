@@ -8,7 +8,7 @@ on:
     branches: ['dev']
 
 jobs:
-  build:
+  unit-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,6 +18,6 @@ jobs:
         with:
           node-version: 20.x
           cache: 'npm'
-      - run: npx yarn install
+      - run: yarn install --production=false
       - run: lerna run build
       - run: npm run test --workspaces
