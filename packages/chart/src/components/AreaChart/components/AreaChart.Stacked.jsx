@@ -19,15 +19,26 @@ const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, 
   if (!data) return
 
   const handleDateCategory = value => {
+    let scaledValue
     if (config.xAxis.type === 'categorical') {
-      return xScale(value) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+      scaledValue = xScale(value)
+    } else if (isDateScale(config.xAxis)) {
+      scaledValue = xScale(parseDate(value, false))
     }
-    if (isDateScale(config.xAxis)) {
-      const scaledValue = xScale(parseDate(value, false))
-      // Add bandwidth offset to center on band scales (date type)
-      // For date-time (time scale), bandwidth doesn't exist so no offset added
-      return scaledValue + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+
+    // Validate scaled value is finite and non-negative
+    if (scaledValue === undefined || !Number.isFinite(scaledValue) || scaledValue < 0) {
+      return NaN // Return NaN so visx's defined check can filter this point
     }
+
+    // Add bandwidth offset to center on band scales
+    return scaledValue + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+  }
+
+  // Check if a data point has valid x coordinate
+  const isValidPoint = d => {
+    const x = handleDateCategory(d.data[config.xAxis.dataKey])
+    return Number.isFinite(x) && x >= 0
   }
 
   const strokeWidth = 2
@@ -50,6 +61,7 @@ const AreaChartStacked = ({ xScale, yScale, yMax, xMax, handleTooltipMouseOver, 
               y0={d => Number(yScale(d[0]))}
               y1={d => Number(yScale(d[1]))}
               curve={allCurves[approvedCurveTypes[config.stackedAreaChartLineType]]}
+              defined={isValidPoint}
             >
               {({ stacks, path }) => {
                 return stacks.map((stack, stackIndex) => {

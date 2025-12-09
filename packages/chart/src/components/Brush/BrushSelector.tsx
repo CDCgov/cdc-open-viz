@@ -17,7 +17,6 @@ interface BrushSelectorProps {
 
 const BRUSH_HEIGHT = 50
 const BRUSH_PADDING = 10
-const BORDER_RADIUS = 4
 const KEYBOARD_STEP = 10 // pixels to move per arrow key press
 const KEYBOARD_STEP_LARGE = 50 // pixels to move with Shift+arrow
 
@@ -89,10 +88,13 @@ const MiniChartPreview = memo<{
   miniYScale: any
   colorScale: any
   config: any
-}>(({ series, tableData, dataKey, xScale, miniYScale, colorScale, config }) => {
+  xMax: number
+}>(({ series, tableData, dataKey, xScale, miniYScale, colorScale, config, xMax }) => {
   if (!series.length || !tableData.length || !xScale || !miniYScale) {
     return null
   }
+
+  const bandwidth = xScale.bandwidth() || 0
 
   return (
     <>
@@ -108,45 +110,17 @@ const MiniChartPreview = memo<{
         const curve = allCurves[seriesLineType] || allCurves.curveLinear
         const strokeDasharray = handleLineType(seriesStyle)
 
-        // Enhanced data validation to prevent NaN errors
+        // Filter to only valid data points
         const validData = tableData.filter(d => {
           const xVal = xScale(d[dataKey])
           const yVal = parseFloat(d[s.dataKey])
-
-          // Must have valid x position and numeric y value
-          if (xVal === undefined || isNaN(yVal) || !isFinite(yVal)) return false
-
-          // Check that scaled values are valid
-          const scaledY = miniYScale(yVal)
-          return !isNaN(scaledY) && isFinite(scaledY)
+          return xVal !== undefined && !isNaN(yVal)
         })
 
-        if (validData.length === 0) {
-          return null
-        }
+        if (validData.length === 0) return null
 
-        const getX = d => {
-          const xVal = xScale(d[dataKey])
-          const x = (xVal || 0) + xScale.bandwidth() / 2
-          return isNaN(x) || !isFinite(x) ? 0 : x
-        }
-
-        const getY = d => {
-          const value = parseFloat(d[s.dataKey])
-          if (isNaN(value) || !isFinite(value)) return 0
-
-          const scaled = miniYScale(value)
-          return isNaN(scaled) || !isFinite(scaled) ? 0 : scaled
-        }
-
-        // Define function to skip points with invalid values
-        const defined = (d: Object) => {
-          const xVal = xScale(d[dataKey])
-          const yVal = parseFloat(d[s.dataKey])
-          if (xVal === undefined || isNaN(yVal) || !isFinite(yVal)) return false
-          const scaledY = miniYScale(yVal)
-          return !isNaN(scaledY) && isFinite(scaledY)
-        }
+        const getX = d => xScale(d[dataKey]) + bandwidth / 2
+        const getY = d => miniYScale(parseFloat(d[s.dataKey]))
 
         return isAreaChart ? (
           <AreaClosed
@@ -162,7 +136,6 @@ const MiniChartPreview = memo<{
             strokeDasharray={strokeDasharray}
             curve={curve}
             pointerEvents='none'
-            defined={defined}
           />
         ) : (
           <LinePath
@@ -176,7 +149,6 @@ const MiniChartPreview = memo<{
             strokeOpacity={0.8}
             curve={curve}
             pointerEvents='none'
-            defined={defined}
           />
         )
       })}
@@ -439,7 +411,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
 
       // Get final brush state and update data
       const brush = brushRef.current
-      if (brush) {
+      if (brush && brush.state.extent && brush.state.extent.x1 > brush.state.extent.x0) {
         const { x0, x1 } = brush.state.extent
         const domain = xScale.domain()
         const xValues: string[] = []
@@ -490,14 +462,49 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
         return
       }
 
-      const filteredValues = bounds.xValues?.filter(val => val !== undefined) || []
-      if (filteredValues.length === 0) {
+      // Validate bounds have valid numeric values
+      if (!isFinite(bounds.x0) || !isFinite(bounds.x1) || !isFinite(bounds.y0) || !isFinite(bounds.y1)) {
+        // Invalid bounds - likely an intermediate state during drag, skip silently
+        return
+      }
+
+      // Only ignore calls where x0=0, x1=0 AND xValues matches the FULL dataset
+      // This indicates an invalid initialization/reset. But if xValues is a subset,
+      // the user is legitimately dragging and we should accept it even with x0=0, x1=0
+      const domain = xScale.domain()
+
+      // Guard: ignore only if it's clearly an invalid full-dataset reset
+      // (x0=0, x1=0 with all domain values) - this happens on visx internal resets
+      const isFullDatasetReset =
+        bounds.x0 === 0 && bounds.x1 === 0 && bounds.xValues && bounds.xValues.length === domain.length
+      if (isFullDatasetReset) {
+        return
+      }
+
+      // Get xValues from bounds or compute from the scale if not provided
+      let xValues = bounds.xValues?.filter(val => val !== undefined) || []
+
+      // If xValues is empty but we have valid bounds, compute xValues from the scale
+      // This handles cases where visx doesn't properly compute xValues during drag
+      if (xValues.length === 0 && bounds.x1 > bounds.x0) {
+        for (const value of domain) {
+          const xPos = xScale(value)
+          if (xPos !== undefined) {
+            const bandCenter = xPos + (xScale.bandwidth?.() || 0) / 2
+            if (bandCenter >= bounds.x0 && bandCenter <= bounds.x1) {
+              xValues.push(value)
+            }
+          }
+        }
+      }
+
+      if (xValues.length === 0) {
         dispatch({ type: 'SET_BRUSH_DATA', payload: [] })
         return
       }
 
       // Create filtered dataset
-      const selectedSet = new Set(filteredValues)
+      const selectedSet = new Set(xValues)
       const filteredData = tableData.filter(row => selectedSet.has(row[dataKey]))
 
       dispatch({ type: 'SET_BRUSH_DATA', payload: filteredData })
@@ -505,7 +512,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       // Update accessible extent for keyboard controls positioning
       setAccessibleExtent({ x0: bounds.x0, x1: bounds.x1 })
     },
-    [dispatch, tableData, dataKey]
+    [dispatch, tableData, dataKey, xScale]
   )
 
   // Set default selection on initial load
@@ -534,9 +541,9 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       // Calculate x0 and x1 based on the selected values' positions
       const firstSelectedPos = xScale(selectedValues[0])
       const lastSelectedPos = xScale(selectedValues[selectedValues.length - 1])
-      const bandwidth = xScale.bandwidth()
+      const bandwidth = xScale.bandwidth() || 0
 
-      x0 = firstSelectedPos !== undefined ? firstSelectedPos : safeXMax * 0.65
+      x0 = firstSelectedPos ?? safeXMax * 0.65
       x1 = lastSelectedPos !== undefined ? lastSelectedPos + bandwidth : safeXMax
     } else {
       // Default: 35% of the width, starting from most recent dates
@@ -609,9 +616,9 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
 
       const firstSelectedPos = xScale(selectedValues[0])
       const lastSelectedPos = xScale(selectedValues[selectedValues.length - 1])
-      const bandwidth = xScale.bandwidth()
+      const bandwidth = xScale.bandwidth() || 0
 
-      x0 = firstSelectedPos !== undefined ? firstSelectedPos : safeXMax * 0.65
+      x0 = firstSelectedPos ?? safeXMax * 0.65
       x1 = lastSelectedPos !== undefined ? lastSelectedPos + bandwidth : safeXMax
     } else {
       // Default: 35% of the width, starting from most recent dates
@@ -688,6 +695,9 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       if (newX0 > newX1) {
         ;[newX0, newX1] = [newX1, newX0]
       }
+
+      // Ensure minimum width
+      if (newX1 - newX0 < 1) return
 
       // Get the domain values for the new range
       const domain = xScale.domain()
@@ -1095,6 +1105,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
               miniYScale={miniYScale}
               colorScale={colorScale}
               config={config}
+              xMax={safeXMax}
             />
           )}
         </Group>
