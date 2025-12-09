@@ -47,7 +47,18 @@ const LineChart = (props: LineChartProps) => {
   const { lineDatapointStyle, showLineSeriesLabels, legend } = config
 
   const xPos = d => {
-    return xScale(getXAxisData(d)) + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+    const pos = xScale(getXAxisData(d))
+    // Validate position is finite (protects against undefined, NaN, Infinity)
+    if (pos === undefined || !Number.isFinite(pos)) return NaN
+    return pos + (xScale.bandwidth ? xScale.bandwidth() / 2 : 0)
+  }
+
+  // Helper to check if a data point has valid coordinates
+  const isValidPoint = (d, seriesKey) => {
+    const x = xPos(d)
+    const y = getYAxisData(d, seriesKey)
+    // x must be finite and non-negative, y must be a valid number
+    return Number.isFinite(x) && x >= 0 && y !== '' && y !== null && y !== undefined
   }
 
   const tooltipPoints = []
@@ -238,7 +249,7 @@ const LineChart = (props: LineChartProps) => {
                       originalSeriesKey: _seriesKey
                     })}
                     defined={(item, i) => {
-                      return item[_seriesKey] !== '' && item[_seriesKey] !== null && item[_seriesKey] !== undefined
+                      return isValidPoint(item, _seriesKey)
                     }}
                   />
 
@@ -264,9 +275,7 @@ const LineChart = (props: LineChartProps) => {
                           shapeRendering='geometricPrecision'
                           strokeDasharray={handleLineType(segment.style)}
                           defined={(item, i) => {
-                            return (
-                              item[_seriesKey] !== '' && item[_seriesKey] !== null && item[_seriesKey] !== undefined
-                            )
+                            return isValidPoint(item, _seriesKey)
                           }}
                         />
                       )
@@ -278,6 +287,14 @@ const LineChart = (props: LineChartProps) => {
                   {/* Confidence Interval Band */}
                   {config.confidenceKeys &&
                     config.series.map((seriesData, seriesKey) => {
+                      // Validation for confidence interval points
+                      const isValidConfidencePoint = d => {
+                        const x = xPos(d)
+                        const lower = d[config.confidenceKeys.lower]
+                        const upper = d[config.confidenceKeys.upper]
+                        return Number.isFinite(x) && x >= 0 && lower != null && upper != null
+                      }
+
                       if (seriesData.dynamicCategory) {
                         // Get unique categories from the data
                         const uniqueCategories = [...new Set(data.map(d => d[seriesData.dynamicCategory]))]
@@ -297,6 +314,7 @@ const LineChart = (props: LineChartProps) => {
                               fill={colorScale(category)} // Optional: Color based on category
                               yScale={yScale}
                               curve={allCurves[seriesData.lineType as keyof typeof allCurves]}
+                              defined={isValidConfidencePoint}
                             />
                           )
                         })
@@ -318,6 +336,7 @@ const LineChart = (props: LineChartProps) => {
                           )}
                           yScale={yScale}
                           curve={allCurves[seriesData.lineType as keyof typeof allCurves]}
+                          defined={isValidConfidencePoint}
                         />
                       )
                     })}
@@ -338,7 +357,7 @@ const LineChart = (props: LineChartProps) => {
                     shapeRendering='geometricPrecision'
                     strokeDasharray={lineType ? handleLineType(lineType) : 0}
                     defined={(item, i) => {
-                      return item[_seriesKey] !== '' && item[_seriesKey] !== null && item[_seriesKey] !== undefined
+                      return isValidPoint(item, _seriesKey)
                     }}
                   />
 
@@ -357,7 +376,7 @@ const LineChart = (props: LineChartProps) => {
                       fill={colorScale(config.runtime.seriesLabels[seriesKey])}
                       fillOpacity={0.3}
                       defined={(item, i) => {
-                        return item[_seriesKey] !== '' && item[_seriesKey] !== null && item[_seriesKey] !== undefined
+                        return isValidPoint(item, _seriesKey)
                       }}
                     />
                   )}
@@ -407,7 +426,7 @@ const LineChart = (props: LineChartProps) => {
                   shapeRendering='geometricPrecision'
                   strokeDasharray={lineType ? handleLineType(lineType) : 0}
                   defined={(item, i) => {
-                    return item[seriesKey] !== '' && item[seriesKey] !== null && item[seriesKey] !== undefined
+                    return isValidPoint(item, _seriesKey)
                   }}
                 />
               )}
