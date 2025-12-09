@@ -56,7 +56,7 @@ export const updateChildFilters = (newSharedFilters: SharedFilter[], data: Recor
             ? childFilter.active
             : childFilter.defaultValue && sortedFilter.values.includes(childFilter.defaultValue)
             ? childFilter.defaultValue
-            : sortedFilter.values[0]
+            : childFilter.resetLabel || sortedFilter.values[0]
           : isChildMultiSelect
           ? []
           : childFilter.active || ''
