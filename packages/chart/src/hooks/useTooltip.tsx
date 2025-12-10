@@ -105,12 +105,16 @@ export const useTooltip = props => {
         addColCommas: column.commas
       }
 
-      const pieColumnData = additionalChartData?.data[column.name]
+      // Handle Pie chart data structure (object with data property) vs other chart types (array)
+      const pieColumnData =
+        config.visualizationType === 'Pie' && additionalChartData?.data
+          ? additionalChartData.data[column.name]
+          : undefined
       const columnData =
         config.tooltips.singleSeries && visualizationType === 'Line'
           ? resolvedScaleValues.filter(
               value => value[config.runtime.series[0].dynamicCategory] === singleSeriesValue
-            )[0][colKey]
+            )[0]?.[colKey]
           : resolvedScaleValues[0]?.[colKey]
       const closestValue = config.visualizationType === 'Pie' ? pieColumnData : columnData
 
