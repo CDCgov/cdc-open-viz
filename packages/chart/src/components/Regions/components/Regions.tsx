@@ -143,36 +143,41 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
     return to
   }
 
-  const getWidth = (to, from) => to - from
+  const getWidth = (to, from) => {
+    const width = to - from
+    // Ensure width is never negative
+    return Math.max(0, width)
+  }
 
   if (regions && orientation === 'vertical') {
-    return regions.map(region => {
-      const from = getFromValue(region)
-      const to = getToValue(region)
-      const width = getWidth(to, from)
+    return regions
+      .map((region, index) => {
+        const from = getFromValue(region)
+        const to = getToValue(region)
+        const width = getWidth(to, from)
 
-      if (!from) return null
-      if (!to) return null
+        if (!from || !to || width <= 0) return null
 
-      const HighlightedArea = () => {
-        return <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
-      }
+        const HighlightedArea = () => {
+          return <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
+        }
 
-      return (
-        <Group
-          height={100}
-          fill='red'
-          className='regions regions-group--line zzz'
-          key={region.label}
-          pointerEvents='none'
-        >
-          <HighlightedArea />
-          <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
-            {region.label}
-          </Text>
-        </Group>
-      )
-    })
+        return (
+          <Group
+            height={100}
+            fill='red'
+            className='regions regions-group--line zzz'
+            key={region.label || `region-${index}`}
+            pointerEvents='none'
+          >
+            <HighlightedArea />
+            <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
+              {region.label}
+            </Text>
+          </Group>
+        )
+      })
+      .filter(Boolean) // Remove null entries
   }
 }
 
