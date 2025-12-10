@@ -229,11 +229,6 @@ const DataTable = (props: DataTableProps) => {
       classes.push('mt-4')
     }
 
-    const isBrushActive = config?.brush?.active && config.legend?.position !== 'bottom'
-    if (isBrushActive) {
-      classes.push('brush-active')
-    }
-
     classes.push(viewport)
 
     return classes.join(' ')
@@ -281,9 +276,6 @@ const DataTable = (props: DataTableProps) => {
         if (hasDownloadLink) {
           classes.push('mt-4', 'mb-2')
         }
-        const isLegendOnBottom = config?.legend?.position === 'bottom' || isLegendWrapViewport(viewport)
-        if (config.brush?.active && !isLegendOnBottom) classes.push('brush-active')
-        if (config.brush?.active && config.legend.hide) classes.push('brush-active')
       } else {
         if (hasDownloadLink) {
           classes.push('mt-2')
