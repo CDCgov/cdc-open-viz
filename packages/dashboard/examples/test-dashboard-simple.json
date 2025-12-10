@@ -7,7 +7,7 @@
         "columnName": "geography",
         "showDropdown": true,
         "filterStyle": "dropdown",
-        "defaultValue": "United States",
+        "defaultValue": "Florida",
         "usedBy": [
           "chart1"
         ]
