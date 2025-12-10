@@ -892,27 +892,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             />
           )}
           {/* Brush moved to separate overlay - no longer in main SVG */}
-          {/* Line chart */}
-          {/* TODO: Make this just line or combo? */}
-          {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(
-            visualizationType
-          ) &&
-            !convertLineToBarGraph && (
-              <>
-                <LineChart
-                  xScale={xScale}
-                  yScale={yScale}
-                  getXAxisData={getXAxisData}
-                  getYAxisData={getYAxisData}
-                  xMax={xMax}
-                  yMax={yMax}
-                  seriesStyle={config.runtime.series}
-                  tooltipData={tooltipData}
-                  handleTooltipMouseOver={handleTooltipMouseOver}
-                  handleTooltipMouseOff={handleTooltipMouseOff}
-                />
-              </>
-            )}
           {/* y anchors */}
           {config.yAxis.anchors &&
             config.yAxis.anchors.map((anchor, index) => {
