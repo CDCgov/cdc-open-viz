@@ -1,0 +1,42 @@
+name: BackstopJS Visual Regression Tests
+
+on:
+  pull_request:
+    branches: [main, dev]
+  push:
+    branches: [main, dev]
+
+jobs:
+  backstop-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build packages
+        run: yarn build
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Start Storybook server
+        run: yarn storybook &
+        env:
+          CI: true
+
+      - name: Wait for Storybook to be ready
+        run: npx wait-on http://localhost:6006 --timeout 60000
+
+      - name: Run BackstopJS tests
+        run: yarn backstop:test
