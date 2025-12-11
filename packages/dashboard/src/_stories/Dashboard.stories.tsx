@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { faker } from '@faker-js/faker'
+import { waitForOptionsToPopulate, performAndAssert } from '@cdc/core/helpers/testing'
 import APIFiltersMapData from './_mock/api-filter-map.json'
 import APIFiltersChartData from './_mock/api-filter-chart.json'
 import APIFilterErrorConfig from './_mock/api-filter-error.json'
@@ -15,7 +16,7 @@ import StandaloneTable from './_mock/standalone-table.json'
 import GroupPivotConfig from './_mock/group-pivot-filter.json'
 import PivotFitlerConfig from './_mock/pivot-filter.json'
 import { type DashboardConfig as Config } from '../types/DashboardConfig'
-import { userEvent, within } from 'storybook/test'
+import { userEvent, within, expect } from 'storybook/test'
 import ToggleExampleConfig from './_mock/toggle-example.json'
 import _ from 'lodash'
 import { footnotesSymbols } from '@cdc/core/helpers/footnoteSymbols'
@@ -502,6 +503,158 @@ export const Cascading_Multi_Parent_Data_Filters: Story = {
           'Demonstrates cascading data filters with multiple parent relationships. The size filter depends on color, and weight depends on both color and size, creating a multi-tier cascading filter system with deterministic test data.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+
+    // Get all filter dropdowns (using findBy to wait for them)
+    const colorFilter = (await canvas.findByLabelText('color', { selector: 'select' })) as HTMLSelectElement
+    const sizeFilter = (await canvas.findByLabelText('size', { selector: 'select' })) as HTMLSelectElement
+    const weightFilter = (await canvas.findByLabelText('weight', { selector: 'select' })) as HTMLSelectElement
+    const smellFilter = (await canvas.findByLabelText('smell', { selector: 'select' })) as HTMLSelectElement
+
+    // Helper to get non-empty filter options
+    const getFilterOptions = (filter: HTMLSelectElement) =>
+      Array.from(filter.querySelectorAll('option'))
+        .map(opt => opt.value)
+        .filter(v => v)
+
+    // Helper to get state of filters and chart
+    const getState = () => ({
+      colorOptions: getFilterOptions(colorFilter),
+      colorSelected: colorFilter.value,
+      sizeOptions: getFilterOptions(sizeFilter),
+      sizeSelected: sizeFilter.value,
+      weightOptions: getFilterOptions(weightFilter),
+      weightSelected: weightFilter.value,
+      smellOptions: getFilterOptions(smellFilter),
+      smellSelected: smellFilter.value,
+      chartRendered: !!canvasElement.querySelector('svg'),
+      noDataVisible: !!canvas.queryByText('No Data Available')
+    })
+
+    // Initial verification - wait for options to populate
+    await waitForOptionsToPopulate(colorFilter, 3)
+    const initialState = getState()
+    expect(initialState.chartRendered).toBe(true)
+    expect(initialState.noDataVisible).toBe(false)
+
+    // ============================================================================
+    // TEST: Color → Size cascade (single parent)
+    // ============================================================================
+
+    // Test 1: Select blue → size should show all 3 sizes
+    await performAndAssert(
+      'Select color=blue → size shows large, medium, small',
+      getState,
+      async () => await user.selectOptions(colorFilter, ['blue']),
+      (before, after) =>
+        after.colorSelected === 'blue' &&
+        after.sizeOptions.includes('large') &&
+        after.sizeOptions.includes('medium') &&
+        after.sizeOptions.includes('small') &&
+        after.sizeOptions.length === 3 &&
+        after.chartRendered &&
+        !after.noDataVisible
+    )
+
+    // Test 2: Select red → size should show only small, medium
+    await performAndAssert(
+      'Select color=red → size shows medium, small (no large)',
+      getState,
+      async () => await user.selectOptions(colorFilter, ['red']),
+      (before, after) =>
+        after.colorSelected === 'red' &&
+        after.sizeOptions.includes('medium') &&
+        after.sizeOptions.includes('small') &&
+        !after.sizeOptions.includes('large') &&
+        after.sizeOptions.length === 2 &&
+        after.chartRendered &&
+        !after.noDataVisible
+    )
+
+    // Test 3: Select green → size should show only large
+    await performAndAssert(
+      'Select color=green → size shows only large',
+      getState,
+      async () => await user.selectOptions(colorFilter, ['green']),
+      (before, after) =>
+        after.colorSelected === 'green' &&
+        after.sizeOptions.length === 1 &&
+        after.sizeOptions[0] === 'large' &&
+        after.sizeSelected === 'large' &&
+        after.chartRendered &&
+        !after.noDataVisible
+    )
+
+    // ============================================================================
+    // TEST: Color + Size → Weight cascade (multiple parents)
+    // ============================================================================
+
+    // Test 4: Select blue + small → weight updates based on both parents
+    await performAndAssert(
+      'Select color=blue → size options repopulate',
+      getState,
+      async () => await user.selectOptions(colorFilter, ['blue']),
+      (before, after) =>
+        after.colorSelected === 'blue' && after.sizeSelected === 'large' && after.sizeOptions.length === 3
+    )
+
+    await performAndAssert(
+      'Select size=small → weight updates based on color+size',
+      getState,
+      async () => await user.selectOptions(sizeFilter, ['small']),
+      (before, after) =>
+        after.colorSelected === 'blue' &&
+        after.sizeSelected === 'small' &&
+        after.weightOptions.length === 3 &&
+        after.chartRendered &&
+        !after.noDataVisible
+    )
+
+    // ============================================================================
+    // TEST: Weight → Smell cascade
+    // ============================================================================
+
+    // Test 5: Select light → smell shows only neutral and sweet (2 options)
+    await performAndAssert(
+      'Select weight=light → smell shows neutral, sweet (not bitter)',
+      getState,
+      async () => await user.selectOptions(weightFilter, ['light']),
+      (before, after) =>
+        after.colorSelected === 'blue' &&
+        after.sizeSelected === 'small' &&
+        after.weightSelected === 'light' &&
+        after.smellOptions.includes('neutral') &&
+        after.smellOptions.includes('sweet') &&
+        !after.smellOptions.includes('bitter') &&
+        after.smellOptions.length === 2 &&
+        after.chartRendered &&
+        !after.noDataVisible
+    )
+
+    // ============================================================================
+    // TEST: Full cascade verification - change parent and verify all children
+    // ============================================================================
+
+    // Test 6: Final - select red again and verify entire cascade updates
+    await performAndAssert(
+      'Select color=red → all filters update; size shows medium, small',
+      getState,
+      async () => await user.selectOptions(colorFilter, ['red']),
+      (before, after) =>
+        after.colorSelected === 'red' &&
+        after.sizeOptions.length === 2 &&
+        after.sizeOptions.includes('medium') &&
+        after.sizeOptions.includes('small') &&
+        // Size, weight, and smell selected values should be valid in their updated options
+        after.sizeOptions.includes(after.sizeSelected) &&
+        after.weightOptions.includes(after.weightSelected) &&
+        after.smellOptions.includes(after.smellSelected) &&
+        after.chartRendered &&
+        !after.noDataVisible
+    )
   }
 }
 
