@@ -245,6 +245,11 @@ const DataTable = (props: DataTableProps) => {
       const sharedFilterColumns = config.table?.sharedFilterColumns || []
       const vizFilterColumns = (config.filters || []).map(filter => filter.columnName)
       const filterColumns = [...sharedFilterColumns, ...vizFilterColumns]
+      const visibleColumns = config.columns
+      ? Object.values(config.columns)
+          .filter(col => col.dataTable !== false)
+          .map(col => col.name)
+      : []
       const visibleData =
         config.type === 'map'
           ? getMapRowData(
@@ -257,21 +262,39 @@ const DataTable = (props: DataTableProps) => {
               filterColumns
             )
           : runtimeData.map(d => {
-              return _.pick(d, [...filterColumns, ...dataSeriesColumns])
+            const columnsToInclude = config.type === 'table'
+              ? [...filterColumns, ...visibleColumns]
+              : [...filterColumns, ...dataSeriesColumns]
+              return _.pick(d, columnsToInclude)
             })
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
+
+    // Map column names to labels
+    const dataWithLabels = csvData.map(row => {
+      const newRow = {}
+      Object.keys(row).forEach(key => {
+        // Find the column config for this key
+        const columnConfig = config.columns ? Object.values(config.columns).find(col => col.name === key) : null
+        // Use label if it exists, otherwise use the original key
+        const columnLabel = columnConfig?.label || key
+        newRow[columnLabel] = row[key]
+      })
+      return newRow
+    })
 
       // only use fullGeoName on County maps and no other
       if (config.general?.geoType === 'us-county' || config.table.showFullGeoNameInCSV) {
         // Add column for full Geo name along with State
-        return csvData.map(row => {
-          return {
-            FullGeoName: formatLegendLocation(row[config.columns.geo.name]),
-            ...row
-          }
-        })
+        return dataWithLabels.map(row => {
+        const geoColumnConfig = config.columns?.geo
+        const geoLabel = geoColumnConfig?.label || config.columns.geo.name
+        return {
+          FullGeoName: formatLegendLocation(csvData[dataWithLabels.indexOf(row)][config.columns.geo.name]),
+          ...row
+        }
+      })
       } else {
-        return csvData
+        return dataWithLabels
       }
     }
 

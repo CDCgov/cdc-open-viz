@@ -161,7 +161,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
 
         {/* DATA TABLE */}
         <DataTable
-          config={{ ...config, columns, filters } as unknown as TableConfig}
+          config={{ ...config, columns, filters, table, filterBehavior, filterIntro } as unknown as TableConfig}
           tableTitle={label}
           indexTitle={indexLabel}
           isEditor={isEditor}
