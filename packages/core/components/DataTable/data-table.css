@@ -108,6 +108,7 @@
         background-repeat: no-repeat;
         background-position: right 0.5em center;
         background-size: 10px 5px;
+        color: #fff !important
       }
 
       th:last-child,
