@@ -66,7 +66,7 @@ table.data-table {
     button {
       background: none;
       font-size: initial;
-      color: #fff;
+      color: #fff !important;
       border: 0;
     }
 
@@ -76,7 +76,7 @@ table.data-table {
   }
 
   thead {
-    color: #fff;
+    color: #fff !important;
 
     .resizer {
       cursor: e-resize;
