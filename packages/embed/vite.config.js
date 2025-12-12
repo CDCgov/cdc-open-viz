@@ -11,7 +11,16 @@ export default defineConfig(({ mode }) => ({
   base: mode === 'production' ? '/TemplatePackage/contrib/widgets/openVizWrapper/dist/embed/' : '/',
 
   server: {
-    port: 8080
+    port: 8080,
+    proxy: {
+      // Proxy /TemplatePackage requests to production cdc.gov
+      // This allows loading main.js chunks in dev mode
+      '/TemplatePackage': {
+        target: 'https://www.cdc.gov',
+        changeOrigin: true,
+        secure: true
+      }
+    }
   },
 
   build: {

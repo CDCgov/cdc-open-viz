@@ -601,13 +601,13 @@ Final URLs:
 - [ ] Implement config loading from `?configUrl` parameter
 - [ ] Add visualization type detection (chart, map, dashboard, etc.)
 - [ ] Implement dynamic component rendering based on type
-- [ ] Add ResizeObserver for height tracking
-- [ ] Implement `postMessage` for resize events to parent
 - [ ] Test with various config types
 - [ ] Handle loading states and errors
 
 ### Phase 2: Embed Helper Script
 
+- [ ] Add ResizeObserver for height tracking
+- [ ] Implement `postMessage` for resize events to parent
 - [ ] Create `embed-helper/index.ts`
 - [ ] Implement iframe detection (`data-cove-embed` attribute)
 - [ ] Add message listener for resize events
