@@ -6,6 +6,7 @@ import { FilterFunction, JsonEditor, UpdateFunction } from 'json-edit-react'
 import './advanced-editor-styles.css'
 import _ from 'lodash'
 import Tooltip from '../ui/Tooltip'
+import EmbedEditor from './EmbedEditor'
 
 export const AdvancedEditor = ({
   loadConfig,
@@ -115,6 +116,9 @@ export const AdvancedEditor = ({
           </React.Fragment>
         )}
       </div>
+
+      {/* Share with Partners Section */}
+      <EmbedEditor />
     </>
   )
 }

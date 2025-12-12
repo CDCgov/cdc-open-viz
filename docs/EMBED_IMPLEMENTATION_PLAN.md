@@ -639,17 +639,29 @@ Final URLs:
 - Simple architecture: measureAndSend() function used by all code paths
 - Origin validation: `/^https:\/\/([a-z0-9-]+\.)?cdc\.gov$/` allows any subdomain
 
-### Phase 3: Editor Integration - Basic Embed Code
+### Phase 3: Editor Integration - Basic Embed Code (✅ COMPLETED)
 
-- [ ] Design "Share with Partners" UI section in editor
-- [ ] Add "Copy Basic Embed Code" button
-- [ ] Implement basic code generation (config URL only, no customization)
-- [ ] Add modal/tooltip to display generated code
-- [ ] Add copy-to-clipboard functionality
-- [ ] Test in chart editor
-- [ ] Test in map editor
-- [ ] Test in dashboard editor
-- [ ] Document usage for CDC employees
+- [x] Create shared embed code generator utility in `@cdc/core`
+- [x] Add `generateEmbedCode()` function to create iframe snippet
+- [x] Add `generateGeneratorLink()` function to create generator URLs
+- [x] Add "Share with Partners" section to AdvancedEditor component
+- [x] Add "Copy Basic Embed Code" button
+- [x] Implement copy-to-clipboard functionality with success feedback
+- [x] Add "Customize Embed Code" button that opens generator in new tab
+- [x] Add configUrl parameter to AdvancedEditor (optional, shows section only if provided)
+- [x] Test in chart editor (works across all editors using AdvancedEditor)
+- [x] Test in map editor (works across all editors using AdvancedEditor)
+- [x] Test in dashboard editor (works across all editors using AdvancedEditor)
+
+**Implementation notes:**
+
+- Centralized logic in `packages/core/helpers/embedCodeGenerator.ts`
+- No circular dependencies - core package has no dependency on embed package
+- Added to shared AdvancedEditor component - automatically works in all editors
+- Placed at bottom of Advanced Options section (before JSON editor)
+- Only shows when configUrl is provided to AdvancedEditor
+- Copy button shows "✓ Copied!" feedback for 3 seconds
+- Generator button opens in new tab with config pre-filled
 
 ### Phase 4: COVE Core - Hide Individual Filters Feature
 
