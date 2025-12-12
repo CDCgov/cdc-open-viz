@@ -577,43 +577,67 @@ Final URLs:
 
 **Goal:** Validate the build pipeline and WCMS publishing workflow with minimal "Hello World" pages.
 
-- [ ] Create `packages/embed/` package skeleton
-- [ ] Set up basic Vite multi-page config
-- [ ] Create minimal "Hello World" React SPA in `embed-page.html`
+### Phase 0: Proof of Concept & Build Setup (✅ COMPLETED)
+
+- [x] Create `packages/embed/` package skeleton
+- [x] Set up basic Vite multi-page config
+- [x] Create minimal "Hello World" React SPA in `embed-page.html`
   - Include a `<script src=".../main.js"></script>` reference (no hash yet)
-- [ ] Create minimal `generator.html` placeholder
-- [ ] Create `embed-helper.js` stub
-- [ ] Test COVE build: `cd ~/work/cdc-open-viz && lerna run --scope @cdc/embed build`
-- [ ] Verify `packages/embed/dist/` contains: `embed.html`, `generator.html`, `embed-helper.js`
-- [ ] **Create `openVizWrapper/copyEmbedFiles.js`** per Task 2 above
-- [ ] **Update `openVizWrapper/package.json`** per Task 1 above
-- [ ] Test full build: `cd openVizWrapper && npm run build`
-- [ ] Verify:
+- [x] Create minimal `generator.html` placeholder
+- [x] Create `embed-helper.js` stub
+- [x] Test COVE build: `cd ~/work/cdc-open-viz && lerna run --scope @cdc/embed build`
+- [x] Verify `packages/embed/dist/` contains: `embed.html`, `generator.html`, `embed-helper.js`
+- [x] **Create `openVizWrapper/copyEmbedFiles.js`** per Task 2 above
+- [x] **Update `openVizWrapper/package.json`** per Task 1 above
+- [x] Test full build: `cd openVizWrapper && npm run build`
+- [x] Verify:
   - Files copied to `openVizWrapper/dist/embed/`
   - Hash injected into HTML files (check `main.js?{hash}` appears)
-- [ ] **TEST: Manually publish to test WCMS**
-- [ ] Load embed page in browser, verify it loads `main.js` with hash
-- [ ] Confirm WCMS publishing workflow works end-to-end
+- [x] **TEST: Manually publish to test WCMS**
+- [x] Load embed page in browser, verify it loads `main.js` with hash
+- [x] Confirm WCMS publishing workflow works end-to-end
 
-### Phase 1: Core Embed Page
+### Phase 1: Core Embed Page (✅ COMPLETED)
 
-- [ ] Create `EmbedRenderer.tsx` component
-- [ ] Implement config loading from `?configUrl` parameter
-- [ ] Add visualization type detection (chart, map, dashboard, etc.)
-- [ ] Implement dynamic component rendering based on type
-- [ ] Test with various config types
-- [ ] Handle loading states and errors
+- [x] Create `EmbedRenderer.tsx` component
+- [x] Implement config loading from `?configUrl` parameter
+- [x] Create wcms-viz-container div with proper data attributes
+- [x] Trigger CDC_Load_Viz() to render visualization
+- [x] Reference production main.js (no bundling of COVE packages)
+- [x] Add Vite dev proxy for /TemplatePackage/\* → cdc.gov
+- [x] Test with real COVE configs locally
+- [x] Handle loading states and errors (Missing Configuration UI)
 
-### Phase 2: Embed Helper Script
+**Implementation notes:**
 
-- [ ] Add ResizeObserver for height tracking
-- [ ] Implement `postMessage` for resize events to parent
-- [ ] Create `embed-helper/index.ts`
-- [ ] Implement iframe detection (`data-cove-embed` attribute)
-- [ ] Add message listener for resize events
-- [ ] Implement origin validation (cdc.gov only)
-- [ ] Test with multiple iframes on same page
-- [ ] Build as standalone IIFE bundle
+- Used production main.js reference instead of bundling COVE
+- Embed page creates container div and triggers COVE loader
+- Visualization type detection handled by existing COVE wrapper
+- Added proxy in Vite dev config to load production chunks
+
+### Phase 2: Embed Helper Script (✅ COMPLETED)
+
+- [x] Create `embed-helper/index.js` with production code
+- [x] Implement iframe detection (`data-cove-embed` attribute)
+- [x] Assign unique IDs to iframes (`cove-0`, `cove-1`, etc.)
+- [x] Send iframe ID via postMessage to embed page
+- [x] Add message listener for resize events in parent
+- [x] Implement origin validation (any subdomain of cdc.gov + localhost for dev)
+- [x] Add ResizeObserver for height tracking in embed page
+- [x] Implement `postMessage` for resize events from iframe to parent
+- [x] Handle race conditions (cove_loaded vs ID assignment)
+- [x] Add duplicate message prevention using shared ref
+- [x] Test with multiple iframes on same page
+- [x] Build as standalone IIFE bundle with stable filename
+
+**Implementation notes:**
+
+- Uses postMessage to communicate iframe ID (doesn't modify src URL)
+- Shared `lastHeightRef` prevents duplicate resize messages from any code path
+- Listens for `cove_loaded` event (official COVE event) to trigger initial resize
+- Explicit resize sent when ID arrives (doesn't rely on ResizeObserver initial fire)
+- Simple architecture: measureAndSend() function used by all code paths
+- Origin validation: `/^https:\/\/([a-z0-9-]+\.)?cdc\.gov$/` allows any subdomain
 
 ### Phase 3: Editor Integration - Basic Embed Code
 
