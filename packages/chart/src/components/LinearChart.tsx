@@ -203,6 +203,21 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       : d[config.runtime.originalXAxis.dataKey]
   const getYAxisData = (d, seriesKey) => d[seriesKey]
   const xAxisDataMapped = data.map(d => getXAxisData(d))
+
+  // Get unique x-axis values (for cases where multiple series share the same x-axis value)
+  // This is important for brush filtering where we want to count unique dates, not total data points
+  const uniqueXAxisDataMapped = useMemo(() => {
+    const unique = new Set()
+    const result: any[] = []
+    for (const value of xAxisDataMapped) {
+      const key = value instanceof Date ? value.getTime() : typeof value === 'number' ? value : String(value)
+      if (!unique.has(key)) {
+        unique.add(key)
+        result.push(value)
+      }
+    }
+    return result
+  }, [xAxisDataMapped])
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
 
   const xMax = parentWidth - Number(runtime.yAxis.size) - (hasRightAxis ? config.yAxis.rightAxisSize : 0)
@@ -970,6 +985,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               hideTooltip={hideTooltip}
               tooltipData={tooltipData}
               yMax={yMax}
+              xMax={xMax}
             />
           )}
           {isNoDataAvailable && (
@@ -1406,17 +1422,20 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   ? xAxisDataMapped
                   : // For date-time with small datasets (e.g., brush-filtered), use explicit tick values
                   // to ensure each data point can have a tick. Otherwise, visx may generate too few.
-                  isDateTime && xAxisDataMapped.length > 0 && xAxisDataMapped.length <= (xTickCount || 15)
-                  ? xAxisDataMapped
+                  // Use uniqueXAxisDataMapped to handle cases where multiple series share x-axis values
+                  isDateTime && uniqueXAxisDataMapped.length > 0 && uniqueXAxisDataMapped.length <= (xTickCount || 15)
+                  ? uniqueXAxisDataMapped
                   : undefined
               }
             >
               {props => {
                 const hasDynamicCategory = config.series.some(s => s.dynamicCategory)
+
                 // For these charts, we generated all ticks in tickValues above, and now need to filter/shift them
                 // so the last tick is always labeled
+                // Use uniqueXAxisDataMapped for date filtering to match the tickValues we set
                 if (config.runtime.xAxis.type === 'date' && !config.runtime.xAxis.manual && !hasDynamicCategory) {
-                  props.ticks = filterAndShiftLinearDateTicks(config, props, xAxisDataMapped, formatDate)
+                  props.ticks = filterAndShiftLinearDateTicks(config, props, uniqueXAxisDataMapped, formatDate)
                 }
 
                 const distanceBetweenTicks =
@@ -1455,7 +1474,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       : typeof tick.value === 'number'
                       ? tick.value
                       : String(tick.value)
-                  if (seenValues.has(valueKey)) return false
+                  if (seenValues.has(valueKey)) {
+                    return false
+                  }
                   seenValues.add(valueKey)
                   return true
                 })

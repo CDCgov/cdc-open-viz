@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useMemo } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import { ChartContext } from '../../../types/ChartContext'
 import { Text } from '@visx/text'
@@ -10,14 +10,37 @@ type RegionsProps = {
   yMax: number
   barWidth?: number
   totalBarsInGroup?: number
+  xMax?: number
 }
 
 // TODO: should regions be removed on categorical axis?
-const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax }) => {
-  const { parseDate, config } = useContext<ChartContext>(ConfigContext)
+const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax, xMax }) => {
+  const { parseDate, config, unfilteredData, getXAxisData } = useContext<ChartContext>(ConfigContext)
 
   const { runtime, regions, visualizationType, orientation, xAxis } = config
-  const domain = xScale.domain()
+  // Use full unfiltered data domain for regions, not the filtered/brushed domain
+  // This ensures regions stay fixed when brush selection changes
+  const fullDomain = useMemo(() => {
+    if (!unfilteredData || !Array.isArray(unfilteredData) || unfilteredData.length === 0) {
+      return xScale.domain()
+    }
+
+    const dataKey = config.runtime.originalXAxis?.dataKey || config.xAxis.dataKey
+    const isDate = isDateScale(config.xAxis)
+
+    if (isDate && getXAxisData) {
+      const mapped = unfilteredData.map(d => getXAxisData(d))
+      // Sort dates if needed
+      return config.xAxis.sortByRecentDate ? [...mapped].reverse() : mapped
+    } else {
+      const mapped = unfilteredData.map(d => d[dataKey])
+      return config.xAxis.sortByRecentDate ? [...mapped].reverse() : mapped
+    }
+  }, [unfilteredData, config, getXAxisData, xScale])
+
+  // Use full domain for "Last Date" calculations to ensure regions stay fixed
+  // But use filtered domain for scale positioning (xScale is based on filtered data)
+  const filteredDomain = xScale.domain()
 
   const getFromValue = region => {
     let from
@@ -36,8 +59,11 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
     // Previous Date
     if (region.fromType === 'Previous Days') {
       const previousDays = Number(region.from) || 0
-      const categoricalDomain = domain.map(d => formatDate(config.xAxis.dateParseFormat, new Date(d)))
-      const d = region.toType === 'Last Date' ? new Date(domain[domain.length - 1]).getTime() : new Date(region.to) // on categorical charts force leading zero 03/15/2016 vs 3/15/2016 for valid date format
+      // Use full domain for "Last Date" calculations
+      const domainToUse = fullDomain.length > 0 ? fullDomain : filteredDomain
+      const categoricalDomain = domainToUse.map(d => formatDate(config.xAxis.dateParseFormat, new Date(d)))
+      const d =
+        region.toType === 'Last Date' ? new Date(domainToUse[domainToUse.length - 1]).getTime() : new Date(region.to) // on categorical charts force leading zero 03/15/2016 vs 3/15/2016 for valid date format
       const to =
         config.xAxis.type === 'categorical'
           ? formatDate(config.xAxis.dateParseFormat, d)
@@ -48,14 +74,15 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       if (xAxis.type === 'date') {
         from = new Date(formatDate(xAxis.dateParseFormat, from)).getTime()
 
-        let closestDate = domain[0]
+        const domainToUse = fullDomain.length > 0 ? fullDomain : filteredDomain
+        let closestDate = domainToUse[0]
         let minDiff = Math.abs(from - closestDate)
 
-        for (let i = 1; i < domain.length; i++) {
-          const diff = Math.abs(from - domain[i])
+        for (let i = 1; i < domainToUse.length; i++) {
+          const diff = Math.abs(from - domainToUse[i])
           if (diff < minDiff) {
             minDiff = diff
-            closestDate = domain[i]
+            closestDate = domainToUse[i]
           }
         }
         from = closestDate
@@ -63,14 +90,15 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
 
       // Here the domain is in the xScale.dateParseFormat
       if (xAxis.type === 'categorical') {
-        let closestDate = domain[0]
+        const domainToUse = fullDomain.length > 0 ? fullDomain : filteredDomain
+        let closestDate = domainToUse[0]
         let minDiff = Math.abs(new Date(from).getTime() - new Date(closestDate).getTime())
 
-        for (let i = 1; i < domain.length; i++) {
-          const diff = Math.abs(new Date(from).getTime() - new Date(domain[i]).getTime())
+        for (let i = 1; i < domainToUse.length; i++) {
+          const diff = Math.abs(new Date(from).getTime() - new Date(domainToUse[i]).getTime())
           if (diff < minDiff) {
             minDiff = diff
-            closestDate = domain[i]
+            closestDate = domainToUse[i]
           }
         }
         from = closestDate
@@ -116,21 +144,45 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       }
     }
     if (region.toType === 'Last Date') {
-      const lastDate = domain[domain.length - 1]
-      to = Number(
-        xScale(lastDate) +
-          ((visualizationType === 'Bar' || visualizationType === 'Combo') && config.xAxis.type === 'date'
-            ? barWidth * totalBarsInGroup
-            : 0)
-      )
-    }
+      // Use full domain to get the actual last date, not the filtered last date
+      const domainToUse = fullDomain.length > 0 ? fullDomain : filteredDomain
+      const lastDate = domainToUse[domainToUse.length - 1]
+      const lastDatePosition = xScale(lastDate)
 
-    if (visualizationType === 'Line' || visualizationType === 'Area Chart') {
-      let scalePadding = Number(config.yAxis.size)
-      if (xScale.bandwidth) {
-        scalePadding += xScale.bandwidth() / 2
+      // If lastDate is not in the filtered domain, xScale might return undefined
+      // In that case, use xMax + yAxis.size to position at the end of the visible chart
+      if (lastDatePosition === undefined || isNaN(lastDatePosition)) {
+        const chartStart = Number(config.yAxis.size || 0)
+        to = xMax !== undefined ? chartStart + xMax : chartStart
+      } else {
+        // For band scales, xScale returns the start of the band
+        // To get to the end of the last band, we need to add the full bandwidth
+        const bandwidth = xScale.bandwidth ? xScale.bandwidth() : 0
+        const chartStart = Number(config.yAxis.size || 0)
+
+        if (visualizationType === 'Line' || visualizationType === 'Area Chart') {
+          // For Line/Area charts with band scales, add full bandwidth to reach end of band
+          // Then add chartStart to account for left padding
+          to = Number(lastDatePosition + bandwidth + chartStart)
+        } else if (visualizationType === 'Bar' || visualizationType === 'Combo') {
+          // For Bar charts, add barWidth instead of bandwidth
+          to = Number(
+            lastDatePosition + (config.xAxis.type === 'date' ? barWidth * totalBarsInGroup : bandwidth) + chartStart
+          )
+        } else {
+          // For other chart types, just add bandwidth and chartStart
+          to = Number(lastDatePosition + bandwidth + chartStart)
+        }
       }
-      to = to + scalePadding
+    } else {
+      // For non-"Last Date" regions, apply the standard padding
+      if (visualizationType === 'Line' || visualizationType === 'Area Chart') {
+        let scalePadding = Number(config.yAxis.size)
+        if (xScale.bandwidth) {
+          scalePadding += xScale.bandwidth() / 2
+        }
+        to = to + scalePadding
+      }
     }
 
     if (visualizationType === 'Bar' && config.xAxis.type === 'date-time' && region.toType !== 'Last Date') {
@@ -150,34 +202,48 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
   }
 
   if (regions && orientation === 'vertical') {
-    return regions
-      .map((region, index) => {
-        const from = getFromValue(region)
-        const to = getToValue(region)
-        const width = getWidth(to, from)
+    return regions.map(region => {
+      const from = getFromValue(region)
+      const to = getToValue(region)
+      let width = getWidth(to, from)
 
-        if (!from || !to || width <= 0) return null
+      if (!from || from === undefined || isNaN(from)) return null
+      if (!to || to === undefined || isNaN(to)) return null
 
-        const HighlightedArea = () => {
-          return <rect x={from} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
-        }
+      // Clip region to visible chart area (xMax) to prevent overflow
+      // xMax is the width of the chart area (excluding left padding), so chartEnd = chartStart + xMax
+      const chartStart = Number(config.yAxis.size || 0)
+      const chartEnd = xMax !== undefined ? chartStart + xMax : chartStart + 1000 // fallback if xMax not provided
 
-        return (
-          <Group
-            height={100}
-            fill='red'
-            className='regions regions-group--line zzz'
-            key={region.label || `region-${index}`}
-            pointerEvents='none'
-          >
-            <HighlightedArea />
-            <Text x={from + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
-              {region.label}
-            </Text>
-          </Group>
-        )
-      })
-      .filter(Boolean) // Remove null entries
+      // Adjust from and to to be within visible bounds
+      let clippedFrom = Math.max(chartStart, from)
+      let clippedTo = Math.min(chartEnd, to)
+
+      // Recalculate width after clipping
+      width = clippedTo - clippedFrom
+
+      // Don't render if width is 0 or negative after clipping
+      if (width <= 0) return null
+
+      const HighlightedArea = () => {
+        return <rect x={clippedFrom} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
+      }
+
+      return (
+        <Group
+          height={100}
+          fill='red'
+          className='regions regions-group--line zzz'
+          key={region.label}
+          pointerEvents='none'
+        >
+          <HighlightedArea />
+          <Text x={clippedFrom + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
+            {region.label}
+          </Text>
+        </Group>
+      )
+    })
   }
 }
 

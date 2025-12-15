@@ -483,18 +483,37 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
 
       // Get xValues from bounds or compute from the scale if not provided
       let xValues = bounds.xValues?.filter(val => val !== undefined) || []
+      const brushDefaultRecentDateCount = config.xAxis?.brushDefaultRecentDateCount
 
       // If xValues is empty but we have valid bounds, compute xValues from the scale
       // This handles cases where visx doesn't properly compute xValues during drag
+      // However, when brushDefaultRecentDateCount is set, we want to be more precise
+      // to avoid including extra dates due to pixel range calculations
       if (xValues.length === 0 && bounds.x1 > bounds.x0) {
-        for (const value of domain) {
-          const xPos = xScale(value)
-          if (xPos !== undefined) {
-            const bandCenter = xPos + (xScale.bandwidth?.() || 0) / 2
-            if (bandCenter >= bounds.x0 && bandCenter <= bounds.x1) {
-              xValues.push(value)
+        if (brushDefaultRecentDateCount && brushDefaultRecentDateCount > 0) {
+          // When using brushDefaultRecentDateCount, use exact count instead of pixel range
+          // to avoid including extra dates that fall within the pixel bounds
+          const countToSelect = Math.min(brushDefaultRecentDateCount, domain.length)
+          xValues = domain.slice(-countToSelect)
+        } else {
+          // For manual brush selection, use pixel-based calculation
+          for (const value of domain) {
+            const xPos = xScale(value)
+            if (xPos !== undefined) {
+              const bandCenter = xPos + (xScale.bandwidth?.() || 0) / 2
+              if (bandCenter >= bounds.x0 && bandCenter <= bounds.x1) {
+                xValues.push(value)
+              }
             }
           }
+        }
+      } else if (xValues.length > 0 && brushDefaultRecentDateCount && brushDefaultRecentDateCount > 0) {
+        // Even if xValues is provided, if it doesn't match the expected count, fix it
+        // This handles cases where visx recalculates and includes extra dates
+        const expectedCount = Math.min(brushDefaultRecentDateCount, domain.length)
+        if (xValues.length !== expectedCount) {
+          // Use exact count from domain
+          xValues = domain.slice(-expectedCount)
         }
       }
 
@@ -534,11 +553,9 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     if (brushDefaultRecentDateCount && brushDefaultRecentDateCount > 0 && domain.length > 0) {
       // Use exact count of most recent data points
       const countToSelect = Math.min(brushDefaultRecentDateCount, domain.length)
-      // Get the last N values from the domain (most recent dates)
       const selectedValues = domain.slice(-countToSelect)
       xValues = selectedValues
 
-      // Calculate x0 and x1 based on the selected values' positions
       const firstSelectedPos = xScale(selectedValues[0])
       const lastSelectedPos = xScale(selectedValues[selectedValues.length - 1])
       const bandwidth = xScale.bandwidth() || 0
@@ -551,7 +568,6 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       x0 = safeXMax - initialWidth
       x1 = safeXMax
 
-      // Find all domain values that fall within the initial range
       for (const value of domain) {
         const xPos = xScale(value)
         if (xPos !== undefined && xPos >= x0 && xPos < x1) {

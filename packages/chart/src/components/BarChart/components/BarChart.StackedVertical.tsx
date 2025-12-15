@@ -259,6 +259,7 @@ const BarChartStackedVertical = () => {
           yMax={yMax}
           barWidth={barWidth}
           totalBarsInGroup={1}
+          xMax={xMax}
           handleTooltipMouseOff={() => {}}
           handleTooltipMouseOver={() => {}}
           handleTooltipClick={() => {}}
