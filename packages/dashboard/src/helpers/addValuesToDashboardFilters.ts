@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
+import { getQueryStringFilterValue, isFilterHiddenByQuery } from '@cdc/core/helpers/queryStringUtils'
 import { SharedFilter } from '../types/SharedFilter'
 import { handleSorting } from '@cdc/core/components/Filters'
 import { mergeCustomOrderValues } from '@cdc/core/helpers/mergeCustomOrderValues'
@@ -78,6 +78,11 @@ export const addValuesToDashboardFilters = (
           filterCopy.active = defaultValue
         }
       }
+    }
+
+    // Check if filter should be hidden by query parameter
+    if (isFilterHiddenByQuery(filterCopy)) {
+      filterCopy.showDropdown = false
     }
 
     // Handle nested dropdown subGrouping.active property

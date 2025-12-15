@@ -663,18 +663,34 @@ Final URLs:
 - Copy button shows "✓ Copied!" feedback for 3 seconds
 - Generator button opens in new tab with config pre-filled
 
-### Phase 4: COVE Core - Hide Individual Filters Feature
+### Phase 4: COVE Core - Hide Individual Filters Feature (✅ COMPLETED)
 
-- [ ] Add URL parameter detection for `hide{FilterName}=true` pattern
-- [ ] Update filter rendering logic to check for hide parameter
-- [ ] Update `packages/core/components/Filters/Filters.tsx` to respect hide flags
-- [ ] Update dashboard filter rendering (`DashboardFilters.tsx`)
-- [ ] Update individual viz filter rendering
-- [ ] Test: `?hideState=true` hides State filter while others remain
-- [ ] Test: Multiple hide params work together
-- [ ] Make sure that if there are zero visible filters, the filter section does not take up vertical space
-- [ ] Test across all visualization types (chart, map, dashboard)
-- [ ] Document parameter format and usage
+- [x] Add URL parameter detection for `hide{FilterName}=true` pattern
+- [x] Update filter rendering logic to check for hide parameter
+- [x] Update `packages/core/components/Filters/Filters.tsx` to respect hide flags
+- [x] Update dashboard filter rendering (`DashboardFilters.tsx`)
+- [x] Update individual viz filter rendering
+- [x] Test: `?hideState=true` hides State filter while others remain
+- [x] Test: Multiple hide params work together
+- [x] Make sure that if there are zero visible filters, the filter section does not take up vertical space
+- [x] Test across all visualization types (chart, map, dashboard)
+- [x] Document parameter format and usage
+
+**Implementation notes:**
+
+- Created `isFilterHiddenByQuery()` in `packages/core/helpers/queryStringUtils.ts`
+- Checks multiple identifiers per filter: `key`, `label`, `columnName` (in that order)
+- Filter hidden if ANY identifier matches: `?hide{identifier}=true|1|yes`
+- Applied in three locations:
+  - Charts: `packages/core/helpers/addValuesToFilters.ts`
+  - Maps: `packages/map/src/CdcMapComponent.tsx`
+  - Dashboards: `packages/dashboard/src/helpers/addValuesToDashboardFilters.ts`
+- Sets `filter.showDropdown = false` when hide parameter detected
+- Added check in `Filters.tsx` to return `null` when all filters hidden (0px height)
+- Dashboards already had this logic in `DashboardFiltersWrapper.tsx`
+- 40 comprehensive tests covering all scenarios
+- Works with multiple filters hidden simultaneously
+- Preserves case sensitivity in parameter names
 
 ### Phase 5: Embed Generator UI
 

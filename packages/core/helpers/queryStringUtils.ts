@@ -13,6 +13,39 @@ export function getQueryStringFilterValue(filter) {
   }
 }
 
+/**
+ * Checks if a filter should be hidden based on query parameter
+ * Checks multiple possible parameter names in priority order.
+ * Returns true if ANY of the possible parameters are set to a truthy value.
+ *
+ * Checks in order:
+ * 1. "hide" + key (dashboard filter identifier)
+ * 2. "hide" + label (user-facing display name)
+ * 3. "hide" + columnName (data column name)
+ *
+ * @param filter - Filter object with key, label, and/or columnName
+ * @returns true if filter should be hidden, false otherwise
+ *
+ */
+export function isFilterHiddenByQuery(filter) {
+  if (!filter) return false
+
+  const urlParams = new URLSearchParams(window.location.search)
+
+  // Helper to check if a parameter name has a truthy value
+  const checkHideParam = (identifier: string): boolean => {
+    if (!identifier) return false
+    const hideParamName = 'hide' + identifier
+    const hideValue = urlParams.get(hideParamName)
+    if (!hideValue) return false
+    const lower = hideValue.toLowerCase()
+    return lower === 'true' || hideValue === '1' || lower === 'yes'
+  }
+
+  // Check each possible identifier in priority order
+  return checkHideParam(filter.key) || checkHideParam(filter.label) || checkHideParam(filter.columnName)
+}
+
 export function getQueryParams() {
   const queryParams = {}
   for (const [key, value] of Array.from(new URLSearchParams(window.location.search).entries())) {

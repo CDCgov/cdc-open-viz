@@ -221,6 +221,12 @@ const Filters: React.FC<FilterProps> = ({
     return (singleFilter.queuedActive || [singleFilter.active, singleFilter.subGrouping?.active]) as [string, string]
   }
 
+  // Don't render filter section if all filters are hidden
+  const allFiltersHidden = vizFiltersWithValues.every(filter => filter.showDropdown === false)
+  if (allFiltersHidden) {
+    return null
+  }
+
   return (
     <section className={getClasses().join(' ')}>
       {visualizationConfig.filterIntro && (

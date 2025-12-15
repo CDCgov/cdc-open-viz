@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
+import { getQueryStringFilterValue, isFilterHiddenByQuery } from '@cdc/core/helpers/queryStringUtils'
 import { VizFilter } from '../types/VizFilter'
 import { mergeCustomOrderValues } from './mergeCustomOrderValues'
 
@@ -152,6 +152,11 @@ export const addValuesToFilters = (filters: VizFilter[], data: any[] | MapData):
         const active = Array.isArray(filterCopy.active) ? filterCopy.active[0] : filterCopy.active
         filterCopy.active = includes(filterCopy.values, active) ? active : defaultValue
       }
+    }
+
+    // Check if filter should be hidden by query parameter
+    if (isFilterHiddenByQuery(filterCopy)) {
+      filterCopy.showDropdown = false
     }
     if (filterCopy.subGrouping) {
       const groupName = filterCopy.active as string
