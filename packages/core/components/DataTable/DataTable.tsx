@@ -287,7 +287,7 @@ const DataTable = (props: DataTableProps) => {
         // Add column for full Geo name along with State
         return dataWithLabels.map(row => {
         const geoColumnConfig = config.columns?.geo
-        const geoLabel = geoColumnConfig?.label || config.columns.geo.name
+        const geoLabel = geoColumnConfig?.label || config.columns?.geo?.name
         return {
           FullGeoName: formatLegendLocation(csvData[dataWithLabels.indexOf(row)][config.columns.geo.name]),
           ...row
