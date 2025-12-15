@@ -110,7 +110,7 @@ export const useTooltip = props => {
         config.tooltips.singleSeries && visualizationType === 'Line'
           ? resolvedScaleValues.filter(
               value => value[config.runtime.series[0].dynamicCategory] === singleSeriesValue
-            )[0]?.[colKey]
+            )[0][colKey]
           : resolvedScaleValues[0]?.[colKey]
       const closestValue = config.visualizationType === 'Pie' ? pieColumnData : columnData
 
