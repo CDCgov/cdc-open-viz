@@ -271,7 +271,7 @@ const DataTable = (props: DataTableProps) => {
 
     // Map column names to labels
     const dataWithLabels = csvData.map(row => {
-      const newRow = {}
+      const newRow: Record<string, any> = {}
       Object.keys(row).forEach(key => {
         // Find the column config for this key
         const columnConfig = config.columns ? Object.values(config.columns).find(col => col.name === key) : null
