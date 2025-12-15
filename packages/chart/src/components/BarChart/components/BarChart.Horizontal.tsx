@@ -526,21 +526,169 @@ const BarChartHorizontal = () => {
                             {testZeroValue(bar.value) ? '' : barDefaultLabel}
                           </Text>
                         )}
-                        {isLabelBelowBar && !config.yAxis.hideLabel && (
-                          <Text
-                            x={config.yAxis.hideAxis ? 0 : 5}
-                            y={barGroup.height}
-                            dy={4}
-                            verticalAnchor={'start'}
-                            textAnchor={'start'}
-                          >
-                            {config.runtime.yAxis.type === 'date'
-                              ? formatDate(parseDate(dataValue))
-                              : isHorizontal
-                              ? dataValue
-                              : formatNumber(dataValue)}
-                          </Text>
-                        )}
+                        {isLabelBelowBar &&
+                          !config.yAxis.hideLabel &&
+                          (() => {
+                            const label =
+                              config.runtime.yAxis.type === 'date'
+                                ? formatDate(parseDate(dataValue))
+                                : isHorizontal
+                                ? dataValue
+                                : formatNumber(dataValue)
+                            if (typeof label === 'string') {
+                              // 1. Check for HTML <a> tag and extract its text and href
+                              const aTagMatch = label.match(/<a [^>]*href=["']?([^"'>\s]+)["']?[^>]*>(.*?)<\/a>/i)
+                              if (aTagMatch) {
+                                const href = aTagMatch[1].startsWith('http') ? aTagMatch[1] : `https://${aTagMatch[1]}`
+                                const linkText = aTagMatch[2]
+                                return (
+                                  <foreignObject
+                                    x={config.yAxis.hideAxis ? 0 : 5}
+                                    y={barGroup.height}
+                                    width={120}
+                                    height={24}
+                                    style={{ overflow: 'visible' }}
+                                  >
+                                    <a
+                                      href={href}
+                                      target='_blank'
+                                      rel='noopener noreferrer'
+                                      style={
+                                        config.tooltips.singleSeries
+                                          ? {
+                                              color: '#0071bc',
+                                              textDecoration: 'underline',
+                                              fontSize: 12,
+                                              fontFamily: 'inherit',
+                                              display: 'inline-block',
+                                              width: '100%'
+                                            }
+                                          : {
+                                              color: 'inherit',
+                                              textDecoration: 'none',
+                                              fontSize: 12,
+                                              fontFamily: 'inherit',
+                                              display: 'inline-block',
+                                              width: '100%'
+                                            }
+                                      }
+                                    >
+                                      {linkText}
+                                    </a>
+                                  </foreignObject>
+                                )
+                              }
+                              // 2. Check for markdown link
+                              const mdMatch = label.match(/\[([^\]]+)\]\((https?:\/\/[^\s]+|www\.[^\s]+)\)/i)
+                              if (mdMatch) {
+                                const href = mdMatch[2].startsWith('http') ? mdMatch[2] : `https://${mdMatch[2]}`
+                                const linkText = mdMatch[1]
+                                return (
+                                  <foreignObject
+                                    x={config.yAxis.hideAxis ? 0 : 5}
+                                    y={barGroup.height}
+                                    width={120}
+                                    height={24}
+                                    style={{ overflow: 'visible' }}
+                                  >
+                                    <a
+                                      href={href}
+                                      target='_blank'
+                                      rel='noopener noreferrer'
+                                      style={
+                                        config.tooltips.singleSeries
+                                          ? {
+                                              color: '#0071bc',
+                                              textDecoration: 'underline',
+                                              fontSize: 12,
+                                              fontFamily: 'inherit',
+                                              display: 'inline-block',
+                                              width: '100%'
+                                            }
+                                          : {
+                                              color: 'inherit',
+                                              textDecoration: 'none',
+                                              fontSize: 12,
+                                              fontFamily: 'inherit',
+                                              display: 'inline-block',
+                                              width: '100%'
+                                            }
+                                      }
+                                    >
+                                      {linkText}
+                                    </a>
+                                  </foreignObject>
+                                )
+                              }
+                              // 3. Check for plain URL
+                              if (/(https?:\/\/|www\.)/i.test(label)) {
+                                try {
+                                  const urlObj = new URL(label.startsWith('http') ? label : `https://${label}`)
+                                  const linkText = urlObj.hostname.replace(/^www\./, '')
+                                  return (
+                                    <foreignObject
+                                      x={config.yAxis.hideAxis ? 0 : 5}
+                                      y={barGroup.height}
+                                      width={120}
+                                      height={24}
+                                      style={{ overflow: 'visible' }}
+                                    >
+                                      <a
+                                        href={urlObj.href}
+                                        target='_blank'
+                                        rel='noopener noreferrer'
+                                        style={
+                                          config.tooltips.singleSeries
+                                            ? {
+                                                color: '#0071bc',
+                                                textDecoration: 'underline',
+                                                fontSize: 12,
+                                                fontFamily: 'inherit',
+                                                display: 'inline-block',
+                                                width: '100%'
+                                              }
+                                            : {
+                                                color: 'inherit',
+                                                textDecoration: 'none',
+                                                fontSize: 12,
+                                                fontFamily: 'inherit',
+                                                display: 'inline-block',
+                                                width: '100%'
+                                              }
+                                        }
+                                      >
+                                        {linkText}
+                                      </a>
+                                    </foreignObject>
+                                  )
+                                } catch {
+                                  return (
+                                    <Text
+                                      x={config.yAxis.hideAxis ? 0 : 5}
+                                      y={barGroup.height}
+                                      dy={4}
+                                      verticalAnchor={'start'}
+                                      textAnchor={'start'}
+                                    >
+                                      {label}
+                                    </Text>
+                                  )
+                                }
+                              }
+                            }
+                            // Not a link, render as normal
+                            return (
+                              <Text
+                                x={config.yAxis.hideAxis ? 0 : 5}
+                                y={barGroup.height}
+                                dy={4}
+                                verticalAnchor={'start'}
+                                textAnchor={'start'}
+                              >
+                                {label}
+                              </Text>
+                            )
+                          })()}
 
                         {config.isLollipopChart && config.lollipopShape === 'circle' && (
                           <circle
