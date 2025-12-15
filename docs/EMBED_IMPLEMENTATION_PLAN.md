@@ -672,6 +672,7 @@ Final URLs:
 - [ ] Update individual viz filter rendering
 - [ ] Test: `?hideState=true` hides State filter while others remain
 - [ ] Test: Multiple hide params work together
+- [ ] Make sure that if there are zero visible filters, the filter section does not take up vertical space
 - [ ] Test across all visualization types (chart, map, dashboard)
 - [ ] Document parameter format and usage
 
