@@ -1451,7 +1451,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                     .reduce((acc, curr) => curr - acc)
 
                 // filter out every [distanceBetweenTicks] tick starting from the end, so the last tick is always labeled
-                let filteredTicks = useDateSpanMonths
+                const filteredTicks = useDateSpanMonths
                   ? [...props.ticks]
                       .reverse()
                       .filter((_, i) => i % distanceBetweenTicks === 0)
@@ -1462,24 +1462,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                         formattedValue: handleBottomTickFormatting(tick.value, i, arr)
                       }))
                   : props.ticks
-
-                // Remove duplicate ticks based on the actual underlying value (not formatted display)
-                // This prevents showing duplicate ticks when the scale generates more ticks than data points
-                const seenValues = new Set()
-                filteredTicks = filteredTicks.filter(tick => {
-                  // Get the actual value - for dates, use getTime() to compare timestamps
-                  const valueKey =
-                    tick.value instanceof Date
-                      ? tick.value.getTime()
-                      : typeof tick.value === 'number'
-                      ? tick.value
-                      : String(tick.value)
-                  if (seenValues.has(valueKey)) {
-                    return false
-                  }
-                  seenValues.add(valueKey)
-                  return true
-                })
 
                 const axisMaxHeight = bottomLabelStart + BOTTOM_LABEL_PADDING
 

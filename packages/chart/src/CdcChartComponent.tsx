@@ -1126,7 +1126,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
 
     if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
-    // Brush is now relatively positioned in document flow, no extra margin needed
     return classes
   }
 
