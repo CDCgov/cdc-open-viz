@@ -87,11 +87,6 @@ export const EmbedEditor: React.FC = () => {
     window.open(generatorUrl, '_blank', 'noopener,noreferrer')
   }
 
-  // Don't render anything if no configUrl available
-  if (!configUrl) {
-    return null
-  }
-
   return (
     <>
       {/* Collapsible Share with Partners Section */}
@@ -111,27 +106,35 @@ export const EmbedEditor: React.FC = () => {
 
         {isExpanded && (
           <div style={{ paddingTop: '1em' }}>
-            <p style={{ fontSize: '0.85em', marginBottom: '1em', color: '#666' }}>
-              Generate embed codes for partners to add this visualization to their websites.
-            </p>
+            {configUrl ? (
+              <>
+                <p style={{ fontSize: '0.85em', marginBottom: '1em', color: '#666' }}>
+                  Generate embed codes for partners to add this visualization to their websites.
+                </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
-              <button
-                className='btn btn-primary'
-                onClick={handleShowEmbedCode}
-                style={{ width: '100%', textAlign: 'left' }}
-              >
-                Get Embed Code
-              </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
+                  <button
+                    className='btn btn-primary'
+                    onClick={handleShowEmbedCode}
+                    style={{ width: '100%', textAlign: 'left' }}
+                  >
+                    Get Embed Code
+                  </button>
 
-              <button
-                className='btn btn-outline-primary'
-                onClick={handleOpenGenerator}
-                style={{ width: '100%', textAlign: 'left' }}
-              >
-                Customize Embed Code →
-              </button>
-            </div>
+                  <button
+                    className='btn btn-outline-primary'
+                    onClick={handleOpenGenerator}
+                    style={{ width: '100%', textAlign: 'left' }}
+                  >
+                    Customize Embed Code →
+                  </button>
+                </div>
+              </>
+            ) : (
+              <p style={{ fontSize: '0.85em', color: '#666', fontStyle: 'italic' }}>
+                An embed code cannot be generated until this visualization has been saved.
+              </p>
+            )}
           </div>
         )}
       </div>
