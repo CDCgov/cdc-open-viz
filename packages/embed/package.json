@@ -8,7 +8,10 @@
   "scripts": {
     "start": "vite --open",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run --reporter verbose",
+    "test-watch": "vitest watch --reporter verbose",
+    "test-watch:ui": "vitest --ui"
   },
   "repository": {
     "type": "git",
