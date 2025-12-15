@@ -170,6 +170,9 @@ table.data-table {
     position: relative;
     padding: 0;
     display: inline;
+    color: #075290;
+    text-decoration: underline;
+    cursor: pointer;
   }
 
   td span.table-link {
