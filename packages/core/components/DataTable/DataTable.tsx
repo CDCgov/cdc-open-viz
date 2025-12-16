@@ -289,11 +289,11 @@ const DataTable = (props: DataTableProps) => {
       // only use fullGeoName on County maps and no other
       if (config.general?.geoType === 'us-county' || config.table.showFullGeoNameInCSV) {
         // Add column for full Geo name along with State
-        return csvDataUpdated.map(row => {
+        return csvDataUpdated.map((row, index) => {
         const geoColumnConfig = config.columns?.geo
         const geoLabel = geoColumnConfig?.label || config.columns?.geo?.name
         return {
-          FullGeoName: formatLegendLocation(csvData[csvDataUpdated.indexOf(row)][config.columns.geo.name]),
+          FullGeoName: formatLegendLocation(csvData[index][config.columns.geo.name]),
           ...row
         }
       })
