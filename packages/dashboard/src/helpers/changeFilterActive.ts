@@ -18,10 +18,12 @@ const handleChildren = (sharedFilters: SharedFilter[], parentIndex: number) => {
   if (childFilterIndexes.length) {
     childFilterIndexes.forEach(filterIndex => {
       const cur = sharedFilters[filterIndex]
-      if (cur.setByQueryParameter) removeQueryParam(cur.setByQueryParameter)
-      cur.active = ''
-      if (cur.subGrouping) {
-        cur.subGrouping.active = ''
+      if (cur.type === 'urlfilter') {
+        if (cur.setByQueryParameter) removeQueryParam(cur.setByQueryParameter)
+        cur.active = ''
+        if (cur.subGrouping) {
+          cur.subGrouping.active = ''
+        }
       }
     })
   }
