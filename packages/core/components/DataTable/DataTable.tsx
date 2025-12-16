@@ -273,12 +273,20 @@ const DataTable = (props: DataTableProps) => {
             })
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
 
+    // Build a map from column name to column config for O(1) lookup
+    const columnConfigMap = config.columns
+      ? Object.values(config.columns).reduce((acc, col) => {
+          acc[col.name] = col
+          return acc
+        }, {} as Record<string, any>)
+      : {}
+
     // Map column names to labels
     const csvDataUpdated = csvData.map(row => {
       const newRow: Record<string, any> = {}
       Object.keys(row).forEach(key => {
-        // Find the column config for this key
-        const columnConfig = config.columns ? Object.values(config.columns).find(col => col.name === key) : null
+        // Use the column config map for O(1) lookup
+        const columnConfig = columnConfigMap[key]
         // Use label if it exists, otherwise use the original key
         const columnLabel = columnConfig?.label || key
         newRow[columnLabel] = row[key]
