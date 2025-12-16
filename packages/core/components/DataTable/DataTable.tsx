@@ -245,6 +245,15 @@ const DataTable = (props: DataTableProps) => {
       const sharedFilterColumns = config.table?.sharedFilterColumns || []
       const vizFilterColumns = (config.filters || []).map(filter => filter.columnName)
       const filterColumns = [...sharedFilterColumns, ...vizFilterColumns]
+      const getVisibleColumns = () => {
+        if (!config.columns) return []
+
+        return Object.values(config.columns)
+          .filter(col => col.dataTable !== false)
+          .map(col => col.name)
+      }
+
+      const visibleColumns = getVisibleColumns()
       const visibleData =
         config.type === 'map'
           ? getMapRowData(
@@ -257,21 +266,53 @@ const DataTable = (props: DataTableProps) => {
               filterColumns
             )
           : runtimeData.map(d => {
-              return _.pick(d, [...filterColumns, ...dataSeriesColumns])
+            const columnsToInclude = config.type === 'table'
+              ? _.uniq([...filterColumns, ...visibleColumns])
+              : _.uniq([...filterColumns, ...dataSeriesColumns])
+              return _.pick(d, columnsToInclude)
             })
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
+
+    // Build a map from column name to column config for O(1) lookup
+    const columnConfigMap = config.columns
+      ? Object.values(config.columns).reduce((acc, col) => {
+          acc[col.name] = col
+          return acc
+        }, {} as Record<string, any>)
+      : {}
+
+    // Map column names to labels
+    const csvDataUpdated = csvData.map(row => {
+      const newRow: Record<string, any> = {}
+      Object.keys(row).forEach(key => {
+        // Use the column config map for O(1) lookup
+        const columnConfig = columnConfigMap[key]
+        // Use label if it exists, otherwise use the original key
+        const columnLabel = columnConfig?.label || key
+        newRow[columnLabel] = row[key]
+      })
+      return newRow
+    })
 
       // only use fullGeoName on County maps and no other
       if (config.general?.geoType === 'us-county' || config.table.showFullGeoNameInCSV) {
         // Add column for full Geo name along with State
-        return csvData.map(row => {
+        return csvDataUpdated.map((row, index) => {
+          const originalRow = csvData[index]
+          if (!originalRow) {
+            console.warn(
+              'Data mismatch: originalRow missing.',
+              { index, csvDataLength: csvData.length, csvDataUpdatedLength: csvDataUpdated.length }
+            )
+            return row
+          }
           return {
-            FullGeoName: formatLegendLocation(row[config.columns.geo.name]),
+            FullGeoName: formatLegendLocation(originalRow[config.columns.geo.name]),
             ...row
           }
         })
       } else {
-        return csvData
+        return csvDataUpdated
       }
     }
 
