@@ -130,7 +130,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
     if (isEditor && config && editorContext?.setTempConfig) {
       editorContext.setTempConfig(config)
     }
-  }, [config, columns, filters, table, isEditor, editorContext])
+  }, [config, isEditor, editorContext])
 
   /* HANDLE LOADING/ERROR STATES */
   if (configLoading || dataLoading) return <Loading />
@@ -161,7 +161,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
 
         {/* DATA TABLE */}
         <DataTable
-          config={{ ...config, columns, filters, table, filterBehavior, filterIntro } as unknown as TableConfig}
+          config={config as unknown as TableConfig}
           tableTitle={label}
           indexTitle={indexLabel}
           isEditor={isEditor}

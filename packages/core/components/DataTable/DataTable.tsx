@@ -270,7 +270,7 @@ const DataTable = (props: DataTableProps) => {
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
 
     // Map column names to labels
-    const dataWithLabels = csvData.map(row => {
+    const csvDataUpdated = csvData.map(row => {
       const newRow: Record<string, any> = {}
       Object.keys(row).forEach(key => {
         // Find the column config for this key
@@ -285,16 +285,16 @@ const DataTable = (props: DataTableProps) => {
       // only use fullGeoName on County maps and no other
       if (config.general?.geoType === 'us-county' || config.table.showFullGeoNameInCSV) {
         // Add column for full Geo name along with State
-        return dataWithLabels.map(row => {
+        return csvDataUpdated.map(row => {
         const geoColumnConfig = config.columns?.geo
         const geoLabel = geoColumnConfig?.label || config.columns?.geo?.name
         return {
-          FullGeoName: formatLegendLocation(csvData[dataWithLabels.indexOf(row)][config.columns.geo.name]),
+          FullGeoName: formatLegendLocation(csvData[csvDataUpdated.indexOf(row)][config.columns.geo.name]),
           ...row
         }
       })
       } else {
-        return dataWithLabels
+        return csvDataUpdated
       }
     }
 
