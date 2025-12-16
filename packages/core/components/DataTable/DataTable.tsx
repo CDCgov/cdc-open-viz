@@ -290,13 +290,16 @@ const DataTable = (props: DataTableProps) => {
       if (config.general?.geoType === 'us-county' || config.table.showFullGeoNameInCSV) {
         // Add column for full Geo name along with State
         return csvDataUpdated.map((row, index) => {
-        const geoColumnConfig = config.columns?.geo
-        const geoLabel = geoColumnConfig?.label || config.columns?.geo?.name
-        return {
-          FullGeoName: formatLegendLocation(csvData[index][config.columns.geo.name]),
-          ...row
-        }
-      })
+          const originalRow = csvData[index]
+          if (!originalRow) {
+            console.warn(`Missing original data for index ${index}`)
+            return row
+          }
+          return {
+            FullGeoName: formatLegendLocation(originalRow[config.columns.geo.name]),
+            ...row
+          }
+        })
       } else {
         return csvDataUpdated
       }
