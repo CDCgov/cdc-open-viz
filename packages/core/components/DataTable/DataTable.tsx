@@ -245,11 +245,15 @@ const DataTable = (props: DataTableProps) => {
       const sharedFilterColumns = config.table?.sharedFilterColumns || []
       const vizFilterColumns = (config.filters || []).map(filter => filter.columnName)
       const filterColumns = [...sharedFilterColumns, ...vizFilterColumns]
-      const visibleColumns = config.columns
-      ? Object.values(config.columns)
+      const getVisibleColumns = () => {
+        if (!config.columns) return []
+
+        return Object.values(config.columns)
           .filter(col => col.dataTable !== false)
           .map(col => col.name)
-      : []
+      }
+
+      const visibleColumns = getVisibleColumns()
       const visibleData =
         config.type === 'map'
           ? getMapRowData(
