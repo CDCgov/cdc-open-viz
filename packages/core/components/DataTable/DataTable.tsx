@@ -267,8 +267,8 @@ const DataTable = (props: DataTableProps) => {
             )
           : runtimeData.map(d => {
             const columnsToInclude = config.type === 'table'
-              ? [...filterColumns, ...visibleColumns]
-              : [...filterColumns, ...dataSeriesColumns]
+              ? _.uniq([...filterColumns, ...visibleColumns])
+              : _.uniq([...filterColumns, ...dataSeriesColumns])
               return _.pick(d, columnsToInclude)
             })
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
