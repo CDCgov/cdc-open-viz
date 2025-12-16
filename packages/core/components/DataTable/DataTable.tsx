@@ -300,7 +300,10 @@ const DataTable = (props: DataTableProps) => {
         return csvDataUpdated.map((row, index) => {
           const originalRow = csvData[index]
           if (!originalRow) {
-            console.warn(`Data mismatch: originalRow missing at index ${index}. csvData length: ${csvData.length}, csvDataUpdated length: ${csvDataUpdated.length}`)
+            console.warn(
+              'Data mismatch: originalRow missing.',
+              { index, csvDataLength: csvData.length, csvDataUpdatedLength: csvDataUpdated.length }
+            )
             return row
           }
           return {
