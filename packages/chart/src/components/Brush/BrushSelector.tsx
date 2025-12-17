@@ -166,6 +166,8 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   const isMouseDown = useRef<boolean>(false)
   const previousExtent = useRef<{ x0: number; x1: number } | null>(null)
   const previousDefaultCount = useRef<number | undefined>(undefined)
+  const isProgrammaticUpdate = useRef<boolean>(false)
+  const isUserInteracting = useRef<boolean>(false)
 
   // Custom touch handling state
   const touchState = useRef<{
@@ -333,6 +335,8 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       e.preventDefault()
       e.stopPropagation()
 
+      isUserInteracting.current = true
+
       const brush = brushRef.current
       const startExtent =
         brush && brush.state.extent.x0 !== -1
@@ -440,6 +444,12 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
         startExtent: { x0: 0, x1: 0 },
         dragType: null
       }
+
+      // Reset isUserInteracting - handleBrushChange will check brush state if needed
+      // Reuse the brush variable already declared above
+      if (brush && !brush.state?.isBrushing) {
+        isUserInteracting.current = false
+      }
     }
 
     // Attach native event listeners with passive: false to allow preventDefault
@@ -487,11 +497,11 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
 
       // If xValues is empty but we have valid bounds, compute xValues from the scale
       // This handles cases where visx doesn't properly compute xValues during drag
-      // However, when brushDefaultRecentDateCount is set, we want to be more precise
-      // to avoid including extra dates due to pixel range calculations
       if (xValues.length === 0 && bounds.x1 > bounds.x0) {
-        if (brushDefaultRecentDateCount && brushDefaultRecentDateCount > 0) {
-          // When using brushDefaultRecentDateCount, use exact count instead of pixel range
+        // During programmatic updates with brushDefaultRecentDateCount, use exact count
+        // During user interactions, use pixel-based calculation to allow free brush movement
+        if (isProgrammaticUpdate.current && brushDefaultRecentDateCount && brushDefaultRecentDateCount > 0) {
+          // When using brushDefaultRecentDateCount during programmatic updates, use exact count
           // to avoid including extra dates that fall within the pixel bounds
           const countToSelect = Math.min(brushDefaultRecentDateCount, domain.length)
           xValues = domain.slice(-countToSelect)
@@ -508,12 +518,18 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
           }
         }
       } else if (xValues.length > 0 && brushDefaultRecentDateCount && brushDefaultRecentDateCount > 0) {
-        // Even if xValues is provided, if it doesn't match the expected count, fix it
-        // This handles cases where visx recalculates and includes extra dates
+        // CRITICAL: Always check if xValues matches expected count when brushDefaultRecentDateCount is set
+        // This prevents the tick/dates bug where visx recalculates and includes extra dates
+        // The bug fix from bb9d533 always enforced exact count, but that breaks user interactions
+        // Solution: Only enforce exact count during programmatic updates OR when user is not actively interacting
         const expectedCount = Math.min(brushDefaultRecentDateCount, domain.length)
         if (xValues.length !== expectedCount) {
-          // Use exact count from domain
-          xValues = domain.slice(-expectedCount)
+          if (isProgrammaticUpdate.current || !isUserInteracting.current) {
+            // Enforce exact count during programmatic updates or when user is not actively dragging
+            // This preserves the bug fix while allowing free brush movement during active user interactions
+            xValues = domain.slice(-expectedCount)
+          }
+          // During active user interactions (dragging), allow xValues to be any count - user can select freely
         }
       }
 
@@ -530,8 +546,18 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
 
       // Update accessible extent for keyboard controls positioning
       setAccessibleExtent({ x0: bounds.x0, x1: bounds.x1 })
+
+      // Reset programmatic update flag after handling the change
+      isProgrammaticUpdate.current = false
+
+      // Reset user interaction flag if brush is no longer being dragged
+      // This ensures we don't use timeouts and check the actual brush state
+      const brush = brushRef.current
+      if (isUserInteracting.current && brush && !brush.state?.isBrushing) {
+        isUserInteracting.current = false
+      }
     },
-    [dispatch, tableData, dataKey, xScale]
+    [dispatch, tableData, dataKey, xScale, config.xAxis?.brushDefaultRecentDateCount]
   )
 
   // Set default selection on initial load
@@ -586,6 +612,8 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
         xValues
       }
 
+      // Mark as programmatic update for initial load
+      isProgrammaticUpdate.current = true
       // Just set the brush data - let the Brush component handle the visual selection
       handleBrushChange(initialBounds)
       hasInitialized.current = true
@@ -659,6 +687,8 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
         xValues
       }
 
+      // Mark as programmatic update when editor value changes
+      isProgrammaticUpdate.current = true
       // Update the brush data
       handleBrushChange(newBounds)
 
@@ -866,6 +896,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   // Track when brush interaction starts (mouse down) with position
   const handleBrushStart = (start: any) => {
     isMouseDown.current = true
+    isUserInteracting.current = true
 
     // Store the starting mouse position (from the brush start object)
     if (start && start.x !== undefined) {
@@ -885,6 +916,12 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   // Track when brush interaction ends
   const handleBrushEnd = () => {
     isMouseDown.current = false
+    // Reset isUserInteracting - handleBrushChange will be called after this
+    // and will check brush state to ensure it's truly done
+    const brush = brushRef.current
+    if (brush && !brush.state?.isBrushing) {
+      isUserInteracting.current = false
+    }
   }
 
   const handleMouseLeave = (event: React.PointerEvent<SVGRectElement>) => {
@@ -895,6 +932,11 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     }
     isMouseDown.current = false
     mouseDownPos.current = null
+    // Reset isUserInteracting - handleBrushChange will check brush state if needed
+    const brush = brushRef.current
+    if (brush && !brush.state?.isBrushing) {
+      isUserInteracting.current = false
+    }
   }
 
   // Handle click to move brush to clicked location

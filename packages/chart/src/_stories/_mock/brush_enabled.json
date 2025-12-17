@@ -17,7 +17,8 @@
     "labelColor": "#333",
     "tickLabelColor": "#333",
     "tickColor": "#333",
-    "brushActive": true
+    "brushActive": true,
+    "brushDefaultRecentDateCount": "4"
   },
   "yAxis": {
     "hideAxis": false,
