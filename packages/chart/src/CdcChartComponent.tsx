@@ -820,15 +820,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const formatDate = (date, i, ticks) => {
-    let formattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(date)
+    const displayFormat =
+      config.runtime[section].dateDisplayFormat || config.runtime[section].dateParseFormat || '%Y-%m-%d'
+    let formattedDate = timeFormat(displayFormat)(date)
     // Handle the case where all months work with '%b.' except for May
-    if (config.runtime[section].dateDisplayFormat?.includes('%b.') && formattedDate.includes('May.')) {
+    if (displayFormat?.includes('%b.') && formattedDate.includes('May.')) {
       formattedDate = formattedDate.replace(/May\./g, 'May')
     }
     // Show years only once
-    if (config.xAxis.showYearsOnce && config.runtime[section].dateDisplayFormat?.includes('%Y') && ticks) {
+    if (config.xAxis.showYearsOnce && displayFormat?.includes('%Y') && ticks) {
       const prevDate = ticks[i - 1] ? ticks[i - 1].value : null
-      const prevFormattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(prevDate)
+      const prevFormattedDate = timeFormat(displayFormat)(prevDate)
       const year = formattedDate.match(/\d{4}/)
       const prevYear = prevFormattedDate.match(/\d{4}/)
       if (year && prevYear && year[0] === prevYear[0]) {
