@@ -566,7 +566,7 @@ const BarChartVertical = () => {
           }}
         </BarGroup>
 
-        <Regions xScale={xScale} yMax={yMax} barWidth={barWidth} totalBarsInGroup={totalBarsInGroup} />
+        <Regions xScale={xScale} yMax={yMax} barWidth={barWidth} totalBarsInGroup={totalBarsInGroup} xMax={xMax} />
       </Group>
     )
   )
