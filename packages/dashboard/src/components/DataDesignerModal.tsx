@@ -194,7 +194,12 @@ export const DataDesignerModal: React.FC<DataDesignerModalProps> = ({ vizKey, ro
           ) : (
             <>
               <Select
-                options={Object.keys(config.datasets[configureData.dataKey]?.data[0] || {})}
+                options={Object.keys(
+                  config.rows[rowIndex]?.data?.[0] ||
+                    configureData.data?.[0] ||
+                    config.datasets[configureData.dataKey]?.data?.[0] ||
+                    {}
+                )}
                 value={config.rows[rowIndex].multiVizColumn}
                 label='Multi-Visualization Column'
                 initial='--Select--'
