@@ -39,7 +39,7 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
         // Calculate bar position and width
         // For band scales, center the bar in the band
         const x = bandwidth > 0 ? xVal + bandwidth / 2 : xVal
-        const barWidth = bandwidth > 0 ? Math.max(bandwidth * 0.6, 2) : 4 // Fallback width if no bandwidth
+        const barWidth = bandwidth > 0 ? Math.max(bandwidth * 0.85, 2) : 4 // 85% of bandwidth for wider bars
 
         if (isStacked) {
           // For stacked bars, render each series as a segment
@@ -100,7 +100,7 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
                 key={`mini-bar-grouped-${i}-${seriesIndex}`}
                 x={barX}
                 y={y}
-                width={groupBarWidth * 0.8} // Slight gap between bars
+                width={groupBarWidth * 0.9} // Wider bars with small gap between them
                 height={barHeight}
                 fill={seriesColor}
                 fillOpacity={0.7}
