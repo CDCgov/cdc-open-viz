@@ -124,7 +124,7 @@ describe('isFilterHiddenByQuery', () => {
   it('should return true when query parameter is "true"', () => {
     mockLocation('?hideState=true')
     const filter = {
-      columnName: 'State'
+      setByQueryParameter: 'State'
     }
     const result = isFilterHiddenByQuery(filter)
     expect(result).toBe(true)
@@ -133,7 +133,7 @@ describe('isFilterHiddenByQuery', () => {
   it('should return true when query parameter is "TRUE" (case insensitive)', () => {
     mockLocation('?hideState=TRUE')
     const filter = {
-      columnName: 'State'
+      setByQueryParameter: 'State'
     }
     const result = isFilterHiddenByQuery(filter)
     expect(result).toBe(true)
@@ -142,7 +142,7 @@ describe('isFilterHiddenByQuery', () => {
   it('should return true when query parameter is "1"', () => {
     mockLocation('?hideLocation=1')
     const filter = {
-      columnName: 'Location'
+      setByQueryParameter: 'Location'
     }
     const result = isFilterHiddenByQuery(filter)
     expect(result).toBe(true)
@@ -151,7 +151,7 @@ describe('isFilterHiddenByQuery', () => {
   it('should return true when query parameter is "yes"', () => {
     mockLocation('?hideYear=yes')
     const filter = {
-      columnName: 'Year'
+      setByQueryParameter: 'Year'
     }
     const result = isFilterHiddenByQuery(filter)
     expect(result).toBe(true)
@@ -160,13 +160,13 @@ describe('isFilterHiddenByQuery', () => {
   it('should return true when query parameter is "YES" (case insensitive)', () => {
     mockLocation('?hideYear=YES')
     const filter = {
-      columnName: 'Year'
+      setByQueryParameter: 'Year'
     }
     const result = isFilterHiddenByQuery(filter)
     expect(result).toBe(true)
   })
 
-  it('should return false when columnName is not defined', () => {
+  it('should return false when setByQueryParameter is not defined', () => {
     mockLocation('?hideState=true')
     const filter = {}
     const result = isFilterHiddenByQuery(filter)
@@ -188,7 +188,7 @@ describe('isFilterHiddenByQuery', () => {
   it('should return false when query parameter is not in URL', () => {
     mockLocation('?other=value')
     const filter = {
-      columnName: 'State'
+      setByQueryParameter: 'State'
     }
     const result = isFilterHiddenByQuery(filter)
     expect(result).toBe(false)
@@ -197,7 +197,7 @@ describe('isFilterHiddenByQuery', () => {
   it('should return false when query parameter is "false"', () => {
     mockLocation('?hideState=false')
     const filter = {
-      columnName: 'State'
+      setByQueryParameter: 'State'
     }
     const result = isFilterHiddenByQuery(filter)
     expect(result).toBe(false)
@@ -206,7 +206,7 @@ describe('isFilterHiddenByQuery', () => {
   it('should return false when query parameter is "0"', () => {
     mockLocation('?hideLocation=0')
     const filter = {
-      columnName: 'Location'
+      setByQueryParameter: 'Location'
     }
     const result = isFilterHiddenByQuery(filter)
     expect(result).toBe(false)
@@ -215,7 +215,7 @@ describe('isFilterHiddenByQuery', () => {
   it('should return false when query parameter is "no"', () => {
     mockLocation('?hideYear=no')
     const filter = {
-      columnName: 'Year'
+      setByQueryParameter: 'Year'
     }
     const result = isFilterHiddenByQuery(filter)
     expect(result).toBe(false)
@@ -224,7 +224,7 @@ describe('isFilterHiddenByQuery', () => {
   it('should return false when query parameter is empty string', () => {
     mockLocation('?hideState=')
     const filter = {
-      columnName: 'State'
+      setByQueryParameter: 'State'
     }
     const result = isFilterHiddenByQuery(filter)
     expect(result).toBe(false)
@@ -233,7 +233,7 @@ describe('isFilterHiddenByQuery', () => {
   it('should return false when query parameter has an arbitrary value', () => {
     mockLocation('?hideState=maybe')
     const filter = {
-      columnName: 'State'
+      setByQueryParameter: 'State'
     }
     const result = isFilterHiddenByQuery(filter)
     expect(result).toBe(false)
@@ -242,7 +242,7 @@ describe('isFilterHiddenByQuery', () => {
   it('should handle multiple query parameters correctly', () => {
     mockLocation('?location=home&hideState=true&year=2024')
     const filter = {
-      columnName: 'State'
+      setByQueryParameter: 'State'
     }
     const result = isFilterHiddenByQuery(filter)
     expect(result).toBe(true)
@@ -251,133 +251,52 @@ describe('isFilterHiddenByQuery', () => {
   it('should not hide when different parameter is true', () => {
     mockLocation('?hideLocation=true&hideState=false')
     const filter = {
-      columnName: 'State'
+      setByQueryParameter: 'State'
     }
     const result = isFilterHiddenByQuery(filter)
     expect(result).toBe(false)
   })
 
-  it('should construct parameter name with exact case from columnName', () => {
+  it('should construct parameter name with exact case from setByQueryParameter', () => {
     mockLocation('?hidecolor=true')
     const filter = {
-      columnName: 'color'
+      setByQueryParameter: 'color'
     }
     const result = isFilterHiddenByQuery(filter)
     expect(result).toBe(true)
   })
 
-  it('should work with multi-word column names', () => {
+  it('should work with multi-word parameter names', () => {
     mockLocation('?hideAnimal Category=1')
     const filter = {
-      columnName: 'Animal Category'
+      setByQueryParameter: 'Animal Category'
     }
     const result = isFilterHiddenByQuery(filter)
     expect(result).toBe(true)
   })
 
-  // Multiple identifiers - check all possibilities
-  it('should match using key when multiple identifiers present', () => {
-    mockLocation('?hideGeography=true')
+  it('should only check setByQueryParameter (not key, label, or columnName)', () => {
+    mockLocation('?hidegeography=true')
     const filter = {
-      key: 'Geography',
+      setByQueryParameter: 'State',
+      key: 'geography',
+      label: 'geography',
+      columnName: 'geography'
+    }
+    const result = isFilterHiddenByQuery(filter)
+    expect(result).toBe(false) // Should NOT match because setByQueryParameter is 'State', not 'geography'
+  })
+
+  it('should match when setByQueryParameter matches URL param', () => {
+    mockLocation('?hideState=true')
+    const filter = {
+      setByQueryParameter: 'State',
+      key: 'geography',
       label: 'Select Geography',
       columnName: 'geography'
     }
     const result = isFilterHiddenByQuery(filter)
-    expect(result).toBe(true)
-  })
-
-  it('should match using label when multiple identifiers present', () => {
-    mockLocation('?hideSelect Geography=1')
-    const filter = {
-      key: 'Geography',
-      label: 'Select Geography',
-      columnName: 'geography'
-    }
-    const result = isFilterHiddenByQuery(filter)
-    expect(result).toBe(true)
-  })
-
-  it('should match using columnName when multiple identifiers present', () => {
-    mockLocation('?hidegeography=yes')
-    const filter = {
-      key: 'Geography',
-      label: 'Select Geography',
-      columnName: 'geography'
-    }
-    const result = isFilterHiddenByQuery(filter)
-    expect(result).toBe(true)
-  })
-
-  it('should return true for any matching identifier (key)', () => {
-    mockLocation('?hideYear=1')
-    const filter = {
-      key: 'Year',
-      label: 'Select Year',
-      columnName: 'year_col'
-    }
-    const result = isFilterHiddenByQuery(filter)
-    expect(result).toBe(true)
-  })
-
-  it('should return true for any matching identifier (label)', () => {
-    mockLocation('?hideSelect Year=true')
-    const filter = {
-      key: 'Year',
-      label: 'Select Year',
-      columnName: 'year_col'
-    }
-    const result = isFilterHiddenByQuery(filter)
-    expect(result).toBe(true)
-  })
-
-  it('should return true for any matching identifier (columnName)', () => {
-    mockLocation('?hideyear_col=1')
-    const filter = {
-      key: 'Year',
-      label: 'Select Year',
-      columnName: 'year_col'
-    }
-    const result = isFilterHiddenByQuery(filter)
-    expect(result).toBe(true)
-  })
-
-  it('should work with only key present', () => {
-    mockLocation('?hideCategory=yes')
-    const filter = {
-      key: 'Category'
-    }
-    const result = isFilterHiddenByQuery(filter)
-    expect(result).toBe(true)
-  })
-
-  it('should work with only label present', () => {
-    mockLocation('?hideSelect Color=1')
-    const filter = {
-      label: 'Select Color'
-    }
-    const result = isFilterHiddenByQuery(filter)
-    expect(result).toBe(true)
-  })
-
-  it('should work with only columnName present', () => {
-    mockLocation('?hidelocation=true')
-    const filter = {
-      columnName: 'location'
-    }
-    const result = isFilterHiddenByQuery(filter)
-    expect(result).toBe(true)
-  })
-
-  it('should not match when none of the identifiers match URL param', () => {
-    mockLocation('?hideSomethingElse=true')
-    const filter = {
-      key: 'Geography',
-      label: 'Select Geography',
-      columnName: 'geography'
-    }
-    const result = isFilterHiddenByQuery(filter)
-    expect(result).toBe(false)
+    expect(result).toBe(true) // Should match because setByQueryParameter is 'State'
   })
 })
 

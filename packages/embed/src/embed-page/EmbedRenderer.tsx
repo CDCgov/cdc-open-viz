@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { useCoveContainer } from '../shared/useCoveContainer'
 
 /**
  * EmbedRenderer - Phase 1 & 2
@@ -16,25 +17,8 @@ const EmbedRenderer: React.FC = () => {
   const params = new URLSearchParams(window.location.search)
   const configUrl = params.get('configUrl')
 
-  // Setup COVE container
-  useEffect(() => {
-    if (!containerRef.current) return
-    if (!configUrl) return
-
-    // Set data attributes that COVE wrapper expects
-    containerRef.current.setAttribute('class', 'wcms-viz-container')
-    containerRef.current.setAttribute('data-language', 'en')
-    containerRef.current.setAttribute('data-host', 'www.cdc.gov')
-    containerRef.current.setAttribute('data-config-url', configUrl)
-    containerRef.current.setAttribute('data-sid', '')
-
-    // Trigger COVE to load the visualization
-    // Check if CDC_Load_Viz function exists (from main.js)
-    // If main.js hasn't loaded yet, it will auto-detect on DOMContentLoaded
-    if (typeof (window as any).CDC_Load_Viz === 'function') {
-      ;(window as any).CDC_Load_Viz()
-    }
-  }, [configUrl])
+  // Setup COVE container using shared hook
+  useCoveContainer(containerRef, configUrl)
 
   // Measure height and send resize message (with duplicate detection)
   const measureAndSend = (id: string) => {

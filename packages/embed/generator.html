@@ -3,27 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CDC COVE Embed Generator</title>
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-      }
-      #generator-root {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-    </style>
+    <link rel="stylesheet prefetch" href="/TemplatePackage/5.0/css/app.min.css?_=71669" />
+    <title>Embed CDC Visualization</title>
   </head>
   <body>
     <div id="generator-root"></div>
-
-    <!-- Reference to main.js - hash will be injected by copyEmbedFiles.js -->
-    <script src="/TemplatePackage/contrib/widgets/openVizWrapper/dist/main.js"></script>
-
     <script type="module" src="/src/generator/index.tsx"></script>
+    <script src="/TemplatePackage/contrib/widgets/openVizWrapper/dist/main.js"></script>
   </body>
 </html>

@@ -1,72 +1,135 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useConfigLoader } from '../shared/useConfigLoader'
+import { extractFilters, initializeFilterState, FilterState } from '../shared/filterUtils'
+import FilterCustomizationControls from './components/FilterCustomizationControls'
+import EmbedCodeGenerator from './components/EmbedCodeGenerator'
+import PreviewPanel from './components/PreviewPanel'
 
 /**
- * Proof of Concept - Phase 0
- * Minimal placeholder for the generator tool
+ * COVE Embed Generator - Phase 5
+ * Allows partners to customize embed codes with filter defaults and hide options
+ *
+ * Layout:
+ * 1. Filter customization controls (source of truth)
+ * 2. Preview iframe
+ * 3. Generated embed code
  */
 const GeneratorApp: React.FC = () => {
   const params = new URLSearchParams(window.location.search)
   const configUrl = params.get('configUrl')
 
-  return (
-    <div
-      style={{
-        padding: '2rem',
-        textAlign: 'center',
-        maxWidth: '800px',
-        margin: '0 auto'
-      }}
-    >
-      <h1 style={{ color: '#005eaa' }}>CDC COVE Embed Generator - Phase 0</h1>
-      <p style={{ fontSize: '1.2rem', color: '#333' }}>✅ Generator page is working!</p>
+  // Load config to extract filter metadata
+  const { loading, error, config } = useConfigLoader(configUrl)
 
-      {configUrl ? (
-        <div
-          style={{
-            marginTop: '2rem',
-            padding: '1rem',
-            background: '#f0f0f0',
-            borderRadius: '4px'
-          }}
-        >
-          <strong>Config URL detected:</strong>
-          <pre
-            style={{
-              textAlign: 'left',
-              overflow: 'auto',
-              fontSize: '0.9rem'
-            }}
-          >
-            {configUrl}
-          </pre>
+  // Extract filter metadata from config (memoize to prevent unnecessary re-renders)
+  const filters = React.useMemo(() => {
+    const extracted = extractFilters(config)
+    return extracted
+  }, [config])
+
+  // Initialize filter state from config defaults
+  const [filterState, setFilterState] = useState<Record<string, FilterState>>({})
+
+  // Update filter state when filters change (only depends on filters, not filterState)
+  React.useEffect(() => {
+    if (filters.length > 0) {
+      const initialState = initializeFilterState(filters)
+      setFilterState(initialState)
+    }
+  }, [filters])
+
+  const handleFilterChange = (filterKey: string, value: string) => {
+    setFilterState(prev => {
+      const newState = {
+        ...prev,
+        [filterKey]: {
+          ...prev[filterKey],
+          value
+        }
+      }
+      return newState
+    })
+  }
+
+  const handleHideToggle = (filterKey: string, hide: boolean) => {
+    setFilterState(prev => {
+      const newState = {
+        ...prev,
+        [filterKey]: {
+          ...prev[filterKey],
+          hide
+        }
+      }
+      return newState
+    })
+  }
+
+  // No config URL provided
+  if (!configUrl) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
+        <h1 style={{ color: '#005eaa' }}>CDC COVE Embed Generator</h1>
+        <div style={{ padding: '2rem', background: '#fff3cd', borderRadius: '4px', marginTop: '2rem' }}>
+          <h2 style={{ fontSize: '1.2rem', color: '#856404' }}>Missing Configuration</h2>
+          <p style={{ color: '#856404' }}>
+            No <code>configUrl</code> parameter provided.
+          </p>
+          <p style={{ color: '#856404' }}>
+            <strong>Usage:</strong> <code>?configUrl=/path/to/config.json</code>
+          </p>
         </div>
-      ) : (
-        <p style={{ marginTop: '2rem', color: '#666' }}>
-          No configUrl parameter provided. <br />
-          Try: <code>?configUrl=/path/to/config.json</code>
-        </p>
-      )}
-
-      <div
-        style={{
-          marginTop: '2rem',
-          padding: '1rem',
-          background: '#e8f4f8',
-          borderRadius: '4px',
-          fontSize: '0.9rem'
-        }}
-      >
-        <strong>Future functionality:</strong>
-        <ul style={{ textAlign: 'left', lineHeight: '1.8' }}>
-          <li>Load and parse config file</li>
-          <li>Detect available filters</li>
-          <li>Show filter selection UI with dropdowns</li>
-          <li>Add "Hide in embed" checkbox for each filter</li>
-          <li>Live preview panel showing the visualization</li>
-          <li>Generate embed code with filter params</li>
-          <li>Copy-to-clipboard functionality</li>
-        </ul>
       </div>
+    )
+  }
+
+  // Loading state
+  if (loading) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center', maxWidth: '1200px', margin: '0 auto' }}>
+        <h1 style={{ color: '#005eaa' }}>CDC COVE Embed Generator</h1>
+        <div style={{ padding: '2rem', marginTop: '2rem' }}>
+          <p style={{ fontSize: '1.1rem', color: '#666' }}>Loading configuration...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
+        <h1 style={{ color: '#005eaa' }}>CDC COVE Embed Generator</h1>
+        <div style={{ padding: '2rem', background: '#f8d7da', borderRadius: '4px', marginTop: '2rem' }}>
+          <h2 style={{ fontSize: '1.2rem', color: '#721c24' }}>Configuration Error</h2>
+          <p style={{ color: '#721c24' }}>{error}</p>
+          <p style={{ fontSize: '0.9rem', color: '#721c24', marginTop: '1rem' }}>
+            Config URL: <code>{configUrl}</code>
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+      <header style={{ marginBottom: '2rem', textAlign: 'center' }}>
+        <h1 style={{ color: '#005eaa', marginBottom: '0.5rem' }}>CDC COVE Embed Generator</h1>
+        <p style={{ color: '#666', fontSize: '1rem' }}>Customize your visualization embed code for partner websites</p>
+      </header>
+
+      {/* 1. Filter Customization Controls */}
+      <FilterCustomizationControls
+        filters={filters}
+        filterState={filterState}
+        onFilterChange={handleFilterChange}
+        onHideToggle={handleHideToggle}
+      />
+
+      {/* 2. Preview */}
+      <PreviewPanel configUrl={configUrl} filters={filters} filterState={filterState} />
+
+      {/* 3. Generated Embed Code */}
+      <EmbedCodeGenerator configUrl={configUrl} filters={filters} filterState={filterState} />
     </div>
   )
 }

@@ -14,36 +14,32 @@ export function getQueryStringFilterValue(filter) {
 }
 
 /**
- * Checks if a filter should be hidden based on query parameter
- * Checks multiple possible parameter names in priority order.
- * Returns true if ANY of the possible parameters are set to a truthy value.
+ * Check if a filter should be hidden based on URL query parameters
+ * Checks for hide{setByQueryParameter}=true|1|yes in the URL
  *
- * Checks in order:
- * 1. "hide" + key (dashboard filter identifier)
- * 2. "hide" + label (user-facing display name)
- * 3. "hide" + columnName (data column name)
- *
- * @param filter - Filter object with key, label, and/or columnName
+ * @param filter - Filter object with setByQueryParameter property
  * @returns true if filter should be hidden, false otherwise
  *
+ * @example
+ * // If filter has setByQueryParameter: "state"
+ * // URL: ?hidestate=true  -> returns true
+ * // URL: ?hideState=true  -> returns false (case sensitive!)
  */
 export function isFilterHiddenByQuery(filter) {
   if (!filter) return false
 
+  // Only check setByQueryParameter - this is the standard way filters are identified in URL params
+  const paramName = filter.setByQueryParameter
+  if (!paramName) return false
+
   const urlParams = new URLSearchParams(window.location.search)
+  const hideParamName = `hide${paramName}`
+  const hideValue = urlParams.get(hideParamName)
 
-  // Helper to check if a parameter name has a truthy value
-  const checkHideParam = (identifier: string): boolean => {
-    if (!identifier) return false
-    const hideParamName = 'hide' + identifier
-    const hideValue = urlParams.get(hideParamName)
-    if (!hideValue) return false
-    const lower = hideValue.toLowerCase()
-    return lower === 'true' || hideValue === '1' || lower === 'yes'
-  }
+  if (!hideValue) return false
 
-  // Check each possible identifier in priority order
-  return checkHideParam(filter.key) || checkHideParam(filter.label) || checkHideParam(filter.columnName)
+  const lower = hideValue.toLowerCase()
+  return lower === 'true' || hideValue === '1' || lower === 'yes'
 }
 
 export function getQueryParams() {
