@@ -12,21 +12,20 @@
 ;(function () {
   'use strict'
 
-  // Find all COVE embed iframes
-  const iframes = document.querySelectorAll('iframe[data-cove-embed]')
+  let iframeCounter = 0
 
-  if (iframes.length === 0) {
-    console.warn('CDC COVE Embed Helper: No iframes found with data-cove-embed attribute.')
-    return
-  }
+  // Initialize an iframe with unique ID and event listener
+  function initializeIframe(iframe) {
+    // Skip if already initialized
+    if (iframe.hasAttribute('data-cove-id')) {
+      return
+    }
 
-  // Assign unique IDs to each iframe
-  iframes.forEach((iframe, index) => {
-    const id = `cove-${index}`
+    const id = `cove-${iframeCounter++}`
     iframe.setAttribute('data-cove-id', id)
 
-    // Send the ID to the iframe via postMessage after it loads
-    iframe.addEventListener('load', () => {
+    // Send the ID to the iframe via postMessage
+    const sendId = () => {
       if (iframe.contentWindow) {
         iframe.contentWindow.postMessage(
           {
@@ -36,7 +35,46 @@
           '*'
         )
       }
+    }
+
+    // If iframe is already loaded, send immediately
+    if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+      sendId()
+    }
+
+    // Also listen for load event in case it hasn't loaded yet
+    iframe.addEventListener('load', sendId)
+  }
+
+  // Initialize existing iframes
+  const existingIframes = document.querySelectorAll('iframe[data-cove-embed]')
+  if (existingIframes.length > 0) {
+    existingIframes.forEach(initializeIframe)
+  }
+
+  // Watch for dynamically added iframes (for React/SPA apps)
+  const observer = new MutationObserver(mutations => {
+    mutations.forEach(mutation => {
+      mutation.addedNodes.forEach(node => {
+        // Check if the added node is an iframe
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          if (node.matches && node.matches('iframe[data-cove-embed]')) {
+            initializeIframe(node)
+          }
+          // Also check children in case a container was added
+          const iframes = node.querySelectorAll && node.querySelectorAll('iframe[data-cove-embed]')
+          if (iframes && iframes.length > 0) {
+            iframes.forEach(initializeIframe)
+          }
+        }
+      })
     })
+  })
+
+  // Start observing the document for iframe additions
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
   })
 
   // Listen for resize messages from embedded visualizations

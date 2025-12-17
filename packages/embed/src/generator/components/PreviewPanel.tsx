@@ -11,43 +11,40 @@ type PreviewPanelProps = {
 /**
  * Live preview of the embed using an iframe
  * Shows the actual embed experience with current filter settings
+ * NOTE: iframe attributes must match exactly what generateEmbedCode() produces
  */
 const PreviewPanel: React.FC<PreviewPanelProps> = ({ configUrl, filters, filterState }) => {
-  // Build iframe URL with filter parameters
+  // Build URL parameters from filter state (same as EmbedCodeGenerator)
+  const urlParams = buildFilterUrlParams(filters, filterState)
+
+  // Build iframe URL (same logic as generateEmbedCode)
   const params = new URLSearchParams()
   params.set('configUrl', configUrl)
-
-  // Add filter parameters
-  const filterParams = buildFilterUrlParams(filters, filterState)
-  Object.entries(filterParams).forEach(([key, value]) => {
-    params.set(key, value)
+  Object.entries(urlParams).forEach(([key, value]) => {
+    if (value) params.set(key, value)
   })
-
-  const iframeUrl = `${getDefaultEmbedBaseUrl()}?${params.toString()}`
+  const embedUrl = `${getDefaultEmbedBaseUrl()}?${params.toString()}`
 
   return (
-    <div style={{ padding: '1.5rem', background: '#ffffff', borderRadius: '4px', border: '1px solid #ddd' }}>
-      <h2 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: '#005eaa' }}>2. Preview</h2>
-
-      <p style={{ fontSize: '0.9rem', marginBottom: '1rem', color: '#666' }}>
-        This shows how the visualization will appear on partner websites with your selected settings.
+    <section style={{ marginBottom: '1.5rem' }}>
+      <h2>2. Preview</h2>
+      <p style={{ color: '#666', marginBottom: '1rem' }}>
+        This shows how the visualization will appear on your website with your selected settings.
       </p>
 
-      <div style={{ border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden' }}>
+      <div>
+        {/* iframe attributes must match generateEmbedCode() exactly */}
         <iframe
-          key={iframeUrl} // Force reload when URL changes
-          src={iframeUrl}
+          key={embedUrl}
+          src={embedUrl}
           data-cove-embed
-          title='Embed Preview'
-          style={{
-            width: '100%',
-            minHeight: '500px',
-            border: 'none',
-            display: 'block'
-          }}
+          width='100%'
+          height='400'
+          frameBorder='0'
+          title='CDC Data Visualization'
         />
       </div>
-    </div>
+    </section>
   )
 }
 

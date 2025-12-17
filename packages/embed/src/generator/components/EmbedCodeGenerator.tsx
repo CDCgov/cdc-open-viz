@@ -35,9 +35,13 @@ const EmbedCodeGenerator: React.FC<EmbedCodeGeneratorProps> = ({ configUrl, filt
   }
 
   return (
-    <div style={{ padding: '1.5rem', background: '#f8f9fa', borderRadius: '4px', marginBottom: '1.5rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        <h2 style={{ fontSize: '1.2rem', margin: 0, color: '#005eaa' }}>3. Copy Embed Code</h2>
+    <section style={{ marginBottom: '1.5rem' }}>
+      <h2>3. Copy Embed Code</h2>
+      <p style={{ color: '#666', marginBottom: '1rem' }}>
+        Copy your embed code, then paste it into your website where you want the visualization to appear.
+      </p>
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
         <button
           onClick={handleCopy}
           style={{
@@ -47,9 +51,7 @@ const EmbedCodeGenerator: React.FC<EmbedCodeGeneratorProps> = ({ configUrl, filt
             border: 'none',
             borderRadius: '4px',
             cursor: 'pointer',
-            fontSize: '0.95rem',
-            fontWeight: 'bold',
-            transition: 'background 0.2s'
+            fontWeight: 'bold'
           }}
         >
           {copied ? '✓ Copied!' : 'Copy Code'}
@@ -60,21 +62,17 @@ const EmbedCodeGenerator: React.FC<EmbedCodeGeneratorProps> = ({ configUrl, filt
         style={{
           background: 'white',
           padding: '1rem',
+          border: '1px solid #ddd',
           borderRadius: '4px',
           overflow: 'auto',
+          fontFamily: 'monospace',
           fontSize: '0.85rem',
-          border: '1px solid #ddd',
-          margin: 0,
           lineHeight: '1.4'
         }}
       >
         <code>{embedCode}</code>
       </pre>
-
-      <div style={{ marginTop: '1rem', fontSize: '0.9rem', color: '#666' }}>
-        💡 Paste this code into your website where you want the visualization to appear.
-      </div>
-    </div>
+    </section>
   )
 }
 

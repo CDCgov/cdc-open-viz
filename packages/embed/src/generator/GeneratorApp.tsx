@@ -67,14 +67,14 @@ const GeneratorApp: React.FC = () => {
   // No config URL provided
   if (!configUrl) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
-        <h1 style={{ color: '#005eaa' }}>CDC COVE Embed Generator</h1>
+      <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+        <h1>COVE Embed Generator</h1>
         <div style={{ padding: '2rem', background: '#fff3cd', borderRadius: '4px', marginTop: '2rem' }}>
-          <h2 style={{ fontSize: '1.2rem', color: '#856404' }}>Missing Configuration</h2>
-          <p style={{ color: '#856404' }}>
+          <h2>Missing Configuration</h2>
+          <p>
             No <code>configUrl</code> parameter provided.
           </p>
-          <p style={{ color: '#856404' }}>
+          <p>
             <strong>Usage:</strong> <code>?configUrl=/path/to/config.json</code>
           </p>
         </div>
@@ -85,10 +85,10 @@ const GeneratorApp: React.FC = () => {
   // Loading state
   if (loading) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center', maxWidth: '1200px', margin: '0 auto' }}>
-        <h1 style={{ color: '#005eaa' }}>CDC COVE Embed Generator</h1>
-        <div style={{ padding: '2rem', marginTop: '2rem' }}>
-          <p style={{ fontSize: '1.1rem', color: '#666' }}>Loading configuration...</p>
+      <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+        <h1>COVE Embed Generator</h1>
+        <div>
+          <p style={{ color: '#666' }}>Loading configuration...</p>
         </div>
       </div>
     )
@@ -97,12 +97,12 @@ const GeneratorApp: React.FC = () => {
   // Error state
   if (error) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
-        <h1 style={{ color: '#005eaa' }}>CDC COVE Embed Generator</h1>
+      <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+        <h1>COVE Embed Generator</h1>
         <div style={{ padding: '2rem', background: '#f8d7da', borderRadius: '4px', marginTop: '2rem' }}>
-          <h2 style={{ fontSize: '1.2rem', color: '#721c24' }}>Configuration Error</h2>
-          <p style={{ color: '#721c24' }}>{error}</p>
-          <p style={{ fontSize: '0.9rem', color: '#721c24', marginTop: '1rem' }}>
+          <h2>Configuration Error</h2>
+          <p>{error}</p>
+          <p>
             Config URL: <code>{configUrl}</code>
           </p>
         </div>
@@ -113,8 +113,8 @@ const GeneratorApp: React.FC = () => {
   return (
     <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
       <header style={{ marginBottom: '2rem', textAlign: 'center' }}>
-        <h1 style={{ color: '#005eaa', marginBottom: '0.5rem' }}>CDC COVE Embed Generator</h1>
-        <p style={{ color: '#666', fontSize: '1rem' }}>Customize your visualization embed code for partner websites</p>
+        <h1>COVE Embed Generator</h1>
+        <p style={{ color: '#666' }}>Customize your visualization embed code.</p>
       </header>
 
       {/* 1. Filter Customization Controls */}

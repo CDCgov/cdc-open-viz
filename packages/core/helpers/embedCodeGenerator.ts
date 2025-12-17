@@ -59,6 +59,7 @@ export function getDefaultGeneratorBaseUrl(): string {
  * @param options.height - iframe height (default: "300")
  * @param options.embedBaseUrl - Base URL for embed page (auto-detected by environment)
  * @param options.helperScriptUrl - URL for embed-helper.js (auto-detected by environment)
+ * @param options.urlParams - Additional URL parameters (e.g., filter values, hide flags)
  * @returns HTML string with iframe and script tag
  */
 export function generateEmbedCode(options: EmbedCodeOptions): string {
