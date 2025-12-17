@@ -145,7 +145,11 @@ export const useEditorPermissions = () => {
   }
   const visHasBrushChart = () => {
     if (config.xAxis.type === 'categorical') return false
-    return ['Line', 'Bar', 'Area Chart', 'Combo'].includes(visualizationType) && orientation === 'vertical'
+    // Allow Line charts, vertical Bar charts (both stacked and grouped), and vertical Area charts
+    if (visualizationType === 'Line' && orientation === 'vertical') return true
+    if (visualizationType === 'Bar' && orientation === 'vertical') return true
+    if (visualizationType === 'Area Chart' && orientation === 'vertical') return true
+    return false
   }
 
   const visHasBarBorders = () => {

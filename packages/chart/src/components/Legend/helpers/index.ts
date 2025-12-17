@@ -28,12 +28,7 @@ export const getMarginTop = (isLegendBottom, config) => {
   if (!isLegendBottom) {
     return '0px'
   }
-  if (isLegendBottom && config.xAxis.brushActive && !config.legend.hide) {
-    const additiolMargin = 25
-    return `${DEFAULT_MARGIN_TOP + config.brush?.height + additiolMargin}px`
-  } else {
-    return `${DEFAULT_MARGIN_TOP}px`
-  }
+  return `${DEFAULT_MARGIN_TOP}px`
 }
 export const getMarginBottom = (isLegendBottom, config) => {
   const isLegendTop = config.legend?.position === 'top' && !config.legend.hide
