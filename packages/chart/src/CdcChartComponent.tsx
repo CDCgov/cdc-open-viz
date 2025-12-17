@@ -820,7 +820,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const formatDate = (date, i, ticks) => {
-    const displayFormat = config.runtime[section].dateDisplayFormat || config.runtime[section].dateParseFormat
+    const displayFormat =
+      config.runtime[section].dateDisplayFormat || config.runtime[section].dateParseFormat || '%Y-%m-%d'
     let formattedDate = timeFormat(displayFormat)(date)
     // Handle the case where all months work with '%b.' except for May
     if (displayFormat?.includes('%b.') && formattedDate.includes('May.')) {
