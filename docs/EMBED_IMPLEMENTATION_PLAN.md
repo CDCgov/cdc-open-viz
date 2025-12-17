@@ -692,32 +692,162 @@ Final URLs:
 - Works with multiple filters hidden simultaneously
 - Preserves case sensitivity in parameter names
 
-### Phase 5: Embed Generator UI
+### Phase 5: Embed Generator UI (✅ COMPLETED)
 
-- [ ] Create generator React app skeleton
-- [ ] Implement config URL parameter handling
-- [ ] Build config loading and parsing
-- [ ] Create filter detection logic (read from config)
-- [ ] Build filter selection UI (dropdowns for each filter)
-- [ ] Add "Hide in embed" checkbox next to EACH filter
-- [ ] Create live preview panel (renders actual COVE component)
-- [ ] Build code snippet generator (includes both value params AND hide params)
-- [ ] Add copy-to-clipboard functionality
-- [ ] Style with CDC design system
-- [ ] Test with various config types and filter combinations
-- [ ] Test: Hiding one filter while showing others
-- [ ] Test: Hiding all filters
-- [ ] Test: Hiding no filters (show all)
+- [x] Create generator React app skeleton
+- [x] Implement config URL parameter handling
+- [x] Build config loading and parsing
+- [x] Create filter detection logic (read from config)
+- [x] Build filter selection UI (4-column responsive grid)
+- [x] Add "Hide in embed" checkbox for each filter
+- [x] Create live preview panel with iframe
+- [x] Implement iframe auto-resizing in preview
+- [x] Build code snippet generator (includes filter values AND hide params)
+- [x] Add copy-to-clipboard functionality
+- [x] Handle configs with no filters (simplified UI mode)
+- [x] Validate filters have setByQueryParameter
+- [x] Show warnings for invalid filters
+- [x] Gray out filters without setByQueryParameter
+- [x] Test with various config types and filter combinations
 
-### Phase 6: Editor Integration - Generator Link
+**Implementation notes:**
 
-- [ ] Add "Customize Embed Code" link/button to editor's "Share with Partners" section
-- [ ] Generate link to generator with `?configUrl=` pre-filled
-- [ ] Open in new tab/window
-- [ ] Test in chart editor
-- [ ] Test in map editor
-- [ ] Test in dashboard editor
-- [ ] Update documentation with full workflow
+**Architecture:**
+
+- New multi-page app in `packages/embed/` alongside embed page
+- `generator.html` + `src/generator/` React app
+- Shared utilities with embed page in `src/shared/`
+- No CSS file - uses inline styles for simplicity
+
+**Key Components:**
+
+- `GeneratorApp.tsx` - Main app container with state management
+- `FilterCustomizationControls.tsx` - 4-column grid of filter cards
+- `PreviewPanel.tsx` - Live iframe preview using relative paths
+- `EmbedCodeGenerator.tsx` - Copy button and code display
+
+**Filter Detection & Validation:**
+
+- `extractFilters()` - Reads `config.filters` or `config.dashboard.sharedFilters`
+- `normalizeFilter()` - Handles different field names across viz types
+- `allFiltersHaveQueryParam()` - Validates all filters have `setByQueryParameter`
+- `buildFilterUrlParams()` - Builds URL params from filter state
+
+**Filter State Management:**
+
+- `initializeFilterState()` - Sets default values from config
+- State tracks both `value` and `hide` per filter
+- Updates flow through `handleFilterChange()` and `handleHideToggle()`
+
+**Preview Implementation:**
+
+- Uses `getEmbedPath()` for relative URL (same-origin)
+- Includes `embed-helper.js` via import in `generator/index.tsx`
+- Auto-resizes via postMessage protocol
+- Reloads when filter state changes via `key={embedUrl}`
+
+**Code Generation:**
+
+- Calls `generateEmbedCode()` from `@cdc/core`
+- Passes `urlParams` with both filter values and hide flags
+- Height defaults to "400" for consistency
+- Full absolute URL for partners to copy
+
+**No Filters Mode:**
+
+- Detects `filters.length === 0`
+- Hides "Customize your visualization" subheader
+- Hides entire filter customization section (section 1)
+- Preview becomes section 1, Code becomes section 2
+- Removes "with your selected settings" from preview text
+
+**Filter Validation & Warnings:**
+
+- **Generator page (permissive):**
+
+  - Shows warning banner if some filters lack `setByQueryParameter`
+  - Grays out invalid filters with "(Cannot be set)" label
+  - Disables inputs on invalid filters
+  - Still allows generating code with valid filters
+
+- **Editor sidebar (strict):**
+  - Blocks both buttons if ANY filter lacks `setByQueryParameter`
+  - Shows yellow warning box with actionable message
+  - Passes through if no filters or all filters valid
+
+**Styling:**
+
+- Inline styles throughout
+- 4-column responsive grid: `minmax(250px, 1fr)`
+- Consistent section structure with numbered headers
+- Blue buttons matching CDC design
+
+### Phase 6: Editor Integration - Generator Link (✅ COMPLETED)
+
+- [x] Add "Customize Embed Code" button to editor's "Share with Partners" section
+- [x] Generate link to generator with `?configUrl=` pre-filled
+- [x] Open in new tab with noopener/noreferrer
+- [x] Add filter validation before showing buttons
+- [x] Show warning message when filters invalid
+- [x] Add "save first" reminder for generator button
+- [x] Pass config to EmbedEditor for validation
+- [x] Test in chart editor
+- [x] Test in map editor
+- [x] Test in dashboard editor
+
+**Implementation notes:**
+
+**Editor UI Updates:**
+
+- Located in `packages/core/components/AdvancedEditor/EmbedEditor.tsx`
+- Updated AdvancedEditor to pass `config` prop to EmbedEditor
+- Two buttons: "Get Embed Code" and "Customize Embed Code →"
+
+**Filter Validation Logic:**
+
+```typescript
+const filtersAreValid = useMemo(() => {
+  const filters = config.filters || []
+  const sharedFilters = config.dashboard?.sharedFilters || []
+  const allFilters = [...filters, ...sharedFilters]
+  if (allFilters.length === 0) return true
+  return allFilters.every(filter => !!filter.setByQueryParameter)
+}, [config])
+```
+
+**Three States:**
+
+1. **No configUrl:** Shows "must be saved" message
+2. **Has configUrl but invalid filters:** Shows warning, hides buttons
+3. **Has configUrl and valid filters:** Shows both buttons
+
+**Warning Message:**
+
+```
+⚠️ Embed Code Not Available
+
+To enable embedding, all filters must have the "Query String Parameter"
+field set. Some filters are missing this field.
+```
+
+**Save Reminder:**
+
+- Added below "Customize Embed Code" button only
+- Text: "⚠️ Make sure to save the visualization before generating a custom embed code."
+- Prevents confusion when generator shows old version
+
+**Generator Link:**
+
+- Uses `generateGeneratorLink()` from `@cdc/core`
+- Passes current configUrl from WCMS permalink or dev fallback
+- Opens with `window.open(url, '_blank', 'noopener,noreferrer')`
+
+**Config URL Detection:**
+
+- Reads `#sample-permalink` element from WCMS
+- Extracts pathname only (strips host)
+- Falls back to `/examples/bar-chart.json` in dev mode
+- Returns null in production if permalink missing
 
 ### Phase 7: Documentation
 
@@ -836,6 +966,31 @@ Prevents malicious sites from sending fake resize events.
 - Code splitting in Vite build
 - Lazy load generator preview until filters selected
 - Debounce resize events (avoid excessive postMessage calls)
+- Duplicate resize prevention: Only sends if height changed by >1px
+
+### Debug Logging
+
+For troubleshooting the resize flow, console logging is enabled:
+
+**Parent (embed-helper.js):**
+
+```
+[Embed Helper] Assigned ID "cove-0" to iframe
+[Embed Helper] → Sent ID "cove-0" to iframe
+[Embed Helper] ← Received resize: id="cove-0", height=650px
+[Embed Helper] ✓ Updated iframe height to 650px
+```
+
+**Iframe (EmbedRenderer.tsx):**
+
+```
+[EmbedRenderer] ← Received ID from parent: "cove-0"
+[EmbedRenderer] → Sending resize: id="cove-0", height=650px
+[EmbedRenderer] Height unchanged (650px), not sending
+[EmbedRenderer] Height too small (50px), not sending
+```
+
+All logs use `// eslint-disable-next-line no-console` to pass linting.
 
 ## Future Enhancements (Not in Scope)
 
@@ -852,14 +1007,14 @@ Prevents malicious sites from sending fake resize events.
 
 ### MVP Success
 
-- [ ] Partners can embed charts from cdc.gov
-- [ ] Embeds work on external domains (cross-origin)
-- [ ] Filters can be pre-selected via URL
-- [ ] Filters can be hidden in embeds
-- [ ] Iframes auto-resize to content
-- [ ] Generator provides live preview
-- [ ] CDC employees can generate embed codes
-- [ ] Monthly deployment process works
+- [x] Partners can embed charts from cdc.gov
+- [x] Embeds work on external domains (cross-origin)
+- [x] Filters can be pre-selected via URL
+- [x] Filters can be hidden in embeds
+- [x] Iframes auto-resize to content
+- [x] Generator provides live preview
+- [x] CDC employees can generate embed codes
+- [ ] Monthly deployment process works (pending production deployment)
 
 ### Long-term Success
 
