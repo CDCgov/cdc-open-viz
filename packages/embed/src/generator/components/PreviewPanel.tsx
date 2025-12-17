@@ -1,6 +1,6 @@
 import React from 'react'
 import { FilterMetadata, FilterState, buildFilterUrlParams } from '../../shared/filterUtils'
-import { getDefaultEmbedBaseUrl } from '@cdc/core/helpers/embedCodeGenerator'
+import { getEmbedPath } from '@cdc/core/helpers/embedCodeGenerator'
 
 type PreviewPanelProps = {
   configUrl: string
@@ -12,18 +12,19 @@ type PreviewPanelProps = {
  * Live preview of the embed using an iframe
  * Shows the actual embed experience with current filter settings
  * NOTE: iframe attributes must match exactly what generateEmbedCode() produces
+ * Uses relative path (getEmbedPath) since preview is on same origin
  */
 const PreviewPanel: React.FC<PreviewPanelProps> = ({ configUrl, filters, filterState }) => {
   // Build URL parameters from filter state (same as EmbedCodeGenerator)
   const urlParams = buildFilterUrlParams(filters, filterState)
 
-  // Build iframe URL (same logic as generateEmbedCode)
+  // Build iframe URL using relative path (same origin)
   const params = new URLSearchParams()
   params.set('configUrl', configUrl)
   Object.entries(urlParams).forEach(([key, value]) => {
     if (value) params.set(key, value)
   })
-  const embedUrl = `${getDefaultEmbedBaseUrl()}?${params.toString()}`
+  const embedUrl = `${getEmbedPath()}?${params.toString()}`
 
   return (
     <section style={{ marginBottom: '1.5rem' }}>

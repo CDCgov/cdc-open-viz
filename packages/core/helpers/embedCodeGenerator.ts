@@ -23,12 +23,24 @@ export function isDevMode(): boolean {
 
 /**
  * Get default embed base URL based on environment
+ * Returns full absolute URL including protocol and host
  */
 export function getDefaultEmbedBaseUrl(): string {
   if (isDevMode()) {
     return 'http://localhost:8080'
   }
   return 'https://www.cdc.gov/TemplatePackage/contrib/widgets/openVizWrapper/dist/embed/embed.html'
+}
+
+/**
+ * Get embed path (without protocol/host) for same-origin usage
+ * Use this for preview iframes on the same domain
+ */
+export function getEmbedPath(): string {
+  if (isDevMode()) {
+    return '/'
+  }
+  return '/TemplatePackage/contrib/widgets/openVizWrapper/dist/embed/embed.html'
 }
 
 /**
