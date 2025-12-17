@@ -28,7 +28,7 @@ const FilterCustomizationControls: React.FC<FilterCustomizationControlsProps> = 
 
   return (
     <section style={{ marginBottom: '1.5rem' }}>
-      <h2>1. Customize Filter Defaults</h2>
+      <h2>1. Customize Filters</h2>
       <p style={{ color: '#666', marginBottom: '1rem' }}>
         Set default values and visibility for the filters in your embedded visualization.
       </p>
@@ -37,23 +37,35 @@ const FilterCustomizationControls: React.FC<FilterCustomizationControlsProps> = 
         {filters.map((filter, index) => {
           const state = filterState[filter.key] || { value: '', hide: false }
           const hasValues = filter.values && filter.values.length > 0
+          const isDisabled = !filter.setByQueryParameter
 
           return (
             <div
               key={filter.key || index}
               style={{
                 padding: '1rem',
-                background: 'white',
+                background: isDisabled ? '#f5f5f5' : 'white',
                 border: '1px solid #ddd',
-                borderRadius: '4px'
+                borderRadius: '4px',
+                opacity: isDisabled ? 0.6 : 1
               }}
             >
               <div>
                 <label
                   htmlFor={`filter-${index}`}
-                  style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}
+                  style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontWeight: 'bold',
+                    color: isDisabled ? '#999' : 'inherit'
+                  }}
                 >
                   {filter.label}
+                  {isDisabled && (
+                    <span style={{ fontWeight: 'normal', fontSize: '0.85em', color: '#999', marginLeft: '0.5rem' }}>
+                      (Cannot be set)
+                    </span>
+                  )}
                 </label>
 
                 {hasValues ? (
@@ -61,11 +73,13 @@ const FilterCustomizationControls: React.FC<FilterCustomizationControlsProps> = 
                     id={`filter-${index}`}
                     value={state.value}
                     onChange={e => onFilterChange(filter.key, e.target.value)}
+                    disabled={isDisabled}
                     style={{
                       width: '100%',
                       padding: '0.5rem',
                       border: '1px solid #ccc',
-                      borderRadius: '4px'
+                      borderRadius: '4px',
+                      cursor: isDisabled ? 'not-allowed' : 'pointer'
                     }}
                   >
                     {filter.values?.map((value, valueIndex) => (
@@ -80,11 +94,19 @@ const FilterCustomizationControls: React.FC<FilterCustomizationControlsProps> = 
               </div>
 
               <div style={{ marginTop: '0.75rem' }}>
-                <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontWeight: 'normal' }}>
+                <label
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    cursor: isDisabled ? 'not-allowed' : 'pointer',
+                    fontWeight: 'normal'
+                  }}
+                >
                   <input
                     type='checkbox'
                     checked={state.hide}
                     onChange={e => onHideToggle(filter.key, e.target.checked)}
+                    disabled={isDisabled}
                     style={{ marginRight: '0.5rem' }}
                   />
                   <span style={{ color: '#666' }}>Hide filter in embed</span>

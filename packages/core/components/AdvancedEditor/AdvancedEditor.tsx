@@ -118,7 +118,7 @@ export const AdvancedEditor = ({
       </div>
 
       {/* Share with Partners Section */}
-      <EmbedEditor />
+      <EmbedEditor config={config} />
     </>
   )
 }

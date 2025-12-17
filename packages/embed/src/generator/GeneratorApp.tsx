@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { useConfigLoader } from '../shared/useConfigLoader'
-import { extractFilters, initializeFilterState, FilterState } from '../shared/filterUtils'
+import { extractFilters, initializeFilterState, FilterState, allFiltersHaveQueryParam } from '../shared/filterUtils'
 import FilterCustomizationControls from './components/FilterCustomizationControls'
 import EmbedCodeGenerator from './components/EmbedCodeGenerator'
 import PreviewPanel from './components/PreviewPanel'
@@ -26,6 +26,9 @@ const GeneratorApp: React.FC = () => {
     const extracted = extractFilters(config)
     return extracted
   }, [config])
+
+  // Check if all filters are valid (have setByQueryParameter)
+  const allValid = useMemo(() => allFiltersHaveQueryParam(filters), [filters])
 
   // Initialize filter state from config defaults
   const [filterState, setFilterState] = useState<Record<string, FilterState>>({})
@@ -116,6 +119,25 @@ const GeneratorApp: React.FC = () => {
         <h1>COVE Embed Generator</h1>
         <p style={{ color: '#666' }}>Customize your visualization embed code.</p>
       </header>
+
+      {/* Warning if some filters don't have setByQueryParameter */}
+      {!allValid && filters.length > 0 && (
+        <div
+          style={{
+            padding: '1rem',
+            background: '#fff3cd',
+            border: '1px solid #ffc107',
+            borderRadius: '4px',
+            marginBottom: '1.5rem'
+          }}
+        >
+          <p style={{ margin: 0, color: '#856404' }}>
+            ⚠️ <strong>Note:</strong> Some filters in this visualization cannot be customized. To fix this, open the
+            visualization in the COVE editor, set the "Query String Parameter" field for each filter, and save the
+            visualization.
+          </p>
+        </div>
+      )}
 
       {/* 1. Filter Customization Controls */}
       <FilterCustomizationControls

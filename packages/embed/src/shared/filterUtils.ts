@@ -89,6 +89,15 @@ export function initializeFilterState(filters: FilterMetadata[]): Record<string,
 }
 
 /**
+ * Check if all filters have setByQueryParameter defined
+ * Returns true if all filters can be controlled via URL, or if there are no filters
+ */
+export function allFiltersHaveQueryParam(filters: FilterMetadata[]): boolean {
+  if (filters.length === 0) return true
+  return filters.every(filter => !!filter.setByQueryParameter)
+}
+
+/**
  * Build URL parameters from filter state
  * Returns an object with URL parameters for both filter values and hide states
  */

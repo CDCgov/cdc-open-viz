@@ -1,16 +1,38 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { generateEmbedCode, generateGeneratorLink } from '../../helpers/embedCodeGenerator'
+
+type EmbedEditorProps = {
+  config?: any // Current visualization config
+}
 
 /**
  * EmbedEditor - Provides "Share with Partners" functionality
  * Generates embed codes for iframe embedding of visualizations
  */
-export const EmbedEditor: React.FC = () => {
+export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
   const [configUrl, setConfigUrl] = useState<string | null>(null)
   const [showEmbedModal, setShowEmbedModal] = useState(false)
   const [embedCode, setEmbedCode] = useState('')
   const [embedCodeCopied, setEmbedCodeCopied] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+
+  // Check if all filters have setByQueryParameter
+  const filtersAreValid = useMemo(() => {
+    if (!config) return true
+
+    // Check regular filters
+    const filters = config.filters || []
+    // Check dashboard shared filters
+    const sharedFilters = config.dashboard?.sharedFilters || []
+
+    const allFilters = [...filters, ...sharedFilters]
+
+    // If no filters, valid
+    if (allFilters.length === 0) return true
+
+    // All filters must have setByQueryParameter
+    return allFilters.every((filter: any) => !!filter.setByQueryParameter)
+  }, [config])
 
   // Detect configUrl from WCMS permalink or use dev fallback
   useEffect(() => {
@@ -106,7 +128,29 @@ export const EmbedEditor: React.FC = () => {
 
         {isExpanded && (
           <div style={{ paddingTop: '1em' }}>
-            {configUrl ? (
+            {!configUrl ? (
+              <p style={{ fontSize: '0.85em', color: '#666', fontStyle: 'italic' }}>
+                An embed code cannot be generated until this visualization has been saved.
+              </p>
+            ) : !filtersAreValid ? (
+              <div
+                style={{
+                  padding: '0.75em',
+                  background: '#fff3cd',
+                  border: '1px solid #ffc107',
+                  borderRadius: '4px',
+                  marginBottom: '0.5em'
+                }}
+              >
+                <p style={{ fontSize: '0.85em', margin: '0 0 0.5em 0', fontWeight: 'bold', color: '#856404' }}>
+                  ⚠️ Embed Code Not Available
+                </p>
+                <p style={{ fontSize: '0.85em', margin: 0, color: '#856404' }}>
+                  To enable embedding, all filters must have the "Query String Parameter" field set. Some filters are
+                  missing this field.
+                </p>
+              </div>
+            ) : (
               <>
                 <p style={{ fontSize: '0.85em', marginBottom: '1em', color: '#666' }}>
                   Generate embed codes for partners to add this visualization to their websites.
@@ -121,19 +165,20 @@ export const EmbedEditor: React.FC = () => {
                     Get Embed Code
                   </button>
 
-                  <button
-                    className='btn btn-outline-primary'
-                    onClick={handleOpenGenerator}
-                    style={{ width: '100%', textAlign: 'left' }}
-                  >
-                    Customize Embed Code →
-                  </button>
+                  <div>
+                    <button
+                      className='btn btn-outline-primary'
+                      onClick={handleOpenGenerator}
+                      style={{ width: '100%', textAlign: 'left' }}
+                    >
+                      Customize Embed Code →
+                    </button>
+                    <p style={{ fontSize: '0.8em', margin: '0.25em 0 0 0', color: '#856404' }}>
+                      ⚠️ Make sure to save the visualization before generating a custom embed code.
+                    </p>
+                  </div>
                 </div>
               </>
-            ) : (
-              <p style={{ fontSize: '0.85em', color: '#666', fontStyle: 'italic' }}>
-                An embed code cannot be generated until this visualization has been saved.
-              </p>
             )}
           </div>
         )}
