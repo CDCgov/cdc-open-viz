@@ -18,12 +18,10 @@ const FilterCustomizationControls: React.FC<FilterCustomizationControlsProps> = 
   onFilterChange,
   onHideToggle
 }) => {
+  // Component should not be rendered if there are no filters
+  // (handled by parent), but just in case, return null
   if (filters.length === 0) {
-    return (
-      <div style={{ padding: '1.5rem', background: '#e8f4f8', borderRadius: '4px', marginBottom: '1.5rem' }}>
-        <p>ℹ️ This visualization has no filters to customize.</p>
-      </div>
-    )
+    return null
   }
 
   return (

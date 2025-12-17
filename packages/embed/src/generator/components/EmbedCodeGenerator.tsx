@@ -6,12 +6,18 @@ type EmbedCodeGeneratorProps = {
   configUrl: string
   filters: FilterMetadata[]
   filterState: Record<string, FilterState>
+  sectionNumber?: number
 }
 
 /**
  * Displays the generated embed code with copy functionality
  */
-const EmbedCodeGenerator: React.FC<EmbedCodeGeneratorProps> = ({ configUrl, filters, filterState }) => {
+const EmbedCodeGenerator: React.FC<EmbedCodeGeneratorProps> = ({
+  configUrl,
+  filters,
+  filterState,
+  sectionNumber = 3
+}) => {
   const [copied, setCopied] = useState(false)
 
   // Build URL parameters from filter state
@@ -36,7 +42,7 @@ const EmbedCodeGenerator: React.FC<EmbedCodeGeneratorProps> = ({ configUrl, filt
 
   return (
     <section style={{ marginBottom: '1.5rem' }}>
-      <h2>3. Copy Embed Code</h2>
+      <h2>{sectionNumber}. Copy Embed Code</h2>
       <p style={{ color: '#666', marginBottom: '1rem' }}>
         Copy your embed code, then paste it into your website where you want the visualization to appear.
       </p>

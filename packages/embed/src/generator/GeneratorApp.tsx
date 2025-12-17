@@ -30,6 +30,9 @@ const GeneratorApp: React.FC = () => {
   // Check if all filters are valid (have setByQueryParameter)
   const allValid = useMemo(() => allFiltersHaveQueryParam(filters), [filters])
 
+  // Check if there are no filters (simplified mode)
+  const hasNoFilters = filters.length === 0
+
   // Initialize filter state from config defaults
   const [filterState, setFilterState] = useState<Record<string, FilterState>>({})
 
@@ -117,7 +120,7 @@ const GeneratorApp: React.FC = () => {
     <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
       <header style={{ marginBottom: '2rem', textAlign: 'center' }}>
         <h1>COVE Embed Generator</h1>
-        <p style={{ color: '#666' }}>Customize your visualization embed code.</p>
+        {!hasNoFilters && <p style={{ color: '#666' }}>Customize your visualization embed code.</p>}
       </header>
 
       {/* Warning if some filters don't have setByQueryParameter */}
@@ -139,19 +142,32 @@ const GeneratorApp: React.FC = () => {
         </div>
       )}
 
-      {/* 1. Filter Customization Controls */}
-      <FilterCustomizationControls
+      {/* 1. Filter Customization Controls (only show if there are filters) */}
+      {!hasNoFilters && (
+        <FilterCustomizationControls
+          filters={filters}
+          filterState={filterState}
+          onFilterChange={handleFilterChange}
+          onHideToggle={handleHideToggle}
+        />
+      )}
+
+      {/* Preview - section 1 if no filters, section 2 if filters */}
+      <PreviewPanel
+        configUrl={configUrl}
         filters={filters}
         filterState={filterState}
-        onFilterChange={handleFilterChange}
-        onHideToggle={handleHideToggle}
+        sectionNumber={hasNoFilters ? 1 : 2}
+        showSelectedSettings={!hasNoFilters}
       />
 
-      {/* 2. Preview */}
-      <PreviewPanel configUrl={configUrl} filters={filters} filterState={filterState} />
-
-      {/* 3. Generated Embed Code */}
-      <EmbedCodeGenerator configUrl={configUrl} filters={filters} filterState={filterState} />
+      {/* Generated Embed Code - section 2 if no filters, section 3 if filters */}
+      <EmbedCodeGenerator
+        configUrl={configUrl}
+        filters={filters}
+        filterState={filterState}
+        sectionNumber={hasNoFilters ? 2 : 3}
+      />
     </div>
   )
 }

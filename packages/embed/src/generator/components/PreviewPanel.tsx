@@ -6,6 +6,8 @@ type PreviewPanelProps = {
   configUrl: string
   filters: FilterMetadata[]
   filterState: Record<string, FilterState>
+  sectionNumber?: number
+  showSelectedSettings?: boolean
 }
 
 /**
@@ -14,7 +16,13 @@ type PreviewPanelProps = {
  * NOTE: iframe attributes must match exactly what generateEmbedCode() produces
  * Uses relative path (getEmbedPath) since preview is on same origin
  */
-const PreviewPanel: React.FC<PreviewPanelProps> = ({ configUrl, filters, filterState }) => {
+const PreviewPanel: React.FC<PreviewPanelProps> = ({
+  configUrl,
+  filters,
+  filterState,
+  sectionNumber = 2,
+  showSelectedSettings = true
+}) => {
   // Build URL parameters from filter state (same as EmbedCodeGenerator)
   const urlParams = buildFilterUrlParams(filters, filterState)
 
@@ -28,9 +36,10 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({ configUrl, filters, filterS
 
   return (
     <section style={{ marginBottom: '1.5rem' }}>
-      <h2>2. Preview</h2>
+      <h2>{sectionNumber}. Preview</h2>
       <p style={{ color: '#666', marginBottom: '1rem' }}>
-        This shows how the visualization will appear on your website with your selected settings.
+        This shows how the visualization will appear on your website
+        {showSelectedSettings && ' with your selected settings'}.
       </p>
 
       <div>
