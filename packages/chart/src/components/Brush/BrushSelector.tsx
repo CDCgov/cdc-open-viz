@@ -3,12 +3,10 @@ import { Brush } from '@visx/brush'
 import BaseBrush from '@visx/brush/lib/BaseBrush'
 import { Group } from '@visx/group'
 import { scaleBand, scaleLinear } from '@visx/scale'
-import { LinePath, AreaClosed } from '@visx/shape'
-import * as allCurves from '@visx/curve'
 import { Bounds } from '@visx/brush/lib/types'
 import type { BrushHandleRenderProps } from '@visx/brush/lib/BrushHandle'
 import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
-import { handleLineType } from '../../helpers/handleLineType'
+import MiniChartPreview from './MiniChartPreview'
 
 interface BrushSelectorProps {
   xMax: number
@@ -78,85 +76,6 @@ const BrushHandle = memo<BrushHandleRenderProps>(({ x, height, isBrushActive, cl
 })
 
 BrushHandle.displayName = 'BrushHandle'
-
-// Mini chart preview for the brush (simplified version)
-const MiniChartPreview = memo<{
-  series: any[]
-  tableData: any[]
-  dataKey: string
-  xScale: any
-  miniYScale: any
-  colorScale: any
-  config: any
-  xMax: number
-}>(({ series, tableData, dataKey, xScale, miniYScale, colorScale, config, xMax }) => {
-  if (!series.length || !tableData.length || !xScale || !miniYScale) {
-    return null
-  }
-
-  const bandwidth = xScale.bandwidth() || 0
-
-  return (
-    <>
-      {series.map((s, i) => {
-        const seriesKey = s.dataKey
-        const seriesColor = colorScale?.(config.runtime.seriesLabels?.[seriesKey] || seriesKey) || '#666'
-        const isAreaChart = s.type === 'Area Chart' || config.visualizationType === 'Area Chart'
-
-        // Get series-specific styling
-        const seriesWeight = s.weight || 2
-        const seriesLineType = s.lineType || 'curveLinear'
-        const seriesStyle = s.type || 'solid'
-        const curve = allCurves[seriesLineType] || allCurves.curveLinear
-        const strokeDasharray = handleLineType(seriesStyle)
-
-        // Filter to only valid data points
-        const validData = tableData.filter(d => {
-          const xVal = xScale(d[dataKey])
-          const yVal = parseFloat(d[s.dataKey])
-          return xVal !== undefined && !isNaN(yVal)
-        })
-
-        if (validData.length === 0) return null
-
-        const getX = d => xScale(d[dataKey]) + bandwidth / 2
-        const getY = d => miniYScale(parseFloat(d[s.dataKey]))
-
-        return isAreaChart ? (
-          <AreaClosed
-            key={`mini-area-${seriesKey}-${i}`}
-            data={validData}
-            x={getX}
-            y={getY}
-            yScale={miniYScale}
-            fill={seriesColor}
-            fillOpacity={0.3}
-            stroke={seriesColor}
-            strokeWidth={seriesWeight}
-            strokeDasharray={strokeDasharray}
-            curve={curve}
-            pointerEvents='none'
-          />
-        ) : (
-          <LinePath
-            key={`mini-line-${seriesKey}-${i}`}
-            data={validData}
-            x={getX}
-            y={getY}
-            stroke={seriesColor}
-            strokeWidth={seriesWeight}
-            strokeDasharray={strokeDasharray}
-            strokeOpacity={0.8}
-            curve={curve}
-            pointerEvents='none'
-          />
-        )
-      })}
-    </>
-  )
-})
-
-MiniChartPreview.displayName = 'MiniChartPreview'
 
 const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   const brushRef = useRef<BaseBrush>(null)
@@ -234,19 +153,50 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       return scaleLinear({ domain: [0, 100], range: [BRUSH_HEIGHT - 4, 2] })
     }
 
+    const isStacked =
+      config.visualizationSubType === 'stacked' &&
+      (config.visualizationType === 'Bar' || config.visualizationType === 'Area Chart')
     let minValue = Number.POSITIVE_INFINITY
     let maxValue = Number.NEGATIVE_INFINITY
     let hasValidValues = false
 
-    for (const s of series) {
-      if (!s.dataKey) continue
+    if (isStacked) {
+      // For stacked bars, calculate the sum of all series for each row
       for (const row of tableData) {
-        const value = parseFloat(row[s.dataKey])
-        if (!isNaN(value) && isFinite(value)) {
-          hasValidValues = true
-          minValue = Math.min(minValue, value)
-          maxValue = Math.max(maxValue, value)
+        let rowSum = 0
+        let hasRowValue = false
+        for (const s of series) {
+          if (!s.dataKey) continue
+          const value = parseFloat(row[s.dataKey])
+          if (!isNaN(value) && isFinite(value)) {
+            rowSum += value
+            hasRowValue = true
+          }
         }
+        if (hasRowValue) {
+          hasValidValues = true
+          minValue = Math.min(minValue, rowSum)
+          maxValue = Math.max(maxValue, rowSum)
+        }
+      }
+      // For stacked charts, ensure domain starts at 0
+      minValue = Math.min(0, minValue)
+    } else {
+      // For non-stacked charts, use individual series values
+      for (const s of series) {
+        if (!s.dataKey) continue
+        for (const row of tableData) {
+          const value = parseFloat(row[s.dataKey])
+          if (!isNaN(value) && isFinite(value)) {
+            hasValidValues = true
+            minValue = Math.min(minValue, value)
+            maxValue = Math.max(maxValue, value)
+          }
+        }
+      }
+      // For bar charts, ensure domain includes 0
+      if (config.visualizationType === 'Bar') {
+        minValue = Math.min(0, minValue)
       }
     }
 
@@ -256,15 +206,22 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       const padding = Math.abs(minValue) * 0.1 || 10
       minValue = minValue - padding
       maxValue = maxValue + padding
+      // Ensure 0 is included if we're near it
+      if (minValue > 0) minValue = 0
     }
 
     if (!hasValidValues) {
       return scaleLinear({ domain: [0, 100], range: [BRUSH_HEIGHT - 4, 2] })
     }
 
+    // Ensure domain includes 0 for bar charts
+    if (config.visualizationType === 'Bar') {
+      minValue = Math.min(0, minValue)
+    }
+
     const domain = minValue === maxValue ? [minValue - 1, maxValue + 1] : [minValue, maxValue]
     return scaleLinear({ domain, range: [BRUSH_HEIGHT - 4, 2], nice: true })
-  }, [series, tableData])
+  }, [series, tableData, config.visualizationSubType, config.visualizationType])
 
   // Fallback: Window mouseup listener to prevent stuck drag states
   useEffect(() => {

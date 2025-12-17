@@ -137,7 +137,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const { labelsAboveGridlines, hideAxis, inlineLabel } = config.yAxis
 
   // HOOKS  % STATES
-  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, data)
+  // When brush is active, use tableData (full dataset) for min/max calculation
+  // so the y-axis shows the full range, but still use filtered data for rendering
+  const dataForMinMax = config.xAxis.brushActive && tableData && tableData.length > 0 ? tableData : data
+  const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, dataForMinMax)
 
   const { visSupportsReactTooltip } = useEditorPermissions()
   const { hasTopAxis } = getTopAxis(config)

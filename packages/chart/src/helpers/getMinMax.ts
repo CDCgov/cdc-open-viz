@@ -55,10 +55,15 @@ const getMinMax = ({
   max = enteredMaxValue && isMaxValid ? Number(enteredMaxValue) : Number.MIN_VALUE
   const { lower, upper } = config?.confidenceKeys || {}
 
+  // When brush is active, use tableData (full dataset) for min/max calculations
+  // so the y-axis shows the full range, but still use filtered data for rendering
+  const dataForMinMax = config.xAxis.brushActive && tableData && tableData.length > 0 ? tableData : data
+
   if (lower && upper && config.visualizationType === 'Bar') {
     const buffer = min < 0 ? 1.1 : 0
-    const maxValueWithCI = Math.max(...data.flatMap(d => [d[upper], d[lower]])) * paddingAddedToAxis
-    const minValueWithCIPlusBuffer = Math.min(...data.flatMap(d => [d[upper], d[lower]])) * paddingAddedToAxis * buffer
+    const maxValueWithCI = Math.max(...dataForMinMax.flatMap(d => [d[upper], d[lower]])) * paddingAddedToAxis
+    const minValueWithCIPlusBuffer =
+      Math.min(...dataForMinMax.flatMap(d => [d[upper], d[lower]])) * paddingAddedToAxis * buffer
     max = max > maxValueWithCI ? max : maxValueWithCI
     min = min < minValueWithCIPlusBuffer ? min : minValueWithCIPlusBuffer
   }
@@ -79,7 +84,7 @@ const getMinMax = ({
       })
 
       // Using the columnNames or "keys" get the returned result
-      const result = data.map(obj => columnNames.map(key => obj[key]))
+      const result = dataForMinMax.map(obj => columnNames.map(key => obj[key]))
 
       const highCIGroup = Math.max.apply(
         null,
@@ -102,7 +107,7 @@ const getMinMax = ({
 
   if (visualizationType === 'Combo') {
     try {
-      if (!data) throw new Error('COVE: missing data while getting min/max for combo chart.')
+      if (!dataForMinMax) throw new Error('COVE: missing data while getting min/max for combo chart.')
       // seperate the left and right axis items & get each sides series keys
       let leftAxisSeriesItems = series.filter(s => s.axis === 'Left')
       let rightAxisSeriesItems = series.filter(s => s.axis === 'Right')
@@ -128,8 +133,8 @@ const getMinMax = ({
         })
         return max
       }
-      leftMax = findMaxFromSeriesKeys(data, leftAxisSeriesItems, leftMax, 'left')
-      rightMax = findMaxFromSeriesKeys(data, rightAxisSeriesItems, rightMax, 'right')
+      leftMax = findMaxFromSeriesKeys(dataForMinMax, leftAxisSeriesItems, leftMax, 'left')
+      rightMax = findMaxFromSeriesKeys(dataForMinMax, rightAxisSeriesItems, rightMax, 'right')
 
       if (leftMax < Number(enteredMaxValue)) {
         leftMax = Number(enteredMaxValue)
@@ -209,7 +214,7 @@ const getMinMax = ({
   }
 
   if (config.isLollipopChart && config.yAxis.displayNumbersOnBar) {
-    const dataKey = data.map(item => item[config.series[0].dataKey])
+    const dataKey = dataForMinMax.map(item => item[config.series[0].dataKey])
     const maxDataVal = Math.max(...dataKey).toString().length
 
     switch (true) {
