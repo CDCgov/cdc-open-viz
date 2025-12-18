@@ -1,0 +1,600 @@
+{
+  "id": "cdc-open-viz-regression-tests",
+  "viewports": [
+    {
+      "label": "desktop",
+      "width": 1920,
+      "height": 1080
+    }
+  ],
+  "onBeforeScript": "puppet/onBefore.js",
+  "onReadyScript": "puppet/onReady.js",
+  "scenarios": [
+    {
+      "label": "Gallery/Charts/Bar Chart Time Based",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--bar-chart-time-based&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Bar Chart Categorical",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--bar-chart-categorical&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Bar Chart With Highlighted Value",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--bar-chart-with-highlighted-value&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Bar Chart With Confidence Intervals",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--bar-chart-with-confidence-intervals&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Bar Chart With Suppressed Values",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--bar-chart-with-suppressed-values&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Horizontal Bar Chart",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--horizontal-bar-chart&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Box Plot With Outliers",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--box-plot-with-outliers&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Horizontal Box Plot",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--horizontal-box-plot&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Bump Chart",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--bump-chart&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Combo Bar And Area",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--combo-bar-and-area&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Epi Style Bar Chart",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--epi-style-bar-chart&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Deviation Bar Chart",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--deviation-bar-chart&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Forecast Chart Single CI",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--forecast-chart-single-ci&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Forecast Chart Multiple CIs",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--forecast-chart-multiple-c-is&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Line Chart Standard",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--line-chart-standard&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Line Chart With Regions",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--line-chart-with-regions&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Line Chart Isolated",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--line-chart-isolated&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Line Chart Line Weights",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--line-chart-line-weights&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Line Chart With Open Circles",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--line-chart-with-open-circles&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Line Chart With Suppression",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--line-chart-with-suppression&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Lollipop Horizontal Bar Chart",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--lollipop-horizontal-bar-chart&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Pie Chart",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--pie-chart&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Donut Chart",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--donut-chart&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Scatter Plot Negative Trend",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--scatter-plot-negative-trend&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Scatter Plot Multi Series",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--scatter-plot-multi-series&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Scatter Plot Nonlinear Trend",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--scatter-plot-nonlinear-trend&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Sparkline Dashboard",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--sparkline-dashboard&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Sparkline 2016 Outreach Var2",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--sparkline-2016-outreach-var-2&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Sparkline 2016 Outreach Var3",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--sparkline-2016-outreach-var-3&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Sparkline 2016 Outreach Var4",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--sparkline-2016-outreach-var-4&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Stacked Area Chart",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--stacked-area-chart&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Area Chart With Annotations",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--area-chart-with-annotations&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Area Chart With Categorical Axis",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--area-chart-with-categorical-axis&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Stacked Horizontal Bar Chart",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--stacked-horizontal-bar-chart&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Charts/Stacked Vertical Bar Chart",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-charts--stacked-vertical-bar-chart&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/Bubble Map World",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--bubble-map-world&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/Bubble Map US",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--bubble-map-us&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/Categorical Map With Special Classes",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--categorical-map-with-special-classes&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/Qualitative Categorical Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--qualitative-categorical-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/Custom Layer Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--custom-layer-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/Map Multiple Filters",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--map-multiple-filters&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/Map Tab Filters",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--map-tab-filters&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/US Geocode Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--us-geocode-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/HHS Regions Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--hhs-regions-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/Standard Hex Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--standard-hex-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/Hex Map With Filter",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--hex-map-with-filter&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/Hex Map With Arrows",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--hex-map-with-arrows&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/US Map With Cities",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--us-map-with-cities&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/US Navigation Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--us-navigation-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/World Navigation Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--world-navigation-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/Equal Interval Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--equal-interval-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/Equal Number Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--equal-number-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/Equal Number Map New Quantile",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--equal-number-map-new-quantile&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/Single State Map Counties",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--single-state-map-counties&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/Single State With Census Toggle",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--single-state-with-census-toggle&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/Single State Filter With Zoom",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--single-state-filter-with-zoom&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/Multi State County Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--multi-state-county-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/US County Level Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--us-county-level-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Maps/World Data Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-maps--world-data-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Data Bites/Data Bite Circle Average",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-data-bites--data-bite-circle-average&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Data Bites/Data Bite Text Max Pic",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-data-bites--data-bite-text-max-pic&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Data Bites/Data Bite Circle Sum",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-data-bites--data-bite-circle-sum&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Data Bites/Data Bite Text Average Pic",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-data-bites--data-bite-text-average-pic&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Waffle Charts/Waffle Chart Person",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-waffle-charts--waffle-chart-person&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Gallery/Waffle Charts/Gauge Chart",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-gallery-waffle-charts--gauge-chart&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/ART/State Specific Dashboard",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-art--state-specific-dashboard&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/BRFSS/Explore By Location",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-brfss--explore-by-location&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/BRFSS/Explore By Topic",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-brfss--explore-by-topic&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/BRFSS/All BRFSS Dashboards",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-brfss--all-brfss-dashboards&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/CancerRegistries/NPCR Programs Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-cancer-registries--npcr-programs-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/EasternEquineEncephalitis/Cumulative Data",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-eastern-equine-encephalitis--cumulative-data&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/EasternEquineEncephalitis/Explore Human Data",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-eastern-equine-encephalitis--explore-human-data&viewMode=story",
+      "delay": 20000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/EasternEquineEncephalitis/Explore County Data",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-eastern-equine-encephalitis--explore-county-data&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/EasternEquineEncephalitis/Connecticut 2022",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-eastern-equine-encephalitis--connecticut-2022&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/EasternEquineEncephalitis/All EEE Visualizations",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-eastern-equine-encephalitis--all-eee-visualizations&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/ExcessiveAlcoholUse/Excessive Alcohol Use Dashboard",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-excessive-alcohol-use--excessive-alcohol-use-dashboard&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/MaternalMortality/PMSS Dashboard",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-maternal-mortality--pmss-dashboard&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/OralHealth/Oral Health Dashboard",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-oral-health--oral-health-dashboard&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/Respiratory/ARI Activity Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-respiratory--ari-activity-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/Respiratory/Epidemic Trends Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-respiratory--epidemic-trends-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/Respiratory/Wastewater Surveillance Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-respiratory--wastewater-surveillance-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/Respiratory/Test Positivity Chart",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-respiratory--test-positivity-chart&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/Respiratory/All Visualizations",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-respiratory--all-visualizations&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/SmokingTobacco/GTSS Data Explorer",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-smoking-and-tobacco--gtss-data-explorer&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/StateDiabetesProfiles/State Diabetes Profiles Dashboard",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-state-diabetes-profiles--state-diabetes-profiles-dashboard&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/Wastewater/Home Page Modules",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-wastewater--home-page-modules&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/Wastewater/Measles Top Modules",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-wastewater--measles-top-modules&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/Wastewater/Measles Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-wastewater--measles-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/Wastewater/Measles Time Period",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-wastewater--measles-time-period&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/Wastewater/COVID Top Modules",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-wastewater--covid-top-modules&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/Wastewater/COVID Time Period Map",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-wastewater--covid-time-period-map&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/Wastewater/COVID State Level",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-wastewater--covid-state-level&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/Wastewater/COVID National Regional Trends",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-wastewater--covid-national-regional-trends&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/Wastewater/COVID State Level Rest",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-wastewater--covid-state-level-rest&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    },
+    {
+      "label": "Pages/Wastewater/All Wastewater Visualizations",
+      "url": "http://localhost:6006/iframe.html?id=regression-tests-pages-wastewater--all-wastewater-visualizations&viewMode=story",
+      "delay": 15000,
+      "misMatchThreshold": 1.0
+    }
+  ],
+  "paths": {
+    "bitmaps_reference": "backstop_data/bitmaps_reference",
+    "bitmaps_test": "backstop_data/bitmaps_test",
+    "engine_scripts": "backstop_data/engine_scripts",
+    "html_report": "backstop_data/html_report",
+    "ci_report": "backstop_data/ci_report"
+  },
+  "report": ["browser"],
+  "engine": "puppeteer",
+  "engineOptions": {
+    "args": ["--no-sandbox"]
+  },
+  "asyncCaptureLimit": 5,
+  "asyncCompareLimit": 50,
+  "debug": false,
+  "debugWindow": false
+}
