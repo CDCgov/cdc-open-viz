@@ -1,0 +1,34 @@
+name: BackstopJS Visual Regression Tests
+
+on:
+  workflow_dispatch:
+
+jobs:
+  backstop-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build packages
+        run: lerna run build
+
+      - name: Start Storybook
+        run: yarn storybook -p 6006 &
+
+      - name: Wait for Storybook to be available
+        run: npx wait-on http://localhost:6006 --timeout 120000
+
+      - name: Run BackstopJS tests
+        run: yarn backstop:test
