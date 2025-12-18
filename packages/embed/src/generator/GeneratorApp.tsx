@@ -15,6 +15,8 @@ import PreviewPanel from './components/PreviewPanel'
  * 3. Generated embed code
  */
 const GeneratorApp: React.FC = () => {
+  const title = 'CDC Visualization Embed Code'
+
   const params = new URLSearchParams(window.location.search)
   const configUrl = params.get('configUrl')
 
@@ -74,7 +76,7 @@ const GeneratorApp: React.FC = () => {
   if (!configUrl) {
     return (
       <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-        <h1>COVE Embed Generator</h1>
+        <h1>{title}</h1>
         <div style={{ padding: '2rem', background: '#fff3cd', borderRadius: '4px', marginTop: '2rem' }}>
           <h2>Missing Configuration</h2>
           <p>
@@ -92,7 +94,7 @@ const GeneratorApp: React.FC = () => {
   if (loading) {
     return (
       <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-        <h1>COVE Embed Generator</h1>
+        <h1>{title}</h1>
         <div>
           <p style={{ color: '#666' }}>Loading configuration...</p>
         </div>
@@ -104,7 +106,7 @@ const GeneratorApp: React.FC = () => {
   if (error) {
     return (
       <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-        <h1>COVE Embed Generator</h1>
+        <h1>{title}</h1>
         <div style={{ padding: '2rem', background: '#f8d7da', borderRadius: '4px', marginTop: '2rem' }}>
           <h2>Configuration Error</h2>
           <p>{error}</p>
@@ -118,9 +120,8 @@ const GeneratorApp: React.FC = () => {
 
   return (
     <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-      <header style={{ marginBottom: '2rem', textAlign: 'center' }}>
-        <h1>COVE Embed Generator</h1>
-        {!hasNoFilters && <p style={{ color: '#666' }}>Customize your visualization embed code.</p>}
+      <header style={{ marginBottom: '2rem', textAlign: 'center', border: 'none' }}>
+        <h1>{title}</h1>
       </header>
 
       {/* Warning if some filters don't have setByQueryParameter */}

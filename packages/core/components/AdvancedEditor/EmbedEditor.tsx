@@ -57,7 +57,7 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
 
       if (isDevelopment) {
         // Use fallback only in development
-        const fallbackUrl = '/examples/bar-chart.json'
+        const fallbackUrl = '/examples/line-chart-states.json'
         setConfigUrl(fallbackUrl)
       } else {
         // In production without permalink, don't show embed section

@@ -44,7 +44,7 @@ export function extractFilters(config: CoveConfig | null): FilterMetadata[] {
  * Different filter types (chart filters vs dashboard filters) may use different field names.
  * This function provides fallbacks to handle these variations:
  *
- * - label: Different sources may have label, columnName, or key
+ * - label: Priority for readability: label > setByQueryParameter > columnName
  * - key: May be called key, columnName, or id depending on the viz type
  * - setByQueryParameter: MUST be used exactly as provided. COVE only recognizes this specific
  *   field for URL parameters - there are no fallbacks. Filters without this field cannot be
@@ -52,7 +52,7 @@ export function extractFilters(config: CoveConfig | null): FilterMetadata[] {
  */
 function normalizeFilter(filter: any): FilterMetadata {
   const normalized = {
-    label: filter.label || filter.columnName || filter.key || 'Unnamed Filter',
+    label: filter.label || filter.setByQueryParameter || filter.columnName || 'Unnamed Filter',
     key: filter.key || filter.columnName || String(filter.id) || '',
     setByQueryParameter: filter.setByQueryParameter,
     values: filter.values || [],

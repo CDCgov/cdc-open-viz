@@ -26,9 +26,10 @@ const FilterCustomizationControls: React.FC<FilterCustomizationControlsProps> = 
 
   return (
     <section style={{ marginBottom: '1.5rem' }}>
-      <h2>1. Customize Filters</h2>
+      <h2>1. Customize {filters.length === 1 ? 'Filter' : 'Filters'}</h2>
       <p style={{ color: '#666', marginBottom: '1rem' }}>
-        Set default values and visibility for the filters in your embedded visualization.
+        Set default value{filters.length === 1 ? '' : 's'} and visibility for the{' '}
+        {filters.length === 1 ? 'filter' : 'filters'} in your embedded visualization.
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
@@ -74,10 +75,26 @@ const FilterCustomizationControls: React.FC<FilterCustomizationControlsProps> = 
                     disabled={isDisabled}
                     style={{
                       width: '100%',
-                      padding: '0.5rem',
-                      border: '1px solid #ccc',
-                      borderRadius: '4px',
-                      cursor: isDisabled ? 'not-allowed' : 'pointer'
+                      padding: '0.5rem 2rem 0.5rem 0.75rem',
+                      fontSize: '0.9rem',
+                      border: '2px solid #d1d5db',
+                      borderRadius: '6px',
+                      backgroundColor: isDisabled ? '#f3f4f6' : '#f9fafb',
+                      cursor: isDisabled ? 'not-allowed' : 'pointer',
+                      outline: 'none',
+                      transition: 'border-color 0.15s ease-in-out',
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 0.5rem center',
+                      appearance: 'none',
+                      WebkitAppearance: 'none',
+                      MozAppearance: 'none'
+                    }}
+                    onFocus={e => {
+                      if (!isDisabled) e.target.style.borderColor = '#3b82f6'
+                    }}
+                    onBlur={e => {
+                      e.target.style.borderColor = '#d1d5db'
                     }}
                   >
                     {filter.values?.map((value, valueIndex) => (
