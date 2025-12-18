@@ -758,6 +758,22 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 }}
               </AxisLeft>
             )}
+          {/* Horizontal chart grid lines */}
+          {runtime.xAxis.gridLines && orientation === 'horizontal' && (
+            <Group left={Number(runtime.yAxis.size)}>
+              {xScale.ticks(xTickCount).map((tickValue, i) => {
+                const tickPosition = xScale(tickValue)
+                return (
+                  <Line
+                    key={`horizontal-gridline-${tickValue}-${i}`}
+                    from={{ x: tickPosition, y: 0 }}
+                    to={{ x: tickPosition, y: yMax }}
+                    stroke='#d6d6d6'
+                  />
+                )
+              })}
+            </Group>
+          )}
           {visualizationType === 'Paired Bar' && generatePairedBarAxis()}
           {visualizationType === 'Deviation Bar' && config.runtime.series?.length === 1 && (
             <DeviationBar animatedChart={animatedChart} xScale={xScale} yScale={yScale} width={xMax} height={yMax} />
@@ -779,6 +795,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               tooltipData={tooltipData}
               showTooltip={showTooltip}
             />
+          )}
+          {visualizationType === 'Warming Stripes' && (
+            <WarmingStripes xScale={xScale} yScale={yScale} xMax={xMax} yMax={yMax} />
           )}
           {visualizationType === 'Box Plot' && config.orientation === 'vertical' && (
             <BoxPlotVertical
@@ -855,9 +874,16 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           )}
           {/* Line chart */}
           {/* TODO: Make this just line or combo? */}
-          {!['Paired Bar', 'Box Plot', 'Area Chart', 'Scatter Plot', 'Deviation Bar', 'Forecasting', 'Bar'].includes(
-            visualizationType
-          ) &&
+          {![
+            'Paired Bar',
+            'Box Plot',
+            'Area Chart',
+            'Scatter Plot',
+            'Deviation Bar',
+            'Forecasting',
+            'Bar',
+            'Warming Stripes'
+          ].includes(visualizationType) &&
             !convertLineToBarGraph && (
               <>
                 <LineChart
@@ -1133,29 +1159,44 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                               )}
 
                             {orientation === 'horizontal' &&
-                              visualizationType !== 'Box Plot' &&
-                              visualizationSubType !== 'stacked' &&
+                              visualizationType === 'Bar' &&
                               config.yAxis.labelPlacement === 'On Date/Category Axis' &&
-                              !config.yAxis.hideLabel && (
-                                <Text
-                                  transform={`translate(${tick.to.x - 5}, ${
-                                    config.isLollipopChart
-                                      ? tick.to.y - minY
-                                      : tick.to.y -
-                                        minY +
-                                        (Number(config.barHeight * config.runtime.series.length) - barMinHeight) / 2
-                                  }) rotate(-${
-                                    config.runtime.horizontal ? config.runtime.yAxis.tickRotation || 0 : 0
-                                  })`}
-                                  verticalAnchor={'start'}
-                                  textAnchor={'end'}
-                                  fontSize={tickLabelFontSize}
-                                >
-                                  {tick.formattedValue}
-                                </Text>
-                              )}
+                              !config.yAxis.hideLabel &&
+                              (() => {
+                                const barGroupCount =
+                                  config.visualizationSubType === 'stacked' ? 1 : config.runtime.seriesKeys.length
+
+                                // Calculate barHeight based on chart type (regular bar vs lollipop)
+                                let barHeight
+                                if (config.isLollipopChart) {
+                                  const lollipopSizes = { large: 7, medium: 6, small: 5 }
+                                  const lollipopBarWidth = lollipopSizes[config.lollipopSize] || 5
+                                  barHeight = lollipopBarWidth * barGroupCount
+                                } else {
+                                  barHeight = Number(config.barHeight) * barGroupCount
+                                }
+
+                                const totalBarHeight = barHeight + Number(config.barSpace)
+                                const barGroupY = i === 0 ? 0 : totalBarHeight * i
+                                const labelCenterY = barGroupY + barHeight / 2
+
+                                return (
+                                  <Text
+                                    x={tick.from.x - Number(runtime.yAxis.size) + horizontalYAxisLabelSpace}
+                                    y={labelCenterY}
+                                    verticalAnchor={'middle'}
+                                    textAnchor={'start'}
+                                    fontSize={tickLabelFontSize}
+                                    width={categoryLabelSpace}
+                                    lineHeight={'1.2em'}
+                                  >
+                                    {tick.formattedValue}
+                                  </Text>
+                                )
+                              })()}
 
                             {orientation === 'horizontal' &&
+                              visualizationType !== 'Bar' &&
                               visualizationSubType === 'stacked' &&
                               config.yAxis.labelPlacement === 'On Date/Category Axis' &&
                               !config.yAxis.hideLabel && (
