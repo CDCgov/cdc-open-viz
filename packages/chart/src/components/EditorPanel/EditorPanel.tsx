@@ -833,6 +833,33 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
     let updatedConfig = { ...config, [section]: sectionValue }
 
+    // Auto-add confidence key columns to tooltips and data table
+    if (section === 'confidenceKeys' && newValue && newValue !== '') {
+      const columnName = newValue
+      const existingColumn = updatedConfig.columns[columnName]
+
+      updatedConfig.columns = {
+        ...updatedConfig.columns,
+        [columnName]: existingColumn
+          ? { ...existingColumn, dataTable: true, tooltips: true }
+          : {
+              name: columnName,
+              label: columnName,
+              dataTable: true,
+              tooltips: true,
+              prefix: '',
+              suffix: '',
+              forestPlot: false,
+              startingPoint: '0',
+              forestPlotAlignRight: false,
+              roundToPlace: 0,
+              commas: false,
+              showInViz: false,
+              forestPlotStartingPoint: 0
+            }
+      }
+    }
+
     enforceRestrictions(updatedConfig)
 
     updateConfig(updatedConfig)
@@ -4070,7 +4097,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     fieldName='position'
                     label='Position'
                     updateField={updateFieldDeprecated}
-                    options={config.visualizationType === 'Warming Stripes' ? ['bottom'] : ['right', 'left', 'bottom', 'top']}
+                    options={
+                      config.visualizationType === 'Warming Stripes' ? ['bottom'] : ['right', 'left', 'bottom', 'top']
+                    }
                   />
                   {(config.legend.position === 'left' ||
                     config.legend.position === 'right' ||
