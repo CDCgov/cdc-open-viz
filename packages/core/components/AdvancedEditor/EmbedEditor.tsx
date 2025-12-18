@@ -129,9 +129,19 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
         {isExpanded && (
           <div style={{ paddingTop: '1em' }}>
             {!configUrl ? (
-              <p style={{ fontSize: '0.85em', color: '#666', fontStyle: 'italic' }}>
-                An embed code cannot be generated until this visualization has been saved.
-              </p>
+              <div
+                style={{
+                  padding: '0.75em',
+                  background: '#fff3cd',
+                  border: '1px solid #ffc107',
+                  borderRadius: '4px',
+                  marginBottom: '0.5em'
+                }}
+              >
+                <p style={{ fontSize: '0.85em', margin: 0, color: '#856404' }}>
+                  ⚠️ An embed code cannot be generated until this visualization has been saved.
+                </p>
+              </div>
             ) : !filtersAreValid ? (
               <div
                 style={{
@@ -147,13 +157,14 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
                 </p>
                 <p style={{ fontSize: '0.85em', margin: 0, color: '#856404' }}>
                   To enable embedding, all filters must have the "Query String Parameter" field set. Some filters are
-                  missing this field.
+                  missing this field. After setting the field, make sure to save your visualization.
                 </p>
               </div>
             ) : (
               <>
                 <p style={{ fontSize: '0.85em', marginBottom: '1em', color: '#666' }}>
-                  Generate embed codes for partners to add this visualization to their websites.
+                  Generate embed codes for partners to add this visualization to their websites. Your visualization will
+                  need to be published to Link (www.cdc.gov) before it can be embedded by a partner.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
@@ -173,9 +184,19 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
                     >
                       Customize Embed Code →
                     </button>
-                    <p style={{ fontSize: '0.8em', margin: '0.25em 0 0 0', color: '#856404' }}>
-                      ⚠️ Make sure to save the visualization before generating a custom embed code.
-                    </p>
+                    <div
+                      style={{
+                        padding: '0.5em',
+                        background: '#fff3cd',
+                        border: '1px solid #ffc107',
+                        borderRadius: '4px',
+                        marginTop: '0.5em'
+                      }}
+                    >
+                      <p style={{ fontSize: '0.8em', margin: 0, color: '#856404' }}>
+                        ⚠️ Make sure to save the visualization before generating a custom embed code.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </>

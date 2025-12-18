@@ -115,6 +115,12 @@ title="CDC Data Visualization"
  * @returns URL string to generator page
  */
 export function generateGeneratorLink(configUrl: string): string {
-  const baseUrl = getDefaultGeneratorBaseUrl()
+  let baseUrl = getDefaultGeneratorBaseUrl()
+
+  // Special handling for testing on wcms-wp-test, can be removed later
+  if (typeof window !== 'undefined' && window.location.hostname === 'wcms-wp-test.cdc.gov') {
+    baseUrl = new URL(baseUrl).pathname
+  }
+
   return `${baseUrl}?configUrl=${configUrl}`
 }

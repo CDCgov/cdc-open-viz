@@ -42,7 +42,15 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
         {showSelectedSettings && ' with your selected settings'}.
       </p>
 
-      <div>
+      <div
+        style={{
+          paddingTop: '1.5rem',
+          paddingBottom: '1.5rem',
+          borderTop: '2px dashed #999',
+          borderBottom: '2px dashed #999',
+          marginTop: '1rem'
+        }}
+      >
         {/* iframe attributes must match generateEmbedCode() exactly */}
         <iframe
           key={embedUrl}
