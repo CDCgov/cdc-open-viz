@@ -173,7 +173,6 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
                 />
               )}
             </>
-
           )}
         </li>
         {config.visualizationType === 'Pie' && (
