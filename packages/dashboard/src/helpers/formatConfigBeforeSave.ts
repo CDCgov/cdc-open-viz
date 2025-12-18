@@ -17,11 +17,12 @@ const cleanDashboardFootnotes = (config: DashboardConfig) => {
   }
 }
 
-const cleanDashboardData = (config: DashboardConfig) => {
+const cleanDashboardData = (config: DashboardConfig, isEditor = false) => {
   if (config.datasets) {
     Object.keys(config.datasets).forEach(datasetKey => {
       delete config.datasets[datasetKey].formattedData
-      if (config.datasets[datasetKey].dataUrl) {
+      // Only delete data when not in editor mode
+      if (config.datasets[datasetKey].dataUrl && !isEditor) {
         delete config.datasets[datasetKey].data
       }
     })
@@ -104,12 +105,12 @@ const removeRuntimeDataURLs = (config: DashboardConfig) => {
   }
 }
 
-export const stripConfig = configToStrip => {
+export const stripConfig = (configToStrip, isEditor = false) => {
   const strippedConfig = cloneConfig(configToStrip)
   if (strippedConfig.type === 'dashboard') {
     if (strippedConfig.multiDashboards) {
       strippedConfig.multiDashboards.forEach((multiDashboard, i) => {
-        cleanDashboardData(strippedConfig.multiDashboards[i])
+        cleanDashboardData(strippedConfig.multiDashboards[i], isEditor)
         cleanSharedFilters(strippedConfig.multiDashboards[i])
         cleanDashboardFootnotes(strippedConfig.multiDashboards[i])
         cleanVisualizationFilters(strippedConfig.multiDashboards[i])
@@ -120,7 +121,7 @@ export const stripConfig = configToStrip => {
       delete strippedConfig.label
     }
     delete strippedConfig.activeDashboard
-    cleanDashboardData(strippedConfig)
+    cleanDashboardData(strippedConfig, isEditor)
     cleanSharedFilters(strippedConfig)
     cleanDashboardFootnotes(strippedConfig)
     cleanVisualizationFilters(strippedConfig)
