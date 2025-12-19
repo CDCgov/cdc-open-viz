@@ -18,7 +18,21 @@ type HeaderProps = {
 const Title = (props: HeaderProps) => {
   const { isDashboard, title, superTitle, classes = [], showTitle = true, ariaLevel = 2 } = props
 
-  // standard classes every vis should have
+  const useModernStyle = true
+
+  if (useModernStyle) {
+    return (
+      title &&
+      showTitle && (
+        <div className='cove-title' style={props.style}>
+          {superTitle && <sup>{parse(superTitle)}</sup>}
+          <h3>{parse(title)}</h3>
+        </div>
+      )
+    )
+  }
+
+  // LEGACY BLOCKY HEADER (Original design with colored backgrounds)
   const updatedClasses = ['cove-component__header', 'component__header', 'mb-3', ...classes]
 
   return (
