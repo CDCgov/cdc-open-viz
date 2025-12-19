@@ -27,11 +27,44 @@ const removeOldBrushKeys = config => {
   }
 }
 
+const migrateTitleStyle = config => {
+  // Migrate ALL visualizations to use titleStyle
+  // Since titleStyle is new in 4.26.1, any config running this migration won't have it yet
+  // so we can unconditionally set it based on whether a title exists
+  // - If title exists and is not empty: use 'legacy' (preserve existing appearance)
+  // - If title is empty/missing: use 'small' (new default)
+
+  if (config.type === 'dashboard') {
+    // Migrate dashboard title
+    if (!config.dashboard) config.dashboard = {}
+    const hasTitle = config.dashboard.title && config.dashboard.title.trim() !== ''
+    config.dashboard.titleStyle = hasTitle ? 'legacy' : 'small'
+
+    // Migrate all visualizations in dashboard
+    if (config.visualizations) {
+      Object.values((config as DashboardConfig).visualizations).forEach(visualization => {
+        migrateTitleStyle(visualization)
+      })
+    }
+  } else if (config.type === 'map') {
+    // Map stores titleStyle under general
+    if (!config.general) config.general = {}
+    const hasTitle = config.general.title && config.general.title.trim() !== ''
+    config.general.titleStyle = hasTitle ? 'legacy' : 'small'
+  } else if (config.type) {
+    // For all other visualization types (chart, data-bite, waffle-chart, etc.)
+    // titleStyle is at root level
+    const hasTitle = config.title && config.title.trim() !== ''
+    config.titleStyle = hasTitle ? 'legacy' : 'small'
+  }
+}
+
 const update_4_26_1 = config => {
   const ver = '4.26.1'
   const newConfig = cloneConfig(config)
   normalizeFilterParents(newConfig)
   removeOldBrushKeys(newConfig)
+  migrateTitleStyle(newConfig)
   newConfig.version = ver
   return newConfig
 }

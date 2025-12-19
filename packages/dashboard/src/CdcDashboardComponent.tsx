@@ -495,6 +495,7 @@ export default function CdcDashboard({
             <Title
               title={title}
               isDashboard={true}
+              titleStyle={config.dashboard.titleStyle}
               classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]}
             />
             {/* Description */}

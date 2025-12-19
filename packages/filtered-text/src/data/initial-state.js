@@ -1,5 +1,6 @@
 export default {
   title: 'Filtered Text',
+  titleStyle: 'small',
   type: 'filtered-text',
   theme: 'theme-blue',
   fontSize: 'small',

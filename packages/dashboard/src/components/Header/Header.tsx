@@ -97,12 +97,27 @@ const Header = (props: HeaderProps) => {
             multidashboard
           </span>
           <br />
-          <input
-            type='text'
-            placeholder='Enter Dashboard Name Here'
-            defaultValue={config.dashboard?.title}
-            onChange={e => changeConfigValue('dashboard', 'title', e.target.value)}
-          />
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '10px' }}>
+            <input
+              type='text'
+              placeholder='Enter Dashboard Name Here'
+              defaultValue={config.dashboard?.title}
+              onChange={e => changeConfigValue('dashboard', 'title', e.target.value)}
+              style={{ flex: 1 }}
+            />
+            <label style={{ display: 'flex', flexDirection: 'column', gap: '3px', fontSize: '0.85em' }}>
+              <span style={{ fontSize: '0.8em' }}>Title Style</span>
+              <select
+                value={config.dashboard.titleStyle}
+                onChange={e => changeConfigValue('dashboard', 'titleStyle', e.target.value)}
+                style={{ fontSize: '0.9em' }}
+              >
+                <option value='small'>Small</option>
+                <option value='large'>Large</option>
+                <option value='legacy'>Legacy</option>
+              </select>
+            </label>
+          </div>
         </div>
       )}
       {!subEditor && (

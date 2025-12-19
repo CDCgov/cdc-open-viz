@@ -105,7 +105,16 @@
   margin-bottom: 1rem;
 }
 
-.cdc-open-viz-module .cove-title h3 {
+.cdc-open-viz-module .cove-title--large {
+  color: #0b4778;
+  font-size: 1.95rem;
+  font-family: var(--app-font-secondary);
+  border-bottom: 1px solid var(--cool-gray-10);
+  font-weight: 300;
+}
+
+.cdc-open-viz-module .cove-title--small {
+  font-size: 1.5rem;
   font-family: var(--app-font-secondary);
 }
 
@@ -116,5 +125,4 @@
   text-transform: uppercase;
   color: #666;
   display: block;
-  margin-bottom: 0.25rem;
 }
