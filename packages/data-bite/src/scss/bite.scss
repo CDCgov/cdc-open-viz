@@ -1,4 +1,3 @@
-
 &.theme-blue {
   .bite-value {
     color: var(--primary);
@@ -113,6 +112,23 @@
     }
     .bite-content__text-wrap {
       flex: 75% !important;
+    }
+  }
+
+  // General: Bite Style > TP5
+  &.bite__style--tp5 {
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+
+    .bite-content--tp5 {
+      width: 100%;
+    }
+    .bite-value--tp5 {
+      flex-shrink: 0;
+    }
+    .bite-content__text-wrap--tp5 {
+      min-width: 0; // Allows text to wrap properly
     }
   }
 
