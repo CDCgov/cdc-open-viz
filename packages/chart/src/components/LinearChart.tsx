@@ -1019,7 +1019,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           )}
           {isNoDataAvailable && (
             <Text
-              x={Number(config.yAxis.size) + Number(xMax / 2)}
+              x={Number(runtime.yAxis.size) + Number(xMax / 2)}
               y={initialHeight / 2 - (config.xAxis.padding || 0) / 2}
               textAnchor='middle'
             >
@@ -1266,9 +1266,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                       config.runtime.seriesLabelsAll[tick.formattedValue - 1]
                                     )) && (
                                     <rect
-                                      x={0 - Number(config.yAxis.size)}
+                                      x={0 - Number(runtime.yAxis.size)}
                                       y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)}
-                                      width={Number(config.yAxis.size) + xScale(xScale.domain()[0])}
+                                      width={Number(runtime.yAxis.size) + xScale(xScale.domain()[0])}
                                       height='2'
                                       fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])}
                                     />
@@ -1555,7 +1555,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 config.xAxis.tickWidthMax = longestTickLength
 
                 return (
-                  <Group className='bottom-axis' width={dimensions[0]}>
+                  <Group className='bottom-axis' width={parentWidth}>
                     {filteredTicks.map((tick, i, propsTicks) => {
                       // when using LogScale show major ticks values only
                       const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
