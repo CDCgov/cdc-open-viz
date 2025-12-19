@@ -421,3 +421,19 @@
 .editor-toggle svg path {
   fill: currentColor;
 }
+
+/* Shared styles consolidated from package-specific EditorPanel.styles.css files */
+/* Previously duplicated in: data-bite, filtered-text, markup-include */
+.editor-panel .condition-section :is(label) {
+  font-size: 1em;
+}
+
+:is(span).edit-label {
+  margin-bottom: 0.3em;
+  display: block;
+}
+
+.react-tooltip {
+  position: absolute;
+  width: 250px;
+}

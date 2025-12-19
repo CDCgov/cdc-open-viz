@@ -521,21 +521,17 @@ const CdcWaffleChart = ({
   let content = <Loading />
 
   if (loading === false) {
-    let body = (
-      <Layout.Responsive isEditor={isEditor}>
-        <WaffleChart
-          config={config}
-          isEditor={isEditor}
-          showConfigConfirm={showConfigConfirm}
-          updateConfig={updateConfig}
-        />
-      </Layout.Responsive>
-    )
-
     content = (
       <>
-        {isEditor && <EditorPanel showConfigConfirm={showConfigConfirm}>{body}</EditorPanel>}
-        {!isEditor && body}
+        {isEditor && <EditorPanel showConfigConfirm={showConfigConfirm} />}
+        <Layout.Responsive isEditor={isEditor}>
+          <WaffleChart
+            config={config}
+            isEditor={isEditor}
+            showConfigConfirm={showConfigConfirm}
+            updateConfig={updateConfig}
+          />
+        </Layout.Responsive>
       </>
     )
   }

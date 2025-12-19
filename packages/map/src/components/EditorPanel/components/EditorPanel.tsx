@@ -24,6 +24,7 @@ import { supportedStatesFipsCodes, supportedCountries } from '../../../data/supp
 import { getSupportedCountryOptions } from '../../../helpers/getCountriesPicked'
 
 // Components - Core
+import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Icon from '@cdc/core/components/ui/Icon'
@@ -111,7 +112,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   ])
 
   const [loadedDefault, setLoadedDefault] = useState(false)
-  const [displayPanel, setDisplayPanel] = useState(true)
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
   const [showConversionModal, setShowConversionModal] = useState(false)
   const [pendingPaletteSelection, setPendingPaletteSelection] = useState<{
@@ -1023,19 +1023,10 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     return currentPaletteName === palette ? 'selected' : ''
   }
 
-  const configStringRef = useRef<string>()
-
   useEffect(() => {
     setLoadedDefault(config.defaultData)
     columnsRequiredChecker()
   }, [config])
-
-  // Only update parent when config content actually changes (not just reference)
-  const configString = JSON.stringify(convertStateToConfig())
-  if (isEditor && setParentConfig && configStringRef.current !== configString) {
-    configStringRef.current = configString
-    setParentConfig(JSON.parse(configString))
-  }
 
   const columnsOptions = [
     <option value='' key={'Select Option'}>
@@ -1070,14 +1061,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   })
 
   const updateField = updateFieldFactory(config, setConfig)
-
-  const onBackClick = () => {
-    setDisplayPanel(!displayPanel)
-    setConfig({
-      ...config,
-      showEditorPanel: !displayPanel
-    })
-  }
 
   const StateOptionList = () => {
     const arrOfArrays = Object.entries(supportedStatesFipsCodes)
@@ -1168,1051 +1151,1469 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
   const isLoadedFromUrl = config?.dataKey?.includes('http://') || config?.dataKey?.includes('https://')
 
+  // Custom convertStateToConfig for map with map-specific logic
+  const customConvertStateToConfig = () => {
+    let strippedState = cloneConfig(config) // Deep copy
+
+    // Strip ref
+    delete strippedState['']
+
+    if (strippedState.columns.geo.name && strippedState.columns.primary.name) {
+      delete strippedState.newViz
+    }
+
+    // Remove the legend
+    let strippedLegend = _.cloneDeep(config.legend)
+
+    delete strippedLegend.disabledAmt
+
+    strippedState.legend = strippedLegend
+
+    // Remove default data marker if the user started this map from default data
+    delete strippedState.defaultData
+
+    // Remove tooltips if they're active in the editor
+    strippedState.general = _.cloneDeep(config.general)
+
+    strippedState.general.showSidebar = 'hidden'
+
+    return strippedState
+  }
+
   return (
-    <ErrorBoundary component='EditorPanel'>
-      <Layout.Sidebar
+    <React.Fragment>
+      <BaseEditorPanel
+        config={config}
+        updateConfig={setConfig as (config: any) => void}
+        loading={false}
+        setParentConfig={setParentConfig as ((config: any) => void) | undefined}
         isDashboard={isDashboard}
-        displayPanel={displayPanel}
         title='Configure Map'
-        onBackClick={onBackClick}
       >
-        <ReactTooltip multiline={true} />
-        <Accordion allowZeroExpanded={true}>
-          <AccordionItem>
-            {' '}
-            {/* Type */}
-            <AccordionItemHeading>
-              <AccordionItemButton>Type</AccordionItemButton>
-            </AccordionItemHeading>
-            <AccordionItemPanel>
-              <label>
-                <span className='edit-label column-heading'>
-                  <span>Geography</span>
-                </span>
-                <ul className='geo-buttons d-grid' style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
-                  <button
-                    className={`${
-                      config.general.geoType === 'us' || config.general.geoType === 'us-county' ? 'active' : ''
-                    } full-width`}
-                    onClick={e => {
-                      e.preventDefault()
-                      handleEditorChanges('geoType', 'us')
-                    }}
-                  >
-                    <UsaGraphic />
-                    <span>United States</span>
-                  </button>
-                  <button
-                    className={`${config.general.geoType === 'us-region' ? 'active' : ''} full-width`}
-                    onClick={e => {
-                      e.preventDefault()
-                      handleEditorChanges('geoType', 'us-region')
-                    }}
-                  >
-                    <UsaRegionGraphic />
-                    <span>U.S. Region</span>
-                  </button>
-                  <button
-                    className={`${config.general.geoType === 'world' ? 'active' : ''} full-width`}
-                    onClick={e => {
-                      e.preventDefault()
-                      handleEditorChanges('geoType', 'world')
-                    }}
-                  >
-                    <WorldGraphic />
-                    <span>World</span>
-                  </button>
-                  <button
-                    className={`${config.general.geoType === 'single-state' ? 'active' : ''} full-width`}
-                    onClick={e => {
-                      e.preventDefault()
-                      handleEditorChanges('geoType', 'single-state')
-                    }}
-                  >
-                    <AlabamaGraphic />
-                    <span>U.S. State</span>
-                  </button>
-                </ul>
-              </label>
-              {/* Select > State or County Map */}
-              {(config.general.geoType === 'us' || config.general.geoType === 'us-county') && (
-                <Select
-                  label='Geography Subtype'
-                  value={config.general.geoType}
-                  options={[
-                    { value: 'us', label: 'US State-Level' },
-                    { value: 'us-county', label: 'US County-Level' }
-                  ]}
-                  onChange={event => {
-                    handleEditorChanges('geoType', event.target.value)
-                  }}
-                />
-              )}
-              {(config.general.geoType === 'us-county' || config.general.geoType === 'single-state') && (
-                <Select
-                  label='County Census Year'
-                  value={config.general.countyCensusYear || '2019'}
-                  options={[
-                    { value: '2022', label: '2022' },
-                    { value: '2021', label: '2021' },
-                    { value: '2020', label: '2020' },
-                    { value: '2019', label: '2019' },
-                    { value: '2015', label: '2015' },
-                    { value: '2014', label: '2014' },
-                    { value: '2013', label: '2013' }
-                  ]}
-                  onChange={event => {
-                    handleEditorChanges('countyCensusYear', event.target.value)
-                  }}
-                />
-              )}
-              {(config.general.geoType === 'us-county' || config.general.geoType === 'single-state') && (
-                <Select
-                  label='Filter Controlling County Census Year'
-                  value={config.general.filterControlsCountyYear || ''}
-                  options={[
-                    { value: '', label: 'None' },
-                    ...(config.filters
-                      ? config.filters.map(filter => ({ value: filter.columnName, label: filter.columnName }))
-                      : [])
-                  ]}
-                  onChange={event => {
-                    handleEditorChanges('filterControlsCountyYear', event.target.value)
-                  }}
-                />
-              )}
+        {({ displayPanel, convertStateToConfig }) => {
+          // Use custom convertStateToConfig for map-specific logic
+          const mapConvertStateToConfig = customConvertStateToConfig
 
-              {config.general.geoType === 'single-state' && runtimeData && (
-                <Select
-                  label='Filter Controlling State Picked'
-                  value={config.general.filterControlsStatesPicked || ''}
-                  options={[
-                    { value: '', label: 'None' },
-                    ...(runtimeData && columnsInData?.map(col => ({ value: col, label: col })))
-                  ]}
-                  onChange={event => {
-                    handleEditorChanges('filterControlsStatesPicked', event.target.value)
-                  }}
-                />
-              )}
-
-              {/* Type */}
-              {/* Select > Filter a state */}
-              {config.general.geoType === 'single-state' && (
-                <label>
-                  <span>States Selector</span>
-                  <MultiSelect
-                    selected={config.general.statesPicked.map(state => state.stateName)}
-                    options={StateOptionList().map(option => ({
-                      value: option.props.value,
-                      label: option.props.children
-                    }))}
-                    fieldName={'statesPicked'}
-                    updateField={(_, __, ___, selectedOptions) => {
-                      handleEditorChanges('chooseState', selectedOptions)
-                    }}
-                  />
-                </label>
-              )}
-              {/* Country Selection for World Maps */}
-              {config.general.geoType === 'world' && (
-                <>
-                  <label>
-                    <span>Countries Selector</span>
-                    <MultiSelect
-                      selected={(config.general.countriesPicked || []).map(country => country.name)}
-                      options={CountryOptionList().map(option => ({
-                        value: option.props.value,
-                        label: option.props.children
-                      }))}
-                      fieldName={'countriesPicked'}
-                      updateField={(_, __, ___, selectedOptions) => {
-                        handleEditorChanges('chooseCountry', selectedOptions)
-                      }}
-                    />
-                  </label>
-                  {config.general.countriesPicked && config.general.countriesPicked.length > 0 && (
-                    <CheckBox
-                      value={config.general.hideUnselectedCountries || false}
-                      fieldName='hideUnselectedCountries'
-                      label='Hide Unselected Countries'
-                      updateField={updateField}
-                      section='general'
-                    />
-                  )}
-                </>
-              )}
-              {/* Type */}
-              <Select
-                label={
-                  <>
-                    Map Type
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>
-                          Select "Data" to create a color-coded data map. To create a navigation-only map, select
-                          "Navigation."
-                        </p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  </>
-                }
-                value={config.general.type}
-                options={[
-                  { value: 'data', label: 'Data' },
-                  ...(config.general.geoType === 'us-county' ? [{ value: 'us-geocode', label: 'Geocode' }] : []),
-                  ...(config.general.geoType === 'world' ? [{ value: 'world-geocode', label: 'Geocode' }] : []),
-                  ...(config.general.geoType !== 'us-county' ? [{ value: 'navigation', label: 'Navigation' }] : []),
-                  ...(config.general.geoType === 'world' || config.general.geoType === 'us'
-                    ? [{ value: 'bubble', label: 'Bubble' }]
-                    : [])
-                ]}
-                onChange={event => {
-                  handleEditorChanges('editorMapType', event.target.value)
-                }}
-              />
-
-              {/* Navigation Behavior */}
-              {(config.general.type === 'navigation' || config.general.type === 'data') && (
-                <Select
-                  label='Navigation Behavior'
-                  value={config.general.navigationTarget}
-                  options={[
-                    { value: '_self', label: 'Same Window' },
-                    { value: '_blank', label: 'New Window' }
-                  ]}
-                  onChange={event => {
-                    const _newConfig = cloneConfig(config)
-                    _newConfig.general.navigationTarget = event.target.value
-                    setConfig(_newConfig)
-                  }}
-                />
-              )}
-              <label>
-                <span className='edit-label'>Data Classification Type</span>
-                <div>
-                  <label>
-                    <input
-                      type='radio'
-                      name='equalnumber'
-                      value='equalnumber'
-                      checked={config.legend.type === 'equalnumber' || config.legend.type === 'equalinterval'}
-                      onChange={e => handleEditorChanges('classificationType', e.target.value)}
-                    />
-                    Numeric/Quantitative
-                  </label>
-                  <label>
-                    <input
-                      type='radio'
-                      name='category'
-                      value='category'
-                      checked={config.legend.type === 'category'}
-                      onChange={e => handleEditorChanges('classificationType', e.target.value)}
-                    />
-                    Categorical
-                  </label>
-                </div>
-              </label>
-
-              {/* Display as Hex */}
-              {general.geoType === 'us' && general.type !== 'navigation' && general.type !== 'bubble' && (
-                <CheckBox
-                  value={config.general.displayAsHex}
-                  section='general'
-                  subsection={null}
-                  fieldName='displayAsHex'
-                  label='Display As Hex Map'
-                  updateField={updateField}
-                  className=''
-                />
-              )}
-
-              {/* Shapes on Hex */}
-              <CheckBox
-                value={config.hexMap.type === 'shapes'}
-                section='hexMap'
-                subsection={null}
-                fieldName='type'
-                label='Display Shapes on Hex Map'
-                updateField={updateField}
-                onChange={event => {
-                  setConfig({
-                    ...config,
-                    hexMap: {
-                      ...config.hexMap,
-                      type: event.target.checked ? 'shapes' : 'standard'
-                    }
-                  })
-                }}
-              />
-              <HexSetting.ShapeColumns columnsOptions={columnsOptions} />
-
-              {'us' === config.general.geoType &&
-                'bubble' !== config.general.type &&
-                false === config.general.displayAsHex && (
-                  <CheckBox
-                    label='Show state labels'
-                    checked={config.general.displayStateLabels}
-                    onChange={event => {
-                      handleEditorChanges('displayStateLabels', event.target.checked)
-                    }}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Recommended set to display for Section 508 compliance.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-                )}
-
-              {'us' === config.general.geoType && (
-                <CheckBox
-                  value={general.territoriesAlwaysShow || false}
-                  section='general'
-                  subsection={null}
-                  fieldName='territoriesAlwaysShow'
-                  label='Show All Territories'
-                  updateField={updateField}
-                />
-              )}
-            </AccordionItemPanel>
-          </AccordionItem>
-          <AccordionItem>
-            {' '}
-            {/* General */}
-            <AccordionItemHeading>
-              <AccordionItemButton>General</AccordionItemButton>
-            </AccordionItemHeading>
-            <AccordionItemPanel>
-              <TextField
-                value={general.title}
-                data-testid='title-input'
-                updateField={updateField}
-                section='general'
-                fieldName='title'
-                id='title'
-                label='Title'
-                placeholder='Map Title'
-                tooltip={
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>
-                        Title is required to set the name of the download file but can be hidden using the option below.
-                      </p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                }
-              />
-              <CheckBox
-                value={config.general.showTitle || false}
-                section='general'
-                subsection={null}
-                fieldName='showTitle'
-                label='Show Title'
-                updateField={updateField}
-              />
-              <TextField
-                value={general.superTitle || ''}
-                updateField={updateField}
-                section='general'
-                fieldName='superTitle'
-                label='Super Title'
-                tooltip={
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>Super Title</p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                }
-              />
-              <TextField
-                type='textarea'
-                value={general.introText}
-                updateField={updateField}
-                section='general'
-                fieldName='introText'
-                label='Message'
-                tooltip={
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>Intro Text</p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                }
-              />
-              <TextField
-                type='textarea'
-                value={general.subtext}
-                updateField={updateField}
-                section='general'
-                fieldName='subtext'
-                label='Subtext'
-                tooltip={
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>
-                        Enter supporting text to display below the data visualization, if applicable. The following HTML
-                        tags are supported: strong, em, sup, and sub.
-                      </p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                }
-              />
-              <TextField
-                type='textarea'
-                value={general.footnotes}
-                updateField={updateField}
-                section='general'
-                fieldName='footnotes'
-                label='Footnotes'
-                tooltip={
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>Footnotes</p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                }
-              />
-
-              {/* <label className="checkbox mt-4">
-                    <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
-                    <span className="edit-label">Enable Media Download</span>
-                  </label> */}
-            </AccordionItemPanel>
-          </AccordionItem>
-          <AccordionItem>
-            {' '}
-            {/* Columns */}
-            <AccordionItemHeading>
-              <AccordionItemButton>Columns</AccordionItemButton>
-            </AccordionItemHeading>
-            <AccordionItemPanel>
-              <fieldset className='primary-fieldset edit-block'>
-                <label>
-                  <span className='edit-label column-heading'>
-                    Geography
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>
-                          Select the source column containing the map location names or, for county-level maps, the FIPS
-                          codes.
-                        </p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  </span>
-                  <Select
-                    value={config.columns.geo ? config.columns.geo.name : columnsOptions[0]}
-                    options={columnsOptions.map(c => c.key)}
-                    onChange={event => {
-                      editColumn('geo', 'name', event.target.value)
-                    }}
-                  />
-                </label>
-                {config.general.type === 'us-geocode' && (
-                  <CheckBox
-                    value={config.general.convertFipsCodes}
-                    section='general'
-                    subsection={null}
-                    fieldName='convertFipsCodes'
-                    label='Convert FIPS Codes to Geography Name'
-                    updateField={updateField}
-                  />
-                )}
-
-                <CheckBox
-                  value={config.general.hideGeoColumnInTooltip || false}
-                  section='general'
-                  subsection={null}
-                  fieldName='hideGeoColumnInTooltip'
-                  label='Hide Geography Column Name in Tooltip'
-                  updateField={updateField}
-                />
-                <TextField
-                  value={config.general.geoLabelOverride}
-                  section='general'
-                  fieldName='geoLabelOverride'
-                  label='Geography Label'
-                  className='edit-label'
-                  updateField={updateField}
-                  tooltip={
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>Enter a geography label for use in tooltips.</p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  }
-                />
-              </fieldset>
-              {'navigation' !== config.general.type && (
-                <fieldset className='primary-fieldset edit-block'>
-                  <Select
-                    label='Data Column'
-                    value={columns.primary.name}
-                    options={columnsOptions.map(c => c.key)}
-                    onChange={event => {
-                      const _state = cloneConfig(config)
-                      _state.columns.primary.name = event.target.value
-                      _state.columns.primary.label = event.target.value
-                      setConfig(_state)
-                    }}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Select the source column containing the categorical or numeric values to be mapped.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-                  <label>
-                    <CheckBox
-                      value={config.general.hidePrimaryColumnInTooltip || false}
-                      section='general'
-                      subsection={null}
-                      fieldName='hidePrimaryColumnInTooltip'
-                      label='Hide Data Column Name in Tooltip'
-                      updateField={updateField}
-                      onChange={event => {
-                        handleEditorChanges('hidePrimaryColumnInTooltip', event.target.checked)
-                      }}
-                    />
-                  </label>
-                  <TextField
-                    value={columns.primary.label}
-                    section='columns'
-                    subsection='primary'
-                    fieldName='label'
-                    label='Data Label'
-                    updateField={updateField}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Enter a data label for use in tooltips and the data table.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-                  <ul className='column-edit'>
-                    <li className='three-col'>
-                      <TextField
-                        value={columns.primary.prefix}
-                        section='columns'
-                        subsection='primary'
-                        fieldName='prefix'
-                        label='Prefix'
-                        updateField={updateField}
-                      />
-                      <TextField
-                        value={columns.primary.suffix}
-                        section='columns'
-                        subsection='primary'
-                        fieldName='suffix'
-                        label='Suffix'
-                        updateField={updateField}
-                      />
-                      <TextField
-                        type='number'
-                        value={columns.primary.roundToPlace}
-                        section='columns'
-                        subsection='primary'
-                        fieldName='roundToPlace'
-                        label='Round'
-                        updateField={updateField}
-                        min={0}
-                      />
-                    </li>
-                    <CheckBox
-                      value={config.columns.primary.useCommas}
-                      section='columns'
-                      subsection='primary'
-                      fieldName='useCommas'
-                      label='Add Commas to Numbers'
-                      updateField={updateField}
-                    />
-                    <CheckBox
-                      value={config.columns.primary.dataTable || false}
-                      section='columns'
-                      subsection='primary'
-                      fieldName='dataTable'
-                      label='Show in Data Table'
-                      updateField={updateField}
-                    />
-                    <CheckBox
-                      value={config.columns.primary.tooltip || false}
-                      section='columns'
-                      subsection='primary'
-                      fieldName='tooltip'
-                      label='Show in Tooltips'
-                      updateField={updateField}
-                    />
-                  </ul>
-                </fieldset>
-              )}
-
-              {config.general.type === 'bubble' && config.legend.type === 'category' && (
-                <fieldset className='primary-fieldset edit-block'>
-                  <label>
-                    <span className='edit-label column-heading'>
-                      Category Column
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>Select the source column containing the categorical bubble values to be mapped.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    </span>
-                    <Select
-                      label=''
-                      value={config.columns.categorical ? config.columns.categorical.name : columnsOptions[0]?.key}
-                      options={columnsOptions.map(c => c.key)}
-                      onChange={event => {
-                        editColumn('categorical', 'name', event.target.value)
-                      }}
-                    />
-                  </label>
-                </fieldset>
-              )}
-              {
-                <>
-                  <Select
-                    label='Latitude Column'
-                    value={config.columns.latitude.name}
-                    options={columnsOptions.map(c => c.key)}
-                    onChange={e => {
-                      editColumn('latitude', 'name', e.target.value)
-                    }}
-                  />
-                  <Select
-                    label='Longitude Column'
-                    value={config.columns.longitude.name}
-                    options={columnsOptions.map(c => c.key)}
-                    onChange={e => {
-                      editColumn('longitude', 'name', e.target.value)
-                    }}
-                  />
-                </>
-              }
-
-              {'navigation' !== config.general.type && (
-                <fieldset className='primary-fieldset edit-block'>
-                  <label>
-                    <span className='edit-label'>
-                      Special Classes
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>
-                            For secondary values such as "NA", the system can automatically color-code them in shades of
-                            gray, one shade for each special class.
-                          </p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    </span>
-                  </label>
-                  {config.legend.specialClasses.length === 2 && (
-                    <Alert
-                      type='info'
-                      message='If a third special class is needed you can apply a pattern to set it apart.'
-                      showCloseButton={false}
-                    />
-                  )}
-                  {specialClasses.map((specialClass, i) => (
-                    <div className='edit-block' key={`special-class-${i}`}>
-                      <button
-                        className='remove-column'
-                        onClick={e => {
-                          e.preventDefault()
-                          editColumn('primary', 'specialClassDelete', i)
-                        }}
-                      >
-                        Remove
-                      </button>
-                      <p>Special Class {i + 1}</p>
+          return (
+            <>
+              <ReactTooltip multiline={true} />
+              <Accordion allowZeroExpanded={true}>
+                <AccordionItem>
+                  {' '}
+                  {/* Type */}
+                  <AccordionItemHeading>
+                    <AccordionItemButton>Type</AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                    <label>
+                      <span className='edit-label column-heading'>
+                        <span>Geography</span>
+                      </span>
+                      <ul className='geo-buttons d-grid' style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                        <button
+                          className={`${
+                            config.general.geoType === 'us' || config.general.geoType === 'us-county' ? 'active' : ''
+                          } full-width`}
+                          onClick={e => {
+                            e.preventDefault()
+                            handleEditorChanges('geoType', 'us')
+                          }}
+                        >
+                          <UsaGraphic />
+                          <span>United States</span>
+                        </button>
+                        <button
+                          className={`${config.general.geoType === 'us-region' ? 'active' : ''} full-width`}
+                          onClick={e => {
+                            e.preventDefault()
+                            handleEditorChanges('geoType', 'us-region')
+                          }}
+                        >
+                          <UsaRegionGraphic />
+                          <span>U.S. Region</span>
+                        </button>
+                        <button
+                          className={`${config.general.geoType === 'world' ? 'active' : ''} full-width`}
+                          onClick={e => {
+                            e.preventDefault()
+                            handleEditorChanges('geoType', 'world')
+                          }}
+                        >
+                          <WorldGraphic />
+                          <span>World</span>
+                        </button>
+                        <button
+                          className={`${config.general.geoType === 'single-state' ? 'active' : ''} full-width`}
+                          onClick={e => {
+                            e.preventDefault()
+                            handleEditorChanges('geoType', 'single-state')
+                          }}
+                        >
+                          <AlabamaGraphic />
+                          <span>U.S. State</span>
+                        </button>
+                      </ul>
+                    </label>
+                    {/* Select > State or County Map */}
+                    {(config.general.geoType === 'us' || config.general.geoType === 'us-county') && (
                       <Select
-                        label='Data Key'
-                        value={specialClass.key}
-                        options={columnsOptions.map(option => ({
-                          value: option.key,
-                          label: option.key
-                        }))}
-                        onChange={event => {
-                          editColumn('primary', 'specialClassEdit', {
-                            prop: 'key',
-                            index: i,
-                            value: event.target.value
-                          })
-                        }}
-                      />
-                      <Select
-                        label='Value'
-                        value={specialClass.value}
+                        label='Geography Subtype'
+                        value={config.general.geoType}
                         options={[
-                          { value: '', label: '- Select Value -' },
-                          ...(columnsByKey[specialClass.key] || [])
-                            .sort()
-                            .map(option => ({ value: option, label: option }))
+                          { value: 'us', label: 'US State-Level' },
+                          { value: 'us-county', label: 'US County-Level' }
                         ]}
                         onChange={event => {
-                          editColumn('primary', 'specialClassEdit', {
-                            prop: 'value',
-                            index: i,
-                            value: event.target.value
-                          })
+                          handleEditorChanges('geoType', event.target.value)
                         }}
                       />
+                    )}
+                    {(config.general.geoType === 'us-county' || config.general.geoType === 'single-state') && (
+                      <Select
+                        label='County Census Year'
+                        value={config.general.countyCensusYear || '2019'}
+                        options={[
+                          { value: '2022', label: '2022' },
+                          { value: '2021', label: '2021' },
+                          { value: '2020', label: '2020' },
+                          { value: '2019', label: '2019' },
+                          { value: '2015', label: '2015' },
+                          { value: '2014', label: '2014' },
+                          { value: '2013', label: '2013' }
+                        ]}
+                        onChange={event => {
+                          handleEditorChanges('countyCensusYear', event.target.value)
+                        }}
+                      />
+                    )}
+                    {(config.general.geoType === 'us-county' || config.general.geoType === 'single-state') && (
+                      <Select
+                        label='Filter Controlling County Census Year'
+                        value={config.general.filterControlsCountyYear || ''}
+                        options={[
+                          { value: '', label: 'None' },
+                          ...(config.filters
+                            ? config.filters.map(filter => ({ value: filter.columnName, label: filter.columnName }))
+                            : [])
+                        ]}
+                        onChange={event => {
+                          handleEditorChanges('filterControlsCountyYear', event.target.value)
+                        }}
+                      />
+                    )}
+
+                    {config.general.geoType === 'single-state' && runtimeData && (
+                      <Select
+                        label='Filter Controlling State Picked'
+                        value={config.general.filterControlsStatesPicked || ''}
+                        options={[
+                          { value: '', label: 'None' },
+                          ...(runtimeData && columnsInData?.map(col => ({ value: col, label: col })))
+                        ]}
+                        onChange={event => {
+                          handleEditorChanges('filterControlsStatesPicked', event.target.value)
+                        }}
+                      />
+                    )}
+
+                    {/* Type */}
+                    {/* Select > Filter a state */}
+                    {config.general.geoType === 'single-state' && (
                       <label>
-                        <span className='edit-label column-heading'>Label</span>
-                        <input
-                          type='text'
-                          value={specialClass.label}
-                          onChange={e => {
-                            editColumn('primary', 'specialClassEdit', {
-                              prop: 'label',
-                              index: i,
-                              value: e.target.value
-                            })
+                        <span>States Selector</span>
+                        <MultiSelect
+                          selected={config.general.statesPicked.map(state => state.stateName)}
+                          options={StateOptionList().map(option => ({
+                            value: option.props.value,
+                            label: option.props.children
+                          }))}
+                          fieldName={'statesPicked'}
+                          updateField={(_, __, ___, selectedOptions) => {
+                            handleEditorChanges('chooseState', selectedOptions)
                           }}
                         />
                       </label>
-                    </div>
-                  ))}
-                  {config.legend.specialClasses.length < 2 && (
-                    <button
-                      className='btn btn-primary full-width'
-                      onClick={e => {
-                        e.preventDefault()
-                        editColumn('primary', 'specialClassAdd', {})
+                    )}
+                    {/* Country Selection for World Maps */}
+                    {config.general.geoType === 'world' && (
+                      <>
+                        <label>
+                          <span>Countries Selector</span>
+                          <MultiSelect
+                            selected={(config.general.countriesPicked || []).map(country => country.name)}
+                            options={CountryOptionList().map(option => ({
+                              value: option.props.value,
+                              label: option.props.children
+                            }))}
+                            fieldName={'countriesPicked'}
+                            updateField={(_, __, ___, selectedOptions) => {
+                              handleEditorChanges('chooseCountry', selectedOptions)
+                            }}
+                          />
+                        </label>
+                        {config.general.countriesPicked && config.general.countriesPicked.length > 0 && (
+                          <CheckBox
+                            value={config.general.hideUnselectedCountries || false}
+                            fieldName='hideUnselectedCountries'
+                            label='Hide Unselected Countries'
+                            updateField={updateField}
+                            section='general'
+                          />
+                        )}
+                      </>
+                    )}
+                    {/* Type */}
+                    <Select
+                      label={
+                        <>
+                          Map Type
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                Select "Data" to create a color-coded data map. To create a navigation-only map, select
+                                "Navigation."
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </>
+                      }
+                      value={config.general.type}
+                      options={[
+                        { value: 'data', label: 'Data' },
+                        ...(config.general.geoType === 'us-county' ? [{ value: 'us-geocode', label: 'Geocode' }] : []),
+                        ...(config.general.geoType === 'world' ? [{ value: 'world-geocode', label: 'Geocode' }] : []),
+                        ...(config.general.geoType !== 'us-county'
+                          ? [{ value: 'navigation', label: 'Navigation' }]
+                          : []),
+                        ...(config.general.geoType === 'world' || config.general.geoType === 'us'
+                          ? [{ value: 'bubble', label: 'Bubble' }]
+                          : [])
+                      ]}
+                      onChange={event => {
+                        handleEditorChanges('editorMapType', event.target.value)
                       }}
-                    >
-                      Add Special Class
-                    </button>
-                  )}
-                </fieldset>
-              )}
+                    />
 
-              <label className='edit-block navigate column-heading'>
-                <span className='edit-label column-heading'>
-                  Navigation
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>
-                        To provide end users with navigation functionality, select the source column containing the
-                        navigation URLs.
-                      </p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                </span>
-                <Select
-                  value={config.columns.navigate ? config.columns.navigate.name : ''}
-                  options={columnsOptions.map(c => c.key)}
-                  onChange={event => {
-                    editColumn('navigate', 'name', event.target.value)
-                  }}
-                />
-              </label>
-              {'navigation' !== config.general.type && (
-                <fieldset className='primary-fieldset edit-block'>
-                  <label>
-                    <span className='edit-label'>
-                      Additional Columns
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>
-                            You can specify additional columns to display in tooltips and / or the supporting data
-                            table.
-                          </p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    </span>
-                  </label>
-                  {additionalColumns.map(val => (
-                    <fieldset className='edit-block' key={val}>
-                      <button
-                        className='remove-column'
-                        onClick={event => {
-                          event.preventDefault()
-                          removeAdditionalColumn(val)
-                        }}
-                      >
-                        Remove
-                      </button>
+                    {/* Navigation Behavior */}
+                    {(config.general.type === 'navigation' || config.general.type === 'data') && (
                       <Select
-                        label='Column'
-                        value={config.columns[val] ? config.columns[val].name : ''}
-                        options={columnsOptions.map(option => ({
-                          value: option.props.value,
-                          label: option.props.children
-                        }))}
+                        label='Navigation Behavior'
+                        value={config.general.navigationTarget}
+                        options={[
+                          { value: '_self', label: 'Same Window' },
+                          { value: '_blank', label: 'New Window' }
+                        ]}
                         onChange={event => {
-                          editColumn(val, 'name', event.target.value)
+                          const _newConfig = cloneConfig(config)
+                          _newConfig.general.navigationTarget = event.target.value
+                          setConfig(_newConfig)
                         }}
                       />
-                      <TextField
-                        value={columns[val].label}
-                        section='columns'
-                        subsection={val}
-                        fieldName='label'
-                        label='Label'
+                    )}
+                    <label>
+                      <span className='edit-label'>Data Classification Type</span>
+                      <div>
+                        <label>
+                          <input
+                            type='radio'
+                            name='equalnumber'
+                            value='equalnumber'
+                            checked={config.legend.type === 'equalnumber' || config.legend.type === 'equalinterval'}
+                            onChange={e => handleEditorChanges('classificationType', e.target.value)}
+                          />
+                          Numeric/Quantitative
+                        </label>
+                        <label>
+                          <input
+                            type='radio'
+                            name='category'
+                            value='category'
+                            checked={config.legend.type === 'category'}
+                            onChange={e => handleEditorChanges('classificationType', e.target.value)}
+                          />
+                          Categorical
+                        </label>
+                      </div>
+                    </label>
+
+                    {/* Display as Hex */}
+                    {general.geoType === 'us' && general.type !== 'navigation' && general.type !== 'bubble' && (
+                      <CheckBox
+                        value={config.general.displayAsHex}
+                        section='general'
+                        subsection={null}
+                        fieldName='displayAsHex'
+                        label='Display As Hex Map'
+                        updateField={updateField}
+                        className=''
+                      />
+                    )}
+
+                    {/* Shapes on Hex */}
+                    <CheckBox
+                      value={config.hexMap.type === 'shapes'}
+                      section='hexMap'
+                      subsection={null}
+                      fieldName='type'
+                      label='Display Shapes on Hex Map'
+                      updateField={updateField}
+                      onChange={event => {
+                        setConfig({
+                          ...config,
+                          hexMap: {
+                            ...config.hexMap,
+                            type: event.target.checked ? 'shapes' : 'standard'
+                          }
+                        })
+                      }}
+                    />
+                    <HexSetting.ShapeColumns columnsOptions={columnsOptions} />
+
+                    {'us' === config.general.geoType &&
+                      'bubble' !== config.general.type &&
+                      false === config.general.displayAsHex && (
+                        <CheckBox
+                          label='Show state labels'
+                          checked={config.general.displayStateLabels}
+                          onChange={event => {
+                            handleEditorChanges('displayStateLabels', event.target.checked)
+                          }}
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>Recommended set to display for Section 508 compliance.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                        />
+                      )}
+
+                    {'us' === config.general.geoType && (
+                      <CheckBox
+                        value={general.territoriesAlwaysShow || false}
+                        section='general'
+                        subsection={null}
+                        fieldName='territoriesAlwaysShow'
+                        label='Show All Territories'
                         updateField={updateField}
                       />
-                      <ul className='column-edit'>
-                        <li className='three-col'>
-                          <TextField
-                            value={columns[val].prefix}
-                            section='columns'
-                            subsection={val}
-                            fieldName='prefix'
-                            label='Prefix'
-                            updateField={updateField}
-                          />
-                          <TextField
-                            value={columns[val].suffix}
-                            section='columns'
-                            subsection={val}
-                            fieldName='suffix'
-                            label='Suffix'
-                            updateField={updateField}
-                          />
-                          <TextField
-                            type='number'
-                            value={columns[val].roundToPlace}
-                            section='columns'
-                            subsection={val}
-                            fieldName='roundToPlace'
-                            label='Round'
-                            updateField={updateField}
-                          />
-                        </li>
-                        <CheckBox
-                          value={config.columns[val].useCommas}
-                          section='columns'
-                          subsection={val}
-                          fieldName='useCommas'
-                          label='Add Commas to Numbers'
-                          updateField={updateField}
+                    )}
+                  </AccordionItemPanel>
+                </AccordionItem>
+                <AccordionItem>
+                  {' '}
+                  {/* General */}
+                  <AccordionItemHeading>
+                    <AccordionItemButton>General</AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                    <TextField
+                      value={general.title}
+                      data-testid='title-input'
+                      updateField={updateField}
+                      section='general'
+                      fieldName='title'
+                      id='title'
+                      label='Title'
+                      placeholder='Map Title'
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>
+                              Title is required to set the name of the download file but can be hidden using the option
+                              below.
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                    <CheckBox
+                      value={config.general.showTitle || false}
+                      section='general'
+                      subsection={null}
+                      fieldName='showTitle'
+                      label='Show Title'
+                      updateField={updateField}
+                    />
+                    <TextField
+                      value={general.superTitle || ''}
+                      updateField={updateField}
+                      section='general'
+                      fieldName='superTitle'
+                      label='Super Title'
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Super Title</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                    <TextField
+                      type='textarea'
+                      value={general.introText}
+                      updateField={updateField}
+                      section='general'
+                      fieldName='introText'
+                      label='Message'
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Intro Text</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                    <TextField
+                      type='textarea'
+                      value={general.subtext}
+                      updateField={updateField}
+                      section='general'
+                      fieldName='subtext'
+                      label='Subtext'
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>
+                              Enter supporting text to display below the data visualization, if applicable. The
+                              following HTML tags are supported: strong, em, sup, and sub.
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                    <TextField
+                      type='textarea'
+                      value={general.footnotes}
+                      updateField={updateField}
+                      section='general'
+                      fieldName='footnotes'
+                      label='Footnotes'
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Footnotes</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+
+                    {/* <label className="checkbox mt-4">
+                    <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
+                    <span className="edit-label">Enable Media Download</span>
+                  </label> */}
+                  </AccordionItemPanel>
+                </AccordionItem>
+                <AccordionItem>
+                  {' '}
+                  {/* Columns */}
+                  <AccordionItemHeading>
+                    <AccordionItemButton>Columns</AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                    <fieldset className='primary-fieldset edit-block'>
+                      <label>
+                        <span className='edit-label column-heading'>
+                          Geography
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                Select the source column containing the map location names or, for county-level maps,
+                                the FIPS codes.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
+                        <Select
+                          value={config.columns.geo ? config.columns.geo.name : columnsOptions[0]}
+                          options={columnsOptions.map(c => c.key)}
                           onChange={event => {
-                            editColumn(val, 'useCommas', event.target.checked)
+                            editColumn('geo', 'name', event.target.value)
                           }}
                         />
+                      </label>
+                      {config.general.type === 'us-geocode' && (
                         <CheckBox
-                          value={config.columns[val].dataTable}
-                          section='columns'
-                          subsection={val}
-                          fieldName='dataTable'
-                          label='Show in Data Table'
+                          value={config.general.convertFipsCodes}
+                          section='general'
+                          subsection={null}
+                          fieldName='convertFipsCodes'
+                          label='Convert FIPS Codes to Geography Name'
                           updateField={updateField}
-                          onChange={event => {
-                            editColumn(val, 'dataTable', event.target.checked)
-                          }}
                         />
-                        <CheckBox
-                          value={config.columns[val].tooltip}
-                          section='columns'
-                          subsection={val}
-                          fieldName='tooltip'
-                          label='Show in Tooltips'
-                          updateField={updateField}
-                          onChange={event => {
-                            editColumn(val, 'tooltip', event.target.checked)
-                          }}
-                        />
-                      </ul>
+                      )}
+
+                      <CheckBox
+                        value={config.general.hideGeoColumnInTooltip || false}
+                        section='general'
+                        subsection={null}
+                        fieldName='hideGeoColumnInTooltip'
+                        label='Hide Geography Column Name in Tooltip'
+                        updateField={updateField}
+                      />
+                      <TextField
+                        value={config.general.geoLabelOverride}
+                        section='general'
+                        fieldName='geoLabelOverride'
+                        label='Geography Label'
+                        className='edit-label'
+                        updateField={updateField}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Enter a geography label for use in tooltips.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
                     </fieldset>
-                  ))}
-                  <button
-                    className={'btn btn-primary full-width'}
-                    onClick={event => {
-                      event.preventDefault()
-                      addAdditionalColumn(additionalColumns.length + 1)
-                    }}
-                  >
-                    Add Column
-                  </button>
-                </fieldset>
-              )}
-              {'category' === config.legend.type && (
-                <fieldset className='primary-fieldset edit-block'>
-                  <label>
-                    <span className='edit-label'>
-                      Additional Category
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>You can provide additional categories to ensure they appear in the legend</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    </span>
-                  </label>
-                  {config.legend.additionalCategories &&
-                    config.legend.additionalCategories.map((val, i) => (
-                      <fieldset className='edit-block' key={val}>
-                        <button
-                          className='remove-column'
-                          onClick={event => {
-                            event.preventDefault()
-                            const updatedAdditionaCategories = [...config.legend.additionalCategories]
-                            updatedAdditionaCategories.splice(i, 1)
-                            updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
+                    {'navigation' !== config.general.type && (
+                      <fieldset className='primary-fieldset edit-block'>
+                        <Select
+                          label='Data Column'
+                          value={columns.primary.name}
+                          options={columnsOptions.map(c => c.key)}
+                          onChange={event => {
+                            const _state = cloneConfig(config)
+                            _state.columns.primary.name = event.target.value
+                            _state.columns.primary.label = event.target.value
+                            setConfig(_state)
                           }}
-                        >
-                          Remove
-                        </button>
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>
+                                  Select the source column containing the categorical or numeric values to be mapped.
+                                </p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                        />
                         <label>
-                          <span className='edit-label column-heading'>Category</span>
-                          <TextField
-                            value={val}
-                            section='legend'
+                          <CheckBox
+                            value={config.general.hidePrimaryColumnInTooltip || false}
+                            section='general'
                             subsection={null}
-                            fieldName='additionalCategories'
-                            updateField={(section, subsection, fieldName, value) => {
-                              const updatedAdditionaCategories = [...config.legend.additionalCategories]
-                              updatedAdditionaCategories[i] = value
-                              updateField(section, subsection, fieldName, updatedAdditionaCategories)
+                            fieldName='hidePrimaryColumnInTooltip'
+                            label='Hide Data Column Name in Tooltip'
+                            updateField={updateField}
+                            onChange={event => {
+                              handleEditorChanges('hidePrimaryColumnInTooltip', event.target.checked)
+                            }}
+                          />
+                        </label>
+                        <TextField
+                          value={columns.primary.label}
+                          section='columns'
+                          subsection='primary'
+                          fieldName='label'
+                          label='Data Label'
+                          updateField={updateField}
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>Enter a data label for use in tooltips and the data table.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                        />
+                        <ul className='column-edit'>
+                          <li className='three-col'>
+                            <TextField
+                              value={columns.primary.prefix}
+                              section='columns'
+                              subsection='primary'
+                              fieldName='prefix'
+                              label='Prefix'
+                              updateField={updateField}
+                            />
+                            <TextField
+                              value={columns.primary.suffix}
+                              section='columns'
+                              subsection='primary'
+                              fieldName='suffix'
+                              label='Suffix'
+                              updateField={updateField}
+                            />
+                            <TextField
+                              type='number'
+                              value={columns.primary.roundToPlace}
+                              section='columns'
+                              subsection='primary'
+                              fieldName='roundToPlace'
+                              label='Round'
+                              updateField={updateField}
+                              min={0}
+                            />
+                          </li>
+                          <CheckBox
+                            value={config.columns.primary.useCommas}
+                            section='columns'
+                            subsection='primary'
+                            fieldName='useCommas'
+                            label='Add Commas to Numbers'
+                            updateField={updateField}
+                          />
+                          <CheckBox
+                            value={config.columns.primary.dataTable || false}
+                            section='columns'
+                            subsection='primary'
+                            fieldName='dataTable'
+                            label='Show in Data Table'
+                            updateField={updateField}
+                          />
+                          <CheckBox
+                            value={config.columns.primary.tooltip || false}
+                            section='columns'
+                            subsection='primary'
+                            fieldName='tooltip'
+                            label='Show in Tooltips'
+                            updateField={updateField}
+                          />
+                        </ul>
+                      </fieldset>
+                    )}
+
+                    {config.general.type === 'bubble' && config.legend.type === 'category' && (
+                      <fieldset className='primary-fieldset edit-block'>
+                        <label>
+                          <span className='edit-label column-heading'>
+                            Category Column
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>Select the source column containing the categorical bubble values to be mapped.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          </span>
+                          <Select
+                            label=''
+                            value={
+                              config.columns.categorical ? config.columns.categorical.name : columnsOptions[0]?.key
+                            }
+                            options={columnsOptions.map(c => c.key)}
+                            onChange={event => {
+                              editColumn('categorical', 'name', event.target.value)
                             }}
                           />
                         </label>
                       </fieldset>
-                    ))}
-                  <button
-                    className={'btn btn-primary full-width'}
-                    onClick={event => {
-                      event.preventDefault()
-                      const updatedAdditionaCategories = [...(config.legend.additionalCategories || [])]
-                      updatedAdditionaCategories.push('')
-                      updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
-                    }}
-                  >
-                    Add Category
-                  </button>
-                </fieldset>
-              )}
-            </AccordionItemPanel>
-          </AccordionItem>{' '}
-          {/* Columns */}
-          {'navigation' !== config.general.type && (
-            <AccordionItem>
-              {' '}
-              {/* Legend */}
-              <AccordionItemHeading>
-                <AccordionItemButton>Legend</AccordionItemButton>
-              </AccordionItemHeading>
-              <AccordionItemPanel>
-                {(config.legend.type === 'equalnumber' || config.legend.type === 'equalinterval') && (
-                  <Select
-                    label='Legend Type'
-                    value={legend.type}
-                    options={[
-                      { value: 'equalnumber', label: 'Equal Number (Quantiles)' },
-                      { value: 'equalinterval', label: 'Equal Interval' }
-                    ]}
-                    onChange={event => {
-                      let testForType = Number(typeof config.data[0][config.columns.primary.name])
-                      let hasValue = config.data[0][config.columns.primary.name]
-                      let messages = []
-
-                      if (!hasValue) {
-                        messages.push(
-                          `There appears to be values missing for data in the primary column ${config.columns.primary.name}`
-                        )
-                      }
-
-                      if (testForType === 'string' && isNaN(testForType) && value !== 'category') {
-                        messages.push(
-                          'Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to DEV-12345categorical.'
-                        )
-                      } else {
-                        messages = []
-                      }
-
-                      const _newConfig = cloneConfig(config)
-                      _newConfig.legend.type = event.target.value
-                      _newConfig.runtime.editorErrorMessage = messages
-                      setConfig(_newConfig)
-                    }}
-                  />
-                )}
-                {'navigation' !== config.general.type && (
-                  <CheckBox
-                    value={config.general.showSidebar || false}
-                    section='general'
-                    subsection={null}
-                    fieldName='showSidebar'
-                    label='Show Legend'
-                    updateField={updateField}
-                  />
-                )}
-                {'navigation' !== config.general.type && (
-                  <>
-                    <Select
-                      label='Legend Position'
-                      value={legend.position || ''}
-                      options={[
-                        { value: 'side', label: 'Side' },
-                        { value: 'bottom', label: 'Bottom' },
-                        { value: 'top', label: 'Top' }
-                      ]}
-                      onChange={event => {
-                        handleEditorChanges('sidebarPosition', event.target.value)
-                      }}
-                    />
-                    {(config.legend.position === 'side' || !config.legend.position) &&
-                      config.legend.style === 'gradient' && (
-                        <span style={{ color: 'red', fontSize: '14px' }}>
-                          Position must be set to top or bottom to use gradient style.
-                        </span>
-                      )}
-                  </>
-                )}
-                {'navigation' !== config.general.type && (
-                  <Select
-                    label={
+                    )}
+                    {
                       <>
-                        Legend Style
+                        <Select
+                          label='Latitude Column'
+                          value={config.columns.latitude.name}
+                          options={columnsOptions.map(c => c.key)}
+                          onChange={e => {
+                            editColumn('latitude', 'name', e.target.value)
+                          }}
+                        />
+                        <Select
+                          label='Longitude Column'
+                          value={config.columns.longitude.name}
+                          options={columnsOptions.map(c => c.key)}
+                          onChange={e => {
+                            editColumn('longitude', 'name', e.target.value)
+                          }}
+                        />
+                      </>
+                    }
+
+                    {'navigation' !== config.general.type && (
+                      <fieldset className='primary-fieldset edit-block'>
+                        <label>
+                          <span className='edit-label'>
+                            Special Classes
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>
+                                  For secondary values such as "NA", the system can automatically color-code them in
+                                  shades of gray, one shade for each special class.
+                                </p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          </span>
+                        </label>
+                        {config.legend.specialClasses.length === 2 && (
+                          <Alert
+                            type='info'
+                            message='If a third special class is needed you can apply a pattern to set it apart.'
+                            showCloseButton={false}
+                          />
+                        )}
+                        {specialClasses.map((specialClass, i) => (
+                          <div className='edit-block' key={`special-class-${i}`}>
+                            <button
+                              className='remove-column'
+                              onClick={e => {
+                                e.preventDefault()
+                                editColumn('primary', 'specialClassDelete', i)
+                              }}
+                            >
+                              Remove
+                            </button>
+                            <p>Special Class {i + 1}</p>
+                            <Select
+                              label='Data Key'
+                              value={specialClass.key}
+                              options={columnsOptions.map(option => ({
+                                value: option.key,
+                                label: option.key
+                              }))}
+                              onChange={event => {
+                                editColumn('primary', 'specialClassEdit', {
+                                  prop: 'key',
+                                  index: i,
+                                  value: event.target.value
+                                })
+                              }}
+                            />
+                            <Select
+                              label='Value'
+                              value={specialClass.value}
+                              options={[
+                                { value: '', label: '- Select Value -' },
+                                ...(columnsByKey[specialClass.key] || [])
+                                  .sort()
+                                  .map(option => ({ value: option, label: option }))
+                              ]}
+                              onChange={event => {
+                                editColumn('primary', 'specialClassEdit', {
+                                  prop: 'value',
+                                  index: i,
+                                  value: event.target.value
+                                })
+                              }}
+                            />
+                            <label>
+                              <span className='edit-label column-heading'>Label</span>
+                              <input
+                                type='text'
+                                value={specialClass.label}
+                                onChange={e => {
+                                  editColumn('primary', 'specialClassEdit', {
+                                    prop: 'label',
+                                    index: i,
+                                    value: e.target.value
+                                  })
+                                }}
+                              />
+                            </label>
+                          </div>
+                        ))}
+                        {config.legend.specialClasses.length < 2 && (
+                          <button
+                            className='btn btn-primary full-width'
+                            onClick={e => {
+                              e.preventDefault()
+                              editColumn('primary', 'specialClassAdd', {})
+                            }}
+                          >
+                            Add Special Class
+                          </button>
+                        )}
+                      </fieldset>
+                    )}
+
+                    <label className='edit-block navigate column-heading'>
+                      <span className='edit-label column-heading'>
+                        Navigation
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>
+                              To provide end users with navigation functionality, select the source column containing
+                              the navigation URLs.
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      </span>
+                      <Select
+                        value={config.columns.navigate ? config.columns.navigate.name : ''}
+                        options={columnsOptions.map(c => c.key)}
+                        onChange={event => {
+                          editColumn('navigate', 'name', event.target.value)
+                        }}
+                      />
+                    </label>
+                    {'navigation' !== config.general.type && (
+                      <fieldset className='primary-fieldset edit-block'>
+                        <label>
+                          <span className='edit-label'>
+                            Additional Columns
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>
+                                  You can specify additional columns to display in tooltips and / or the supporting data
+                                  table.
+                                </p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          </span>
+                        </label>
+                        {additionalColumns.map(val => (
+                          <fieldset className='edit-block' key={val}>
+                            <button
+                              className='remove-column'
+                              onClick={event => {
+                                event.preventDefault()
+                                removeAdditionalColumn(val)
+                              }}
+                            >
+                              Remove
+                            </button>
+                            <Select
+                              label='Column'
+                              value={config.columns[val] ? config.columns[val].name : ''}
+                              options={columnsOptions.map(option => ({
+                                value: option.props.value,
+                                label: option.props.children
+                              }))}
+                              onChange={event => {
+                                editColumn(val, 'name', event.target.value)
+                              }}
+                            />
+                            <TextField
+                              value={columns[val].label}
+                              section='columns'
+                              subsection={val}
+                              fieldName='label'
+                              label='Label'
+                              updateField={updateField}
+                            />
+                            <ul className='column-edit'>
+                              <li className='three-col'>
+                                <TextField
+                                  value={columns[val].prefix}
+                                  section='columns'
+                                  subsection={val}
+                                  fieldName='prefix'
+                                  label='Prefix'
+                                  updateField={updateField}
+                                />
+                                <TextField
+                                  value={columns[val].suffix}
+                                  section='columns'
+                                  subsection={val}
+                                  fieldName='suffix'
+                                  label='Suffix'
+                                  updateField={updateField}
+                                />
+                                <TextField
+                                  type='number'
+                                  value={columns[val].roundToPlace}
+                                  section='columns'
+                                  subsection={val}
+                                  fieldName='roundToPlace'
+                                  label='Round'
+                                  updateField={updateField}
+                                />
+                              </li>
+                              <CheckBox
+                                value={config.columns[val].useCommas}
+                                section='columns'
+                                subsection={val}
+                                fieldName='useCommas'
+                                label='Add Commas to Numbers'
+                                updateField={updateField}
+                                onChange={event => {
+                                  editColumn(val, 'useCommas', event.target.checked)
+                                }}
+                              />
+                              <CheckBox
+                                value={config.columns[val].dataTable}
+                                section='columns'
+                                subsection={val}
+                                fieldName='dataTable'
+                                label='Show in Data Table'
+                                updateField={updateField}
+                                onChange={event => {
+                                  editColumn(val, 'dataTable', event.target.checked)
+                                }}
+                              />
+                              <CheckBox
+                                value={config.columns[val].tooltip}
+                                section='columns'
+                                subsection={val}
+                                fieldName='tooltip'
+                                label='Show in Tooltips'
+                                updateField={updateField}
+                                onChange={event => {
+                                  editColumn(val, 'tooltip', event.target.checked)
+                                }}
+                              />
+                            </ul>
+                          </fieldset>
+                        ))}
+                        <button
+                          className={'btn btn-primary full-width'}
+                          onClick={event => {
+                            event.preventDefault()
+                            addAdditionalColumn(additionalColumns.length + 1)
+                          }}
+                        >
+                          Add Column
+                        </button>
+                      </fieldset>
+                    )}
+                    {'category' === config.legend.type && (
+                      <fieldset className='primary-fieldset edit-block'>
+                        <label>
+                          <span className='edit-label'>
+                            Additional Category
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>You can provide additional categories to ensure they appear in the legend</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          </span>
+                        </label>
+                        {config.legend.additionalCategories &&
+                          config.legend.additionalCategories.map((val, i) => (
+                            <fieldset className='edit-block' key={val}>
+                              <button
+                                className='remove-column'
+                                onClick={event => {
+                                  event.preventDefault()
+                                  const updatedAdditionaCategories = [...config.legend.additionalCategories]
+                                  updatedAdditionaCategories.splice(i, 1)
+                                  updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
+                                }}
+                              >
+                                Remove
+                              </button>
+                              <label>
+                                <span className='edit-label column-heading'>Category</span>
+                                <TextField
+                                  value={val}
+                                  section='legend'
+                                  subsection={null}
+                                  fieldName='additionalCategories'
+                                  updateField={(section, subsection, fieldName, value) => {
+                                    const updatedAdditionaCategories = [...config.legend.additionalCategories]
+                                    updatedAdditionaCategories[i] = value
+                                    updateField(section, subsection, fieldName, updatedAdditionaCategories)
+                                  }}
+                                />
+                              </label>
+                            </fieldset>
+                          ))}
+                        <button
+                          className={'btn btn-primary full-width'}
+                          onClick={event => {
+                            event.preventDefault()
+                            const updatedAdditionaCategories = [...(config.legend.additionalCategories || [])]
+                            updatedAdditionaCategories.push('')
+                            updateField('legend', null, 'additionalCategories', updatedAdditionaCategories)
+                          }}
+                        >
+                          Add Category
+                        </button>
+                      </fieldset>
+                    )}
+                  </AccordionItemPanel>
+                </AccordionItem>{' '}
+                {/* Columns */}
+                {'navigation' !== config.general.type && (
+                  <AccordionItem>
+                    {' '}
+                    {/* Legend */}
+                    <AccordionItemHeading>
+                      <AccordionItemButton>Legend</AccordionItemButton>
+                    </AccordionItemHeading>
+                    <AccordionItemPanel>
+                      {(config.legend.type === 'equalnumber' || config.legend.type === 'equalinterval') && (
+                        <Select
+                          label='Legend Type'
+                          value={legend.type}
+                          options={[
+                            { value: 'equalnumber', label: 'Equal Number (Quantiles)' },
+                            { value: 'equalinterval', label: 'Equal Interval' }
+                          ]}
+                          onChange={event => {
+                            let testForType = Number(typeof config.data[0][config.columns.primary.name])
+                            let hasValue = config.data[0][config.columns.primary.name]
+                            let messages = []
+
+                            if (!hasValue) {
+                              messages.push(
+                                `There appears to be values missing for data in the primary column ${config.columns.primary.name}`
+                              )
+                            }
+
+                            if (testForType === 'string' && isNaN(testForType) && value !== 'category') {
+                              messages.push(
+                                'Error with legend. Primary columns that are text must use a categorical legend type. Try changing the legend type to DEV-12345categorical.'
+                              )
+                            } else {
+                              messages = []
+                            }
+
+                            const _newConfig = cloneConfig(config)
+                            _newConfig.legend.type = event.target.value
+                            _newConfig.runtime.editorErrorMessage = messages
+                            setConfig(_newConfig)
+                          }}
+                        />
+                      )}
+                      {'navigation' !== config.general.type && (
+                        <CheckBox
+                          value={config.general.showSidebar || false}
+                          section='general'
+                          subsection={null}
+                          fieldName='showSidebar'
+                          label='Show Legend'
+                          updateField={updateField}
+                        />
+                      )}
+                      {'navigation' !== config.general.type && (
+                        <>
+                          <Select
+                            label='Legend Position'
+                            value={legend.position || ''}
+                            options={[
+                              { value: 'side', label: 'Side' },
+                              { value: 'bottom', label: 'Bottom' },
+                              { value: 'top', label: 'Top' }
+                            ]}
+                            onChange={event => {
+                              handleEditorChanges('sidebarPosition', event.target.value)
+                            }}
+                          />
+                          {(config.legend.position === 'side' || !config.legend.position) &&
+                            config.legend.style === 'gradient' && (
+                              <span style={{ color: 'red', fontSize: '14px' }}>
+                                Position must be set to top or bottom to use gradient style.
+                              </span>
+                            )}
+                        </>
+                      )}
+                      {'navigation' !== config.general.type && (
+                        <Select
+                          label={
+                            <>
+                              Legend Style
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon
+                                    display='question'
+                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                  />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    If using gradient style, limit the legend to five items for better mobile
+                                    visibility, and position the legend at the top or bottom.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            </>
+                          }
+                          value={legend.style || ''}
+                          options={[
+                            { value: 'circles', label: 'circles' },
+                            { value: 'boxes', label: 'boxes' },
+                            ...(legend.position !== 'side' ? [{ value: 'gradient', label: 'gradient' }] : [])
+                          ]}
+                          onChange={event => {
+                            handleEditorChanges('legendStyle', event.target.value)
+                          }}
+                        />
+                      )}
+                      {'navigation' !== config.general.type && config.legend.style === 'gradient' && (
+                        <Select
+                          label='Gradient Style'
+                          value={legend.subStyle || ''}
+                          options={['linear blocks', 'smooth']}
+                          onChange={event => {
+                            handleEditorChanges('legendSubStyle', event.target.value)
+                          }}
+                        />
+                      )}
+                      {allowLegendSeparators && (
+                        <TextField
+                          value={legend.separators}
+                          updateField={updateField}
+                          section='legend'
+                          fieldName='separators'
+                          label='Legend Separators'
+                          placeholder='ex: 1,4'
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>
+                                  Separators between legend items represented by the legend item numbers separated by
+                                  commas.
+                                </p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                        />
+                      )}
+                      {'navigation' !== config.general.type && config.legend.style === 'gradient' && (
+                        <label>
+                          <span className='edit-label'>Tick Rotation (Degrees)</span>
+                          <input
+                            type='number'
+                            className='number-narrow'
+                            value={legend.tickRotation || ''}
+                            onChange={event => {
+                              handleEditorChanges('legendTickRotation', event.target.value)
+                            }}
+                          ></input>
+                        </label>
+                      )}
+                      {
+                        <CheckBox
+                          value={legend.hideBorder}
+                          section='legend'
+                          subsection={null}
+                          fieldName='hideBorder'
+                          label='Hide Legend Box'
+                          updateField={updateField}
+                          onChange={event => {
+                            handleEditorChanges('legendBorder', event.target.checked)
+                          }}
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon
+                                  display='question'
+                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p> Default option for top and bottom legends is 'No Box.'</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                        />
+                      }
+                      {'side' === legend.position && (
+                        <CheckBox
+                          value={legend.singleColumn}
+                          section='legend'
+                          subsection={null}
+                          fieldName='singleColumn'
+                          label='Single Column Legend'
+                          updateField={updateField}
+                          onChange={event => {
+                            const _newConfig = cloneConfig(config)
+                            _newConfig.legend.singleColumn = event.target.checked
+                            _newConfig.legend.singleRow = false
+                            _newConfig.legend.verticalSorted = false
+
+                            setConfig(_newConfig)
+                          }}
+                        />
+                      )}
+                      {'side' !== legend.position && legend.style !== 'gradient' && (
+                        <CheckBox
+                          value={legend.singleRow}
+                          section='legend'
+                          subsection={null}
+                          fieldName='singleRow'
+                          label='Single Row Legend'
+                          updateField={updateField}
+                          onChange={event => {
+                            const _newConfig = cloneConfig(config)
+                            _newConfig.legend.singleRow = event.target.checked
+                            _newConfig.legend.singleColumn = false
+                            _newConfig.legend.verticalSorted = false
+
+                            setConfig(_newConfig)
+                          }}
+                        />
+                      )}
+
+                      {'navigation' !== config.general.type && config.legend.type === 'category' && (
+                        <Select
+                          label='Legend Group By :'
+                          value={legend.groupBy || ''}
+                          options={columnsOptions.map(c => c.key)}
+                          onChange={event => {
+                            const _newConfig = cloneConfig(config)
+                            _newConfig.legend.groupBy = event.target.value
+                            setConfig(_newConfig)
+                          }}
+                        />
+                      )}
+                      {config.legend.style !== 'gradient' && (
+                        <CheckBox
+                          value={legend.verticalSorted}
+                          section='legend'
+                          subsection={null}
+                          fieldName='verticalSorted'
+                          label='Vertical sorted legend'
+                          updateField={updateField}
+                        />
+                      )}
+
+                      {/* always show */}
+                      {
+                        <CheckBox
+                          value={legend.showSpecialClassesLast}
+                          section='legend'
+                          subsection={null}
+                          fieldName='showSpecialClassesLast'
+                          label='Show Special Classes Last'
+                          updateField={updateField}
+                          onChange={event => {
+                            handleEditorChanges('legendShowSpecialClassesLast', event.target.checked)
+                          }}
+                        />
+                      }
+                      {'category' !== legend.type && (
+                        <CheckBox
+                          value={legend.separateZero || false}
+                          section='legend'
+                          subsection={null}
+                          fieldName='separateZero'
+                          label='Separate Zero'
+                          updateField={updateField}
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon
+                                  display='question'
+                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>For numeric data, you can separate the zero value as its own data class.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                        />
+                      )}
+
+                      {/* Temp Checkbox */}
+                      {config.legend.type === 'equalnumber' && (
+                        <CheckBox
+                          value={config.general.equalNumberOptIn}
+                          section='general'
+                          subsection={null}
+                          fieldName='equalNumberOptIn'
+                          label='Use new quantile legend'
+                          updateField={updateField}
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon
+                                  display='question'
+                                  style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>
+                                  This prevents numbers from being used in more than one category (ie. 0-1, 1-2, 2-3){' '}
+                                </p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                        />
+                      )}
+
+                      {'category' !== legend.type && (
+                        <Select
+                          label={
+                            <>
+                              Number of Items
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    For numeric maps, select the number of data classes. Do not include designated
+                                    special classes.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            </>
+                          }
+                          value={legend.numberOfItems}
+                          options={[...Array(numberOfItemsLimit).keys()].map(num => ({
+                            value: num + 1,
+                            label: num + 1
+                          }))}
+                          onChange={event => {
+                            handleEditorChanges('legendNumber', event.target.value)
+                          }}
+                        />
+                      )}
+                      {'category' === legend.type && (
+                        <React.Fragment>
+                          <label>
+                            <span className='edit-label'>
+                              Category Order
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>Drag map categories into preferred legend order. </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            </span>
+                          </label>
+                          {/* TODO: Swap out this drag and drop library back to something simpler. I had to remove the old one because it hadn't been updated and wouldn't work with Webpack 5. This is overkill for our needs. */}
+                          <DragDropContext
+                            onDragEnd={({ source, destination }) => categoryMove(source.index, destination.index)}
+                          >
+                            <Droppable droppableId='category_order'>
+                              {provided => (
+                                <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef}>
+                                  <CategoryList />
+                                  {provided.placeholder}
+                                </ul>
+                              )}
+                            </Droppable>
+                          </DragDropContext>
+                          {runtimeLegend && runtimeLegend.length >= 10 && (
+                            <section className='error-box my-2'>
+                              <div>
+                                <strong className='pt-1'>Warning</strong>
+                                <p>
+                                  The maximum number of categorical legend items is 10. If your data has more than 10
+                                  categories your map will not display properly.
+                                </p>
+                              </div>
+                            </section>
+                          )}
+                        </React.Fragment>
+                      )}
+                      <TextField
+                        value={legend.title}
+                        updateField={updateField}
+                        section='legend'
+                        fieldName='title'
+                        label='Legend Title'
+                        placeholder='Legend Title'
+                      />
+                      {false === legend.dynamicDescription && (
+                        <TextField
+                          type='textarea'
+                          value={legend.description}
+                          updateField={updateField}
+                          section='legend'
+                          fieldName='description'
+                          label='Legend Description'
+                        />
+                      )}
+                      {true === legend.dynamicDescription && (
+                        <React.Fragment>
+                          <label>
+                            <span>Legend Description</span>
+                            <span className='subtext'>
+                              For {displayFilterLegendValue(activeFilterValueForDescription)}
+                            </span>
+                            <DynamicDesc value={legend.descriptions[String(activeFilterValueForDescription)]} />
+                          </label>
+                          <label>
+                            <Select
+                              label='Filter Value'
+                              value={String(activeFilterValueForDescription)}
+                              options={filterValueOptionList.map(arr => ({
+                                value: arr,
+                                label: displayFilterLegendValue(arr)
+                              }))}
+                              onChange={event => {
+                                handleEditorChanges('changeActiveFilterValue', event.target.value)
+                              }}
+                            />
+                          </label>
+                        </React.Fragment>
+                      )}
+                      {config.filters.length > 0 && (
+                        <label className='checkbox column-heading'>
+                          <CheckBox
+                            value={legend.dynamicDescription}
+                            section='legend'
+                            subsection={null}
+                            fieldName='dynamicDescription'
+                            label='Dynamic Legend Description'
+                            updateField={updateField}
+                            onChange={() => {
+                              handleEditorChanges('dynamicDescription', filterValueOptionList[0])
+                            }}
+                          />
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon
+                                display='question'
+                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                              />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                Check this option if the map has multiple filter controls and you want to specify a
+                                description for each filter selection.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </label>
+                      )}
+                      <span className='d-flex mt-2'>
+                        <CheckBox
+                          value={legend.unified}
+                          section='legend'
+                          subsection={null}
+                          fieldName='unified'
+                          label='Unified Legend'
+                          updateField={updateField}
+                          onChange={event => handleEditorChanges('unifiedLegend', event.target.checked)}
+                        />
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
                             <Icon
@@ -2222,658 +2623,289 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           </Tooltip.Target>
                           <Tooltip.Content>
                             <p>
-                              If using gradient style, limit the legend to five items for better mobile visibility, and
-                              position the legend at the top or bottom.
+                              Check this option if you want the high and low values in the legend to be based on{' '}
+                              <em>all</em> mapped values (useful for maps with filters or small multiples).
                             </p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      </>
-                    }
-                    value={legend.style || ''}
-                    options={[
-                      { value: 'circles', label: 'circles' },
-                      { value: 'boxes', label: 'boxes' },
-                      ...(legend.position !== 'side' ? [{ value: 'gradient', label: 'gradient' }] : [])
-                    ]}
-                    onChange={event => {
-                      handleEditorChanges('legendStyle', event.target.value)
-                    }}
-                  />
-                )}
-                {'navigation' !== config.general.type && config.legend.style === 'gradient' && (
-                  <Select
-                    label='Gradient Style'
-                    value={legend.subStyle || ''}
-                    options={['linear blocks', 'smooth']}
-                    onChange={event => {
-                      handleEditorChanges('legendSubStyle', event.target.value)
-                    }}
-                  />
-                )}
-                {allowLegendSeparators && (
-                  <TextField
-                    value={legend.separators}
-                    updateField={updateField}
-                    section='legend'
-                    fieldName='separators'
-                    label='Legend Separators'
-                    placeholder='ex: 1,4'
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>
-                            Separators between legend items represented by the legend item numbers separated by commas.
-                          </p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-                )}
-                {'navigation' !== config.general.type && config.legend.style === 'gradient' && (
-                  <label>
-                    <span className='edit-label'>Tick Rotation (Degrees)</span>
-                    <input
-                      type='number'
-                      className='number-narrow'
-                      value={legend.tickRotation || ''}
-                      onChange={event => {
-                        handleEditorChanges('legendTickRotation', event.target.value)
-                      }}
-                    ></input>
-                  </label>
-                )}
-                {
-                  <CheckBox
-                    value={legend.hideBorder}
-                    section='legend'
-                    subsection={null}
-                    fieldName='hideBorder'
-                    label='Hide Legend Box'
-                    updateField={updateField}
-                    onChange={event => {
-                      handleEditorChanges('legendBorder', event.target.checked)
-                    }}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p> Default option for top and bottom legends is 'No Box.'</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-                }
-                {'side' === legend.position && (
-                  <CheckBox
-                    value={legend.singleColumn}
-                    section='legend'
-                    subsection={null}
-                    fieldName='singleColumn'
-                    label='Single Column Legend'
-                    updateField={updateField}
-                    onChange={event => {
-                      const _newConfig = cloneConfig(config)
-                      _newConfig.legend.singleColumn = event.target.checked
-                      _newConfig.legend.singleRow = false
-                      _newConfig.legend.verticalSorted = false
-
-                      setConfig(_newConfig)
-                    }}
-                  />
-                )}
-                {'side' !== legend.position && legend.style !== 'gradient' && (
-                  <CheckBox
-                    value={legend.singleRow}
-                    section='legend'
-                    subsection={null}
-                    fieldName='singleRow'
-                    label='Single Row Legend'
-                    updateField={updateField}
-                    onChange={event => {
-                      const _newConfig = cloneConfig(config)
-                      _newConfig.legend.singleRow = event.target.checked
-                      _newConfig.legend.singleColumn = false
-                      _newConfig.legend.verticalSorted = false
-
-                      setConfig(_newConfig)
-                    }}
-                  />
-                )}
-
-                {'navigation' !== config.general.type && config.legend.type === 'category' && (
-                  <Select
-                    label='Legend Group By :'
-                    value={legend.groupBy || ''}
-                    options={columnsOptions.map(c => c.key)}
-                    onChange={event => {
-                      const _newConfig = cloneConfig(config)
-                      _newConfig.legend.groupBy = event.target.value
-                      setConfig(_newConfig)
-                    }}
-                  />
-                )}
-                {config.legend.style !== 'gradient' && (
-                  <CheckBox
-                    value={legend.verticalSorted}
-                    section='legend'
-                    subsection={null}
-                    fieldName='verticalSorted'
-                    label='Vertical sorted legend'
-                    updateField={updateField}
-                  />
-                )}
-
-                {/* always show */}
-                {
-                  <CheckBox
-                    value={legend.showSpecialClassesLast}
-                    section='legend'
-                    subsection={null}
-                    fieldName='showSpecialClassesLast'
-                    label='Show Special Classes Last'
-                    updateField={updateField}
-                    onChange={event => {
-                      handleEditorChanges('legendShowSpecialClassesLast', event.target.checked)
-                    }}
-                  />
-                }
-                {'category' !== legend.type && (
-                  <CheckBox
-                    value={legend.separateZero || false}
-                    section='legend'
-                    subsection={null}
-                    fieldName='separateZero'
-                    label='Separate Zero'
-                    updateField={updateField}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>For numeric data, you can separate the zero value as its own data class.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-                )}
-
-                {/* Temp Checkbox */}
-                {config.legend.type === 'equalnumber' && (
-                  <CheckBox
-                    value={config.general.equalNumberOptIn}
-                    section='general'
-                    subsection={null}
-                    fieldName='equalNumberOptIn'
-                    label='Use new quantile legend'
-                    updateField={updateField}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                          />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>This prevents numbers from being used in more than one category (ie. 0-1, 1-2, 2-3) </p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-                )}
-
-                {'category' !== legend.type && (
-                  <Select
-                    label={
-                      <>
-                        Number of Items
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>
-                              For numeric maps, select the number of data classes. Do not include designated special
-                              classes.
-                            </p>
-                          </Tooltip.Content>
-                        </Tooltip>
-                      </>
-                    }
-                    value={legend.numberOfItems}
-                    options={[...Array(numberOfItemsLimit).keys()].map(num => ({
-                      value: num + 1,
-                      label: num + 1
-                    }))}
-                    onChange={event => {
-                      handleEditorChanges('legendNumber', event.target.value)
-                    }}
-                  />
-                )}
-                {'category' === legend.type && (
-                  <React.Fragment>
-                    <label>
-                      <span className='edit-label'>
-                        Category Order
-                        <Tooltip style={{ textTransform: 'none' }}>
-                          <Tooltip.Target>
-                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                          </Tooltip.Target>
-                          <Tooltip.Content>
-                            <p>Drag map categories into preferred legend order. </p>
                           </Tooltip.Content>
                         </Tooltip>
                       </span>
-                    </label>
-                    {/* TODO: Swap out this drag and drop library back to something simpler. I had to remove the old one because it hadn't been updated and wouldn't work with Webpack 5. This is overkill for our needs. */}
-                    <DragDropContext
-                      onDragEnd={({ source, destination }) => categoryMove(source.index, destination.index)}
-                    >
-                      <Droppable droppableId='category_order'>
-                        {provided => (
-                          <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef}>
-                            <CategoryList />
-                            {provided.placeholder}
-                          </ul>
-                        )}
-                      </Droppable>
-                    </DragDropContext>
-                    {runtimeLegend && runtimeLegend.length >= 10 && (
-                      <section className='error-box my-2'>
-                        <div>
-                          <strong className='pt-1'>Warning</strong>
-                          <p>
-                            The maximum number of categorical legend items is 10. If your data has more than 10
-                            categories your map will not display properly.
-                          </p>
-                        </div>
-                      </section>
-                    )}
-                  </React.Fragment>
+                    </AccordionItemPanel>
+                  </AccordionItem>
                 )}
-                <TextField
-                  value={legend.title}
-                  updateField={updateField}
-                  section='legend'
-                  fieldName='title'
-                  label='Legend Title'
-                  placeholder='Legend Title'
-                />
-                {false === legend.dynamicDescription && (
-                  <TextField
-                    type='textarea'
-                    value={legend.description}
-                    updateField={updateField}
-                    section='legend'
-                    fieldName='description'
-                    label='Legend Description'
-                  />
-                )}
-                {true === legend.dynamicDescription && (
-                  <React.Fragment>
-                    <label>
-                      <span>Legend Description</span>
-                      <span className='subtext'>For {displayFilterLegendValue(activeFilterValueForDescription)}</span>
-                      <DynamicDesc value={legend.descriptions[String(activeFilterValueForDescription)]} />
-                    </label>
-                    <label>
-                      <Select
-                        label='Filter Value'
-                        value={String(activeFilterValueForDescription)}
-                        options={filterValueOptionList.map(arr => ({
-                          value: arr,
-                          label: displayFilterLegendValue(arr)
-                        }))}
-                        onChange={event => {
-                          handleEditorChanges('changeActiveFilterValue', event.target.value)
-                        }}
-                      />
-                    </label>
-                  </React.Fragment>
-                )}
-                {config.filters.length > 0 && (
-                  <label className='checkbox column-heading'>
-                    <CheckBox
-                      value={legend.dynamicDescription}
-                      section='legend'
-                      subsection={null}
-                      fieldName='dynamicDescription'
-                      label='Dynamic Legend Description'
-                      updateField={updateField}
-                      onChange={() => {
-                        handleEditorChanges('dynamicDescription', filterValueOptionList[0])
-                      }}
-                    />
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon
-                          display='question'
-                          style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                        />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>
-                          Check this option if the map has multiple filter controls and you want to specify a
-                          description for each filter selection.
-                        </p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  </label>
-                )}
-                <span className='d-flex mt-2'>
-                  <CheckBox
-                    value={legend.unified}
-                    section='legend'
-                    subsection={null}
-                    fieldName='unified'
-                    label='Unified Legend'
-                    updateField={updateField}
-                    onChange={event => handleEditorChanges('unifiedLegend', event.target.checked)}
-                  />
-                  <Tooltip style={{ textTransform: 'none' }}>
-                    <Tooltip.Target>
-                      <Icon
-                        display='question'
-                        style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                      />
-                    </Tooltip.Target>
-                    <Tooltip.Content>
-                      <p>
-                        Check this option if you want the high and low values in the legend to be based on <em>all</em>{' '}
-                        mapped values (useful for maps with filters or small multiples).
-                      </p>
-                    </Tooltip.Content>
-                  </Tooltip>
-                </span>
-              </AccordionItemPanel>
-            </AccordionItem>
-          )}
-          {'navigation' !== config.general.type && (
-            <>
-              <AccordionItem>
-                {/* Filters */}
-                <AccordionItemHeading>
-                  <AccordionItemButton>Filters</AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  <VizFilterEditor
-                    config={config}
-                    updateField={updateField}
-                    rawData={config.data}
-                    hasFootnotes={isDashboard}
-                  />
-                </AccordionItemPanel>
-              </AccordionItem>
-              <AccordionItem>
-                <AccordionItemHeading>
-                  <AccordionItemButton>Footnotes</AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  <FootnotesEditor config={config} updateField={updateField} datasets={datasets} />
-                </AccordionItemPanel>
-              </AccordionItem>
-            </>
-          )}
-          {'navigation' !== config.general.type && (
-            <AccordionItem>
-              {' '}
-              {/* Data Table */}
-              <AccordionItemHeading>
-                <AccordionItemButton>Data Table</AccordionItemButton>
-              </AccordionItemHeading>
-              <AccordionItemPanel>
-                <TextField
-                  value={table.label}
-                  updateField={updateField}
-                  section='table'
-                  fieldName='label'
-                  id='dataTableTitle'
-                  label='Data Table Title'
-                  placeholder='Data Table'
-                  tooltip={
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>Label is required for Data Table for 508 Compliance</p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  }
-                />
-                <CheckBox
-                  value={config.table.wrapColumns}
-                  section='table'
-                  subsection={null}
-                  fieldName='wrapColumns'
-                  label='WRAP DATA TABLE COLUMNS'
-                  updateField={updateField}
-                  className='column-heading'
-                />
-                <CheckBox
-                  value={config.table.forceDisplay !== undefined ? config.table.forceDisplay : !isDashboard}
-                  section='table'
-                  subsection={null}
-                  fieldName='forceDisplay'
-                  label='Show Data Table'
-                  updateField={updateField}
-                  onChange={event => {
-                    handleEditorChanges('showDataTable', event.target.checked)
-                  }}
-                  tooltip={
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon
-                          display='question'
-                          style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                        />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>
-                          Data tables are required for 508 compliance. When choosing to hide this data table, replace
-                          with your own version.
-                        </p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  }
-                />
-
-                <CheckBox
-                  value={config.table.showNonGeoData}
-                  section='table'
-                  subsection={null}
-                  fieldName='showNonGeoData'
-                  label='Show Non Geographic Data'
-                  updateField={updateField}
-                  tooltip={
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon
-                          display='question'
-                          style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                        />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>Show any data not associated with a geographic location</p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  }
-                />
-
-                <TextField
-                  value={table.indexLabel || ''}
-                  updateField={updateField}
-                  section='table'
-                  fieldName='indexLabel'
-                  label='Index Column Header'
-                  placeholder='Location'
-                  tooltip={
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>
-                          To comply with 508 standards, if the first column in the data table has no header, enter a
-                          brief one here.
-                        </p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  }
-                />
-                <TextField
-                  value={config.table.caption}
-                  updateField={updateField}
-                  section='table'
-                  fieldName='caption'
-                  label='Screen Reader Description'
-                  placeholder='Data Table'
-                  tooltip={
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>Enter a description of the data table to be read by screen readers.</p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  }
-                  type='textarea'
-                />
-                <CheckBox
-                  value={config.table.limitHeight}
-                  section='table'
-                  subsection={null}
-                  fieldName='limitHeight'
-                  label='Limit Table Height'
-                  updateField={updateField}
-                  onChange={event => {
-                    handleEditorChanges('limitDataTableHeight', event.target.checked)
-                  }}
-                />
-                {config.table.limitHeight && (
-                  <TextField
-                    value={table.height}
-                    updateField={updateField}
-                    section='table'
-                    fieldName='height'
-                    label='Data Table Height'
-                    placeholder='Height(px)'
-                    type='number'
-                    min='0'
-                    max='500'
-                  />
-                )}
-
-                <TextField
-                  value={table.cellMinWidth}
-                  updateField={updateField}
-                  section='table'
-                  fieldName='cellMinWidth'
-                  label='Table Cell Min Width'
-                  type='number'
-                  min='0'
-                  max='500'
-                />
-
-                <CheckBox
-                  value={config.table.expanded || false}
-                  section='table'
-                  subsection={null}
-                  fieldName='expanded'
-                  label='Map loads with data table expanded'
-                  updateField={updateField}
-                  onChange={event => {
-                    handleEditorChanges('expandDataTable', event.target.checked)
-                  }}
-                />
-                <CheckBox
-                  value={config.table.download}
-                  fieldName='download'
-                  label='Show Download CSV Link'
-                  section='table'
-                  updateField={updateField}
-                />
-                {config.table.download && (
+                {'navigation' !== config.general.type && (
                   <>
-                    <CheckBox
-                      value={config.table.showDownloadLinkBelow}
-                      section='table'
-                      subsection={null}
-                      fieldName='showDownloadLinkBelow'
-                      label='Show Link Below Table'
-                      updateField={updateField}
-                      className='ms-4'
-                      onChange={event => {
-                        handleEditorChanges('toggleDownloadLinkBelow', event.target.checked)
-                      }}
-                    />
-                    <CheckBox
-                      value={config.table.downloadVisibleDataOnly}
-                      fieldName='downloadVisibleDataOnly'
-                      className='ms-4'
-                      label='Download only visible data'
-                      section='table'
-                      updateField={updateField}
-                    />
+                    <AccordionItem>
+                      {/* Filters */}
+                      <AccordionItemHeading>
+                        <AccordionItemButton>Filters</AccordionItemButton>
+                      </AccordionItemHeading>
+                      <AccordionItemPanel>
+                        <VizFilterEditor
+                          config={config}
+                          updateField={updateField}
+                          rawData={config.data}
+                          hasFootnotes={isDashboard}
+                        />
+                      </AccordionItemPanel>
+                    </AccordionItem>
+                    <AccordionItem>
+                      <AccordionItemHeading>
+                        <AccordionItemButton>Footnotes</AccordionItemButton>
+                      </AccordionItemHeading>
+                      <AccordionItemPanel>
+                        <FootnotesEditor config={config} updateField={updateField} datasets={datasets} />
+                      </AccordionItemPanel>
+                    </AccordionItem>
                   </>
                 )}
-                {isDashboard && (
-                  <CheckBox
-                    value={config.table.showDataTableLink}
-                    section='table'
-                    subsection={null}
-                    fieldName='showDataTableLink'
-                    label='Show Data Table Name & Link'
-                    updateField={updateField}
-                  />
-                )}
-                {isLoadedFromUrl && (
-                  <CheckBox
-                    value={config.table.showDownloadUrl}
-                    section='table'
-                    subsection={null}
-                    fieldName='showDownloadUrl'
-                    label='Show URL to Automatically Updated Data'
-                    updateField={updateField}
-                  />
-                )}
-                <CheckBox
-                  value={config.table.showFullGeoNameInCSV}
-                  section='table'
-                  subsection={null}
-                  fieldName='showFullGeoNameInCSV'
-                  label='Include Full Geo Name in CSV Download'
-                  updateField={updateField}
-                  onChange={event => {
-                    handleEditorChanges('toggleShowFullGeoNameInCSV', event.target.checked)
-                  }}
-                />
-                <CheckBox
-                  value={config.general.showDownloadImgButton}
-                  section='general'
-                  subsection={null}
-                  fieldName='showDownloadImgButton'
-                  label='Enable Image Download'
-                  updateField={updateField}
-                  onChange={event => {
-                    handleEditorChanges('toggleDownloadImgButton', event.target.checked)
-                  }}
-                />
+                {'navigation' !== config.general.type && (
+                  <AccordionItem>
+                    {' '}
+                    {/* Data Table */}
+                    <AccordionItemHeading>
+                      <AccordionItemButton>Data Table</AccordionItemButton>
+                    </AccordionItemHeading>
+                    <AccordionItemPanel>
+                      <TextField
+                        value={table.label}
+                        updateField={updateField}
+                        section='table'
+                        fieldName='label'
+                        id='dataTableTitle'
+                        label='Data Table Title'
+                        placeholder='Data Table'
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Label is required for Data Table for 508 Compliance</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                      <CheckBox
+                        value={config.table.wrapColumns}
+                        section='table'
+                        subsection={null}
+                        fieldName='wrapColumns'
+                        label='WRAP DATA TABLE COLUMNS'
+                        updateField={updateField}
+                        className='column-heading'
+                      />
+                      <CheckBox
+                        value={config.table.forceDisplay !== undefined ? config.table.forceDisplay : !isDashboard}
+                        section='table'
+                        subsection={null}
+                        fieldName='forceDisplay'
+                        label='Show Data Table'
+                        updateField={updateField}
+                        onChange={event => {
+                          handleEditorChanges('showDataTable', event.target.checked)
+                        }}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon
+                                display='question'
+                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                              />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                Data tables are required for 508 compliance. When choosing to hide this data table,
+                                replace with your own version.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
 
-                {/* <label className='checkbox'>
+                      <CheckBox
+                        value={config.table.showNonGeoData}
+                        section='table'
+                        subsection={null}
+                        fieldName='showNonGeoData'
+                        label='Show Non Geographic Data'
+                        updateField={updateField}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon
+                                display='question'
+                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                              />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Show any data not associated with a geographic location</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+
+                      <TextField
+                        value={table.indexLabel || ''}
+                        updateField={updateField}
+                        section='table'
+                        fieldName='indexLabel'
+                        label='Index Column Header'
+                        placeholder='Location'
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                To comply with 508 standards, if the first column in the data table has no header, enter
+                                a brief one here.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                      <TextField
+                        value={config.table.caption}
+                        updateField={updateField}
+                        section='table'
+                        fieldName='caption'
+                        label='Screen Reader Description'
+                        placeholder='Data Table'
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Enter a description of the data table to be read by screen readers.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        type='textarea'
+                      />
+                      <CheckBox
+                        value={config.table.limitHeight}
+                        section='table'
+                        subsection={null}
+                        fieldName='limitHeight'
+                        label='Limit Table Height'
+                        updateField={updateField}
+                        onChange={event => {
+                          handleEditorChanges('limitDataTableHeight', event.target.checked)
+                        }}
+                      />
+                      {config.table.limitHeight && (
+                        <TextField
+                          value={table.height}
+                          updateField={updateField}
+                          section='table'
+                          fieldName='height'
+                          label='Data Table Height'
+                          placeholder='Height(px)'
+                          type='number'
+                          min='0'
+                          max='500'
+                        />
+                      )}
+
+                      <TextField
+                        value={table.cellMinWidth}
+                        updateField={updateField}
+                        section='table'
+                        fieldName='cellMinWidth'
+                        label='Table Cell Min Width'
+                        type='number'
+                        min='0'
+                        max='500'
+                      />
+
+                      <CheckBox
+                        value={config.table.expanded || false}
+                        section='table'
+                        subsection={null}
+                        fieldName='expanded'
+                        label='Map loads with data table expanded'
+                        updateField={updateField}
+                        onChange={event => {
+                          handleEditorChanges('expandDataTable', event.target.checked)
+                        }}
+                      />
+                      <CheckBox
+                        value={config.table.download}
+                        fieldName='download'
+                        label='Show Download CSV Link'
+                        section='table'
+                        updateField={updateField}
+                      />
+                      {config.table.download && (
+                        <>
+                          <CheckBox
+                            value={config.table.showDownloadLinkBelow}
+                            section='table'
+                            subsection={null}
+                            fieldName='showDownloadLinkBelow'
+                            label='Show Link Below Table'
+                            updateField={updateField}
+                            className='ms-4'
+                            onChange={event => {
+                              handleEditorChanges('toggleDownloadLinkBelow', event.target.checked)
+                            }}
+                          />
+                          <CheckBox
+                            value={config.table.downloadVisibleDataOnly}
+                            fieldName='downloadVisibleDataOnly'
+                            className='ms-4'
+                            label='Download only visible data'
+                            section='table'
+                            updateField={updateField}
+                          />
+                        </>
+                      )}
+                      {isDashboard && (
+                        <CheckBox
+                          value={config.table.showDataTableLink}
+                          section='table'
+                          subsection={null}
+                          fieldName='showDataTableLink'
+                          label='Show Data Table Name & Link'
+                          updateField={updateField}
+                        />
+                      )}
+                      {isLoadedFromUrl && (
+                        <CheckBox
+                          value={config.table.showDownloadUrl}
+                          section='table'
+                          subsection={null}
+                          fieldName='showDownloadUrl'
+                          label='Show URL to Automatically Updated Data'
+                          updateField={updateField}
+                        />
+                      )}
+                      <CheckBox
+                        value={config.table.showFullGeoNameInCSV}
+                        section='table'
+                        subsection={null}
+                        fieldName='showFullGeoNameInCSV'
+                        label='Include Full Geo Name in CSV Download'
+                        updateField={updateField}
+                        onChange={event => {
+                          handleEditorChanges('toggleShowFullGeoNameInCSV', event.target.checked)
+                        }}
+                      />
+                      <CheckBox
+                        value={config.general.showDownloadImgButton}
+                        section='general'
+                        subsection={null}
+                        fieldName='showDownloadImgButton'
+                        label='Enable Image Download'
+                        updateField={updateField}
+                        onChange={event => {
+                          handleEditorChanges('toggleDownloadImgButton', event.target.checked)
+                        }}
+                      />
+
+                      {/* <label className='checkbox'>
                       <input
                         type='checkbox'
                         checked={state.general.showDownloadPdfButton}
@@ -2883,566 +2915,579 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       />
                       <span className='edit-label'>Enable Pdf Download</span>
                     </label> */}
-              </AccordionItemPanel>
-            </AccordionItem>
-          )}
-          <AccordionItem>
-            {' '}
-            {/* Tooltips */}
-            <AccordionItemHeading>
-              <AccordionItemButton>Interactivity</AccordionItemButton>
-            </AccordionItemHeading>
-            <AccordionItemPanel>
-              <Select
-                label={
-                  <>
-                    Detail displays on{' '}
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>
-                          At mobile sizes, information always appears in a popover modal when a user taps on an item.
-                        </p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  </>
-                }
-                value={config.tooltips.appearanceType}
-                options={[
-                  { value: 'hover', label: 'Hover - Tooltip' },
-                  { value: 'click', label: 'Click - Popover Modal' }
-                ]}
-                onChange={event => {
-                  handleEditorChanges('appearanceType', event.target.value)
-                }}
-              />
-              {'click' === config.tooltips.appearanceType && (
-                <TextField
-                  value={tooltips.linkLabel}
-                  section='tooltips'
-                  fieldName='linkLabel'
-                  label='Tooltips Link Label'
-                  updateField={updateField}
-                />
-              )}
-            </AccordionItemPanel>
-          </AccordionItem>
-          <AccordionItem>
-            {' '}
-            {/* Visual */}
-            <AccordionItemHeading>
-              <AccordionItemButton>Visual</AccordionItemButton>
-            </AccordionItemHeading>
-            <AccordionItemPanel>
-              <HeaderThemeSelector
-                selectedTheme={config.general.headerColor}
-                onThemeSelect={palette => handleEditorChanges('headerColor', palette)}
-                label='Header Theme'
-              />
-              <CheckBox
-                value={config.general.showTitle || false}
-                section='general'
-                subsection={null}
-                fieldName='showTitle'
-                label='Show Title'
-                updateField={updateField}
-                onChange={event => {
-                  handleEditorChanges('showTitle', event.target.checked)
-                }}
-              />
-
-              {'navigation' === config.general.type && (
-                <CheckBox
-                  value={config.general.fullBorder || false}
-                  section='general'
-                  subsection={null}
-                  fieldName='fullBorder'
-                  label='Add border around map'
-                  updateField={updateField}
-                />
-              )}
-              <Select
-                label='Geo Border Color'
-                value={config.general.geoBorderColor || ''}
-                options={[
-                  { value: 'darkGray', label: 'Dark Gray (Default)' },
-                  { value: 'sameAsBackground', label: 'White' }
-                ]}
-                onChange={event => {
-                  handleEditorChanges('geoBorderColor', event.target.value)
-                }}
-              />
-              <label>
-                <span className='edit-label'>Map Color Palette</span>
-              </label>
-              <div className='mb-2'>
-                <small className='text-muted'>
-                  Review color contrasts{' '}
-                  <a href='https://webaim.org/resources/contrastchecker/' target='_blank' rel='noopener noreferrer'>
-                    here
-                  </a>
-                </small>
-              </div>
-              <DeveloperPaletteRollback config={config} updateConfig={setConfig} />
-              <InputToggle
-                type='3d'
-                section='general'
-                subsection='palette'
-                fieldName='isReversed'
-                size='small'
-                label='Use selected palette in reverse order'
-                onClick={() => {
-                  const _state = cloneConfig(config)
-                  const currentPaletteName = config.general.palette?.name || ''
-                  _state.general.palette.isReversed = !_state.general.palette.isReversed
-                  let paletteName = ''
-                  if (_state.general.palette.isReversed && !currentPaletteName.endsWith('reverse')) {
-                    paletteName = currentPaletteName + 'reverse'
-                  }
-                  if (!_state.general.palette.isReversed && currentPaletteName.endsWith('reverse')) {
-                    paletteName = currentPaletteName.slice(0, -7)
-                  }
-                  if (paletteName) {
-                    _state.general.palette.name = paletteName
-                  }
-                  setConfig(_state)
-                }}
-                value={config.general.palette.isReversed}
-              />
-              <span>Sequential</span>
-              <PaletteSelector
-                palettes={sequential}
-                colorPalettes={colorPalettes}
-                config={config}
-                onPaletteSelect={handlePaletteSelection}
-                selectedPalette={getCurrentPaletteName(config)}
-                colorIndices={[2, 3, 5]}
-                className='color-palette'
-                element='button'
-                getItemClassName={getPaletteClassName}
-              />
-              <span>Non-Sequential</span>
-              <PaletteSelector
-                palettes={nonSequential}
-                colorPalettes={colorPalettes}
-                config={config}
-                onPaletteSelect={handlePaletteSelection}
-                selectedPalette={getCurrentPaletteName(config)}
-                colorIndices={[2, 3, 5]}
-                className='color-palette'
-                element='button'
-                getItemClassName={getPaletteClassName}
-                minColorsForFilter={(_, paletteAccessor, config) => {
-                  if (paletteAccessor.length <= 8 && config.general.geoType === 'us-region') {
-                    return false
-                  }
-                  return true
-                }}
-              />
-              <span>Colorblind Safe</span>
-              <PaletteSelector
-                palettes={accessibleColors}
-                colorPalettes={colorPalettes}
-                config={config}
-                onPaletteSelect={handlePaletteSelection}
-                selectedPalette={getCurrentPaletteName(config)}
-                colorIndices={[2, 3, 5]}
-                className='color-palette'
-                element='button'
-                getItemClassName={getPaletteClassName}
-                minColorsForFilter={(_, paletteAccessor, config) => {
-                  if (paletteAccessor.length <= 8 && config.general.geoType === 'us-region') {
-                    return false
-                  }
-                  return true
-                }}
-              />
-
-              {isCoveDeveloperMode() && (
-                <>
-                  <div className='mt-3'>
-                    <label className='checkbox'>
-                      <input
-                        type='checkbox'
-                        checked={!!config.general.palette.customColorsOrdered}
-                        onChange={e => {
-                          const _state = cloneConfig(config)
-                          if (e.target.checked) {
-                            // Extract actual colors from runtime legend if available
-                            if (runtimeLegend?.items && runtimeLegend.items.length > 0) {
-                              const extractedColors = []
-                              for (const item of runtimeLegend.items) {
-                                // Skip special classes (like "No Data")
-                                if (item.special) continue
-                                // Add the color if it exists and hasn't been added yet
-                                if (item.color && !extractedColors.includes(item.color)) {
-                                  extractedColors.push(item.color)
-                                }
-                              }
-                              _state.general.palette.customColorsOrdered =
-                                extractedColors.length > 0
-                                  ? extractedColors
-                                  : ['#3366cc', '#5588dd', '#77aaee', '#99ccff']
-                            } else {
-                              // Fallback to default colors if runtime legend not available
-                              _state.general.palette.customColorsOrdered = ['#3366cc', '#5588dd', '#77aaee', '#99ccff']
-                            }
-                          } else {
-                            // Remove custom colors and revert to default palette
-                            delete _state.general.palette.customColorsOrdered
-                            delete _state.general.palette.customColors
-                            // Set default palette if none exists
-                            if (!_state.general.palette.name) {
-                              _state.general.palette.name = 'sequential_blue_green'
-                              _state.general.palette.version = '2.0'
-                            }
-                          }
-                          setConfig(_state)
-                        }}
+                    </AccordionItemPanel>
+                  </AccordionItem>
+                )}
+                <AccordionItem>
+                  {' '}
+                  {/* Tooltips */}
+                  <AccordionItemHeading>
+                    <AccordionItemButton>Interactivity</AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                    <Select
+                      label={
+                        <>
+                          Detail displays on{' '}
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                At mobile sizes, information always appears in a popover modal when a user taps on an
+                                item.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </>
+                      }
+                      value={config.tooltips.appearanceType}
+                      options={[
+                        { value: 'hover', label: 'Hover - Tooltip' },
+                        { value: 'click', label: 'Click - Popover Modal' }
+                      ]}
+                      onChange={event => {
+                        handleEditorChanges('appearanceType', event.target.value)
+                      }}
+                    />
+                    {'click' === config.tooltips.appearanceType && (
+                      <TextField
+                        value={tooltips.linkLabel}
+                        section='tooltips'
+                        fieldName='linkLabel'
+                        label='Tooltips Link Label'
+                        updateField={updateField}
                       />
-                      Use Custom Colors
+                    )}
+                  </AccordionItemPanel>
+                </AccordionItem>
+                <AccordionItem>
+                  {' '}
+                  {/* Visual */}
+                  <AccordionItemHeading>
+                    <AccordionItemButton>Visual</AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                    <HeaderThemeSelector
+                      selectedTheme={config.general.headerColor}
+                      onThemeSelect={palette => handleEditorChanges('headerColor', palette)}
+                      label='Header Theme'
+                    />
+                    <CheckBox
+                      value={config.general.showTitle || false}
+                      section='general'
+                      subsection={null}
+                      fieldName='showTitle'
+                      label='Show Title'
+                      updateField={updateField}
+                      onChange={event => {
+                        handleEditorChanges('showTitle', event.target.checked)
+                      }}
+                    />
+
+                    {'navigation' === config.general.type && (
+                      <CheckBox
+                        value={config.general.fullBorder || false}
+                        section='general'
+                        subsection={null}
+                        fieldName='fullBorder'
+                        label='Add border around map'
+                        updateField={updateField}
+                      />
+                    )}
+                    <Select
+                      label='Geo Border Color'
+                      value={config.general.geoBorderColor || ''}
+                      options={[
+                        { value: 'darkGray', label: 'Dark Gray (Default)' },
+                        { value: 'sameAsBackground', label: 'White' }
+                      ]}
+                      onChange={event => {
+                        handleEditorChanges('geoBorderColor', event.target.value)
+                      }}
+                    />
+                    <label>
+                      <span className='edit-label'>Map Color Palette</span>
                     </label>
-                  </div>
-
-                  {config.general.palette.customColorsOrdered && (
-                    <div className='mt-2'>
-                      <CustomColorsEditor
-                        colors={config.general.palette.customColorsOrdered}
-                        onChange={newColors => {
-                          const _state = cloneConfig(config)
-                          _state.general.palette.customColorsOrdered = newColors
-                          setConfig(_state)
-                        }}
-                        label='Custom Color Order'
-                        minColors={1}
-                        maxColors={20}
-                      />
-                    </div>
-                  )}
-                </>
-              )}
-
-              <label>
-                Geocode Settings
-                <TextField
-                  type='number'
-                  value={config.visual.geoCodeCircleSize}
-                  section='visual'
-                  max='10'
-                  fieldName='geoCodeCircleSize'
-                  label='Geocode Circle Size'
-                  updateField={updateField}
-                />
-              </label>
-
-              {config.general.type === 'bubble' && (
-                <>
-                  <TextField
-                    type='number'
-                    value={config.visual.minBubbleSize}
-                    section='visual'
-                    fieldName='minBubbleSize'
-                    label='Minimum Bubble Size'
-                    updateField={updateField}
-                  />
-                  <TextField
-                    type='number'
-                    value={config.visual.maxBubbleSize}
-                    section='visual'
-                    fieldName='maxBubbleSize'
-                    label='Maximum Bubble Size'
-                    updateField={updateField}
-                  />
-                </>
-              )}
-              {(config.general.geoType === 'world' ||
-                (config.general.geoType === 'us' && config.general.type === 'bubble')) && (
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={config.visual.showBubbleZeros}
-                    onChange={event => {
-                      const _newConfig = _.cloneDeep(config)
-                      _newConfig.visual.showBubbleZeros = event.target.checked
-                      setConfig(_newConfig)
-                    }}
-                  />
-                  <span className='edit-label'>Show Data with Zero's on Bubble Map</span>
-                </label>
-              )}
-              {(config.general.geoType === 'world' || config.general.geoType === 'single-state') && (
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={config.general.allowMapZoom}
-                    onChange={event => {
-                      const _newConfig = cloneConfig(config)
-                      _newConfig.general.allowMapZoom = event.target.checked
-                      _newConfig.mapPosition.coordinates = config.general.geoType === 'world' ? [0, 30] : [0, 0]
-                      _newConfig.mapPosition.zoom = 1
-                      setConfig(_newConfig)
-                    }}
-                  />
-                  <span className='edit-label'>Allow Map Zooming</span>
-                </label>
-              )}
-              {config.general.type === 'bubble' && (
-                <label className='checkbox'>
-                  <input
-                    type='checkbox'
-                    checked={config.visual.extraBubbleBorder}
-                    onChange={event => {
-                      const _newConfig = cloneConfig(config)
-                      _newConfig.visual.extraBubbleBorder = event.target.checked
-                      setConfig(_newConfig)
-                    }}
-                  />
-                  <span className='edit-label'>Bubble Map has extra border</span>
-                </label>
-              )}
-              {(config.general.geoType === 'us' ||
-                config.general.geoType === 'us-county' ||
-                config.general.geoType === 'world') && (
-                <>
-                  <Select
-                    label='Default City Style'
-                    value={config.visual.cityStyle || 'circle'}
-                    options={[
-                      { value: 'circle', label: 'Circle' },
-                      { value: 'pin', label: 'Pin' },
-                      { value: 'square', label: 'Square' },
-                      { value: 'triangle', label: 'Triangle' },
-                      { value: 'diamond', label: 'Diamond' },
-                      { value: 'star', label: 'Star' }
-                    ]}
-                    onChange={event => {
-                      handleEditorChanges('handleCityStyle', event.target.value)
-                    }}
-                  />
-                  <TextField
-                    value={config.visual.cityStyleLabel}
-                    section='visual'
-                    fieldName='cityStyleLabel'
-                    label='Label (Optional) '
-                    updateField={updateField}
-                    tooltip={
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>When a label is provided, the default city style will appear in the legend.</p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                    }
-                  />
-                </>
-              )}
-              {/* <AdditionalCityStyles /> */}
-              <>
-                {config.visual.additionalCityStyles.length > 0 &&
-                  config.visual.additionalCityStyles.map(({ label, column, value, shape }, i) => {
-                    return (
-                      <div className='edit-block' key={`additional-city-style-${i}`}>
-                        <button
-                          className='remove-column'
-                          onClick={e => {
-                            e.preventDefault()
-                            editCityStyles('remove', i, '', '')
-                          }}
+                    <div className='mb-2'>
+                      <small className='text-muted'>
+                        Review color contrasts{' '}
+                        <a
+                          href='https://webaim.org/resources/contrastchecker/'
+                          target='_blank'
+                          rel='noopener noreferrer'
                         >
-                          Remove
-                        </button>
-                        <p>City Style {i + 1}</p>
-                        <Select
-                          label='Column with configuration value'
-                          value={column}
-                          options={columnsOptions.map(c => c.key)}
-                          onChange={e => {
-                            editCityStyles('update', i, 'column', e.target.value)
-                          }}
-                        />
-                        <label>
-                          <span className='edit-label column-heading'>Value to Trigger</span>
-                          <input
-                            type='text'
-                            value={value}
-                            onChange={e => {
-                              editCityStyles('update', i, 'value', e.target.value)
-                            }}
-                          ></input>
-                        </label>
-                        <Select
-                          label='Shape'
-                          value={shape}
-                          options={[
-                            { value: '', label: '- Select Option -' },
-                            ...['Circle', 'Square', 'Triangle', 'Diamond', 'Star', 'Pin']
-                              .filter(val => String(config.visual.cityStyle).toLowerCase() !== val.toLowerCase())
-                              .map(val => ({ value: val, label: val }))
-                          ]}
-                          onChange={e => {
-                            editCityStyles('update', i, 'shape', e.target.value)
-                          }}
-                        />
-                        <label>
-                          <span className='edit-label column-heading'>Label</span>
-                          <input
-                            key={i}
-                            type='text'
-                            value={label}
-                            onChange={e => {
-                              editCityStyles('update', i, 'label', e.target.value)
-                            }}
-                          />
-                        </label>
-                      </div>
-                    )
-                  })}
+                          here
+                        </a>
+                      </small>
+                    </div>
+                    <DeveloperPaletteRollback config={config} updateConfig={setConfig} />
+                    <InputToggle
+                      type='3d'
+                      section='general'
+                      subsection='palette'
+                      fieldName='isReversed'
+                      size='small'
+                      label='Use selected palette in reverse order'
+                      onClick={() => {
+                        const _state = cloneConfig(config)
+                        const currentPaletteName = config.general.palette?.name || ''
+                        _state.general.palette.isReversed = !_state.general.palette.isReversed
+                        let paletteName = ''
+                        if (_state.general.palette.isReversed && !currentPaletteName.endsWith('reverse')) {
+                          paletteName = currentPaletteName + 'reverse'
+                        }
+                        if (!_state.general.palette.isReversed && currentPaletteName.endsWith('reverse')) {
+                          paletteName = currentPaletteName.slice(0, -7)
+                        }
+                        if (paletteName) {
+                          _state.general.palette.name = paletteName
+                        }
+                        setConfig(_state)
+                      }}
+                      value={config.general.palette.isReversed}
+                    />
+                    <span>Sequential</span>
+                    <PaletteSelector
+                      palettes={sequential}
+                      colorPalettes={colorPalettes}
+                      config={config}
+                      onPaletteSelect={handlePaletteSelection}
+                      selectedPalette={getCurrentPaletteName(config)}
+                      colorIndices={[2, 3, 5]}
+                      className='color-palette'
+                      element='button'
+                      getItemClassName={getPaletteClassName}
+                    />
+                    <span>Non-Sequential</span>
+                    <PaletteSelector
+                      palettes={nonSequential}
+                      colorPalettes={colorPalettes}
+                      config={config}
+                      onPaletteSelect={handlePaletteSelection}
+                      selectedPalette={getCurrentPaletteName(config)}
+                      colorIndices={[2, 3, 5]}
+                      className='color-palette'
+                      element='button'
+                      getItemClassName={getPaletteClassName}
+                      minColorsForFilter={(_, paletteAccessor, config) => {
+                        if (paletteAccessor.length <= 8 && config.general.geoType === 'us-region') {
+                          return false
+                        }
+                        return true
+                      }}
+                    />
+                    <span>Colorblind Safe</span>
+                    <PaletteSelector
+                      palettes={accessibleColors}
+                      colorPalettes={colorPalettes}
+                      config={config}
+                      onPaletteSelect={handlePaletteSelection}
+                      selectedPalette={getCurrentPaletteName(config)}
+                      colorIndices={[2, 3, 5]}
+                      className='color-palette'
+                      element='button'
+                      getItemClassName={getPaletteClassName}
+                      minColorsForFilter={(_, paletteAccessor, config) => {
+                        if (paletteAccessor.length <= 8 && config.general.geoType === 'us-region') {
+                          return false
+                        }
+                        return true
+                      }}
+                    />
 
-                <button
-                  type='button'
-                  onClick={() => editCityStyles('add', 0, '', '')}
-                  className='btn btn-primary full-width'
-                >
-                  Add city style
-                </button>
-              </>
-              <label htmlFor='opacity'>
-                <TextField
-                  type='number'
-                  min={0}
-                  max={100}
-                  value={config.tooltips.opacity ? config.tooltips.opacity : 100}
-                  section='tooltips'
-                  fieldName='opacity'
-                  label='Tooltip Opacity (%)'
-                  updateField={updateField}
-                />
-              </label>
-              {/* Leaflet Map Type */}
-              {config.general.geoType === 'leaflet' && (
-                <>
-                  <Select
-                    label='Leaflet Theme'
-                    options={layerOptions}
-                    section={'leaflet'}
-                    fieldName='theme'
-                    updateField={updateField}
-                  />
-                </>
-              )}
-            </AccordionItemPanel>
-          </AccordionItem>
-          <AccordionItem>
-            <AccordionItemHeading>
-              <AccordionItemButton>Custom Map Layers</AccordionItemButton>
-            </AccordionItemHeading>
-            <AccordionItemPanel>
-              {config.map.layers.length === 0 && <p>There are currently no layers.</p>}
+                    {isCoveDeveloperMode() && (
+                      <>
+                        <div className='mt-3'>
+                          <label className='checkbox'>
+                            <input
+                              type='checkbox'
+                              checked={!!config.general.palette.customColorsOrdered}
+                              onChange={e => {
+                                const _state = cloneConfig(config)
+                                if (e.target.checked) {
+                                  // Extract actual colors from runtime legend if available
+                                  if (runtimeLegend?.items && runtimeLegend.items.length > 0) {
+                                    const extractedColors = []
+                                    for (const item of runtimeLegend.items) {
+                                      // Skip special classes (like "No Data")
+                                      if (item.special) continue
+                                      // Add the color if it exists and hasn't been added yet
+                                      if (item.color && !extractedColors.includes(item.color)) {
+                                        extractedColors.push(item.color)
+                                      }
+                                    }
+                                    _state.general.palette.customColorsOrdered =
+                                      extractedColors.length > 0
+                                        ? extractedColors
+                                        : ['#3366cc', '#5588dd', '#77aaee', '#99ccff']
+                                  } else {
+                                    // Fallback to default colors if runtime legend not available
+                                    _state.general.palette.customColorsOrdered = [
+                                      '#3366cc',
+                                      '#5588dd',
+                                      '#77aaee',
+                                      '#99ccff'
+                                    ]
+                                  }
+                                } else {
+                                  // Remove custom colors and revert to default palette
+                                  delete _state.general.palette.customColorsOrdered
+                                  delete _state.general.palette.customColors
+                                  // Set default palette if none exists
+                                  if (!_state.general.palette.name) {
+                                    _state.general.palette.name = 'sequential_blue_green'
+                                    _state.general.palette.version = '2.0'
+                                  }
+                                }
+                                setConfig(_state)
+                              }}
+                            />
+                            Use Custom Colors
+                          </label>
+                        </div>
 
-              {config.map.layers.map((layer, index) => {
-                return (
-                  <>
-                    <Accordion allowZeroExpanded>
-                      <AccordionItem className='series-item map-layers-list'>
-                        <AccordionItemHeading className='series-item__title map-layers-list--title'>
-                          <AccordionItemButton>{`Layer ${index + 1}: ${layer.name}`}</AccordionItemButton>
-                        </AccordionItemHeading>
-                        <AccordionItemPanel>
-                          <div className='map-layers-panel'>
-                            <label htmlFor='layerName'>Layer Name:</label>
-                            <input
-                              type='text'
-                              name='layerName'
-                              value={layer.name}
-                              onChange={e => handleMapLayer(e, index, 'name')}
+                        {config.general.palette.customColorsOrdered && (
+                          <div className='mt-2'>
+                            <CustomColorsEditor
+                              colors={config.general.palette.customColorsOrdered}
+                              onChange={newColors => {
+                                const _state = cloneConfig(config)
+                                _state.general.palette.customColorsOrdered = newColors
+                                setConfig(_state)
+                              }}
+                              label='Custom Color Order'
+                              minColors={1}
+                              maxColors={20}
                             />
-                            <label htmlFor='layerFilename'>File:</label>
-                            <input
-                              type='text'
-                              name='layerFilename'
-                              value={layer.url}
-                              onChange={e => handleMapLayer(e, index, 'url')}
-                            />
-                            <label htmlFor='layerNamespace'>TOPOJSON Namespace:</label>
-                            <input
-                              type='text'
-                              name='layerNamespace'
-                              value={layer.namespace}
-                              onChange={e => handleMapLayer(e, index, 'namespace')}
-                            />
-                            <label htmlFor='layerFill'>Fill Color:</label>
-                            <input
-                              type='text'
-                              name='layerFill'
-                              value={layer.fill}
-                              onChange={e => handleMapLayer(e, index, 'fill')}
-                            />
-                            <label htmlFor='layerFill'>Fill Opacity (%):</label>
-                            <input
-                              type='number'
-                              min={0}
-                              max={100}
-                              name='layerFill'
-                              value={layer.fillOpacity ? layer.fillOpacity * 100 : ''}
-                              onChange={e => handleMapLayer(e, index, 'fillOpacity')}
-                            />
-                            <label htmlFor='layerStroke'>Stroke Color:</label>
-                            <input
-                              type='text'
-                              name='layerStroke'
-                              value={layer.stroke}
-                              onChange={e => handleMapLayer(e, index, 'stroke')}
-                            />
-                            <label htmlFor='layerStroke'>Stroke Width:</label>
-                            <input
-                              type='number'
-                              min={0}
-                              max={5}
-                              name='layerStrokeWidth'
-                              value={layer.strokeWidth}
-                              onChange={e => handleMapLayer(e, index, 'strokeWidth')}
-                            />
-                            <label htmlFor='layerTooltip'>Tooltip:</label>
-                            <textarea
-                              name='layerTooltip'
-                              value={layer.tooltip}
-                              onChange={e => handleMapLayer(e, index, 'tooltip')}
-                            ></textarea>
-                            <button onClick={e => handleRemoveLayer(e, index)}>Remove Layer</button>
                           </div>
-                        </AccordionItemPanel>
-                      </AccordionItem>
-                    </Accordion>
-                  </>
-                )
-              })}
-              <button className={'btn btn-primary full-width'} onClick={handleAddLayer}>
-                Add Map Layer
-              </button>
-              <p className='layer-purpose-details'>
-                Context should be added to your visualization or associated page to describe the significance of layers
-                that are added to maps.
-              </p>
-            </AccordionItemPanel>
-          </AccordionItem>
-          {config.general.geoType === 'us' && <Panels.PatternSettings name='Pattern Settings' />}
-          {config.general.geoType !== 'us-county' && <Panels.Annotate name='Text Annotations' />}
-          <PanelMarkup
-            name='Markup Variables'
-            markupVariables={config.markupVariables || []}
-            data={config.data || []}
-            enableMarkupVariables={config.enableMarkupVariables || false}
-            onMarkupVariablesChange={variables => setConfig({ ...config, markupVariables: variables })}
-            onToggleEnable={enabled => setConfig({ ...config, enableMarkupVariables: enabled })}
-          />
-          <Panels.SmallMultiples name='Small Multiples' />
-        </Accordion>
-        <AdvancedEditor loadConfig={setConfig} config={config} convertStateToConfig={convertStateToConfig} />
-      </Layout.Sidebar>
+                        )}
+                      </>
+                    )}
+
+                    <label>
+                      Geocode Settings
+                      <TextField
+                        type='number'
+                        value={config.visual.geoCodeCircleSize}
+                        section='visual'
+                        max='10'
+                        fieldName='geoCodeCircleSize'
+                        label='Geocode Circle Size'
+                        updateField={updateField}
+                      />
+                    </label>
+
+                    {config.general.type === 'bubble' && (
+                      <>
+                        <TextField
+                          type='number'
+                          value={config.visual.minBubbleSize}
+                          section='visual'
+                          fieldName='minBubbleSize'
+                          label='Minimum Bubble Size'
+                          updateField={updateField}
+                        />
+                        <TextField
+                          type='number'
+                          value={config.visual.maxBubbleSize}
+                          section='visual'
+                          fieldName='maxBubbleSize'
+                          label='Maximum Bubble Size'
+                          updateField={updateField}
+                        />
+                      </>
+                    )}
+                    {(config.general.geoType === 'world' ||
+                      (config.general.geoType === 'us' && config.general.type === 'bubble')) && (
+                      <label className='checkbox'>
+                        <input
+                          type='checkbox'
+                          checked={config.visual.showBubbleZeros}
+                          onChange={event => {
+                            const _newConfig = _.cloneDeep(config)
+                            _newConfig.visual.showBubbleZeros = event.target.checked
+                            setConfig(_newConfig)
+                          }}
+                        />
+                        <span className='edit-label'>Show Data with Zero's on Bubble Map</span>
+                      </label>
+                    )}
+                    {(config.general.geoType === 'world' || config.general.geoType === 'single-state') && (
+                      <label className='checkbox'>
+                        <input
+                          type='checkbox'
+                          checked={config.general.allowMapZoom}
+                          onChange={event => {
+                            const _newConfig = cloneConfig(config)
+                            _newConfig.general.allowMapZoom = event.target.checked
+                            _newConfig.mapPosition.coordinates = config.general.geoType === 'world' ? [0, 30] : [0, 0]
+                            _newConfig.mapPosition.zoom = 1
+                            setConfig(_newConfig)
+                          }}
+                        />
+                        <span className='edit-label'>Allow Map Zooming</span>
+                      </label>
+                    )}
+                    {config.general.type === 'bubble' && (
+                      <label className='checkbox'>
+                        <input
+                          type='checkbox'
+                          checked={config.visual.extraBubbleBorder}
+                          onChange={event => {
+                            const _newConfig = cloneConfig(config)
+                            _newConfig.visual.extraBubbleBorder = event.target.checked
+                            setConfig(_newConfig)
+                          }}
+                        />
+                        <span className='edit-label'>Bubble Map has extra border</span>
+                      </label>
+                    )}
+                    {(config.general.geoType === 'us' ||
+                      config.general.geoType === 'us-county' ||
+                      config.general.geoType === 'world') && (
+                      <>
+                        <Select
+                          label='Default City Style'
+                          value={config.visual.cityStyle || 'circle'}
+                          options={[
+                            { value: 'circle', label: 'Circle' },
+                            { value: 'pin', label: 'Pin' },
+                            { value: 'square', label: 'Square' },
+                            { value: 'triangle', label: 'Triangle' },
+                            { value: 'diamond', label: 'Diamond' },
+                            { value: 'star', label: 'Star' }
+                          ]}
+                          onChange={event => {
+                            handleEditorChanges('handleCityStyle', event.target.value)
+                          }}
+                        />
+                        <TextField
+                          value={config.visual.cityStyleLabel}
+                          section='visual'
+                          fieldName='cityStyleLabel'
+                          label='Label (Optional) '
+                          updateField={updateField}
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>When a label is provided, the default city style will appear in the legend.</p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                        />
+                      </>
+                    )}
+                    {/* <AdditionalCityStyles /> */}
+                    <>
+                      {config.visual.additionalCityStyles.length > 0 &&
+                        config.visual.additionalCityStyles.map(({ label, column, value, shape }, i) => {
+                          return (
+                            <div className='edit-block' key={`additional-city-style-${i}`}>
+                              <button
+                                className='remove-column'
+                                onClick={e => {
+                                  e.preventDefault()
+                                  editCityStyles('remove', i, '', '')
+                                }}
+                              >
+                                Remove
+                              </button>
+                              <p>City Style {i + 1}</p>
+                              <Select
+                                label='Column with configuration value'
+                                value={column}
+                                options={columnsOptions.map(c => c.key)}
+                                onChange={e => {
+                                  editCityStyles('update', i, 'column', e.target.value)
+                                }}
+                              />
+                              <label>
+                                <span className='edit-label column-heading'>Value to Trigger</span>
+                                <input
+                                  type='text'
+                                  value={value}
+                                  onChange={e => {
+                                    editCityStyles('update', i, 'value', e.target.value)
+                                  }}
+                                ></input>
+                              </label>
+                              <Select
+                                label='Shape'
+                                value={shape}
+                                options={[
+                                  { value: '', label: '- Select Option -' },
+                                  ...['Circle', 'Square', 'Triangle', 'Diamond', 'Star', 'Pin']
+                                    .filter(val => String(config.visual.cityStyle).toLowerCase() !== val.toLowerCase())
+                                    .map(val => ({ value: val, label: val }))
+                                ]}
+                                onChange={e => {
+                                  editCityStyles('update', i, 'shape', e.target.value)
+                                }}
+                              />
+                              <label>
+                                <span className='edit-label column-heading'>Label</span>
+                                <input
+                                  key={i}
+                                  type='text'
+                                  value={label}
+                                  onChange={e => {
+                                    editCityStyles('update', i, 'label', e.target.value)
+                                  }}
+                                />
+                              </label>
+                            </div>
+                          )
+                        })}
+
+                      <button
+                        type='button'
+                        onClick={() => editCityStyles('add', 0, '', '')}
+                        className='btn btn-primary full-width'
+                      >
+                        Add city style
+                      </button>
+                    </>
+                    <label htmlFor='opacity'>
+                      <TextField
+                        type='number'
+                        min={0}
+                        max={100}
+                        value={config.tooltips.opacity ? config.tooltips.opacity : 100}
+                        section='tooltips'
+                        fieldName='opacity'
+                        label='Tooltip Opacity (%)'
+                        updateField={updateField}
+                      />
+                    </label>
+                    {/* Leaflet Map Type */}
+                    {config.general.geoType === 'leaflet' && (
+                      <>
+                        <Select
+                          label='Leaflet Theme'
+                          options={layerOptions}
+                          section={'leaflet'}
+                          fieldName='theme'
+                          updateField={updateField}
+                        />
+                      </>
+                    )}
+                  </AccordionItemPanel>
+                </AccordionItem>
+                <AccordionItem>
+                  <AccordionItemHeading>
+                    <AccordionItemButton>Custom Map Layers</AccordionItemButton>
+                  </AccordionItemHeading>
+                  <AccordionItemPanel>
+                    {config.map.layers.length === 0 && <p>There are currently no layers.</p>}
+
+                    {config.map.layers.map((layer, index) => {
+                      return (
+                        <>
+                          <Accordion allowZeroExpanded>
+                            <AccordionItem className='series-item map-layers-list'>
+                              <AccordionItemHeading className='series-item__title map-layers-list--title'>
+                                <AccordionItemButton>{`Layer ${index + 1}: ${layer.name}`}</AccordionItemButton>
+                              </AccordionItemHeading>
+                              <AccordionItemPanel>
+                                <div className='map-layers-panel'>
+                                  <label htmlFor='layerName'>Layer Name:</label>
+                                  <input
+                                    type='text'
+                                    name='layerName'
+                                    value={layer.name}
+                                    onChange={e => handleMapLayer(e, index, 'name')}
+                                  />
+                                  <label htmlFor='layerFilename'>File:</label>
+                                  <input
+                                    type='text'
+                                    name='layerFilename'
+                                    value={layer.url}
+                                    onChange={e => handleMapLayer(e, index, 'url')}
+                                  />
+                                  <label htmlFor='layerNamespace'>TOPOJSON Namespace:</label>
+                                  <input
+                                    type='text'
+                                    name='layerNamespace'
+                                    value={layer.namespace}
+                                    onChange={e => handleMapLayer(e, index, 'namespace')}
+                                  />
+                                  <label htmlFor='layerFill'>Fill Color:</label>
+                                  <input
+                                    type='text'
+                                    name='layerFill'
+                                    value={layer.fill}
+                                    onChange={e => handleMapLayer(e, index, 'fill')}
+                                  />
+                                  <label htmlFor='layerFill'>Fill Opacity (%):</label>
+                                  <input
+                                    type='number'
+                                    min={0}
+                                    max={100}
+                                    name='layerFill'
+                                    value={layer.fillOpacity ? layer.fillOpacity * 100 : ''}
+                                    onChange={e => handleMapLayer(e, index, 'fillOpacity')}
+                                  />
+                                  <label htmlFor='layerStroke'>Stroke Color:</label>
+                                  <input
+                                    type='text'
+                                    name='layerStroke'
+                                    value={layer.stroke}
+                                    onChange={e => handleMapLayer(e, index, 'stroke')}
+                                  />
+                                  <label htmlFor='layerStroke'>Stroke Width:</label>
+                                  <input
+                                    type='number'
+                                    min={0}
+                                    max={5}
+                                    name='layerStrokeWidth'
+                                    value={layer.strokeWidth}
+                                    onChange={e => handleMapLayer(e, index, 'strokeWidth')}
+                                  />
+                                  <label htmlFor='layerTooltip'>Tooltip:</label>
+                                  <textarea
+                                    name='layerTooltip'
+                                    value={layer.tooltip}
+                                    onChange={e => handleMapLayer(e, index, 'tooltip')}
+                                  ></textarea>
+                                  <button onClick={e => handleRemoveLayer(e, index)}>Remove Layer</button>
+                                </div>
+                              </AccordionItemPanel>
+                            </AccordionItem>
+                          </Accordion>
+                        </>
+                      )
+                    })}
+                    <button className={'btn btn-primary full-width'} onClick={handleAddLayer}>
+                      Add Map Layer
+                    </button>
+                    <p className='layer-purpose-details'>
+                      Context should be added to your visualization or associated page to describe the significance of
+                      layers that are added to maps.
+                    </p>
+                  </AccordionItemPanel>
+                </AccordionItem>
+                {config.general.geoType === 'us' && <Panels.PatternSettings name='Pattern Settings' />}
+                {config.general.geoType !== 'us-county' && <Panels.Annotate name='Text Annotations' />}
+                <PanelMarkup
+                  name='Markup Variables'
+                  markupVariables={config.markupVariables || []}
+                  data={config.data || []}
+                  enableMarkupVariables={config.enableMarkupVariables || false}
+                  onMarkupVariablesChange={variables => setConfig({ ...config, markupVariables: variables })}
+                  onToggleEnable={enabled => setConfig({ ...config, enableMarkupVariables: enabled })}
+                />
+                <Panels.SmallMultiples name='Small Multiples' />
+              </Accordion>
+              <AdvancedEditor loadConfig={setConfig} config={config} convertStateToConfig={mapConvertStateToConfig} />
+            </>
+          )
+        }}
+      </BaseEditorPanel>
 
       {showConversionModal && (
         <PaletteConversionModal
@@ -3452,7 +3497,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           paletteName={pendingPaletteSelection?.palette}
         />
       )}
-    </ErrorBoundary>
+    </React.Fragment>
   )
 }
 

@@ -56,9 +56,12 @@ export const BasicEditorLoadingTests: Story = {
     await waitForEditor(canvas)
 
     // Verify all three main accordion sections are present
-    const generalButton = canvas.getByRole('button', { name: /general/i })
-    const dataButton = canvas.getByRole('button', { name: /data/i })
-    const visualButton = canvas.getByRole('button', { name: /visual/i })
+    // Use waitFor to give VisualSection time to render
+    const generalButton = await canvas.findByRole('button', { name: /general/i })
+    const dataButton = await canvas.findByRole('button', { name: /data/i })
+
+    // Find Visual section accordion button
+    const visualButton = await canvas.findByRole('button', { name: /visual/i }, { timeout: 5000 })
 
     await expect(generalButton).toBeVisible()
     await expect(dataButton).toBeVisible()
