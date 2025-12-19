@@ -96,3 +96,25 @@
 .type-sparkline.type-chart .cove-component__header {
   margin: 0px !important;
 }
+
+/* ============================================================================
+   MODERN TITLE
+   ============================================================================ */
+
+.cdc-open-viz-module .cove-title {
+  margin-bottom: 1rem;
+}
+
+.cdc-open-viz-module .cove-title h3 {
+  font-family: var(--app-font-secondary);
+}
+
+.cdc-open-viz-module .cove-title sup {
+  font-family: var(--app-font-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #666;
+  display: block;
+  margin-bottom: 0.25rem;
+}
