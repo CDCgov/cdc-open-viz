@@ -1,4 +1,5 @@
 import { useEffect, RefObject } from 'react'
+import { isValidConfigUrl } from './urlValidation'
 
 /**
  * Shared hook for setting up a COVE container div
@@ -7,6 +8,11 @@ import { useEffect, RefObject } from 'react'
 export function useCoveContainer(containerRef: RefObject<HTMLDivElement>, configUrl: string | null) {
   useEffect(() => {
     if (!containerRef.current || !configUrl) return
+
+    if (!isValidConfigUrl(configUrl)) {
+      console.error('Invalid configUrl: must be a relative URL', configUrl)
+      return
+    }
 
     // Set data attributes that COVE wrapper expects
     containerRef.current.setAttribute('class', 'wcms-viz-container')

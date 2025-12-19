@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { useConfigLoader } from '../shared/useConfigLoader'
 import { extractFilters, initializeFilterState, FilterState, allFiltersHaveQueryParam } from '../shared/filterUtils'
+import { getConfigUrlParam } from '../shared/urlValidation'
 import FilterCustomizationControls from './components/FilterCustomizationControls'
 import EmbedCodeGenerator from './components/EmbedCodeGenerator'
 import PreviewPanel from './components/PreviewPanel'
@@ -17,8 +18,7 @@ import PreviewPanel from './components/PreviewPanel'
 const GeneratorApp: React.FC = () => {
   const title = 'CDC Visualization Embed Code'
 
-  const params = new URLSearchParams(window.location.search)
-  const configUrl = params.get('configUrl')
+  const configUrl = getConfigUrlParam()
 
   // Load config to extract filter metadata
   const { loading, error, config } = useConfigLoader(configUrl)
@@ -72,18 +72,21 @@ const GeneratorApp: React.FC = () => {
     })
   }
 
-  // No config URL provided
+  // No valid config URL provided
   if (!configUrl) {
     return (
       <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
         <h1>{title}</h1>
         <div style={{ padding: '2rem', background: '#fff3cd', borderRadius: '4px', marginTop: '2rem' }}>
-          <h2>Missing Configuration</h2>
+          <h2>Invalid Configuration</h2>
           <p>
-            No <code>configUrl</code> parameter provided.
+            The <code>configUrl</code> parameter is missing or invalid.
           </p>
           <p>
-            <strong>Usage:</strong> <code>?configUrl=/path/to/config.json</code>
+            <strong>Required:</strong> A relative URL must be provided.
+          </p>
+          <p>
+            <strong>Example:</strong> <code>?configUrl=/path/to/config.json</code>
           </p>
         </div>
       </div>

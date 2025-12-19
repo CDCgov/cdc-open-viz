@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { isValidConfigUrl } from './urlValidation'
 
 /**
  * Minimal config type for generator
@@ -26,6 +27,10 @@ export type ConfigLoadState = {
  * Load and parse a COVE configuration file
  */
 async function loadConfig(configUrl: string): Promise<CoveConfig> {
+  if (!isValidConfigUrl(configUrl)) {
+    throw new Error('Invalid configUrl: must be a relative URL (no protocol or host)')
+  }
+
   const response = await fetch(configUrl)
 
   if (!response.ok) {

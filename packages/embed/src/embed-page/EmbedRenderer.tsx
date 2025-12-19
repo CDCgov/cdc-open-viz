@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useCoveContainer } from '../shared/useCoveContainer'
+import { getConfigUrlParam } from '../shared/urlValidation'
 
 /**
  * EmbedRenderer - Phase 1 & 2
@@ -14,8 +15,7 @@ const EmbedRenderer: React.FC = () => {
   const iframeIdRef = useRef<string | null>(null)
   const lastHeightRef = useRef<number>(0) // Shared across all resize paths
 
-  const params = new URLSearchParams(window.location.search)
-  const configUrl = params.get('configUrl')
+  const configUrl = getConfigUrlParam()
 
   // Setup COVE container using shared hook
   useCoveContainer(containerRef, configUrl)
@@ -109,7 +109,7 @@ const EmbedRenderer: React.FC = () => {
     }
   }, [iframeId])
 
-  // Show error if no config URL provided
+  // Show error if no valid config URL provided
   if (!configUrl) {
     return (
       <div
@@ -119,12 +119,15 @@ const EmbedRenderer: React.FC = () => {
           color: '#d32f2f'
         }}
       >
-        <h2>Missing Configuration</h2>
+        <h2>Invalid Configuration</h2>
         <p>
-          No <code>configUrl</code> parameter provided.
+          The <code>configUrl</code> parameter is missing or invalid.
         </p>
         <p>
-          <strong>Usage:</strong> <code>?configUrl=/path/to/config.json</code>
+          <strong>Required:</strong> A relative URL must be provided.
+        </p>
+        <p>
+          <strong>Example:</strong> <code>?configUrl=/path/to/config.json</code>
         </p>
       </div>
     )
