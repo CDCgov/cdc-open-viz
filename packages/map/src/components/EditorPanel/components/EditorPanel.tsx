@@ -1536,6 +1536,28 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         </Tooltip>
                       }
                     />
+                    <Select
+                      value={general.titleStyle}
+                      section='general'
+                      fieldName='titleStyle'
+                      label='Title Style'
+                      updateField={updateField}
+                      options={[
+                        { value: 'small', label: 'Small' },
+                        { value: 'large', label: 'Large' },
+                        { value: 'legacy', label: 'Legacy' }
+                      ]}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Choose the visual style for the map title.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
                     <CheckBox
                       value={config.general.showTitle || false}
                       section='general'

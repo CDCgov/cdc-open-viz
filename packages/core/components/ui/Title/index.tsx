@@ -13,20 +13,21 @@ type HeaderProps = {
   ariaLevel?: number
   config: Visualization
   theme?: string
+  titleStyle: 'legacy' | 'large' | 'small'
 }
 
 const Title = (props: HeaderProps) => {
-  const { isDashboard, title, superTitle, classes = [], showTitle = true, ariaLevel = 2 } = props
+  const { isDashboard, title, superTitle, classes = [], showTitle = true, ariaLevel = 2, titleStyle } = props
 
-  const useModernStyle = true
+  if (titleStyle === 'large' || titleStyle === 'small') {
+    const sizeClass = titleStyle === 'large' ? 'cove-title--large' : 'cove-title--small'
 
-  if (useModernStyle) {
     return (
       title &&
       showTitle && (
         <div className='cove-title' style={props.style}>
           {superTitle && <sup>{parse(superTitle)}</sup>}
-          <h3>{parse(title)}</h3>
+          <div className={sizeClass}>{parse(title)}</div>
         </div>
       )
     )

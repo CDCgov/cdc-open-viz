@@ -390,6 +390,29 @@ const PanelGeneral: FC<PanelProps> = props => {
             </Tooltip>
           }
         />
+
+        <Select
+          value={config.titleStyle}
+          fieldName='titleStyle'
+          label='Title Style'
+          updateField={updateField}
+          options={[
+            { value: 'small', label: 'Small' },
+            { value: 'large', label: 'Large' },
+            { value: 'legacy', label: 'Legacy' }
+          ]}
+          tooltip={
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>Choose the visual style for the title.</p>
+              </Tooltip.Content>
+            </Tooltip>
+          }
+        />
+
         <CheckBox value={config.showTitle} fieldName='showTitle' label='Show Title' updateField={updateField} />
 
         {visSupportsSuperTitle() && (
