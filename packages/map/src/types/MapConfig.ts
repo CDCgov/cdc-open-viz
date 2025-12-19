@@ -164,6 +164,7 @@ export type MapConfig = Visualization & {
     territoriesAlwaysShow: boolean
     territoriesLabel: string
     title: string
+    titleStyle: 'legacy' | 'large' | 'small'
     type: 'data' | 'navigation' | 'us-geocode' | 'world-geocode' | 'bubble'
   }
   legend: {

@@ -220,6 +220,7 @@ export type AllChartsConfig = {
   table: Table
   tipRounding: string
   title: string
+  titleStyle?: 'legacy' | 'large' | 'small'
   tooltips: {
     singleSeries: boolean
     opacity: number
