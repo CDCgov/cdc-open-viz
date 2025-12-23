@@ -1771,6 +1771,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               <Select
                                 fieldName='visualizationType'
                                 label='Add Data Series'
+                                aria-label='Add Data Series'
                                 initial='Select'
                                 onChange={e => {
                                   if (e.target.value !== '' && e.target.value !== 'Select') {

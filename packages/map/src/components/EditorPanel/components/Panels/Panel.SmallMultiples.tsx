@@ -199,6 +199,8 @@ const PanelSmallMultiples: FC<PanelSmallMultiplesProps> = props => {
                     value={currentOrderType}
                     options={tileOrderOptions}
                     label='Tile Order'
+                    fieldName='tileOrderType'
+                    section='smallMultiples'
                     updateField={(_section, _subsection, _fieldName, value) => {
                       handleOrderTypeChange(value)
                     }}

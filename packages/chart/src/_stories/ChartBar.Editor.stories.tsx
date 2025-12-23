@@ -2565,9 +2565,15 @@ export const BarFiltersTests: Story = {
       'Apply Filter Value - Chart data visually filtered to show only Q2',
       getChartDataState,
       async () => {
-        // Find the "Filter Default Value" dropdown - this sets filter.active which actually filters the data
-        const filterDefaultValueSelect = canvas.getByLabelText(/filter default value/i) as HTMLSelectElement
-
+        // Find all "Filter Default Value (category)" dropdowns
+        const filterDefaultValueSelects = canvas.getAllByLabelText(
+          /filter default value \(category\)/i
+        ) as HTMLSelectElement[]
+        // Select the dropdown that contains Q2 as an option
+        const filterDefaultValueSelect = filterDefaultValueSelects.find(select =>
+          Array.from(select.options).some(opt => opt.value === 'Q2')
+        )
+        if (!filterDefaultValueSelect) throw new Error('Could not find filter default value dropdown for Q2')
         // Select Q2 to filter the chart to only show Q2 data (different from current state)
         await userEvent.selectOptions(filterDefaultValueSelect, 'Q2')
       },
