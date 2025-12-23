@@ -58,22 +58,13 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
   // Apparently some packages use state.title where others use state.general.title
   const handleFileName = state => {
     // dashboard titles
-    if (state?.dashboard?.title)
-      return (
-        `${state.dashboard.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
-      )
+    if (state?.dashboard?.title) return `${state.dashboard.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
 
     // map titles
-    if (state?.general?.title)
-      return (
-        `${state.general.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
-      )
+    if (state?.general?.title) return `${state.general.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
 
     // chart titles
-    if (state?.title)
-      return (
-        `${state.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
-      )
+    if (state?.title) return `${state.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
 
     return 'no-title'
   }
@@ -84,13 +75,22 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
     case 'image':
       const container = document.createElement('div')
 
-      // Simple configurable padding (main fix for spacing issues)
-      const downloadPadding = state.downloadImagePadding !== undefined ? state.downloadImagePadding : (!state.showTitle ? 35 : 0)
-      if (downloadPadding > 0) {
-        container.style.padding = `${downloadPadding}px`
-      }
+      const clonedElement = baseSvg.cloneNode(true) as HTMLElement
 
-      container.appendChild(baseSvg.cloneNode(true));
+      // Expand SVG width to prevent clipping of overflowing content (like tick labels)
+      const svgWidthBuffer = 25
+      const svgElements = clonedElement.querySelectorAll('svg')
+      svgElements.forEach(svg => {
+        const currentWidth = parseInt(svg.getAttribute('width') || '0')
+        if (currentWidth > 0) {
+          svg.setAttribute('width', (currentWidth + svgWidthBuffer).toString())
+        }
+
+        // Remove animation classes to show final state immediately without animation
+        svg.classList.remove('animated', 'animate')
+      })
+
+      container.appendChild(clonedElement)
 
       const downloadImage = async () => {
         document.body.appendChild(container) // Append container to the DOM
@@ -119,7 +119,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
                 el.className.search(/download-buttons|download-links|data-table-container/) !== -1,
               useCORS: true,
               scale: 2, // Better quality
-              allowTaint: true,
+              allowTaint: true
             })
             .then(canvas => {
               document.body.removeChild(container) // Clean up container
@@ -163,6 +163,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
   }
 }
 
+// Button component for Dashboard downloads (renders as actual button)
 const Button = ({ state, text, type, title, elementToCapture, interactionLabel = '' }) => {
   const buttonClasses = ['btn', 'btn-primary']
   return (
@@ -174,6 +175,27 @@ const Button = ({ state, text, type, title, elementToCapture, interactionLabel =
     >
       {buttonText[type]}
     </button>
+  )
+}
+
+// DownloadLink component for Chart/Map downloads (renders as text link)
+const DownloadLink = ({ state, type, title, elementToCapture, interactionLabel = '' }) => {
+  const vizType = state?.type === 'map' ? 'Map' : 'Chart'
+  const format = type === 'pdf' ? 'PDF' : 'PNG'
+  const linkText = `Download ${vizType} (${format})`
+
+  return (
+    <a
+      role='button'
+      onClick={() => generateMedia(state, type, elementToCapture, interactionLabel)}
+      aria-label={title}
+      title={title}
+      className={`no-border`}
+      style={{ cursor: 'pointer' }}
+      data-html2canvas-ignore
+    >
+      {linkText}
+    </a>
   )
 }
 
@@ -238,6 +260,7 @@ const MediaControls = () => null
 MediaControls.Section = Section
 MediaControls.Link = Link
 MediaControls.Button = Button
+MediaControls.DownloadLink = DownloadLink
 MediaControls.generateMedia = generateMedia
 
 export default MediaControls

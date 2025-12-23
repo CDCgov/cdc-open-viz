@@ -57,7 +57,6 @@ import EditorPanel from './components/EditorPanel'
 import Error from './components/EditorPanel/components/Error'
 import Legend from './components/Legend'
 import MapContainer from './components/MapContainer'
-import MapControls from './components/MapControls'
 import NavigationMenu from './components/NavigationMenu'
 
 // hooks
@@ -507,8 +506,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     : link && link}
 
                   {processedSubtext.length > 0 && <p className='subtext mt-4'>{parse(processedSubtext)}</p>}
-
-                  <MapControls config={config} imageId={imageId} interactionLabel={interactionLabel} />
 
                   {shouldShowDataTable(config, table, general, loading) && (
                     <DataTable

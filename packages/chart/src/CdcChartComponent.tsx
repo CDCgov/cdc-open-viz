@@ -1329,29 +1329,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   <div className={getChartSubTextClasses().join(' ')}>{parse(processedDescription)}</div>
                 )}
 
-                {/* buttons */}
-                <MediaControls.Section classes={['download-buttons']}>
-                  {config.table.showDownloadImgButton && (
-                    <MediaControls.Button
-                      text='Download Image'
-                      title='Download Chart as Image'
-                      type='image'
-                      state={config}
-                      elementToCapture={imageId}
-                      interactionLabel={interactionLabel}
-                    />
-                  )}
-                  {config.table.showDownloadPdfButton && (
-                    <MediaControls.Button
-                      text='Download PDF'
-                      title='Download Chart as PDF'
-                      type='pdf'
-                      state={config}
-                      elementToCapture={imageId}
-                      interactionLabel={interactionLabel}
-                    />
-                  )}
-                </MediaControls.Section>
                 {/* Data Table */}
                 {((config.xAxis.dataKey &&
                   config.table.show &&
@@ -1398,6 +1375,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         viewport={currentViewport}
                         tabbingId={handleChartTabbing(config, legendId)}
                         colorScale={colorScale}
+                        imageRef={imageId}
+                        showDownloadImgButton={config.table.showDownloadImgButton}
+                        showDownloadPdfButton={config.table.showDownloadPdfButton}
                         interactionLabel={interactionLabel}
                       />
                     )
