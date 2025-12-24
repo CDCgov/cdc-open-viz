@@ -44,10 +44,10 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
 
       <div
         style={{
-          paddingTop: '1.5rem',
-          paddingBottom: '1.5rem',
-          borderTop: '2px dashed #999',
-          borderBottom: '2px dashed #999',
+          padding: '1.5rem',
+          border: '2px dashed #999',
+          boxShadow: 'inset 0 0 0 10px #ffffe0, 0 0 0 10px #ffffe0',
+          borderRadius: '4px',
           marginTop: '1rem'
         }}
       >
