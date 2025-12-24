@@ -25,7 +25,7 @@ const EmbedRenderer: React.FC = () => {
     const container = containerRef.current
     if (!container) return
 
-    const height = Math.round(container.getBoundingClientRect().height)
+    const height = Math.ceil(container.getBoundingClientRect().height) + 15
 
     if (height < 100) return
 
