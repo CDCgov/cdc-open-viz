@@ -327,7 +327,7 @@ export const GeneralSectionTests: Story = {
     expect(titleInput).toBeTruthy()
 
     const getTitleVisual = () => {
-      const titleElement = canvasElement.querySelector('.map-title')
+      const titleElement = canvasElement.querySelector('.cove-title, .map-title')
       return {
         titleText: titleElement?.textContent || '',
         hasTitleElement: Boolean(titleElement)
@@ -346,7 +346,7 @@ export const GeneralSectionTests: Story = {
 
     // ==========================================================================
     // TEST: Show Title checkbox
-    // Verifies: Title element visibility changes (visible/hidden class)
+    // Verifies: Title element visibility is controlled by showTitle
     // ==========================================================================
     const generalAccordion = canvasElement.querySelector('[aria-expanded="true"]')?.closest('.accordion__item')
     const showTitleLabel = Array.from(generalAccordion?.querySelectorAll('label') || []).find(label =>
@@ -356,22 +356,20 @@ export const GeneralSectionTests: Story = {
     expect(showTitleCheckbox).toBeTruthy()
 
     const getTitleVisibility = () => {
-      const titleElement = canvasElement.querySelector('.map-title')
-      const classes = titleElement ? Array.from(titleElement.classList) : []
+      const titleElement = canvasElement.querySelector('.cove-title, header.cove-component__header')
       return {
-        isVisible: classes.includes('visible'),
-        isHidden: classes.includes('hidden')
+        isPresent: Boolean(titleElement)
       }
     }
 
-    // Test config has showTitle: true, so title starts visible
+    // Test config has showTitle: true, so title starts visible (present in DOM)
     await performAndAssert(
       'Show Title → Hide',
       getTitleVisibility,
       async () => {
         await userEvent.click(showTitleCheckbox)
       },
-      (before, after) => before.isVisible && !after.isVisible && after.isHidden
+      (before, after) => before.isPresent && !after.isPresent
     )
 
     await performAndAssert(
@@ -380,7 +378,7 @@ export const GeneralSectionTests: Story = {
       async () => {
         await userEvent.click(showTitleCheckbox)
       },
-      (before, after) => !before.isVisible && after.isVisible && !after.isHidden
+      (before, after) => !before.isPresent && after.isPresent
     )
 
     // ==========================================================================
@@ -391,7 +389,7 @@ export const GeneralSectionTests: Story = {
     expect(superTitleInput).toBeTruthy()
 
     const getSuperTitleVisual = () => {
-      const titleElement = canvasElement.querySelector('.map-title')
+      const titleElement = canvasElement.querySelector('.cove-title, .map-title')
       return {
         titleText: titleElement?.textContent || ''
       }
@@ -405,6 +403,60 @@ export const GeneralSectionTests: Story = {
         await userEvent.type(superTitleInput, 'Super Title Text')
       },
       (before, after) => !before.titleText.includes('Super Title Text') && after.titleText.includes('Super Title Text')
+    )
+
+    // ==========================================================================
+    // TEST: Title Style dropdown
+    // Verifies: Changing title style changes the CSS class of the title element
+    // ==========================================================================
+    const titleStyleSelect = canvas.getByLabelText(/Title Style/i) as HTMLSelectElement
+    expect(titleStyleSelect).toBeTruthy()
+
+    const getTitleStyleVisual = () => {
+      const coveTitleElement = canvasElement.querySelector('.cove-title')
+      const legacyTitleElement = canvasElement.querySelector('header.cove-component__header')
+
+      // For modern titles, the size class is on a child div
+      const sizeElement = coveTitleElement?.querySelector('div')
+      const sizeClasses = sizeElement ? Array.from(sizeElement.classList) : []
+
+      return {
+        hasCoveTitle: Boolean(coveTitleElement),
+        hasLegacyTitle: Boolean(legacyTitleElement),
+        isSmall: sizeClasses.includes('cove-title--small'),
+        isLarge: sizeClasses.includes('cove-title--large')
+      }
+    }
+
+    // Current config has titleStyle: 'small'
+    // Test: Change to 'large'
+    await performAndAssert(
+      'Title Style → Change to Large',
+      getTitleStyleVisual,
+      async () => {
+        await userEvent.selectOptions(titleStyleSelect, 'large')
+      },
+      (before, after) => before.isSmall && after.isLarge && after.hasCoveTitle && !after.hasLegacyTitle
+    )
+
+    // Test: Change to 'legacy'
+    await performAndAssert(
+      'Title Style → Change to Legacy',
+      getTitleStyleVisual,
+      async () => {
+        await userEvent.selectOptions(titleStyleSelect, 'legacy')
+      },
+      (before, after) => before.hasCoveTitle && !after.hasCoveTitle && after.hasLegacyTitle
+    )
+
+    // Test: Change back to 'small'
+    await performAndAssert(
+      'Title Style → Change back to Small',
+      getTitleStyleVisual,
+      async () => {
+        await userEvent.selectOptions(titleStyleSelect, 'small')
+      },
+      (before, after) => before.hasLegacyTitle && !after.hasLegacyTitle && after.isSmall && after.hasCoveTitle
     )
 
     // ==========================================================================
@@ -2168,36 +2220,34 @@ export const VisualSectionTests: StoryObj<typeof CdcMap> = {
     await performAndAssert(
       'Show Title → Toggle off',
       () => {
-        const title = canvasElement.querySelector('.map-title')
-        const isVisible = title?.classList.contains('visible')
+        const titleElement = canvasElement.querySelector('.cove-title, header.cove-component__header')
         return {
-          isVisible: Boolean(isVisible)
+          isPresent: Boolean(titleElement)
         }
       },
       async () => {
         await userEvent.click(showTitleCheckbox)
       },
       (before, after) => {
-        // After toggling off, title should be hidden
-        return before.isVisible && !after.isVisible
+        // After toggling off, title should be removed from DOM
+        return before.isPresent && !after.isPresent
       }
     )
 
     await performAndAssert(
       'Show Title → Toggle back on',
       () => {
-        const title = canvasElement.querySelector('.map-title')
-        const isVisible = title?.classList.contains('visible')
+        const titleElement = canvasElement.querySelector('.cove-title, header.cove-component__header')
         return {
-          isVisible: Boolean(isVisible)
+          isPresent: Boolean(titleElement)
         }
       },
       async () => {
         await userEvent.click(showTitleCheckbox)
       },
       (before, after) => {
-        // After toggling back on, title should be visible
-        return !before.isVisible && after.isVisible
+        // After toggling back on, title should be present in DOM
+        return !before.isPresent && after.isPresent
       }
     )
 
