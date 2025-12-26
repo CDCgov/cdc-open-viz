@@ -90,6 +90,22 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
 
       clonedElement.style.padding = '0'
 
+      // Replace canvas elements with images (for county maps, etc.)
+      // Canvas pixel data doesn't clone, so convert to image before screenshot
+      const originalCanvases = baseSvg.querySelectorAll('canvas')
+      const clonedCanvases = clonedElement.querySelectorAll('canvas')
+      clonedCanvases.forEach((clonedCanvas, index) => {
+        const originalCanvas = originalCanvases[index]
+        if (originalCanvas && originalCanvas.width > 0 && originalCanvas.height > 0) {
+          const img = document.createElement('img')
+          img.src = originalCanvas.toDataURL('image/png')
+          img.width = originalCanvas.width
+          img.height = originalCanvas.height
+          img.className = originalCanvas.className
+          clonedCanvas.parentNode.replaceChild(img, clonedCanvas)
+        }
+      })
+
       // Expand SVG width to prevent clipping of overflowing content (like tick labels)
       const svgWidthBuffer = 25
       const svgElements = clonedElement.querySelectorAll('svg')
