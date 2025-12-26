@@ -288,6 +288,29 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           updateField={updateField}
         />
       )}
+      {config.type !== 'table' && config.table.showDownloadImgButton && (
+        <CheckBox
+          value={config.table.includeContextInDownload}
+          fieldName='includeContextInDownload'
+          className='ms-4'
+          label='Include Heading & Context'
+          section='table'
+          updateField={updateField}
+          tooltip={
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>
+                  When enabled, the image download will include the page heading (H2 or H3) and any explanatory
+                  paragraphs that appear before the visualization
+                </p>
+              </Tooltip.Content>
+            </Tooltip>
+          }
+        />
+      )}
       <label>
         <span className='edit-label column-heading'>Table Cell Min Width</span>
         <input

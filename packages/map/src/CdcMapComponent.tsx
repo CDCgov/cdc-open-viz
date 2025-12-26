@@ -532,6 +532,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       runtimeLegend={runtimeLegend}
                       showDownloadImgButton={showDownloadImgButton}
                       showDownloadPdfButton={showDownloadPdfButton}
+                      includeContextInDownload={config.general?.includeContextInDownload}
                       tabbingId={tabId}
                       tableTitle={table.label}
                       vizTitle={general.title}
@@ -551,6 +552,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                               state={config}
                               elementToCapture={imageId}
                               interactionLabel={interactionLabel}
+                              includeContextInDownload={config.general?.includeContextInDownload}
                             />
                           )}
                           {showDownloadPdfButton && (
@@ -560,6 +562,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                               state={config}
                               elementToCapture={imageId}
                               interactionLabel={interactionLabel}
+                              includeContextInDownload={config.general?.includeContextInDownload}
                             />
                           )}
                         </MediaControls.Section>

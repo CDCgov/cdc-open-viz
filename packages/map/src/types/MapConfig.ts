@@ -148,6 +148,7 @@ export type MapConfig = Visualization & {
     }
     showDownloadMediaButton: boolean
     showDownloadImgButton: boolean
+    includeContextInDownload?: boolean
     showDownloadPdfButton: boolean
     showSidebar: boolean
     showTitle: boolean

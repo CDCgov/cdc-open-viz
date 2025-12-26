@@ -63,6 +63,7 @@ export type DataTableProps = {
   interactionLabel?: string
   showDownloadImgButton?: boolean
   showDownloadPdfButton?: boolean
+  includeContextInDownload?: boolean
   // Map-specific props (optional)
   legendMemo?: React.MutableRefObject<Map<any, any>>
   legendSpecialClassLastMemo?: React.MutableRefObject<Map<any, any>>
@@ -89,6 +90,7 @@ const DataTable = (props: DataTableProps) => {
     interactionLabel = '',
     showDownloadImgButton,
     showDownloadPdfButton,
+    includeContextInDownload = false,
     imageRef
   } = props
   const runtimeData = useMemo(() => {
@@ -374,6 +376,7 @@ const DataTable = (props: DataTableProps) => {
               state={config}
               elementToCapture={imageRef}
               interactionLabel={interactionLabel}
+              includeContextInDownload={includeContextInDownload}
             />
           )}
           {showDownloadPdfButton && (
@@ -383,6 +386,7 @@ const DataTable = (props: DataTableProps) => {
               state={config}
               elementToCapture={imageRef}
               interactionLabel={interactionLabel}
+              includeContextInDownload={includeContextInDownload}
             />
           )}
           <MediaControls.Link config={config} dashboardDataConfig={dataConfig} interactionLabel={interactionLabel} />

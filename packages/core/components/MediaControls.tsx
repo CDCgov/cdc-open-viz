@@ -35,7 +35,7 @@ const saveImageAs = (uri, filename) => {
   }
 }
 
-const generateMedia = (state, type, elementToCapture, interactionLabel) => {
+const generateMedia = (state, type, elementToCapture, interactionLabel, includeContextInDownload = false) => {
   // Identify Selector
   const baseSvg = document.querySelector(`[data-download-id=${elementToCapture}]`)
 
@@ -73,27 +73,53 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
 
   switch (type) {
     case 'image':
-      const container = document.createElement('div')
+      let clonedTree: HTMLElement
+      let clonedViz: HTMLElement
 
-      // Get original dimensions to maintain width in clone
+      // Clone section (if context enabled and found) or just viz
+      const section = baseSvg.closest('.dfe-section, section, [data-section]')
+      if (includeContextInDownload && section) {
+        clonedTree = section.cloneNode(true) as HTMLElement
+        clonedViz = clonedTree.querySelector(`[data-download-id=${elementToCapture}]`) as HTMLElement
+
+        // Remove margin-bottom from cloned section
+        clonedTree.style.marginBottom = '0'
+
+        // Remove top margin from context headings (H2/H3 not inside viz)
+        const allHeadings = clonedTree.querySelectorAll('h2, h3')
+        allHeadings.forEach(heading => {
+          if (!clonedViz.contains(heading)) {
+            ;(heading as HTMLElement).style.marginTop = '0'
+          }
+        })
+      } else {
+        clonedTree = baseSvg.cloneNode(true) as HTMLElement
+        clonedViz = clonedTree
+      }
+
+      // Container and dimension setup
+      const container = document.createElement('div')
       const computedStyle = getComputedStyle(baseSvg)
-      const origWidth =
+      const vizWidth =
         parseFloat(computedStyle.width) -
         (parseFloat(computedStyle.paddingLeft) || 0) -
         (parseFloat(computedStyle.paddingRight) || 0)
 
-      // Add padding to container but keep visualization the same size
-      container.style.width = `${origWidth + 36}px`
+      container.style.width = `${vizWidth + 36}px`
       container.style.padding = '18px'
+      clonedViz.style.padding = '0'
 
-      const clonedElement = baseSvg.cloneNode(true) as HTMLElement
-
-      clonedElement.style.padding = '0'
+      // Strip all links from cloned tree (links aren't clickable in a static PNG)
+      const allLinks = clonedTree.querySelectorAll('a')
+      allLinks.forEach(link => {
+        const textNode = document.createTextNode(link.textContent || '')
+        link.parentNode?.replaceChild(textNode, link)
+      })
 
       // Replace canvas elements with images (for county maps, etc.)
       // Canvas pixel data doesn't clone, so convert to image before screenshot
       const originalCanvases = baseSvg.querySelectorAll('canvas')
-      const clonedCanvases = clonedElement.querySelectorAll('canvas')
+      const clonedCanvases = clonedViz.querySelectorAll('canvas')
       clonedCanvases.forEach((clonedCanvas, index) => {
         const originalCanvas = originalCanvases[index]
         if (originalCanvas && originalCanvas.width > 0 && originalCanvas.height > 0) {
@@ -108,7 +134,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
 
       // Expand SVG width to prevent clipping of overflowing content (like tick labels)
       const svgWidthBuffer = 25
-      const svgElements = clonedElement.querySelectorAll('svg')
+      const svgElements = clonedViz.querySelectorAll('svg')
       svgElements.forEach(svg => {
         const currentWidth = parseInt(svg.getAttribute('width') || '0')
         if (currentWidth > 0) {
@@ -119,10 +145,12 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
         svg.classList.remove('animated', 'animate')
       })
 
-      container.appendChild(clonedElement)
+      container.appendChild(clonedTree)
 
       const downloadImage = async () => {
-        document.body.appendChild(container) // Append container to the DOM
+        // Append to main element if exists, otherwise body
+        const targetElement = document.querySelector('main') || document.body
+        targetElement.appendChild(container)
 
         // Fix select elements to show their current selected values before screenshot
         const selectElements = container.querySelectorAll('select')
@@ -193,13 +221,22 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
 }
 
 // Button component for Dashboard downloads (renders as actual button)
-const Button = ({ state, text, type, title, elementToCapture, interactionLabel = '' }) => {
+const Button = ({
+  state,
+  text,
+  type,
+  title,
+  elementToCapture,
+  interactionLabel = '',
+  includeContextInDownload = false
+}) => {
   const buttonClasses = ['btn', 'btn-primary']
+
   return (
     <button
       className={buttonClasses.join(' ')}
       title={title}
-      onClick={() => generateMedia(state, type, elementToCapture, interactionLabel)}
+      onClick={() => generateMedia(state, type, elementToCapture, interactionLabel, includeContextInDownload)}
       style={{ lineHeight: '1.4em' }}
     >
       {buttonText[type]}
@@ -208,7 +245,14 @@ const Button = ({ state, text, type, title, elementToCapture, interactionLabel =
 }
 
 // DownloadLink component for Chart/Map downloads (renders as text link)
-const DownloadLink = ({ state, type, title, elementToCapture, interactionLabel = '' }) => {
+const DownloadLink = ({
+  state,
+  type,
+  title,
+  elementToCapture,
+  interactionLabel = '',
+  includeContextInDownload = false
+}) => {
   const vizType = state?.type === 'map' ? 'Map' : 'Chart'
   const format = type === 'pdf' ? 'PDF' : 'PNG'
   const linkText = `Download ${vizType} (${format})`
@@ -216,7 +260,7 @@ const DownloadLink = ({ state, type, title, elementToCapture, interactionLabel =
   return (
     <a
       role='button'
-      onClick={() => generateMedia(state, type, elementToCapture, interactionLabel)}
+      onClick={() => generateMedia(state, type, elementToCapture, interactionLabel, includeContextInDownload)}
       aria-label={title}
       title={title}
       className={`no-border`}

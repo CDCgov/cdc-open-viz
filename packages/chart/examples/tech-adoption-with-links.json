@@ -134,7 +134,7 @@
   },
   "table": {
     "label": "Data Table",
-    "expanded": true,
+    "expanded": false,
     "limitHeight": false,
     "height": "500",
     "caption": "",
@@ -150,6 +150,7 @@
     "collapsible": true,
     "show": true,
     "showDownloadImgButton": true,
+    "includeContextInDownload": true,
     "groupBy": "",
     "cellMinWidth": "150"
   },

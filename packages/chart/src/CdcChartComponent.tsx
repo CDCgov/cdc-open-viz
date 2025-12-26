@@ -1378,6 +1378,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                           imageRef={imageId}
                           showDownloadImgButton={config.table.showDownloadImgButton}
                           showDownloadPdfButton={config.table.showDownloadPdfButton}
+                          includeContextInDownload={config.table?.includeContextInDownload}
                           interactionLabel={interactionLabel}
                         />
                       )
@@ -1392,6 +1393,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                               state={config}
                               elementToCapture={imageId}
                               interactionLabel={interactionLabel}
+                              includeContextInDownload={config.table?.includeContextInDownload}
                             />
                           )}
                           {config.table.showDownloadPdfButton && (
@@ -1401,6 +1403,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                               state={config}
                               elementToCapture={imageId}
                               interactionLabel={interactionLabel}
+                              includeContextInDownload={config.table?.includeContextInDownload}
                             />
                           )}
                         </MediaControls.Section>
