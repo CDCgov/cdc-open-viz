@@ -75,7 +75,20 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
     case 'image':
       const container = document.createElement('div')
 
+      // Get original dimensions to maintain width in clone
+      const computedStyle = getComputedStyle(baseSvg)
+      const origWidth =
+        parseFloat(computedStyle.width) -
+        (parseFloat(computedStyle.paddingLeft) || 0) -
+        (parseFloat(computedStyle.paddingRight) || 0)
+
+      // Add padding to container but keep visualization the same size
+      container.style.width = `${origWidth + 36}px`
+      container.style.padding = '18px'
+
       const clonedElement = baseSvg.cloneNode(true) as HTMLElement
+
+      clonedElement.style.padding = '0'
 
       // Expand SVG width to prevent clipping of overflowing content (like tick labels)
       const svgWidthBuffer = 25
