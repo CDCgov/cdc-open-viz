@@ -9,6 +9,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 import DataTable from '@cdc/core/components/DataTable'
 import Filters from '@cdc/core/components/Filters'
 import Layout from '@cdc/core/components/Layout'
+import MediaControls from '@cdc/core/components/MediaControls'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Title from '@cdc/core/components/ui/Title'
 import Waiting from '@cdc/core/components/Waiting'
@@ -507,7 +508,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
                   {processedSubtext.length > 0 && <p className='subtext mt-4'>{parse(processedSubtext)}</p>}
 
-                  {shouldShowDataTable(config, table, general, loading) && (
+                  {/* Data Table or Download Links */}
+                  {shouldShowDataTable(config, table, general, loading) ? (
                     <DataTable
                       columns={dataTableColumns}
                       config={dataTableConfig}
@@ -538,6 +540,31 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       wrapColumns={table.wrapColumns}
                       interactionLabel={interactionLabel}
                     />
+                  ) : (
+                    (showDownloadImgButton || showDownloadPdfButton) && (
+                      <div className='w-100 d-flex justify-content-end'>
+                        <MediaControls.Section classes={['download-links', 'mt-4', 'mb-2']}>
+                          {showDownloadImgButton && (
+                            <MediaControls.DownloadLink
+                              type='image'
+                              title='Download Map as Image'
+                              state={config}
+                              elementToCapture={imageId}
+                              interactionLabel={interactionLabel}
+                            />
+                          )}
+                          {showDownloadPdfButton && (
+                            <MediaControls.DownloadLink
+                              type='pdf'
+                              title='Download Map as PDF'
+                              state={config}
+                              elementToCapture={imageId}
+                              interactionLabel={interactionLabel}
+                            />
+                          )}
+                        </MediaControls.Section>
+                      </div>
+                    )
                   )}
 
                   {config.annotations?.length > 0 && <Annotation.Dropdown />}
