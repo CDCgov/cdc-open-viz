@@ -227,7 +227,8 @@ const DataTable = (props: DataTableProps) => {
   const getClassNames = (): string => {
     const classes = ['data-table-container']
 
-    const hasDownloadLinkAbove = config.table.download && !config.table.showDownloadLinkBelow
+    const hasDownloadLinkAbove =
+      (config.table.download || showDownloadImgButton || showDownloadPdfButton) && !config.table.showDownloadLinkBelow
     const isStandaloneTable = config.type === 'table'
 
     if (!hasDownloadLinkAbove && !isStandaloneTable) {
