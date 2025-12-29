@@ -18,6 +18,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
   territory,
   textColor,
   backgroundColor,
+  mapId,
   svgStyle,
   getSyncProps,
   syncHandlers,
@@ -70,7 +71,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
           {label}
         </text>
 
-        {config.map.patterns.map((patternData, patternIndex) => {
+        {config.map?.patterns?.map((patternData, patternIndex) => {
           const patternColor = patternData.color || getContrastColor('#FFF', backgroundColor)
           const hasMatchingValues = patternData.dataValue === territoryData?.[patternData.dataKey]
 
@@ -81,7 +82,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
             <>
               {patternData?.pattern === 'waves' && (
                 <PatternWaves
-                  id={`territory-${territory}-${patternData?.dataKey}--${patternIndex}`}
+                  id={`${mapId}--territory-${territory}-${patternData?.dataKey}--${patternIndex}`}
                   height={patternSizes[patternData?.size] ?? 10}
                   width={patternSizes[patternData?.size] ?? 10}
                   fill={patternColor}
@@ -91,7 +92,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
               )}
               {patternData?.pattern === 'circles' && (
                 <PatternCircles
-                  id={`territory-${territory}-${patternData?.dataKey}--${patternIndex}`}
+                  id={`${mapId}--territory-${territory}-${patternData?.dataKey}--${patternIndex}`}
                   height={patternSizes[patternData?.size] ?? 10}
                   width={patternSizes[patternData?.size] ?? 10}
                   fill={patternColor}
@@ -102,7 +103,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
               )}
               {patternData?.pattern === 'lines' && (
                 <PatternLines
-                  id={`territory-${territory}-${patternData?.dataKey}--${patternIndex}`}
+                  id={`${mapId}--territory-${territory}-${patternData?.dataKey}--${patternIndex}`}
                   height={patternSizes[patternData?.size] ?? 6}
                   width={patternSizes[patternData?.size] ?? 6}
                   stroke={patternColor}
@@ -114,7 +115,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                 stroke={stroke}
                 strokeWidth={strokeWidth}
                 d={rectanglePath}
-                fill={`url(#territory-${territory}-${patternData?.dataKey}--${patternIndex})`}
+                fill={`url(#${mapId}--territory-${territory}-${patternData?.dataKey}--${patternIndex})`}
                 style={{ pointerEvents: 'none' }}
                 className={[
                   `territory-pattern-${patternData?.dataKey}`,
