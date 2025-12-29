@@ -65,7 +65,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const container = useRef()
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config || {})
-  const { contentEditor, theme } = config || {}
+  const { contentEditor, theme, visual } = config || {}
   const {
     showNoDataMessage,
     allowHideSection,
@@ -78,6 +78,9 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const markupVariables = config?.markupVariables || contentEditorMarkupVariables || []
 
   const { inlineHTML, srcUrl, title, useInlineHTML } = contentEditor || {}
+
+  // Determine if padding should be applied based on visual settings
+  const shouldApplyPadding = visual?.border || visual?.accent || visual?.background
 
   // Default Functions
   const updateConfig = newConfig => {
@@ -261,7 +264,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
                       interactionLabel={interactionLabel || 'markup-include'}
                     />
                   )}
-                  <div className='cove-component__content-wrap'>
+                  <div className={`cove-component__content-wrap${shouldApplyPadding ? ' has-padding' : ''}`}>
                     {_showNoDataMessage && (
                       <div className='no-data-message'>
                         <p>{`${noDataMessageText}`}</p>
