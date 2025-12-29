@@ -54,6 +54,17 @@ const EditorPanel: React.FC<FilteredTextEditorPanelProps> = () => {
               placeholder='Filterable Text Title'
               updateField={updateField}
             />
+            <Select
+              value={config.titleStyle}
+              fieldName='titleStyle'
+              label='Title Style'
+              updateField={updateField}
+              options={[
+                { value: 'small', label: 'Small' },
+                { value: 'large', label: 'Large' },
+                { value: 'legacy', label: 'Legacy' }
+              ]}
+            />
           </Accordion.Section>
           <Accordion.Section title='Data'>
             <Select

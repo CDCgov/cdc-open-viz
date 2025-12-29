@@ -246,8 +246,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
                 <Title
                   title={title}
                   isDashboard={isDashboard}
-                  showTitle={config.showTitle}
-                  titleStyle={config.titleStyle}
+                  titleStyle={contentEditor.titleStyle}
                   config={config}
                   classes={[`${theme}`, 'mb-0']}
                 />
