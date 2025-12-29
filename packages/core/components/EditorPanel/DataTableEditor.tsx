@@ -303,8 +303,9 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
               </Tooltip.Target>
               <Tooltip.Content>
                 <p>
-                  When enabled, the image download will include the page heading (H2 or H3) and any explanatory
-                  paragraphs that appear before the visualization
+                  When enabled, the image download will include the section heading (H2 or H3) and any explanatory
+                  paragraphs that appear before the visualization. Be sure to test the image download on the published
+                  page to ensure the correct context is included.
                 </p>
               </Tooltip.Content>
             </Tooltip>
