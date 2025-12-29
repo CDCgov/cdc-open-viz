@@ -2,6 +2,7 @@ import React from 'react'
 // import html2pdf from 'html2pdf.js'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { prepareScreenshotContainer } from '@cdc/core/helpers/prepareScreenshot'
 
 const buttonText = {
   pdf: 'Download PDF',
@@ -73,79 +74,8 @@ const generateMedia = (state, type, elementToCapture, interactionLabel, includeC
 
   switch (type) {
     case 'image':
-      let clonedTree: HTMLElement
-      let clonedViz: HTMLElement
-
-      // Clone section (if context enabled and found) or just viz
-      const section = baseSvg.closest('.dfe-section, section, [data-section]')
-      if (includeContextInDownload && section) {
-        clonedTree = section.cloneNode(true) as HTMLElement
-        clonedViz = clonedTree.querySelector(`[data-download-id=${elementToCapture}]`) as HTMLElement
-
-        // Remove margin-bottom from cloned section
-        clonedTree.style.marginBottom = '0'
-
-        // Remove top margin from context headings (H2/H3 not inside viz)
-        const allHeadings = clonedTree.querySelectorAll('h2, h3')
-        allHeadings.forEach(heading => {
-          if (!clonedViz.contains(heading)) {
-            ;(heading as HTMLElement).style.marginTop = '0'
-          }
-        })
-      } else {
-        clonedTree = baseSvg.cloneNode(true) as HTMLElement
-        clonedViz = clonedTree
-      }
-
-      // Container and dimension setup
-      const container = document.createElement('div')
-      const computedStyle = getComputedStyle(baseSvg)
-      const vizWidth =
-        parseFloat(computedStyle.width) -
-        (parseFloat(computedStyle.paddingLeft) || 0) -
-        (parseFloat(computedStyle.paddingRight) || 0)
-
-      container.style.width = `${vizWidth + 36}px`
-      container.style.padding = '18px'
-      clonedViz.style.padding = '0'
-
-      // Strip all links from cloned tree (links aren't clickable in a static PNG)
-      const allLinks = clonedTree.querySelectorAll('a')
-      allLinks.forEach(link => {
-        const textNode = document.createTextNode(link.textContent || '')
-        link.parentNode?.replaceChild(textNode, link)
-      })
-
-      // Replace canvas elements with images (for county maps, etc.)
-      // Canvas pixel data doesn't clone, so convert to image before screenshot
-      const originalCanvases = baseSvg.querySelectorAll('canvas')
-      const clonedCanvases = clonedViz.querySelectorAll('canvas')
-      clonedCanvases.forEach((clonedCanvas, index) => {
-        const originalCanvas = originalCanvases[index]
-        if (originalCanvas && originalCanvas.width > 0 && originalCanvas.height > 0) {
-          const img = document.createElement('img')
-          img.src = originalCanvas.toDataURL('image/png')
-          img.width = originalCanvas.width
-          img.height = originalCanvas.height
-          img.className = originalCanvas.className
-          clonedCanvas.parentNode.replaceChild(img, clonedCanvas)
-        }
-      })
-
-      // Expand SVG width to prevent clipping of overflowing content (like tick labels)
-      const svgWidthBuffer = 25
-      const svgElements = clonedViz.querySelectorAll('svg')
-      svgElements.forEach(svg => {
-        const currentWidth = parseInt(svg.getAttribute('width') || '0')
-        if (currentWidth > 0) {
-          svg.setAttribute('width', (currentWidth + svgWidthBuffer).toString())
-        }
-
-        // Remove animation classes to show final state immediately without animation
-        svg.classList.remove('animated', 'animate')
-      })
-
-      container.appendChild(clonedTree)
+      // Prepare screenshot container with all cloning, styling, and transformations
+      const container = prepareScreenshotContainer(baseSvg, includeContextInDownload, elementToCapture)
 
       const downloadImage = async () => {
         // Append to main element if exists, otherwise body
@@ -179,7 +109,7 @@ const generateMedia = (state, type, elementToCapture, interactionLabel, includeC
               allowTaint: true
             })
             .then(canvas => {
-              document.body.removeChild(container) // Clean up container
+              targetElement.removeChild(container) // Clean up container from wherever we appended it
               saveImageAs(canvas.toDataURL(), filename + '.png')
               publishAnalyticsEvent({
                 vizType: state.type,
