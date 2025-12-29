@@ -8,7 +8,7 @@ import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
 // Components
 import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
-import { TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
+import { TextField, CheckBox, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import Accordion from '@cdc/core/components/ui/Accordion'
 import MarkupVariablesEditor from '@cdc/core/components/EditorPanel/components/MarkupVariablesEditor'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
@@ -63,6 +63,18 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
               label='Title'
               placeholder='Markup Include Title'
               updateField={updateField}
+            />
+            <Select
+              value={contentEditor.titleStyle || 'small'}
+              section='contentEditor'
+              fieldName='titleStyle'
+              label='Title Style'
+              updateField={updateField}
+              options={[
+                { value: 'small', label: 'Small' },
+                { value: 'large', label: 'Large' },
+                { value: 'legacy', label: 'Legacy' }
+              ]}
             />
           </Accordion.Section>
           <Accordion.Section title='Content Editor'>
