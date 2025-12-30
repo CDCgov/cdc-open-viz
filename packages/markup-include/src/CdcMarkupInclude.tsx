@@ -79,8 +79,9 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   const { inlineHTML, srcUrl, title, useInlineHTML } = contentEditor || {}
 
-  // Determine if padding should be applied based on visual settings
-  const shouldApplyPadding = visual?.border || visual?.accent || visual?.background
+  const shouldApplyTopPadding =
+    visual?.border || visual?.background || (contentEditor?.title && contentEditor?.titleStyle === 'legacy')
+  const shouldApplySidePadding = visual?.border || visual?.accent || visual?.background
 
   // Default Functions
   const updateConfig = newConfig => {
@@ -245,14 +246,14 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         {!hideMarkupInclude && (
           <Layout.Responsive isEditor={isEditor}>
             <div className='markup-include-content-container cove-component__content no-borders'>
+              <Title
+                title={title}
+                isDashboard={isDashboard}
+                titleStyle={contentEditor.titleStyle}
+                config={config}
+                classes={[`${theme}`, 'mb-0']}
+              />
               <div className={`markup-include-component ${contentClasses.join(' ')}`}>
-                <Title
-                  title={title}
-                  isDashboard={isDashboard}
-                  titleStyle={contentEditor.titleStyle}
-                  config={config}
-                  classes={[`${theme}`, 'mb-0']}
-                />
                 <div className={`${innerContainerClasses.join(' ')}`}>
                   {/* Filters */}
                   {config.filters && config.filters.length > 0 && (
@@ -264,7 +265,11 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
                       interactionLabel={interactionLabel || 'markup-include'}
                     />
                   )}
-                  <div className={`cove-component__content-wrap${shouldApplyPadding ? ' has-padding' : ''}`}>
+                  <div
+                    className={`cove-component__content-wrap${shouldApplyTopPadding ? ' has-top-padding' : ''}${
+                      shouldApplySidePadding ? ' has-side-padding' : ''
+                    }`}
+                  >
                     {_showNoDataMessage && (
                       <div className='no-data-message'>
                         <p>{`${noDataMessageText}`}</p>

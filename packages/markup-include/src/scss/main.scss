@@ -2,8 +2,14 @@
   .cove-component__content-wrap {
     padding: 0;
 
-    &.has-padding {
-      padding: 1rem;
+    &.has-top-padding {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    &.has-side-padding {
+      padding-left: 1rem;
+      padding-right: 1rem;
     }
 
     h1,
