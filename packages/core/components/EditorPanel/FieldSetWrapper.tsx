@@ -18,33 +18,32 @@ const FieldSet: React.FC<FieldSetProps> = ({ fieldName, fieldKey, fieldType, con
     setOpenControls({ ...openControls, [key]: value })
   }
 
-  if (!show)
-    return (
-      <div className='mb-1'>
-        <button className='btn btn-light' onClick={() => setShow(fieldKey, true)}>
-          <Icon display='caretDown' />
-        </button>
-        <span> {fieldName ? `${fieldName}` : 'New ' + fieldType}</span>
-      </div>
-    )
   return (
-    <fieldset className='edit-block mb-1' key={fieldKey}>
-      <div className='d-flex justify-content-between'>
-        <button className='btn btn-light' onClick={() => setShow(fieldKey, false)}>
-          <Icon display='caretUp' />
+    <div className='filter-item'>
+      <div className='filter-item__header'>
+        <Icon display='move' size={15} style={{ marginRight: '0.5rem' }} />
+        <button className='btn btn-light' onClick={() => setShow(fieldKey, !show)}>
+          <Icon display={show ? 'caretUp' : 'caretDown'} size={20} />
         </button>
-        <button
-          className='btn btn-danger btn-sm'
-          onClick={event => {
-            event.preventDefault()
-            deleteField()
-          }}
-        >
-          Remove
-        </button>
+        <span className='filter-item__name'>{fieldName ? `${fieldName}` : 'New ' + fieldType}</span>
       </div>
-      {children}
-    </fieldset>
+      {show && (
+        <div className='filter-item__content'>
+          <div className='filter-item__remove-wrapper'>
+            <button
+              className='btn btn-danger btn-sm'
+              onClick={event => {
+                event.preventDefault()
+                deleteField()
+              }}
+            >
+              Remove
+            </button>
+          </div>
+          {children}
+        </div>
+      )}
+    </div>
   )
 }
 

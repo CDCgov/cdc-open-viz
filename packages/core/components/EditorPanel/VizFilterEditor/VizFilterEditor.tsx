@@ -14,6 +14,7 @@ import FilterOrder from './components/FilterOrder'
 import { useMemo, useState } from 'react'
 import MultiSelect from '../../MultiSelect'
 import NestedDropdownEditor from './NestedDropdownEditor'
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
 type VizFilterProps = {
   config: Visualization
@@ -128,6 +129,26 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
       .map(({ label, columnName, id }) => ({ label: label || columnName, value: id }))
   }
 
+  const handleFilterReorder = (idx1: number, idx2: number) => {
+    if (idx1 === undefined || idx2 === undefined || idx1 === idx2) return
+    const filters = _.cloneDeep(config.filters)
+    const [movedFilter] = filters.splice(idx1, 1)
+    filters.splice(idx2, 0, movedFilter)
+    updateField(null, null, 'filters', filters)
+  }
+
+  const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
+    ...draggableStyle
+  })
+
+  const sortableItemStyles = {
+    animate: false,
+    animateReplay: true,
+    display: 'block',
+    boxSizing: 'border-box' as const,
+    border: '1px solid #D1D1D1'
+  }
+
   return (
     <>
       {config.filters && (
@@ -160,20 +181,34 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
             fieldName='filterIntro'
           />
           <br />
-          <ul className='filters-list'>
-            {/* Whether filters should apply onChange or Apply Button */}
+          <DragDropContext
+            onDragEnd={({ source, destination }) => handleFilterReorder(source.index, destination?.index)}
+          >
+            <Droppable droppableId='filters_list'>
+              {provided => (
+                <ul {...provided.droppableProps} ref={provided.innerRef} className='filters-list'>
+                  {/* Whether filters should apply onChange or Apply Button */}
 
-            {config.filters.map((filter, filterIndex) => {
-              if (filter.type === 'url') return <></>
-              return (
-                <FieldSetWrapper
-                  key={filter.columnName}
-                  fieldName={filter.columnName}
-                  fieldKey={filterIndex}
-                  fieldType='Filter'
-                  controls={openControls}
-                  deleteField={() => removeFilter(filterIndex)}
-                >
+                  {config.filters.map((filter, filterIndex) => {
+                    if (filter.type === 'url') return <></>
+                    return (
+                      <Draggable key={filter.id || `filter-${filterIndex}`} draggableId={`filter-${filter.id || filterIndex}`} index={filterIndex}>
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className={snapshot.isDragging ? 'currently-dragging' : ''}
+                            style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
+                          >
+                            <FieldSetWrapper
+                              key={filter.columnName}
+                              fieldName={filter.columnName}
+                              fieldKey={filterIndex}
+                              fieldType='Filter'
+                              controls={openControls}
+                              deleteField={() => removeFilter(filterIndex)}
+                            >
                   <Select
                     value={filter.filterStyle}
                     fieldName='filterStyle'
@@ -339,9 +374,16 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                     />
                   </label>
                 </FieldSetWrapper>
-              )
-            })}
-          </ul>
+                          </div>
+                        )}
+                      </Draggable>
+                    )
+                  })}
+                  {provided.placeholder}
+                </ul>
+              )}
+            </Droppable>
+          </DragDropContext>
         </>
       )}
       {!config.filters && <p style={{ textAlign: 'center' }}>There are currently no filters.</p>}
