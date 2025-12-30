@@ -78,6 +78,7 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
       fieldType='Column'
       controls={controls}
       deleteField={() => deleteColumn(colKey)}
+      draggable={false}
     >
       <Select
         label='Column'

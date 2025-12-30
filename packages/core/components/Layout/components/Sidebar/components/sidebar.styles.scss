@@ -186,8 +186,61 @@
       overflow: hidden;
     }
 
-    // Filters list - matches series list styling
-    .filters-list {
+    .editor-field-item {
+      position: relative;
+      padding: 5px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+
+      &:last-child {
+        padding-bottom: 5px;
+      }
+
+      &__header {
+        width: 100%;
+        background-color: #f5f5f5;
+        border: 1px solid #ccc;
+        display: flex;
+        align-items: center;
+        padding: 5px;
+        padding-left: 5px !important;
+
+        .cove-icon {
+          flex-shrink: 0;
+          padding-right: 5px;
+          margin-right: 10px;
+        }
+
+        .btn {
+          flex-shrink: 0;
+        }
+      }
+
+      &__name {
+        margin-left: 0.5rem;
+        user-select: none;
+        flex: 1;
+      }
+
+      &__content {
+        padding: 10px;
+        background-color: #fff;
+      }
+
+      &__remove-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 10px;
+
+        .btn {
+          border: 1px solid red;
+          border-radius: 10px;
+        }
+      }
+    }
+
+    .draggable-field-list {
       list-style: none;
       padding: 0;
       margin: 0;
@@ -196,65 +249,23 @@
         opacity: 0.8;
       }
 
-      .filter-item {
-        position: relative;
-        padding: 5px;
+      .editor-field-item {
         cursor: grab;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        margin-bottom: 10px;
 
         &:active {
           cursor: grabbing;
         }
 
-        &:last-child {
-          padding-bottom: 5px;
-        }
-
-        &__header {
-          width: 100%;
-          background-color: #f5f5f5;
-          border: 1px solid #ccc;
-          display: flex;
-          align-items: center;
-          padding: 5px;
-          padding-left: 5px !important;
-
-          .cove-icon {
-            cursor: grab;
-            flex-shrink: 0;
-            padding-right: 5px;
-            margin-right: 10px;
-          }
-
-          .btn {
-            flex-shrink: 0;
-          }
-        }
-
-        &__name {
-          margin-left: 0.5rem;
-          user-select: none;
-          flex: 1;
-        }
-
-        &__content {
-          padding: 10px;
-          background-color: #fff;
-        }
-
-        &__remove-wrapper {
-          display: flex;
-          justify-content: flex-end;
-          margin-bottom: 10px;
-
-          .btn {
-            border: 1px solid red;
-            border-radius: 10px;
-          }
+        &__header .cove-icon {
+          cursor: grab;
         }
       }
+    }
+
+    .filters-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
     }
 
     .accordion__heading {

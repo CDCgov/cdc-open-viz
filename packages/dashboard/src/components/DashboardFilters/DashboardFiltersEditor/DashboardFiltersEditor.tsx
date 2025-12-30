@@ -246,7 +246,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
           <DragDropContext onDragEnd={handleFilterReorder}>
             <Droppable droppableId='dashboard_filters_list'>
               {provided => (
-                <ul {...provided.droppableProps} ref={provided.innerRef} className='filters-list'>
+                <ul {...provided.droppableProps} ref={provided.innerRef} className='draggable-field-list'>
                   {vizConfig.sharedFilterIndexes.map((index, filterIndex) => {
                     const filter = sharedFilters[index]
                     return (
