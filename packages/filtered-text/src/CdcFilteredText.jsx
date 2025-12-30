@@ -36,9 +36,12 @@ const CdcFilteredText = ({
   const [stateData, setStateData] = useState(config.data || [])
   const [excludedData, setExcludedData] = useState()
   let { title, filters } = config
-  const fontSize = config.fontSize === 'small' ? '16px' : config.fontSize === 'medium' ? '22px' : '27px'
 
   const { contentClasses, innerContainerClasses } = useDataVizClasses(config)
+  const { visual } = config
+
+  const shouldApplyTopPadding = visual?.border || visual?.background || (config.title && config.titleStyle === 'legacy')
+  const shouldApplySidePadding = visual?.border || visual?.accent || visual?.background
 
   // Default Functions
 
@@ -127,21 +130,16 @@ const CdcFilteredText = ({
       <>
         <Layout.Responsive isEditor={isEditor}>
           <div className={`cove-component__content no-borders`}>
-            <Title
-              classes={[`${config.theme}`]}
-              title={title}
-              titleStyle={config.titleStyle}
-              config={config}
-              style={{ fontSize }}
-            />
-            <div className={`${contentClasses.join(' ')} body`}>
+            <Title classes={[`${config.theme}`, 'mb-0']} title={title} titleStyle={config.titleStyle} config={config} />
+            <div
+              className={`${contentClasses.join(' ')} body${shouldApplyTopPadding ? ' has-top-padding' : ''}${
+                shouldApplySidePadding ? ' has-side-padding' : ''
+              }`}
+            >
               {filterByTextColumn()
                 .slice(0, 1)
                 .map((el, i) => (
-                  <p style={{ fontSize }} key={i}>
-                    {' '}
-                    {parse(el[config.textColumn] || '')}{' '}
-                  </p>
+                  <p key={i}> {parse(el[config.textColumn] || '')} </p>
                 ))}
             </div>
           </div>
