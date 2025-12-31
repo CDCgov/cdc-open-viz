@@ -45,9 +45,15 @@
   }
 
   input.cove-combobox-input[role='combobox']:disabled {
-    background-color: #e9ecef;
+    background-color: var(--lightestGray);
+    color: var(--cool-gray-90);
     opacity: 1;
-    cursor: not-allowed;
+    cursor: default;
+  }
+
+  input.cove-combobox-input[role='combobox']:disabled::placeholder {
+    color: var(--cool-gray-90);
+    opacity: 1;
   }
 
   input.cove-combobox-input[role='combobox']::placeholder {
@@ -74,8 +80,12 @@
   }
 
   .cove-combobox-button:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
+    cursor: default;
+    opacity: 1;
+  }
+
+  .cove-combobox-button:disabled i {
+    color: var(--cool-gray-90);
   }
 
   .cove-combobox-button i {

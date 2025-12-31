@@ -34,6 +34,8 @@ const ComboBox: React.FC<ComboBoxProps> = ({
   const [focused, setFocused] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
 
+  const isDisabled = loading || !options?.length
+
   const inputRef = useRef<HTMLInputElement>(null)
   const listboxRef = useRef<HTMLUListElement>(null)
   const comboboxId = useId()
@@ -107,7 +109,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
   }
 
   const noResults = focused && query.length > 0 && !filteredOptions.length
-  const isListOpen = focused && !loading
+  const isListOpen = focused && !isDisabled
 
   const listboxId = `${comboboxId}-listbox`
   const labelId = label ? `${comboboxId}-label` : undefined
@@ -130,7 +132,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
 
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (loading) return
+    if (isDisabled) return
 
     switch (e.key) {
       case 'ArrowDown':
@@ -198,7 +200,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
 
   // Handle input focus
   const handleFocus = () => {
-    if (loading) return
+    if (isDisabled) return
     inputRef.current?.select()
     setFocused(true)
   }
@@ -217,7 +219,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
 
   // Handle button toggle
   const handleButtonClick = (e: React.MouseEvent) => {
-    if (loading) return
+    if (isDisabled) return
 
     e.preventDefault()
     if (focused) {
@@ -250,8 +252,8 @@ const ComboBox: React.FC<ComboBoxProps> = ({
   }, [])
 
   const activeDescendantId = activeIndex >= 0 ? `${comboboxId}-option-${activeIndex}` : undefined
-  const displayValue = focused ? query : selectedOption?.label || ''
-  const displayPlaceholder = loading ? 'Loading...' : selectedOption?.label || placeholder
+  const displayValue = isDisabled ? '' : focused ? query : selectedOption?.label || ''
+  const displayPlaceholder = isDisabled ? (loading ? 'Loading...' : '- Select -') : selectedOption?.label || placeholder
 
   return (
     <div className='cove-combobox'>
@@ -270,7 +272,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
           aria-activedescendant={activeDescendantId}
           aria-labelledby={labelId}
           aria-label={label ? undefined : 'Filter selection'}
-          aria-disabled={loading}
+          aria-disabled={isDisabled}
           autoComplete='off'
           className='cove-combobox-input'
           value={displayValue}
@@ -279,7 +281,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           placeholder={displayPlaceholder}
-          disabled={loading}
+          disabled={isDisabled}
         />
 
         <button
@@ -290,7 +292,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
           aria-expanded={isListOpen}
           className='cove-combobox-button'
           onMouseDown={handleButtonClick}
-          disabled={loading}
+          disabled={isDisabled}
         >
           <i className='cdc-fa-magnifying-glass' aria-hidden='true'></i>
         </button>
