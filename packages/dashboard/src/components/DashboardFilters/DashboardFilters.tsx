@@ -1,5 +1,6 @@
 import React from 'react'
 import MultiSelect from '@cdc/core/components/MultiSelect'
+import ComboBox from '@cdc/core/components/ComboBox'
 import { SharedFilter } from '../../types/SharedFilter'
 import { APIFilterDropdowns, DropdownOptions } from './DashboardFiltersWrapper'
 import { FILTER_STYLE } from '../../types/FilterStyles'
@@ -153,6 +154,16 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                 listLabel={label}
                 handleSelectedItems={value => updateField(null, null, filterIndex, value)}
                 loading={loading}
+              />
+            ) : filter.filterStyle === FILTER_STYLE.combobox ? (
+              <ComboBox
+                options={multiValues}
+                fieldName={filterIndex}
+                updateField={updateField}
+                selected={(filter.queuedActive || filter.active) as string}
+                label={label}
+                loading={loading}
+                placeholder={filter.resetLabel || '- Select -'}
               />
             ) : (
               <>
