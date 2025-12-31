@@ -269,6 +269,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
                               fieldKey={index}
                               fieldType='Dashboard Filter'
                               controls={openControls}
+                              draggable={true}
                               deleteField={() => {
                                 overlay?.actions.openOverlay(
                                   <DeleteFilterModal

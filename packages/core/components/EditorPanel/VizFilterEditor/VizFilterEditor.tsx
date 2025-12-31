@@ -212,6 +212,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                               fieldType='Filter'
                               controls={openControls}
                               deleteField={() => removeFilter(filterIndex)}
+                              draggable={true}
                             >
                               <Select
                                 value={filter.filterStyle}

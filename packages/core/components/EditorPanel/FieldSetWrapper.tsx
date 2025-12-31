@@ -19,7 +19,7 @@ const FieldSet: React.FC<FieldSetProps> = ({
   controls,
   deleteField,
   children,
-  draggable = true
+  draggable = false
 }) => {
   const [openControls, setOpenControls] = controls
   const show = openControls[fieldKey]
