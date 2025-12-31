@@ -97,10 +97,6 @@
   }
 
   .cove-combobox-option {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     padding: 0.5rem 0.5rem;
     font-family: var(--app-font-secondary);
     font-weight: 300;
@@ -109,6 +105,10 @@
     cursor: pointer;
     user-select: none;
     transition: background-color 0.15s ease-in-out;
+  }
+
+  .cove-combobox-option .cove-combobox-option-highlight {
+    font-weight: 600;
   }
 
   .cove-combobox-option:hover:not(.no-results) {
@@ -120,10 +120,8 @@
   }
 
   .cove-combobox-option.no-results {
-    color: #6c757d;
     cursor: default;
     font-style: italic;
-    text-align: center;
   }
 
   .cove-combobox-option.no-results:hover {

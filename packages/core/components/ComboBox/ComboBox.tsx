@@ -41,11 +41,73 @@ const ComboBox: React.FC<ComboBoxProps> = ({
   // Get selected option
   const selectedOption = options.find(opt => opt.value === selected)
 
-  // Filter options based on query
-  const filteredOptions = query ? options.filter(opt => opt.label.toLowerCase().includes(query.toLowerCase())) : options
+  // Token-based filtering: all tokens must match (AND logic)
+  const filteredOptions = query
+    ? options.filter(opt => {
+        const tokens = query
+          .toLowerCase()
+          .split(/\s+/)
+          .filter(t => t.length > 0)
+        const label = opt.label.toLowerCase()
+        return tokens.every(token => label.includes(token))
+      })
+    : options
 
-  const noResults = !filteredOptions.length
-  const isListOpen = focused && !noResults && !loading
+  // Highlight matched tokens in option labels
+  const highlightMatches = (label: string, query: string): React.ReactNode => {
+    if (!query) return label
+
+    const tokens = query
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(t => t.length > 0)
+    if (tokens.length === 0) return label
+
+    // Find all match positions for all tokens
+    const matches: { start: number; end: number }[] = []
+    tokens.forEach(token => {
+      let pos = 0
+      const lowerLabel = label.toLowerCase()
+      while ((pos = lowerLabel.indexOf(token, pos)) !== -1) {
+        matches.push({ start: pos, end: pos + token.length })
+        pos += token.length
+      }
+    })
+
+    // Sort and merge overlapping matches
+    matches.sort((a, b) => a.start - b.start)
+    const merged: { start: number; end: number }[] = []
+    matches.forEach(match => {
+      if (merged.length === 0 || match.start > merged[merged.length - 1].end) {
+        merged.push(match)
+      } else {
+        merged[merged.length - 1].end = Math.max(merged[merged.length - 1].end, match.end)
+      }
+    })
+
+    // Build the highlighted result
+    const parts: React.ReactNode[] = []
+    let lastIndex = 0
+    merged.forEach((match, i) => {
+      if (match.start > lastIndex) {
+        parts.push(label.substring(lastIndex, match.start))
+      }
+      parts.push(
+        <span className='cove-combobox-option-highlight' key={i}>
+          {label.substring(match.start, match.end)}
+        </span>
+      )
+      lastIndex = match.end
+    })
+    if (lastIndex < label.length) {
+      parts.push(label.substring(lastIndex))
+    }
+
+    return <>{parts}</>
+  }
+
+  const noResults = focused && query.length > 0 && !filteredOptions.length
+  const isListOpen = focused && !loading
 
   const listboxId = `${comboboxId}-listbox`
   const labelId = label ? `${comboboxId}-label` : undefined
@@ -245,8 +307,8 @@ const ComboBox: React.FC<ComboBoxProps> = ({
           tabIndex={-1}
         >
           {noResults ? (
-            <li role='option' className='cove-combobox-option no-results' aria-disabled='true'>
-              No matching options
+            <li className='cove-combobox-option no-results' aria-disabled='true'>
+              There are no items matching this search.
             </li>
           ) : (
             filteredOptions.map((option, index) => {
@@ -266,7 +328,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
                   }}
                   onMouseEnter={() => setActiveIndex(index)}
                 >
-                  {option.label}
+                  {highlightMatches(option.label, query)}
                 </li>
               )
             })
