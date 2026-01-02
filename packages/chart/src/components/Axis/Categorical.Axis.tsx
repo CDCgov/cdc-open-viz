@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { BarStack, Line } from '@visx/shape'
-import { scaleBand, scaleLinear, scaleOrdinal } from '@visx/scale'
+import { scaleBand, scaleOrdinal } from '@visx/scale'
 import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 import ConfigContext from '../../ConfigContext'
@@ -9,7 +9,7 @@ import createBarElement from '@cdc/core/components/createBarElement'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 
-const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
+const CategoricalYAxis = ({ yScale, yMax, leftSize, xMax }) => {
   const { config } = useContext(ConfigContext)
 
   const { orientation } = config
@@ -23,6 +23,9 @@ const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
   }
 
   const categories = config.yAxis?.categories
+
+  // Get max from the yScale domain
+  const max = yScale.domain()[1]
 
   const createDataShape = categories => {
     const categoryObj = [...categories].reduce((acc, item) => {
@@ -68,11 +71,7 @@ const CategoricalYAxis = ({ yMax, leftSize, max, xMax }) => {
     range: [0, leftSize]
   })
 
-  const yScale = scaleLinear({
-    domain: [0, max],
-    range: [yMax, 0],
-    clamp: true
-  })
+  // Use the yScale passed from useScales instead of creating a new one
 
   const colorScale = scaleOrdinal({
     domain: categories.map(d => d?.label),
