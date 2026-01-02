@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo, useContext } from 'react'
+import { useState, useEffect, useCallback, memo, useContext, useMemo } from 'react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import chroma from 'chroma-js'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
@@ -23,6 +23,7 @@ import MultiSelect from '@cdc/core/components/MultiSelect'
 import { viewports } from '@cdc/core/helpers/getViewport'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
+import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 
 // chart components
 import Panels from './components/Panels'
@@ -911,57 +912,50 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     }
   }
 
-  const getColumns = (filter = true) => {
-    let columns = {}
-
-    // Try multiple data sources in order of preference
-    let dataToUse = []
-
+  // Select data source with memoization (replaces getColumns data source selection logic)
+  const dataSourceForColumns = useMemo(() => {
     if (unfilteredData && unfilteredData.length > 0) {
-      // First preference: unfilteredData from context
-      dataToUse = unfilteredData
+      return unfilteredData
     } else if (isDashboard && datasets && config.dataKey && datasets[config.dataKey]?.data?.length > 0) {
-      // Second preference: data from datasets in dashboard mode
-      dataToUse = datasets[config.dataKey].data
+      return datasets[config.dataKey].data
     } else if (rawData && rawData.length > 0) {
-      // Third preference: rawData from context
-      dataToUse = rawData
+      return rawData
     } else if (data && data.length > 0) {
-      // Fourth preference: transformedData from context
-      dataToUse = data
+      return data
     } else if (config.data && config.data.length > 0) {
-      // Fifth preference: data directly from config
-      dataToUse = config.data
+      return config.data
     }
+    return []
+  }, [unfilteredData, isDashboard, datasets, config.dataKey, config.data, rawData, data])
 
-    // If we still don't have data, return empty array
-    if (!dataToUse || dataToUse.length === 0) {
-      return []
-    }
+  // Extract column names from data with memoization (replaces getColumns)
+  const allColumns = useDataColumns(dataSourceForColumns)
 
-    dataToUse.forEach(row => {
-      if (row && typeof row === 'object') {
-        Object.keys(row).forEach(columnName => (columns[columnName] = true))
+  // Filter out series columns and confidence key columns (except lower and upper)
+  const filteredColumns = useMemo(() => {
+    const { lower, upper } = config.confidenceKeys || {}
+    return allColumns.filter(key => {
+      // Filter out series columns
+      if (config.series && config.series.some(series => series.dataKey === key)) {
+        return false
       }
+      // Filter out confidence key columns (except lower and upper)
+      if (
+        config.confidenceKeys &&
+        Object.keys(config.confidenceKeys).includes(key) &&
+        ((lower && upper) || lower || upper) &&
+        key !== lower &&
+        key !== upper
+      ) {
+        return false
+      }
+      return true
     })
+  }, [allColumns, config.series, config.confidenceKeys])
 
-    if (filter) {
-      const { lower, upper } = config.confidenceKeys || {}
-      Object.keys(columns).forEach(key => {
-        if (
-          (config.series && config.series.filter(series => series.dataKey === key).length > 0) ||
-          (config.confidenceKeys &&
-            Object.keys(config.confidenceKeys).includes(key) &&
-            ((lower && upper) || lower || upper) &&
-            key !== lower &&
-            key !== upper)
-        ) {
-          delete columns[key]
-        }
-      })
-    }
-
-    return Object.keys(columns)
+  // Maintain backwards compatibility with getColumns(filter) API
+  const getColumns = (filter = true) => {
+    return filter ? filteredColumns : allColumns
   }
 
   const getLegendStyleOptions = (option: 'style' | 'subStyle' | 'shapes' | 'groupBy'): string[] => {
