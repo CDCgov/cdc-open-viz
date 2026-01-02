@@ -200,6 +200,7 @@ const UsaMap = () => {
           strokeColor='#fff'
           territoryData={territoryData}
           backgroundColor={styles.fill}
+          mapId={mapId}
           getSyncProps={getSyncProps}
           syncHandlers={syncHandlers}
         />
@@ -254,6 +255,7 @@ const UsaMap = () => {
           territoryData={territoryData}
           tabIndex={-1}
           backgroundColor={styles.fill}
+          mapId={mapId}
           getSyncProps={getSyncProps}
           syncHandlers={syncHandlers}
         />
