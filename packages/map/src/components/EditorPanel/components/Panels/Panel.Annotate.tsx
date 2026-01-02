@@ -13,25 +13,6 @@ import { setConfig } from 'dompurify'
 
 const PanelAnnotate: React.FC = props => {
   const { config, setConfig, dimensions, isDraggingAnnotation } = useContext<MapContext>(ConfigContext)
-  const getColumns = (filter = true) => {
-    const columns = {}
-    config.data.forEach(row => {
-      Object.keys(row).forEach(columnName => (columns[columnName] = true))
-    })
-
-    if (filter) {
-      Object.keys(columns).forEach(key => {
-        if (
-          (config.series && config.series.filter(series => series.dataKey === key).length > 0) ||
-          (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key))
-        ) {
-          delete columns[key]
-        }
-      })
-    }
-
-    return Object.keys(columns)
-  }
 
   const handleAnnotationUpdate = (value, property, index) => {
     const annotations = [...config?.annotations]
