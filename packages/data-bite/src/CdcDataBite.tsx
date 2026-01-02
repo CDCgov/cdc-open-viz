@@ -599,7 +599,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
             {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
             {(!config.dataColumn || !config.dataFunction) && <Confirm />}
             {showBite && 'tp5' === biteStyle ? (
-              <div className='dfe-block cdc-callout cdc-callout--data d-flex flex-column h-100'>
+              <div className='bite-content dfe-block cdc-callout cdc-callout--data d-flex flex-column h-100'>
                 <div className='cdc-callout__icon' aria-hidden='true' role='img'></div>
                 {config.visual?.showTitle && (
                   <h3 className='cdc-callout__heading fw-bold flex-shrink-0 pb-2 d-flex align-items-start'>
