@@ -1310,9 +1310,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           )}
           {config.yAxis.type === 'categorical' && config.orientation === 'vertical' && (
             <CategoricalYAxis
-              max={max}
-              maxValue={maxValue}
-              height={initialHeight}
+              yScale={yScale}
               xMax={xMax}
               yMax={yMax}
               leftSize={Number(runtime.yAxis.size) - config.yAxis.axisPadding}
