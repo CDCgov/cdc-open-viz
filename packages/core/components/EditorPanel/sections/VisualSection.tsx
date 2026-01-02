@@ -92,7 +92,6 @@ export const VisualSection = <TConfig extends VisualSectionConfig = VisualSectio
   showBackground = true,
   showHideBackgroundColor = true
 }: VisualSectionProps<TConfig>) => {
-  console.log('[VisualSection] Rendering with config:', config)
   const visual = config.visual || {}
   const theme = config.theme
 
