@@ -1,6 +1,6 @@
 import _ from 'lodash'
 
-const getColumns = (data: Record<string, any>[], columnName: string, pivot: string[], excludeColumns: string[]) => {
+const getNonPivotColumns = (data: Record<string, any>[], columnName: string, pivot: string[], excludeColumns: string[]) => {
   const excludedColumns = [columnName, ...pivot, ...excludeColumns]
   return _.uniq(data.flatMap(row => Object.keys(row))).filter(col => !excludedColumns.includes(col))
 }
@@ -13,7 +13,7 @@ export const pivotData = (
   pivot: string[],
   excludeColumns: string[]
 ): Record<string, any>[] => {
-  const columns = getColumns(data, columnName, pivot, excludeColumns)
+  const columns = getNonPivotColumns(data, columnName, pivot, excludeColumns)
   const newColumns = data.reduce((acc, row) => {
     acc[row[columnName]] = ''
     return acc
