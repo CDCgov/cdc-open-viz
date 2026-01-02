@@ -599,21 +599,28 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
             {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
             {(!config.dataColumn || !config.dataFunction) && <Confirm />}
             {showBite && 'tp5' === biteStyle ? (
-              <div className='dfe-block cdc-callout cdc-callout--data'>
+              <div className='dfe-block cdc-callout cdc-callout--data d-flex flex-column h-100'>
                 <div className='cdc-callout__icon' aria-hidden='true' role='img'></div>
                 {config.visual?.showTitle && (
-                  <h3 className='cdc-callout__heading'>{parse(processContentWithMarkup(title))}</h3>
+                  <h3 className='cdc-callout__heading fw-bold flex-shrink-0 pb-2 d-flex align-items-start'>
+                    {parse(processContentWithMarkup(title))}
+                  </h3>
                 )}
-                <div className='cdc-callout__body'>
+                <div className='cdc-callout__body d-flex flex-row align-items-start align-content-start flex-grow-1 pt-2'>
                   {showBite && (
-                    <div className='cdc-callout__databite' style={{ fontSize: biteFontSize + 'px' }}>
+                    <div
+                      className='cdc-callout__databite flex-shrink-0 align-self-start me-3'
+                      style={{ fontSize: '2.45rem' }}
+                    >
                       {calculateDataBite(false)}
                     </div>
                   )}
-                  <div className='cdc-callout__content'>
+                  <div className='cdc-callout__content flex-grow-1 d-flex flex-column align-self-start min-w-0'>
                     {parse(processContentWithMarkup(biteBody))}
                     {subtext && !config.general.isCompactStyle && (
-                      <p className='bite-subtext'>{parse(processContentWithMarkup(subtext))}</p>
+                      <p className='bite-subtext fst-italic flex-shrink-0'>
+                        {parse(processContentWithMarkup(subtext))}
+                      </p>
                     )}
                   </div>
                 </div>

@@ -120,15 +120,38 @@
     padding: 0 !important;
     background: transparent !important;
     border: none !important;
+    height: 100%; // Allow height to fill parent container
 
-    .bite-content--tp5 {
-      width: 100%;
+    // Most layout handled by Bootstrap classes in JSX, minimal custom CSS
+    .cdc-callout__heading {
+      min-height: 2.5em; // Minimum height for JS equalization
     }
-    .bite-value--tp5 {
-      flex-shrink: 0;
+
+    .cdc-callout__databite {
+      line-height: 1; // Tight line height for numbers
     }
-    .bite-content__text-wrap--tp5 {
-      min-width: 0; // Allows text to wrap properly
+
+    .cdc-callout__content {
+      font-size: 1.1rem;
+    }
+
+    .bite-subtext {
+      margin-top: auto; // Push to bottom on desktop
+    }
+
+    // Mobile: consistent wrapping for all data bites at same breakpoint
+    @media (max-width: 767.98px) {
+      .cdc-callout__body {
+        flex-wrap: wrap;
+      }
+
+      .cdc-callout__content {
+        margin-top: 0.5rem; // Gap when wrapped below number
+      }
+
+      .bite-subtext {
+        margin-top: 0.5rem; // Remove auto margin on mobile
+      }
     }
   }
 
