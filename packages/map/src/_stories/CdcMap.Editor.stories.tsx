@@ -119,7 +119,10 @@ export const TypeSectionTests: Story = {
     // ==========================================================================
     // TEST: Map Type select toggles classes/data representation
     // ==========================================================================
-    const typeSelect = canvas.getByLabelText(/Map Type/i) as HTMLSelectElement
+    // Use getAllByLabelText to avoid multiple elements error
+    const typeSelects = canvas.getAllByLabelText(/Map Type/i, { selector: 'select' }) as HTMLSelectElement[]
+    // Assume the first select is the correct one for the Type section
+    const typeSelect = typeSelects[0]
     const initialType = typeSelect.value
     const mapTypeOptions = Array.from(typeSelect.options).map(option => option.value)
     expect(mapTypeOptions).toContain('navigation')

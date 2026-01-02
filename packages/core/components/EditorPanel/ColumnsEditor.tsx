@@ -5,8 +5,9 @@ import { Visualization } from '../../types/Visualization'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import { Column } from '../../types/Column'
 import _ from 'lodash'
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import FieldSetWrapper from './FieldSetWrapper'
+import { useDataColumns } from '../../hooks/useDataColumns'
 
 interface ColumnsEditorProps {
   config: Partial<Visualization>
@@ -52,19 +53,21 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
     updateField(null, null, 'columns', newColumns)
   }
 
-  const getColumns = () => {
-    const columns: string[] = config.data.flatMap(row => {
-      return Object.keys(row).map(columnName => columnName)
-    })
+  // Extract column names from data with memoization (replaces getColumns)
+  const allColumns = useDataColumns(config.data)
+
+  // Filter out groupBy and already configured columns
+  const availableColumns = useMemo(() => {
     const configuredColumns = Object.values(config.columns).map(col => col.name)
-    const cols = _.uniq(columns).filter(key => {
+    const cols = allColumns.filter(key => {
       if (config.table.groupBy === key) return false
       if (configuredColumns.includes(key)) return false
       return true
     })
+    // Add current column name if it exists
     if (config.columns[colKey]?.name) cols.push(config.columns[colKey].name)
     return cols
-  }
+  }, [allColumns, config.table.groupBy, config.columns, colKey])
 
   const colName = config.columns[colKey]?.name
 
@@ -82,7 +85,7 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
         fieldName='name'
         section={'columns'}
         initial={'-Select-'}
-        options={getColumns()}
+        options={availableColumns}
         updateField={(_section, _subsection, _fieldName, value) => changeName(value)}
       />
       {config.type !== 'table' && (

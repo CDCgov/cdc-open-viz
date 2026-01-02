@@ -11,17 +11,12 @@ import {
 import ColumnsEditor from '@cdc/core/components/EditorPanel/ColumnsEditor'
 import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
 import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import Layout from '@cdc/core/components/Layout'
+import { EditorPanelDispatch } from '@cdc/core/components/EditorPanel/EditorPanelDispatch'
 
 import { State } from '../store/dataTable.reducer'
 
 const EditorPanel = ({ state, dispatch }) => {
-  const { table, showEditorPanel, columns, filters, data, config } = state as State
-
-  const onBackClick = () => {
-    dispatch({ type: 'SET_SHOW_EDITOR_PANEL', payload: !showEditorPanel })
-  }
+  const { table, columns, filters, data, config } = state as State
 
   // Creates a function that updates a field in a specified state
   const createFieldUpdater = (curValue, setter) => (section, subsection, fieldName, newValue) => {
@@ -59,14 +54,14 @@ const EditorPanel = ({ state, dispatch }) => {
   }
 
   return (
-    <ErrorBoundary component='EditorPanel'>
-      <Layout.Sidebar
-        isEditor={true}
-        config={config}
-        title='Configure Data Table'
-        onBackClick={onBackClick}
-        displayPanel={showEditorPanel}
-      >
+    <EditorPanelDispatch
+      state={state}
+      dispatch={dispatch}
+      title='Configure Data Table'
+      showEditorPanelKey='showEditorPanel'
+      toggleActionType='SET_SHOW_EDITOR_PANEL'
+    >
+      {({ state: _state, dispatch: _dispatch }) => (
         <section className='form-container'>
           <form>
             <Accordion allowZeroExpanded={true}>
@@ -112,8 +107,8 @@ const EditorPanel = ({ state, dispatch }) => {
             </Accordion>
           </form>
         </section>
-      </Layout.Sidebar>
-    </ErrorBoundary>
+      )}
+    </EditorPanelDispatch>
   )
 }
 

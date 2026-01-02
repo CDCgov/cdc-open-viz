@@ -204,7 +204,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                           updateField={(_section, _subSection, _key, value) => {
                             updateFilterDefaultValue(filterIndex, value)
                           }}
-                          label='Filter Default Value'
+                          label={`Filter Default Value${filter.columnName ? ` (${filter.columnName})` : ''}`}
                           initial='Select'
                         />
                       )}
