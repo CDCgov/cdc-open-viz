@@ -86,7 +86,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
       },
       seriesKey: '',
       x: 50,
-      y: Number(newSvgDims?.[1] / 2),
+      y: 50,
       xKey:
         config.xAxis.type === 'date'
           ? new Date(config?.data?.[0]?.[config.xAxis.dataKey]).getTime()

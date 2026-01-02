@@ -20,7 +20,7 @@ const removeOldBrushKeys = config => {
     delete config.brush
   }
 
-  if (config.type === 'dashboard') {
+  if (config.type === 'dashboard' && config.visualizations) {
     Object.values((config as DashboardConfig).visualizations).forEach(visualization => {
       removeOldBrushKeys(visualization)
     })
@@ -67,12 +67,37 @@ const migrateTitleStyle = config => {
   }
 }
 
+const migrateAnnotationYToPercentage = config => {
+  if (config.annotations && Array.isArray(config.annotations)) {
+    config.annotations = config.annotations.map(annotation => {
+      if (annotation.y !== undefined) {
+        const [savedWidth, savedHeight] = annotation.savedDimensions || []
+
+        if (savedHeight && savedHeight > 0) {
+          annotation.y = (annotation.y / savedHeight) * 100
+        } else {
+          annotation.y = 50
+        }
+      }
+
+      return annotation
+    })
+  }
+
+  if (config.type === 'dashboard' && config.visualizations) {
+    Object.values(config.visualizations).forEach(visualization => {
+      migrateAnnotationYToPercentage(visualization)
+    })
+  }
+}
+
 const update_4_26_1 = config => {
   const ver = '4.26.1'
   const newConfig = cloneConfig(config)
   normalizeFilterParents(newConfig)
   removeOldBrushKeys(newConfig)
   migrateTitleStyle(newConfig)
+  migrateAnnotationYToPercentage(newConfig)
   newConfig.version = ver
   return newConfig
 }

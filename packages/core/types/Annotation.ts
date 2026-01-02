@@ -35,6 +35,8 @@ export type Annotation = {
   snapToNearestPoint: boolean
   // type of  connecting line from label to subject
   connectionType: 'line' | 'curve' | 'elbow' | 'none'
+  // curve control point offset for curve connection type
+  bezier?: number
   // marker type highlighting the subject
   marker: 'arrow' | 'circle'
   // should the item be snapped to the subject?

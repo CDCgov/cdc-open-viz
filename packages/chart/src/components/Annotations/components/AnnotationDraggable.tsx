@@ -25,7 +25,7 @@ import { LinePath } from '@visx/shape'
 // styles
 import './AnnotationDraggable.styles.css'
 
-const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragStateChange }) => {
+const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax, svgRef, onDragStateChange }) => {
   // prettier-ignore
   const { config, dimensions, isEditor, updateConfig, colorScale } = useContext(ConfigContext)
 
@@ -41,6 +41,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
       const text = annotation.text || ''
 
       const annotationX = xScaleAnnotation(annotation.x)
+      const annotationY = yScaleAnnotation(annotation.y)
 
       // sanitize the text for setting dangerouslySetInnerHTML
       const sanitizedData = () => ({
@@ -55,7 +56,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
           dx={annotation.dx} // label position
           dy={annotation.dy} // label postion
           x={annotationX}
-          y={annotation.y}
+          y={annotationY}
           canEditLabel={annotation.edit.label || false}
           canEditSubject={(annotation.edit.subject && annotation.connectionType !== 'none') || false}
           onDragStart={() => onDragStateChange(true)}
@@ -64,7 +65,10 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
 
             let updatedAnnotations = [...annotations]
 
-            if (annotation.x === xScaleAnnotation.invert(props.x) && annotation.y === props.y) {
+            if (
+              annotation.x === xScaleAnnotation.invert(props.x) &&
+              annotation.y === yScaleAnnotation.invert(props.y)
+            ) {
               updatedAnnotations[index] = { ...updatedAnnotations[index], dx: props.dx, dy: props.dy }
             } else {
               if (annotation.snapToNearestPoint) {
@@ -83,13 +87,13 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
                 updatedAnnotations[index] = {
                   ...updatedAnnotations[index],
                   x: xScaleAnnotation.invert(xScale(nearestDatum.x)),
-                  y: yScale(nearestDatum.y)
+                  y: yScaleAnnotation.invert(yScale(nearestDatum.y))
                 }
               } else {
                 updatedAnnotations[index] = {
                   ...updatedAnnotations[index],
                   x: xScaleAnnotation.invert(props.x),
-                  y: props.y
+                  y: yScaleAnnotation.invert(props.y)
                 }
               }
             }
@@ -138,10 +142,10 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
           )}
           {annotation.connectionType === 'curve' && (
             <LinePath
-              d={`M ${annotationX},${annotation.y}
+              d={`M ${annotationX},${annotationY}
                       Q ${annotationX + annotation.dx / 2}, ${
-                annotation.y + annotation.dy / 2 + Number(annotation?.bezier) || 0
-              } ${annotationX + annotation.dx},${annotation.y + annotation.dy}`}
+                annotationY + annotation.dy / 2 + Number(annotation?.bezier) || 0
+              } ${annotationX + annotation.dx},${annotationY + annotation.dy}`}
               stroke='black'
               strokeWidth='2'
               fill='none'
@@ -161,7 +165,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
               fill='black'
               id={`marker-start--${index}`}
               x={annotationX}
-              y={annotation.y}
+              y={annotationY}
               stroke='#333'
               markerWidth={10}
               size={10}
@@ -173,7 +177,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
           <circle
             fill='white'
             cx={annotationX + annotation.dx}
-            cy={annotation.y + annotation.dy}
+            cy={annotationY + annotation.dy}
             r={16}
             className='annotation__mobile-label annotation__mobile-label-circle'
             stroke={colorScale(annotation.seriesKey)}
@@ -181,7 +185,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
           <text
             height={16}
             x={annotationX + annotation.dx}
-            y={annotation.y + annotation.dy}
+            y={annotationY + annotation.dy}
             className='annotation__mobile-label'
             alignmentBaseline='middle'
             textAnchor='middle'
