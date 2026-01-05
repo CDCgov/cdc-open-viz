@@ -125,6 +125,7 @@
     // Most layout handled by Bootstrap classes in JSX, minimal custom CSS
     .cdc-callout__heading {
       min-height: 2.5em; // Minimum height for JS equalization
+      padding-right: 1.5rem;
     }
 
     .cdc-callout__databite {
@@ -137,21 +138,6 @@
 
     .bite-subtext {
       margin-top: auto; // Push to bottom on desktop
-    }
-
-    // Mobile: consistent wrapping for all data bites at same breakpoint
-    @media (max-width: 767.98px) {
-      .cdc-callout__body {
-        flex-wrap: wrap;
-      }
-
-      .cdc-callout__content {
-        margin-top: 0.5rem; // Gap when wrapped below number
-      }
-
-      .bite-subtext {
-        margin-top: 0.5rem; // Remove auto margin on mobile
-      }
     }
   }
 

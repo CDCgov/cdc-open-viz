@@ -284,8 +284,18 @@
     // TP5 Data Bite specific adjustments
     // Hide icon when there are 3+ data bites in a row
     .row:has(.bite__style--tp5):has([class*='col-'] ~ [class*='col-'] ~ [class*='col-']) {
-      .bite__style--tp5 .cdc-callout__icon {
-        display: none;
+      .bite__style--tp5 {
+        .cdc-callout__icon {
+          display: none;
+        }
+        .cdc-callout__heading {
+          padding-right: 0;
+        }
+      }
+    }
+    .row:has(.bite__style--tp5):has([class*='col-'] ~ [class*='col-']) {
+      .bite__style--tp5 .cdc-callout__body {
+        margin-bottom: -1rem;
       }
     }
 

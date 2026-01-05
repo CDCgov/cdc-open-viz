@@ -275,34 +275,59 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
             </Button>
           </Accordion.Section>
 
-          <Accordion.Section title='Visual'>
-            <VisualSection
-              config={config}
-              updateField={updateField}
-              updateConfig={updateConfig}
-              themeSelectorPosition='after'
-              beforeCheckboxes={
-                <>
-                  <TextField
-                    type='number'
-                    value={config.biteFontSize}
-                    fieldName='biteFontSize'
-                    label='Bite Font Size'
-                    updateField={updateField}
-                    min={17}
-                    max={65}
-                  />
-                  <Select
-                    value={config.fontSize}
-                    fieldName='fontSize'
-                    label='Overall Font Size'
-                    updateField={updateField}
-                    options={['small', 'medium', 'large']}
-                  />
-                </>
-              }
-            />
-          </Accordion.Section>
+          {/* Visual section for TP5 style */}
+          {config.biteStyle === 'tp5' && (
+            <Accordion.Section title='Visual'>
+              <CheckBox
+                value={config.visual?.whiteBackground}
+                section='visual'
+                fieldName='whiteBackground'
+                label='Use White Background Style'
+                updateField={updateField}
+              />
+              {/* TODO: Uncomment when ready to release Display Border feature
+              <CheckBox
+                value={config.visual?.border}
+                section='visual'
+                fieldName='border'
+                label='Display Border'
+                updateField={updateField}
+              />
+              */}
+            </Accordion.Section>
+          )}
+
+          {/* Visual section for other bite styles */}
+          {config.biteStyle !== 'tp5' && (
+            <Accordion.Section title='Visual'>
+              <VisualSection
+                config={config}
+                updateField={updateField}
+                updateConfig={updateConfig}
+                themeSelectorPosition='after'
+                beforeCheckboxes={
+                  <>
+                    <TextField
+                      type='number'
+                      value={config.biteFontSize}
+                      fieldName='biteFontSize'
+                      label='Bite Font Size'
+                      updateField={updateField}
+                      min={17}
+                      max={65}
+                    />
+                    <Select
+                      value={config.fontSize}
+                      fieldName='fontSize'
+                      label='Overall Font Size'
+                      updateField={updateField}
+                      options={['small', 'medium', 'large']}
+                    />
+                  </>
+                }
+              />
+            </Accordion.Section>
+          )}
 
           {['title', 'body', 'graphic'].includes(config.biteStyle) && (
             <Accordion.Section title={`Image${['dynamic'].includes(config.imageData.display) ? 's' : ''}`}>

@@ -602,7 +602,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
               <div className='bite-content dfe-block cdc-callout cdc-callout--data d-flex flex-column h-100'>
                 <div className='cdc-callout__icon' aria-hidden='true' role='img'></div>
                 {config.visual?.showTitle && (
-                  <h3 className='cdc-callout__heading fw-bold flex-shrink-0 pb-2 d-flex align-items-start'>
+                  <h3 className='cdc-callout__heading fw-bold flex-shrink-0 d-flex align-items-start'>
                     {parse(processContentWithMarkup(title))}
                   </h3>
                 )}
@@ -612,13 +612,13 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                       className='cdc-callout__databite flex-shrink-0 align-self-start me-3'
                       style={{ fontSize: '2.45rem' }}
                     >
-                      {calculateDataBite(false)}
+                      {calculateDataBite(true)}
                     </div>
                   )}
                   <div className='cdc-callout__content flex-grow-1 d-flex flex-column align-self-start min-w-0'>
                     {parse(processContentWithMarkup(biteBody))}
                     {subtext && !config.general.isCompactStyle && (
-                      <p className='bite-subtext fst-italic flex-shrink-0'>
+                      <p className='bite-subtext fst-italic flex-shrink-0 mt-3'>
                         {parse(processContentWithMarkup(subtext))}
                       </p>
                     )}
