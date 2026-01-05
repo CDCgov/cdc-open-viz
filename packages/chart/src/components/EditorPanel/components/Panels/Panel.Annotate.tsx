@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../../../ConfigContext.js'
+import { useEditorPermissions } from '../../useEditorPermissions'
 
 // CDC Core
 import Accordion from '@cdc/core/components/ui/Accordion'
@@ -14,6 +15,7 @@ import './../panels.scss'
 
 const PanelAnnotate: React.FC<PanelProps> = props => {
   const { updateConfig, config, svgRef, transformedData } = useContext(ConfigContext)
+  const { visSupportsDataAnnotations } = useEditorPermissions()
 
   const updateField = (section, subsection, fieldName, value) => {
     if (subsection) {
@@ -60,7 +62,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
 
     const newAnnotation = {
       text: 'New Annotation',
-      anchorMode: 'data',
+      anchorMode: 'fixed',
       fontSize: 16,
       bezier: 10,
       show: {
@@ -158,24 +160,29 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     />
                   </label>
 
-                  <Select
-                    label='Position Mode:'
-                    value={annotation.anchorMode || 'absolute'}
-                    options={['absolute', 'data']}
-                    section='annotations'
-                    subsection={null}
-                    fieldName='anchorMode'
-                    updateField={(section, subsection, fieldName, value) => {
-                      const updatedAnnotations = _.cloneDeep(config?.annotations)
-                      updatedAnnotations[index].anchorMode = value
-                      updateConfig({
-                        ...config,
-                        annotations: updatedAnnotations
-                      })
-                    }}
-                  />
+                  {visSupportsDataAnnotations() && (
+                    <Select
+                      label='Position Mode:'
+                      value={annotation.anchorMode || 'fixed'}
+                      options={[
+                        { value: 'fixed', label: 'Fixed position' },
+                        { value: 'data', label: 'Snap to data' }
+                      ]}
+                      section='annotations'
+                      subsection={null}
+                      fieldName='anchorMode'
+                      updateField={(section, subsection, fieldName, value) => {
+                        const updatedAnnotations = _.cloneDeep(config?.annotations)
+                        updatedAnnotations[index].anchorMode = value
+                        updateConfig({
+                          ...config,
+                          annotations: updatedAnnotations
+                        })
+                      }}
+                    />
+                  )}
 
-                  {annotation.anchorMode === 'data' && (
+                  {visSupportsDataAnnotations() && annotation.anchorMode === 'data' && (
                     <Select
                       label='Series:'
                       value={annotation.seriesKey || config.series?.[0]?.dataKey || ''}

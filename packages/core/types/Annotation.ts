@@ -1,6 +1,6 @@
 export type Annotation = {
-  // Positioning mode: absolute uses x/y percentages, data anchors to data point
-  anchorMode?: 'absolute' | 'data'
+  // Positioning mode: fixed uses x/y percentages, data anchors to data point
+  anchorMode?: 'fixed' | 'data'
 
   // background opacity of annotation
   opacity: number

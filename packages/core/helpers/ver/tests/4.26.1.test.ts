@@ -246,7 +246,7 @@ describe('update_4_26_1', () => {
       expect(result.dashboard.sharedFilters[0].parents).toEqual(['parent-id'])
       expect(result.visualizations.chart1.brush).toBeUndefined()
       expect(result.visualizations.chart1.annotations[0].y).toBe(50)
-      expect(result.visualizations.chart1.annotations[0].anchorMode).toBe('absolute')
+      expect(result.visualizations.chart1.annotations[0].anchorMode).toBe('fixed')
       expect(result.visualizations.chart1.annotations[0].dataX).toBeUndefined()
       expect(result.version).toBe('4.26.1')
     })
@@ -271,7 +271,7 @@ describe('update_4_26_1', () => {
 
       const annotation = result.annotations[0]
       expect(annotation.y).toBe(50)
-      expect(annotation.anchorMode).toBe('absolute')
+      expect(annotation.anchorMode).toBe('fixed')
       expect(annotation.dataX).toBe(1577836800000)
       expect(annotation.xKey).toBeUndefined()
       expect(annotation.yKey).toBeUndefined()

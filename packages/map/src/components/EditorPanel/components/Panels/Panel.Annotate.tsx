@@ -33,7 +33,7 @@ const PanelAnnotate: React.FC = props => {
 
     const newAnnotation = {
       text: 'New Annotation',
-      anchorMode: 'absolute',
+      anchorMode: 'fixed',
       fontSize: 16,
       show: {
         desktop: true,

@@ -94,8 +94,8 @@ const migrateAnnotationYToPercentage = config => {
 const migrateAnnotationDataModel = config => {
   if (config.annotations && Array.isArray(config.annotations)) {
     config.annotations = config.annotations.map(annotation => {
-      // Set all existing annotations to absolute mode
-      annotation.anchorMode = 'absolute'
+      // Set all existing annotations to fixed mode
+      annotation.anchorMode = 'fixed'
 
       // Rename xKey -> dataX
       if (annotation.xKey !== undefined) {
