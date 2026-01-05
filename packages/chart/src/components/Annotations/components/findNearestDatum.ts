@@ -1,103 +1,86 @@
-const findNearestDatum = ({ data, xScale, yScale, config, xMax, annotationSeriesKey }, xPosition) => {
-  const { xAxis, visualizationType, orientation } = config
-
-  const convertXValueToTimestamp = (xValue, minX, maxX, domain, xScale) => {
-    let ticks = []
-    if (config.xAxis.type === 'date-time') {
-      minX = new Date(minX)
-      maxX = new Date(maxX)
-      domain = domain.map(d => new Date(d))
-      ticks = xScale.ticks().map(d => new Date(d))
-    }
-
-    // Calculate the percentage position of xValue between minX and maxX
-    const percentage = (xValue - minX) / (maxX - minX)
-
-    // Calculate the index in the domain array corresponding to the percentage position
-    const index = Math.round(percentage * (domain.length - 1))
-
-    if (config.xAxis.type === 'date-time') {
-      return ticks[index]
-    }
-
-    // Return the timestamp from the domain array at the calculated index
-    return domain[index]
+/**
+ * Finds the nearest data point to a given pixel coordinate.
+ * Uses the visible/filtered data only.
+ *
+ * Scale types by axis:
+ * - 'categorical' → band scale
+ * - 'date' → band scale (discrete dates)
+ * - 'date-time' → time scale (continuous)
+ * - 'continuous' → linear scale
+ *
+ * @param data - The filtered/visible data array (transformedData)
+ * @param xScale - The x scale (can be band, time, or linear)
+ * @param xAxisType - Type of x axis ('categorical', 'date', 'date-time', or 'continuous')
+ * @param xAxisDataKey - The key used for x values in data rows
+ * @param seriesKey - The key used for y values in data rows
+ * @param xPixel - The pixel x coordinate to find nearest datum for
+ * @returns Object with { x: dataX, y: dataY } or null if not found
+ */
+const findNearestDatum = ({ data, xScale, xAxisType, xAxisDataKey, seriesKey, xPixel }) => {
+  if (!data || data.length === 0) {
+    return null
   }
 
-  const getXValueFromCoordinate = x => {
-    if (visualizationType === 'Pie') return
-    if (orientation === 'horizontal') return
+  // Handle categorical and date (both use band scales)
+  if (xAxisType === 'categorical' || xAxisType === 'date') {
+    const domain = xScale.domain()
+    const bandwidth = xScale.bandwidth?.() || 0
 
-    if (config.xAxis.type === 'date-time') {
-      // Calculate the percentage position of xValue between minX and maxX
-      const invertedValue = new Date(xScale.invert(x))
-      const ticks = config.data.map(d => new Date(d[config.xAxis.dataKey]).getTime())
-      let minDistance = Infinity
-      let closestDate = null
+    // Find closest band center
+    const closestValue = domain
+      .map(value => ({
+        value,
+        distance: Math.abs(xPixel - (xScale(value) + bandwidth / 2))
+      }))
+      .sort((a, b) => a.distance - b.distance)[0]?.value
 
-      ticks.forEach(timestamp => {
-        const distance = Math.abs(invertedValue.getTime() - timestamp)
-        if (distance < minDistance) {
-          minDistance = distance
-          closestDate = timestamp
-        }
-      })
+    // Find the data row with this x value
+    const dataRow = data.find(d => d[xAxisDataKey] === closestValue)
+    if (!dataRow) return null
 
-      return new Date(closestDate).getTime()
+    return {
+      x: dataRow[xAxisDataKey],
+      y: dataRow[seriesKey]
     }
-
-    // Check the type of x equal to point or if the type of xAxis is equal to continuous or date
-    if (
-      config.xAxis.type === 'categorical' ||
-      (visualizationType === 'Combo' && orientation !== 'horizontal' && visualizationType !== 'Forest Plot')
-    ) {
-      const range = xScale.range()[1] - xScale.range()[0]
-      const eachBand = range / (xScale.domain().length + 1)
-
-      let numerator = x
-      const index = Math.floor((Number(numerator) - eachBand / 2) / eachBand)
-      return xScale.domain()[index] // fixes off by 1 error
-    }
-
-    if (config.xAxis.type === 'date') {
-      const xValue = x // Assuming x is the coordinate on the chart
-      const xTimestamp = convertXValueToTimestamp(x, 0, xMax, xScale.domain(), xScale)
-
-      // Calculate the closest date to the x coordinate
-      let closestDate = null
-      let minDistance = Number.MAX_VALUE
-
-      xScale.domain().forEach(timestamp => {
-        const distance = Math.abs(xTimestamp - timestamp)
-        if (distance < minDistance) {
-          minDistance = distance
-          closestDate = timestamp
-        }
-      })
-
-      return closestDate
-    }
-
-    return x
   }
 
-  const xValue = getXValueFromCoordinate(xPosition - Number(config.yAxis.size || 0))
+  // Handle date-time (time scale with continuous dates)
+  if (xAxisType === 'date-time') {
+    const targetTime = xScale.invert(xPixel).getTime()
 
-  let closestSeries = []
+    // Find closest data point by timestamp distance
+    const closestRow = data
+      .map(row => ({
+        row,
+        distance: Math.abs(new Date(row[xAxisDataKey]).getTime() - targetTime)
+      }))
+      .sort((a, b) => a.distance - b.distance)[0]?.row
 
-  if (!xValue) return { x: 0, y: 0 }
+    if (!closestRow) return null
 
-  if (xAxis.type === 'categorical') {
-    closestSeries = config.data.filter(d => d[config.xAxis.dataKey] === xValue)
+    return {
+      x: closestRow[xAxisDataKey],
+      y: closestRow[seriesKey]
+    }
   }
 
-  if (xAxis.type === 'date' || xAxis.type === 'date-time') {
-    closestSeries = config.data.filter(d => new Date(d[config.xAxis.dataKey]).getTime() === xValue)
-  }
+  // Handle continuous (linear scale)
+  const invertedValue = xScale.invert(xPixel)
 
-  const y = closestSeries[0][annotationSeriesKey] // Map each key to its corresponding value in data
-  const x = xValue
-  return { x, y }
+  // Find closest data point by numeric distance
+  const closestRow = data
+    .map(row => ({
+      row,
+      distance: Math.abs(Number(row[xAxisDataKey]) - invertedValue)
+    }))
+    .sort((a, b) => a.distance - b.distance)[0]?.row
+
+  if (!closestRow) return null
+
+  return {
+    x: closestRow[xAxisDataKey],
+    y: closestRow[seriesKey]
+  }
 }
 
 export { findNearestDatum }

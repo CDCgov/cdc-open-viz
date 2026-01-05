@@ -1,4 +1,7 @@
 export type Annotation = {
+  // Positioning mode: absolute uses x/y percentages, data anchors to data point
+  anchorMode?: 'absolute' | 'data'
+
   // background opacity of annotation
   opacity: number
   // HTML text string to display in annotation
@@ -15,24 +18,18 @@ export type Annotation = {
     horizontal: boolean
     vertical: boolean
   }
-  // x value for scaling
-  xKey: string
-  // y value for scaling
-  yKey: string
-  // orignal x value of subject
-  originalX: number
-  // x of subject
+  // Data X value for data-anchored mode (timestamp, category, etc.)
+  dataX?: any
+  // x of subject (percentage 0-100)
   x: number
-  // y of object
+  // y of object (percentage 0-100)
   y: number
   // x offset of label from subject
   dx: number
   // y offset of label from subject
   dy: number
   // assigned series that the annotation should snap to
-  seriesKey: string
-  // if the dragged item should be snapped to the nearest point
-  snapToNearestPoint: boolean
+  seriesKey?: string
   // type of  connecting line from label to subject
   connectionType: 'line' | 'curve' | 'elbow' | 'none'
   // curve control point offset for curve connection type

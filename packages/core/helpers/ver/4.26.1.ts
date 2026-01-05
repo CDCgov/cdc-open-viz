@@ -91,6 +91,38 @@ const migrateAnnotationYToPercentage = config => {
   }
 }
 
+const migrateAnnotationDataModel = config => {
+  if (config.annotations && Array.isArray(config.annotations)) {
+    config.annotations = config.annotations.map(annotation => {
+      // Set all existing annotations to absolute mode
+      annotation.anchorMode = 'absolute'
+
+      // Rename xKey -> dataX
+      if (annotation.xKey !== undefined) {
+        annotation.dataX = annotation.xKey
+        delete annotation.xKey
+      }
+
+      // Delete yKey entirely (Y will be calculated dynamically in data mode)
+      delete annotation.yKey
+
+      // Delete deprecated properties
+      delete annotation.snapToNearestPoint
+      delete annotation.originalX
+      delete annotation.originalDX
+      delete annotation.originalY
+
+      return annotation
+    })
+  }
+
+  if (config.type === 'dashboard' && config.visualizations) {
+    Object.values(config.visualizations).forEach(visualization => {
+      migrateAnnotationDataModel(visualization)
+    })
+  }
+}
+
 const update_4_26_1 = config => {
   const ver = '4.26.1'
   const newConfig = cloneConfig(config)
@@ -98,6 +130,7 @@ const update_4_26_1 = config => {
   removeOldBrushKeys(newConfig)
   migrateTitleStyle(newConfig)
   migrateAnnotationYToPercentage(newConfig)
+  migrateAnnotationDataModel(newConfig)
   newConfig.version = ver
   return newConfig
 }

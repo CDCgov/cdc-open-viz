@@ -193,7 +193,9 @@ describe('update_4_26_1', () => {
       expect(annotation.text).toBe('Complex Annotation')
       expect(annotation.dx).toBe(20)
       expect(annotation.dy).toBe(-30)
-      expect(annotation.xKey).toBe(1577836800000)
+      expect(annotation.dataX).toBe(1577836800000)
+      expect(annotation.xKey).toBeUndefined()
+      expect(annotation.yKey).toBeUndefined()
       expect(annotation.seriesKey).toBe('series1')
     })
 
@@ -244,7 +246,36 @@ describe('update_4_26_1', () => {
       expect(result.dashboard.sharedFilters[0].parents).toEqual(['parent-id'])
       expect(result.visualizations.chart1.brush).toBeUndefined()
       expect(result.visualizations.chart1.annotations[0].y).toBe(50)
+      expect(result.visualizations.chart1.annotations[0].anchorMode).toBe('absolute')
+      expect(result.visualizations.chart1.annotations[0].dataX).toBeUndefined()
       expect(result.version).toBe('4.26.1')
+    })
+
+    it('should migrate data model along with Y position', () => {
+      const config: any = {
+        type: 'chart',
+        version: '4.26.0',
+        annotations: [
+          {
+            x: 50,
+            y: 200,
+            savedDimensions: [800, 400],
+            xKey: 1577836800000,
+            yKey: '42',
+            snapToNearestPoint: true
+          }
+        ]
+      }
+
+      const result = update_4_26_1(config)
+
+      const annotation = result.annotations[0]
+      expect(annotation.y).toBe(50)
+      expect(annotation.anchorMode).toBe('absolute')
+      expect(annotation.dataX).toBe(1577836800000)
+      expect(annotation.xKey).toBeUndefined()
+      expect(annotation.yKey).toBeUndefined()
+      expect(annotation.snapToNearestPoint).toBeUndefined()
     })
   })
 })

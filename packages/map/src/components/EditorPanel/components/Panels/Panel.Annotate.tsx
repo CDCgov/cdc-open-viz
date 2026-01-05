@@ -33,7 +33,7 @@ const PanelAnnotate: React.FC = props => {
 
     const newAnnotation = {
       text: 'New Annotation',
-      snapToNearestPoint: false,
+      anchorMode: 'absolute',
       fontSize: 16,
       show: {
         desktop: true,
@@ -61,8 +61,6 @@ const PanelAnnotate: React.FC = props => {
       seriesKey: '',
       x: Number(newSvgDims?.[0]) / 2,
       y: Number(newSvgDims?.[1] / 2),
-      xKey: null,
-      yKey: null,
       dx: 0,
       dy: 0,
       opacity: '100',

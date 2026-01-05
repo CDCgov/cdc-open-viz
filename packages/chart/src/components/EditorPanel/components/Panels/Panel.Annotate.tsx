@@ -13,7 +13,7 @@ import { type PanelProps } from './../PanelProps'
 import './../panels.scss'
 
 const PanelAnnotate: React.FC<PanelProps> = props => {
-  const { updateConfig, config, svgRef } = useContext(ConfigContext)
+  const { updateConfig, config, svgRef, transformedData } = useContext(ConfigContext)
 
   const updateField = (section, subsection, fieldName, value) => {
     if (subsection) {
@@ -60,7 +60,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
 
     const newAnnotation = {
       text: 'New Annotation',
-      snapToNearestPoint: false,
+      anchorMode: 'data',
       fontSize: 16,
       bezier: 10,
       show: {
@@ -84,16 +84,10 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
         subject: true,
         label: true
       },
-      seriesKey: '',
+      seriesKey: config.series?.[0]?.dataKey || '',
       x: 50,
       y: 50,
-      xKey:
-        config.xAxis.type === 'date'
-          ? new Date(config?.data?.[0]?.[config.xAxis.dataKey]).getTime()
-          : config.xAxis.type === 'categorical'
-          ? '1/15/2016'
-          : '',
-      yKey: '',
+      dataX: transformedData?.[5]?.[config.xAxis.dataKey] || '',
       dx: 20,
       dy: -20,
       opacity: '100',
@@ -163,6 +157,43 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                       onChange={e => handleAnnotationUpdate(e.target.value, 'text', index)}
                     />
                   </label>
+
+                  <Select
+                    label='Position Mode:'
+                    value={annotation.anchorMode || 'absolute'}
+                    options={['absolute', 'data']}
+                    section='annotations'
+                    subsection={null}
+                    fieldName='anchorMode'
+                    updateField={(section, subsection, fieldName, value) => {
+                      const updatedAnnotations = _.cloneDeep(config?.annotations)
+                      updatedAnnotations[index].anchorMode = value
+                      updateConfig({
+                        ...config,
+                        annotations: updatedAnnotations
+                      })
+                    }}
+                  />
+
+                  {annotation.anchorMode === 'data' && (
+                    <Select
+                      label='Series:'
+                      value={annotation.seriesKey || ''}
+                      options={['', ...config.series.map(s => s.dataKey)]}
+                      section='annotations'
+                      subsection={null}
+                      fieldName='seriesKey'
+                      updateField={(section, subsection, fieldName, value) => {
+                        const updatedAnnotations = _.cloneDeep(config?.annotations)
+                        updatedAnnotations[index].seriesKey = value
+                        updateConfig({
+                          ...config,
+                          annotations: updatedAnnotations
+                        })
+                      }}
+                    />
+                  )}
+
                   <label>
                     Opacity
                     <br />

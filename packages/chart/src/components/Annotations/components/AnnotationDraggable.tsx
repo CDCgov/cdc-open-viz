@@ -7,18 +7,12 @@ import { findNearestDatum } from './findNearestDatum'
 
 // prettier-ignore
 import {
-  applyBandScaleOffset,
   handleConnectionHorizontalType,
-  handleConnectionVerticalType,
-  handleMobileXPosition,
-  handleMobileYPosition,
-  handleTextX,
-  handleTextY
+  handleConnectionVerticalType
 } from './helpers'
 
 // visx
 import { HtmlLabel, CircleSubject, EditableAnnotation, Connector, Annotation as VisxAnnotation } from '@visx/annotation'
-import { Drag } from '@visx/drag'
 import { MarkerArrow } from '@visx/marker'
 import { LinePath } from '@visx/shape'
 
@@ -27,7 +21,7 @@ import './AnnotationDraggable.styles.css'
 
 const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax, svgRef, onDragStateChange }) => {
   // prettier-ignore
-  const { config, dimensions, isEditor, updateConfig, colorScale } = useContext(ConfigContext)
+  const { config, dimensions, isEditor, updateConfig, colorScale, transformedData } = useContext(ConfigContext)
 
   // destructure config items here...
   const { annotations } = config
@@ -40,8 +34,21 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
     annotations.map((annotation, index) => {
       const text = annotation.text || ''
 
-      const annotationX = xScaleAnnotation(annotation.x)
-      const annotationY = yScaleAnnotation(annotation.y)
+      // Default to absolute positioning
+      let annotationX = xScaleAnnotation(annotation.x)
+      let annotationY = yScaleAnnotation(annotation.y)
+
+      // Override with data-anchored positioning if applicable
+      if (annotation.anchorMode === 'data' && annotation.dataX !== undefined) {
+        const dataSource = transformedData || config.data
+        const dataPoint = dataSource.find(d => d[config.xAxis.dataKey] === annotation.dataX)
+
+        if (dataPoint) {
+          const dataYValue = dataPoint[annotation.seriesKey]
+          annotationX = xScale(annotation.dataX) + (xScale.bandwidth?.() / 2 || 0)
+          annotationY = yScale(dataYValue) - 10
+        }
+      }
 
       // sanitize the text for setting dangerouslySetInnerHTML
       const sanitizedData = () => ({
@@ -65,29 +72,31 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
 
             let updatedAnnotations = [...annotations]
 
-            if (
-              annotation.x === xScaleAnnotation.invert(props.x) &&
-              annotation.y === yScaleAnnotation.invert(props.y)
-            ) {
+            const isLabelOnlyDrag =
+              annotation.anchorMode === 'data'
+                ? annotationX === props.x && annotationY === props.y
+                : annotation.x === xScaleAnnotation.invert(props.x) && annotation.y === yScaleAnnotation.invert(props.y)
+
+            if (isLabelOnlyDrag) {
               updatedAnnotations[index] = { ...updatedAnnotations[index], dx: props.dx, dy: props.dy }
             } else {
-              if (annotation.snapToNearestPoint) {
-                let nearestDatum = findNearestDatum(
-                  {
-                    data: config.data,
-                    xScale,
-                    yScale,
-                    config,
-                    xMax: xMax - config.yAxis.size / 2,
-                    annotationSeriesKey: annotation.seriesKey
-                  },
-                  props.x
-                )
+              if (annotation.anchorMode === 'data') {
+                let nearestDatum = findNearestDatum({
+                  data: transformedData || config.data,
+                  xScale,
+                  xAxisType: config.xAxis.type,
+                  xAxisDataKey: config.xAxis.dataKey,
+                  seriesKey: annotation.seriesKey,
+                  xPixel: props.x
+                })
 
-                updatedAnnotations[index] = {
-                  ...updatedAnnotations[index],
-                  x: xScaleAnnotation.invert(xScale(nearestDatum.x)),
-                  y: yScaleAnnotation.invert(yScale(nearestDatum.y))
+                if (nearestDatum) {
+                  updatedAnnotations[index] = {
+                    ...updatedAnnotations[index],
+                    dataX: nearestDatum.x,
+                    x: xScaleAnnotation.invert(props.x),
+                    y: yScaleAnnotation.invert(props.y)
+                  }
                 }
               } else {
                 updatedAnnotations[index] = {
