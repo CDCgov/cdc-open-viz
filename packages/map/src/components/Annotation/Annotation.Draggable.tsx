@@ -120,7 +120,7 @@ const Annotations: React.FC<AnnotationsProps> = ({ onDragStateChange }) => {
                         x={x}
                         y={dy}
                         stroke={APP_FONT_COLOR}
-                        markerWidth={10}
+                        markerWidth={12}
                         size={10}
                         strokeWidth={1}
                         orient='auto-start-reverse'

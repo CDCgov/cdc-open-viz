@@ -65,7 +65,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
 
       return (
         <AnnotationComponent
-          key={`annotation-${index}`}
+          key={`annotation-${index}-${annotationX}-${annotationY}-${annotation.dx}-${annotation.dy}`}
           width={200}
           height={height}
           dx={annotation.dx} // label position
@@ -182,7 +182,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
               x={annotationX}
               y={annotationY}
               stroke={APP_FONT_COLOR}
-              markerWidth={10}
+              markerWidth={12}
               size={10}
               strokeWidth={1}
               orient='auto-start-reverse'
