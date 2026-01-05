@@ -1,6 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import DOMPurify from 'dompurify'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 // helpers
 import { findNearestDatum } from './findNearestDatum'
@@ -21,7 +22,7 @@ import './AnnotationDraggable.styles.css'
 
 const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax, svgRef, onDragStateChange }) => {
   // prettier-ignore
-  const { config, dimensions, isEditor, updateConfig, colorScale, transformedData } = useContext(ConfigContext)
+  const { config, dimensions, isEditor, updateConfig, colorScale, transformedData, parseDate } = useContext(ConfigContext)
 
   // destructure config items here...
   const { annotations } = config
@@ -45,7 +46,14 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
 
         if (dataPoint) {
           const dataYValue = dataPoint[annotation.seriesKey]
-          annotationX = xScale(annotation.dataX) + (xScale.bandwidth?.() / 2 || 0)
+
+          // For date/date-time axes, convert raw value to timestamp for scale
+          let xScaleInput = annotation.dataX
+          if (config.xAxis.type === 'date' || config.xAxis.type === 'date-time') {
+            xScaleInput = parseDate(xScaleInput, false)?.getTime()
+          }
+
+          annotationX = xScale(xScaleInput) + (xScale.bandwidth?.() / 2 || 0)
           annotationY = yScale(dataYValue) - 10
         }
       }
@@ -66,6 +74,8 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
           y={annotationY}
           canEditLabel={annotation.edit.label || false}
           canEditSubject={(annotation.edit.subject && annotation.connectionType !== 'none') || false}
+          labelDragHandleProps={{ r: 15, stroke: 'red' }}
+          subjectDragHandleProps={{ r: 15, stroke: 'red' }}
           onDragStart={() => onDragStateChange(true)}
           onDragEnd={props => {
             onDragStateChange(false)
@@ -87,7 +97,8 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
                   xAxisType: config.xAxis.type,
                   xAxisDataKey: config.xAxis.dataKey,
                   seriesKey: annotation.seriesKey,
-                  xPixel: props.x
+                  xPixel: props.x,
+                  parseDate
                 })
 
                 if (nearestDatum) {
@@ -155,27 +166,22 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
                       Q ${annotationX + annotation.dx / 2}, ${
                 annotationY + annotation.dy / 2 + Number(annotation?.bezier) || 0
               } ${annotationX + annotation.dx},${annotationY + annotation.dy}`}
-              stroke='black'
+              stroke={APP_FONT_COLOR}
               strokeWidth='2'
               fill='none'
               marker-start={`url(#marker-start--${index})`}
             />
           )}
           {annotation.marker === 'circle' && (
-            <CircleSubject
-              id={`marker-start--${index}`}
-              className='circle-subject'
-              stroke={colorScale(annotation.seriesKey)}
-              radius={8}
-            />
+            <CircleSubject className='circle-subject' stroke={APP_FONT_COLOR} radius={8} />
           )}
           {annotation.marker === 'arrow' && (
             <MarkerArrow
-              fill='black'
+              fill={APP_FONT_COLOR}
               id={`marker-start--${index}`}
               x={annotationX}
               y={annotationY}
-              stroke='#333'
+              stroke={APP_FONT_COLOR}
               markerWidth={10}
               size={10}
               strokeWidth={1}
@@ -189,7 +195,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
             cy={annotationY + annotation.dy}
             r={16}
             className='annotation__mobile-label annotation__mobile-label-circle'
-            stroke={colorScale(annotation.seriesKey)}
+            stroke={APP_FONT_COLOR}
           />
           <text
             height={16}

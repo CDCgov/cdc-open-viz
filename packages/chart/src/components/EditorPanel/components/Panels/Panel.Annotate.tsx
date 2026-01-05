@@ -61,7 +61,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
     ]
 
     const newAnnotation = {
-      text: 'New Annotation',
+      text: 'New annotation',
       anchorMode: 'fixed',
       fontSize: 16,
       bezier: 10,

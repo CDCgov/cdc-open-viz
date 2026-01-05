@@ -393,6 +393,7 @@ const getFirstDayOfMonth = ms => {
 }
 
 const dateFormatHasMonthButNoDays = dateFormat => {
+  if (!dateFormat) return false
   return (
     (dateFormat.includes('%b') ||
       dateFormat.includes('%B') ||

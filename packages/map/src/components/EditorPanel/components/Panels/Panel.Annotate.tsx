@@ -32,7 +32,7 @@ const PanelAnnotate: React.FC = props => {
     const newSvgDims = [svgContainer.width, svgContainer.height]
 
     const newAnnotation = {
-      text: 'New Annotation',
+      text: 'New annotation',
       anchorMode: 'fixed',
       fontSize: 16,
       show: {
