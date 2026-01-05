@@ -19,5 +19,17 @@
   .sbdocs-h3 {
     color: #3a569b !important;
   }
+
+  /* Add 1rem padding when editor isn't visible to mimic DFE */
+  .cove-storybook:not(:has(.isEditor)) {
+    padding: 1rem;
+  }
+
+  /* Remove Storybook's default padding to prevent double padding */
+  #storybook-root,
+  body.sb-main-padded,
+  body.sb-show-main.sb-main-padded {
+    padding: 0 !important;
+  }
 </style>
 <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />

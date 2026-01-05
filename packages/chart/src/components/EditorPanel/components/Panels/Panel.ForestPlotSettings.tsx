@@ -8,18 +8,24 @@ import WarningImage from '../../../../images/warning.svg'
 
 // contexts
 import ConfigContext from '../../../../ConfigContext'
+import { useEditorPanelContext } from '../../EditorPanelContext'
 
 // types
 import { type ChartContext } from '../../../../types/ChartContext'
 import { type PanelProps } from '../PanelProps'
 
-import { AccordionItem, AccordionItemHeading, AccordionItemPanel, AccordionItemButton } from 'react-accessible-accordion'
+import {
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemPanel,
+  AccordionItemButton
+} from 'react-accessible-accordion'
 
 const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
   const { config, rawData: unfilteredData, updateConfig } = useContext<ChartContext>(ConfigContext)
+  const { getColumns } = useEditorPanelContext()
   if (config.visualizationType !== 'Forest Plot') return
 
-  // todo: get from editor context?
   const enforceRestrictions = updatedConfig => {
     if (updatedConfig.orientation === 'horizontal') {
       updatedConfig.labels = false
@@ -31,31 +37,6 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
     if (updatedConfig.visualizationType === 'Combo') {
       updatedConfig.orientation = 'vertical'
     }
-  }
-
-  // todo: get from editor context?
-  const getColumns = (filter = true) => {
-    let columns = {}
-    unfilteredData.forEach(row => {
-      Object.keys(row).forEach(columnName => (columns[columnName] = true))
-    })
-
-    if (filter) {
-      Object.keys(columns).forEach(key => {
-        if (
-          (config.series && config.series.filter(series => series.dataKey === key).length > 0) ||
-          (config.confidenceKeys && Object.keys(config.confidenceKeys).includes(key))
-          /*
-            TODO: Resolve errors when config keys exist, but have no value
-              Proposal:  (((confidenceUpper && confidenceLower) || confidenceUpper || confidenceLower) && Object.keys(config.confidenceKeys).includes(key))
-          */
-        ) {
-          delete columns[key]
-        }
-      })
-    }
-
-    return Object.keys(columns)
   }
 
   // todo: editor context?
@@ -151,7 +132,9 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
       <AccordionItemHeading>
         <AccordionItemButton>
           {name}
-          {(!config.forestPlot.estimateField || !config.forestPlot.upper || !config.forestPlot.lower) && <WarningImage width='25' className='warning-icon' />}
+          {(!config.forestPlot.estimateField || !config.forestPlot.upper || !config.forestPlot.lower) && (
+            <WarningImage width='25' className='warning-icon' />
+          )}
         </AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
@@ -201,14 +184,22 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
               <Tooltip.Content>
                 <p>
                   Linear - Typically used for continuous outcomes. Line of no effect is positioned on 0 (zero) <br />
-                  <br /> Logarithmic - Typically used for binary outcomes such as risk ratios and odds ratios. Line of no effect is positioned on 1.
+                  <br /> Logarithmic - Typically used for binary outcomes such as risk ratios and odds ratios. Line of
+                  no effect is positioned on 1.
                 </p>
               </Tooltip.Content>
             </Tooltip>
           }
         />
 
-        <TextField type='text' value={config.forestPlot?.title || ''} updateField={updateField} section='forestPlot' fieldName='title' label='Plot Title' />
+        <TextField
+          type='text'
+          value={config.forestPlot?.title || ''}
+          updateField={updateField}
+          section='forestPlot'
+          fieldName='title'
+          label='Plot Title'
+        />
 
         <br />
         <hr />
@@ -317,7 +308,14 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
           </span>
         </label>
 
-        <CheckBox value={config.forestPlot?.lineOfNoEffect?.show || false} section='forestPlot' subsection='lineOfNoEffect' fieldName='show' label='Show Line of No Effect' updateField={updateField} />
+        <CheckBox
+          value={config.forestPlot?.lineOfNoEffect?.show || false}
+          section='forestPlot'
+          subsection='lineOfNoEffect'
+          fieldName='show'
+          label='Show Line of No Effect'
+          updateField={updateField}
+        />
 
         <br />
         <hr />
@@ -400,13 +398,37 @@ const ForestPlotSettings: FC<PanelProps> = ({ name }) => {
           />
         </label>
 
-        <TextField type='number' min={20} max={45} value={config.forestPlot.rowHeight ? config.forestPlot.rowHeight : 10} updateField={updateField} section='forestPlot' fieldName='rowHeight' label='Row Height' placeholder='10' />
+        <TextField
+          type='number'
+          min={20}
+          max={45}
+          value={config.forestPlot.rowHeight ? config.forestPlot.rowHeight : 10}
+          updateField={updateField}
+          section='forestPlot'
+          fieldName='rowHeight'
+          label='Row Height'
+          placeholder='10'
+        />
         <br />
         <hr />
         <br />
         <h4>Labels Settings</h4>
-        <TextField type='text' value={config.forestPlot?.leftLabel || ''} updateField={updateField} section='forestPlot' fieldName='leftLabel' label='Left Label' />
-        <TextField type='text' value={config.forestPlot?.rightLabel || ''} updateField={updateField} section='forestPlot' fieldName='rightLabel' label='Right Label' />
+        <TextField
+          type='text'
+          value={config.forestPlot?.leftLabel || ''}
+          updateField={updateField}
+          section='forestPlot'
+          fieldName='leftLabel'
+          label='Left Label'
+        />
+        <TextField
+          type='text'
+          value={config.forestPlot?.rightLabel || ''}
+          updateField={updateField}
+          section='forestPlot'
+          fieldName='rightLabel'
+          label='Right Label'
+        />
 
         <br />
         <hr />

@@ -1,0 +1,569 @@
+{
+  "annotations": [],
+  "type": "chart",
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "title": "Technology Adoption Statistics",
+  "showTitle": true,
+  "showDownloadMediaButton": false,
+  "theme": "theme-blue",
+  "animate": true,
+  "lineDatapointStyle": "hover",
+  "lineDatapointColor": "Same as Line",
+  "barHasBorder": "true",
+  "isLollipopChart": false,
+  "lollipopShape": "circle",
+  "lollipopColorStyle": "two-tone",
+  "visualizationSubType": "regular",
+  "barStyle": "rounded",
+  "roundingStyle": "standard",
+  "tipRounding": "top",
+  "isResponsiveTicks": false,
+  "general": {
+    "annotationDropdownText": "Annotations",
+    "showMissingDataLabel": false,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": true,
+    "hideNullValue": true,
+    "palette": {
+      "isReversed": false,
+      "version": "2.0",
+      "name": "divergent_green_orange"
+    }
+  },
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "preliminaryData": [],
+  "yAxis": {
+    "hideAxis": false,
+    "displayNumbersOnBar": true,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "75",
+    "gridLines": false,
+    "enablePadding": false,
+    "min": "",
+    "max": "",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
+    "rightHideAxis": false,
+    "rightAxisSize": 0,
+    "rightLabel": "",
+    "rightLabelOffsetSize": 0,
+    "rightAxisLabelColor": "#1c1d1f",
+    "rightAxisTickLabelColor": "#1c1d1f",
+    "rightAxisTickColor": "#1c1d1f",
+    "numTicks": "6",
+    "axisPadding": 0,
+    "scalePadding": 10,
+    "tickRotation": 0,
+    "anchors": [],
+    "shoMissingDataLabel": true,
+    "showMissingDataLine": true,
+    "categories": [],
+    "label": "Adoption Rate (%)",
+    "labelPlacement": "Below Bar"
+  },
+  "boxplot": {
+    "plots": [],
+    "borders": "true",
+    "plotOutlierValues": false,
+    "plotNonOutlierValues": true,
+    "labels": {
+      "q1": "Lower Quartile",
+      "q2": "q2",
+      "q3": "Upper Quartile",
+      "q4": "q4",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "mean": "Mean",
+      "median": "Median",
+      "sd": "Standard Deviation",
+      "iqr": "Interquartile Range",
+      "count": "Count",
+      "outliers": "Outliers",
+      "values": "Values",
+      "lowerBounds": "Lower Bounds",
+      "upperBounds": "Upper Bounds"
+    }
+  },
+  "topAxis": {
+    "hasLine": false
+  },
+  "isLegendValue": false,
+  "barThickness": "0.37",
+  "barHeight": 25,
+  "barSpace": 15,
+  "heights": {
+    "vertical": 300,
+    "horizontal": 250
+  },
+  "xAxis": {
+    "sortDates": false,
+    "anchors": [],
+    "type": "categorical",
+    "showTargetLabel": true,
+    "targetLabel": "Target",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "50",
+    "tickRotation": 0,
+    "min": "",
+    "max": "100",
+    "labelColor": "#1c1d1f",
+    "tickLabelColor": "#1c1d1f",
+    "tickColor": "#1c1d1f",
+    "numTicks": "",
+    "labelOffset": 0,
+    "axisPadding": 200,
+    "target": 0,
+    "maxTickRotation": "90",
+    "padding": 5,
+    "showYearsOnce": false,
+    "sortByRecentDate": false,
+    "brushActive": false,
+    "dataKey": "Technology",
+    "tickWidthMax": 43,
+    "label": "Technology"
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "limitHeight": false,
+    "height": "500",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": false,
+    "indexLabel": "",
+    "download": true,
+    "showVertical": true,
+    "dateDisplayFormat": "",
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "collapsible": true,
+    "show": true,
+    "showDownloadImgButton": false,
+    "groupBy": "",
+    "cellMinWidth": "150"
+  },
+  "orientation": "horizontal",
+  "columns": {
+    "Users (millions)": {
+      "label": "Users (millions)",
+      "dataTable": true,
+      "tooltips": true,
+      "prefix": "",
+      "suffix": "M",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 1,
+      "commas": true,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "Users (millions)"
+    },
+    "Growth Rate": {
+      "label": "Growth Rate",
+      "dataTable": true,
+      "tooltips": true,
+      "prefix": "",
+      "suffix": "%",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 1,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "Growth Rate"
+    },
+    "Learn More": {
+      "label": "Learn More",
+      "dataTable": true,
+      "tooltips": false,
+      "prefix": "",
+      "suffix": "",
+      "forestPlot": false,
+      "startingPoint": "0",
+      "forestPlotAlignRight": false,
+      "roundToPlace": 0,
+      "commas": false,
+      "showInViz": false,
+      "forestPlotStartingPoint": 0,
+      "name": "Learn More"
+    }
+  },
+  "legend": {
+    "hide": true,
+    "behavior": "isolate",
+    "axisAlign": true,
+    "singleRow": true,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "",
+    "dynamicLegend": false,
+    "dynamicLegendDefaultText": "Show All",
+    "dynamicLegendItemLimit": 5,
+    "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+    "dynamicLegendChartMessage": "Select Options from the Legend",
+    "label": "",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "hideSuppressedLabels": false,
+    "hideSuppressionLink": false,
+    "seriesHighlight": [],
+    "style": "circles",
+    "subStyle": "linear blocks",
+    "groupBy": "",
+    "shape": "circle",
+    "tickRotation": "",
+    "order": "dataColumn",
+    "hideBorder": {
+      "side": false,
+      "topBottom": true
+    },
+    "position": "right",
+    "orderedValues": [],
+    "patterns": {},
+    "patternField": "",
+    "unified": true
+  },
+  "smallMultiples": {
+    "mode": "",
+    "tileColumn": "",
+    "tilesPerRowDesktop": 3,
+    "tilesPerRowMobile": 1,
+    "tileOrder": [],
+    "tileOrderType": "asc",
+    "tileTitles": {},
+    "independentYAxis": false,
+    "colorMode": "same",
+    "synchronizedTooltips": true,
+    "showAreaUnderLine": true
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "twoColor": {
+    "palette": "monochrome-1",
+    "isPaletteReversed": false
+  },
+  "labels": false,
+  "dataFormat": {
+    "commas": true,
+    "prefix": "",
+    "suffix": "%",
+    "abbreviated": false,
+    "bottomSuffix": "",
+    "bottomPrefix": "",
+    "bottomAbbreviated": false
+  },
+  "filters": [
+    {
+      "values": [
+        "Social Media",
+        "Cloud Services",
+        "Development Tools",
+        "Communication"
+      ],
+      "filterStyle": "dropdown",
+      "id": 1765208699247,
+      "showDropdown": true,
+      "active": "Social Media",
+      "columnName": "Category",
+      "orderedValues": [
+        "Social Media",
+        "Cloud Services",
+        "Development Tools",
+        "Communication"
+      ],
+      "label": "Select technology category",
+      "order": "cust"
+    }
+  ],
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false,
+    "lineDatapointSymbol": "none",
+    "maximumShapeAmount": 7
+  },
+  "useLogScale": false,
+  "filterBehavior": "Filter Change",
+  "highlightedBarValues": [],
+  "series": [
+    {
+      "dataKey": "Adoption Rate",
+      "type": "Bar",
+      "axis": "Left",
+      "tooltip": true,
+      "dynamicCategory": ""
+    }
+  ],
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": ""
+  },
+  "forestPlot": {
+    "startAt": 0,
+    "colors": {
+      "line": "",
+      "shape": ""
+    },
+    "lineOfNoEffect": {
+      "show": true
+    },
+    "type": "",
+    "pooledResult": {
+      "diamondHeight": 5,
+      "column": ""
+    },
+    "estimateField": "",
+    "estimateRadius": "",
+    "shape": "square",
+    "rowHeight": 20,
+    "description": {
+      "show": true,
+      "text": "description",
+      "location": 0
+    },
+    "result": {
+      "show": true,
+      "text": "result",
+      "location": 100
+    },
+    "radius": {
+      "min": 2,
+      "max": 10,
+      "scalingColumn": ""
+    },
+    "regression": {
+      "lower": 0,
+      "upper": 0,
+      "estimateField": 0
+    },
+    "leftWidthOffset": 0,
+    "rightWidthOffset": 0,
+    "showZeroLine": false,
+    "leftLabel": "",
+    "rightLabel": ""
+  },
+  "area": {
+    "isStacked": false
+  },
+  "sankey": {
+    "title": {
+      "defaultColor": "black"
+    },
+    "iterations": 1,
+    "rxValue": 0.9,
+    "overallSize": {
+      "width": 900,
+      "height": 700
+    },
+    "margin": {
+      "margin_y": 25,
+      "margin_x": 0
+    },
+    "nodeSize": {
+      "nodeWidth": 26,
+      "nodeHeight": 40
+    },
+    "nodePadding": 55,
+    "nodeFontColor": "black",
+    "nodeColor": {
+      "default": "#ff8500",
+      "inactive": "#808080"
+    },
+    "linkColor": {
+      "default": "#ffc900",
+      "inactive": "#D3D3D3"
+    },
+    "opacity": {
+      "nodeOpacityDefault": 1,
+      "nodeOpacityInactive": 0.1,
+      "LinkOpacityDefault": 1,
+      "LinkOpacityInactive": 0.1
+    },
+    "storyNodeFontColor": "#006778",
+    "storyNodeText": [],
+    "nodeValueStyle": {
+      "textBefore": "(",
+      "textAfter": ")"
+    },
+    "data": []
+  },
+  "markupVariables": [],
+  "enableMarkupVariables": false,
+  "errors": [],
+  "currentViewport": "lg",
+  "id": 1,
+  "category": "Charts",
+  "label": "Bar",
+  "subType": "Bar",
+  "icon": {
+    "key": null,
+    "ref": null,
+    "props": {},
+    "_owner": null
+  },
+  "content": "Use bars to show comparisons between data categories.",
+  "visualizationType": "Bar",
+  "activeVizButtonID": 1,
+  "dataFileName": "",
+  "dataFileSourceType": "data",
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
+  "version": "4.25.11",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "dynamicMarginTop": 0,
+  "data": [
+    {
+      "Category": "Social Media",
+      "Technology": "<a href=\"https://developer.twitter.com/en/docs\">Twitter/X</a>",
+      "Adoption Rate": "68.2",
+      "Users (millions)": "528.3",
+      "Growth Rate": "2.1",
+      "Learn More": "<a href=\"https://developer.twitter.com/en/docs\">View API Documentation &raquo;</a>"
+    },
+    {
+      "Category": "Social Media",
+      "Technology": "<a href=\"https://developers.facebook.com/docs/instagram\">Instagram</a>",
+      "Adoption Rate": "82.5",
+      "Users (millions)": "1478.0",
+      "Growth Rate": "8.7",
+      "Learn More": "<a href=\"https://developers.facebook.com/docs/instagram\">Learn more about Instagram API &raquo;</a>"
+    },
+    {
+      "Category": "Social Media",
+      "Technology": "<a href=\"https://developers.tiktok.com/\">TikTok</a>",
+      "Adoption Rate": "73.1",
+      "Users (millions)": "1051.0",
+      "Growth Rate": "15.2",
+      "Learn More": "<a href=\"https://developers.tiktok.com/\">Explore TikTok Developer Platform &raquo;</a>"
+    },
+    {
+      "Category": "Social Media",
+      "Technology": "<a href=\"https://developer.linkedin.com/\">LinkedIn</a>",
+      "Adoption Rate": "45.8",
+      "Users (millions)": "875.0",
+      "Growth Rate": "5.3",
+      "Learn More": "<a href=\"https://developer.linkedin.com/\">LinkedIn Developer Resources &raquo;</a>"
+    },
+    {
+      "Category": "Cloud Services",
+      "Technology": "<a href=\"https://aws.amazon.com/documentation/\">AWS</a>",
+      "Adoption Rate": "91.3",
+      "Users (millions)": "2500.0",
+      "Growth Rate": "12.5",
+      "Learn More": "<a href=\"https://aws.amazon.com/documentation/\">AWS Documentation &raquo;</a>"
+    },
+    {
+      "Category": "Cloud Services",
+      "Technology": "<a href=\"https://docs.microsoft.com/azure/\">Azure</a>",
+      "Adoption Rate": "78.9",
+      "Users (millions)": "1800.0",
+      "Growth Rate": "18.3",
+      "Learn More": "<a href=\"https://docs.microsoft.com/azure/\">Azure Documentation &raquo;</a>"
+    },
+    {
+      "Category": "Cloud Services",
+      "Technology": "<a href=\"https://cloud.google.com/docs\">Google Cloud</a>",
+      "Adoption Rate": "62.4",
+      "Users (millions)": "1200.0",
+      "Growth Rate": "22.1",
+      "Learn More": "<a href=\"https://cloud.google.com/docs\">Google Cloud Docs &raquo;</a>"
+    },
+    {
+      "Category": "Cloud Services",
+      "Technology": "<a href=\"https://docs.digitalocean.com/\">DigitalOcean</a>",
+      "Adoption Rate": "34.2",
+      "Users (millions)": "385.0",
+      "Growth Rate": "6.8",
+      "Learn More": "<a href=\"https://docs.digitalocean.com/\">DigitalOcean Documentation &raquo;</a>"
+    },
+    {
+      "Category": "Development Tools",
+      "Technology": "<a href=\"https://docs.github.com/\">GitHub</a>",
+      "Adoption Rate": "94.6",
+      "Users (millions)": "100.0",
+      "Growth Rate": "9.2",
+      "Learn More": "<a href=\"https://docs.github.com/\">GitHub Documentation &raquo;</a>"
+    },
+    {
+      "Category": "Development Tools",
+      "Technology": "<a href=\"https://code.visualstudio.com/docs\">VS Code</a>",
+      "Adoption Rate": "87.3",
+      "Users (millions)": "14.0",
+      "Growth Rate": "11.5",
+      "Learn More": "<a href=\"https://code.visualstudio.com/docs\">VS Code Documentation &raquo;</a>"
+    },
+    {
+      "Category": "Development Tools",
+      "Technology": "<a href=\"https://docs.docker.com/\">Docker</a>",
+      "Adoption Rate": "79.8",
+      "Users (millions)": "13.0",
+      "Growth Rate": "14.3",
+      "Learn More": "<a href=\"https://docs.docker.com/\">Docker Documentation &raquo;</a>"
+    },
+    {
+      "Category": "Development Tools",
+      "Technology": "<a href=\"https://docs.npmjs.com/\">npm</a>",
+      "Adoption Rate": "85.2",
+      "Users (millions)": "17.0",
+      "Growth Rate": "7.9",
+      "Learn More": "<a href=\"https://docs.npmjs.com/\">npm Documentation &raquo;</a>"
+    },
+    {
+      "Category": "Communication",
+      "Technology": "<a href=\"https://api.slack.com/\">Slack</a>",
+      "Adoption Rate": "71.5",
+      "Users (millions)": "18.0",
+      "Growth Rate": "10.2",
+      "Learn More": "<a href=\"https://api.slack.com/\">Slack API Documentation &raquo;</a>"
+    },
+    {
+      "Category": "Communication",
+      "Technology": "<a href=\"https://docs.microsoft.com/microsoftteams/\">Microsoft Teams</a>",
+      "Adoption Rate": "68.9",
+      "Users (millions)": "280.0",
+      "Growth Rate": "25.7",
+      "Learn More": "<a href=\"https://docs.microsoft.com/microsoftteams/\">Teams Documentation &raquo;</a>"
+    },
+    {
+      "Category": "Communication",
+      "Technology": "<a href=\"https://developers.zoom.us/\">Zoom</a>",
+      "Adoption Rate": "75.2",
+      "Users (millions)": "300.0",
+      "Growth Rate": "8.4",
+      "Learn More": "<a href=\"https://developers.zoom.us/\">Zoom Developer Platform &raquo;</a>"
+    },
+    {
+      "Category": "Communication",
+      "Technology": "<a href=\"https://discord.com/developers/docs/\">Discord</a>",
+      "Adoption Rate": "56.3",
+      "Users (millions)": "150.0",
+      "Growth Rate": "19.6",
+      "Learn More": "<a href=\"https://discord.com/developers/docs/\">Discord Developer Portal &raquo;</a>"
+    }
+  ],
+  "datasets": {}
+}

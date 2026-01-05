@@ -14,7 +14,7 @@ import { getNestedOptions } from './helpers/getNestedOptions'
 import { getWrappingStatuses } from './helpers/filterWrapping'
 import { handleSorting } from './helpers/handleSorting'
 import { getChangedFilters } from './helpers/getChangedFilters'
-import { getUniqueValues } from '@cdc/map/src/helpers'
+import { getUniqueValues } from '../../helpers/getUniqueValues'
 import { getQueryParams, updateQueryString } from '../../helpers/queryStringUtils'
 import { applyQueuedActive } from './helpers/applyQueuedActive'
 import Tabs from './components/Tabs'
@@ -95,7 +95,9 @@ const Filters: React.FC<FilterProps> = ({
       eventAction: 'change',
       eventLabel: interactionLabel,
       vizTitle: getVizTitle(visualizationConfig),
-      specifics: `key: ${String(newFilters?.[index]?.columnName).toLowerCase()}, value: ${String(newFilters?.[index]?.active).toLowerCase()}`
+      specifics: `key: ${String(newFilters?.[index]?.columnName).toLowerCase()}, value: ${String(
+        newFilters?.[index]?.active
+      ).toLowerCase()}`
     })
   }
 
@@ -201,6 +203,9 @@ const Filters: React.FC<FilterProps> = ({
   }, [filters])
 
   if (visualizationConfig?.filters?.length === 0) return <></>
+
+  const hasVisibleFilters = filters?.some(filter => filter.showDropdown !== false)
+  if (!hasVisibleFilters) return <></>
 
   const getClasses = () => {
     const { visualizationType, legend } = visualizationConfig || {}

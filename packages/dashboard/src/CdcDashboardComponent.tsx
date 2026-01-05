@@ -60,6 +60,7 @@ import Alert from '@cdc/core/components/Alert'
 import { shouldLoadAllFilters } from './helpers/shouldLoadAllFilters'
 import { subscribe, unsubscribe } from '@cdc/core/helpers/events'
 import DashboardEditors from './components/DashboardEditors'
+import { updateChildFilters } from './helpers/updateChildFilters'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -330,7 +331,8 @@ export default function CdcDashboard({
   useEffect(() => {
     const { config } = state
     const loadAllFilters = shouldLoadAllFilters(config, isEditor && !isPreview)
-    const sharedFiltersWithValues = addValuesToDashboardFilters(config.dashboard.sharedFilters, state.data)
+    let sharedFiltersWithValues = addValuesToDashboardFilters(config.dashboard.sharedFilters, state.data)
+    sharedFiltersWithValues = updateChildFilters(sharedFiltersWithValues, state.data)
     setAPILoading(true)
     loadAPIFilters(sharedFiltersWithValues, apiFilterDropdowns, loadAllFilters)?.then(newFilters => {
       const allValuesSelected = newFilters.every(filter => {

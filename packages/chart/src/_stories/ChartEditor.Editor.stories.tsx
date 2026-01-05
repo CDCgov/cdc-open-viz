@@ -71,9 +71,7 @@ export const GeneralSectionTests: Story = {
       const chartContainer = canvasElement.querySelector('.tooltip-boundary')
       // Target the main chart SVG specifically (not brush or other SVGs)
       const chartSvg =
-        canvasElement.querySelector('.tooltip-boundary svg[role="img"]') ||
-        canvasElement.querySelector('svg.linear') ||
-        canvasElement.querySelector('.cdc-open-viz-module svg:not(.brush-container svg)')
+        canvasElement.querySelector('.tooltip-boundary svg[role="img"]') || canvasElement.querySelector('svg.linear')
       return {
         containerHeight: chartContainer?.getBoundingClientRect().height || 0,
         svgHeight: parseInt(chartSvg?.getAttribute('height') || '0', 10),

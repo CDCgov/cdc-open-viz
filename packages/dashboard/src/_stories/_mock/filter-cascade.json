@@ -1,0 +1,3350 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": [
+      {
+        "key": "color",
+        "showDropdown": true,
+        "values": ["blue", "green", "red"],
+        "type": "datafilter",
+        "orderedValues": ["blue", "green", "red"],
+        "columnName": "color",
+        "tier": 1
+      },
+      {
+        "key": "size",
+        "showDropdown": true,
+        "values": ["large", "medium", "small"],
+        "type": "datafilter",
+        "orderedValues": ["large", "medium", "small"],
+        "columnName": "size",
+        "tier": 1,
+        "parents": ["color"]
+      },
+      {
+        "key": "weight",
+        "showDropdown": true,
+        "values": ["heavy", "light", "medium"],
+        "type": "datafilter",
+        "orderedValues": ["heavy", "light", "medium"],
+        "columnName": "weight",
+        "tier": 1,
+        "parents": ["color", "size"]
+      },
+      {
+        "key": "smell",
+        "showDropdown": true,
+        "values": ["bitter", "neutral", "sweet"],
+        "type": "datafilter",
+        "orderedValues": ["bitter", "neutral", "sweet"],
+        "columnName": "smell",
+        "tier": 1,
+        "parents": ["color", "size", "weight"]
+      }
+    ]
+  },
+  "rows": [
+    {
+      "uuid": "__​undefined__",
+      "toggle": "__​undefined__",
+      "equalHeight": "__​undefined__",
+      "columns": [
+        {
+          "width": 12,
+          "widget": "dashboardFilters1757091569634"
+        },
+        {},
+        {}
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "chart1757091656464"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "dashboardFilters1757091569634": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "newViz": true,
+      "openModal": true,
+      "uid": "dashboardFilters1757091569634",
+      "type": "dashboardFilters",
+      "sharedFilterIndexes": [0, 1, 2, 3],
+      "visualizationType": "dashboardFilters"
+    },
+    "chart1757091656464": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "openModal": true,
+      "uid": "chart1757091656464",
+      "type": "chart",
+      "visualizationType": "Bar",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "dataKey": "./test-data.json",
+      "annotations": [],
+      "allowLineToBarGraph": "__​undefined__",
+      "debugSvg": false,
+      "chartMessage": {
+        "noData": "No Data Available"
+      },
+      "title": "",
+      "showTitle": true,
+      "showDownloadMediaButton": false,
+      "theme": "theme-blue",
+      "animate": false,
+      "lineDatapointStyle": "hover",
+      "lineDatapointColor": "Same as Line",
+      "barHasBorder": "true",
+      "isLollipopChart": false,
+      "lollipopShape": "circle",
+      "lollipopColorStyle": "two-tone",
+      "visualizationSubType": "regular",
+      "barStyle": "",
+      "roundingStyle": "standard",
+      "tipRounding": "top",
+      "isResponsiveTicks": false,
+      "general": {
+        "annotationDropdownText": "Annotations",
+        "showMissingDataLabel": true,
+        "showSuppressedSymbol": true,
+        "showZeroValueData": true,
+        "hideNullValue": true,
+        "palette": {
+          "name": "qualitative_bold",
+          "version": "1.0"
+        }
+      },
+      "padding": {
+        "left": 5,
+        "right": 5
+      },
+      "preliminaryData": [],
+      "yAxis": {
+        "hideAxis": false,
+        "displayNumbersOnBar": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 50,
+        "gridLines": false,
+        "enablePadding": false,
+        "min": "",
+        "max": "",
+        "labelColor": "#1c1d1f",
+        "tickLabelColor": "#1c1d1f",
+        "tickColor": "#1c1d1f",
+        "rightHideAxis": false,
+        "rightAxisSize": 0,
+        "rightLabel": "",
+        "rightLabelOffsetSize": 0,
+        "rightAxisLabelColor": "#1c1d1f",
+        "rightAxisTickLabelColor": "#1c1d1f",
+        "rightAxisTickColor": "#1c1d1f",
+        "numTicks": "",
+        "axisPadding": 0,
+        "scalePadding": 10,
+        "tickRotation": 0,
+        "anchors": [],
+        "shoMissingDataLabel": true,
+        "showMissingDataLine": true,
+        "categories": []
+      },
+      "boxplot": {
+        "plots": [],
+        "borders": "true",
+        "plotOutlierValues": false,
+        "plotNonOutlierValues": true,
+        "labels": {
+          "q1": "Lower Quartile",
+          "q2": "q2",
+          "q3": "Upper Quartile",
+          "q4": "q4",
+          "minimum": "Minimum",
+          "maximum": "Maximum",
+          "mean": "Mean",
+          "median": "Median",
+          "sd": "Standard Deviation",
+          "iqr": "Interquartile Range",
+          "count": "Count",
+          "outliers": "Outliers",
+          "values": "Values",
+          "lowerBounds": "Lower Bounds",
+          "upperBounds": "Upper Bounds"
+        }
+      },
+      "topAxis": {
+        "hasLine": false
+      },
+      "isLegendValue": false,
+      "barThickness": 0.35,
+      "barHeight": 25,
+      "barSpace": 15,
+      "heights": {
+        "vertical": 300,
+        "horizontal": 750
+      },
+      "xAxis": {
+        "sortDates": false,
+        "anchors": [],
+        "type": "categorical",
+        "showTargetLabel": true,
+        "targetLabel": "Target",
+        "hideAxis": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 75,
+        "tickRotation": 0,
+        "min": "",
+        "max": "",
+        "labelColor": "#1c1d1f",
+        "tickLabelColor": "#1c1d1f",
+        "tickColor": "#1c1d1f",
+        "numTicks": "",
+        "labelOffset": 0,
+        "axisPadding": 200,
+        "target": 0,
+        "maxTickRotation": 0,
+        "padding": 5,
+        "showYearsOnce": false,
+        "sortByRecentDate": false,
+        "brushActive": false,
+        "dataKey": "index",
+        "axisBBox": 29.860000610351562,
+        "tickWidthMax": 20
+      },
+      "table": {
+        "label": "Data Table",
+        "expanded": true,
+        "limitHeight": false,
+        "height": "",
+        "caption": "",
+        "showDownloadUrl": false,
+        "showDataTableLink": true,
+        "showDownloadLinkBelow": true,
+        "indexLabel": "",
+        "download": false,
+        "showVertical": true,
+        "dateDisplayFormat": "",
+        "showMissingDataLabel": true,
+        "showSuppressedSymbol": true,
+        "collapsible": true,
+        "show": false,
+        "sharedFilterColumns": ["color", "size", "weight", "smell"]
+      },
+      "orientation": "vertical",
+      "columns": {},
+      "legend": {
+        "hide": false,
+        "behavior": "isolate",
+        "axisAlign": true,
+        "singleRow": true,
+        "colorCode": "",
+        "reverseLabelOrder": false,
+        "description": "",
+        "dynamicLegend": false,
+        "dynamicLegendDefaultText": "Show All",
+        "dynamicLegendItemLimit": 5,
+        "dynamicLegendItemLimitMessage": "Dynamic Legend Item Limit Hit.",
+        "dynamicLegendChartMessage": "Select Options from the Legend",
+        "label": "",
+        "lineMode": false,
+        "verticalSorted": false,
+        "highlightOnHover": false,
+        "hideSuppressedLabels": false,
+        "hideSuppressionLink": false,
+        "seriesHighlight": [],
+        "style": "circles",
+        "subStyle": "linear blocks",
+        "groupBy": "",
+        "shape": "circle",
+        "tickRotation": "",
+        "order": "dataColumn",
+        "hideBorder": {
+          "side": false,
+          "topBottom": true
+        },
+        "position": "right",
+        "orderedValues": [],
+        "patterns": {},
+        "patternField": "",
+        "unified": true
+      },
+      "exclusions": {
+        "active": false,
+        "keys": []
+      },
+      "isPaletteReversed": false,
+      "twoColor": {
+        "palette": "monochrome-1",
+        "isPaletteReversed": false
+      },
+      "labels": false,
+      "dataFormat": {
+        "commas": false,
+        "prefix": "",
+        "suffix": "",
+        "abbreviated": false,
+        "bottomSuffix": "",
+        "bottomPrefix": "",
+        "bottomAbbreviated": false
+      },
+      "confidenceKeys": {},
+      "visual": {
+        "border": true,
+        "accent": true,
+        "background": true,
+        "verticalHoverLine": false,
+        "horizontalHoverLine": false,
+        "lineDatapointSymbol": "none",
+        "maximumShapeAmount": 7
+      },
+      "useLogScale": false,
+      "highlightedBarValues": [],
+      "series": [
+        {
+          "dataKey": "value",
+          "type": "Bar",
+          "axis": "Left",
+          "tooltip": true
+        }
+      ],
+      "tooltips": {
+        "opacity": 90,
+        "singleSeries": false,
+        "dateDisplayFormat": ""
+      },
+      "forestPlot": {
+        "startAt": 0,
+        "colors": {
+          "line": "",
+          "shape": ""
+        },
+        "lineOfNoEffect": {
+          "show": true
+        },
+        "type": "",
+        "pooledResult": {
+          "diamondHeight": 5,
+          "column": ""
+        },
+        "estimateField": "",
+        "estimateRadius": "",
+        "shape": "square",
+        "rowHeight": 20,
+        "description": {
+          "show": true,
+          "text": "description",
+          "location": 0
+        },
+        "result": {
+          "show": true,
+          "text": "result",
+          "location": 100
+        },
+        "radius": {
+          "min": 2,
+          "max": 10,
+          "scalingColumn": ""
+        },
+        "regression": {
+          "lower": 0,
+          "upper": 0,
+          "estimateField": 0
+        },
+        "leftWidthOffset": 0,
+        "rightWidthOffset": 0,
+        "showZeroLine": false,
+        "leftLabel": "",
+        "rightLabel": ""
+      },
+      "area": {
+        "isStacked": false
+      },
+      "sankey": {
+        "title": {
+          "defaultColor": "black"
+        },
+        "iterations": 1,
+        "rxValue": 0.9,
+        "overallSize": {
+          "width": 900,
+          "height": 700
+        },
+        "margin": {
+          "margin_y": 25,
+          "margin_x": 0
+        },
+        "nodeSize": {
+          "nodeWidth": 26,
+          "nodeHeight": 40
+        },
+        "nodePadding": 55,
+        "nodeFontColor": "black",
+        "nodeColor": {
+          "default": "#ff8500",
+          "inactive": "#808080"
+        },
+        "linkColor": {
+          "default": "#ffc900",
+          "inactive": "#D3D3D3"
+        },
+        "opacity": {
+          "nodeOpacityDefault": 1,
+          "nodeOpacityInactive": 0.1,
+          "LinkOpacityDefault": 1,
+          "LinkOpacityInactive": 0.1
+        },
+        "storyNodeFontColor": "#006778",
+        "storyNodeText": [],
+        "nodeValueStyle": {
+          "textBefore": "(",
+          "textAfter": ")"
+        },
+        "data": []
+      },
+      "dynamicMarginTop": 0
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "showDownloadLinkBelow": true,
+    "showVertical": true
+  },
+  "newViz": true,
+  "errors": [],
+  "currentViewport": "lg",
+  "id": 15,
+  "category": "General",
+  "label": "Dashboard",
+  "type": "dashboard",
+  "subType": null,
+  "orientation": null,
+  "icon": {
+    "key": null,
+    "ref": null,
+    "props": {},
+    "_owner": null,
+    "_store": {}
+  },
+  "content": "Present multiple data visualizations with shared filter controls.",
+  "visualizationType": null,
+  "activeVizButtonID": 15,
+  "runtime": {},
+  "version": "4.26.1",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "uuid": 1757091566447,
+  "general": {
+    "palette": {
+      "version": "1.0",
+      "backups": [
+        {
+          "name": "__​undefined__",
+          "version": "1.0",
+          "isReversed": "__​undefined__"
+        }
+      ]
+    }
+  },
+  "datasets": {
+    "./test-data.json": {
+      "data": [
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "1",
+          "value": "99.4"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "2",
+          "value": "69.6"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "3",
+          "value": "17.7"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "4",
+          "value": "65.3"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "5",
+          "value": "88.5"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "6",
+          "value": "60.2"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "7",
+          "value": "71.2"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "8",
+          "value": "86.5"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "9",
+          "value": "37.6"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "10",
+          "value": "37.1"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "1",
+          "value": "55.8"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "2",
+          "value": "22.4"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "3",
+          "value": "98.6"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "4",
+          "value": "92.2"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "5",
+          "value": "12.6"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "6",
+          "value": "14.9"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "7",
+          "value": "47.2"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "8",
+          "value": "80.3"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "9",
+          "value": "98.7"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "10",
+          "value": "12.4"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "1",
+          "value": "68.8"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "2",
+          "value": "13.3"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "3",
+          "value": "38.2"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "4",
+          "value": "21.8"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "5",
+          "value": "40.5"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "6",
+          "value": "57.8"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "7",
+          "value": "32.5"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "8",
+          "value": "95.1"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "9",
+          "value": "66.0"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "10",
+          "value": "54.1"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "1",
+          "value": "32.1"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "2",
+          "value": "23.6"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "3",
+          "value": "83.9"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "4",
+          "value": "24.0"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "5",
+          "value": "81.0"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "6",
+          "value": "70.4"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "7",
+          "value": "91.9"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "8",
+          "value": "37.5"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "9",
+          "value": "79.6"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "10",
+          "value": "89.3"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "1",
+          "value": "57.3"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "2",
+          "value": "16.1"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "3",
+          "value": "20.1"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "4",
+          "value": "84.8"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "5",
+          "value": "34.5"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "6",
+          "value": "43.5"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "7",
+          "value": "11.1"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "8",
+          "value": "47.5"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "9",
+          "value": "72.2"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "10",
+          "value": "54.3"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "1",
+          "value": "68.0"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "2",
+          "value": "68.7"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "3",
+          "value": "65.4"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "4",
+          "value": "27.7"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "5",
+          "value": "61.0"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "6",
+          "value": "18.0"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "7",
+          "value": "75.7"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "8",
+          "value": "16.4"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "9",
+          "value": "52.1"
+        },
+        {
+          "color": "blue",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "10",
+          "value": "70.5"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "1",
+          "value": "75.8"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "2",
+          "value": "37.6"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "3",
+          "value": "44.9"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "4",
+          "value": "15.3"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "5",
+          "value": "76.6"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "6",
+          "value": "30.4"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "7",
+          "value": "96.7"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "8",
+          "value": "38.3"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "9",
+          "value": "56.4"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "10",
+          "value": "85.8"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "1",
+          "value": "26.7"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "2",
+          "value": "62.9"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "3",
+          "value": "24.3"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "4",
+          "value": "99.1"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "5",
+          "value": "76.1"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "6",
+          "value": "13.4"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "7",
+          "value": "15.6"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "8",
+          "value": "14.4"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "9",
+          "value": "86.8"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "10",
+          "value": "88.2"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "1",
+          "value": "83.2"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "2",
+          "value": "41.4"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "3",
+          "value": "49.6"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "4",
+          "value": "39.5"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "5",
+          "value": "59.4"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "6",
+          "value": "95.8"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "7",
+          "value": "83.8"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "8",
+          "value": "42.6"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "9",
+          "value": "69.7"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "10",
+          "value": "52.9"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "1",
+          "value": "16.5"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "2",
+          "value": "98.3"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "3",
+          "value": "68.8"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "4",
+          "value": "48.7"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "5",
+          "value": "61.5"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "6",
+          "value": "37.6"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "7",
+          "value": "89.4"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "8",
+          "value": "63.5"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "9",
+          "value": "24.2"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "10",
+          "value": "85.0"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "1",
+          "value": "71.2"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "2",
+          "value": "40.9"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "3",
+          "value": "95.9"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "4",
+          "value": "21.1"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "5",
+          "value": "55.8"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "6",
+          "value": "31.1"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "7",
+          "value": "70.2"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "8",
+          "value": "88.3"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "9",
+          "value": "28.1"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "10",
+          "value": "23.5"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "1",
+          "value": "39.6"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "2",
+          "value": "94.9"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "3",
+          "value": "20.7"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "4",
+          "value": "28.0"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "5",
+          "value": "96.7"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "6",
+          "value": "26.7"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "7",
+          "value": "25.7"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "8",
+          "value": "31.4"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "9",
+          "value": "51.8"
+        },
+        {
+          "color": "blue",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "10",
+          "value": "13.5"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "1",
+          "value": "90.7"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "2",
+          "value": "96.6"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "3",
+          "value": "15.1"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "4",
+          "value": "50.0"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "5",
+          "value": "99.5"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "6",
+          "value": "33.3"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "7",
+          "value": "83.1"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "8",
+          "value": "95.3"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "9",
+          "value": "55.6"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "10",
+          "value": "10.6"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "1",
+          "value": "46.7"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "2",
+          "value": "91.2"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "3",
+          "value": "30.9"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "4",
+          "value": "73.5"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "5",
+          "value": "50.5"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "6",
+          "value": "83.4"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "7",
+          "value": "34.7"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "8",
+          "value": "18.7"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "9",
+          "value": "36.0"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "10",
+          "value": "25.3"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "1",
+          "value": "26.1"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "2",
+          "value": "36.2"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "3",
+          "value": "84.7"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "4",
+          "value": "42.4"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "5",
+          "value": "53.7"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "6",
+          "value": "66.9"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "7",
+          "value": "35.9"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "8",
+          "value": "66.9"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "9",
+          "value": "45.5"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "10",
+          "value": "95.2"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "1",
+          "value": "47.8"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "2",
+          "value": "82.0"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "3",
+          "value": "45.3"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "4",
+          "value": "90.7"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "5",
+          "value": "18.0"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "6",
+          "value": "89.9"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "7",
+          "value": "33.1"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "8",
+          "value": "89.7"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "9",
+          "value": "80.7"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "10",
+          "value": "16.4"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "1",
+          "value": "38.6"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "2",
+          "value": "43.3"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "3",
+          "value": "48.2"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "4",
+          "value": "74.8"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "5",
+          "value": "90.5"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "6",
+          "value": "87.2"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "7",
+          "value": "75.6"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "8",
+          "value": "31.9"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "9",
+          "value": "65.4"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "10",
+          "value": "17.0"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "1",
+          "value": "92.6"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "2",
+          "value": "83.6"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "3",
+          "value": "41.3"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "4",
+          "value": "41.3"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "5",
+          "value": "65.3"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "6",
+          "value": "91.6"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "7",
+          "value": "60.7"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "8",
+          "value": "61.6"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "9",
+          "value": "80.9"
+        },
+        {
+          "color": "blue",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "10",
+          "value": "52.8"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "1",
+          "value": "67.2"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "2",
+          "value": "51.6"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "3",
+          "value": "12.5"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "4",
+          "value": "73.2"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "5",
+          "value": "95.0"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "6",
+          "value": "53.5"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "7",
+          "value": "87.5"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "8",
+          "value": "11.6"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "9",
+          "value": "74.2"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "10",
+          "value": "56.8"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "1",
+          "value": "22.5"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "2",
+          "value": "51.6"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "3",
+          "value": "62.1"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "4",
+          "value": "94.1"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "5",
+          "value": "53.9"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "6",
+          "value": "61.1"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "7",
+          "value": "11.3"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "8",
+          "value": "40.2"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "9",
+          "value": "27.3"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "10",
+          "value": "95.0"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "1",
+          "value": "17.6"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "2",
+          "value": "49.7"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "3",
+          "value": "32.4"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "4",
+          "value": "32.9"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "5",
+          "value": "78.5"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "6",
+          "value": "24.7"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "7",
+          "value": "75.9"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "8",
+          "value": "85.0"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "9",
+          "value": "21.8"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "10",
+          "value": "88.1"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "1",
+          "value": "26.1"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "2",
+          "value": "76.0"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "3",
+          "value": "75.7"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "4",
+          "value": "16.5"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "5",
+          "value": "71.4"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "6",
+          "value": "89.3"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "7",
+          "value": "72.8"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "8",
+          "value": "51.3"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "9",
+          "value": "86.4"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "10",
+          "value": "72.1"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "1",
+          "value": "19.5"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "2",
+          "value": "91.9"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "3",
+          "value": "84.1"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "4",
+          "value": "68.6"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "5",
+          "value": "57.1"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "6",
+          "value": "56.3"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "7",
+          "value": "33.5"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "8",
+          "value": "36.8"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "9",
+          "value": "41.9"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "10",
+          "value": "83.9"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "1",
+          "value": "47.7"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "2",
+          "value": "95.7"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "3",
+          "value": "80.4"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "4",
+          "value": "18.0"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "5",
+          "value": "67.6"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "6",
+          "value": "53.6"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "7",
+          "value": "86.7"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "8",
+          "value": "29.4"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "9",
+          "value": "68.8"
+        },
+        {
+          "color": "red",
+          "size": "small",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "10",
+          "value": "68.3"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "1",
+          "value": "12.9"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "2",
+          "value": "96.7"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "3",
+          "value": "33.1"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "4",
+          "value": "91.5"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "5",
+          "value": "56.9"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "6",
+          "value": "33.8"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "7",
+          "value": "28.5"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "8",
+          "value": "36.3"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "9",
+          "value": "95.2"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "10",
+          "value": "39.4"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "1",
+          "value": "64.1"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "2",
+          "value": "32.8"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "3",
+          "value": "61.7"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "4",
+          "value": "69.0"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "5",
+          "value": "35.4"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "6",
+          "value": "93.0"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "7",
+          "value": "45.2"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "8",
+          "value": "57.1"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "9",
+          "value": "25.0"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "10",
+          "value": "88.1"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "1",
+          "value": "22.8"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "2",
+          "value": "68.3"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "3",
+          "value": "48.6"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "4",
+          "value": "74.9"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "5",
+          "value": "83.2"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "6",
+          "value": "61.7"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "7",
+          "value": "65.1"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "8",
+          "value": "80.2"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "9",
+          "value": "61.7"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "10",
+          "value": "20.5"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "1",
+          "value": "31.1"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "2",
+          "value": "63.5"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "3",
+          "value": "56.2"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "4",
+          "value": "72.9"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "5",
+          "value": "13.2"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "6",
+          "value": "73.4"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "7",
+          "value": "55.5"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "8",
+          "value": "90.8"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "9",
+          "value": "27.7"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "10",
+          "value": "90.9"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "1",
+          "value": "92.0"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "2",
+          "value": "84.2"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "3",
+          "value": "62.8"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "4",
+          "value": "57.7"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "5",
+          "value": "69.6"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "6",
+          "value": "53.4"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "7",
+          "value": "54.0"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "8",
+          "value": "62.2"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "9",
+          "value": "51.4"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "10",
+          "value": "81.5"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "1",
+          "value": "61.7"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "2",
+          "value": "46.5"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "3",
+          "value": "92.2"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "4",
+          "value": "67.1"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "5",
+          "value": "94.7"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "6",
+          "value": "17.5"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "7",
+          "value": "95.5"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "8",
+          "value": "15.3"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "9",
+          "value": "17.8"
+        },
+        {
+          "color": "red",
+          "size": "medium",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "10",
+          "value": "96.1"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "1",
+          "value": "95.1"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "2",
+          "value": "92.0"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "3",
+          "value": "24.1"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "4",
+          "value": "98.2"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "5",
+          "value": "84.5"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "6",
+          "value": "17.1"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "7",
+          "value": "59.9"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "8",
+          "value": "83.3"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "9",
+          "value": "85.6"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "sweet",
+          "index": "10",
+          "value": "29.9"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "1",
+          "value": "76.5"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "2",
+          "value": "30.2"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "3",
+          "value": "84.3"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "4",
+          "value": "89.2"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "5",
+          "value": "11.8"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "6",
+          "value": "49.0"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "7",
+          "value": "33.9"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "8",
+          "value": "24.3"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "9",
+          "value": "30.5"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "neutral",
+          "index": "10",
+          "value": "37.6"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "1",
+          "value": "92.9"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "2",
+          "value": "22.6"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "3",
+          "value": "31.7"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "4",
+          "value": "65.8"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "5",
+          "value": "85.5"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "6",
+          "value": "92.9"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "7",
+          "value": "34.9"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "8",
+          "value": "11.5"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "9",
+          "value": "42.8"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "heavy",
+          "smell": "bitter",
+          "index": "10",
+          "value": "39.3"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "1",
+          "value": "36.3"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "2",
+          "value": "43.4"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "3",
+          "value": "30.7"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "4",
+          "value": "21.2"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "5",
+          "value": "67.1"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "6",
+          "value": "69.6"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "7",
+          "value": "82.6"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "8",
+          "value": "82.6"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "9",
+          "value": "49.8"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "sweet",
+          "index": "10",
+          "value": "70.0"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "1",
+          "value": "31.7"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "2",
+          "value": "87.3"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "3",
+          "value": "55.3"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "4",
+          "value": "51.9"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "5",
+          "value": "33.6"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "6",
+          "value": "61.5"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "7",
+          "value": "10.3"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "8",
+          "value": "44.8"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "9",
+          "value": "79.9"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "light",
+          "smell": "neutral",
+          "index": "10",
+          "value": "66.7"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "1",
+          "value": "23.6"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "2",
+          "value": "65.7"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "3",
+          "value": "60.4"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "4",
+          "value": "52.5"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "5",
+          "value": "25.7"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "6",
+          "value": "85.8"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "7",
+          "value": "37.3"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "8",
+          "value": "16.9"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "9",
+          "value": "40.9"
+        },
+        {
+          "color": "green",
+          "size": "large",
+          "weight": "medium",
+          "smell": "bitter",
+          "index": "10",
+          "value": "55.8"
+        }
+      ],
+      "dataFileSize": 122936,
+      "dataFileName": "./test-data.json",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "JSON",
+      "preview": true
+    }
+  }
+}

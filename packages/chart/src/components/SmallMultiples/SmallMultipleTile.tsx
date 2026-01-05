@@ -114,7 +114,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
     hideYAxisLabel: !isFirstInRow,
     legend: {
       ...tileConfig.legend,
-      hide: true
+      hide: true // Hide legends for all small multiple tiles
     },
     showAreaUnderLine: config.smallMultiples?.showAreaUnderLine || false
   }

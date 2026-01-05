@@ -420,8 +420,8 @@ export const DataSectionTests: Story = {
 }
 
 /**
- * VISUAL SECTION TESTS
- * Tests all functionality within the Visual accordion
+ * CHART SETTINGS AND VISUAL SECTION TESTS
+ * Tests functionality within the Chart Settings and Visual accordions
  */
 export const VisualSectionTests: Story = {
   args: {
@@ -431,7 +431,8 @@ export const VisualSectionTests: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await waitForEditor(canvas)
-    await openAccordion(canvas, 'Visual')
+    // Open Chart Settings accordion first for tests 1-5
+    await openAccordion(canvas, 'Chart Settings')
     // Core helper functions used throughout the visual tests
     const waffleRoot = () => canvasElement.querySelector('.cove-waffle-chart') as HTMLElement
     const contentContainer = () => canvasElement.querySelector('.cove-component__content > div') as HTMLElement
@@ -569,6 +570,9 @@ export const VisualSectionTests: Story = {
     // TEST 6: Overall Font Size Change
     // Expectation: font-small|font-medium|font-large class changes on waffle root.
     // ============================================================================
+    // Open Visual accordion for tests 6+
+    await openAccordion(canvas, 'Visual')
+
     const overallFontClass = () => {
       const root = waffleRoot()
       if (!root) return ''
@@ -624,11 +628,8 @@ export const VisualSectionTests: Story = {
     // ============================================================================
     const contentClassSig = () => Array.from(contentContainer().classList).sort().join(' ')
 
-    // Find border checkbox by label text instead of name attribute
-    const borderCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(input => {
-      const label = input.closest('label')
-      return label?.textContent?.includes('Display Border')
-    }) as HTMLInputElement
+    // Find border checkbox by exact label text
+    const borderCheckbox = canvas.getByLabelText('Display Border') as HTMLInputElement
     expect(borderCheckbox).toBeTruthy()
     const borderWrapper = borderCheckbox.closest('label.checkbox') as HTMLElement
     expect(borderWrapper).toBeTruthy()
@@ -659,13 +660,8 @@ export const VisualSectionTests: Story = {
     // TEST 9: Theme Border Color Toggle
     // Expectation: Class 'component--has-borderColorTheme' toggles.
     // ============================================================================
-    // Find border color theme checkbox by label text
-    const borderColorThemeCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(
-      input => {
-        const label = input.closest('label')
-        return label?.textContent?.includes('Use theme border color')
-      }
-    ) as HTMLInputElement
+    // Find border color theme checkbox by exact label text
+    const borderColorThemeCheckbox = canvas.getByLabelText('Use Border Color Theme') as HTMLInputElement
     expect(borderColorThemeCheckbox).toBeTruthy()
     const borderColorThemeWrapper = borderColorThemeCheckbox.closest('label.checkbox') as HTMLElement
     expect(borderColorThemeWrapper).toBeTruthy()
@@ -682,11 +678,8 @@ export const VisualSectionTests: Story = {
     // TEST 10: Accent Style Toggle
     // Expectation: Class 'component--has-accent' toggles.
     // ============================================================================
-    // Find accent checkbox by label text
-    const accentCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(input => {
-      const label = input.closest('label')
-      return label?.textContent?.includes('Use Accent Style')
-    }) as HTMLInputElement
+    // Find accent checkbox by exact label text
+    const accentCheckbox = canvas.getByLabelText('Use Accent Style') as HTMLInputElement
     expect(accentCheckbox).toBeTruthy()
     const accentWrapper = accentCheckbox.closest('label.checkbox') as HTMLElement
     expect(accentWrapper).toBeTruthy()
@@ -703,11 +696,8 @@ export const VisualSectionTests: Story = {
     // TEST 11: Theme Background Color Toggle
     // Expectation: Class 'component--has-background' toggles.
     // ============================================================================
-    // Find background checkbox by label text
-    const backgroundCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(input => {
-      const label = input.closest('label')
-      return label?.textContent?.includes('Use Theme Background Color')
-    }) as HTMLInputElement
+    // Find background checkbox by exact label text
+    const backgroundCheckbox = canvas.getByLabelText('Use Theme Background Color') as HTMLInputElement
     expect(backgroundCheckbox).toBeTruthy()
     const backgroundWrapper = backgroundCheckbox.closest('label.checkbox') as HTMLElement
     expect(backgroundWrapper).toBeTruthy()
@@ -724,11 +714,8 @@ export const VisualSectionTests: Story = {
     // TEST 12: Hide Background Color Toggle
     // Expectation: Class 'component--hideBackgroundColor' toggles.
     // ============================================================================
-    // Find hide background checkbox by label text
-    const hideBackgroundCheckbox = Array.from(canvasElement.querySelectorAll('input[type="checkbox"]')).find(input => {
-      const label = input.closest('label')
-      return label?.textContent?.includes('Hide Background Color')
-    }) as HTMLInputElement
+    // Find hide background checkbox by exact label text
+    const hideBackgroundCheckbox = canvas.getByLabelText('Hide Background Color') as HTMLInputElement
     expect(hideBackgroundCheckbox).toBeTruthy()
     const hideBackgroundWrapper = hideBackgroundCheckbox.closest('label.checkbox') as HTMLElement
     expect(hideBackgroundWrapper).toBeTruthy()
