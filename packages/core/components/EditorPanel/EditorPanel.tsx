@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, ReactNode } from 'react'
 import { cloneConfig } from '../../helpers/cloneConfig'
+import { chartColorPalettes } from '@cdc/core/data/chartColorPalettes'
 import ErrorBoundary from '../ErrorBoundary'
 import Layout from '../Layout'
 import './EditorPanel.styles.css'
@@ -57,6 +58,10 @@ export function EditorPanel<TConfig = any>({
   initialDisplayPanel = true
 }: BaseEditorPanelProps<TConfig>) {
   const [displayPanel, setDisplayPanel] = useState(initialDisplayPanel)
+  // Palette selector state using chartColorPalettes.v2
+  const paletteOptions = Object.entries(chartColorPalettes.v2).map(([key, colors]) => ({ key, colors }))
+  const [selectedPaletteKey, setSelectedPaletteKey] = useState(paletteOptions[0]?.key || '')
+  const selectedPalette = paletteOptions.find(p => p.key === selectedPaletteKey)?.colors || []
   const prevConfigRef = useRef<string>()
 
   /**
@@ -119,9 +124,7 @@ export function EditorPanel<TConfig = any>({
     updateConfig(newConfig)
   }
 
-  // Don't render if loading and panel should be hidden
-  if (loading && !(config as any)?.showEditorPanel) return null
-
+  console.log('Rendering EditorPanel with displayPanel:', displayPanel)
   return (
     <ErrorBoundary component='EditorPanel'>
       <Layout.Sidebar
@@ -130,11 +133,27 @@ export function EditorPanel<TConfig = any>({
         title={title}
         onBackClick={onBackClick}
       >
+        {/* Palette Selector UI */}
+        <div style={{ marginBottom: '1rem' }}>
+          <label htmlFor="palette-select" style={{ fontWeight: 'bold' }}>Palette:</label>
+          <select
+            id="palette-select"
+            value={selectedPaletteKey}
+            onChange={e => setSelectedPaletteKey(e.target.value)}
+            style={{ marginLeft: '0.5rem' }}
+          >
+            {paletteOptions.map(palette => (
+              <option key={palette.key} value={palette.key}>{palette.key.replace(/_/g, ' ')}</option>
+            ))}
+          </select>
+        </div>
+        {/* ...existing code... */}
         {children({
           config,
           updateConfig,
           displayPanel,
-          convertStateToConfig
+          convertStateToConfig,
+          selectedPalette
         })}
       </Layout.Sidebar>
     </ErrorBoundary>

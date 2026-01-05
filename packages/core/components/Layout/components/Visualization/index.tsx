@@ -91,6 +91,13 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
 
       classes.push('cove-component', 'waffle-chart')
     }
+
+    if (config.type === 'schedule-table') {
+      classes.push('cdc-open-viz-module', 'type-schedule-table', `theme-${config.theme}`, currentViewport)
+      if (isEditor) {
+        classes.push('is-editor')
+      }
+    }
     return classes
   }
 
