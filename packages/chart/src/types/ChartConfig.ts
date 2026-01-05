@@ -48,6 +48,7 @@ export type VisualizationType =
   | 'Forecasting'
   | 'Sankey'
   | 'Bump Chart'
+  | 'Warming Stripes'
 export interface PreliminaryDataItem {
   column: string
   displayLegend: boolean
@@ -103,6 +104,7 @@ type Legend = CoreLegend & {
   order: 'dataColumn' | 'asc' | 'desc'
   orderedValues: Label[]
   tickRotation: string
+  warmingStripesIntervals?: number
   hideBorder: {
     side: boolean
     topBottom: boolean

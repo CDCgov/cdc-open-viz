@@ -105,7 +105,7 @@ export const useTooltip = props => {
         addColCommas: column.commas
       }
 
-      const pieColumnData = additionalChartData?.arc?.data[column.name]
+      const pieColumnData = additionalChartData?.data?.[column.name]
       const columnData =
         config.tooltips.singleSeries && visualizationType === 'Line'
           ? resolvedScaleValues.filter(
@@ -145,7 +145,7 @@ export const useTooltip = props => {
         tooltipItems.push(
           [config.xAxis.dataKey, pieData[config.xAxis.dataKey]],
           [
-            config.runtime.yAxis.dataKey,
+            config.runtime.yAxis.label || config.runtime.yAxis.dataKey,
             showPiePercent ? pctString(actualPieValue) : formatNumber(pieData[config.runtime.yAxis.dataKey])
           ],
           showPiePercent ? [] : ['Percent', pctString(pctOf360)]
@@ -260,11 +260,30 @@ export const useTooltip = props => {
     const dataXPosition = eventSvgCoords.x + 10
     const dataYPosition = eventSvgCoords.y
 
+    // Helper to strip <a> tags and only show link text
+    function stripLinkTags(str) {
+      if (typeof str !== 'string') return str
+      // Remove HTML <a> tags, keep inner text
+      return str.replace(/<a [^>]*>(.*?)<\/a>/gi, '$1')
+    }
+
+    // Strip link tags from all tooltip values
+    const cleanTooltipItems = [...tooltipItems, ...additionalTooltipItems].map(item => {
+      // item can be [key, value] or [key, value, axisPosition]
+      if (Array.isArray(item)) {
+        // Only strip from value (item[1])
+        const newItem = [...item]
+        newItem[1] = stripLinkTags(newItem[1])
+        return newItem
+      }
+      return item
+    })
+
     const tooltipInformation = {
       tooltipLeft: dataXPosition,
       tooltipTop: dataYPosition,
       tooltipData: {
-        data: [...tooltipItems, ...additionalTooltipItems],
+        data: cleanTooltipItems,
         dataXPosition,
         dataYPosition
       }

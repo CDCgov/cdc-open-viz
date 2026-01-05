@@ -21,7 +21,8 @@ export const useEditorPermissions = () => {
     'Pie',
     'Scatter Plot',
     'Spark Line',
-    'Sankey'
+    'Sankey',
+    'Warming Stripes'
   ]
 
   const visSupportsDateCategoryAxis = () => {
@@ -63,7 +64,8 @@ export const useEditorPermissions = () => {
       'Forest Plot',
       'Spark Line',
       'Sankey',
-      'Bump Chart'
+      'Bump Chart',
+      'Warming Stripes'
     ]
     if (disabledCharts.includes(visualizationType)) return false
     return true
@@ -77,7 +79,8 @@ export const useEditorPermissions = () => {
       'Forest Plot',
       'Spark Line',
       'Sankey',
-      'Bump Chart'
+      'Bump Chart',
+      'Warming Stripes'
     ]
     if (disabledCharts.includes(visualizationType)) return false
     return true
@@ -93,6 +96,8 @@ export const useEditorPermissions = () => {
         return false
       case 'Sankey':
         return false
+      case 'Warming Stripes':
+        return true
       default:
         return true
     }
@@ -140,7 +145,11 @@ export const useEditorPermissions = () => {
   }
   const visHasBrushChart = () => {
     if (config.xAxis.type === 'categorical') return false
-    return ['Line', 'Bar', 'Area Chart', 'Combo'].includes(visualizationType) && orientation === 'vertical'
+    // Allow Line charts, vertical Bar charts (both stacked and grouped), and vertical Area charts
+    if (visualizationType === 'Line' && orientation === 'vertical') return true
+    if (visualizationType === 'Bar' && orientation === 'vertical') return true
+    if (visualizationType === 'Area Chart' && orientation === 'vertical') return true
+    return false
   }
 
   const visHasBarBorders = () => {
@@ -153,6 +162,8 @@ export const useEditorPermissions = () => {
 
   const visHasDataCutoff = () => {
     switch (visualizationType) {
+      case 'Warming Stripes':
+        return false
       case 'Sankey':
         return false
       case 'Forest Plot':
@@ -168,7 +179,9 @@ export const useEditorPermissions = () => {
     }
   }
 
-  const visHasSelectableLegendValues = !['Box Plot', 'Forest Plot', 'Spark Line'].includes(visualizationType)
+  const visHasSelectableLegendValues = !['Box Plot', 'Forest Plot', 'Spark Line', 'Warming Stripes'].includes(
+    visualizationType
+  )
   const visHasLegendAxisAlign = () => {
     return visualizationType === 'Bar' && visualizationSubType === 'stacked' && config.legend.behavior === 'isolate'
   }
@@ -177,7 +190,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsTooltipOpacity = () => {
-    const disabledCharts = ['Spark Line', 'Sankey']
+    const disabledCharts = ['Spark Line', 'Sankey', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -207,19 +220,19 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsDateCategoryAxisLabel = () => {
-    const disabledCharts = ['Forest Plot', 'Spark Line', 'Bump Chart']
+    const disabledCharts = ['Forest Plot', 'Spark Line', 'Bump Chart', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryAxisLine = () => {
-    const disabledCharts = ['Forest Plot', 'Spark Line']
+    const disabledCharts = ['Forest Plot', 'Spark Line', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsDateCategoryAxisTicks = () => {
-    const disabledCharts = ['Forest Plot', 'Spark Line']
+    const disabledCharts = ['Forest Plot', 'Spark Line', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -243,7 +256,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsRegions = () => {
-    const disabledCharts = ['Forest Plot', 'Pie', 'Paired Bar', 'Spark Line', 'Sankey']
+    const disabledCharts = ['Forest Plot', 'Pie', 'Paired Bar', 'Spark Line', 'Sankey', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -261,14 +274,13 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsFilters = () => {
-    const disabledCharts = ['Forest Plot', 'Sankey']
+    const disabledCharts = ['Forest Plot', 'Sankey', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsValueAxisGridLines = () => {
     const disabledCharts = ['Forest Plot']
-    if (orientation === 'horizontal') return false
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -302,13 +314,13 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsBarThickness = () => {
-    const disabledCharts = ['Forest Plot']
+    const disabledCharts = ['Forest Plot', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
 
   const visSupportsChartHeight = () => {
-    const disabledCharts = ['Spark Line']
+    const disabledCharts = ['Spark Line', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -320,7 +332,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsLeftValueAxis = () => {
-    const disabledCharts = ['Spark Line', 'Sankey']
+    const disabledCharts = ['Spark Line', 'Sankey', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -335,6 +347,7 @@ export const useEditorPermissions = () => {
     const disabledCharts = ['Spark Line', 'Sankey', 'Bump Chart']
     if (disabledCharts.includes(visualizationType)) return false
     if (config.orientation !== 'horizontal') return false
+    if (config.orientation === 'horizontal' && visualizationType === 'Bar' && !config.isLollipopChart) return false
     return true
   }
 
@@ -370,7 +383,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsSmallMultiples = () => {
-    const enabledCharts = ['Line', 'Bar', 'Area Chart', 'Combo', 'Box Plot', 'Scatter Plot']
+    const enabledCharts = ['Line', 'Bar', 'Area Chart', 'Combo', 'Box Plot', 'Scatter Plot', 'Warming Stripes']
     if (enabledCharts.includes(visualizationType)) return true
     return false
   }

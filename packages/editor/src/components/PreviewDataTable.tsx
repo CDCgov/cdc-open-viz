@@ -260,36 +260,43 @@ const PreviewDataTable = () => {
     <div className='table-responsive'>
       <table className='mt-2 w-100 table table-striped data-table table-sm ' aria-hidden='true' {...getTableProps}>
         <thead>
-          {headerGroups.map(headerGroup => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map(column => {
-                const { key, ...headerProps } = column.getHeaderProps(column.getSortByToggleProps())
-                return (
-                  <th
-                    key={key}
-                    scope='col'
-                    {...headerProps}
-                    className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : ''}
-                    title={column.Header}
-                  >
-                    {column.render('Header')}
-                    <div {...column.getResizerProps()} className='resizer' />
-                  </th>
-                )
-              })}
-            </tr>
-          ))}
+          {headerGroups.map(headerGroup => {
+            const { key, ...headerGroupProps } = headerGroup.getHeaderGroupProps()
+            return (
+              <tr key={key} {...headerGroupProps}>
+                {headerGroup.headers.map(column => {
+                  const { key: columnKey, ...headerProps } = column.getHeaderProps(column.getSortByToggleProps())
+                  return (
+                    <th
+                      key={columnKey}
+                      scope='col'
+                      {...headerProps}
+                      className={column.isSorted ? (column.isSortedDesc ? 'sort sort-desc' : 'sort sort-asc') : ''}
+                      title={column.Header}
+                    >
+                      {column.render('Header')}
+                      <div {...column.getResizerProps()} className='resizer' />
+                    </th>
+                  )
+                })}
+              </tr>
+            )
+          })}
         </thead>
         <tbody {...getTableBodyProps()}>
           {page.map(row => {
             prepareRow(row)
+            const { key, ...rowProps } = row.getRowProps()
             return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map(cell => (
-                  <td {...cell.getCellProps()} title={cell.value}>
-                    {cell.render('Cell')}
-                  </td>
-                ))}
+              <tr key={key} {...rowProps}>
+                {row.cells.map(cell => {
+                  const { key: cellKey, ...cellProps } = cell.getCellProps()
+                  return (
+                    <td key={cellKey} {...cellProps} title={cell.value}>
+                      {cell.render('Cell')}
+                    </td>
+                  )
+                })}
               </tr>
             )
           })}

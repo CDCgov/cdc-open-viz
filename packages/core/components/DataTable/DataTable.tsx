@@ -48,6 +48,14 @@ export type DataTableProps = {
   setFilteredCountryCode?: string // used for Maps only
   tabbingId: string
   tableTitle: string
+  applyLegendToRow?: (
+    rowObj: any,
+    config: any,
+    runtimeLegend: any,
+    legendMemo: any,
+    legendSpecialClassLastMemo: any
+  ) => string[]
+  getPatternForRow?: (rowObj: any, config: any) => any
   viewport: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   vizTitle?: string
   // determines if columns should be wrapped in the table
@@ -145,23 +153,23 @@ const DataTable = (props: DataTableProps) => {
   const rows =
     isVertical && sortBy.column
       ? rawRows.sort((a, b) => {
-        let dataA
-        let dataB
-        if (config.type === 'map' && config.columns) {
-          const sortByColName = config.columns[sortBy.column].name
-          dataA = runtimeData[a][sortByColName]
-          dataB = runtimeData[b][sortByColName]
-        }
-        if (['chart', 'dashboard', 'table'].includes(config.type)) {
-          dataA = runtimeData[a][sortBy.column]
-          dataB = runtimeData[b][sortBy.column]
-        }
-        if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date-time') {
-          dataA = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[a][config.xAxis.dataKey])
-          dataB = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[b][config.xAxis.dataKey])
-        }
-        return dataA || dataB ? customSort(dataA, dataB, sortBy, config) : 0
-      })
+          let dataA
+          let dataB
+          if (config.type === 'map' && config.columns) {
+            const sortByColName = config.columns[sortBy.column].name
+            dataA = runtimeData[a][sortByColName]
+            dataB = runtimeData[b][sortByColName]
+          }
+          if (['chart', 'dashboard', 'table'].includes(config.type)) {
+            dataA = runtimeData[a][sortBy.column]
+            dataB = runtimeData[b][sortBy.column]
+          }
+          if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date-time') {
+            dataA = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[a][config.xAxis.dataKey])
+            dataB = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[b][config.xAxis.dataKey])
+          }
+          return dataA || dataB ? customSort(dataA, dataB, sortBy, config) : 0
+        })
       : rawRows
 
   const limitHeight = {
@@ -221,11 +229,6 @@ const DataTable = (props: DataTableProps) => {
       classes.push('mt-4')
     }
 
-    const isBrushActive = config?.brush?.active && config.legend?.position !== 'bottom'
-    if (isBrushActive) {
-      classes.push('brush-active')
-    }
-
     classes.push(viewport)
 
     return classes.join(' ')
@@ -237,33 +240,74 @@ const DataTable = (props: DataTableProps) => {
       const sharedFilterColumns = config.table?.sharedFilterColumns || []
       const vizFilterColumns = (config.filters || []).map(filter => filter.columnName)
       const filterColumns = [...sharedFilterColumns, ...vizFilterColumns]
+      const getVisibleColumns = () => {
+        if (!config.columns) return []
+
+        return Object.values(config.columns)
+          .filter(col => col.dataTable !== false)
+          .map(col => col.name)
+      }
+
+      const visibleColumns = getVisibleColumns()
       const visibleData =
         config.type === 'map'
           ? getMapRowData(
-            rows,
-            columns,
-            config,
-            formatLegendLocation,
-            runtimeData as Record<string, Object>,
-            displayGeoName,
-            filterColumns
-          )
+              rows,
+              columns,
+              config,
+              formatLegendLocation,
+              runtimeData as Record<string, Object>,
+              displayGeoName,
+              filterColumns
+            )
           : runtimeData.map(d => {
-            return _.pick(d, [...filterColumns, ...dataSeriesColumns])
-          })
+            const columnsToInclude = config.type === 'table'
+              ? _.uniq([...filterColumns, ...visibleColumns])
+              : _.uniq([...filterColumns, ...dataSeriesColumns])
+              return _.pick(d, columnsToInclude)
+            })
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
+
+    // Build a map from column name to column config for O(1) lookup
+    const columnConfigMap = config.columns
+      ? Object.values(config.columns).reduce((acc, col) => {
+          acc[col.name] = col
+          return acc
+        }, {} as Record<string, any>)
+      : {}
+
+    // Map column names to labels
+    const csvDataUpdated = csvData.map(row => {
+      const newRow: Record<string, any> = {}
+      Object.keys(row).forEach(key => {
+        // Use the column config map for O(1) lookup
+        const columnConfig = columnConfigMap[key]
+        // Use label if it exists, otherwise use the original key
+        const columnLabel = columnConfig?.label || key
+        newRow[columnLabel] = row[key]
+      })
+      return newRow
+    })
 
       // only use fullGeoName on County maps and no other
       if (config.general?.geoType === 'us-county' || config.table.showFullGeoNameInCSV) {
         // Add column for full Geo name along with State
-        return csvData.map(row => {
+        return csvDataUpdated.map((row, index) => {
+          const originalRow = csvData[index]
+          if (!originalRow) {
+            console.warn(
+              'Data mismatch: originalRow missing.',
+              { index, csvDataLength: csvData.length, csvDataUpdatedLength: csvDataUpdated.length }
+            )
+            return row
+          }
           return {
-            FullGeoName: formatLegendLocation(row[config.columns.geo.name]),
+            FullGeoName: formatLegendLocation(originalRow[config.columns.geo.name]),
             ...row
           }
         })
       } else {
-        return csvData
+        return csvDataUpdated
       }
     }
 
@@ -273,9 +317,6 @@ const DataTable = (props: DataTableProps) => {
         if (hasDownloadLink) {
           classes.push('mt-4', 'mb-2')
         }
-        const isLegendOnBottom = config?.legend?.position === 'bottom' || isLegendWrapViewport(viewport)
-        if (config.brush?.active && !isLegendOnBottom) classes.push('brush-active')
-        if (config.brush?.active && config.legend.hide) classes.push('brush-active')
       } else {
         if (hasDownloadLink) {
           classes.push('mt-2')
@@ -287,15 +328,15 @@ const DataTable = (props: DataTableProps) => {
     const childrenMatrix =
       config.type === 'map'
         ? mapCellMatrix({
-          ...props,
-          rows,
-          wrapColumns,
-          runtimeData,
-          viewport,
-          legendMemo: props.legendMemo || defaultLegendMemo,
-          legendSpecialClassLastMemo: props.legendSpecialClassLastMemo || defaultLegendSpecialClassLastMemo,
-          runtimeLegend: props.runtimeLegend || defaultRuntimeLegend
-        })
+            ...props,
+            rows,
+            wrapColumns,
+            runtimeData,
+            viewport,
+            legendMemo: props.legendMemo || defaultLegendMemo,
+            legendSpecialClassLastMemo: props.legendSpecialClassLastMemo || defaultLegendSpecialClassLastMemo,
+            runtimeLegend: props.runtimeLegend || defaultRuntimeLegend
+          })
         : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
 
     const useBottomExpandCollapse = config.table.showBottomCollapse && expanded && Array.isArray(childrenMatrix)
@@ -303,12 +344,12 @@ const DataTable = (props: DataTableProps) => {
     // If every value in a column is a number, record the column index so the header and cells can be right-aligned
     const rightAlignedCols = childrenMatrix.length
       ? Object.fromEntries(
-        Object.keys(childrenMatrix[0])
-          .filter(
-            i => childrenMatrix.filter(row => isRightAlignedTableValue(row[i])).length === childrenMatrix.length
-          )
-          .map(x => [x, true])
-      )
+          Object.keys(childrenMatrix[0])
+            .filter(
+              i => childrenMatrix.filter(row => isRightAlignedTableValue(row[i])).length === childrenMatrix.length
+            )
+            .map(x => [x, true])
+        )
       : {}
 
     const showCollapseButton = config.table.collapsible !== false && useBottomExpandCollapse
@@ -384,8 +425,9 @@ const DataTable = (props: DataTableProps) => {
                 )
               }
               tableOptions={{
-                className: `table table-striped table-width-unset ${expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
-                  }${isVertical ? '' : ' horizontal'}`,
+                className: `table table-striped table-width-unset ${
+                  expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
+                }${isVertical ? '' : ' horizontal'}`,
                 'aria-live': 'assertive',
                 'aria-rowcount': config?.data?.length ? config.data.length : -1,
                 hidden: !expanded,

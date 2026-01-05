@@ -43,7 +43,11 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
   const filterStyles = Object.values(FILTER_STYLE)
 
   const parentFilters: string[] = (config.dashboard.sharedFilters || [])
-    .filter(({ key, type }) => key !== filter.key && type !== 'datafilter')
+    .filter(({ key }) => key !== filter.key)
+    .map(({ key }) => key)
+
+  const dataFilterParents: string[] = (config.dashboard.sharedFilters || [])
+    .filter(({ key }) => key !== filter.key)
     .map(({ key }) => key)
 
   const vizRowColumnLocator = getVizRowColumnLocator(config.rows)
@@ -617,19 +621,18 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                 updateField={(_section, _subSection, _key, value) => updateFilterProp('resetLabel', value)}
               />
 
-              <Select
-                label='Parent Filter'
-                value={filter.parents || ''}
-                options={[
-                  { value: '', label: 'Select a filter' },
-                  ...(config.dashboard.sharedFilters || [])
-                    .filter(sharedFilter => sharedFilter.key !== filter.key)
-                    .map(sharedFilter => ({ value: sharedFilter.key, label: sharedFilter.key }))
-                ]}
-                onChange={e => {
-                  updateFilterProp('parents', e.target.value)
-                }}
-              />
+              <label>
+                <span className='edit-label column-heading mt-1'>Parent Filter(s): </span>
+                <MultiSelect
+                  label='Parent Filter(s): '
+                  options={dataFilterParents.map(key => ({ value: key, label: key }))}
+                  fieldName='parents'
+                  selected={filter.parents}
+                  updateField={(_section, _subsection, _fieldname, newItems) => {
+                    updateFilterProp('parents', newItems)
+                  }}
+                />
+              </label>
 
               {!isNestedDropdown && (
                 <TextField

@@ -37,6 +37,7 @@ import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 
 import SparkLine from './components/Sparkline'
 import Legend from './components/Legend'
+import WarmingStripesGradientLegend from './components/WarmingStripes/WarmingStripesGradientLegend'
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import { abbreviateNumber } from './helpers/abbreviateNumber'
@@ -559,7 +560,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     for (let entry of entries) {
       let { width, height } = entry.contentRect
 
-      const editorIsOpen = isEditor && !!document.querySelector('.editor-panel:not(.hidden)')
+      const editorIsOpen = isEditor
       width = editorIsOpen ? width - EDITOR_WIDTH : width
 
       const newViewport = getViewport(width)
@@ -819,15 +820,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const formatDate = (date, i, ticks) => {
-    let formattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(date)
+    const displayFormat =
+      config.runtime[section].dateDisplayFormat || config.runtime[section].dateParseFormat || '%Y-%m-%d'
+    let formattedDate = timeFormat(displayFormat)(date)
     // Handle the case where all months work with '%b.' except for May
-    if (config.runtime[section].dateDisplayFormat?.includes('%b.') && formattedDate.includes('May.')) {
+    if (displayFormat?.includes('%b.') && formattedDate.includes('May.')) {
       formattedDate = formattedDate.replace(/May\./g, 'May')
     }
     // Show years only once
-    if (config.xAxis.showYearsOnce && config.runtime[section].dateDisplayFormat?.includes('%Y') && ticks) {
+    if (config.xAxis.showYearsOnce && displayFormat?.includes('%Y') && ticks) {
       const prevDate = ticks[i - 1] ? ticks[i - 1].value : null
-      const prevFormattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(prevDate)
+      const prevFormattedDate = timeFormat(displayFormat)(prevDate)
       const year = formattedDate.match(/\d{4}/)
       const prevYear = prevFormattedDate.match(/\d{4}/)
       if (year && prevYear && year[0] === prevYear[0]) {
@@ -1125,8 +1128,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
 
     if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
-    if (config.xAxis.brushActive && !isLegendOnBottom) classes.push('subtext--brush-active ')
-    if (config.xAxis.brushActive && config.legend.hide) classes.push('subtext--brush-active ')
     return classes
   }
 
@@ -1305,13 +1306,18 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {/* Legend */}
                   {!config.legend.hide &&
                     config.visualizationType !== 'Spark Line' &&
-                    config.visualizationType !== 'Sankey' && (
+                    config.visualizationType !== 'Sankey' &&
+                    !(config.visualizationType === 'Warming Stripes' && config.legend?.style === 'gradient') &&
+                    !(config.visualizationType === 'Warming Stripes' && config.smallMultiples?.mode) && (
                       <Legend
                         ref={legendRef}
                         skipId={handleChartTabbing(config, legendId)}
                         interactionLabel={interactionLabel}
                       />
                     )}
+                  {config.visualizationType === 'Warming Stripes' &&
+                    config.legend?.style === 'gradient' &&
+                    !config.smallMultiples?.mode && <WarmingStripesGradientLegend />}
                 </LegendWrapper>
                 {/* Link */}
                 {isDashboard && config.table && config.table.show && config.table.showDataTableLink

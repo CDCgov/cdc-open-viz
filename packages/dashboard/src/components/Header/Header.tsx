@@ -1,4 +1,4 @@
-import { useContext, useRef } from 'react'
+import { useContext, useRef, useEffect } from 'react'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
 
@@ -20,8 +20,22 @@ const Header = (props: HeaderProps) => {
   const dispatch = useContext(DashboardDispatchContext)
   const back = () => {
     if (!visualizationKey) return
+
     const newConfig = cloneConfig(config)
-    newConfig.visualizations[visualizationKey].editing = false
+
+    // Ensure visualizations object exists
+    if (!newConfig.visualizations || !newConfig.visualizations[visualizationKey]) {
+      console.error(`Visualization ${visualizationKey} not found in config`)
+      return
+    }
+
+    // Explicitly set editing to false
+    newConfig.visualizations[visualizationKey] = {
+      ...newConfig.visualizations[visualizationKey],
+      editing: false,
+      showEditorPanel: false
+    }
+
     dispatch({ type: 'SET_CONFIG', payload: newConfig })
 
     // the Widget component will do a data fetch if no data is available for the visualization
@@ -59,19 +73,21 @@ const Header = (props: HeaderProps) => {
   const configStringRef = useRef<string>()
 
   // Only update parent when config content actually changes (not just reference)
-  const configString = JSON.stringify(convertStateToConfig())
-  if (configStringRef.current !== configString) {
-    configStringRef.current = configString
+  useEffect(() => {
+    const configString = JSON.stringify(convertStateToConfig())
+    if (configStringRef.current !== configString) {
+      configStringRef.current = configString
 
-    // Emit the data in a regular JS event so it can be consumed by anything.
-    const event = new CustomEvent('updateVizConfig', { detail: configString })
-    window.dispatchEvent(event)
+      // Emit the data in a regular JS event so it can be consumed by anything.
+      const event = new CustomEvent('updateVizConfig', { detail: configString })
+      window.dispatchEvent(event)
 
-    // Pass up to Editor if needed
-    if (setParentConfig) {
-      setParentConfig(JSON.parse(configString))
+      // Pass up to Editor if needed
+      if (setParentConfig) {
+        setParentConfig(JSON.parse(configString))
+      }
     }
-  }
+  }, [config, setParentConfig])
 
   const handleCheck = e => {
     const { checked } = e.currentTarget
