@@ -133,20 +133,6 @@ export function EditorPanel<TConfig = any>({
         title={title}
         onBackClick={onBackClick}
       >
-        {/* Palette Selector UI */}
-        <div style={{ marginBottom: '1rem' }}>
-          <label htmlFor="palette-select" style={{ fontWeight: 'bold' }}>Palette:</label>
-          <select
-            id="palette-select"
-            value={selectedPaletteKey}
-            onChange={e => setSelectedPaletteKey(e.target.value)}
-            style={{ marginLeft: '0.5rem' }}
-          >
-            {paletteOptions.map(palette => (
-              <option key={palette.key} value={palette.key}>{palette.key.replace(/_/g, ' ')}</option>
-            ))}
-          </select>
-        </div>
         {/* ...existing code... */}
         {children({
           config,

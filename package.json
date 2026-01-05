@@ -105,6 +105,7 @@
     "dev:map": "lerna run --scope @cdc/map start -- -- --port 3008",
     "dev:markup-include": "lerna run --scope @cdc/markup-include start -- -- --port 3009",
     "dev:waffle-chart": "lerna run --scope @cdc/waffle-chart start -- -- --port 3010",
+    "dev:schedule-table": "lerna run --scope @cdc/schedule-table start -- -- --port 3011",
     "storybook": "storybook dev -p 6006",
     "test-storybook": "vitest run --project=storybook -t 'Tests'",
     "storybook-docs": "storybook dev --docs",

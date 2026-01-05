@@ -9,6 +9,7 @@ import '@cdc/core/styles/v2/components/editor.scss'
 import Accordion from '@cdc/core/components/ui/Accordion'
 import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualSection'
+import { chartColorPalettes } from '@cdc/core/data/chartColorPalettes'
 
 // Helpers
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
@@ -17,6 +18,8 @@ import { useFilterManagement } from '@cdc/core/hooks/useFilterManagement'
 
 // Types
 import { RecommendationCategory, Footnote } from '../../types/Config'
+import { PaletteSelector } from '@cdc/core/components/PaletteSelector'
+import Footnotes from '@cdc/core/components/Footnotes/Footnotes'
 
 const EditorPanel: React.FC = () => {
   const { config, updateConfig, loading, data, setParentConfig, isDashboard } = useContext(ConfigContext)
@@ -104,12 +107,7 @@ const EditorPanel: React.FC = () => {
               placeholder='Schedule Table Title'
               updateField={updateField}
             />
-            <CheckBox
-              value={config.showTitle}
-              fieldName='showTitle'
-              label='Show Title'
-              updateField={updateField}
-            />
+            <CheckBox value={config.showTitle} fieldName='showTitle' label='Show Title' updateField={updateField} />
           </Accordion.Section>
 
           <Accordion.Section title='Data Mapping'>
@@ -169,7 +167,7 @@ const EditorPanel: React.FC = () => {
             />
           </Accordion.Section>
 
-          <Accordion.Section title='Recommendations'>
+          <Accordion.Section title='Legend'>
             <label className='edit-label'>
               <span className='edit-label__heading'>Recommendation Categories</span>
               <span className='edit-label__description'>Define color-coded recommendation categories</span>
@@ -294,6 +292,7 @@ const EditorPanel: React.FC = () => {
               <span className='edit-label__description'>Add footnotes to your schedule table</span>
             </label>
 
+            {/* Editing UI remains the same, but display uses shared Footnotes */}
             {config.footnotes?.map((footnote, index) => (
               <fieldset key={index} className='edit-block' style={{ marginBottom: '1rem' }}>
                 <button
@@ -324,6 +323,9 @@ const EditorPanel: React.FC = () => {
             <button type='button' className='btn btn-primary' onClick={addFootnote}>
               + Add Footnote
             </button>
+
+            {/* Display footnotes using shared component for preview */}
+            <Footnotes footnotes={config.footnotes || []} />
           </Accordion.Section>
 
           <Accordion.Section title='Filters'>
@@ -376,6 +378,15 @@ const EditorPanel: React.FC = () => {
               showBorder={true}
               showAccent={true}
               showBackground={true}
+            />
+
+            <PaletteSelector
+              palettes={Object.keys(chartColorPalettes.v2)}
+              colorPalettes={chartColorPalettes.v2}
+              config={config}
+              selectedPalette={config.palette || Object.keys(chartColorPalettes.v2)[0]}
+              onPaletteSelect={palette => updateConfig({ ...config, palette })}
+              element='button'
             />
           </Accordion.Section>
         </Accordion>
