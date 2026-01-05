@@ -1,0 +1,216 @@
+{
+  "type": "schedule-table",
+  "visualizationType": "Schedule Table",
+  "title": "Recommended Adult Immunization Schedule",
+  "showTitle": true,
+  "matrix": {
+    "rowKey": "vaccine",
+    "columnKey": "ageGroup",
+    "valueKey": "recommendation",
+    "displayKey": "displayText",
+    "notesKey": "notesUrl"
+  },
+  "columnOrder": [
+    "19-26 years",
+    "27-49 years",
+    "50-64 years",
+    "≥65 years"
+  ],
+  "recommendations": [
+    {
+      "value": "recommended",
+      "label": "Recommended vaccination for adults who meet age requirement, lack documentation of vaccination, or lack evidence of immunity",
+      "color": "#ffc107",
+      "symbol": "■"
+    },
+    {
+      "value": "risk-based",
+      "label": "Recommended vaccination for adults with an additional risk factor or another indication",
+      "color": "#9c27b0",
+      "symbol": "●"
+    },
+    {
+      "value": "shared-decision",
+      "label": "Vaccination is based on shared clinical decision-making",
+      "color": "#03a9f4",
+      "symbol": "▲"
+    },
+    {
+      "value": "no-guidance",
+      "label": "No Guidance/Not Applicable",
+      "color": "#e0e0e0",
+      "symbol": ""
+    }
+  ],
+  "table": {
+    "caption": "Recommended immunization schedule for adults by age group",
+    "showLegend": true,
+    "legendPosition": "top",
+    "stickyHeaders": true,
+    "cellMinWidth": 200,
+    "showNotesLinks": true,
+    "notesLinkText": "See Notes"
+  },
+  "data": [
+    {
+      "vaccine": "COVID-19",
+      "ageGroup": "19-26 years",
+      "recommendation": "shared-decision",
+      "displayText": "1 or more doses of 2025-2026 vaccine",
+      "notesUrl": "https://www.cdc.gov/vaccines/vpd/covid-19/"
+    },
+    {
+      "vaccine": "COVID-19",
+      "ageGroup": "27-49 years",
+      "recommendation": "shared-decision",
+      "displayText": "1 or more doses of 2025-2026 vaccine",
+      "notesUrl": "https://www.cdc.gov/vaccines/vpd/covid-19/"
+    },
+    {
+      "vaccine": "COVID-19",
+      "ageGroup": "50-64 years",
+      "recommendation": "shared-decision",
+      "displayText": "1 or more doses of 2025-2026 vaccine",
+      "notesUrl": "https://www.cdc.gov/vaccines/vpd/covid-19/"
+    },
+    {
+      "vaccine": "COVID-19",
+      "ageGroup": "≥65 years",
+      "recommendation": "recommended",
+      "displayText": "2 or more doses of 2025-2026 vaccine",
+      "notesUrl": "https://www.cdc.gov/vaccines/vpd/covid-19/"
+    },
+    {
+      "vaccine": "Influenza inactivated (IIV3, ccIIV3)",
+      "ageGroup": "19-26 years",
+      "recommendation": "recommended",
+      "displayText": "1 dose annually"
+    },
+    {
+      "vaccine": "Influenza inactivated (IIV3, ccIIV3)",
+      "ageGroup": "27-49 years",
+      "recommendation": "recommended",
+      "displayText": "1 dose annually"
+    },
+    {
+      "vaccine": "Influenza inactivated (IIV3, ccIIV3)",
+      "ageGroup": "50-64 years",
+      "recommendation": "recommended",
+      "displayText": "1 dose annually"
+    },
+    {
+      "vaccine": "Influenza inactivated (IIV3, ccIIV3)",
+      "ageGroup": "≥65 years",
+      "recommendation": "recommended",
+      "displayText": "1 dose annually (HD-IIV3, RIV3, or aIIV3 preferred)"
+    },
+    {
+      "vaccine": "Influenza recombinant (RIV3)",
+      "ageGroup": "19-26 years",
+      "recommendation": "recommended",
+      "displayText": "1 dose annually"
+    },
+    {
+      "vaccine": "Influenza recombinant (RIV3)",
+      "ageGroup": "27-49 years",
+      "recommendation": "recommended",
+      "displayText": "1 dose annually"
+    },
+    {
+      "vaccine": "Influenza recombinant (RIV3)",
+      "ageGroup": "50-64 years",
+      "recommendation": "recommended",
+      "displayText": "1 dose annually"
+    },
+    {
+      "vaccine": "Influenza recombinant (RIV3)",
+      "ageGroup": "≥65 years",
+      "recommendation": "recommended",
+      "displayText": "1 dose annually (HD-IIV3, RIV3, or aIIV3 preferred)"
+    },
+    {
+      "vaccine": "Influenza inactivated (aIIV3; HD-IIV3)",
+      "ageGroup": "27-49 years",
+      "recommendation": "risk-based",
+      "displayText": "Solid organ transplant",
+      "notesUrl": "https://www.cdc.gov/flu/"
+    },
+    {
+      "vaccine": "Influenza inactivated (aIIV3; HD-IIV3)",
+      "ageGroup": "≥65 years",
+      "recommendation": "recommended",
+      "displayText": "1 dose annually (HD-IIV3, RIV3, or aIIV3 preferred)"
+    },
+    {
+      "vaccine": "Influenza live, attenuated (LAIV3)",
+      "ageGroup": "19-26 years",
+      "recommendation": "recommended",
+      "displayText": "1 dose annually"
+    },
+    {
+      "vaccine": "Influenza live, attenuated (LAIV3)",
+      "ageGroup": "27-49 years",
+      "recommendation": "recommended",
+      "displayText": "1 dose annually"
+    },
+    {
+      "vaccine": "Respiratory Syncytial Virus (RSV)",
+      "ageGroup": "27-49 years",
+      "recommendation": "risk-based",
+      "displayText": "Seasonal administration during pregnancy",
+      "notesUrl": "https://www.cdc.gov/rsv/"
+    },
+    {
+      "vaccine": "Respiratory Syncytial Virus (RSV)",
+      "ageGroup": "50-64 years",
+      "recommendation": "risk-based",
+      "displayText": "60 through 74 years",
+      "notesUrl": "https://www.cdc.gov/rsv/"
+    },
+    {
+      "vaccine": "Respiratory Syncytial Virus (RSV)",
+      "ageGroup": "≥65 years",
+      "recommendation": "recommended",
+      "displayText": "≥75 years"
+    },
+    {
+      "vaccine": "Tetanus, diphtheria, pertussis (Tdap or Td)",
+      "ageGroup": "19-26 years",
+      "recommendation": "risk-based",
+      "displayText": "1 dose Tdap each pregnancy; 1 dose Td/Tdap for wound management",
+      "notesUrl": "https://www.cdc.gov/vaccines/vpd/tdap/"
+    },
+    {
+      "vaccine": "Tetanus, diphtheria, pertussis (Tdap or Td)",
+      "ageGroup": "27-49 years",
+      "recommendation": "risk-based",
+      "displayText": "1 dose Tdap each pregnancy; 1 dose Td/Tdap for wound management",
+      "notesUrl": "https://www.cdc.gov/vaccines/vpd/tdap/"
+    },
+    {
+      "vaccine": "Tetanus, diphtheria, pertussis (Tdap or Td)",
+      "ageGroup": "50-64 years",
+      "recommendation": "risk-based",
+      "displayText": "1 dose Tdap each pregnancy; 1 dose Td/Tdap for wound management",
+      "notesUrl": "https://www.cdc.gov/vaccines/vpd/tdap/"
+    },
+    {
+      "vaccine": "Tetanus, diphtheria, pertussis (Tdap or Td)",
+      "ageGroup": "≥65 years",
+      "recommendation": "risk-based",
+      "displayText": "1 dose Tdap each pregnancy; 1 dose Td/Tdap for wound management",
+      "notesUrl": "https://www.cdc.gov/vaccines/vpd/tdap/"
+    }
+  ],
+  "footnotes": [
+    {
+      "text": "These recommendations must be read with the footnotes that follow. For those who fall behind or start late, provide catch-up vaccination at the earliest opportunity as indicated by the green bars in the schedule."
+    }
+  ],
+  "general": {
+    "showTitle": true,
+    "border": true,
+    "accent": false,
+    "background": true
+  }
+}

@@ -1,0 +1,148 @@
+.cove-component__content {
+  display: flex;
+  flex-direction: column;
+}
+
+// Fix squished content when sidebar is collapsed
+.cdc-open-viz-module.editor-panel--hidden .cove-component__content,
+.cdc-open-viz-module.editor-panel--hidden .cove-component__content>*,
+.cdc-open-viz-module.editor-panel--hidden .schedule-table-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  display: block !important;
+}
+
+// Ensure content area expands when sidebar is hidden
+.cdc-open-viz-module.editor-panel--hidden .cove-component__content {
+  width: 100% !important;
+  min-width: 0 !important;
+  display: block !important;
+}
+
+// Ensure sidebar collapses when hidden
+.cdc-open-viz-module.editor-panel--hidden .sidebar {
+  width: 0 !important;
+  min-width: 0 !important;
+  display: none !important;
+}
+
+@import '@cdc/core/components/Layout/components/Sidebar/components/sidebar.styles.scss';
+@import '@cdc/core/styles/v2/components/editor.scss';
+
+// Schedule Table Styles
+
+.schedule-table-container {
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  &.bordered {
+    border: 1px solid #dee2e6;
+  }
+
+  th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    padding: 0.75rem;
+    text-align: center;
+    border: 1px solid #dee2e6;
+
+    &:first-child {
+      text-align: left;
+    }
+  }
+
+  td {
+    border: 1px solid #dee2e6;
+    padding: 0;
+    vertical-align: middle;
+  }
+}
+
+.schedule-cell {
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  line-height: 1.4;
+
+  &.empty {
+    background-color: #ffffff;
+  }
+
+  &__notes-link {
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #005ea2;
+    text-decoration: underline;
+
+    &:hover {
+      color: #0a3d6e;
+      text-decoration: none;
+    }
+  }
+}
+
+// Legend styles
+.schedule-legend {
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+  }
+
+  &__items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__label {
+    flex: 1;
+    line-height: 1.4;
+  }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+  .schedule-table-container {
+    font-size: 0.875rem;
+  }
+
+  .schedule-cell {
+    min-height: 50px;
+    padding: 6px;
+  }
+
+  .schedule-legend {
+    &__items {
+      gap: 0.5rem;
+    }
+  }
+}
+
+// Title styles
+.schedule-table-title {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
