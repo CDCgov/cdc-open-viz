@@ -87,7 +87,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
       seriesKey: config.series?.[0]?.dataKey || '',
       x: 50,
       y: 50,
-      dataX: transformedData?.[5]?.[config.xAxis.dataKey] || '',
+      dataX: transformedData?.[0]?.[config.xAxis.dataKey] || '',
       dx: 20,
       dy: -20,
       opacity: '100',
@@ -178,14 +178,14 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                   {annotation.anchorMode === 'data' && (
                     <Select
                       label='Series:'
-                      value={annotation.seriesKey || ''}
-                      options={['', ...config.series.map(s => s.dataKey)]}
+                      value={annotation.seriesKey || config.series?.[0]?.dataKey || ''}
+                      options={config.series.map(s => s.dataKey)}
                       section='annotations'
                       subsection={null}
                       fieldName='seriesKey'
                       updateField={(section, subsection, fieldName, value) => {
                         const updatedAnnotations = _.cloneDeep(config?.annotations)
-                        updatedAnnotations[index].seriesKey = value
+                        updatedAnnotations[index].seriesKey = value || config.series?.[0]?.dataKey
                         updateConfig({
                           ...config,
                           annotations: updatedAnnotations
