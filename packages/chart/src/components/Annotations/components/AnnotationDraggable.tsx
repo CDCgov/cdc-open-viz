@@ -25,7 +25,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
   const { config, dimensions, isEditor, updateConfig, colorScale, transformedData, parseDate } = useContext(ConfigContext)
 
   // destructure config items here...
-  const { annotations } = config
+  const { annotations, visualizationType } = config
   const [height] = dimensions
 
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
@@ -53,8 +53,18 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
             xScaleInput = parseDate(xScaleInput, false)?.getTime()
           }
 
+          // Base X position (centered on data point)
           annotationX = xScale(xScaleInput) + (xScale.bandwidth?.() / 2 || 0)
-          annotationY = yScale(dataYValue) - 10
+
+          // Adjust X for arrow markers based on label direction
+          if (annotation.marker === 'arrow' && Math.abs(annotation.dx) >= 100) {
+            const direction = annotation.dx > 0 ? 1 : -1
+            const nudgeAmount = xScale.bandwidth?.() ? xScale.bandwidth() / 6 : 2
+            annotationX += direction * nudgeAmount
+          }
+
+          // Y position based on marker type
+          annotationY = yScale(dataYValue) - (annotation.marker === 'circle' ? 0 : 5)
         }
       }
 
@@ -126,6 +136,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
         >
           <HtmlLabel
             className='annotation__desktop-label'
+            containerStyle={{ width: '150px' }}
             showAnchorLine={false}
             horizontalAnchor={handleConnectionHorizontalType(annotation, xScale, config)}
             verticalAnchor={handleConnectionVerticalType(annotation, xScale, config)}
@@ -167,7 +178,6 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
                 annotationY + annotation.dy / 2 + Number(annotation?.bezier) || 0
               } ${annotationX + annotation.dx},${annotationY + annotation.dy}`}
               stroke={APP_FONT_COLOR}
-              strokeWidth='2'
               fill='none'
               marker-start={`url(#marker-start--${index})`}
             />

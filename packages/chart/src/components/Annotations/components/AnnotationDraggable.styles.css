@@ -1,5 +1,7 @@
 .cdc-open-viz-module .annotation__desktop-label {
   display: none;
+  line-height: 1.1rem;
+  font-size: 16px;
 }
 
 .cdc-open-viz-module {
