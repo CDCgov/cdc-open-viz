@@ -62,51 +62,47 @@ const EditorPanel = ({ state, dispatch }) => {
       toggleActionType='SET_SHOW_EDITOR_PANEL'
     >
       {({ state: _state, dispatch: _dispatch }) => (
-        <section className='form-container'>
-          <form>
-            <Accordion allowZeroExpanded={true}>
-              {/* COLUMNS */}
-              <AccordionItem>
-                {/* LABEL */}
-                <AccordionItemHeading>
-                  <AccordionItemButton>Columns</AccordionItemButton>
-                </AccordionItemHeading>
+        <Accordion allowZeroExpanded={true}>
+          {/* COLUMNS */}
+          <AccordionItem>
+            {/* LABEL */}
+            <AccordionItemHeading>
+              <AccordionItemButton>Columns</AccordionItemButton>
+            </AccordionItemHeading>
 
-                {/* COLUMNS EDITOR COMPONENT */}
-                <AccordionItemPanel>
-                  <ColumnsEditor
-                    config={config}
-                    updateField={createFieldUpdater(columns, 'SET_COLUMNS')}
-                    deleteColumn={removeAdditionalColumn}
-                  />
-                </AccordionItemPanel>
-              </AccordionItem>
+            {/* COLUMNS EDITOR COMPONENT */}
+            <AccordionItemPanel>
+              <ColumnsEditor
+                config={config}
+                updateField={createFieldUpdater(columns, 'SET_COLUMNS')}
+                deleteColumn={removeAdditionalColumn}
+              />
+            </AccordionItemPanel>
+          </AccordionItem>
 
-              {/* DATA TABLE */}
-              <AccordionItem>
-                {/* LABEL */}
-                <AccordionItemHeading>
-                  <AccordionItemButton>Data Table</AccordionItemButton>
-                </AccordionItemHeading>
+          {/* DATA TABLE */}
+          <AccordionItem>
+            {/* LABEL */}
+            <AccordionItemHeading>
+              <AccordionItemButton>Data Table</AccordionItemButton>
+            </AccordionItemHeading>
 
-                {/* DATA TABLE EDITOR COMPONENT */}
-                <AccordionItemPanel>
-                  <DataTableEditor config={config} columns={Object.keys(data[0] || {})} updateField={updateDataTable} />
-                </AccordionItemPanel>
-              </AccordionItem>
+            {/* DATA TABLE EDITOR COMPONENT */}
+            <AccordionItemPanel>
+              <DataTableEditor config={config} columns={Object.keys(data[0] || {})} updateField={updateDataTable} />
+            </AccordionItemPanel>
+          </AccordionItem>
 
-              {/* FILTERS */}
-              <AccordionItem>
-                <AccordionItemHeading>
-                  <AccordionItemButton>Filters</AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  <VizFilterEditor config={config} updateField={updateFilters} rawData={data} />
-                </AccordionItemPanel>
-              </AccordionItem>
-            </Accordion>
-          </form>
-        </section>
+          {/* FILTERS */}
+          <AccordionItem>
+            <AccordionItemHeading>
+              <AccordionItemButton>Filters</AccordionItemButton>
+            </AccordionItemHeading>
+            <AccordionItemPanel>
+              <VizFilterEditor config={config} updateField={updateFilters} rawData={data} />
+            </AccordionItemPanel>
+          </AccordionItem>
+        </Accordion>
       )}
     </EditorPanelDispatch>
   )
