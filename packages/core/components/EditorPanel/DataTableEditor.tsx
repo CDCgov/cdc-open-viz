@@ -27,7 +27,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
   }, [config.columns])
 
   const groupPivotColumns = useMemo(() => {
-    const columns: string[] = config.data.flatMap(Object.keys)
+    const columns: string[] = (config.data || []).flatMap(Object.keys)
     const cols = _.uniq(columns).filter(key => {
       return true
     })
