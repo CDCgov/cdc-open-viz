@@ -141,14 +141,14 @@ const ComboBox: React.FC<ComboBoxProps> = ({
           setFocused(true)
           setActiveIndex(0)
         } else {
-          setActiveIndex(prev => (prev < filteredOptions.length - 1 ? prev + 1 : prev))
+          setActiveIndex(prev => (prev < filteredOptions.length - 1 ? prev + 1 : 0))
         }
         break
 
       case 'ArrowUp':
         e.preventDefault()
         if (focused) {
-          setActiveIndex(prev => (prev > 0 ? prev - 1 : -1))
+          setActiveIndex(prev => (prev > 0 ? prev - 1 : filteredOptions.length - 1))
         }
         break
 
