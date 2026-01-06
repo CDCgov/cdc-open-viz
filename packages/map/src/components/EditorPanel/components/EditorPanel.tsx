@@ -2909,6 +2909,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           value={config.general.includeContextInDownload}
                           section='general'
                           subsection={null}
+                          className='ms-4'
                           fieldName='includeContextInDownload'
                           label='Include Heading & Context'
                           updateField={updateField}
@@ -2919,7 +2920,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                               </Tooltip.Target>
                               <Tooltip.Content>
                                 <p>
-                                  When enabled, the image download will include the page heading (H2 or H3) and any
+                                  When enabled, the image download will include the section heading (H2 or H3) and any
                                   explanatory paragraphs that appear before the visualization
                                 </p>
                               </Tooltip.Content>
