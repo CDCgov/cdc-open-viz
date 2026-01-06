@@ -137,16 +137,16 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
   if (invalidConfig || invalidData) throw new Error('Invalid config or data provided to CdcDataTable component')
 
   return (
-    <Layout.VisualizationWrapper
+    <Layout.CoveWrapper
       ref={outerContainerRef}
       config={config}
       isEditor={isEditor}
       showEditorPanel={showEditorPanel}
       currentViewport={currentViewport}
+      EditorPanel={EditorPanel}
+      editorPanelProps={{ dispatch, state }}
+      skipInnerContainer={true}
     >
-      {/* EDITOR */}
-      {isEditor && <EditorPanel dispatch={dispatch} state={state} />}
-
       {/* FILTERS */}
       <div className='bg-white z-1'>
         {filters && (
@@ -174,7 +174,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
           configUrl={configUrl}
         />
       </div>
-    </Layout.VisualizationWrapper>
+    </Layout.CoveWrapper>
   )
 }
 

@@ -19,7 +19,6 @@ import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import markupIncludeReducer from './store/markupInclude.reducer'
-import Layout from '@cdc/core/components/Layout'
 // styles
 import './cdcMarkupInclude.style.css'
 import './scss/main.scss'
@@ -34,6 +33,7 @@ type CdcMarkupIncludeProps = {
   interactionLabel?: string
 }
 
+import Layout from '@cdc/core/components/Layout'
 import Title from '@cdc/core/components/ui/Title'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
 import { Datasets } from '@cdc/core/types/DataSet'
@@ -237,44 +237,40 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   if (loading === false) {
     content = (
       <>
-        {isEditor && <EditorPanel datasets={datasets} />}
-
         {!hideMarkupInclude && (
-          <Layout.Responsive isEditor={isEditor}>
-            <div className='markup-include-content-container cove-component__content no-borders'>
-              <div className={`markup-include-component ${contentClasses.join(' ')}`}>
-                <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
-                <div className={`${innerContainerClasses.join(' ')}`}>
-                  {/* Filters */}
-                  {config.filters && config.filters.length > 0 && (
-                    <Filters
-                      config={config}
-                      setFilters={setFilters}
-                      excludedData={data || []}
-                      dimensions={[0, 0]}
-                      interactionLabel={interactionLabel || 'markup-include'}
-                    />
+          <div className='markup-include-content-container cove-component__content no-borders'>
+            <div className={`markup-include-component ${contentClasses.join(' ')}`}>
+              <Title title={title} isDashboard={isDashboard} classes={[`${theme}`, 'mb-0']} />
+              <div className={`${innerContainerClasses.join(' ')}`}>
+                {/* Filters */}
+                {config.filters && config.filters.length > 0 && (
+                  <Filters
+                    config={config}
+                    setFilters={setFilters}
+                    excludedData={data || []}
+                    dimensions={[0, 0]}
+                    interactionLabel={interactionLabel || 'markup-include'}
+                  />
+                )}
+                <div className='cove-component__content-wrap'>
+                  {_showNoDataMessage && (
+                    <div className='no-data-message'>
+                      <p>{`${noDataMessageText}`}</p>
+                    </div>
                   )}
-                  <div className='cove-component__content-wrap'>
-                    {_showNoDataMessage && (
-                      <div className='no-data-message'>
-                        <p>{`${noDataMessageText}`}</p>
-                      </div>
-                    )}
-                    {!markupError && !_showNoDataMessage && <Markup allowElements={!!urlMarkup} content={markup} />}
-                    {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
-                  </div>
+                  {!markupError && !_showNoDataMessage && <Markup allowElements={!!urlMarkup} content={markup} />}
+                  {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
                 </div>
               </div>
-              <FootnotesStandAlone
-                config={configObj?.footnotes}
-                filters={config?.filters || []}
-                markupVariables={markupVariables}
-                enableMarkupVariables={config?.enableMarkupVariables}
-                data={data}
-              />
             </div>
-          </Layout.Responsive>
+            <FootnotesStandAlone
+              config={configObj?.footnotes}
+              filters={config?.filters || []}
+              markupVariables={markupVariables}
+              enableMarkupVariables={config?.enableMarkupVariables}
+              data={data}
+            />
+          </div>
         )}
       </>
     )
@@ -295,9 +291,16 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     <ErrorBoundary component='CdcMarkupInclude'>
       <ConfigContext.Provider value={{ config, updateConfig, loading, data: data, setParentConfig, isDashboard }}>
         {!config?.newViz && config?.runtime && config?.runtime.editorErrorMessage && <Error />}
-        <Layout.VisualizationWrapper config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
+        <Layout.CoveWrapper
+          config={config}
+          isEditor={isEditor}
+          EditorPanel={EditorPanel}
+          editorPanelProps={{ datasets }}
+          showEditorPanel={config?.showEditorPanel}
+          skipInnerContainer={true}
+        >
           {content}
-        </Layout.VisualizationWrapper>
+        </Layout.CoveWrapper>
       </ConfigContext.Provider>
     </ErrorBoundary>
   )

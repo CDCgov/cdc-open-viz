@@ -302,8 +302,11 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   const displayNone = filters.length ? filters.every(filter => filter.showDropdown === false) : false
   if (displayNone && !isEditor) return <></>
   return (
-    <Layout.VisualizationWrapper config={visualizationConfig} isEditor={isEditor} currentViewport={currentViewport}>
-      {isEditor && (
+    <Layout.CoveWrapper
+      config={visualizationConfig}
+      isEditor={isEditor}
+      currentViewport={currentViewport}
+      EditorPanel={() => (
         <Layout.Sidebar
           displayPanel={displayPanel}
           isDashboard={true}
@@ -313,7 +316,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
           <DashboardFiltersEditor updateConfig={updateConfig} vizConfig={visualizationConfig} />
         </Layout.Sidebar>
       )}
-
+      showEditorPanel={isEditor}
+      skipInnerContainer={true}
+    >
       {!displayNone && (
         <Layout.Responsive isEditor={isEditor}>
           <div
@@ -339,7 +344,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
           </div>
         </Layout.Responsive>
       )}
-    </Layout.VisualizationWrapper>
+    </Layout.CoveWrapper>
   )
 }
 

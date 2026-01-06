@@ -143,12 +143,7 @@ const CdcFilteredText = ({
       </>
     )
 
-    content = (
-      <>
-        {isEditor && <EditorPanel />}
-        {body}
-      </>
-    )
+    content = <>{body}</>
   }
   const values = {
     config,
@@ -163,9 +158,15 @@ const CdcFilteredText = ({
   return (
     <ErrorBoundary component='CdcFilteredText'>
       <ConfigContext.Provider value={values}>
-        <Layout.VisualizationWrapper config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
+        <Layout.CoveWrapper
+          config={config}
+          isEditor={isEditor}
+          showEditorPanel={config?.showEditorPanel}
+          EditorPanel={EditorPanel}
+          skipInnerContainer={true}
+        >
           {content}
-        </Layout.VisualizationWrapper>
+        </Layout.CoveWrapper>
       </ConfigContext.Provider>
     </ErrorBoundary>
   )

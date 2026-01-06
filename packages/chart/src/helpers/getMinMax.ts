@@ -42,7 +42,7 @@ const getMinMax = ({
   }
 
   const { visualizationType, series } = config
-  const { max: enteredMaxValue, min: enteredMinValue } = config.runtime.yAxis
+  const { max: enteredMaxValue, min: enteredMinValue } = config.runtime?.yAxis || {}
   const paddingAddedToAxis = config.yAxis.enablePadding ? 1 + config.yAxis.scalePadding / 100 : 1
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   // do validation bafore applying t0 charts
@@ -69,9 +69,7 @@ const getMinMax = ({
   }
 
   if (config.series.filter(s => s?.type === 'Forecasting')) {
-    const {
-      runtime: { forecastingSeriesKeys }
-    } = config
+    const forecastingSeriesKeys = config.runtime?.forecastingSeriesKeys
     if (forecastingSeriesKeys?.length > 0) {
       // push all keys into an array
       let columnNames = []
@@ -207,7 +205,7 @@ const getMinMax = ({
   }
 
   //Adds Y Axis data padding if applicable
-  if (config.runtime.yAxis.paddingPercent) {
+  if (config.runtime?.yAxis?.paddingPercent) {
     let paddingValue = (max - min) * config.runtime.yAxis.paddingPercent
     min -= paddingValue
     max += paddingValue

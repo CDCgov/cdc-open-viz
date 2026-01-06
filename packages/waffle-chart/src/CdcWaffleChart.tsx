@@ -522,17 +522,12 @@ const CdcWaffleChart = ({
 
   if (loading === false) {
     content = (
-      <>
-        {isEditor && <EditorPanel showConfigConfirm={showConfigConfirm} />}
-        <Layout.Responsive isEditor={isEditor}>
-          <WaffleChart
-            config={config}
-            isEditor={isEditor}
-            showConfigConfirm={showConfigConfirm}
-            updateConfig={updateConfig}
-          />
-        </Layout.Responsive>
-      </>
+      <WaffleChart
+        config={config}
+        isEditor={isEditor}
+        showConfigConfirm={showConfigConfirm}
+        updateConfig={updateConfig}
+      />
     )
   }
 
@@ -541,14 +536,17 @@ const CdcWaffleChart = ({
       <ConfigContext.Provider
         value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef }}
       >
-        <Layout.VisualizationWrapper
+        <Layout.CoveWrapper
           config={config}
           isEditor={isEditor}
           ref={outerContainerRef}
+          EditorPanel={EditorPanel}
+          editorPanelProps={{ showConfigConfirm }}
           showEditorPanel={config?.showEditorPanel}
+          skipInnerContainer={true}
         >
           {content}
-        </Layout.VisualizationWrapper>
+        </Layout.CoveWrapper>
       </ConfigContext.Provider>
     </ErrorBoundary>
   )

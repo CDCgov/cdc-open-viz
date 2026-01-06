@@ -1,8 +1,11 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
-import '../styles/editor-utils.scss'
-import '../styles/editor.scss'
+import './Responsive.styles.scss'
 
-import Icon from '../../ui/Icon'
+// Sub-components
+import { EditorHotkeys, EditorViewportControls, EditorGridOverlay } from './Responsive/components'
+
+// Hooks
+import { useEditorKeyboard, useDimensionTracking } from './Responsive/hooks'
 
 const breakpoints = [
   '360', // xxs (mobile) 0 - 360
@@ -17,17 +20,18 @@ const os =
   navigator.userAgent.indexOf('Win') !== -1 ? 'Win' : navigator.userAgent.indexOf('Mac') !== -1 ? 'MacOS' : null
 
 const Responsive = ({ children, isEditor }) => {
+  // State
   const [displayPanel, setDisplayPanel] = useState(false)
   const [displayGrid, setDisplayGrid] = useState(false)
   const [viewportPreview, setViewportPreview] = useState(null)
   const [rotateAnimation, setRotateAnimation] = useState(false)
-  const [showConfirm, setShowConfirm] = useState(false)
   const [previewDimensions, setPreviewDimensions] = useState<{ width: number; height: number }>(null)
 
-  const resetIcon = useRef(null)
-  const editorPanelRef = useRef(null)
+  // Refs
+  const resetIconRef = useRef(null)
   const componentContainerRef = useRef(null)
 
+  // Viewport preview controller
   const viewportPreviewController = useCallback(
     breakpoint => {
       return setViewportPreview(prevState => (prevState !== breakpoint ? breakpoint : null))
@@ -35,158 +39,84 @@ const Responsive = ({ children, isEditor }) => {
     [viewportPreview]
   )
 
-  const onKeypress = key => {
-    if (!isEditor) return key
-    if (key.code === 'KeyL' && key.ctrlKey) setDisplayPanel(display => !display)
-    const viewportCommandKey = os === 'MacOS' ? key.metaKey : key.altKey
-    if (viewportCommandKey) {
-      let keyIndex = key.key
-
-      // Validates that the hotkey pressed is a number, and that
-      // the number is within the range of the provided breakpoint list range.
-      if (!isNaN(keyIndex)) {
-        if (keyIndex <= breakpoints.length) {
-          key.preventDefault()
-          viewportPreviewController(breakpoints[keyIndex - 1])
-        }
-      }
-    }
-
-    if (!viewportCommandKey) {
-      if (key.code === 'KeyG') setDisplayGrid(display => !display)
-      if (key.code === 'KeyR') resetPreview()
-    }
-  }
-
-  // Set and clean up the event listener for the hotkeys
-  useEffect(() => {
-    document.addEventListener('keydown', onKeypress)
-    return () => document.removeEventListener('keydown', onKeypress)
-  }, [])
-
-  //Reset Viewport Preview
+  // Reset viewport preview with animation
   const resetPreview = useCallback(() => {
-    if (!rotateAnimation && resetIcon.current) {
+    if (!rotateAnimation && resetIconRef.current) {
       setViewportPreview(null)
       setRotateAnimation(true)
       setDisplayGrid(false)
-      resetIcon.current.style.transition = 'transform 800ms cubic-bezier(0.16, 1, 0.3, 1)'
-      resetIcon.current.style.transform = 'rotate(-360deg)'
+      resetIconRef.current.style.transition = 'transform 800ms cubic-bezier(0.16, 1, 0.3, 1)'
+      resetIconRef.current.style.transform = 'rotate(-360deg)'
 
       const timeoutShow = setTimeout(() => {
         setRotateAnimation(false)
-        resetIcon.current.style.transition = null
-        resetIcon.current.style.transform = 'rotate(0deg)'
-        resetIcon.current.style.transform = null
+        resetIconRef.current.style.transition = null
+        resetIconRef.current.style.transform = 'rotate(0deg)'
+        resetIconRef.current.style.transform = null
       }, 400)
 
       return () => clearTimeout(timeoutShow)
     }
   }, [rotateAnimation])
 
+  // Toggle grid overlay handlers
+  const handleGridToggle = useCallback(() => {
+    setDisplayGrid(display => !display)
+  }, [])
+
+  // Custom hooks for keyboard shortcuts and dimension tracking
+  useEditorKeyboard({
+    isEditor,
+    breakpoints,
+    os,
+    setDisplayPanel,
+    setDisplayGrid,
+    viewportPreviewController,
+    resetPreview
+  })
+
+  useDimensionTracking({
+    containerRef: componentContainerRef,
+    setPreviewDimensions
+  })
+
   // Toggle the grid display with the viewport preview
   useEffect(() => {
     return viewportPreview ? setDisplayGrid(true) : setDisplayGrid(false)
   }, [viewportPreview])
 
-  // Observe and set editor component widths
-  useEffect(() => {
-    if (!componentContainerRef.current) return
-
-    let resizeObserver = new ResizeObserver(entries => {
-      for (let entry of entries) {
-        let { width, height } = entry.contentRect
-        setPreviewDimensions({ width, height })
-      }
-    })
-
-    resizeObserver.observe(componentContainerRef.current)
-
-    return () => {
-      if (!resizeObserver) return
-      resizeObserver.disconnect()
-      resizeObserver = null
-    }
-  })
-
-  const onBackClick = () => setDisplayPanel(!displayPanel)
-
+  // Early return if not in editor mode or panel not displayed
   if (!isEditor || !displayPanel) return children
 
   return (
     <div className='cove-editor__content' data-grid={displayGrid || null}>
-      <div
-        className='cove-editor__content-wrap--x'
-        style={viewportPreview ? { maxWidth: viewportPreview + 'px', minWidth: 'unset' } : null}
+      <EditorGridOverlay
+        displayGrid={displayGrid}
+        displayPanel={displayPanel}
+        viewportPreview={viewportPreview}
+        previewDimensions={previewDimensions}
+        componentContainerRef={componentContainerRef}
       >
-        <div className='cove-editor__content-wrap--y'>
-          <div className='cove-editor-utils__breakpoints--px'>
-            {displayGrid && displayPanel && (
-              <>
-                {Math.round(previewDimensions.width)}
-                <span className='mx-1' style={{ fontSize: '0.675rem' }}>
-                  ✕
-                </span>
-                {Math.round(previewDimensions.height)}
-              </>
-            )}
-          </div>
-          <div className='cove-editor__grid-caret--top' ref={componentContainerRef}>
-            <div className='cove-editor__grid-caret--bottom'>{children}</div>
-          </div>
-        </div>
-      </div>
-      <div className='cove-editor-utils__hotkeys'>
-        <div className='cove-editor-utils__hotkeys--left'>
-          <p className={displayPanel ? 'hotkey--active' : null}>Editor</p>
-          <p className={displayGrid ? 'hotkey--active' : null}>Grid</p>
-          <p className={rotateAnimation ? 'hotkey--active' : null}>Reset</p>
-          <p className={viewportPreview ? 'hotkey--active' : null}>View</p>
-        </div>
-        <div className='cove-editor-utils__hotkeys--right'>
-          <p className={displayPanel ? 'hotkey--active' : null}>esc</p>
-          <p className={displayGrid ? 'hotkey--active' : null}>G</p>
-          <p className={rotateAnimation ? 'hotkey--active' : null}>R</p>
-          <p className={viewportPreview ? 'hotkey--active' : null}>
-            {os === 'MacOS' ? <Icon style={{ marginRight: '0.25rem' }} display='command' size={12} /> : 'Alt'} +{' '}
-            {viewportPreview ? breakpoints.indexOf(viewportPreview) + 1 : `[1 - ${breakpoints.length}]`}
-          </p>
-        </div>
-      </div>
+        {children}
+      </EditorGridOverlay>
 
-      <div className='cove-editor-utils__breakpoints'>
-        <ul className={`cove-editor-utils__breakpoints-list${viewportPreview ? ' has-active' : ''}`}>
-          <button
-            className='cove-editor-utils__breakpoints-item'
-            onClick={() => {
-              setDisplayGrid(display => !display)
-            }}
-          >
-            <div className='cove-editor-utils__breakpoints-grid'>
-              <Icon display='grid' />
-            </div>
-          </button>
-          {breakpoints.map((breakpoint, index) => (
-            <button
-              className={`cove-editor-utils__breakpoints-item${viewportPreview === breakpoint ? ' active' : ''}`}
-              onClick={() => viewportPreviewController(breakpoint)}
-              key={index}
-            >
-              {breakpoint}px
-            </button>
-          ))}
-          <button
-            className='cove-editor-utils__breakpoints-item'
-            onClick={() => {
-              resetPreview()
-            }}
-          >
-            <div className='cove-editor-utils__breakpoints-reset' ref={resetIcon}>
-              <Icon display='rotateLeft' />
-            </div>
-          </button>
-        </ul>
-      </div>
+      <EditorHotkeys
+        displayPanel={displayPanel}
+        displayGrid={displayGrid}
+        rotateAnimation={rotateAnimation}
+        viewportPreview={viewportPreview}
+        breakpoints={breakpoints}
+        os={os}
+      />
+
+      <EditorViewportControls
+        breakpoints={breakpoints}
+        viewportPreview={viewportPreview}
+        resetIconRef={resetIconRef}
+        onViewportChange={viewportPreviewController}
+        onGridToggle={handleGridToggle}
+        onReset={resetPreview}
+      />
     </div>
   )
 }

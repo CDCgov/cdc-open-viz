@@ -405,179 +405,177 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     <LegendMemoProvider legendMemo={legendMemo} legendSpecialClassLastMemo={legendSpecialClassLastMemo}>
       <ConfigContext.Provider value={mapProps}>
         <MapDispatchContext.Provider value={dispatch}>
-          <Layout.VisualizationWrapper
+          <Layout.CoveWrapper
             config={config}
             isEditor={isEditor}
             ref={outerContainerRef}
             currentViewport={currentViewport}
             imageId={imageId}
             showEditorPanel={config.showEditorPanel}
+            EditorPanel={EditorPanel}
+            editorPanelProps={{ datasets }}
+            skipInnerContainer={true}
           >
-            {isEditor && <EditorPanel datasets={datasets} />}
-            <Layout.Responsive isEditor={isEditor}>
-              {requiredColumns?.length > 0 && (
-                <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
-              )}
-              {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
-                <section
-                  className={buildSectionClassNames(
-                    currentViewport,
-                    headerColor,
-                    config?.runtime?.editorErrorMessage.length > 0
-                  )}
-                  aria-label={'Map: ' + title}
-                  ref={innerContainerRef}
-                >
-                  {config?.runtime?.editorErrorMessage.length > 0 && <Error />}
-                  <Title
-                    title={title}
-                    superTitle={processedSuperTitle}
-                    config={config}
-                    classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${headerColor}`]}
-                  />
-                  <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
-                  {config?.annotations?.length > 0 && (
-                    <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
-                  )}
-
-                  {processedIntroText && <section className='introText mb-4'>{parse(processedIntroText)}</section>}
-
-                  {config?.filters?.length > 0 && (
-                    <Filters
-                      config={config}
-                      setConfig={setConfig}
-                      filteredData={runtimeFilters}
-                      setFilters={_setRuntimeData}
-                      dimensions={dimensions}
-                      standaloneMap={!config}
-                      interactionLabel={interactionLabel}
-                    />
-                  )}
-
-                  <div
-                    role='region'
-                    tabIndex={0}
-                    className={getMapContainerClasses(config, modal).join(' ')}
-                    onClick={e => closeModal(e, modal)}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') {
-                        closeModal(e, modal)
-                      }
-                    }}
-                  >
-                    <MapContainer
-                      config={config}
-                      modal={modal}
-                      currentViewport={currentViewport}
-                      geoType={geoType}
-                      general={general}
-                      logo={logo}
-                      mapSvgRef={mapSvg}
-                    />
-
-                    {general.showSidebar && 'navigation' !== general.type && (
-                      <Legend
-                        dimensions={dimensions}
-                        ref={legendRef}
-                        skipId={tabId}
-                        containerWidthPadding={0}
-                        currentViewport={currentViewport}
-                        interactionLabel={interactionLabel}
-                      />
-                    )}
-                  </div>
-
-                  {'navigation' === general.type && (
-                    <NavigationMenu
-                      mapTabbingID={tabId}
-                      displayGeoName={displayGeoName}
-                      data={runtimeData}
-                      options={general}
-                      columns={config.columns}
-                      navigationHandler={val => navigationHandler('_blank', val, customNavigationHandler)}
-                    />
-                  )}
-
-                  {/* Link (to data table?) */}
-                  {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink
-                    ? tableLink
-                    : link && link}
-
-                  {processedSubtext.length > 0 && <p className='subtext mt-4'>{parse(processedSubtext)}</p>}
-
-                  <MapControls config={config} imageId={imageId} interactionLabel={interactionLabel} />
-
-                  {shouldShowDataTable(config, table, general, loading) && (
-                    <DataTable
-                      columns={dataTableColumns}
-                      config={dataTableConfig}
-                      currentViewport={currentViewport}
-                      displayGeoName={displayGeoName}
-                      expandDataTable={table.expanded}
-                      formatLegendLocation={key =>
-                        formatLegendLocation(key, dataTableRuntimeData?.[key]?.[config.columns.geo.name])
-                      }
-                      headerColor={general.headerColor}
-                      imageRef={imageId}
-                      indexTitle={table.indexLabel}
-                      innerContainerRef={innerContainerRef}
-                      legendMemo={legendMemo}
-                      legendSpecialClassLastMemo={legendSpecialClassLastMemo}
-                      navigationHandler={navigationHandler}
-                      outerContainerRef={outerContainerRef}
-                      rawData={dataTableConfig.data}
-                      runtimeData={dataTableRuntimeData}
-                      runtimeLegend={runtimeLegend}
-                      showDownloadImgButton={showDownloadImgButton}
-                      showDownloadPdfButton={showDownloadPdfButton}
-                      tabbingId={tabId}
-                      tableTitle={table.label}
-                      vizTitle={general.title}
-                      applyLegendToRow={applyLegendToRow}
-                      getPatternForRow={getPatternForRow}
-                      wrapColumns={table.wrapColumns}
-                      interactionLabel={interactionLabel}
-                    />
-                  )}
-
-                  {config.annotations?.length > 0 && <Annotation.Dropdown />}
-
-                  {processedFootnotes && <section className='footnotes pt-2 mt-4'>{parse(processedFootnotes)}</section>}
-                </section>
-              )}
-
-              <div aria-live='assertive' className='cdcdataviz-sr-only'>
-                {accessibleStatus}
-              </div>
-
-              {!isDraggingAnnotation && 'hover' === tooltips.appearanceType && (
-                <ReactTooltip
-                  id={`tooltip__${tooltipId}`}
-                  float={true}
-                  className={`tooltip tooltip-test`}
-                  style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
+            {requiredColumns?.length > 0 && (
+              <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
+            )}
+            {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
+              <section
+                className={buildSectionClassNames(
+                  currentViewport,
+                  headerColor,
+                  config?.runtime?.editorErrorMessage.length > 0
+                )}
+                aria-label={'Map: ' + title}
+                ref={innerContainerRef}
+              >
+                {config?.runtime?.editorErrorMessage.length > 0 && <Error />}
+                <Title
+                  title={title}
+                  superTitle={processedSuperTitle}
+                  config={config}
+                  classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${headerColor}`]}
                 />
-              )}
-              <div
-                ref={tooltipRef}
-                id={`tooltip__${tooltipId}-canvas`}
-                className='tooltip'
-                style={{
-                  background: `rgba(255,255,255,${config.tooltips.opacity / 100})`,
-                  position: 'absolute',
-                  whiteSpace: 'nowrap',
-                  display: 'none' // can't use d-none here
-                }}
-              ></div>
-              <FootnotesStandAlone
-                config={config.footnotes}
-                filters={config.filters?.filter(f => f.filterFootnotes)}
-                markupVariables={config.markupVariables}
-                enableMarkupVariables={config.enableMarkupVariables}
-                data={config.data}
+                <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
+                {config?.annotations?.length > 0 && (
+                  <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
+                )}
+
+                {processedIntroText && <section className='introText mb-4'>{parse(processedIntroText)}</section>}
+
+                {config?.filters?.length > 0 && (
+                  <Filters
+                    config={config}
+                    setConfig={setConfig}
+                    filteredData={runtimeFilters}
+                    setFilters={_setRuntimeData}
+                    dimensions={dimensions}
+                    standaloneMap={!config}
+                    interactionLabel={interactionLabel}
+                  />
+                )}
+
+                <div
+                  role='region'
+                  tabIndex={0}
+                  className={getMapContainerClasses(config, modal).join(' ')}
+                  onClick={e => closeModal(e, modal)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      closeModal(e, modal)
+                    }
+                  }}
+                >
+                  <MapContainer
+                    config={config}
+                    modal={modal}
+                    currentViewport={currentViewport}
+                    geoType={geoType}
+                    general={general}
+                    logo={logo}
+                    mapSvgRef={mapSvg}
+                  />
+
+                  {general.showSidebar && 'navigation' !== general.type && (
+                    <Legend
+                      dimensions={dimensions}
+                      ref={legendRef}
+                      skipId={tabId}
+                      containerWidthPadding={0}
+                      currentViewport={currentViewport}
+                      interactionLabel={interactionLabel}
+                    />
+                  )}
+                </div>
+
+                {'navigation' === general.type && (
+                  <NavigationMenu
+                    mapTabbingID={tabId}
+                    displayGeoName={displayGeoName}
+                    data={runtimeData}
+                    options={general}
+                    columns={config.columns}
+                    navigationHandler={val => navigationHandler('_blank', val, customNavigationHandler)}
+                  />
+                )}
+
+                {/* Link (to data table?) */}
+                {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
+
+                {processedSubtext.length > 0 && <p className='subtext mt-4'>{parse(processedSubtext)}</p>}
+
+                <MapControls config={config} imageId={imageId} interactionLabel={interactionLabel} />
+
+                {shouldShowDataTable(config, table, general, loading) && (
+                  <DataTable
+                    columns={dataTableColumns}
+                    config={dataTableConfig}
+                    currentViewport={currentViewport}
+                    displayGeoName={displayGeoName}
+                    expandDataTable={table.expanded}
+                    formatLegendLocation={key =>
+                      formatLegendLocation(key, dataTableRuntimeData?.[key]?.[config.columns.geo.name])
+                    }
+                    headerColor={general.headerColor}
+                    imageRef={imageId}
+                    indexTitle={table.indexLabel}
+                    innerContainerRef={innerContainerRef}
+                    legendMemo={legendMemo}
+                    legendSpecialClassLastMemo={legendSpecialClassLastMemo}
+                    navigationHandler={navigationHandler}
+                    outerContainerRef={outerContainerRef}
+                    rawData={dataTableConfig.data}
+                    runtimeData={dataTableRuntimeData}
+                    runtimeLegend={runtimeLegend}
+                    showDownloadImgButton={showDownloadImgButton}
+                    showDownloadPdfButton={showDownloadPdfButton}
+                    tabbingId={tabId}
+                    tableTitle={table.label}
+                    vizTitle={general.title}
+                    applyLegendToRow={applyLegendToRow}
+                    getPatternForRow={getPatternForRow}
+                    wrapColumns={table.wrapColumns}
+                    interactionLabel={interactionLabel}
+                  />
+                )}
+
+                {config.annotations?.length > 0 && <Annotation.Dropdown />}
+
+                {processedFootnotes && <section className='footnotes pt-2 mt-4'>{parse(processedFootnotes)}</section>}
+              </section>
+            )}
+
+            <div aria-live='assertive' className='cdcdataviz-sr-only'>
+              {accessibleStatus}
+            </div>
+
+            {!isDraggingAnnotation && 'hover' === tooltips.appearanceType && (
+              <ReactTooltip
+                id={`tooltip__${tooltipId}`}
+                float={true}
+                className={`tooltip tooltip-test`}
+                style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
               />
-            </Layout.Responsive>
-          </Layout.VisualizationWrapper>
+            )}
+            <div
+              ref={tooltipRef}
+              id={`tooltip__${tooltipId}-canvas`}
+              className='tooltip'
+              style={{
+                background: `rgba(255,255,255,${config.tooltips.opacity / 100})`,
+                position: 'absolute',
+                whiteSpace: 'nowrap',
+                display: 'none' // can't use d-none here
+              }}
+            ></div>
+            <FootnotesStandAlone
+              config={config.footnotes}
+              filters={config.filters?.filter(f => f.filterFootnotes)}
+              markupVariables={config.markupVariables}
+              enableMarkupVariables={config.enableMarkupVariables}
+              data={config.data}
+            />
+          </Layout.CoveWrapper>
         </MapDispatchContext.Provider>
       </ConfigContext.Provider>
     </LegendMemoProvider>
