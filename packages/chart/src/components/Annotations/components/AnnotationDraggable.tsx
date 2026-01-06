@@ -136,7 +136,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
         >
           <HtmlLabel
             className='annotation__desktop-label'
-            containerStyle={{ width: '150px' }}
+            containerStyle={{ width: config.general.showAnnotationDropdown ? '200px' : '150px' }}
             showAnchorLine={false}
             horizontalAnchor={handleConnectionHorizontalType(annotation, xScale, config)}
             verticalAnchor={handleConnectionVerticalType(annotation, xScale, config)}
@@ -203,14 +203,15 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
             fill='white'
             cx={annotationX + annotation.dx}
             cy={annotationY + annotation.dy}
-            r={16}
+            r={12}
             className='annotation__mobile-label annotation__mobile-label-circle'
             stroke={APP_FONT_COLOR}
           />
           <text
             height={16}
             x={annotationX + annotation.dx}
-            y={annotationY + annotation.dy}
+            y={annotationY + annotation.dy + 1}
+            fontSize={14}
             className='annotation__mobile-label'
             alignmentBaseline='middle'
             textAnchor='middle'

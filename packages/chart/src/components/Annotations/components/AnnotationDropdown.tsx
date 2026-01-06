@@ -9,8 +9,6 @@ const AnnotationDropdown = () => {
   const { currentViewport: viewport, config } = useContext(ConfigContext)
   const [expanded, setExpanded] = useState(false)
 
-  const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${APP_FONT_SIZE}px`
-
   const {
     config: { annotations }
   } = useContext(ConfigContext)
@@ -30,7 +28,7 @@ const AnnotationDropdown = () => {
   }
 
   const handleSectionClasses = () => {
-    const classes = [`data-table-container`, viewport, `d-block`, `d-lg-none`, `w-100`]
+    const classes = [`data-table-container`, viewport, `d-block`, `d-lg-none`, `w-100`, 'mt-4']
 
     if (config.general.showAnnotationDropdown) {
       classes.push('d-lg-block')
@@ -43,7 +41,6 @@ const AnnotationDropdown = () => {
     <>
       <section className={handleSectionClasses()}>
         <div
-          style={{ fontSize: titleFontSize }}
           role='button'
           className={handleAccordionClassName()}
           onClick={() => {
