@@ -57,14 +57,12 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
 
   return (
     <form className='d-flex flex-wrap'>
-      {sharedFilters.map((filter, filterIndex) => {
+      {show.map(filterIndex => {
+        const filter = sharedFilters[filterIndex]
         const urlFilterType = filter.type === 'urlfilter'
         const label = stripDuplicateLabelIncrement(filter.key || '')
 
-        if (
-          (!urlFilterType && !filter.showDropdown && filter.filterStyle !== FILTER_STYLE.nestedDropdown) ||
-          (show && !show.includes(filterIndex))
-        )
+        if (!urlFilterType && !filter.showDropdown && filter.filterStyle !== FILTER_STYLE.nestedDropdown)
           return <React.Fragment key={`${filter.key}-filtersection-${filterIndex}-option`} />
         const values: JSX.Element[] = []
 
