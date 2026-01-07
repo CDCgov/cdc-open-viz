@@ -2,6 +2,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import DOMPurify from 'dompurify'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import { isMobileAnnotationViewport } from '@cdc/core/helpers/viewports'
 
 // helpers
 import { findNearestDatum } from './findNearestDatum'
@@ -22,13 +23,14 @@ import './AnnotationDraggable.styles.css'
 
 const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax, svgRef, onDragStateChange }) => {
   // prettier-ignore
-  const { config, dimensions, isEditor, updateConfig, colorScale, transformedData, parseDate } = useContext(ConfigContext)
+  const { config, dimensions, isEditor, updateConfig, colorScale, transformedData, parseDate, currentViewport } = useContext(ConfigContext)
 
   // destructure config items here...
   const { annotations, visualizationType } = config
   const [height] = dimensions
 
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
+  const isMobile = isMobileAnnotationViewport(currentViewport)
 
   return (
     annotations &&
@@ -134,37 +136,41 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
             })
           }}
         >
-          <HtmlLabel
-            className='annotation__desktop-label'
-            containerStyle={{ width: config.general.showAnnotationDropdown ? '200px' : '150px' }}
-            showAnchorLine={false}
-            horizontalAnchor={handleConnectionHorizontalType(annotation, xScale, config)}
-            verticalAnchor={handleConnectionVerticalType(annotation, xScale, config)}
-          >
-            <div
-              style={{
-                borderRadius: 5, // Optional: set border radius
-                backgroundColor: `rgba(255, 255, 255, ${annotation?.opacity ? Number(annotation?.opacity) / 100 : 1})`,
-                padding: '10px',
-                width: 'auto',
-                display: config.general.showAnnotationDropdown ? 'inline-flex' : 'flex',
-                justifyContent: 'start',
-                flexDirection: 'row'
-              }}
-              // role='presentation'
-              tabIndex={0}
-              aria-label={`Annotation text that reads: ${annotation.text}`}
+          {!isMobile && (
+            <HtmlLabel
+              className='annotation__desktop-label'
+              containerStyle={{ width: config.general.showAnnotationDropdown ? '200px' : '150px' }}
+              showAnchorLine={false}
+              horizontalAnchor={handleConnectionHorizontalType(annotation, xScale, config)}
+              verticalAnchor={handleConnectionVerticalType(annotation, xScale, config)}
             >
-              {config?.general?.showAnnotationDropdown && (
-                <>
-                  <p className='annotation__has-dropdown-number' style={{ margin: '2px 6px' }}>
-                    {index + 1}
-                  </p>
-                </>
-              )}
-              <div dangerouslySetInnerHTML={sanitizedData()} />
-            </div>
-          </HtmlLabel>
+              <div
+                style={{
+                  borderRadius: 5, // Optional: set border radius
+                  backgroundColor: `rgba(255, 255, 255, ${
+                    annotation?.opacity ? Number(annotation?.opacity) / 100 : 1
+                  })`,
+                  padding: '10px',
+                  width: 'auto',
+                  display: config.general.showAnnotationDropdown ? 'inline-flex' : 'flex',
+                  justifyContent: 'start',
+                  flexDirection: 'row'
+                }}
+                // role='presentation'
+                tabIndex={0}
+                aria-label={`Annotation text that reads: ${annotation.text}`}
+              >
+                {config?.general?.showAnnotationDropdown && (
+                  <>
+                    <p className='annotation__has-dropdown-number' style={{ margin: '2px 6px' }}>
+                      {index + 1}
+                    </p>
+                  </>
+                )}
+                <div dangerouslySetInnerHTML={sanitizedData()} />
+              </div>
+            </HtmlLabel>
+          )}
           {annotation.connectionType === 'line' && (
             <Connector type='line' pathProps={{ markerStart: `url(#marker-start--${index})` }} />
           )}
@@ -199,25 +205,29 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
               markerUnits='userSpaceOnUse'
             />
           )}
-          <circle
-            fill='white'
-            cx={annotationX + annotation.dx}
-            cy={annotationY + annotation.dy}
-            r={12}
-            className='annotation__mobile-label annotation__mobile-label-circle'
-            stroke={APP_FONT_COLOR}
-          />
-          <text
-            height={16}
-            x={annotationX + annotation.dx}
-            y={annotationY + annotation.dy + 1}
-            fontSize={14}
-            className='annotation__mobile-label'
-            alignmentBaseline='middle'
-            textAnchor='middle'
-          >
-            {index + 1}
-          </text>
+          {isMobile && (
+            <>
+              <circle
+                fill='white'
+                cx={annotationX + annotation.dx}
+                cy={annotationY + annotation.dy}
+                r={12}
+                className='annotation__mobile-label annotation__mobile-label-circle'
+                stroke={APP_FONT_COLOR}
+              />
+              <text
+                height={16}
+                x={annotationX + annotation.dx}
+                y={annotationY + annotation.dy + 1}
+                fontSize={14}
+                className='annotation__mobile-label'
+                alignmentBaseline='middle'
+                textAnchor='middle'
+              >
+                {index + 1}
+              </text>
+            </>
+          )}
         </AnnotationComponent>
       )
     })
