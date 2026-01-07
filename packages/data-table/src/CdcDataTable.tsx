@@ -145,7 +145,6 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
       currentViewport={currentViewport}
       EditorPanel={EditorPanel}
       editorPanelProps={{ dispatch, state }}
-      skipInnerContainer={true}
     >
       {/* FILTERS */}
       <div className='bg-white z-1'>

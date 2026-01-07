@@ -1,13 +1,8 @@
 // Data-bite-specific Editor Panel Styles
 // Common editor panel styles are imported from @cdc/core/styles/editor-panel-base via cove-main.scss
 
-.spacing-wrapper {
-  padding-left: 350px;
-}
-
-.editor-panel.hidden + .spacing-wrapper {
-  padding-left: 0;
-}
+// Note: Layout is now handled by Layout.CoveWrapper using CSS Grid
+// The old .spacing-wrapper padding-left approach has been removed to avoid conflicts
 
 .editor-panel {
   .text-center {

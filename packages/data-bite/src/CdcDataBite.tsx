@@ -668,6 +668,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
         ref={outerContainerRef}
         config={config}
         isEditor={isEditor}
+        currentViewport={currentViewport}
         EditorPanel={EditorPanel}
         showEditorPanel={config?.showEditorPanel}
         skipInnerContainer={biteStyle !== 'gradient'}

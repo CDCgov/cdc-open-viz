@@ -26,6 +26,7 @@ export default {
   title: '',
   theme: 'theme-blue',
   shadow: false,
+  showEditorPanel: true,
   visual: {
     border: false,
     accent: false,
