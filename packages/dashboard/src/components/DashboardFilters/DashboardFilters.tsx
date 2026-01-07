@@ -1,5 +1,6 @@
 import React from 'react'
 import MultiSelect from '@cdc/core/components/MultiSelect'
+import ComboBox from '@cdc/core/components/ComboBox'
 import { SharedFilter } from '../../types/SharedFilter'
 import { APIFilterDropdowns, DropdownOptions } from './DashboardFiltersWrapper'
 import { FILTER_STYLE } from '../../types/FilterStyles'
@@ -56,14 +57,12 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
 
   return (
     <form className='d-flex flex-wrap'>
-      {sharedFilters.map((filter, filterIndex) => {
+      {show.map(filterIndex => {
+        const filter = sharedFilters[filterIndex]
         const urlFilterType = filter.type === 'urlfilter'
         const label = stripDuplicateLabelIncrement(filter.key || '')
 
-        if (
-          (!urlFilterType && !filter.showDropdown && filter.filterStyle !== FILTER_STYLE.nestedDropdown) ||
-          (show && !show.includes(filterIndex))
-        )
+        if (!urlFilterType && !filter.showDropdown && filter.filterStyle !== FILTER_STYLE.nestedDropdown)
           return <React.Fragment key={`${filter.key}-filtersection-${filterIndex}-option`} />
         const values: JSX.Element[] = []
 
@@ -153,6 +152,16 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                 listLabel={label}
                 handleSelectedItems={value => updateField(null, null, filterIndex, value)}
                 loading={loading}
+              />
+            ) : filter.filterStyle === FILTER_STYLE.combobox ? (
+              <ComboBox
+                options={multiValues}
+                fieldName={filterIndex}
+                updateField={updateField}
+                selected={(filter.queuedActive || filter.active) as string}
+                label={label}
+                loading={loading}
+                placeholder={filter.resetLabel || '- Select -'}
               />
             ) : (
               <>
