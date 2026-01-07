@@ -25,7 +25,7 @@ type MarkupIncludeEditorPanelProps = {
 const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
   const { config, data, isDashboard, loading, setParentConfig, updateConfig } = useContext(ConfigContext)
   const { contentEditor, theme, visual } = config
-  const { inlineHTML, srcUrl, title, useInlineHTML } = contentEditor
+  const { inlineHTML, srcUrl, title, useInlineHTML } = contentEditor || {}
   const updateField = updateFieldFactory(config, updateConfig, true)
 
   const textAreaInEditorContainer = useRef(null)

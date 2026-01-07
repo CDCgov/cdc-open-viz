@@ -222,9 +222,14 @@ const VisualizationRow: React.FC<VizRowProps> = ({
             </a>
           )
 
+          // Markup-includes with external URLs don't depend on dashboard data
+          const isMarkupIncludeWithoutDataDependency =
+            type === 'markup-include' && !visualizationConfig.dataKey && !visualizationConfig.data?.length
+
           const hideVisualization =
             inNoDataState &&
             filterBehavior !== 'Apply Button' &&
+            !isMarkupIncludeWithoutDataDependency &&
             (type !== 'dashboardFilters' || applyButtonNotClicked(visualizationConfig))
 
           const shouldShow = row.toggle === undefined || (row.toggle && show[colIndex])
