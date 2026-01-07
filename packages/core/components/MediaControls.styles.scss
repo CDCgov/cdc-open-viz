@@ -23,14 +23,3 @@
     font-size: var(--download-link-font-size);
   }
 }
-
-// odd wrapper thats different on dashboards
-.cdc-dashboard-inner-container {
-  .download-links {
-    padding: unset;
-    margin-bottom: 5px;
-  }
-  .download-buttons {
-    margin: unset;
-  }
-}

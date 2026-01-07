@@ -23,7 +23,6 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
   print-color-adjust: exact !important; /* Firefox 97+, Safari 15.4+ */
 
   @import 'global';
-  @import 'button-section';
   @import 'series-list';
 
   input[type='range'] {

@@ -44,10 +44,10 @@ const DataDesigner = (props: DataDesignerProps) => {
   return (
     <div className='cove-data-designer__container'>
       <div className='mb-2'>
-        <div className='cove-heading--3 fw-bold mb-1'>Describe Data</div>
+        <div className='fw-bold mb-1'>Describe Data</div>
         {hasDataOrientation && (
           <>
-            <div className='cove-heading--3 fw-normal mb-1'>Data Orientation</div>
+            <div className='fw-normal mb-1'>Data Orientation</div>
             <div className='grid grid-gap-2 mb-4'>
               <div className='column'>
                 <button
@@ -62,7 +62,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                   }}
                 >
                   <Card>
-                    <strong className='cove-heading--3'>Vertical</strong>
+                    <strong>Vertical</strong>
                     <p className='mb-1'>
                       Values for map geography or chart date/category axis are contained in a single <em>column</em>.
                     </p>
@@ -83,7 +83,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                   }}
                 >
                   <Card>
-                    <strong className='cove-heading--3'>Horizontal</strong>
+                    <strong>Horizontal</strong>
                     <p className='mb-1'>
                       Values for map geography or chart date/category axis are contained in a single <em>row</em>
                     </p>
@@ -163,7 +163,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                         }}
                       >
                         <Card>
-                          <strong className='cove-heading--3'>Single Row</strong>
+                          <strong>Single Row</strong>
                           <p className='mb-1'>Each row contains the data for an individual series in itself.</p>
                           {DATA_TABLE_SINGLE_ROW}
                         </Card>
@@ -180,7 +180,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                         }}
                       >
                         <Card>
-                          <strong className='cove-heading--3'>Multiple Rows</strong>
+                          <strong>Multiple Rows</strong>
                           <p className='mb-1'>Each series data is broken out into multiple rows.</p>
                           {DATA_TABLE_MULTI_ROW}
                         </Card>

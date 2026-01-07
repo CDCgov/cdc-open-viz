@@ -246,6 +246,14 @@
     &.is-editor {
       margin-top: 7em;
     }
+
+    .download-links {
+      padding: unset;
+      margin-bottom: 5px;
+    }
+    .download-buttons {
+      margin: unset;
+    }
   }
 
   .sub-editor {

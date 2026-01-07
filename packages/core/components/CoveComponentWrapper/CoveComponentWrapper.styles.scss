@@ -1,3 +1,27 @@
-// Component-specific styles for CoveComponentWrapper
-// Currently, styles are in /packages/core/styles/v2/layout/_component.scss
-// This file serves as a placeholder for future component-adjacent styles
+@import '../../styles/variables';
+
+.cove {
+
+  // Base component wrapper styles
+  .cove-component {
+    border-radius: 3px;
+  }
+
+  .cove-component__content {
+    border: solid 1px #ccc;
+    border-top: none;
+    border-radius: 0 0 3px 3px;
+
+    &.no-borders {
+      border: none !important;
+    }
+
+    .cove-component__content:not(.component--hideBackgroundColor) {
+      background: $lightestGray;
+    }
+  }
+
+  .cove-component__content-wrap {
+    padding: 0 1rem 1rem;
+  }
+}

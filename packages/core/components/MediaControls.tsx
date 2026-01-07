@@ -3,6 +3,8 @@ import React from 'react'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
+import './MediaControls.styles.scss'
+
 const buttonText = {
   pdf: 'Download PDF',
   image: 'Download Image',

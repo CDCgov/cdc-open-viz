@@ -135,6 +135,7 @@ $primary: #3e92d5;
   overflow: hidden auto;
   width: calc(100% - $editorWidth);
   left: $editorWidth;
+
   @at-root {
     .cove-editor.panel-shown #{&} {
       background-color: #e7e7e7;
@@ -148,6 +149,7 @@ $primary: #3e92d5;
 
 .cove-editor__grid-caret--bottom {
   @at-root {
+
     .cove-editor__content[data-grid] #{&}::before,
     .cove-editor__content[data-grid] #{&}::after {
       content: '';
@@ -184,6 +186,7 @@ $primary: #3e92d5;
 
 .cove-editor__grid-caret--top {
   @at-root {
+
     .cove-editor__content[data-grid] #{&}::before,
     .cove-editor__content[data-grid] #{&}::after {
       content: '';
@@ -219,6 +222,7 @@ $primary: #3e92d5;
 }
 
 .cove-editor__content-wrap--x {
+  top: 0;
   display: flex;
   align-items: center;
   position: absolute;
@@ -274,6 +278,7 @@ $primary: #3e92d5;
   margin-bottom: 5rem;
 
   @at-root {
+
     .cove-editor__content[data-grid] #{&}::before,
     .cove-editor__content[data-grid] #{&}::after {
       content: '';
@@ -324,7 +329,7 @@ $primary: #3e92d5;
 
   &--left,
   &--right {
-    > * {
+    >* {
       transition: color 150ms ease;
     }
   }
@@ -338,7 +343,7 @@ $primary: #3e92d5;
   &--right {
     font-style: italic;
 
-    > * {
+    >* {
       display: flex;
     }
   }
@@ -373,6 +378,7 @@ $primary: #3e92d5;
   button {
     padding: 0;
     background: transparent;
+    border: 0;
   }
 
   @at-root {
@@ -446,19 +452,20 @@ $primary: #3e92d5;
     border-bottom: 2px dotted #88c3ea;
   }
 
-  > .cove-editor-utils__breakpoints-grid {
+  >.cove-editor-utils__breakpoints-grid {
     display: inline-flex;
     height: 1.25rem;
     padding-right: 0.125rem;
     padding-left: 0.25rem;
   }
 
-  > .cove-editor-utils__breakpoints-reset {
+  >.cove-editor-utils__breakpoints-reset {
     display: inline-flex;
     height: 1.25rem;
   }
 
   @at-root {
+
     //Gray out
     .cove-editor-utils__breakpoints-list #{&} .cove-editor-utils__breakpoints-grid {
       color: #b4b4b4;
@@ -488,6 +495,7 @@ $primary: #3e92d5;
   0% {
     bottom: -3rem;
   }
+
   100% {
     bottom: 2rem;
   }
@@ -497,6 +505,7 @@ $primary: #3e92d5;
   0% {
     bottom: 2rem;
   }
+
   100% {
     bottom: -3rem;
   }

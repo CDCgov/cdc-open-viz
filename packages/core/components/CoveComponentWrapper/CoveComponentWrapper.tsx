@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react'
 import VisualizationWrapper from '../Layout/components/Visualization'
 import Responsive from '../Layout/components/Responsive'
 import { Visualization } from '../../types/Visualization'
+import './CoveComponentWrapper.styles.scss'
 
 
 
