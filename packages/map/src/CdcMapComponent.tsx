@@ -9,6 +9,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 import DataTable from '@cdc/core/components/DataTable'
 import Filters from '@cdc/core/components/Filters'
 import Layout from '@cdc/core/components/Layout'
+import MediaControls from '@cdc/core/components/MediaControls'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Title from '@cdc/core/components/ui/Title'
 import Waiting from '@cdc/core/components/Waiting'
@@ -57,7 +58,6 @@ import EditorPanel from './components/EditorPanel'
 import Error from './components/EditorPanel/components/Error'
 import Legend from './components/Legend'
 import MapContainer from './components/MapContainer'
-import MapControls from './components/MapControls'
 import NavigationMenu from './components/NavigationMenu'
 
 // hooks
@@ -508,9 +508,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
                   {processedSubtext.length > 0 && <p className='subtext mt-4'>{parse(processedSubtext)}</p>}
 
-                  <MapControls config={config} imageId={imageId} interactionLabel={interactionLabel} />
-
-                  {shouldShowDataTable(config, table, general, loading) && (
+                  {/* Data Table or Download Links */}
+                  {shouldShowDataTable(config, table, general, loading) ? (
                     <DataTable
                       columns={dataTableColumns}
                       config={dataTableConfig}
@@ -533,6 +532,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       runtimeLegend={runtimeLegend}
                       showDownloadImgButton={showDownloadImgButton}
                       showDownloadPdfButton={showDownloadPdfButton}
+                      includeContextInDownload={config.general?.includeContextInDownload}
                       tabbingId={tabId}
                       tableTitle={table.label}
                       vizTitle={general.title}
@@ -541,6 +541,33 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       wrapColumns={table.wrapColumns}
                       interactionLabel={interactionLabel}
                     />
+                  ) : (
+                    (showDownloadImgButton || showDownloadPdfButton) && (
+                      <div className='w-100 d-flex justify-content-end'>
+                        <MediaControls.Section classes={['download-links', 'mt-4', 'mb-2']}>
+                          {showDownloadImgButton && (
+                            <MediaControls.DownloadLink
+                              type='image'
+                              title='Download Map as Image'
+                              state={config}
+                              elementToCapture={imageId}
+                              interactionLabel={interactionLabel}
+                              includeContextInDownload={config.general?.includeContextInDownload}
+                            />
+                          )}
+                          {showDownloadPdfButton && (
+                            <MediaControls.DownloadLink
+                              type='pdf'
+                              title='Download Map as PDF'
+                              state={config}
+                              elementToCapture={imageId}
+                              interactionLabel={interactionLabel}
+                              includeContextInDownload={config.general?.includeContextInDownload}
+                            />
+                          )}
+                        </MediaControls.Section>
+                      </div>
+                    )
                   )}
 
                   {config.annotations?.length > 0 && <Annotation.Dropdown />}
