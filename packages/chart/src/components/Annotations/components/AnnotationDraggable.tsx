@@ -7,12 +7,6 @@ import { isMobileAnnotationViewport } from '@cdc/core/helpers/viewports'
 // helpers
 import { findNearestDatum } from './findNearestDatum'
 
-// prettier-ignore
-import {
-  handleConnectionHorizontalType,
-  handleConnectionVerticalType
-} from './helpers'
-
 // visx
 import { HtmlLabel, CircleSubject, EditableAnnotation, Connector, Annotation as VisxAnnotation } from '@visx/annotation'
 import { MarkerArrow } from '@visx/marker'
@@ -77,7 +71,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
 
       return (
         <AnnotationComponent
-          key={`annotation-${index}-${annotationX}-${annotationY}-${annotation.dx}-${annotation.dy}`}
+          key={`annotation-${index}-${annotation.x}-${annotation.y}-${annotation.dx}-${annotation.dy}`}
           width={200}
           height={height}
           dx={annotation.dx} // label position
@@ -141,8 +135,6 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
               className='annotation__desktop-label'
               containerStyle={{ width: config.general.showAnnotationDropdown ? '200px' : '150px' }}
               showAnchorLine={false}
-              horizontalAnchor={handleConnectionHorizontalType(annotation, xScale, config)}
-              verticalAnchor={handleConnectionVerticalType(annotation, xScale, config)}
             >
               <div
                 style={{
