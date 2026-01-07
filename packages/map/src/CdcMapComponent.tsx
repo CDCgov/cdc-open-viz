@@ -23,7 +23,7 @@ import './scss/main.scss'
 import './cdcMapComponent.styles.css'
 
 // Core Helpers
-import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
+import { getQueryStringFilterValue, isFilterHiddenByQuery } from '@cdc/core/helpers/queryStringUtils'
 import { generateRuntimeFilters } from './helpers/generateRuntimeFilters'
 import { type MapReducerType, MapState } from './store/map.reducer'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
@@ -197,6 +197,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
           const queryStringFilterValue = getQueryStringFilterValue(filter)
           if (queryStringFilterValue) {
             filters[index].active = queryStringFilterValue
+          }
+          if (isFilterHiddenByQuery(filter)) {
+            filters[index].showDropdown = false
           }
         })
         dispatch({ type: 'SET_RUNTIME_FILTERS', payload: filters })
