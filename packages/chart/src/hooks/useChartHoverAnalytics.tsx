@@ -1,6 +1,6 @@
-import { useRef } from 'react'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { hasTrackedHover, markHoverTracked } from '../utils/analyticsTracking'
 
 type UseChartHoverAnalyticsParams = {
   config: any
@@ -9,14 +9,16 @@ type UseChartHoverAnalyticsParams = {
 
 /**
  * Hook to track analytics when user enters the chart area
- * Fires once per chart entry, not on every hover interaction
+ * Fires once per visualization, persists across component remounts
  */
 export const useChartHoverAnalytics = ({ config, interactionLabel = '' }: UseChartHoverAnalyticsParams) => {
-  const hasTrackedRef = useRef(false)
-
   const handleChartMouseEnter = () => {
-    // Only track if we have an interaction label and haven't tracked yet
-    if (!interactionLabel || hasTrackedRef.current) return
+    // Only track if we have an interaction label
+    if (!interactionLabel) return
+
+    // Use unique ID to track per visualization
+    const vizId = String(config.runtime.uniqueId)
+    if (hasTrackedHover(vizId)) return
 
     // Publish the analytics event
     publishAnalyticsEvent({
@@ -29,12 +31,11 @@ export const useChartHoverAnalytics = ({ config, interactionLabel = '' }: UseCha
     })
 
     // Mark as tracked so we don't fire again
-    hasTrackedRef.current = true
+    markHoverTracked(vizId)
   }
 
   const handleChartMouseLeave = () => {
-    // Reset tracking when mouse leaves so next entry will track
-    hasTrackedRef.current = false
+    // No-op: We no longer reset tracking on mouse leave
   }
 
   return {
