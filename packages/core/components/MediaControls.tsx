@@ -2,6 +2,7 @@ import React from 'react'
 // import html2pdf from 'html2pdf.js'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { prepareScreenshotContainer } from '@cdc/core/helpers/prepareScreenshot'
 
 const buttonText = {
   pdf: 'Download PDF',
@@ -35,7 +36,7 @@ const saveImageAs = (uri, filename) => {
   }
 }
 
-const generateMedia = (state, type, elementToCapture, interactionLabel) => {
+const generateMedia = (state, type, elementToCapture, interactionLabel, includeContextInDownload = false) => {
   // Identify Selector
   const baseSvg = document.querySelector(`[data-download-id=${elementToCapture}]`)
 
@@ -58,22 +59,13 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
   // Apparently some packages use state.title where others use state.general.title
   const handleFileName = state => {
     // dashboard titles
-    if (state?.dashboard?.title)
-      return (
-        `${state.dashboard.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
-      )
+    if (state?.dashboard?.title) return `${state.dashboard.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
 
     // map titles
-    if (state?.general?.title)
-      return (
-        `${state.general.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
-      )
+    if (state?.general?.title) return `${state.general.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
 
     // chart titles
-    if (state?.title)
-      return (
-        `${state.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
-      )
+    if (state?.title) return `${state.title.replace(/\s+/g, '-').toLowerCase()}-${timestamp}`
 
     return 'no-title'
   }
@@ -82,18 +74,13 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
 
   switch (type) {
     case 'image':
-      const container = document.createElement('div')
-
-      // Simple configurable padding (main fix for spacing issues)
-      const downloadPadding = state.downloadImagePadding !== undefined ? state.downloadImagePadding : (!state.showTitle ? 35 : 0)
-      if (downloadPadding > 0) {
-        container.style.padding = `${downloadPadding}px`
-      }
-
-      container.appendChild(baseSvg.cloneNode(true));
+      // Prepare screenshot container with all cloning, styling, and transformations
+      const container = prepareScreenshotContainer(baseSvg, includeContextInDownload, elementToCapture)
 
       const downloadImage = async () => {
-        document.body.appendChild(container) // Append container to the DOM
+        // Append to main element if exists, otherwise body
+        const targetElement = document.querySelector('main') || document.body
+        targetElement.appendChild(container)
 
         // Fix select elements to show their current selected values before screenshot
         const selectElements = container.querySelectorAll('select')
@@ -119,10 +106,10 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
                 el.className.search(/download-buttons|download-links|data-table-container/) !== -1,
               useCORS: true,
               scale: 2, // Better quality
-              allowTaint: true,
+              allowTaint: true
             })
             .then(canvas => {
-              document.body.removeChild(container) // Clean up container
+              targetElement.removeChild(container) // Clean up container from wherever we appended it
               saveImageAs(canvas.toDataURL(), filename + '.png')
               publishAnalyticsEvent({
                 vizType: state.type,
@@ -163,17 +150,55 @@ const generateMedia = (state, type, elementToCapture, interactionLabel) => {
   }
 }
 
-const Button = ({ state, text, type, title, elementToCapture, interactionLabel = '' }) => {
+// Button component for Dashboard downloads (renders as actual button)
+const Button = ({
+  state,
+  text,
+  type,
+  title,
+  elementToCapture,
+  interactionLabel = '',
+  includeContextInDownload = false
+}) => {
   const buttonClasses = ['btn', 'btn-primary']
+
   return (
     <button
       className={buttonClasses.join(' ')}
       title={title}
-      onClick={() => generateMedia(state, type, elementToCapture, interactionLabel)}
+      onClick={() => generateMedia(state, type, elementToCapture, interactionLabel, includeContextInDownload)}
       style={{ lineHeight: '1.4em' }}
     >
       {buttonText[type]}
     </button>
+  )
+}
+
+// DownloadLink component for Chart/Map downloads (renders as text link)
+const DownloadLink = ({
+  state,
+  type,
+  title,
+  elementToCapture,
+  interactionLabel = '',
+  includeContextInDownload = false
+}) => {
+  const vizType = state?.type === 'map' ? 'Map' : 'Chart'
+  const format = type === 'pdf' ? 'PDF' : 'PNG'
+  const linkText = `Download ${vizType} (${format})`
+
+  return (
+    <a
+      role='button'
+      onClick={() => generateMedia(state, type, elementToCapture, interactionLabel, includeContextInDownload)}
+      aria-label={title}
+      title={title}
+      className={`no-border`}
+      style={{ cursor: 'pointer' }}
+      data-html2canvas-ignore
+    >
+      {linkText}
+    </a>
   )
 }
 
@@ -238,6 +263,7 @@ const MediaControls = () => null
 MediaControls.Section = Section
 MediaControls.Link = Link
 MediaControls.Button = Button
+MediaControls.DownloadLink = DownloadLink
 MediaControls.generateMedia = generateMedia
 
 export default MediaControls

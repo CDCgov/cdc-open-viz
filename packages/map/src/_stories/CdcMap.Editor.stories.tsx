@@ -2092,9 +2092,13 @@ export const DataTableSectionTests: Story = {
     await performAndAssert(
       'Enable Image Download → Enable button',
       () => {
-        const downloadImgButton = Array.from(canvasElement.querySelectorAll('button')).find(
-          btn => btn.textContent?.includes('Download Image') || btn.classList.contains('download-image')
-        )
+        const downloadImgButton =
+          Array.from(canvasElement.querySelectorAll('button')).find(
+            btn => btn.textContent?.includes('Download Image') || btn.classList.contains('download-image')
+          ) ||
+          Array.from(canvasElement.querySelectorAll('a[role="button"]')).find(
+            link => link.textContent?.includes('Download Map') && link.textContent?.includes('PNG')
+          )
         return {
           hasDownloadImgButton: Boolean(downloadImgButton)
         }

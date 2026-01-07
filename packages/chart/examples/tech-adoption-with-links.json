@@ -134,7 +134,7 @@
   },
   "table": {
     "label": "Data Table",
-    "expanded": true,
+    "expanded": false,
     "limitHeight": false,
     "height": "500",
     "caption": "",
@@ -149,7 +149,8 @@
     "showSuppressedSymbol": true,
     "collapsible": true,
     "show": true,
-    "showDownloadImgButton": false,
+    "showDownloadImgButton": true,
+    "includeContextInDownload": true,
     "groupBy": "",
     "cellMinWidth": "150"
   },
@@ -270,13 +271,13 @@
   },
   "filters": [
     {
-      "values": ["Social Media", "Cloud Services", "Really really long long Development Tools", "Communication"],
-      "filterStyle": "combobox",
+      "values": ["Social Media", "Cloud Services", "Development Tools", "Communication"],
+      "filterStyle": "dropdown",
       "id": 1765208699247,
       "showDropdown": true,
       "active": "Social Media",
       "columnName": "Category",
-      "orderedValues": ["Social Media", "Cloud Services", "Really really long long Development Tools", "Communication"],
+      "orderedValues": ["Social Media", "Cloud Services", "Development Tools", "Communication"],
       "label": "Select technology category",
       "order": "cust"
     }
