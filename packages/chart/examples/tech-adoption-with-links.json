@@ -270,23 +270,13 @@
   },
   "filters": [
     {
-      "values": [
-        "Social Media",
-        "Cloud Services",
-        "Development Tools",
-        "Communication"
-      ],
-      "filterStyle": "dropdown",
+      "values": ["Social Media", "Cloud Services", "Really really long long Development Tools", "Communication"],
+      "filterStyle": "combobox",
       "id": 1765208699247,
       "showDropdown": true,
       "active": "Social Media",
       "columnName": "Category",
-      "orderedValues": [
-        "Social Media",
-        "Cloud Services",
-        "Development Tools",
-        "Communication"
-      ],
+      "orderedValues": ["Social Media", "Cloud Services", "Really really long long Development Tools", "Communication"],
       "label": "Select technology category",
       "order": "cust"
     }
@@ -501,7 +491,7 @@
       "Learn More": "<a href=\"https://docs.digitalocean.com/\">DigitalOcean Documentation &raquo;</a>"
     },
     {
-      "Category": "Development Tools",
+      "Category": "Really really long long Development Tools",
       "Technology": "<a href=\"https://docs.github.com/\">GitHub</a>",
       "Adoption Rate": "94.6",
       "Users (millions)": "100.0",
@@ -509,7 +499,7 @@
       "Learn More": "<a href=\"https://docs.github.com/\">GitHub Documentation &raquo;</a>"
     },
     {
-      "Category": "Development Tools",
+      "Category": "Really really long long Development Tools",
       "Technology": "<a href=\"https://code.visualstudio.com/docs\">VS Code</a>",
       "Adoption Rate": "87.3",
       "Users (millions)": "14.0",
@@ -517,7 +507,7 @@
       "Learn More": "<a href=\"https://code.visualstudio.com/docs\">VS Code Documentation &raquo;</a>"
     },
     {
-      "Category": "Development Tools",
+      "Category": "Really really long long Development Tools",
       "Technology": "<a href=\"https://docs.docker.com/\">Docker</a>",
       "Adoption Rate": "79.8",
       "Users (millions)": "13.0",
@@ -525,7 +515,7 @@
       "Learn More": "<a href=\"https://docs.docker.com/\">Docker Documentation &raquo;</a>"
     },
     {
-      "Category": "Development Tools",
+      "Category": "Really really long long Development Tools",
       "Technology": "<a href=\"https://docs.npmjs.com/\">npm</a>",
       "Adoption Rate": "85.2",
       "Users (millions)": "17.0",
