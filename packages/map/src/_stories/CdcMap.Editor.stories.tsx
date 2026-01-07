@@ -407,7 +407,7 @@ export const GeneralSectionTests: Story = {
 
     // ==========================================================================
     // TEST: Title Style dropdown
-    // Verifies: Changing title style changes the CSS class of the title element
+    // Verifies: Changing title style changes the heading element (h2/h3) used
     // ==========================================================================
     const titleStyleSelect = canvas.getByLabelText(/Title Style/i) as HTMLSelectElement
     expect(titleStyleSelect).toBeTruthy()
@@ -416,15 +416,15 @@ export const GeneralSectionTests: Story = {
       const coveTitleElement = canvasElement.querySelector('.cove-title')
       const legacyTitleElement = canvasElement.querySelector('header.cove-component__header')
 
-      // For modern titles, the size class is on a child div
-      const sizeElement = coveTitleElement?.querySelector('div')
-      const sizeClasses = sizeElement ? Array.from(sizeElement.classList) : []
+      // For modern titles, check for h2 (large) or h3 (small) elements
+      const hasH2 = Boolean(coveTitleElement?.querySelector('h2'))
+      const hasH3 = Boolean(coveTitleElement?.querySelector('h3'))
 
       return {
         hasCoveTitle: Boolean(coveTitleElement),
         hasLegacyTitle: Boolean(legacyTitleElement),
-        isSmall: sizeClasses.includes('cove-title--small'),
-        isLarge: sizeClasses.includes('cove-title--large')
+        isSmall: hasH3,
+        isLarge: hasH2
       }
     }
 
