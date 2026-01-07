@@ -21,6 +21,7 @@ import { addValuesToDashboardFilters } from '../../../helpers/addValuesToDashboa
 import { FILTER_STYLE } from '../../../types/FilterStyles'
 import { handleSorting } from '@cdc/core/components/Filters'
 import { removeDashboardFilter } from '../../../helpers/removeDashboardFilter'
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
 
 type DashboardFitlersEditorProps = {
   vizConfig: DashboardFilters
@@ -122,6 +123,29 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
     dispatch({ type: 'SET_CONFIG', payload: { dashboard, visualizations: newVisualizations } })
   }
 
+  const handleFilterReorder = (result: DropResult) => {
+    const { source, destination } = result
+    if (!destination || source.index === destination.index) return
+
+    const newIndexes = [...vizConfig.sharedFilterIndexes]
+    const [movedIndex] = newIndexes.splice(source.index, 1)
+    newIndexes.splice(destination.index, 0, movedIndex)
+
+    updateConfig({
+      ...vizConfig,
+      sharedFilterIndexes: newIndexes
+    })
+  }
+
+  const getItemStyle = (isDragging, draggableStyle) => ({
+    ...draggableStyle,
+    ...(isDragging && sortableItemStyles)
+  })
+
+  const sortableItemStyles = {
+    background: 'rgba(0, 0, 0, 0.1)'
+  }
+
   const addNewFilter = () => {
     const _sharedFilters = _.cloneDeep(sharedFilters) || []
     const columnName = 'New Dashboard Filter ' + (_sharedFilters.length + 1)
@@ -219,44 +243,70 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
           <AccordionItemButton>Filters</AccordionItemButton>
         </AccordionItemHeading>
         <AccordionItemPanel>
-          {vizConfig.sharedFilterIndexes.map(index => {
-            const filter = sharedFilters[index]
-            return (
-              <FieldSetWrapper
-                key={filter.key + index}
-                fieldName={filter.key}
-                fieldKey={index}
-                fieldType='Dashboard Filter'
-                controls={openControls}
-                deleteField={() => {
-                  overlay?.actions.openOverlay(
-                    <DeleteFilterModal
-                      removeFilterCompletely={removeFilter}
-                      removeFilterFromViz={index => {
-                        updateConfig({
-                          ...vizConfig,
-                          sharedFilterIndexes: vizConfig.sharedFilterIndexes.filter(i => i !== index)
-                        })
-                      }}
-                      filterIndex={index}
-                    />
-                  )
-                }}
-              >
-                <FilterEditor
-                  filter={filter}
-                  filterIndex={index}
-                  updateFilterProp={(name, value) => {
-                    updateFilterProp(name, index, value)
-                  }}
-                  toggleNestedQueryParameters={checked => {
-                    toggleNestedQueryParameters(index, checked)
-                  }}
-                  config={config}
-                />
-              </FieldSetWrapper>
-            )
-          })}
+          <DragDropContext onDragEnd={handleFilterReorder}>
+            <Droppable droppableId='dashboard_filters_list'>
+              {provided => (
+                <ul {...provided.droppableProps} ref={provided.innerRef} className='draggable-field-list'>
+                  {vizConfig.sharedFilterIndexes.map((index, filterIndex) => {
+                    const filter = sharedFilters[index]
+                    return (
+                      <Draggable
+                        key={filter.key + index}
+                        draggableId={`filter-${filter.key}-${index}`}
+                        index={filterIndex}
+                      >
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
+                            className={snapshot.isDragging ? 'currently-dragging' : ''}
+                          >
+                            <FieldSetWrapper
+                              key={filter.key + index}
+                              fieldName={filter.key}
+                              fieldKey={index}
+                              fieldType='Dashboard Filter'
+                              controls={openControls}
+                              draggable={true}
+                              deleteField={() => {
+                                overlay?.actions.openOverlay(
+                                  <DeleteFilterModal
+                                    removeFilterCompletely={removeFilter}
+                                    removeFilterFromViz={index => {
+                                      updateConfig({
+                                        ...vizConfig,
+                                        sharedFilterIndexes: vizConfig.sharedFilterIndexes.filter(i => i !== index)
+                                      })
+                                    }}
+                                    filterIndex={index}
+                                  />
+                                )
+                              }}
+                            >
+                              <FilterEditor
+                                filter={filter}
+                                filterIndex={index}
+                                updateFilterProp={(name, value) => {
+                                  updateFilterProp(name, index, value)
+                                }}
+                                toggleNestedQueryParameters={checked => {
+                                  toggleNestedQueryParameters(index, checked)
+                                }}
+                                config={config}
+                              />
+                            </FieldSetWrapper>
+                          </div>
+                        )}
+                      </Draggable>
+                    )
+                  })}
+                  {provided.placeholder}
+                </ul>
+              )}
+            </Droppable>
+          </DragDropContext>
           <button onClick={addNewFilter} className='btn btn-primary full-width'>
             Add Filter
           </button>

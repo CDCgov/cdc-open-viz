@@ -2388,10 +2388,9 @@ export const BarFiltersTests: Story = {
       const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
       const bars = svg?.querySelectorAll('rect[class*="bar"], rect[data-testid*="bar"], g[class*="bar"] rect') || []
-      const filtersList = canvasElement.querySelector('.filters-list')
+      const filtersList = canvasElement.querySelector('.draggable-field-list')
 
-      // Fix: filters can be either div.mb-1 (collapsed) or fieldset.edit-block.mb-1 (expanded)
-      const filterElements = filtersList?.querySelectorAll('div.mb-1, fieldset.edit-block.mb-1') || []
+      const filterElements = filtersList?.querySelectorAll('.editor-field-item') || []
 
       // Get actual data visualization state for filtering verification
       // Method 1: Try X-axis tick labels (most direct)
