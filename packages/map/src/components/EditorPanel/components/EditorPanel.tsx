@@ -1543,8 +1543,8 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       label='Title Style'
                       updateField={updateField}
                       options={[
-                        { value: 'small', label: 'Small' },
-                        { value: 'large', label: 'Large' },
+                        { value: 'small', label: 'Small (h3)' },
+                        { value: 'large', label: 'Large (h2)' },
                         { value: 'legacy', label: 'Legacy' }
                       ]}
                       tooltip={
@@ -1553,7 +1553,11 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                           </Tooltip.Target>
                           <Tooltip.Content>
-                            <p>Choose the visual style for the map title.</p>
+                            <p>
+                              Choose the visual style for the map title. Consider heading order on your page when
+                              selecting the title style. For 508 reasons, ensure your page follows a proper heading
+                              order.
+                            </p>
                           </Tooltip.Content>
                         </Tooltip>
                       }

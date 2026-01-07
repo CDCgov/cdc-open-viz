@@ -20,14 +20,14 @@ const Title = (props: HeaderProps) => {
   const { isDashboard, title, superTitle, classes = [], showTitle = true, ariaLevel = 2, titleStyle } = props
 
   if (titleStyle === 'large' || titleStyle === 'small') {
-    const sizeClass = titleStyle === 'large' ? 'cove-title--large' : 'cove-title--small'
+    const TitleElement = titleStyle === 'large' ? 'h2' : 'h3'
 
     return (
       title &&
       showTitle && (
         <div className='cove-title' style={props.style}>
           {superTitle && <sup>{parse(superTitle)}</sup>}
-          <div className={sizeClass}>{parse(title)}</div>
+          <TitleElement>{parse(title)}</TitleElement>
         </div>
       )
     )
