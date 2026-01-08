@@ -1326,79 +1326,86 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 <div className={getChartSubTextClasses().join(' ')}>{parse(processedDescription)}</div>
               )}
 
-              {/* buttons */}
-              <MediaControls.Section classes={['download-buttons']}>
-                {config.table.showDownloadImgButton && (
-                  <MediaControls.Button
-                    text='Download Image'
-                    title='Download Chart as Image'
-                    type='image'
-                    state={config}
-                    elementToCapture={imageId}
-                    interactionLabel={interactionLabel}
-                  />
-                )}
-                {config.table.showDownloadPdfButton && (
-                  <MediaControls.Button
-                    text='Download PDF'
-                    title='Download Chart as PDF'
-                    type='pdf'
-                    state={config}
-                    elementToCapture={imageId}
-                    interactionLabel={interactionLabel}
-                  />
-                )}
-              </MediaControls.Section>
               {/* Data Table */}
-              {((config.xAxis.dataKey &&
+              {(config.xAxis.dataKey &&
                 config.table.show &&
                 config.visualizationType !== 'Spark Line' &&
                 config.visualizationType !== 'Sankey') ||
-                (config.visualizationType === 'Sankey' && config.table.show)) &&
-                (() => {
-                  let dataTableConfig = pivotDynamicSeries(config)
-                  let dataTableColumns = config.columns
-                  let dataTableRuntimeData = getTableRuntimeData()
-                  let dataTableRawData =
-                    config.visualizationType === 'Sankey'
-                      ? config?.data?.[0]?.tableData
-                      : config.table.customTableConfig
-                      ? filterVizData(config.filters, config.data)
-                      : config.data
+              (config.visualizationType === 'Sankey' && config.table.show)
+                ? (() => {
+                    let dataTableConfig = pivotDynamicSeries(config)
+                    let dataTableColumns = config.columns
+                    let dataTableRuntimeData = getTableRuntimeData()
+                    let dataTableRawData =
+                      config.visualizationType === 'Sankey'
+                        ? config?.data?.[0]?.tableData
+                        : config.table.customTableConfig
+                        ? filterVizData(config.filters, config.data)
+                        : config.data
 
-                  if (config.smallMultiples?.mode) {
-                    const prepared = prepareSmallMultiplesDataTable(config, config.columns, dataTableRuntimeData)
-                    dataTableConfig = prepared.config
-                    dataTableColumns = prepared.columns
-                    dataTableRuntimeData = prepared.runtimeData
-                    if (config.smallMultiples.mode === 'by-column') {
-                      dataTableRawData = prepared.config.data
+                    if (config.smallMultiples?.mode) {
+                      const prepared = prepareSmallMultiplesDataTable(config, config.columns, dataTableRuntimeData)
+                      dataTableConfig = prepared.config
+                      dataTableColumns = prepared.columns
+                      dataTableRuntimeData = prepared.runtimeData
+                      if (config.smallMultiples.mode === 'by-column') {
+                        dataTableRawData = prepared.config.data
+                      }
                     }
-                  }
 
-                  return (
-                    <DataTable
-                      /* changing the "key" will force the table to re-render
-                                  when the default sort changes while editing */
-                      key={dataTableDefaultSortBy}
-                      config={dataTableConfig}
-                      rawData={dataTableRawData}
-                      runtimeData={dataTableRuntimeData}
-                      expandDataTable={config.table.expanded}
-                      columns={dataTableColumns}
-                      defaultSortBy={dataTableDefaultSortBy}
-                      displayGeoName={name => name}
-                      applyLegendToRow={applyLegendToRow}
-                      tableTitle={config.table.label}
-                      indexTitle={config.table.indexLabel}
-                      vizTitle={title}
-                      viewport={currentViewport}
-                      tabbingId={handleChartTabbing(config, legendId)}
-                      colorScale={colorScale}
-                      interactionLabel={interactionLabel}
-                    />
-                  )
-                })()}
+                    return (
+                      <DataTable
+                        /* changing the "key" will force the table to re-render
+                                    when the default sort changes while editing */
+                        key={dataTableDefaultSortBy}
+                        config={dataTableConfig}
+                        rawData={dataTableRawData}
+                        runtimeData={dataTableRuntimeData}
+                        expandDataTable={config.table.expanded}
+                        columns={dataTableColumns}
+                        defaultSortBy={dataTableDefaultSortBy}
+                        displayGeoName={name => name}
+                        applyLegendToRow={applyLegendToRow}
+                        tableTitle={config.table.label}
+                        indexTitle={config.table.indexLabel}
+                        vizTitle={title}
+                        viewport={currentViewport}
+                        tabbingId={handleChartTabbing(config, legendId)}
+                        colorScale={colorScale}
+                        imageRef={imageId}
+                        showDownloadImgButton={config.table.showDownloadImgButton}
+                        showDownloadPdfButton={config.table.showDownloadPdfButton}
+                        includeContextInDownload={config.table?.includeContextInDownload}
+                        interactionLabel={interactionLabel}
+                      />
+                    )
+                  })()
+                : (config.table.showDownloadImgButton || config.table.showDownloadPdfButton) && (
+                    <div className='w-100 d-flex justify-content-end'>
+                      <MediaControls.Section classes={['download-links', 'mt-4', 'mb-2']}>
+                        {config.table.showDownloadImgButton && (
+                          <MediaControls.DownloadLink
+                            type='image'
+                            title='Download Chart as Image'
+                            state={config}
+                            elementToCapture={imageId}
+                            interactionLabel={interactionLabel}
+                            includeContextInDownload={config.table?.includeContextInDownload}
+                          />
+                        )}
+                        {config.table.showDownloadPdfButton && (
+                          <MediaControls.DownloadLink
+                            type='pdf'
+                            title='Download Chart as PDF'
+                            state={config}
+                            elementToCapture={imageId}
+                            interactionLabel={interactionLabel}
+                            includeContextInDownload={config.table?.includeContextInDownload}
+                          />
+                        )}
+                      </MediaControls.Section>
+                    </div>
+                  )}
               {config?.annotations?.length > 0 && <Annotation.Dropdown />}
               {/* show pdf or image button */}
               {processedLegacyFootnotes && (

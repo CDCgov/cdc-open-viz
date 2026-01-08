@@ -173,6 +173,20 @@
     margin-bottom: 20px;
   }
 
+  // Override Bootstrap's row negative margins to prevent horizontal scrollbar
+  .row {
+    margin-right: 0;
+    margin-left: 0;
+
+    // Remove padding from first and last columns to keep content flush to edges
+    > [class*='col-']:first-child {
+      padding-left: 0;
+    }
+    > [class*='col-']:last-child {
+      padding-right: 0;
+    }
+  }
+
   .dashboard-row {
     display: flex;
     flex-direction: column;

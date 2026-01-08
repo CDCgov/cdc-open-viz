@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -8,6 +8,8 @@
     body {
       margin: 0;
       border-top: none !important;
+      /* Force scrollbar so page stays consistent width */
+      min-height: calc(100vh + 1px);
     }
 
     .cdc-map-outer-container {
@@ -24,7 +26,7 @@
 
 <body>
   <!-- GENERIC CHART TYPES -->
-  <div class="react-container" data-config="/examples/cases-year.json"></div>
+  <div class="react-container" data-config="/examples/private/height.json"></div>
 
   <noscript>You need to enable JavaScript to run this app.</noscript>
 

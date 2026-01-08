@@ -98,6 +98,16 @@ export default function CdcDashboard({
     }
 
     const vals = reloadURLHelpers.getDatasetKeys(state.config).map(key => state.data[key])
+
+    // Check if there are any visualizations that actually need data
+    // Markup-includes without dataKey don't require dashboard data
+    const visualizationsNeedingData = Object.values(state.config.visualizations).filter(viz => {
+      return viz.type !== 'markup-include' || viz.dataKey
+    })
+
+    // If no visualizations need data, don't show no-data state
+    if (!vals.length && visualizationsNeedingData.length === 0) return false
+
     if (!vals.length) return true
     return vals.some(val => val === undefined)
   }, [state.data, state.config.visualizations, state.config.dashboard?.sharedFilters, state.filtersApplied])
