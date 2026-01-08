@@ -98,11 +98,6 @@ const generateMedia = (state, type, elementToCapture, interactionLabel, includeC
           }
         })
 
-        // Set a fixed width on the container to match the original element's width
-        const originalWidth = (baseSvg as HTMLElement).offsetWidth
-        container.style.width = `${originalWidth}px`
-        container.style.paddingTop = '2rem' // Add padding to prevent filters from being cut off
-
         import(/* webpackChunkName: "html2canvas" */ 'html2canvas').then(mod => {
           mod
             .default(container, {
