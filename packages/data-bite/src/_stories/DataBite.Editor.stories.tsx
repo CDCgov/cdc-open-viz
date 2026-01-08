@@ -11,6 +11,8 @@ import {
   getDisplayValue,
   getTitleText
 } from '@cdc/core/helpers/testing'
+import testConfig from './_mock/test-config.json'
+import exampleData from './_mock/example-data.json'
 
 const meta: Meta<typeof DataBite> = {
   title: 'Components/Templates/Data Bite/Editor Tests',
@@ -22,6 +24,12 @@ const meta: Meta<typeof DataBite> = {
 
 export default meta
 type Story = StoryObj<typeof DataBite>
+
+// Merge config with data for testing
+const testConfigWithData = {
+  ...testConfig,
+  data: exampleData
+}
 
 // ============================================================================
 // REFACTORED EDITOR TESTS FOLLOWING TESTING_BEST_PRACTICES.md
@@ -48,7 +56,7 @@ type Story = StoryObj<typeof DataBite>
 // ============================================================================
 export const BasicEditorLoadingTests: Story = {
   args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
+    config: testConfigWithData,
     isEditor: true
   },
   play: async ({ canvasElement }) => {
@@ -79,7 +87,7 @@ export const BasicEditorLoadingTests: Story = {
 // ============================================================================
 export const GeneralSectionTests: Story = {
   args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
+    config: testConfigWithData,
     isEditor: true
   },
   play: async ({ canvasElement }) => {
@@ -222,7 +230,7 @@ export const GeneralSectionTests: Story = {
 // ============================================================================
 export const DataSectionTests: Story = {
   args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
+    config: testConfigWithData,
     isEditor: true
   },
   play: async ({ canvasElement }) => {
@@ -602,7 +610,7 @@ export const DataSectionTests: Story = {
 // ============================================================================
 export const VisualSectionTests: Story = {
   args: {
-    configUrl: '/packages/data-bite/tests/fixtures/test-config.json',
+    config: testConfigWithData,
     isEditor: true
   },
   play: async ({ canvasElement }) => {

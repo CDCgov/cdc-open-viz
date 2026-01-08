@@ -2806,8 +2806,11 @@ export const BarVisualTests: Story = {
       const chartSvg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Find bar elements in the chart
+      // Look for path elements with id starting with "barGroup" which are the actual bars
       const barElements =
-        chartSvg?.querySelectorAll('rect[class*="bar"], path[class*="bar"], g[class*="bar"] rect') || []
+        chartSvg?.querySelectorAll(
+          'path[id^="barGroup"], rect[class*="bar"], path[class*="bar"], g[class*="bar"] rect'
+        ) || []
 
       // Check for border-related styles and attributes
       const barsWithStroke = Array.from(barElements).filter(bar => {
