@@ -1,0 +1,194 @@
+{
+  "type": "chart",
+  "title": "Quadrant 2: Gentle Downward (91°-179°)",
+  "theme": "theme-blue",
+  "animate": false,
+  "fontSize": "medium",
+  "lineDatapointStyle": "always show",
+  "visualizationSubType": "regular",
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "yAxis": {
+    "hideAxis": false,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "68",
+    "gridLines": true,
+    "enablePadding": false,
+    "min": "0",
+    "max": "120",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "axisPadding": 0,
+    "scalePadding": 10,
+    "tickRotation": 0,
+    "label": "Value"
+  },
+  "topAxis": {
+    "hasLine": false
+  },
+  "height": "450",
+  "xAxis": {
+    "sortDates": false,
+    "type": "categorical",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "78",
+    "tickRotation": "0",
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "labelOffset": 0,
+    "axisPadding": 0,
+    "padding": 5,
+    "dataKey": "Category",
+    "label": "Data Points"
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "Testing gentle downward angles (Q2: 91°-179°)",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "download": true,
+    "showVertical": true,
+    "show": true
+  },
+  "orientation": "vertical",
+  "legend": {
+    "hide": false,
+    "behavior": "highlight",
+    "axisAlign": true,
+    "singleRow": false,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "Gentle downward angle line",
+    "label": "Series",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "style": "lines",
+    "subStyle": "linear blocks",
+    "shape": "circle",
+    "hideBorder": {
+      "side": false,
+      "topBottom": true
+    },
+    "position": "right",
+    "hasShape": true
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "palette": "qualitative4",
+  "isPaletteReversed": false,
+  "labels": true,
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": false
+  },
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false,
+    "lineDatapointSymbol": "standard"
+  },
+  "data": [
+    {
+      "Category": "A",
+      "Gentle Downward (Q2)": "100"
+    },
+    {
+      "Category": "B",
+      "Gentle Downward (Q2)": "80"
+    },
+    {
+      "Category": "C",
+      "Gentle Downward (Q2)": "90"
+    },
+    {
+      "Category": "D",
+      "Gentle Downward (Q2)": "100"
+    },
+    {
+      "Category": "E",
+      "Gentle Downward (Q2)": "90"
+    },
+    {
+      "Category": "F",
+      "Gentle Downward (Q2)": "10"
+    },
+    {
+      "Category": "G",
+      "Gentle Downward (Q2)": "80"
+    },
+    {
+      "Category": "H",
+      "Gentle Downward (Q2)": "100"
+    }
+  ],
+  "visualizationType": "Line",
+  "series": [
+    {
+      "dataKey": "Gentle Downward (Q2)",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    }
+  ],
+  "description": "Testing Quadrant 2 angles (91°-179°) - gentle downward slopes where labels should be positioned to avoid line overlap.",
+  "annotations": [],
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "showTitle": true,
+  "showDownloadMediaButton": false,
+  "lineDatapointColor": "Same as Line",
+  "isResponsiveTicks": false,
+  "general": {
+    "annotationDropdownText": "Annotations",
+    "showDownloadButton": false,
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": true,
+    "hideNullValue": true
+  },
+  "isLegendValue": false,
+  "barSpace": 15,
+  "heights": {
+    "vertical": 450,
+    "horizontal": 750
+  },
+  "columns": {},
+  "brush": {
+    "height": 45,
+    "active": false
+  },
+  "useLogScale": false,
+  "filterBehavior": "Filter Change",
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": ""
+  },
+  "version": "4.25.1"
+}
