@@ -115,16 +115,21 @@
     }
   }
 
-  // General: Bite Style > TP5
+  // TP5 Style (default: callout with blue background)
   &.bite__style--tp5 {
     padding: 0 !important;
-    background: transparent !important;
     border: none !important;
     height: 100%; // Allow height to fill parent container
+    background: none !important;
+
+    .cdc-callout {
+      box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+      border: 2px solid #dff2f6 !important;
+      margin: 0 !important;
+    }
 
     // Most layout handled by Bootstrap classes in JSX, minimal custom CSS
     .cdc-callout__heading {
-      min-height: 2.5em; // Minimum height for JS equalization
       padding-right: 1.5rem;
     }
 
@@ -138,6 +143,25 @@
 
     .bite-subtext {
       margin-top: auto; // Push to bottom on desktop
+    }
+
+    // White background variant (when "Use White Background Style" is checked)
+    &.white-background-style {
+      background: white !important;
+
+      .cdc-callout {
+        background: transparent !important;
+        border: 2px solid #009ec1 !important;
+        box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+      }
+    }
+
+    // White background with border (when both white background and Display Border are checked)
+    &.white-background-style.display-border {
+      .cdc-callout {
+        border: none !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
     }
   }
 

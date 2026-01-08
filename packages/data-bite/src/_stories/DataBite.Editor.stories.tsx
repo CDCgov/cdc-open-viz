@@ -151,35 +151,31 @@ export const GeneralSectionTests: Story = {
     )
 
     // ============================================================================
-    // TEST 3: Show Title Toggle
-    // Expectation: Title visibility changes (DOM presence/absence).
+    // TEST 3: Title Visibility Based on Content
+    // Expectation: Title shows when text exists, hides when empty
     // ============================================================================
-    const showTitleCheckbox = canvasElement.querySelector('input[name="showTitle"]') as HTMLInputElement
-    expect(showTitleCheckbox).toBeTruthy()
-
-    const getTitleVisibility = () => {
-      const titleElement = canvasElement.querySelector('.cove-component__header') as HTMLElement
-      return titleElement && titleElement.offsetParent !== null
-    }
-
-    const wasVisible = getTitleVisibility()
+    // Clear the title to hide it
+    await userEvent.clear(titleInput)
     await performAndAssert(
-      'Title Toggle',
-      getTitleVisibility,
-      async () => {
-        await userEvent.click(showTitleCheckbox)
+      'Title Hidden When Empty',
+      () => {
+        const titleElement = canvasElement.querySelector('.cove-component__header') as HTMLElement
+        return titleElement && titleElement.offsetParent !== null
       },
-      (before, after) => after !== before
+      async () => {}, // action already performed above
+      (before, after) => after === false
     )
 
-    // Toggle back to original state
+    // Add title back to show it
+    await userEvent.type(titleInput, 'Restored Title')
     await performAndAssert(
-      'Title Toggle Reset',
-      getTitleVisibility,
-      async () => {
-        await userEvent.click(showTitleCheckbox)
+      'Title Shown When Has Content',
+      () => {
+        const titleElement = canvasElement.querySelector('.cove-component__header') as HTMLElement
+        return titleElement && titleElement.offsetParent !== null
       },
-      (before, after) => after === wasVisible
+      async () => {}, // action already performed above
+      (before, after) => after === true
     )
 
     // ============================================================================

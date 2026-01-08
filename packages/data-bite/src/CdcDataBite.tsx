@@ -595,27 +595,40 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       <>
         {isEditor && <EditorPanel />}
         <Layout.Responsive isEditor={isEditor}>
-          <div className={`cove-component__content ${showBite && 'tp5' === biteStyle ? 'bite__style--tp5' : ''}`}>
+          <div
+            className={`cove-component__content ${showBite && 'tp5' === biteStyle ? 'bite__style--tp5' : ''} ${
+              showBite && 'tp5' === biteStyle && config.visual?.whiteBackground ? 'white-background-style' : ''
+            } ${
+              showBite && 'tp5' === biteStyle && config.visual?.whiteBackground && config.visual?.border
+                ? 'display-border'
+                : ''
+            }`}
+          >
             {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
             {(!config.dataColumn || !config.dataFunction) && <Confirm />}
-            {showBite && 'tp5' === biteStyle ? (
-              <div className='bite-content dfe-block cdc-callout cdc-callout--data d-flex flex-column h-100'>
-                <div className='cdc-callout__icon' aria-hidden='true' role='img'></div>
-                {config.visual?.showTitle && (
+            {showBite && biteStyle === 'tp5' ? (
+              <div
+                className={`bite-content cdc-callout d-flex flex-column h-100 ${
+                  !config.visual?.whiteBackground ? 'dfe-block cdc-callout--data' : ''
+                }`}
+              >
+                {/* Icon shows by default, hidden when white background is enabled */}
+                {!config.visual?.whiteBackground && (
+                  <div className='cdc-callout__icon' aria-hidden='true' role='img'></div>
+                )}
+
+                {title && title.trim() && (
                   <h3 className='cdc-callout__heading fw-bold flex-shrink-0 d-flex align-items-start'>
                     {parse(processContentWithMarkup(title))}
                   </h3>
                 )}
-                <div className='cdc-callout__body d-flex flex-row align-items-start align-content-start flex-grow-1 pt-2'>
+                <div className='cdc-callout__body d-flex flex-row align-items-center align-content-start flex-grow-1'>
                   {showBite && (
-                    <div
-                      className='cdc-callout__databite flex-shrink-0 align-self-start me-3'
-                      style={{ fontSize: '2.45rem' }}
-                    >
+                    <div className='cdc-callout__databite flex-shrink-0  me-3' style={{ fontSize: '2.45rem' }}>
                       {calculateDataBite(true)}
                     </div>
                   )}
-                  <div className='cdc-callout__content flex-grow-1 d-flex flex-column align-self-start min-w-0'>
+                  <div className='cdc-callout__content flex-grow-1 d-flex flex-column  min-w-0'>
                     {parse(processContentWithMarkup(biteBody))}
                     {subtext && !config.general.isCompactStyle && (
                       <p className='bite-subtext fst-italic flex-shrink-0 mt-3'>
