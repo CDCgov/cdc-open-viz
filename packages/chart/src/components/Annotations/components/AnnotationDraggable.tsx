@@ -6,6 +6,7 @@ import { isMobileAnnotationViewport } from '@cdc/core/helpers/viewports'
 
 // helpers
 import { findNearestDatum } from './findNearestDatum'
+import { getVisibleAnnotations } from '../helpers/getVisibleAnnotations'
 
 // visx
 import { HtmlLabel, CircleSubject, EditableAnnotation, Connector, Annotation as VisxAnnotation } from '@visx/annotation'
@@ -22,6 +23,9 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
   // destructure config items here...
   const { annotations, visualizationType } = config
   const [height] = dimensions
+
+  // Filter annotations to only show those with visible data (for data-mode annotations)
+  const visibleAnnotations = getVisibleAnnotations(annotations, transformedData, config.xAxis?.dataKey)
 
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
   const isMobile = isMobileAnnotationViewport(currentViewport)
@@ -46,8 +50,9 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
   }
 
   return (
-    annotations &&
-    annotations.map((annotation, index) => {
+    visibleAnnotations &&
+    visibleAnnotations.map((annotation, annotationIndex) => {
+      const originalIndex = annotations.indexOf(annotation)
       const text = annotation.text || ''
 
       // Default to absolute positioning
@@ -90,7 +95,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
 
       return (
         <AnnotationComponent
-          key={`annotation-${index}-${annotation.x}-${annotation.y}-${annotation.dx}-${annotation.dy}`}
+          key={`annotation-${originalIndex}-${annotation.x}-${annotation.y}-${annotation.dx}-${annotation.dy}`}
           width={200}
           height={height}
           dx={annotation.dx} // label position
@@ -103,10 +108,10 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
           subjectDragHandleProps={{ r: 15, stroke: 'red' }}
           onDragStart={() => {
             onDragStateChange(true)
-            setLiveDrag({ index, dx: annotation.dx })
+            setLiveDrag({ index: annotationIndex, dx: annotation.dx })
           }}
           onDragMove={props => {
-            setLiveDrag({ index, dx: props.dx })
+            setLiveDrag({ index: annotationIndex, dx: props.dx })
           }}
           onDragEnd={props => {
             onDragStateChange(false)
@@ -120,7 +125,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
                 : annotation.x === xScaleAnnotation.invert(props.x) && annotation.y === yScaleAnnotation.invert(props.y)
 
             if (isLabelOnlyDrag) {
-              updatedAnnotations[index] = { ...updatedAnnotations[index], dx: props.dx, dy: props.dy }
+              updatedAnnotations[originalIndex] = { ...updatedAnnotations[originalIndex], dx: props.dx, dy: props.dy }
             } else {
               if (annotation.anchorMode === 'data') {
                 let nearestDatum = findNearestDatum({
@@ -134,16 +139,16 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
                 })
 
                 if (nearestDatum) {
-                  updatedAnnotations[index] = {
-                    ...updatedAnnotations[index],
+                  updatedAnnotations[originalIndex] = {
+                    ...updatedAnnotations[originalIndex],
                     dataX: nearestDatum.x,
                     x: xScaleAnnotation.invert(props.x),
                     y: yScaleAnnotation.invert(props.y)
                   }
                 }
               } else {
-                updatedAnnotations[index] = {
-                  ...updatedAnnotations[index],
+                updatedAnnotations[originalIndex] = {
+                  ...updatedAnnotations[originalIndex],
                   x: xScaleAnnotation.invert(props.x),
                   y: yScaleAnnotation.invert(props.y)
                 }
@@ -160,7 +165,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
             (() => {
               const labelWidth = config.general.showAnnotationDropdown ? 200 : 150
               // Use live dx during drag, otherwise use stored annotation.dx
-              const currentDx = liveDrag?.index === index ? liveDrag.dx : annotation.dx
+              const currentDx = liveDrag?.index === annotationIndex ? liveDrag.dx : annotation.dx
               const { horizontalAnchor, verticalAnchor } = getAnnotationAnchors(annotationX, currentDx, labelWidth)
               return (
                 <HtmlLabel
@@ -189,7 +194,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
                     {config?.general?.showAnnotationDropdown && (
                       <>
                         <p className='annotation__has-dropdown-number' style={{ margin: '2px 6px' }}>
-                          {index + 1}
+                          {originalIndex + 1}
                         </p>
                       </>
                     )}
@@ -199,10 +204,10 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
               )
             })()}
           {annotation.connectionType === 'line' && (
-            <Connector type='line' pathProps={{ markerStart: `url(#marker-start--${index})` }} />
+            <Connector type='line' pathProps={{ markerStart: `url(#marker-start--${originalIndex})` }} />
           )}
           {annotation.connectionType === 'elbow' && (
-            <Connector type='elbow' pathProps={{ markerStart: `url(#marker-start--${index})` }} />
+            <Connector type='elbow' pathProps={{ markerStart: `url(#marker-start--${originalIndex})` }} />
           )}
           {annotation.connectionType === 'curve' && (
             <LinePath
@@ -212,7 +217,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
               } ${annotationX + annotation.dx},${annotationY + annotation.dy}`}
               stroke={APP_FONT_COLOR}
               fill='none'
-              marker-start={`url(#marker-start--${index})`}
+              marker-start={`url(#marker-start--${originalIndex})`}
             />
           )}
           {annotation.marker === 'circle' && (
@@ -221,7 +226,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
           {annotation.marker === 'arrow' && (
             <MarkerArrow
               fill={APP_FONT_COLOR}
-              id={`marker-start--${index}`}
+              id={`marker-start--${originalIndex}`}
               x={annotationX}
               y={annotationY}
               stroke={APP_FONT_COLOR}
@@ -251,7 +256,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
                 alignmentBaseline='middle'
                 textAnchor='middle'
               >
-                {index + 1}
+                {originalIndex + 1}
               </text>
             </>
           )}
