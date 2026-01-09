@@ -173,6 +173,20 @@
     margin-bottom: 20px;
   }
 
+  // Override Bootstrap's row negative margins to prevent horizontal scrollbar
+  .row {
+    margin-right: 0;
+    margin-left: 0;
+
+    // Remove padding from first and last columns to keep content flush to edges
+    > [class*='col-']:first-child {
+      padding-left: 0;
+    }
+    > [class*='col-']:last-child {
+      padding-right: 0;
+    }
+  }
+
   .dashboard-row {
     display: flex;
     flex-direction: column;
@@ -244,8 +258,48 @@
 
   .cdc-dashboard-inner-container {
     &.is-editor {
-      margin-top: 7em;
+      padding: 1rem;
     }
+
+    // Ensure Bootstrap rows with data bites stretch columns to equal height
+    .row:has([class*='bite__style']) {
+      display: flex !important;
+      align-items: stretch !important;
+
+      // Ensure Bootstrap columns are flex containers
+      [class*='col-'] {
+        display: flex !important;
+        flex-direction: column !important;
+
+        > * {
+          display: flex !important;
+          flex-direction: column !important;
+          flex: 1 !important;
+          min-height: 0;
+          width: 100%;
+        }
+      }
+    }
+
+    // TP5 adjustments when there are 2+ data bites in a row
+    .row:has(.bite__style--tp5):has([class*='col-'] ~ [class*='col-']) {
+      .bite__style--tp5 {
+        .cdc-callout__heading {
+          padding-right: 0;
+        }
+        .cdc-callout__body {
+          margin-bottom: -1rem;
+        }
+      }
+
+      // Hide icon when in multi-column layout, unless using white background
+      .bite__style--tp5:not(.white-background-style) .cdc-callout__icon {
+        display: none;
+      }
+    }
+
+    // Data bite alignment styles are now in packages/data-bite/src/scss/bite.scss
+    // under .cdc-dashboard-inner-container to ensure proper specificity
   }
 
   .sub-editor {

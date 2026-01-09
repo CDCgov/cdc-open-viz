@@ -42,6 +42,20 @@ export const Data_Bite_Text_Average_Pic: Story = {
   }
 }
 
+export const Data_Bite_TP5_Style: Story = {
+  args: {
+    configUrl: '/packages/data-bite/examples/tp5-style.json'
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'TP5 Style - A new layout style that displays the data value and message side by side, centered. The title appears above, and subtext appears below the message. On mobile devices, the message wraps below the data value. This style mimics the CDC Template Package 5.0 callout component design.'
+      }
+    }
+  }
+}
+
 // Simple editor mode story for basic rendering
 export const Editor_Mode_Basic: Story = {
   args: {

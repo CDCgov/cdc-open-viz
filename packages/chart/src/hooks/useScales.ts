@@ -133,7 +133,17 @@ const useScales = (properties: useScaleProps) => {
   // handle  Vertical bars
   if (!isHorizontal) {
     xScale = composeScaleBand(xAxisDataMapped, [0, xMax], paddingRange)
-    yScale = composeYScale({ min, max, yMax, config, leftMax })
+    // For categorical y-axis, use [0, max] domain and [yMax, 0] range to match CategoricalYAxis
+    // This ensures line data aligns with categorical bars and bars go to 100% height
+    if (config.yAxis.type === 'categorical') {
+      yScale = scaleLinear({
+        domain: [0, max],
+        range: [yMax, 0],
+        clamp: true
+      })
+    } else {
+      yScale = composeYScale({ min, max, yMax, config, leftMax })
+    }
     seriesScale = composeScaleBand(seriesDomain, [0, xScale.bandwidth()], 0)
   }
 

@@ -96,3 +96,33 @@
 .type-sparkline.type-chart .cove-component__header {
   margin: 0px !important;
 }
+
+/* ============================================================================
+   MODERN TITLE
+   ============================================================================ */
+
+.cdc-open-viz-module .cove-title {
+  margin-bottom: 1rem;
+}
+
+.cdc-open-viz-module .cove-title h2 {
+  color: #0b4778;
+  font-size: 1.95rem;
+  font-family: var(--app-font-secondary);
+  border-bottom: 1px solid var(--cool-gray-10);
+  font-weight: 300;
+}
+
+.cdc-open-viz-module .cove-title h3 {
+  font-size: 1.5rem;
+  font-family: var(--app-font-secondary);
+}
+
+.cdc-open-viz-module .cove-title sup {
+  font-family: var(--app-font-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #666;
+  display: block;
+}

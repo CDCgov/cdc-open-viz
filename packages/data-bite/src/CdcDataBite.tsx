@@ -595,70 +595,115 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       <>
         {isEditor && <EditorPanel />}
         <Layout.Responsive isEditor={isEditor}>
-          <div className={`cove-component__content`}>
+          <div
+            className={`cove-component__content ${showBite && 'tp5' === biteStyle ? 'bite__style--tp5' : ''} ${
+              showBite && 'tp5' === biteStyle && config.visual?.whiteBackground ? 'white-background-style' : ''
+            } ${
+              showBite && 'tp5' === biteStyle && config.visual?.whiteBackground && config.visual?.border
+                ? 'display-border'
+                : ''
+            }`}
+          >
             {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
             {(!config.dataColumn || !config.dataFunction) && <Confirm />}
-            <Title
-              showTitle={config.visual?.showTitle}
-              config={config}
-              title={processContentWithMarkup(title)}
-              isDashboard={isDashboard}
-              classes={['bite-header', `${config.theme}`]}
-            />
-            <div className={`bite ${biteClasses.join(' ')}`}>
-              <div className={`bite-content-container ${contentClasses.join(' ')}`}>
-                {showBite && 'graphic' === biteStyle && isTop && (
-                  <CircleCallout
-                    theme={config.theme}
-                    text={calculateDataBite()}
-                    biteFontSize={biteFontSize}
-                    dataFormat={dataFormat}
-                  />
+            {showBite && biteStyle === 'tp5' ? (
+              <div
+                className={`bite-content cdc-callout d-flex flex-column h-100 ${
+                  !config.visual?.whiteBackground ? 'dfe-block cdc-callout--data' : ''
+                }`}
+              >
+                {/* Icon shows by default, hidden when white background is enabled */}
+                {!config.visual?.whiteBackground && (
+                  <div className='cdc-callout__icon' aria-hidden='true' role='img'></div>
                 )}
-                {isTop && <DataImage />}
-                <div className={`bite-content`}>
-                  {showBite && 'title' === biteStyle && (
-                    <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
-                      {calculateDataBite()}
+
+                {config.visual?.showTitle && title && title.trim() && (
+                  <h3 className='cdc-callout__heading fw-bold flex-shrink-0 d-flex align-items-start'>
+                    {parse(processContentWithMarkup(title))}
+                  </h3>
+                )}
+                <div className='cdc-callout__body d-flex flex-row align-items-center align-content-start flex-grow-1'>
+                  {showBite && (
+                    <div className='cdc-callout__databite flex-shrink-0  me-3' style={{ fontSize: '2.45rem' }}>
+                      {calculateDataBite(true)}
                     </div>
                   )}
-                  {showBite && 'split' === biteStyle && (
-                    <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
-                      {calculateDataBite()}
-                    </div>
-                  )}
-                  <Fragment>
-                    <div className='bite-content__text-wrap'>
-                      <p className='bite-text'>
-                        {showBite && 'body' === biteStyle && (
-                          <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
-                            {calculateDataBite()}
-                          </span>
-                        )}
-                        {parse(processContentWithMarkup(biteBody))}
+                  <div className='cdc-callout__content flex-grow-1 d-flex flex-column  min-w-0'>
+                    {parse(processContentWithMarkup(biteBody))}
+                    {subtext && !config.general.isCompactStyle && (
+                      <p className='bite-subtext fst-italic flex-shrink-0 mt-3'>
+                        {parse(processContentWithMarkup(subtext))}
                       </p>
-                      {showBite && 'end' === biteStyle && (
-                        <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
-                          {calculateDataBite()}
-                        </span>
-                      )}
-                      {subtext && !config.general.isCompactStyle && (
-                        <p className='bite-subtext'>{parse(processContentWithMarkup(subtext))}</p>
-                      )}
-                    </div>
-                  </Fragment>
+                    )}
+                  </div>
                 </div>
-                {isBottom && <DataImage />}
-                {showBite && 'graphic' === biteStyle && !isTop && (
-                  <CircleCallout
-                    theme={config.theme}
-                    text={calculateDataBite()}
-                    biteFontSize={biteFontSize}
-                    dataFormat={dataFormat}
-                  />
-                )}
               </div>
-            </div>
+            ) : (
+              <>
+                <Title
+                  showTitle={config.visual?.showTitle}
+                  titleStyle={config.titleStyle}
+                  config={config}
+                  title={processContentWithMarkup(title)}
+                  isDashboard={isDashboard}
+                  classes={['bite-header', `${config.theme}`]}
+                />
+                <div className={`bite ${biteClasses.join(' ')}`}>
+                  <div className={`bite-content-container ${contentClasses.join(' ')}`}>
+                    {showBite && 'graphic' === biteStyle && isTop && (
+                      <CircleCallout
+                        theme={config.theme}
+                        text={calculateDataBite()}
+                        biteFontSize={biteFontSize}
+                        dataFormat={dataFormat}
+                      />
+                    )}
+                    {isTop && <DataImage />}
+                    <div className={`bite-content`}>
+                      {showBite && 'title' === biteStyle && (
+                        <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
+                          {calculateDataBite()}
+                        </div>
+                      )}
+                      {showBite && 'split' === biteStyle && (
+                        <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
+                          {calculateDataBite()}
+                        </div>
+                      )}
+                      <Fragment>
+                        <div className='bite-content__text-wrap'>
+                          <p className='bite-text'>
+                            {showBite && 'body' === biteStyle && (
+                              <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
+                                {calculateDataBite()}
+                              </span>
+                            )}
+                            {parse(processContentWithMarkup(biteBody))}
+                          </p>
+                          {showBite && 'end' === biteStyle && (
+                            <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
+                              {calculateDataBite()}
+                            </span>
+                          )}
+                          {subtext && !config.general.isCompactStyle && (
+                            <p className='bite-subtext'>{parse(processContentWithMarkup(subtext))}</p>
+                          )}
+                        </div>
+                      </Fragment>
+                    </div>
+                    {isBottom && <DataImage />}
+                    {showBite && 'graphic' === biteStyle && !isTop && (
+                      <CircleCallout
+                        theme={config.theme}
+                        text={calculateDataBite()}
+                        biteFontSize={biteFontSize}
+                        dataFormat={dataFormat}
+                      />
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
           {link && link}
         </Layout.Responsive>

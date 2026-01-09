@@ -5,6 +5,7 @@ import parse from 'html-react-parser'
 // CDC
 import Button from '../elements/Button'
 import MultiSelect from '../MultiSelect'
+import ComboBox from '../ComboBox'
 import { Visualization } from '../../types/Visualization'
 import { MultiSelectFilter, VizFilter } from '../../types/VizFilter'
 import { addValuesToFilters } from '../../helpers/addValuesToFilters'
@@ -23,13 +24,14 @@ import { publishAnalyticsEvent } from '../../helpers/metrics/helpers'
 import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
 
 export const VIZ_FILTER_STYLE = {
+  combobox: 'combobox',
   dropdown: 'dropdown',
+  multiSelect: 'multi-select',
   nestedDropdown: 'nested-dropdown',
   pill: 'pill',
   tab: 'tab',
   tabSimple: 'tab-simple',
-  tabBar: 'tab bar',
-  multiSelect: 'multi-select'
+  tabBar: 'tab bar'
 } as const
 
 export type VizFilterStyle = (typeof VIZ_FILTER_STYLE)[keyof typeof VIZ_FILTER_STYLE]
@@ -221,6 +223,12 @@ const Filters: React.FC<FilterProps> = ({
     return (singleFilter.queuedActive || [singleFilter.active, singleFilter.subGrouping?.active]) as [string, string]
   }
 
+  // Don't render filter section if all filters are hidden
+  const allFiltersHidden = vizFiltersWithValues.every(filter => filter.showDropdown === false)
+  if (allFiltersHidden) {
+    return null
+  }
+
   return (
     <section className={getClasses().join(' ')}>
       {visualizationConfig.filterIntro && (
@@ -240,7 +248,9 @@ const Filters: React.FC<FilterProps> = ({
               'form-group',
               mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`
             ]
-            const mobileExempt = ['nested-dropdown', 'multi-select', VIZ_FILTER_STYLE.tabSimple].includes(filterStyle)
+            const mobileExempt = ['nested-dropdown', 'multi-select', 'combobox', VIZ_FILTER_STYLE.tabSimple].includes(
+              filterStyle
+            )
             const { isDropdown } = wrappingFilters[columnName] || {}
             const showDefaultDropdown =
               ((filterStyle === 'dropdown' || mobileFilterStyle) && !mobileExempt) || isDropdown
@@ -305,6 +315,17 @@ const Filters: React.FC<FilterProps> = ({
                     options={getNestedOptions(singleFilter)}
                     listLabel={label}
                     handleSelectedItems={value => changeFilterActive(outerIndex, value)}
+                  />
+                )}
+                {filterStyle === 'combobox' && (
+                  <ComboBox
+                    options={singleFilter.values.map(v => ({ value: v, label: v }))}
+                    fieldName={outerIndex}
+                    updateField={(_section, _subSection, fieldName, value) => {
+                      changeFilterActive(fieldName, value)
+                    }}
+                    selected={singleFilter.active as string}
+                    label={label}
                   />
                 )}
               </div>

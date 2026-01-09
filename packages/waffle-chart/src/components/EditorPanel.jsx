@@ -1,10 +1,9 @@
-import React, { useState, useEffect, memo, useContext } from 'react'
-import cloneConfig from '@cdc/core/helpers/cloneConfig'
+import React, { useEffect, memo, useContext } from 'react'
 import _ from 'lodash'
-import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import ConfigContext from '../ConfigContext'
 
+import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import Accordion from '@cdc/core/components/ui/Accordion'
 import Button from '@cdc/core/components/elements/Button'
@@ -12,8 +11,9 @@ import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { TextField, Select, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
-import Layout from '@cdc/core/components/Layout'
-import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
+import { useFilterManagement } from '@cdc/core/hooks/useFilterManagement'
+import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
+import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualSection'
 
 import '@cdc/core/styles/v2/components/editor.scss'
 import WarningImage from '../images/warning.svg'
@@ -23,27 +23,16 @@ import { DATA_OPERATORS, DATA_FUNCTIONS } from '../CdcWaffleChart'
 const EditorPanel = memo(props => {
   const { config, updateConfig, loading, data, setParentConfig, isDashboard } = useContext(ConfigContext)
   const { showConfigConfirm } = props
-  const [displayPanel, setDisplayPanel] = useState(true)
   const inputSelectStyle = condition => (condition ? { backgroundColor: '#ffd2d2', color: '#d8000c' } : {})
 
   const updateField = updateFieldFactory(config, updateConfig, true)
 
-  useEffect(() => {
-    // Pass up to Editor if needed
-    if (setParentConfig) {
-      const newConfig = convertStateToConfig()
-      setParentConfig(newConfig)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [config])
-
-  useEffect(() => {
-    if (!showConfigConfirm) {
-      let newConfig = { ...config }
-      delete newConfig.newViz
-      updateConfig(newConfig)
-    }
-  }, [])
+  // Filters
+  const { addNewFilter, removeFilter, updateFilterProp, getFilterColumnValues } = useFilterManagement(
+    config,
+    updateConfig,
+    data
+  )
 
   useEffect(() => {
     //Verify comparate data type
@@ -61,67 +50,8 @@ const EditorPanel = memo(props => {
     }
   }, [config.dataConditionalOperator, config.dataConditionalComparate])
 
-  const onBackClick = () => {
-    setDisplayPanel(!displayPanel)
-    updateConfig({
-      ...config,
-      showEditorPanel: !displayPanel
-    })
-
-    // if (isDashboard) {
-    //   updateConfig({ ...config, editing: false })
-    // } else {
-    //   setDisplayPanel(!displayPanel)
-    // }
-  }
-
-  const convertStateToConfig = () => {
-    let strippedState = cloneConfig(config)
-    delete strippedState.newViz
-    delete strippedState.runtime
-
-    return strippedState
-  }
-
-  const addNewFilter = () => {
-    let filters = config.filters ? [...config.filters] : []
-    filters.push({ values: [] })
-    updateConfig({ ...config, filters })
-  }
-
-  const removeFilter = index => {
-    let filters = [...config.filters]
-    filters.splice(index, 1)
-    updateConfig({ ...config, filters })
-  }
-
-  const updateFilterProp = (name, index, value) => {
-    let filters = [...config.filters]
-    filters[index][name] = value
-    updateConfig({ ...config, filters })
-  }
-
-  const getColumns = (filter = true) => {
-    let columns = {}
-
-    data.map(row => Object.keys(row).forEach(columnName => (columns[columnName] = true)))
-
-    return Object.keys(columns)
-  }
-
-  const getFilterColumnValues = index => {
-    let filterDataOptions = []
-    const filterColumnName = config.filters[index].columnName
-    if (data && filterColumnName) {
-      data.forEach(function (row) {
-        if (undefined !== row[filterColumnName] && -1 === filterDataOptions.indexOf(row[filterColumnName])) {
-          filterDataOptions.push(row[filterColumnName])
-        }
-      })
-      filterDataOptions.sort()
-    }
-    return filterDataOptions
-  }
+  // Extract column names from data with memoization (replaces getColumns)
+  const columns = useDataColumns(data)
   //visualizationType
 
   const approvedWaffleChartOptions = ['Waffle', 'Gauge']
@@ -210,7 +140,7 @@ const EditorPanel = memo(props => {
               label='Data Column'
               updateField={updateField}
               initial='Select'
-              options={getColumns()}
+              options={columns}
             />
           </div>
 
@@ -237,7 +167,7 @@ const EditorPanel = memo(props => {
                   fieldName='dataConditionalColumn'
                   updateField={updateField}
                   initial='Select'
-                  options={getColumns()}
+                  options={columns}
                 />
               </div>
               <div className='cove-accordion__panel-col'>
@@ -297,7 +227,7 @@ const EditorPanel = memo(props => {
                 label='Data Column'
                 updateField={updateField}
                 initial='Select'
-                options={getColumns()}
+                options={columns}
               />
               <Select
                 value={config.dataDenomFunction || ''}
@@ -387,7 +317,7 @@ const EditorPanel = memo(props => {
                 <Select
                   label='Column'
                   value={filter.columnName || ''}
-                  options={getColumns()}
+                  options={columns}
                   initial='- Select Option -'
                   onChange={e => {
                     updateFilterProp('columnName', index, e.target.value)
@@ -410,7 +340,7 @@ const EditorPanel = memo(props => {
           Add Filter
         </Button>
       </Accordion.Section>
-      <Accordion.Section title='Visual' className='panel-visual'>
+      <Accordion.Section title='Chart Settings'>
         {config.visualizationType !== 'Gauge' && (
           <Select
             value={config.shape}
@@ -471,82 +401,43 @@ const EditorPanel = memo(props => {
             </div>
           </div>
         </div>
+      </Accordion.Section>
 
-        <Select
-          value={config.overallFontSize}
-          fieldName='overallFontSize'
-          label='Overall Font Size'
+      <Accordion.Section title='Visual'>
+        <VisualSection
+          config={config}
           updateField={updateField}
-          options={['small', 'medium', 'large']}
+          updateConfig={updateConfig}
+          beforeCheckboxes={
+            <Select
+              value={config.overallFontSize}
+              fieldName='overallFontSize'
+              label='Overall Font Size'
+              updateField={updateField}
+              options={['small', 'medium', 'large']}
+            />
+          }
         />
-
-        <HeaderThemeSelector
-          selectedTheme={config.theme}
-          onThemeSelect={theme => updateConfig({ ...config, theme })}
-          label='Theme'
-        />
-
-        <div className='cove-accordion__panel-section reverse-labels'>
-          <CheckBox
-            value={config.visual.border}
-            section='visual'
-            fieldName='border'
-            label='Display Border'
-            updateField={updateField}
-          />
-          <CheckBox
-            value={config.visual.borderColorTheme}
-            section='visual'
-            fieldName='borderColorTheme'
-            label='Use theme border color'
-            updateField={updateField}
-          />
-          <CheckBox
-            value={config.visual.accent}
-            section='visual'
-            fieldName='accent'
-            label='Use Accent Style'
-            updateField={updateField}
-          />
-          <CheckBox
-            value={config.visual.background}
-            section='visual'
-            fieldName='background'
-            label='Use Theme Background Color'
-            updateField={updateField}
-          />
-          <CheckBox
-            value={config.visual.hideBackgroundColor}
-            section='visual'
-            fieldName='hideBackgroundColor'
-            label='Hide Background Color'
-            updateField={updateField}
-          />
-        </div>
       </Accordion.Section>
     </Accordion>
   )
 
-  if (loading) return null
-
   return (
-    <ErrorBoundary component='EditorPanel'>
-      <>
-        <Layout.Sidebar
-          displayPanel={displayPanel}
-          onBackClick={onBackClick}
-          isDashboard={isDashboard}
-          title='Configure Waffle Chart'
-          showEditorPanel={displayPanel}
-        >
-          <>
-            {editorContent}
-            <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />
-          </>
-        </Layout.Sidebar>
-        {props.children}
-      </>
-    </ErrorBoundary>
+    <BaseEditorPanel
+      config={config}
+      updateConfig={updateConfig}
+      loading={loading}
+      setParentConfig={setParentConfig}
+      isDashboard={isDashboard}
+      title='Configure Waffle Chart'
+    >
+      {({ convertStateToConfig }) => (
+        <>
+          {editorContent}
+          <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />
+        </>
+      )}
+    </BaseEditorPanel>
   )
 })
 

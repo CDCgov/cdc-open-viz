@@ -1,4 +1,4 @@
-import { useContext, FC } from 'react'
+import { useContext, FC, useMemo } from 'react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import {
   AccordionItem,
@@ -11,6 +11,7 @@ import {
 import { TextField, Select, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
+import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 
 // contexts
 import { ChartContext } from './../../../../types/ChartContext.js'
@@ -25,30 +26,30 @@ const PanelSmallMultiples: FC<PanelProps> = props => {
   const { updateField } = useEditorPanelContext()
   const { visSupportsSmallMultiples } = useEditorPermissions()
 
-  const getColumns = (filter = true) => {
-    let columns = {}
-    rawData?.forEach(row => {
-      Object.keys(row).forEach(columnName => (columns[columnName] = true))
+  // Extract column names from data with memoization (replaces getColumns)
+  const allColumns = useDataColumns(rawData)
+
+  // Filter out series columns and confidence key columns (except lower and upper)
+  const filteredColumns = useMemo(() => {
+    const { lower, upper } = config.confidenceKeys || {}
+    return allColumns.filter(key => {
+      // Filter out series columns
+      if (config.series && config.series.some(series => series.dataKey === key)) {
+        return false
+      }
+      // Filter out confidence key columns (except lower and upper)
+      if (
+        config.confidenceKeys &&
+        Object.keys(config.confidenceKeys).includes(key) &&
+        ((lower && upper) || lower || upper) &&
+        key !== lower &&
+        key !== upper
+      ) {
+        return false
+      }
+      return true
     })
-
-    if (filter) {
-      const { lower, upper } = config.confidenceKeys || {}
-      Object.keys(columns).forEach(key => {
-        if (
-          (config.series && config.series.filter(series => series.dataKey === key).length > 0) ||
-          (config.confidenceKeys &&
-            Object.keys(config.confidenceKeys).includes(key) &&
-            ((lower && upper) || lower || upper) &&
-            key !== lower &&
-            key !== upper)
-        ) {
-          delete columns[key]
-        }
-      })
-    }
-
-    return Object.keys(columns)
-  }
+  }, [allColumns, config.series, config.confidenceKeys])
 
   return (
     <>
@@ -91,7 +92,7 @@ const PanelSmallMultiples: FC<PanelProps> = props => {
                 label='Tile By Column'
                 initial='Select Column'
                 updateField={updateField}
-                options={getColumns()}
+                options={filteredColumns}
               />
             )}
 
@@ -184,6 +185,8 @@ const PanelSmallMultiples: FC<PanelProps> = props => {
                         value={currentOrderType}
                         options={tileOrderOptions}
                         label='Tile Order'
+                        fieldName='tileOrderType'
+                        section='smallMultiples'
                         updateField={(_section, _subsection, _fieldName, value) => {
                           handleOrderTypeChange(value)
                         }}
@@ -244,6 +247,8 @@ const PanelSmallMultiples: FC<PanelProps> = props => {
                     }
                   ]}
                   label='Color Mode'
+                  fieldName='colorMode'
+                  section='smallMultiples'
                   updateField={(_section, _subsection, _fieldName, value) => {
                     updateConfig({
                       ...config,

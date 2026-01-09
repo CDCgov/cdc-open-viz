@@ -13,6 +13,35 @@ export function getQueryStringFilterValue(filter) {
   }
 }
 
+/**
+ * Check if a filter should be hidden based on URL query parameters
+ * Checks for hide{setByQueryParameter}=true|1|yes in the URL
+ *
+ * @param filter - Filter object with setByQueryParameter property
+ * @returns true if filter should be hidden, false otherwise
+ *
+ * @example
+ * // If filter has setByQueryParameter: "state"
+ * // URL: ?hidestate=true  -> returns true
+ * // URL: ?hideState=true  -> returns false (case sensitive!)
+ */
+export function isFilterHiddenByQuery(filter) {
+  if (!filter) return false
+
+  // Only check setByQueryParameter - this is the standard way filters are identified in URL params
+  const paramName = filter.setByQueryParameter
+  if (!paramName) return false
+
+  const urlParams = new URLSearchParams(window.location.search)
+  const hideParamName = `hide${paramName}`
+  const hideValue = urlParams.get(hideParamName)
+
+  if (!hideValue) return false
+
+  const lower = hideValue.toLowerCase()
+  return lower === 'true' || hideValue === '1' || lower === 'yes'
+}
+
 export function getQueryParams() {
   const queryParams = {}
   for (const [key, value] of Array.from(new URLSearchParams(window.location.search).entries())) {

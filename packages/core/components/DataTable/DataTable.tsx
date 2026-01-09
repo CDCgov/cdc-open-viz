@@ -61,6 +61,9 @@ export type DataTableProps = {
   // determines if columns should be wrapped in the table
   wrapColumns?: boolean
   interactionLabel?: string
+  showDownloadImgButton?: boolean
+  showDownloadPdfButton?: boolean
+  includeContextInDownload?: boolean
   // Map-specific props (optional)
   legendMemo?: React.MutableRefObject<Map<any, any>>
   legendSpecialClassLastMemo?: React.MutableRefObject<Map<any, any>>
@@ -84,7 +87,11 @@ const DataTable = (props: DataTableProps) => {
     viewport,
     vizTitle,
     wrapColumns,
-    interactionLabel = ''
+    interactionLabel = '',
+    showDownloadImgButton,
+    showDownloadPdfButton,
+    includeContextInDownload = false,
+    imageRef
   } = props
   const runtimeData = useMemo(() => {
     const data = removeNullColumns(parentRuntimeData)
@@ -222,16 +229,12 @@ const DataTable = (props: DataTableProps) => {
   const getClassNames = (): string => {
     const classes = ['data-table-container']
 
-    const hasDownloadLinkAbove = config.table.download && !config.table.showDownloadLinkBelow
+    const hasDownloadLinkAbove =
+      (config.table.download || showDownloadImgButton || showDownloadPdfButton) && !config.table.showDownloadLinkBelow
     const isStandaloneTable = config.type === 'table'
 
     if (!hasDownloadLinkAbove && !isStandaloneTable) {
       classes.push('mt-4')
-    }
-
-    const isBrushActive = config?.brush?.active && config.legend?.position !== 'bottom'
-    if (isBrushActive) {
-      classes.push('brush-active')
     }
 
     classes.push(viewport)
@@ -266,33 +269,34 @@ const DataTable = (props: DataTableProps) => {
               filterColumns
             )
           : runtimeData.map(d => {
-            const columnsToInclude = config.type === 'table'
-              ? _.uniq([...filterColumns, ...visibleColumns])
-              : _.uniq([...filterColumns, ...dataSeriesColumns])
+              const columnsToInclude =
+                config.type === 'table'
+                  ? _.uniq([...filterColumns, ...visibleColumns])
+                  : _.uniq([...filterColumns, ...dataSeriesColumns])
               return _.pick(d, columnsToInclude)
             })
       const csvData = config.table?.downloadVisibleDataOnly ? visibleData : rawData
 
-    // Build a map from column name to column config for O(1) lookup
-    const columnConfigMap = config.columns
-      ? Object.values(config.columns).reduce((acc, col) => {
-          acc[col.name] = col
-          return acc
-        }, {} as Record<string, any>)
-      : {}
+      // Build a map from column name to column config for O(1) lookup
+      const columnConfigMap = config.columns
+        ? Object.values(config.columns).reduce((acc, col) => {
+            acc[col.name] = col
+            return acc
+          }, {} as Record<string, any>)
+        : {}
 
-    // Map column names to labels
-    const csvDataUpdated = csvData.map(row => {
-      const newRow: Record<string, any> = {}
-      Object.keys(row).forEach(key => {
-        // Use the column config map for O(1) lookup
-        const columnConfig = columnConfigMap[key]
-        // Use label if it exists, otherwise use the original key
-        const columnLabel = columnConfig?.label || key
-        newRow[columnLabel] = row[key]
+      // Map column names to labels
+      const csvDataUpdated = csvData.map(row => {
+        const newRow: Record<string, any> = {}
+        Object.keys(row).forEach(key => {
+          // Use the column config map for O(1) lookup
+          const columnConfig = columnConfigMap[key]
+          // Use label if it exists, otherwise use the original key
+          const columnLabel = columnConfig?.label || key
+          newRow[columnLabel] = row[key]
+        })
+        return newRow
       })
-      return newRow
-    })
 
       // only use fullGeoName on County maps and no other
       if (config.general?.geoType === 'us-county' || config.table.showFullGeoNameInCSV) {
@@ -300,10 +304,11 @@ const DataTable = (props: DataTableProps) => {
         return csvDataUpdated.map((row, index) => {
           const originalRow = csvData[index]
           if (!originalRow) {
-            console.warn(
-              'Data mismatch: originalRow missing.',
-              { index, csvDataLength: csvData.length, csvDataUpdatedLength: csvDataUpdated.length }
-            )
+            console.warn('Data mismatch: originalRow missing.', {
+              index,
+              csvDataLength: csvData.length,
+              csvDataUpdatedLength: csvDataUpdated.length
+            })
             return row
           }
           return {
@@ -322,9 +327,6 @@ const DataTable = (props: DataTableProps) => {
         if (hasDownloadLink) {
           classes.push('mt-4', 'mb-2')
         }
-        const isLegendOnBottom = config?.legend?.position === 'bottom' || isLegendWrapViewport(viewport)
-        if (config.brush?.active && !isLegendOnBottom) classes.push('brush-active')
-        if (config.brush?.active && config.legend.hide) classes.push('brush-active')
       } else {
         if (hasDownloadLink) {
           classes.push('mt-2')
@@ -363,8 +365,30 @@ const DataTable = (props: DataTableProps) => {
     const showCollapseButton = config.table.collapsible !== false && useBottomExpandCollapse
     const TableMediaControls = ({ belowTable }) => {
       const hasDownloadLink = config.table.download
+      const hasImageDownloads = showDownloadImgButton || showDownloadPdfButton
+
       return (
-        <MediaControls.Section classes={getMediaControlsClasses(belowTable, hasDownloadLink)}>
+        <MediaControls.Section classes={getMediaControlsClasses(belowTable, hasDownloadLink || hasImageDownloads)}>
+          {showDownloadImgButton && (
+            <MediaControls.DownloadLink
+              type='image'
+              title='Download Chart as Image'
+              state={config}
+              elementToCapture={imageRef}
+              interactionLabel={interactionLabel}
+              includeContextInDownload={includeContextInDownload}
+            />
+          )}
+          {showDownloadPdfButton && (
+            <MediaControls.DownloadLink
+              type='pdf'
+              title='Download Chart as PDF'
+              state={config}
+              elementToCapture={imageRef}
+              interactionLabel={interactionLabel}
+              includeContextInDownload={includeContextInDownload}
+            />
+          )}
           <MediaControls.Link config={config} dashboardDataConfig={dataConfig} interactionLabel={interactionLabel} />
           {hasDownloadLink && (
             <DownloadButton
