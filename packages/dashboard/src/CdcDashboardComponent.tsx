@@ -505,10 +505,11 @@ export default function CdcDashboard({
             <Title
               title={title}
               isDashboard={true}
+              titleStyle={config.dashboard.titleStyle}
               classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]}
             />
             {/* Description */}
-            {description && <div className='subtext mb-3'>{parse(description)}</div>}
+            {description && <div className='subtext mb-4'>{parse(description)}</div>}
             {/* Visualizations */}
             {filteredRows?.map((row, index) => (
               <VisualizationRow
@@ -648,6 +649,9 @@ export default function CdcDashboard({
   }
 
   const dashboardContainerClasses = ['cdc-open-viz-module', 'type-dashboard', `${currentViewport}`]
+  if (isEditor) {
+    dashboardContainerClasses.push('isEditor')
+  }
 
   return (
     <GlobalContextProvider>

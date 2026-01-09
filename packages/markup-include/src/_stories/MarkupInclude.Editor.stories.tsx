@@ -89,6 +89,8 @@ const testConfig = {
   legend: {},
   newViz: true,
   theme: 'theme-blue',
+  titleStyle: 'small',
+  showTitle: true,
   type: 'markup-include',
   visual: {
     border: false,
@@ -135,8 +137,10 @@ export const GeneralSectionTests: Story = {
     await performAndAssert(
       'Title Update',
       () => {
-        const headerElement = canvasElement.querySelector('.cove-component__header h2')
-        return headerElement?.textContent?.trim() || ''
+        const modernTitle = canvasElement.querySelector('.cove-title')
+        const legacyTitle = canvasElement.querySelector('.cove-component__header h2')
+        const titleElement = modernTitle || legacyTitle
+        return titleElement?.textContent?.trim() || ''
       },
       async () => {
         await userEvent.clear(titleInput)
@@ -145,7 +149,9 @@ export const GeneralSectionTests: Story = {
       (before, after) => after === 'Updated Markup Include Title E2E' && after !== before
     )
 
-    const headerElement = canvasElement.querySelector('.cove-component__header h2')
+    const modernHeader = canvasElement.querySelector('.cove-title')
+    const legacyHeader = canvasElement.querySelector('.cove-component__header h2')
+    const headerElement = modernHeader || legacyHeader
     expect(headerElement).toBeTruthy()
     expect(headerElement!.textContent?.trim()).toBe('Updated Markup Include Title E2E')
   }

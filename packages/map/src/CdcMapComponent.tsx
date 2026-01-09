@@ -435,6 +435,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   <Title
                     title={title}
                     superTitle={processedSuperTitle}
+                    titleStyle={general.titleStyle}
+                    showTitle={general.showTitle}
                     config={config}
                     classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${headerColor}`]}
                   />
