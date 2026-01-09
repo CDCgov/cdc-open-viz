@@ -850,7 +850,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
               prefix: '',
               suffix: '',
               forestPlot: false,
-              startingPoint: '0',
+              startingPoint: 0,
               forestPlotAlignRight: false,
               roundToPlace: 0,
               commas: false,
