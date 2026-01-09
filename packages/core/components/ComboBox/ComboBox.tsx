@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useId } from 'react'
 import './combobox.styles.css'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
+import MagnifyingGlassIcon from '../../assets/icon-magnifying-glass.svg'
 
 interface Option {
   value: string | number
@@ -294,7 +295,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
           onMouseDown={handleButtonClick}
           disabled={isDisabled}
         >
-          <i className='cdc-fa-magnifying-glass' aria-hidden='true'></i>
+          <MagnifyingGlassIcon aria-hidden='true' />
         </button>
       </div>
 

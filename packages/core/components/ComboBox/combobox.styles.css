@@ -84,11 +84,11 @@
     opacity: 1;
   }
 
-  .cove-combobox-button:disabled i {
+  .cove-combobox-button:disabled svg {
     color: var(--cool-gray-90);
   }
 
-  .cove-combobox-button i {
+  .cove-combobox-button svg {
     color: currentColor;
     font-size: 0.8em;
   }
