@@ -12,6 +12,7 @@ import { isV1Palette } from '@cdc/core/helpers/palettes/utils'
 import { v2ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
 import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
 import { buildForecastPaletteMappings } from '../../../helpers/buildForecastPaletteMappings'
+import { getFullColorPalette } from '../../../helpers/smallMultiplesHelpers'
 import { FaStar } from 'react-icons/fa'
 import { Label } from '../../../types/Label'
 import { ColorScale, TransformedData } from '../../../types/ChartContext'
@@ -31,6 +32,32 @@ export const createFormatLabels =
   ) =>
   (defaultLabels: Label[]): Label[] => {
     const { visualizationType, visualizationSubType, series, runtime, legend } = config
+
+    // Handle small multiples legend adjustments
+    // by-series + same: all tiles use same color, legend should show one color
+    if (config.smallMultiples?.mode === 'by-series' && config.smallMultiples?.colorMode === 'same') {
+      const baseColor = colorScale?.range()?.[0]
+      return defaultLabels.map((label, i) => ({
+        ...label,
+        value: baseColor
+      }))
+    }
+
+    // by-column + different: each tile gets different color, legend should show tile values with their colors
+    if (config.smallMultiples?.mode === 'by-column' && config.smallMultiples?.colorMode === 'different') {
+      const tileColumn = config.smallMultiples.tileColumn
+      const tileValues = Array.from(new Set(data.map(d => d[tileColumn])))
+        .filter(Boolean)
+        .sort()
+      const tilePalette = getFullColorPalette(config, tileValues.length)
+
+      return tileValues.map((value, index) => ({
+        datum: value,
+        index,
+        text: config.smallMultiples.tileTitles?.[value] || String(value),
+        value: tilePalette[index]
+      }))
+    }
 
     // Handle Warming Stripes legend
     if (visualizationType === 'Warming Stripes') {

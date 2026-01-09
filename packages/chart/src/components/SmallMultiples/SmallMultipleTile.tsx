@@ -116,6 +116,10 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
       ...tileConfig.legend,
       hide: true // Hide legends for all small multiple tiles
     },
+    xAxis: {
+      ...tileConfig.xAxis,
+      brushActive: false // Hide brush slider for all small multiple tiles
+    },
     showAreaUnderLine: config.smallMultiples?.showAreaUnderLine || false
   }
 
