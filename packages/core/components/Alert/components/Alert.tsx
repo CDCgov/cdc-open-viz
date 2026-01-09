@@ -13,8 +13,6 @@ type AlertProps = {
   // size of the icon in the alert box
   iconSize?: number
   // font size of the message text
-  fontSize?: string
-  // heading for the alert box
   heading?: string
   // dismiss function
   onDismiss?: Function
@@ -30,7 +28,6 @@ const Alert: React.FC<AlertProps> = ({
   type = 'info',
   message = '',
   iconSize = 21,
-  fontSize,
   heading,
   onDismiss,
   autoDismiss,
@@ -59,7 +56,7 @@ const Alert: React.FC<AlertProps> = ({
         {type === 'success' && <Icon display='check' size={iconSize} />}
         {type === 'danger' && <Icon display='warningCircle' size={iconSize} />}
         {type === 'info' && <Icon display='info' size={iconSize} />}
-        <span dangerouslySetInnerHTML={sanitizedData()} style={fontSize ? { fontSize } : undefined} />
+        <span dangerouslySetInnerHTML={sanitizedData()} style={{ fontSize: '0.75rem' }} />
       </div>
       {showCloseButton && (
         <button type='button' className='close ps-5' aria-label='Close' onClick={() => onDismiss()}>

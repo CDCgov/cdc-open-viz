@@ -171,7 +171,6 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
                   type="danger"
                   message="Confidence Interval column - required for 508 compliance"
                   showCloseButton={false}
-                  fontSize="0.75rem"
                   iconSize={14}
                 />
               )}
