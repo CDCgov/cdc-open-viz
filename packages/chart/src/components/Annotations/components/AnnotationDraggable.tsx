@@ -26,6 +26,25 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
   const isMobile = isMobileAnnotationViewport(currentViewport)
 
+  // Track live drag position for real-time anchor calculations
+  const [liveDrag, setLiveDrag] = useState<{ index: number; dx: number } | null>(null)
+
+  // Helper to determine label anchoring when near chart edges
+  const getAnnotationAnchors = (annotationX: number, dx: number, labelWidth: number) => {
+    const endpointX = annotationX + dx
+
+    const leftOverflow = dx < 0 && endpointX - labelWidth < 0
+    const rightOverflow = dx > 0 && endpointX + labelWidth > xMax
+
+    if (leftOverflow || rightOverflow) {
+      // Center label above the endpoint
+      return { horizontalAnchor: 'middle' as const, verticalAnchor: 'end' as const }
+    }
+
+    // Let visx auto-decide
+    return { horizontalAnchor: null, verticalAnchor: null }
+  }
+
   return (
     annotations &&
     annotations.map((annotation, index) => {
@@ -82,9 +101,16 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
           canEditSubject={(annotation.edit.subject && annotation.connectionType !== 'none') || false}
           labelDragHandleProps={{ r: 15, stroke: 'red' }}
           subjectDragHandleProps={{ r: 15, stroke: 'red' }}
-          onDragStart={() => onDragStateChange(true)}
+          onDragStart={() => {
+            onDragStateChange(true)
+            setLiveDrag({ index, dx: annotation.dx })
+          }}
+          onDragMove={props => {
+            setLiveDrag({ index, dx: props.dx })
+          }}
           onDragEnd={props => {
             onDragStateChange(false)
+            setLiveDrag(null)
 
             let updatedAnnotations = [...annotations]
 
@@ -130,39 +156,48 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
             })
           }}
         >
-          {!isMobile && (
-            <HtmlLabel
-              className='annotation__desktop-label'
-              containerStyle={{ width: config.general.showAnnotationDropdown ? '200px' : '150px' }}
-              showAnchorLine={false}
-            >
-              <div
-                style={{
-                  borderRadius: 5, // Optional: set border radius
-                  backgroundColor: `rgba(255, 255, 255, ${
-                    annotation?.opacity ? Number(annotation?.opacity) / 100 : 1
-                  })`,
-                  padding: '10px',
-                  width: 'auto',
-                  display: config.general.showAnnotationDropdown ? 'inline-flex' : 'flex',
-                  justifyContent: 'start',
-                  flexDirection: 'row'
-                }}
-                // role='presentation'
-                tabIndex={0}
-                aria-label={`Annotation text that reads: ${annotation.text}`}
-              >
-                {config?.general?.showAnnotationDropdown && (
-                  <>
-                    <p className='annotation__has-dropdown-number' style={{ margin: '2px 6px' }}>
-                      {index + 1}
-                    </p>
-                  </>
-                )}
-                <div dangerouslySetInnerHTML={sanitizedData()} />
-              </div>
-            </HtmlLabel>
-          )}
+          {!isMobile &&
+            (() => {
+              const labelWidth = config.general.showAnnotationDropdown ? 200 : 150
+              // Use live dx during drag, otherwise use stored annotation.dx
+              const currentDx = liveDrag?.index === index ? liveDrag.dx : annotation.dx
+              const { horizontalAnchor, verticalAnchor } = getAnnotationAnchors(annotationX, currentDx, labelWidth)
+              return (
+                <HtmlLabel
+                  className='annotation__desktop-label'
+                  containerStyle={{ width: `${labelWidth}px` }}
+                  horizontalAnchor={horizontalAnchor}
+                  verticalAnchor={verticalAnchor}
+                  showAnchorLine={false}
+                >
+                  <div
+                    style={{
+                      borderRadius: 5, // Optional: set border radius
+                      backgroundColor: `rgba(255, 255, 255, ${
+                        annotation?.opacity ? Number(annotation?.opacity) / 100 : 1
+                      })`,
+                      padding: '10px',
+                      width: 'auto',
+                      display: config.general.showAnnotationDropdown ? 'inline-flex' : 'flex',
+                      justifyContent: 'start',
+                      flexDirection: 'row'
+                    }}
+                    // role='presentation'
+                    tabIndex={0}
+                    aria-label={`Annotation text that reads: ${annotation.text}`}
+                  >
+                    {config?.general?.showAnnotationDropdown && (
+                      <>
+                        <p className='annotation__has-dropdown-number' style={{ margin: '2px 6px' }}>
+                          {index + 1}
+                        </p>
+                      </>
+                    )}
+                    <div dangerouslySetInnerHTML={sanitizedData()} />
+                  </div>
+                </HtmlLabel>
+              )
+            })()}
           {annotation.connectionType === 'line' && (
             <Connector type='line' pathProps={{ markerStart: `url(#marker-start--${index})` }} />
           )}
