@@ -340,6 +340,11 @@
           display: flex;
           align-items: flex-start;
         }
+
+        // Hide icon when in multi-column layout, unless using white background
+        &:not(.white-background-style) .cdc-callout__icon {
+          display: none;
+        }
       }
     }
 

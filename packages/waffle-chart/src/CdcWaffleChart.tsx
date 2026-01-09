@@ -365,7 +365,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         <Error updateConfig={updateConfig} config={config} />
       )}
       {config.newViz && showConfigConfirm && <Confirm updateConfig={updateConfig} config={config} />}
-      <div className='cove-component__content-wrap'>
+      <div className='cove-component__content-wrap pb-0'>
         {config.visualizationType === 'Gauge' && (
           <div className={`cove-gauge-chart${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
             <div className='cove-gauge-chart__chart'>
