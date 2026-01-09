@@ -834,7 +834,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     let updatedConfig = { ...config, [section]: sectionValue }
 
     // Auto-add confidence key columns to tooltips and data table
-    if (section === 'confidenceKeys' && newValue && newValue !== '') {
+    if (section === 'confidenceKeys' && newValue) {
       const columnName = newValue
       const existingColumn = updatedConfig.columns[columnName]
 
