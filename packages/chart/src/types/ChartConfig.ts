@@ -18,6 +18,7 @@ type General = CoreGeneral & {
     customColors?: string[]
     customColorsOrdered?: string[]
   }
+  useIntelligentLineChartLabels?: boolean
 }
 import { type Link } from './../components/Sankey/types'
 import { type DataDescription } from '@cdc/core/types/DataDescription'
