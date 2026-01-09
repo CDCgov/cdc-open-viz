@@ -56,7 +56,7 @@ const Alert: React.FC<AlertProps> = ({
         {type === 'success' && <Icon display='check' size={iconSize} />}
         {type === 'danger' && <Icon display='warningCircle' size={iconSize} />}
         {type === 'info' && <Icon display='info' size={iconSize} />}
-        <span dangerouslySetInnerHTML={sanitizedData()} style={{ fontSize: '0.75rem' }} />
+        <span dangerouslySetInnerHTML={sanitizedData()} />
       </div>
       {showCloseButton && (
         <button type='button' className='close ps-5' aria-label='Close' onClick={() => onDismiss()}>
