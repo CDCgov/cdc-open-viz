@@ -12,7 +12,7 @@ type AlertProps = {
   message?: string
   // size of the icon in the alert box
   iconSize?: number
-  // font size of the message text
+  // heading for the alert box
   heading?: string
   // dismiss function
   onDismiss?: Function
