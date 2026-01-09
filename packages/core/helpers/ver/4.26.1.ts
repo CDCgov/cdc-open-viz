@@ -64,12 +64,33 @@ const migrateTitleStyle = config => {
   }
 }
 
+const migrateDataBiteShowTitle = config => {
+  if (config.type === 'data-bite') {
+    // If showTitle is explicitly false, clear the title field
+    if (config.visual?.showTitle === false && config.title) {
+      config.title = ''
+    }
+    // Remove showTitle property as it's no longer used
+    if (config.visual?.showTitle !== undefined) {
+      delete config.visual.showTitle
+    }
+  }
+
+  // Handle dashboards with data bite visualizations
+  if (config.type === 'dashboard') {
+    Object.values((config as DashboardConfig).visualizations).forEach(visualization => {
+      migrateDataBiteShowTitle(visualization)
+    })
+  }
+}
+
 const update_4_26_1 = config => {
   const ver = '4.26.1'
   const newConfig = cloneConfig(config)
   normalizeFilterParents(newConfig)
   removeOldBrushKeys(newConfig)
   migrateTitleStyle(newConfig)
+  migrateDataBiteShowTitle(newConfig)
   newConfig.version = ver
   return newConfig
 }
