@@ -384,7 +384,7 @@ export const useEditorPermissions = () => {
 
   const visSupportsSmallMultiples = () => {
     const enabledCharts = ['Line', 'Bar', 'Area Chart', 'Combo', 'Box Plot', 'Scatter Plot', 'Warming Stripes']
-    if (enabledCharts.includes(visualizationType)) return true
+    if (enabledCharts.includes(visualizationType) && config.orientation !== 'horizontal') return true
     return false
   }
 
