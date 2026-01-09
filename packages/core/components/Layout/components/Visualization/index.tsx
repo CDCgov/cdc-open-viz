@@ -11,7 +11,14 @@ import { MapConfig } from '@cdc/map/src/types/MapConfig'
 
 type VisualizationWrapper = {
   children: React.ReactNode
-  config: ChartConfig | DataBiteConfig | WaffleChartConfig | MarkupIncludeConfig | DashboardFilters | MapConfig | DataTableConfig
+  config:
+    | ChartConfig
+    | DataBiteConfig
+    | WaffleChartConfig
+    | MarkupIncludeConfig
+    | DashboardFilters
+    | MapConfig
+    | DataTableConfig
   currentViewport?: string
   imageId?: string
   isEditor: boolean
@@ -87,6 +94,14 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
 
       if (isEditor) {
         classes.push('is-editor')
+      }
+
+      // Add TP5 style classes
+      if (config.waffleStyle === 'tp5') {
+        classes.push('waffle__style--tp5')
+        if (config.visual?.whiteBackground) {
+          classes.push('white-background-style')
+        }
       }
 
       classes.push('cove-component', 'waffle-chart')

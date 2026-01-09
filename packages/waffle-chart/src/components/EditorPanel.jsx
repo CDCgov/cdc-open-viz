@@ -75,6 +75,16 @@ const EditorPanel = memo(props => {
             options={['Linear']}
           />
         )}
+        <Select
+          value={config.waffleStyle || 'original'}
+          fieldName='waffleStyle'
+          label='Waffle Style'
+          updateField={updateField}
+          options={[
+            { label: 'Original', value: 'original' },
+            { label: 'TP5 Style', value: 'tp5' }
+          ]}
+        />
         <TextField
           value={config.title}
           fieldName='title'
@@ -403,22 +413,38 @@ const EditorPanel = memo(props => {
         </div>
       </Accordion.Section>
 
-      <Accordion.Section title='Visual'>
-        <VisualSection
-          config={config}
-          updateField={updateField}
-          updateConfig={updateConfig}
-          beforeCheckboxes={
-            <Select
-              value={config.overallFontSize}
-              fieldName='overallFontSize'
-              label='Overall Font Size'
-              updateField={updateField}
-              options={['small', 'medium', 'large']}
-            />
-          }
-        />
-      </Accordion.Section>
+      {/* Visual section for TP5 style */}
+      {config.waffleStyle === 'tp5' && (
+        <Accordion.Section title='Visual'>
+          <CheckBox
+            value={config.visual?.whiteBackground}
+            section='visual'
+            fieldName='whiteBackground'
+            label='Use White Background Style'
+            updateField={updateField}
+          />
+        </Accordion.Section>
+      )}
+
+      {/* Visual section for other styles */}
+      {config.waffleStyle !== 'tp5' && (
+        <Accordion.Section title='Visual'>
+          <VisualSection
+            config={config}
+            updateField={updateField}
+            updateConfig={updateConfig}
+            beforeCheckboxes={
+              <Select
+                value={config.overallFontSize}
+                fieldName='overallFontSize'
+                label='Overall Font Size'
+                updateField={updateField}
+                options={['small', 'medium', 'large']}
+              />
+            }
+          />
+        </Accordion.Section>
+      )}
     </Accordion>
   )
 

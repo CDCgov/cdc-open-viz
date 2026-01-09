@@ -1,6 +1,5 @@
 // Remove custom theme mixin - use core styles instead
 
-
 .type-dashboard .type-waffle-chart .cove-component__content {
   padding-top: 0;
 }
@@ -19,7 +18,7 @@
       justify-items: center;
       align-items: flex-start;
 
-      &>svg {
+      & > svg {
         margin: 0.7em 0;
       }
     }
@@ -97,7 +96,6 @@
 }
 
 @at-root {
-
   .cove-waffle-chart.font-small,
   .cove-gauge-chart.font-small #{&} {
     .cove-waffle-chart__data--primary {
@@ -128,6 +126,45 @@
 
     .cove-waffle-chart__data--text {
       font-size: 20px;
+    }
+  }
+}
+
+// TP5 Style for Waffle Chart
+.type-waffle-chart {
+  &.waffle__style--tp5 {
+    .cove-component__content {
+      background: none !important;
+    }
+
+    .cdc-callout {
+      box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+      border: 2px solid #dff2f6 !important;
+      margin: 0 !important;
+      padding: 1.5rem;
+    }
+
+    // White background variant (when "Use White Background Style" is checked)
+    &.white-background-style {
+      .cove-component__content {
+        background: white !important;
+      }
+
+      .cdc-callout {
+        background: transparent !important;
+        border: 2px solid #009ec1 !important;
+        box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+      }
+    }
+
+    // Override waffle chart default padding inside callout
+    .cove-waffle-chart {
+      padding: 0;
+    }
+
+    .cove-waffle-chart__data {
+      margin-bottom: 0;
+      align-content: flex-start;
     }
   }
 }

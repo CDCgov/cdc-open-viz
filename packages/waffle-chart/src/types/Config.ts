@@ -36,8 +36,11 @@ export type Config = {
   showTitle: boolean
   type: 'waffle-chart'
   valueDescription: string
-  visual: ComponentStyles
+  visual: ComponentStyles & {
+    whiteBackground?: boolean
+  }
   visualizationSubType: 'linear' | ''
   visualizationType: 'Gauge' | 'Waffle'
+  waffleStyle: 'original' | 'tp5'
   version: Version
 }
