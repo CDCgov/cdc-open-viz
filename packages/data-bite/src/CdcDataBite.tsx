@@ -641,6 +641,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
             ) : (
               <>
                 <Title
+                  showTitle={config.visual?.showTitle}
                   titleStyle={config.titleStyle}
                   config={config}
                   title={processContentWithMarkup(title)}

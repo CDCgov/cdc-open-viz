@@ -92,6 +92,14 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
               placeholder='Data Bite Title'
               updateField={updateField}
             />
+            <CheckBox
+              value={config.visual?.showTitle}
+              section='visual'
+              checked={config.visual?.showTitle}
+              fieldName='showTitle'
+              label='Show Title'
+              updateField={updateField}
+            />
 
             <TextField
               type='textarea'
