@@ -1,5 +1,6 @@
 export default {
   title: 'Chart Title',
+  titleStyle: 'small',
   showTitle: true,
   visualizationType: 'Waffle',
   visualizationSubType: 'linear',

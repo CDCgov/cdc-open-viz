@@ -35,6 +35,12 @@
       width: 100% !important;
       grid-area: content;
       padding: 1rem;
+
+      // Prevent double padding on nested .cove-component__content divs
+      // (e.g., in markup-include, waffle-chart, filtered-text)
+      .cove-component__content {
+        padding: 0;
+      }
     }
   }
 }

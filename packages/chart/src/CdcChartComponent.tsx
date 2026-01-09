@@ -1155,6 +1155,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 isDashboard={isDashboard}
                 title={title}
                 superTitle={processedSuperTitle}
+                titleStyle={config.titleStyle}
                 classes={['chart-title', `${config.theme}`, 'cove-component__header', 'mb-3']}
                 style={undefined}
                 config={config}

@@ -32,6 +32,7 @@ import TopSpacing_4 from './_mock/data-bite-dash-test_1_1_1.json'
 import CustomOrderNewValues from './_mock/custom-order-new-values.json'
 import APIFilterResetConfig from '../../examples/test-api-filter-reset.json'
 import CascadingDataFilters from './_mock/filter-cascade.json'
+import GalleryDataBiteDashboard from './_mock/gallery-data-bite-dashboard.json'
 
 // Dashboard Filter Updates for Ascending, Descending, and Custom Order
 import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
@@ -480,6 +481,13 @@ export const Top_Spacing_3: Story = {
 export const Top_Spacing_4: Story = {
   args: {
     config: TopSpacing_4,
+    isEditor: false
+  }
+}
+
+export const Gallery_Data_Bite_Dashboard: Story = {
+  args: {
+    config: GalleryDataBiteDashboard,
     isEditor: false
   }
 }

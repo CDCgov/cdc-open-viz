@@ -600,6 +600,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
             {(!config.dataColumn || !config.dataFunction) && <Confirm />}
             <Title
               showTitle={config.visual?.showTitle}
+              titleStyle={config.titleStyle}
               config={config}
               title={processContentWithMarkup(title)}
               isDashboard={isDashboard}

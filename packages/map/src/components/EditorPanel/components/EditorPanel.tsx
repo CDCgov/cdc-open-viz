@@ -1536,6 +1536,32 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         </Tooltip>
                       }
                     />
+                    <Select
+                      value={general.titleStyle}
+                      section='general'
+                      fieldName='titleStyle'
+                      label='Title Style'
+                      updateField={updateField}
+                      options={[
+                        { value: 'small', label: 'Small (h3)' },
+                        { value: 'large', label: 'Large (h2)' },
+                        { value: 'legacy', label: 'Legacy' }
+                      ]}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>
+                              Choose the visual style for the map title. Consider heading order on your page when
+                              selecting the title style. For 508 reasons, ensure your page follows a proper heading
+                              order.
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
                     <CheckBox
                       value={config.general.showTitle || false}
                       section='general'

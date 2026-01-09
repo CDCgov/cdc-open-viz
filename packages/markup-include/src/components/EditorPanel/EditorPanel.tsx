@@ -8,8 +8,10 @@ import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 
 // Components
 import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
-import { TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
+import { TextField, CheckBox, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import Accordion from '@cdc/core/components/ui/Accordion'
+import Icon from '@cdc/core/components/ui/Icon'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
 import MarkupVariablesEditor from '@cdc/core/components/EditorPanel/components/MarkupVariablesEditor'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualSection'
@@ -63,6 +65,32 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
               label='Title'
               placeholder='Markup Include Title'
               updateField={updateField}
+            />
+            <Select
+              value={contentEditor.titleStyle || 'small'}
+              section='contentEditor'
+              fieldName='titleStyle'
+              label='Title Style'
+              updateField={updateField}
+              options={[
+                { value: 'small', label: 'Small (h3)' },
+                { value: 'large', label: 'Large (h2)' },
+                { value: 'legacy', label: 'Legacy' }
+              ]}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>Choose the visual style for the title.</p>
+                    <p>
+                      Consider heading order on your page when selecting the title style. For 508 reasons, ensure your
+                      page follows a proper heading order.
+                    </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
             />
           </Accordion.Section>
           <Accordion.Section title='Content Editor'>
