@@ -4,7 +4,8 @@ export const BITE_LOCATIONS = {
   title: 'Value above Message',
   body: 'Value before Message',
   end: 'Value after Message',
-  gradient: 'Gradient'
+  gradient: 'Gradient',
+  tp5: 'TP5 Style'
 }
 
 export const IMAGE_POSITION_LEFT = 'Left'

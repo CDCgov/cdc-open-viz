@@ -134,6 +134,10 @@ function buildContextClone(
   return { clonedTree, clonedViz }
 }
 
+function isInEditorMode(element: HTMLElement): boolean {
+  return element.closest('.cdc-open-viz-module.isEditor') !== null
+}
+
 /**
  * Prepare cloned elements (with or without context)
  * Returns viz-only clone as fallback for any failure
@@ -149,8 +153,8 @@ export function prepareClonedElements(
     return { clonedTree: tree, clonedViz: tree }
   }
 
-  // Early return: context not requested
-  if (!includeContextInDownload) {
+  // Early return: context not requested or in editor mode (editor downloads should not include context)
+  if (!includeContextInDownload || isInEditorMode(baseSvg)) {
     return defaultClone()
   }
 
