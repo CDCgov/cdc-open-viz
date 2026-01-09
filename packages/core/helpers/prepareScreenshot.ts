@@ -252,7 +252,7 @@ export function prepareScreenshotContainer(
   // 6. Create and style container
   const container = document.createElement('div')
   container.style.width = `${vizWidth + 36}px`
-  container.style.padding = '2rem'
+  container.style.padding = '18px'
 
   // 7. Reset viz padding
   clonedViz.style.padding = '0'
