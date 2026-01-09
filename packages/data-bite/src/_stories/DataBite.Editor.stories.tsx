@@ -151,13 +151,16 @@ export const GeneralSectionTests: Story = {
     )
 
     // ============================================================================
-    // TEST 3: Title Visibility Based on Content
-    // Expectation: Title shows when text exists, hides when empty
+    // TEST 3: Show Title Toggle
+    // Expectation: Title visibility toggles based on checkbox state
     // ============================================================================
-    // Clear the title to hide it
-    await userEvent.clear(titleInput)
+    const showTitleCheckbox = canvasElement.querySelector('input[name="visual-null-showTitle"]') as HTMLInputElement
+    expect(showTitleCheckbox).toBeTruthy()
+
+    // Uncheck to hide title
+    await userEvent.click(showTitleCheckbox)
     await performAndAssert(
-      'Title Hidden When Empty',
+      'Title Hidden on Uncheck',
       () => {
         const titleElement = canvasElement.querySelector('.cove-component__header') as HTMLElement
         return titleElement && titleElement.offsetParent !== null
@@ -166,10 +169,10 @@ export const GeneralSectionTests: Story = {
       (before, after) => after === false
     )
 
-    // Add title back to show it
-    await userEvent.type(titleInput, 'Restored Title')
+    // Check to show title again
+    await userEvent.click(showTitleCheckbox)
     await performAndAssert(
-      'Title Shown When Has Content',
+      'Title Shown on Check',
       () => {
         const titleElement = canvasElement.querySelector('.cove-component__header') as HTMLElement
         return titleElement && titleElement.offsetParent !== null

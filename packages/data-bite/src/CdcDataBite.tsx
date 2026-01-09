@@ -617,7 +617,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                   <div className='cdc-callout__icon' aria-hidden='true' role='img'></div>
                 )}
 
-                {title && title.trim() && (
+                {config.visual?.showTitle && title && title.trim() && (
                   <h3 className='cdc-callout__heading fw-bold flex-shrink-0 d-flex align-items-start'>
                     {parse(processContentWithMarkup(title))}
                   </h3>
