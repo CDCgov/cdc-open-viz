@@ -118,7 +118,7 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
         })
       }
     },
-    [position, projectionData.stateCenter, interactionLabel, dispatch, config]
+    [position, projectionData.stateCenter, interactionLabel, dispatch]
   )
 
   // Essential fix: Remove config from dependencies to prevent infinite loops
