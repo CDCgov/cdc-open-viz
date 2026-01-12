@@ -38,7 +38,7 @@ const migrateTitleStyle = config => {
     // Migrate dashboard title
     if (!config.dashboard) config.dashboard = {}
     const hasTitle = config.dashboard.title && config.dashboard.title.trim() !== ''
-    config.dashboard.titleStyle = hasTitle ? 'legacy' : 'small'
+    config.dashboard.titleStyle ||= hasTitle ? 'legacy' : 'small'
 
     // Migrate all visualizations in dashboard
     if (config.visualizations) {
@@ -50,17 +50,17 @@ const migrateTitleStyle = config => {
     // Map stores titleStyle under general
     if (!config.general) config.general = {}
     const hasTitle = config.general.title && config.general.title.trim() !== ''
-    config.general.titleStyle = hasTitle ? 'legacy' : 'small'
+    config.general.titleStyle ||= hasTitle ? 'legacy' : 'small'
   } else if (config.type === 'markup-include') {
     // Markup-include stores titleStyle under contentEditor (same location as title)
     if (!config.contentEditor) config.contentEditor = {}
     const hasTitle = config.contentEditor.title && config.contentEditor.title.trim() !== ''
-    config.contentEditor.titleStyle = hasTitle ? 'legacy' : 'small'
+    config.contentEditor.titleStyle ||= hasTitle ? 'legacy' : 'small'
   } else if (config.type) {
     // For all other visualization types (chart, data-bite, waffle-chart, filtered-text, etc.)
     // titleStyle is at root level
     const hasTitle = config.title && config.title.trim() !== ''
-    config.titleStyle = hasTitle ? 'legacy' : 'small'
+    config.titleStyle ||= hasTitle ? 'legacy' : 'small'
   }
 }
 
