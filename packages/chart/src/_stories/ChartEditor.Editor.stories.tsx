@@ -127,7 +127,7 @@ export const GeneralSectionTests: Story = {
     // Test 1: Title Text Change
     const getTitleText = () => {
       // Look for the chart title using the specific class from CdcChartComponent.tsx line 913
-      const titleElement = canvasElement.querySelector('.chart-title')
+      const titleElement = canvasElement.querySelector('.chart-title, .cove-title')
       const result = {
         titleExists: Boolean(titleElement),
         titleText: titleElement?.textContent?.trim() || '',
