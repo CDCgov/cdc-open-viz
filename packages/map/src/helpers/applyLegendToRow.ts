@@ -47,6 +47,10 @@ export const applyLegendToRow = (
       return generateColorsArray(DEFAULT_MAP_BACKGROUND)
     }
 
+    if (runtimeLegend.items?.[disabledIdx]?.hidden) {
+      return generateColorsArray('rgba(0, 0, 0, 0.00)')
+    }
+
     const legendBinColor = runtimeLegend.items.find(o => o.bin === idx)?.color
     return generateColorsArray(legendBinColor, runtimeLegend.items[idx]?.special)
   } catch (e) {

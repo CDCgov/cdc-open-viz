@@ -2340,6 +2340,16 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         </label>
                       )}
                       {
+                        <Select
+                          value={config.legend.behavior}
+                          section='legend'
+                          fieldName='behavior'
+                          label='Legend Behavior (When clicked)'
+                          updateField={updateField}
+                          options={['highlight', 'isolate']}
+                        />
+                      }
+                      {
                         <CheckBox
                           value={legend.hideBorder}
                           section='legend'
