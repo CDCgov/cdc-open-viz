@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { generateEmbedCode, generateGeneratorLink } from '../../helpers/embedCodeGenerator'
+import { generateEmbedCode } from '../../helpers/embedCodeGenerator'
 
 type EmbedEditorProps = {
   config?: any // Current visualization config
@@ -98,15 +98,13 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
     setEmbedCodeCopied(false)
   }
 
-  // Handle opening embed code generator
-  const handleOpenGenerator = () => {
-    if (!configUrl) {
-      alert('This visualization must be published before using the embed code generator.')
-      return
-    }
+  // Waitlist of allowed hosts for the embed editor feature
+  const allowedHosts = ['localhost', 'wcms-wp-test.cdc.gov']
+  const currentHost = typeof window !== 'undefined' ? window.location.hostname : ''
 
-    const generatorUrl = generateGeneratorLink(configUrl)
-    window.open(generatorUrl, '_blank', 'noopener,noreferrer')
+  // Only show embed editor for waitlisted hosts
+  if (!allowedHosts.includes(currentHost)) {
+    return null
   }
 
   return (
@@ -175,29 +173,6 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
                   >
                     Get Embed Code
                   </button>
-
-                  <div>
-                    <button
-                      className='btn btn-outline-primary'
-                      onClick={handleOpenGenerator}
-                      style={{ width: '100%', textAlign: 'left' }}
-                    >
-                      Customize Embed Code →
-                    </button>
-                    <div
-                      style={{
-                        padding: '0.5em',
-                        background: '#fff3cd',
-                        border: '1px solid #ffc107',
-                        borderRadius: '4px',
-                        marginTop: '0.5em'
-                      }}
-                    >
-                      <p style={{ fontSize: '0.8em', margin: 0, color: '#856404' }}>
-                        ⚠️ Make sure to save the visualization before generating a custom embed code.
-                      </p>
-                    </div>
-                  </div>
                 </div>
               </>
             )}
