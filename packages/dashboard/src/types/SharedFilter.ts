@@ -19,6 +19,19 @@ export type SharedFilter = FilterBase & {
   labels?: Record<string, any>
   key: string
   apiFilter?: APIFilter
+  /**
+   * Which dataset's URL to modify when applying this URL filter.
+   *
+   * - **Required** for File Name filters: Specifies which dataset's filename should be modified
+   * - **Auto-inferred** for Query String filters: Automatically determined from widgets in `usedBy` array
+   *
+   * @example
+   * // File Name filter - must specify which dataset
+   * { type: 'urlfilter', filterBy: 'File Name', datasetKey: 'resp-data.json' }
+   *
+   * // Query String filter - auto-populated from usedBy
+   * { type: 'urlfilter', filterBy: 'Query String', usedBy: ['chart1'] }
+   */
   datasetKey?: string
   subGrouping: SubGrouping
   tier?: number

@@ -26,6 +26,72 @@ Dashboards have a section called `sharedFilters` that is mapped over to gather a
 
 After all required selections are made the `sharedFilters` are mapped over to gather query parameters to attach to the dynamic datasets. If the sharedFilter item has a list of `usedBy` identifiers the query parameters will only apply to datasets that are mapped to those respective visualizations or rows, conversly if there's now `usedBy` or the list is empty the sharedFilter item will apply it's query parameter(s) to all dynamic datasets used by the current dashboard.
 
+## URL Filter Types: Query String vs File Name
+
+URL filters support two different methods for modifying dataset URLs, specified by the `filterBy` property:
+
+### Query String Filters (`filterBy: "Query String"`)
+
+Query String filters append the filter value as a URL query parameter. This is the most common approach for REST APIs.
+
+**Configuration:**
+- `filterBy`: Set to `"Query String"`
+- `queryParameter`: The name of the query parameter to append (e.g., `"geography"`, `"state"`)
+- `datasetKey`: **Auto-populated** from the widgets specified in `usedBy` - you don't need to specify this manually
+
+**Example:**
+```json
+{
+  "key": "Geography",
+  "type": "urlfilter",
+  "filterBy": "Query String",
+  "queryParameter": "geography",
+  "usedBy": ["chart1"],
+  "apiFilter": {
+    "apiEndpoint": "https://api.cdc.gov/states",
+    "valueSelector": "state",
+    "textSelector": "state_name"
+  }
+}
+```
+
+When a user selects "Alaska", the dataset URL `https://api.cdc.gov/data.json` becomes `https://api.cdc.gov/data.json?geography=Alaska`.
+
+### File Name Filters (`filterBy: "File Name"`)
+
+File Name filters replace the filename portion of the URL. This is useful for APIs that use path-based routing or file-based data sources.
+
+**Configuration:**
+- `filterBy`: Set to `"File Name"`
+- `fileName`: Template for the new filename, use `${query}` placeholder for the filter value
+- `datasetKey`: **Required** - specifies which dataset's filename should be modified
+- `whitespaceReplacement`: How to handle spaces in the filter value (`"Keep Spaces"`, `"Remove Spaces"`, or `"Replace With Underscore"`)
+
+**Example:**
+```json
+{
+  "key": "State",
+  "type": "urlfilter",
+  "filterBy": "File Name",
+  "fileName": "NSSPSubState${query}",
+  "datasetKey": "resp-data.json",
+  "whitespaceReplacement": "Remove Spaces",
+  "usedBy": ["chart1"],
+  "apiFilter": {
+    "apiEndpoint": "https://api.cdc.gov/states",
+    "valueSelector": "state"
+  }
+}
+```
+
+When a user selects "Alaska", the dataset URL `https://api.cdc.gov/data/default.json` becomes `https://api.cdc.gov/data/NSSPSubStateAlaska.json`.
+
+### Dataset Key Behavior
+
+- **Query String filters**: The `datasetKey` is automatically determined from the widgets specified in the `usedBy` array. The system looks at each widget's `dataKey` property to identify which datasets should receive the query parameter.
+
+- **File Name filters**: The `datasetKey` must be explicitly specified to indicate which dataset's filename should be modified. This is required because filename transformations apply to specific URLs.
+
 Example (2):
 
 ```

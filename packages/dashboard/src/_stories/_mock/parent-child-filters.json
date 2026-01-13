@@ -1,0 +1,233 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "title": "Parent-Child Filter Demo",
+    "description": "Demonstrates hierarchical filter relationships with defaultValue support",
+    "sharedFilters": [
+      {
+        "key": "State",
+        "showDropdown": true,
+        "values": [
+          "California",
+          "Texas",
+          "New York"
+        ],
+        "type": "datafilter",
+        "orderedValues": [
+          "California",
+          "Texas",
+          "New York"
+        ],
+        "columnName": "state",
+        "tier": 1,
+        "defaultValue": "California"
+      },
+      {
+        "key": "County",
+        "showDropdown": true,
+        "values": [],
+        "type": "datafilter",
+        "orderedValues": [],
+        "columnName": "county",
+        "tier": 2,
+        "parents": [
+          "State"
+        ],
+        "defaultValue": "Los Angeles"
+      },
+      {
+        "key": "City",
+        "showDropdown": true,
+        "values": [],
+        "type": "datafilter",
+        "orderedValues": [],
+        "columnName": "city",
+        "tier": 3,
+        "parents": [
+          "County"
+        ],
+        "defaultValue": "Los Angeles"
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "dashboardFilters1"
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "chart1"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "dashboardFilters1": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "uid": "dashboardFilters1",
+      "type": "dashboardFilters",
+      "sharedFilterIndexes": [
+        0,
+        1,
+        2
+      ],
+      "visualizationType": "dashboardFilters"
+    },
+    "chart1": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "uid": "chart1",
+      "type": "chart",
+      "visualizationType": "Bar",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "dataKey": "parent-child-data.json",
+      "title": "Population by City",
+      "showTitle": true,
+      "xAxis": {
+        "label": "City",
+        "dataKey": "city"
+      },
+      "yAxis": {
+        "label": "Population",
+        "dataKey": "population",
+        "numTicks": 5
+      }
+    }
+  },
+  "datasets": {
+    "parent-child-data.json": {
+      "data": [
+        {
+          "state": "California",
+          "county": "Los Angeles",
+          "city": "Los Angeles",
+          "population": 3979576
+        },
+        {
+          "state": "California",
+          "county": "Los Angeles",
+          "city": "Long Beach",
+          "population": 466742
+        },
+        {
+          "state": "California",
+          "county": "Los Angeles",
+          "city": "Pasadena",
+          "population": 138699
+        },
+        {
+          "state": "California",
+          "county": "San Diego",
+          "city": "San Diego",
+          "population": 1423851
+        },
+        {
+          "state": "California",
+          "county": "San Diego",
+          "city": "Chula Vista",
+          "population": 275487
+        },
+        {
+          "state": "California",
+          "county": "Orange",
+          "city": "Anaheim",
+          "population": 346824
+        },
+        {
+          "state": "California",
+          "county": "Orange",
+          "city": "Santa Ana",
+          "population": 310227
+        },
+        {
+          "state": "California",
+          "county": "Orange",
+          "city": "Irvine",
+          "population": 307670
+        },
+        {
+          "state": "Texas",
+          "county": "Harris",
+          "city": "Houston",
+          "population": 2320268
+        },
+        {
+          "state": "Texas",
+          "county": "Harris",
+          "city": "Pasadena",
+          "population": 151950
+        },
+        {
+          "state": "Texas",
+          "county": "Dallas",
+          "city": "Dallas",
+          "population": 1304379
+        },
+        {
+          "state": "Texas",
+          "county": "Dallas",
+          "city": "Irving",
+          "population": 256684
+        },
+        {
+          "state": "Texas",
+          "county": "Bexar",
+          "city": "San Antonio",
+          "population": 1547253
+        },
+        {
+          "state": "Texas",
+          "county": "Travis",
+          "city": "Austin",
+          "population": 978908
+        },
+        {
+          "state": "New York",
+          "county": "New York",
+          "city": "Manhattan",
+          "population": 1694251
+        },
+        {
+          "state": "New York",
+          "county": "Kings",
+          "city": "Brooklyn",
+          "population": 2736074
+        },
+        {
+          "state": "New York",
+          "county": "Queens",
+          "city": "Queens",
+          "population": 2405464
+        },
+        {
+          "state": "New York",
+          "county": "Bronx",
+          "city": "Bronx",
+          "population": 1472654
+        },
+        {
+          "state": "New York",
+          "county": "Richmond",
+          "city": "Staten Island",
+          "population": 495747
+        }
+      ],
+      "dataFileSize": 1234,
+      "dataFileName": "parent-child-data.json",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "JSON",
+      "preview": true
+    }
+  }
+}

@@ -39,7 +39,11 @@ export const addValuesToDashboardFilters = (
     if (filtersToSkip.includes(index)) return filter
     if (filter.type === 'urlfilter') return filter
     const filterCopy = _.cloneDeep(filter)
-    const filterValues = generateValuesForFilter(getSelector(filter), data)
+
+    // Only generate values from data if not pre-configured
+    const hasPreConfiguredValues = filter.values && filter.values.length > 0
+    const filterValues = hasPreConfiguredValues ? filter.values : generateValuesForFilter(getSelector(filter), data)
+
     filterCopy.values = filterValues
 
     // Merge new values with existing custom order (fixes DEV-11740 & DEV-11376)
@@ -54,28 +58,12 @@ export const addValuesToDashboardFilters = (
         const active: string[] = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
         filterCopy.active = active.filter(val => defaultValues.includes(val))
       } else {
-        // Preserve existing active value if it's valid in the new filter values
-        const currentActive = filterCopy.active as string
-        const isResetLabelValue = currentActive && currentActive === filterCopy.resetLabel
-        const isCurrentActiveValid = currentActive && (filterValues.includes(currentActive) || isResetLabelValue)
-
-        // Check if this is an intentional clear (empty string, but not undefined during initial load)
-        const isIntentionalClear = currentActive === ''
-
-        // Priority: valid current active > defaultValue (only on initial load) > reset label > first value
-        if (isCurrentActiveValid) {
-          // Keep the current active value if valid
-          filterCopy.active = currentActive
-        } else if (isIntentionalClear) {
-          // Don't override intentional clears
-          filterCopy.active = currentActive
-        } else if (filterCopy.defaultValue && !currentActive) {
-          // Use defaultValue only on initial load (when there's no current active value)
+        // Initialize active from defaultValue if not already set
+        // OR if defaultValue exists, always use it (overrides stale active from saved config)
+        if (filterCopy.defaultValue) {
           filterCopy.active = filterCopy.defaultValue
-        } else {
-          // Set to reset label or first value
-          const defaultValue = filterCopy.resetLabel || filterCopy.values[0]
-          filterCopy.active = defaultValue
+        } else if (!filterCopy.active) {
+          filterCopy.active = filterCopy.resetLabel || filterCopy.values[0]
         }
       }
     }
