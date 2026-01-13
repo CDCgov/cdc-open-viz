@@ -1637,10 +1637,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   }
 
   const handleConfidenceKeyChange = (fieldName: 'upper' | 'lower', columnName: string) => {
-    const updatedConfig = {
-      ...config,
-      confidenceKeys: { ...config.confidenceKeys, [fieldName]: columnName }
-    }
+    const updatedConfig = cloneConfig(config)
+    updatedConfig.confidenceKeys[fieldName] = columnName
 
     // Auto-add confidence key column to tooltips and data table
     if (columnName) {
