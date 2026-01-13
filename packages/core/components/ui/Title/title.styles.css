@@ -124,5 +124,7 @@
   font-weight: 600;
   text-transform: uppercase;
   color: #666;
-  display: block;
+  sup {
+    font-size: 75%;
+  }
 }
