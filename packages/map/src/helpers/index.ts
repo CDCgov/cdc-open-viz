@@ -17,4 +17,12 @@ export { titleCase as toTitleCase } from './toTitleCase'
 export { titleCase } from './titleCase'
 export { validateFipsCodeLength } from './validateFipsCodeLength'
 export { getMapContainerClasses } from './getMapContainerClasses'
-export { SVG_HEIGHT, SVG_WIDTH, SVG_PADDING, SVG_VIEWBOX, MAX_ZOOM_LEVEL, DEFAULT_MAP_BACKGROUND } from './constants'
+export {
+  SVG_HEIGHT,
+  SVG_WIDTH,
+  SVG_PADDING,
+  SVG_VIEWBOX,
+  MAX_ZOOM_LEVEL,
+  DEFAULT_MAP_BACKGROUND,
+  DISABLED_MAP_COLOR
+} from './constants'

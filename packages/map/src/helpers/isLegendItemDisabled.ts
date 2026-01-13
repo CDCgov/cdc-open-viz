@@ -12,5 +12,5 @@ export const isLegendItemDisabled = (
   if (!legendMemo.current.has(hash)) return false
   const idx = legendMemo.current.get(hash)
   const disabledIdx = config.legend.showSpecialClassesLast ? legendSpecialClassLastMemo.current.get(hash) ?? idx : idx
-  return runtimeLegend.items[disabledIdx]?.disabled || false
+  return runtimeLegend.items[disabledIdx]?.disabled || runtimeLegend.items[disabledIdx]?.hidden || false
 }

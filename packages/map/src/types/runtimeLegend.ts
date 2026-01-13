@@ -1,5 +1,6 @@
 type RuntimeLegendItem = {
   disabled?: boolean
+  hidden?: boolean
   bin?: number
   color?: string
   special?: boolean
