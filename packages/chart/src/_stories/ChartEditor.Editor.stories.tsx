@@ -200,7 +200,7 @@ export const GeneralSectionTests: Story = {
     // Test 1: Super Title Text Change
     const getSuperTitleText = () => {
       // Super title is part of the .chart-title component but rendered separately
-      const titleContainer = canvasElement.querySelector('.chart-title')
+      const titleContainer = canvasElement.querySelector('.chart-title, .cove-title')
       const superTitleElement =
         titleContainer?.querySelector('.super-title, [class*="super"]') || titleContainer?.children[0] // First child might be super title
 
