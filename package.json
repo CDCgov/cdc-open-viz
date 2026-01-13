@@ -137,6 +137,7 @@
   },
   "resolutions": {
     "jackspeak": "2.1.1",
-    "esbuild": "^0.25.0"
+    "esbuild": "^0.25.0",
+    "js-yaml": "^4.1.1"
   }
 }
