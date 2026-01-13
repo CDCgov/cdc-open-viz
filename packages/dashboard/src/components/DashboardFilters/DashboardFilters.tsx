@@ -6,6 +6,7 @@ import { APIFilterDropdowns, DropdownOptions } from './DashboardFiltersWrapper'
 import { FILTER_STYLE } from '../../types/FilterStyles'
 import { NestedOptions, ValueTextPair } from '@cdc/core/components/NestedDropdown/nestedDropdownHelpers'
 import NestedDropdown from '@cdc/core/components/NestedDropdown'
+import { getNestedOptions } from '@cdc/core/components/Filters/helpers/getNestedOptions'
 import { MouseEventHandler } from 'react'
 import Loader from '@cdc/core/components/Loader'
 import _ from 'lodash'
@@ -70,12 +71,11 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         const loading = apiFilterDropdowns[_key] === null
 
         const multiValues: { value; label }[] = []
-        const nestedOptions: NestedOptions = Object.entries(filter?.subGrouping?.valuesLookup || {}).map(
-          ([key, data]) => [
-            [key, key], // Main option: [value, text]
-            Array.isArray(data?.values) ? data.values.map(value => [value, value]) : [] // Ensure `values` is an array
-          ]
-        )
+        const nestedOptions: NestedOptions = getNestedOptions({
+          orderedValues: filter.orderedValues,
+          values: filter.values,
+          subGrouping: filter.subGrouping
+        })
 
         if (_key && apiFilterDropdowns[_key]) {
           // URL Filter

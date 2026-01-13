@@ -72,6 +72,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
     newSharedFilters[index][prop] = value
     if (prop === 'columnName') {
       if (newSharedFilters[index].subGrouping) delete newSharedFilters[index].subGrouping
+      newSharedFilters[index].defaultValue = ''
       // changing a data column and want to load the data into the preview options
       const sharedFiltersWithValues = addValuesToDashboardFilters(newSharedFilters, data)
       dispatch({ type: 'SET_SHARED_FILTERS', payload: sharedFiltersWithValues })
