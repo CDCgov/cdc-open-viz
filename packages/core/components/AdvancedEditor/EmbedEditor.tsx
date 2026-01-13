@@ -98,11 +98,10 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
     setEmbedCodeCopied(false)
   }
 
-  // Waitlist of allowed hosts for the embed editor feature
+  // Allowed hosts for the embed editor feature
   const allowedHosts = ['localhost', 'wcms-wp-test.cdc.gov']
   const currentHost = typeof window !== 'undefined' ? window.location.hostname : ''
 
-  // Only show embed editor for waitlisted hosts
   if (!allowedHosts.includes(currentHost)) {
     return null
   }
