@@ -2340,6 +2340,19 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         </label>
                       )}
                       {
+                        // TODO: DEV-7271 Follow-up to implement option to isolate on legend click. For now, always highlight.
+                        /*
+                        <Select
+                          value={config.legend.behavior}
+                          section='legend'
+                          fieldName='behavior'
+                          label='Legend Behavior (When clicked)'
+                          updateField={updateField}
+                          options={['highlight', 'isolate']}
+                        />
+                        */
+                      }
+                      {
                         <CheckBox
                           value={legend.hideBorder}
                           section='legend'
