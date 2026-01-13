@@ -98,13 +98,8 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
     setEmbedCodeCopied(false)
   }
 
-  // Allowed hosts for the embed editor feature
-  const allowedHosts = ['localhost', 'wcms-wp-test.cdc.gov']
-  const currentHost = typeof window !== 'undefined' ? window.location.hostname : ''
-
-  if (!allowedHosts.includes(currentHost)) {
-    return null
-  }
+  // Hide embed section until released
+  return null
 
   return (
     <>
