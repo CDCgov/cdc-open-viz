@@ -56,6 +56,20 @@ export const Data_Bite_TP5_Style: Story = {
   }
 }
 
+export const Data_Bite_TP5_White_Background: Story = {
+  args: {
+    configUrl: '/packages/data-bite/examples/tp5-white-background.json'
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'TP5 Style with White Background - This variant uses a white background with a 1px border and 6px border radius, providing a cleaner look while maintaining the TP5 layout style.'
+      }
+    }
+  }
+}
+
 // Simple editor mode story for basic rendering
 export const Editor_Mode_Basic: Story = {
   args: {

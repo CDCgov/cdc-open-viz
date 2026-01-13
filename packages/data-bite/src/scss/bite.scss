@@ -123,6 +123,7 @@
     background: none !important;
 
     .cdc-callout {
+      gap: 0.5rem;
       box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
       border: 2px solid #dff2f6 !important;
       margin: 0 !important;
@@ -147,11 +148,11 @@
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
-      background: white !important;
+      background: white;
 
       .cdc-callout {
-        background: transparent !important;
-        border: 2px solid #009ec1 !important;
+        border: 1px solid #009ec1 !important;
+        background: transparent;
         box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
       }
     }
