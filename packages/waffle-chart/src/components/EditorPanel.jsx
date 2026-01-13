@@ -54,7 +54,11 @@ const EditorPanel = memo(props => {
   const columns = useDataColumns(data)
   //visualizationType
 
-  const approvedWaffleChartOptions = ['Waffle', 'TP5 Waffle', 'Gauge']
+  const approvedWaffleChartOptions = [
+    { value: 'Waffle', label: 'Waffle' },
+    { value: 'TP5 Waffle', label: 'TP5 Style Waffle' },
+    { value: 'Gauge', label: 'Gauge' }
+  ]
 
   const editorContent = (
     <Accordion>
