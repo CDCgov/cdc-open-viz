@@ -31,7 +31,6 @@ export default {
   nodeSpacer: '2',
   theme: 'theme-blue',
   type: 'waffle-chart',
-  waffleStyle: 'original',
   gauge: {
     height: 35,
     width: '100%'

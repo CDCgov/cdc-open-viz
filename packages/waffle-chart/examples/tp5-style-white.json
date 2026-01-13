@@ -5,7 +5,7 @@
   "content": "of overdoses resulted in death.",
   "subtext": "This data is an example and does not reflect actual averages",
   "orientation": "horizontal",
-  "waffleStyle": "tp5",
+  "visualizationType": "TP5 Waffle",
   "data": [
     {
       "Resulted in Death": 250,
@@ -56,7 +56,6 @@
   "nodeWidth": 10,
   "nodeSpacer": 2,
   "theme": "theme-blue",
-  "visualizationType": "Waffle",
   "visualizationSubType": "",
   "invalidComparate": false,
   "showDenominator": false,

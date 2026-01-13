@@ -97,7 +97,7 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
       }
 
       // Add TP5 style classes
-      if (config.waffleStyle === 'tp5') {
+      if (config.visualizationType === 'TP5 Waffle') {
         classes.push('waffle__style--tp5')
         if (config.visual?.whiteBackground) {
           classes.push('white-background-style')

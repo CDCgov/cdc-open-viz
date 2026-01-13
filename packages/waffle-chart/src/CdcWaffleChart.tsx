@@ -30,6 +30,10 @@ import './scss/main.scss'
 import Title from '@cdc/core/components/ui/Title'
 import Layout from '@cdc/core/components/Layout'
 
+// TP5 Style Constants
+const TP5_NODE_WIDTH = 13
+const TP5_NODE_SPACER = 3
+
 type CdcWaffleChartProps = {
   configUrl?: string
   config?: Config
@@ -256,8 +260,10 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
 
   const buildWaffle = useCallback(() => {
     let waffleData = []
-    let nodeWidthNum = parseInt(nodeWidth, 10)
-    let nodeSpacerNum = parseInt(nodeSpacer, 10)
+    // Use standardized values for TP5 style
+    const isTP5 = config.visualizationType === 'TP5 Waffle'
+    let nodeWidthNum = isTP5 ? TP5_NODE_WIDTH : parseInt(nodeWidth, 10)
+    let nodeSpacerNum = isTP5 ? TP5_NODE_SPACER : parseInt(nodeSpacer, 10)
 
     const calculatePos = (shape, axis, index, width, spacer) => {
       let mod = axis === 'x' ? index % 10 : axis === 'y' ? Math.floor(index / 10) : null
@@ -270,7 +276,8 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         x: calculatePos(shape, 'x', i, nodeWidthNum, nodeSpacerNum),
         y: calculatePos(shape, 'y', i, nodeWidthNum, nodeSpacerNum),
         color: config.visual.colors[theme],
-        opacity: i + 1 > 100 - Math.round(dataPercentage) ? 1 : 0.35
+        opacity: i + 1 > 100 - Math.round(dataPercentage) ? 1 : 0.2,
+        isFilled: i + 1 > 100 - Math.round(dataPercentage)
       }
       waffleData.push(newNode)
     }
@@ -280,25 +287,30 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         <Bar
           className='cdc-waffle-chart__node'
           style={{ transitionDelay: `${0.1 * key}ms` }}
-          x={node.x}
-          y={node.y}
-          width={nodeWidthNum}
-          height={nodeWidthNum}
-          fill={node.color}
-          fillOpacity={node.opacity}
+          x={isTP5 && !node.isFilled ? node.x + 1 : node.x}
+          y={isTP5 && !node.isFilled ? node.y + 1 : node.y}
+          width={isTP5 && !node.isFilled ? nodeWidthNum - 2 : nodeWidthNum}
+          height={isTP5 && !node.isFilled ? nodeWidthNum - 2 : nodeWidthNum}
+          fill={isTP5 && !node.isFilled ? '#dff2f6' : node.color}
+          fillOpacity={isTP5 ? 1 : node.opacity}
+          stroke={isTP5 && !node.isFilled ? node.color : undefined}
+          strokeWidth={isTP5 && !node.isFilled ? 1 : 0}
           key={key}
         />
       ) : node.shape === 'person' ? (
         <path
+          className='cdc-waffle-chart__node'
           style={{
-            transform: `translateX(${node.x + nodeWidthNum / 4}px) translateY(${node.y}px) scale(${nodeWidthNum / 20})`
+            transform: `translateX(${node.x}px) translateY(${node.y + nodeWidthNum * 0.1}px) scale(${
+              (nodeWidthNum * 0.8) / 448
+            })`,
+            transitionDelay: `${0.1 * key}ms`
           }}
-          fill={node.color}
-          fillOpacity={node.opacity}
+          fill={node.isFilled ? node.color : 'transparent'}
+          stroke={node.color}
+          strokeWidth={node.isFilled ? 0 : 448 / nodeWidthNum}
           key={key}
-          d='M3.75,0a2.5,2.5,0,1,1-2.5,2.5A2.5,2.5,0,0,1,3.75,0M5.625,5.625H5.18125a3.433,3.433,0,0,1-2.8625,0H1.875A1.875,1.875,
-                          0,0,0,0,7.5v5.3125a.9375.9375,0,0,0,.9375.9375h.625v5.3125A.9375.9375,0,0,0,2.5,20H5a.9375.9375,0,0,0,
-                          .9375-.9375V13.75h.625A.9375.9375,0,0,0,7.5,12.8125V7.5A1.875,1.875,0,0,0,5.625,5.625Z'
+          d='M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z'
         ></path>
       ) : (
         <Circle
@@ -306,18 +318,28 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
           style={{ transitionDelay: `${0.1 * key}ms` }}
           cx={node.x}
           cy={node.y}
-          r={nodeWidthNum / 2}
-          fill={node.color}
-          fillOpacity={node.opacity}
+          r={isTP5 && !node.isFilled ? nodeWidthNum / 2 - 1 : nodeWidthNum / 2}
+          fill={isTP5 && !node.isFilled ? '#dff2f6' : node.color}
+          fillOpacity={isTP5 ? 1 : node.opacity}
+          stroke={isTP5 && !node.isFilled ? node.color : undefined}
+          strokeWidth={isTP5 && !node.isFilled ? 1 : 0}
           key={key}
         />
       )
     )
-  }, [theme, dataPercentage, shape, nodeWidth, nodeSpacer])
+  }, [theme, dataPercentage, shape, nodeWidth, nodeSpacer, config.visualizationType])
 
   const setRatio = useCallback(() => {
-    return nodeWidth * 10 + nodeSpacer * 9
-  }, [nodeWidth, nodeSpacer])
+    const isTP5 = config.visualizationType === 'TP5 Waffle'
+    const width = isTP5 ? TP5_NODE_WIDTH : nodeWidth
+    const spacer = isTP5 ? TP5_NODE_SPACER : nodeSpacer
+    return width * 10 + spacer * 9
+  }, [nodeWidth, nodeSpacer, config.visualizationType])
+
+  const setSvgSize = useCallback(() => {
+    // Add 2px padding to account for strokes on edges
+    return setRatio() + 2
+  }, [nodeWidth, nodeSpacer, config.visualizationType])
 
   const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
 
@@ -365,7 +387,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         <Error updateConfig={updateConfig} config={config} />
       )}
       {config.newViz && showConfigConfirm && <Confirm updateConfig={updateConfig} config={config} />}
-      <div className='cove-component__content-wrap pb-0'>
+      <div className='cove-component__content-wrap p-0'>
         {config.visualizationType === 'Gauge' && (
           <div className={`cove-gauge-chart${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
             <div className='cove-gauge-chart__chart'>
@@ -400,8 +422,10 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
             }`}
           >
             <div className='cove-waffle-chart__chart' style={{ width: setRatio() }}>
-              <svg width={setRatio()} height={setRatio()}>
-                <Group>{buildWaffle()}</Group>
+              <svg width={setSvgSize()} height={setSvgSize()} style={{ display: 'block' }}>
+                <Group top={1} left={1}>
+                  {buildWaffle()}
+                </Group>
               </svg>
             </div>
             {(dataPercentage || content) && (
@@ -415,7 +439,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                 )}
                 <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
 
-                {subtext && <div className='cove-waffle-chart__subtext subtext'>{parse(subtext)}</div>}
+                {subtext && <div className='cove-waffle-chart__subtext subtext fst-italic'>{parse(subtext)}</div>}
               </div>
             )}
           </div>
@@ -425,7 +449,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   )
 
   // TP5 Style: render with callout wrapper inside cove-component__content
-  if (config.waffleStyle === 'tp5') {
+  if (config.visualizationType === 'TP5 Waffle') {
     const calloutClasses = ['cdc-callout', 'd-flex', 'flex-column', 'overflow-hidden']
     if (!config.visual?.whiteBackground) {
       calloutClasses.push('dfe-block', 'cdc-callout--data')

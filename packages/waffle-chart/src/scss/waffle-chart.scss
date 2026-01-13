@@ -139,7 +139,6 @@
 
     .cdc-callout {
       box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
-      border: 2px solid #dff2f6 !important;
       margin: 0 !important;
       padding: 1.5rem;
     }
@@ -152,7 +151,7 @@
 
       .cdc-callout {
         background: transparent !important;
-        border: 2px solid #009ec1 !important;
+        border: 1px solid #009ec1 !important;
         box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
       }
     }
@@ -160,11 +159,21 @@
     // Override waffle chart default padding inside callout
     .cove-waffle-chart {
       padding: 0;
+      row-gap: 1rem;
+    }
+
+    .cove-waffle-chart__chart {
+      margin-bottom: 0;
     }
 
     .cove-waffle-chart__data {
       margin-bottom: 0;
       align-content: flex-start;
+    }
+    .cove-waffle-chart__data--primary {
+      color: var(--colors-cyan-60v);
+      font-weight: 300;
+      font-size: 2.5rem;
     }
   }
 }

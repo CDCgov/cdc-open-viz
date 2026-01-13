@@ -1,8 +1,7 @@
 {
-  "title": "Chart Title",
+  "title": "A Waffle Chart - Person",
   "titleStyle": "small",
   "showTitle": true,
-  "visualizationType": "Waffle",
   "visualizationSubType": "linear",
   "showPercent": true,
   "showDenominator": true,
@@ -25,12 +24,12 @@
   "dataDenomFunction": "",
   "suffix": "%",
   "roundToPlace": "0",
-  "shape": "circle",
+  "shape": "person",
   "nodeWidth": "10",
   "nodeSpacer": "2",
   "theme": "theme-blue",
   "type": "waffle-chart",
-  "waffleStyle": "tp5",
+  "visualizationType": "TP5 Waffle",
   "gauge": {
     "height": 35,
     "width": "100%"
