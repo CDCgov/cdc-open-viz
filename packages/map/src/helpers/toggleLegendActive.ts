@@ -51,7 +51,7 @@ export const toggleLegendActive = (i: number, legendLabel: string, runtimeLegend
         return item
       })
 
-      // When no existing disabled items, isolate to only the clicked item
+      // When no existing disabled items, enable only (highlight) the clicked item
     } else {
       items = items.map((item, index) => {
         if (index !== i) {
