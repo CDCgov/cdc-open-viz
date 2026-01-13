@@ -1,0 +1,60 @@
+{
+  "type": "data-bite",
+  "data": [
+    {
+      "Category": "Total",
+      "Value": 1234
+    },
+    {
+      "Category": "Group A",
+      "Value": 5678
+    },
+    {
+      "Category": "Group B",
+      "Value": 9012
+    },
+    {
+      "Category": "Group C",
+      "Value": 3456
+    }
+  ],
+  "dataBite": "",
+  "dataFunction": "Mean (Average)",
+  "dataColumn": "Value",
+  "bitePosition": "Left",
+  "biteFontSize": 36,
+  "fontSize": "medium",
+  "biteBody": "Highlight a statistic, data point, or key fact about a topic using the relevant layout option:",
+  "imageData": {
+    "display": "none",
+    "url": "",
+    "alt": "",
+    "options": []
+  },
+  "dataFormat": {
+    "roundToPlace": 0,
+    "commas": true,
+    "prefix": "",
+    "suffix": ""
+  },
+  "biteStyle": "tp5",
+  "filters": [],
+  "subtext": "*This is an optional subtext or citation.",
+  "title": "Data / Fact",
+  "theme": "theme-blue",
+  "shadow": false,
+  "visual": {
+    "border": false,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false,
+    "showTitle": true,
+    "whiteBackground": true
+  },
+  "general": {
+    "isCompactStyle": false
+  },
+  "markupVariables": [],
+  "enableMarkupVariables": false
+}
