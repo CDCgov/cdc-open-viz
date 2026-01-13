@@ -7,7 +7,10 @@ export const toggleLegendActive = (i: number, legendLabel: string, runtimeLegend
   const behavior = (legendBehavior || 'highlight').toLowerCase()
 
   // "Isolate" behavior that exclusively shows only the clicked item
-  if (behavior === 'isolate') {
+
+  // TODO: DEV-7271 Follow-up to implement option to isolate on legend click. For now, always highlight.
+  // if (behavior === 'isolate') {
+  if (false) {
     // With an existing hidden item, just toggle the item clicked on
     const hasExistingHidden = items.some(item => item.hidden === true)
     if (hasExistingHidden) {

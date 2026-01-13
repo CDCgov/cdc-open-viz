@@ -30,6 +30,8 @@ export const GEOCODE_TYPES = {
 
 export const DEFAULT_MAP_BACKGROUND = '#DFE1E2'
 
+export const DISABLED_MAP_COLOR = '#FFFFFF'
+
 // Component constants
 export const LOGO_MAX_WIDTH = '50px'
 
