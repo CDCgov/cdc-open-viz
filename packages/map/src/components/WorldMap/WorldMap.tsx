@@ -28,6 +28,7 @@ import useApplyTooltipsToGeo from '../../hooks/useApplyTooltipsToGeo'
 import useCountryZoom from '../../hooks/useCountryZoom'
 import generateRuntimeData from '../../helpers/generateRuntimeData'
 import { applyLegendToRow } from '../../helpers/applyLegendToRow'
+import { normalizeTopoJsonProperties } from '../../helpers/normalizeTopoJsonProperties'
 
 import './worldMap.styles.css'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
@@ -67,10 +68,34 @@ const WorldMap = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      import(/* webpackChunkName: "world-topo" */ './data/world-topo.json').then(topoJSON => {
-        const worldFeatures = feature(topoJSON, topoJSON.objects.countries).features
-        setWorld(worldFeatures)
-      })
+      import(/* webpackChunkName: "world-map-2026" */ './data/cove_world_map_2026.json')
+        .then(topoJSON => {
+          // Smart detection of TopoJSON object key
+          // Try known keys first, then fall back to first available key
+          const objectKey = topoJSON.objects.countries
+            ? 'countries'
+            : topoJSON.objects.Cove_World_Map_2025
+            ? 'Cove_World_Map_2025'
+            : Object.keys(topoJSON.objects)[0]
+
+          if (!objectKey) {
+            throw new Error('No valid TopoJSON objects found in world map file')
+          }
+
+          // Extract features from TopoJSON
+          const rawFeatures = feature(topoJSON, topoJSON.objects[objectKey]).features
+
+          // Normalize properties to ensure consistent interface
+          const normalizedFeatures = rawFeatures.map(f => ({
+            ...f,
+            properties: normalizeTopoJsonProperties(f.properties)
+          }))
+
+          setWorld(normalizedFeatures)
+        })
+        .catch(error => {
+          console.error('Failed to load world map data:', error)
+        })
     }
     fetchData()
   }, [])
@@ -196,14 +221,15 @@ const WorldMap = () => {
 
   const constructGeoJsx = geographies => {
     const geosJsx = geographies.map(({ feature: geo, path }, i) => {
-      // If the geo.properties.config value is found in the data use that, otherwise fall back to geo.properties.iso
+      // Use ISO code for lookups since runtimeData is keyed by UIDs (ISO codes)
+      // Check state first for US territories that might appear in world maps
       const dataHasStateName = config.data.some(d => d[config.columns.geo.name] === geo.properties.state)
       const geoKey =
         geo.properties.state && runtimeData[geo.properties.state]
           ? geo.properties.state
+          : geo.properties.iso && runtimeData[geo.properties.iso]
+          ? geo.properties.iso
           : geo.properties.name
-          ? geo.properties.name
-          : geo.properties.iso
 
       const additionalData = {
         name: geo.properties.name
@@ -212,7 +238,7 @@ const WorldMap = () => {
 
       let geoData = runtimeData[geoKey]
 
-      const geoDisplayName = displayGeoName(supportedCountries[geoKey]?.[0])
+      const geoDisplayName = displayGeoName(supportedCountries[geo.properties.iso]?.[0])
       let legendColors
 
       // Once we receive data for this geographic item, setup variables.
