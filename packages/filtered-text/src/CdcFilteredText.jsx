@@ -115,13 +115,9 @@ const CdcFilteredText = ({
     loadConfig().catch(err => console.error(err))
   }, []) // eslint-disable-line
 
-  useEffect(() => {
-    if (configObj && !configObj.dataUrl) {
-      updateConfig({ ...defaults, ...configObj })
-      setStateData(configObj.data)
-      setExcludedData(configObj.data)
-    }
-  }, [configObj?.data]) // eslint-disable-line
+  if (configObj && config && JSON.stringify(configObj.data) !== JSON.stringify(config.data)) {
+    loadConfig()
+  }
 
   let content = <Loading />
 
