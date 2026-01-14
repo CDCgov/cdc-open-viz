@@ -63,9 +63,9 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
         )
       : projection
 
-    const path: GeoPath = geoPath().projection(projection)
-    const featureCenter = combinedData ? path.centroid(combinedData as any) : [0, 0]
-    const stateCenter = newProjection.invert(featureCenter)
+    const path: GeoPath = geoPath().projection(newProjection)
+    // For reset, use the center of the SVG viewport, not the feature centroid
+    const stateCenter = newProjection.invert([SVG_WIDTH / 2, SVG_HEIGHT / 2])
 
     const bounds = combinedData ? path.bounds(combinedData as any) : null
 
