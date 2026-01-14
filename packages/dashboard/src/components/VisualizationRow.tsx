@@ -233,7 +233,8 @@ const VisualizationRow: React.FC<VizRowProps> = ({
       )}
       {row.columns.map((col, colIndex) => {
         if (col.width) {
-          if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`col col-${col.width}`}></div>
+          if (!col.widget)
+            return <div key={`row__${index}__col__${colIndex}`} className={`col-12 col-md-${col.width}`}></div>
 
           const visualizationConfig = getVizConfig(
             col.widget,
@@ -290,11 +291,10 @@ const VisualizationRow: React.FC<VizRowProps> = ({
             sharedFilterIndexes &&
             sharedFilterIndexes.filter(idx => config.dashboard.sharedFilters?.[idx]?.showDropdown === false).length ===
               sharedFilterIndexes.length
-          const hasMarginBottom = !isLastRow && !hiddenDashboardFilters
 
           const vizWrapperClass = `col-12 col-md-${col.width}${!shouldShow ? ' d-none' : ''}${
-            hideVisualization ? ' hide-parent-visualization' : hasMarginBottom ? ' mb-4' : ''
-          }`
+            hideVisualization ? ' hide-parent-visualization' : ''
+          }${hiddenDashboardFilters ? ' hidden-dashboard-filters' : ''}`
           const link =
             config.table && config.table.show && config.datasets && table && table.showDataTableLink
               ? tableLink
