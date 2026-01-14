@@ -1,6 +1,6 @@
 {
   "type": "waffle-chart",
-  "shape": "square",
+  "shape": "person",
   "title": "Overdose Mortality Rate",
   "content": "of overdoses resulted in death.",
   "subtext": "This data is an example and does not reflect actual averages",

@@ -301,16 +301,23 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         <path
           className='cdc-waffle-chart__node'
           style={{
-            transform: `translateX(${node.x}px) translateY(${node.y + nodeWidthNum * 0.1}px) scale(${
-              (nodeWidthNum * 0.8) / 448
-            })`,
+            transform: isTP5
+              ? `translateX(${node.x}px) translateY(${node.y + nodeWidthNum * 0.1}px) scale(${
+                  (nodeWidthNum * 0.8) / 448
+                })`
+              : `translateX(${node.x + nodeWidthNum / 4}px) translateY(${node.y}px) scale(${nodeWidthNum / 20})`,
             transitionDelay: `${0.1 * key}ms`
           }}
-          fill={node.isFilled ? node.color : 'transparent'}
-          stroke={node.color}
-          strokeWidth={node.isFilled ? 0 : 448 / nodeWidthNum}
+          fill={isTP5 && !node.isFilled ? 'transparent' : node.color}
+          fillOpacity={isTP5 ? 1 : node.opacity}
+          stroke={isTP5 && !node.isFilled ? node.color : undefined}
+          strokeWidth={isTP5 && !node.isFilled ? 448 / nodeWidthNum : 0}
           key={key}
-          d='M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z'
+          d={
+            isTP5
+              ? 'M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z'
+              : 'M3.75,0a2.5,2.5,0,1,1-2.5,2.5A2.5,2.5,0,0,1,3.75,0M5.625,5.625H5.18125a3.433,3.433,0,0,1-2.8625,0H1.875A1.875,1.875,0,0,0,0,7.5v5.3125a.9375.9375,0,0,0,.9375.9375h.625v5.3125A.9375.9375,0,0,0,2.5,20H5a.9375.9375,0,0,0,.9375-.9375V13.75h.625A.9375.9375,0,0,0,7.5,12.8125V7.5A1.875,1.875,0,0,0,5.625,5.625Z'
+          }
         ></path>
       ) : (
         <Circle
