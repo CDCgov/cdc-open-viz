@@ -51,13 +51,6 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
     ['4.26.1', update_4_26_1]
   ]
 
-  const latestVersion = versions[versions.length - 1][0]
-
-  // If no version, set to latest (for new configs)
-  if (!genConfig.version) {
-    genConfig.version = latestVersion
-  }
-
   const initialVersion = genConfig.version
 
   versions.forEach(([version, updateFunction, alwaysRun]: [string, UpdateFunction, boolean?]) => {
@@ -74,7 +67,7 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
   })
 
   // Always set to the latest version
-  genConfig.version = latestVersion
+  genConfig.version = versions[versions.length - 1][0]
 
   // config version is stored at the root level of the config.
   if (multiDashboardVersion) delete genConfig.version
