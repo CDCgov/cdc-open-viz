@@ -66,6 +66,9 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
     }
   })
 
+  // Always set to the latest version
+  genConfig.version = versions[versions.length - 1][0]
+
   // config version is stored at the root level of the config.
   if (multiDashboardVersion) delete genConfig.version
 
