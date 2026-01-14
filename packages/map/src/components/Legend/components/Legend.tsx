@@ -99,6 +99,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           color: entry.color,
           label: parse(legendLabel),
           disabled: entry.disabled,
+          hidden: entry.hidden,
           special: entry.hasOwnProperty('special'),
           value: [entry.min, entry.max]
         }
@@ -112,13 +113,13 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const legendList = (patternsOnly = false) => {
     const formattedItems = patternsOnly ? [] : getFormattedLegendItems()
     const patternsOnlyFont = isMobileFontViewport(viewport) ? '12px' : '14px'
-    const hasDisabledItems = formattedItems.some(item => item.disabled)
+    const hasDisabledItems = runtimeLegend.disabledAmt > 0
     let legendItems
 
     legendItems = formattedItems.map((item, idx) => {
       const handleListItemClass = () => {
         let classes = ['legend-container__li', 'd-flex', 'align-items-center']
-        if (item.disabled) classes.push('legend-container__li--disabled')
+        if (item.disabled || item.hidden) classes.push('legend-container__li--disabled')
         else if (hasDisabledItems) classes.push('legend-container__li--not-disabled')
         if (item.special) classes.push('legend-container__li--special-class')
         return classes.join(' ')
@@ -130,7 +131,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           key={idx}
           title={`Legend item ${item.label} - Click to disable`}
           onClick={() => {
-            toggleLegendActive(idx, item.label, runtimeLegend, dispatch)
+            toggleLegendActive(idx, item.label, runtimeLegend, dispatch, config.legend.behavior)
             publishAnalyticsEvent({
               vizType: config.type,
               vizSubType: getVizSubType(config),
@@ -144,7 +145,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           onKeyDown={e => {
             if (e.key === 'Enter') {
               e.preventDefault()
-              toggleLegendActive(idx, item.label, runtimeLegend, dispatch)
+              toggleLegendActive(idx, item.label, runtimeLegend, dispatch, config.legend.behavior)
               publishAnalyticsEvent({
                 vizType: config.type,
                 vizSubType: getVizSubType(config),

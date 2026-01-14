@@ -107,20 +107,3 @@ title="CDC Data Visualization"
 
   return iframeCode
 }
-
-/**
- * Generate link to embed code generator with pre-filled config
- *
- * @param configUrl - URL to the published config JSON
- * @returns URL string to generator page
- */
-export function generateGeneratorLink(configUrl: string): string {
-  let baseUrl = getDefaultGeneratorBaseUrl()
-
-  // Special handling for testing on wcms-wp-test, can be removed later
-  if (typeof window !== 'undefined' && window.location.hostname === 'wcms-wp-test.cdc.gov') {
-    baseUrl = new URL(baseUrl).pathname
-  }
-
-  return `${baseUrl}?configUrl=${configUrl}`
-}
