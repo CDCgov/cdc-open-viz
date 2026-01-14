@@ -149,20 +149,7 @@ const EditorPanel: React.FC<FilteredTextEditorPanelProps> = () => {
             </Button>
           </Accordion.Section>
           <Accordion.Section title='Visual'>
-            <VisualSection
-              config={config}
-              updateField={updateField}
-              updateConfig={updateConfig}
-              beforeCheckboxes={
-                <Select
-                  value={config.fontSize}
-                  fieldName='fontSize'
-                  label='Font Size'
-                  updateField={updateField}
-                  options={['small', 'medium', 'large']}
-                />
-              }
-            />
+            <VisualSection config={config} updateField={updateField} updateConfig={updateConfig} />
           </Accordion.Section>
         </Accordion>
       )}

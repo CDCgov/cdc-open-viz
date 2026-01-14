@@ -177,6 +177,8 @@
   .row {
     margin-right: 0;
     margin-left: 0;
+    // Row spacing for desktop
+    margin-bottom: 1.5rem;
 
     // Remove padding from first and last columns to keep content flush to edges
     > [class*='col-']:first-child {
@@ -184,6 +186,37 @@
     }
     > [class*='col-']:last-child {
       padding-right: 0;
+    }
+
+    // Last row doesn't need bottom margin
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // Mobile layout adjustments
+  @include breakpoint(xs) {
+    .row {
+      // Row spacing (larger - hierarchical separation between rows)
+      margin-bottom: 1.5rem;
+
+      > [class*='col-'] {
+        // Remove side padding when columns stack to full width
+        padding-left: 0;
+        padding-right: 0;
+        // Column spacing (tighter - related items within same row)
+        margin-bottom: 0.75rem;
+      }
+
+      // Last column doesn't need margin (row margin handles gap to next row)
+      > [class*='col-']:last-child {
+        margin-bottom: 0;
+      }
+
+      // Last row doesn't need extra margin
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
   }
 

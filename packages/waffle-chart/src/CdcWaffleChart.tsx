@@ -512,12 +512,9 @@ const CdcWaffleChart = ({
     }
   }, [config, container])
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => {
-    if (!configObj?.dataUrl) {
-      updateConfig({ ...defaults, ...configObj })
-    }
-  }, [configObj?.data])
+  if (configObj && config && JSON.stringify(configObj.data) !== JSON.stringify(config.data)) {
+    loadConfig()
+  }
 
   let content = <Loading />
 
