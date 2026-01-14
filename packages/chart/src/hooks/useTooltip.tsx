@@ -545,9 +545,6 @@ export const useTooltip = props => {
       config.runtime.series
         .filter(s => s.type === 'Forecasting' && s.confidenceIntervals)
         .forEach(s => {
-          if (!s.confidenceIntervals) {
-            return
-          }
           s.confidenceIntervals.forEach(c => {
             if (c.showInTooltip) {
               includedSeries.push(c.high)
