@@ -624,9 +624,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                 )}
                 <div className='cdc-callout__body d-flex flex-row align-items-center align-content-start flex-grow-1'>
                   {showBite && (
-                    <div className='cdc-callout__databite flex-shrink-0  me-3' style={{ fontSize: '2.45rem' }}>
-                      {calculateDataBite(true)}
-                    </div>
+                    <div className='cdc-callout__databite flex-shrink-0  me-3'>{calculateDataBite(true)}</div>
                   )}
                   <div className='cdc-callout__content flex-grow-1 d-flex flex-column  min-w-0'>
                     {parse(processContentWithMarkup(biteBody))}
