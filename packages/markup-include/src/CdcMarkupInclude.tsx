@@ -252,6 +252,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
                 titleStyle={contentEditor.titleStyle}
                 config={config}
                 classes={[`${theme}`, 'mb-0']}
+                noContent={!markup}
               />
               <div className={`markup-include-component ${contentClasses.join(' ')}`}>
                 <div className={`${innerContainerClasses.join(' ')}`}>
