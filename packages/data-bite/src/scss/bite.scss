@@ -121,7 +121,7 @@
     border: none !important;
     height: 100%; // Allow height to fill parent container
     background: none !important;
-    container-type: inline-size; // Enable container queries
+    container-type: inline-size;
 
     .cdc-callout {
       gap: 0.7rem;
@@ -142,7 +142,7 @@
     }
 
     .cdc-callout__body {
-      flex-wrap: nowrap; // Prevent content-based wrapping
+      flex-wrap: nowrap;
       gap: 0.5rem;
       flex: auto;
     }
