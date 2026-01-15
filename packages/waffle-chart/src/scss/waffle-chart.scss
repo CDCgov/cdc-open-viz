@@ -174,7 +174,7 @@
     }
 
     .cdc-callout__heading {
-      font-family: var(--fonts-nunito);
+      font-family: var(--fonts-nunito) !important;
       width: 100%;
       font-size: 1.1rem;
     }
