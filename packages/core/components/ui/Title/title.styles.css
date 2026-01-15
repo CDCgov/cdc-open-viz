@@ -101,8 +101,18 @@
    MODERN TITLE
    ============================================================================ */
 
-.cdc-open-viz-module .cove-title {
-  margin-bottom: 1rem;
+.cdc-open-viz-module .cove-title--small {
+  margin-bottom: 0.75rem;
+}
+
+.cdc-open-viz-module .cove-title--large {
+  margin-bottom: 1.33rem;
+}
+
+/* Used in dashboards to more closely associate a title-only component with the content below it */
+.cdc-open-viz-module .cove-title--no-content {
+  margin-top: 1rem;
+  margin-bottom: 0;
 }
 
 .cdc-open-viz-module .cove-title h2 {

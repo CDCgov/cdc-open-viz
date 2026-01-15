@@ -56,8 +56,11 @@ const migrateTitleStyle = config => {
     if (!config.contentEditor) config.contentEditor = {}
     const hasTitle = config.contentEditor.title && config.contentEditor.title.trim() !== ''
     config.contentEditor.titleStyle = hasTitle ? 'legacy' : 'small'
+  } else if (config.type === 'data-bite' || config.type === 'waffle-chart') {
+    // Data bites and waffle charts always use legacy title style - no migration needed
+    // The components hardcode 'legacy' for the Title component
   } else if (config.type) {
-    // For all other visualization types (chart, data-bite, waffle-chart, filtered-text, etc.)
+    // For all other visualization types (chart, filtered-text, etc.)
     // titleStyle is at root level
     const hasTitle = config.title && config.title.trim() !== ''
     config.titleStyle = hasTitle ? 'legacy' : 'small'

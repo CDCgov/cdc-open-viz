@@ -126,7 +126,13 @@ const CdcFilteredText = ({
       <>
         <Layout.Responsive isEditor={isEditor}>
           <div className={`cove-component__content no-borders`}>
-            <Title classes={[`${config.theme}`, 'mb-0']} title={title} titleStyle={config.titleStyle} config={config} />
+            <Title
+              classes={[`${config.theme}`, 'mb-0']}
+              title={title}
+              titleStyle={config.titleStyle}
+              config={config}
+              noContent={!config.textColumn}
+            />
             <div
               className={`${contentClasses.join(' ')} body${shouldApplyTopPadding ? ' has-top-padding' : ''}${
                 shouldApplySidePadding ? ' has-side-padding' : ''

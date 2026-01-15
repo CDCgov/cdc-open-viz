@@ -14,10 +14,20 @@ type HeaderProps = {
   config: Visualization
   theme?: string
   titleStyle: 'legacy' | 'large' | 'small'
+  noContent?: boolean
 }
 
 const Title = (props: HeaderProps) => {
-  const { isDashboard, title, superTitle, classes = [], showTitle = true, ariaLevel = 2, titleStyle } = props
+  const {
+    isDashboard,
+    title,
+    superTitle,
+    classes = [],
+    showTitle = true,
+    ariaLevel = 2,
+    titleStyle,
+    noContent = false
+  } = props
 
   if (titleStyle === 'large' || titleStyle === 'small') {
     const TitleElement = titleStyle === 'large' ? 'h2' : 'h3'
@@ -25,7 +35,10 @@ const Title = (props: HeaderProps) => {
     return (
       title &&
       showTitle && (
-        <div className='cove-title' style={props.style}>
+        <div
+          className={`cove-title cove-title--${titleStyle}${noContent ? ' cove-title--no-content' : ''}`}
+          style={props.style}
+        >
           {superTitle && <sup>{parse(superTitle)}</sup>}
           <TitleElement>{parse(title)}</TitleElement>
         </div>
