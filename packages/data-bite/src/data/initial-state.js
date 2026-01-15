@@ -24,7 +24,6 @@ export default {
   filters: [],
   subtext: '',
   title: '',
-  titleStyle: 'small',
   theme: 'theme-blue',
   shadow: false,
   visual: {

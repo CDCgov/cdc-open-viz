@@ -482,7 +482,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       <Title
         showTitle={config.showTitle}
         title={title}
-        titleStyle={config.titleStyle}
+        titleStyle='legacy'
         config={config}
         classes={['chart-title', `${config.theme}`, 'mb-0']}
       />
