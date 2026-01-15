@@ -121,6 +121,7 @@
     border: none !important;
     height: 100%; // Allow height to fill parent container
     background: none !important;
+    container-type: inline-size; // Enable container queries
 
     .cdc-callout {
       gap: 0.7rem;
@@ -131,7 +132,6 @@
       border-radius: 0.25rem;
       background-color: var(--colors-cyan-10, #eff9fa);
     }
-    // delete me
 
     // Most layout handled by Bootstrap classes in JSX, minimal custom CSS
     .cdc-callout__heading {
@@ -142,12 +142,20 @@
     }
 
     .cdc-callout__body {
-      flex-wrap: wrap;
+      flex-wrap: nowrap; // Prevent content-based wrapping
       gap: 0.5rem;
       flex: auto;
     }
 
+    // Container query: wrap when width is less than 350px
+    @container (max-width: 576px) {
+      .cdc-callout__body {
+        flex-wrap: wrap;
+      }
+    }
+
     .cdc-callout__databite {
+      width: auto;
       line-height: 1; // Tight line height for numbers
       color: var(--colors-cyan-60v, #007a99);
       font-size: 2rem;
