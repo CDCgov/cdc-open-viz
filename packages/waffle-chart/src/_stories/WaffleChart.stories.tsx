@@ -189,4 +189,32 @@ export const Gauge: Story = {
   )
 }
 
+export const Waffle_Chart_TP5_Style: Story = {
+  args: {
+    configUrl: '/packages/waffle-chart/examples/tp5-style.json'
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'TP5 Style - A new layout style that displays the waffle chart in a callout component with a blue background and icon. The title appears inside the callout header. This style mimics the CDC Template Package 5.0 callout component design and includes an optional white background variant.'
+      }
+    }
+  }
+}
+
+export const Waffle_Chart_TP5_Style_White_Background: Story = {
+  args: {
+    configUrl: '/packages/waffle-chart/examples/tp5-style-white.json'
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'TP5 Style with White Background - The white background variant of the TP5 style features a white background with a teal border instead of the default blue background. The icon remains visible in this variant.'
+      }
+    }
+  }
+}
+
 export default meta
