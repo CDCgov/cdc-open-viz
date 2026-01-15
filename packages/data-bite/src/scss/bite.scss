@@ -147,7 +147,7 @@
       flex: auto;
     }
 
-    // Container query: wrap when width is less than 350px
+    // Container query: wrap when width is less than 576px
     @container (max-width: 576px) {
       .cdc-callout__body {
         flex-wrap: wrap;
