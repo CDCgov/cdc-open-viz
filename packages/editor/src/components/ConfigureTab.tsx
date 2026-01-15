@@ -30,7 +30,11 @@ export default function ConfigureTab({ containerEl }) {
         </ErrorBoundary>
       )
     case 'waffle-chart':
-      if (config.visualizationType === 'Waffle' || config.visualizationType === 'Gauge') {
+      if (
+        config.visualizationType === 'Waffle' ||
+        config.visualizationType === 'TP5 Waffle' ||
+        config.visualizationType === 'Gauge'
+      ) {
         return (
           <ErrorBoundary component='CdcWaffleChart'>
             <CdcWaffleChart isEditor={true} isDebug={isDebug} config={config} setConfig={setTempConfig} />
