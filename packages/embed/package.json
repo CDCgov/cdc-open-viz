@@ -2,30 +2,30 @@
   "name": "@cdc/embed",
   "version": "4.25.10",
   "description": "Embeddable COVE visualizations for partner websites",
-  "moduleName": "CdcEmbed",
+  "license": "Apache-2.0",
+  "author": "CDC",
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.2",
+    "vite": "^7.3.1"
+  },
   "main": "dist/embed.html",
-  "type": "module",
-  "scripts": {
-    "start": "vite --open",
-    "build": "vite build",
-    "preview": "vite preview",
-    "test": "vitest run --reporter verbose",
-    "test-watch": "vitest watch --reporter verbose",
-    "test-watch:ui": "vitest --ui"
+  "moduleName": "CdcEmbed",
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CDCgov/cdc-open-viz",
     "directory": "packages/embed"
   },
-  "author": "CDC",
-  "license": "Apache-2.0",
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.4",
-    "vite": "^5.4.21"
+  "scripts": {
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "vite --open",
+    "test": "vitest run --reporter verbose",
+    "test-watch": "vitest watch --reporter verbose",
+    "test-watch:ui": "vitest --ui"
   },
-  "peerDependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  }
+  "type": "module"
 }
