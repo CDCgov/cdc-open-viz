@@ -79,6 +79,7 @@
 }
 
 .cove-component__content {
+  padding: 0;
   // Visual: Shadow
   &.shadow {
     box-shadow: rgba(0, 0, 0, 0.2) 0 3px 10px;
@@ -161,14 +162,12 @@
       font-size: 2rem;
     }
 
-    .cdc-callout__icon {
-      color: var(--colors-cyan-60v, #007a99);
-      box-sizing: border-box;
+    .cdc-callout__flag {
       position: absolute;
-      font-family: var(--icons-cdc);
-      top: -0.65rem;
-      right: 1rem;
-      font-size: 2rem;
+      top: -0.36rem;
+      right: 1.08rem;
+      width: 1.84rem;
+      height: auto;
     }
 
     .cdc-callout__content {

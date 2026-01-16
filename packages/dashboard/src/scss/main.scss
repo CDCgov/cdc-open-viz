@@ -197,15 +197,13 @@
   // Mobile layout adjustments
   @include breakpoint(xs) {
     .row {
-      // Row spacing (larger - hierarchical separation between rows)
       margin-bottom: 1.5rem;
 
       > [class*='col-'] {
         // Remove side padding when columns stack to full width
         padding-left: 0;
         padding-right: 0;
-        // Column spacing (tighter - related items within same row)
-        margin-bottom: 0.75rem;
+        margin-bottom: 1.5rem;
       }
 
       // Last column doesn't need margin (row margin handles gap to next row)
