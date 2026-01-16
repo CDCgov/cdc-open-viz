@@ -15,9 +15,56 @@ dns.setDefaultResultOrder('verbatim')
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+// Default editor padding CSS - can be overridden by passing custom CSS to devOptions
+// Dashboard overrides this with .cdc-open-viz-module.type-dashboard:not(.isDashboardEditor)
+const PACKAGE_CSS = `
+      .cdc-open-viz-module:not(.isEditor) {
+        padding: 1rem;
+      }`
+
+// Generate dev index.html content
+const generateDevIndexHtml = (css = PACKAGE_CSS) => {
+  return `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <style>
+      body {
+        margin: 0;
+        border-top: none !important;
+        min-height: calc(100vh + 1px);
+      }
+${css}
+    </style>
+    <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />
+  </head>
+  <body>
+    <div class="react-container" data-config="/examples/default.json"></div>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <script type="module" src="./src/index"></script>
+  </body>
+</html>`
+}
+
+// Vite plugin to transform index.html for development
+// Uses transformIndexHtml so React plugin can still inject its preamble
+const coveDevIndexPlugin = css => ({
+  name: 'cove-dev-index',
+  transformIndexHtml: {
+    order: 'pre',
+    handler() {
+      // Replace the entire HTML with our generated version
+      // This runs early ('pre') so other plugins like React can still transform it
+      return generateDevIndexHtml(css)
+    }
+  }
+})
+
 // DEV NOTE: Modifications made to this file will not be hot-loaded through HMR for component.
 // - Active dev servers ('lerna run start') must be restarted in order to view the changed settings.
-const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}) => {
+const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}, devOptions = {}) => {
+  const { css: devCss } = devOptions
   let configOptionsDefault = {
     css: {
       preprocessorOptions: {
@@ -57,6 +104,7 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
       }
     },
     plugins: [
+      coveDevIndexPlugin(devCss),
       react(reactOptions),
       svgr({
         svgrOptions: {
