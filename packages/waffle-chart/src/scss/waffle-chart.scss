@@ -158,6 +158,14 @@
       color: var(--colors-cyan-60v);
     }
 
+    .cdc-callout__flag {
+      position: absolute;
+      top: -0.25rem;
+      right: 1.08rem;
+      width: 1.85rem;
+      height: auto;
+    }
+
     .cove-waffle-chart {
       align-items: center;
       padding: 0;
