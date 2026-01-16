@@ -1,6 +1,5 @@
 // Remove custom theme mixin - use core styles instead
 
-
 .type-dashboard .type-waffle-chart .cove-component__content {
   padding-top: 0;
 }
@@ -19,7 +18,7 @@
       justify-items: center;
       align-items: flex-start;
 
-      &>svg {
+      & > svg {
         margin: 0.7em 0;
       }
     }
@@ -97,7 +96,6 @@
 }
 
 @at-root {
-
   .cove-waffle-chart.font-small,
   .cove-gauge-chart.font-small #{&} {
     .cove-waffle-chart__data--primary {
@@ -128,6 +126,91 @@
 
     .cove-waffle-chart__data--text {
       font-size: 20px;
+    }
+  }
+}
+
+// TP5 Style for Waffle Chart
+.type-waffle-chart {
+  &.waffle__style--tp5 {
+    .cove-component__content {
+      background: none !important;
+    }
+
+    .cdc-callout {
+      box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+      margin: 0 !important;
+      padding: 1.5rem;
+      background-color: var(--colors-cyan-10, #eff9fa);
+      border: 1px solid var(--colors-cyan-15, #dff2f6);
+      position: relative;
+      border-radius: 0.25rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .cdc-callout__icon {
+      position: absolute;
+      font-family: var(--icons-cdc);
+      top: -0.65rem;
+      right: 1rem;
+      font-size: 2rem;
+      color: var(--colors-cyan-60v);
+    }
+
+    .cdc-callout__flag {
+      position: absolute;
+      top: -0.25rem;
+      right: 1.08rem;
+      width: 1.85rem;
+      height: auto;
+    }
+
+    .cove-waffle-chart {
+      align-items: center;
+      padding: 0;
+      row-gap: 1rem;
+    }
+
+    .cove-waffle-chart__chart {
+      margin-bottom: 0;
+    }
+
+    .cove-waffle-chart__data {
+      margin-bottom: 0;
+      align-content: flex-start;
+    }
+
+    .cdc-callout__heading {
+      font-family: var(--fonts-nunito) !important;
+      width: 100%;
+      font-size: 1.1rem;
+    }
+
+    .cove-waffle-chart__data--text {
+      margin-top: 0.5rem;
+      font-size: 1rem;
+    }
+    .cove-waffle-chart__subtext {
+      font-size: 1rem;
+    }
+    .cove-waffle-chart__data--primary {
+      font-size: 2rem;
+      color: var(--colors-cyan-60v);
+      font-weight: 400;
+    }
+
+    // White background variant (when "Use White Background Style" is checked)
+    &.white-background-style {
+      .cove-component__content {
+        background: white !important;
+      }
+
+      .cdc-callout {
+        background: transparent !important;
+        border: 1px solid #009ec1 !important;
+        box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+      }
     }
   }
 }

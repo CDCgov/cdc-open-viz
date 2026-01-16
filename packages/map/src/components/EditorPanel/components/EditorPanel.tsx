@@ -1536,6 +1536,32 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         </Tooltip>
                       }
                     />
+                    <Select
+                      value={general.titleStyle}
+                      section='general'
+                      fieldName='titleStyle'
+                      label='Title Style'
+                      updateField={updateField}
+                      options={[
+                        { value: 'small', label: 'Small (h3)' },
+                        { value: 'large', label: 'Large (h2)' },
+                        { value: 'legacy', label: 'Legacy' }
+                      ]}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>
+                              Choose the visual style for the map title. Consider heading order on your page when
+                              selecting the title style. For 508 reasons, ensure your page follows a proper heading
+                              order.
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
                     <CheckBox
                       value={config.general.showTitle || false}
                       section='general'
@@ -2314,6 +2340,19 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         </label>
                       )}
                       {
+                        // TODO: DEV-7271 Follow-up to implement option to isolate on legend click. For now, always highlight.
+                        /*
+                        <Select
+                          value={config.legend.behavior}
+                          section='legend'
+                          fieldName='behavior'
+                          label='Legend Behavior (When clicked)'
+                          updateField={updateField}
+                          options={['highlight', 'isolate']}
+                        />
+                        */
+                      }
+                      {
                         <CheckBox
                           value={legend.hideBorder}
                           section='legend'
@@ -2904,6 +2943,30 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           handleEditorChanges('toggleDownloadImgButton', event.target.checked)
                         }}
                       />
+                      {config.general.showDownloadImgButton && (
+                        <CheckBox
+                          value={config.general.includeContextInDownload}
+                          section='general'
+                          subsection={null}
+                          className='ms-4'
+                          fieldName='includeContextInDownload'
+                          label='Include Heading & Context'
+                          updateField={updateField}
+                          tooltip={
+                            <Tooltip style={{ textTransform: 'none' }}>
+                              <Tooltip.Target>
+                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                              </Tooltip.Target>
+                              <Tooltip.Content>
+                                <p>
+                                  When enabled, the image download will include the section heading (H2 or H3) and any
+                                  explanatory paragraphs that appear before the visualization
+                                </p>
+                              </Tooltip.Content>
+                            </Tooltip>
+                          }
+                        />
+                      )}
 
                       {/* <label className='checkbox'>
                       <input

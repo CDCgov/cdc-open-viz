@@ -32,6 +32,9 @@ import TopSpacing_4 from './_mock/data-bite-dash-test_1_1_1.json'
 import CustomOrderNewValues from './_mock/custom-order-new-values.json'
 import APIFilterResetConfig from '../../examples/test-api-filter-reset.json'
 import CascadingDataFilters from './_mock/filter-cascade.json'
+import ParentChildFilters from './_mock/parent-child-filters.json'
+import NestedParentChildFilters from './_mock/nested-parent-child-filters.json'
+import GalleryDataBiteDashboard from './_mock/gallery-data-bite-dashboard.json'
 
 // Dashboard Filter Updates for Ascending, Descending, and Custom Order
 import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
@@ -484,6 +487,13 @@ export const Top_Spacing_4: Story = {
   }
 }
 
+export const Gallery_Data_Bite_Dashboard: Story = {
+  args: {
+    config: GalleryDataBiteDashboard,
+    isEditor: false
+  }
+}
+
 export const Clear_Filters_Button: Story = {
   args: {
     config: APIFilterResetConfig as unknown as Config,
@@ -654,6 +664,211 @@ export const Cascading_Multi_Parent_Data_Filters: Story = {
         after.smellOptions.includes(after.smellSelected) &&
         after.chartRendered &&
         !after.noDataVisible
+    )
+  }
+}
+
+export const Parent_Child_Filters_With_DefaultValue: Story = {
+  args: {
+    config: ParentChildFilters as unknown as Config,
+    isEditor: false
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Demonstrates parent-child filter relationships (State → County → City) with defaultValue support. Shows how child filter options update based on parent selection, and how defaultValue is applied on initial load.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+
+    // Get filter dropdowns
+    const stateFilter = (await canvas.findByLabelText('State', { selector: 'select' })) as HTMLSelectElement
+    const countyFilter = (await canvas.findByLabelText('County', { selector: 'select' })) as HTMLSelectElement
+    const cityFilter = (await canvas.findByLabelText('City', { selector: 'select' })) as HTMLSelectElement
+
+    const getFilterOptions = (select: HTMLSelectElement) =>
+      Array.from(select.options)
+        .map(o => o.value)
+        .filter(Boolean)
+
+    const getState = () => ({
+      stateOptions: getFilterOptions(stateFilter),
+      stateSelected: stateFilter.value,
+      countyOptions: getFilterOptions(countyFilter),
+      countySelected: countyFilter.value,
+      cityOptions: getFilterOptions(cityFilter),
+      citySelected: cityFilter.value,
+      chartRendered: !!canvasElement.querySelector('svg')
+    })
+
+    // Wait for initial load
+    await waitForOptionsToPopulate(stateFilter, 3)
+    const initialState = getState()
+
+    // Verify defaultValue is applied on initial load
+    expect(initialState.stateSelected).toBe('California')
+    expect(initialState.countySelected).toBe('Los Angeles')
+    expect(initialState.citySelected).toBe('Los Angeles')
+    expect(initialState.chartRendered).toBe(true)
+
+    // Test 1: Change state to Texas → county and city should update
+    await performAndAssert(
+      'Select state=Texas → county shows Texas counties',
+      getState,
+      async () => await user.selectOptions(stateFilter, ['Texas']),
+      (before, after) =>
+        after.stateSelected === 'Texas' &&
+        after.countyOptions.includes('Harris') &&
+        after.countyOptions.includes('Dallas') &&
+        after.countyOptions.includes('Bexar') &&
+        after.countyOptions.includes('Travis') &&
+        !after.countyOptions.includes('Los Angeles') &&
+        after.chartRendered
+    )
+
+    // Test 2: Select county → city options update
+    await performAndAssert(
+      'Select county=Harris → city shows Houston, Pasadena',
+      getState,
+      async () => await user.selectOptions(countyFilter, ['Harris']),
+      (before, after) =>
+        after.countySelected === 'Harris' &&
+        after.cityOptions.includes('Houston') &&
+        after.cityOptions.includes('Pasadena') &&
+        after.cityOptions.length === 2 &&
+        after.chartRendered
+    )
+
+    // Test 3: Change state back to California → verify cascade updates
+    await performAndAssert(
+      'Select state=California → filters reset to California data',
+      getState,
+      async () => await user.selectOptions(stateFilter, ['California']),
+      (before, after) =>
+        after.stateSelected === 'California' &&
+        after.countyOptions.includes('Los Angeles') &&
+        after.countyOptions.includes('San Diego') &&
+        after.countyOptions.includes('Orange') &&
+        after.chartRendered
+    )
+
+    // Test 4: Select Orange county → verify city options
+    await performAndAssert(
+      'Select county=Orange → city shows Anaheim, Santa Ana, Irvine',
+      getState,
+      async () => await user.selectOptions(countyFilter, ['Orange']),
+      (before, after) =>
+        after.countySelected === 'Orange' &&
+        after.cityOptions.includes('Anaheim') &&
+        after.cityOptions.includes('Santa Ana') &&
+        after.cityOptions.includes('Irvine') &&
+        after.cityOptions.length === 3 &&
+        !after.cityOptions.includes('Los Angeles') &&
+        after.chartRendered
+    )
+  }
+}
+
+export const Nested_Dropdown_With_Parent_Child: Story = {
+  args: {
+    config: NestedParentChildFilters as unknown as Config,
+    isEditor: false
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Demonstrates nested dropdown filters (Year/Quarter subGrouping) with parent-child relationships. The Year/Quarter filter depends on Region selection, and both Year and Quarter defaultValue properties are respected on initial load.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+
+    // Get filter dropdowns
+    const regionFilter = (await canvas.findByLabelText('Region', { selector: 'select' })) as HTMLSelectElement
+    const yearQuarterFilter = (await canvas.findByLabelText('Year and Quarter', {
+      selector: 'select'
+    })) as HTMLSelectElement
+
+    const getFilterOptions = (select: HTMLSelectElement) =>
+      Array.from(select.options)
+        .map(o => o.text)
+        .filter(Boolean)
+
+    const getState = () => ({
+      regionOptions: getFilterOptions(regionFilter),
+      regionSelected: regionFilter.value,
+      yearQuarterOptions: getFilterOptions(yearQuarterFilter),
+      yearQuarterSelected: yearQuarterFilter.value,
+      chartRendered: !!canvasElement.querySelector('svg')
+    })
+
+    // Wait for initial load
+    await waitForOptionsToPopulate(regionFilter, 4)
+    const initialState = getState()
+
+    // Verify defaultValue is applied on initial load (North region, 2023 Q2)
+    expect(initialState.regionSelected).toBe('North')
+    expect(initialState.yearQuarterSelected).toContain('2023')
+    expect(initialState.yearQuarterSelected).toContain('Q2')
+    expect(initialState.chartRendered).toBe(true)
+
+    // Test 1: Change region to South → year options should update based on available data
+    await performAndAssert(
+      'Select region=South → year/quarter filter updates',
+      getState,
+      async () => await user.selectOptions(regionFilter, ['South']),
+      (before, after) =>
+        after.regionSelected === 'South' &&
+        after.yearQuarterOptions.some(opt => opt.includes('2022')) &&
+        after.yearQuarterOptions.some(opt => opt.includes('2023')) &&
+        after.yearQuarterOptions.some(opt => opt.includes('2024')) &&
+        after.chartRendered
+    )
+
+    // Test 2: Change region to East → should only show 2023 and 2024 (no 2022 data for East)
+    await performAndAssert(
+      'Select region=East → year shows only 2023, 2024',
+      getState,
+      async () => await user.selectOptions(regionFilter, ['East']),
+      (before, after) =>
+        after.regionSelected === 'East' &&
+        after.yearQuarterOptions.some(opt => opt.includes('2023')) &&
+        after.yearQuarterOptions.some(opt => opt.includes('2024')) &&
+        !after.yearQuarterOptions.some(opt => opt.includes('2022')) &&
+        after.chartRendered
+    )
+
+    // Test 3: Change region to West → should only show 2023 Q3-Q4 and 2024
+    await performAndAssert(
+      'Select region=West → limited year/quarter options',
+      getState,
+      async () => await user.selectOptions(regionFilter, ['West']),
+      (before, after) =>
+        after.regionSelected === 'West' &&
+        (after.yearQuarterOptions.some(opt => opt.includes('2023')) ||
+          after.yearQuarterOptions.some(opt => opt.includes('2024'))) &&
+        !after.yearQuarterOptions.some(opt => opt.includes('2022')) &&
+        after.chartRendered
+    )
+
+    // Test 4: Change back to North → verify all years available again
+    await performAndAssert(
+      'Select region=North → all years (2022-2024) available',
+      getState,
+      async () => await user.selectOptions(regionFilter, ['North']),
+      (before, after) =>
+        after.regionSelected === 'North' &&
+        after.yearQuarterOptions.some(opt => opt.includes('2022')) &&
+        after.yearQuarterOptions.some(opt => opt.includes('2023')) &&
+        after.yearQuarterOptions.some(opt => opt.includes('2024')) &&
+        after.chartRendered
     )
   }
 }

@@ -1,0 +1,72 @@
+{
+  "type": "waffle-chart",
+  "shape": "person",
+  "title": "Overdose Mortality Rate",
+  "content": "of overdoses resulted in death.",
+  "subtext": "This data is an example and does not reflect actual averages",
+  "orientation": "horizontal",
+  "visualizationType": "TP5 Waffle",
+  "data": [
+    {
+      "Resulted in Death": 250,
+      "Number of Overdoses": 600,
+      "state": "Alabama",
+      "Year": "2010"
+    },
+    {
+      "Resulted in Death": 16,
+      "Number of Overdoses": 80,
+      "state": "Alaska",
+      "Year": "2008"
+    },
+    {
+      "Resulted in Death": 19,
+      "Number of Overdoses": 100,
+      "state": "Alaska",
+      "Year": "2010"
+    },
+    {
+      "Resulted in Death": 93,
+      "Number of Overdoses": 400,
+      "state": "Alaska",
+      "Year": "2012"
+    },
+    {
+      "Resulted in Death": 82,
+      "Number of Overdoses": 400,
+      "state": "Arizona",
+      "Year": "2010"
+    }
+  ],
+  "filters": [],
+  "fontSize": null,
+  "overallFontSize": "medium",
+  "dataColumn": "Resulted in Death",
+  "dataFunction": "Sum",
+  "dataConditionalColumn": "",
+  "dataConditionalOperator": null,
+  "dataConditionalComparate": "",
+  "customDenom": true,
+  "dataDenom": null,
+  "dataDenomColumn": "Number of Overdoses",
+  "dataDenomFunction": "Sum",
+  "prefix": "",
+  "suffix": "%",
+  "roundToPlace": 0,
+  "nodeWidth": 10,
+  "nodeSpacer": 2,
+  "theme": "theme-blue",
+  "visualizationSubType": "",
+  "invalidComparate": false,
+  "showDenominator": false,
+  "showPercent": true,
+  "valueDescription": "Overdose mortality percentage",
+  "visual": {
+    "border": false,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false,
+    "whiteBackground": true
+  }
+}

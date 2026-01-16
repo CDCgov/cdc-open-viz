@@ -542,14 +542,16 @@ export const useTooltip = props => {
     includedSeries.push(...dynamicDataCategories)
 
     if (config.visualizationType === 'Forecasting') {
-      config.runtime.series.map(s => {
-        s.confidenceIntervals.map(c => {
-          if (c.showInTooltip) {
-            includedSeries.push(c.high)
-            includedSeries.push(c.low)
-          }
+      config.runtime.series
+        .filter(s => s.type === 'Forecasting' && s.confidenceIntervals)
+        .forEach(s => {
+          s.confidenceIntervals.forEach(c => {
+            if (c.showInTooltip) {
+              includedSeries.push(c.high)
+              includedSeries.push(c.low)
+            }
+          })
         })
-      })
     }
 
     const colNames = Object.values(config.columns).map(column => column.name)

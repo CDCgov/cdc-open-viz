@@ -1,10 +1,12 @@
 import React from 'react'
 import MultiSelect from '@cdc/core/components/MultiSelect'
+import ComboBox from '@cdc/core/components/ComboBox'
 import { SharedFilter } from '../../types/SharedFilter'
 import { APIFilterDropdowns, DropdownOptions } from './DashboardFiltersWrapper'
 import { FILTER_STYLE } from '../../types/FilterStyles'
 import { NestedOptions, ValueTextPair } from '@cdc/core/components/NestedDropdown/nestedDropdownHelpers'
 import NestedDropdown from '@cdc/core/components/NestedDropdown'
+import { getNestedOptions } from '@cdc/core/components/Filters/helpers/getNestedOptions'
 import { MouseEventHandler } from 'react'
 import Loader from '@cdc/core/components/Loader'
 import _ from 'lodash'
@@ -56,14 +58,12 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
 
   return (
     <form className='d-flex flex-wrap'>
-      {sharedFilters.map((filter, filterIndex) => {
+      {show.map(filterIndex => {
+        const filter = sharedFilters[filterIndex]
         const urlFilterType = filter.type === 'urlfilter'
         const label = stripDuplicateLabelIncrement(filter.key || '')
 
-        if (
-          (!urlFilterType && !filter.showDropdown && filter.filterStyle !== FILTER_STYLE.nestedDropdown) ||
-          (show && !show.includes(filterIndex))
-        )
+        if (!urlFilterType && !filter.showDropdown && filter.filterStyle !== FILTER_STYLE.nestedDropdown)
           return <React.Fragment key={`${filter.key}-filtersection-${filterIndex}-option`} />
         const values: JSX.Element[] = []
 
@@ -71,12 +71,11 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         const loading = apiFilterDropdowns[_key] === null
 
         const multiValues: { value; label }[] = []
-        const nestedOptions: NestedOptions = Object.entries(filter?.subGrouping?.valuesLookup || {}).map(
-          ([key, data]) => [
-            [key, key], // Main option: [value, text]
-            Array.isArray(data?.values) ? data.values.map(value => [value, value]) : [] // Ensure `values` is an array
-          ]
-        )
+        const nestedOptions: NestedOptions = getNestedOptions({
+          orderedValues: filter.orderedValues,
+          values: filter.values,
+          subGrouping: filter.subGrouping
+        })
 
         if (_key && apiFilterDropdowns[_key]) {
           // URL Filter
@@ -153,6 +152,16 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                 listLabel={label}
                 handleSelectedItems={value => updateField(null, null, filterIndex, value)}
                 loading={loading}
+              />
+            ) : filter.filterStyle === FILTER_STYLE.combobox ? (
+              <ComboBox
+                options={multiValues}
+                fieldName={filterIndex}
+                updateField={updateField}
+                selected={(filter.queuedActive || filter.active) as string}
+                label={label}
+                loading={loading}
+                placeholder={filter.resetLabel || '- Select -'}
               />
             ) : (
               <>

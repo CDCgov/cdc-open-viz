@@ -54,7 +54,11 @@ const EditorPanel = memo(props => {
   const columns = useDataColumns(data)
   //visualizationType
 
-  const approvedWaffleChartOptions = ['Waffle', 'Gauge']
+  const approvedWaffleChartOptions = [
+    { value: 'Waffle', label: 'Waffle' },
+    { value: 'TP5 Waffle', label: 'TP5 Style Waffle' },
+    { value: 'Gauge', label: 'Gauge' }
+  ]
 
   const editorContent = (
     <Accordion>
@@ -350,75 +354,91 @@ const EditorPanel = memo(props => {
             options={['circle', 'square', 'person']}
           />
         )}
-        {config.visualizationType !== 'Gauge' && (
-          <div
-            className='cove-accordion__panel-row cove-accordion__small-inputs'
-            style={{ marginTop: '1rem', marginBottom: '1rem' }}
-          >
-            <div className='cove-accordion__panel-col'>
-              <TextField
-                type='number'
-                value={config.nodeWidth}
-                fieldName='nodeWidth'
-                label='Width'
+        {config.visualizationType !== 'Gauge' && config.visualizationType !== 'TP5 Waffle' && (
+          <>
+            <div
+              className='cove-accordion__panel-row cove-accordion__small-inputs'
+              style={{ marginTop: '1rem', marginBottom: '1rem' }}
+            >
+              <div className='cove-accordion__panel-col'>
+                <TextField
+                  type='number'
+                  value={config.nodeWidth}
+                  fieldName='nodeWidth'
+                  label='Width'
+                  updateField={updateField}
+                />
+              </div>
+              <div className='cove-accordion__panel-col'>
+                <TextField
+                  type='number'
+                  value={config.nodeSpacer}
+                  fieldName='nodeSpacer'
+                  label='Spacer'
+                  updateField={updateField}
+                />
+              </div>
+            </div>
+
+            <div className='cove-input-group'>
+              <Select
+                value={config.orientation}
+                fieldName='orientation'
+                label='Layout'
                 updateField={updateField}
+                options={['horizontal', 'vertical']}
               />
             </div>
-            <div className='cove-accordion__panel-col'>
-              <TextField
-                type='number'
-                value={config.nodeSpacer}
-                fieldName='nodeSpacer'
-                label='Spacer'
-                updateField={updateField}
-              />
+
+            <div className='cove-input-group'>
+              <label>
+                <span className='edit-label column-heading cove-input__label'>Data Point Font Size</span>
+              </label>
+              <div className='cove-accordion__panel-row cove-accordion__small-inputs align-center'>
+                <div className='cove-accordion__panel-col'>
+                  <TextField type='number' value={config.fontSize} fieldName='fontSize' updateField={updateField} />
+                </div>
+                <div className='cove-accordion__panel-col' style={{ display: 'flex', alignItems: 'center' }}>
+                  <label className='accordion__panel-label--muted'> default (50px)</label>
+                </div>
+              </div>
             </div>
-          </div>
+          </>
         )}
-
-        <div className='cove-input-group'>
-          {config.visualizationType !== 'Gauge' && (
-            <Select
-              value={config.orientation}
-              fieldName='orientation'
-              label='Layout'
-              updateField={updateField}
-              options={['horizontal', 'vertical']}
-            />
-          )}
-        </div>
-
-        <div className='cove-input-group'>
-          <label>
-            <span className='edit-label column-heading cove-input__label'>Data Point Font Size</span>
-          </label>
-          <div className='cove-accordion__panel-row cove-accordion__small-inputs align-center'>
-            <div className='cove-accordion__panel-col'>
-              <TextField type='number' value={config.fontSize} fieldName='fontSize' updateField={updateField} />
-            </div>
-            <div className='cove-accordion__panel-col' style={{ display: 'flex', alignItems: 'center' }}>
-              <label className='accordion__panel-label--muted'> default (50px)</label>
-            </div>
-          </div>
-        </div>
       </Accordion.Section>
 
-      <Accordion.Section title='Visual'>
-        <VisualSection
-          config={config}
-          updateField={updateField}
-          updateConfig={updateConfig}
-          beforeCheckboxes={
-            <Select
-              value={config.overallFontSize}
-              fieldName='overallFontSize'
-              label='Overall Font Size'
-              updateField={updateField}
-              options={['small', 'medium', 'large']}
-            />
-          }
-        />
-      </Accordion.Section>
+      {/* Visual section for TP5 style */}
+      {config.visualizationType === 'TP5 Waffle' && (
+        <Accordion.Section title='Visual'>
+          <CheckBox
+            value={config.visual?.whiteBackground}
+            section='visual'
+            fieldName='whiteBackground'
+            label='Use White Background Style'
+            updateField={updateField}
+          />
+        </Accordion.Section>
+      )}
+
+      {/* Visual section for other styles */}
+      {config.visualizationType !== 'TP5 Waffle' && (
+        <Accordion.Section title='Visual'>
+          <VisualSection
+            config={config}
+            updateField={updateField}
+            updateConfig={updateConfig}
+            beforeCheckboxes={
+              <Select
+                value={config.overallFontSize}
+                fieldName='overallFontSize'
+                label='Overall Font Size'
+                updateField={updateField}
+                options={['small', 'medium', 'large']}
+              />
+            }
+          />
+        </Accordion.Section>
+      )}
     </Accordion>
   )
 

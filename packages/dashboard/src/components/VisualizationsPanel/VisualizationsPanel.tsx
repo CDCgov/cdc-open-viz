@@ -51,7 +51,6 @@ const addVisualization = (type, subType) => {
         markupVariables: [],
         showHeader: true,
         srcUrl: '#example',
-        title: 'Markup Include',
         useInlineHTML: true
       }
       newVisualizationConfig.theme = 'theme-blue'

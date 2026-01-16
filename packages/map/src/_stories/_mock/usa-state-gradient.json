@@ -8,6 +8,7 @@
     "geoBorderColor": "darkGray",
     "headerColor": "theme-blue",
     "title": "",
+    "titleStyle": "small",
     "showTitle": true,
     "showSidebar": true,
     "showDownloadButton": true,

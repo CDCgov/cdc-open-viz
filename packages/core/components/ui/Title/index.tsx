@@ -13,12 +13,40 @@ type HeaderProps = {
   ariaLevel?: number
   config: Visualization
   theme?: string
+  titleStyle: 'legacy' | 'large' | 'small'
+  noContent?: boolean
 }
 
 const Title = (props: HeaderProps) => {
-  const { isDashboard, title, superTitle, classes = [], showTitle = true, ariaLevel = 2 } = props
+  const {
+    isDashboard,
+    title,
+    superTitle,
+    classes = [],
+    showTitle = true,
+    ariaLevel = 2,
+    titleStyle,
+    noContent = false
+  } = props
 
-  // standard classes every vis should have
+  if (titleStyle === 'large' || titleStyle === 'small') {
+    const TitleElement = titleStyle === 'large' ? 'h2' : 'h3'
+
+    return (
+      title &&
+      showTitle && (
+        <div
+          className={`cove-title cove-title--${titleStyle}${noContent ? ' cove-title--no-content' : ''}`}
+          style={props.style}
+        >
+          {superTitle && <sup>{parse(superTitle)}</sup>}
+          <TitleElement>{parse(title)}</TitleElement>
+        </div>
+      )
+    )
+  }
+
+  // LEGACY BLOCKY HEADER (Original design with colored backgrounds)
   const updatedClasses = ['cove-component__header', 'component__header', 'mb-3', ...classes]
 
   return (

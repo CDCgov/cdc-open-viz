@@ -72,6 +72,11 @@ const PanelSmallMultiples: FC<PanelSmallMultiplesProps> = props => {
     setConfig(newConfig)
   }
 
+  // Small multiples only supported for us, single-state, and us-region map types
+  if (!['us', 'single-state', 'us-region'].includes(general.geoType)) {
+    return null
+  }
+
   return (
     <AccordionItem>
       <AccordionItemHeading>

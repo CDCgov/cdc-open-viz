@@ -142,7 +142,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const dataForMinMax = config.xAxis.brushActive && tableData && tableData.length > 0 ? tableData : data
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, dataForMinMax)
 
-  const { visSupportsReactTooltip } = useEditorPermissions()
+  const { visSupportsSmallMultiples } = useEditorPermissions()
   const { hasTopAxis } = getTopAxis(config)
   const [animatedChart, setAnimatedChart] = useState(false)
   const [showHoverLine, setShowHoverLine] = useState(false)
@@ -518,8 +518,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     tooltipRef.current.node.style.maxWidth = `${maxWidth}px`
   }, [tooltipOpen, tooltipData])
 
-  // Check if small multiples are enabled - if so, render SmallMultiples instead
-  if (config.smallMultiples?.mode) {
+  // Check if small multiples are enabled and supported - if so, render SmallMultiples instead
+  if (config.smallMultiples?.mode && visSupportsSmallMultiples()) {
     return (
       <SmallMultiples
         config={config}
