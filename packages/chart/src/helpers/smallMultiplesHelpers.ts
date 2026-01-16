@@ -181,7 +181,7 @@ export const getTileDisplayTitle = (mode, seriesKey, tileValue, tileKey, config)
  * Get the full color palette from config with exactly the number of colors needed
  * This creates a temporary colorScale with the right number of series to get the needed colors
  */
-const getFullColorPalette = (config, numberOfTiles) => {
+export const getFullColorPalette = (config, numberOfTiles) => {
   // Create fake series keys for exactly the number of tiles needed
   const tempSeriesKeys = Array(numberOfTiles)
     .fill(null)

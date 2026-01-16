@@ -14,9 +14,7 @@ import exampleLegendBins from './_mock/legend-bins.json'
 
 // Fallback step function for test descriptions
 const step = async (description: string, fn: () => Promise<void> | void) => {
-  console.log(`▶ ${description}`)
   await fn()
-  console.log(`✓ ${description}`)
 }
 
 const meta: Meta<typeof CdcMap> = {
@@ -44,8 +42,6 @@ const testMapRendering = async (canvasElement: HTMLElement, storyName: string) =
     const coveModule = canvasElement.querySelector('.cdc-open-viz-module')
     expect(coveModule).toBeInTheDocument()
   })
-
-  console.log(` ${storyName} map rendered successfully`)
 }
 
 export const Equal_Interval_Map: Story = {

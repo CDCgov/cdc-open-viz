@@ -37,6 +37,7 @@ type DeprecatedVisualizationType = {
   table: Table
   theme: string
   title: string
+  titleStyle: 'legacy' | 'large' | 'small'
   type: 'chart' | 'map' | 'data-bite' | 'waffle-chart' | 'markup-include' | 'filtered-text' | 'table' | 'navigation'
   usesSharedFilter?: any
   visualizationSubType: string

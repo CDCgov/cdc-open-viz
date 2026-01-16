@@ -18,6 +18,7 @@ export type VizFilterStyle =
   | 'dropdown bar'
   | 'multi-select'
   | 'nested-dropdown'
+  | 'combobox'
 export type GeneralFilter = FilterBase & {
   active: string
   queuedActive: string | string[]

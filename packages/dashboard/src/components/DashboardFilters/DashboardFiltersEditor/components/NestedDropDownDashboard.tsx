@@ -1,8 +1,11 @@
 import { DashboardConfig } from '../../../../types/DashboardConfig'
 import { SharedFilter } from '../../../../types/SharedFilter'
 import _ from 'lodash'
-import { SubGrouping } from '@cdc/core/types/VizFilter'
+import { SubGrouping, OrderBy } from '@cdc/core/types/VizFilter'
 import { TextField, Select } from '@cdc/core/components/EditorPanel/Inputs'
+import { handleSorting } from '@cdc/core/components/Filters/helpers/handleSorting'
+import { filterOrderOptions } from '@cdc/core/helpers/filterOrderOptions'
+import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/components/FilterOrder'
 
 type NestedDropDownEditorDashboardProps = {
   config: DashboardConfig
@@ -50,12 +53,10 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
   const handleFitlerGroupColumnNameChange = (value: string) => {
     if (!value) {
       updateFilterProp('columnName', '')
-      updateFilterProp('defaultValue', '')
       return
     }
     const [newColumnName, selectedOptionDatasetName] = value.split('|')
     updateFilterProp('columnName', newColumnName)
-    updateFilterProp('defaultValue', '') // Reset default value when column changes
     populateSubGroupingOptions(selectedOptionDatasetName, newColumnName)
   }
 
@@ -66,18 +67,23 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
     }
     const [newColumnName, selectedOptionDatasetName] = value.split('|')
 
+    const order = subGrouping?.order || 'asc'
+
     const valuesLookup = filter.values.reduce((acc, groupName) => {
-      const values: string[] = _.uniq(
+      const rawValues: string[] = _.uniq(
         config.datasets[selectedOptionDatasetName].data
           .map(d => {
             return d[filter.columnName] === groupName ? d[newColumnName] : ''
           })
           .filter(value => value !== '')
-      ).sort()
+      )
+
+      // Sort values according to the order setting
+      const { values: sortedValues } = handleSorting({ values: rawValues, order })
 
       acc[groupName] = {
-        values,
-        orderedValues: values
+        values: sortedValues,
+        orderedValues: sortedValues
       }
       return acc
     }, {})
@@ -86,8 +92,90 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
       ...subGrouping,
       columnName: newColumnName,
       valuesLookup,
+      order,
       defaultValue: '' // Reset default value when column changes
     }
+
+    updateFilterProp('subGrouping', newSubGrouping)
+  }
+
+  // Handle group order change (asc/desc/cust)
+  const handleGroupingOrderBy = (order: OrderBy) => {
+    const groupSortObject = {
+      values: _.cloneDeep(filter.values),
+      order
+    }
+    const { values: newOrderedValues } = handleSorting(groupSortObject)
+
+    const updates: Partial<SharedFilter> = {
+      values: newOrderedValues,
+      order
+    }
+
+    if (order === 'cust') {
+      updates.orderedValues = newOrderedValues
+    } else {
+      updates.orderedValues = undefined
+    }
+
+    // Update filter with new order and values
+    updateFilterProp('order', order)
+  }
+
+  // Handle drag-drop reorder for group values
+  const handleGroupingCustomOrder = (sourceIndex: number, destinationIndex: number) => {
+    if (sourceIndex === undefined || destinationIndex === undefined || sourceIndex === destinationIndex) return
+
+    const orderedValues = _.cloneDeep(filter.orderedValues || filter.values)
+    const [movedItem] = orderedValues.splice(sourceIndex, 1)
+    orderedValues.splice(destinationIndex, 0, movedItem)
+
+    // Update both values and orderedValues, and ensure order is 'cust'
+    updateFilterProp('orderedValues', orderedValues)
+    if (filter.order !== 'cust') {
+      updateFilterProp('order', 'cust')
+    }
+  }
+
+  // Handle subgroup order change (asc/desc/cust)
+  const handleSubGroupingOrderBy = (order: OrderBy) => {
+    const newValuesLookup = Object.keys(subGrouping.valuesLookup).reduce((acc, groupName) => {
+      const subGroup = subGrouping.valuesLookup[groupName]
+      const { values: sortedValues } = handleSorting({ values: _.cloneDeep(subGroup.values), order })
+
+      acc[groupName] = {
+        values: sortedValues,
+        orderedValues: order === 'cust' ? sortedValues : undefined
+      }
+      return acc
+    }, {})
+
+    const newSubGrouping: SubGrouping = {
+      ...subGrouping,
+      order,
+      valuesLookup: newValuesLookup
+    }
+
+    updateFilterProp('subGrouping', newSubGrouping)
+  }
+
+  // Handle drag-drop reorder for subgroup values within a specific group
+  const handleSubGroupingCustomOrder = (
+    sourceIndex: number,
+    destinationIndex: number,
+    currentOrderedValues: string[],
+    groupName: string
+  ) => {
+    if (sourceIndex === undefined || destinationIndex === undefined || sourceIndex === destinationIndex) return
+
+    const updatedGroupOrderedValues = _.cloneDeep(currentOrderedValues)
+    const [movedItem] = updatedGroupOrderedValues.splice(sourceIndex, 1)
+    updatedGroupOrderedValues.splice(destinationIndex, 0, movedItem)
+
+    const newSubGrouping = _.cloneDeep(subGrouping)
+    newSubGrouping.valuesLookup[groupName].values = updatedGroupOrderedValues
+    newSubGrouping.valuesLookup[groupName].orderedValues = updatedGroupOrderedValues
+    newSubGrouping.order = 'cust'
 
     updateFilterProp('subGrouping', newSubGrouping)
   }
@@ -144,7 +232,7 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
       {filter.columnName && filter.values && filter.values.length > 0 && (
         <Select
           value={filter.defaultValue}
-          options={filter.values}
+          options={filter.orderedValues || filter.values}
           updateField={(_section, _subSection, _key, value) => updateFilterProp('defaultValue', value)}
           label={'Group Default Value'}
           initial={'Select'}
@@ -157,7 +245,8 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
           value={subGrouping.defaultValue}
           options={(() => {
             const groupKey = filter.defaultValue || (Array.isArray(filter.active) ? filter.active[0] : filter.active)
-            return subGrouping.valuesLookup[groupKey as string]?.values || []
+            const lookup = subGrouping.valuesLookup[groupKey as string]
+            return lookup?.orderedValues || lookup?.values || []
           })()}
           updateField={(_section, _subSection, _key, value) => {
             const newSubGrouping = { ...subGrouping, defaultValue: value }
@@ -166,6 +255,54 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
           label={'Sub Group Default Value'}
           initial={'Select'}
         />
+      )}
+
+      {/* Group Order */}
+      {filter.columnName && filter.values && filter.values.length > 0 && (
+        <div className='mt-2'>
+          <Select
+            label='Group Order'
+            value={filter.order || 'asc'}
+            options={filterOrderOptions}
+            onChange={e => handleGroupingOrderBy(e.target.value as OrderBy)}
+          />
+          {filter.order === 'cust' && (
+            <FilterOrder
+              orderedValues={filter.orderedValues || filter.values}
+              handleFilterOrder={handleGroupingCustomOrder}
+            />
+          )}
+        </div>
+      )}
+
+      {/* SubGrouping Order */}
+      {subGrouping?.columnName && subGrouping.valuesLookup && Object.keys(subGrouping.valuesLookup).length > 0 && (
+        <div className='mt-2'>
+          <Select
+            label='SubGrouping Order'
+            value={subGrouping.order || 'asc'}
+            options={filterOrderOptions}
+            onChange={e => handleSubGroupingOrderBy(e.target.value as OrderBy)}
+          />
+          {subGrouping.order === 'cust' &&
+            (filter.orderedValues || filter.values)?.map((groupName, i) => {
+              const lookup = subGrouping.valuesLookup[groupName]
+              if (!lookup) return null
+              const orderedSubGroupValues = lookup.orderedValues || lookup.values
+              return (
+                <div key={`group-subgroup-values-${groupName}-${i}`}>
+                  <span className='font-weight-bold fw-bold'>{groupName}</span>
+                  <FilterOrder
+                    key={`subgroup-values-${groupName}-${i}`}
+                    orderedValues={orderedSubGroupValues}
+                    handleFilterOrder={(sourceIndex, destinationIndex) => {
+                      handleSubGroupingCustomOrder(sourceIndex, destinationIndex, orderedSubGroupValues, groupName)
+                    }}
+                  />
+                </div>
+              )
+            })}
+        </div>
       )}
     </div>
   )

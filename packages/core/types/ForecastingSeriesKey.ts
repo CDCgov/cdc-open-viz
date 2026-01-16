@@ -6,6 +6,7 @@ export type ForecastingSeriesKey = {
   confidenceIntervals: {
     high: string
     low: string
+    showInTooltip?: boolean
   }[]
   stageColumn: string
   stages: {

@@ -36,23 +36,25 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
     ['4.24.4', update_4_24_4],
     ['4.24.5', update_4_24_5],
     ['4.24.7', update_4_24_7, true],
-    ['4.24.9', update_4_24_9],
+    ['4.24.9', update_4_24_9, true],
     ['4.24.10', update_4_24_10, true],
-    ['4.24.11', update_4_24_11],
-    ['4.25.1', update_4_25_1],
-    ['4.25.3', update_4_25_3],
-    ['4.25.4', update_4_25_4],
-    ['4.25.6', update_4_25_6],
-    ['4.25.7', update_4_25_7],
-    ['4.25.8', update_4_25_8],
-    ['4.25.9', update_4_25_9],
-    ['4.25.10', update_4_25_10],
-    ['4.25.11', update_4_25_11],
+    ['4.24.11', update_4_24_11, true],
+    ['4.25.1', update_4_25_1, true],
+    ['4.25.3', update_4_25_3, true],
+    ['4.25.4', update_4_25_4, true],
+    ['4.25.6', update_4_25_6, true],
+    ['4.25.7', update_4_25_7, true],
+    ['4.25.8', update_4_25_8, true],
+    ['4.25.9', update_4_25_9, true],
+    ['4.25.10', update_4_25_10, true],
+    ['4.25.11', update_4_25_11, true],
     ['4.26.1', update_4_26_1]
   ]
 
+  const initialVersion = genConfig.version
+
   versions.forEach(([version, updateFunction, alwaysRun]: [string, UpdateFunction, boolean?]) => {
-    if (versionNeedsUpdate(genConfig.version, version) || alwaysRun) {
+    if (versionNeedsUpdate(initialVersion, version) || alwaysRun) {
       genConfig = updateFunction(genConfig)
 
       if (genConfig.multiDashboards) {
@@ -63,6 +65,9 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
       }
     }
   })
+
+  // Always set to the latest version
+  genConfig.version = versions[versions.length - 1][0]
 
   // config version is stored at the root level of the config.
   if (multiDashboardVersion) delete genConfig.version

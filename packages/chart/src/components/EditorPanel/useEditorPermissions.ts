@@ -202,7 +202,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsSequentialPallete = () => {
-    const disabledCharts = ['Paired Bar', 'Deviation Bar', 'Forest Plot', 'Forecasting', 'Sankey']
+    const disabledCharts = ['Line', 'Paired Bar', 'Deviation Bar', 'Forest Plot', 'Forecasting', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -384,7 +384,7 @@ export const useEditorPermissions = () => {
 
   const visSupportsSmallMultiples = () => {
     const enabledCharts = ['Line', 'Bar', 'Area Chart', 'Combo', 'Box Plot', 'Scatter Plot', 'Warming Stripes']
-    if (enabledCharts.includes(visualizationType)) return true
+    if (enabledCharts.includes(visualizationType) && config.orientation !== 'horizontal') return true
     return false
   }
 

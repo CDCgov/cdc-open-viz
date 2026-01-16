@@ -9,8 +9,9 @@
         border-top: none !important;
       }
 
-      .cdc-open-viz-module {
-        min-height: 100vh;
+      /* Add 1rem padding to mimic DFE when editor is not visible */
+      .cdc-open-viz-module:not(.isEditor) {
+        padding: 1rem;
       }
     </style>
     <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />
@@ -20,10 +21,13 @@
     <!-- <div class="react-container" data-config="/examples/sankey-example-data.json"></div> -->
 
     <!-- DATA PRESENTATION GALLERY: https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/data_bites.html#examples -->
-    <div class="react-container" data-config="/examples/gallery/calculated-average.json"></div>
+    <!-- <div class="react-container" data-config="/examples/gallery/calculated-average.json"></div> -->
     <!-- <div class="react-container" data-config="/examples/gallery/calculated-with-pic.json"></div> -->
-    <div class="react-container" data-config="/examples/gallery/max-value.json"></div>
+    <!-- <div class="react-container" data-config="/examples/gallery/max-value.json"></div> -->
     <!-- <div class="react-container" data-config="/examples/gallery/sum-of-data.json"></div> -->
+
+    <!-- TP5 Style Example -->
+    <div class="react-container" data-config="/examples/tp5-style.json"></div>
 
     <script type="module" src="./src/index.jsx"></script>
   </body>

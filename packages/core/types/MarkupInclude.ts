@@ -14,6 +14,7 @@ export type MarkupIncludeConfig = Visualization & {
     noDataMessageText?: string
     srcUrl: string
     title: string
+    titleStyle?: 'legacy' | 'large' | 'small'
     useInlineHTML: boolean
   }
   data?: Object[]

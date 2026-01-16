@@ -8,6 +8,7 @@ import _ from 'lodash'
 import React, { useState, useMemo } from 'react'
 import FieldSetWrapper from './FieldSetWrapper'
 import { useDataColumns } from '../../hooks/useDataColumns'
+import Alert from '../Alert/components/Alert'
 
 interface ColumnsEditorProps {
   config: Partial<Visualization>
@@ -154,16 +155,26 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
         </li>
         <li>
           {config.table.showVertical && (
-            <label className='checkbox'>
-              <input
-                type='checkbox'
-                checked={config.columns[colKey].dataTable ?? true}
-                onChange={event => {
-                  editColumn('dataTable', event.target.checked)
-                }}
-              />
-              <span className='edit-label'>Show in Data Table</span>
-            </label>
+            <>
+              <label className='checkbox'>
+                <input
+                  type='checkbox'
+                  checked={config.columns[colKey].dataTable ?? true}
+                  onChange={event => {
+                    editColumn('dataTable', event.target.checked)
+                  }}
+                />
+                <span className='edit-label'>Show in Data Table</span>
+              </label>
+              {(config.confidenceKeys?.upper === colName || config.confidenceKeys?.lower === colName) && (
+                <Alert
+                  type="danger"
+                  message="Confidence Interval column - required for 508 compliance"
+                  showCloseButton={false}
+                  iconSize={14}
+                />
+              )}
+            </>
           )}
         </li>
         {config.visualizationType === 'Pie' && (

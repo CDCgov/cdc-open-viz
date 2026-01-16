@@ -54,6 +54,30 @@ const EditorPanel: React.FC<FilteredTextEditorPanelProps> = () => {
               placeholder='Filterable Text Title'
               updateField={updateField}
             />
+            <Select
+              value={config.titleStyle}
+              fieldName='titleStyle'
+              label='Title Style'
+              updateField={updateField}
+              options={[
+                { value: 'small', label: 'Small (h3)' },
+                { value: 'large', label: 'Large (h2)' },
+                { value: 'legacy', label: 'Legacy' }
+              ]}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>
+                      Choose the visual style for the title. Consider heading order on your page when selecting the
+                      title style. For 508 reasons, ensure your page follows a proper heading order.
+                    </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
           </Accordion.Section>
           <Accordion.Section title='Data'>
             <Select
@@ -125,20 +149,7 @@ const EditorPanel: React.FC<FilteredTextEditorPanelProps> = () => {
             </Button>
           </Accordion.Section>
           <Accordion.Section title='Visual'>
-            <VisualSection
-              config={config}
-              updateField={updateField}
-              updateConfig={updateConfig}
-              beforeCheckboxes={
-                <Select
-                  value={config.fontSize}
-                  fieldName='fontSize'
-                  label='Font Size'
-                  updateField={updateField}
-                  options={['small', 'medium', 'large']}
-                />
-              }
-            />
+            <VisualSection config={config} updateField={updateField} updateConfig={updateConfig} />
           </Accordion.Section>
         </Accordion>
       )}

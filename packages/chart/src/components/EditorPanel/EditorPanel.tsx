@@ -1636,6 +1636,29 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     updateConfig(updatedConfig)
   }
 
+  const handleConfidenceKeyChange = (fieldName: 'upper' | 'lower', columnName: string) => {
+    const updatedConfig = cloneConfig(config)
+    updatedConfig.confidenceKeys[fieldName] = columnName
+
+    // Auto-add confidence key column to tooltips and data table
+    if (columnName) {
+      const existingColumn = updatedConfig.columns[columnName]
+      const baseColumnProps = { dataTable: true, tooltips: true }
+      updatedConfig.columns = {
+        ...updatedConfig.columns,
+        [columnName]: existingColumn
+          ? { ...existingColumn, ...baseColumnProps }
+          : {
+              name: columnName,
+              label: columnName,
+              ...baseColumnProps
+            }
+      }
+    }
+
+    updateConfig(updatedConfig)
+  }
+
   const hasDynamicCategory = ![undefined, '- Select - '].includes(config.series?.[0]?.dynamicCategory)
   const hasMultipleSeries = config.series?.length > 1
 
@@ -1832,21 +1855,17 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 <span className='divider-heading'>Confidence Keys</span>
                                 <Select
                                   value={config.confidenceKeys.upper || ''}
-                                  section='confidenceKeys'
-                                  fieldName='upper'
                                   label='Upper'
-                                  updateField={updateFieldDeprecated}
                                   initial='Select'
                                   options={getColumns()}
+                                  onChange={e => handleConfidenceKeyChange('upper', e.target.value)}
                                 />
                                 <Select
                                   value={config.confidenceKeys.lower || ''}
-                                  section='confidenceKeys'
-                                  fieldName='lower'
                                   label='Lower'
-                                  updateField={updateFieldDeprecated}
                                   initial='Select'
                                   options={getColumns()}
+                                  onChange={e => handleConfidenceKeyChange('lower', e.target.value)}
                                 />
                               </>
                             )}

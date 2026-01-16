@@ -9,6 +9,7 @@ import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import { getFallbackColorPalette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
+import { hasTrackedHover, markHoverTracked } from '../../utils/analyticsTracking'
 
 type WarmingStripesProps = {
   xScale: any
@@ -131,19 +132,20 @@ const WarmingStripes = ({ xMax, yMax }: WarmingStripesProps) => {
             style={{ cursor: 'pointer', transition: 'fill-opacity 0.2s ease' }}
             onMouseEnter={() => {
               if (currentHover !== index) {
-                const xValue = item[xAxisDataKey]
-                const yValue = item[valueKey]
-
-                publishAnalyticsEvent({
-                  vizType: config?.type,
-                  vizSubType: getVizSubType(config),
-                  eventType: 'chart_hover',
-                  eventAction: 'hover',
-                  eventLabel: interactionLabel || 'unknown',
-                  vizTitle: getVizTitle(config),
-                  series: valueKey,
-                  specifics: `${xAxisDataKey}: ${xValue}, ${valueKey}: ${yValue}`
-                })
+                // Only publish analytics event once per visualization (shared tracking)
+                const vizId = String(config.runtime.uniqueId)
+                if (!hasTrackedHover(vizId)) {
+                  publishAnalyticsEvent({
+                    vizType: config?.type,
+                    vizSubType: getVizSubType(config),
+                    eventType: 'chart_hover',
+                    eventAction: 'hover',
+                    eventLabel: interactionLabel || 'unknown',
+                    vizTitle: getVizTitle(config),
+                    series: valueKey
+                  })
+                  markHoverTracked(vizId)
+                }
                 setCurrentHover(index)
               }
             }}

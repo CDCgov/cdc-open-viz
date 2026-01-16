@@ -8,5 +8,8 @@ export type Series = {
   confidenceIntervals?: {
     high: string
     low: string
+    showInTooltip?: boolean
   }[]
+  stageColumn?: string
+  originalDataKey?: string
 }[]

@@ -283,9 +283,33 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
         <CheckBox
           value={config.table.showDownloadImgButton}
           fieldName='showDownloadImgButton'
-          label='Display Image Button'
+          label='Display Image Download Link'
           section='table'
           updateField={updateField}
+        />
+      )}
+      {config.type !== 'table' && config.table.showDownloadImgButton && (
+        <CheckBox
+          value={config.table.includeContextInDownload}
+          fieldName='includeContextInDownload'
+          className='ms-4'
+          label='Include Heading & Context'
+          section='table'
+          updateField={updateField}
+          tooltip={
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>
+                  When enabled, the image download will include the section heading (H2 or H3) and any explanatory
+                  paragraphs that appear immediately before the visualization. Be sure to test the image download on the
+                  published page to ensure the correct context is included.
+                </p>
+              </Tooltip.Content>
+            </Tooltip>
+          }
         />
       )}
       <label>

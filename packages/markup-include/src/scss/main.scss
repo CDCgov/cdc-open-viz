@@ -1,6 +1,16 @@
 .markup-include {
   .cove-component__content-wrap {
-    padding: 1rem 0;
+    padding: 0;
+
+    &.has-top-padding {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    &.has-side-padding {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
 
     h1,
     h2,
@@ -14,9 +24,6 @@
     }
   }
 
-  .cove-component__content {
-    font-size: 14px;
-  }
   .cove-component__content.component--hideBackgroundColor {
     background: transparent;
   }

@@ -6,6 +6,7 @@ export type Dashboard = {
   datasets: Record<string, DataSet>
   description: any
   title: any
+  titleStyle: 'legacy' | 'large' | 'small'
   theme: any
   filters: any // deprecate
 }

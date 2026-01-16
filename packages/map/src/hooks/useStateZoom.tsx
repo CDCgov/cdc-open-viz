@@ -74,7 +74,7 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
 
   const setScaleAndTranslate = useCallback(
     (zoomFunction: string = '') => {
-      const _prevPosition = config.mapPosition
+      const _prevPosition = position
       let newZoom = _prevPosition.zoom
       let newCoordinates = _prevPosition.coordinates
       if (zoomFunction === 'zoomIn' && _prevPosition.zoom < 4) {
@@ -118,7 +118,7 @@ const useSetScaleAndTranslate = (topoData: { states: StateData[] }) => {
         })
       }
     },
-    [config.mapPosition, projectionData.stateCenter, interactionLabel, dispatch]
+    [position, projectionData.stateCenter, interactionLabel, dispatch]
   )
 
   // Essential fix: Remove config from dependencies to prevent infinite loops

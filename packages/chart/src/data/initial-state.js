@@ -23,6 +23,7 @@ const createInitialState = () => {
       noData: 'No Data Available'
     },
     title: '',
+    titleStyle: 'small',
     showTitle: true,
     showDownloadMediaButton: false,
     theme: 'theme-blue',
