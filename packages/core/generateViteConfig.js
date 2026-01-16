@@ -5,6 +5,7 @@ import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 import svgr from 'vite-plugin-svgr' // Svg Support
 import dsv from '@rollup/plugin-dsv' // CSV Support
 import dns from 'dns' // nodeJS
+import fs from 'fs'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -15,45 +16,76 @@ dns.setDefaultResultOrder('verbatim')
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+// Path to dev template files
+const devTemplatePath = path.join(__dirname, 'devTemplate')
+
 // Default editor padding CSS - can be overridden by passing custom CSS to devOptions
 // Dashboard overrides this with .cdc-open-viz-module.type-dashboard:not(.isDashboardEditor)
-const PACKAGE_CSS = `
+const DEFAULT_PACKAGE_CSS = `
       .cdc-open-viz-module:not(.isEditor) {
         padding: 1rem;
       }`
 
-// Generate dev index.html content
-const generateDevIndexHtml = (css = PACKAGE_CSS) => {
-  return `<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <style>
-      body {
-        margin: 0;
-        border-top: none !important;
-        min-height: calc(100vh + 1px);
-      }
-${css}
-    </style>
-    <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />
-  </head>
-  <body>
-    <div class="react-container" data-config="/examples/default.json"></div>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <script>
-      // Allow config override via ?config= URL parameter
-      (function() {
-        var configParam = new URLSearchParams(window.location.search).get('config');
-        if (configParam) {
-          document.querySelector('.react-container').setAttribute('data-config', configParam);
+// Read dev template files
+const readTemplate = () => {
+  const html = fs.readFileSync(path.join(devTemplatePath, 'index.html'), 'utf-8')
+  const sidebarCss = fs.readFileSync(path.join(devTemplatePath, 'sidebar.css'), 'utf-8')
+  const devJs = fs.readFileSync(path.join(devTemplatePath, 'dev.js'), 'utf-8')
+  return { html, sidebarCss, devJs }
+}
+
+// Generate dev index.html content by combining template files
+const generateDevIndexHtml = (packageCss = DEFAULT_PACKAGE_CSS) => {
+  const { html, sidebarCss, devJs } = readTemplate()
+
+  return html
+    .replace('/* {{PACKAGE_CSS}} */', packageCss)
+    .replace('/* {{SIDEBAR_CSS}} */', sidebarCss)
+    .replace('// {{DEV_JS}}', devJs)
+}
+
+// Vite plugin to serve /__examples endpoint
+const examplesApiPlugin = () => ({
+  name: 'cove-examples-api',
+  configureServer(server) {
+    server.middlewares.use((req, res, next) => {
+      if (req.url === '/__examples') {
+        // Get the package root (where vite.config.js is)
+        const packageRoot = server.config.root || process.cwd()
+        const examplesDir = path.join(packageRoot, 'examples')
+
+        try {
+          const files = listJsonFiles(examplesDir, examplesDir)
+          res.setHeader('Content-Type', 'application/json')
+          res.setHeader('Access-Control-Allow-Origin', '*')
+          res.end(JSON.stringify(files))
+        } catch (err) {
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify([]))
         }
-      })();
-    </script>
-    <script type="module" src="./src/index"></script>
-  </body>
-</html>`
+        return
+      }
+      next()
+    })
+  }
+})
+
+// Recursively list JSON files in a directory
+function listJsonFiles(dir, baseDir) {
+  const files = []
+  if (!fs.existsSync(dir)) return files
+
+  const entries = fs.readdirSync(dir, { withFileTypes: true })
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name)
+    if (entry.isDirectory()) {
+      files.push(...listJsonFiles(fullPath, baseDir))
+    } else if (entry.name.endsWith('.json')) {
+      // Get relative path from examples dir
+      files.push(path.relative(baseDir, fullPath))
+    }
+  }
+  return files.sort()
 }
 
 // Vite plugin to transform index.html for development
@@ -86,6 +118,7 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
     },
     server: {
       port: 8080,
+      open: false,
       headers: {
         'Access-Control-Allow-Origin': '*'
       }
@@ -113,6 +146,7 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
       }
     },
     plugins: [
+      examplesApiPlugin(),
       coveDevIndexPlugin(devCss),
       react(reactOptions),
       svgr({

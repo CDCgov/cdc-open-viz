@@ -1,0 +1,87 @@
+.dev-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 100vh;
+  background: #1e1e2e;
+  border-right: 1px solid #313244;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 12px;
+  color: #cdd6f4;
+  overflow-y: auto;
+  z-index: 99999;
+}
+
+.dev-sidebar-header {
+  padding: 10px 12px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6c7086;
+  border-bottom: 1px solid #313244;
+}
+
+.dev-sidebar-tree {
+  padding: 4px 0;
+}
+
+.dev-sidebar-item {
+  display: block;
+  width: 100%;
+  padding: 3px 12px;
+  background: none;
+  border: none;
+  color: #cdd6f4;
+  text-align: left;
+  cursor: pointer;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.dev-sidebar-item:hover {
+  background: #313244;
+}
+
+.dev-sidebar-item.active {
+  background: #45475a;
+  color: #89b4fa;
+}
+
+.dev-sidebar-folder {
+  padding: 4px 12px;
+  color: #f9e2af;
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.dev-sidebar-folder:hover {
+  color: #f5c211;
+}
+
+.dev-sidebar-folder::before {
+  content: '▶';
+  font-size: 8px;
+  transition: transform 0.15s;
+}
+
+.dev-sidebar-folder.open::before {
+  transform: rotate(90deg);
+}
+
+.dev-sidebar-folder-contents {
+  display: none;
+  padding-left: 12px;
+}
+
+.dev-sidebar-folder.open + .dev-sidebar-folder-contents {
+  display: block;
+}
+
+body.has-sidebar {
+  margin-left: 240px;
+}
