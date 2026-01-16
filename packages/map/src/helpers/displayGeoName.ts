@@ -48,21 +48,24 @@ export const displayGeoName = (key: string, convertFipsCodes = true): string => 
     wasLookedUp = true
   }
 
-  if (cityKeys.includes(value)) {
-    value = titleCase(String(value) || '')
-    wasLookedUp = true
-  }
-
+  // Check dictionary replacements before city lookup to handle special cases like DC
   const dict = {
     'Washington D.C.': 'District of Columbia',
     'WASHINGTON DC': 'District of Columbia',
     DC: 'District of Columbia',
     'WASHINGTON DC.': 'District of Columbia',
+    'DISTRICT OF COLUMBIA': 'District of Columbia',
+    Dc: 'District of Columbia',
     Congo: 'Republic of the Congo'
   }
 
   if (Object.keys(dict).includes(value)) {
     value = dict[value]
+    wasLookedUp = true
+  }
+
+  if (cityKeys.includes(value)) {
+    value = titleCase(String(value) || '')
     wasLookedUp = true
   }
 
