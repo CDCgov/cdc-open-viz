@@ -33,6 +33,9 @@ import { Config } from './types/Config'
 import dataBiteReducer from './store/db.reducer'
 import { IMAGE_POSITION_LEFT, IMAGE_POSITION_RIGHT, IMAGE_POSITION_TOP, IMAGE_POSITION_BOTTOM } from './constants'
 
+// images
+import CalloutFlag from './images/callout-flag.svg?url'
+
 import {
   DATA_FUNCTION_COUNT,
   DATA_FUNCTION_MAX,
@@ -614,7 +617,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
               >
                 {/* Icon shows by default, hidden when white background is enabled */}
                 {!config.visual?.whiteBackground && (
-                  <div className='cdc-callout__icon' aria-hidden='true' role='img'></div>
+                  <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
                 )}
 
                 {config.visual?.showTitle && title && title.trim() && (
