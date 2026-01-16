@@ -15,52 +15,100 @@
         height: 100%;
       }
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         display: flex;
-        background: #1a1a2e;
-        color: #eee;
+        background: #1e1e2e;
+        color: #cdd6f4;
       }
-      .sidebar {
-        width: 200px;
-        background: #16213e;
-        border-right: 1px solid #2a3f5f;
-        padding: 1rem 0;
-        display: flex;
-        flex-direction: column;
+
+      /* Sidebar styles (adapted from devTemplate/sidebar.css) */
+      .dev-sidebar {
+        width: 240px;
+        height: 100vh;
+        background: #1e1e2e;
+        border-right: 1px solid #313244;
+        font-size: 12px;
+        overflow-y: auto;
+        flex-shrink: 0;
       }
-      .sidebar h1 {
-        font-size: 0.75rem;
+      .dev-sidebar-header {
+        padding: 10px 12px;
+        font-size: 10px;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        color: #666;
-        padding: 0 1rem;
-        margin-bottom: 0.75rem;
+        color: #6c7086;
+        border-bottom: 1px solid #313244;
       }
-      .sidebar button {
+      .dev-sidebar-tree {
+        padding: 4px 0;
+      }
+      .dev-sidebar-item {
         display: block;
         width: 100%;
-        padding: 0.6rem 1rem;
+        padding: 3px 12px;
         background: none;
         border: none;
-        color: #ccc;
+        color: #cdd6f4;
         text-align: left;
         cursor: pointer;
-        font-size: 0.9rem;
-        transition: all 0.1s ease;
+        font-size: 12px;
+        text-decoration: none;
       }
-      .sidebar button:hover {
-        background: #1e2d4d;
-        color: #fff;
+      .dev-sidebar-item:hover {
+        background: #313244;
       }
-      .sidebar button.active {
-        background: #2a3f5f;
-        color: #4fd1c5;
-        border-left: 3px solid #4fd1c5;
+      .dev-sidebar-item.active {
+        background: #45475a;
+        color: #89b4fa;
       }
+      .dev-sidebar-folder {
+        padding: 4px 12px;
+        color: #f9e2af;
+        font-size: 12px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+      }
+      .dev-sidebar-folder:hover {
+        color: #f5c211;
+      }
+      .dev-sidebar-folder::before {
+        content: '▶';
+        font-size: 8px;
+        transition: transform 0.15s;
+      }
+      .dev-sidebar-folder.open::before {
+        transform: rotate(90deg);
+      }
+      .dev-sidebar-folder-contents {
+        display: none;
+        padding-left: 12px;
+      }
+      .dev-sidebar-folder.open + .dev-sidebar-folder-contents {
+        display: block;
+      }
+      /* Package-level folders - same color, just slightly more padding */
+      .dev-sidebar-package {
+        padding: 6px 12px;
+        margin-top: 4px;
+      }
+      .dev-sidebar-offline {
+        opacity: 0.4;
+        cursor: default;
+      }
+      .dev-sidebar-offline::before {
+        content: '○';
+        font-size: 10px;
+      }
+
+      /* Main content area */
       .main {
         flex: 1;
         display: flex;
         flex-direction: column;
+        background: #fff;
       }
       iframe {
         flex: 1;
@@ -73,51 +121,245 @@
         justify-content: center;
         height: 100%;
         color: #666;
-        font-size: 1.1rem;
+        font-size: 1rem;
+        background: #f5f5f5;
       }
     </style>
   </head>
   <body>
-    <nav class="sidebar">
-      <h1>Packages</h1>
-      <button data-port="3001">Chart</button>
-      <button data-port="3003">Dashboard</button>
-      <button data-port="3004">Data Bite</button>
-      <button data-port="3005">Data Table</button>
-      <button data-port="3007">Filtered Text</button>
-      <button data-port="3008">Map</button>
-      <button data-port="3009">Markup Include</button>
-      <button data-port="3010">Waffle Chart</button>
+    <nav class="dev-sidebar">
+      <div class="dev-sidebar-header">All Packages</div>
+      <div class="dev-sidebar-tree" id="sidebar-tree">
+        <div class="loading" style="padding: 12px; background: none; color: #6c7086; font-size: 12px">
+          Loading examples...
+        </div>
+      </div>
     </nav>
     <main class="main">
-      <div class="loading">Select a package to preview</div>
+      <div class="loading">Waiting for chart package...</div>
     </main>
 
     <script>
+      const packages = {
+        chart: 3001,
+        dashboard: 3003,
+        'data-bite': 3004,
+        'data-table': 3005,
+        'filtered-text': 3007,
+        map: 3008,
+        'markup-include': 3009,
+        'waffle-chart': 3010
+      }
+
+      const DEFAULT_PACKAGE = 'chart'
+      const DEFAULT_CONFIG = '/examples/default.json'
+
       const main = document.querySelector('.main')
-      const buttons = document.querySelectorAll('.sidebar button')
+      const sidebarTree = document.getElementById('sidebar-tree')
 
-      function loadPackage(port) {
-        // Update active state
-        buttons.forEach(btn => btn.classList.toggle('active', btn.dataset.port === port))
+      // Check for editor mode from URL
+      const portalParams = new URLSearchParams(window.location.search)
+      const editorMode = portalParams.get('editor') === 'true'
 
-        // Replace content with iframe
-        main.innerHTML = `<iframe src="http://localhost:${port}"></iframe>`
+      // State (no localStorage - always starts fresh)
+      let currentSelection = null
+      let expandedFolders = { [DEFAULT_PACKAGE]: true } // Chart expanded by default
+      let packageStatus = {} // Track which packages are online/offline
+      let packageData = {} // Cache fetched examples data
 
-        // Save to localStorage
-        localStorage.setItem('portal-active-port', port)
+      // Load iframe with package and config
+      function loadConfig(packageName, configPath) {
+        const port = packages[packageName]
+        const editorParam = editorMode ? '&editor=true' : ''
+        main.innerHTML = `<iframe src="http://localhost:${port}?config=${configPath}${editorParam}"></iframe>`
+
+        currentSelection = { packageName, configPath }
+
+        // Expand the package folder
+        expandedFolders[packageName] = true
+
+        // Update active state in sidebar
+        rebuildSidebar()
       }
 
-      // Click handlers
-      buttons.forEach(btn => {
-        btn.addEventListener('click', () => loadPackage(btn.dataset.port))
-      })
+      // Toggle folder
+      function toggleFolder(folderId, folder, packageName = null) {
+        const wasOpen = folder.classList.contains('open')
+        folder.classList.toggle('open')
+        expandedFolders[folderId] = folder.classList.contains('open')
 
-      // Restore last selection
-      const savedPort = localStorage.getItem('portal-active-port')
-      if (savedPort) {
-        loadPackage(savedPort)
+        // If opening a package folder, auto-select default.json
+        if (!wasOpen && packageName && packageStatus[packageName]) {
+          loadConfig(packageName, '/examples/default.json')
+        }
       }
+
+      // Group files by directory (same logic as standalone sidebar)
+      function groupByDirectory(files) {
+        const tree = { files: [], dirs: {} }
+        files.forEach(file => {
+          const parts = file.split('/')
+          if (parts.length === 1) {
+            tree.files.push(file)
+          } else {
+            const dir = parts[0]
+            if (!tree.dirs[dir]) tree.dirs[dir] = []
+            tree.dirs[dir].push(parts.slice(1).join('/'))
+          }
+        })
+        return tree
+      }
+
+      // Render tree HTML for a package's examples
+      function renderPackageTree(packageName, tree) {
+        let html = ''
+
+        // Root files
+        tree.files.forEach(file => {
+          const configPath = '/examples/' + file
+          const isActive = currentSelection?.packageName === packageName && currentSelection?.configPath === configPath
+          html += `<button class="dev-sidebar-item${
+            isActive ? ' active' : ''
+          }" data-package="${packageName}" data-config="${configPath}">${file}</button>`
+        })
+
+        // Subdirectories
+        Object.keys(tree.dirs)
+          .sort()
+          .forEach(dir => {
+            const folderId = `${packageName}/${dir}`
+            const isOpen = expandedFolders[folderId] ? ' open' : ''
+            html += `<div class="dev-sidebar-folder${isOpen}" data-folder-id="${folderId}">${dir}</div>`
+            html += `<div class="dev-sidebar-folder-contents">`
+            tree.dirs[dir].forEach(file => {
+              const configPath = '/examples/' + dir + '/' + file
+              const isActive =
+                currentSelection?.packageName === packageName && currentSelection?.configPath === configPath
+              html += `<button class="dev-sidebar-item${
+                isActive ? ' active' : ''
+              }" data-package="${packageName}" data-config="${configPath}">${file}</button>`
+            })
+            html += '</div>'
+          })
+
+        return html
+      }
+
+      // Render a single package in the sidebar
+      function renderPackage(packageName, isOnline, examples = null) {
+        const folderId = packageName
+        const isOpen = expandedFolders[folderId] ? ' open' : ''
+
+        if (isOnline && examples) {
+          const tree = groupByDirectory(examples)
+          let html = `<div class="dev-sidebar-folder dev-sidebar-package${isOpen}" data-folder-id="${folderId}" data-package="${packageName}">${packageName}</div>`
+          html += `<div class="dev-sidebar-folder-contents">`
+          html += renderPackageTree(packageName, tree)
+          html += '</div>'
+          return html
+        } else {
+          return `<div class="dev-sidebar-folder dev-sidebar-package dev-sidebar-offline" data-folder-id="${folderId}" data-package="${packageName}">${packageName}</div>`
+        }
+      }
+
+      // Attach event handlers to sidebar elements
+      function attachHandlers() {
+        // Click handlers for files
+        sidebarTree.querySelectorAll('.dev-sidebar-item').forEach(btn => {
+          btn.addEventListener('click', () => {
+            loadConfig(btn.dataset.package, btn.dataset.config)
+          })
+        })
+
+        // Click handlers for folders
+        sidebarTree.querySelectorAll('.dev-sidebar-folder:not(.dev-sidebar-offline)').forEach(folder => {
+          folder.addEventListener('click', () => {
+            const packageName = folder.classList.contains('dev-sidebar-package') ? folder.dataset.package : null
+            toggleFolder(folder.dataset.folderId, folder, packageName)
+          })
+        })
+      }
+
+      // Fetch examples for a single package
+      async function fetchPackageExamples(packageName) {
+        const port = packages[packageName]
+        try {
+          const response = await fetch(`http://localhost:${port}/__examples`)
+          const examples = await response.json()
+          return { online: true, examples }
+        } catch (err) {
+          return { online: false, examples: null }
+        }
+      }
+
+      // Update a single package's display in the sidebar
+      async function updatePackageStatus(packageName) {
+        const { online, examples } = await fetchPackageExamples(packageName)
+        const wasOnline = packageStatus[packageName]
+        packageStatus[packageName] = online
+
+        if (online) {
+          packageData[packageName] = examples
+        }
+
+        // If status changed, rebuild sidebar
+        if (online !== wasOnline) {
+          rebuildSidebar()
+
+          // If chart just came online and nothing selected yet, auto-select it
+          if (online && packageName === DEFAULT_PACKAGE && !currentSelection) {
+            loadConfig(DEFAULT_PACKAGE, DEFAULT_CONFIG)
+          }
+        }
+      }
+
+      // Rebuild entire sidebar from cached data
+      function rebuildSidebar() {
+        let html = ''
+        for (const packageName of Object.keys(packages)) {
+          html += renderPackage(packageName, packageStatus[packageName], packageData[packageName])
+        }
+        sidebarTree.innerHTML = html
+        attachHandlers()
+      }
+
+      // Initial load - fetch all packages
+      async function initSidebar() {
+        // Fetch all packages in parallel
+        await Promise.all(
+          Object.keys(packages).map(async packageName => {
+            const { online, examples } = await fetchPackageExamples(packageName)
+            packageStatus[packageName] = online
+            if (online) {
+              packageData[packageName] = examples
+            }
+          })
+        )
+
+        rebuildSidebar()
+
+        // Auto-select chart's default.json if chart is online
+        if (packageStatus[DEFAULT_PACKAGE]) {
+          loadConfig(DEFAULT_PACKAGE, DEFAULT_CONFIG)
+        }
+
+        // Start polling for offline packages
+        startPolling()
+      }
+
+      // Poll offline packages every 2 seconds
+      function startPolling() {
+        setInterval(() => {
+          for (const packageName of Object.keys(packages)) {
+            if (!packageStatus[packageName]) {
+              updatePackageStatus(packageName)
+            }
+          }
+        }, 2000)
+      }
+
+      // Initialize
+      initSidebar()
     </script>
   </body>
 </html>

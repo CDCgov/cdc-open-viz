@@ -84,7 +84,7 @@ if (params.get('sidebar') === 'true') {
       const url = new URL(window.location)
       url.searchParams.set('config', configPath)
       url.searchParams.set('sidebar', 'true')
-      history.pushState({}, '', url)
+      history.pushState({}, '', url.toString().replace(/%2F/g, '/'))
 
       // Reload visualization
       await window.reloadVisualization(configPath)
