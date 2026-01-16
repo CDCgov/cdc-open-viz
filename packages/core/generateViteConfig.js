@@ -35,6 +35,7 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
       }
     },
     build: {
+      minify: true,  // toggle this line for debugging
       commonjsOptions: {
         include: [/@cdc\/core/, /node_modules/]
       },

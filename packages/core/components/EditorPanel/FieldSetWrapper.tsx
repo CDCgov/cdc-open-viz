@@ -32,7 +32,7 @@ const FieldSet: React.FC<FieldSetProps> = ({
     if (!show)
       return (
         <div className='mb-1'>
-          <button className='btn btn-light' onClick={() => setShow(fieldKey, true)}>
+          <button type='button' className='btn btn-light' onClick={() => setShow(fieldKey, true)}>
             <Icon display='caretDown' />
           </button>
           <span> {fieldName ? `${fieldName}` : 'New ' + fieldType}</span>
@@ -41,10 +41,11 @@ const FieldSet: React.FC<FieldSetProps> = ({
     return (
       <fieldset className='edit-block mb-1' key={fieldKey}>
         <div className='d-flex justify-content-between'>
-          <button className='btn btn-light' onClick={() => setShow(fieldKey, false)}>
+          <button type='button' className='btn btn-light' onClick={() => setShow(fieldKey, false)}>
             <Icon display='caretUp' />
           </button>
           <button
+            type='button'
             className='btn btn-danger btn-sm'
             onClick={event => {
               event.preventDefault()
@@ -64,7 +65,7 @@ const FieldSet: React.FC<FieldSetProps> = ({
     <div className='editor-field-item'>
       <div className='editor-field-item__header'>
         <Icon display='move' size={15} style={{ marginRight: '0.5rem' }} />
-        <button className='btn btn-light' onClick={() => setShow(fieldKey, !show)}>
+        <button type='button' className='btn btn-light' onClick={() => setShow(fieldKey, !show)}>
           <Icon display={show ? 'caretUp' : 'caretDown'} size={20} />
         </button>
         <span className='editor-field-item__name'>{fieldName ? `${fieldName}` : 'New ' + fieldType}</span>
@@ -73,6 +74,7 @@ const FieldSet: React.FC<FieldSetProps> = ({
         <div className='editor-field-item__content'>
           <div className='editor-field-item__remove-wrapper'>
             <button
+              type='button'
               className='btn btn-danger btn-sm'
               onClick={event => {
                 event.preventDefault()
