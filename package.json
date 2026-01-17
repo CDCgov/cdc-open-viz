@@ -106,7 +106,9 @@
   "resolutions": {
     "esbuild": "^0.25.0",
     "jackspeak": "^2.3.6",
-    "js-yaml": "^4.1.1"
+    "js-yaml": "^4.1.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "scripts": {
     "backstop:approve": "backstop approve",
