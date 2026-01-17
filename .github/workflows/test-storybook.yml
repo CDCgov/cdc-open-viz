@@ -25,14 +25,8 @@ jobs:
       - name: Build Packages
         run: lerna run build
 
-      - name: Add Playwright
-        run: npx playwright install
-
-      - name: Start Storybook
-        run: yarn storybook -p 6006 &
-
-      - name: Wait for Storybook to be available
-        run: npx wait-on http://localhost:6006
+      - name: Install Playwright with dependencies
+        run: npx playwright install chromium --with-deps
 
       - name: Run Storybook tests
-        run: yarn test-storybook --no-watch --reporter=default
+        run: yarn test-storybook
