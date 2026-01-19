@@ -1,4 +1,6 @@
 import { getColorPaletteVersion } from './getColorPaletteVersion'
+import { VersionedColorPalettes, ColorPalettes, ColorPalette } from '../types/Palette'
+import { BaseVisualizationConfig } from '../types/BaseVisualizationConfig'
 
 /**
  * Gets the appropriate palette accessor based on config version
@@ -7,7 +9,11 @@ import { getColorPaletteVersion } from './getColorPaletteVersion'
  * @param paletteName - Optional palette name to get specific palette
  * @returns The versioned palette accessor or fallback to main palettes, optionally filtered to specific palette
  */
-export const getPaletteAccessor = (colorPalettes: any, config: any, paletteName?: string) => {
+export const getPaletteAccessor = (
+  colorPalettes: VersionedColorPalettes | ColorPalettes,
+  config: Partial<BaseVisualizationConfig>,
+  paletteName?: string
+): ColorPalettes | ColorPalette | undefined => {
   const paletteAccessor = colorPalettes?.[`v${getColorPaletteVersion(config)}`] || colorPalettes
 
   if (paletteName && paletteAccessor) {

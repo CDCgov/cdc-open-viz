@@ -4,6 +4,7 @@ import { type Annotation } from '@cdc/core/types/Annotation'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
 import { DataRow } from '@cdc/core/types/DataRow'
+import { ColorPalettes, TwoColorPalette } from '@cdc/core/types/Palette'
 export type ColorScale = PickD3Scale<'ordinal', any, any>
 
 export type TransformedData = {
@@ -22,8 +23,8 @@ type SharedChartContext = {
   vizViewport?: 'lg' | 'md' | 'sm' | 'xs' | 'xxs'
   dashboardConfig?: DashboardConfig
   // process top level chart aria label for each chart type
-  handleChartAriaLabels: (config: any) => string
-  handleDragStateChange: (isDragging: any) => void
+  handleChartAriaLabels: (config: ChartConfig) => string
+  handleDragStateChange: (isDragging: boolean) => void
   highlight?: Function
   handleShowAll?: Function
   interactionLabel?: string
@@ -36,7 +37,7 @@ type SharedChartContext = {
   parentRef?: React.RefObject<HTMLDivElement>
   setLegendIsolateValues?: Function
   svgRef?: React.RefObject<SVGSVGElement>
-  handleSmallMultipleHover?: (xAxisValue: any, yCoordinate: number) => void
+  handleSmallMultipleHover?: (xAxisValue: string | number | Date, yCoordinate: number) => void
 }
 
 // Line Chart Specific Context
@@ -56,15 +57,15 @@ type LineChartContext = SharedChartContext & {
   transformedData: TransformedData[]
   updateConfig: Function
   visualizationType: 'Line'
-  colorPalettes: Record<string, string[]>
-  twoColorPalette: Record<string, string[]>
+  colorPalettes: ColorPalettes
+  twoColorPalette: TwoColorPalette
 }
 
 export type ChartContext =
   | LineChartContext
   | (SharedChartContext & {
       annotations: Annotation[]
-      colorPalettes: any
+      colorPalettes: ColorPalettes
       dimensions: DimensionsType
       formatDate?: Function
       formatTooltipsDate: Function
@@ -84,6 +85,6 @@ export type ChartContext =
       sharedFilterValue?: string
       tableData?: DataRow[]
       transformedData?: TransformedData[]
-      twoColorPalette: any
+      twoColorPalette: TwoColorPalette
       updateConfig?: Function
     })

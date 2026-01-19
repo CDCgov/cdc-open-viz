@@ -9,16 +9,11 @@ import { Runtime } from '@cdc/core/types/Runtime'
 import { Table } from '@cdc/core/types/Table'
 import { BoxPlot } from '@cdc/core/types/BoxPlot'
 import { General as CoreGeneral } from '@cdc/core/types/General'
+import { PaletteConfig } from '@cdc/core/types/Palette'
 
 // Extend the core General type to include palette information for charts
 type General = CoreGeneral & {
-  palette?: {
-    name?: string
-    version?: string
-    isReversed?: boolean
-    customColors?: string[]
-    customColorsOrdered?: string[]
-  }
+  palette?: PaletteConfig
 }
 import { type Link } from './../components/Sankey/types'
 import { type DataDescription } from '@cdc/core/types/DataDescription'

@@ -7,6 +7,7 @@ import { type VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 import { DataRow } from '@cdc/core/types/DataRow'
+import { PaletteConfig } from '@cdc/core/types/Palette'
 
 // Runtime data types
 export type RuntimeFilters = VizFilter[] & { fromHash?: number }
@@ -136,13 +137,7 @@ export interface MapConfig extends DataVisualizationConfig, MarkupConfig {
     hideGeoColumnInTooltip: boolean
     hidePrimaryColumnInTooltip: boolean
     language: string
-    palette: {
-      isReversed: boolean
-      name: string
-      version: string
-      customColors?: string[]
-      customColorsOrdered?: string[]
-    }
+    palette: PaletteConfig
     showDownloadMediaButton: boolean
     showDownloadImgButton: boolean
     includeContextInDownload?: boolean

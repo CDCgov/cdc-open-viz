@@ -1,10 +1,11 @@
 import { getColorPaletteVersion } from './getColorPaletteVersion'
 import { chartColorPalettes, twoColorPalette } from '../data/colorPalettes'
+import { ColorPalettes } from '../types/Palette'
 
 export interface FilterColorPalettesOptions {
   config: any
   isReversed?: boolean
-  colorPalettes?: any
+  colorPalettes?: ColorPalettes
   visualizationType?: string
   useV2Migration?: boolean
 }
