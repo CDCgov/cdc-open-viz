@@ -11,185 +11,39 @@ import { BoxPlot } from '@cdc/core/types/BoxPlot'
 import { General as CoreGeneral } from '@cdc/core/types/General'
 import { PaletteConfig } from '@cdc/core/types/Palette'
 
-// Extend the core General type to include palette information for charts
-type General = CoreGeneral & {
-  palette?: PaletteConfig
-}
-import { type Link } from './../components/Sankey/types'
-import { type DataDescription } from '@cdc/core/types/DataDescription'
-import { type Legend as CoreLegend } from '@cdc/core/types/Legend'
-import { Label } from './Label'
-import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
-import { Region } from '@cdc/core/types/Region'
-import { type Annotation } from '@cdc/core/types/Annotation'
-import Footnotes from '@cdc/core/types/Footnotes'
-import { PreliminaryDataItem } from '@cdc/core/types/PreliminaryData'
+// --- ChartConfigBase and all chart config interfaces ---
 
-type ChartColumns = Record<string, Column>
-export type ChartOrientation = 'vertical' | 'horizontal'
-export type VisualizationType =
-  | 'Area Chart'
-  | 'Bar'
-  | 'Box Plot'
-  | 'Deviation Bar'
-  | 'Forest Plot'
-  | 'Line'
-  | 'Paired Bar'
-  | 'Pie'
-  | 'Scatter Plot'
-  | 'Spark Line'
-  | 'Combo'
-  | 'Forecasting'
-  | 'Sankey'
-  | 'Bump Chart'
-  | 'Warming Stripes'
-
-type DataFormat = {
-  abbreviated: boolean
-  bottomAbbreviated: boolean
-  bottomCommas: boolean
-  bottomPrefix: string
-  bottomRoundTo: number
-  bottomSuffix: string
-  commas: boolean
-  prefix: string
-  preserveOriginalDecimals?: boolean
-  rightCommas: boolean
-  rightPrefix: string
-  rightRoundTo: number
-  rightSuffix: string
-  roundTo: number
-  suffix: string
-  showPiePercent: boolean
-}
-
-type Exclusions = {
-  keys: string[]
-  active: boolean
-  dateStart: string
-  dateEnd: string
-}
-
-type Legend = CoreLegend & {
-  seriesHighlight: string[]
-  unified: boolean
-  hideSuppressionLink: boolean
-  style: 'circles' | 'boxes' | 'gradient' | 'lines'
-  subStyle: 'linear blocks' | 'smooth'
-  hasShape: boolean
-  order: 'dataColumn' | 'asc' | 'desc'
-  orderedValues: Label[]
-  tickRotation: string
-  warmingStripesIntervals?: number
-  hideBorder: {
-    side: boolean
-    topBottom: boolean
-  }
-  groupBy: string
-  separators?: string
-  patterns?: {
-    [key: string]: {
-      label?: string
-      color?: string
-      shape?: string
-      dataKey?: string
-      dataValue?: string
-      contrastCheck?: boolean
-      patternSize?: number
-    }
-  }
-}
-
-type Visual = {
-  border?: boolean
-  borderColorTheme?: boolean
-  accent?: boolean
-  background?: boolean
-  hideBackgroundColor?: boolean
-  verticalHoverLine?: boolean
-  horizontalHoverLine?: boolean
-  lineDatapointSymbol: 'none' | 'standard'
-  maximumShapeAmount: 7
-}
-
-export interface AllChartsConfig extends DataVisualizationConfig, MarkupConfig {
+export interface ChartConfigBase extends DataVisualizationConfig, MarkupConfig {
   type: 'chart'
-  annotations: Annotation[]
+  annotations: any[]
   animate: boolean
-  general: General
-  barHasBorder: 'true' | 'false'
-  barHeight: number
-  barSpace: number
-  barStyle: 'lollipop' | 'rounded' | 'flat'
-  barThickness: number
-  boxplot: BoxPlot
-  chartMessage: { noData?: string }
+  general: any
+  chartMessage?: { noData?: string }
   color: string
-  colorMatchLineSeriesLabels: boolean
-  columns: ChartColumns
-  confidenceKeys: ConfidenceInterval
-  dataCutoff: number
-  dataDescription: Partial<DataDescription>
-  dataFormat: DataFormat
+  columns: any
+  dataDescription: Partial<any>
+  dataFormat: any
   dataKey: string
   description: string
-  dynamicMarginTop: number
-  exclusions: Exclusions
-  legacyFootnotes: string // this footnote functionality should be moved to the Footnotes component
-  footnotes: Footnotes
-  forestPlot: ForestPlotConfigSettings
-  formattedData: DataRow[] & { urlFiltered: boolean }
-  heights: {
-    vertical: number
-    horizontal: number
-    mobileVertical: number
-  }
-  highlightedBarValues: { value: any; color: string; borderWidth: number; legendLabel: string }[]
+  footnotes: any
+  formattedData: any[] & { urlFiltered: boolean }
   introText: string
-  isLollipopChart: boolean
-  isLegendValue: boolean
-  isResponsiveTicks: boolean
-  isPaletteReversed: boolean
   labels: boolean
-  legend: Legend
-  lineDatapointColor: 'Same as Line' | 'Lighter than Line'
-  lineDatapointStyle: 'hidden' | 'always show' | 'hover'
-  lollipopColorStyle: 'regular' | 'two-tone'
-  lollipopShape: string
-  lollipopSize: 'small' | 'medium' | 'large'
-  orientation: ChartOrientation
+  legend: any
+  orientation: any
   palette: string
-  pieType?: string
-  preliminaryData: PreliminaryDataItem[]
-  primary?: DataFormat
-  rankByValue: 'asc' | 'desc'
-  roundingStyle: string
-  runtime: Runtime
+  preliminaryData: any[]
+  runtime: any
   runtimeDataUrl: string
-  series: Series
-  showLineSeriesLabels: boolean
-  showAreaUnderLine?: boolean
+  series: any
   showSidebar: boolean
   showTitle: boolean
-  smallMultiples?: {
-    mode?: 'by-column' | 'by-series'
-    tileColumn?: string
-    tilesPerRowDesktop?: number
-    tilesPerRowMobile?: number
-    tileOrderType?: 'asc' | 'desc' | 'custom'
-    tileOrder?: string[]
-    tileTitles?: { [key: string]: string }
-    independentYAxis?: boolean
-    colorMode?: 'same' | 'different'
-    synchronizedTooltips?: boolean
-    showAreaUnderLine?: boolean
-  }
+  smallMultiples?: any
   sortData: 'ascending' | 'descending'
-  stackedAreaChartLineType: string
   suppressedData?: { label: string; icon: string; value: string }[]
   superTitle: string
   theme: string
-  table: Table
+  table: any
   tipRounding: string
   title: string
   titleStyle?: 'legacy' | 'large' | 'small'
@@ -198,60 +52,140 @@ export interface AllChartsConfig extends DataVisualizationConfig, MarkupConfig {
     opacity: number
     dateDisplayFormat: string
   }
-  topAxis: { hasLine: boolean }
-  twoColor: { palette: string }
-  visual: Visual
-  visualizationType: VisualizationType
-  visualizationSubType: string
-  xAxis: Axis
-  yAxis: Axis
+  topAxis?: { hasLine: boolean }
+  twoColor?: { palette: string }
+  visual: any
+  visualizationSubType?: string
+  xAxis: any
+  yAxis: any
   hideXAxisLabel?: boolean
   hideYAxisLabel?: boolean
-  xScale: Function
-  yScale: Function
-  regions: Region[]
-  sankey: {
-    data: { links: Link[]; storyNodeText: DataRow[]; tooltips: DataRow[] }[]
-    nodePadding: number
-    iterations: number
-    nodeSize: {
-      nodeWidth: number
-    }
-    margin: { margin_x: number; margin_y: number }
-    nodeColor: { default: boolean; inactive: boolean }
-    opacity: {
-      LinkOpacityInactive: string
-      LinkOpacityDefault: string
-      nodeOpacityInactive: boolean
-      nodeOpacityDefault: boolean
-    }
-    rxValue: number
-    nodeFontColor: string
-    nodeValueStyle: {
-      textBefore: string
-      textAfter: string
-    }
-    linkColor: {
-      inactive: string
-      default: string
-    }
-  }
+  xScale?: Function
+  yScale?: Function
+  regions?: any[]
 }
 
-type ForestPlotConfig = {
+export interface BarChartConfig extends ChartConfigBase {
+  visualizationType: 'Bar'
+  barHasBorder: 'true' | 'false'
+  barHeight: number
+  barSpace: number
+  barStyle: 'lollipop' | 'rounded' | 'flat'
+  barThickness: number
+  highlightedBarValues?: { value: any; color: string; borderWidth: number; legendLabel: string }[]
+  isLollipopChart?: boolean
+  lollipopColorStyle?: 'regular' | 'two-tone'
+  lollipopShape?: string
+  lollipopSize?: 'small' | 'medium' | 'large'
+}
+
+export interface LineChartConfig extends ChartConfigBase {
+  visualizationType: 'Line'
+  allowLineToBarGraph?: boolean
+  convertLineToBarGraph?: boolean
+  isolatedDotsSameSize?: boolean
+  lineDatapointColor?: 'Same as Line' | 'Lighter than Line'
+  lineDatapointStyle?: 'hidden' | 'always show' | 'hover'
+  showLineSeriesLabels?: boolean
+  showAreaUnderLine?: boolean
+}
+
+export interface PieChartConfig extends ChartConfigBase {
+  visualizationType: 'Pie'
+  pieType?: string
+  showPiePercent?: boolean
+}
+
+export interface BoxPlotChartConfig extends ChartConfigBase {
+  visualizationType: 'Box Plot'
+  boxplot: any
+  confidenceKeys: any
+}
+
+export interface ScatterPlotChartConfig extends ChartConfigBase {
+  visualizationType: 'Scatter Plot'
+}
+
+export interface AreaChartConfig extends ChartConfigBase {
+  visualizationType: 'Area Chart'
+  showAreaUnderLine?: boolean
+}
+
+export interface PairedBarChartConfig extends ChartConfigBase {
+  visualizationType: 'Paired Bar'
+}
+
+export interface DeviationBarChartConfig extends ChartConfigBase {
+  visualizationType: 'Deviation Bar'
+}
+
+export interface SparkLineChartConfig extends ChartConfigBase {
+  visualizationType: 'Spark Line'
+}
+
+export interface ComboChartConfig extends ChartConfigBase {
+  visualizationType: 'Combo'
+  stackedAreaChartLineType?: string
+}
+
+export interface ForecastingChartConfig extends ChartConfigBase {
+  visualizationType: 'Forecasting'
+}
+
+export interface BumpChartConfig extends ChartConfigBase {
+  visualizationType: 'Bump Chart'
+}
+
+export interface WarmingStripesChartConfig extends ChartConfigBase {
+  visualizationType: 'Warming Stripes'
+  warmingStripesIntervals?: number
+}
+
+export type ForestPlotChartConfig = {
   visualizationType: 'Forest Plot'
-  forestPlot: ForestPlotConfigSettings
-} & AllChartsConfig &
+  forestPlot: any
+} & ChartConfigBase &
   MarkupConfig
 
-export type LineChartConfig = {
-  allowLineToBarGraph: boolean
-  convertLineToBarGraph: boolean
-  isolatedDotsSameSize: boolean
-  lineDatapointStyle: 'hidden' | 'always show' | 'hover'
-  visualizationType: 'Line'
-} & AllChartsConfig &
+export type SankeyChartConfig = {
+  visualizationType: 'Sankey'
+  enableTooltips: boolean
+  data: [
+    {
+      tooltips: any[]
+      tooltipData: any[]
+      tableData: any[]
+      links: {
+        source: any
+        target: any
+        value: number
+      }[]
+      storyNodeText: any[]
+    }
+  ]
+} & ChartConfigBase &
   MarkupConfig
+
+export type ChartConfig =
+  | BarChartConfig
+  | LineChartConfig
+  | PieChartConfig
+  | BoxPlotChartConfig
+  | ScatterPlotChartConfig
+  | AreaChartConfig
+  | PairedBarChartConfig
+  | DeviationBarChartConfig
+  | SparkLineChartConfig
+  | ComboChartConfig
+  | ForecastingChartConfig
+  | BumpChartConfig
+  | WarmingStripesChartConfig
+  | ForestPlotChartConfig
+  | SankeyChartConfig
+
+// (Removed duplicate legacy ForestPlotConfig type)
+
+// (Removed duplicate legacy LineChartConfig type)
 
 type SankeyLink = {
   depth: number
@@ -274,25 +208,6 @@ type StoryNode = {
   segmentTextBefore: string
 }
 
-type SankeyChartConfig = {
-  enableTooltips: boolean
-  data: [
-    {
-      tooltips: DataRow[]
-      // data to display in the sankey chart tooltips
-      tooltipData: DataRow[]
-      // data to display in the data table, bypasses the default data table output
-      tableData: DataRow[]
-      links: {
-        source: SankeyLink
-        target: SankeyLink
-        value: number
-      }[]
-      storyNodeText: StoryNode[]
-    }
-  ]
-  visualizationType: 'Sankey'
-} & AllChartsConfig &
-  MarkupConfig
+// (Removed duplicate legacy SankeyChartConfig type)
 
-export type ChartConfig = SankeyChartConfig | LineChartConfig | ForestPlotConfig | AllChartsConfig
+// (Removed duplicate legacy ChartConfig type)
