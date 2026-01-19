@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { applyQueuedActive } from '../applyQueuedActive'
 import { VIZ_FILTER_STYLE } from '../../Filters'
-import { SharedFilter } from '@cdc/dashboard/src/types/SharedFilter'
+import { SharedFilter } from '../../../../types/SharedFilter'
 
 describe('applyQueuedActive', () => {
   it('should apply queuedActive to active and subGrouping.active for nestedDropdown filter style', () => {

@@ -28,8 +28,8 @@ import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import Footnotes from '@cdc/core/types/Footnotes'
+import { PreliminaryDataItem } from '@cdc/core/types/PreliminaryData'
 
-export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
 type ChartColumns = Record<string, Column>
 export type ChartOrientation = 'vertical' | 'horizontal'
 export type VisualizationType =
@@ -48,24 +48,6 @@ export type VisualizationType =
   | 'Sankey'
   | 'Bump Chart'
   | 'Warming Stripes'
-export interface PreliminaryDataItem {
-  column: string
-  displayLegend: boolean
-  displayTable: boolean
-  displayTooltip: boolean
-  iconCode: string
-  label: string
-  lineCode: string
-  seriesKeys: string[]
-  style: string
-  symbol: string
-  type: 'effect' | 'suppression'
-  value: string
-  hideBarSymbol: boolean
-  hideLineStyle: boolean
-  circleSize: number
-  displayGray: boolean
-}
 
 type DataFormat = {
   abbreviated: boolean

@@ -4,7 +4,7 @@ import { DataTableConfig } from '../types/DataTableConfig'
 import { Column } from '@cdc/core/types/Column'
 import { Table } from '@cdc/core/types/Table'
 import { VizFilter } from '@cdc/core/types/VizFilter'
-import { ViewportSize } from '@cdc/chart/src/types/ChartConfig'
+import { ViewportSize } from '@cdc/core/types/ViewportSize'
 import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 
 export const getInitialState = (isEditor: boolean): State => {

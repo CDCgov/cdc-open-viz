@@ -1,6 +1,6 @@
 // todo: review tooltipData type
 // todo: review svgRef type
-import { type PreliminaryDataItem } from '../../types/ChartConfig'
+import { type PreliminaryDataItem } from '@cdc/core/types/PreliminaryData'
 export type LineChartProps = {
   xScale: Function
   yScale: Function

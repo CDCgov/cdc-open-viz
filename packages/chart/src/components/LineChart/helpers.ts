@@ -1,5 +1,5 @@
 import { DataItem, StyleProps, Style } from './LineChartProps'
-import { PreliminaryDataItem } from '../../types/ChartConfig'
+import { PreliminaryDataItem } from '@cdc/core/types/PreliminaryData'
 
 import _ from 'lodash'
 export const createStyles = (props: StyleProps): Style[] => {

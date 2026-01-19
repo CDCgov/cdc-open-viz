@@ -1,5 +1,5 @@
 import { VIZ_FILTER_STYLE } from '../Filters'
-import { SharedFilter } from '@cdc/dashboard/src/types/SharedFilter'
+import { SharedFilter } from '../../../types/SharedFilter'
 
 export const applyQueuedActive = (sharedFilter: SharedFilter) => {
   if (sharedFilter.filterStyle === VIZ_FILTER_STYLE.nestedDropdown) {

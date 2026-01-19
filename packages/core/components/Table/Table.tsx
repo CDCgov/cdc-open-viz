@@ -3,7 +3,7 @@ import Row from './components/Row'
 import GroupRow from './components/GroupRow'
 import { CellMatrix } from './types/CellMatrix'
 import { RowType } from './types/RowType'
-import { PreliminaryDataItem } from '@cdc/chart/src/types/ChartConfig'
+import { PreliminaryDataItem } from '../../types/PreliminaryData'
 import './table.styles.css'
 
 type TableProps = {

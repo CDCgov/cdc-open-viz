@@ -1,6 +1,6 @@
 import React, { ReactNode, FC } from 'react'
 import Cell from './Cell'
-import { PreliminaryDataItem } from '@cdc/chart/src/types/ChartConfig'
+import { PreliminaryDataItem } from '../../../types/PreliminaryData'
 import parse from 'html-react-parser'
 
 type RowProps = {
