@@ -1,8 +1,8 @@
-import { Config } from '../types/Config'
+import { DataBiteConfig } from '../types/DataBiteConfig'
 import DataBiteActions from './db.actions'
 
 type DataBiteState = {
-  config?: Config
+  config?: DataBiteConfig
   loading: boolean
   currentViewport: string
   coveLoadedHasRan: boolean

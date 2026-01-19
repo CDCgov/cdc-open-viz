@@ -15,10 +15,10 @@ import EditorPanel from './components/EditorPanel'
 import defaults from './data/initial-state.js'
 import { processData } from './helpers/dataHelpers'
 import { getInitialState, reducer, State } from './store/dataTable.reducer'
-import { Config } from './types/Config'
+import { DataTableConfig } from './types/DataTableConfig'
 
 type CdcDataTableProps = {
-  config?: Config
+  config?: DataTableConfig
   configUrl?: string
   isEditor: boolean
 }

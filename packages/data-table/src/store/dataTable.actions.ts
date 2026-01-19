@@ -1,4 +1,4 @@
-import { Config } from '../types/Config'
+import { DataTableConfig } from '../types/DataTableConfig'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 
 type Action<T, P = undefined> = {
@@ -6,7 +6,7 @@ type Action<T, P = undefined> = {
   payload?: P
 }
 
-type SET_CONFIG = Action<'SET_CONFIG', Config>
+type SET_CONFIG = Action<'SET_CONFIG', DataTableConfig>
 type SET_SHOW_EDITOR_PANEL = Action<'SET_SHOW_EDITOR_PANEL', boolean>
 type SET_COLUMNS = Action<'SET_COLUMNS', Record<string, unknown>>
 type SET_DATA = Action<'SET_DATA', object[]>

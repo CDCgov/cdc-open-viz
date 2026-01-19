@@ -1,8 +1,8 @@
-import { Config } from '../types/Config'
+import { WaffleChartConfig } from '../types/WaffleChartConfig'
 import ChartActions from './chart.actions'
 
 type ChartState = {
-  config?: Config
+  config?: WaffleChartConfig
   container: any
   coveLoadedHasRan: boolean
   loading: boolean

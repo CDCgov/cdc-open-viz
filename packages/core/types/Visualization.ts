@@ -12,11 +12,16 @@ import { Runtime } from './Runtime'
 import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
 import Footnotes from './Footnotes'
 
-// This was originally created as a catchall for the different types of visualizations.
-// Currently it includes properties that ares specific to one Visualization type.
-// We should avoid adding any new property to this type unless it is used by all visualizations.
-// We should refactor it also to remove properties that are not used by all visualizations.
-// See AnyVisualization type below...
+// Re-export the new base interfaces for convenience
+export { BaseVisualizationConfig, DataVisualizationConfig, VisualizationType } from './BaseVisualizationConfig'
+
+/**
+ * @deprecated This type contains properties specific to individual visualization types.
+ * Use the new inheritance pattern instead:
+ * - For non-data visualizations: extend `BaseVisualizationConfig`
+ * - For data-bearing visualizations: extend `DataVisualizationConfig`
+ * See `BaseVisualizationConfig.ts` for the new base interfaces.
+ */
 type DeprecatedVisualizationType = {
   columns: Record<string, Partial<Column>>
   confidenceKeys: ConfidenceInterval
@@ -51,6 +56,10 @@ type StatefulProperties = {
   newViz: boolean
 }
 
+/**
+ * @deprecated Use `BaseVisualizationConfig` or `DataVisualizationConfig` instead.
+ * This type will be removed in a future version.
+ */
 export type CommonVisualizationProperties = Partial<StatefulProperties> & {
   showEditorPanel?: boolean
   uid?: string | number // this is the actual key of the visualization object
@@ -59,6 +68,11 @@ export type CommonVisualizationProperties = Partial<StatefulProperties> & {
   footnotes?: Footnotes
 } & Partial<ConfigureData>
 
+/**
+ * @deprecated This type combines properties from all visualization types.
+ * Use package-specific config interfaces that extend `BaseVisualizationConfig`
+ * or `DataVisualizationConfig` instead. This type will be removed in a future version.
+ */
 export type Visualization = DeprecatedVisualizationType & CommonVisualizationProperties
 
 // This type is used as a catchall for the different types of visualizations.

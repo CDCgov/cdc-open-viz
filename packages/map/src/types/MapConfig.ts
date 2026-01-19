@@ -1,6 +1,7 @@
+import { DataVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig'
 import { type ComponentThemes } from '@cdc/core/types/ComponentThemes'
-import { type Visualization } from '@cdc/core/types/Visualization'
 import { type EditorColumnProperties } from '@cdc/core/types/EditorColumnProperties'
+import { type FilterBehavior } from '@cdc/core/types/FilterBehavior'
 import { type Version } from '@cdc/core/types/Version'
 import { type VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
@@ -94,7 +95,8 @@ export type SmallMultiples = {
   synchronizedTooltips?: boolean
 }
 
-export type MapConfig = Visualization & {
+export interface MapConfig extends DataVisualizationConfig, MarkupConfig {
+  type: 'map'
   annotations: Annotation[]
   // map color palette
   color: string
@@ -106,7 +108,6 @@ export type MapConfig = Visualization & {
     longitude: LongitudeColumnProperties
     categorical: { name: string }
   }
-  dataUrl: string
   data: DataRow[]
   runtimeDataUrl: string
   filters: VizFilter[]
@@ -218,12 +219,10 @@ export type MapConfig = Visualization & {
     patterns: PatternSelection[]
   }
   hexMap: HexMapSettings
-  filterBehavior: string
+  filterBehavior: FilterBehavior
   filterIntro: string
   visual: MapVisualSettings
   smallMultiples?: SmallMultiples
-  // visualization type
-  type: 'map'
   // version of the map
   version: Version
-} & MarkupConfig
+}

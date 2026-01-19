@@ -1,23 +1,18 @@
+import { DataVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig'
 import { Column } from '@cdc/core/types/Column'
 import { DataDescription } from '@cdc/core/types/DataDescription'
-import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 import { General } from '@cdc/core/types/General'
 import { Table } from '@cdc/core/types/Table'
 import { Version } from '@cdc/core/types/Version'
-import { VizFilter } from '@cdc/core/types/VizFilter'
 
-export type Config = {
+export interface DataTableConfig extends DataVisualizationConfig {
+  type: 'table'
   columns?: Record<string, Column>
-  data?: Object[]
   dataDescription: Partial<DataDescription>
   dataFormat?: DataFormat
-  dataUrl?: string
-  filters?: VizFilter[]
-  filterBehavior?: FilterBehavior
   filterIntro?: string
   general?: General
   table: Table
-  type: 'table'
   version: Version
   visualizationType: 'Table'
 }

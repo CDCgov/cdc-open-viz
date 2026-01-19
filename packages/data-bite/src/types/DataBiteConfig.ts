@@ -1,9 +1,10 @@
+import { BaseVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig'
 import { Version } from '@cdc/core/types/Version'
 import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 
-export type Config = {
-  type: string
+export interface DataBiteConfig extends BaseVisualizationConfig, MarkupConfig {
+  type: 'data-bite'
   data: Object[]
   dataBite: string
   dataFunction: string
@@ -43,4 +44,4 @@ export type Config = {
     isCompactStyle: boolean
   }
   version: Version
-} & MarkupConfig
+}

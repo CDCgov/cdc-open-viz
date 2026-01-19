@@ -1,10 +1,10 @@
+import { DataVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig'
 import { Axis } from '@cdc/core/types/Axis'
 import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 import { type ForestPlotConfigSettings } from './ForestPlot'
 import { type Column } from '@cdc/core/types/Column'
 import { type Series } from '@cdc/core/types/Series'
 import { Runtime } from '@cdc/core/types/Runtime'
-import { FilterBehavior } from '@cdc/core/types/FilterBehavior'
 import { Table } from '@cdc/core/types/Table'
 import { BoxPlot } from '@cdc/core/types/BoxPlot'
 import { General as CoreGeneral } from '@cdc/core/types/General'
@@ -25,9 +25,7 @@ import { type Legend as CoreLegend } from '@cdc/core/types/Legend'
 import { Label } from './Label'
 import { ConfidenceInterval } from '@cdc/core/types/ConfidenceInterval'
 import { Region } from '@cdc/core/types/Region'
-import { VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
-import { Version } from '@cdc/core/types/Version'
 import Footnotes from '@cdc/core/types/Footnotes'
 
 export type ViewportSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg'
@@ -136,7 +134,8 @@ type Visual = {
   maximumShapeAmount: 7
 }
 
-export type AllChartsConfig = {
+export interface AllChartsConfig extends DataVisualizationConfig, MarkupConfig {
+  type: 'chart' | 'dashboard'
   annotations: Annotation[]
   animate: boolean
   general: General
@@ -151,8 +150,6 @@ export type AllChartsConfig = {
   colorMatchLineSeriesLabels: boolean
   columns: ChartColumns
   confidenceKeys: ConfidenceInterval
-  data: Object[]
-  dataUrl: string
   dataCutoff: number
   dataDescription: Partial<DataDescription>
   dataFormat: DataFormat
@@ -160,8 +157,6 @@ export type AllChartsConfig = {
   description: string
   dynamicMarginTop: number
   exclusions: Exclusions
-  filters: VizFilter[]
-  filterBehavior: FilterBehavior
   legacyFootnotes: string // this footnote functionality should be moved to the Footnotes component
   footnotes: Footnotes
   forestPlot: ForestPlotConfigSettings
@@ -184,7 +179,6 @@ export type AllChartsConfig = {
   lollipopColorStyle: 'regular' | 'two-tone'
   lollipopShape: string
   lollipopSize: 'small' | 'medium' | 'large'
-  newViz: boolean
   orientation: ChartOrientation
   palette: string
   pieType?: string
@@ -228,9 +222,6 @@ export type AllChartsConfig = {
   }
   topAxis: { hasLine: boolean }
   twoColor: { palette: string }
-  type: 'chart' | 'dashboard'
-  uid: string | number
-  version: Version
   visual: Visual
   visualizationType: VisualizationType
   visualizationSubType: string
@@ -267,7 +258,7 @@ export type AllChartsConfig = {
       default: string
     }
   }
-} & MarkupConfig
+}
 
 type ForestPlotConfig = {
   visualizationType: 'Forest Plot'

@@ -1,8 +1,8 @@
-import type { Config } from '../types/Config'
+import type { WaffleChartConfig } from '../types/WaffleChartConfig'
 
 type Action<T, P> = { type: T; payload: P }
 
-type SET_CONFIG = Action<'SET_CONFIG', Config>
+type SET_CONFIG = Action<'SET_CONFIG', WaffleChartConfig>
 type SET_CONTAINER = Action<'SET_CONTAINER', any>
 type SET_COVE_LOADED_HAS_RAN = Action<'SET_COVE_LOADED_HAS_RAN', boolean>
 type SET_LOADING = Action<'SET_LOADING', boolean>

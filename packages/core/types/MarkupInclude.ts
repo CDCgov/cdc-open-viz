@@ -1,9 +1,10 @@
+import { BaseVisualizationConfig } from './BaseVisualizationConfig'
 import { Runtime } from '@cdc/core/types/Runtime'
 import { MarkupVariable } from './MarkupVariable'
-import { Visualization } from './Visualization'
 import { VizFilter } from './VizFilter'
 
-export type MarkupIncludeConfig = Visualization & {
+export interface MarkupIncludeConfig extends BaseVisualizationConfig {
+  type: 'markup-include'
   contentEditor: {
     // Changing the base config object creates an infinite loop, nesting it is a workaround
     allowHideSection?: boolean
@@ -22,7 +23,6 @@ export type MarkupIncludeConfig = Visualization & {
   filters?: VizFilter[]
   formattedData: {}
   markupVariables?: MarkupVariable[] // Support markupVariables at root level for backwards compatibility
-  newViz?: boolean
   runtime?: Runtime
   visual: {
     border: boolean

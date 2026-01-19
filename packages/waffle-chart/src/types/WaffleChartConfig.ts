@@ -1,8 +1,10 @@
+import { BaseVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig'
 import { ComponentStyles } from '@cdc/core/types/ComponentStyles'
 import { ComponentThemes } from '@cdc/core/types/ComponentThemes'
 import { Version } from '@cdc/core/types/Version'
 
-export type Config = {
+export interface WaffleChartConfig extends BaseVisualizationConfig {
+  type: 'waffle-chart'
   // supporting text in the box
   content: string
   customDenom: boolean
@@ -34,7 +36,6 @@ export type Config = {
   theme: ComponentThemes
   title: string
   showTitle: boolean
-  type: 'waffle-chart'
   valueDescription: string
   visual: ComponentStyles & {
     whiteBackground?: boolean
