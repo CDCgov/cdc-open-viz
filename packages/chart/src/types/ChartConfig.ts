@@ -63,6 +63,18 @@ export interface ChartConfigBase extends DataVisualizationConfig, MarkupConfig {
   xScale?: Function
   yScale?: Function
   regions?: any[]
+  // Add optional properties for backwards compatibility and type safety
+  heights?: {
+    vertical?: number
+    horizontal?: number
+    mobileVertical?: number
+    [key: string]: number | undefined
+  }
+  exclusions?: {
+    active?: boolean
+    keys?: string[]
+    [key: string]: any
+  }
 }
 
 export interface BarChartConfig extends ChartConfigBase {
