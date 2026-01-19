@@ -53,6 +53,12 @@ export type SubGrouping = {
 
 export type VizFilter = GeneralFilter | MultiSelectFilter
 
+/**
+ * Runtime filter array type with optional fromHash property.
+ * Used by Maps to track filter hash state.
+ */
+export type RuntimeVizFilters = VizFilter[] & { fromHash?: number }
+
 // Re-export new typed filter system for gradual migration
 export type {
   TypedVizFilter,

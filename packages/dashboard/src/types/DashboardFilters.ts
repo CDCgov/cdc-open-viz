@@ -5,7 +5,8 @@ import { ConfigureData } from '@cdc/core/types/ConfigureData'
 
 export type DashboardFilters = BaseVisualizationConfig & {
   sharedFilterIndexes: number[]
-  applyFiltersButtonText: string
+  /** Text for the apply filters button. Defaults to 'Apply Filters' */
+  applyFiltersButtonText?: string
   autoLoad?: boolean
   showClearButton?: boolean
   type: 'dashboardFilters'
@@ -15,4 +16,6 @@ export type DashboardFilters = BaseVisualizationConfig & {
   visualizationType?: string
   filterBehavior?: FilterBehavior
   footnotes?: Footnotes
+  /** @deprecated Legacy property used during migration from older configs */
+  hide?: number[]
 } & Partial<ConfigureData>

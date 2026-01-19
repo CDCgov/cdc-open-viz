@@ -24,7 +24,9 @@ export const iconHash = {
 }
 
 export const getIcon = (visualization: AnyVisualization) => {
-  const { type, visualizationType, general } = visualization
+  const { type, visualizationType } = visualization
+  // Access general safely since not all visualization types have it
+  const general = 'general' in visualization ? visualization.general : undefined
   if (visualizationType) return iconHash[visualizationType]
   if (general?.geoType) {
     // for visualizations, mismatching state and state icon is not desired

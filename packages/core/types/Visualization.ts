@@ -65,6 +65,23 @@ export type CommonVisualizationProperties = Partial<StatefulProperties> & {
   visualizationType?: string
   filterBehavior: FilterBehavior
   footnotes?: Footnotes
+  // Properties needed for backwards compatibility with markup-include and dashboard filters
+  contentEditor?: {
+    inlineHTML?: string
+    srcUrl?: string
+    title?: string
+    [key: string]: any
+  }
+  visual?: {
+    border?: boolean
+    accent?: boolean
+    background?: boolean
+    hideBackgroundColor?: boolean
+    borderColorTheme?: boolean
+    [key: string]: any
+  }
+  sharedFilterIndexes?: number[]
+  autoLoad?: boolean
 } & Partial<ConfigureData>
 
 /**

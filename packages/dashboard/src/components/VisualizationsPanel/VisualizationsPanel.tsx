@@ -25,10 +25,12 @@ const addVisualization = (type, subType) => {
       newVisualizationConfig.visualizationType = subType
       break
     case 'map':
-      newVisualizationConfig.general = {}
-      newVisualizationConfig.general.geoType = subType
+      // Use type assertion for partial general config during initialization
+      newVisualizationConfig.general = { geoType: subType } as any
       break
-    case 'data-bite' || 'waffle-chart' || 'filtered-text':
+    case 'data-bite':
+    case 'waffle-chart':
+    case 'filtered-text':
       newVisualizationConfig.visualizationType = type
       break
     case 'table':

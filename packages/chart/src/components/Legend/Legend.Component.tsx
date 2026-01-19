@@ -31,7 +31,6 @@ interface LegendProps {
   formatLabels: (labels: Label[]) => Label[]
   highlight: Function
   handleShowAll: Function
-  ref: React.Ref<() => void>
   seriesHighlight: string[]
   skipId: string
   dimensions: DimensionsType // for responsive width legend
@@ -39,7 +38,7 @@ interface LegendProps {
   interactionLabel: string
 }
 
-const Legend: React.FC<LegendProps> = forwardRef(
+const Legend = forwardRef<HTMLElement, LegendProps>(
   (
     {
       config,
@@ -73,6 +72,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
     }
 
     const { HighLightedBarUtils } = useHighlightedBars(config, null)
+    let highlightedBarValues = null
     let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
 
     if (!legend) return null
@@ -230,7 +230,6 @@ const Legend: React.FC<LegendProps> = forwardRef(
                       >
                         <LegendShape
                           shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
-                          style={{ borderRadius: '0px' }}
                           fill='transparent'
                           borderColor={bar.color ? bar.color : `rgba(255, 102, 1)`}
                         />{' '}
@@ -249,11 +248,12 @@ const Legend: React.FC<LegendProps> = forwardRef(
                       ['top', 'bottom'].includes(config.legend.position) ? 'flex-row flex-wrap' : 'flex-column'
                     }`}
                   >
-                    {Object.entries(config.legend.patterns).map(([key, pattern]) => {
+                    {Object.entries(config.legend.patterns).map(([key, patternValue]) => {
+                      const pattern = patternValue as { shape?: string; color?: string }
                       const patternId = `legend-pattern-${key}`
                       const size = config.legend.patternSize || 8
                       const legendSize = 16
-                      const pColor = (pattern as any)?.color || '#666666'
+                      const pColor = pattern?.color || '#666666'
 
                       return (
                         <LegendItem

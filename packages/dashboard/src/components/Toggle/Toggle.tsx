@@ -10,8 +10,10 @@ type ToggleProps = {
   row: ConfigRow
   visualizations: Record<string, AnyVisualization>
   setToggled: (colIndex: number) => void
+  /** @deprecated Unused prop - text is derived from column toggleName or visualization type */
+  text?: string
 }
-const Toggle: React.FC<ToggleProps> = ({ active, row, visualizations, setToggled, text }) => {
+const Toggle: React.FC<ToggleProps> = ({ active, row, visualizations, setToggled }) => {
   const selectItem = (colIndex, e = null) => {
     if (e?.key && e.key !== 'Enter' && e.key !== ' ') return
     if (e?.key === ' ') e.preventDefault() // Prevent page scroll

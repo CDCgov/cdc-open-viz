@@ -6,6 +6,8 @@ export type COVE_VISUALIZATION_TYPES =
   | 'markup-include'
   | 'waffle-chart'
   | 'dashboard'
+  | 'dashboardFilters'
+  | 'filter-dropdowns' // Legacy name for dashboardFilters
   | 'filtered-text'
   | 'table-filter'
   | 'data-bite'

@@ -37,7 +37,10 @@ export const dashboardFiltersMigrate = config => {
   config.dashboard.sharedFilters = newSharedFilters
 
   Object.keys(dashboardConfig.visualizations).forEach(vizKey => {
-    const viz = dashboardConfig.visualizations[vizKey] as DashboardFilters
+    // Use 'any' cast during migration since legacy configs may have different type values
+    const viz = dashboardConfig.visualizations[vizKey] as DashboardFilters & {
+      type: 'dashboardFilters' | 'filter-dropdowns'
+    }
     // hide was removed from visualizations
     if (viz.hide !== undefined) {
       viz.sharedFilterIndexes = newSharedFilters.map((_sf, i) => i).filter(i => !viz.hide.includes(i))
@@ -51,7 +54,7 @@ export const dashboardFiltersMigrate = config => {
       delete viz.hide
     }
     // 'filter-dropdowns' was renamed to 'dashboardFilters' for clarity
-    if (viz.type === 'filter-dropdowns') {
+    if ((viz.type as string) === 'filter-dropdowns') {
       viz.type = 'dashboardFilters'
       viz.visualizationType = 'dashboardFilters'
       if (!viz.sharedFilterIndexes) {

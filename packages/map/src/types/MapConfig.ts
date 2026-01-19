@@ -95,6 +95,10 @@ export type SmallMultiples = {
 // Full MapConfig interface with all explicit property types
 export interface MapConfig extends DataVisualizationConfig, MarkupConfig {
   type: 'map'
+  /** Shared filter indexes for dashboard integration */
+  sharedFilterIndexes?: number[]
+  /** Auto-load filters behavior */
+  autoLoad?: boolean
   annotations: Annotation[]
   color: string
   columns: {

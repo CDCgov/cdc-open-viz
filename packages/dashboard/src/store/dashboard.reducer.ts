@@ -44,7 +44,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       const currentMultiDashboards = state.config.multiDashboards
       const label = 'New Dashboard ' + (currentMultiDashboards.length + 1)
       const newMultiDashboards = [...currentMultiDashboards, { ...createBlankDashboard(), label }]
-      return applyMultiDashboards(state, newMultiDashboards)
+      return applyMultiDashboards(state, newMultiDashboards as MultiDashboard[])
     }
     case 'UPDATE_CONFIG': {
       const [config, filteredData] = getUpdateConfig(state)(...action.payload)
@@ -119,7 +119,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         return dashboard
       })
       const newConfig = { ...state.config, label: action.payload.new } // make sure active label is updated
-      return applyMultiDashboards({ ...state, newConfig }, newMultiDashboards)
+      return applyMultiDashboards({ ...state, config: newConfig }, newMultiDashboards)
     }
     case 'REORDER_MULTIDASHBOARDS': {
       const { newIndex, currentIndex } = action.payload

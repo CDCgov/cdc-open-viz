@@ -13,7 +13,7 @@ export const getPaletteAccessor = (
   colorPalettes: VersionedColorPalettes | ColorPalettes,
   config: Partial<BaseVisualizationConfig>,
   paletteName?: string
-): ColorPalettes | ColorPalette | undefined => {
+): ColorPalettes | ColorPalette | VersionedColorPalettes | undefined => {
   const paletteAccessor = colorPalettes?.[`v${getColorPaletteVersion(config)}`] || colorPalettes
 
   if (paletteName && paletteAccessor) {

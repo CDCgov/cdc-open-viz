@@ -75,6 +75,8 @@ export interface ChartConfigBase extends DataVisualizationConfig, MarkupConfig {
     keys?: string[]
     [key: string]: any
   }
+  /** Highlighted bar values (available on Bar charts) */
+  highlightedBarValues?: { value: any; color: string; borderWidth: number; legendLabel: string }[]
 }
 
 export interface BarChartConfig extends ChartConfigBase {

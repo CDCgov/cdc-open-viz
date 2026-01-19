@@ -7,7 +7,7 @@ import Button from '../elements/Button'
 import MultiSelect from '../MultiSelect'
 import ComboBox from '../ComboBox'
 import { DataVisualizationConfig } from '../../types/BaseVisualizationConfig'
-import { MultiSelectFilter, VizFilter } from '../../types/VizFilter'
+import { MultiSelectFilter, VizFilter, RuntimeVizFilters } from '../../types/VizFilter'
 import { addValuesToFilters } from '../../helpers/addValuesToFilters'
 import { DimensionsType } from '../../types/Dimensions'
 import NestedDropdown from '../NestedDropdown'
@@ -200,7 +200,9 @@ const Filters: React.FC<FilterProps> = ({
   const vizFiltersWithValues = useMemo(() => {
     // Here charts is using config.filters where maps is using a runtime value
     if (!filters) return []
-    if (filters.fromHash) delete filters.fromHash // support for Maps config
+    // Support for Maps config - filters may have a fromHash property at runtime
+    const runtimeFilters = filters as RuntimeVizFilters
+    if (runtimeFilters.fromHash) delete runtimeFilters.fromHash
     return addValuesToFilters(filters as VizFilter[], visualizationConfig.data)
   }, [filters])
 

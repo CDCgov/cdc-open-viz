@@ -1,10 +1,9 @@
-import { BaseVisualizationConfig } from './BaseVisualizationConfig'
+import { DataVisualizationConfig } from './BaseVisualizationConfig'
 import { Runtime } from '@cdc/core/types/Runtime'
 import { MarkupVariable } from './MarkupVariable'
-import { VizFilter } from './VizFilter'
 import { DataRow } from './DataRow'
 
-export interface MarkupIncludeConfig extends BaseVisualizationConfig {
+export interface MarkupIncludeConfig extends DataVisualizationConfig {
   type: 'markup-include'
   contentEditor: {
     // Changing the base config object creates an infinite loop, nesting it is a workaround
@@ -21,8 +20,6 @@ export interface MarkupIncludeConfig extends BaseVisualizationConfig {
   }
   data?: DataRow[]
   enableMarkupVariables?: boolean
-  filters?: VizFilter[]
-  formattedData: {}
   markupVariables?: MarkupVariable[] // Support markupVariables at root level for backwards compatibility
   runtime?: Runtime
   visual: {

@@ -4,7 +4,7 @@ type Col = {
   equalHeight?: boolean
   width: number | null
   hide?: boolean
-  widget?: string
+  widget?: string | number | null
   toggleName?: string
   uuid?: string | number
 }

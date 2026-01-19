@@ -43,30 +43,29 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
       return (
         <CdcChart
           key={visualizationKey}
-          config={visualizationConfig}
+          config={visualizationConfig as any}
           isEditor={true}
           isDebug={isDebug}
           setConfig={_updateConfig}
-          setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
-          setSharedFilterValue={setSharedFilterValue}
+          setSharedFilter={setsSharedFilter ? (setSharedFilter as any) : undefined}
+          setSharedFilterValue={setSharedFilterValue as any}
           dashboardConfig={state.config}
           datasets={state.config.datasets}
           isDashboard={true}
+          interactionLabel={interactionLabel}
         />
       )
     case 'map':
       return (
         <CdcMapComponent
           key={visualizationKey}
-          config={visualizationConfig}
+          config={visualizationConfig as any}
           isEditor={true}
-          isDebug={isDebug}
           setConfig={_updateConfig}
-          setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
-          setSharedFilterValue={setSharedFilterValue}
+          setSharedFilter={setsSharedFilter ? (setSharedFilter as any) : undefined}
+          setSharedFilterValue={setSharedFilterValue as any}
           isDashboard={true}
-          showLoader={false}
-          dashboardConfig={state.config}
+          navigationHandler={() => {}}
           datasets={state.config.datasets}
           interactionLabel={interactionLabel}
         />
@@ -76,9 +75,11 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
       return (
         <CdcDataBite
           key={visualizationKey}
-          config={{ ...visualizationConfig, newViz: true }}
+          config={{ ...visualizationConfig, newViz: true } as any}
+          configUrl=''
+          link=''
           isEditor={true}
-          setConfig={_updateConfig}
+          setConfig={_updateConfig as any}
           isDashboard={true}
           interactionLabel={interactionLabel}
         />
@@ -88,9 +89,9 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
       return (
         <CdcWaffleChart
           key={visualizationKey}
-          config={visualizationConfig}
+          config={visualizationConfig as any}
           isEditor={true}
-          setConfig={_updateConfig}
+          setConfig={_updateConfig as any}
           isDashboard={true}
           interactionLabel={interactionLabel}
         />
@@ -100,7 +101,8 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
       return (
         <CdcMarkupInclude
           key={visualizationKey}
-          config={visualizationConfig}
+          config={visualizationConfig as any}
+          configUrl=''
           isEditor={true}
           setConfig={_updateConfig}
           isDashboard={true}
@@ -135,7 +137,7 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
       return (
         <DataTableStandAlone
           visualizationKey={visualizationKey}
-          config={visualizationConfig}
+          config={visualizationConfig as any}
           isEditor={true}
           updateConfig={_updateConfig}
           datasets={state.config.datasets}

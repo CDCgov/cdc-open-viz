@@ -243,7 +243,7 @@ const Widget = ({
                 className='btn btn-configure'
                 onClick={() => {
                   overlay?.actions.openOverlay(
-                    <DataDesignerModal rowIndex={widgetConfig.rowIdx} vizKey={widgetConfig.uid} />
+                    <DataDesignerModal rowIndex={widgetConfig.rowIdx} vizKey={String(widgetConfig.uid)} />
                   )
                 }}
               >

@@ -1,4 +1,5 @@
 import { BoxPlot } from './BoxPlot'
+import { ComponentThemes } from './ComponentThemes'
 
 export type General = {
   boxplot: BoxPlot
@@ -12,4 +13,6 @@ export type General = {
   hideNullValue: boolean
   title: string
   annotationDropdownText?: string
+  /** Header color theme - used by maps and filters */
+  headerColor?: ComponentThemes
 }

@@ -17,7 +17,7 @@ export type Runtime = {
   seriesKeys: string[]
   seriesLabels: Record<string, any>
   seriesLabelsAll: string[]
-  editorErrorMessage: string
+  editorErrorMessage: string | string[]
   lineSeriesKeys?: string[]
   horizontal: boolean
   uniqueId: number | string

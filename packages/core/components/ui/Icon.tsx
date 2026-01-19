@@ -84,7 +84,7 @@ export type IconType = keyof typeof iconHash
 
 export const ICON_TYPES = Object.keys(iconHash)
 
-type IconProps = {
+export type IconProps = {
   /* Define the icon to display */
   display: keyof typeof iconHash
   /* Returns icon data as plain svg */
@@ -97,6 +97,8 @@ type IconProps = {
   color?: string
   style?: object
   className?: string // className attribute will be ignored.
+  /* Click handler for the icon */
+  onClick?: (e: React.MouseEvent<HTMLSpanElement>) => void
 }
 
 const Icon: React.FC<IconProps> = ({

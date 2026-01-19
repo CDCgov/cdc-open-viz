@@ -1,10 +1,10 @@
-import { BaseVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig'
+import { DataVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig'
 import { ComponentStyles } from '@cdc/core/types/ComponentStyles'
 import { ComponentThemes } from '@cdc/core/types/ComponentThemes'
 import { Version } from '@cdc/core/types/Version'
 import { DataRow } from '@cdc/core/types/DataRow'
 
-export interface WaffleChartConfig extends BaseVisualizationConfig {
+export interface WaffleChartConfig extends DataVisualizationConfig {
   type: 'waffle-chart'
   // supporting text in the box
   content: string

@@ -40,8 +40,8 @@ const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateCo
   // If no data is available, fallback to column names from config.columns
   const columnsFromConfig = config.columns
     ? Object.values(config.columns)
-      .map(col => col.name)
-      .filter(Boolean)
+        .map((col: { name?: string }) => col.name)
+        .filter(Boolean)
     : []
   const finalColumns = columns.length > 0 ? columns : columnsFromConfig
 

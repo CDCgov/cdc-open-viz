@@ -33,7 +33,7 @@ const FootnotesEditor: React.FC<FootnotesEditorProps> = ({ config, updateField, 
       setLoadingAPIData(true)
       try {
         newData = await fetchRemoteData(dataUrl)
-        newData = transform.autoStandardize(newData)
+        newData = transform.autoStandardize(newData) as typeof newData
       } catch (e) {
         setErrorMessage('There was an issue loading the data source. Please check the datasource URL and try again.')
       }

@@ -1,5 +1,6 @@
 import { removeDashboardFilter } from '../removeDashboardFilter'
 import { AnyVisualization } from '../../types/AnyVisualization'
+import { SharedFilter } from '../../types/SharedFilter'
 import _ from 'lodash'
 
 describe('removeDashboardFilter', () => {
@@ -21,7 +22,11 @@ describe('removeDashboardFilter', () => {
       }
     }
 
-    const [newSharedFilters, newVisualizations] = removeDashboardFilter(index, sharedFilters, visualizations)
+    const [newSharedFilters, newVisualizations] = removeDashboardFilter(
+      index,
+      sharedFilters as unknown as SharedFilter[],
+      visualizations
+    )
 
     expect(newSharedFilters).toEqual([
       { id: 1, name: 'Filter 1' },
@@ -58,7 +63,11 @@ describe('removeDashboardFilter', () => {
       }
     }
 
-    const [newSharedFilters, newVisualizations] = removeDashboardFilter(index, sharedFilters, visualizations)
+    const [newSharedFilters, newVisualizations] = removeDashboardFilter(
+      index,
+      sharedFilters as unknown as SharedFilter[],
+      visualizations
+    )
 
     expect(newSharedFilters).toEqual([
       { id: 2, name: 'Filter 2' },
@@ -95,7 +104,11 @@ describe('removeDashboardFilter', () => {
       }
     }
 
-    const [newSharedFilters, newVisualizations] = removeDashboardFilter(index, sharedFilters, visualizations)
+    const [newSharedFilters, newVisualizations] = removeDashboardFilter(
+      index,
+      sharedFilters as unknown as SharedFilter[],
+      visualizations
+    )
 
     expect(newSharedFilters).toEqual([
       { id: 1, name: 'Filter 1' },
@@ -128,7 +141,11 @@ describe('removeDashboardFilter', () => {
       }
     }
 
-    const [newSharedFilters, newVisualizations] = removeDashboardFilter(0, sharedFilters, visualizations)
+    const [newSharedFilters, newVisualizations] = removeDashboardFilter(
+      0,
+      sharedFilters as unknown as SharedFilter[],
+      visualizations
+    )
 
     expect(newSharedFilters).toEqual([
       { id: 2, name: 'Filter 2' },
