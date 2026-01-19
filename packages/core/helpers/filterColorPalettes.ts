@@ -60,7 +60,7 @@ function filterTwoColorPalettes(version: number, isReversed?: boolean): string[]
   // Use the version to get the correct two-color palettes
   const versionKey = `v${version}`
   const versionedTwoColorPalettes = twoColorPalette[versionKey] || twoColorPalette.v2
-  
+
   return Object.keys(versionedTwoColorPalettes).filter(name =>
     isReversed ? name.endsWith('reverse') : !name.endsWith('reverse')
   )
