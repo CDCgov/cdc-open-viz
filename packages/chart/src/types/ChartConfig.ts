@@ -135,7 +135,7 @@ type Visual = {
 }
 
 export interface AllChartsConfig extends DataVisualizationConfig, MarkupConfig {
-  type: 'chart' | 'dashboard'
+  type: 'chart'
   annotations: Annotation[]
   animate: boolean
   general: General
