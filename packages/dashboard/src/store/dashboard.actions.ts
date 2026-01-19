@@ -2,7 +2,7 @@ import type { DashboardConfig as Config } from '../types/DashboardConfig'
 import { type Action } from '@cdc/core/types/Action'
 import { Tab } from '../types/Tab'
 import { ConfigRow } from '../types/ConfigRow'
-import { AnyVisualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization } from '../types/AnyVisualization'
 import { SharedFilter } from '../types/SharedFilter'
 
 type ADD_VISUALIZATION = Action<'ADD_VISUALIZATION', { rowIdx: number; colIdx: number; newViz: AnyVisualization }>

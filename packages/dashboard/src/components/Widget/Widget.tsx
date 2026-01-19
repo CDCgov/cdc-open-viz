@@ -5,7 +5,7 @@ import { DashboardContext, DashboardDispatchContext } from '../../DashboardConte
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import Icon from '@cdc/core/components/ui/Icon'
-import { AnyVisualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization } from '../../types/AnyVisualization'
 import { iconHash } from '../../helpers/iconHash'
 import _ from 'lodash'
 import { DataDesignerModal } from '../DataDesignerModal'

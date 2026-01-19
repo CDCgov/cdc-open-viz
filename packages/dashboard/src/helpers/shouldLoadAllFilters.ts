@@ -1,5 +1,5 @@
 import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
-import { Visualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization } from '../types/AnyVisualization'
 
 export const shouldLoadAllFilters = (config, isEditorPanel): boolean => {
   const autoLoad = Boolean(getQueryParam('cove-auto-load'))
@@ -7,7 +7,7 @@ export const shouldLoadAllFilters = (config, isEditorPanel): boolean => {
   const hasFilterByFileNameFunctionality = activeConfig.dashboard.sharedFilters?.some(
     filter => filter.filterBy === 'File Name'
   )
-  const isAutoLoadTab = Object.values(activeConfig.visualizations).reduce((acc, viz: Visualization) => {
+  const isAutoLoadTab = Object.values(activeConfig.visualizations).reduce((acc, viz: AnyVisualization) => {
     if (acc === false) return acc
     if (viz.visualizationType === 'dashboardFilters') {
       if (viz.filterBehavior === 'Apply Button') return false
@@ -20,7 +20,7 @@ export const shouldLoadAllFilters = (config, isEditorPanel): boolean => {
   if (autoLoad || isAutoLoadTab || hasFilterByFileNameFunctionality || isEditorPanel) {
     const rowDataSetKeys = activeConfig.rows.map(row => row.dataKey).filter(Boolean)
     const dataKeys = Object.values(activeConfig.visualizations)
-      .map((visualization: Visualization) => visualization.dataKey)
+      .map((visualization: AnyVisualization) => (visualization as any).dataKey)
       .filter(Boolean)
       .concat(rowDataSetKeys)
     const missingData = dataKeys.find(dataset => !config.datasets[dataset]?.data?.length)

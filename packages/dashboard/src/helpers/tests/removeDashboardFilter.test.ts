@@ -1,5 +1,5 @@
 import { removeDashboardFilter } from '../removeDashboardFilter'
-import { AnyVisualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization } from '../../types/AnyVisualization'
 import _ from 'lodash'
 
 describe('removeDashboardFilter', () => {
@@ -113,7 +113,6 @@ describe('removeDashboardFilter', () => {
       }
     })
   })
-
 
   it('should handle removing the last filter', () => {
     const sharedFilters = [

@@ -1,4 +1,4 @@
-import { AnyVisualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization } from '../types/AnyVisualization'
 import _ from 'lodash'
 import { SharedFilter } from '../types/SharedFilter'
 

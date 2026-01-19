@@ -1,5 +1,5 @@
 import Icon from '@cdc/core/components/ui/Icon'
-import { AnyVisualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization } from '../types/AnyVisualization'
 
 export const iconHash = {
   'data-bite': <Icon display='databite' base />,

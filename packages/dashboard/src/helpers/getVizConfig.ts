@@ -4,7 +4,7 @@ import { MultiDashboardConfig } from '../types/MultiDashboard'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { getApplicableFilters } from './getFilteredData'
 import { filterData } from './filterData'
-import { AnyVisualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization } from '../types/AnyVisualization'
 
 const transform = new DataTransform()
 

@@ -1,5 +1,5 @@
 import { ConfigRow } from '../../types/ConfigRow'
-import { AnyVisualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization } from '../../types/AnyVisualization'
 import { getIcon } from '../../helpers/iconHash'
 import { labelHash } from '@cdc/core/helpers/labelHash'
 import './toggle-style.css'

@@ -8,7 +8,7 @@ import CdcFilteredText from '@cdc/filtered-text/src/CdcFilteredText'
 import DashboardSharedFilters from './DashboardFilters'
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
 import _ from 'lodash'
-import { AnyVisualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization } from '../types/AnyVisualization'
 import { DashboardState } from '../store/dashboard.reducer'
 
 type DashboardEditorProps = {

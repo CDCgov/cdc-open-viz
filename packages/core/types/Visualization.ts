@@ -9,15 +9,7 @@ import { VizFilter } from './VizFilter'
 import { FilterBehavior } from './FilterBehavior'
 import { General } from './General'
 import { Runtime } from './Runtime'
-import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
 import Footnotes from './Footnotes'
-import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
-import { MapConfig } from '@cdc/map/src/types/MapConfig'
-import { DataTableConfig } from '@cdc/data-table/src/types/DataTableConfig'
-import { DataBiteConfig } from '@cdc/data-bite/src/types/DataBiteConfig'
-import { WaffleChartConfig } from '@cdc/waffle-chart/src/types/WaffleChartConfig'
-import { MarkupIncludeConfig } from './MarkupInclude'
-import { FilteredTextConfig } from '@cdc/filtered-text/src/types/FilteredTextConfig'
 
 // Re-export the new base interfaces for convenience
 export { BaseVisualizationConfig, DataVisualizationConfig, VisualizationType } from './BaseVisualizationConfig'
@@ -83,17 +75,8 @@ export type CommonVisualizationProperties = Partial<StatefulProperties> & {
 export type Visualization = DeprecatedVisualizationType & CommonVisualizationProperties
 
 /**
- * Union type representing any visualization configuration.
- * Use this when you need to handle multiple visualization types.
- * Prefer specific config types when you know the visualization type.
+ * @deprecated AnyVisualization has moved to @cdc/dashboard/src/types/AnyVisualization
+ * to avoid circular dependencies. Import from there instead.
+ * This re-export will be removed in a future version.
  */
-export type AnyVisualization =
-  | ChartConfig
-  | MapConfig
-  | DataTableConfig
-  | DataBiteConfig
-  | WaffleChartConfig
-  | MarkupIncludeConfig
-  | FilteredTextConfig
-  | DashboardFilters
-  | Visualization // Keep deprecated type for backwards compatibility during migration
+export type { AnyVisualization } from '@cdc/dashboard/src/types/AnyVisualization'

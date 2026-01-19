@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react'
-import type { AnyVisualization } from '@cdc/core/types/Visualization'
+import type { AnyVisualization } from '../../types/AnyVisualization'
 import Widget from '../Widget/Widget'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import { Table } from '@cdc/core/types/Table'

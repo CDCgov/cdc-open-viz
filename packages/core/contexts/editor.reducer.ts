@@ -1,12 +1,12 @@
 import _ from 'lodash'
 import EditorActions from './editor.actions'
-import { Visualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization } from '@cdc/dashboard/src/types/AnyVisualization'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 
 export type EditorState = {
-  config?: Visualization
-  tempConfig?: Visualization | null
+  config?: AnyVisualization
+  tempConfig?: AnyVisualization | null
   errors: string[]
   currentViewport: string
   globalActive: number

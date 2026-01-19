@@ -2,7 +2,7 @@ import _ from 'lodash'
 import cloneConfig from '../cloneConfig'
 import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
 import { MultiDashboardConfig } from '@cdc/dashboard/src/types/MultiDashboard'
-import { AnyVisualization } from '../../types/Visualization'
+import { AnyVisualization } from '@cdc/dashboard/src/types/AnyVisualization'
 import versionNeedsUpdate from './versionNeedsUpdate'
 
 /**

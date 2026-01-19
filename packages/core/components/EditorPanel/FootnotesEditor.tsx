@@ -8,9 +8,9 @@ import { Datasets } from '@cdc/core/types/DataSet'
 import DataTransform from '../../helpers/DataTransform'
 import fetchRemoteData from '../../helpers/fetchRemoteData'
 import Loader from '../Loader'
-import { AnyVisualization } from '../../types/Visualization'
+import { DataVisualizationConfig } from '../../types/BaseVisualizationConfig'
 interface FootnotesEditorProps {
-  config: AnyVisualization
+  config: DataVisualizationConfig & { footnotes?: any; dataKey?: string }
   updateField: UpdateFieldFunc<Footnote[] | Object>
   datasets: Datasets
 }

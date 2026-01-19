@@ -6,7 +6,7 @@ import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
 import { Tab } from '../types/Tab'
 import { Dashboard } from '../types/Dashboard'
 import { ConfigRow } from '../types/ConfigRow'
-import { AnyVisualization } from '@cdc/core/types/Visualization'
+import { AnyVisualization } from '../types/AnyVisualization'
 import { initialState } from '../DashboardContext'
 
 type BlankMultiConfig = {
