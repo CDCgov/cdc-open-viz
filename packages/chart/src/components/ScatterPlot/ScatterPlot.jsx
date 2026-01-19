@@ -42,8 +42,8 @@ const ScatterPlot = ({ xScale, yScale }) => {
         ? `${config.runtime.seriesLabels[s] || ''}<br/>`
         : ''
     }
-    ${config.xAxis.label}: ${formatNumber(item[config.xAxis.dataKey], 'bottom')} <br/>
-    ${config.yAxis.label}: ${formatNumber(item[s], 'left')}<br/>
+    ${config.runtime?.xAxis?.label || config.xAxis.label}: ${formatNumber(item[config.xAxis.dataKey], 'bottom')} <br/>
+    ${config.runtime?.yAxis?.label || config.yAxis.label}: ${formatNumber(item[s], 'left')}<br/>
    ${additionalColumns
      .map(
        ([label, name, options]) =>
