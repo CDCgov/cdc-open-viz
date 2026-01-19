@@ -1,12 +1,12 @@
 import React from 'react'
-import { Visualization } from '../../types/Visualization'
+import { BaseVisualizationConfig } from '../../types/BaseVisualizationConfig'
 import { ViewPort } from '../../types/ViewPort'
 import './editor-wrapper.style.css'
 
 type StandAloneComponentProps = {
   visualizationKey: string
-  config
-  updateConfig: (Visualization) => void
+  config: BaseVisualizationConfig
+  updateConfig: (config: BaseVisualizationConfig) => void
   configUrl: string
   setEditing: Function
   hostname: string

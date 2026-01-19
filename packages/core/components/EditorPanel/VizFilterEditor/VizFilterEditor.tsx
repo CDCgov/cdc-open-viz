@@ -1,7 +1,7 @@
 import { Select, TextField } from '../Inputs'
 import Tooltip from '../../ui/Tooltip'
 import Icon from '../../ui/Icon'
-import { Visualization } from '../../../types/Visualization'
+import { DataVisualizationConfig } from '../../../types/BaseVisualizationConfig'
 import { UpdateFieldFunc } from '../../../types/UpdateFieldFunc'
 import _ from 'lodash'
 import { MultiSelectFilter, VizFilter, VizFilterStyle } from '../../../types/VizFilter'
@@ -17,7 +17,7 @@ import NestedDropdownEditor from './NestedDropdownEditor'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
 type VizFilterProps = {
-  config: Visualization
+  config: DataVisualizationConfig
   updateField: UpdateFieldFunc<string | VizFilter[] | VizFilter>
   rawData: Object[]
   hasFootnotes?: boolean
@@ -248,9 +248,8 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                                       updateField={(_section, _subSection, _key, value) => {
                                         updateFilterDefaultValue(filterIndex, value)
                                       }}
-                                      label={`Filter Default Value${
-                                        filter.columnName ? ` (${filter.columnName})` : ''
-                                      }`}
+                                      label={`Filter Default Value${filter.columnName ? ` (${filter.columnName})` : ''
+                                        }`}
                                       initial='Select'
                                     />
                                   )}

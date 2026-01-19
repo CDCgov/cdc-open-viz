@@ -3,13 +3,17 @@ import { Runtime } from '../../../types/Runtime'
 import { Region } from '../../../types/Region'
 import { BoxPlot } from '../../../types/BoxPlot'
 import { type PreliminaryDataItem } from '@cdc/chart/src/types/ChartConfig'
-import { Visualization } from '../../../types/Visualization'
+import { DataVisualizationConfig } from '../../../types/BaseVisualizationConfig'
 
-export type TableConfig = Visualization & {
+/**
+ * Configuration for the DataTable component used to display tabular data within visualizations.
+ * This is separate from the standalone DataTableConfig in the data-table package.
+ */
+export type TableConfig = DataVisualizationConfig & {
   boxplot?: BoxPlot
   regions?: Region[]
   runtime?: Runtime
-  runtimeSeriesLabels?: Object
+  runtimeSeriesLabels?: Record<string, string>
   xAxis?: Axis
   yAxis?: Axis
   preliminaryData: PreliminaryDataItem[]

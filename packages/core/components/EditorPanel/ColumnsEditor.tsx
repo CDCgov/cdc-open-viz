@@ -1,7 +1,7 @@
 import Tooltip from '../ui/Tooltip'
 import Icon from '../ui/Icon'
 import { Select, TextField } from './Inputs'
-import { Visualization } from '../../types/Visualization'
+import { DataVisualizationConfig } from '../../types/BaseVisualizationConfig'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import { Column } from '../../types/Column'
 import _ from 'lodash'
@@ -11,7 +11,7 @@ import { useDataColumns } from '../../hooks/useDataColumns'
 import Alert from '../Alert/components/Alert'
 
 interface ColumnsEditorProps {
-  config: Partial<Visualization>
+  config: Partial<DataVisualizationConfig> & { columns?: Record<string, Partial<Column>> }
   updateField: UpdateFieldFunc<string | boolean | string[] | number | Column | Record<string, Partial<Column>>>
   deleteColumn: (colName: string) => void
 }

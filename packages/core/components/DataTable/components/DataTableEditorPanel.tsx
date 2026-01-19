@@ -6,7 +6,7 @@ import {
   AccordionItemPanel
 } from 'react-accessible-accordion'
 import DataTableEditor from '../../EditorPanel/DataTableEditor'
-import { Visualization } from '@cdc/core/types/Visualization'
+import { DataVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { useMemo } from 'react'
 import ColumnsEditor from '../../EditorPanel/ColumnsEditor'
@@ -16,7 +16,7 @@ import FootnotesEditor from '../../EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 
 type DataTableEditorProps = {
-  config: Visualization
+  config: DataVisualizationConfig & { columns?: any; table?: any }
   updateConfig: Function
   datasets?: Datasets
 }
@@ -40,8 +40,8 @@ const DataTableEditorPanel: React.FC<DataTableEditorProps> = ({ config, updateCo
   // If no data is available, fallback to column names from config.columns
   const columnsFromConfig = config.columns
     ? Object.values(config.columns)
-        .map(col => col.name)
-        .filter(Boolean)
+      .map(col => col.name)
+      .filter(Boolean)
     : []
   const finalColumns = columns.length > 0 ? columns : columnsFromConfig
 

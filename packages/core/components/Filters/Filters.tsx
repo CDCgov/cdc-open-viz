@@ -6,7 +6,7 @@ import parse from 'html-react-parser'
 import Button from '../elements/Button'
 import MultiSelect from '../MultiSelect'
 import ComboBox from '../ComboBox'
-import { Visualization } from '../../types/Visualization'
+import { DataVisualizationConfig } from '../../types/BaseVisualizationConfig'
 import { MultiSelectFilter, VizFilter } from '../../types/VizFilter'
 import { addValuesToFilters } from '../../helpers/addValuesToFilters'
 import { DimensionsType } from '../../types/Dimensions'
@@ -40,7 +40,7 @@ export const filterStyleOptions = Object.values(VIZ_FILTER_STYLE)
 
 type FilterProps = {
   dimensions?: DimensionsType
-  config: Visualization
+  config: DataVisualizationConfig & { filterIntro?: string }
   setFilters: Function
   standaloneMap?: boolean
   excludedData?: Object[]
