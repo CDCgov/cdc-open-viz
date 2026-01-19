@@ -92,10 +92,10 @@ export type SmallMultiples = {
   synchronizedTooltips?: boolean
 }
 
+// Full MapConfig interface with all explicit property types
 export interface MapConfig extends DataVisualizationConfig, MarkupConfig {
   type: 'map'
   annotations: Annotation[]
-  // map color palette
   color: string
   columns: {
     geo: GeoColumnProperties
@@ -110,7 +110,7 @@ export interface MapConfig extends DataVisualizationConfig, MarkupConfig {
   filters: VizFilter[]
   general: {
     navigationTarget: '_self' | '_blank'
-    noDataMessage: string // single-state no data message
+    noDataMessage: string
     subtext: string
     introText: string
     allowMapZoom: boolean
@@ -120,7 +120,6 @@ export interface MapConfig extends DataVisualizationConfig, MarkupConfig {
     fullBorder: boolean
     geoBorderColor: string
     geoLabelOverride: string
-    // whether to use the old custom quantile scaling method or new custom quantile scaling method
     equalNumberOptIn: boolean
     geoType:
       | 'us'
@@ -144,15 +143,9 @@ export interface MapConfig extends DataVisualizationConfig, MarkupConfig {
     showDownloadPdfButton: boolean
     showSidebar: boolean
     showTitle: boolean
-    statesPicked: {
-      fipsCode: string
-      stateName: string
-    }[]
-    countriesPicked?: {
-      iso: string
-      name: string
-    }[]
-    hideUnselectedCountries?: boolean // When true, hide unselected countries; when false (default), gray them out
+    statesPicked: { fipsCode: string; stateName: string }[]
+    countriesPicked?: { iso: string; name: string }[]
+    hideUnselectedCountries?: boolean
     territoriesAlwaysShow: boolean
     territoriesLabel: string
     title: string
@@ -160,11 +153,11 @@ export interface MapConfig extends DataVisualizationConfig, MarkupConfig {
     type: 'data' | 'navigation' | 'us-geocode' | 'world-geocode' | 'bubble'
   }
   legend: {
-    additionalCategories
-    categoryValuesOrder
-    description
-    descriptions: {}
-    specialClasses: { key; label; value }[]
+    additionalCategories: unknown
+    categoryValuesOrder: unknown
+    description: string
+    descriptions: Record<string, string>
+    specialClasses: { key: string; label: string; value: string }[]
     unified: boolean
     separateZero: boolean
     singleColumn: boolean
@@ -179,9 +172,10 @@ export interface MapConfig extends DataVisualizationConfig, MarkupConfig {
     style: 'circles' | 'boxes' | 'gradient'
     subStyle: 'linear blocks' | 'smooth'
     tickRotation: string
-    hideBorder: false
-    singleColumnLegend: false
+    hideBorder: boolean
+    singleColumnLegend: boolean
     separators?: string
+    patterns?: PatternSelection[]
   }
   table: {
     label: string
@@ -206,7 +200,15 @@ export interface MapConfig extends DataVisualizationConfig, MarkupConfig {
   }
   mapPosition: { coordinates: Coordinate; zoom: number }
   map: {
-    layers: { url; namespace; fill; fillOpacity; stroke; strokeWidth; tooltip }[]
+    layers: {
+      url: string
+      namespace: string
+      fill: string
+      fillOpacity: number
+      stroke: string
+      strokeWidth: number
+      tooltip: string
+    }[]
     patterns: PatternSelection[]
   }
   hexMap: HexMapSettings
@@ -214,6 +216,23 @@ export interface MapConfig extends DataVisualizationConfig, MarkupConfig {
   filterIntro: string
   visual: MapVisualSettings
   smallMultiples?: SmallMultiples
-  // version of the map
   version: Version
 }
+
+// Discriminated union types for each map type
+export type USMapConfig = MapConfig & {
+  general: MapConfig['general'] & { geoType: 'us' | 'us-region' | 'us-county' | 'single-state' }
+}
+export type WorldMapConfig = MapConfig & { general: MapConfig['general'] & { geoType: 'world' } }
+export type BubbleMapConfig = MapConfig & { general: MapConfig['general'] & { geoType: 'bubble' } }
+export type USGeocodeMapConfig = MapConfig & { general: MapConfig['general'] & { geoType: 'us-geocode' } }
+export type WorldGeocodeMapConfig = MapConfig & { general: MapConfig['general'] & { geoType: 'world-geocode' } }
+export type GoogleMapConfig = MapConfig & { general: MapConfig['general'] & { geoType: 'google-map' } }
+
+export type AnyMapConfig =
+  | USMapConfig
+  | WorldMapConfig
+  | BubbleMapConfig
+  | USGeocodeMapConfig
+  | WorldGeocodeMapConfig
+  | GoogleMapConfig
