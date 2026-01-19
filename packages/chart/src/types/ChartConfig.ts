@@ -1,6 +1,7 @@
 import { DataVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig'
 import { Axis } from '@cdc/core/types/Axis'
 import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
+import { DataRow } from '@cdc/core/types/DataRow'
 import { type ForestPlotConfigSettings } from './ForestPlot'
 import { type Column } from '@cdc/core/types/Column'
 import { type Series } from '@cdc/core/types/Series'
@@ -160,7 +161,7 @@ export interface AllChartsConfig extends DataVisualizationConfig, MarkupConfig {
   legacyFootnotes: string // this footnote functionality should be moved to the Footnotes component
   footnotes: Footnotes
   forestPlot: ForestPlotConfigSettings
-  formattedData: Object[] & { urlFiltered: boolean }
+  formattedData: DataRow[] & { urlFiltered: boolean }
   heights: {
     vertical: number
     horizontal: number
@@ -233,7 +234,7 @@ export interface AllChartsConfig extends DataVisualizationConfig, MarkupConfig {
   yScale: Function
   regions: Region[]
   sankey: {
-    data: { links: Link[]; storyNodeText: Object[]; tooltips: Object[] }[]
+    data: { links: Link[]; storyNodeText: DataRow[]; tooltips: DataRow[] }[]
     nodePadding: number
     iterations: number
     nodeSize: {
@@ -300,11 +301,11 @@ type SankeyChartConfig = {
   enableTooltips: boolean
   data: [
     {
-      tooltips: Object[]
+      tooltips: DataRow[]
       // data to display in the sankey chart tooltips
-      tooltipData: Object[]
+      tooltipData: DataRow[]
       // data to display in the data table, bypasses the default data table output
-      tableData: Object[]
+      tableData: DataRow[]
       links: {
         source: SankeyLink
         target: SankeyLink

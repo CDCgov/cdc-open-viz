@@ -2,13 +2,14 @@ import { BaseVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig
 import { ComponentStyles } from '@cdc/core/types/ComponentStyles'
 import { ComponentThemes } from '@cdc/core/types/ComponentThemes'
 import { Version } from '@cdc/core/types/Version'
+import { DataRow } from '@cdc/core/types/DataRow'
 
 export interface WaffleChartConfig extends BaseVisualizationConfig {
   type: 'waffle-chart'
   // supporting text in the box
   content: string
   customDenom: boolean
-  data: Object[]
+  data: DataRow[]
   dataColumn: string
   dataConditionalColumn: string
   dataConditionalComparate: string

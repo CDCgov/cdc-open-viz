@@ -6,6 +6,7 @@ import { type Version } from '@cdc/core/types/Version'
 import { type VizFilter } from '@cdc/core/types/VizFilter'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
+import { DataRow } from '@cdc/core/types/DataRow'
 
 // Runtime data types
 export type RuntimeFilters = VizFilter[] & { fromHash?: number }
@@ -78,11 +79,6 @@ type HexMapSettings = {
 }
 
 export type Coordinate = [number, number]
-
-export type DataRow = {
-  uid?: string // optional 'uid' property
-  [key: string]: string | number | boolean | null | undefined // allowing primitive data types for dynamic columns
-}
 
 export type SmallMultiples = {
   mode?: 'by-column'

@@ -1,5 +1,7 @@
+import { DataRow } from './DataRow'
+
 export type BoxPlot = {
-  tableData: Object[]
+  tableData: DataRow[]
   labels: {
     mean: string
     maximum: string

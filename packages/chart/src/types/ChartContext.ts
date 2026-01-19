@@ -3,6 +3,7 @@ import { PickD3Scale } from '@visx/scale'
 import { type Annotation } from '@cdc/core/types/Annotation'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { type DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
+import { DataRow } from '@cdc/core/types/DataRow'
 export type ColorScale = PickD3Scale<'ordinal', any, any>
 
 export type TransformedData = {
@@ -49,9 +50,9 @@ type LineChartContext = SharedChartContext & {
   isNumber: unknown
   isDebug?: boolean
   parseDate: Function
-  rawData: Object[]
+  rawData: DataRow[]
   seriesHighlight: string[]
-  tableData: Object[]
+  tableData: DataRow[]
   transformedData: TransformedData[]
   updateConfig: Function
   visualizationType: 'Line'
@@ -77,11 +78,11 @@ export type ChartContext =
       // url param added to allow various console logs and chart helpers
       isDebug?: boolean
       parseDate?: Function
-      rawData?: Object[]
+      rawData?: DataRow[]
       seriesHighlight?: string[]
       setSharedFilter?: Function
       sharedFilterValue?: string
-      tableData?: Object[]
+      tableData?: DataRow[]
       transformedData?: TransformedData[]
       twoColorPalette: any
       updateConfig?: Function

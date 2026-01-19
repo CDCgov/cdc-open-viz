@@ -2,10 +2,11 @@ import { BaseVisualizationConfig } from '@cdc/core/types/BaseVisualizationConfig
 import { Version } from '@cdc/core/types/Version'
 import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 import { VizFilter } from '@cdc/core/types/VizFilter'
+import { DataRow } from '@cdc/core/types/DataRow'
 
 export interface DataBiteConfig extends BaseVisualizationConfig, MarkupConfig {
   type: 'data-bite'
-  data: Object[]
+  data: DataRow[]
   dataBite: string
   dataFunction: string
   dataColumn: string

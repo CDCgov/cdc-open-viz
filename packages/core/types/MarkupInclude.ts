@@ -2,6 +2,7 @@ import { BaseVisualizationConfig } from './BaseVisualizationConfig'
 import { Runtime } from '@cdc/core/types/Runtime'
 import { MarkupVariable } from './MarkupVariable'
 import { VizFilter } from './VizFilter'
+import { DataRow } from './DataRow'
 
 export interface MarkupIncludeConfig extends BaseVisualizationConfig {
   type: 'markup-include'
@@ -18,7 +19,7 @@ export interface MarkupIncludeConfig extends BaseVisualizationConfig {
     titleStyle?: 'legacy' | 'large' | 'small'
     useInlineHTML: boolean
   }
-  data?: Object[]
+  data?: DataRow[]
   enableMarkupVariables?: boolean
   filters?: VizFilter[]
   formattedData: {}

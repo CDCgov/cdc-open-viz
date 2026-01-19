@@ -5,10 +5,12 @@ export type Footnote = {
   text: string
 }
 
+import { DataRow } from './DataRow'
+
 type Footnotes = {
   filters?: VizFilter[]
   dataKey?: string
-  data?: Object[]
+  data?: DataRow[]
   dynamicFootnotes?: {
     symbolColumn?: string
     textColumn: string

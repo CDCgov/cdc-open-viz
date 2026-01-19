@@ -2,6 +2,7 @@ import { VizFilter } from './VizFilter'
 import { FilterBehavior } from './FilterBehavior'
 import Footnotes from './Footnotes'
 import { Version } from './Version'
+import { DataRow } from './DataRow'
 
 export type VisualizationType =
   | 'chart'
@@ -31,7 +32,7 @@ export interface BaseVisualizationConfig {
  * Use this for visualizations that handle data, filters, and footnotes (e.g., chart, map, table).
  */
 export interface DataVisualizationConfig extends BaseVisualizationConfig {
-  data?: Object[]
+  data?: DataRow[]
   dataUrl?: string
   filters?: VizFilter[]
   filterBehavior?: FilterBehavior

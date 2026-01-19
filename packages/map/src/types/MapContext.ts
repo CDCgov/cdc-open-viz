@@ -1,4 +1,5 @@
-import { DataRow, type MapConfig } from './MapConfig'
+import { type MapConfig } from './MapConfig'
+import { DataRow } from '@cdc/core/types/DataRow'
 import { type ViewPort } from '@cdc/core/types/ViewPort'
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { VizFilter } from '@cdc/core/types/VizFilter'
@@ -44,7 +45,7 @@ export type MapContext = {
   scale: number
   translate: [number, number]
   topoData: object
-  runtimeData: Object[]
+  runtimeData: DataRow[]
   tooltipId: string
   interactionLabel?: string
   handleSmallMultipleHover?: (geoId: string | null, yCoordinate?: number) => void
