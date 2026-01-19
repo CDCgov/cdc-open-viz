@@ -16,4 +16,5 @@ export type Legend = {
   type: string
   verticalSorted: boolean
   groupBy: string
+  patternSize?: number
 }

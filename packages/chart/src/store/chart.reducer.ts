@@ -63,13 +63,13 @@ export const reducer = (state: ChartState, action: ChartActions): ChartState => 
     case 'SET_SERIES_HIGHLIGHT':
       return { ...state, seriesHighlight: action.payload }
     case 'SET_VIEWPORT':
-      return { ...state, currentViewport: action.payload }
+      return { ...state, currentViewport: action.payload as ViewportSize }
     case 'SET_VIZ_VIEWPORT':
-      return { ...state, vizViewport: action.payload }
+      return { ...state, vizViewport: action.payload as ViewportSize }
     case 'SET_DIMENSIONS':
       return { ...state, dimensions: action.payload }
     case 'SET_CONTAINER':
-      return { ...state, container: action.payload }
+      return { ...state, container: action.payload as HTMLElement | null }
     case 'SET_LOADED_EVENT':
       return { ...state, coveLoadedEventRan: action.payload }
     case 'SET_DRAG_ANNOTATIONS':

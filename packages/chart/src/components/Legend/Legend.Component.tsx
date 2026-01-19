@@ -72,7 +72,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
       marginTop: getMarginTop(isLegendBottom, config)
     }
 
-    const { HighLightedBarUtils } = useHighlightedBars(config)
+    const { HighLightedBarUtils } = useHighlightedBars(config, null)
     let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
 
     if (!legend) return null
