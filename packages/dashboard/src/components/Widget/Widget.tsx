@@ -12,17 +12,47 @@ import { DataDesignerModal } from '../DataDesignerModal'
 import { labelHash } from '@cdc/core/helpers/labelHash'
 import './widget.styles.css'
 
+/**
+ * Visualization configuration extended with position information
+ */
 type WidgetConfig = AnyVisualization & { rowIdx: number; colIdx: number }
+
+/**
+ * Props for the Widget component
+ */
 type WidgetProps = {
-  title: string
+  /** Optional title for the widget */
+  title?: string
+  /** Column data containing widget metadata */
   columnData?: any
+  /** Configuration for an existing widget including its position */
   widgetConfig?: WidgetConfig
+  /** Function to create a new visualization when dragging from the palette */
   addVisualization?: Function
+  /** Type of visualization (chart, map, table, etc.) */
   type: string
+  /** Whether the widget is displayed within a row layout */
   widgetInRow?: boolean
+  /** Whether the widget is in a toggle row (collapsible section) */
   toggleRow?: boolean
 }
 
+/**
+ * Widget component - represents a draggable visualization container in the dashboard
+ *
+ * This component serves two purposes:
+ * 1. Visualization palette item: Can be dragged from the palette to add new visualizations
+ * 2. Existing widget: Displays and manages an already-placed visualization in the dashboard
+ *
+ * Features:
+ * - Drag and drop functionality for repositioning
+ * - Configuration and data setup via modal dialogs
+ * - Delete functionality for removing widgets
+ * - Toggle row support for collapsible sections
+ * - Visual indicators for configuration status
+ *
+ * @param props - Widget component props
+ */
 const Widget = ({
   title,
   columnData,
@@ -43,6 +73,12 @@ const Widget = ({
 
   const transform = new DataTransform()
 
+  /**
+   * Handles the drop event when a widget is moved to a new position
+   *
+   * @param item - The dragged item
+   * @param monitor - React DnD monitor object containing drop information
+   */
   const handleWidgetMove = (item, monitor) => {
     let result = monitor.getDropResult()
 
@@ -70,6 +106,9 @@ const Widget = ({
     [config.activeDashboard, config.rows, config.dashboard.sharedFilters]
   )
 
+  /**
+   * Deletes the current widget from the dashboard
+   */
   const deleteWidget = () => {
     if (!widgetConfig) return
 
@@ -79,6 +118,13 @@ const Widget = ({
     })
   }
 
+  /**
+   * Modifies a data URL to include a limit parameter for sampling
+   *
+   * @param dataUrl - The original data URL
+   * @param limit - The number of records to limit to
+   * @returns The modified URL with the limit parameter, or null if invalid
+   */
   const changeDataLimit = (dataUrl, limit) => {
     if (!dataUrl || typeof dataUrl !== 'string') {
       console.error('Invalid dataUrl provided to changeDataLimit:', dataUrl)
@@ -97,6 +143,10 @@ const Widget = ({
     }
   }
 
+  /**
+   * Loads a limited sample of data (100 records) for preview purposes
+   * Used when configuring a widget to show a data preview without loading the full dataset
+   */
   const loadSampleData = () => {
     const dataKey = config.rows[widgetConfig.rowIdx]?.dataKey || widgetConfig?.dataKey
     const dataset = config.datasets[dataKey]
@@ -119,6 +169,9 @@ const Widget = ({
     }
   }
 
+  /**
+   * Opens the widget configuration editor and loads sample data if needed
+   */
   const editWidget = () => {
     if (!widgetConfig) return
     dispatch({
@@ -128,6 +181,15 @@ const Widget = ({
     loadSampleData()
   }
 
+  /**
+   * Determines if the widget has sufficient configuration to be edited
+   *
+   * Checks if:
+   * - Data is configured at the row level, OR
+   * - Widget type doesn't require data (dashboardFilters, markup-include), OR
+   * - Widget has formatted data already, OR
+   * - Widget has both dataKey and dataDescription configured
+   */
   let isConfigurationReady = false
   const dataConfiguredForRow = !!config.rows[widgetConfig?.rowIdx]?.dataKey
   if (dataConfiguredForRow || ['dashboardFilters', 'markup-include'].includes(type)) {
@@ -155,6 +217,10 @@ const Widget = ({
     }
   }
 
+  /**
+   * Indicates whether the widget needs data configuration
+   * True if data isn't configured at row level and widget isn't a dashboard filter
+   */
   const needsDataConfiguration = !dataConfiguredForRow && widgetConfig?.type !== 'dashboardFilters'
 
   const widgetContent = (
