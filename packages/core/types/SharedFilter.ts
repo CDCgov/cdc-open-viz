@@ -70,3 +70,27 @@ export type SharedFilter = FilterBase & {
    **/
   whitespaceReplacement?: 'Keep Spaces' | 'Remove Spaces' | 'Replace With Underscore'
 }
+
+// Re-export strongly-typed dashboard filter system
+export {
+  TypedSharedFilter,
+  SingleSelectDashboardFilter,
+  MultiSelectDashboardFilter,
+  NestedDropdownDashboardFilter,
+  DashboardFilterStyle,
+  FilterType,
+  FilterBy,
+  WhitespaceReplacement,
+  // Type guards
+  isMultiSelectDashboardFilter,
+  isNestedDropdownDashboardFilter,
+  isSingleSelectDashboardFilter,
+  // Helper functions
+  getDashboardFilterActive,
+  hasDashboardActiveSelection,
+  getDashboardSelectedValues,
+  isURLFilter,
+  isDataFilter,
+  isQueryStringFilter,
+  isFileNameFilter
+} from './TypedSharedFilters'

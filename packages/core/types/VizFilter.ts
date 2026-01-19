@@ -52,3 +52,20 @@ export type SubGrouping = {
 }
 
 export type VizFilter = GeneralFilter | MultiSelectFilter
+
+// Re-export new typed filter system for gradual migration
+export type {
+  TypedVizFilter,
+  SingleSelectFilter as TypedSingleSelectFilter,
+  MultiSelectFilter as TypedMultiSelectFilter,
+  NestedDropdownFilter as TypedNestedDropdownFilter
+} from './TypedFilters'
+
+export {
+  isMultiSelectFilter,
+  isNestedDropdownFilter,
+  isSingleSelectFilter,
+  getFilterActive,
+  hasActiveSelection,
+  getSelectedValues
+} from './TypedFilters'
