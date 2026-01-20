@@ -72,7 +72,6 @@ const Legend = forwardRef<HTMLElement, LegendProps>(
     }
 
     const { HighLightedBarUtils } = useHighlightedBars(config, null)
-    let highlightedBarValues = null
     let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
 
     if (!legend) return null
