@@ -1,5 +1,3 @@
-import Footnotes from '@cdc/core/types/Footnotes'
-import { Visualization } from '@cdc/core/types/Visualization'
 import { AnyVisualization } from '../types/AnyVisualization'
 import { DashboardConfig } from '../types/DashboardConfig'
 import { removeDashboardFilter } from './removeDashboardFilter'
