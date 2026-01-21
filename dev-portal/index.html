@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CDC Open Viz - Dev Portal</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        display: flex;
+        background: #1a1a2e;
+        color: #eee;
+      }
+      .sidebar {
+        width: 200px;
+        background: #16213e;
+        border-right: 1px solid #2a3f5f;
+        padding: 1rem 0;
+        display: flex;
+        flex-direction: column;
+      }
+      .sidebar h1 {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #666;
+        padding: 0 1rem;
+        margin-bottom: 0.75rem;
+      }
+      .sidebar button {
+        display: block;
+        width: 100%;
+        padding: 0.6rem 1rem;
+        background: none;
+        border: none;
+        color: #ccc;
+        text-align: left;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.1s ease;
+      }
+      .sidebar button:hover {
+        background: #1e2d4d;
+        color: #fff;
+      }
+      .sidebar button.active {
+        background: #2a3f5f;
+        color: #4fd1c5;
+        border-left: 3px solid #4fd1c5;
+      }
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      iframe {
+        flex: 1;
+        border: none;
+        background: #fff;
+      }
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #666;
+        font-size: 1.1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="sidebar">
+      <h1>Packages</h1>
+      <button data-port="3001">Chart</button>
+      <button data-port="3003">Dashboard</button>
+      <button data-port="3004">Data Bite</button>
+      <button data-port="3005">Data Table</button>
+      <button data-port="3007">Filtered Text</button>
+      <button data-port="3008">Map</button>
+      <button data-port="3009">Markup Include</button>
+      <button data-port="3010">Waffle Chart</button>
+    </nav>
+    <main class="main">
+      <div class="loading">Select a package to preview</div>
+    </main>
+
+    <script>
+      const main = document.querySelector('.main')
+      const buttons = document.querySelectorAll('.sidebar button')
+
+      function loadPackage(port) {
+        // Update active state
+        buttons.forEach(btn => btn.classList.toggle('active', btn.dataset.port === port))
+
+        // Replace content with iframe
+        main.innerHTML = `<iframe src="http://localhost:${port}"></iframe>`
+
+        // Save to localStorage
+        localStorage.setItem('portal-active-port', port)
+      }
+
+      // Click handlers
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => loadPackage(btn.dataset.port))
+      })
+
+      // Restore last selection
+      const savedPort = localStorage.getItem('portal-active-port')
+      if (savedPort) {
+        loadPackage(savedPort)
+      }
+    </script>
+  </body>
+</html>

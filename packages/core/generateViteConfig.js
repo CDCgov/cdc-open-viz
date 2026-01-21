@@ -42,6 +42,15 @@ ${css}
   <body>
     <div class="react-container" data-config="/examples/default.json"></div>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <script>
+      // Allow config override via ?config= URL parameter
+      (function() {
+        var configParam = new URLSearchParams(window.location.search).get('config');
+        if (configParam) {
+          document.querySelector('.react-container').setAttribute('data-config', configParam);
+        }
+      })();
+    </script>
     <script type="module" src="./src/index"></script>
   </body>
 </html>`
