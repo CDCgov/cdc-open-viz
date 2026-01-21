@@ -6,7 +6,7 @@ type DataBiteState = {
   loading: boolean
   currentViewport: string
   coveLoadedHasRan: boolean
-  container: any
+  container: HTMLElement | null
 }
 
 const reducer = (state: DataBiteState, action: DataBiteActions): DataBiteState => {
