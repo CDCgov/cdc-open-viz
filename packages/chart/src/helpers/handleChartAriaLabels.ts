@@ -14,5 +14,6 @@ export const handleChartAriaLabels = state => {
     return ariaLabel
   } catch (e) {
     console.error('COVE: ', e.message) // eslint-disable-line
+    return 'Data visualization container'
   }
 }
