@@ -15,6 +15,7 @@ import useRightAxis from '../../hooks/useRightAxis'
 
 // Local helpers and components
 import { filterCircles, createStyles, createDataSegments } from './helpers'
+import { getLabelPositionForDataPoint } from './helpers/labelPositioning'
 import LineChartCircle from './components/LineChart.Circle'
 import LineChartBumpCircle from './components/LineChart.BumpCircle'
 import isNumber from '@cdc/core/helpers/isNumber'
@@ -128,20 +129,55 @@ const LineChart = (props: LineChartProps) => {
                   xValue: d[config.xAxis.dataKey],
                   yValue: d[_seriesKey]
                 })
+
+                // Build array of point coordinates for intelligent label positioning
+                const dataPointsForSeries = _data
+                  .filter(item => isNumber(item[_seriesKey]))
+                  .map(item => ({
+                    x: xPos(item),
+                    y:
+                      seriesAxis === 'Right'
+                        ? yScaleRight(getYAxisData(item, _seriesKey))
+                        : yScale(getYAxisData(item, _seriesKey))
+                  }))
+
+                // Find the index in the filtered array (points with valid data only)
+                const filteredIndex = dataPointsForSeries.findIndex(
+                  point =>
+                    point.x === xPos(d) &&
+                    point.y ===
+                      (seriesAxis === 'Right'
+                        ? yScaleRight(getYAxisData(d, _seriesKey))
+                        : yScale(getYAxisData(d, _seriesKey)))
+                )
+
+                // Calculate label position
+                const labelValue = d[_seriesKey]
+                const xAxisY = seriesAxis === 'Right' ? yScaleRight(0) : yScale(0)
+
+                // Use intelligent label positioning if enabled, otherwise use simple default
+                const labelOffset =
+                  config.general?.useIntelligentLineChartLabels && filteredIndex >= 0
+                    ? getLabelPositionForDataPoint(dataPointsForSeries, filteredIndex, xAxisY, labelValue)
+                    : { dx: 0, dy: -9, textAnchor: 'middle' as const, verticalAnchor: 'end' as const }
+
+                const baseX = xPos(d)
+                const baseY =
+                  seriesAxis === 'Right'
+                    ? yScaleRight(getYAxisData(d, _seriesKey))
+                    : yScale(getYAxisData(d, _seriesKey))
+
                 return (
                   isNumber(d[_seriesKey]) && (
                     <React.Fragment key={`series-${seriesKey}-point-${dataIndex}`}>
-                      {/* Render label */}
+                      {/* Render label with intelligent positioning */}
                       {config.labels && (
                         <Text
-                          x={xPos(d)}
-                          y={
-                            seriesAxis === 'Right'
-                              ? yScaleRight(getYAxisData(d, _seriesKey))
-                              : yScale(getYAxisData(d, _seriesKey))
-                          }
+                          x={baseX + labelOffset.dx}
+                          y={baseY + labelOffset.dy}
                           fill={'#000'}
-                          textAnchor='middle'
+                          textAnchor={labelOffset.textAnchor || 'middle'}
+                          verticalAnchor={labelOffset.verticalAnchor || 'middle'}
                         >
                           {formatNumber(d[_seriesKey], 'left')}
                         </Text>
