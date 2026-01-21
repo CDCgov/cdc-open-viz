@@ -173,8 +173,16 @@
       // Update URL to reflect current selection (for shareable links)
       function updateUrl(packageName, configPath) {
         const url = new URL(window.location)
-        url.searchParams.set('package', packageName)
-        url.searchParams.set('config', configPath)
+        const isDefault = packageName === DEFAULT_PACKAGE && configPath === DEFAULT_CONFIG
+
+        if (isDefault) {
+          // Keep URL clean for default selection
+          url.searchParams.delete('package')
+          url.searchParams.delete('config')
+        } else {
+          url.searchParams.set('package', packageName)
+          url.searchParams.set('config', configPath)
+        }
         // Keep editor param if present
         if (editorMode) {
           url.searchParams.set('editor', 'true')
@@ -187,7 +195,7 @@
       function loadConfig(packageName, configPath, skipUrlUpdate = false) {
         const port = packages[packageName]
         const editorParam = editorMode ? '&editor=true' : ''
-        main.innerHTML = `<iframe src="http://localhost:${port}?config=${configPath}${editorParam}"></iframe>`
+        main.innerHTML = `<iframe src="http://localhost:${port}?config=${configPath}&sidebar=false${editorParam}"></iframe>`
 
         currentSelection = { packageName, configPath }
 
@@ -224,6 +232,8 @@
         }
       }
 
+      const caseInsensitiveSort = (a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })
+
       // Group files by directory (same logic as standalone sidebar)
       function groupByDirectory(files) {
         const tree = { files: [], dirs: {} }
@@ -245,7 +255,7 @@
         let html = ''
 
         // Root files
-        tree.files.forEach(file => {
+        tree.files.sort(caseInsensitiveSort).forEach(file => {
           const configPath = '/examples/' + file
           const isActive = currentSelection?.packageName === packageName && currentSelection?.configPath === configPath
           html += `<button class="dev-sidebar-item${
@@ -255,13 +265,13 @@
 
         // Subdirectories
         Object.keys(tree.dirs)
-          .sort()
+          .sort(caseInsensitiveSort)
           .forEach(dir => {
             const folderId = `${packageName}/${dir}`
             const isOpen = expandedFolders[folderId] ? ' open' : ''
             html += `<div class="dev-sidebar-folder${isOpen}" data-folder-id="${folderId}">${dir}</div>`
             html += `<div class="dev-sidebar-folder-contents">`
-            tree.dirs[dir].forEach(file => {
+            tree.dirs[dir].sort(caseInsensitiveSort).forEach(file => {
               const configPath = '/examples/' + dir + '/' + file
               const isActive =
                 currentSelection?.packageName === packageName && currentSelection?.configPath === configPath
@@ -342,7 +352,7 @@
           }
           // Otherwise, if default package came online and nothing selected, use default
           else if (online && packageName === DEFAULT_PACKAGE && !currentSelection) {
-            loadConfig(DEFAULT_PACKAGE, DEFAULT_CONFIG)
+            loadConfig(DEFAULT_PACKAGE, DEFAULT_CONFIG, true)
           }
         }
       }
@@ -377,8 +387,8 @@
           // URL has package and config - restore that selection
           loadConfig(urlPackage, urlConfig, true) // skip URL update since we're loading from URL
         } else if (packageStatus[DEFAULT_PACKAGE]) {
-          // No URL params or package offline - use default
-          loadConfig(DEFAULT_PACKAGE, DEFAULT_CONFIG)
+          // No URL params or package offline - use default (skip URL update to keep URL clean)
+          loadConfig(DEFAULT_PACKAGE, DEFAULT_CONFIG, true)
         }
 
         // Start polling for offline packages

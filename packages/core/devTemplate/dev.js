@@ -18,8 +18,8 @@ window.reloadVisualization = async configUrl => {
   await import(/* @vite-ignore */ `./src/index?t=${Date.now()}`)
 }
 
-// Initialize sidebar if ?sidebar=true
-if (params.get('sidebar') === 'true') {
+// Initialize sidebar by default (hide with ?sidebar=false)
+if (params.get('sidebar') !== 'false') {
   document.body.classList.add('has-sidebar')
 
   // Fetch examples list
@@ -45,10 +45,12 @@ if (params.get('sidebar') === 'true') {
     }
   })
 
+  const caseInsensitiveSort = (a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })
+
   let html = '<nav class="dev-sidebar"><div class="dev-sidebar-header">Examples</div><div class="dev-sidebar-tree">'
 
   // Render root files
-  tree.files.forEach(file => {
+  tree.files.sort(caseInsensitiveSort).forEach(file => {
     const configPath = '/examples/' + file
     const isActive = configPath === currentConfig ? ' active' : ''
     html += `<button class="dev-sidebar-item${isActive}" data-config="${configPath}">${file}</button>`
@@ -56,11 +58,11 @@ if (params.get('sidebar') === 'true') {
 
   // Render directories
   Object.keys(tree.dirs)
-    .sort()
+    .sort(caseInsensitiveSort)
     .forEach(dir => {
       const isOpen = currentConfig.includes('/examples/' + dir + '/') ? ' open' : ''
       html += `<div class="dev-sidebar-folder${isOpen}">${dir}</div><div class="dev-sidebar-folder-contents">`
-      tree.dirs[dir].forEach(file => {
+      tree.dirs[dir].sort(caseInsensitiveSort).forEach(file => {
         const configPath = '/examples/' + dir + '/' + file
         const isActive = configPath === currentConfig ? ' active' : ''
         html += `<button class="dev-sidebar-item${isActive}" data-config="${configPath}">${file}</button>`
@@ -80,10 +82,13 @@ if (params.get('sidebar') === 'true') {
       sidebarRoot.querySelectorAll('.dev-sidebar-item').forEach(b => b.classList.remove('active'))
       btn.classList.add('active')
 
-      // Update URL without reload
+      // Update URL without reload - keep clean if selecting default
       const url = new URL(window.location)
-      url.searchParams.set('config', configPath)
-      url.searchParams.set('sidebar', 'true')
+      if (configPath === '/examples/default.json') {
+        url.searchParams.delete('config')
+      } else {
+        url.searchParams.set('config', configPath)
+      }
       history.pushState({}, '', url.toString().replace(/%2F/g, '/'))
 
       // Reload visualization
