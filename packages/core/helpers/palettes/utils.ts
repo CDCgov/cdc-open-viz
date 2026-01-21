@@ -1,16 +1,16 @@
-import { map } from 'lodash'
 import { FALLBACK_COLOR_PALETTE_V1, FALLBACK_COLOR_PALETTE_V2, USE_V2_MIGRATION } from '../constants'
 import { getColorPaletteVersion } from '../getColorPaletteVersion'
 import { getPaletteAccessor } from '../getPaletteAccessor'
 import { chartPaletteMigrationMap } from './migratePaletteName'
 import { newMapPaletteNames } from './standardizePaletteNames'
+import { Visualization } from '../../types/Visualization'
 
 /**
  * Gets the current palette name from a visualization config
  * @param config - The visualization config object
  * @returns The current palette name or empty string if not found
  */
-export const getCurrentPaletteName = (config: any): string => {
+export const getCurrentPaletteName = (config: Partial<Visualization>): string => {
   // Check new v2 format first
   if (config?.general?.palette?.name) {
     return config.general.palette.name
@@ -35,7 +35,7 @@ export const getCurrentPaletteName = (config: any): string => {
  * @param colorPalettes - The color palettes object (e.g., mapColorPalettes, chartColorPalettes)
  * @returns The palette colors array or empty array if not found
  */
-export const getPaletteColors = (config: any, colorPalettes: any): string[] => {
+export const getPaletteColors = (config: Partial<Visualization>, colorPalettes: Record<string, Record<string, string[]>>): string[] => {
   // First check for custom colors (v2 format)
   if (config?.general?.palette?.customColors) {
     return config.general.palette.customColors
@@ -65,7 +65,7 @@ export const getPaletteColors = (config: any, colorPalettes: any): string[] => {
  * @param config - The visualization config object
  * @returns True if the config is using v1 palette configuration (which would show conversion modal)
  */
-export const isV1Palette = (config: any): boolean => {
+export const isV1Palette = (config: Partial<Visualization>): boolean => {
   // If v2 migration is disabled globally, don't treat as v1 (no conversion modal)
   if (!USE_V2_MIGRATION) {
     return false
@@ -84,7 +84,7 @@ export const isV1Palette = (config: any): boolean => {
  * @param config - The visualization config object
  * @returns The fallback palette name for the detected version
  */
-export const getFallbackColorPalette = (config: any): string => {
+export const getFallbackColorPalette = (config: Partial<Visualization>): string => {
   const paletteVersion = getColorPaletteVersion(config)
   return paletteVersion === 1 ? FALLBACK_COLOR_PALETTE_V1 : FALLBACK_COLOR_PALETTE_V2
 }
@@ -161,7 +161,7 @@ export const migratePaletteWithMap = (
  * @param config - The visualization config object
  * @returns True if backup data exists
  */
-export const hasPaletteBackup = (config: any): boolean => {
+export const hasPaletteBackup = (config: Partial<Visualization>): boolean => {
   return !!(config?.general?.palette?.backups?.length > 0)
 }
 
@@ -170,7 +170,7 @@ export const hasPaletteBackup = (config: any): boolean => {
  * @param config - The visualization config object
  * @returns The original palette name or null if no backup exists
  */
-export const getOriginalPaletteName = (config: any): string | null => {
+export const getOriginalPaletteName = (config: Partial<Visualization>): string | null => {
   const backups = config?.general?.palette?.backups
   if (!backups || backups.length === 0) return null
 
@@ -184,7 +184,7 @@ export const getOriginalPaletteName = (config: any): string | null => {
  * @param config - The visualization config object
  * @returns The original two-color palette name or null if no backup exists
  */
-export const getOriginalTwoColorPaletteName = (config: any): string | null => {
+export const getOriginalTwoColorPaletteName = (config: Partial<Visualization>): string | null => {
   const backups = config?.general?.palette?.backups
   if (!backups || backups.length === 0) return null
 
@@ -198,7 +198,7 @@ export const getOriginalTwoColorPaletteName = (config: any): string | null => {
  * @param config - The visualization config object
  * @returns True if two-color backup data exists
  */
-export const hasTwoColorPaletteBackup = (config: any): boolean => {
+export const hasTwoColorPaletteBackup = (config: Partial<Visualization>): boolean => {
   const backups = config?.general?.palette?.backups
   if (!backups || backups.length === 0) return false
   return backups.some((backup: any) => backup.type === 'twoColor')
@@ -209,7 +209,7 @@ export const hasTwoColorPaletteBackup = (config: any): boolean => {
  * @param config - The visualization config object to modify
  * @returns True if rollback was successful, false if no backup available
  */
-export const rollbackPaletteToOriginal = (config: any): boolean => {
+export const rollbackPaletteToOriginal = (config: Partial<Visualization>): boolean => {
   const backups = config?.general?.palette?.backups
   if (!backups || backups.length === 0) {
     return false
@@ -230,7 +230,7 @@ export const rollbackPaletteToOriginal = (config: any): boolean => {
     config.general.palette.version = '1.0' // Reset to v1
   }
 
-  return config
+  return true
 }
 
 /**
@@ -238,7 +238,7 @@ export const rollbackPaletteToOriginal = (config: any): boolean => {
  * @param config - The visualization config object to modify
  * @returns True if rollback was successful, false if no backup available
  */
-export const rollbackTwoColorPaletteToOriginal = (config: any): boolean => {
+export const rollbackTwoColorPaletteToOriginal = (config: Partial<Visualization>): boolean => {
   const backups = config?.general?.palette?.backups
   if (!backups || backups.length === 0) {
     return false
