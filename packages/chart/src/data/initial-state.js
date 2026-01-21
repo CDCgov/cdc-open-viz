@@ -45,7 +45,8 @@ const createInitialState = () => {
       showSuppressedSymbol: true,
       showZeroValueData: true,
       hideNullValue: true,
-      palette: paletteDefaults
+      palette: paletteDefaults,
+      useIntelligentLineChartLabels: false
     },
     padding: {
       left: 5,
