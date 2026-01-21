@@ -15,7 +15,7 @@ await import('./src/index')
 window.reloadVisualization = async configUrl => {
   const wrapper = document.getElementById('viz-wrapper')
   wrapper.innerHTML = `<div class="react-container" data-config="${configUrl}"></div>`
-  await import(`./src/index?t=${Date.now()}`)
+  await import(/* @vite-ignore */ `./src/index?t=${Date.now()}`)
 }
 
 // Initialize sidebar if ?sidebar=true

@@ -157,18 +157,34 @@
       const main = document.querySelector('.main')
       const sidebarTree = document.getElementById('sidebar-tree')
 
-      // Check for editor mode from URL
+      // Check for URL params (for shareable links and browser navigation)
       const portalParams = new URLSearchParams(window.location.search)
       const editorMode = portalParams.get('editor') === 'true'
+      const urlPackage = portalParams.get('package')
+      const urlConfig = portalParams.get('config')
 
       // State (no localStorage - always starts fresh)
       let currentSelection = null
-      let expandedFolders = { [DEFAULT_PACKAGE]: true } // Chart expanded by default
+      // Expand the package from URL, or default to chart
+      let expandedFolders = { [urlPackage || DEFAULT_PACKAGE]: true }
       let packageStatus = {} // Track which packages are online/offline
       let packageData = {} // Cache fetched examples data
 
+      // Update URL to reflect current selection (for shareable links)
+      function updateUrl(packageName, configPath) {
+        const url = new URL(window.location)
+        url.searchParams.set('package', packageName)
+        url.searchParams.set('config', configPath)
+        // Keep editor param if present
+        if (editorMode) {
+          url.searchParams.set('editor', 'true')
+        }
+        // Replace encoded slashes with real slashes for readability
+        history.pushState({ packageName, configPath }, '', url.toString().replace(/%2F/g, '/'))
+      }
+
       // Load iframe with package and config
-      function loadConfig(packageName, configPath) {
+      function loadConfig(packageName, configPath, skipUrlUpdate = false) {
         const port = packages[packageName]
         const editorParam = editorMode ? '&editor=true' : ''
         main.innerHTML = `<iframe src="http://localhost:${port}?config=${configPath}${editorParam}"></iframe>`
@@ -177,6 +193,20 @@
 
         // Expand the package folder
         expandedFolders[packageName] = true
+
+        // Also expand any subdirectory containing this config
+        // e.g., /examples/feature/bar.json -> expand "chart/feature"
+        const pathWithinExamples = configPath.replace('/examples/', '')
+        const parts = pathWithinExamples.split('/')
+        if (parts.length > 1) {
+          // Has a subdirectory - expand it
+          expandedFolders[`${packageName}/${parts[0]}`] = true
+        }
+
+        // Update URL for shareable links (skip during popstate handling)
+        if (!skipUrlUpdate) {
+          updateUrl(packageName, configPath)
+        }
 
         // Update active state in sidebar
         rebuildSidebar()
@@ -306,8 +336,12 @@
         if (online !== wasOnline) {
           rebuildSidebar()
 
-          // If chart just came online and nothing selected yet, auto-select it
-          if (online && packageName === DEFAULT_PACKAGE && !currentSelection) {
+          // If the URL-requested package just came online, load it
+          if (online && packageName === urlPackage && urlConfig && !currentSelection) {
+            loadConfig(urlPackage, urlConfig, true)
+          }
+          // Otherwise, if default package came online and nothing selected, use default
+          else if (online && packageName === DEFAULT_PACKAGE && !currentSelection) {
             loadConfig(DEFAULT_PACKAGE, DEFAULT_CONFIG)
           }
         }
@@ -338,8 +372,12 @@
 
         rebuildSidebar()
 
-        // Auto-select chart's default.json if chart is online
-        if (packageStatus[DEFAULT_PACKAGE]) {
+        // Check URL params for initial selection (shareable links)
+        if (urlPackage && urlConfig && packageStatus[urlPackage]) {
+          // URL has package and config - restore that selection
+          loadConfig(urlPackage, urlConfig, true) // skip URL update since we're loading from URL
+        } else if (packageStatus[DEFAULT_PACKAGE]) {
+          // No URL params or package offline - use default
           loadConfig(DEFAULT_PACKAGE, DEFAULT_CONFIG)
         }
 
@@ -357,6 +395,16 @@
           }
         }, 2000)
       }
+
+      // Handle browser back/forward navigation
+      window.addEventListener('popstate', event => {
+        if (event.state?.packageName && event.state?.configPath) {
+          // Load the config from history state (skip URL update since we're navigating)
+          if (packageStatus[event.state.packageName]) {
+            loadConfig(event.state.packageName, event.state.configPath, true)
+          }
+        }
+      })
 
       // Initialize
       initSidebar()
