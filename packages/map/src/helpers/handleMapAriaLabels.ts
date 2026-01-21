@@ -33,5 +33,6 @@ export const handleMapAriaLabels = (state: MapConfig = '') => {
     return ariaLabel
   } catch (e) {
     console.error('COVE: ', e.message) // eslint-disable-line
+    return 'Data visualization container'
   }
 }
