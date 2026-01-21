@@ -202,6 +202,68 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     return hasBody ? parse[1] : parse
   }
 
+  /**
+   * Transforms HTML by extracting <style> tags and applying their CSS rules as inline styles.
+   * This is needed because interweave bans <style> tags for security reasons.
+   */
+  const applyStyleTagsAsInlineStyles = (html: string): string => {
+    if (!html || typeof html !== 'string') return html
+
+    // Use DOMParser to parse HTML
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(html, 'text/html')
+
+    // Extract all <style> elements using DOM methods
+    const styleElements = doc.querySelectorAll('style')
+    if (styleElements.length === 0) return html
+
+    // Use CSSStyleSheet to parse CSS properly (validates and throws on invalid CSS)
+    const sheet = new CSSStyleSheet()
+    const cssRules: Array<{ selector: string; styles: string }> = []
+
+    styleElements.forEach(styleEl => {
+      try {
+        // replaceSync parses the CSS and throws if invalid
+        sheet.replaceSync(styleEl.textContent || '')
+
+        // Extract parsed rules from the stylesheet
+        for (let i = 0; i < sheet.cssRules.length; i++) {
+          const rule = sheet.cssRules[i]
+          if (rule instanceof CSSStyleRule) {
+            cssRules.push({
+              selector: rule.selectorText,
+              styles: rule.style.cssText
+            })
+          }
+        }
+      } catch (e) {
+        console.warn('Markup Include: Invalid CSS in style tag', e)
+      }
+
+      // Remove the style element from the parsed document
+      styleEl.remove()
+    })
+
+    // Apply each CSS rule to matching elements
+    for (const rule of cssRules) {
+      try {
+        const elements = doc.body.querySelectorAll(rule.selector)
+
+        elements.forEach(el => {
+          const existingStyle = el.getAttribute('style') || ''
+          // Later CSS rules override earlier ones (normal cascade behavior)
+          const newStyle = existingStyle ? `${existingStyle}; ${rule.styles}` : rule.styles
+          el.setAttribute('style', newStyle)
+        })
+      } catch (e) {
+        // Skip invalid selectors (e.g., pseudo-selectors like :hover won't match)
+        console.warn(`Markup Include: Could not apply CSS rule for selector "${rule.selector}"`, e)
+      }
+    }
+
+    return doc.body.innerHTML
+  }
+
   //Load initial config
   useEffect(() => {
     loadConfig().catch(err => console.error(err))
@@ -233,7 +295,14 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
       })
     : { processedContent: parseBodyMarkup(urlMarkup), shouldHideSection: false, shouldShowNoDataMessage: false }
 
-  const markup = processedMarkup.processedContent
+  // Apply <style> tag CSS as inline styles (since interweave bans <style> tags)
+  const markup = useMemo(() => {
+    const rawMarkup = processedMarkup.processedContent
+    if (rawMarkup && typeof document !== 'undefined') {
+      return applyStyleTagsAsInlineStyles(rawMarkup)
+    }
+    return rawMarkup
+  }, [processedMarkup.processedContent])
 
   const hideMarkupInclude = processedMarkup.shouldHideSection
   const _showNoDataMessage = processedMarkup.shouldShowNoDataMessage
