@@ -120,7 +120,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
         // replace filters with sharedFilters
         if (!dashboard.sharedFilters) dashboard.sharedFilters = []
         const filters = dashboard.filters.map(filter => {
-          return { ...filter, key: filter.label, showDropdown: true, usedBy: getVizKeys(newConfig) }
+          return { ...filter, key: filter.label, showDropdown: true, required: false, usedBy: getVizKeys(newConfig) }
         })
         dashboard.sharedFilters = [...dashboard.sharedFilters, ...filters]
         newConfig.dashboard = { ...dashboard, filters: undefined }

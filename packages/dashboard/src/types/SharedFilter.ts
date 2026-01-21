@@ -38,6 +38,17 @@ export type SharedFilter = FilterBase & {
   // value to use when the filter loads
   defaultValue?: string
   /**
+   * Controls whether the filter dropdown is visible in the UI.
+   * When false, the filter is hidden but can still be controlled programmatically.
+   */
+  showDropdown?: boolean
+  /**
+   * Controls whether a filter selection is required before displaying visualizations.
+   * When true, visualizations won't render until the user selects a value.
+   * Default is false (filter is optional).
+   */
+  required?: boolean
+  /**
    * How to format the end file name when filter.filterBy is set to "File Name"
    *
    * @example * United States

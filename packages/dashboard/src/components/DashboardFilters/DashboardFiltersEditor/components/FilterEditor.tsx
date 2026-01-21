@@ -208,16 +208,28 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
             onChange={e => updateFilterProp('filterStyle', e.target.value)}
           />
           {filter.filterStyle === FILTER_STYLE.dropdown && (
-            <label>
-              <span className='me-1'>Show Dropdown</span>
-              <input
-                type='checkbox'
-                checked={filter.showDropdown}
-                onChange={e => {
-                  updateFilterProp('showDropdown', !filter.showDropdown)
-                }}
-              />
-            </label>
+            <>
+              <label>
+                <span className='me-1'>Show Dropdown</span>
+                <input
+                  type='checkbox'
+                  checked={filter.showDropdown}
+                  onChange={e => {
+                    updateFilterProp('showDropdown', !filter.showDropdown)
+                  }}
+                />
+              </label>
+              <label>
+                <span className='me-1'>Required Selection</span>
+                <input
+                  type='checkbox'
+                  checked={filter.required === true}
+                  onChange={e => {
+                    updateFilterProp('required', !filter.required)
+                  }}
+                />
+              </label>
+            </>
           )}
 
           <TextField
@@ -556,6 +568,16 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                       defaultChecked={filter.showDropdown === true}
                       onChange={e => {
                         updateFilterProp('showDropdown', !filter.showDropdown)
+                      }}
+                    />
+                  </label>
+                  <label>
+                    <span className='edit-label column-heading'>Required Selection</span>
+                    <input
+                      type='checkbox'
+                      defaultChecked={filter.required === true}
+                      onChange={e => {
+                        updateFilterProp('required', !filter.required)
                       }}
                     />
                   </label>

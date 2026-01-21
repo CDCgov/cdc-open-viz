@@ -150,7 +150,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
   const addNewFilter = () => {
     const _sharedFilters = _.cloneDeep(sharedFilters) || []
     const columnName = 'New Dashboard Filter ' + (_sharedFilters.length + 1)
-    const newFilter = { key: columnName, showDropdown: true, values: [] } as SharedFilter
+    const newFilter = { key: columnName, showDropdown: true, required: false, values: [] } as SharedFilter
     dispatch({ type: 'SET_SHARED_FILTERS', payload: [..._sharedFilters, newFilter] })
     updateConfig({ ...vizConfig, sharedFilterIndexes: [...vizConfig.sharedFilterIndexes, _sharedFilters.length] })
   }

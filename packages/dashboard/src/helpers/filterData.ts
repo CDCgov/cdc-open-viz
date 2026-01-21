@@ -33,13 +33,16 @@ function getMaxTierAndSetFilterTiers(filters: SharedFilter[]): number {
 
 /**
  * Checks if a filter is currently at its reset/incomplete state.
- * A filter is incomplete if it's visible AND:
+ * A filter is incomplete if it's marked as required AND:
  * - The active value is empty/null/undefined, OR
  * - The active value equals the resetLabel (if one is defined)
  */
 export const isFilterAtResetState = (filter: SharedFilter): boolean => {
-  // Only check filters that are visible to the user
-  if (!filter.showDropdown) return false
+  // Backward compatibility: if required is undefined, fall back to showDropdown behavior
+  const isRequired = filter.required !== undefined ? filter.required : filter.showDropdown
+
+  // Only check filters that are marked as required
+  if (!isRequired) return false
 
   // Check if active value is empty/null/undefined
   const isEmptyValue = filter.active === '' || filter.active === null || filter.active === undefined
