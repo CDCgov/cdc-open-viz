@@ -1,5 +1,4 @@
-export const handleMapAriaLabels = (state: MapConfig = '', testing = false) => {
-  if (testing) console.log(`handleMapAriaLabels Testing On: ${state}`) // eslint-disable-line
+export const handleMapAriaLabels = (state: MapConfig = '') => {
   try {
     if (!state.general.geoType) throw Error('handleMapAriaLabels: no geoType found in state')
     const {
