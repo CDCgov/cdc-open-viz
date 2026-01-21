@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-// import FocusLock from "react-focus-lock";
 import ReactDOM from 'react-dom'
 import CloseIcon from '../../assets/icons/close.svg'
 
@@ -21,7 +20,6 @@ export const Modal = ({ isShown, hide, modalContent, headerText }) => {
   const modal = (
     <>
       <div className='modal-backdrop' onClick={hide} />
-      {/* <FocusLock> */}
       <div className='modal-wrapper' aria-modal aria-labelledby={headerText} tabIndex={-1} role='dialog'>
         <div className='modal'>
           <div className='modal-header'>
@@ -31,7 +29,6 @@ export const Modal = ({ isShown, hide, modalContent, headerText }) => {
           <div className='modal-content'>{modalContent}</div>
         </div>
       </div>
-      {/* </FocusLock> */}
     </>
   )
 
