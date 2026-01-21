@@ -1,18 +1,22 @@
-export const handleLineType = lineType => {
+const DASH_PATTERNS = {
+  SMALL: '5 5',
+  MEDIUM: '10 5',
+  LARGE: '15 5',
+  SOLID: 0
+} as const
+
+export const handleLineType = (lineType: string): string | number => {
   switch (lineType) {
     case 'dashed-sm':
-      return '5 5'
     case 'Dashed Small':
-      return '5 5'
+      return DASH_PATTERNS.SMALL
     case 'dashed-md':
-      return '10 5'
     case 'Dashed Medium':
-      return '10 5'
+      return DASH_PATTERNS.MEDIUM
     case 'dashed-lg':
-      return '15 5'
     case 'Dashed Large':
-      return '15 5'
+      return DASH_PATTERNS.LARGE
     default:
-      return 0
+      return DASH_PATTERNS.SOLID
   }
 }
