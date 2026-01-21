@@ -7,12 +7,18 @@ export const titleCase = string => {
   if (string !== undefined) {
     // Words that should remain lowercase in geographic names
     const lowercaseWords = ['of', 'the', 'and']
+    // Words that should remain uppercase (abbreviations)
+    const uppercaseWords = ['u.s.', 'us']
 
     const titleCaseWord = (word: string): string => {
       const lowerWord = word.toLowerCase()
-      return lowercaseWords.includes(lowerWord)
-        ? lowerWord
-        : word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()
+      if (lowercaseWords.includes(lowerWord)) {
+        return lowerWord
+      }
+      if (uppercaseWords.includes(lowerWord)) {
+        return word.toUpperCase()
+      }
+      return word.charAt(0).toUpperCase() + word.substring(1).toLowerCase()
     }
 
     // if hyphen found, then split, uppercase each word, and put back together
