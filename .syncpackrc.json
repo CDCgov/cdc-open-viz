@@ -1,0 +1,140 @@
+{
+  "versionGroups": [
+    {
+      "label": "Keep @cdc packages in sync",
+      "dependencies": [
+        "@cdc/**"
+      ],
+      "dependencyTypes": [
+        "prod",
+        "dev"
+      ],
+      "policy": "sameRange"
+    },
+    {
+      "label": "Pin shared React dependencies",
+      "dependencies": [
+        "react",
+        "react-dom"
+      ],
+      "dependencyTypes": [
+        "peer"
+      ],
+      "pinVersion": "^18.2.0"
+    },
+    {
+      "label": "Pin shared @types packages",
+      "dependencies": [
+        "@types/**"
+      ],
+      "dependencyTypes": [
+        "dev"
+      ],
+      "policy": "sameRange"
+    },
+    {
+      "label": "Pin shared build tools",
+      "dependencies": [
+        "@vitejs/**",
+        "vite",
+        "typescript"
+      ],
+      "dependencyTypes": [
+        "dev",
+        "prod"
+      ],
+      "policy": "highest"
+    },
+    {
+      "label": "Synchronize shared utilities",
+      "dependencies": [
+        "html-react-parser",
+        "papaparse",
+        "lodash",
+        "use-debounce",
+        "dompurify"
+      ],
+      "policy": "highest"
+    },
+    {
+      "label": "Pin @visx packages to latest",
+      "dependencies": [
+        "@visx/**"
+      ],
+      "pinVersion": "^3.12.0"
+    },
+    {
+      "label": "Synchronize visualization libraries",
+      "dependencies": [
+        "chroma-js"
+      ],
+      "policy": "highest"
+    },
+    {
+      "label": "Synchronize D3 ecosystem",
+      "dependencies": [
+        "d3",
+        "d3-**"
+      ],
+      "policy": "highests"
+    },
+    {
+      "label": "Synchronize UI/accessibility libraries",
+      "dependencies": [
+        "react-tooltip",
+        "react-accessible-accordion"
+      ],
+      "policy": "sameRange"
+    },
+    {
+      "label": "Synchronize drag-and-drop libraries",
+      "dependencies": [
+        "react-dnd",
+        "react-dnd-html5-backend",
+        "@hello-pangea/dnd"
+      ],
+      "policy": "sameRange"
+    },
+    {
+      "label": "Synchronize Storybook ecosystem",
+      "dependencies": [
+        "@storybook/**",
+        "storybook"
+      ],
+      "dependencyTypes": [
+        "dev"
+      ],
+      "policy": "highest"
+    }
+  ],
+  "semverGroups": [
+    {
+      "label": "Use caret ranges for most dependencies",
+      "range": "^",
+      "dependencies": [
+        "**"
+      ],
+      "packages": [
+        "**"
+      ]
+    }
+  ],
+  "sortAz": [
+    "contributors",
+    "dependencies",
+    "devDependencies",
+    "keywords",
+    "peerDependencies",
+    "resolutions",
+    "scripts"
+  ],
+  "sortFirst": [
+    "name",
+    "version",
+    "description",
+    "keywords",
+    "license",
+    "author",
+    "contributors"
+  ]
+}
