@@ -1,4 +1,5 @@
 import { BoxPlot } from './BoxPlot'
+import { Palette } from './Palette'
 
 export type General = {
   boxplot: BoxPlot
@@ -12,4 +13,5 @@ export type General = {
   hideNullValue: boolean
   title: string
   annotationDropdownText?: string
+  palette?: Palette
 }
