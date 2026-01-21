@@ -118,13 +118,12 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
     },
     server: {
       port: 8080,
-      open: false,
       headers: {
         'Access-Control-Allow-Origin': '*'
       }
     },
     build: {
-      minify: true,  // toggle this line for debugging
+      minify: true, // toggle this line for debugging
       commonjsOptions: {
         include: [/@cdc\/core/, /node_modules/]
       },
