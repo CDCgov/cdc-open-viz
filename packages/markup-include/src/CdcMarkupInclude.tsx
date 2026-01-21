@@ -204,7 +204,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   /**
    * Transforms HTML by extracting <style> tags and applying their CSS rules as inline styles.
-   * This is needed because interweave bans <style> tags for security reasons.
+   * This ensures that the CSS is applied only to this COVE visualization.
    */
   const applyStyleTagsAsInlineStyles = (html: string): string => {
     if (!html || typeof html !== 'string') return html
