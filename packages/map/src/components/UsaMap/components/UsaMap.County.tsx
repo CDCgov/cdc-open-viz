@@ -15,7 +15,7 @@ import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import { MapConfig } from '../../../types/MapConfig'
-import { DEFAULT_MAP_BACKGROUND } from '../../../helpers/constants'
+import { DISABLED_MAP_COLOR } from '../../../helpers/constants'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
@@ -625,9 +625,9 @@ const CountyMap = () => {
         context.fillStyle =
           legendValues && config.general.type !== 'us-geocode'
             ? legendValues[0] === '#000000'
-              ? DEFAULT_MAP_BACKGROUND
+              ? DISABLED_MAP_COLOR
               : legendValues[0]
-            : DEFAULT_MAP_BACKGROUND
+            : DISABLED_MAP_COLOR
         context.beginPath()
         path(geo)
         context.fill()
@@ -708,7 +708,7 @@ const CountyMap = () => {
                 ? applyLegendToRow(runtimeData[key], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
                 : false
             if (legendValues) {
-              if (legendValues?.[0] === '#000000' || legendValues?.[0] === DEFAULT_MAP_BACKGROUND) return
+              if (legendValues?.[0] === '#000000' || legendValues?.[0] === DISABLED_MAP_COLOR) return
               const shapeType = config.visual.cityStyle.toLowerCase()
               const shapeProperties = createShapeProperties(shapeType, pixelCoords, legendValues, config, geoRadius)
               if (shapeProperties) {
