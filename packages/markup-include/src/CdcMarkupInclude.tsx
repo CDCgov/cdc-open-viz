@@ -213,11 +213,11 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     const parser = new DOMParser()
     const doc = parser.parseFromString(html, 'text/html')
 
-    // Extract all <style> elements using DOM methods
+    // Extract all <style> elements
     const styleElements = doc.querySelectorAll('style')
     if (styleElements.length === 0) return html
 
-    // Use CSSStyleSheet to parse CSS properly (validates and throws on invalid CSS)
+    // Parse CSS rules
     const sheet = new CSSStyleSheet()
     const cssRules: Array<{ selector: string; styles: string }> = []
 
@@ -240,7 +240,6 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         console.warn('Markup Include: Invalid CSS in style tag', e)
       }
 
-      // Remove the style element from the parsed document
       styleEl.remove()
     })
 
@@ -251,7 +250,6 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
         elements.forEach(el => {
           const existingStyle = el.getAttribute('style') || ''
-          // Later CSS rules override earlier ones (normal cascade behavior)
           const newStyle = existingStyle ? `${existingStyle}; ${rule.styles}` : rule.styles
           el.setAttribute('style', newStyle)
         })
@@ -295,14 +293,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
       })
     : { processedContent: parseBodyMarkup(urlMarkup), shouldHideSection: false, shouldShowNoDataMessage: false }
 
-  // Apply <style> tag CSS as inline styles (since interweave bans <style> tags)
-  const markup = useMemo(() => {
-    const rawMarkup = processedMarkup.processedContent
-    if (rawMarkup && typeof document !== 'undefined') {
-      return applyStyleTagsAsInlineStyles(rawMarkup)
-    }
-    return rawMarkup
-  }, [processedMarkup.processedContent])
+  const markup = applyStyleTagsAsInlineStyles(processedMarkup.processedContent)
 
   const hideMarkupInclude = processedMarkup.shouldHideSection
   const _showNoDataMessage = processedMarkup.shouldShowNoDataMessage
