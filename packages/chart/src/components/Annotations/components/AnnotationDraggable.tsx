@@ -16,7 +16,7 @@ import { LinePath } from '@visx/shape'
 // styles
 import './AnnotationDraggable.styles.css'
 
-const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax, svgRef, onDragStateChange }) => {
+const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax, yMax, svgRef, onDragStateChange }) => {
   // prettier-ignore
   const { config, dimensions, isEditor, updateConfig, colorScale, transformedData, parseDate, currentViewport } = useContext(ConfigContext)
 
@@ -29,6 +29,20 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
 
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
   const isMobile = isMobileAnnotationViewport(currentViewport)
+
+  /**
+   * Scale dx/dy offsets based on savedDimensions vs current dimensions.
+   * This ensures label positions scale proportionally when chart is resized.
+   * Falls back to unscaled values if savedDimensions is missing (backward compatible).
+   */
+  const getScaledOffsets = (annotation: { dx: number; dy: number; savedDimensions?: [number, number] }) => {
+    const [savedWidth, savedHeight] = annotation.savedDimensions || []
+
+    const scaledDx = savedWidth && savedWidth > 0 ? (annotation.dx / savedWidth) * xMax : annotation.dx
+    const scaledDy = savedHeight && savedHeight > 0 ? (annotation.dy / savedHeight) * yMax : annotation.dy
+
+    return { scaledDx, scaledDy }
+  }
 
   // Track live drag position for real-time anchor calculations
   const [liveDrag, setLiveDrag] = useState<{ index: number; dx: number } | null>(null)
@@ -54,6 +68,9 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
     visibleAnnotations.map((annotation, annotationIndex) => {
       const originalIndex = annotations.indexOf(annotation)
       const text = annotation.text || ''
+
+      // Calculate scaled dx/dy offsets based on savedDimensions
+      const { scaledDx, scaledDy } = getScaledOffsets(annotation)
 
       // Default to absolute positioning
       let annotationX = xScaleAnnotation(annotation.x)
@@ -98,8 +115,8 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
           key={`annotation-${originalIndex}-${annotation.x}-${annotation.y}-${annotation.dx}-${annotation.dy}`}
           width={200}
           height={height}
-          dx={annotation.dx} // label position
-          dy={annotation.dy} // label postion
+          dx={scaledDx} // label position (scaled to current chart dimensions)
+          dy={scaledDy} // label position (scaled to current chart dimensions)
           x={annotationX}
           y={annotationY}
           canEditLabel={annotation.edit.label || false}
@@ -108,7 +125,7 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
           subjectDragHandleProps={{ r: 15, stroke: 'red' }}
           onDragStart={() => {
             onDragStateChange(true)
-            setLiveDrag({ index: annotationIndex, dx: annotation.dx })
+            setLiveDrag({ index: annotationIndex, dx: scaledDx })
           }}
           onDragMove={props => {
             setLiveDrag({ index: annotationIndex, dx: props.dx })
@@ -119,13 +136,21 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
 
             let updatedAnnotations = [...annotations]
 
+            // Current chart dimensions to save with the annotation
+            const currentDimensions: [number, number] = [xMax, yMax]
+
             const isLabelOnlyDrag =
               annotation.anchorMode === 'data'
                 ? annotationX === props.x && annotationY === props.y
                 : annotation.x === xScaleAnnotation.invert(props.x) && annotation.y === yScaleAnnotation.invert(props.y)
 
             if (isLabelOnlyDrag) {
-              updatedAnnotations[originalIndex] = { ...updatedAnnotations[originalIndex], dx: props.dx, dy: props.dy }
+              updatedAnnotations[originalIndex] = {
+                ...updatedAnnotations[originalIndex],
+                dx: props.dx,
+                dy: props.dy,
+                savedDimensions: currentDimensions
+              }
             } else {
               if (annotation.anchorMode === 'data') {
                 let nearestDatum = findNearestDatum({
@@ -143,14 +168,16 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
                     ...updatedAnnotations[originalIndex],
                     dataX: nearestDatum.x,
                     x: xScaleAnnotation.invert(props.x),
-                    y: yScaleAnnotation.invert(props.y)
+                    y: yScaleAnnotation.invert(props.y),
+                    savedDimensions: currentDimensions
                   }
                 }
               } else {
                 updatedAnnotations[originalIndex] = {
                   ...updatedAnnotations[originalIndex],
                   x: xScaleAnnotation.invert(props.x),
-                  y: yScaleAnnotation.invert(props.y)
+                  y: yScaleAnnotation.invert(props.y),
+                  savedDimensions: currentDimensions
                 }
               }
             }
@@ -164,8 +191,8 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
           {!isMobile &&
             (() => {
               const labelWidth = config.general.showAnnotationDropdown ? 200 : 150
-              // Use live dx during drag, otherwise use stored annotation.dx
-              const currentDx = liveDrag?.index === annotationIndex ? liveDrag.dx : annotation.dx
+              // Use live dx during drag (already in current space), otherwise use scaled dx
+              const currentDx = liveDrag?.index === annotationIndex ? liveDrag.dx : scaledDx
               const { horizontalAnchor, verticalAnchor } = getAnnotationAnchors(annotationX, currentDx, labelWidth)
               return (
                 <HtmlLabel
@@ -212,9 +239,9 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
           {annotation.connectionType === 'curve' && (
             <LinePath
               d={`M ${annotationX},${annotationY}
-                      Q ${annotationX + annotation.dx / 2}, ${
-                annotationY + annotation.dy / 2 + Number(annotation?.bezier) || 0
-              } ${annotationX + annotation.dx},${annotationY + annotation.dy}`}
+                      Q ${annotationX + scaledDx / 2}, ${
+                annotationY + scaledDy / 2 + Number(annotation?.bezier) || 0
+              } ${annotationX + scaledDx},${annotationY + scaledDy}`}
               stroke={APP_FONT_COLOR}
               fill='none'
               marker-start={`url(#marker-start--${originalIndex})`}
@@ -241,16 +268,16 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
             <>
               <circle
                 fill='white'
-                cx={annotationX + annotation.dx}
-                cy={annotationY + annotation.dy}
+                cx={annotationX + scaledDx}
+                cy={annotationY + scaledDy}
                 r={12}
                 className='annotation__mobile-label annotation__mobile-label-circle'
                 stroke={APP_FONT_COLOR}
               />
               <text
                 height={16}
-                x={annotationX + annotation.dx}
-                y={annotationY + annotation.dy + 1}
+                x={annotationX + scaledDx}
+                y={annotationY + scaledDy + 1}
                 fontSize={14}
                 className='annotation__mobile-label'
                 alignmentBaseline='middle'

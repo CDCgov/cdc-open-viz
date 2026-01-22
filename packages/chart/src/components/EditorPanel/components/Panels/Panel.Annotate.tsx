@@ -17,6 +17,21 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   const { updateConfig, config, svgRef, transformedData } = useContext(ConfigContext)
   const { visSupportsDataAnnotations } = useEditorPermissions()
 
+  /**
+   * Get the current SVG dimensions for saving with annotations.
+   * Uses getBoundingClientRect for consistency with how annotations are rendered.
+   */
+  const getSvgDimensions = (): [number, number] => {
+    const svgContainer = document.querySelector('.chart-container > svg')?.getBoundingClientRect()
+    if (svgContainer && svgContainer.width > 0 && svgContainer.height > 0) {
+      return [svgContainer.width, svgContainer.height]
+    }
+    // Fallback to ref if DOM query fails
+    const width = Number(svgRef?.current?.width?.baseVal?.value || svgRef?.current?.width) || 0
+    const height = Number(svgRef?.current?.height?.baseVal?.value || svgRef?.current?.height) || 0
+    return [width, height]
+  }
+
   const updateField = (section, subsection, fieldName, value) => {
     if (subsection) {
       updateConfig({
@@ -41,11 +56,9 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   }
 
   const handleAnnotationUpdate = (value, property, index) => {
-    const svgContainer = document.querySelector('.chart-container  > svg')?.getBoundingClientRect()
-    const newSvgDims = [svgContainer?.width, svgContainer?.height]
     const annotations = [...config?.annotations]
     annotations[index][property] = value
-    annotations[index].savedDimensions = newSvgDims
+    annotations[index].savedDimensions = getSvgDimensions()
 
     updateConfig({
       ...config,
@@ -54,11 +67,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   }
 
   const handleAddAnnotation = () => {
-    // check if svg is animated svg or standard svg
-    const newSvgDims = [
-      svgRef?.current?.width?.baseVal?.value || svgRef?.current?.width,
-      svgRef?.current?.height?.baseVal?.value || svgRef?.current?.height
-    ]
+    const newSvgDims = getSvgDimensions()
 
     const newAnnotation = {
       text: 'New annotation',
