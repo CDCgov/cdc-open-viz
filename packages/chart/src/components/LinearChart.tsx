@@ -68,15 +68,60 @@ type LinearChartProps = {
   parentHeight: number
 }
 
+// Axis and tick constants
 const BOTTOM_LABEL_PADDING = 9
 const X_TICK_LABEL_PADDING = 4.5
 const DEFAULT_TICK_LENGTH = 8
-const MONTH_AS_MS = 1000 * 60 * 60 * 24 * 30
+const TICK_LABEL_MARGIN_RIGHT = 4.5
+const DEFAULT_MAX_TICK_ROTATION = 90
+const TICK_ROTATION_VERTICAL_ANCHOR_THRESHOLD = -50
+const TICK_BUFFER_SPACING = 40
+
+// Font sizes
 const TICK_LABEL_FONT_SIZE = 16
 const TICK_LABEL_FONT_SIZE_SMALL = 13
 const AXIS_LABEL_FONT_SIZE = 18
 const AXIS_LABEL_FONT_SIZE_SMALL = 14
-const TICK_LABEL_MARGIN_RIGHT = 4.5
+
+// Logarithmic axis constants
+const LOGARITHMIC_TICK_LENGTH = 6
+const MAJOR_LOG_TICK_LENGTH = 7
+const MAJOR_TICK_LENGTH = 16
+const MAJOR_LOG_TICK_STROKE_WIDTH = 1.3
+const HORIZONTAL_LOG_DY_OFFSET = 8
+
+// Label positioning constants
+const BELOW_BAR_TEXT_OFFSET = -6.5
+const LABEL_PADDING_OFFSET = 8
+const VALUE_ON_LINE_PADDING_NO_AXIS = -8
+const VALUE_ON_LINE_PADDING_WITH_AXIS = -12
+const LABEL_Y_PADDING_ABOVE_GRIDLINES = 4
+const HORIZONTAL_TICK_OFFSET_ADJUSTMENT = 5
+const DYNAMIC_MARGIN_TOP_PADDING = 20
+
+// Brush constants
+const BRUSH_HEIGHT = 70
+const BRUSH_MARGIN = 10
+const BRUSH_MIN_WIDTH = 100
+
+// Tooltip constants
+const TOOLTIP_EDGE_BUFFER = 10
+const TOOLTIP_OFFSET = 6
+
+// Chart-specific constants
+const WARMING_STRIPES_HEIGHT = 78
+const BAR_MIN_HEIGHT = 15
+const ZERO_LINE_STROKE_WIDTH = 2
+
+// Tick width calculation accumulators
+const BASE_TICK_WIDTH_ACCUMULATOR = 100
+const MULTI_LABEL_ACCUMULATOR = 180
+
+// Time constants
+const MONTH_AS_MS = 1000 * 60 * 60 * 24 * 30
+
+// Lollipop chart sizes
+const LOLLIPOP_SIZES = { large: 7, medium: 6, small: 5 } as const
 
 type TooltipData = {
   dataXPosition?: number
@@ -183,7 +228,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   // height before bottom axis
   const initialHeight = useMemo(
-    () => (visualizationType === 'Warming Stripes' ? 78 : calcInitialHeight(config, currentViewport)),
+    () =>
+      visualizationType === 'Warming Stripes' ? WARMING_STRIPES_HEIGHT : calcInitialHeight(config, currentViewport),
     [config, currentViewport, parentHeight, config.heights?.vertical, config.heights?.horizontal, visualizationType]
   )
   const forestHeight = useMemo(() => initialHeight + forestRowsHeight, [initialHeight, forestRowsHeight])
@@ -410,7 +456,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       // parent element is visible
       setAnimatedChart(prevState => true)
     }
-  }) /* eslint-disable-line */
+  }, [])
 
   // If the chart is in view, set to animate if it has not already played
   useEffect(() => {
@@ -461,9 +507,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const svgHeight = initialHeight + svgAdditionalHeight
 
     // Parent container height (includes brush if active)
-    const brushHeight = 70
-    const brushMargin = 10
-    const brushHeightWithMargin = config.xAxis.brushActive ? brushHeight + brushMargin : 0
+    const brushHeightWithMargin = config.xAxis.brushActive ? BRUSH_HEIGHT + BRUSH_MARGIN : 0
     const parentHeight = svgHeight + brushHeightWithMargin
 
     if (!parentRef.current) return
@@ -513,8 +557,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
     const rightSideRemainingSpace = parentWidth - dataXPosition
 
-    const rightSide = rightSideRemainingSpace <= tooltipWidth && dataXPosition > parentWidth / 2 - 10
-    const maxWidth = rightSide ? dataXPosition - 10 : parentWidth - (dataXPosition + 6)
+    const rightSide = rightSideRemainingSpace <= tooltipWidth && dataXPosition > parentWidth / 2 - TOOLTIP_EDGE_BUFFER
+    const maxWidth = rightSide ? dataXPosition - TOOLTIP_EDGE_BUFFER : parentWidth - (dataXPosition + TOOLTIP_OFFSET)
     tooltipRef.current.node.style.maxWidth = `${maxWidth}px`
   }, [tooltipOpen, tooltipData])
 
@@ -544,8 +588,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       const tickWidthAll = filteredTicks.map(tick =>
         getTextWidth(formatNumber(tick.value, 'left'), GET_TEXT_WIDTH_FONT)
       )
-      const accumulator = 100
-      const sumOfTickWidth = tickWidthAll.reduce((a, b) => a + b, accumulator)
+      const sumOfTickWidth = tickWidthAll.reduce((a, b) => a + b, BASE_TICK_WIDTH_ACCUMULATOR)
       const spaceBetweenEachTick = (xMaxHalf - sumOfTickWidth) / numberOfTicks
       // Determine the position of each tick
       let positions = [0]
@@ -580,7 +623,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               <Group className='bottom-axis'>
                 {props.ticks.map((tick, i) => {
                   const isTicksOverlapping = getTickPositions(props.ticks, g1xScale)
-                  const maxTickRotation = Number(config.xAxis.maxTickRotation) || 90
+                  const maxTickRotation = Number(config.xAxis.maxTickRotation) || DEFAULT_MAX_TICK_ROTATION
                   const isResponsiveTicks = config.isResponsiveTicks && isTicksOverlapping
                   const angle =
                     tick.index !== 0 && (isResponsiveTicks ? maxTickRotation : Number(config.yAxis.tickRotation))
@@ -629,7 +672,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 <Group className='bottom-axis'>
                   {props.ticks.map((tick, i) => {
                     const isTicksOverlapping = getTickPositions(props.ticks, g2xScale)
-                    const maxTickRotation = Number(config.xAxis.maxTickRotation) || 90
+                    const maxTickRotation = Number(config.xAxis.maxTickRotation) || DEFAULT_MAX_TICK_ROTATION
                     const isResponsiveTicks = config.isResponsiveTicks && isTicksOverlapping
                     const angle =
                       tick.index !== 0 && (isResponsiveTicks ? maxTickRotation : Number(config.yAxis.tickRotation))
@@ -944,11 +987,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
               if (!anchor.value) return
               if (config.yAxis.labelPlacement === 'Below Bar') {
-                const textOffset = -6.5
-                middleOffset = textOffset + Number(config.series.length * config.barHeight) / config.series.length
+                middleOffset =
+                  BELOW_BAR_TEXT_OFFSET + Number(config.series.length * config.barHeight) / config.series.length
               } else {
-                const paddingOffset = 8
-                middleOffset = paddingOffset
+                middleOffset = LABEL_PADDING_OFFSET
               }
 
               if (!position) return
@@ -956,13 +998,13 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               return (
                 // prettier-ignore
                 <Line
-                key={`yAxis-${anchor.value}--${index}`}
-                strokeDasharray={handleLineType(anchor.lineStyle)}
-                stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                className='anchor-y'
-                from={{ x: runtime.yAxis.size, y: position - middleOffset }}
-                to={{ x: runtime.yAxis.size + xMax, y: position - middleOffset }}
-              />
+                  key={`yAxis-${anchor.value}--${index}`}
+                  strokeDasharray={handleLineType(anchor.lineStyle)}
+                  stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                  className='anchor-y'
+                  from={{ x: runtime.yAxis.size, y: position - middleOffset }}
+                  to={{ x: runtime.yAxis.size + xMax, y: position - middleOffset }}
+                />
               )
             })}
           {/* x anchors */}
@@ -992,14 +1034,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               return (
                 // prettier-ignore
                 <Line
-                key={`xAxis-${anchor.value}--${index}`}
-                strokeDasharray={handleLineType(anchor.lineStyle)}
-                stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                className='anchor-x'
-                from={{ x: Number(anchorPosition) + Number(padding), y: 0 }}
-                to={{ x: Number(anchorPosition) + Number(padding), y: yMax }}
-              />
+                  key={`xAxis-${anchor.value}--${index}`}
+                  strokeDasharray={handleLineType(anchor.lineStyle)}
+                  stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                  fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                  className='anchor-x'
+                  from={{ x: Number(anchorPosition) + Number(padding), y: 0 }}
+                  to={{ x: Number(anchorPosition) + Number(padding), y: yMax }}
+                />
               )
             })}
           {/* we are handling regions in bar charts differently, so that we can calculate the bar group into the region space. */}
@@ -1048,7 +1090,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             config.yAxis.type !== 'categorical' && (
               <AxisLeft
                 scale={yScale}
-                tickLength={isLogarithmicAxis ? 6 : 8}
+                tickLength={isLogarithmicAxis ? LOGARITHMIC_TICK_LENGTH : DEFAULT_TICK_LENGTH}
                 left={Number(runtime.yAxis.size) - config.yAxis.axisPadding}
                 label={runtime.yAxis.label || runtime.yAxis.label}
                 stroke='#333'
@@ -1061,7 +1103,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       ? Math.abs(props.axisToPoint.y - props.axisFromPoint.y) / 2
                       : (props.axisFromPoint.y - props.axisToPoint.y) / 2
                   const horizontalTickOffset =
-                    yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
+                    yMax / props.ticks.length / 2 -
+                    (yMax / props.ticks.length) * (1 - config.barThickness) +
+                    HORIZONTAL_TICK_OFFSET_ADJUSTMENT
                   return (
                     <Group className='left-axis'>
                       {!config.yAxis.hideAxis && (
@@ -1102,23 +1146,24 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                           from={{ x: xScale(0), y: 0 }}
                           to={{ x: xScale(0), y: yMax }}
                           stroke='#333'
-                          strokeWidth={2}
+                          strokeWidth={ZERO_LINE_STROKE_WIDTH}
                         />
                       )}
                       {props.ticks.map((tick, i) => {
                         const minY = props.ticks[0].to.y
-                        const barMinHeight = 15 // 15 is the min height for bars by default
                         const showTicks = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
-                        const tickLength = showTicks === 'block' ? 7 : 0
+                        const tickLength = showTicks === 'block' ? MAJOR_LOG_TICK_LENGTH : 0
                         const to = { x: tick.to.x - tickLength, y: tick.to.y }
 
                         // Vertical value/suffix vars
                         const lastTick = props.ticks.length - 1 === i
                         const useInlineLabel = lastTick && inlineLabel
                         const hideTopTick = lastTick && inlineLabel && !inlineLabelHasNoSpace
-                        const valueOnLinePadding = hideAxis ? -8 : -12
+                        const valueOnLinePadding = hideAxis
+                          ? VALUE_ON_LINE_PADDING_NO_AXIS
+                          : VALUE_ON_LINE_PADDING_WITH_AXIS
                         const labelXPadding = labelsAboveGridlines ? valueOnLinePadding : TICK_LABEL_MARGIN_RIGHT
-                        const labelYPadding = labelsAboveGridlines ? 4 : 0
+                        const labelYPadding = labelsAboveGridlines ? LABEL_Y_PADDING_ABOVE_GRIDLINES : 0
                         const labelX = tick.to.x - labelXPadding
                         const labelY = tick.to.y - labelYPadding
                         const labelVerticalAnchor = labelsAboveGridlines ? 'end' : 'middle'
@@ -1169,8 +1214,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                 // Calculate barHeight based on chart type (regular bar vs lollipop)
                                 let barHeight
                                 if (config.isLollipopChart) {
-                                  const lollipopSizes = { large: 7, medium: 6, small: 5 }
-                                  const lollipopBarWidth = lollipopSizes[config.lollipopSize] || 5
+                                  const lollipopBarWidth = LOLLIPOP_SIZES[config.lollipopSize] || LOLLIPOP_SIZES.small
                                   barHeight = lollipopBarWidth * barGroupCount
                                 } else {
                                   barHeight = Number(config.barHeight) * barGroupCount
@@ -1202,7 +1246,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                               !config.yAxis.hideLabel && (
                                 <Text
                                   transform={`translate(${tick.to.x - 5}, ${
-                                    tick.to.y - minY + (Number(config.barHeight) - barMinHeight) / 2
+                                    tick.to.y - minY + (Number(config.barHeight) - BAR_MIN_HEIGHT) / 2
                                   }) rotate(-${runtime.horizontal ? runtime.yAxis.tickRotation : 0})`}
                                   verticalAnchor={'start'}
                                   textAnchor={'end'}
@@ -1370,7 +1414,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                     ? (props.axisToPoint.y - props.axisFromPoint.y) / 2
                     : (props.axisFromPoint.y - props.axisToPoint.y) / 2
                 const horizontalTickOffset =
-                  yMax / props.ticks.length / 2 - (yMax / props.ticks.length) * (1 - config.barThickness) + 5
+                  yMax / props.ticks.length / 2 -
+                  (yMax / props.ticks.length) * (1 - config.barThickness) +
+                  HORIZONTAL_TICK_OFFSET_ADJUSTMENT
                 return (
                   <Group className='right-axis'>
                     {props.ticks.map((tick, i) => {
@@ -1515,12 +1561,12 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   ...filteredTicks.map(tick => getTextWidth(tick.formattedValue, GET_TEXT_WIDTH_FONT))
                 )
                 // const marginTop = 20 // moved to top bc need for yMax calcs
-                const accumulator = isMultiLabel ? 180 : 100
+                const accumulator = isMultiLabel ? MULTI_LABEL_ACCUMULATOR : BASE_TICK_WIDTH_ACCUMULATOR
 
                 const textWidths = filteredTicks.map(tick => getTextWidth(tick.formattedValue, GET_TEXT_WIDTH_FONT))
                 const sumOfTickWidth = textWidths.reduce((a, b) => a + b, accumulator)
                 const spaceBetweenEachTick = (xMax - sumOfTickWidth) / (filteredTicks.length - 1)
-                const bufferBetweenTicks = 40
+                const bufferBetweenTicks = TICK_BUFFER_SPACING
                 const maxLengthOfTick =
                   parentWidth / filteredTicks.length - X_TICK_LABEL_PADDING * 2 - bufferBetweenTicks
 
@@ -1547,7 +1593,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   lastTickEnd > lastTickEndThreshold // Force wrap it last tick is close to the end of the axis
 
                 const dynamicMarginTop =
-                  areTicksTouching && config.isResponsiveTicks ? longestTickLength + DEFAULT_TICK_LENGTH + 20 : 0
+                  areTicksTouching && config.isResponsiveTicks
+                    ? longestTickLength + DEFAULT_TICK_LENGTH + DYNAMIC_MARGIN_TOP_PADDING
+                    : 0
 
                 config.dynamicMarginTop = dynamicMarginTop
                 config.xAxis.tickWidthMax = longestTickLength
@@ -1557,7 +1605,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                     {filteredTicks.map((tick, i, propsTicks) => {
                       // when using LogScale show major ticks values only
                       const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
-                      const tickLength = showTick === 'block' ? 16 : DEFAULT_TICK_LENGTH
+                      const tickLength = showTick === 'block' ? MAJOR_TICK_LENGTH : DEFAULT_TICK_LENGTH
                       const to = { x: tick.to.x, y: tickLength }
                       const limitedWidth = 100 / propsTicks.length
                       //reset rotations by updating config
@@ -1579,18 +1627,22 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                               from={tick.from}
                               to={orientation === 'horizontal' && isLogarithmicAxis ? to : tick.to}
                               stroke={config.xAxis.tickColor}
-                              strokeWidth={showTick === 'block' && isLogarithmicAxis ? 1.3 : 1}
+                              strokeWidth={showTick === 'block' && isLogarithmicAxis ? MAJOR_LOG_TICK_STROKE_WIDTH : 1}
                             />
                           )}
                           {!config.xAxis.hideLabel && (
                             <Text
                               innerRef={el => (xAxisLabelRefs.current[i] = el)}
-                              dy={config.orientation === 'horizontal' && isLogarithmicAxis ? 8 : 0}
+                              dy={
+                                config.orientation === 'horizontal' && isLogarithmicAxis ? HORIZONTAL_LOG_DY_OFFSET : 0
+                              }
                               display={config.orientation === 'horizontal' && isLogarithmicAxis ? showTick : 'block'}
                               x={tick.to.x}
                               y={tick.to.y + X_TICK_LABEL_PADDING}
                               angle={tickRotation}
-                              verticalAnchor={tickRotation < -50 ? 'middle' : 'start'}
+                              verticalAnchor={
+                                tickRotation < TICK_ROTATION_VERTICAL_ANCHOR_THRESHOLD ? 'middle' : 'start'
+                              }
                               textAnchor={tickRotation ? 'end' : 'middle'}
                               width={
                                 areTicksTouching && !config.isResponsiveTicks && !Number(config.xAxis.tickRotation)
@@ -1680,10 +1732,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           <div
             style={{
               position: 'relative',
-              marginTop: '10px',
+              marginTop: `${BRUSH_MARGIN}px`,
               left: `${runtime.yAxis.size || 0}px`,
-              width: `${Math.max(xMax, 100)}px`,
-              height: '70px',
+              width: `${Math.max(xMax, BRUSH_MIN_WIDTH)}px`,
+              height: `${BRUSH_HEIGHT}px`,
               pointerEvents: 'auto',
               zIndex: 15,
               touchAction: 'none', // Enable touch interactions for brush
@@ -1693,7 +1745,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             }}
             className='brush-overlay'
           >
-            <BrushSelector xMax={Math.max(xMax, 100)} yMax={70} />
+            <BrushSelector xMax={Math.max(xMax, BRUSH_MIN_WIDTH)} yMax={BRUSH_HEIGHT} />
           </div>
         )}
       </div>
