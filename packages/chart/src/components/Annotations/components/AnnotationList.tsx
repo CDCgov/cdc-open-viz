@@ -2,18 +2,14 @@ import React, { useContext } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import './AnnotationList.styles.css'
 import DOMPurify from 'dompurify'
-import { getVisibleAnnotations } from '../helpers/getVisibleAnnotations'
 
 type AnnotationListProps = {
   useBootstrapVisibilityClasses?: boolean
 }
 
 const AnnotationList: React.FC<AnnotationListProps> = ({ useBootstrapVisibilityClasses = true }) => {
-  const { config, transformedData } = useContext(ConfigContext)
+  const { config, visibleAnnotations } = useContext(ConfigContext)
   const annotations = config.annotations || []
-
-  // Filter annotations to only show those with visible data (for data-mode annotations)
-  const visibleAnnotations = getVisibleAnnotations(annotations, transformedData, config.xAxis?.dataKey)
 
   const ulClasses = () => {
     const classes = ['annotation-list']

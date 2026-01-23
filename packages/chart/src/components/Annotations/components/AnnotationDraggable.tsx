@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useState } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import DOMPurify from 'dompurify'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
@@ -6,7 +6,6 @@ import { isMobileAnnotationViewport } from '@cdc/core/helpers/viewports'
 
 // helpers
 import { findNearestDatum } from './findNearestDatum'
-import { getVisibleAnnotations } from '../helpers/getVisibleAnnotations'
 
 // visx
 import { HtmlLabel, CircleSubject, EditableAnnotation, Connector, Annotation as VisxAnnotation } from '@visx/annotation'
@@ -28,14 +27,11 @@ const Annotations = ({
   onDragStateChange
 }) => {
   // prettier-ignore
-  const { config, dimensions, isEditor, updateConfig, colorScale, transformedData, parseDate, currentViewport } = useContext(ConfigContext)
+  const { config, dimensions, isEditor, updateConfig, colorScale, transformedData, parseDate, currentViewport, visibleAnnotations } = useContext(ConfigContext)
 
   // destructure config items here...
   const { annotations, visualizationType } = config
   const [height] = dimensions
-
-  // Filter annotations to only show those with visible data (for data-mode annotations)
-  const visibleAnnotations = getVisibleAnnotations(annotations, transformedData, config.xAxis?.dataKey)
 
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
   const isMobile = isMobileAnnotationViewport(currentViewport)

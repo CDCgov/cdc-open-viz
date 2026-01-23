@@ -3,17 +3,12 @@ import ConfigContext from '../../../ConfigContext'
 import './AnnotationDropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
 import Annotation from '..'
-import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
 import { isMobileAnnotationViewport } from '@cdc/core/helpers/viewports'
 
 const AnnotationDropdown = () => {
   const { currentViewport: viewport, config } = useContext(ConfigContext)
   const [expanded, setExpanded] = useState(false)
   const isMobile = isMobileAnnotationViewport(viewport)
-
-  const {
-    config: { annotations }
-  } = useContext(ConfigContext)
 
   const limitHeight = {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
