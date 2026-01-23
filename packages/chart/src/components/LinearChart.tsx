@@ -699,6 +699,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               yScaleAnnotation={yScaleAnnotation}
               xMax={xMax}
               yMax={yMax}
+              seriesScale={seriesScale}
               svgRef={svgRef}
               onDragStateChange={handleDragStateChange}
             />

@@ -16,7 +16,17 @@ import { LinePath } from '@visx/shape'
 // styles
 import './AnnotationDraggable.styles.css'
 
-const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax, yMax, svgRef, onDragStateChange }) => {
+const Annotations = ({
+  xScale,
+  yScale,
+  xScaleAnnotation,
+  yScaleAnnotation,
+  xMax,
+  yMax,
+  seriesScale,
+  svgRef,
+  onDragStateChange
+}) => {
   // prettier-ignore
   const { config, dimensions, isEditor, updateConfig, colorScale, transformedData, parseDate, currentViewport } = useContext(ConfigContext)
 
@@ -90,13 +100,28 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, yScaleAnnotation, xMax,
             xScaleInput = parseDate(xScaleInput, false)?.getTime()
           }
 
-          // Base X position (centered on data point)
-          annotationX = xScale(xScaleInput) + (xScale.bandwidth?.() / 2 || 0)
+          // Check if this annotation's series is a bar in a grouped bar situation
+          const annotationSeries = config.series?.find(s => s.dataKey === annotation.seriesKey)
+          const barSeriesCount = config.series?.filter(s => s.type === 'Bar').length || 0
+          const isGroupedBarAnnotation =
+            annotationSeries?.type === 'Bar' && barSeriesCount > 1 && config.visualizationSubType !== 'stacked'
+
+          if (isGroupedBarAnnotation && seriesScale) {
+            // Position at group start + series offset + half series bar width
+            const seriesOffset = seriesScale(annotation.seriesKey) || 0
+            const seriesBandwidth = seriesScale.bandwidth?.() || 0
+            annotationX = xScale(xScaleInput) + seriesOffset + seriesBandwidth / 2
+          } else {
+            // For lines, areas, single bars, etc - center on the data point
+            annotationX = xScale(xScaleInput) + (xScale.bandwidth?.() / 2 || 0)
+          }
 
           // Adjust X for arrow markers based on label direction
           if (annotation.marker === 'arrow' && Math.abs(annotation.dx) >= 100) {
             const direction = annotation.dx > 0 ? 1 : -1
-            const nudgeAmount = xScale.bandwidth?.() ? xScale.bandwidth() / 6 : 2
+            const relevantBandwidth =
+              isGroupedBarAnnotation && seriesScale ? seriesScale.bandwidth?.() : xScale.bandwidth?.()
+            const nudgeAmount = relevantBandwidth ? relevantBandwidth / 6 : 2
             annotationX += direction * nudgeAmount
           }
 

@@ -15,6 +15,6 @@ export const isMobileTerritoryViewport = currentViewport => isBelowBreakpoint('s
 
 export const isMobileFontViewport = currentViewport => isBelowBreakpoint('sm', currentViewport)
 
-export const isMobileAnnotationViewport = currentViewport => isBelowBreakpoint('md', currentViewport)
+export const isMobileAnnotationViewport = currentViewport => isBelowBreakpoint('sm', currentViewport)
 
 export const isMobileSmallMultiplesViewport = currentViewport => isBelowBreakpoint('md', currentViewport)
