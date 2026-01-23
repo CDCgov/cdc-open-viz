@@ -466,8 +466,8 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                 {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
               </div>
               <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
-              <svg height={config.gauge.height} width={'100%'}>
-                <Group>
+              <svg height={config.gauge.height + 4} width={'100%'} style={{ overflow: 'visible' }}>
+                <Group top={2} left={2}>
                   <foreignObject
                     style={{ border: '1px solid black' }}
                     x={0}
