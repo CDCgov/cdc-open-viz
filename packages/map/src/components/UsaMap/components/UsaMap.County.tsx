@@ -15,7 +15,7 @@ import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
 import { MapConfig } from '../../../types/MapConfig'
-import { DISABLED_MAP_COLOR } from '../../../helpers/constants'
+import { DEFAULT_MAP_BACKGROUND, DISABLED_MAP_COLOR } from '../../../helpers/constants'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
@@ -625,9 +625,9 @@ const CountyMap = () => {
         context.fillStyle =
           legendValues && config.general.type !== 'us-geocode'
             ? legendValues[0] === '#000000'
-              ? DISABLED_MAP_COLOR
+              ? DEFAULT_MAP_BACKGROUND
               : legendValues[0]
-            : DISABLED_MAP_COLOR
+            : DEFAULT_MAP_BACKGROUND
         context.beginPath()
         path(geo)
         context.fill()
