@@ -344,6 +344,11 @@
       .bite__style--tp5:not(.white-background-style) .cdc-callout__icon {
         display: none;
       }
+
+      // Hide flag when in multi-column layout
+      .bite__style--tp5 .cdc-callout__flag {
+        display: none;
+      }
     }
 
     // TP5 Waffle Chart adjustments when there are 2+ in a row
@@ -358,8 +363,16 @@
 
         .cdc-callout {
           flex: 1;
-          display: flex;
-          flex-direction: column;
+        }
+
+        // Hide icon when in multi-column layout
+        .cdc-callout__icon {
+          display: none;
+        }
+
+        // Hide flag when in multi-column layout
+        .cdc-callout__flag {
+          display: none;
         }
 
         .cdc-callout__heading {
