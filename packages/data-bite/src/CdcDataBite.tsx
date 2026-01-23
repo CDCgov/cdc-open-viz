@@ -622,15 +622,15 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
                 {config.visual?.showTitle && title && title.trim() && (
                   <h3 className='cdc-callout__heading fw-bold flex-shrink-0 d-flex align-items-start'>
-                    <span>{parse(processContentWithMarkup(title))}</span>
+                    {parse(processContentWithMarkup(title))}
                   </h3>
                 )}
-                <div className='cdc-callout__body d-flex flex-row align-content-start flex-grow-1'>
+                <div className='cdc-callout__body d-flex flex-row align-items-center align-content-start flex-grow-1'>
                   {showBite && (
                     <div className='cdc-callout__databite flex-shrink-0  me-3'>{calculateDataBite(true)}</div>
                   )}
                   <div className='cdc-callout__content flex-grow-1 d-flex flex-column  min-w-0'>
-                    <p className='mb-0'>{parse(processContentWithMarkup(biteBody))}</p>
+                    {parse(processContentWithMarkup(biteBody))}
                     {subtext && !config.general.isCompactStyle && (
                       <p className='bite-subtext fst-italic flex-shrink-0 mt-3'>
                         {parse(processContentWithMarkup(subtext))}
