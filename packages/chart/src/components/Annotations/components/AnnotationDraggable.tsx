@@ -211,7 +211,7 @@ const Annotations = ({
         >
           {!isMobile &&
             (() => {
-              const labelWidth = config.general.showAnnotationDropdown ? 200 : 150
+              const labelWidth = config.general.showAnnotationDropdown ? 186 : 150
               // Use live dx during drag (already in current space), otherwise use scaled dx
               const currentDx = liveDrag?.index === annotationIndex ? liveDrag.dx : scaledDx
               const { horizontalAnchor, verticalAnchor } = getAnnotationAnchors(annotationX, currentDx, labelWidth)
@@ -233,7 +233,8 @@ const Annotations = ({
                       width: 'auto',
                       display: config.general.showAnnotationDropdown ? 'inline-flex' : 'flex',
                       justifyContent: 'start',
-                      flexDirection: 'row'
+                      flexDirection: 'row',
+                      alignItems: 'center'
                     }}
                     // role='presentation'
                     tabIndex={0}
@@ -241,7 +242,10 @@ const Annotations = ({
                   >
                     {config?.general?.showAnnotationDropdown && (
                       <>
-                        <p className='annotation__has-dropdown-number' style={{ margin: '2px 6px' }}>
+                        <p
+                          className='annotation__has-dropdown-number'
+                          style={{ margin: '2px 6px', position: 'relative', left: '-4px' }}
+                        >
                           {originalIndex + 1}
                         </p>
                       </>

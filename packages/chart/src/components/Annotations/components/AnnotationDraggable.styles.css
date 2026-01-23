@@ -13,11 +13,13 @@
     justify-content: center;
     align-items: center;
     border-radius: 50%;
-    padding: 8px;
     width: 24px;
     height: 24px;
+    min-width: 24px;
+    min-height: 24px;
     border: 1px solid #666;
     text-align: center;
     font-size: 14px;
+    box-sizing: border-box;
   }
 }
