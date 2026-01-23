@@ -296,28 +296,10 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
           y={isTP5 && !node.isFilled ? node.y + 1 : node.y}
           width={isTP5 && !node.isFilled ? nodeWidthNum - 2 : nodeWidthNum}
           height={isTP5 && !node.isFilled ? nodeWidthNum - 2 : nodeWidthNum}
-          fill={
-            isTP5
-              ? tp5StrokeColor
-                ? node.isFilled
-                  ? '#009EC1'
-                  : '#DFF2F6'
-                : node.isFilled
-                ? node.color
-                : '#dff2f6'
-              : node.color
-          }
+          fill={isTP5 ? (node.isFilled ? '#009EC1' : '#DFF2F6') : node.color}
           fillOpacity={isTP5 ? 1 : node.opacity}
-          stroke={
-            isTP5
-              ? tp5StrokeColor && !node.isFilled
-                ? tp5StrokeColor
-                : node.isFilled
-                ? undefined
-                : node.color
-              : undefined
-          }
-          strokeWidth={isTP5 ? (tp5StrokeColor && !node.isFilled ? 1 : node.isFilled ? 0 : 1) : 0}
+          stroke={isTP5 ? (!node.isFilled ? '#009EC1' : undefined) : undefined}
+          strokeWidth={isTP5 ? (!node.isFilled ? 1 : 0) : 0}
           key={key}
         />
       ) : node.shape === 'person' ? (
@@ -331,30 +313,10 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
               : `translateX(${node.x + nodeWidthNum / 4}px) translateY(${node.y}px) scale(${nodeWidthNum / 20})`,
             transitionDelay: `${0.1 * key}ms`
           }}
-          fill={
-            isTP5
-              ? tp5StrokeColor
-                ? node.isFilled
-                  ? '#009EC1'
-                  : 'white'
-                : node.isFilled
-                ? node.color
-                : 'transparent'
-              : node.color
-          }
+          fill={isTP5 ? (node.isFilled ? '#009EC1' : 'transparent') : node.color}
           fillOpacity={isTP5 ? 1 : node.opacity}
-          stroke={
-            isTP5
-              ? tp5StrokeColor && !node.isFilled
-                ? tp5StrokeColor
-                : node.isFilled
-                ? undefined
-                : node.color
-              : undefined
-          }
-          strokeWidth={
-            isTP5 ? (tp5StrokeColor && !node.isFilled ? 448 / nodeWidthNum : node.isFilled ? 0 : 448 / nodeWidthNum) : 0
-          }
+          stroke={isTP5 ? (!node.isFilled ? '#009EC1' : undefined) : undefined}
+          strokeWidth={isTP5 ? (!node.isFilled ? 448 / nodeWidthNum : 0) : 0}
           key={key}
           d={
             isTP5
@@ -369,28 +331,10 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
           cx={node.x}
           cy={node.y}
           r={isTP5 && !node.isFilled ? nodeWidthNum / 2 - 1 : nodeWidthNum / 2}
-          fill={
-            isTP5
-              ? tp5StrokeColor
-                ? node.isFilled
-                  ? '#009EC1'
-                  : '#DFF2F6'
-                : node.isFilled
-                ? node.color
-                : '#dff2f6'
-              : node.color
-          }
+          fill={isTP5 ? (node.isFilled ? '#009EC1' : '#DFF2F6') : node.color}
           fillOpacity={isTP5 ? 1 : node.opacity}
-          stroke={
-            isTP5
-              ? tp5StrokeColor && !node.isFilled
-                ? tp5StrokeColor
-                : node.isFilled
-                ? undefined
-                : node.color
-              : undefined
-          }
-          strokeWidth={isTP5 ? (tp5StrokeColor && !node.isFilled ? 1 : node.isFilled ? 0 : 1) : 0}
+          stroke={isTP5 ? (!node.isFilled ? '#009EC1' : undefined) : undefined}
+          strokeWidth={isTP5 ? (!node.isFilled ? 1 : 0) : 0}
           key={key}
         />
       )
@@ -466,8 +410,8 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                 {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
               </div>
               <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
-              <svg height={config.gauge.height} width={'100%'}>
-                <Group>
+              <svg height={config.gauge.height + 4} width={'100%'} style={{ overflow: 'visible' }}>
+                <Group top={2} left={2}>
                   <foreignObject
                     style={{ border: '1px solid black' }}
                     x={0}
