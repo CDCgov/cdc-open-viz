@@ -269,7 +269,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   }, [xAxisDataMapped])
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
 
-  const xMax = parentWidth - Number(runtime.yAxis.size) - (hasRightAxis ? config.yAxis.rightAxisSize : 0)
+  // State for computed y-axis width - allows re-render when horizontal bar label space is calculated
+  const [computedYAxisWidth, setComputedYAxisWidth] = useState<number | null>(null)
+
+  // Use computed width if available, otherwise fall back to config value
+  const yAxisWidth = computedYAxisWidth ?? Number(runtime.yAxis.size)
+
+  // Chart width calculation using the current y-axis width
+  const xMax = parentWidth - yAxisWidth - (hasRightAxis ? config.yAxis.rightAxisSize : 0)
 
   const {
     xScale,
@@ -312,9 +319,19 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   }, [isHorizontal, config.visualizationType, config.yAxis.labelPlacement, yScale, parentWidth])
 
   const horizontalYAxisLabelSpace = runtime.yAxis.label && !config.hideYAxisLabel ? 30 : 0
-  if (isHorizontal && config.visualizationType === 'Bar') {
-    runtime.yAxis.size = categoryLabelSpace + horizontalYAxisLabelSpace
-  }
+
+  // Update y-axis width state when computed value changes (for horizontal bar charts)
+  useEffect(() => {
+    if (isHorizontal && config.visualizationType === 'Bar') {
+      const newWidth = categoryLabelSpace + horizontalYAxisLabelSpace
+      if (newWidth !== computedYAxisWidth) {
+        setComputedYAxisWidth(newWidth)
+      }
+    } else if (computedYAxisWidth !== null) {
+      // Reset to null for non-horizontal bar charts so we use config value
+      setComputedYAxisWidth(null)
+    }
+  }, [isHorizontal, config.visualizationType, categoryLabelSpace, horizontalYAxisLabelSpace, computedYAxisWidth])
 
   const [yTickCount, xTickCount] = ['yAxis', 'xAxis'].map(axis =>
     countNumOfTicks({ axis, max, runtime, currentViewport, isHorizontal, data, config, min })
@@ -449,12 +466,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   })
 
   // Make sure the chart is visible if in the editor
-  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     const element = document.querySelector('.isEditor')
     if (element) {
-      // parent element is visible
-      setAnimatedChart(prevState => true)
+      setAnimatedChart(true)
     }
   }, [])
 
@@ -462,7 +477,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   useEffect(() => {
     if (dataRef?.isIntersecting === true && config.animate) {
       setTimeout(() => {
-        setAnimatedChart(prevState => true)
+        setAnimatedChart(true)
       }, 500)
     }
   }, [dataRef?.isIntersecting, config.animate])
@@ -610,7 +625,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       <>
         <AxisBottom
           top={yMax}
-          left={Number(runtime.yAxis.size)}
+          left={yAxisWidth}
           label={runtime.xAxis.label}
           tickFormat={isDateScale(runtime.xAxis) ? formatDate : formatNumber}
           scale={g1xScale}
@@ -656,7 +671,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
         <AxisBottom
           innerRef={axisBottomRef}
           top={yMax}
-          left={Number(runtime.yAxis.size)}
+          left={yAxisWidth}
           label={runtime.xAxis.label}
           tickFormat={
             isDateScale(runtime.xAxis) ? formatDate : runtime.xAxis.dataKey !== 'Year' ? formatNumber : tick => tick
@@ -753,11 +768,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           {/* Actual AxisLeft is drawn after visualization */}
           {!['Spark Line', 'Forest Plot', 'Warming Stripes'].includes(visualizationType) &&
             config.yAxis.type !== 'categorical' && (
-              <AxisLeft
-                scale={yScale}
-                left={Number(runtime.yAxis.size) - config.yAxis.axisPadding}
-                numTicks={handleNumTicks}
-              >
+              <AxisLeft scale={yScale} left={yAxisWidth - config.yAxis.axisPadding} numTicks={handleNumTicks}>
                 {props => {
                   const axisCenter =
                     config.orientation === 'horizontal'
@@ -789,7 +800,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                         className='y-label'
                         textAnchor='middle'
                         verticalAnchor='start'
-                        transform={`translate(${-1 * runtime.yAxis.size + yLabelOffset}, ${axisCenter}) rotate(-90)`}
+                        transform={`translate(${-1 * yAxisWidth + yLabelOffset}, ${axisCenter}) rotate(-90)`}
                         fontWeight='bold'
                         fill={config.yAxis.labelColor}
                         fontSize={axisLabelFontSize}
@@ -803,7 +814,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             )}
           {/* Horizontal chart grid lines */}
           {runtime.xAxis.gridLines && orientation === 'horizontal' && (
-            <Group left={Number(runtime.yAxis.size)}>
+            <Group left={yAxisWidth}>
               {xScale.ticks(xTickCount).map((tickValue, i) => {
                 const tickPosition = xScale(tickValue)
                 return (
@@ -887,6 +898,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               seriesScale={seriesScale}
               xMax={xMax}
               yMax={yMax}
+              yAxisWidth={yAxisWidth}
               getXAxisData={getXAxisData}
               getYAxisData={getYAxisData}
               animatedChart={animatedChart}
@@ -1002,8 +1014,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   strokeDasharray={handleLineType(anchor.lineStyle)}
                   stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   className='anchor-y'
-                  from={{ x: runtime.yAxis.size, y: position - middleOffset }}
-                  to={{ x: runtime.yAxis.size + xMax, y: position - middleOffset }}
+                  from={{ x: yAxisWidth, y: position - middleOffset }}
+                  to={{ x: yAxisWidth + xMax, y: position - middleOffset }}
                 />
               )
             })}
@@ -1061,7 +1073,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           )}
           {isNoDataAvailable && (
             <Text
-              x={Number(runtime.yAxis.size) + Number(xMax / 2)}
+              x={yAxisWidth + Number(xMax / 2)}
               y={initialHeight / 2 - (config.xAxis.padding || 0) / 2}
               textAnchor='middle'
             >
@@ -1074,7 +1086,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               <HoverLine xMax={xMax} yMax={yMax} point={point} tooltipData={tooltipData} orientation='vertical' />
             </>
           )}
-          <Group left={Number(config.runtime.yAxis.size)}>
+          <Group left={yAxisWidth}>
             <Annotation.Draggable
               xScale={xScale}
               yScale={yScale}
@@ -1091,7 +1103,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               <AxisLeft
                 scale={yScale}
                 tickLength={isLogarithmicAxis ? LOGARITHMIC_TICK_LENGTH : DEFAULT_TICK_LENGTH}
-                left={Number(runtime.yAxis.size) - config.yAxis.axisPadding}
+                left={yAxisWidth - config.yAxis.axisPadding}
                 label={runtime.yAxis.label || runtime.yAxis.label}
                 stroke='#333'
                 tickFormat={handleLeftTickFormatting}
@@ -1226,7 +1238,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
                                 return (
                                   <Text
-                                    x={tick.from.x - Number(runtime.yAxis.size) + horizontalYAxisLabelSpace}
+                                    x={tick.from.x - yAxisWidth + horizontalYAxisLabelSpace}
                                     y={labelCenterY}
                                     verticalAnchor={'middle'}
                                     textAnchor={'start'}
@@ -1310,9 +1322,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                                       config.runtime.seriesLabelsAll[tick.formattedValue - 1]
                                     )) && (
                                     <rect
-                                      x={0 - Number(runtime.yAxis.size)}
+                                      x={0 - yAxisWidth}
                                       y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)}
-                                      width={Number(runtime.yAxis.size) + xScale(xScale.domain()[0])}
+                                      width={yAxisWidth + xScale(xScale.domain()[0])}
                                       height='2'
                                       fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])}
                                     />
@@ -1378,7 +1390,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                         className='y-label'
                         textAnchor='middle'
                         verticalAnchor='start'
-                        transform={`translate(${-1 * runtime.yAxis.size + yLabelOffset}, ${axisCenter}) rotate(-90)`}
+                        transform={`translate(${-1 * yAxisWidth + yLabelOffset}, ${axisCenter}) rotate(-90)`}
                         fontWeight='bold'
                         fill={config.yAxis.labelColor}
                         fontSize={axisLabelFontSize}
@@ -1395,14 +1407,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               yScale={yScale}
               xMax={xMax}
               yMax={yMax}
-              leftSize={Number(runtime.yAxis.size) - config.yAxis.axisPadding}
+              leftSize={yAxisWidth - config.yAxis.axisPadding}
             />
           )}
           {/* Right Axis */}
           {hasRightAxis && (
             <AxisRight
               scale={yScaleRight}
-              left={Number(runtime.yAxis.size + xMax)}
+              left={yAxisWidth + xMax}
               label={config.yAxis.rightLabel}
               tickFormat={tick => formatNumber(tick, 'right')}
               numTicks={runtime.yAxis.rightNumTicks || undefined}
@@ -1476,7 +1488,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           {hasTopAxis && config.topAxis.hasLine && (
             <AxisTop
               stroke='#333'
-              left={Number(runtime.yAxis.size)}
+              left={yAxisWidth}
               scale={xScale}
               hideTicks
               hideZero
@@ -1496,7 +1508,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   ? yMax + Number(config.xAxis.axisPadding)
                   : yMax
               }
-              left={config.visualizationType !== 'Forest Plot' ? Number(runtime.yAxis.size) : 0}
+              left={config.visualizationType !== 'Forest Plot' ? yAxisWidth : 0}
               label={runtime.xAxis.label}
               tickFormat={handleBottomTickFormatting}
               scale={xScale}
@@ -1579,6 +1591,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 }
                 // calculate the end of x axis box
                 const axisBBox = axisBottomRef?.current?.getBBox().height
+                // TODO: Technical debt - This mutation is read by parent/sibling components.
+                // Should be refactored to use proper React state management or callbacks.
                 config.xAxis.axisBBox = axisBBox
 
                 // force wrap it last tick is close to the end of the axis
@@ -1597,8 +1611,16 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                     ? longestTickLength + DEFAULT_TICK_LENGTH + DYNAMIC_MARGIN_TOP_PADDING
                     : 0
 
+                // TODO: Technical debt - These mutations are read by parent/sibling components.
+                // Should be refactored to use proper React state management or callbacks.
                 config.dynamicMarginTop = dynamicMarginTop
                 config.xAxis.tickWidthMax = longestTickLength
+
+                // Compute effective tick rotations without mutating config
+                const effectiveYAxisTickRotation =
+                  config.isResponsiveTicks && config.orientation === 'horizontal' ? 0 : config.yAxis.tickRotation
+                const effectiveXAxisTickRotation =
+                  config.isResponsiveTicks && config.orientation === 'vertical' ? 0 : config.xAxis.tickRotation
 
                 return (
                   <Group className='bottom-axis' width={parentWidth}>
@@ -1608,13 +1630,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                       const tickLength = showTick === 'block' ? MAJOR_TICK_LENGTH : DEFAULT_TICK_LENGTH
                       const to = { x: tick.to.x, y: tickLength }
                       const limitedWidth = 100 / propsTicks.length
-                      //reset rotations by updating config
-                      config.yAxis.tickRotation =
-                        config.isResponsiveTicks && config.orientation === 'horizontal' ? 0 : config.yAxis.tickRotation
-                      config.xAxis.tickRotation =
-                        config.isResponsiveTicks && config.orientation === 'vertical' ? 0 : config.xAxis.tickRotation
-                      //configure rotation
 
+                      // Configure rotation using effective values (computed above without mutations)
                       const tickRotation =
                         config.isResponsiveTicks && areTicksTouching
                           ? -Number(config.xAxis.maxTickRotation) || -90
@@ -1645,7 +1662,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                               }
                               textAnchor={tickRotation ? 'end' : 'middle'}
                               width={
-                                areTicksTouching && !config.isResponsiveTicks && !Number(config.xAxis.tickRotation)
+                                areTicksTouching && !config.isResponsiveTicks && !Number(effectiveXAxisTickRotation)
                                   ? limitedWidth
                                   : undefined
                               }
@@ -1733,7 +1750,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             style={{
               position: 'relative',
               marginTop: `${BRUSH_MARGIN}px`,
-              left: `${runtime.yAxis.size || 0}px`,
+              left: `${yAxisWidth}px`,
               width: `${Math.max(xMax, BRUSH_MIN_WIDTH)}px`,
               height: `${BRUSH_HEIGHT}px`,
               pointerEvents: 'auto',

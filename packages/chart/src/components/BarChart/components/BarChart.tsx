@@ -18,6 +18,7 @@ type BarChartProps = {
   seriesScale: PositionScale
   xMax: number
   yMax: number
+  yAxisWidth?: number
   handleTooltipMouseOver: MouseEventHandler<SVGRectElement>
   handleTooltipMouseOff: MouseEventHandler<SVGRectElement>
   handleTooltipClick: MouseEventHandler<SVGRectElement>
@@ -29,6 +30,7 @@ const BarChart: React.FC<BarChartProps> = ({
   seriesScale,
   xMax,
   yMax,
+  yAxisWidth,
   handleTooltipMouseOver,
   handleTooltipMouseOff,
   handleTooltipClick
@@ -47,10 +49,14 @@ const BarChart: React.FC<BarChartProps> = ({
     barChart
   }
 
+  // Use yAxisWidth prop if provided (for horizontal bar charts with dynamic labels)
+  // otherwise fall back to config value
+  const leftOffset = yAxisWidth ?? parseFloat(config.runtime.yAxis.size)
+
   return (
     <ErrorBoundary component='BarChart'>
       <BarChartContext.Provider value={contextValues}>
-        <Group left={parseFloat(config.runtime.yAxis.size)}>
+        <Group left={leftOffset}>
           <BarChartType.StackedVertical />
           <BarChartType.StackedHorizontal />
           <BarChartType.Vertical />
