@@ -107,6 +107,9 @@ const coveDevIndexPlugin = css => ({
 const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}, devOptions = {}) => {
   const { css: devCss } = devOptions
   let configOptionsDefault = {
+    define: {
+      __COVE_PACKAGE_NAME__: JSON.stringify(componentName)
+    },
     css: {
       preprocessorOptions: {
         scss: {
