@@ -28,6 +28,7 @@ import Regions from './Regions'
 import { CategoricalYAxis, LeftAxis, LeftAxisGridlines, BottomAxis } from './Axis'
 import BrushSelector from './Brush/BrushSelector'
 import VisualizationRenderer from './LinearChart/VisualizationRenderer'
+import { TYPES_WITHOUT_GRID, TYPES_WITH_TOOLTIP_GUIDES } from './LinearChart/linearChart.constants'
 
 // Helpers
 import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/viewports'
@@ -389,10 +390,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config
     if (visualizationType === 'Combo' && runtime.forecastingSeriesKeys > 0) return true
-    if (visualizationType === 'Area Chart') return true
-    if (visualizationType === 'Line') return true
-    if (visualizationType === 'Bar') return true
-    return false
+    return TYPES_WITH_TOOLTIP_GUIDES.includes(visualizationType as any)
   }
 
   const getManualStep = () => {
@@ -734,17 +732,16 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           {!isDraggingAnnotation && <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>}{' '}
           {/* GRID LINES */}
           {/* Actual LeftAxis is drawn after visualization */}
-          {!['Spark Line', 'Forest Plot', 'Warming Stripes'].includes(visualizationType) &&
-            config.yAxis.type !== 'categorical' && (
-              <LeftAxisGridlines
-                yScale={yScale}
-                xMax={xMax}
-                yAxisWidth={yAxisWidth}
-                numTicks={handleNumTicks}
-                yLabelOffset={yLabelOffset}
-                axisLabelFontSize={axisLabelFontSize}
-              />
-            )}
+          {!TYPES_WITHOUT_GRID.includes(visualizationType as any) && config.yAxis.type !== 'categorical' && (
+            <LeftAxisGridlines
+              yScale={yScale}
+              xMax={xMax}
+              yAxisWidth={yAxisWidth}
+              numTicks={handleNumTicks}
+              yLabelOffset={yLabelOffset}
+              axisLabelFontSize={axisLabelFontSize}
+            />
+          )}
           {/* Horizontal chart grid lines */}
           {runtime.xAxis.gridLines && orientation === 'horizontal' && (
             <Group left={yAxisWidth}>
@@ -894,26 +891,25 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           </Group>
           {/* Highlighted regions */}
           {/* Y axis */}
-          {!['Spark Line', 'Forest Plot', 'Warming Stripes'].includes(visualizationType) &&
-            config.yAxis.type !== 'categorical' && (
-              <LeftAxis
-                yScale={yScale}
-                xScale={xScale}
-                yMax={yMax}
-                xMax={xMax}
-                yAxisWidth={yAxisWidth}
-                numTicks={handleNumTicks}
-                tickLabelFontSize={tickLabelFontSize}
-                axisLabelFontSize={axisLabelFontSize}
-                handleLeftTickFormatting={handleLeftTickFormatting}
-                topYLabelRef={topYLabelRef}
-                suffixRef={suffixRef}
-                suffixWidth={suffixWidth}
-                horizontalYAxisLabelSpace={horizontalYAxisLabelSpace}
-                categoryLabelSpace={categoryLabelSpace}
-                yLabelOffset={yLabelOffset}
-              />
-            )}
+          {!TYPES_WITHOUT_GRID.includes(visualizationType as any) && config.yAxis.type !== 'categorical' && (
+            <LeftAxis
+              yScale={yScale}
+              xScale={xScale}
+              yMax={yMax}
+              xMax={xMax}
+              yAxisWidth={yAxisWidth}
+              numTicks={handleNumTicks}
+              tickLabelFontSize={tickLabelFontSize}
+              axisLabelFontSize={axisLabelFontSize}
+              handleLeftTickFormatting={handleLeftTickFormatting}
+              topYLabelRef={topYLabelRef}
+              suffixRef={suffixRef}
+              suffixWidth={suffixWidth}
+              horizontalYAxisLabelSpace={horizontalYAxisLabelSpace}
+              categoryLabelSpace={categoryLabelSpace}
+              yLabelOffset={yLabelOffset}
+            />
+          )}
           {config.yAxis.type === 'categorical' && config.orientation === 'vertical' && (
             <CategoricalYAxis
               yScale={yScale}

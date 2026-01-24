@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../ConfigContext'
+import { VISUALIZATION_TYPES, LINE_CHART_EXCLUDED_TYPES } from './linearChart.constants'
 
 // Visualization components
 import { AreaChartStacked } from '../AreaChart'
@@ -181,30 +182,20 @@ const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
       )}
 
       {/* Line Chart for other visualization types */}
-      {![
-        'Paired Bar',
-        'Box Plot',
-        'Area Chart',
-        'Scatter Plot',
-        'Deviation Bar',
-        'Forecasting',
-        'Bar',
-        'Warming Stripes'
-      ].includes(visualizationType) &&
-        !convertLineToBarGraph && (
-          <LineChart
-            xScale={xScale}
-            yScale={yScale}
-            getXAxisData={getXAxisData}
-            getYAxisData={getYAxisData}
-            xMax={xMax}
-            yMax={yMax}
-            seriesStyle={config.runtime.series}
-            tooltipData={tooltipData}
-            handleTooltipMouseOver={handleTooltipMouseOver}
-            handleTooltipMouseOff={handleTooltipMouseOff}
-          />
-        )}
+      {!LINE_CHART_EXCLUDED_TYPES.includes(visualizationType as any) && !convertLineToBarGraph && (
+        <LineChart
+          xScale={xScale}
+          yScale={yScale}
+          getXAxisData={getXAxisData}
+          getYAxisData={getYAxisData}
+          xMax={xMax}
+          yMax={yMax}
+          seriesStyle={config.runtime.series}
+          tooltipData={tooltipData}
+          handleTooltipMouseOver={handleTooltipMouseOver}
+          handleTooltipMouseOff={handleTooltipMouseOff}
+        />
+      )}
 
       {/* Forecasting - also used by Combo */}
       {(visualizationType === 'Forecasting' || visualizationType === 'Combo') && (
