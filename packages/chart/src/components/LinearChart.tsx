@@ -21,23 +21,13 @@ import _ from 'lodash'
 
 // CDC Components
 import { isDateScale } from '@cdc/core/helpers/cove/date'
-import { AreaChartStacked } from './AreaChart'
-import BarChart from './BarChart'
 import ConfigContext from '../ConfigContext'
-import BoxPlotVertical from './BoxPlot/BoxPlot.Vertical'
-import BoxPlotHorizontal from './BoxPlot/BoxPlot.Horizontal'
-import ScatterPlot from './ScatterPlot'
-import DeviationBar from './DeviationBar'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
-import Forecasting from './Forecasting'
-import LineChart from './LineChart'
-import ForestPlot from './ForestPlot'
-import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from '../hooks/useIntersectionObserver'
 import Regions from './Regions'
 import { CategoricalYAxis, LeftAxis, LeftAxisGridlines, BottomAxis } from './Axis'
 import BrushSelector from './Brush/BrushSelector'
-import WarmingStripes from './WarmingStripes'
+import VisualizationRenderer from './LinearChart/VisualizationRenderer'
 
 // Helpers
 import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/viewports'
@@ -772,167 +762,30 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             </Group>
           )}
           {visualizationType === 'Paired Bar' && generatePairedBarAxis()}
-          {visualizationType === 'Deviation Bar' && config.runtime.series?.length === 1 && (
-            <DeviationBar animatedChart={animatedChart} xScale={xScale} yScale={yScale} width={xMax} height={yMax} />
-          )}
-          {visualizationType === 'Paired Bar' && (
-            <PairedBarChart originalWidth={parentWidth} width={xMax} height={yMax} />
-          )}
-          {visualizationType === 'Scatter Plot' && (
-            <ScatterPlot
-              xScale={xScale}
-              yScale={yScale}
-              getXAxisData={getXAxisData}
-              getYAxisData={getYAxisData}
-              xMax={xMax}
-              yMax={yMax}
-              handleTooltipMouseOver={handleTooltipMouseOver}
-              handleTooltipMouseOff={handleTooltipMouseOff}
-              handleTooltipClick={handleTooltipClick}
-              tooltipData={tooltipData}
-              showTooltip={showTooltip}
-            />
-          )}
-          {visualizationType === 'Warming Stripes' && (
-            <WarmingStripes xScale={xScale} yScale={yScale} xMax={xMax} yMax={yMax} />
-          )}
-          {visualizationType === 'Box Plot' && config.orientation === 'vertical' && (
-            <BoxPlotVertical
-              seriesScale={seriesScale}
-              xMax={xMax}
-              yMax={yMax}
-              min={min}
-              max={max}
-              xScale={xScale}
-              yScale={yScale}
-            />
-          )}
-          {visualizationType === 'Box Plot' && config.orientation === 'horizontal' && (
-            <BoxPlotHorizontal
-              seriesScale={seriesScale}
-              xMax={xMax}
-              yMax={yMax}
-              min={min}
-              max={max}
-              xScale={xScale}
-              yScale={yScale}
-            />
-          )}
-          {((visualizationType === 'Area Chart' && config.visualizationSubType === 'stacked') ||
-            visualizationType === 'Combo') && (
-            <AreaChartStacked
-              xScale={xScale}
-              yScale={yScale}
-              yMax={yMax}
-              xMax={xMax}
-              chartRef={svgRef}
-              width={xMax}
-              height={yMax}
-              handleTooltipMouseOver={handleTooltipMouseOver}
-              handleTooltipMouseOff={handleTooltipMouseOff}
-              tooltipData={tooltipData}
-              showTooltip={showTooltip}
-            />
-          )}
-          {(visualizationType === 'Bar' || visualizationType === 'Combo' || convertLineToBarGraph) && (
-            <BarChart
-              xScale={xScale}
-              yScale={yScale}
-              seriesScale={seriesScale}
-              xMax={xMax}
-              yMax={yMax}
-              yAxisWidth={yAxisWidth}
-              getXAxisData={getXAxisData}
-              getYAxisData={getYAxisData}
-              animatedChart={animatedChart}
-              visible={animatedChart}
-              handleTooltipMouseOver={handleTooltipMouseOver}
-              handleTooltipMouseOff={handleTooltipMouseOff}
-              handleTooltipClick={handleTooltipClick}
-              tooltipData={tooltipData}
-              showTooltip={showTooltip}
-              chartRef={svgRef}
-            />
-          )}
-          {(visualizationType === 'Combo' || visualizationType === 'Bump Chart') && (
-            <LineChart
-              xScale={xScale}
-              yScale={yScale}
-              getXAxisData={getXAxisData}
-              getYAxisData={getYAxisData}
-              xMax={xMax}
-              yMax={yMax}
-              seriesStyle={config.runtime.series}
-              handleTooltipMouseOver={handleTooltipMouseOver}
-              handleTooltipMouseOff={handleTooltipMouseOff}
-              handleTooltipClick={handleTooltipClick}
-              tooltipData={tooltipData}
-              showTooltip={showTooltip}
-            />
-          )}
-          {/* Line chart */}
-          {/* TODO: Make this just line or combo? */}
-          {![
-            'Paired Bar',
-            'Box Plot',
-            'Area Chart',
-            'Scatter Plot',
-            'Deviation Bar',
-            'Forecasting',
-            'Bar',
-            'Warming Stripes'
-          ].includes(visualizationType) &&
-            !convertLineToBarGraph && (
-              <>
-                <LineChart
-                  xScale={xScale}
-                  yScale={yScale}
-                  getXAxisData={getXAxisData}
-                  getYAxisData={getYAxisData}
-                  xMax={xMax}
-                  yMax={yMax}
-                  seriesStyle={config.runtime.series}
-                  tooltipData={tooltipData}
-                  handleTooltipMouseOver={handleTooltipMouseOver}
-                  handleTooltipMouseOff={handleTooltipMouseOff}
-                />
-              </>
-            )}
-          {(visualizationType === 'Forecasting' || visualizationType === 'Combo') && (
-            <Forecasting
-              showTooltip={showTooltip}
-              tooltipData={tooltipData}
-              xScale={xScale}
-              yScale={yScale}
-              width={xMax}
-              height={yMax}
-              xScaleNoPadding={xScaleNoPadding}
-              chartRef={svgRef}
-              handleTooltipMouseOver={handleTooltipMouseOver}
-              handleTooltipMouseOff={handleTooltipMouseOff}
-            />
-          )}
-          {visualizationType === 'Forest Plot' && (
-            <ForestPlot
-              xScale={xScale}
-              yScale={yScale}
-              seriesScale={seriesScale}
-              width={parentWidth}
-              height={forestHeight}
-              getXAxisData={getXAxisData}
-              getYAxisData={getYAxisData}
-              animatedChart={animatedChart}
-              visible={animatedChart}
-              handleTooltipMouseOver={handleTooltipMouseOver}
-              handleTooltipMouseOff={handleTooltipMouseOff}
-              handleTooltipClick={handleTooltipClick}
-              tooltipData={tooltipData}
-              showTooltip={showTooltip}
-              chartRef={svgRef}
-              config={config}
-              forestPlotRightLabelRef={forestPlotRightLabelRef}
-            />
-          )}
+          {/* Visualization Renderer - handles all chart type rendering */}
+          <VisualizationRenderer
+            xScale={xScale}
+            yScale={yScale}
+            xMax={xMax}
+            yMax={yMax}
+            seriesScale={seriesScale}
+            xScaleNoPadding={xScaleNoPadding}
+            min={min}
+            max={max}
+            parentWidth={parentWidth}
+            yAxisWidth={yAxisWidth}
+            forestHeight={forestHeight}
+            animatedChart={animatedChart}
+            tooltipData={tooltipData}
+            showTooltip={showTooltip}
+            handleTooltipMouseOver={handleTooltipMouseOver}
+            handleTooltipMouseOff={handleTooltipMouseOff}
+            handleTooltipClick={handleTooltipClick}
+            getXAxisData={getXAxisData}
+            getYAxisData={getYAxisData}
+            svgRef={svgRef}
+            forestPlotRightLabelRef={forestPlotRightLabelRef}
+          />
           {/* Brush moved to separate overlay - no longer in main SVG */}
           {/* y anchors */}
           {config.yAxis.anchors &&
