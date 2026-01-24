@@ -1,13 +1,4 @@
-import React, {
-  forwardRef,
-  useContext,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-  useCallback
-} from 'react'
+import React, { forwardRef, useContext, useEffect, useMemo, useRef, useState } from 'react'
 
 // Libraries
 import { AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -109,12 +100,9 @@ type UseTooltipReturn<T = TooltipData> = {
 const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, parentWidth }, svgRef) => {
   // prettier-ignore
   const {
-    colorScale,
     config,
-    convertLineToBarGraph,
     currentViewport,
     vizViewport,
-    dimensions,
     formatDate,
     formatNumber,
     handleChartAriaLabels,
@@ -122,33 +110,18 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     handleDragStateChange,
     interactionLabel,
     isDraggingAnnotation,
-    isEditor,
     legendRef,
     parseDate,
     parentRef,
     tableData,
     transformedData: data,
-    seriesHighlight
   } = useContext(ConfigContext)
 
   // CONFIG
   // todo: start destructuring this file for conciseness
-  const {
-    heights,
-    visualizationType,
-    visualizationSubType,
-    orientation,
-    xAxis,
-    yAxis,
-    runtime,
-    legend,
-    forestPlot,
-    brush,
-    dataFormat,
-    debugSvg
-  } = config
+  const { visualizationType, orientation, xAxis, yAxis, runtime, legend, forestPlot, debugSvg } = config
 
-  const { labelsAboveGridlines, hideAxis, inlineLabel } = config.yAxis
+  const { inlineLabel } = config.yAxis
 
   // HOOKS  % STATES
   // When brush is active, use tableData (full dataset) for min/max calculation
@@ -247,19 +220,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   // Chart width calculation using the current y-axis width
   const xMax = parentWidth - yAxisWidth - (hasRightAxis ? config.yAxis.rightAxisSize : 0)
 
-  const {
-    xScale,
-    yScale,
-    seriesScale,
-    g1xScale,
-    g2xScale,
-    xScaleNoPadding,
-    xScaleAnnotation,
-    min,
-    max,
-    leftMax,
-    rightMax
-  } = useScales({
+  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleAnnotation, min, max } = useScales({
     data,
     tableData,
     config,
