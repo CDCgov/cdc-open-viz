@@ -1,4 +1,5 @@
 export { default as CategoricalYAxis } from './Categorical.Axis'
 export { default as LeftAxis } from './LeftAxis'
 export { default as LeftAxisGridlines } from './LeftAxisGridlines'
+export { default as BottomAxis } from './BottomAxis'
 export * from './axis.constants'

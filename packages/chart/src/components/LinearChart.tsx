@@ -35,7 +35,7 @@ import ForestPlot from './ForestPlot'
 import PairedBarChart from './PairedBarChart'
 import useIntersectionObserver from '../hooks/useIntersectionObserver'
 import Regions from './Regions'
-import { CategoricalYAxis, LeftAxis, LeftAxisGridlines } from './Axis'
+import { CategoricalYAxis, LeftAxis, LeftAxisGridlines, BottomAxis } from './Axis'
 import BrushSelector from './Brush/BrushSelector'
 import WarmingStripes from './WarmingStripes'
 
@@ -43,13 +43,12 @@ import WarmingStripes from './WarmingStripes'
 import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { calcInitialHeight } from '../helpers/sizeHelpers'
-import { filterAndShiftLinearDateTicks } from '../helpers/filterAndShiftLinearDateTicks'
 import { calculateHorizontalBarCategoryLabelWidth } from '../helpers/calculateHorizontalBarCategoryLabelWidth'
 
 // Hooks
 import useReduceData from '../hooks/useReduceData'
 import useRightAxis from '../hooks/useRightAxis'
-import useScales, { getTickValues } from '../hooks/useScales'
+import useScales from '../hooks/useScales'
 import { useProgrammaticTooltip } from '../hooks/useProgrammaticTooltip'
 import { useSmallMultipleSynchronization } from '../hooks/useSmallMultipleSynchronization'
 
@@ -72,8 +71,6 @@ const BOTTOM_LABEL_PADDING = 9
 const X_TICK_LABEL_PADDING = 4.5
 const DEFAULT_TICK_LENGTH = 8
 const DEFAULT_MAX_TICK_ROTATION = 90
-const TICK_ROTATION_VERTICAL_ANCHOR_THRESHOLD = -50
-const TICK_BUFFER_SPACING = 40
 
 // Font sizes
 const TICK_LABEL_FONT_SIZE = 16
@@ -81,16 +78,10 @@ const TICK_LABEL_FONT_SIZE_SMALL = 13
 const AXIS_LABEL_FONT_SIZE = 18
 const AXIS_LABEL_FONT_SIZE_SMALL = 14
 
-// Logarithmic axis constants
-const MAJOR_TICK_LENGTH = 16
-const MAJOR_LOG_TICK_STROKE_WIDTH = 1.3
-const HORIZONTAL_LOG_DY_OFFSET = 8
-
 // Label positioning constants
 const BELOW_BAR_TEXT_OFFSET = -6.5
 const LABEL_PADDING_OFFSET = 8
 const HORIZONTAL_TICK_OFFSET_ADJUSTMENT = 5
-const DYNAMIC_MARGIN_TOP_PADDING = 20
 
 // Brush constants
 const BRUSH_HEIGHT = 70
@@ -104,9 +95,8 @@ const TOOLTIP_OFFSET = 6
 // Chart-specific constants
 const WARMING_STRIPES_HEIGHT = 78
 
-// Tick width calculation accumulators
+// Tick width calculation (used in paired bar axis)
 const BASE_TICK_WIDTH_ACCUMULATOR = 100
-const MULTI_LABEL_ACCUMULATOR = 180
 
 // Time constants
 const MONTH_AS_MS = 1000 * 60 * 60 * 24 * 30
@@ -1168,200 +1158,27 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           )}
           {/* X axis */}
           {visualizationType !== 'Paired Bar' && visualizationType !== 'Spark Line' && (
-            <AxisBottom
-              innerRef={axisBottomRef}
-              top={
-                runtime.horizontal && config.visualizationType !== 'Forest Plot'
-                  ? Number(heights.horizontal) + Number(config.xAxis.axisPadding)
-                  : config.visualizationType === 'Forest Plot'
-                  ? yMax + Number(config.xAxis.axisPadding)
-                  : yMax
-              }
-              left={config.visualizationType !== 'Forest Plot' ? yAxisWidth : 0}
-              label={runtime.xAxis.label}
-              tickFormat={handleBottomTickFormatting}
-              scale={xScale}
-              stroke='#333'
-              numTicks={useDateSpanMonths ? dateSpanMonths : xTickCount}
-              tickStroke='#333'
-              tickValues={
-                config.runtime.xAxis.manual
-                  ? getTickValues(xAxisDataMapped, xScale, isDateTime ? xTickCount : getManualStep(), config)
-                  : config.runtime.xAxis.type === 'date'
-                  ? xAxisDataMapped
-                  : // For date-time with small datasets (e.g., brush-filtered), use explicit tick values
-                  // to ensure each data point can have a tick. Otherwise, visx may generate too few.
-                  // Use uniqueXAxisDataMapped to handle cases where multiple series share x-axis values
-                  isDateTime && uniqueXAxisDataMapped.length > 0 && uniqueXAxisDataMapped.length <= (xTickCount || 15)
-                  ? uniqueXAxisDataMapped
-                  : undefined
-              }
-            >
-              {props => {
-                const hasDynamicCategory = config.series.some(s => s.dynamicCategory)
-
-                // For these charts, we generated all ticks in tickValues above, and now need to filter/shift them
-                // so the last tick is always labeled
-                // Use uniqueXAxisDataMapped for date filtering to match the tickValues we set
-                if (config.runtime.xAxis.type === 'date' && !config.runtime.xAxis.manual && !hasDynamicCategory) {
-                  props.ticks = filterAndShiftLinearDateTicks(config, props, uniqueXAxisDataMapped, formatDate)
-                }
-
-                const distanceBetweenTicks =
-                  useDateSpanMonths &&
-                  xScale
-                    .ticks(xTickCount)
-                    .map(t =>
-                      props.ticks.findIndex(
-                        tick => (typeof tick.value === 'number' ? tick.value : tick.value.getTime()) === t.getTime()
-                      )
-                    )
-                    .slice(0, 2)
-                    .reduce((acc, curr) => curr - acc)
-
-                // filter out every [distanceBetweenTicks] tick starting from the end, so the last tick is always labeled
-                const filteredTicks = useDateSpanMonths
-                  ? [...props.ticks]
-                      .reverse()
-                      .filter((_, i) => i % distanceBetweenTicks === 0)
-                      .reverse()
-                      .map((tick, i, arr) => ({
-                        ...tick,
-                        // reformat in case showYearsOnce, since first month of year may have changed
-                        formattedValue: handleBottomTickFormatting(tick.value, i, arr)
-                      }))
-                  : props.ticks
-
-                const axisMaxHeight = bottomLabelStart + BOTTOM_LABEL_PADDING
-
-                const containsMultipleWords = inputString => /\s/.test(inputString)
-                const isMultiLabel = filteredTicks.some(tick => containsMultipleWords(tick.value))
-
-                // Calculate sumOfTickWidth here, before map function
-                const longestTickLength = Math.max(
-                  ...filteredTicks.map(tick => getTextWidth(tick.formattedValue, GET_TEXT_WIDTH_FONT))
-                )
-                // const marginTop = 20 // moved to top bc need for yMax calcs
-                const accumulator = isMultiLabel ? MULTI_LABEL_ACCUMULATOR : BASE_TICK_WIDTH_ACCUMULATOR
-
-                const textWidths = filteredTicks.map(tick => getTextWidth(tick.formattedValue, GET_TEXT_WIDTH_FONT))
-                const sumOfTickWidth = textWidths.reduce((a, b) => a + b, accumulator)
-                const spaceBetweenEachTick = (xMax - sumOfTickWidth) / (filteredTicks.length - 1)
-                const bufferBetweenTicks = TICK_BUFFER_SPACING
-                const maxLengthOfTick =
-                  parentWidth / filteredTicks.length - X_TICK_LABEL_PADDING * 2 - bufferBetweenTicks
-
-                // Determine the position of each tick
-                let positions = [0] // The first tick is at position 0
-                for (let i = 1; i < textWidths.length; i++) {
-                  // The position of each subsequent tick is the position of the previous tick
-                  // plus the width of the previous tick and the space
-                  positions[i] = positions[i - 1] + textWidths[i - 1] + spaceBetweenEachTick
-                }
-                // calculate the end of x axis box
-                const axisBBox = axisBottomRef?.current?.getBBox().height
-                // TODO: Technical debt - This mutation is read by parent/sibling components.
-                // Should be refactored to use proper React state management or callbacks.
-                config.xAxis.axisBBox = axisBBox
-
-                // force wrap it last tick is close to the end of the axis
-                const lastTickWidth = textWidths[textWidths.length - 1]
-                const lastTickPosition = positions[positions.length - 1] + lastTickWidth
-                const lastTickEnd = lastTickPosition + lastTickWidth / 2
-                const lastTickEndThreshold = xMax - lastTickWidth
-
-                const areTicksTouching =
-                  textWidths.some(textWidth => textWidth > maxLengthOfTick) || // Force wrap if any tick is too long
-                  config.xAxis.showYearsOnce || // Force wrap when showing years once so it's easier to read
-                  lastTickEnd > lastTickEndThreshold // Force wrap it last tick is close to the end of the axis
-
-                const dynamicMarginTop =
-                  areTicksTouching && config.isResponsiveTicks
-                    ? longestTickLength + DEFAULT_TICK_LENGTH + DYNAMIC_MARGIN_TOP_PADDING
-                    : 0
-
-                // TODO: Technical debt - These mutations are read by parent/sibling components.
-                // Should be refactored to use proper React state management or callbacks.
-                config.dynamicMarginTop = dynamicMarginTop
-                config.xAxis.tickWidthMax = longestTickLength
-
-                // Compute effective tick rotations without mutating config
-                const effectiveYAxisTickRotation =
-                  config.isResponsiveTicks && config.orientation === 'horizontal' ? 0 : config.yAxis.tickRotation
-                const effectiveXAxisTickRotation =
-                  config.isResponsiveTicks && config.orientation === 'vertical' ? 0 : config.xAxis.tickRotation
-
-                return (
-                  <Group className='bottom-axis' width={parentWidth}>
-                    {filteredTicks.map((tick, i, propsTicks) => {
-                      // when using LogScale show major ticks values only
-                      const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
-                      const tickLength = showTick === 'block' ? MAJOR_TICK_LENGTH : DEFAULT_TICK_LENGTH
-                      const to = { x: tick.to.x, y: tickLength }
-                      const limitedWidth = 100 / propsTicks.length
-
-                      // Configure rotation using effective values (computed above without mutations)
-                      const tickRotation =
-                        config.isResponsiveTicks && areTicksTouching
-                          ? -Number(config.xAxis.maxTickRotation) || -90
-                          : -Number(config.runtime.xAxis.tickRotation)
-
-                      return (
-                        <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                          {!config.xAxis.hideTicks && (
-                            <Line
-                              from={tick.from}
-                              to={orientation === 'horizontal' && isLogarithmicAxis ? to : tick.to}
-                              stroke={config.xAxis.tickColor}
-                              strokeWidth={showTick === 'block' && isLogarithmicAxis ? MAJOR_LOG_TICK_STROKE_WIDTH : 1}
-                            />
-                          )}
-                          {!config.xAxis.hideLabel && (
-                            <Text
-                              innerRef={el => (xAxisLabelRefs.current[i] = el)}
-                              dy={
-                                config.orientation === 'horizontal' && isLogarithmicAxis ? HORIZONTAL_LOG_DY_OFFSET : 0
-                              }
-                              display={config.orientation === 'horizontal' && isLogarithmicAxis ? showTick : 'block'}
-                              x={tick.to.x}
-                              y={tick.to.y + X_TICK_LABEL_PADDING}
-                              angle={tickRotation}
-                              verticalAnchor={
-                                tickRotation < TICK_ROTATION_VERTICAL_ANCHOR_THRESHOLD ? 'middle' : 'start'
-                              }
-                              textAnchor={tickRotation ? 'end' : 'middle'}
-                              width={
-                                areTicksTouching && !config.isResponsiveTicks && !Number(effectiveXAxisTickRotation)
-                                  ? limitedWidth
-                                  : undefined
-                              }
-                              fill={config.xAxis.tickLabelColor}
-                              fontSize={tickLabelFontSize}
-                            >
-                              {tick.formattedValue}
-                            </Text>
-                          )}
-                        </Group>
-                      )
-                    })}
-                    {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
-                    <Text
-                      innerRef={xAxisTitleRef}
-                      className='x-axis-title-label'
-                      x={xMax / 2}
-                      y={isForestPlot ? 0 /* set via ref */ : axisMaxHeight}
-                      textAnchor='middle'
-                      verticalAnchor='start'
-                      fontWeight='bold'
-                      fill={config.xAxis.labelColor}
-                      fontSize={axisLabelFontSize}
-                    >
-                      {!config.hideXAxisLabel ? props.label : null}
-                    </Text>
-                  </Group>
-                )
-              }}
-            </AxisBottom>
+            <BottomAxis
+              axisBottomRef={axisBottomRef}
+              xScale={xScale}
+              yMax={yMax}
+              xMax={xMax}
+              yAxisWidth={yAxisWidth}
+              xTickCount={xTickCount}
+              tickLabelFontSize={tickLabelFontSize}
+              axisLabelFontSize={axisLabelFontSize}
+              handleBottomTickFormatting={handleBottomTickFormatting}
+              useDateSpanMonths={useDateSpanMonths}
+              dateSpanMonths={dateSpanMonths}
+              xAxisDataMapped={xAxisDataMapped}
+              uniqueXAxisDataMapped={uniqueXAxisDataMapped}
+              isDateTime={isDateTime}
+              bottomLabelStart={bottomLabelStart}
+              parentWidth={parentWidth}
+              xAxisLabelRefs={xAxisLabelRefs}
+              xAxisTitleRef={xAxisTitleRef}
+              getManualStep={getManualStep}
+            />
           )}
         </svg>
         {!isDraggingAnnotation &&
