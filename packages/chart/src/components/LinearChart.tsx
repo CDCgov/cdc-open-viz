@@ -1,7 +1,7 @@
 import React, { forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 
 // Libraries
-import { AxisBottom, AxisRight, AxisTop } from '@visx/axis'
+import { AxisTop } from '@visx/axis'
 import { Group } from '@visx/group'
 import { Line, Bar } from '@visx/shape'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
@@ -16,7 +16,7 @@ import ConfigContext from '../ConfigContext'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import useIntersectionObserver from '../hooks/useIntersectionObserver'
 import Regions from './Regions'
-import { CategoricalYAxis, LeftAxis, LeftAxisGridlines, BottomAxis } from './Axis'
+import { CategoricalYAxis, LeftAxis, LeftAxisGridlines, BottomAxis, PairedBarAxis, RightAxis } from './Axis'
 import BrushSelector from './Brush/BrushSelector'
 import VisualizationRenderer from './LinearChart/VisualizationRenderer'
 import { TYPES_WITHOUT_GRID, TYPES_WITH_TOOLTIP_GUIDES } from './LinearChart/linearChart.constants'
@@ -24,7 +24,6 @@ import { useTickFormatters } from './LinearChart/utils/tickFormatting'
 
 // Helpers
 import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/viewports'
-import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { calcInitialHeight } from '../helpers/sizeHelpers'
 import { calculateHorizontalBarCategoryLabelWidth } from '../helpers/calculateHorizontalBarCategoryLabelWidth'
 
@@ -64,7 +63,6 @@ const AXIS_LABEL_FONT_SIZE_SMALL = 14
 // Label positioning constants
 const BELOW_BAR_TEXT_OFFSET = -6.5
 const LABEL_PADDING_OFFSET = 8
-const HORIZONTAL_TICK_OFFSET_ADJUSTMENT = 5
 
 // Brush constants
 const BRUSH_HEIGHT = 70
@@ -77,9 +75,6 @@ const TOOLTIP_OFFSET = 6
 
 // Chart-specific constants
 const WARMING_STRIPES_HEIGHT = 78
-
-// Tick width calculation (used in paired bar axis)
-const BASE_TICK_WIDTH_ACCUMULATOR = 100
 
 // Time constants
 const MONTH_AS_MS = 1000 * 60 * 60 * 24 * 30
@@ -491,149 +486,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     )
   }
 
-  // Render Functions
-  const generatePairedBarAxis = () => {
-    const axisMaxHeight = bottomLabelStart + BOTTOM_LABEL_PADDING
-
-    const getTickPositions = (ticks, xScale) => {
-      if (!ticks.length) return false
-      // filter out first index
-      const filteredTicks = ticks.filter(tick => tick.index !== 0)
-      const numberOfTicks = filteredTicks?.length
-      const xMaxHalf = xScale.range()[0] || xMax / 2
-      const tickWidthAll = filteredTicks.map(tick =>
-        getTextWidth(formatNumber(tick.value, 'left'), GET_TEXT_WIDTH_FONT)
-      )
-      const sumOfTickWidth = tickWidthAll.reduce((a, b) => a + b, BASE_TICK_WIDTH_ACCUMULATOR)
-      const spaceBetweenEachTick = (xMaxHalf - sumOfTickWidth) / numberOfTicks
-      // Determine the position of each tick
-      let positions = [0]
-      for (let i = 1; i < tickWidthAll.length; i++) {
-        positions[i] = positions[i - 1] + tickWidthAll[i - 1] + spaceBetweenEachTick
-      }
-
-      // Check if ticks are overlapping
-      let isTicksOverlapping = false
-      tickWidthAll.forEach((_, i) => {
-        if (positions[i] + tickWidthAll[i] > positions[i + 1]) {
-          isTicksOverlapping = true
-          return
-        }
-      })
-      return isTicksOverlapping
-    }
-    return (
-      <>
-        <AxisBottom
-          top={yMax}
-          left={yAxisWidth}
-          label={runtime.xAxis.label}
-          tickFormat={isDateScale(runtime.xAxis) ? formatDate : formatNumber}
-          scale={g1xScale}
-          stroke='#333'
-          tickStroke='#333'
-          numTicks={runtime.xAxis.numTicks || undefined}
-        >
-          {props => {
-            return (
-              <Group className='bottom-axis'>
-                {props.ticks.map((tick, i) => {
-                  const isTicksOverlapping = getTickPositions(props.ticks, g1xScale)
-                  const maxTickRotation = Number(config.xAxis.maxTickRotation) || DEFAULT_MAX_TICK_ROTATION
-                  const isResponsiveTicks = config.isResponsiveTicks && isTicksOverlapping
-                  const angle =
-                    tick.index !== 0 && (isResponsiveTicks ? maxTickRotation : Number(config.yAxis.tickRotation))
-                  const textAnchor = angle && tick.index !== 0 ? 'end' : 'middle'
-
-                  return (
-                    <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                      {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
-                      {!runtime.yAxis.hideLabel && (
-                        <Text // prettier-ignore
-                          innerRef={el => (xAxisLabelRefs.current[i] = el)}
-                          x={tick.to.x}
-                          y={tick.to.y}
-                          angle={-angle}
-                          verticalAnchor={angle ? 'middle' : 'start'}
-                          textAnchor={textAnchor}
-                          fontSize={tickLabelFontSize}
-                        >
-                          {formatNumber(tick.value, 'left')}
-                        </Text>
-                      )}
-                    </Group>
-                  )
-                })}
-                {!runtime.yAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
-              </Group>
-            )
-          }}
-        </AxisBottom>
-        <AxisBottom
-          innerRef={axisBottomRef}
-          top={yMax}
-          left={yAxisWidth}
-          label={runtime.xAxis.label}
-          tickFormat={
-            isDateScale(runtime.xAxis) ? formatDate : runtime.xAxis.dataKey !== 'Year' ? formatNumber : tick => tick
-          }
-          scale={g2xScale}
-          stroke='#333'
-          tickStroke='#333'
-          numTicks={runtime.xAxis.numTicks || undefined}
-        >
-          {props => {
-            return (
-              <>
-                <Group className='bottom-axis'>
-                  {props.ticks.map((tick, i) => {
-                    const isTicksOverlapping = getTickPositions(props.ticks, g2xScale)
-                    const maxTickRotation = Number(config.xAxis.maxTickRotation) || DEFAULT_MAX_TICK_ROTATION
-                    const isResponsiveTicks = config.isResponsiveTicks && isTicksOverlapping
-                    const angle =
-                      tick.index !== 0 && (isResponsiveTicks ? maxTickRotation : Number(config.yAxis.tickRotation))
-                    const textAnchor = angle && tick.index !== 0 ? 'end' : 'middle'
-                    if (!i) return <></> // skip first tick to avoid overlapping 0's
-                    return (
-                      <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                        {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
-                        {!runtime.yAxis.hideLabel && (
-                          <Text // prettier-ignore
-                            x={tick.to.x}
-                            y={tick.to.y + X_TICK_LABEL_PADDING}
-                            angle={-angle}
-                            verticalAnchor={angle ? 'middle' : 'start'}
-                            textAnchor={textAnchor}
-                            fontSize={tickLabelFontSize}
-                          >
-                            {formatNumber(tick.value, 'left')}
-                          </Text>
-                        )}
-                      </Group>
-                    )
-                  })}
-                  {!runtime.yAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
-                </Group>
-                <Group>
-                  <Text
-                    className='x-axis-title-label'
-                    x={xMax / 2}
-                    y={axisMaxHeight}
-                    stroke='#333'
-                    textAnchor={'middle'}
-                    verticalAnchor='start'
-                    fontSize={axisLabelFontSize}
-                  >
-                    {!config.hideXAxisLabel ? runtime.xAxis.label : null}
-                  </Text>
-                </Group>
-              </>
-            )
-          }}
-        </AxisBottom>
-      </>
-    )
-  }
   return isNaN(parentWidth) ? (
     <React.Fragment></React.Fragment>
   ) : (
@@ -693,7 +545,21 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               })}
             </Group>
           )}
-          {visualizationType === 'Paired Bar' && generatePairedBarAxis()}
+          {visualizationType === 'Paired Bar' && (
+            <PairedBarAxis
+              g1xScale={g1xScale}
+              g2xScale={g2xScale}
+              yMax={yMax}
+              xMax={xMax}
+              yAxisWidth={yAxisWidth}
+              bottomLabelStart={bottomLabelStart}
+              tickLabelFontSize={tickLabelFontSize}
+              axisLabelFontSize={axisLabelFontSize}
+              axisBottomRef={axisBottomRef}
+              xAxisLabelRefs={xAxisLabelRefs}
+              tickLabelFont={GET_TEXT_WIDTH_FONT}
+            />
+          )}
           {/* Visualization Renderer - handles all chart type rendering */}
           <VisualizationRenderer
             xScale={xScale}
@@ -855,78 +721,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           )}
           {/* Right Axis */}
           {hasRightAxis && (
-            <AxisRight
-              scale={yScaleRight}
-              left={yAxisWidth + xMax}
-              label={config.yAxis.rightLabel}
-              tickFormat={tick => formatNumber(tick, 'right')}
-              numTicks={runtime.yAxis.rightNumTicks || undefined}
-              labelOffset={45}
-            >
-              {props => {
-                const axisCenter =
-                  config.orientation === 'horizontal'
-                    ? (props.axisToPoint.y - props.axisFromPoint.y) / 2
-                    : (props.axisFromPoint.y - props.axisToPoint.y) / 2
-                const horizontalTickOffset =
-                  yMax / props.ticks.length / 2 -
-                  (yMax / props.ticks.length) * (1 - config.barThickness) +
-                  HORIZONTAL_TICK_OFFSET_ADJUSTMENT
-                return (
-                  <Group className='right-axis'>
-                    {props.ticks.map((tick, i) => {
-                      return (
-                        <Group key={`vx-tick-${tick.value}-${i}`} className='vx-axis-tick'>
-                          {!runtime.yAxis.rightHideTicks && (
-                            <Line
-                              from={tick.from}
-                              to={tick.to}
-                              display={runtime.horizontal ? 'none' : 'block'}
-                              stroke={config.yAxis.rightAxisTickColor}
-                            />
-                          )}
-
-                          {runtime.yAxis.rightGridLines ? (
-                            <Line from={{ x: tick.from.x + xMax, y: tick.from.y }} to={tick.from} stroke='#d6d6d6' />
-                          ) : (
-                            ''
-                          )}
-
-                          {!config.yAxis.rightHideLabel && (
-                            <Text
-                              x={tick.to.x}
-                              y={tick.to.y + (runtime.horizontal ? horizontalTickOffset : 0)}
-                              verticalAnchor={runtime.horizontal ? 'start' : 'middle'}
-                              textAnchor={'start'}
-                              fill={config.yAxis.rightAxisTickLabelColor}
-                              fontSize={tickLabelFontSize}
-                            >
-                              {tick.formattedValue}
-                            </Text>
-                          )}
-                        </Group>
-                      )
-                    })}
-                    {!config.yAxis.rightHideAxis && (
-                      <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />
-                    )}
-                    <Text
-                      className='y-label'
-                      textAnchor='middle'
-                      verticalAnchor='start'
-                      transform={`translate(${
-                        config.yAxis.rightLabelOffsetSize ? config.yAxis.rightLabelOffsetSize : 0
-                      }, ${axisCenter}) rotate(-90)`}
-                      fontWeight='bold'
-                      fill={config.yAxis.rightAxisLabelColor}
-                      fontSize={axisLabelFontSize}
-                    >
-                      {props.label}
-                    </Text>
-                  </Group>
-                )
-              }}
-            </AxisRight>
+            <RightAxis
+              yScaleRight={yScaleRight}
+              yMax={yMax}
+              xMax={xMax}
+              yAxisWidth={yAxisWidth}
+              tickLabelFontSize={tickLabelFontSize}
+              axisLabelFontSize={axisLabelFontSize}
+            />
           )}
           {hasTopAxis && config.topAxis.hasLine && (
             <AxisTop
