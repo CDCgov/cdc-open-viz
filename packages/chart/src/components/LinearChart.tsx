@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 
 // Libraries
 import { AxisBottom, AxisRight, AxisTop } from '@visx/axis'
@@ -173,28 +173,34 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const initialHeight = useMemo(
     () =>
       visualizationType === 'Warming Stripes' ? WARMING_STRIPES_HEIGHT : calcInitialHeight(config, currentViewport),
-    [config, currentViewport, parentHeight, config.heights?.vertical, config.heights?.horizontal, visualizationType]
+    [visualizationType, currentViewport, config.heights, config.orientation]
   )
   const forestHeight = useMemo(() => initialHeight + forestRowsHeight, [initialHeight, forestRowsHeight])
 
   // Used to calculate the y position of the x-axis title
+  // Dependencies trigger recalc when axis config changes (affects label rendering/size)
   const bottomLabelStart = useMemo(() => {
     xAxisLabelRefs.current = xAxisLabelRefs.current?.filter(label => label)
     if (!xAxisLabelRefs.current.length) return
     const tallestLabel = Math.max(...xAxisLabelRefs.current.map(label => label.getBBox().height))
     return tallestLabel + X_TICK_LABEL_PADDING + DEFAULT_TICK_LENGTH
-  }, [parentWidth, config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation])
+  }, [parentWidth, config.xAxis.tickRotation, config.xAxis.hideLabel, xAxisLabelRefs.current])
 
   const yMax = initialHeight + forestRowsHeight
 
   const isNoDataAvailable = config.filters?.length > 0 && data.length === 0
 
-  const getXAxisData = d =>
-    isDateScale(config.runtime.xAxis)
-      ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime()
-      : d[config.runtime.originalXAxis.dataKey]
-  const getYAxisData = (d, seriesKey) => d[seriesKey]
-  const xAxisDataMapped = data.map(d => getXAxisData(d))
+  // Memoized data accessors to prevent unnecessary re-renders (Phase 4.1)
+  const getXAxisData = useCallback(
+    d =>
+      isDateScale(config.runtime.xAxis)
+        ? parseDate(d[config.runtime.originalXAxis.dataKey]).getTime()
+        : d[config.runtime.originalXAxis.dataKey],
+    [config.runtime.xAxis, config.runtime.originalXAxis.dataKey, parseDate]
+  )
+  const getYAxisData = useCallback((d, seriesKey) => d[seriesKey], [])
+
+  const xAxisDataMapped = useMemo(() => data.map(d => getXAxisData(d)), [data, getXAxisData])
 
   // Get unique x-axis values (for cases where multiple series share the same x-axis value)
   // This is important for brush filtering where we want to count unique dates, not total data points
@@ -322,13 +328,13 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     return TYPES_WITH_TOOLTIP_GUIDES.includes(visualizationType as any)
   }
 
-  const getManualStep = () => {
+  const getManualStep = useCallback(() => {
     let manualStep = config.xAxis.manualStep
     if (config.xAxis.viewportStepCount && config.xAxis.viewportStepCount[currentViewport]) {
       manualStep = config.xAxis.viewportStepCount[currentViewport]
     }
     return manualStep
-  }
+  }, [config.xAxis.manualStep, config.xAxis.viewportStepCount, currentViewport])
 
   const smallMultiplesSync = useSmallMultipleSynchronization(xMax, yMax, getXValueFromCoordinate)
 
