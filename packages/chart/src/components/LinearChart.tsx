@@ -20,6 +20,7 @@ import { CategoricalYAxis, LeftAxis, LeftAxisGridlines, BottomAxis } from './Axi
 import BrushSelector from './Brush/BrushSelector'
 import VisualizationRenderer from './LinearChart/VisualizationRenderer'
 import { TYPES_WITHOUT_GRID, TYPES_WITH_TOOLTIP_GUIDES } from './LinearChart/linearChart.constants'
+import { useTickFormatters } from './LinearChart/utils/tickFormatting'
 
 // Helpers
 import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/viewports'
@@ -235,6 +236,16 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     currentViewport
   })
 
+  // Consolidated tick formatters (Phase 3.1)
+  const { handleLeftTickFormatting, handleBottomTickFormatting } = useTickFormatters({
+    isLogarithmicAxis,
+    orientation,
+    visualizationType,
+    min,
+    max,
+    shouldAbbreviate
+  })
+
   // Calculate category label space for horizontal bar charts
   const categoryLabelSpace = useMemo(() => {
     return calculateHorizontalBarCategoryLabelWidth({
@@ -305,49 +316,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const useDateSpanMonths = isDateTime && dateSpanMonths > xTickCount && !config.runtime.xAxis.manual
 
   // GETTERS & FUNCTIONS
-  const handleLeftTickFormatting = (tick, index, ticks) => {
-    if (isLogarithmicAxis && tick === 0.1) {
-      //when logarithmic scale applied change value of first tick
-      tick = 0
-    }
-
-    if (config.data && !config.data[index] && visualizationType === 'Forest Plot') return
-    if (config.visualizationType === 'Forest Plot') return config.data[index][config.xAxis.dataKey]
-    if (isDateScale(runtime.yAxis)) return formatDate(parseDate(tick))
-    if (orientation === 'vertical' && max - min < 3 && !config.dataFormat?.roundTo)
-      return formatNumber(tick, 'left', shouldAbbreviate, false, false, '1', { index, length: ticks.length })
-    if (orientation === 'vertical') {
-      // TODO suggestion: pass all options as object key/values to allow for more flexibility
-      return formatNumber(tick, 'left', shouldAbbreviate, false, false, undefined, { index, length: ticks.length })
-    }
-    return tick
-  }
-
-  const handleBottomTickFormatting = (tick, i, ticks) => {
-    if (isLogarithmicAxis && tick === 0.1) {
-      // when logarithmic scale applied change value FIRST  of  tick
-      tick = 0
-    }
-
-    if (isDateScale(runtime.xAxis) && config.visualizationType !== 'Forest Plot') {
-      return formatDate(tick, i, ticks)
-    }
-    if (orientation === 'horizontal' && config.visualizationType !== 'Forest Plot')
-      return formatNumber(tick, 'left', shouldAbbreviate)
-    if (config.xAxis.type === 'continuous' && config.visualizationType !== 'Forest Plot')
-      return formatNumber(tick, 'bottom', shouldAbbreviate)
-    if (config.visualizationType === 'Forest Plot')
-      return formatNumber(
-        tick,
-        'left',
-        config.dataFormat.abbreviated,
-        config.runtime.xAxis.prefix,
-        config.runtime.xAxis.suffix,
-        Number(config.dataFormat.roundTo)
-      )
-    return tick
-  }
-
   const chartHasTooltipGuides = () => {
     const { visualizationType } = config
     if (visualizationType === 'Combo' && runtime.forecastingSeriesKeys > 0) return true
