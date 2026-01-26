@@ -18,8 +18,10 @@ window.reloadVisualization = async configUrl => {
   await import(/* @vite-ignore */ `./src/index?t=${Date.now()}`)
 }
 
-// Initialize sidebar by default (hide with ?sidebar=false)
-if (params.get('sidebar') !== 'false') {
+// Initialize sidebar by default (hide with ?sidebar=false, or for editor package)
+// __COVE_PACKAGE_NAME__ is injected by Vite's define option in generateViteConfig.js
+const sidebarDisabled = params.get('sidebar') === 'false' || __COVE_PACKAGE_NAME__ === 'CdcEditor'
+if (!sidebarDisabled) {
   document.body.classList.add('has-sidebar')
 
   // Fetch examples list
