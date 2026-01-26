@@ -22,7 +22,7 @@ type RightAxisProps = {
 /**
  * Right Y-axis component for dual-axis charts.
  * Renders a secondary y-axis on the right side with configurable styling.
- * Extracted from LinearChart.tsx (Phase 5.3)
+ * Extracted from LinearChart.tsx
  */
 export const RightAxis: React.FC<RightAxisProps> = ({
   yScaleRight,

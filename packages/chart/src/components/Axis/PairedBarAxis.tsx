@@ -32,7 +32,7 @@ type PairedBarAxisProps = {
 /**
  * Specialized axis component for Paired Bar charts.
  * Renders two mirrored AxisBottom components with shared tick formatting logic.
- * Extracted from LinearChart.tsx (Phase 2.1/5.3)
+ * Extracted from LinearChart.tsx
  */
 export const PairedBarAxis: React.FC<PairedBarAxisProps> = ({
   g1xScale,

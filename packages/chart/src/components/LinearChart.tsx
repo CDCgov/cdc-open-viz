@@ -185,7 +185,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   const isNoDataAvailable = config.filters?.length > 0 && data.length === 0
 
-  // Memoized data accessors to prevent unnecessary re-renders (Phase 4.1)
+  // Memoized data accessors to prevent unnecessary re-renders
   const getXAxisData = useCallback(
     d =>
       isDateScale(config.runtime.xAxis)
@@ -237,7 +237,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     currentViewport
   })
 
-  // Consolidated tick formatters (Phase 3.1)
+  // Consolidated tick formatters
   const { handleLeftTickFormatting, handleBottomTickFormatting } = useTickFormatters({
     isLogarithmicAxis,
     orientation,

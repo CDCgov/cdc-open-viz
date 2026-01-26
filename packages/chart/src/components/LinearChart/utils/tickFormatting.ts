@@ -25,7 +25,7 @@ const handleLogarithmicTick = (tick: number, isLogarithmic: boolean): number => 
 /**
  * Hook that provides consolidated tick formatting functions for both axes.
  * Consolidates handleLeftTickFormatting and handleBottomTickFormatting
- * from LinearChart.tsx (Phase 3.1 of refactoring plan)
+ * from LinearChart.tsx
  */
 export const useTickFormatters = (options: TickFormattingOptions) => {
   const { config, formatDate, formatNumber, parseDate } = useContext(ConfigContext)
