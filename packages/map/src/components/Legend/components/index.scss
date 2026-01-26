@@ -118,7 +118,6 @@
         border: none;
         padding: 0;
         margin: 0;
-        outline: none;
         font: inherit;
         color: inherit;
         cursor: pointer;
@@ -126,6 +125,9 @@
 
         &--pattern {
           cursor: default;
+        }
+        &:focus {
+          outline: none;
         }
       }
 
