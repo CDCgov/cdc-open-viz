@@ -4,4 +4,5 @@ export type Label = {
   text: string
   value: string
   icon?: any
+  colors?: string[]
 }

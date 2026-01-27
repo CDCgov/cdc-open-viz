@@ -35,6 +35,7 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
       }
     },
     build: {
+      minify: true,  // toggle this line for debugging
       commonjsOptions: {
         include: [/@cdc\/core/, /node_modules/]
       },
@@ -58,7 +59,13 @@ const generateViteConfig = (componentName, configOptions = {}, reactOptions = {}
     plugins: [
       react(reactOptions),
       svgr({
-        exportAsDefault: true
+        svgrOptions: {
+          exportType: 'default',
+          ref: true,
+          svgo: false,
+          titleProp: true
+        },
+        include: '**/*.svg'
       }),
       cssInjectedByJsPlugin(),
       dsv()

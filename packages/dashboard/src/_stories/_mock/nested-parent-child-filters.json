@@ -1,0 +1,392 @@
+{
+    "dashboard": {
+        "theme": "theme-blue",
+        "title": "Nested Dropdown with Parent-Child Demo",
+        "description": "Demonstrates nested dropdown filters (year/quarter) with parent-child relationships",
+        "sharedFilters": [
+            {
+                "key": "Region",
+                "showDropdown": true,
+                "values": [
+                    "North",
+                    "South",
+                    "East",
+                    "West"
+                ],
+                "type": "datafilter",
+                "orderedValues": [
+                    "North",
+                    "South",
+                    "East",
+                    "West"
+                ],
+                "columnName": "region",
+                "tier": 1,
+                "defaultValue": "North"
+            },
+            {
+                "key": "Year and Quarter",
+                "showDropdown": true,
+                "values": [
+                    "2022",
+                    "2023",
+                    "2024"
+                ],
+                "type": "datafilter",
+                "orderedValues": [
+                    "2022",
+                    "2023",
+                    "2024"
+                ],
+                "columnName": "year",
+                "filterStyle": "nested-dropdown",
+                "tier": 2,
+                "parents": [
+                    "Region"
+                ],
+                "defaultValue": "2023",
+                "subGrouping": {
+                    "columnName": "quarter",
+                    "defaultValue": "Q2",
+                    "valuesLookup": {
+                        "2022": {
+                            "values": [
+                                "Q1",
+                                "Q2",
+                                "Q3",
+                                "Q4"
+                            ],
+                            "orderedValues": [
+                                "Q1",
+                                "Q2",
+                                "Q3",
+                                "Q4"
+                            ]
+                        },
+                        "2023": {
+                            "values": [
+                                "Q1",
+                                "Q2",
+                                "Q3",
+                                "Q4"
+                            ],
+                            "orderedValues": [
+                                "Q1",
+                                "Q2",
+                                "Q3",
+                                "Q4"
+                            ]
+                        },
+                        "2024": {
+                            "values": [
+                                "Q1",
+                                "Q2",
+                                "Q3",
+                                "Q4"
+                            ],
+                            "orderedValues": [
+                                "Q1",
+                                "Q2",
+                                "Q3",
+                                "Q4"
+                            ]
+                        }
+                    }
+                }
+            }
+        ]
+    },
+    "rows": [
+        {
+            "columns": [
+                {
+                    "width": 12,
+                    "widget": "dashboardFilters1"
+                }
+            ]
+        },
+        {
+            "columns": [
+                {
+                    "width": 12,
+                    "widget": "chart1"
+                }
+            ]
+        }
+    ],
+    "visualizations": {
+        "dashboardFilters1": {
+            "filters": [],
+            "filterBehavior": "Filter Change",
+            "uid": "dashboardFilters1",
+            "type": "dashboardFilters",
+            "sharedFilterIndexes": [
+                0,
+                1
+            ],
+            "visualizationType": "dashboardFilters"
+        },
+        "chart1": {
+            "filters": [],
+            "filterBehavior": "Filter Change",
+            "uid": "chart1",
+            "type": "chart",
+            "visualizationType": "Line",
+            "dataDescription": {
+                "horizontal": false,
+                "series": false
+            },
+            "dataKey": "nested-parent-child-data.json",
+            "title": "Sales by Quarter",
+            "showTitle": true,
+            "xAxis": {
+                "label": "Quarter",
+                "dataKey": "quarter"
+            },
+            "yAxis": {
+                "label": "Sales ($)",
+                "dataKey": "sales",
+                "numTicks": 5
+            }
+        }
+    },
+    "datasets": {
+        "nested-parent-child-data.json": {
+            "data": [
+                {
+                    "region": "North",
+                    "year": "2022",
+                    "quarter": "Q1",
+                    "sales": 125000
+                },
+                {
+                    "region": "North",
+                    "year": "2022",
+                    "quarter": "Q2",
+                    "sales": 135000
+                },
+                {
+                    "region": "North",
+                    "year": "2022",
+                    "quarter": "Q3",
+                    "sales": 145000
+                },
+                {
+                    "region": "North",
+                    "year": "2022",
+                    "quarter": "Q4",
+                    "sales": 155000
+                },
+                {
+                    "region": "North",
+                    "year": "2023",
+                    "quarter": "Q1",
+                    "sales": 165000
+                },
+                {
+                    "region": "North",
+                    "year": "2023",
+                    "quarter": "Q2",
+                    "sales": 175000
+                },
+                {
+                    "region": "North",
+                    "year": "2023",
+                    "quarter": "Q3",
+                    "sales": 185000
+                },
+                {
+                    "region": "North",
+                    "year": "2023",
+                    "quarter": "Q4",
+                    "sales": 195000
+                },
+                {
+                    "region": "North",
+                    "year": "2024",
+                    "quarter": "Q1",
+                    "sales": 205000
+                },
+                {
+                    "region": "North",
+                    "year": "2024",
+                    "quarter": "Q2",
+                    "sales": 215000
+                },
+                {
+                    "region": "North",
+                    "year": "2024",
+                    "quarter": "Q3",
+                    "sales": 225000
+                },
+                {
+                    "region": "North",
+                    "year": "2024",
+                    "quarter": "Q4",
+                    "sales": 235000
+                },
+                {
+                    "region": "South",
+                    "year": "2022",
+                    "quarter": "Q1",
+                    "sales": 95000
+                },
+                {
+                    "region": "South",
+                    "year": "2022",
+                    "quarter": "Q2",
+                    "sales": 105000
+                },
+                {
+                    "region": "South",
+                    "year": "2022",
+                    "quarter": "Q3",
+                    "sales": 115000
+                },
+                {
+                    "region": "South",
+                    "year": "2022",
+                    "quarter": "Q4",
+                    "sales": 125000
+                },
+                {
+                    "region": "South",
+                    "year": "2023",
+                    "quarter": "Q1",
+                    "sales": 135000
+                },
+                {
+                    "region": "South",
+                    "year": "2023",
+                    "quarter": "Q2",
+                    "sales": 145000
+                },
+                {
+                    "region": "South",
+                    "year": "2023",
+                    "quarter": "Q3",
+                    "sales": 155000
+                },
+                {
+                    "region": "South",
+                    "year": "2023",
+                    "quarter": "Q4",
+                    "sales": 165000
+                },
+                {
+                    "region": "South",
+                    "year": "2024",
+                    "quarter": "Q1",
+                    "sales": 175000
+                },
+                {
+                    "region": "South",
+                    "year": "2024",
+                    "quarter": "Q2",
+                    "sales": 185000
+                },
+                {
+                    "region": "South",
+                    "year": "2024",
+                    "quarter": "Q3",
+                    "sales": 195000
+                },
+                {
+                    "region": "South",
+                    "year": "2024",
+                    "quarter": "Q4",
+                    "sales": 205000
+                },
+                {
+                    "region": "East",
+                    "year": "2023",
+                    "quarter": "Q1",
+                    "sales": 145000
+                },
+                {
+                    "region": "East",
+                    "year": "2023",
+                    "quarter": "Q2",
+                    "sales": 155000
+                },
+                {
+                    "region": "East",
+                    "year": "2023",
+                    "quarter": "Q3",
+                    "sales": 165000
+                },
+                {
+                    "region": "East",
+                    "year": "2023",
+                    "quarter": "Q4",
+                    "sales": 175000
+                },
+                {
+                    "region": "East",
+                    "year": "2024",
+                    "quarter": "Q1",
+                    "sales": 185000
+                },
+                {
+                    "region": "East",
+                    "year": "2024",
+                    "quarter": "Q2",
+                    "sales": 195000
+                },
+                {
+                    "region": "East",
+                    "year": "2024",
+                    "quarter": "Q3",
+                    "sales": 205000
+                },
+                {
+                    "region": "East",
+                    "year": "2024",
+                    "quarter": "Q4",
+                    "sales": 215000
+                },
+                {
+                    "region": "West",
+                    "year": "2023",
+                    "quarter": "Q3",
+                    "sales": 125000
+                },
+                {
+                    "region": "West",
+                    "year": "2023",
+                    "quarter": "Q4",
+                    "sales": 135000
+                },
+                {
+                    "region": "West",
+                    "year": "2024",
+                    "quarter": "Q1",
+                    "sales": 145000
+                },
+                {
+                    "region": "West",
+                    "year": "2024",
+                    "quarter": "Q2",
+                    "sales": 155000
+                },
+                {
+                    "region": "West",
+                    "year": "2024",
+                    "quarter": "Q3",
+                    "sales": 165000
+                },
+                {
+                    "region": "West",
+                    "year": "2024",
+                    "quarter": "Q4",
+                    "sales": 175000
+                }
+            ],
+            "dataFileSize": 2345,
+            "dataFileName": "nested-parent-child-data.json",
+            "dataFileSourceType": "file",
+            "dataFileFormat": "JSON",
+            "preview": true
+        }
+    }
+}

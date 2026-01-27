@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { faker } from '@faker-js/faker'
+import { waitForOptionsToPopulate, performAndAssert } from '@cdc/core/helpers/testing'
 import APIFiltersMapData from './_mock/api-filter-map.json'
 import APIFiltersChartData from './_mock/api-filter-chart.json'
 import APIFilterErrorConfig from './_mock/api-filter-error.json'
@@ -15,7 +16,7 @@ import StandaloneTable from './_mock/standalone-table.json'
 import GroupPivotConfig from './_mock/group-pivot-filter.json'
 import PivotFitlerConfig from './_mock/pivot-filter.json'
 import { type DashboardConfig as Config } from '../types/DashboardConfig'
-import { userEvent, within } from 'storybook/test'
+import { userEvent, within, expect } from 'storybook/test'
 import ToggleExampleConfig from './_mock/toggle-example.json'
 import _ from 'lodash'
 import { footnotesSymbols } from '@cdc/core/helpers/footnoteSymbols'
@@ -30,6 +31,10 @@ import TopSpacing_3 from './_mock/data-bite-dash-test_1_1.json'
 import TopSpacing_4 from './_mock/data-bite-dash-test_1_1_1.json'
 import CustomOrderNewValues from './_mock/custom-order-new-values.json'
 import APIFilterResetConfig from '../../examples/test-api-filter-reset.json'
+import CascadingDataFilters from './_mock/filter-cascade.json'
+import ParentChildFilters from './_mock/parent-child-filters.json'
+import NestedParentChildFilters from './_mock/nested-parent-child-filters.json'
+import GalleryDataBiteDashboard from './_mock/gallery-data-bite-dashboard.json'
 
 // Dashboard Filter Updates for Ascending, Descending, and Custom Order
 import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
@@ -482,10 +487,389 @@ export const Top_Spacing_4: Story = {
   }
 }
 
+export const Gallery_Data_Bite_Dashboard: Story = {
+  args: {
+    config: GalleryDataBiteDashboard,
+    isEditor: false
+  }
+}
+
 export const Clear_Filters_Button: Story = {
   args: {
     config: APIFilterResetConfig as unknown as Config,
     isEditor: false
+  }
+}
+
+export const Cascading_Multi_Parent_Data_Filters: Story = {
+  args: {
+    config: CascadingDataFilters as unknown as Config,
+    isEditor: false
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Demonstrates cascading data filters with multiple parent relationships. The size filter depends on color, and weight depends on both color and size, creating a multi-tier cascading filter system with deterministic test data.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+
+    // Get all filter dropdowns (using findBy to wait for them)
+    const colorFilter = (await canvas.findByLabelText('color', { selector: 'select' })) as HTMLSelectElement
+    const sizeFilter = (await canvas.findByLabelText('size', { selector: 'select' })) as HTMLSelectElement
+    const weightFilter = (await canvas.findByLabelText('weight', { selector: 'select' })) as HTMLSelectElement
+    const smellFilter = (await canvas.findByLabelText('smell', { selector: 'select' })) as HTMLSelectElement
+
+    // Helper to get non-empty filter options
+    const getFilterOptions = (filter: HTMLSelectElement) =>
+      Array.from(filter.querySelectorAll('option'))
+        .map(opt => opt.value)
+        .filter(v => v)
+
+    // Helper to get state of filters and chart
+    const getState = () => ({
+      colorOptions: getFilterOptions(colorFilter),
+      colorSelected: colorFilter.value,
+      sizeOptions: getFilterOptions(sizeFilter),
+      sizeSelected: sizeFilter.value,
+      weightOptions: getFilterOptions(weightFilter),
+      weightSelected: weightFilter.value,
+      smellOptions: getFilterOptions(smellFilter),
+      smellSelected: smellFilter.value,
+      chartRendered: !!canvasElement.querySelector('svg'),
+      noDataVisible: !!canvas.queryByText('No Data Available')
+    })
+
+    // Initial verification - wait for options to populate
+    await waitForOptionsToPopulate(colorFilter, 3)
+    const initialState = getState()
+    expect(initialState.chartRendered).toBe(true)
+    expect(initialState.noDataVisible).toBe(false)
+
+    // ============================================================================
+    // TEST: Color → Size cascade (single parent)
+    // ============================================================================
+
+    // Test 1: Select blue → size should show all 3 sizes
+    await performAndAssert(
+      'Select color=blue → size shows large, medium, small',
+      getState,
+      async () => await user.selectOptions(colorFilter, ['blue']),
+      (before, after) =>
+        after.colorSelected === 'blue' &&
+        after.sizeOptions.includes('large') &&
+        after.sizeOptions.includes('medium') &&
+        after.sizeOptions.includes('small') &&
+        after.sizeOptions.length === 3 &&
+        after.chartRendered &&
+        !after.noDataVisible
+    )
+
+    // Test 2: Select red → size should show only small, medium
+    await performAndAssert(
+      'Select color=red → size shows medium, small (no large)',
+      getState,
+      async () => await user.selectOptions(colorFilter, ['red']),
+      (before, after) =>
+        after.colorSelected === 'red' &&
+        after.sizeOptions.includes('medium') &&
+        after.sizeOptions.includes('small') &&
+        !after.sizeOptions.includes('large') &&
+        after.sizeOptions.length === 2 &&
+        after.chartRendered &&
+        !after.noDataVisible
+    )
+
+    // Test 3: Select green → size should show only large
+    await performAndAssert(
+      'Select color=green → size shows only large',
+      getState,
+      async () => await user.selectOptions(colorFilter, ['green']),
+      (before, after) =>
+        after.colorSelected === 'green' &&
+        after.sizeOptions.length === 1 &&
+        after.sizeOptions[0] === 'large' &&
+        after.sizeSelected === 'large' &&
+        after.chartRendered &&
+        !after.noDataVisible
+    )
+
+    // ============================================================================
+    // TEST: Color + Size → Weight cascade (multiple parents)
+    // ============================================================================
+
+    // Test 4: Select blue + small → weight updates based on both parents
+    await performAndAssert(
+      'Select color=blue → size options repopulate',
+      getState,
+      async () => await user.selectOptions(colorFilter, ['blue']),
+      (before, after) =>
+        after.colorSelected === 'blue' && after.sizeSelected === 'large' && after.sizeOptions.length === 3
+    )
+
+    await performAndAssert(
+      'Select size=small → weight updates based on color+size',
+      getState,
+      async () => await user.selectOptions(sizeFilter, ['small']),
+      (before, after) =>
+        after.colorSelected === 'blue' &&
+        after.sizeSelected === 'small' &&
+        after.weightOptions.length === 3 &&
+        after.chartRendered &&
+        !after.noDataVisible
+    )
+
+    // ============================================================================
+    // TEST: Weight → Smell cascade
+    // ============================================================================
+
+    // Test 5: Select light → smell shows only neutral and sweet (2 options)
+    await performAndAssert(
+      'Select weight=light → smell shows neutral, sweet (not bitter)',
+      getState,
+      async () => await user.selectOptions(weightFilter, ['light']),
+      (before, after) =>
+        after.colorSelected === 'blue' &&
+        after.sizeSelected === 'small' &&
+        after.weightSelected === 'light' &&
+        after.smellOptions.includes('neutral') &&
+        after.smellOptions.includes('sweet') &&
+        !after.smellOptions.includes('bitter') &&
+        after.smellOptions.length === 2 &&
+        after.chartRendered &&
+        !after.noDataVisible
+    )
+
+    // ============================================================================
+    // TEST: Full cascade verification - change parent and verify all children
+    // ============================================================================
+
+    // Test 6: Final - select red again and verify entire cascade updates
+    await performAndAssert(
+      'Select color=red → all filters update; size shows medium, small',
+      getState,
+      async () => await user.selectOptions(colorFilter, ['red']),
+      (before, after) =>
+        after.colorSelected === 'red' &&
+        after.sizeOptions.length === 2 &&
+        after.sizeOptions.includes('medium') &&
+        after.sizeOptions.includes('small') &&
+        // Size, weight, and smell selected values should be valid in their updated options
+        after.sizeOptions.includes(after.sizeSelected) &&
+        after.weightOptions.includes(after.weightSelected) &&
+        after.smellOptions.includes(after.smellSelected) &&
+        after.chartRendered &&
+        !after.noDataVisible
+    )
+  }
+}
+
+export const Parent_Child_Filters_With_DefaultValue: Story = {
+  args: {
+    config: ParentChildFilters as unknown as Config,
+    isEditor: false
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Demonstrates parent-child filter relationships (State → County → City) with defaultValue support. Shows how child filter options update based on parent selection, and how defaultValue is applied on initial load.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+
+    // Get filter dropdowns
+    const stateFilter = (await canvas.findByLabelText('State', { selector: 'select' })) as HTMLSelectElement
+    const countyFilter = (await canvas.findByLabelText('County', { selector: 'select' })) as HTMLSelectElement
+    const cityFilter = (await canvas.findByLabelText('City', { selector: 'select' })) as HTMLSelectElement
+
+    const getFilterOptions = (select: HTMLSelectElement) =>
+      Array.from(select.options)
+        .map(o => o.value)
+        .filter(Boolean)
+
+    const getState = () => ({
+      stateOptions: getFilterOptions(stateFilter),
+      stateSelected: stateFilter.value,
+      countyOptions: getFilterOptions(countyFilter),
+      countySelected: countyFilter.value,
+      cityOptions: getFilterOptions(cityFilter),
+      citySelected: cityFilter.value,
+      chartRendered: !!canvasElement.querySelector('svg')
+    })
+
+    // Wait for initial load
+    await waitForOptionsToPopulate(stateFilter, 3)
+    const initialState = getState()
+
+    // Verify defaultValue is applied on initial load
+    expect(initialState.stateSelected).toBe('California')
+    expect(initialState.countySelected).toBe('Los Angeles')
+    expect(initialState.citySelected).toBe('Los Angeles')
+    expect(initialState.chartRendered).toBe(true)
+
+    // Test 1: Change state to Texas → county and city should update
+    await performAndAssert(
+      'Select state=Texas → county shows Texas counties',
+      getState,
+      async () => await user.selectOptions(stateFilter, ['Texas']),
+      (before, after) =>
+        after.stateSelected === 'Texas' &&
+        after.countyOptions.includes('Harris') &&
+        after.countyOptions.includes('Dallas') &&
+        after.countyOptions.includes('Bexar') &&
+        after.countyOptions.includes('Travis') &&
+        !after.countyOptions.includes('Los Angeles') &&
+        after.chartRendered
+    )
+
+    // Test 2: Select county → city options update
+    await performAndAssert(
+      'Select county=Harris → city shows Houston, Pasadena',
+      getState,
+      async () => await user.selectOptions(countyFilter, ['Harris']),
+      (before, after) =>
+        after.countySelected === 'Harris' &&
+        after.cityOptions.includes('Houston') &&
+        after.cityOptions.includes('Pasadena') &&
+        after.cityOptions.length === 2 &&
+        after.chartRendered
+    )
+
+    // Test 3: Change state back to California → verify cascade updates
+    await performAndAssert(
+      'Select state=California → filters reset to California data',
+      getState,
+      async () => await user.selectOptions(stateFilter, ['California']),
+      (before, after) =>
+        after.stateSelected === 'California' &&
+        after.countyOptions.includes('Los Angeles') &&
+        after.countyOptions.includes('San Diego') &&
+        after.countyOptions.includes('Orange') &&
+        after.chartRendered
+    )
+
+    // Test 4: Select Orange county → verify city options
+    await performAndAssert(
+      'Select county=Orange → city shows Anaheim, Santa Ana, Irvine',
+      getState,
+      async () => await user.selectOptions(countyFilter, ['Orange']),
+      (before, after) =>
+        after.countySelected === 'Orange' &&
+        after.cityOptions.includes('Anaheim') &&
+        after.cityOptions.includes('Santa Ana') &&
+        after.cityOptions.includes('Irvine') &&
+        after.cityOptions.length === 3 &&
+        !after.cityOptions.includes('Los Angeles') &&
+        after.chartRendered
+    )
+  }
+}
+
+export const Nested_Dropdown_With_Parent_Child: Story = {
+  args: {
+    config: NestedParentChildFilters as unknown as Config,
+    isEditor: false
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Demonstrates nested dropdown filters (Year/Quarter subGrouping) with parent-child relationships. The Year/Quarter filter depends on Region selection, and both Year and Quarter defaultValue properties are respected on initial load.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+
+    // Get filter dropdowns
+    const regionFilter = (await canvas.findByLabelText('Region', { selector: 'select' })) as HTMLSelectElement
+    const yearQuarterFilter = (await canvas.findByLabelText('Year and Quarter', {
+      selector: 'select'
+    })) as HTMLSelectElement
+
+    const getFilterOptions = (select: HTMLSelectElement) =>
+      Array.from(select.options)
+        .map(o => o.text)
+        .filter(Boolean)
+
+    const getState = () => ({
+      regionOptions: getFilterOptions(regionFilter),
+      regionSelected: regionFilter.value,
+      yearQuarterOptions: getFilterOptions(yearQuarterFilter),
+      yearQuarterSelected: yearQuarterFilter.value,
+      chartRendered: !!canvasElement.querySelector('svg')
+    })
+
+    // Wait for initial load
+    await waitForOptionsToPopulate(regionFilter, 4)
+    const initialState = getState()
+
+    // Verify defaultValue is applied on initial load (North region, 2023 Q2)
+    expect(initialState.regionSelected).toBe('North')
+    expect(initialState.yearQuarterSelected).toContain('2023')
+    expect(initialState.yearQuarterSelected).toContain('Q2')
+    expect(initialState.chartRendered).toBe(true)
+
+    // Test 1: Change region to South → year options should update based on available data
+    await performAndAssert(
+      'Select region=South → year/quarter filter updates',
+      getState,
+      async () => await user.selectOptions(regionFilter, ['South']),
+      (before, after) =>
+        after.regionSelected === 'South' &&
+        after.yearQuarterOptions.some(opt => opt.includes('2022')) &&
+        after.yearQuarterOptions.some(opt => opt.includes('2023')) &&
+        after.yearQuarterOptions.some(opt => opt.includes('2024')) &&
+        after.chartRendered
+    )
+
+    // Test 2: Change region to East → should only show 2023 and 2024 (no 2022 data for East)
+    await performAndAssert(
+      'Select region=East → year shows only 2023, 2024',
+      getState,
+      async () => await user.selectOptions(regionFilter, ['East']),
+      (before, after) =>
+        after.regionSelected === 'East' &&
+        after.yearQuarterOptions.some(opt => opt.includes('2023')) &&
+        after.yearQuarterOptions.some(opt => opt.includes('2024')) &&
+        !after.yearQuarterOptions.some(opt => opt.includes('2022')) &&
+        after.chartRendered
+    )
+
+    // Test 3: Change region to West → should only show 2023 Q3-Q4 and 2024
+    await performAndAssert(
+      'Select region=West → limited year/quarter options',
+      getState,
+      async () => await user.selectOptions(regionFilter, ['West']),
+      (before, after) =>
+        after.regionSelected === 'West' &&
+        (after.yearQuarterOptions.some(opt => opt.includes('2023')) ||
+          after.yearQuarterOptions.some(opt => opt.includes('2024'))) &&
+        !after.yearQuarterOptions.some(opt => opt.includes('2022')) &&
+        after.chartRendered
+    )
+
+    // Test 4: Change back to North → verify all years available again
+    await performAndAssert(
+      'Select region=North → all years (2022-2024) available',
+      getState,
+      async () => await user.selectOptions(regionFilter, ['North']),
+      (before, after) =>
+        after.regionSelected === 'North' &&
+        after.yearQuarterOptions.some(opt => opt.includes('2022')) &&
+        after.yearQuarterOptions.some(opt => opt.includes('2023')) &&
+        after.yearQuarterOptions.some(opt => opt.includes('2024')) &&
+        after.chartRendered
+    )
   }
 }
 

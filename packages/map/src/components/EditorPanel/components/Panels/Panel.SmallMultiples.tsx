@@ -11,6 +11,7 @@ import {
 import { TextField, Select, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
+import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 
 // contexts
 import ConfigContext from '../../../../context'
@@ -25,22 +26,11 @@ const PanelSmallMultiples: FC<PanelSmallMultiplesProps> = props => {
   const { config, setConfig } = useContext<MapContext>(ConfigContext)
   const { general } = config
 
-  const getColumns = () => {
-    let columns = {}
-    config.data?.forEach(row => {
-      Object.keys(row).forEach(columnName => (columns[columnName] = true))
-    })
-
-    // Filter out geo and primary columns
-    if (config.columns?.geo?.name) {
-      delete columns[config.columns.geo.name]
-    }
-    if (config.columns?.primary?.name) {
-      delete columns[config.columns.primary.name]
-    }
-
-    return Object.keys(columns)
-  }
+  // Extract column names from data with memoization (replaces getColumns)
+  // Filter out geo and primary columns
+  const columns = useDataColumns(config.data, {
+    excludeColumns: [config.columns?.geo?.name, config.columns?.primary?.name].filter(Boolean)
+  })
 
   const updateField = (section, subsection, fieldName, value) => {
     const newConfig = { ...config }
@@ -82,6 +72,11 @@ const PanelSmallMultiples: FC<PanelSmallMultiplesProps> = props => {
     setConfig(newConfig)
   }
 
+  // Small multiples only supported for us, single-state, and us-region map types
+  if (!['us', 'single-state', 'us-region'].includes(general.geoType)) {
+    return null
+  }
+
   return (
     <AccordionItem>
       <AccordionItemHeading>
@@ -95,7 +90,7 @@ const PanelSmallMultiples: FC<PanelSmallMultiplesProps> = props => {
           label='Tile By Column'
           initial='Select Column'
           updateField={handleColumnChange}
-          options={getColumns()}
+          options={columns}
           tooltip={
             <Tooltip style={{ textTransform: 'none' }}>
               <Tooltip.Target>
@@ -199,6 +194,8 @@ const PanelSmallMultiples: FC<PanelSmallMultiplesProps> = props => {
                     value={currentOrderType}
                     options={tileOrderOptions}
                     label='Tile Order'
+                    fieldName='tileOrderType'
+                    section='smallMultiples'
                     updateField={(_section, _subsection, _fieldName, value) => {
                       handleOrderTypeChange(value)
                     }}

@@ -71,9 +71,7 @@ export const GeneralSectionTests: Story = {
       const chartContainer = canvasElement.querySelector('.tooltip-boundary')
       // Target the main chart SVG specifically (not brush or other SVGs)
       const chartSvg =
-        canvasElement.querySelector('.tooltip-boundary svg[role="img"]') ||
-        canvasElement.querySelector('svg.linear') ||
-        canvasElement.querySelector('.cdc-open-viz-module svg:not(.brush-container svg)')
+        canvasElement.querySelector('.tooltip-boundary svg[role="img"]') || canvasElement.querySelector('svg.linear')
       return {
         containerHeight: chartContainer?.getBoundingClientRect().height || 0,
         svgHeight: parseInt(chartSvg?.getAttribute('height') || '0', 10),
@@ -129,7 +127,7 @@ export const GeneralSectionTests: Story = {
     // Test 1: Title Text Change
     const getTitleText = () => {
       // Look for the chart title using the specific class from CdcChartComponent.tsx line 913
-      const titleElement = canvasElement.querySelector('.chart-title')
+      const titleElement = canvasElement.querySelector('.chart-title, .cove-title')
       const result = {
         titleExists: Boolean(titleElement),
         titleText: titleElement?.textContent?.trim() || '',
@@ -202,7 +200,7 @@ export const GeneralSectionTests: Story = {
     // Test 1: Super Title Text Change
     const getSuperTitleText = () => {
       // Super title is part of the .chart-title component but rendered separately
-      const titleContainer = canvasElement.querySelector('.chart-title')
+      const titleContainer = canvasElement.querySelector('.chart-title, .cove-title')
       const superTitleElement =
         titleContainer?.querySelector('.super-title, [class*="super"]') || titleContainer?.children[0] // First child might be super title
 

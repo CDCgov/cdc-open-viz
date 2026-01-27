@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import SampleDataContext from './samples/SampleDataContext'
+import { cityTemperature } from '@visx/mock-data'
 
 // Data Samples
 import validMapData from './samples/valid-data-map.csv?raw'
@@ -16,6 +17,13 @@ import vaidWorldData from './samples/valid-world-data.json?raw'
 import validRegionData from './samples/valid-region-data.json?raw'
 import validSankeyData from './samples/valid-sankey-data.json?raw'
 import pivotData from './samples/pivotData.json?raw'
+
+// Convert visx cityTemperature data to CSV format
+const visxTemperatureData = (() => {
+  const headers = Object.keys(cityTemperature[0])
+  const rows = cityTemperature.map(row => Object.values(row).join(','))
+  return [headers.join(','), ...rows].join('\n')
+})()
 
 // Add additional data to samples
 const sampleData = {
@@ -54,6 +62,11 @@ const sampleData = {
       text: 'Pivot Table Data',
       fileName: 'pivotData.json',
       data: pivotData
+    },
+    {
+      text: 'Warming Stripes Temperature Data',
+      fileName: 'visx-temperature-data.csv',
+      data: visxTemperatureData
     }
   ],
   maps: [

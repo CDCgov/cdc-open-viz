@@ -5,8 +5,10 @@ import { Visualization } from '../../types/Visualization'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import { Column } from '../../types/Column'
 import _ from 'lodash'
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import FieldSetWrapper from './FieldSetWrapper'
+import { useDataColumns } from '../../hooks/useDataColumns'
+import Alert from '../Alert/components/Alert'
 
 interface ColumnsEditorProps {
   config: Partial<Visualization>
@@ -52,19 +54,21 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
     updateField(null, null, 'columns', newColumns)
   }
 
-  const getColumns = () => {
-    const columns: string[] = config.data.flatMap(row => {
-      return Object.keys(row).map(columnName => columnName)
-    })
+  // Extract column names from data with memoization (replaces getColumns)
+  const allColumns = useDataColumns(config.data)
+
+  // Filter out groupBy and already configured columns
+  const availableColumns = useMemo(() => {
     const configuredColumns = Object.values(config.columns).map(col => col.name)
-    const cols = _.uniq(columns).filter(key => {
+    const cols = allColumns.filter(key => {
       if (config.table.groupBy === key) return false
       if (configuredColumns.includes(key)) return false
       return true
     })
+    // Add current column name if it exists
     if (config.columns[colKey]?.name) cols.push(config.columns[colKey].name)
     return cols
-  }
+  }, [allColumns, config.table.groupBy, config.columns, colKey])
 
   const colName = config.columns[colKey]?.name
 
@@ -82,7 +86,7 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
         fieldName='name'
         section={'columns'}
         initial={'-Select-'}
-        options={getColumns()}
+        options={availableColumns}
         updateField={(_section, _subsection, _fieldName, value) => changeName(value)}
       />
       {config.type !== 'table' && (
@@ -92,7 +96,11 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
           fieldName={'series'}
           section='columns'
           initial={'Select series'}
-          options={config.series?.map(series => series.dataKey) || []}
+          options={
+            config.visualizationType === 'Pie'
+              ? config.runtime?.seriesKeys || []
+              : config.series?.map(series => series.dataKey) || []
+          }
           updateField={(_section, _subsection, _fieldName, value) => editColumn('series', value)}
         />
       )}
@@ -147,16 +155,26 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
         </li>
         <li>
           {config.table.showVertical && (
-            <label className='checkbox'>
-              <input
-                type='checkbox'
-                checked={config.columns[colKey].dataTable ?? true}
-                onChange={event => {
-                  editColumn('dataTable', event.target.checked)
-                }}
-              />
-              <span className='edit-label'>Show in Data Table</span>
-            </label>
+            <>
+              <label className='checkbox'>
+                <input
+                  type='checkbox'
+                  checked={config.columns[colKey].dataTable ?? true}
+                  onChange={event => {
+                    editColumn('dataTable', event.target.checked)
+                  }}
+                />
+                <span className='edit-label'>Show in Data Table</span>
+              </label>
+              {(config.confidenceKeys?.upper === colName || config.confidenceKeys?.lower === colName) && (
+                <Alert
+                  type="danger"
+                  message="Confidence Interval column - required for 508 compliance"
+                  showCloseButton={false}
+                  iconSize={14}
+                />
+              )}
+            </>
           )}
         </li>
         {config.visualizationType === 'Pie' && (

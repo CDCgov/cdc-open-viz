@@ -3,7 +3,8 @@ export default {
     inlineHTML: '<h2>Inline HTML</h2>',
     showHeader: true,
     srcUrl: '#example',
-    title: 'Markup Include',
+    title: '',
+    titleStyle: 'small',
     useInlineHTML: false,
     showNoDataMessage: false,
     noDataMessageText: 'No Data Available'

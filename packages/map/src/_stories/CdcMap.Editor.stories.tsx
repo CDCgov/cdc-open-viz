@@ -119,7 +119,10 @@ export const TypeSectionTests: Story = {
     // ==========================================================================
     // TEST: Map Type select toggles classes/data representation
     // ==========================================================================
-    const typeSelect = canvas.getByLabelText(/Map Type/i) as HTMLSelectElement
+    // Use getAllByLabelText to avoid multiple elements error
+    const typeSelects = canvas.getAllByLabelText(/Map Type/i, { selector: 'select' }) as HTMLSelectElement[]
+    // Assume the first select is the correct one for the Type section
+    const typeSelect = typeSelects[0]
     const initialType = typeSelect.value
     const mapTypeOptions = Array.from(typeSelect.options).map(option => option.value)
     expect(mapTypeOptions).toContain('navigation')
@@ -324,7 +327,7 @@ export const GeneralSectionTests: Story = {
     expect(titleInput).toBeTruthy()
 
     const getTitleVisual = () => {
-      const titleElement = canvasElement.querySelector('.map-title')
+      const titleElement = canvasElement.querySelector('.cove-title, .map-title')
       return {
         titleText: titleElement?.textContent || '',
         hasTitleElement: Boolean(titleElement)
@@ -343,7 +346,7 @@ export const GeneralSectionTests: Story = {
 
     // ==========================================================================
     // TEST: Show Title checkbox
-    // Verifies: Title element visibility changes (visible/hidden class)
+    // Verifies: Title element visibility is controlled by showTitle
     // ==========================================================================
     const generalAccordion = canvasElement.querySelector('[aria-expanded="true"]')?.closest('.accordion__item')
     const showTitleLabel = Array.from(generalAccordion?.querySelectorAll('label') || []).find(label =>
@@ -353,22 +356,20 @@ export const GeneralSectionTests: Story = {
     expect(showTitleCheckbox).toBeTruthy()
 
     const getTitleVisibility = () => {
-      const titleElement = canvasElement.querySelector('.map-title')
-      const classes = titleElement ? Array.from(titleElement.classList) : []
+      const titleElement = canvasElement.querySelector('.cove-title, header.cove-component__header')
       return {
-        isVisible: classes.includes('visible'),
-        isHidden: classes.includes('hidden')
+        isPresent: Boolean(titleElement)
       }
     }
 
-    // Test config has showTitle: true, so title starts visible
+    // Test config has showTitle: true, so title starts visible (present in DOM)
     await performAndAssert(
       'Show Title → Hide',
       getTitleVisibility,
       async () => {
         await userEvent.click(showTitleCheckbox)
       },
-      (before, after) => before.isVisible && !after.isVisible && after.isHidden
+      (before, after) => before.isPresent && !after.isPresent
     )
 
     await performAndAssert(
@@ -377,7 +378,7 @@ export const GeneralSectionTests: Story = {
       async () => {
         await userEvent.click(showTitleCheckbox)
       },
-      (before, after) => !before.isVisible && after.isVisible && !after.isHidden
+      (before, after) => !before.isPresent && after.isPresent
     )
 
     // ==========================================================================
@@ -388,7 +389,7 @@ export const GeneralSectionTests: Story = {
     expect(superTitleInput).toBeTruthy()
 
     const getSuperTitleVisual = () => {
-      const titleElement = canvasElement.querySelector('.map-title')
+      const titleElement = canvasElement.querySelector('.cove-title, .map-title')
       return {
         titleText: titleElement?.textContent || ''
       }
@@ -402,6 +403,60 @@ export const GeneralSectionTests: Story = {
         await userEvent.type(superTitleInput, 'Super Title Text')
       },
       (before, after) => !before.titleText.includes('Super Title Text') && after.titleText.includes('Super Title Text')
+    )
+
+    // ==========================================================================
+    // TEST: Title Style dropdown
+    // Verifies: Changing title style changes the heading element (h2/h3) used
+    // ==========================================================================
+    const titleStyleSelect = canvas.getByLabelText(/Title Style/i) as HTMLSelectElement
+    expect(titleStyleSelect).toBeTruthy()
+
+    const getTitleStyleVisual = () => {
+      const coveTitleElement = canvasElement.querySelector('.cove-title')
+      const legacyTitleElement = canvasElement.querySelector('header.cove-component__header')
+
+      // For modern titles, check for h2 (large) or h3 (small) elements
+      const hasH2 = Boolean(coveTitleElement?.querySelector('h2'))
+      const hasH3 = Boolean(coveTitleElement?.querySelector('h3'))
+
+      return {
+        hasCoveTitle: Boolean(coveTitleElement),
+        hasLegacyTitle: Boolean(legacyTitleElement),
+        isSmall: hasH3,
+        isLarge: hasH2
+      }
+    }
+
+    // Current config has titleStyle: 'small'
+    // Test: Change to 'large'
+    await performAndAssert(
+      'Title Style → Change to Large',
+      getTitleStyleVisual,
+      async () => {
+        await userEvent.selectOptions(titleStyleSelect, 'large')
+      },
+      (before, after) => before.isSmall && after.isLarge && after.hasCoveTitle && !after.hasLegacyTitle
+    )
+
+    // Test: Change to 'legacy'
+    await performAndAssert(
+      'Title Style → Change to Legacy',
+      getTitleStyleVisual,
+      async () => {
+        await userEvent.selectOptions(titleStyleSelect, 'legacy')
+      },
+      (before, after) => before.hasCoveTitle && !after.hasCoveTitle && after.hasLegacyTitle
+    )
+
+    // Test: Change back to 'small'
+    await performAndAssert(
+      'Title Style → Change back to Small',
+      getTitleStyleVisual,
+      async () => {
+        await userEvent.selectOptions(titleStyleSelect, 'small')
+      },
+      (before, after) => before.hasLegacyTitle && !after.hasLegacyTitle && after.isSmall && after.hasCoveTitle
     )
 
     // ==========================================================================
@@ -1573,10 +1628,8 @@ export const FiltersSectionTests: Story = {
     await performAndAssert(
       'Add Filter → Click button',
       () => {
-        const filtersList = canvasElement.querySelector('.filters-list')
-        // Count all filter items (both collapsed and expanded)
-        const allFilterItems = Array.from(filtersList?.querySelectorAll('li, .edit-block, .mb-1') || [])
-        const collapsedFilters = filtersList?.querySelectorAll('.mb-1:has(button)') || []
+        const filtersList = canvasElement.querySelector('.draggable-field-list')
+        const collapsedFilters = filtersList?.querySelectorAll('.editor-field-item') || []
         return {
           hasFiltersList: Boolean(filtersList),
           hasCollapsedFilter: collapsedFilters.length > 0
@@ -1591,16 +1644,16 @@ export const FiltersSectionTests: Story = {
       }
     )
 
-    // Find and expand the collapsed filter
-    const filtersList = canvasElement.querySelector('.filters-list')
-    const expandButton = filtersList?.querySelector('.mb-1 button') as HTMLButtonElement
+    // Find and expand the collapsed filter (click the header expand button)
+    const filtersList = canvasElement.querySelector('.draggable-field-list')
+    const expandButton = filtersList?.querySelector('.editor-field-item__header button') as HTMLButtonElement
     await userEvent.click(expandButton)
 
-    // Wait for the expanded filter block
-    await waitForPresence('.filters-list .edit-block', canvasElement)
+    // Wait for the expanded filter content
+    await waitForPresence('.draggable-field-list .editor-field-item__content', canvasElement)
 
-    // Find the newly added filter section
-    const filterBlock = filtersList?.querySelector('.edit-block') as HTMLElement
+    // Find the newly added filter section content
+    const filterBlock = filtersList?.querySelector('.editor-field-item__content') as HTMLElement
 
     // ==========================================================================
     // TEST: Select STATE as the filter column
@@ -1612,7 +1665,7 @@ export const FiltersSectionTests: Story = {
     }) as HTMLSelectElement
 
     const getDefaultValueState = () => {
-      const updatedFilterBlock = filtersList?.querySelector('.edit-block') as HTMLElement
+      const updatedFilterBlock = filtersList?.querySelector('.editor-field-item__content') as HTMLElement
       const defaultValueSelect = Array.from(updatedFilterBlock?.querySelectorAll('select') || []).find(select => {
         const label = select.closest('label')
         const labelSpan = label?.querySelector('.edit-label')
@@ -1668,7 +1721,7 @@ export const FiltersSectionTests: Story = {
     // ==========================================================================
     // TEST: Select Alabama as the default filter value
     // ==========================================================================
-    const updatedFilterBlock = filtersList?.querySelector('.edit-block') as HTMLElement
+    const updatedFilterBlock = filtersList?.querySelector('.editor-field-item__content') as HTMLElement
     const defaultValueSelect = Array.from(updatedFilterBlock?.querySelectorAll('select') || []).find(select => {
       const label = select.closest('label')
       const labelSpan = label?.querySelector('.edit-label')
@@ -2091,9 +2144,13 @@ export const DataTableSectionTests: Story = {
     await performAndAssert(
       'Enable Image Download → Enable button',
       () => {
-        const downloadImgButton = Array.from(canvasElement.querySelectorAll('button')).find(
-          btn => btn.textContent?.includes('Download Image') || btn.classList.contains('download-image')
-        )
+        const downloadImgButton =
+          Array.from(canvasElement.querySelectorAll('button')).find(
+            btn => btn.textContent?.includes('Download Image') || btn.classList.contains('download-image')
+          ) ||
+          Array.from(canvasElement.querySelectorAll('a[role="button"]')).find(
+            link => link.textContent?.includes('Download Map') && link.textContent?.includes('PNG')
+          )
         return {
           hasDownloadImgButton: Boolean(downloadImgButton)
         }
@@ -2163,36 +2220,34 @@ export const VisualSectionTests: StoryObj<typeof CdcMap> = {
     await performAndAssert(
       'Show Title → Toggle off',
       () => {
-        const title = canvasElement.querySelector('.map-title')
-        const isVisible = title?.classList.contains('visible')
+        const titleElement = canvasElement.querySelector('.cove-title, header.cove-component__header')
         return {
-          isVisible: Boolean(isVisible)
+          isPresent: Boolean(titleElement)
         }
       },
       async () => {
         await userEvent.click(showTitleCheckbox)
       },
       (before, after) => {
-        // After toggling off, title should be hidden
-        return before.isVisible && !after.isVisible
+        // After toggling off, title should be removed from DOM
+        return before.isPresent && !after.isPresent
       }
     )
 
     await performAndAssert(
       'Show Title → Toggle back on',
       () => {
-        const title = canvasElement.querySelector('.map-title')
-        const isVisible = title?.classList.contains('visible')
+        const titleElement = canvasElement.querySelector('.cove-title, header.cove-component__header')
         return {
-          isVisible: Boolean(isVisible)
+          isPresent: Boolean(titleElement)
         }
       },
       async () => {
         await userEvent.click(showTitleCheckbox)
       },
       (before, after) => {
-        // After toggling back on, title should be visible
-        return !before.isVisible && after.isVisible
+        // After toggling back on, title should be present in DOM
+        return !before.isPresent && after.isPresent
       }
     )
 

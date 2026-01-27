@@ -123,7 +123,7 @@ const Widget = ({
     if (!widgetConfig) return
     dispatch({
       type: 'UPDATE_VISUALIZATION',
-      payload: { vizKey: widgetConfig.uid as string, configureData: { editing: true } }
+      payload: { vizKey: widgetConfig.uid as string, configureData: { editing: true, showEditorPanel: true } }
     })
     loadSampleData()
   }

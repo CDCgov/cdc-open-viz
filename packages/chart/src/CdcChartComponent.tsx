@@ -37,6 +37,7 @@ import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
 
 import SparkLine from './components/Sparkline'
 import Legend from './components/Legend'
+import WarmingStripesGradientLegend from './components/WarmingStripes/WarmingStripesGradientLegend'
 import defaults from './data/initial-state'
 import EditorPanel from './components/EditorPanel'
 import { abbreviateNumber } from './helpers/abbreviateNumber'
@@ -239,6 +240,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   const convertLineToBarGraph = isConvertLineToBarGraph(config, filteredData)
 
+  // Declaratively calculate series keys for pie charts based on filtered data
+  const pieSeriesKeys = useMemo(() => {
+    if (config.visualizationType !== 'Pie' || !config.xAxis?.dataKey) return null
+    const data = filteredData?.length > 0 ? filteredData : excludedData
+    if (!data) return null
+    return _.uniq(data.map(d => d[config.xAxis.dataKey]))
+  }, [config.visualizationType, config.xAxis?.dataKey, filteredData, excludedData])
+
   const prepareConfig = (loadedConfig: ChartConfig) => {
     // Create defaults without version to avoid overriding legacy configs
     const defaultsWithoutPalette = { ...defaults }
@@ -375,6 +384,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       const pieData = currentData.length > 0 ? currentData : newExcludedData
       newConfig.runtime.seriesKeys = _.uniq(pieData.map(d => d[newConfig.xAxis.dataKey]))
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
+      newConfig.runtime.isPieChart = true // Flag to know when to use derived keys
     } else {
       const finalData = dataOverride || newConfig.formattedData || newConfig.data
       newConfig.runtime.seriesKeys = (newConfig.runtime.series || []).flatMap(series => {
@@ -559,7 +569,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     for (let entry of entries) {
       let { width, height } = entry.contentRect
 
-      const editorIsOpen = isEditor && !!document.querySelector('.editor-panel:not(.hidden)')
+      const editorIsOpen = isEditor
       width = editorIsOpen ? width - EDITOR_WIDTH : width
 
       const newViewport = getViewport(width)
@@ -709,6 +719,19 @@ const CdcChart: React.FC<CdcChartProps> = ({
     }
   }, [externalFilters]) // eslint-disable-line
 
+  // Declaratively update runtime series keys for pie charts when derived value changes
+  if (config.runtime?.isPieChart && pieSeriesKeys && !_.isEqual(pieSeriesKeys, config.runtime?.seriesKeys)) {
+    const newConfig = {
+      ...config,
+      runtime: {
+        ...config.runtime,
+        seriesKeys: pieSeriesKeys,
+        seriesLabelsAll: pieSeriesKeys
+      }
+    }
+    setConfig(newConfig)
+  }
+
   // Generates color palette to pass to child chart component
   useEffect(() => {
     if (stateData && config.xAxis && config.runtime?.seriesKeys) {
@@ -819,15 +842,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const formatDate = (date, i, ticks) => {
-    let formattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(date)
+    const displayFormat =
+      config.runtime[section].dateDisplayFormat || config.runtime[section].dateParseFormat || '%Y-%m-%d'
+    let formattedDate = timeFormat(displayFormat)(date)
     // Handle the case where all months work with '%b.' except for May
-    if (config.runtime[section].dateDisplayFormat?.includes('%b.') && formattedDate.includes('May.')) {
+    if (displayFormat?.includes('%b.') && formattedDate.includes('May.')) {
       formattedDate = formattedDate.replace(/May\./g, 'May')
     }
     // Show years only once
-    if (config.xAxis.showYearsOnce && config.runtime[section].dateDisplayFormat?.includes('%Y') && ticks) {
+    if (config.xAxis.showYearsOnce && displayFormat?.includes('%Y') && ticks) {
       const prevDate = ticks[i - 1] ? ticks[i - 1].value : null
-      const prevFormattedDate = timeFormat(config.runtime[section].dateDisplayFormat)(prevDate)
+      const prevFormattedDate = timeFormat(displayFormat)(prevDate)
       const year = formattedDate.match(/\d{4}/)
       const prevYear = prevFormattedDate.match(/\d{4}/)
       if (year && prevYear && year[0] === prevYear[0]) {
@@ -1125,8 +1150,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
 
     if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
-    if (config.xAxis.brushActive && !isLegendOnBottom) classes.push('subtext--brush-active ')
-    if (config.xAxis.brushActive && config.legend.hide) classes.push('subtext--brush-active ')
     return classes
   }
 
@@ -1154,6 +1177,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 isDashboard={isDashboard}
                 title={title}
                 superTitle={processedSuperTitle}
+                titleStyle={config.titleStyle}
                 classes={['chart-title', `${config.theme}`, 'cove-component__header', 'mb-3']}
                 style={undefined}
                 config={config}
@@ -1305,13 +1329,18 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {/* Legend */}
                   {!config.legend.hide &&
                     config.visualizationType !== 'Spark Line' &&
-                    config.visualizationType !== 'Sankey' && (
+                    config.visualizationType !== 'Sankey' &&
+                    !(config.visualizationType === 'Warming Stripes' && config.legend?.style === 'gradient') &&
+                    !(config.visualizationType === 'Warming Stripes' && config.smallMultiples?.mode) && (
                       <Legend
                         ref={legendRef}
                         skipId={handleChartTabbing(config, legendId)}
                         interactionLabel={interactionLabel}
                       />
                     )}
+                  {config.visualizationType === 'Warming Stripes' &&
+                    config.legend?.style === 'gradient' &&
+                    !config.smallMultiples?.mode && <WarmingStripesGradientLegend />}
                 </LegendWrapper>
                 {/* Link */}
                 {isDashboard && config.table && config.table.show && config.table.showDataTableLink
@@ -1323,79 +1352,86 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   <div className={getChartSubTextClasses().join(' ')}>{parse(processedDescription)}</div>
                 )}
 
-                {/* buttons */}
-                <MediaControls.Section classes={['download-buttons']}>
-                  {config.table.showDownloadImgButton && (
-                    <MediaControls.Button
-                      text='Download Image'
-                      title='Download Chart as Image'
-                      type='image'
-                      state={config}
-                      elementToCapture={imageId}
-                      interactionLabel={interactionLabel}
-                    />
-                  )}
-                  {config.table.showDownloadPdfButton && (
-                    <MediaControls.Button
-                      text='Download PDF'
-                      title='Download Chart as PDF'
-                      type='pdf'
-                      state={config}
-                      elementToCapture={imageId}
-                      interactionLabel={interactionLabel}
-                    />
-                  )}
-                </MediaControls.Section>
                 {/* Data Table */}
-                {((config.xAxis.dataKey &&
+                {(config.xAxis.dataKey &&
                   config.table.show &&
                   config.visualizationType !== 'Spark Line' &&
                   config.visualizationType !== 'Sankey') ||
-                  (config.visualizationType === 'Sankey' && config.table.show)) &&
-                  (() => {
-                    let dataTableConfig = pivotDynamicSeries(config)
-                    let dataTableColumns = config.columns
-                    let dataTableRuntimeData = getTableRuntimeData()
-                    let dataTableRawData =
-                      config.visualizationType === 'Sankey'
-                        ? config?.data?.[0]?.tableData
-                        : config.table.customTableConfig
-                        ? filterVizData(config.filters, config.data)
-                        : config.data
+                (config.visualizationType === 'Sankey' && config.table.show)
+                  ? (() => {
+                      let dataTableConfig = pivotDynamicSeries(config)
+                      let dataTableColumns = config.columns
+                      let dataTableRuntimeData = getTableRuntimeData()
+                      let dataTableRawData =
+                        config.visualizationType === 'Sankey'
+                          ? config?.data?.[0]?.tableData
+                          : config.table.customTableConfig
+                          ? filterVizData(config.filters, config.data)
+                          : config.data
 
-                    if (config.smallMultiples?.mode) {
-                      const prepared = prepareSmallMultiplesDataTable(config, config.columns, dataTableRuntimeData)
-                      dataTableConfig = prepared.config
-                      dataTableColumns = prepared.columns
-                      dataTableRuntimeData = prepared.runtimeData
-                      if (config.smallMultiples.mode === 'by-column') {
-                        dataTableRawData = prepared.config.data
+                      if (config.smallMultiples?.mode) {
+                        const prepared = prepareSmallMultiplesDataTable(config, config.columns, dataTableRuntimeData)
+                        dataTableConfig = prepared.config
+                        dataTableColumns = prepared.columns
+                        dataTableRuntimeData = prepared.runtimeData
+                        if (config.smallMultiples.mode === 'by-column') {
+                          dataTableRawData = prepared.config.data
+                        }
                       }
-                    }
 
-                    return (
-                      <DataTable
-                        /* changing the "key" will force the table to re-render
-                                    when the default sort changes while editing */
-                        key={dataTableDefaultSortBy}
-                        config={dataTableConfig}
-                        rawData={dataTableRawData}
-                        runtimeData={dataTableRuntimeData}
-                        expandDataTable={config.table.expanded}
-                        columns={dataTableColumns}
-                        defaultSortBy={dataTableDefaultSortBy}
-                        displayGeoName={name => name}
-                        applyLegendToRow={applyLegendToRow}
-                        tableTitle={config.table.label}
-                        indexTitle={config.table.indexLabel}
-                        vizTitle={title}
-                        viewport={currentViewport}
-                        tabbingId={handleChartTabbing(config, legendId)}
-                        colorScale={colorScale}
-                        interactionLabel={interactionLabel}
-                      />
-                    )
-                  })()}
+                      return (
+                        <DataTable
+                          /* changing the "key" will force the table to re-render
+                                  when the default sort changes while editing */
+                          key={dataTableDefaultSortBy}
+                          config={dataTableConfig}
+                          rawData={dataTableRawData}
+                          runtimeData={dataTableRuntimeData}
+                          expandDataTable={config.table.expanded}
+                          columns={dataTableColumns}
+                          defaultSortBy={dataTableDefaultSortBy}
+                          displayGeoName={name => name}
+                          applyLegendToRow={applyLegendToRow}
+                          tableTitle={config.table.label}
+                          indexTitle={config.table.indexLabel}
+                          vizTitle={title}
+                          viewport={currentViewport}
+                          tabbingId={handleChartTabbing(config, legendId)}
+                          colorScale={colorScale}
+                          imageRef={imageId}
+                          showDownloadImgButton={config.table.showDownloadImgButton}
+                          showDownloadPdfButton={config.table.showDownloadPdfButton}
+                          includeContextInDownload={config.table?.includeContextInDownload}
+                          interactionLabel={interactionLabel}
+                        />
+                      )
+                    })()
+                  : (config.table.showDownloadImgButton || config.table.showDownloadPdfButton) && (
+                      <div className='w-100 d-flex justify-content-end'>
+                        <MediaControls.Section classes={['download-links', 'mt-4', 'mb-2']}>
+                          {config.table.showDownloadImgButton && (
+                            <MediaControls.DownloadLink
+                              type='image'
+                              title='Download Chart as Image'
+                              state={config}
+                              elementToCapture={imageId}
+                              interactionLabel={interactionLabel}
+                              includeContextInDownload={config.table?.includeContextInDownload}
+                            />
+                          )}
+                          {config.table.showDownloadPdfButton && (
+                            <MediaControls.DownloadLink
+                              type='pdf'
+                              title='Download Chart as PDF'
+                              state={config}
+                              elementToCapture={imageId}
+                              interactionLabel={interactionLabel}
+                              includeContextInDownload={config.table?.includeContextInDownload}
+                            />
+                          )}
+                        </MediaControls.Section>
+                      </div>
+                    )}
                 {config?.annotations?.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
                 {processedLegacyFootnotes && (

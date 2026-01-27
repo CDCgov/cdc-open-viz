@@ -99,6 +99,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
           color: entry.color,
           label: parse(legendLabel),
           disabled: entry.disabled,
+          hidden: entry.hidden,
           special: entry.hasOwnProperty('special'),
           value: [entry.min, entry.max]
         }
@@ -111,56 +112,40 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   const legendList = (patternsOnly = false) => {
     const formattedItems = patternsOnly ? [] : getFormattedLegendItems()
-    const patternsOnlyFont = isMobileFontViewport(viewport) ? '12px' : '14px'
-    const hasDisabledItems = formattedItems.some(item => item.disabled)
+    const hasDisabledItems = runtimeLegend.disabledAmt > 0
     let legendItems
 
     legendItems = formattedItems.map((item, idx) => {
       const handleListItemClass = () => {
         let classes = ['legend-container__li', 'd-flex', 'align-items-center']
-        if (item.disabled) classes.push('legend-container__li--disabled')
+        if (item.disabled || item.hidden) classes.push('legend-container__li--disabled')
         else if (hasDisabledItems) classes.push('legend-container__li--not-disabled')
         if (item.special) classes.push('legend-container__li--special-class')
         return classes.join(' ')
       }
 
       return (
-        <li
-          className={handleListItemClass()}
-          key={idx}
-          title={`Legend item ${item.label} - Click to disable`}
-          onClick={() => {
-            toggleLegendActive(idx, item.label, runtimeLegend, dispatch)
-            publishAnalyticsEvent({
-              vizType: config.type,
-              vizSubType: getVizSubType(config),
-              eventType: `map_legend_item_toggled`,
-              eventAction: 'click',
-              eventLabel: `${interactionLabel}`,
-              vizTitle: getVizTitle(config),
-              specifics: `mode: isolate, label: ${item.label}`
-            })
-          }}
-          onKeyDown={e => {
-            if (e.key === 'Enter') {
-              e.preventDefault()
-              toggleLegendActive(idx, item.label, runtimeLegend, dispatch)
+        <li className={handleListItemClass()} key={idx}>
+          <button
+            type='button'
+            className='legend-container__li-btn'
+            title={`Legend item ${item.label} - Click to disable`}
+            onClick={() => {
+              toggleLegendActive(idx, item.label, runtimeLegend, dispatch, config.legend.behavior)
               publishAnalyticsEvent({
                 vizType: config.type,
                 vizSubType: getVizSubType(config),
                 eventType: `map_legend_item_toggled`,
-                eventAction: 'keydown',
+                eventAction: 'click',
                 eventLabel: `${interactionLabel}`,
                 vizTitle: getVizTitle(config),
                 specifics: `mode: isolate, label: ${item.label}`
               })
-            }
-          }}
-          tabIndex={0}
-          role='button'
-        >
-          <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} fill={item.color} />
-          <span>{item.label}</span>
+            }}
+          >
+            <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} fill={item.color} />
+            <span>{item.label}</span>
+          </button>
         </li>
       )
     })
@@ -180,12 +165,12 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
         legendItems.push(
           <>
-            <li
-              className={`legend-container__li legend-container__li--geo-pattern`}
-              aria-label='You are on a pattern button. We dont support toggling patterns on this legend at the moment, but provide the area as being focusable for congruity.'
-              tabIndex={0}
-            >
-              <span className='legend-item' style={{ border: 'unset' }}>
+            <li className={`legend-container__li legend-container__li--geo-pattern`}>
+              <button
+                type='button'
+                className='legend-container__li-btn legend-container__li-btn--pattern'
+                aria-label='Pattern legend item. Toggling patterns is not currently supported.'
+              >
                 <svg width={legendSize} height={legendSize}>
                   {pattern === 'waves' && (
                     <PatternWaves
@@ -225,10 +210,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                     strokeWidth={1}
                   />
                 </svg>
-              </span>
-              <p style={{ lineHeight: '22.4px', fontSize: patternsOnly ? patternsOnlyFont : '16px' }}>
-                {patternData.label || patternData.dataValue || ''}
-              </p>
+                <span>{patternData.label || patternData.dataValue || ''}</span>
+              </button>
             </li>
           </>
         )

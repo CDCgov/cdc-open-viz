@@ -1,7 +1,8 @@
 export const FILTER_STYLE = {
-  nestedDropdown: 'nested-dropdown',
+  combobox: 'combobox',
+  dropdown: 'dropdown',
   multiSelect: 'multi-select',
-  dropdown: 'dropdown'
+  nestedDropdown: 'nested-dropdown'
 } as const
 
 export type FilterStyle = (typeof FILTER_STYLE)[keyof typeof FILTER_STYLE]

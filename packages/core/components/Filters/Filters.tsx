@@ -5,6 +5,7 @@ import parse from 'html-react-parser'
 // CDC
 import Button from '../elements/Button'
 import MultiSelect from '../MultiSelect'
+import ComboBox from '../ComboBox'
 import { Visualization } from '../../types/Visualization'
 import { MultiSelectFilter, VizFilter } from '../../types/VizFilter'
 import { addValuesToFilters } from '../../helpers/addValuesToFilters'
@@ -14,7 +15,7 @@ import { getNestedOptions } from './helpers/getNestedOptions'
 import { getWrappingStatuses } from './helpers/filterWrapping'
 import { handleSorting } from './helpers/handleSorting'
 import { getChangedFilters } from './helpers/getChangedFilters'
-import { getUniqueValues } from '@cdc/map/src/helpers'
+import { getUniqueValues } from '../../helpers/getUniqueValues'
 import { getQueryParams, updateQueryString } from '../../helpers/queryStringUtils'
 import { applyQueuedActive } from './helpers/applyQueuedActive'
 import Tabs from './components/Tabs'
@@ -23,13 +24,14 @@ import { publishAnalyticsEvent } from '../../helpers/metrics/helpers'
 import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
 
 export const VIZ_FILTER_STYLE = {
+  combobox: 'combobox',
   dropdown: 'dropdown',
+  multiSelect: 'multi-select',
   nestedDropdown: 'nested-dropdown',
   pill: 'pill',
   tab: 'tab',
   tabSimple: 'tab-simple',
-  tabBar: 'tab bar',
-  multiSelect: 'multi-select'
+  tabBar: 'tab bar'
 } as const
 
 export type VizFilterStyle = (typeof VIZ_FILTER_STYLE)[keyof typeof VIZ_FILTER_STYLE]
@@ -95,7 +97,9 @@ const Filters: React.FC<FilterProps> = ({
       eventAction: 'change',
       eventLabel: interactionLabel,
       vizTitle: getVizTitle(visualizationConfig),
-      specifics: `key: ${String(newFilters?.[index]?.columnName).toLowerCase()}, value: ${String(newFilters?.[index]?.active).toLowerCase()}`
+      specifics: `key: ${String(newFilters?.[index]?.columnName).toLowerCase()}, value: ${String(
+        newFilters?.[index]?.active
+      ).toLowerCase()}`
     })
   }
 
@@ -202,6 +206,9 @@ const Filters: React.FC<FilterProps> = ({
 
   if (visualizationConfig?.filters?.length === 0) return <></>
 
+  const hasVisibleFilters = filters?.some(filter => filter.showDropdown !== false)
+  if (!hasVisibleFilters) return <></>
+
   const getClasses = () => {
     const { visualizationType, legend } = visualizationConfig || {}
     const baseClass = 'filters-section'
@@ -214,6 +221,12 @@ const Filters: React.FC<FilterProps> = ({
   const getNestedGroup = (singleFilter: VizFilter): string[] => {
     if (singleFilter.filterStyle !== 'nested-dropdown') return []
     return (singleFilter.queuedActive || [singleFilter.active, singleFilter.subGrouping?.active]) as [string, string]
+  }
+
+  // Don't render filter section if all filters are hidden
+  const allFiltersHidden = vizFiltersWithValues.every(filter => filter.showDropdown === false)
+  if (allFiltersHidden) {
+    return null
   }
 
   return (
@@ -235,7 +248,9 @@ const Filters: React.FC<FilterProps> = ({
               'form-group',
               mobileFilterStyle ? 'single-filters--dropdown' : `single-filters--${filterStyle}`
             ]
-            const mobileExempt = ['nested-dropdown', 'multi-select', VIZ_FILTER_STYLE.tabSimple].includes(filterStyle)
+            const mobileExempt = ['nested-dropdown', 'multi-select', 'combobox', VIZ_FILTER_STYLE.tabSimple].includes(
+              filterStyle
+            )
             const { isDropdown } = wrappingFilters[columnName] || {}
             const showDefaultDropdown =
               ((filterStyle === 'dropdown' || mobileFilterStyle) && !mobileExempt) || isDropdown
@@ -300,6 +315,17 @@ const Filters: React.FC<FilterProps> = ({
                     options={getNestedOptions(singleFilter)}
                     listLabel={label}
                     handleSelectedItems={value => changeFilterActive(outerIndex, value)}
+                  />
+                )}
+                {filterStyle === 'combobox' && (
+                  <ComboBox
+                    options={singleFilter.values.map(v => ({ value: v, label: v }))}
+                    fieldName={outerIndex}
+                    updateField={(_section, _subSection, fieldName, value) => {
+                      changeFilterActive(fieldName, value)
+                    }}
+                    selected={(singleFilter.queuedActive || singleFilter.active) as string}
+                    label={label}
                   />
                 )}
               </div>

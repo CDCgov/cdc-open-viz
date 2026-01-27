@@ -316,36 +316,37 @@ const PanelGeneral: FC<PanelProps> = props => {
             />
           </>
         )}
-
-        <CheckBox
-          tooltip={
-            <Tooltip style={{ textTransform: 'none' }}>
-              <Tooltip.Target>
-                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-              </Tooltip.Target>
-              <Tooltip.Content>
-                {config.visualizationSubType === 'stacked' && (
-                  <p>
-                    We do not recommend using stacked vertical/horizontal bar charts for missing data. If you choose to
-                    proceed, selecting this option will display 'N/A' in the tooltip hover and data table (e.g. nothing
-                    will display in chart).
-                  </p>
-                )}
-                {config.visualizationSubType !== 'stacked' && (
-                  <p>
-                    Selecting this option will display 'N/A' on the Date/Category Axis, in the tooltip hover, and in the
-                    data table to indicate missing or undefined data values.
-                  </p>
-                )}
-              </Tooltip.Content>
-            </Tooltip>
-          }
-          value={config.general.showMissingDataLabel}
-          section='general'
-          fieldName='showMissingDataLabel'
-          label='Display "Missing Data" Label'
-          updateField={updateField}
-        />
+        {config.visualizationType !== 'Warming Stripes' && (
+          <CheckBox
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  {config.visualizationSubType === 'stacked' && (
+                    <p>
+                      We do not recommend using stacked vertical/horizontal bar charts for missing data. If you choose
+                      to proceed, selecting this option will display 'N/A' in the tooltip hover and data table (e.g.
+                      nothing will display in chart).
+                    </p>
+                  )}
+                  {config.visualizationSubType !== 'stacked' && (
+                    <p>
+                      Selecting this option will display 'N/A' on the Date/Category Axis, in the tooltip hover, and in
+                      the data table to indicate missing or undefined data values.
+                    </p>
+                  )}
+                </Tooltip.Content>
+              </Tooltip>
+            }
+            value={config.general.showMissingDataLabel}
+            section='general'
+            fieldName='showMissingDataLabel'
+            label='Display "Missing Data" Label'
+            updateField={updateField}
+          />
+        )}
 
         {visualizationType === 'Pie' && (
           <Select fieldName='pieType' label='Pie Chart Type' updateField={updateField} options={['Regular', 'Donut']} />
@@ -389,6 +390,32 @@ const PanelGeneral: FC<PanelProps> = props => {
             </Tooltip>
           }
         />
+
+        <Select
+          value={config.titleStyle}
+          fieldName='titleStyle'
+          label='Title Style'
+          updateField={updateField}
+          options={[
+            { value: 'small', label: 'Small (h3)' },
+            { value: 'large', label: 'Large (h2)' },
+            { value: 'legacy', label: 'Legacy' }
+          ]}
+          tooltip={
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>
+                  Choose the visual style for the title. Consider heading order on your page when selecting the title
+                  style. For 508 reasons, ensure your page follows a proper heading order.
+                </p>
+              </Tooltip.Content>
+            </Tooltip>
+          }
+        />
+
         <CheckBox value={config.showTitle} fieldName='showTitle' label='Show Title' updateField={updateField} />
 
         {visSupportsSuperTitle() && (

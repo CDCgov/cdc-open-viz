@@ -60,6 +60,7 @@ import Alert from '@cdc/core/components/Alert'
 import { shouldLoadAllFilters } from './helpers/shouldLoadAllFilters'
 import { subscribe, unsubscribe } from '@cdc/core/helpers/events'
 import DashboardEditors from './components/DashboardEditors'
+import { updateChildFilters } from './helpers/updateChildFilters'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -97,6 +98,16 @@ export default function CdcDashboard({
     }
 
     const vals = reloadURLHelpers.getDatasetKeys(state.config).map(key => state.data[key])
+
+    // Check if there are any visualizations that actually need data
+    // Markup-includes without dataKey don't require dashboard data
+    const visualizationsNeedingData = Object.values(state.config.visualizations).filter(viz => {
+      return viz.type !== 'markup-include' || viz.dataKey
+    })
+
+    // If no visualizations need data, don't show no-data state
+    if (!vals.length && visualizationsNeedingData.length === 0) return false
+
     if (!vals.length) return true
     return vals.some(val => val === undefined)
   }, [state.data, state.config.visualizations, state.config.dashboard?.sharedFilters, state.filtersApplied])
@@ -330,7 +341,8 @@ export default function CdcDashboard({
   useEffect(() => {
     const { config } = state
     const loadAllFilters = shouldLoadAllFilters(config, isEditor && !isPreview)
-    const sharedFiltersWithValues = addValuesToDashboardFilters(config.dashboard.sharedFilters, state.data)
+    let sharedFiltersWithValues = addValuesToDashboardFilters(config.dashboard.sharedFilters, state.data)
+    sharedFiltersWithValues = updateChildFilters(sharedFiltersWithValues, state.data)
     setAPILoading(true)
     loadAPIFilters(sharedFiltersWithValues, apiFilterDropdowns, loadAllFilters)?.then(newFilters => {
       const allValuesSelected = newFilters.every(filter => {
@@ -493,10 +505,11 @@ export default function CdcDashboard({
             <Title
               title={title}
               isDashboard={true}
+              titleStyle={config.dashboard.titleStyle}
               classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]}
             />
             {/* Description */}
-            {description && <div className='subtext mb-3'>{parse(description)}</div>}
+            {description && <div className='subtext mb-4'>{parse(description)}</div>}
             {/* Visualizations */}
             {filteredRows?.map((row, index) => (
               <VisualizationRow
@@ -636,6 +649,9 @@ export default function CdcDashboard({
   }
 
   const dashboardContainerClasses = ['cdc-open-viz-module', 'type-dashboard', `${currentViewport}`]
+  if (isEditor) {
+    dashboardContainerClasses.push('isDashboardEditor')
+  }
 
   return (
     <GlobalContextProvider>

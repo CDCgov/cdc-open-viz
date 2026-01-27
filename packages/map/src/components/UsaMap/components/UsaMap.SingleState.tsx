@@ -58,9 +58,6 @@ const SingleStateMap: React.FC = () => {
 
   const { geoClickHandler } = useGeoClickHandler()
 
-  const cityListProjection = geoAlbersUsaTerritories()
-    .translate([SVG_WIDTH / 2, SVG_HEIGHT / 2])
-    .scale(1)
   const geoStrokeColor = getGeoStrokeColor(config)
   const path = geoPath().projection(projection)
 
@@ -132,10 +129,10 @@ const SingleStateMap: React.FC = () => {
       />
     )
 
-    // Push city list
+    // Push city list - use projection from useStateZoom which is fitted to ALL selected states
     geosJsx.push(
       <CityList
-        projection={cityListProjection}
+        projection={projection}
         key='cities'
         geoClickHandler={geoClickHandler}
         titleCase={titleCase}
@@ -192,7 +189,7 @@ const SingleStateMap: React.FC = () => {
                 statesToShow
               ]}
             >
-              {({ features, projection }) => {
+              {({ features }) => {
                 return (
                   <g
                     id='mapGroup'
@@ -203,7 +200,7 @@ const SingleStateMap: React.FC = () => {
                     data-scale=''
                     key='countyMapGroup'
                   >
-                    {constructGeoJsx(features, projection)}
+                    {constructGeoJsx(features)}
                   </g>
                 )
               }}

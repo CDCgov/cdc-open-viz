@@ -9,42 +9,85 @@ type FieldSetProps = {
   controls: OpenControls
   deleteField: Function
   children: React.ReactNode
+  draggable?: boolean
 }
 
-const FieldSet: React.FC<FieldSetProps> = ({ fieldName, fieldKey, fieldType, controls, deleteField, children }) => {
+const FieldSet: React.FC<FieldSetProps> = ({
+  fieldName,
+  fieldKey,
+  fieldType,
+  controls,
+  deleteField,
+  children,
+  draggable = false
+}) => {
   const [openControls, setOpenControls] = controls
   const show = openControls[fieldKey]
   const setShow = (key, value) => {
     setOpenControls({ ...openControls, [key]: value })
   }
 
-  if (!show)
+  // Markup for non-draggable items
+  if (!draggable) {
+    if (!show)
+      return (
+        <div className='mb-1'>
+          <button type='button' className='btn btn-light' onClick={() => setShow(fieldKey, true)}>
+            <Icon display='caretDown' />
+          </button>
+          <span> {fieldName ? `${fieldName}` : 'New ' + fieldType}</span>
+        </div>
+      )
     return (
-      <div className='mb-1'>
-        <button className='btn btn-light' onClick={() => setShow(fieldKey, true)}>
-          <Icon display='caretDown' />
-        </button>
-        <span> {fieldName ? `${fieldName}` : 'New ' + fieldType}</span>
-      </div>
+      <fieldset className='edit-block mb-1' key={fieldKey}>
+        <div className='d-flex justify-content-between'>
+          <button type='button' className='btn btn-light' onClick={() => setShow(fieldKey, false)}>
+            <Icon display='caretUp' />
+          </button>
+          <button
+            type='button'
+            className='btn btn-danger btn-sm'
+            onClick={event => {
+              event.preventDefault()
+              deleteField()
+            }}
+          >
+            Remove
+          </button>
+        </div>
+        {children}
+      </fieldset>
     )
+  }
+
+  // Draggable fieldset
   return (
-    <fieldset className='edit-block mb-1' key={fieldKey}>
-      <div className='d-flex justify-content-between'>
-        <button className='btn btn-light' onClick={() => setShow(fieldKey, false)}>
-          <Icon display='caretUp' />
+    <div className='editor-field-item'>
+      <div className='editor-field-item__header'>
+        <Icon display='move' size={15} style={{ marginRight: '0.5rem' }} />
+        <button type='button' className='btn btn-light' onClick={() => setShow(fieldKey, !show)}>
+          <Icon display={show ? 'caretUp' : 'caretDown'} size={20} />
         </button>
-        <button
-          className='btn btn-danger btn-sm'
-          onClick={event => {
-            event.preventDefault()
-            deleteField()
-          }}
-        >
-          Remove
-        </button>
+        <span className='editor-field-item__name'>{fieldName ? `${fieldName}` : 'New ' + fieldType}</span>
       </div>
-      {children}
-    </fieldset>
+      {show && (
+        <div className='editor-field-item__content'>
+          <div className='editor-field-item__remove-wrapper'>
+            <button
+              type='button'
+              className='btn btn-danger btn-sm'
+              onClick={event => {
+                event.preventDefault()
+                deleteField()
+              }}
+            >
+              Remove
+            </button>
+          </div>
+          {children}
+        </div>
+      )}
+    </div>
   )
 }
 

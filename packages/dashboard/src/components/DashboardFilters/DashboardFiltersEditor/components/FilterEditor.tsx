@@ -43,7 +43,11 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
   const filterStyles = Object.values(FILTER_STYLE)
 
   const parentFilters: string[] = (config.dashboard.sharedFilters || [])
-    .filter(({ key, type }) => key !== filter.key && type !== 'datafilter')
+    .filter(({ key }) => key !== filter.key)
+    .map(({ key }) => key)
+
+  const dataFilterParents: string[] = (config.dashboard.sharedFilters || [])
+    .filter(({ key }) => key !== filter.key)
     .map(({ key }) => key)
 
   const vizRowColumnLocator = getVizRowColumnLocator(config.rows)
@@ -247,21 +251,6 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
               {!hasDashboardApplyBehavior(config.visualizations) && (
                 <>
                   <Select
-                    label='URL to Filter'
-                    value={filter.datasetKey || ''}
-                    options={[
-                      { value: '', label: '- Select Option -' },
-                      ...Object.keys(config.datasets)
-                        .filter(datasetKey => config.datasets[datasetKey].dataUrl)
-                        .map(datasetKey => ({
-                          value: datasetKey,
-                          label: config.datasets[datasetKey].dataUrl
-                        }))
-                    ]}
-                    onChange={e => updateFilterProp('datasetKey', e.target.value)}
-                  />
-
-                  <Select
                     label='Filter By'
                     value={filter.filterBy || ''}
                     options={[
@@ -271,6 +260,40 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                     ]}
                     onChange={e => updateFilterProp('filterBy', e.target.value)}
                   />
+
+                  {filter.filterBy === 'File Name' && (
+                    <Select
+                      label='URL to Filter'
+                      value={filter.datasetKey || ''}
+                      options={[
+                        { value: '', label: '- Select Option -' },
+                        ...Object.keys(config.datasets)
+                          .filter(datasetKey => config.datasets[datasetKey].dataUrl)
+                          .map(datasetKey => ({
+                            value: datasetKey,
+                            label: config.datasets[datasetKey].dataUrl
+                          }))
+                      ]}
+                      onChange={e => updateFilterProp('datasetKey', e.target.value)}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>Select which dataset URL's filename should be modified by this filter.</p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
+                  )}
+
+                  {filter.filterBy === 'Query String' && filter.usedBy && filter.usedBy.length > 0 && (
+                    <div className='bg-info-subtle p-2 my-2' style={{ fontSize: '0.9em' }}>
+                      <Icon display='info' style={{ marginRight: '0.5rem' }} />
+                      Will apply to datasets used by selected widgets
+                    </div>
+                  )}
                   {filter.filterBy === 'File Name' && (
                     <>
                       <TextField
@@ -617,19 +640,18 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                 updateField={(_section, _subSection, _key, value) => updateFilterProp('resetLabel', value)}
               />
 
-              <Select
-                label='Parent Filter'
-                value={filter.parents || ''}
-                options={[
-                  { value: '', label: 'Select a filter' },
-                  ...(config.dashboard.sharedFilters || [])
-                    .filter(sharedFilter => sharedFilter.key !== filter.key)
-                    .map(sharedFilter => ({ value: sharedFilter.key, label: sharedFilter.key }))
-                ]}
-                onChange={e => {
-                  updateFilterProp('parents', e.target.value)
-                }}
-              />
+              <label>
+                <span className='edit-label column-heading mt-1'>Parent Filter(s): </span>
+                <MultiSelect
+                  label='Parent Filter(s): '
+                  options={dataFilterParents.map(key => ({ value: key, label: key }))}
+                  fieldName='parents'
+                  selected={filter.parents}
+                  updateField={(_section, _subsection, _fieldname, newItems) => {
+                    updateFilterProp('parents', newItems)
+                  }}
+                />
+              </label>
 
               {!isNestedDropdown && (
                 <TextField

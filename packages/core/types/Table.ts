@@ -17,6 +17,7 @@ export type Table = {
   expanded?: boolean
   groupBy?: string
   height?: number
+  includeContextInDownload?: boolean
   indexLabel?: string
   label?: string
   limitHeight?: boolean

@@ -195,7 +195,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           updateField={updateField}
         />
       )}
-      {config?.visualizationType !== 'Sankey' && (
+      {config?.visualizationType !== 'Sankey' && config?.visualizationType !== 'Warming Stripes' && (
         <label onClick={e => e.preventDefault()}>
           <span className='edit-label column-heading mt-1'>Exclude Columns </span>
           <MultiSelect
@@ -283,9 +283,33 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
         <CheckBox
           value={config.table.showDownloadImgButton}
           fieldName='showDownloadImgButton'
-          label='Display Image Button'
+          label='Display Image Download Link'
           section='table'
           updateField={updateField}
+        />
+      )}
+      {config.type !== 'table' && config.table.showDownloadImgButton && (
+        <CheckBox
+          value={config.table.includeContextInDownload}
+          fieldName='includeContextInDownload'
+          className='ms-4'
+          label='Include Heading & Context'
+          section='table'
+          updateField={updateField}
+          tooltip={
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>
+                  When enabled, the image download will include the section heading (H2 or H3) and any explanatory
+                  paragraphs that appear immediately before the visualization. Be sure to test the image download on the
+                  published page to ensure the correct context is included.
+                </p>
+              </Tooltip.Content>
+            </Tooltip>
+          }
         />
       )}
       <label>
@@ -296,7 +320,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           onChange={e => updateField('table', null, 'cellMinWidth', e.target.value)}
         />
       </label>
-      {config?.visualizationType !== 'Sankey' && (
+      {config?.visualizationType !== 'Sankey' && config?.visualizationType !== 'Warming Stripes' && (
         <Select
           value={config.table.groupBy}
           fieldName={'groupBy'}
@@ -322,28 +346,30 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           }
         />
       )}
-      <Select
-        label='Pivot Column'
-        tooltip={
-          <Tooltip style={{ textTransform: 'none' }}>
-            <Tooltip.Target>
-              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-            </Tooltip.Target>
-            <Tooltip.Content>
-              <p>Select a Column whos data values will be pivoted to Column Values.</p>
-            </Tooltip.Content>
-          </Tooltip>
-        }
-        value={config.table.pivot?.columnName}
-        options={groupPivotColumns.filter(
-          col => col !== config.table.groupBy && !(config.table.pivot?.valueColumns || []).includes(col)
-        )}
-        initial='-Select-'
-        section='table'
-        subsection='pivot'
-        fieldName='columnName'
-        updateField={updateField}
-      />
+      {config.visualizationType !== 'Warming Stripes' && (
+        <Select
+          label='Pivot Column'
+          tooltip={
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>Select a Column whos data values will be pivoted to Column Values.</p>
+              </Tooltip.Content>
+            </Tooltip>
+          }
+          value={config.table.pivot?.columnName}
+          options={groupPivotColumns.filter(
+            col => col !== config.table.groupBy && !(config.table.pivot?.valueColumns || []).includes(col)
+          )}
+          initial='-Select-'
+          section='table'
+          subsection='pivot'
+          fieldName='columnName'
+          updateField={updateField}
+        />
+      )}
       {config.table.pivot?.columnName && (
         <label>
           <span className='edit-label column-heading mt-1'>

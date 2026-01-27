@@ -36,6 +36,7 @@ import iconTable from '../../assets/icon-table.svg'
 import iconSankey from '../../assets/icon-sankey.svg'
 import iconRotateLeft from '../../assets/icon-rotate-left.svg'
 import iconCommand from '../../assets/icon-command.svg'
+import iconMagnifyingGlass from '../../assets/icon-magnifying-glass.svg'
 
 import '../../styles/v2/components/icon.scss'
 
@@ -75,7 +76,8 @@ const iconHash = {
   table: iconTable,
   sankey: iconSankey,
   rotateLeft: iconRotateLeft,
-  command: iconCommand
+  command: iconCommand,
+  magnifyingGlass: iconMagnifyingGlass
 }
 
 export type IconType = keyof typeof iconHash

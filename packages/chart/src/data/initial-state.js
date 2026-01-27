@@ -23,6 +23,7 @@ const createInitialState = () => {
       noData: 'No Data Available'
     },
     title: '',
+    titleStyle: 'small',
     showTitle: true,
     showDownloadMediaButton: false,
     theme: 'theme-blue',
@@ -139,7 +140,8 @@ const createInitialState = () => {
       padding: 5,
       showYearsOnce: false,
       sortByRecentDate: false,
-      brushActive: false
+      brushActive: false,
+      brushDefaultRecentDateCount: undefined
     },
     table: {
       label: 'Data Table',
