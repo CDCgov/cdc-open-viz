@@ -16,9 +16,6 @@
 .download-links {
   justify-content: flex-end;
   line-height: 1;
-  &.brush-active {
-    margin-top: 2em;
-  }
   a:not(:last-child) {
     margin-right: 10px;
   }

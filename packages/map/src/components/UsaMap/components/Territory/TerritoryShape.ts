@@ -11,6 +11,7 @@ export type TerritoryShape = {
   territory: string
   territoryData: object
   textColor: string
+  mapId?: string
   svgStyle?: React.CSSProperties
   getSyncProps?: (geoKey: string) => any
   syncHandlers?: {

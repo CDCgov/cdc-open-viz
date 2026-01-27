@@ -112,7 +112,7 @@ const LegendGroup = ({ legendItems }) => {
                   onKeyDown={e => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault()
-                      toggleLegendActive(index, item.label, runtimeLegend, dispatch)
+                      toggleLegendActive(index, item.label, runtimeLegend, dispatch, config.legend.behavior)
                     }
                   }}
                 >

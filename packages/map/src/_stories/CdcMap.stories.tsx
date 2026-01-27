@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { within, expect } from 'storybook/test'
 import CdcMap from '../CdcMap'
 import EqualNumberOptInExample from './_mock/DEV-7286.json'
 import EqualNumberMap from './_mock/equal-number.json'
@@ -11,6 +12,11 @@ import USBubbleCities from './_mock/us-bubble-cities.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import exampleLegendBins from './_mock/legend-bins.json'
 
+// Fallback step function for test descriptions
+const step = async (description: string, fn: () => Promise<void> | void) => {
+  await fn()
+}
+
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map',
   component: CdcMap
@@ -18,10 +24,33 @@ const meta: Meta<typeof CdcMap> = {
 
 type Story = StoryObj<typeof CdcMap>
 
+// Helper function to test map rendering
+const testMapRendering = async (canvasElement: HTMLElement, storyName: string) => {
+  const canvas = within(canvasElement)
+
+  await step('Wait for map to render', async () => {
+    const mapElement = await canvas.findByRole('img', { hidden: true }, { timeout: 10000 })
+    expect(mapElement).toBeInTheDocument()
+  })
+
+  await step('Verify SVG element is present', async () => {
+    const svgElement = canvasElement.querySelector('svg')
+    expect(svgElement).toBeInTheDocument()
+  })
+
+  await step('Verify COVE module wrapper is present', async () => {
+    const coveModule = canvasElement.querySelector('.cdc-open-viz-module')
+    expect(coveModule).toBeInTheDocument()
+  })
+}
+
 export const Equal_Interval_Map: Story = {
   args: {
     isEditor: true,
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/page-elements/equal-interval-map.json'
+  },
+  play: async ({ canvasElement }) => {
+    await testMapRendering(canvasElement, 'Equal Interval Map')
   }
 }
 
@@ -43,41 +72,62 @@ export const Scale_Based: Story = {
     configUrl:
       'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Scale-Based-Categorical-Map-With-Special-Classes.json',
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await testMapRendering(canvasElement, 'Scale Based')
   }
 }
 export const Qualitative: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/page-elements/qualitative-map.json'
+  },
+  play: async ({ canvasElement }) => {
+    await testMapRendering(canvasElement, 'Qualitative')
   }
 }
 
 export const World_Map: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/world-data-map-example.json'
+  },
+  play: async ({ canvasElement }) => {
+    await testMapRendering(canvasElement, 'World Map')
   }
 }
 
 export const Filterable_Map: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/page-elements/gender-rate-map.json'
+  },
+  play: async ({ canvasElement }) => {
+    await testMapRendering(canvasElement, 'Filterable Map')
   }
 }
 
 export const Hex_Map: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Hex_Map.json'
+  },
+  play: async ({ canvasElement }) => {
+    await testMapRendering(canvasElement, 'Hex Map')
   }
 }
 
 export const County_Map: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/US-County-Level-Map.json'
+  },
+  play: async ({ canvasElement }) => {
+    await testMapRendering(canvasElement, 'County Map')
   }
 }
 
 export const Single_State: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-data-map-counties.json'
+  },
+  play: async ({ canvasElement }) => {
+    await testMapRendering(canvasElement, 'Single State')
   }
 }
 
@@ -102,18 +152,27 @@ export const Multi_Country_Hide_Mode: Story = {
 export const Bubble_Map: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-Bubble-Map-world.json'
+  },
+  play: async ({ canvasElement }) => {
+    await testMapRendering(canvasElement, 'Bubble Map')
   }
 }
 
 export const HHS_Region_Map: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/example-hhs-regions-data.json'
+  },
+  play: async ({ canvasElement }) => {
+    await testMapRendering(canvasElement, 'HHS Region Map')
   }
 }
 
 export const Custom_Map_Layers: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/custom-layer-map.json'
+  },
+  play: async ({ canvasElement }) => {
+    await testMapRendering(canvasElement, 'Custom Map Layers')
   }
 }
 
@@ -195,6 +254,41 @@ export const Legend_Bins: Story = {
 export const US_Bubble_Cities_Test: Story = {
   args: {
     config: USBubbleCities,
+    isEditor: true
+  }
+}
+
+export const City_Styles_By_Variable: Story = {
+  args: {
+    config: editConfigKeys(exampleCityState, [
+      {
+        path: ['visual', 'additionalCityStyles'],
+        value: [
+          {
+            label: 'High Risk (Rate > 20)',
+            column: 'Rate',
+            value: '22',
+            shape: 'Star'
+          },
+          {
+            label: 'School Location',
+            column: 'Location',
+            value: 'School',
+            shape: 'Triangle'
+          },
+          {
+            label: 'Vehicle Location',
+            column: 'Location',
+            value: 'Vehicle',
+            shape: 'Diamond'
+          }
+        ]
+      },
+      {
+        path: ['visual', 'cityStyle'],
+        value: 'circle'
+      }
+    ]),
     isEditor: true
   }
 }

@@ -1,4 +1,4 @@
-import { hashObj } from '../hashObj'
+import { hashObj } from '@cdc/core/helpers/hashObj'
 
 describe('hashObj', () => {
   it('should return a hash value for a given object', () => {

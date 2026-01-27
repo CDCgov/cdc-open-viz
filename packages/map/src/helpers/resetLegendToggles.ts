@@ -5,6 +5,7 @@ export const resetLegendToggles = (runtimeLegend, dispatch) => {
 
   legendCopy.items.forEach(legendItem => {
     delete legendItem.disabled
+    delete legendItem.hidden
   })
   legendCopy.disabledAmt = 0
 

@@ -103,11 +103,33 @@
       }
 
       .legend-container__ul {
+        list-style: none;
         line-height: 1;
         row-gap: var(--space-between-legend-item-rows);
         column-gap: var(--space-between-legend-item-columns);
       }
 
+      .legend-container__li-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        width: 100%;
+        background: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        font: inherit;
+        color: inherit;
+        cursor: pointer;
+        text-align: left;
+
+        &--pattern {
+          cursor: default;
+        }
+        &:focus {
+          outline: none;
+        }
+      }
 
       .legend-container__ul:not(.single-row, .legend-container__ul--single-column) {
         list-style: none;
@@ -116,11 +138,6 @@
 
         @include breakpoint(md) {
           grid-template-columns: 1fr 1fr;
-        }
-
-        button {
-          font-size: unset;
-          background: transparent;
         }
 
         &.vertical-sorted {

@@ -1,4 +1,4 @@
-import { hashObj } from './hashObj'
+import { hashObj } from '@cdc/core/helpers/hashObj'
 import { MapConfig } from '../types/MapConfig'
 
 export const generateRuntimeLegendHash = (config: MapConfig, runtimeFilters) => {

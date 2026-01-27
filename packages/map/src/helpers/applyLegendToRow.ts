@@ -1,5 +1,6 @@
 import { generateColorsArray } from '@cdc/core/helpers/generateColorsArray'
-import { hashObj, DEFAULT_MAP_BACKGROUND } from '../helpers'
+import { hashObj } from '@cdc/core/helpers/hashObj'
+import { DEFAULT_MAP_BACKGROUND, DISABLED_MAP_COLOR } from '../helpers'
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { MapConfig } from '../types/MapConfig'
 import { type RuntimeLegend } from '../types/runtimeLegend'
@@ -42,8 +43,9 @@ export const applyLegendToRow = (
     const idx = legendMemo.current.get(hash)!
     const disabledIdx = showSpecialClassesLast ? legendSpecialClassLastMemo.current.get(hash) ?? idx : idx
 
-    if (runtimeLegend.items?.[disabledIdx]?.disabled) {
-      return generateColorsArray(DEFAULT_MAP_BACKGROUND)
+    // Note: DISABLED_MAP_COLOR is used in UsaMap.County.tsx to check for hidden bubbles. Should be refactored to use the hidden value when that is implemented.
+    if (runtimeLegend.items?.[disabledIdx]?.disabled || runtimeLegend.items?.[disabledIdx]?.hidden) {
+      return generateColorsArray(DISABLED_MAP_COLOR)
     }
 
     const legendBinColor = runtimeLegend.items.find(o => o.bin === idx)?.color

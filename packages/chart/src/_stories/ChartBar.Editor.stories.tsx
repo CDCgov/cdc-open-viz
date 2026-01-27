@@ -2388,10 +2388,9 @@ export const BarFiltersTests: Story = {
       const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
       const bars = svg?.querySelectorAll('rect[class*="bar"], rect[data-testid*="bar"], g[class*="bar"] rect') || []
-      const filtersList = canvasElement.querySelector('.filters-list')
+      const filtersList = canvasElement.querySelector('.draggable-field-list')
 
-      // Fix: filters can be either div.mb-1 (collapsed) or fieldset.edit-block.mb-1 (expanded)
-      const filterElements = filtersList?.querySelectorAll('div.mb-1, fieldset.edit-block.mb-1') || []
+      const filterElements = filtersList?.querySelectorAll('.editor-field-item') || []
 
       // Get actual data visualization state for filtering verification
       // Method 1: Try X-axis tick labels (most direct)
@@ -2565,9 +2564,15 @@ export const BarFiltersTests: Story = {
       'Apply Filter Value - Chart data visually filtered to show only Q2',
       getChartDataState,
       async () => {
-        // Find the "Filter Default Value" dropdown - this sets filter.active which actually filters the data
-        const filterDefaultValueSelect = canvas.getByLabelText(/filter default value/i) as HTMLSelectElement
-
+        // Find all "Filter Default Value (category)" dropdowns
+        const filterDefaultValueSelects = canvas.getAllByLabelText(
+          /filter default value \(category\)/i
+        ) as HTMLSelectElement[]
+        // Select the dropdown that contains Q2 as an option
+        const filterDefaultValueSelect = filterDefaultValueSelects.find(select =>
+          Array.from(select.options).some(opt => opt.value === 'Q2')
+        )
+        if (!filterDefaultValueSelect) throw new Error('Could not find filter default value dropdown for Q2')
         // Select Q2 to filter the chart to only show Q2 data (different from current state)
         await userEvent.selectOptions(filterDefaultValueSelect, 'Q2')
       },

@@ -1,0 +1,123 @@
+{
+  "title": "A Waffle Chart - Person",
+  "titleStyle": "small",
+  "showTitle": true,
+  "visualizationSubType": "linear",
+  "showPercent": true,
+  "showDenominator": true,
+  "valueDescription": "out of",
+  "content": "Highlight a piece of data in relationship to a data set.",
+  "subtext": "",
+  "orientation": null,
+  "filters": [],
+  "fontSize": "",
+  "overallFontSize": "medium",
+  "dataColumn": "Age-adjusted rate",
+  "dataFunction": "Count",
+  "dataConditionalColumn": "",
+  "dataConditionalOperator": "",
+  "dataConditionalComparate": "",
+  "invalidComparate": false,
+  "customDenom": false,
+  "dataDenom": "100",
+  "dataDenomColumn": "",
+  "dataDenomFunction": "",
+  "suffix": "%",
+  "roundToPlace": "0",
+  "shape": "person",
+  "nodeWidth": "10",
+  "nodeSpacer": "2",
+  "theme": "theme-blue",
+  "type": "waffle-chart",
+  "visualizationType": "TP5 Waffle",
+  "gauge": {
+    "height": 35,
+    "width": "100%"
+  },
+  "visual": {
+    "border": true,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false,
+    "colors": {
+      "theme-blue": "#005eaa",
+      "theme-purple": "#712177",
+      "theme-brown": "#705043",
+      "theme-teal": "#00695c",
+      "theme-pink": "#af4448",
+      "theme-orange": "#bb4d00",
+      "theme-slate": "#29434e",
+      "theme-indigo": "#26418f",
+      "theme-cyan": "#006778",
+      "theme-green": "#4b830d",
+      "theme-amber": "#fbab18"
+    }
+  },
+  "errors": [],
+  "currentViewport": "lg",
+  "id": 17,
+  "category": "General",
+  "label": "Waffle Chart",
+  "subType": "Waffle",
+  "icon": {
+    "type": {},
+    "key": null,
+    "ref": null,
+    "props": {},
+    "_owner": null,
+    "_store": {}
+  },
+  "activeVizButtonID": 17,
+  "dataFileName": "valid-data-chart.csv",
+  "dataFileSourceType": "file",
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
+  "data": [
+    {
+      "Race": "Hispanic or Latino",
+      "Age-adjusted rate": "644.2"
+    },
+    {
+      "Race": "Non-Hispanic American Indian",
+      "Age-adjusted rate": "636.1"
+    },
+    {
+      "Race": "Non-Hispanic Black",
+      "Age-adjusted rate": "563.7"
+    },
+    {
+      "Race": "Non-Hispanic Asian or Pacific Islander",
+      "Age-adjusted rate": "202.5"
+    },
+    {
+      "Race": "Non-Hispanic White",
+      "Age-adjusted rate": "183.6"
+    }
+  ],
+  "formattedData": [
+    {
+      "Race": "Hispanic or Latino",
+      "Age-adjusted rate": "644.2"
+    },
+    {
+      "Race": "Non-Hispanic American Indian",
+      "Age-adjusted rate": "636.1"
+    },
+    {
+      "Race": "Non-Hispanic Black",
+      "Age-adjusted rate": "563.7"
+    },
+    {
+      "Race": "Non-Hispanic Asian or Pacific Islander",
+      "Age-adjusted rate": "202.5"
+    },
+    {
+      "Race": "Non-Hispanic White",
+      "Age-adjusted rate": "183.6"
+    }
+  ],
+  "datasets": {}
+}

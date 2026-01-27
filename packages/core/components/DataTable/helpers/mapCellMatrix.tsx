@@ -4,12 +4,18 @@ import { DataTableProps } from '../DataTable'
 import { ReactNode } from 'react'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import _ from 'lodash'
-import { applyLegendToRow } from '@cdc/map/src/helpers/applyLegendToRow'
-import { hashObj } from '@cdc/map/src/helpers'
-import { getPatternForRow } from '@cdc/map/src/helpers/getPatternForRow'
+import { hashObj } from '../../../helpers/hashObj'
 
 type MapRowsProps = DataTableProps & {
   rows: string[]
+  applyLegendToRow: (
+    rowObj: any,
+    config: any,
+    runtimeLegend: any,
+    legendMemo: any,
+    legendSpecialClassLastMemo: any
+  ) => string[]
+  getPatternForRow: (rowObj: any, config: any) => any
 }
 
 const getGeoLabel = (config, row, formatLegendLocation, displayGeoName, runtimeData = null) => {
@@ -92,7 +98,9 @@ const mapCellArray = ({
   setFilteredCountryCode,
   legendMemo,
   legendSpecialClassLastMemo,
-  runtimeLegend
+  runtimeLegend,
+  applyLegendToRow,
+  getPatternForRow
 }: MapRowsProps): ReactNode[][] => {
   const { allowMapZoom, geoType, type } = config.general
   return rows.map(row =>
@@ -116,11 +124,11 @@ const mapCellArray = ({
             type === 'bubble' && allowMapZoom && geoType === 'world' ? () => setFilteredCountryCode(row) : undefined
 
           const validColor = legendColor && legendColor.length > 0 && !noColor
-          
+
           // Check for pattern information
           const patternInfo = getPatternForRow(rowObj, config)
           const mapId = config.runtime?.uniqueId || 'map'
-          
+
           return (
             <div className='col-12'>
               {validColor ? (

@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { getQueryStringFilterValue } from '@cdc/core/helpers/queryStringUtils'
+import { getQueryStringFilterValue, isFilterHiddenByQuery } from '@cdc/core/helpers/queryStringUtils'
 import { SharedFilter } from '../types/SharedFilter'
 import { handleSorting } from '@cdc/core/components/Filters'
 import { mergeCustomOrderValues } from '@cdc/core/helpers/mergeCustomOrderValues'
@@ -39,7 +39,11 @@ export const addValuesToDashboardFilters = (
     if (filtersToSkip.includes(index)) return filter
     if (filter.type === 'urlfilter') return filter
     const filterCopy = _.cloneDeep(filter)
-    const filterValues = generateValuesForFilter(getSelector(filter), data)
+
+    // Only generate values from data if not pre-configured
+    const hasPreConfiguredValues = filter.values && filter.values.length > 0
+    const filterValues = hasPreConfiguredValues ? filter.values : generateValuesForFilter(getSelector(filter), data)
+
     filterCopy.values = filterValues
 
     // Merge new values with existing custom order (fixes DEV-11740 & DEV-11376)
@@ -54,30 +58,19 @@ export const addValuesToDashboardFilters = (
         const active: string[] = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
         filterCopy.active = active.filter(val => defaultValues.includes(val))
       } else {
-        // Preserve existing active value if it's valid in the new filter values
-        const currentActive = filterCopy.active as string
-        const isResetLabelValue = currentActive && currentActive === filterCopy.resetLabel
-        const isCurrentActiveValid = currentActive && (filterValues.includes(currentActive) || isResetLabelValue)
-
-        // Check if this is an intentional clear (empty string, but not undefined during initial load)
-        const isIntentionalClear = currentActive === ''
-
-        // Priority: defaultValue > valid current active > reset label > first value
+        // Initialize active from defaultValue if not already set
+        // OR if defaultValue exists, always use it (overrides stale active from saved config)
         if (filterCopy.defaultValue) {
-          // If defaultValue is explicitly set, always use it
           filterCopy.active = filterCopy.defaultValue
-        } else if (isCurrentActiveValid) {
-          // Keep the current active value if valid
-          filterCopy.active = currentActive
-        } else if (isIntentionalClear) {
-          // Don't override intentional clears
-          filterCopy.active = currentActive
-        } else {
-          // Set to reset label or first value
-          const defaultValue = filterCopy.resetLabel || filterCopy.values[0]
-          filterCopy.active = defaultValue
+        } else if (!filterCopy.active) {
+          filterCopy.active = filterCopy.resetLabel || filterCopy.values[0]
         }
       }
+    }
+
+    // Check if filter should be hidden by query parameter
+    if (isFilterHiddenByQuery(filterCopy)) {
+      filterCopy.showDropdown = false
     }
 
     // Handle nested dropdown subGrouping.active property

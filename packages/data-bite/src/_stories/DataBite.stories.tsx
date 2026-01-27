@@ -42,6 +42,34 @@ export const Data_Bite_Text_Average_Pic: Story = {
   }
 }
 
+export const Data_Bite_TP5_Style: Story = {
+  args: {
+    configUrl: '/packages/data-bite/examples/tp5-style.json'
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'TP5 Style - A new layout style that displays the data value and message side by side, centered. The title appears above, and subtext appears below the message. On mobile devices, the message wraps below the data value. This style mimics the CDC Template Package 5.0 callout component design.'
+      }
+    }
+  }
+}
+
+export const Data_Bite_TP5_White_Background: Story = {
+  args: {
+    configUrl: '/packages/data-bite/examples/tp5-white-background.json'
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'TP5 Style with White Background - This variant uses a white background with a 1px border and 6px border radius, providing a cleaner look while maintaining the TP5 layout style.'
+      }
+    }
+  }
+}
+
 // Simple editor mode story for basic rendering
 export const Editor_Mode_Basic: Story = {
   args: {

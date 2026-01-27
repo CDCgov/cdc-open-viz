@@ -51,7 +51,6 @@ const addVisualization = (type, subType) => {
         markupVariables: [],
         showHeader: true,
         srcUrl: '#example',
-        title: 'Markup Include',
         useInlineHTML: true
       }
       newVisualizationConfig.theme = 'theme-blue'
@@ -81,7 +80,7 @@ const addVisualization = (type, subType) => {
 
 const VisualizationsPanel = () => {
   const [advancedEditing, setAdvancedEditing] = useState(false)
-  const { config } = useContext(DashboardContext)
+  const { config, isEditor } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
   const loadConfig = incomingConfig => {
     const newConfig = !incomingConfig.multiDashboards
@@ -124,7 +123,7 @@ const VisualizationsPanel = () => {
         loadConfig={loadConfig}
         config={config}
         convertStateToConfig={() => undefined}
-        stripConfig={stripConfig}
+        stripConfig={cfg => stripConfig(cfg, isEditor)}
         onExpandCollapse={() => {
           setAdvancedEditing(!advancedEditing)
         }}

@@ -4,10 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <style>
-      .type-waffle-chart {
-        min-height: 100vh;
-      }
-
       body {
         /* max-width: 1000px; */
         margin: 0 auto !important;
@@ -17,8 +13,9 @@
         border-top: none !important;
       }
 
-      .react-container + .react-container {
-        margin-top: 3rem;
+      /* Add 1rem padding to mimic DFE when editor is not visible */
+      .cdc-open-viz-module:not(.isEditor) {
+        padding: 1rem;
       }
     </style>
     <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />

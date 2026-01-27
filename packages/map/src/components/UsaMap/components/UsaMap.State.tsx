@@ -44,9 +44,9 @@ import {
   displayGeoName,
   SVG_HEIGHT,
   SVG_VIEWBOX,
-  SVG_WIDTH,
-  hashObj
+  SVG_WIDTH
 } from '../../../helpers'
+import { hashObj } from '@cdc/core/helpers/hashObj'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
@@ -200,6 +200,7 @@ const UsaMap = () => {
           strokeColor='#fff'
           territoryData={territoryData}
           backgroundColor={styles.fill}
+          mapId={mapId}
           getSyncProps={getSyncProps}
           syncHandlers={syncHandlers}
         />
@@ -254,6 +255,7 @@ const UsaMap = () => {
           territoryData={territoryData}
           tabIndex={-1}
           backgroundColor={styles.fill}
+          mapId={mapId}
           getSyncProps={getSyncProps}
           syncHandlers={syncHandlers}
         />

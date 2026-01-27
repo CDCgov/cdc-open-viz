@@ -19,6 +19,16 @@
     float: none;
   }
   .cove-component__content.body:not(:empty) {
-    padding: 1rem !important ;
+    padding: 0;
+
+    &.has-top-padding {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    &.has-side-padding {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
   }
 }

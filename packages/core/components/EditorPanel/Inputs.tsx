@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react'
+import { memo, useEffect, useState, useMemo } from 'react'
 import { useDebounce } from 'use-debounce'
 import { DROPDOWN_STYLES } from '../Filters/components/Dropdown'
 
@@ -50,6 +50,13 @@ const TextField = memo((props: TextFieldProps) => {
   const [value, setValue] = useState(stateValue)
   const [debouncedValue] = useDebounce(value, 500)
 
+  // Generate unique ID for accessibility
+  const inputId = useMemo(() => {
+    const sectionPart = section ?? 'root'
+    const subsectionPart = subsection ?? 'none'
+    return attributes.id || `input-${sectionPart}-${subsectionPart}-${fieldName}`
+  }, [section, subsection, fieldName, attributes.id])
+
   useEffect(() => {
     if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
       updateField(section, subsection, fieldName, debouncedValue, i)
@@ -74,25 +81,25 @@ const TextField = memo((props: TextFieldProps) => {
     }
   }
 
-  let formElement = <input type='text' name={name} onChange={onChange} {...attributes} value={value} />
+  let formElement = <input type='text' id={inputId} name={name} onChange={onChange} {...attributes} value={value} />
 
   if ('textarea' === type) {
-    formElement = <textarea name={name} onChange={onChange} {...attributes} value={value}></textarea>
+    formElement = <textarea id={inputId} name={name} onChange={onChange} {...attributes} value={value}></textarea>
   }
 
   if ('number' === type) {
-    formElement = <input type='number' name={name} onChange={onChange} {...attributes} value={value} />
+    formElement = <input type='number' id={inputId} name={name} onChange={onChange} {...attributes} value={value} />
   }
 
   if ('date' === type) {
-    formElement = <input type='date' name={name} onChange={onChange} {...attributes} value={value} />
+    formElement = <input type='date' id={inputId} name={name} onChange={onChange} {...attributes} value={value} />
   }
   if (!display) {
     return <></>
   }
 
   return (
-    <label>
+    <label htmlFor={inputId}>
       <span className='edit-label column-heading'>
         {label}
         {tooltip}
@@ -114,11 +121,20 @@ const CheckBox = memo((props: CheckboxProps) => {
     updateField,
     ...attributes
   } = props
+
+  // Generate unique ID for accessibility
+  const inputId = useMemo(() => {
+    const sectionPart = section ?? 'root'
+    const subsectionPart = subsection ?? 'none'
+    return attributes.id || `checkbox-${sectionPart}-${subsectionPart}-${fieldName}`
+  }, [section, subsection, fieldName, attributes.id])
+
   if (!display) {
     return <></>
   }
   return (
     <label
+      htmlFor={inputId}
       className='checkbox column-heading'
       onClick={e => {
         if (!['SPAN', 'INPUT'].includes(e.target.nodeName)) {
@@ -128,6 +144,7 @@ const CheckBox = memo((props: CheckboxProps) => {
     >
       <input
         type='checkbox'
+        id={inputId}
         className='edit-checkbox'
         name={fieldName}
         checked={value}
@@ -172,6 +189,14 @@ const Select = memo((props: SelectProps) => {
     onChange: onChangeProp,
     ...attributes
   } = props
+
+  // Generate unique ID for accessibility
+  const inputId = useMemo(() => {
+    const sectionPart = section ?? 'root'
+    const subsectionPart = subsection ?? 'none'
+    return attributes.id || `select-${sectionPart}-${subsectionPart}-${fieldName}`
+  }, [section, subsection, fieldName, attributes.id])
+
   const optionsJsx = options?.map((option, index) => {
     if (typeof option === 'string') {
       return (
@@ -200,12 +225,13 @@ const Select = memo((props: SelectProps) => {
   }
 
   return (
-    <label style={disabled ? { opacity: 0.6, pointerEvents: 'none' } : {}}>
+    <label htmlFor={inputId} style={disabled ? { opacity: 0.6, pointerEvents: 'none' } : {}}>
       <span className='edit-label'>
         {label}
         {tooltip}
       </span>
       <select
+        id={inputId}
         className={`cove-form-select ${required && !value ? 'warning' : ''} ${DROPDOWN_STYLES}`}
         name={fieldName}
         value={value}
