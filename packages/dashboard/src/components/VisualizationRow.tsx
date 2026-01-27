@@ -103,53 +103,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     }
   }, [toggledRow, row.toggle])
 
-  // Equalize TP5 data bite title heights in the same row
-  useEffect(() => {
-    const rowElement = document.querySelector(`[data-row-index="${index}"]`)
-    if (!rowElement) return
-
-    const tp5Titles = Array.from(rowElement.querySelectorAll('.bite__style--tp5 .cdc-callout__heading'))
-    if (tp5Titles.length <= 1) return // No need to equalize if there's only one or none
-
-    const equalizeTP5Titles = () => {
-      // Reset heights first
-      tp5Titles.forEach((title: HTMLElement) => {
-        title.style.minHeight = ''
-      })
-
-      // Calculate max height after reset
-      let maxHeight = 0
-      tp5Titles.forEach((title: HTMLElement) => {
-        const height = title.offsetHeight
-        if (height > maxHeight) maxHeight = height
-      })
-
-      // Apply max height to all titles
-      if (maxHeight > 0) {
-        tp5Titles.forEach((title: HTMLElement) => {
-          title.style.minHeight = `${maxHeight}px`
-        })
-      }
-    }
-
-    // Initial equalization
-    equalizeTP5Titles()
-
-    // Use ResizeObserver to watch for size changes in any of the titles
-    const resizeObserver = new ResizeObserver(() => {
-      equalizeTP5Titles()
-    })
-
-    // Observe all titles
-    tp5Titles.forEach(title => {
-      resizeObserver.observe(title as Element)
-    })
-
-    return () => {
-      resizeObserver.disconnect()
-    }
-  }, [index, row, config, filteredDataOverride])
-
   const show = useMemo(() => {
     if (row.toggle) {
       return row.columns.map((col, i) => i === toggledRow)
@@ -223,18 +176,13 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   }
 
   return (
-    <div
-      className={`row${row.equalHeight ? ' equal-height' : ''}${row.toggle ? ' toggle' : ''}`}
-      key={`row__${index}`}
-      data-row-index={index}
-    >
+    <div className={`row${row.equalHeight ? ' equal-height' : ''}${row.toggle ? ' toggle' : ''}`} key={`row__${index}`}>
       {row.toggle && !inNoDataState && (
         <Toggle row={row} visualizations={config.visualizations} active={toggledRow} setToggled={setToggled} />
       )}
       {row.columns.map((col, colIndex) => {
         if (col.width) {
-          if (!col.widget)
-            return <div key={`row__${index}__col__${colIndex}`} className={`col-12 col-md-${col.width}`}></div>
+          if (!col.widget) return <div key={`row__${index}__col__${colIndex}`} className={`col col-${col.width}`}></div>
 
           const visualizationConfig = getVizConfig(
             col.widget,
@@ -274,14 +222,9 @@ const VisualizationRow: React.FC<VizRowProps> = ({
             </a>
           )
 
-          // Markup-includes with external URLs don't depend on dashboard data
-          const isMarkupIncludeWithoutDataDependency =
-            type === 'markup-include' && !visualizationConfig.dataKey && !visualizationConfig.data?.length
-
           const hideVisualization =
             inNoDataState &&
             filterBehavior !== 'Apply Button' &&
-            !isMarkupIncludeWithoutDataDependency &&
             (type !== 'dashboardFilters' || applyButtonNotClicked(visualizationConfig))
 
           const shouldShow = row.toggle === undefined || (row.toggle && show[colIndex])
@@ -291,10 +234,11 @@ const VisualizationRow: React.FC<VizRowProps> = ({
             sharedFilterIndexes &&
             sharedFilterIndexes.filter(idx => config.dashboard.sharedFilters?.[idx]?.showDropdown === false).length ===
               sharedFilterIndexes.length
+          const hasMarginBottom = !isLastRow && !hiddenDashboardFilters
 
           const vizWrapperClass = `col-12 col-md-${col.width}${!shouldShow ? ' d-none' : ''}${
-            hideVisualization ? ' hide-parent-visualization' : ''
-          }${hiddenDashboardFilters ? ' hidden-dashboard-filters' : ''}`
+            hideVisualization ? ' hide-parent-visualization' : hasMarginBottom ? ' mb-4' : ''
+          }`
           const link =
             config.table && config.table.show && config.datasets && table && table.showDataTableLink
               ? tableLink
