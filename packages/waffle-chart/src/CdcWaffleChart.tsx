@@ -474,11 +474,15 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                         {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
                       </div>
                     </div>
-                    {content && (
-                      <div className='cove-gauge-chart__content flex-grow-1 d-flex flex-column min-w-0'>
+                    <div className='cove-gauge-chart__content flex-grow-1 d-flex flex-column min-w-0'>
+                      {content ? (
                         <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
-                      </div>
-                    )}
+                      ) : (
+                        <div className='cove-waffle-chart__data--text' aria-hidden='true'>
+                          &nbsp;
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <svg
                     height={config.gauge.height + 2}
