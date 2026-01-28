@@ -203,12 +203,19 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
 
   if (regions && orientation === 'vertical') {
     return regions.map(region => {
-      const from = getFromValue(region)
-      const to = getToValue(region)
-      let width = getWidth(to, from)
+      let from = getFromValue(region)
+      let to = getToValue(region)
 
       if (!from || from === undefined || isNaN(from)) return null
       if (!to || to === undefined || isNaN(to)) return null
+
+      // Ensure from is always the smaller value and to is the larger value
+      // This handles regions defined in reverse (from future to past)
+      if (from > to) {
+        ;[from, to] = [to, from]
+      }
+
+      let width = getWidth(to, from)
 
       // Clip region to visible chart area (xMax) to prevent overflow
       // xMax is the width of the chart area (excluding left padding), so chartEnd = chartStart + xMax
