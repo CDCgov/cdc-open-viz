@@ -46,11 +46,17 @@
       "policy": "highest"
     },
     {
+      "label": "Pin lodash version",
+      "dependencies": [
+        "lodash"
+      ],
+      "pinVersion": "^4.17.23"
+    },
+    {
       "label": "Synchronize shared utilities",
       "dependencies": [
         "html-react-parser",
         "papaparse",
-        "lodash",
         "use-debounce",
         "dompurify"
       ],
