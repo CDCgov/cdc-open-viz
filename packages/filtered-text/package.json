@@ -8,7 +8,7 @@
   "dependencies": {
     "@cdc/core": "^4.25.11",
     "html-react-parser": "^5.2.3",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.23"
   },
   "devDependencies": {
     "@rollup/plugin-dsv": "^3.0.2",

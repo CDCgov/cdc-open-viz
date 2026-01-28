@@ -9,7 +9,7 @@
     "@cdc/core": "^4.25.11",
     "axios": "^1.13.2",
     "interweave": "^13.1.1",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "react-accessible-accordion": "^5.0.1"
   },
   "devDependencies": {
