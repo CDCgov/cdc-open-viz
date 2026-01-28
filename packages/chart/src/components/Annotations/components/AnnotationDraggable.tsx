@@ -134,8 +134,8 @@ const Annotations = ({
       return (
         <AnnotationComponent
           key={`annotation-${originalIndex}-${annotation.x}-${annotation.y}-${annotation.dx}-${annotation.dy}`}
-          width={200}
-          height={height}
+          width={xMax}
+          height={yMax}
           dx={scaledDx} // label position (scaled to current chart dimensions)
           dy={scaledDy} // label position (scaled to current chart dimensions)
           x={annotationX}
