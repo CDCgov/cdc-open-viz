@@ -71,15 +71,6 @@ const EditorPanel = memo(props => {
           updateField={updateField}
           options={approvedWaffleChartOptions}
         />
-        {(config.visualizationType === 'Gauge' || config.visualizationType === 'TP5 Gauge') && (
-          <Select
-            value={config.visualizationSubType}
-            fieldName='visualizationSubType'
-            label='Chart Subtype'
-            updateField={updateField}
-            options={['Linear']}
-          />
-        )}
         <TextField
           value={config.title}
           fieldName='title'
@@ -345,8 +336,8 @@ const EditorPanel = memo(props => {
           Add Filter
         </Button>
       </Accordion.Section>
-      <Accordion.Section title='Chart Settings'>
-        {config.visualizationType !== 'Gauge' && config.visualizationType !== 'TP5 Gauge' && (
+      {config.visualizationType !== 'Gauge' && config.visualizationType !== 'TP5 Gauge' && (
+        <Accordion.Section title='Chart Settings'>
           <Select
             value={config.shape}
             fieldName='shape'
@@ -354,10 +345,7 @@ const EditorPanel = memo(props => {
             updateField={updateField}
             options={['circle', 'square', 'person']}
           />
-        )}
-        {config.visualizationType !== 'Gauge' &&
-          config.visualizationType !== 'TP5 Waffle' &&
-          config.visualizationType !== 'TP5 Gauge' && (
+          {config.visualizationType !== 'TP5 Waffle' && (
             <>
               <div
                 className='cove-accordion__panel-row cove-accordion__small-inputs'
@@ -408,7 +396,8 @@ const EditorPanel = memo(props => {
               </div>
             </>
           )}
-      </Accordion.Section>
+        </Accordion.Section>
+      )}
 
       {/* Visual section for TP5 style */}
       {(config.visualizationType === 'TP5 Waffle' || config.visualizationType === 'TP5 Gauge') && (

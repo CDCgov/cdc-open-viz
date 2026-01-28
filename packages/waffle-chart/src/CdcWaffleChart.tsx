@@ -597,7 +597,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     }
 
     return (
-      <div className='cove-component__content p-0 border-0'>
+      <div className='cove-component__content border-0'>
         <div className={calloutClasses.join(' ')}>
           {!config.visual?.whiteBackground && (
             <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
