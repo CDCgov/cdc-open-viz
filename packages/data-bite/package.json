@@ -9,7 +9,7 @@
     "@cdc/core": "^4.25.11",
     "chroma-js": "^3.1.2",
     "html-react-parser": "^5.2.3",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "react-accessible-accordion": "^5.0.1",
     "resize-observer-polyfill": "^1.5.1"
   },
