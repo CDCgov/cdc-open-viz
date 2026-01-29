@@ -77,10 +77,9 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
         subject: true,
         label: true
       },
-      seriesKey: config.series?.[0]?.dataKey || '',
+      // seriesKey and dataX are only set when switching to data mode
       x: 50,
       y: 50,
-      dataX: transformedData?.[0]?.[config.xAxis.dataKey] || '',
       dx: 20,
       dy: -20,
       opacity: '100',
@@ -164,6 +163,17 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                       updateField={(section, subsection, fieldName, value) => {
                         const updatedAnnotations = _.cloneDeep(config?.annotations)
                         updatedAnnotations[index].anchorMode = value
+
+                        // When switching to data mode, ensure seriesKey and dataX are initialized
+                        if (value === 'data') {
+                          if (!updatedAnnotations[index].seriesKey) {
+                            updatedAnnotations[index].seriesKey = config.series?.[0]?.dataKey || ''
+                          }
+                          if (!updatedAnnotations[index].dataX) {
+                            updatedAnnotations[index].dataX = transformedData?.[0]?.[config.xAxis.dataKey] || ''
+                          }
+                        }
+
                         updateConfig({
                           ...config,
                           annotations: updatedAnnotations

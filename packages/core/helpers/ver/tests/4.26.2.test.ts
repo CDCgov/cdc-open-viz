@@ -134,7 +134,7 @@ describe('update_4_26_2', () => {
       expect(result.visualizations.chart1.annotations[0].savedDimensions).toBeUndefined()
     })
 
-    it('should preserve all other annotation properties', () => {
+    it('should preserve all other annotation properties and delete xKey entirely', () => {
       const config: any = {
         type: 'chart',
         version: '4.26.1',
@@ -162,11 +162,35 @@ describe('update_4_26_2', () => {
       expect(annotation.text).toBe('Complex Annotation')
       expect(annotation.dx).toBe(20)
       expect(annotation.dy).toBe(-30)
-      expect(annotation.dataX).toBe(1577836800000)
+      // xKey is deleted entirely (not renamed to dataX) because old format
+      // stored timestamps but new dataX expects raw data values
       expect(annotation.xKey).toBeUndefined()
+      expect(annotation.dataX).toBeUndefined()
       expect(annotation.yKey).toBeUndefined()
+      // Non-empty seriesKey is preserved
       expect(annotation.seriesKey).toBe('series1')
       expect(annotation.savedDimensions).toBeUndefined()
+    })
+
+    it('should delete empty seriesKey', () => {
+      const config: any = {
+        type: 'chart',
+        version: '4.26.1',
+        heights: { vertical: 300 },
+        annotations: [
+          {
+            text: 'Annotation with empty seriesKey',
+            x: 50,
+            y: 150,
+            seriesKey: ''
+          }
+        ]
+      }
+
+      const result = update_4_26_2(config)
+
+      // Empty seriesKey should be deleted to prevent yScale(undefined) errors
+      expect(result.annotations[0].seriesKey).toBeUndefined()
     })
 
     it('should handle config with no annotations', () => {
@@ -263,7 +287,8 @@ describe('update_4_26_2', () => {
       const annotation = result.annotations[0]
       expect(annotation.y).toBe(50) // 200 / 400 * 100 = 50
       expect(annotation.anchorMode).toBe('fixed')
-      expect(annotation.dataX).toBe(1577836800000)
+      // xKey is deleted entirely (not renamed to dataX) - format incompatible
+      expect(annotation.dataX).toBeUndefined()
       expect(annotation.xKey).toBeUndefined()
       expect(annotation.yKey).toBeUndefined()
       expect(annotation.snapToNearestPoint).toBeUndefined()

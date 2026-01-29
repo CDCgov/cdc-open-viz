@@ -40,14 +40,18 @@ const migrateAnnotationDataModel = config => {
       // Set all existing annotations to fixed mode
       annotation.anchorMode = 'fixed'
 
-      // Rename xKey -> dataX
-      if (annotation.xKey !== undefined) {
-        annotation.dataX = annotation.xKey
-        delete annotation.xKey
-      }
+      // Delete xKey entirely - old format stored timestamps for dates,
+      // but new dataX expects raw data values. Format is incompatible.
+      // User can re-enable data mode which will set fresh dataX value.
+      delete annotation.xKey
 
       // Delete yKey entirely (Y will be calculated dynamically in data mode)
       delete annotation.yKey
+
+      // Delete empty seriesKey - it would cause yScale(undefined) errors in data mode
+      if (!annotation.seriesKey) {
+        delete annotation.seriesKey
+      }
 
       // Delete deprecated properties
       delete annotation.snapToNearestPoint
