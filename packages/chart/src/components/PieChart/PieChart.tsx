@@ -268,7 +268,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
       const textOpacity = shouldMute ? 0.3 : 1
 
       return (
-        <Group key={key} className={`slice-${CSS.escape(key)}`}>
+        <Group key={key} className={`slice-${CSS.escape(String(key))}`}>
           {/* ── the slice */}
           <animated.path
             d={to([styles.startAngle, styles.endAngle], (start: number, end: number) =>
