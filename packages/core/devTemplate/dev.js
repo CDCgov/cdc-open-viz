@@ -34,43 +34,58 @@ if (!sidebarDisabled) {
   // Build sidebar HTML
   const sidebarRoot = document.getElementById('dev-sidebar-root')
 
-  // Group files by directory
-  const tree = { files: [], dirs: {} }
-  examples.forEach(file => {
-    const parts = file.split('/')
-    if (parts.length === 1) {
-      tree.files.push(file)
-    } else {
-      const dir = parts[0]
-      if (!tree.dirs[dir]) tree.dirs[dir] = []
-      tree.dirs[dir].push(parts.slice(1).join('/'))
-    }
-  })
+  // Build a recursive tree structure for arbitrary nesting depth
+  const buildTree = files => {
+    const tree = { files: [], dirs: {} }
+    files.forEach(file => {
+      const parts = file.split('/')
+      if (parts.length === 1) {
+        tree.files.push(file)
+      } else {
+        const dir = parts[0]
+        if (!tree.dirs[dir]) tree.dirs[dir] = []
+        tree.dirs[dir].push(parts.slice(1).join('/'))
+      }
+    })
+    // Recursively build subtrees for each directory
+    Object.keys(tree.dirs).forEach(dir => {
+      tree.dirs[dir] = buildTree(tree.dirs[dir])
+    })
+    return tree
+  }
+
+  const tree = buildTree(examples)
 
   const caseInsensitiveSort = (a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })
 
-  let html = '<nav class="dev-sidebar"><div class="dev-sidebar-header">Examples</div><div class="dev-sidebar-tree">'
+  // Recursive function to render tree at any depth
+  const renderTree = (node, pathPrefix) => {
+    let html = ''
 
-  // Render root files
-  tree.files.sort(caseInsensitiveSort).forEach(file => {
-    const configPath = '/examples/' + file
-    const isActive = configPath === currentConfig ? ' active' : ''
-    html += `<button class="dev-sidebar-item${isActive}" data-config="${configPath}">${file}</button>`
-  })
-
-  // Render directories
-  Object.keys(tree.dirs)
-    .sort(caseInsensitiveSort)
-    .forEach(dir => {
-      const isOpen = currentConfig.includes('/examples/' + dir + '/') ? ' open' : ''
-      html += `<div class="dev-sidebar-folder${isOpen}">${dir}</div><div class="dev-sidebar-folder-contents">`
-      tree.dirs[dir].sort(caseInsensitiveSort).forEach(file => {
-        const configPath = '/examples/' + dir + '/' + file
-        const isActive = configPath === currentConfig ? ' active' : ''
-        html += `<button class="dev-sidebar-item${isActive}" data-config="${configPath}">${file}</button>`
-      })
-      html += '</div>'
+    // Render files at this level
+    node.files.sort(caseInsensitiveSort).forEach(file => {
+      const configPath = pathPrefix + file
+      const isActive = configPath === currentConfig ? ' active' : ''
+      html += `<button class="dev-sidebar-item${isActive}" data-config="${configPath}">${file}</button>`
     })
+
+    // Render subdirectories recursively
+    Object.keys(node.dirs)
+      .sort(caseInsensitiveSort)
+      .forEach(dir => {
+        const dirPath = pathPrefix + dir + '/'
+        const isOpen = currentConfig.startsWith(dirPath) ? ' open' : ''
+        html += `<div class="dev-sidebar-folder${isOpen}" data-folder-path="${dirPath}">${dir}</div>`
+        html += '<div class="dev-sidebar-folder-contents">'
+        html += renderTree(node.dirs[dir], dirPath)
+        html += '</div>'
+      })
+
+    return html
+  }
+
+  let html = '<nav class="dev-sidebar"><div class="dev-sidebar-header">Examples</div><div class="dev-sidebar-tree">'
+  html += renderTree(tree, '/examples/')
 
   html += '</div></nav>'
   sidebarRoot.innerHTML = html

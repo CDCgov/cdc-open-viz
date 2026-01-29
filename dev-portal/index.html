@@ -202,13 +202,17 @@
         // Expand the package folder
         expandedFolders[packageName] = true
 
-        // Also expand any subdirectory containing this config
-        // e.g., /examples/feature/bar.json -> expand "chart/feature"
+        // Expand all parent directories containing this config
+        // e.g., /examples/foo/bar/baz/file.json -> expand all parent paths
         const pathWithinExamples = configPath.replace('/examples/', '')
         const parts = pathWithinExamples.split('/')
         if (parts.length > 1) {
-          // Has a subdirectory - expand it
-          expandedFolders[`${packageName}/${parts[0]}`] = true
+          // Build up path progressively and expand each directory level
+          let currentPath = '/examples/'
+          for (let i = 0; i < parts.length - 1; i++) {
+            currentPath += parts[i] + '/'
+            expandedFolders[`${packageName}:${currentPath}`] = true
+          }
         }
 
         // Update URL for shareable links (skip during popstate handling)
@@ -234,8 +238,8 @@
 
       const caseInsensitiveSort = (a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })
 
-      // Group files by directory (same logic as standalone sidebar)
-      function groupByDirectory(files) {
+      // Build a recursive tree structure for arbitrary nesting depth
+      function buildTree(files) {
         const tree = { files: [], dirs: {} }
         files.forEach(file => {
           const parts = file.split('/')
@@ -247,38 +251,36 @@
             tree.dirs[dir].push(parts.slice(1).join('/'))
           }
         })
+        // Recursively build subtrees for each directory
+        Object.keys(tree.dirs).forEach(dir => {
+          tree.dirs[dir] = buildTree(tree.dirs[dir])
+        })
         return tree
       }
 
-      // Render tree HTML for a package's examples
-      function renderPackageTree(packageName, tree) {
+      // Recursive function to render tree at any depth
+      function renderPackageTree(packageName, node, pathPrefix) {
         let html = ''
 
-        // Root files
-        tree.files.sort(caseInsensitiveSort).forEach(file => {
-          const configPath = '/examples/' + file
+        // Render files at this level
+        node.files.sort(caseInsensitiveSort).forEach(file => {
+          const configPath = pathPrefix + file
           const isActive = currentSelection?.packageName === packageName && currentSelection?.configPath === configPath
           html += `<button class="dev-sidebar-item${
             isActive ? ' active' : ''
           }" data-package="${packageName}" data-config="${configPath}">${file}</button>`
         })
 
-        // Subdirectories
-        Object.keys(tree.dirs)
+        // Render subdirectories recursively
+        Object.keys(node.dirs)
           .sort(caseInsensitiveSort)
           .forEach(dir => {
-            const folderId = `${packageName}/${dir}`
+            const dirPath = pathPrefix + dir + '/'
+            const folderId = `${packageName}:${dirPath}`
             const isOpen = expandedFolders[folderId] ? ' open' : ''
             html += `<div class="dev-sidebar-folder${isOpen}" data-folder-id="${folderId}">${dir}</div>`
             html += `<div class="dev-sidebar-folder-contents">`
-            tree.dirs[dir].sort(caseInsensitiveSort).forEach(file => {
-              const configPath = '/examples/' + dir + '/' + file
-              const isActive =
-                currentSelection?.packageName === packageName && currentSelection?.configPath === configPath
-              html += `<button class="dev-sidebar-item${
-                isActive ? ' active' : ''
-              }" data-package="${packageName}" data-config="${configPath}">${file}</button>`
-            })
+            html += renderPackageTree(packageName, node.dirs[dir], dirPath)
             html += '</div>'
           })
 
@@ -291,10 +293,10 @@
         const isOpen = expandedFolders[folderId] ? ' open' : ''
 
         if (isOnline && examples) {
-          const tree = groupByDirectory(examples)
+          const tree = buildTree(examples)
           let html = `<div class="dev-sidebar-folder dev-sidebar-package${isOpen}" data-folder-id="${folderId}" data-package="${packageName}">${packageName}</div>`
           html += `<div class="dev-sidebar-folder-contents">`
-          html += renderPackageTree(packageName, tree)
+          html += renderPackageTree(packageName, tree, '/examples/')
           html += '</div>'
           return html
         } else {
