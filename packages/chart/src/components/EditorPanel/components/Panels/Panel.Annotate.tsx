@@ -14,23 +14,8 @@ import { type PanelProps } from './../PanelProps'
 import './../panels.scss'
 
 const PanelAnnotate: React.FC<PanelProps> = props => {
-  const { updateConfig, config, svgRef, transformedData } = useContext(ConfigContext)
+  const { updateConfig, config, transformedData } = useContext(ConfigContext)
   const { visSupportsDataAnnotations } = useEditorPermissions()
-
-  /**
-   * Get the current SVG dimensions for saving with annotations.
-   * Uses getBoundingClientRect for consistency with how annotations are rendered.
-   */
-  const getSvgDimensions = (): [number, number] => {
-    const svgContainer = document.querySelector('.chart-container > svg')?.getBoundingClientRect()
-    if (svgContainer && svgContainer.width > 0 && svgContainer.height > 0) {
-      return [svgContainer.width, svgContainer.height]
-    }
-    // Fallback to ref if DOM query fails
-    const width = Number(svgRef?.current?.width?.baseVal?.value || svgRef?.current?.width) || 0
-    const height = Number(svgRef?.current?.height?.baseVal?.value || svgRef?.current?.height) || 0
-    return [width, height]
-  }
 
   const updateField = (section, subsection, fieldName, value) => {
     if (subsection) {
@@ -58,7 +43,6 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   const handleAnnotationUpdate = (value, property, index) => {
     const annotations = [...config?.annotations]
     annotations[index][property] = value
-    annotations[index].savedDimensions = getSvgDimensions()
 
     updateConfig({
       ...config,
@@ -67,8 +51,6 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   }
 
   const handleAddAnnotation = () => {
-    const newSvgDims = getSvgDimensions()
-
     const newAnnotation = {
       text: 'New annotation',
       anchorMode: 'fixed',
@@ -102,7 +84,6 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
       dx: 20,
       dy: -20,
       opacity: '100',
-      savedDimensions: newSvgDims,
       connectionType: 'line'
     }
 
