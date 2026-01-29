@@ -1892,6 +1892,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     </AccordionItem>
                   )}
                 <Panels.BoxPlot name='Measures' />
+                <Panels.Radar name='Radar Chart Settings' />
                 {/* Left Value Axis */}
                 {visSupportsLeftValueAxis() && (
                   <AccordionItem>

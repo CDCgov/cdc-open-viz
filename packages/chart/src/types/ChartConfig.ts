@@ -43,6 +43,7 @@ export type VisualizationType =
   | 'Line'
   | 'Paired Bar'
   | 'Pie'
+  | 'Radar'
   | 'Scatter Plot'
   | 'Spark Line'
   | 'Combo'

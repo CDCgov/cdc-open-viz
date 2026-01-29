@@ -16,7 +16,8 @@ export const VISUALIZATION_TYPES = {
   BUMP_CHART: 'Bump Chart',
   DEVIATION_BAR: 'Deviation Bar',
   PAIRED_BAR: 'Paired Bar',
-  FORECASTING: 'Forecasting'
+  FORECASTING: 'Forecasting',
+  RADAR: 'Radar'
 } as const
 
 export type VisualizationType = (typeof VISUALIZATION_TYPES)[keyof typeof VISUALIZATION_TYPES]

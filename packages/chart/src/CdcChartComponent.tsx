@@ -28,6 +28,7 @@ import _ from 'lodash'
 // Primary Components
 import ConfigContext, { ChartDispatchContext } from './ConfigContext'
 import PieChart from './components/PieChart'
+import RadarChart from './components/RadarChart'
 import SankeyChart from './components/Sankey'
 import LinearChart from './components/LinearChart'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
@@ -375,6 +376,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
       // Use the same data that will be passed to PieChart (after exclusions and filters)
       const pieData = currentData.length > 0 ? currentData : newExcludedData
       newConfig.runtime.seriesKeys = _.uniq(pieData.map(d => d[newConfig.xAxis.dataKey]))
+      newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
+    } else if (newConfig.visualizationType === 'Radar') {
+      // Radar chart: seriesKeys are the entity names from xAxis.dataKey
+      const radarData = currentData.length > 0 ? currentData : newExcludedData
+      newConfig.runtime.seriesKeys = _.uniq(radarData.map(d => d[newConfig.xAxis.dataKey]))
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
     } else {
       const finalData = dataOverride || newConfig.formattedData || newConfig.data
@@ -1217,7 +1223,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     {/* All charts with LinearChart */}
                     {filteredData &&
                       filteredData.length > 0 &&
-                      !['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
+                      !['Spark Line', 'Line', 'Sankey', 'Pie', 'Radar', 'Sankey'].includes(
+                        config.visualizationType
+                      ) && (
                         <div ref={parentRef} style={{ width: `100%` }}>
                           <ParentSize>
                             {parent => (
@@ -1231,6 +1239,19 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
                         {parent => (
                           <PieChart
+                            ref={svgRef}
+                            parentWidth={parent.width}
+                            parentHeight={parent.height}
+                            interactionLabel={interactionLabel}
+                          />
+                        )}
+                      </ParentSize>
+                    )}
+                    {/* Radar Chart */}
+                    {filteredData && filteredData.length > 0 && config.visualizationType === 'Radar' && (
+                      <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
+                        {parent => (
+                          <RadarChart
                             ref={svgRef}
                             parentWidth={parent.width}
                             parentHeight={parent.height}
