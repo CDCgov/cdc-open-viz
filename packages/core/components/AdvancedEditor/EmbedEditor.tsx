@@ -98,9 +98,6 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
     setEmbedCodeCopied(false)
   }
 
-  // Hide embed section until released
-  return null
-
   return (
     <>
       {/* Collapsible Share with Partners Section */}

@@ -16,6 +16,7 @@ const EmbedRenderer: React.FC = () => {
   const [iframeId, setIframeId] = useState<string | null>(null)
   const iframeIdRef = useRef<string | null>(null)
   const lastHeightRef = useRef<number>(0) // Shared across all resize paths
+  const [showLogo, setShowLogo] = useState(false) // Hide logo until chart loads
 
   const configUrl = getConfigUrlParam()
 
@@ -52,9 +53,10 @@ const EmbedRenderer: React.FC = () => {
     iframeIdRef.current = iframeId
   }, [iframeId])
 
-  // Listen for cove_loaded - send resize if we have an ID
+  // Listen for cove_loaded - send resize if we have an ID and show logo
   useEffect(() => {
     const handleCoveLoaded = () => {
+      setShowLogo(true)
       if (iframeIdRef.current) {
         measureAndSend(iframeIdRef.current)
       }
@@ -139,9 +141,11 @@ const EmbedRenderer: React.FC = () => {
   return (
     <div ref={wrapperRef}>
       <div ref={coveContainerRef} />
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <img src={cdcLogo} alt='CDC Logo' style={{ height: '40px', width: 'auto' }} />
-      </div>
+      {showLogo && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <img src={cdcLogo} alt='CDC Logo' style={{ height: '40px', width: 'auto' }} />
+        </div>
+      )}
     </div>
   )
 }
