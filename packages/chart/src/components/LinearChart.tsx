@@ -2,6 +2,7 @@ import React, {
   forwardRef,
   useContext,
   useEffect,
+  useLayoutEffect,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -149,6 +150,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
   const [calculatedSvgHeight, setCalculatedSvgHeight] = useState<number | null>(null)
+  const [axisUpdateKey, setAxisUpdateKey] = useState(0)
 
   // REFS
   const axisBottomRef = useRef(null)
@@ -194,7 +196,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     if (!xAxisLabelRefs.current.length) return
     const tallestLabel = Math.max(...xAxisLabelRefs.current.map(label => label.getBBox().height))
     return tallestLabel + X_TICK_LABEL_PADDING + DEFAULT_TICK_LENGTH
-  }, [parentWidth, config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation])
+  }, [parentWidth, config.xAxis, xAxisLabelRefs.current, config.xAxis.tickRotation, axisUpdateKey])
 
   const yMax = initialHeight + forestRowsHeight
 
@@ -221,6 +223,12 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     }
     return result
   }, [xAxisDataMapped])
+
+  // Force update x axis ticks when filtering
+  useLayoutEffect(() => {
+    setAxisUpdateKey(prev => prev + 1)
+  }, [data.length, xAxisDataMapped?.[0], xAxisDataMapped?.[xAxisDataMapped.length - 1]])
+
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
 
   const xMax = parentWidth - Number(runtime.yAxis.size) - (hasRightAxis ? config.yAxis.rightAxisSize : 0)
