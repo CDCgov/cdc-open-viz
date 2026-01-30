@@ -46,24 +46,7 @@ const addVisualization = (type, subType) => {
       newVisualizationConfig.visualizationType = type
       break
     case 'markup-include':
-      newVisualizationConfig.contentEditor = {
-        inlineHTML: '<h2>Inline HTML</h2>',
-        markupVariables: [],
-        showHeader: true,
-        srcUrl: '#example',
-        useInlineHTML: true
-      }
-      newVisualizationConfig.theme = 'theme-blue'
-      newVisualizationConfig.visual = {
-        border: false,
-        accent: false,
-        background: false,
-        hideBackgroundColor: false,
-        borderColorTheme: false
-      }
-      newVisualizationConfig.showEditorPanel = true
       newVisualizationConfig.visualizationType = type
-
       break
     case 'dashboardFilters': {
       newVisualizationConfig.sharedFilterIndexes = []
