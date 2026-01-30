@@ -209,6 +209,23 @@ function convertCanvasToImages(baseSvg: HTMLElement, clonedViz: HTMLElement): vo
 }
 
 /**
+ * Remove width classes that interfere with screenshot sizing
+ */
+function removeWidthClasses(clonedTree: HTMLElement): void {
+  const classesToRemove = ['dfe-block--width-wide', 'dfe-block--width-full_width']
+
+  classesToRemove.forEach(className => {
+    const elements = clonedTree.querySelectorAll(`.${className}`)
+    elements.forEach(el => el.classList.remove(className))
+  })
+
+  // Also check the root element itself
+  classesToRemove.forEach(className => {
+    clonedTree.classList.remove(className)
+  })
+}
+
+/**
  * Expand SVG widths and remove animation classes
  */
 function expandSvgWidths(clonedViz: HTMLElement): void {
@@ -237,31 +254,34 @@ export function prepareScreenshotContainer(
   // 1. Clone elements (with or without context)
   const { clonedTree, clonedViz } = prepareClonedElements(baseSvg, includeContextInDownload, elementToCapture)
 
-  // 2. Strip all links (not clickable in static image)
+  // 2. Remove width classes that interfere with screenshot sizing
+  removeWidthClasses(clonedTree)
+
+  // 3. Strip all links (not clickable in static image)
   stripLinks(clonedTree)
 
-  // 3. Convert canvas elements to images
+  // 4. Convert canvas elements to images
   convertCanvasToImages(baseSvg, clonedViz)
 
-  // 4. Expand SVG widths to prevent clipping
+  // 5. Expand SVG widths to prevent clipping
   expandSvgWidths(clonedViz)
 
-  // 5. Calculate viz dimensions
+  // 6. Calculate viz dimensions
   const computedStyle = getComputedStyle(baseSvg)
   const vizWidth =
     parseFloat(computedStyle.width) -
     (parseFloat(computedStyle.paddingLeft) || 0) -
     (parseFloat(computedStyle.paddingRight) || 0)
 
-  // 6. Create and style container
+  // 7. Create and style container
   const container = document.createElement('div')
   container.style.width = `${vizWidth + 36}px`
   container.style.padding = '18px'
 
-  // 7. Reset viz padding
+  // 8. Reset viz padding
   clonedViz.style.padding = '0'
 
-  // 8. Append cloned tree to container
+  // 9. Append cloned tree to container
   container.appendChild(clonedTree)
 
   return container
