@@ -52,6 +52,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
 
   const openControls = useState({})
   const [canAddExisting, setCanAddExisting] = useState(false)
+  const [isNestedDragHovered, setIsNestedDragHovered] = useState(false)
 
   const updateFilterProp = (prop: string, index: number, value) => {
     const newSharedFilters = _.cloneDeep(sharedFilters)
@@ -255,6 +256,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
                         key={filter.key + index}
                         draggableId={`filter-${filter.key}-${index}`}
                         index={filterIndex}
+                        isDragDisabled={isNestedDragHovered}
                       >
                         {(provided, snapshot) => (
                           <div
@@ -296,6 +298,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
                                   toggleNestedQueryParameters(index, checked)
                                 }}
                                 config={config}
+                                onNestedDragAreaHover={setIsNestedDragHovered}
                               />
                             </FieldSetWrapper>
                           </div>
