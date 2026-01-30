@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useCoveContainer } from '../shared/useCoveContainer'
 import { getConfigUrlParam } from '../shared/urlValidation'
+import cdcLogo from '../../../core/assets/logo2.svg'
 
 /**
  * EmbedRenderer - Phase 1 & 2
@@ -10,7 +11,8 @@ import { getConfigUrlParam } from '../shared/urlValidation'
  * Also sends resize events to parent window for iframe height adjustment.
  */
 const EmbedRenderer: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null)
+  const wrapperRef = useRef<HTMLDivElement>(null) // Wrapper for height measurement (includes logo)
+  const coveContainerRef = useRef<HTMLDivElement>(null) // Container for COVE visualization
   const [iframeId, setIframeId] = useState<string | null>(null)
   const iframeIdRef = useRef<string | null>(null)
   const lastHeightRef = useRef<number>(0) // Shared across all resize paths
@@ -18,14 +20,14 @@ const EmbedRenderer: React.FC = () => {
   const configUrl = getConfigUrlParam()
 
   // Setup COVE container using shared hook
-  useCoveContainer(containerRef, configUrl)
+  useCoveContainer(coveContainerRef, configUrl)
 
   // Measure height and send resize message (with duplicate detection)
   const measureAndSend = (id: string) => {
-    const container = containerRef.current
-    if (!container) return
+    const wrapper = wrapperRef.current
+    if (!wrapper) return
 
-    const height = Math.ceil(container.getBoundingClientRect().height) + 15
+    const height = Math.ceil(wrapper.getBoundingClientRect().height) + 15
 
     if (height < 100) return
 
@@ -96,8 +98,8 @@ const EmbedRenderer: React.FC = () => {
       resizeTimeout = window.setTimeout(() => measureAndSend(iframeId), 10)
     })
 
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current)
+    if (wrapperRef.current) {
+      resizeObserver.observe(wrapperRef.current)
     }
 
     // Send initial resize (in case content already rendered before ID arrived)
@@ -133,8 +135,15 @@ const EmbedRenderer: React.FC = () => {
     )
   }
 
-  // Render the container div that COVE will populate
-  return <div ref={containerRef} />
+  // Render the container div that COVE will populate, plus CDC logo
+  return (
+    <div ref={wrapperRef}>
+      <div ref={coveContainerRef} />
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <img src={cdcLogo} alt='CDC Logo' style={{ height: '40px', width: 'auto' }} />
+      </div>
+    </div>
+  )
 }
 
 export default EmbedRenderer
