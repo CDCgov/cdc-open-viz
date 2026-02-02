@@ -244,8 +244,9 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
             bottom: 0,
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
             display: 'flex',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             justifyContent: 'center',
+            paddingTop: '5vh',
             zIndex: 9999
           }}
           onClick={handleCloseModal}
