@@ -1,5 +1,5 @@
 /**
- * CDC COVE Embed Helper - Phase 2
+ * CDC COVE Embed Helper
  *
  * Standalone script that handles iframe resizing for embedded COVE visualizations.
  * Partners include this on their page along with the iframe(s).
@@ -9,7 +9,7 @@
  * <script src="https://www.cdc.gov/.../embed-helper.js"></script>
  */
 
-import { isValidMessageOrigin } from '../shared/urlValidation'
+import { isValidMessageOrigin } from './urlValidation'
 
 let iframeCounter = 0
 

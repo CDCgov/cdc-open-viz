@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useCoveContainer } from '../shared/useCoveContainer'
-import { getConfigUrlParam } from '../shared/urlValidation'
-import cdcLogo from '../../../core/assets/logo2.svg'
+import { getConfigUrlParam } from '@cdc/core/helpers/embed'
+import cdcLogo from '@cdc/core/assets/logo2.svg'
 
 /**
  * EmbedRenderer - Phase 1 & 2

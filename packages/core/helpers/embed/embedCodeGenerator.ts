@@ -25,7 +25,7 @@ export function isDevMode(): boolean {
  * Get default embed base URL based on environment
  * Returns full absolute URL including protocol and host
  */
-export function getDefaultEmbedBaseUrl(): string {
+export function getEmbedBaseUrl(): string {
   if (isDevMode()) {
     return 'http://localhost:8080'
   }
@@ -38,7 +38,7 @@ export function getDefaultEmbedBaseUrl(): string {
  */
 export function getEmbedPath(): string {
   if (isDevMode()) {
-    return '/'
+    return 'http://localhost:8080'
   }
   return '/TemplatePackage/contrib/widgets/openVizWrapper/dist/embed/embed.html'
 }
@@ -46,21 +46,11 @@ export function getEmbedPath(): string {
 /**
  * Get default embed helper script URL based on environment
  */
-export function getDefaultHelperScriptUrl(): string {
+export function getHelperScriptUrl(): string {
   if (isDevMode()) {
     return 'http://localhost:8080/src/embed-helper/index.js'
   }
   return 'https://www.cdc.gov/TemplatePackage/contrib/widgets/openVizWrapper/dist/embed/embed-helper.js'
-}
-
-/**
- * Get default generator base URL based on environment
- */
-export function getDefaultGeneratorBaseUrl(): string {
-  if (isDevMode()) {
-    return 'http://localhost:8080/generator.html'
-  }
-  return 'https://www.cdc.gov/TemplatePackage/contrib/widgets/openVizWrapper/dist/embed/generator.html'
 }
 
 /**
@@ -79,8 +69,8 @@ export function generateEmbedCode(options: EmbedCodeOptions): string {
     configUrl,
     width = '100%',
     height = '300',
-    embedBaseUrl = getDefaultEmbedBaseUrl(),
-    helperScriptUrl = getDefaultHelperScriptUrl(),
+    embedBaseUrl = getEmbedBaseUrl(),
+    helperScriptUrl = getHelperScriptUrl(),
     urlParams = {}
   } = options
 
