@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import {
   generateEmbedCode,
-  getEmbedPath,
   extractFilters,
   initializeFilterState,
   buildFilterUrlParams,
@@ -70,8 +69,7 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
     const urlParams = buildFilterUrlParams(filters, filterState)
     return generateEmbedCode({
       configUrl,
-      urlParams,
-      height: '400'
+      urlParams
     })
   }, [configUrl, filters, filterState])
 
@@ -437,23 +435,17 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
                       padding: '1rem'
                     }}
                   >
-                    <iframe
+                    <div
                       key={`${configUrl}-${JSON.stringify(filterState)}`}
-                      src={(() => {
+                      data-cove-embed
+                      data-config-url={(() => {
                         const urlParams = buildFilterUrlParams(filters, filterState)
                         const params = new URLSearchParams()
-                        params.set('configUrl', configUrl || '')
                         Object.entries(urlParams).forEach(([key, value]) => {
                           if (value) params.set(key, value)
                         })
-                        return `${getEmbedPath()}?${params.toString()}`
+                        return params.toString() ? `${configUrl}?${params.toString()}` : configUrl || ''
                       })()}
-                      data-cove-embed
-                      width='100%'
-                      height='400'
-                      frameBorder='0'
-                      title='CDC Data Visualization'
-                      style={{ border: 'none' }}
                     />
                   </div>
                 </div>

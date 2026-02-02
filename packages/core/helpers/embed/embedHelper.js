@@ -1,15 +1,18 @@
 /**
  * CDC COVE Embed Helper
  *
- * Standalone script that handles iframe resizing for embedded COVE visualizations.
- * Partners include this on their page along with the iframe(s).
+ * Standalone script that handles iframe creation and resizing for embedded COVE visualizations.
+ * Partners place a div container on their page with data-config-url attribute.
+ * This script finds the div, creates an iframe (width: 100%, initial height: 400px),
+ * and handles dynamic resizing.
  *
  * Usage:
- * <iframe src="..." data-cove-embed width="100%" height="400"></iframe>
+ * <div data-cove-embed data-config-url="/path/to/config.json"></div>
  * <script src="https://www.cdc.gov/.../embed-helper.js"></script>
  */
 
 import { isValidMessageOrigin } from './urlValidation'
+import { getEmbedBaseUrl } from './embedCodeGenerator'
 
 let iframeCounter = 0
 
@@ -45,25 +48,74 @@ function initializeIframe(iframe) {
   iframe.addEventListener('load', sendId)
 }
 
-// Initialize existing iframes
-const existingIframes = document.querySelectorAll('iframe[data-cove-embed]')
-if (existingIframes.length > 0) {
-  existingIframes.forEach(initializeIframe)
+// Create iframe from div container
+function createIframeFromContainer(container) {
+  // Skip if already processed
+  if (container.hasAttribute('data-cove-processed')) {
+    return
+  }
+  container.setAttribute('data-cove-processed', 'true')
+
+  // Read configuration from data attributes
+  const configUrl = container.dataset.configUrl
+
+  if (!configUrl) {
+    console.error('CDC COVE Embed: data-config-url attribute is required')
+    return
+  }
+
+  // Parse config URL to separate base path from query parameters
+  // data-config-url might be: "/path/config.json?state=CA&hidestate=true"
+  // We need to split into: configUrl + separate params for embed page
+  const [baseConfigUrl, queryString] = configUrl.split('?')
+
+  // Build clean URL manually (avoid encoding configUrl path)
+  let iframeSrc = `${getEmbedBaseUrl()}?configUrl=${baseConfigUrl}`
+
+  // Add any additional query parameters from the config URL
+  if (queryString) {
+    iframeSrc += `&${queryString}`
+  }
+
+  // Create iframe element with hardcoded dimensions
+  const iframe = document.createElement('iframe')
+  iframe.src = iframeSrc
+
+  iframe.width = '100%'
+  iframe.height = '400'
+  iframe.frameBorder = '0'
+  iframe.title = 'CDC Data Visualization'
+  iframe.setAttribute('data-cove-embed', '')
+
+  // Apply min-height style to container
+  container.style.minHeight = '400px'
+
+  // Inject iframe into container
+  container.appendChild(iframe)
+
+  // Initialize the iframe for resizing
+  initializeIframe(iframe)
 }
 
-// Watch for dynamically added iframes (for React/SPA apps)
+// Process existing div containers
+const existingContainers = document.querySelectorAll('div[data-cove-embed]')
+if (existingContainers.length > 0) {
+  existingContainers.forEach(createIframeFromContainer)
+}
+
+// Watch for dynamically added containers (for React/SPA apps)
 const observer = new MutationObserver(mutations => {
   mutations.forEach(mutation => {
     mutation.addedNodes.forEach(node => {
-      // Check if the added node is an iframe
       if (node.nodeType === Node.ELEMENT_NODE) {
-        if (node.matches && node.matches('iframe[data-cove-embed]')) {
-          initializeIframe(node)
+        // Check for div containers
+        if (node.matches && node.matches('div[data-cove-embed]')) {
+          createIframeFromContainer(node)
         }
         // Also check children in case a container was added
-        const iframes = node.querySelectorAll && node.querySelectorAll('iframe[data-cove-embed]')
-        if (iframes && iframes.length > 0) {
-          iframes.forEach(initializeIframe)
+        const containers = node.querySelectorAll && node.querySelectorAll('div[data-cove-embed]')
+        if (containers && containers.length > 0) {
+          containers.forEach(createIframeFromContainer)
         }
       }
     })

@@ -5,10 +5,6 @@
 
 interface EmbedCodeOptions {
   configUrl: string
-  width?: string
-  height?: string
-  embedBaseUrl?: string
-  helperScriptUrl?: string
   /** Additional URL parameters (e.g., filter values, hide flags) */
   urlParams?: Record<string, string>
 }
@@ -22,7 +18,7 @@ export function isDevMode(): boolean {
 }
 
 /**
- * Get default embed base URL based on environment
+ * Get embed base URL for creating iframes
  * Returns full absolute URL including protocol and host
  */
 export function getEmbedBaseUrl(): string {
@@ -54,46 +50,28 @@ export function getHelperScriptUrl(): string {
 }
 
 /**
- * Generate basic iframe embed code for partners
+ * Generate embed code for partners (div-based)
  *
  * @param options.configUrl - URL to the published config JSON
- * @param options.width - iframe width (default: "100%")
- * @param options.height - iframe height (default: "300")
- * @param options.embedBaseUrl - Base URL for embed page (auto-detected by environment)
- * @param options.helperScriptUrl - URL for embed-helper.js (auto-detected by environment)
  * @param options.urlParams - Additional URL parameters (e.g., filter values, hide flags)
- * @returns HTML string with iframe and script tag
+ * @returns HTML string with div container and script tag (width/height are hardcoded in embed-helper)
  */
 export function generateEmbedCode(options: EmbedCodeOptions): string {
-  const {
-    configUrl,
-    width = '100%',
-    height = '300',
-    embedBaseUrl = getEmbedBaseUrl(),
-    helperScriptUrl = getHelperScriptUrl(),
-    urlParams = {}
-  } = options
+  const { configUrl, urlParams = {} } = options
 
-  // Construct embed page URL with config parameter and any additional params
+  // Build full config URL with query parameters
   const params = new URLSearchParams()
-  params.set('configUrl', configUrl)
-
-  // Add any additional URL parameters (filters, hide flags, etc.)
   Object.entries(urlParams).forEach(([key, value]) => {
     if (value) params.set(key, value)
   })
+  const fullConfigUrl = params.toString() ? `${configUrl}?${params.toString()}` : configUrl
 
-  const embedUrl = `${embedBaseUrl}?${params.toString()}`
+  // Generate div-based embed code (width and height are hardcoded in embed-helper)
+  const embedCode = `<div
+  data-cove-embed
+  data-config-url="${fullConfigUrl}"
+></div>
+<script src="${getHelperScriptUrl()}"></script>`
 
-  // Generate iframe code
-  const iframeCode = `<iframe src="${embedUrl}"
-data-cove-embed
-width="${width}"
-height="${height}"
-frameborder="0"
-title="CDC Data Visualization"
-></iframe>
-<script src="${helperScriptUrl}"></script>`
-
-  return iframeCode
+  return embedCode
 }
