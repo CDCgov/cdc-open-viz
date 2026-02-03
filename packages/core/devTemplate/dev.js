@@ -84,11 +84,77 @@ if (!sidebarDisabled) {
     return html
   }
 
-  let html = '<nav class="dev-sidebar"><div class="dev-sidebar-header">Examples</div><div class="dev-sidebar-tree">'
-  html += renderTree(tree, '/examples/')
+  // Format package name for display (e.g., "CdcChart" -> "Chart", "CdcMap" -> "Map")
+  const formatPackageName = name => {
+    if (!name) return ''
+    return name
+      .replace(/^Cdc/, '')
+      .replace(/([A-Z])/g, ' $1')
+      .trim()
+  }
+  const packageDisplayName = formatPackageName(__COVE_PACKAGE_NAME__)
 
+  let html = '<nav class="dev-sidebar">'
+  html += `<div class="dev-sidebar-header">${packageDisplayName} Examples</div>`
+  html +=
+    '<div class="dev-sidebar-search"><input type="text" id="dev-sidebar-search-input" placeholder="Search examples..." /></div>'
+  html += '<div class="dev-sidebar-tree">'
+  html += renderTree(tree, '/examples/')
   html += '</div></nav>'
   sidebarRoot.innerHTML = html
+
+  // Search functionality
+  const searchInput = document.getElementById('dev-sidebar-search-input')
+  searchInput.addEventListener('input', e => {
+    const query = e.target.value.toLowerCase()
+    const items = sidebarRoot.querySelectorAll('.dev-sidebar-item')
+    const folders = sidebarRoot.querySelectorAll('.dev-sidebar-folder')
+
+    if (!query) {
+      // Reset: show all items, collapse folders (except those with active item)
+      items.forEach(item => (item.style.display = ''))
+      folders.forEach(folder => {
+        folder.style.display = ''
+        if (!folder.nextElementSibling?.querySelector('.active')) {
+          folder.classList.remove('open')
+        }
+      })
+      return
+    }
+
+    // Split query into tokens - all must match (in any order)
+    const tokens = query.split(/\s+/).filter(t => t)
+    const matchesAllTokens = text => tokens.every(token => text.includes(token))
+
+    // First pass: find folders that match the query
+    const matchingFolderPaths = new Set()
+    folders.forEach(folder => {
+      const folderName = folder.textContent.toLowerCase()
+      if (matchesAllTokens(folderName)) {
+        matchingFolderPaths.add(folder.dataset.folderPath)
+      }
+    })
+
+    // Filter items: show if item matches OR is inside a matching folder
+    items.forEach(item => {
+      const configPath = item.dataset.config
+      const itemMatches = matchesAllTokens(item.textContent.toLowerCase())
+      const inMatchingFolder = [...matchingFolderPaths].some(folderPath => configPath.startsWith(folderPath))
+      item.style.display = itemMatches || inMatchingFolder ? '' : 'none'
+    })
+
+    // Show/hide folders based on whether they match or have visible children
+    folders.forEach(folder => {
+      const folderPath = folder.dataset.folderPath
+      const folderMatches = matchingFolderPaths.has(folderPath)
+      const contents = folder.nextElementSibling
+      const hasVisibleChildren = contents?.querySelector('.dev-sidebar-item:not([style*="display: none"])')
+      folder.style.display = folderMatches || hasVisibleChildren ? '' : 'none'
+      if (folderMatches || hasVisibleChildren) {
+        folder.classList.add('open')
+      }
+    })
+  })
 
   // Click handlers for files
   sidebarRoot.querySelectorAll('.dev-sidebar-item').forEach(btn => {

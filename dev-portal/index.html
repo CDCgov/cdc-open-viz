@@ -39,6 +39,26 @@
         color: #6c7086;
         border-bottom: 1px solid #313244;
       }
+      .dev-sidebar-search {
+        padding: 8px 12px;
+        border-bottom: 1px solid #313244;
+      }
+      .dev-sidebar-search input {
+        width: 100%;
+        padding: 6px 10px;
+        background: #313244;
+        border: 1px solid #45475a;
+        border-radius: 4px;
+        color: #cdd6f4;
+        font-size: 12px;
+        outline: none;
+      }
+      .dev-sidebar-search input::placeholder {
+        color: #6c7086;
+      }
+      .dev-sidebar-search input:focus {
+        border-color: #89b4fa;
+      }
       .dev-sidebar-tree {
         padding: 4px 0;
       }
@@ -129,6 +149,9 @@
   <body>
     <nav class="dev-sidebar">
       <div class="dev-sidebar-header">All Packages</div>
+      <div class="dev-sidebar-search">
+        <input type="text" id="dev-sidebar-search-input" placeholder="Search examples..." />
+      </div>
       <div class="dev-sidebar-tree" id="sidebar-tree">
         <div class="loading" style="padding: 12px; background: none; color: #6c7086; font-size: 12px">
           Loading examples...
@@ -322,6 +345,98 @@
         })
       }
 
+      // Search functionality
+      const searchInput = document.getElementById('dev-sidebar-search-input')
+
+      function applySearchFilter() {
+        const query = searchInput.value.toLowerCase()
+        const items = sidebarTree.querySelectorAll('.dev-sidebar-item')
+        const folders = sidebarTree.querySelectorAll('.dev-sidebar-folder:not(.dev-sidebar-package)')
+        const packageFolders = sidebarTree.querySelectorAll('.dev-sidebar-package')
+
+        if (!query) {
+          // Reset: show all items, collapse folders (except those with active item or expanded)
+          items.forEach(item => (item.style.display = ''))
+          folders.forEach(folder => {
+            folder.style.display = ''
+            const folderId = folder.dataset.folderId
+            if (!expandedFolders[folderId]) {
+              folder.classList.remove('open')
+            }
+          })
+          packageFolders.forEach(pkg => {
+            pkg.style.display = ''
+            const folderId = pkg.dataset.folderId
+            if (!expandedFolders[folderId]) {
+              pkg.classList.remove('open')
+            }
+          })
+          return
+        }
+
+        // Split query into tokens - all must match (in any order)
+        const tokens = query.split(/\s+/).filter(t => t)
+        const matchesAllTokens = text => tokens.every(token => text.includes(token))
+
+        // First pass: find packages and folders that match the query
+        const matchingPackages = new Set()
+        const matchingFolderIds = new Set()
+
+        packageFolders.forEach(pkg => {
+          const pkgName = pkg.dataset.package.toLowerCase()
+          if (matchesAllTokens(pkgName)) {
+            matchingPackages.add(pkg.dataset.package)
+          }
+        })
+
+        folders.forEach(folder => {
+          const folderName = folder.textContent.toLowerCase()
+          if (matchesAllTokens(folderName)) {
+            matchingFolderIds.add(folder.dataset.folderId)
+          }
+        })
+
+        // Filter items: show if item matches OR is inside a matching package/folder
+        items.forEach(item => {
+          const packageName = item.dataset.package
+          const configPath = item.dataset.config
+          const itemMatches = matchesAllTokens(item.textContent.toLowerCase())
+          const inMatchingPackage = matchingPackages.has(packageName)
+          const inMatchingFolder = [...matchingFolderIds].some(folderId => {
+            // folderId format is "packageName:/examples/path/"
+            const [folderPkg, folderPath] = folderId.split(':')
+            return packageName === folderPkg && configPath.startsWith(folderPath)
+          })
+          item.style.display = itemMatches || inMatchingPackage || inMatchingFolder ? '' : 'none'
+        })
+
+        // Show/hide folders based on whether they match or have visible children
+        folders.forEach(folder => {
+          const folderId = folder.dataset.folderId
+          const folderMatches = matchingFolderIds.has(folderId)
+          const contents = folder.nextElementSibling
+          const hasVisibleChildren = contents?.querySelector('.dev-sidebar-item:not([style*="display: none"])')
+          folder.style.display = folderMatches || hasVisibleChildren ? '' : 'none'
+          if (folderMatches || hasVisibleChildren) {
+            folder.classList.add('open')
+          }
+        })
+
+        // Show/hide packages based on whether they match or have visible children
+        packageFolders.forEach(pkg => {
+          const packageName = pkg.dataset.package
+          const packageMatches = matchingPackages.has(packageName)
+          const contents = pkg.nextElementSibling
+          const hasVisibleChildren = contents?.querySelector('.dev-sidebar-item:not([style*="display: none"])')
+          pkg.style.display = packageMatches || hasVisibleChildren ? '' : 'none'
+          if (packageMatches || hasVisibleChildren) {
+            pkg.classList.add('open')
+          }
+        })
+      }
+
+      searchInput.addEventListener('input', applySearchFilter)
+
       // Fetch examples for a single package
       async function fetchPackageExamples(packageName) {
         const port = packages[packageName]
@@ -367,6 +482,7 @@
         }
         sidebarTree.innerHTML = html
         attachHandlers()
+        applySearchFilter()
       }
 
       // Initial load - fetch all packages
