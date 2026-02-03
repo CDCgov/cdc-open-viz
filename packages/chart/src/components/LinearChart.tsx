@@ -956,13 +956,13 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               return (
                 // prettier-ignore
                 <Line
-                key={`yAxis-${anchor.value}--${index}`}
-                strokeDasharray={handleLineType(anchor.lineStyle)}
-                stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                className='anchor-y'
-                from={{ x: runtime.yAxis.size, y: position - middleOffset }}
-                to={{ x: runtime.yAxis.size + xMax, y: position - middleOffset }}
-              />
+                  key={`yAxis-${anchor.value}--${index}`}
+                  strokeDasharray={handleLineType(anchor.lineStyle)}
+                  stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                  className='anchor-y'
+                  from={{ x: Number(runtime.yAxis.size), y: position - middleOffset }}
+                  to={{ x: Number(runtime.yAxis.size) + Number(xMax), y: position - middleOffset }}
+                />
               )
             })}
           {/* x anchors */}
@@ -992,14 +992,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               return (
                 // prettier-ignore
                 <Line
-                key={`xAxis-${anchor.value}--${index}`}
-                strokeDasharray={handleLineType(anchor.lineStyle)}
-                stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
-                className='anchor-x'
-                from={{ x: Number(anchorPosition) + Number(padding), y: 0 }}
-                to={{ x: Number(anchorPosition) + Number(padding), y: yMax }}
-              />
+                  key={`xAxis-${anchor.value}--${index}`}
+                  strokeDasharray={handleLineType(anchor.lineStyle)}
+                  stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                  fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
+                  className='anchor-x'
+                  from={{ x: Number(anchorPosition) + Number(padding), y: 0 }}
+                  to={{ x: Number(anchorPosition) + Number(padding), y: yMax }}
+                />
               )
             })}
           {/* we are handling regions in bar charts differently, so that we can calculate the bar group into the region space. */}
