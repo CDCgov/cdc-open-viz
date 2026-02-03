@@ -11,14 +11,21 @@ import Icon from '@cdc/core/components/ui/Icon'
 import ConfigContext from '../../../../ConfigContext'
 import { useEditorPanelContext } from '../../EditorPanelContext'
 import { type PanelProps } from './../PanelProps'
+import { ChartContext } from '../../../../types/ChartContext'
 
 const PanelRadar: FC<PanelProps> = props => {
-  const { config } = useContext(ConfigContext)
+  const { config, rawData } = useContext<ChartContext>(ConfigContext)
 
   if (config.visualizationType !== 'Radar') return null
 
   const { updateField } = useEditorPanelContext()
   const radar = config.radar || {}
+
+  // Get available columns from the data
+  const getColumns = () => {
+    if (!rawData || rawData.length === 0) return []
+    return Object.keys(rawData[0])
+  }
 
   return (
     <AccordionItem>
@@ -26,8 +33,104 @@ const PanelRadar: FC<PanelProps> = props => {
         <AccordionItemButton>{props.name}</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
-        {/* Grid Settings */}
+        {/* Data Settings */}
         <fieldset className='fieldset'>
+          <legend style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px' }}>Data Settings</legend>
+
+          <Select
+            value={config.xAxis?.dataKey || ''}
+            section='xAxis'
+            fieldName='dataKey'
+            label='Category Column'
+            initial='Select'
+            required={true}
+            updateField={updateField}
+            options={getColumns()}
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>Select the column containing category labels for each axis of the radar chart.</p>
+                </Tooltip.Content>
+              </Tooltip>
+            }
+          />
+        </fieldset>
+
+        {/* Number Formatting */}
+        <fieldset className='fieldset' style={{ marginTop: '20px' }}>
+          <legend style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px' }}>Number Formatting</legend>
+
+          <CheckBox
+            value={config.dataFormat?.commas}
+            section='dataFormat'
+            fieldName='commas'
+            label='Add Commas'
+            updateField={updateField}
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>Add commas to numeric values in tooltips and data table.</p>
+                </Tooltip.Content>
+              </Tooltip>
+            }
+          />
+
+          <TextField
+            value={config.dataFormat?.roundTo ?? 0}
+            type='number'
+            section='dataFormat'
+            fieldName='roundTo'
+            label='Round to Decimal Point'
+            updateField={updateField}
+            min={0}
+          />
+
+          <div className='two-col-inputs'>
+            <TextField
+              value={config.dataFormat?.prefix || ''}
+              section='dataFormat'
+              fieldName='prefix'
+              label='Prefix'
+              updateField={updateField}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>Enter a data prefix (such as "$"), if applicable.</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
+            <TextField
+              value={config.dataFormat?.suffix || ''}
+              section='dataFormat'
+              fieldName='suffix'
+              label='Suffix'
+              updateField={updateField}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>Enter a data suffix (such as "%"), if applicable.</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
+          </div>
+        </fieldset>
+
+        {/* Grid Settings */}
+        <fieldset className='fieldset' style={{ marginTop: '20px' }}>
           <legend style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px' }}>Grid Settings</legend>
 
           <TextField

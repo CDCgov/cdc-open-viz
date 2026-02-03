@@ -4581,14 +4581,16 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 )}
                 <Panels.Annotate name='Text Annotations' />
                 {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
-                <PanelMarkup
-                  name='Markup Variables'
-                  markupVariables={config.markupVariables || []}
-                  data={rawData}
-                  enableMarkupVariables={config.enableMarkupVariables || false}
-                  onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
-                  onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
-                />
+                {config.visualizationType !== 'Radar' && (
+                  <PanelMarkup
+                    name='Markup Variables'
+                    markupVariables={config.markupVariables || []}
+                    data={rawData}
+                    enableMarkupVariables={config.enableMarkupVariables || false}
+                    onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
+                    onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
+                  />
+                )}
                 <Panels.SmallMultiples name='Small Multiples' />
               </Accordion>
               {config.type !== 'Spark Line' && (
