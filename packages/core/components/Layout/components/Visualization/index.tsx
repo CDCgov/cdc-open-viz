@@ -104,6 +104,13 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
         }
       }
 
+      if (config.visualizationType === 'TP5 Gauge') {
+        classes.push('gauge__style--tp5')
+        if (config.visual?.whiteBackground) {
+          classes.push('white-background-style')
+        }
+      }
+
       classes.push('cove-component', 'waffle-chart')
     }
     return classes

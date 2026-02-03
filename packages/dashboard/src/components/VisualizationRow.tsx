@@ -103,50 +103,55 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     }
   }, [toggledRow, row.toggle])
 
-  // Equalize TP5 data bite title heights in the same row
-  useEffect(() => {
-    const rowElement = document.querySelector(`[data-row-index="${index}"]`)
-    if (!rowElement) return
+  const setupTP5MinHeightEqualizer = (rowElement: Element, itemSelector: string) => {
+    const items = Array.from(rowElement.querySelectorAll(itemSelector)) as HTMLElement[]
+    if (items.length <= 1) return undefined
 
-    const tp5Titles = Array.from(rowElement.querySelectorAll('.bite__style--tp5 .cdc-callout__heading'))
-    if (tp5Titles.length <= 1) return // No need to equalize if there's only one or none
-
-    const equalizeTP5Titles = () => {
-      // Reset heights first
-      tp5Titles.forEach((title: HTMLElement) => {
-        title.style.minHeight = ''
+    const equalizeHeights = () => {
+      items.forEach(item => {
+        item.style.minHeight = ''
       })
 
-      // Calculate max height after reset
       let maxHeight = 0
-      tp5Titles.forEach((title: HTMLElement) => {
-        const height = title.offsetHeight
+      items.forEach(item => {
+        const height = item.offsetHeight
         if (height > maxHeight) maxHeight = height
       })
 
-      // Apply max height to all titles
       if (maxHeight > 0) {
-        tp5Titles.forEach((title: HTMLElement) => {
-          title.style.minHeight = `${maxHeight}px`
+        items.forEach(item => {
+          item.style.minHeight = `${maxHeight}px`
         })
       }
     }
 
-    // Initial equalization
-    equalizeTP5Titles()
+    equalizeHeights()
 
-    // Use ResizeObserver to watch for size changes in any of the titles
     const resizeObserver = new ResizeObserver(() => {
-      equalizeTP5Titles()
+      equalizeHeights()
     })
 
-    // Observe all titles
-    tp5Titles.forEach(title => {
-      resizeObserver.observe(title as Element)
+    items.forEach(item => {
+      resizeObserver.observe(item)
     })
+
+    return () => resizeObserver.disconnect()
+  }
+
+  // Equalize TP5 callout title heights and TP5 gauge message blocks for like visualizations in the same row
+  useEffect(() => {
+    const rowElement = document.querySelector(`[data-row-index="${index}"]`)
+    if (!rowElement) return
+
+    const cleanups = [
+      setupTP5MinHeightEqualizer(rowElement, '.bite__style--tp5 .cdc-callout__heading'),
+      setupTP5MinHeightEqualizer(rowElement, '.waffle__style--tp5 .cdc-callout__heading'),
+      setupTP5MinHeightEqualizer(rowElement, '.gauge__style--tp5 .cdc-callout__heading'),
+      setupTP5MinHeightEqualizer(rowElement, '.gauge__style--tp5 .cove-gauge-chart__content')
+    ].filter(Boolean) as Array<() => void>
 
     return () => {
-      resizeObserver.disconnect()
+      cleanups.forEach(cleanup => cleanup())
     }
   }, [index, row, config, filteredDataOverride])
 

@@ -217,4 +217,32 @@ export const Waffle_Chart_TP5_Style_White_Background: Story = {
   }
 }
 
+export const TP5_Gauge: Story = {
+  args: {
+    configUrl: '/packages/waffle-chart/examples/tp5-gauge.json'
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'TP5 Gauge - A TP5 callout-style gauge with a blue background, callout flag, and title inside the callout header.'
+      }
+    }
+  }
+}
+
+export const TP5_Gauge_White_Background: Story = {
+  args: {
+    configUrl: '/packages/waffle-chart/examples/tp5-gauge-white.json'
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'TP5 Gauge with White Background - The white background variant of the TP5 gauge features a white callout with a teal border and no callout flag.'
+      }
+    }
+  }
+}
+
 export default meta
