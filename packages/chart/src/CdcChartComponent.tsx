@@ -263,6 +263,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
       delete defaultsWithoutPalette.general?.palette
     }
 
+    // Override palette defaults for Line charts specifically
+    if (loadedConfig?.visualizationType === 'Line' && !loadedConfig?.general?.palette) {
+      defaultsWithoutPalette.general.palette = {
+        isReversed: false,
+        version: '2.0',
+        name: 'divergent_blue_cyan'
+      }
+    }
+
     let newConfig = { ...defaultsWithoutPalette, ...loadedConfig }
 
     _.defaultsDeep(newConfig, {
