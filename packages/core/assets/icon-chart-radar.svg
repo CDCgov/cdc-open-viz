@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor">
+    <!-- Outer pentagon (grid) -->
+    <path d="M256 32l211.25 153.5L175 478.5H337l81.25-293L256 32zm0 0L44.75 185.5L175 478.5h162L175 478.5 44.75 185.5 256 32z" fill="none" stroke="currentColor" stroke-width="20" stroke-linejoin="round"/>
+    <!-- Middle pentagon (grid ring) -->
+    <path d="M256 112l126.75 92.1L207.5 375.3h97l48.75-171.2L256 112z" fill="none" stroke="currentColor" stroke-width="12" stroke-opacity="0.4" stroke-linejoin="round"/>
+    <path d="M256 112l-126.75 92.1L207.5 375.3h-97l-48.75-171.2L256 112z" fill="none" stroke="currentColor" stroke-width="12" stroke-opacity="0.4" stroke-linejoin="round"/>
+    <!-- Inner pentagon (grid ring) -->
+    <path d="M256 192l63.4 46L289 332.7h-66l-30-94.7L256 192z" fill="none" stroke="currentColor" stroke-width="8" stroke-opacity="0.3" stroke-linejoin="round"/>
+    <!-- Axis lines -->
+    <line x1="256" y1="256" x2="256" y2="32" stroke="currentColor" stroke-width="8" stroke-opacity="0.5"/>
+    <line x1="256" y1="256" x2="467.25" y2="185.5" stroke="currentColor" stroke-width="8" stroke-opacity="0.5"/>
+    <line x1="256" y1="256" x2="337" y2="478.5" stroke="currentColor" stroke-width="8" stroke-opacity="0.5"/>
+    <line x1="256" y1="256" x2="175" y2="478.5" stroke="currentColor" stroke-width="8" stroke-opacity="0.5"/>
+    <line x1="256" y1="256" x2="44.75" y2="185.5" stroke="currentColor" stroke-width="8" stroke-opacity="0.5"/>
+    <!-- Data polygon (filled) -->
+    <polygon points="256,80 400,200 350,420 162,420 112,200" fill="currentColor" fill-opacity="0.3" stroke="currentColor" stroke-width="16" stroke-linejoin="round"/>
+    <!-- Data points -->
+    <circle cx="256" cy="80" r="12" fill="currentColor"/>
+    <circle cx="400" cy="200" r="12" fill="currentColor"/>
+    <circle cx="350" cy="420" r="12" fill="currentColor"/>
+    <circle cx="162" cy="420" r="12" fill="currentColor"/>
+    <circle cx="112" cy="200" r="12" fill="currentColor"/>
+</svg>
