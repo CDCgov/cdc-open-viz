@@ -18,8 +18,38 @@
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #6c7086;
+  color: #9399b2;
   border-bottom: 1px solid #313244;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dev-sidebar-editor-toggle {
+  background: none;
+  border: 1px solid #45475a;
+  border-radius: 4px;
+  color: #9399b2;
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  padding-bottom: 2px;
+}
+
+.dev-sidebar-editor-toggle:hover {
+  border-color: #89b4fa;
+  color: #89b4fa;
+}
+
+.dev-sidebar-editor-toggle.active {
+  background: #89b4fa;
+  border-color: #89b4fa;
+  color: #1e1e2e;
 }
 
 .dev-sidebar-search {

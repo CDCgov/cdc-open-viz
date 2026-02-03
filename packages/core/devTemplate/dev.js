@@ -4,8 +4,13 @@
 // Apply config override from ?config= URL parameter (must happen before React loads)
 const params = new URLSearchParams(window.location.search)
 const configParam = params.get('config')
+let editorEnabled = params.get('editor') === 'true'
+
 if (configParam) {
   document.querySelector('.react-container').setAttribute('data-config', configParam)
+}
+if (editorEnabled) {
+  document.querySelector('.react-container').setAttribute('data-editor', 'true')
 }
 
 // Load the visualization component
@@ -14,7 +19,8 @@ await import('./src/index')
 // Reload visualization without page refresh
 window.reloadVisualization = async configUrl => {
   const wrapper = document.getElementById('viz-wrapper')
-  wrapper.innerHTML = `<div class="react-container" data-config="${configUrl}"></div>`
+  const editorAttr = editorEnabled ? ' data-editor="true"' : ''
+  wrapper.innerHTML = `<div class="react-container" data-config="${configUrl}"${editorAttr}></div>`
   await import(/* @vite-ignore */ `./src/index?t=${Date.now()}`)
 }
 
@@ -94,8 +100,9 @@ if (!sidebarDisabled) {
   }
   const packageDisplayName = formatPackageName(__COVE_PACKAGE_NAME__)
 
+  const editorToggleClass = editorEnabled ? ' active' : ''
   let html = '<nav class="dev-sidebar">'
-  html += `<div class="dev-sidebar-header">${packageDisplayName} Examples</div>`
+  html += `<div class="dev-sidebar-header"><span>${packageDisplayName} Examples</span><button class="dev-sidebar-editor-toggle${editorToggleClass}" id="dev-editor-toggle" title="Toggle Editor">⚙</button></div>`
   html +=
     '<div class="dev-sidebar-search"><input type="text" id="dev-sidebar-search-input" placeholder="Search examples..." /></div>'
   html += '<div class="dev-sidebar-tree">'
@@ -184,5 +191,26 @@ if (!sidebarDisabled) {
     folder.addEventListener('click', () => {
       folder.classList.toggle('open')
     })
+  })
+
+  // Editor toggle handler
+  const editorToggle = document.getElementById('dev-editor-toggle')
+  editorToggle.addEventListener('click', async () => {
+    editorEnabled = !editorEnabled
+    editorToggle.classList.toggle('active', editorEnabled)
+
+    // Update URL
+    const url = new URL(window.location)
+    if (editorEnabled) {
+      url.searchParams.set('editor', 'true')
+    } else {
+      url.searchParams.delete('editor')
+    }
+    history.pushState({}, '', url.toString().replace(/%2F/g, '/'))
+
+    // Reload visualization with new editor state
+    const currentConfig =
+      document.querySelector('.react-container')?.getAttribute('data-config') || '/examples/default.json'
+    await window.reloadVisualization(currentConfig)
   })
 }
