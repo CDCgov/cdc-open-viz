@@ -40,6 +40,6 @@ export type Config = {
     whiteBackground?: boolean
   }
   visualizationSubType: 'linear' | ''
-  visualizationType: 'Gauge' | 'Waffle' | 'TP5 Waffle'
+  visualizationType: 'Gauge' | 'Waffle' | 'TP5 Waffle' | 'TP5 Gauge'
   version: Version
 }

@@ -312,8 +312,9 @@
       }
     }
 
-    // Ensure Bootstrap rows with TP5 waffle charts stretch columns to equal height
-    .row:has(.waffle__style--tp5) {
+    // Ensure Bootstrap rows with TP5 waffle/gauge charts stretch columns to equal height
+    .row:has(.waffle__style--tp5),
+    .row:has(.gauge__style--tp5) {
       display: flex !important;
       align-items: stretch !important;
 
@@ -346,9 +347,11 @@
       }
     }
 
-    // TP5 Waffle Chart adjustments when there are 2+ in a row
-    .row:has(.waffle__style--tp5):has([class*='col-'] ~ [class*='col-']) {
-      .waffle__style--tp5 {
+    // TP5 Waffle/Gauge adjustments when there are 2+ in a row
+    .row:has(.waffle__style--tp5):has([class*='col-'] ~ [class*='col-']),
+    .row:has(.gauge__style--tp5):has([class*='col-'] ~ [class*='col-']) {
+      .waffle__style--tp5,
+      .gauge__style--tp5 {
         // Enable flex stretching only in dashboard rows
         .cove-component__content {
           height: 100%;

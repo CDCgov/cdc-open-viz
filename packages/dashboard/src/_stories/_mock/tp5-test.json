@@ -1,0 +1,267 @@
+{
+  "type": "dashboard",
+  "title": "TP5 Alignment Test Dashboard",
+  "description": "Testing alignment of TP5 Waffles, Data Bites, and Gauges",
+  "data": [
+    {
+      "Category": "Adults",
+      "Vaccination Rate": "68.5",
+      "Insured Rate": "87.2",
+      "Screening Rate": "72.8"
+    },
+    {
+      "Category": "Seniors",
+      "Vaccination Rate": "82.3",
+      "Insured Rate": "95.1",
+      "Screening Rate": "84.6"
+    },
+    {
+      "Category": "Youth",
+      "Vaccination Rate": "54.2",
+      "Insured Rate": "92.4",
+      "Screening Rate": "65.3"
+    }
+  ],
+  "dashboard": {
+    "filters": []
+  },
+  "rows": [
+    [
+      { "width": 4, "widget": "waffle1" },
+      { "width": 4, "widget": "waffle2" },
+      { "width": 4, "widget": "waffle3" }
+    ],
+    [
+      { "width": 4, "widget": "bite1" },
+      { "width": 4, "widget": "bite2" },
+      { "width": 4, "widget": "bite3" }
+    ],
+    [
+      { "width": 4, "widget": "gauge1" },
+      { "width": 4, "widget": "gauge2" },
+      { "width": 4, "widget": "gauge3" }
+    ]
+  ],
+  "visualizations": {
+    "waffle1": {
+      "uid": "waffle1",
+      "type": "waffle-chart",
+      "title": "Vaccination Coverage",
+      "visualizationType": "TP5 Waffle",
+      "visualizationSubType": "linear",
+      "showPercent": true,
+      "showDenominator": false,
+      "valueDescription": "",
+      "content": "of the population is vaccinated against seasonal flu",
+      "subtext": "Based on 2024 CDC surveillance data across all age groups",
+      "dataColumn": "Vaccination Rate",
+      "dataFunction": "Mean (Average)",
+      "customDenom": false,
+      "dataDenom": "100",
+      "suffix": "%",
+      "roundToPlace": "1",
+      "theme": "theme-blue",
+      "shape": "square",
+      "visual": {
+        "whiteBackground": false
+      },
+      "showTitle": true,
+      "overallFontSize": "medium"
+    },
+    "waffle2": {
+      "uid": "waffle2",
+      "type": "waffle-chart",
+      "title": "Health Insurance Coverage Rate",
+      "visualizationType": "TP5 Waffle",
+      "visualizationSubType": "linear",
+      "showPercent": true,
+      "showDenominator": false,
+      "valueDescription": "",
+      "content": "completed recommended cancer screenings including mammography, colonoscopy, and cervical cancer screening",
+      "subtext": "",
+      "dataColumn": "Insured Rate",
+      "dataFunction": "Mean (Average)",
+      "customDenom": false,
+      "dataDenom": "100",
+      "suffix": "%",
+      "roundToPlace": "1",
+      "theme": "theme-teal",
+      "shape": "person",
+      "visual": {
+        "whiteBackground": false
+      },
+      "showTitle": true,
+      "overallFontSize": "medium"
+    },
+    "waffle3": {
+      "uid": "waffle3",
+      "type": "waffle-chart",
+      "title": "Cancer Screening Completion",
+      "visualizationType": "TP5 Waffle",
+      "visualizationSubType": "linear",
+      "showPercent": true,
+      "showDenominator": false,
+      "valueDescription": "",
+      "content": "completed recommended cancer screenings including mammography, colonoscopy, and cervical cancer screening",
+      "subtext": "Data from National Health Interview Survey 2024",
+      "dataColumn": "Screening Rate",
+      "dataFunction": "Mean (Average)",
+      "customDenom": false,
+      "dataDenom": "100",
+      "suffix": "%",
+      "roundToPlace": "1",
+      "theme": "theme-purple",
+      "shape": "circle",
+      "visual": {
+        "whiteBackground": false
+      },
+      "showTitle": true,
+      "overallFontSize": "medium"
+    },
+    "gauge1": {
+      "uid": "gauge1",
+      "type": "waffle-chart",
+      "title": "Vaccination Coverage",
+      "visualizationType": "TP5 Gauge",
+      "visualizationSubType": "linear",
+      "showPercent": true,
+      "showDenominator": false,
+      "valueDescription": "",
+      "content": "of the population is vaccinated against seasonal flu",
+      "subtext": "Based on 2024 CDC surveillance data across all age groups",
+      "dataColumn": "Vaccination Rate",
+      "dataFunction": "Mean (Average)",
+      "customDenom": false,
+      "dataDenom": "100",
+      "suffix": "%",
+      "roundToPlace": "1",
+      "theme": "theme-blue",
+      "gauge": {
+        "height": 35,
+        "width": "100%"
+      },
+      "visual": {
+        "whiteBackground": false
+      },
+      "showTitle": true,
+      "overallFontSize": "medium"
+    },
+    "gauge2": {
+      "uid": "gauge2",
+      "type": "waffle-chart",
+      "title": "Health Insurance Coverage Rate",
+      "visualizationType": "TP5 Gauge",
+      "visualizationSubType": "linear",
+      "showPercent": true,
+      "showDenominator": false,
+      "valueDescription": "",
+      "content": "",
+      "subtext": "",
+      "dataColumn": "Insured Rate",
+      "dataFunction": "Mean (Average)",
+      "customDenom": false,
+      "dataDenom": "100",
+      "suffix": "%",
+      "roundToPlace": "1",
+      "theme": "theme-teal",
+      "gauge": {
+        "height": 35,
+        "width": "100%"
+      },
+      "visual": {
+        "whiteBackground": false
+      },
+      "showTitle": true,
+      "overallFontSize": "medium"
+    },
+    "gauge3": {
+      "uid": "gauge3",
+      "type": "waffle-chart",
+      "title": "Cancer Screening Completion",
+      "visualizationType": "TP5 Gauge",
+      "visualizationSubType": "linear",
+      "showPercent": true,
+      "showDenominator": false,
+      "valueDescription": "",
+      "content": "completed recommended cancer screenings including mammography, colonoscopy, and cervical cancer screening",
+      "subtext": "Data from National Health Interview Survey 2024",
+      "dataColumn": "Screening Rate",
+      "dataFunction": "Mean (Average)",
+      "customDenom": false,
+      "dataDenom": "100",
+      "suffix": "%",
+      "roundToPlace": "1",
+      "theme": "theme-purple",
+      "gauge": {
+        "height": 35,
+        "width": "100%"
+      },
+      "visual": {
+        "whiteBackground": false
+      },
+      "showTitle": true,
+      "overallFontSize": "medium"
+    },
+    "bite1": {
+      "uid": "bite1",
+      "type": "data-bite",
+      "title": "Vaccination Coverage",
+      "biteStyle": "tp5",
+      "dataColumn": "Vaccination Rate",
+      "dataFunction": "Mean (Average)",
+      "biteBody": "of the population is vaccinated against seasonal flu",
+      "subtext": "Based on 2024 CDC surveillance data across all age groups",
+      "dataFormat": {
+        "roundToPlace": 1,
+        "commas": true,
+        "prefix": "",
+        "suffix": "%"
+      },
+      "theme": "theme-blue",
+      "visual": {
+        "hideBackgroundColor": false
+      }
+    },
+    "bite2": {
+      "uid": "bite2",
+      "type": "data-bite",
+      "title": "Health Insurance Coverage Rate",
+      "biteStyle": "tp5",
+      "dataColumn": "Insured Rate",
+      "dataFunction": "Mean (Average)",
+      "biteBody": "",
+      "subtext": "",
+      "dataFormat": {
+        "roundToPlace": 1,
+        "commas": true,
+        "prefix": "",
+        "suffix": "%"
+      },
+      "theme": "theme-teal",
+      "visual": {
+        "hideBackgroundColor": false
+      }
+    },
+    "bite3": {
+      "uid": "bite3",
+      "type": "data-bite",
+      "title": "Cancer Screening Completion",
+      "biteStyle": "tp5",
+      "dataColumn": "Screening Rate",
+      "dataFunction": "Mean (Average)",
+      "biteBody": "completed recommended cancer screenings including mammography, colonoscopy, and cervical cancer screening",
+      "subtext": "Data from National Health Interview Survey 2024",
+      "dataFormat": {
+        "roundToPlace": 1,
+        "commas": true,
+        "prefix": "",
+        "suffix": "%"
+      },
+      "theme": "theme-purple",
+      "visual": {
+        "hideBackgroundColor": false
+      }
+    }
+  }
+}
+
