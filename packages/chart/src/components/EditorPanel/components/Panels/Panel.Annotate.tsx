@@ -1,5 +1,6 @@
 import React, { useContext } from 'react'
 import ConfigContext from '../../../../ConfigContext.js'
+import { useEditorPermissions } from '../../useEditorPermissions'
 
 // CDC Core
 import Accordion from '@cdc/core/components/ui/Accordion'
@@ -13,7 +14,8 @@ import { type PanelProps } from './../PanelProps'
 import './../panels.scss'
 
 const PanelAnnotate: React.FC<PanelProps> = props => {
-  const { updateConfig, config, svgRef } = useContext(ConfigContext)
+  const { updateConfig, config, transformedData } = useContext(ConfigContext)
+  const { visSupportsDataAnnotations } = useEditorPermissions()
 
   const updateField = (section, subsection, fieldName, value) => {
     if (subsection) {
@@ -39,11 +41,8 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   }
 
   const handleAnnotationUpdate = (value, property, index) => {
-    const svgContainer = document.querySelector('.chart-container  > svg')?.getBoundingClientRect()
-    const newSvgDims = [svgContainer?.width, svgContainer?.height]
     const annotations = [...config?.annotations]
     annotations[index][property] = value
-    annotations[index].savedDimensions = newSvgDims
 
     updateConfig({
       ...config,
@@ -52,15 +51,9 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
   }
 
   const handleAddAnnotation = () => {
-    // check if svg is animated svg or standard svg
-    const newSvgDims = [
-      svgRef?.current?.width?.baseVal?.value || svgRef?.current?.width,
-      svgRef?.current?.height?.baseVal?.value || svgRef?.current?.height
-    ]
-
     const newAnnotation = {
-      text: 'New Annotation',
-      snapToNearestPoint: false,
+      text: 'New annotation',
+      anchorMode: 'fixed',
       fontSize: 16,
       bezier: 10,
       show: {
@@ -84,20 +77,12 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
         subject: true,
         label: true
       },
-      seriesKey: '',
+      // seriesKey and dataX are only set when switching to data mode
       x: 50,
-      y: Number(newSvgDims?.[1] / 2),
-      xKey:
-        config.xAxis.type === 'date'
-          ? new Date(config?.data?.[0]?.[config.xAxis.dataKey]).getTime()
-          : config.xAxis.type === 'categorical'
-          ? '1/15/2016'
-          : '',
-      yKey: '',
+      y: 50,
       dx: 20,
       dy: -20,
       opacity: '100',
-      savedDimensions: newSvgDims,
       connectionType: 'line'
     }
 
@@ -163,6 +148,59 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                       onChange={e => handleAnnotationUpdate(e.target.value, 'text', index)}
                     />
                   </label>
+
+                  {visSupportsDataAnnotations() && (
+                    <Select
+                      label='Position Mode:'
+                      value={annotation.anchorMode || 'fixed'}
+                      options={[
+                        { value: 'fixed', label: 'Fixed position' },
+                        { value: 'data', label: 'Snap to data' }
+                      ]}
+                      section='annotations'
+                      subsection={null}
+                      fieldName='anchorMode'
+                      updateField={(section, subsection, fieldName, value) => {
+                        const updatedAnnotations = _.cloneDeep(config?.annotations)
+                        updatedAnnotations[index].anchorMode = value
+
+                        // When switching to data mode, ensure seriesKey and dataX are initialized
+                        if (value === 'data') {
+                          if (!updatedAnnotations[index].seriesKey) {
+                            updatedAnnotations[index].seriesKey = config.series?.[0]?.dataKey || ''
+                          }
+                          if (!updatedAnnotations[index].dataX) {
+                            updatedAnnotations[index].dataX = transformedData?.[0]?.[config.xAxis.dataKey] || ''
+                          }
+                        }
+
+                        updateConfig({
+                          ...config,
+                          annotations: updatedAnnotations
+                        })
+                      }}
+                    />
+                  )}
+
+                  {visSupportsDataAnnotations() && annotation.anchorMode === 'data' && (
+                    <Select
+                      label='Series:'
+                      value={annotation.seriesKey || config.series?.[0]?.dataKey || ''}
+                      options={config.series.map(s => s.dataKey)}
+                      section='annotations'
+                      subsection={null}
+                      fieldName='seriesKey'
+                      updateField={(section, subsection, fieldName, value) => {
+                        const updatedAnnotations = _.cloneDeep(config?.annotations)
+                        updatedAnnotations[index].seriesKey = value || config.series?.[0]?.dataKey
+                        updateConfig({
+                          ...config,
+                          annotations: updatedAnnotations
+                        })
+                      }}
+                    />
+                  )}
+
                   <label>
                     Opacity
                     <br />

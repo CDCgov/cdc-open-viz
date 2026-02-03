@@ -222,7 +222,18 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   // Chart width calculation using the current y-axis width
   const xMax = parentWidth - yAxisWidth - (hasRightAxis ? config.yAxis.rightAxisSize : 0)
 
-  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleAnnotation, min, max } = useScales({
+  const {
+    xScale,
+    yScale,
+    seriesScale,
+    g1xScale,
+    g2xScale,
+    xScaleNoPadding,
+    xScaleAnnotation,
+    yScaleAnnotation,
+    min,
+    max
+  } = useScales({
     data,
     tableData,
     config,
@@ -685,7 +696,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               xScale={xScale}
               yScale={yScale}
               xScaleAnnotation={xScaleAnnotation}
+              yScaleAnnotation={yScaleAnnotation}
               xMax={xMax}
+              yMax={yMax}
+              seriesScale={seriesScale}
               svgRef={svgRef}
               onDragStateChange={handleDragStateChange}
             />

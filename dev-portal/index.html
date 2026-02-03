@@ -36,8 +36,55 @@
         font-size: 10px;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        color: #6c7086;
+        color: #9399b2;
         border-bottom: 1px solid #313244;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .dev-sidebar-editor-toggle {
+        background: none;
+        border: 1px solid #45475a;
+        border-radius: 4px;
+        color: #9399b2;
+        cursor: pointer;
+        width: 22px;
+        height: 22px;
+        font-size: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        padding-bottom: 2px;
+      }
+      .dev-sidebar-editor-toggle:hover {
+        border-color: #89b4fa;
+        color: #89b4fa;
+      }
+      .dev-sidebar-editor-toggle.active {
+        background: #89b4fa;
+        border-color: #89b4fa;
+        color: #1e1e2e;
+      }
+      .dev-sidebar-search {
+        padding: 8px 12px;
+        border-bottom: 1px solid #313244;
+      }
+      .dev-sidebar-search input {
+        width: 100%;
+        padding: 6px 10px;
+        background: #313244;
+        border: 1px solid #45475a;
+        border-radius: 4px;
+        color: #cdd6f4;
+        font-size: 12px;
+        outline: none;
+      }
+      .dev-sidebar-search input::placeholder {
+        color: #6c7086;
+      }
+      .dev-sidebar-search input:focus {
+        border-color: #89b4fa;
       }
       .dev-sidebar-tree {
         padding: 4px 0;
@@ -128,7 +175,13 @@
   </head>
   <body>
     <nav class="dev-sidebar">
-      <div class="dev-sidebar-header">All Packages</div>
+      <div class="dev-sidebar-header">
+        <span>All Packages</span>
+        <button class="dev-sidebar-editor-toggle" id="dev-editor-toggle" title="Toggle Editor">⚙</button>
+      </div>
+      <div class="dev-sidebar-search">
+        <input type="text" id="dev-sidebar-search-input" placeholder="Search examples..." />
+      </div>
       <div class="dev-sidebar-tree" id="sidebar-tree">
         <div class="loading" style="padding: 12px; background: none; color: #6c7086; font-size: 12px">
           Loading examples...
@@ -159,9 +212,15 @@
 
       // Check for URL params (for shareable links and browser navigation)
       const portalParams = new URLSearchParams(window.location.search)
-      const editorMode = portalParams.get('editor') === 'true'
+      let editorMode = portalParams.get('editor') === 'true'
       const urlPackage = portalParams.get('package')
       const urlConfig = portalParams.get('config')
+
+      // Set initial editor toggle state
+      const editorToggle = document.getElementById('dev-editor-toggle')
+      if (editorMode) {
+        editorToggle.classList.add('active')
+      }
 
       // State (no localStorage - always starts fresh)
       let currentSelection = null
@@ -202,13 +261,17 @@
         // Expand the package folder
         expandedFolders[packageName] = true
 
-        // Also expand any subdirectory containing this config
-        // e.g., /examples/feature/bar.json -> expand "chart/feature"
+        // Expand all parent directories containing this config
+        // e.g., /examples/foo/bar/baz/file.json -> expand all parent paths
         const pathWithinExamples = configPath.replace('/examples/', '')
         const parts = pathWithinExamples.split('/')
         if (parts.length > 1) {
-          // Has a subdirectory - expand it
-          expandedFolders[`${packageName}/${parts[0]}`] = true
+          // Build up path progressively and expand each directory level
+          let currentPath = '/examples/'
+          for (let i = 0; i < parts.length - 1; i++) {
+            currentPath += parts[i] + '/'
+            expandedFolders[`${packageName}:${currentPath}`] = true
+          }
         }
 
         // Update URL for shareable links (skip during popstate handling)
@@ -234,8 +297,8 @@
 
       const caseInsensitiveSort = (a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })
 
-      // Group files by directory (same logic as standalone sidebar)
-      function groupByDirectory(files) {
+      // Build a recursive tree structure for arbitrary nesting depth
+      function buildTree(files) {
         const tree = { files: [], dirs: {} }
         files.forEach(file => {
           const parts = file.split('/')
@@ -247,38 +310,36 @@
             tree.dirs[dir].push(parts.slice(1).join('/'))
           }
         })
+        // Recursively build subtrees for each directory
+        Object.keys(tree.dirs).forEach(dir => {
+          tree.dirs[dir] = buildTree(tree.dirs[dir])
+        })
         return tree
       }
 
-      // Render tree HTML for a package's examples
-      function renderPackageTree(packageName, tree) {
+      // Recursive function to render tree at any depth
+      function renderPackageTree(packageName, node, pathPrefix) {
         let html = ''
 
-        // Root files
-        tree.files.sort(caseInsensitiveSort).forEach(file => {
-          const configPath = '/examples/' + file
+        // Render files at this level
+        node.files.sort(caseInsensitiveSort).forEach(file => {
+          const configPath = pathPrefix + file
           const isActive = currentSelection?.packageName === packageName && currentSelection?.configPath === configPath
           html += `<button class="dev-sidebar-item${
             isActive ? ' active' : ''
           }" data-package="${packageName}" data-config="${configPath}">${file}</button>`
         })
 
-        // Subdirectories
-        Object.keys(tree.dirs)
+        // Render subdirectories recursively
+        Object.keys(node.dirs)
           .sort(caseInsensitiveSort)
           .forEach(dir => {
-            const folderId = `${packageName}/${dir}`
+            const dirPath = pathPrefix + dir + '/'
+            const folderId = `${packageName}:${dirPath}`
             const isOpen = expandedFolders[folderId] ? ' open' : ''
             html += `<div class="dev-sidebar-folder${isOpen}" data-folder-id="${folderId}">${dir}</div>`
             html += `<div class="dev-sidebar-folder-contents">`
-            tree.dirs[dir].sort(caseInsensitiveSort).forEach(file => {
-              const configPath = '/examples/' + dir + '/' + file
-              const isActive =
-                currentSelection?.packageName === packageName && currentSelection?.configPath === configPath
-              html += `<button class="dev-sidebar-item${
-                isActive ? ' active' : ''
-              }" data-package="${packageName}" data-config="${configPath}">${file}</button>`
-            })
+            html += renderPackageTree(packageName, node.dirs[dir], dirPath)
             html += '</div>'
           })
 
@@ -291,10 +352,10 @@
         const isOpen = expandedFolders[folderId] ? ' open' : ''
 
         if (isOnline && examples) {
-          const tree = groupByDirectory(examples)
+          const tree = buildTree(examples)
           let html = `<div class="dev-sidebar-folder dev-sidebar-package${isOpen}" data-folder-id="${folderId}" data-package="${packageName}">${packageName}</div>`
           html += `<div class="dev-sidebar-folder-contents">`
-          html += renderPackageTree(packageName, tree)
+          html += renderPackageTree(packageName, tree, '/examples/')
           html += '</div>'
           return html
         } else {
@@ -319,6 +380,120 @@
           })
         })
       }
+
+      // Search functionality
+      const searchInput = document.getElementById('dev-sidebar-search-input')
+
+      function applySearchFilter() {
+        const query = searchInput.value.toLowerCase()
+        const items = sidebarTree.querySelectorAll('.dev-sidebar-item')
+        const folders = sidebarTree.querySelectorAll('.dev-sidebar-folder:not(.dev-sidebar-package)')
+        const packageFolders = sidebarTree.querySelectorAll('.dev-sidebar-package')
+
+        if (!query) {
+          // Reset: show all items, collapse folders (except those with active item or expanded)
+          items.forEach(item => (item.style.display = ''))
+          folders.forEach(folder => {
+            folder.style.display = ''
+            const folderId = folder.dataset.folderId
+            if (!expandedFolders[folderId]) {
+              folder.classList.remove('open')
+            }
+          })
+          packageFolders.forEach(pkg => {
+            pkg.style.display = ''
+            const folderId = pkg.dataset.folderId
+            if (!expandedFolders[folderId]) {
+              pkg.classList.remove('open')
+            }
+          })
+          return
+        }
+
+        // Split query into tokens - all must match (in any order)
+        const tokens = query.split(/\s+/).filter(t => t)
+        const matchesAllTokens = text => tokens.every(token => text.includes(token))
+
+        // First pass: find packages and folders that match the query
+        const matchingPackages = new Set()
+        const matchingFolderIds = new Set()
+
+        packageFolders.forEach(pkg => {
+          const pkgName = pkg.dataset.package.toLowerCase()
+          if (matchesAllTokens(pkgName)) {
+            matchingPackages.add(pkg.dataset.package)
+          }
+        })
+
+        folders.forEach(folder => {
+          const folderName = folder.textContent.toLowerCase()
+          if (matchesAllTokens(folderName)) {
+            matchingFolderIds.add(folder.dataset.folderId)
+          }
+        })
+
+        // Filter items: show if item matches OR is inside a matching package/folder
+        items.forEach(item => {
+          const packageName = item.dataset.package
+          const configPath = item.dataset.config
+          const itemMatches = matchesAllTokens(item.textContent.toLowerCase())
+          const inMatchingPackage = matchingPackages.has(packageName)
+          const inMatchingFolder = [...matchingFolderIds].some(folderId => {
+            // folderId format is "packageName:/examples/path/"
+            const [folderPkg, folderPath] = folderId.split(':')
+            return packageName === folderPkg && configPath.startsWith(folderPath)
+          })
+          item.style.display = itemMatches || inMatchingPackage || inMatchingFolder ? '' : 'none'
+        })
+
+        // Show/hide folders based on whether they match or have visible children
+        folders.forEach(folder => {
+          const folderId = folder.dataset.folderId
+          const folderMatches = matchingFolderIds.has(folderId)
+          const contents = folder.nextElementSibling
+          const hasVisibleChildren = contents?.querySelector('.dev-sidebar-item:not([style*="display: none"])')
+          folder.style.display = folderMatches || hasVisibleChildren ? '' : 'none'
+          if (folderMatches || hasVisibleChildren) {
+            folder.classList.add('open')
+          }
+        })
+
+        // Show/hide packages based on whether they match or have visible children
+        packageFolders.forEach(pkg => {
+          const packageName = pkg.dataset.package
+          const packageMatches = matchingPackages.has(packageName)
+          const contents = pkg.nextElementSibling
+          const hasVisibleChildren = contents?.querySelector('.dev-sidebar-item:not([style*="display: none"])')
+          pkg.style.display = packageMatches || hasVisibleChildren ? '' : 'none'
+          if (packageMatches || hasVisibleChildren) {
+            pkg.classList.add('open')
+          }
+        })
+      }
+
+      searchInput.addEventListener('input', applySearchFilter)
+
+      // Editor toggle handler
+      editorToggle.addEventListener('click', () => {
+        editorMode = !editorMode
+        editorToggle.classList.toggle('active', editorMode)
+
+        // Update URL
+        const url = new URL(window.location)
+        if (editorMode) {
+          url.searchParams.set('editor', 'true')
+        } else {
+          url.searchParams.delete('editor')
+        }
+        history.pushState({}, '', url.toString().replace(/%2F/g, '/'))
+
+        // Reload iframe with new editor state
+        if (currentSelection) {
+          const port = packages[currentSelection.packageName]
+          const editorParam = editorMode ? '&editor=true' : ''
+          main.innerHTML = `<iframe src="http://localhost:${port}?config=${currentSelection.configPath}&sidebar=false${editorParam}"></iframe>`
+        }
+      })
 
       // Fetch examples for a single package
       async function fetchPackageExamples(packageName) {
@@ -365,6 +540,7 @@
         }
         sidebarTree.innerHTML = html
         attachHandlers()
+        applySearchFilter()
       }
 
       // Initial load - fetch all packages
