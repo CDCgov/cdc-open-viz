@@ -20,7 +20,7 @@ const removeOldBrushKeys = config => {
     delete config.brush
   }
 
-  if (config.type === 'dashboard') {
+  if (config.type === 'dashboard' && config.visualizations) {
     Object.values((config as DashboardConfig).visualizations).forEach(visualization => {
       removeOldBrushKeys(visualization)
     })

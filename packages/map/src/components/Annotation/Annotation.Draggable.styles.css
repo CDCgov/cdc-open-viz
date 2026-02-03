@@ -1,18 +1,18 @@
-.cdc-open-viz-module .annotation__desktop-label {
+.cdc-open-viz-module.type-map .annotation__desktop-label {
   display: none;
 }
 
-.cdc-open-viz-module {
+.cdc-open-viz-module.type-map {
   .annotation__mobile-label-circle {
     stroke-width: 2;
   }
 }
 
 @container content (min-width: 700px) {
-  .cdc-open-viz-module .annotation__mobile-label {
+  .cdc-open-viz-module.type-map .annotation__mobile-label {
     display: none;
   }
-  .cdc-open-viz-module .annotation__desktop-label {
+  .cdc-open-viz-module.type-map .annotation__desktop-label {
     display: block;
   }
 }

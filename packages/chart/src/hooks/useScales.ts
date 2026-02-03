@@ -121,6 +121,11 @@ const useScales = (properties: useScaleProps) => {
     range: [0, xMax]
   })
 
+  let yScaleAnnotation = scaleLinear({
+    domain: [0, 100],
+    range: [0, yMax]
+  })
+
   // handle  Horizontal bars
   if (isHorizontal) {
     xScale = composeXScale({ min: min * 1.03, max, xMax, config })
@@ -372,6 +377,7 @@ const useScales = (properties: useScaleProps) => {
     g2xScale,
     xScaleNoPadding,
     xScaleAnnotation,
+    yScaleAnnotation,
     min,
     max,
     leftMax,
@@ -387,6 +393,7 @@ const getFirstDayOfMonth = ms => {
 }
 
 const dateFormatHasMonthButNoDays = dateFormat => {
+  if (!dateFormat) return false
   return (
     (dateFormat.includes('%b') ||
       dateFormat.includes('%B') ||

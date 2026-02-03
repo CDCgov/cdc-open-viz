@@ -8,7 +8,7 @@ type AnnotationListProps = {
 }
 
 const AnnotationList: React.FC<AnnotationListProps> = ({ useBootstrapVisibilityClasses = true }) => {
-  const { config } = useContext(ConfigContext)
+  const { config, visibleAnnotations } = useContext(ConfigContext)
   const annotations = config.annotations || []
 
   const ulClasses = () => {
@@ -19,7 +19,8 @@ const AnnotationList: React.FC<AnnotationListProps> = ({ useBootstrapVisibilityC
     return classes.join(' ')
   }
 
-  const annotationListItems = annotations.map((annotation, annotationIndex) => {
+  const annotationListItems = visibleAnnotations.map(annotation => {
+    const originalIndex = annotations.indexOf(annotation)
     const text = annotation.text || ''
 
     // sanitize the text for setting dangerouslySetInnerHTML
@@ -27,9 +28,9 @@ const AnnotationList: React.FC<AnnotationListProps> = ({ useBootstrapVisibilityC
       __html: DOMPurify.sanitize(text)
     })
     return (
-      <li key={`annotation-li-item__annotationIndex`}>
+      <li key={`annotation-li-item__${originalIndex}`}>
         <div className='annotation__title-wrapper'>
-          <div className='annotation__title-circle'>{annotationIndex + 1}</div>
+          <div className='annotation__title-circle'>{originalIndex + 1}</div>
           <p className='annotation__subtext' dangerouslySetInnerHTML={sanitizedData()} />
         </div>
       </li>

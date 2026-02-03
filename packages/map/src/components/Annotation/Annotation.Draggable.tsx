@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 // visx
 import { HtmlLabel, CircleSubject, EditableAnnotation, Connector, Annotation as VisxAnnotation } from '@visx/annotation'
@@ -16,13 +17,7 @@ type AnnotationsProps = {
 
 const Annotations: React.FC<AnnotationsProps> = ({ onDragStateChange }) => {
   const [draggingItems, setDraggingItems] = useState([])
-  const {
-    config,
-    setConfig,
-    isDraggingAnnotation,
-    isEditor,
-    dimensions
-  } = useContext<MapContext>(ConfigContext)
+  const { config, setConfig, isDraggingAnnotation, isEditor, dimensions } = useContext<MapContext>(ConfigContext)
   const [width, height] = dimensions
   const { annotations } = config
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
@@ -54,8 +49,8 @@ const Annotations: React.FC<AnnotationsProps> = ({ onDragStateChange }) => {
                     y={y}
                     canEditLabel={edit.label || false}
                     canEditSubject={edit.subject || false}
-                    labelDragHandleProps={{ r: 15, stroke: isDraggingAnnotation ? 'red' : 'var(--primary)' }}
-                    subjectDragHandleProps={{ r: 15, stroke: isDraggingAnnotation ? 'red' : 'var(--primary)' }}
+                    labelDragHandleProps={{ r: 15, stroke: 'red' }}
+                    subjectDragHandleProps={{ r: 15, stroke: 'red' }}
                     onDragEnd={props => {
                       onDragStateChange(false)
                       const updatedAnnotations = annotations.map((annotation, idx) => {
@@ -100,7 +95,6 @@ const Annotations: React.FC<AnnotationsProps> = ({ onDragStateChange }) => {
                         // ! IMPORTANT: Workaround for 508
                         // - HTML needs to be set from the editor, and we need a wrapper with the tabIndex
                         // - TabIndex is only supposed to be used on interactive elements. This is a workaround.
-                        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
                         tabIndex={0}
                         aria-label={`Annotation text that reads: ${annotation.text}`}
                         dangerouslySetInnerHTML={{ __html: annotation.text }}
@@ -116,15 +110,17 @@ const Annotations: React.FC<AnnotationsProps> = ({ onDragStateChange }) => {
                     )}
 
                     {/* MARKERS */}
-                    {marker === 'circle' && <CircleSubject className='circle-subject' stroke={'black'} radius={8} />}
+                    {marker === 'circle' && (
+                      <CircleSubject className='circle-subject' stroke={APP_FONT_COLOR} radius={8} />
+                    )}
                     {marker === 'arrow' && (
                       <MarkerArrow
-                        fill='black'
+                        fill={APP_FONT_COLOR}
                         id='marker-start'
                         x={x}
                         y={dy}
-                        stroke='#333'
-                        markerWidth={10}
+                        stroke={APP_FONT_COLOR}
+                        markerWidth={12}
                         size={10}
                         strokeWidth={1}
                         orient='auto-start-reverse'
