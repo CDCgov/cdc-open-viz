@@ -265,6 +265,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     // Override palette defaults for Line charts specifically
     if (loadedConfig?.visualizationType === 'Line' && !loadedConfig?.general?.palette) {
+      if (!defaultsWithoutPalette.general) {
+        defaultsWithoutPalette.general = {}
+      }
       defaultsWithoutPalette.general.palette = {
         isReversed: false,
         version: '2.0',
