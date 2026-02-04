@@ -9,7 +9,6 @@ import React, {
   useState,
   useCallback
 } from 'react'
-import React, { forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 
 // Libraries
 import { AxisTop } from '@visx/axis'
