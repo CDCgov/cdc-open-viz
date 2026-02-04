@@ -25,6 +25,7 @@ type VizFilterProps = {
 
 const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawData, hasFootnotes }) => {
   const openControls = useState({})
+  const [isNestedDragHovered, setIsNestedDragHovered] = useState(false)
   const dataColumns = useMemo(() => {
     return _.uniq(_.flatten(rawData?.map(row => Object.keys(row))))
   }, [rawData])
@@ -196,6 +197,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                         key={filter.id || `filter-${filterIndex}`}
                         draggableId={`filter-${filter.id || filterIndex}`}
                         index={filterIndex}
+                        isDragDisabled={isNestedDragHovered}
                       >
                         {(provided, snapshot) => (
                           <div
@@ -305,6 +307,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                                       handleFilterOrder={(index1, index2) =>
                                         handleFilterOrder(index1, index2, filterIndex)
                                       }
+                                      onNestedDragAreaHover={setIsNestedDragHovered}
                                     />
                                   )}
                                   {filter.order === 'column' && (
@@ -354,6 +357,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
                                   handleNameChange={value => handleNameChange(filterIndex, value)}
                                   updateField={updateField}
                                   updateFilterStyle={updateFilterStyle}
+                                  onNestedDragAreaHover={setIsNestedDragHovered}
                                 />
                               )}
                               {hasFootnotes && (

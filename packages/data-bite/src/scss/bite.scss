@@ -156,6 +156,7 @@
     }
 
     .cdc-callout__databite {
+      padding-top: 2px;
       width: auto;
       line-height: 1; // Tight line height for numbers
       color: var(--colors-cyan-60v, #007a99);
@@ -193,8 +194,7 @@
     // White background with border (when both white background and Display Border are checked)
     &.white-background-style.display-border {
       .cdc-callout {
-        border: none !important;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
       }
     }
   }

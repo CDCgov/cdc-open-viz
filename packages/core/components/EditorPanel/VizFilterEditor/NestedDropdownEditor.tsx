@@ -16,6 +16,7 @@ type NestedDropdownEditorProps = {
   updateField: Function
   updateFilterStyle: Function
   handleGroupingCustomOrder: (index1: number, index2: number) => void
+  onNestedDragAreaHover?: (isHovering: boolean) => void
 }
 
 const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
@@ -25,7 +26,8 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
   handleNameChange: handleGroupColumnNameChange,
   filterIndex,
   rawData,
-  updateField
+  updateField,
+  onNestedDragAreaHover
 }) => {
   const filter = config.filters[filterIndex]
   const subGrouping = filter?.subGrouping
@@ -159,7 +161,10 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
       <Select
         label='Filter Grouping'
         value={filter.columnName}
-        options={[{ value: '', label: '- Select Option -' }, ...columnNameOptions.map(opt => ({ value: opt, label: opt }))]}
+        options={[
+          { value: '', label: '- Select Option -' },
+          ...columnNameOptions.map(opt => ({ value: opt, label: opt }))
+        ]}
         onChange={e => handleGroupColumnNameChange(e.target.value)}
       />
 
@@ -168,9 +173,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
         value={subGrouping?.columnName ?? ''}
         options={[
           { value: '', label: '- Select Option -' },
-          ...columnNameOptions
-            .filter(option => option !== filter.columnName)
-            .map(opt => ({ value: opt, label: opt }))
+          ...columnNameOptions.filter(option => option !== filter.columnName).map(opt => ({ value: opt, label: opt }))
         ]}
         onChange={e => {
           handleSubGroupColumnNameChange(e.target.value)
@@ -222,7 +225,11 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
           onChange={e => handleGroupingOrderBy(e.target.value as OrderBy)}
         />
         {filter.order === 'cust' && (
-          <FilterOrder orderedValues={filter.orderedValues} handleFilterOrder={handleGroupingCustomOrder} />
+          <FilterOrder
+            orderedValues={filter.orderedValues}
+            handleFilterOrder={handleGroupingCustomOrder}
+            onNestedDragAreaHover={onNestedDragAreaHover}
+          />
         )}
       </div>
 
@@ -247,6 +254,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
                     handleFilterOrder={(sourceIndex, destinationIndex) => {
                       handleSubGroupingCustomOrder(sourceIndex, destinationIndex, orderedSubGroupValues, groupName)
                     }}
+                    onNestedDragAreaHover={onNestedDragAreaHover}
                   />
                 </div>
               )

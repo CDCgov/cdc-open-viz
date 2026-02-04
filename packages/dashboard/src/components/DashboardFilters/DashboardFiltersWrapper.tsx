@@ -297,9 +297,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   // if all of the filters are hidden filters don't display the VisualizationWrapper
   const filters = visualizationConfig?.sharedFilterIndexes
     ?.map(Number)
-    .map(filterIndex => dashboardConfig.dashboard.sharedFilters[filterIndex])
+    ?.map(filterIndex => dashboardConfig.dashboard.sharedFilters[filterIndex])
 
-  const displayNone = filters.length ? filters.every(filter => filter.showDropdown === false) : false
+  const displayNone = filters?.length ? filters.every(filter => filter.showDropdown === false) : false
   if (displayNone && !isEditor) return <></>
   return (
     <Layout.VisualizationWrapper config={visualizationConfig} isEditor={isEditor} currentViewport={currentViewport}>

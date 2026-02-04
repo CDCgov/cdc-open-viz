@@ -93,7 +93,7 @@
     margin-top: 1em;
     justify-content: space-between;
 
-    >label {
+    > label {
       width: 48%;
       margin-top: 0 !important;
     }
@@ -130,7 +130,7 @@
         cursor: pointer;
       }
 
-      +li {
+      + li {
         border-top: $lightGray 1px solid;
       }
     }
@@ -189,7 +189,7 @@
       display: flex;
       justify-content: space-between;
 
-      >label {
+      > label {
         margin-top: 0;
         width: 30%;
         display: inline-block;
@@ -237,7 +237,7 @@
       margin-top: 0;
     }
 
-    label+label {
+    label + label {
       margin-top: 1em;
     }
 
@@ -256,13 +256,13 @@
 
   .sort-list {
     list-style: none;
+    padding: 0;
 
-    >li {
-      margin-right: 0.3em;
+    > li {
       margin-bottom: 0.3em;
     }
 
-    li>div {
+    li > div {
       display: block;
       box-sizing: border-box;
       border: 1px solid #d1d1d1;
@@ -270,8 +270,8 @@
       background: #f1f1f1;
       padding: 0.4em 0.6em;
       font-size: 0.8em;
-      margin-bottom: 0.3em;
       cursor: move;
+      width: 100%;
     }
   }
 

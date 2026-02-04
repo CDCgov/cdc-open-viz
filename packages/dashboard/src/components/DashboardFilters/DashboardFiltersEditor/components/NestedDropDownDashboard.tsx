@@ -12,13 +12,15 @@ type NestedDropDownEditorDashboardProps = {
   filter: SharedFilter
   isDashboard: boolean
   updateFilterProp: Function
+  onNestedDragAreaHover?: (isHovering: boolean) => void
 }
 
 const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
   filter,
   config,
   isDashboard = false,
-  updateFilterProp
+  updateFilterProp,
+  onNestedDragAreaHover
 }) => {
   const subGrouping = filter?.subGrouping
 
@@ -270,6 +272,7 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
             <FilterOrder
               orderedValues={filter.orderedValues || filter.values}
               handleFilterOrder={handleGroupingCustomOrder}
+              onNestedDragAreaHover={onNestedDragAreaHover}
             />
           )}
         </div>
@@ -298,6 +301,7 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
                     handleFilterOrder={(sourceIndex, destinationIndex) => {
                       handleSubGroupingCustomOrder(sourceIndex, destinationIndex, orderedSubGroupValues, groupName)
                     }}
+                    onNestedDragAreaHover={onNestedDragAreaHover}
                   />
                 </div>
               )

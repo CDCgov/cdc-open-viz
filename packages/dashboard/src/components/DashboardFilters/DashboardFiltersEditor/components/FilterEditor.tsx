@@ -27,6 +27,7 @@ type FilterEditorProps = {
   filterIndex: number
   updateFilterProp: (name: keyof SharedFilter, value: any) => void
   toggleNestedQueryParameters: (checked: boolean) => void
+  onNestedDragAreaHover?: (isHovering: boolean) => void
 }
 
 const FilterEditor: React.FC<FilterEditorProps> = ({
@@ -34,7 +35,8 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
   filterIndex,
   config,
   updateFilterProp,
-  toggleNestedQueryParameters
+  toggleNestedQueryParameters,
+  onNestedDragAreaHover
 }) => {
   const [columns, setColumns] = useState<string[]>([])
   const [dataFiltersLoading, setDataFiltersLoading] = useState(false)
@@ -546,6 +548,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                         values.splice(index2, 0, removed)
                         updateFilterProp('orderedValues', values)
                       }}
+                      onNestedDragAreaHover={onNestedDragAreaHover}
                     />
                   )}
 
@@ -569,6 +572,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                     }}
                     isDashboard={true}
                     config={config}
+                    onNestedDragAreaHover={onNestedDragAreaHover}
                   />
                   <label>
                     <input
