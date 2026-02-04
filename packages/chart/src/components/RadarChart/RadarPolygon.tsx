@@ -1,17 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Group } from '@visx/group'
 import { genPolygonPoints, pointsToString } from './helpers'
+import ConfigContext from '../../ConfigContext'
 
 type RadarPolygonProps = {
   values: number[]
   scale: (n: number) => number
   color: string
-  fillOpacity: number
-  strokeWidth: number
-  showPoints: boolean
-  pointRadius: number
   entityName: string
-  isHighlighted: boolean
   shouldMute: boolean
   onMouseEnter?: (e: React.MouseEvent, data: { entityName: string; values: number[] }) => void
   onMouseLeave?: () => void
@@ -25,22 +21,24 @@ const RadarPolygon: React.FC<RadarPolygonProps> = ({
   values,
   scale,
   color,
-  fillOpacity,
-  strokeWidth,
-  showPoints,
-  pointRadius,
   entityName,
-  isHighlighted,
   shouldMute,
   onMouseEnter,
   onMouseLeave
 }) => {
+  const { config } = useContext(ConfigContext)
+
+  const radarConfig = config.radar
+  const fillOpacity = radarConfig?.fillOpacity ?? 0.3
+  const strokeWidth = radarConfig?.strokeWidth ?? 2
+  const showPoints = radarConfig?.showPoints ?? true
+  const pointRadius = radarConfig?.pointRadius ?? 4
   const [isHovered, setIsHovered] = useState(false)
 
   const points = genPolygonPoints(values, scale)
   const polygonString = pointsToString(points)
 
-  const opacity = shouldMute ? 0.2 : isHovered ? fillOpacity + 0.2 : fillOpacity
+  const opacity = shouldMute ? 0.2 : isHovered ? Math.min(1, fillOpacity + 0.2) : fillOpacity
   const currentStrokeWidth = isHovered ? strokeWidth + 1 : strokeWidth
 
   const handleMouseEnter = (e: React.MouseEvent) => {
@@ -54,7 +52,7 @@ const RadarPolygon: React.FC<RadarPolygonProps> = ({
   }
 
   return (
-    <Group className={`radar-polygon radar-polygon-${entityName.replace(/\s+/g, '-')}`}>
+    <Group className={`radar-polygon radar-polygon-${CSS.escape(String(entityName))}`}>
       {/* Data polygon */}
       <polygon
         points={polygonString}
@@ -77,7 +75,7 @@ const RadarPolygon: React.FC<RadarPolygonProps> = ({
             cy={point.y}
             r={isHovered ? pointRadius + 1 : pointRadius}
             fill={color}
-            stroke="#fff"
+            stroke='#fff'
             strokeWidth={1}
             opacity={shouldMute ? 0.3 : 1}
             style={{ cursor: 'pointer', transition: 'r 0.2s ease' }}

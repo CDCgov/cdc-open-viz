@@ -60,7 +60,10 @@ const Legend: React.FC<LegendProps> = forwardRef(
     const { series } = runtime
 
     const seriesWithData = getSeriesWithData(config)
-    const dontFilterLegendItems = !series.length || legend.unified || !seriesWithData.length
+    // For Radar charts, seriesWithData contains dimension keys but legend shows entity names
+    // so we skip the series filter for radar charts
+    const isRadarChart = config.visualizationType === 'Radar'
+    const dontFilterLegendItems = !series.length || legend.unified || !seriesWithData.length || isRadarChart
 
     const isLegendBottom =
       legend?.position === 'bottom' ||

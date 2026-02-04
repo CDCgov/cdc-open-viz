@@ -269,6 +269,18 @@ export type AllChartsConfig = {
       default: string
     }
   }
+  radar?: {
+    gridRings: number
+    showGridRings: boolean
+    gridRingStyle: 'polygons' | 'circles'
+    scaleMin: number
+    scaleMax: number | string
+    fillOpacity: number
+    showPoints: boolean
+    pointRadius: number
+    strokeWidth: number
+    axisLabelOffset: number
+  }
 } & MarkupConfig
 
 type ForestPlotConfig = {

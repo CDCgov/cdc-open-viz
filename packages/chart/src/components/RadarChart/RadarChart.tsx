@@ -1,7 +1,8 @@
-import React, { useContext, useMemo, useRef, useEffect } from 'react'
+import React, { useContext, useMemo, useEffect } from 'react'
 import { Group } from '@visx/group'
 import { scaleLinear } from '@visx/scale'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
+import { localPoint } from '@visx/event'
 
 import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
 import { useTooltip as useCoveTooltip } from '../../hooks/useTooltip'
@@ -40,8 +41,7 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
 
   const dispatch = useContext(ChartDispatchContext)
 
-  const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } =
-    useTooltip<TooltipData>()
+  const { tooltipData, showTooltip, hideTooltip, tooltipOpen, tooltipLeft, tooltipTop } = useTooltip<TooltipData>()
 
   const { handleTooltipMouseOff } = useCoveTooltip({
     xScale: false,
@@ -113,7 +113,7 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
 
   // Chart dimensions
   const width = props.parentWidth || 400
-  const height = config.heights?.vertical || 300
+  const height = props.parentHeight || config.heights?.vertical || 300
   const margin = { top: 40, right: 40, bottom: 40, left: 40 }
 
   const innerWidth = width - margin.left - margin.right
@@ -132,24 +132,23 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
   }, [scaleMin, scaleMax, radius])
 
   // Handle tooltip display
-  const handlePolygonHover = (
-    e: React.MouseEvent,
-    entityData: { entityName: string; values: number[] }
-  ) => {
+  const handlePolygonHover = (e: React.MouseEvent, entityData: { entityName: string; values: number[] }) => {
     const tooltipValues = entityData.values.map((val, i) => ({
       label: dimensionKeys[i],
       value: val
     }))
 
+    const point = localPoint(e) || { x: 0, y: 0 }
+
     showTooltip({
       tooltipData: {
         entityName: entityData.entityName,
         values: tooltipValues,
-        dataXPosition: e.clientX,
-        dataYPosition: e.clientY
+        dataXPosition: point.x,
+        dataYPosition: point.y
       },
-      tooltipLeft: e.clientX,
-      tooltipTop: e.clientY
+      tooltipLeft: point.x,
+      tooltipTop: point.y
     })
   }
 
@@ -163,38 +162,50 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
       return colorScale(entityName)
     }
     // Fallback colors
-    const fallbackColors = [
-      '#1f77b4',
-      '#ff7f0e',
-      '#2ca02c',
-      '#d62728',
-      '#9467bd',
-      '#8c564b',
-      '#e377c2',
-      '#7f7f7f'
-    ]
+    const fallbackColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f']
     return fallbackColors[index % fallbackColors.length]
   }
 
   // Update runtime seriesKeys for legend
   useEffect(() => {
-    if (entities.length > 0 && dispatch) {
-      const seriesKeys = entities.map(e => e.name)
-      dispatch({
-        type: 'SET_RUNTIME',
-        payload: {
-          ...config.runtime,
-          seriesKeys,
-          seriesLabelsAll: seriesKeys
-        }
-      })
+    if (!dispatch || entities.length === 0) {
+      return
     }
-  }, [entities])
+
+    // Ensure seriesKeys are unique and stable
+    const seriesKeys = Array.from(new Set(entities.map(e => e.name)))
+    const previousSeriesKeys = (config.runtime?.seriesKeys || []) as string[]
+
+    const hasSameKeys =
+      previousSeriesKeys.length === seriesKeys.length &&
+      previousSeriesKeys.every((key, index) => key === seriesKeys[index])
+
+    if (hasSameKeys) {
+      return
+    }
+
+    dispatch({
+      type: 'SET_RUNTIME',
+      payload: {
+        ...config.runtime,
+        seriesKeys,
+        seriesLabelsAll: seriesKeys
+      }
+    })
+  }, [entities, dispatch, config.runtime])
 
   // Validation
+  if (!config.xAxis?.dataKey) {
+    return (
+      <div className='radar-chart-error' style={{ padding: '20px', color: '#666' }}>
+        Radar chart requires an entity identifier. Please set the X Axis data key in the configuration.
+      </div>
+    )
+  }
+
   if (dimensionKeys.length < 3) {
     return (
-      <div className="radar-chart-error" style={{ padding: '20px', color: '#666' }}>
+      <div className='radar-chart-error' style={{ padding: '20px', color: '#666' }}>
         Radar chart requires at least 3 dimensions. Please add more series in the configuration.
       </div>
     )
@@ -202,20 +213,20 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
 
   if (entities.length === 0) {
     return (
-      <div className="radar-chart-error" style={{ padding: '20px', color: '#666' }}>
+      <div className='radar-chart-error' style={{ padding: '20px', color: '#666' }}>
         No data available for radar chart.
       </div>
     )
   }
 
   return (
-    <ErrorBoundary component="RadarChart">
+    <ErrorBoundary component='RadarChart'>
       <svg
         ref={ref}
         width={width}
         height={height}
-        className="radar-chart"
-        role="img"
+        className='radar-chart'
+        role='img'
         aria-label={handleChartAriaLabels(config)}
         onMouseEnter={handleChartMouseEnter}
         onMouseLeave={() => {
@@ -225,36 +236,18 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
       >
         <Group top={centerY} left={centerX}>
           {/* Grid rings */}
-          <RadarGrid
-            levels={radarConfig.gridRings}
-            radius={radius}
-            axisCount={dimensionKeys.length}
-            gridStyle={radarConfig.gridRingStyle}
-            showGrid={radarConfig.showGridRings}
-          />
+          <RadarGrid radius={radius} axisCount={dimensionKeys.length} />
 
           {/* Axis lines and labels */}
-          <RadarAxis
-            labels={dimensionKeys}
-            radius={radius}
-            labelOffset={radarConfig.axisLabelOffset}
-          />
+          <RadarAxis radius={radius} />
 
           {/* Data polygons */}
           {entities.map((entity, index) => {
-            const isHighlighted =
-              seriesHighlight.length === 0 || seriesHighlight.includes(entity.name)
-            const shouldMute =
-              config.legend?.behavior === 'highlight' &&
-              seriesHighlight.length > 0 &&
-              !isHighlighted
+            const isHighlighted = seriesHighlight.length === 0 || seriesHighlight.includes(entity.name)
+            const shouldMute = config.legend?.behavior === 'highlight' && seriesHighlight.length > 0 && !isHighlighted
 
             // Skip rendering if isolate behavior and not highlighted
-            if (
-              config.legend?.behavior === 'isolate' &&
-              seriesHighlight.length > 0 &&
-              !isHighlighted
-            ) {
+            if (config.legend?.behavior === 'isolate' && seriesHighlight.length > 0 && !isHighlighted) {
               return null
             }
 
@@ -264,12 +257,7 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
                 values={entity.values}
                 scale={radiusScale}
                 color={getEntityColor(entity.name, index)}
-                fillOpacity={radarConfig.fillOpacity}
-                strokeWidth={radarConfig.strokeWidth}
-                showPoints={radarConfig.showPoints}
-                pointRadius={radarConfig.pointRadius}
                 entityName={entity.name}
-                isHighlighted={isHighlighted}
                 shouldMute={shouldMute}
                 onMouseEnter={handlePolygonHover}
                 onMouseLeave={handlePolygonLeave}
@@ -285,11 +273,7 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
           <style>{`.tooltip {background-color: rgba(255,255,255, ${
             (config.tooltips?.opacity || 90) / 100
           }) !important`}</style>
-          <TooltipWithBounds
-            className="tooltip cdc-open-viz-module"
-            left={tooltipLeft}
-            top={tooltipTop}
-          >
+          <TooltipWithBounds className='tooltip cdc-open-viz-module' left={tooltipLeft} top={tooltipTop}>
             <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>{tooltipData.entityName}</div>
             <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
               {tooltipData.values.map((item, index) => (

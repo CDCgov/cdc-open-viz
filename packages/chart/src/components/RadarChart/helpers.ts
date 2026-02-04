@@ -41,10 +41,7 @@ export const genPoints = (length: number, radius: number): RadarPoint[] => {
  * @param scale - scale function to map values to radius
  * @returns array of x,y coordinates for the polygon
  */
-export const genPolygonPoints = (
-  dataArray: number[],
-  scale: (n: number) => number
-): RadarPoint[] => {
+export const genPolygonPoints = (dataArray: number[], scale: (n: number) => number): RadarPoint[] => {
   return dataArray.map((value, i) => {
     const angle = (i * 2 * Math.PI) / dataArray.length - Math.PI / 2
     const scaledRadius = scale(value)
@@ -83,22 +80,4 @@ export const getTextAnchor = (angle: number): 'start' | 'middle' | 'end' => {
     return 'end'
   }
   return 'start'
-}
-
-/**
- * Calculate vertical alignment adjustment for labels
- * @param angle - angle in radians
- * @returns dy value for SVG text element
- */
-export const getVerticalAnchor = (angle: number): string => {
-  const degrees = (angle * 180) / Math.PI
-  const normalizedDegrees = ((degrees % 360) + 360) % 360
-
-  if (normalizedDegrees > 45 && normalizedDegrees < 135) {
-    return '0.35em' // top area
-  }
-  if (normalizedDegrees > 225 && normalizedDegrees < 315) {
-    return '0.35em' // bottom area
-  }
-  return '0.35em'
 }

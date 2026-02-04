@@ -1,13 +1,12 @@
-import React from 'react'
+import React, { useContext, useMemo } from 'react'
 import { Group } from '@visx/group'
 import { Line } from '@visx/shape'
 import { Text } from '@visx/text'
 import { genPoints, getTextAnchor } from './helpers'
+import ConfigContext from '../../ConfigContext'
 
 type RadarAxisProps = {
-  labels: string[]
   radius: number
-  labelOffset: number
   strokeColor?: string
   strokeWidth?: number
   labelColor?: string
@@ -19,20 +18,27 @@ type RadarAxisProps = {
  * and the axis labels at each vertex
  */
 const RadarAxis: React.FC<RadarAxisProps> = ({
-  labels,
   radius,
-  labelOffset,
   strokeColor = '#999999',
   strokeWidth = 1,
   labelColor = '#333333',
   fontSize = 12
 }) => {
+  const { config } = useContext(ConfigContext)
+
+  const radarConfig = config.radar
+  const labelOffset = radarConfig?.axisLabelOffset ?? 15
+
+  const labels = useMemo(() => {
+    if (!config.series || config.series.length === 0) return []
+    return config.series.map(s => s.dataKey).filter(Boolean)
+  }, [config.series])
   const axisCount = labels.length
   const axisPoints = genPoints(axisCount, radius)
   const labelPoints = genPoints(axisCount, radius + labelOffset)
 
   return (
-    <Group className="radar-axis">
+    <Group className='radar-axis'>
       {/* Axis lines from center to edge */}
       {axisPoints.map((point, i) => (
         <Line
@@ -56,10 +62,10 @@ const RadarAxis: React.FC<RadarAxisProps> = ({
             x={point.x}
             y={point.y}
             textAnchor={textAnchor}
-            verticalAnchor="middle"
+            verticalAnchor='middle'
             fill={labelColor}
             fontSize={fontSize}
-            fontFamily="sans-serif"
+            fontFamily='sans-serif'
           >
             {labels[i]}
           </Text>

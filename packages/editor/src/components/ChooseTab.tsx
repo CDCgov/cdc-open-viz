@@ -469,7 +469,7 @@ const buttons = [
     content: 'Present the numerical proportions of a data series.'
   },
   {
-    id: 26,
+    id: 27,
     category: 'Charts',
     label: 'Radar',
     type: 'chart',

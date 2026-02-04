@@ -1252,9 +1252,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     {/* All charts with LinearChart */}
                     {filteredData &&
                       filteredData.length > 0 &&
-                      !['Spark Line', 'Line', 'Sankey', 'Pie', 'Radar', 'Sankey'].includes(
-                        config.visualizationType
-                      ) && (
+                      !['Spark Line', 'Line', 'Sankey', 'Pie', 'Radar'].includes(config.visualizationType) && (
                         <div ref={parentRef} style={{ width: `100%` }}>
                           <ParentSize>
                             {parent => (

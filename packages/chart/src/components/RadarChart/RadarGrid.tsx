@@ -1,13 +1,11 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Group } from '@visx/group'
 import { genPoints, pointsToString } from './helpers'
+import ConfigContext from '../../ConfigContext'
 
 type RadarGridProps = {
-  levels: number
   radius: number
   axisCount: number
-  gridStyle: 'circles' | 'polygons'
-  showGrid: boolean
   strokeColor?: string
   strokeWidth?: number
 }
@@ -16,19 +14,17 @@ type RadarGridProps = {
  * RadarGrid renders concentric rings (either circles or polygons)
  * for the radar chart background grid
  */
-const RadarGrid: React.FC<RadarGridProps> = ({
-  levels,
-  radius,
-  axisCount,
-  gridStyle,
-  showGrid,
-  strokeColor = '#e0e0e0',
-  strokeWidth = 1
-}) => {
+const RadarGrid: React.FC<RadarGridProps> = ({ radius, axisCount, strokeColor = '#e0e0e0', strokeWidth = 1 }) => {
+  const { config } = useContext(ConfigContext)
+
+  const radarConfig = config.radar
+  const levels = radarConfig?.gridRings ?? 5
+  const showGrid = radarConfig?.showGridRings ?? true
+  const gridStyle = radarConfig?.gridRingStyle ?? 'polygons'
   if (!showGrid) return null
 
   return (
-    <Group className="radar-grid">
+    <Group className='radar-grid'>
       {[...new Array(levels)].map((_, i) => {
         const levelRadius = ((i + 1) * radius) / levels
         const key = `grid-level-${i}`
@@ -40,7 +36,7 @@ const RadarGrid: React.FC<RadarGridProps> = ({
               cx={0}
               cy={0}
               r={levelRadius}
-              fill="none"
+              fill='none'
               stroke={strokeColor}
               strokeWidth={strokeWidth}
               strokeOpacity={0.5}
@@ -54,7 +50,7 @@ const RadarGrid: React.FC<RadarGridProps> = ({
           <polygon
             key={key}
             points={pointsToString(points)}
-            fill="none"
+            fill='none'
             stroke={strokeColor}
             strokeWidth={strokeWidth}
             strokeOpacity={0.5}
