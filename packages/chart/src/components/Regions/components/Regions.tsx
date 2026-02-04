@@ -1,257 +1,422 @@
-import React, { useContext, useMemo } from 'react'
+import React, { useContext } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import { ChartContext } from '../../../types/ChartContext'
 import { Text } from '@visx/text'
 import { Group } from '@visx/group'
 import { formatDate, isDateScale } from '@cdc/core/helpers/cove/date.js'
 
+// Constants for visualization types
+const VIZ_TYPES = {
+  BAR: 'Bar',
+  LINE: 'Line',
+  AREA: 'Area Chart',
+  COMBO: 'Combo'
+} as const
+
+type Region = {
+  from: string
+  to: string
+  fromType?: 'Fixed' | 'Previous Days'
+  toType?: 'Fixed' | 'Last Date'
+  label: string
+  background: string
+  color: string
+}
+
+type XScale = {
+  (value: unknown): number
+  domain: () => unknown[]
+  bandwidth?: () => number
+}
+
 type RegionsProps = {
-  xScale: Function
+  xScale: XScale
   yMax: number
   barWidth?: number
   totalBarsInGroup?: number
   xMax?: number
 }
 
+type HighlightedAreaProps = {
+  x: number
+  width: number
+  yMax: number
+  background: string
+}
+
+const HighlightedArea: React.FC<HighlightedAreaProps> = ({ x, width, yMax, background }) => (
+  <rect x={x} y={0} width={width} height={yMax} fill={background} opacity={0.3} />
+)
+
+/** Find the closest date in domain to a target date */
+const findClosestDate = <T,>(targetTime: number, domain: T[], getTime: (d: T) => number): T => {
+  let closest = domain[0]
+  let minDiff = Math.abs(targetTime - getTime(closest))
+
+  for (let i = 1; i < domain.length; i++) {
+    const diff = Math.abs(targetTime - getTime(domain[i]))
+    if (diff < minDiff) {
+      minDiff = diff
+      closest = domain[i]
+    }
+  }
+  return closest
+}
+
+/** Check if visualization type is line-like (Line or Area Chart) */
+const isLineLike = (type: string): boolean => type === VIZ_TYPES.LINE || type === VIZ_TYPES.AREA
+
+/** Check if visualization type is bar-like (Bar or Combo) */
+const isBarLike = (type: string): boolean => type === VIZ_TYPES.BAR || type === VIZ_TYPES.COMBO
+
 // TODO: should regions be removed on categorical axis?
 const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax, xMax }) => {
-  const { parseDate, config, unfilteredData, getXAxisData } = useContext<ChartContext>(ConfigContext)
+  const { parseDate, config } = useContext<ChartContext>(ConfigContext)
 
-  const { runtime, regions, visualizationType, orientation, xAxis } = config
-  // Use full unfiltered data domain for regions, not the filtered/brushed domain
-  // This ensures regions stay fixed when brush selection changes
-  const fullDomain = useMemo(() => {
-    if (!unfilteredData || !Array.isArray(unfilteredData) || unfilteredData.length === 0) {
-      return xScale.domain()
+  const { regions, visualizationType, orientation, xAxis } = config
+
+  const getBarOffset = (): number => (barWidth * totalBarsInGroup) / 2
+
+  // ============================================
+  // HELPER FUNCTIONS FOR PREVIOUS DAYS
+  // ============================================
+
+  const calculatePreviousDaysFrom = (region: Region, axisType: string): number => {
+    const previousDays = Number(region.from) || 0
+    const domain = xScale.domain()
+
+    // Determine the "to" reference date
+    const toRefDate =
+      region.toType === 'Last Date'
+        ? new Date(domain[domain.length - 1] as string | number).getTime()
+        : new Date(region.to)
+
+    const toFormatted = formatDate(config.xAxis.dateParseFormat, toRefDate)
+    const toDate = new Date(toFormatted)
+    const fromDate = new Date(toDate)
+    fromDate.setDate(fromDate.getDate() - previousDays)
+
+    let closestValue: unknown
+
+    if (axisType === 'date') {
+      const fromTime = new Date(formatDate(xAxis.dateParseFormat, fromDate)).getTime()
+      closestValue = findClosestDate(fromTime, domain as number[], d => d)
+    } else if (axisType === 'categorical') {
+      const fromTime = fromDate.getTime()
+      closestValue = findClosestDate(fromTime, domain as string[], d => new Date(d).getTime())
+    } else if (axisType === 'date-time') {
+      closestValue = fromDate.getTime()
     }
 
-    const dataKey = config.runtime.originalXAxis?.dataKey || config.xAxis.dataKey
-    const isDate = isDateScale(config.xAxis)
+    return xScale(closestValue)
+  }
 
-    if (isDate && getXAxisData) {
-      const mapped = unfilteredData.map(d => getXAxisData(d))
-      // Sort dates if needed
-      return config.xAxis.sortByRecentDate ? [...mapped].reverse() : mapped
+  // ============================================
+  // LINE/AREA CHART LOGIC
+  // ============================================
+
+  const getLineFromValue_Categorical = (region: Region): number => {
+    let from: number
+    if (region.fromType === 'Previous Days') {
+      from = calculatePreviousDaysFrom(region, 'categorical')
     } else {
-      const mapped = unfilteredData.map(d => d[dataKey])
-      return config.xAxis.sortByRecentDate ? [...mapped].reverse() : mapped
+      from = xScale(region.from)
     }
-  }, [unfilteredData, config, getXAxisData, xScale])
+    // Add left padding (yAxis.size) + half bandwidth to center on the category
+    let scalePadding = Number(config.yAxis.size)
+    if (xScale.bandwidth) {
+      scalePadding += xScale.bandwidth() / 2
+    }
+    return from + scalePadding
+  }
 
-  // Use full domain for "Last Date" calculations to ensure regions stay fixed
-  // But use filtered domain for scale positioning (xScale is based on filtered data)
-  const filteredDomain = xScale.domain()
+  const getLineToValue_Categorical = (region: Region): number => {
+    if (region.toType === 'Last Date') {
+      return calculateLineLastDatePosition_Categorical()
+    }
+    let to = xScale(region.to)
+    // Add left padding (yAxis.size) + half bandwidth
+    let scalePadding = Number(config.yAxis.size)
+    if (xScale.bandwidth) {
+      scalePadding += xScale.bandwidth() / 2
+    }
+    return to + scalePadding
+  }
 
-  const getFromValue = region => {
-    let from
+  const getLineFromValue_Date = (region: Region): number => {
+    let from: number
+    if (region.fromType === 'Previous Days') {
+      from = calculatePreviousDaysFrom(region, 'date')
+    } else {
+      // For date scale (band), we need to find the value in the domain
+      // Parse the region date to match the format in the domain
+      const date = new Date(region.from)
+      const parsedDate = parseDate(formatDate(config.xAxis.dateParseFormat, date)).getTime()
 
-    // Fixed Date
-    if (!region?.fromType || region.fromType === 'Fixed') {
+      // For band scales, find the closest date in the domain
+      const domain = xScale.domain() as number[]
+      const closestDate = findClosestDate(parsedDate, domain, d => d)
+      from = xScale(closestDate)
+    }
+    // Add left padding (yAxis.size) + half bandwidth
+    let scalePadding = Number(config.yAxis.size)
+    if (xScale.bandwidth) {
+      scalePadding += xScale.bandwidth() / 2
+    }
+    return from + scalePadding
+  }
+
+  const getLineToValue_Date = (region: Region): number => {
+    if (region.toType === 'Last Date') {
+      return calculateLineLastDatePosition_Date()
+    }
+    // For date scale (band), we need to find the value in the domain
+    // Parse the region date to match the format in the domain
+    const parsedDate = parseDate(region.to).getTime()
+
+    // For band scales, find the closest date in the domain
+    const domain = xScale.domain() as number[]
+    const closestDate = findClosestDate(parsedDate, domain, d => d)
+    let to = xScale(closestDate)
+
+    // Add left padding (yAxis.size) + half bandwidth
+    let scalePadding = Number(config.yAxis.size)
+    if (xScale.bandwidth) {
+      scalePadding += xScale.bandwidth() / 2
+    }
+    return to + scalePadding
+  }
+
+  const getLineFromValue_DateTime = (region: Region): number => {
+    if (region.fromType === 'Previous Days') {
+      const from = calculatePreviousDaysFrom(region, 'date-time')
+      return from + Number(config.yAxis.size)
+    }
+    const date = new Date(region.from)
+    const parsedDate = parseDate(formatDate(config.xAxis.dateParseFormat, date)).getTime()
+    let from = xScale(parsedDate)
+    // For date-time, xScale returns correct position (no bandwidth), just add left padding
+    return from + Number(config.yAxis.size)
+  }
+
+  const getLineToValue_DateTime = (region: Region): number => {
+    if (region.toType === 'Last Date') {
+      return calculateLineLastDatePosition_DateTime()
+    }
+    let to = xScale(parseDate(region.to).getTime())
+    return to + Number(config.yAxis.size)
+  }
+
+  const calculateLineLastDatePosition_Categorical = (): number => {
+    const chartStart = Number(config.yAxis.size || 0)
+    // Extend to the right edge of the chart
+    return chartStart + (xMax || 0)
+  }
+
+  const calculateLineLastDatePosition_Date = (): number => {
+    const chartStart = Number(config.yAxis.size || 0)
+    // For date scale line charts with Last Date, extend to the right edge of the chart
+    return chartStart + (xMax || 0)
+  }
+
+  const calculateLineLastDatePosition_DateTime = (): number => {
+    const domain = xScale.domain()
+    const lastDate = domain[domain.length - 1]
+    const lastDatePosition = xScale(lastDate)
+    // Match the non-Last Date logic: just add yAxis.size
+    return Number(lastDatePosition + Number(config.yAxis.size))
+  }
+
+  // ============================================
+  // BAR CHART LOGIC
+  // ============================================
+
+  const getBarFromValue_Categorical = (region: Region): number => {
+    if (region.fromType === 'Previous Days') {
+      return calculatePreviousDaysFrom(region, 'categorical')
+    }
+    return xScale(region.from)
+  }
+
+  const getBarToValue_Categorical = (region: Region): number => {
+    if (region.toType === 'Last Date') {
+      return calculateBarLastDatePosition_Categorical()
+    }
+    let to = xScale(region.to)
+    return to + barWidth * totalBarsInGroup
+  }
+
+  const getBarFromValue_Date = (region: Region): number => {
+    if (region.fromType === 'Previous Days') {
+      return calculatePreviousDaysFrom(region, 'date')
+    }
+    // For date scale (band), we need to find the value in the domain
+    const date = new Date(region.from)
+    const parsedDate = parseDate(formatDate(config.xAxis.dateParseFormat, date)).getTime()
+
+    // For band scales, find the closest date in the domain
+    const domain = xScale.domain() as number[]
+    const closestDate = findClosestDate(parsedDate, domain, d => d)
+    return xScale(closestDate)
+  }
+
+  const getBarToValue_Date = (region: Region): number => {
+    if (region.toType === 'Last Date') {
+      return calculateBarLastDatePosition_Date()
+    }
+    // For date scale (band), we need to find the value in the domain
+    const parsedDate = parseDate(region.to).getTime()
+
+    // For band scales, find the closest date in the domain
+    const domain = xScale.domain() as number[]
+    const closestDate = findClosestDate(parsedDate, domain, d => d)
+    let to = xScale(closestDate)
+
+    return to + barWidth * totalBarsInGroup
+  }
+
+  const getBarFromValue_DateTime = (region: Region): number => {
+    let from: number
+    if (region.fromType === 'Previous Days') {
+      from = calculatePreviousDaysFrom(region, 'date-time')
+    } else {
       const date = new Date(region.from)
       const parsedDate = parseDate(formatDate(config.xAxis.dateParseFormat, date)).getTime()
       from = xScale(parsedDate)
-
-      if (visualizationType === 'Bar' && xAxis.type === 'date-time') {
-        from = from - (barWidth * totalBarsInGroup) / 2
-      }
     }
-
-    // Previous Date
-    if (region.fromType === 'Previous Days') {
-      const previousDays = Number(region.from) || 0
-      // Use full domain for "Last Date" calculations
-      const domainToUse = fullDomain.length > 0 ? fullDomain : filteredDomain
-      const categoricalDomain = domainToUse.map(d => formatDate(config.xAxis.dateParseFormat, new Date(d)))
-      const d =
-        region.toType === 'Last Date' ? new Date(domainToUse[domainToUse.length - 1]).getTime() : new Date(region.to) // on categorical charts force leading zero 03/15/2016 vs 3/15/2016 for valid date format
-      const to =
-        config.xAxis.type === 'categorical'
-          ? formatDate(config.xAxis.dateParseFormat, d)
-          : formatDate(config.xAxis.dateParseFormat, d)
-      const toDate = new Date(to)
-      from = new Date(toDate.setDate(toDate.getDate() - Number(previousDays)))
-
-      if (xAxis.type === 'date') {
-        from = new Date(formatDate(xAxis.dateParseFormat, from)).getTime()
-
-        const domainToUse = fullDomain.length > 0 ? fullDomain : filteredDomain
-        let closestDate = domainToUse[0]
-        let minDiff = Math.abs(from - closestDate)
-
-        for (let i = 1; i < domainToUse.length; i++) {
-          const diff = Math.abs(from - domainToUse[i])
-          if (diff < minDiff) {
-            minDiff = diff
-            closestDate = domainToUse[i]
-          }
-        }
-        from = closestDate
-      }
-
-      // Here the domain is in the xScale.dateParseFormat
-      if (xAxis.type === 'categorical') {
-        const domainToUse = fullDomain.length > 0 ? fullDomain : filteredDomain
-        let closestDate = domainToUse[0]
-        let minDiff = Math.abs(new Date(from).getTime() - new Date(closestDate).getTime())
-
-        for (let i = 1; i < domainToUse.length; i++) {
-          const diff = Math.abs(new Date(from).getTime() - new Date(domainToUse[i]).getTime())
-          if (diff < minDiff) {
-            minDiff = diff
-            closestDate = domainToUse[i]
-          }
-        }
-        from = closestDate
-      }
-
-      from = xScale(from)
-    }
-
-    if (xAxis.type === 'categorical' && region.fromType !== 'Previous Days') {
-      from = xScale(region.from)
-    }
-
-    if (visualizationType === 'Line' || visualizationType === 'Area Chart') {
-      let scalePadding = Number(config.yAxis.size)
-      if (xScale.bandwidth) {
-        scalePadding += xScale.bandwidth() / 2
-      }
-      from = from + scalePadding
-    }
-
-    if (visualizationType === 'Bar' && config.xAxis.type === 'date-time' && region.fromType === 'Previous Days') {
-      from = from - (barWidth * totalBarsInGroup) / 2
-    }
-
-    return from
+    return from - getBarOffset()
   }
 
-  const getToValue = region => {
-    let to
-
-    // when xScale is categorical leading zeros are removed, ie. 03/15/2016 is 3/15/2016
-    if (xAxis.type === 'categorical') {
-      to = xScale(region.to)
-    }
-
-    if (isDateScale(xAxis)) {
-      if (!region?.toType || region.toType === 'Fixed') {
-        to = xScale(parseDate(region.to).getTime())
-      }
-
-      if (visualizationType === 'Bar' || config.visualizationType === 'Combo') {
-        to = region.toType !== 'Last Date' ? xScale(parseDate(region.to).getTime()) + barWidth * totalBarsInGroup : to
-      }
-    }
+  const getBarToValue_DateTime = (region: Region): number => {
     if (region.toType === 'Last Date') {
-      // Use full domain to get the actual last date, not the filtered last date
-      const domainToUse = fullDomain.length > 0 ? fullDomain : filteredDomain
-      const lastDate = domainToUse[domainToUse.length - 1]
-      const lastDatePosition = xScale(lastDate)
+      return calculateBarLastDatePosition_DateTime()
+    }
+    let to = xScale(parseDate(region.to).getTime())
+    return to - getBarOffset()
+  }
 
-      // If lastDate is not in the filtered domain, xScale might return undefined
-      // In that case, use xMax + yAxis.size to position at the end of the visible chart
-      if (lastDatePosition === undefined || isNaN(lastDatePosition)) {
-        const chartStart = Number(config.yAxis.size || 0)
-        to = xMax !== undefined ? chartStart + xMax : chartStart
-      } else {
-        // For band scales, xScale returns the start of the band
-        // To get to the end of the last band, we need to add the full bandwidth
-        const bandwidth = xScale.bandwidth ? xScale.bandwidth() : 0
-        const chartStart = Number(config.yAxis.size || 0)
+  const calculateBarLastDatePosition_Categorical = (): number => {
+    const domain = xScale.domain()
+    const lastDate = domain[domain.length - 1]
+    const lastDatePosition = xScale(lastDate)
+    const bandwidth = xScale.bandwidth ? xScale.bandwidth() : 0
+    // For categorical bars, extend to the end of the last bar
+    // Don't add chartStart - xScale already returns positions in the chart coordinate space
+    return xMax
+  }
 
-        if (visualizationType === 'Line' || visualizationType === 'Area Chart') {
-          // For Line/Area charts with band scales, add full bandwidth to reach end of band
-          // Then add chartStart to account for left padding
-          to = Number(lastDatePosition + bandwidth + chartStart)
-        } else if (visualizationType === 'Bar' || visualizationType === 'Combo') {
-          // For Bar charts, add barWidth instead of bandwidth
-          to = Number(
-            lastDatePosition + (config.xAxis.type === 'date' ? barWidth * totalBarsInGroup : bandwidth) + chartStart
-          )
-        } else {
-          // For other chart types, just add bandwidth and chartStart
-          to = Number(lastDatePosition + bandwidth + chartStart)
-        }
-      }
-    } else {
-      // For non-"Last Date" regions, apply the standard padding
-      if (visualizationType === 'Line' || visualizationType === 'Area Chart') {
-        let scalePadding = Number(config.yAxis.size)
-        if (xScale.bandwidth) {
-          scalePadding += xScale.bandwidth() / 2
-        }
-        to = to + scalePadding
+  const calculateBarLastDatePosition_Date = (): number => {
+    const domain = xScale.domain()
+    const lastDate = domain[domain.length - 1]
+    const lastDatePosition = xScale(lastDate)
+    const offset = barWidth * totalBarsInGroup
+    // Don't add chartStart - xScale already returns positions in chart coordinate space
+    return Number(lastDatePosition + offset)
+  }
+
+  const calculateBarLastDatePosition_DateTime = (): number => {
+    const domain = xScale.domain()
+    const lastDate = domain[domain.length - 1]
+    const lastDatePosition = xScale(lastDate)
+    // For date-time bars, don't add chartStart - xScale returns positions in chart coordinate space
+    // Also don't subtract barOffset since we want to extend to the edge
+    return Number(lastDatePosition)
+  }
+
+  // ============================================
+  // MAIN ROUTING FUNCTIONS
+  // ============================================
+
+  const getFromValue = (region: Region): number => {
+    const isLine = isLineLike(visualizationType)
+    const isBar = isBarLike(visualizationType)
+
+    // LINE/AREA CHARTS
+    if (isLine) {
+      if (xAxis.type === 'categorical') {
+        return getLineFromValue_Categorical(region)
+      } else if (xAxis.type === 'date') {
+        return getLineFromValue_Date(region)
+      } else if (xAxis.type === 'date-time') {
+        return getLineFromValue_DateTime(region)
       }
     }
 
-    if (visualizationType === 'Bar' && config.xAxis.type === 'date-time' && region.toType !== 'Last Date') {
-      to = to - (barWidth * totalBarsInGroup) / 2
+    // BAR CHARTS
+    if (isBar) {
+      if (xAxis.type === 'categorical') {
+        return getBarFromValue_Categorical(region)
+      } else if (xAxis.type === 'date') {
+        return getBarFromValue_Date(region)
+      } else if (xAxis.type === 'date-time') {
+        return getBarFromValue_DateTime(region)
+      }
     }
 
-    if ((visualizationType === 'Bar' || visualizationType === 'Combo') && xAxis.type === 'categorical') {
-      to = to + (visualizationType === 'Bar' || visualizationType === 'Combo' ? barWidth * totalBarsInGroup : 0)
+    return 0
+  }
+
+  const getToValue = (region: Region): number => {
+    const isLine = isLineLike(visualizationType)
+    const isBar = isBarLike(visualizationType)
+
+    // LINE/AREA CHARTS
+    if (isLine) {
+      if (xAxis.type === 'categorical') {
+        return getLineToValue_Categorical(region)
+      } else if (xAxis.type === 'date') {
+        return getLineToValue_Date(region)
+      } else if (xAxis.type === 'date-time') {
+        return getLineToValue_DateTime(region)
+      }
     }
-    return to
-  }
 
-  const getWidth = (to, from) => {
-    const width = to - from
-    // Ensure width is never negative
-    return Math.max(0, width)
-  }
-
-  if (regions && orientation === 'vertical') {
-    return regions.map(region => {
-      let from = getFromValue(region)
-      let to = getToValue(region)
-
-      if (!from || from === undefined || isNaN(from)) return null
-      if (!to || to === undefined || isNaN(to)) return null
-
-      // Ensure from is always the smaller value and to is the larger value
-      // This handles regions defined in reverse (from future to past)
-      if (from > to) {
-        ;[from, to] = [to, from]
+    // BAR CHARTS
+    if (isBar) {
+      if (xAxis.type === 'categorical') {
+        return getBarToValue_Categorical(region)
+      } else if (xAxis.type === 'date') {
+        return getBarToValue_Date(region)
+      } else if (xAxis.type === 'date-time') {
+        return getBarToValue_DateTime(region)
       }
+    }
 
-      let width = getWidth(to, from)
-
-      // Clip region to visible chart area (xMax) to prevent overflow
-      // xMax is the width of the chart area (excluding left padding), so chartEnd = chartStart + xMax
-      const chartStart = Number(config.yAxis.size || 0)
-      const chartEnd = xMax !== undefined ? chartStart + xMax : chartStart + 1000 // fallback if xMax not provided
-
-      // Adjust from and to to be within visible bounds
-      let clippedFrom = Math.max(chartStart, from)
-      let clippedTo = Math.min(chartEnd, to)
-
-      // Recalculate width after clipping
-      width = clippedTo - clippedFrom
-
-      // Don't render if width is 0 or negative after clipping
-      if (width <= 0) return null
-
-      const HighlightedArea = () => {
-        return <rect x={clippedFrom} y={0} width={width} height={yMax} fill={region.background} opacity={0.3} />
-      }
-
-      return (
-        <Group
-          height={100}
-          fill='red'
-          className='regions regions-group--line zzz'
-          key={region.label}
-          pointerEvents='none'
-        >
-          <HighlightedArea />
-          <Text x={clippedFrom + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
-            {region.label}
-          </Text>
-        </Group>
-      )
-    })
+    return 0
   }
+
+  const getWidth = (to: number, from: number): number => Math.max(0, to - from)
+
+  if (!regions || orientation !== 'vertical') return null
+
+  const chartStart = Number(config.yAxis.size || 0)
+  const chartEnd = xMax !== undefined ? chartStart + xMax : chartStart + 1000
+
+  return regions.map((region: Region) => {
+    const from = getFromValue(region)
+    const to = getToValue(region)
+
+    // Validate computed positions
+    if (from === undefined || isNaN(from) || to === undefined || isNaN(to)) {
+      return null
+    }
+
+    // Clip region to visible chart area
+    const clippedFrom = Math.max(chartStart, from)
+    const clippedTo = Math.min(chartEnd, to)
+    const width = getWidth(clippedTo, clippedFrom)
+
+    if (width <= 0) return null
+
+    return (
+      <Group height={100} fill='red' className='regions regions-group--line' key={region.label} pointerEvents='none'>
+        <HighlightedArea x={clippedFrom} width={width} yMax={yMax} background={region.background} />
+        <Text x={clippedFrom + width / 2} y={5} fill={region.color} verticalAnchor='start' textAnchor='middle'>
+          {region.label}
+        </Text>
+      </Group>
+    )
+  })
 }
 
 export default Regions

@@ -8,9 +8,10 @@ type GetOptionsMemoParams = {
 }
 
 export const getNestedOptions = ({ orderedValues, values, subGrouping }: GetOptionsMemoParams): NestedOptions => {
+  if (!values?.length && !orderedValues?.length) return []
   // keep custom ordered value order
   const filteredValues = orderedValues?.length
-    ? orderedValues.filter(orderedValue => values.includes(orderedValue))
+    ? orderedValues.filter(orderedValue => values?.includes(orderedValue))
     : values
   const options: NestedOptions = filteredValues.map<[ValueTextPair, ValueTextPair[]]>(value => {
     if (!subGrouping) return [[value], []]

@@ -324,7 +324,7 @@ const Filters: React.FC<FilterProps> = ({
                     updateField={(_section, _subSection, fieldName, value) => {
                       changeFilterActive(fieldName, value)
                     }}
-                    selected={singleFilter.active as string}
+                    selected={(singleFilter.queuedActive || singleFilter.active) as string}
                     label={label}
                   />
                 )}

@@ -265,8 +265,6 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     let waffleData = []
     // Use standardized values for TP5 style
     const isTP5 = config.visualizationType === 'TP5 Waffle'
-    const isWhiteBackground = config.visual?.whiteBackground
-    const tp5StrokeColor = isWhiteBackground ? '#009EC1' : null
     let nodeWidthNum = isTP5 ? TP5_NODE_WIDTH : parseInt(nodeWidth, 10)
     let nodeSpacerNum = isTP5 ? TP5_NODE_SPACER : parseInt(nodeSpacer, 10)
 
@@ -296,28 +294,10 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
           y={isTP5 && !node.isFilled ? node.y + 1 : node.y}
           width={isTP5 && !node.isFilled ? nodeWidthNum - 2 : nodeWidthNum}
           height={isTP5 && !node.isFilled ? nodeWidthNum - 2 : nodeWidthNum}
-          fill={
-            isTP5
-              ? tp5StrokeColor
-                ? node.isFilled
-                  ? '#009EC1'
-                  : '#DFF2F6'
-                : node.isFilled
-                ? node.color
-                : '#dff2f6'
-              : node.color
-          }
+          fill={isTP5 ? (node.isFilled ? '#009EC1' : '#DFF2F6') : node.color}
           fillOpacity={isTP5 ? 1 : node.opacity}
-          stroke={
-            isTP5
-              ? tp5StrokeColor && !node.isFilled
-                ? tp5StrokeColor
-                : node.isFilled
-                ? undefined
-                : node.color
-              : undefined
-          }
-          strokeWidth={isTP5 ? (tp5StrokeColor && !node.isFilled ? 1 : node.isFilled ? 0 : 1) : 0}
+          stroke={isTP5 ? (!node.isFilled ? '#009EC1' : undefined) : undefined}
+          strokeWidth={isTP5 ? (!node.isFilled ? 1 : 0) : 0}
           key={key}
         />
       ) : node.shape === 'person' ? (
@@ -331,30 +311,10 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
               : `translateX(${node.x + nodeWidthNum / 4}px) translateY(${node.y}px) scale(${nodeWidthNum / 20})`,
             transitionDelay: `${0.1 * key}ms`
           }}
-          fill={
-            isTP5
-              ? tp5StrokeColor
-                ? node.isFilled
-                  ? '#009EC1'
-                  : 'white'
-                : node.isFilled
-                ? node.color
-                : 'transparent'
-              : node.color
-          }
+          fill={isTP5 ? (node.isFilled ? '#009EC1' : 'transparent') : node.color}
           fillOpacity={isTP5 ? 1 : node.opacity}
-          stroke={
-            isTP5
-              ? tp5StrokeColor && !node.isFilled
-                ? tp5StrokeColor
-                : node.isFilled
-                ? undefined
-                : node.color
-              : undefined
-          }
-          strokeWidth={
-            isTP5 ? (tp5StrokeColor && !node.isFilled ? 448 / nodeWidthNum : node.isFilled ? 0 : 448 / nodeWidthNum) : 0
-          }
+          stroke={isTP5 ? (!node.isFilled ? '#009EC1' : undefined) : undefined}
+          strokeWidth={isTP5 ? (!node.isFilled ? 448 / nodeWidthNum : 0) : 0}
           key={key}
           d={
             isTP5
@@ -369,28 +329,10 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
           cx={node.x}
           cy={node.y}
           r={isTP5 && !node.isFilled ? nodeWidthNum / 2 - 1 : nodeWidthNum / 2}
-          fill={
-            isTP5
-              ? tp5StrokeColor
-                ? node.isFilled
-                  ? '#009EC1'
-                  : '#DFF2F6'
-                : node.isFilled
-                ? node.color
-                : '#dff2f6'
-              : node.color
-          }
+          fill={isTP5 ? (node.isFilled ? '#009EC1' : '#DFF2F6') : node.color}
           fillOpacity={isTP5 ? 1 : node.opacity}
-          stroke={
-            isTP5
-              ? tp5StrokeColor && !node.isFilled
-                ? tp5StrokeColor
-                : node.isFilled
-                ? undefined
-                : node.color
-              : undefined
-          }
-          strokeWidth={isTP5 ? (tp5StrokeColor && !node.isFilled ? 1 : node.isFilled ? 0 : 1) : 0}
+          stroke={isTP5 ? (!node.isFilled ? '#009EC1' : undefined) : undefined}
+          strokeWidth={isTP5 ? (!node.isFilled ? 1 : 0) : 0}
           key={key}
         />
       )

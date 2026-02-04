@@ -241,6 +241,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   const convertLineToBarGraph = isConvertLineToBarGraph(config, filteredData)
 
+  // Declaratively calculate series keys for pie charts based on filtered data
+  const pieSeriesKeys = useMemo(() => {
+    if (config.visualizationType !== 'Pie' || !config.xAxis?.dataKey) return null
+    const data = filteredData?.length > 0 ? filteredData : excludedData
+    if (!data) return null
+    return _.uniq(data.map(d => d[config.xAxis.dataKey]))
+  }, [config.visualizationType, config.xAxis?.dataKey, filteredData, excludedData])
+
   const prepareConfig = (loadedConfig: ChartConfig) => {
     // Create defaults without version to avoid overriding legacy configs
     const defaultsWithoutPalette = { ...defaults }
@@ -377,6 +385,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       const pieData = currentData.length > 0 ? currentData : newExcludedData
       newConfig.runtime.seriesKeys = _.uniq(pieData.map(d => d[newConfig.xAxis.dataKey]))
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
+      newConfig.runtime.isPieChart = true // Flag to know when to use derived keys
     } else {
       const finalData = dataOverride || newConfig.formattedData || newConfig.data
       newConfig.runtime.seriesKeys = (newConfig.runtime.series || []).flatMap(series => {
@@ -710,6 +719,19 @@ const CdcChart: React.FC<CdcChartProps> = ({
       dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(externalFilters, excludedData) })
     }
   }, [externalFilters]) // eslint-disable-line
+
+  // Declaratively update runtime series keys for pie charts when derived value changes
+  if (config.runtime?.isPieChart && pieSeriesKeys && !_.isEqual(pieSeriesKeys, config.runtime?.seriesKeys)) {
+    const newConfig = {
+      ...config,
+      runtime: {
+        ...config.runtime,
+        seriesKeys: pieSeriesKeys,
+        seriesLabelsAll: pieSeriesKeys
+      }
+    }
+    setConfig(newConfig)
+  }
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
@@ -1367,7 +1389,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       return (
                         <DataTable
                           /* changing the "key" will force the table to re-render
-                                    when the default sort changes while editing */
+                                  when the default sort changes while editing */
                           key={dataTableDefaultSortBy}
                           config={dataTableConfig}
                           rawData={dataTableRawData}

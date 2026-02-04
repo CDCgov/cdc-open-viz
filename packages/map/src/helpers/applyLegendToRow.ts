@@ -43,6 +43,7 @@ export const applyLegendToRow = (
     const idx = legendMemo.current.get(hash)!
     const disabledIdx = showSpecialClassesLast ? legendSpecialClassLastMemo.current.get(hash) ?? idx : idx
 
+    // Note: DISABLED_MAP_COLOR is used in UsaMap.County.tsx to check for hidden bubbles. Should be refactored to use the hidden value when that is implemented.
     if (runtimeLegend.items?.[disabledIdx]?.disabled || runtimeLegend.items?.[disabledIdx]?.hidden) {
       return generateColorsArray(DISABLED_MAP_COLOR)
     }

@@ -18,7 +18,7 @@
       justify-items: center;
       align-items: flex-start;
 
-      & > svg {
+      &>svg {
         margin: 0.7em 0;
       }
     }
@@ -96,6 +96,7 @@
 }
 
 @at-root {
+
   .cove-waffle-chart.font-small,
   .cove-gauge-chart.font-small #{&} {
     .cove-waffle-chart__data--primary {
@@ -178,6 +179,7 @@
     @container (max-width: 576px) {
       .cove-waffle-chart {
         flex-wrap: wrap;
+
         .cove-waffle-chart__chart {
           width: 100% !important;
         }
@@ -203,9 +205,11 @@
       margin-top: 0.5rem;
       font-size: 1rem;
     }
+
     .cove-waffle-chart__subtext {
       font-size: 1rem;
     }
+
     .cove-waffle-chart__data--primary {
       font-size: 2rem;
       color: var(--colors-cyan-60v);
@@ -266,7 +270,7 @@
       width: 100%;
     }
 
-    .cove-gauge-chart__chart > svg {
+    .cove-gauge-chart__chart>svg {
       display: block;
       width: 100%;
     }
@@ -283,6 +287,7 @@
     @container (max-width: 576px) {
       .cove-gauge-chart__body {
         flex-wrap: wrap;
+
         .cove-gauge-chart__value-section {
           width: 100%;
         }
