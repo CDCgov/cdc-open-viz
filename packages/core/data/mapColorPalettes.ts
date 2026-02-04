@@ -43,3 +43,13 @@ export const mapColorPalettes = {
 
 export const mapColorPalettesV1 = mapColorPalettes.v1
 export const mapColorPalettesV2 = mapColorPalettes.v2
+
+// Lighter colors (first palette color 75% toward white) for zero-value categories in v2 sequential palettes
+// Used when: categorical map, first category value is "0", palette not reversed
+export const sequentialZeroColors: Record<string, string> = {
+  sequential_blue: '#F6F9FD',
+  sequential_teal: '#F9FEFE',
+  sequential_purple: '#F8F4F7',
+  sequential_orange: '#FFF8F5',
+  sequential_green: '#F5FEFD'
+}

@@ -1,4 +1,4 @@
-import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
+import { mapColorPalettes as colorPalettes, sequentialZeroColors } from '@cdc/core/data/colorPalettes'
 import chroma from 'chroma-js'
 import { type MapConfig } from '../types/MapConfig'
 import { mapV1ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
@@ -42,6 +42,7 @@ const mapPaletteNameMigrations = {
 
 type LegendItem = {
   special: boolean
+  value?: string | number
 }
 
 /**
@@ -135,6 +136,18 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
   // Use qualitative color palettes directly
   if (color.includes('qualitative')) {
     return mapColorPalette[colorIdx]
+  }
+
+  // Use lighter color for first category with value "0" in supported sequential palettes
+  // Only applies when: categorical map, first non-special item, value is 0, palette not reversed
+  if (
+    colorIdx === 0 &&
+    legend?.type === 'category' &&
+    !palette.isReversed &&
+    (result[legendIdx]?.value === 0 || result[legendIdx]?.value === '0') &&
+    sequentialZeroColors[color]
+  ) {
+    return sequentialZeroColors[color]
   }
 
   // Determine color distribution based on non-special items
