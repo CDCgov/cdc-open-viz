@@ -54,6 +54,7 @@ import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
 import Annotation from './components/Annotations'
+import { getVisibleAnnotations } from './components/Annotations/helpers/getVisibleAnnotations'
 // Core Helpers
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
@@ -241,6 +242,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   const convertLineToBarGraph = isConvertLineToBarGraph(config, filteredData)
 
+  // Declaratively calculate series keys for pie charts based on filtered data
+  const pieSeriesKeys = useMemo(() => {
+    if (config.visualizationType !== 'Pie' || !config.xAxis?.dataKey) return null
+    const data = filteredData?.length > 0 ? filteredData : excludedData
+    if (!data) return null
+    return _.uniq(data.map(d => d[config.xAxis.dataKey]))
+  }, [config.visualizationType, config.xAxis?.dataKey, filteredData, excludedData])
+
   const prepareConfig = (loadedConfig: ChartConfig) => {
     // Create defaults without version to avoid overriding legacy configs
     const defaultsWithoutPalette = { ...defaults }
@@ -377,6 +386,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       const pieData = currentData.length > 0 ? currentData : newExcludedData
       newConfig.runtime.seriesKeys = _.uniq(pieData.map(d => d[newConfig.xAxis.dataKey]))
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
+      newConfig.runtime.isPieChart = true // Flag to know when to use derived keys
     } else if (newConfig.visualizationType === 'Radar') {
       // Radar chart: seriesKeys are the entity names from xAxis.dataKey
       const radarData = currentData.length > 0 ? currentData : newExcludedData
@@ -715,6 +725,19 @@ const CdcChart: React.FC<CdcChartProps> = ({
       dispatch({ type: 'SET_FILTERED_DATA', payload: filterVizData(externalFilters, excludedData) })
     }
   }, [externalFilters]) // eslint-disable-line
+
+  // Declaratively update runtime series keys for pie charts when derived value changes
+  if (config.runtime?.isPieChart && pieSeriesKeys && !_.isEqual(pieSeriesKeys, config.runtime?.seriesKeys)) {
+    const newConfig = {
+      ...config,
+      runtime: {
+        ...config.runtime,
+        seriesKeys: pieSeriesKeys,
+        seriesLabelsAll: pieSeriesKeys
+      }
+    }
+    setConfig(newConfig)
+  }
 
   // Generates color palette to pass to child chart component
   useEffect(() => {
@@ -1102,6 +1125,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return tableConfig
   }
 
+  // Transform and clean data for chart rendering
+  const transformedData = getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean })
+
+  // Filter annotations to only those visible in current data view
+  const visibleAnnotations = getVisibleAnnotations(config.annotations, transformedData, config.xAxis?.dataKey)
+
   // Prevent render if loading
   let body = <Loading />
 
@@ -1193,7 +1222,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   />
                 )}
                 <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
-                {config.annotations?.length > 0 && (
+                {visibleAnnotations.length > 0 && (
                   <SkipTo
                     skipId={handleChartTabbing(config, legendId)}
                     skipMessage={`Skip over annotations`}
@@ -1381,7 +1410,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       return (
                         <DataTable
                           /* changing the "key" will force the table to re-render
-                                    when the default sort changes while editing */
+                                when the default sort changes while editing */
                           key={dataTableDefaultSortBy}
                           config={dataTableConfig}
                           rawData={dataTableRawData}
@@ -1431,7 +1460,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         </MediaControls.Section>
                       </div>
                     )}
-                {config?.annotations?.length > 0 && <Annotation.Dropdown />}
+                {visibleAnnotations.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
                 {processedLegacyFootnotes && (
                   <section className='footnotes pt-2 mt-4'>{parse(processedLegacyFootnotes)}</section>
@@ -1504,10 +1533,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
     setSharedFilterValue,
     svgRef,
     tableData: filteredData || excludedData,
-    transformedData: getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean }),
+    transformedData,
     twoColorPalette,
     unfilteredData: stateData,
-    updateConfig
+    updateConfig,
+    visibleAnnotations
   }
 
   return (

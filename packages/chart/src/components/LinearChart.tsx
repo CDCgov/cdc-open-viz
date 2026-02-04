@@ -1,4 +1,14 @@
-import React, { forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, {
+  forwardRef,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+  useCallback
+} from 'react'
 
 // Libraries
 import { AxisTop } from '@visx/axis'
@@ -132,6 +142,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const [point, setPoint] = useState({ x: 0, y: 0 })
   const [suffixWidth, setSuffixWidth] = useState(0)
   const [calculatedSvgHeight, setCalculatedSvgHeight] = useState<number | null>(null)
+  const [axisUpdateKey, setAxisUpdateKey] = useState(0)
 
   // REFS
   const axisBottomRef = useRef(null)
@@ -179,7 +190,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     if (!xAxisLabelRefs.current.length) return
     const tallestLabel = Math.max(...xAxisLabelRefs.current.map(label => label.getBBox().height))
     return tallestLabel + X_TICK_LABEL_PADDING + DEFAULT_TICK_LENGTH
-  }, [parentWidth, config.xAxis.tickRotation, config.xAxis.hideLabel, xAxisLabelRefs.current])
+  }, [parentWidth, config.xAxis.tickRotation, config.xAxis.hideLabel, xAxisLabelRefs.current, axisUpdateKey])
 
   const yMax = initialHeight + forestRowsHeight
 
@@ -211,6 +222,12 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     }
     return result
   }, [xAxisDataMapped])
+
+  // Force update x axis ticks when filtering
+  useLayoutEffect(() => {
+    setAxisUpdateKey(prev => prev + 1)
+  }, [data.length, xAxisDataMapped?.[0], xAxisDataMapped?.[xAxisDataMapped.length - 1]])
+
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
 
   // State for computed y-axis width - allows re-render when horizontal bar label space is calculated
@@ -222,7 +239,18 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   // Chart width calculation using the current y-axis width
   const xMax = parentWidth - yAxisWidth - (hasRightAxis ? config.yAxis.rightAxisSize : 0)
 
-  const { xScale, yScale, seriesScale, g1xScale, g2xScale, xScaleNoPadding, xScaleAnnotation, min, max } = useScales({
+  const {
+    xScale,
+    yScale,
+    seriesScale,
+    g1xScale,
+    g2xScale,
+    xScaleNoPadding,
+    xScaleAnnotation,
+    yScaleAnnotation,
+    min,
+    max
+  } = useScales({
     data,
     tableData,
     config,
@@ -608,8 +636,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   strokeDasharray={handleLineType(anchor.lineStyle)}
                   stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   className='anchor-y'
-                  from={{ x: yAxisWidth, y: position - middleOffset }}
-                  to={{ x: yAxisWidth + xMax, y: position - middleOffset }}
+                  from={{ x: Number(runtime.yAxis.size), y: position - middleOffset }}
+                  to={{ x: Number(runtime.yAxis.size) + Number(xMax), y: position - middleOffset }}
                 />
               )
             })}
@@ -685,7 +713,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               xScale={xScale}
               yScale={yScale}
               xScaleAnnotation={xScaleAnnotation}
+              yScaleAnnotation={yScaleAnnotation}
               xMax={xMax}
+              yMax={yMax}
+              seriesScale={seriesScale}
               svgRef={svgRef}
               onDragStateChange={handleDragStateChange}
             />

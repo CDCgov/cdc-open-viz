@@ -30,8 +30,8 @@ const StateOutput: React.FC<StateOutputProps> = ({ topoData, path, scale, runtim
   return stateLines.map((line, index) => (
     <g
       key={`single-state-${index}`}
-      className='single-state pe-none'
-      style={{ fill: 'transparent' }}
+      className='single-state'
+      style={{ fill: 'transparent', pointerEvents: 'none' }}
       stroke={geoStrokeColor}
       strokeWidth={2 / scale}
     >

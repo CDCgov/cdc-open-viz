@@ -57,7 +57,8 @@ const EditorPanel = memo(props => {
   const approvedWaffleChartOptions = [
     { value: 'Waffle', label: 'Waffle' },
     { value: 'TP5 Waffle', label: 'TP5 Style Waffle' },
-    { value: 'Gauge', label: 'Gauge' }
+    { value: 'Gauge', label: 'Gauge' },
+    { value: 'TP5 Gauge', label: 'TP5 Style Gauge' }
   ]
 
   const editorContent = (
@@ -70,15 +71,6 @@ const EditorPanel = memo(props => {
           updateField={updateField}
           options={approvedWaffleChartOptions}
         />
-        {config.visualizationType === 'Gauge' && (
-          <Select
-            value={config.visualizationSubType}
-            fieldName='visualizationSubType'
-            label='Chart Subtype'
-            updateField={updateField}
-            options={['Linear']}
-          />
-        )}
         <TextField
           value={config.title}
           fieldName='title'
@@ -263,7 +255,7 @@ const EditorPanel = memo(props => {
             </div>
           </li>
         </ul>
-        {config.visualizationType === 'Gauge' && (
+        {(config.visualizationType === 'Gauge' || config.visualizationType === 'TP5 Gauge') && (
           <>
             <hr className='cove-accordion__divider' />
             <div className='cove-accordion__panel-section reverse-labels'>
@@ -344,8 +336,8 @@ const EditorPanel = memo(props => {
           Add Filter
         </Button>
       </Accordion.Section>
-      <Accordion.Section title='Chart Settings'>
-        {config.visualizationType !== 'Gauge' && (
+      {config.visualizationType !== 'Gauge' && config.visualizationType !== 'TP5 Gauge' && (
+        <Accordion.Section title='Chart Settings'>
           <Select
             value={config.shape}
             fieldName='shape'
@@ -353,62 +345,62 @@ const EditorPanel = memo(props => {
             updateField={updateField}
             options={['circle', 'square', 'person']}
           />
-        )}
-        {config.visualizationType !== 'Gauge' && config.visualizationType !== 'TP5 Waffle' && (
-          <>
-            <div
-              className='cove-accordion__panel-row cove-accordion__small-inputs'
-              style={{ marginTop: '1rem', marginBottom: '1rem' }}
-            >
-              <div className='cove-accordion__panel-col'>
-                <TextField
-                  type='number'
-                  value={config.nodeWidth}
-                  fieldName='nodeWidth'
-                  label='Width'
-                  updateField={updateField}
-                />
-              </div>
-              <div className='cove-accordion__panel-col'>
-                <TextField
-                  type='number'
-                  value={config.nodeSpacer}
-                  fieldName='nodeSpacer'
-                  label='Spacer'
-                  updateField={updateField}
-                />
-              </div>
-            </div>
-
-            <div className='cove-input-group'>
-              <Select
-                value={config.orientation}
-                fieldName='orientation'
-                label='Layout'
-                updateField={updateField}
-                options={['horizontal', 'vertical']}
-              />
-            </div>
-
-            <div className='cove-input-group'>
-              <label>
-                <span className='edit-label column-heading cove-input__label'>Data Point Font Size</span>
-              </label>
-              <div className='cove-accordion__panel-row cove-accordion__small-inputs align-center'>
+          {config.visualizationType !== 'TP5 Waffle' && (
+            <>
+              <div
+                className='cove-accordion__panel-row cove-accordion__small-inputs'
+                style={{ marginTop: '1rem', marginBottom: '1rem' }}
+              >
                 <div className='cove-accordion__panel-col'>
-                  <TextField type='number' value={config.fontSize} fieldName='fontSize' updateField={updateField} />
+                  <TextField
+                    type='number'
+                    value={config.nodeWidth}
+                    fieldName='nodeWidth'
+                    label='Width'
+                    updateField={updateField}
+                  />
                 </div>
-                <div className='cove-accordion__panel-col' style={{ display: 'flex', alignItems: 'center' }}>
-                  <label className='accordion__panel-label--muted'> default (50px)</label>
+                <div className='cove-accordion__panel-col'>
+                  <TextField
+                    type='number'
+                    value={config.nodeSpacer}
+                    fieldName='nodeSpacer'
+                    label='Spacer'
+                    updateField={updateField}
+                  />
                 </div>
               </div>
-            </div>
-          </>
-        )}
-      </Accordion.Section>
+
+              <div className='cove-input-group'>
+                <Select
+                  value={config.orientation}
+                  fieldName='orientation'
+                  label='Layout'
+                  updateField={updateField}
+                  options={['horizontal', 'vertical']}
+                />
+              </div>
+
+              <div className='cove-input-group'>
+                <label>
+                  <span className='edit-label column-heading cove-input__label'>Data Point Font Size</span>
+                </label>
+                <div className='cove-accordion__panel-row cove-accordion__small-inputs align-center'>
+                  <div className='cove-accordion__panel-col'>
+                    <TextField type='number' value={config.fontSize} fieldName='fontSize' updateField={updateField} />
+                  </div>
+                  <div className='cove-accordion__panel-col' style={{ display: 'flex', alignItems: 'center' }}>
+                    <label className='accordion__panel-label--muted'> default (50px)</label>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </Accordion.Section>
+      )}
 
       {/* Visual section for TP5 style */}
-      {config.visualizationType === 'TP5 Waffle' && (
+      {(config.visualizationType === 'TP5 Waffle' || config.visualizationType === 'TP5 Gauge') && (
         <Accordion.Section title='Visual'>
           <CheckBox
             value={config.visual?.whiteBackground}
@@ -421,7 +413,7 @@ const EditorPanel = memo(props => {
       )}
 
       {/* Visual section for other styles */}
-      {config.visualizationType !== 'TP5 Waffle' && (
+      {config.visualizationType !== 'TP5 Waffle' && config.visualizationType !== 'TP5 Gauge' && (
         <Accordion.Section title='Visual'>
           <VisualSection
             config={config}

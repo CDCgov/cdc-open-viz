@@ -126,6 +126,9 @@
         &--pattern {
           cursor: default;
         }
+        &:focus {
+          outline: none;
+        }
       }
 
       .legend-container__ul:not(.single-row, .legend-container__ul--single-column) {

@@ -56,6 +56,12 @@ export const useEditorPermissions = () => {
     return true
   }
 
+  const visSupportsDataAnnotations = () => {
+    const enabledCharts = ['Line', 'Bar', 'Combo', 'Area Chart', 'Forecasting']
+    if (enabledCharts.includes(visualizationType) && config.orientation !== 'horizontal') return true
+    return false
+  }
+
   const visHasLabelOnData = () => {
     const disabledCharts = [
       'Area Chart',
@@ -446,6 +452,7 @@ export const useEditorPermissions = () => {
     visSupportsDateCategoryAxisPadding,
     visSupportsFilters,
     visSupportsFootnotes,
+    visSupportsDataAnnotations,
     visSupportsLeftValueAxis,
     visSupportsNonSequentialPallete,
     visSupportsPreliminaryData,

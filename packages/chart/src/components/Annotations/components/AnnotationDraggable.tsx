@@ -1,46 +1,130 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useState } from 'react'
 import ConfigContext from '../../../ConfigContext'
 import DOMPurify from 'dompurify'
+import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
+import { isMobileAnnotationViewport } from '@cdc/core/helpers/viewports'
 
 // helpers
 import { findNearestDatum } from './findNearestDatum'
 
-// prettier-ignore
-import {
-  applyBandScaleOffset,
-  handleConnectionHorizontalType,
-  handleConnectionVerticalType,
-  handleMobileXPosition,
-  handleMobileYPosition,
-  handleTextX,
-  handleTextY
-} from './helpers'
-
 // visx
 import { HtmlLabel, CircleSubject, EditableAnnotation, Connector, Annotation as VisxAnnotation } from '@visx/annotation'
-import { Drag } from '@visx/drag'
 import { MarkerArrow } from '@visx/marker'
 import { LinePath } from '@visx/shape'
 
 // styles
 import './AnnotationDraggable.styles.css'
 
-const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragStateChange }) => {
+const Annotations = ({
+  xScale,
+  yScale,
+  xScaleAnnotation,
+  yScaleAnnotation,
+  xMax,
+  yMax,
+  seriesScale,
+  svgRef,
+  onDragStateChange
+}) => {
   // prettier-ignore
-  const { config, dimensions, isEditor, updateConfig, colorScale } = useContext(ConfigContext)
+  const { config, dimensions, isEditor, updateConfig, colorScale, transformedData, parseDate, currentViewport, visibleAnnotations } = useContext(ConfigContext)
 
   // destructure config items here...
-  const { annotations } = config
+  const { annotations, visualizationType } = config
   const [height] = dimensions
 
   const AnnotationComponent = isEditor ? EditableAnnotation : VisxAnnotation
+  const isMobile = isMobileAnnotationViewport(currentViewport)
+
+  /**
+   * Scale dx/dy offsets based on savedDimensions vs current dimensions.
+   * This ensures label positions scale proportionally when chart is resized.
+   * Falls back to unscaled values if savedDimensions is missing (backward compatible).
+   */
+  const getScaledOffsets = (annotation: { dx: number; dy: number; savedDimensions?: [number, number] }) => {
+    const [savedWidth, savedHeight] = annotation.savedDimensions || []
+
+    const scaledDx = savedWidth && savedWidth > 0 ? (annotation.dx / savedWidth) * xMax : annotation.dx
+    const scaledDy = savedHeight && savedHeight > 0 ? (annotation.dy / savedHeight) * yMax : annotation.dy
+
+    return { scaledDx, scaledDy }
+  }
+
+  // Track live drag position for real-time anchor calculations
+  const [liveDrag, setLiveDrag] = useState<{ index: number; dx: number } | null>(null)
+
+  // Helper to determine label anchoring when near chart edges
+  const getAnnotationAnchors = (annotationX: number, dx: number, labelWidth: number) => {
+    const endpointX = annotationX + dx
+
+    const leftOverflow = dx < 0 && endpointX - labelWidth < 0
+    const rightOverflow = dx > 0 && endpointX + labelWidth > xMax
+
+    if (leftOverflow || rightOverflow) {
+      // Center label above the endpoint
+      return { horizontalAnchor: 'middle' as const, verticalAnchor: 'end' as const }
+    }
+
+    // Let visx auto-decide
+    return { horizontalAnchor: null, verticalAnchor: null }
+  }
 
   return (
-    annotations &&
-    annotations.map((annotation, index) => {
+    visibleAnnotations &&
+    visibleAnnotations.map((annotation, annotationIndex) => {
+      const originalIndex = annotations.indexOf(annotation)
       const text = annotation.text || ''
 
-      const annotationX = xScaleAnnotation(annotation.x)
+      // Calculate scaled dx/dy offsets based on savedDimensions
+      const { scaledDx, scaledDy } = getScaledOffsets(annotation)
+
+      // Default to absolute positioning
+      let annotationX = xScaleAnnotation(annotation.x)
+      let annotationY = yScaleAnnotation(annotation.y)
+
+      // Override with data-anchored positioning if applicable
+      if (annotation.anchorMode === 'data' && annotation.dataX !== undefined) {
+        const dataSource = transformedData || config.data
+        const dataPoint = dataSource.find(d => d[config.xAxis.dataKey] === annotation.dataX)
+
+        if (dataPoint) {
+          const dataYValue = dataPoint[annotation.seriesKey]
+
+          // For date/date-time axes, convert raw value to timestamp for scale
+          let xScaleInput = annotation.dataX
+          if (config.xAxis.type === 'date' || config.xAxis.type === 'date-time') {
+            xScaleInput = parseDate(xScaleInput, false)?.getTime()
+          }
+
+          // Check if this annotation's series is a bar in a grouped bar situation
+          const annotationSeries = config.series?.find(s => s.dataKey === annotation.seriesKey)
+          const barSeriesCount = config.series?.filter(s => s.type === 'Bar').length || 0
+          const isGroupedBarAnnotation =
+            annotationSeries?.type === 'Bar' && barSeriesCount > 1 && config.visualizationSubType !== 'stacked'
+
+          if (isGroupedBarAnnotation && seriesScale) {
+            // Position at group start + series offset + half series bar width
+            const seriesOffset = seriesScale(annotation.seriesKey) || 0
+            const seriesBandwidth = seriesScale.bandwidth?.() || 0
+            annotationX = xScale(xScaleInput) + seriesOffset + seriesBandwidth / 2
+          } else {
+            // For lines, areas, single bars, etc - center on the data point
+            annotationX = xScale(xScaleInput) + (xScale.bandwidth?.() / 2 || 0)
+          }
+
+          // Adjust X for arrow markers based on label direction
+          if (annotation.marker === 'arrow' && Math.abs(annotation.dx) >= 100) {
+            const direction = annotation.dx > 0 ? 1 : -1
+            const relevantBandwidth =
+              isGroupedBarAnnotation && seriesScale ? seriesScale.bandwidth?.() : xScale.bandwidth?.()
+            const nudgeAmount = relevantBandwidth ? relevantBandwidth / 6 : 2
+            annotationX += direction * nudgeAmount
+          }
+
+          // Y position based on marker type
+          annotationY = yScale(dataYValue) - (annotation.marker === 'circle' ? 0 : 5)
+        }
+      }
 
       // sanitize the text for setting dangerouslySetInnerHTML
       const sanitizedData = () => ({
@@ -49,47 +133,72 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
 
       return (
         <AnnotationComponent
-          key={`annotation-${index}`}
-          width={200}
-          height={height}
-          dx={annotation.dx} // label position
-          dy={annotation.dy} // label postion
+          key={`annotation-${originalIndex}-${annotation.x}-${annotation.y}-${annotation.dx}-${annotation.dy}`}
+          width={xMax}
+          height={yMax}
+          dx={scaledDx} // label position (scaled to current chart dimensions)
+          dy={scaledDy} // label position (scaled to current chart dimensions)
           x={annotationX}
-          y={annotation.y}
+          y={annotationY}
           canEditLabel={annotation.edit.label || false}
           canEditSubject={(annotation.edit.subject && annotation.connectionType !== 'none') || false}
-          onDragStart={() => onDragStateChange(true)}
+          labelDragHandleProps={{ r: 15, stroke: 'red' }}
+          subjectDragHandleProps={{ r: 15, stroke: 'red' }}
+          onDragStart={() => {
+            onDragStateChange(true)
+            setLiveDrag({ index: annotationIndex, dx: scaledDx })
+          }}
+          onDragMove={props => {
+            setLiveDrag({ index: annotationIndex, dx: props.dx })
+          }}
           onDragEnd={props => {
             onDragStateChange(false)
+            setLiveDrag(null)
 
             let updatedAnnotations = [...annotations]
 
-            if (annotation.x === xScaleAnnotation.invert(props.x) && annotation.y === props.y) {
-              updatedAnnotations[index] = { ...updatedAnnotations[index], dx: props.dx, dy: props.dy }
-            } else {
-              if (annotation.snapToNearestPoint) {
-                let nearestDatum = findNearestDatum(
-                  {
-                    data: config.data,
-                    xScale,
-                    yScale,
-                    config,
-                    xMax: xMax - config.yAxis.size / 2,
-                    annotationSeriesKey: annotation.seriesKey
-                  },
-                  props.x
-                )
+            // Current chart dimensions to save with the annotation
+            const currentDimensions: [number, number] = [xMax, yMax]
 
-                updatedAnnotations[index] = {
-                  ...updatedAnnotations[index],
-                  x: xScaleAnnotation.invert(xScale(nearestDatum.x)),
-                  y: yScale(nearestDatum.y)
+            const isLabelOnlyDrag =
+              annotation.anchorMode === 'data'
+                ? annotationX === props.x && annotationY === props.y
+                : annotation.x === xScaleAnnotation.invert(props.x) && annotation.y === yScaleAnnotation.invert(props.y)
+
+            if (isLabelOnlyDrag) {
+              updatedAnnotations[originalIndex] = {
+                ...updatedAnnotations[originalIndex],
+                dx: props.dx,
+                dy: props.dy,
+                savedDimensions: currentDimensions
+              }
+            } else {
+              if (annotation.anchorMode === 'data') {
+                let nearestDatum = findNearestDatum({
+                  data: transformedData || config.data,
+                  xScale,
+                  xAxisType: config.xAxis.type,
+                  xAxisDataKey: config.xAxis.dataKey,
+                  seriesKey: annotation.seriesKey,
+                  xPixel: props.x,
+                  parseDate
+                })
+
+                if (nearestDatum) {
+                  updatedAnnotations[originalIndex] = {
+                    ...updatedAnnotations[originalIndex],
+                    dataX: nearestDatum.x,
+                    x: xScaleAnnotation.invert(props.x),
+                    y: yScaleAnnotation.invert(props.y),
+                    savedDimensions: currentDimensions
+                  }
                 }
               } else {
-                updatedAnnotations[index] = {
-                  ...updatedAnnotations[index],
+                updatedAnnotations[originalIndex] = {
+                  ...updatedAnnotations[originalIndex],
                   x: xScaleAnnotation.invert(props.x),
-                  y: props.y
+                  y: yScaleAnnotation.invert(props.y),
+                  savedDimensions: currentDimensions
                 }
               }
             }
@@ -100,94 +209,109 @@ const Annotations = ({ xScale, yScale, xScaleAnnotation, xMax, svgRef, onDragSta
             })
           }}
         >
-          <HtmlLabel
-            className='annotation__desktop-label'
-            showAnchorLine={false}
-            horizontalAnchor={handleConnectionHorizontalType(annotation, xScale, config)}
-            verticalAnchor={handleConnectionVerticalType(annotation, xScale, config)}
-          >
-            <div
-              style={{
-                borderRadius: 5, // Optional: set border radius
-                backgroundColor: `rgba(255, 255, 255, ${annotation?.opacity ? Number(annotation?.opacity) / 100 : 1})`,
-                padding: '10px',
-                width: 'auto',
-                display: config.general.showAnnotationDropdown ? 'inline-flex' : 'flex',
-                justifyContent: 'start',
-                flexDirection: 'row'
-              }}
-              // role='presentation'
-              tabIndex={0}
-              aria-label={`Annotation text that reads: ${annotation.text}`}
-            >
-              {config?.general?.showAnnotationDropdown && (
-                <>
-                  <p className='annotation__has-dropdown-number' style={{ margin: '2px 6px' }}>
-                    {index + 1}
-                  </p>
-                </>
-              )}
-              <div dangerouslySetInnerHTML={sanitizedData()} />
-            </div>
-          </HtmlLabel>
+          {!isMobile &&
+            (() => {
+              const labelWidth = config.general.showAnnotationDropdown ? 186 : 150
+              // Use live dx during drag (already in current space), otherwise use scaled dx
+              const currentDx = liveDrag?.index === annotationIndex ? liveDrag.dx : scaledDx
+              const { horizontalAnchor, verticalAnchor } = getAnnotationAnchors(annotationX, currentDx, labelWidth)
+              return (
+                <HtmlLabel
+                  className='annotation__desktop-label'
+                  containerStyle={{ width: `${labelWidth}px` }}
+                  horizontalAnchor={horizontalAnchor}
+                  verticalAnchor={verticalAnchor}
+                  showAnchorLine={false}
+                >
+                  <div
+                    style={{
+                      borderRadius: 5, // Optional: set border radius
+                      backgroundColor: `rgba(255, 255, 255, ${
+                        annotation?.opacity ? Number(annotation?.opacity) / 100 : 1
+                      })`,
+                      padding: '10px',
+                      width: 'auto',
+                      display: config.general.showAnnotationDropdown ? 'inline-flex' : 'flex',
+                      justifyContent: 'start',
+                      flexDirection: 'row',
+                      alignItems: 'center'
+                    }}
+                    // role='presentation'
+                    tabIndex={0}
+                    aria-label={`Annotation text that reads: ${annotation.text}`}
+                  >
+                    {config?.general?.showAnnotationDropdown && (
+                      <>
+                        <p
+                          className='annotation__has-dropdown-number'
+                          style={{ margin: '2px 6px', position: 'relative', left: '-4px' }}
+                        >
+                          {originalIndex + 1}
+                        </p>
+                      </>
+                    )}
+                    <div dangerouslySetInnerHTML={sanitizedData()} />
+                  </div>
+                </HtmlLabel>
+              )
+            })()}
           {annotation.connectionType === 'line' && (
-            <Connector type='line' pathProps={{ markerStart: `url(#marker-start--${index})` }} />
+            <Connector type='line' pathProps={{ markerStart: `url(#marker-start--${originalIndex})` }} />
           )}
           {annotation.connectionType === 'elbow' && (
-            <Connector type='elbow' pathProps={{ markerStart: `url(#marker-start--${index})` }} />
+            <Connector type='elbow' pathProps={{ markerStart: `url(#marker-start--${originalIndex})` }} />
           )}
           {annotation.connectionType === 'curve' && (
             <LinePath
-              d={`M ${annotationX},${annotation.y}
-                      Q ${annotationX + annotation.dx / 2}, ${
-                annotation.y + annotation.dy / 2 + Number(annotation?.bezier) || 0
-              } ${annotationX + annotation.dx},${annotation.y + annotation.dy}`}
-              stroke='black'
-              strokeWidth='2'
+              d={`M ${annotationX},${annotationY}
+                      Q ${annotationX + scaledDx / 2}, ${
+                annotationY + scaledDy / 2 + Number(annotation?.bezier) || 0
+              } ${annotationX + scaledDx},${annotationY + scaledDy}`}
+              stroke={APP_FONT_COLOR}
               fill='none'
-              marker-start={`url(#marker-start--${index})`}
+              marker-start={`url(#marker-start--${originalIndex})`}
             />
           )}
           {annotation.marker === 'circle' && (
-            <CircleSubject
-              id={`marker-start--${index}`}
-              className='circle-subject'
-              stroke={colorScale(annotation.seriesKey)}
-              radius={8}
-            />
+            <CircleSubject className='circle-subject' stroke={APP_FONT_COLOR} radius={8} />
           )}
           {annotation.marker === 'arrow' && (
             <MarkerArrow
-              fill='black'
-              id={`marker-start--${index}`}
+              fill={APP_FONT_COLOR}
+              id={`marker-start--${originalIndex}`}
               x={annotationX}
-              y={annotation.y}
-              stroke='#333'
-              markerWidth={10}
+              y={annotationY}
+              stroke={APP_FONT_COLOR}
+              markerWidth={12}
               size={10}
               strokeWidth={1}
               orient='auto-start-reverse'
               markerUnits='userSpaceOnUse'
             />
           )}
-          <circle
-            fill='white'
-            cx={annotationX + annotation.dx}
-            cy={annotation.y + annotation.dy}
-            r={16}
-            className='annotation__mobile-label annotation__mobile-label-circle'
-            stroke={colorScale(annotation.seriesKey)}
-          />
-          <text
-            height={16}
-            x={annotationX + annotation.dx}
-            y={annotation.y + annotation.dy}
-            className='annotation__mobile-label'
-            alignmentBaseline='middle'
-            textAnchor='middle'
-          >
-            {index + 1}
-          </text>
+          {isMobile && (
+            <>
+              <circle
+                fill='white'
+                cx={annotationX + scaledDx}
+                cy={annotationY + scaledDy}
+                r={12}
+                className='annotation__mobile-label annotation__mobile-label-circle'
+                stroke={APP_FONT_COLOR}
+              />
+              <text
+                height={16}
+                x={annotationX + scaledDx}
+                y={annotationY + scaledDy + 1}
+                fontSize={14}
+                className='annotation__mobile-label'
+                alignmentBaseline='middle'
+                textAnchor='middle'
+              >
+                {originalIndex + 1}
+              </text>
+            </>
+          )}
         </AnnotationComponent>
       )
     })

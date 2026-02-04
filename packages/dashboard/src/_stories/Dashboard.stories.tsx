@@ -35,6 +35,7 @@ import CascadingDataFilters from './_mock/filter-cascade.json'
 import ParentChildFilters from './_mock/parent-child-filters.json'
 import NestedParentChildFilters from './_mock/nested-parent-child-filters.json'
 import GalleryDataBiteDashboard from './_mock/gallery-data-bite-dashboard.json'
+import TP5TestConfig from './_mock/tp5-test.json'
 
 // Dashboard Filter Updates for Ascending, Descending, and Custom Order
 import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
@@ -99,6 +100,13 @@ export const Example_2: Story = {
 export const Example_3: Story = {
   args: {
     config: ExampleConfig_3,
+    isEditor: false
+  }
+}
+
+export const TP5_Test_Dashboard: Story = {
+  args: {
+    config: TP5TestConfig,
     isEditor: false
   }
 }

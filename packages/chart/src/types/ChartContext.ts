@@ -36,6 +36,7 @@ type SharedChartContext = {
   setLegendIsolateValues?: Function
   svgRef?: React.RefObject<SVGSVGElement>
   handleSmallMultipleHover?: (xAxisValue: any, yCoordinate: number) => void
+  visibleAnnotations?: Annotation[]
 }
 
 // Line Chart Specific Context

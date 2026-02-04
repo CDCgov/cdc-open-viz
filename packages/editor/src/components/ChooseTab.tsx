@@ -27,6 +27,7 @@ import ComboChartIcon from '@cdc/core/assets/icon-combo-chart.svg'
 import EpiChartIcon from '@cdc/core/assets/icon-epi-chart.svg'
 import TableIcon from '@cdc/core/assets/icon-table.svg'
 import WarmingStripesIcon from '@cdc/core/assets/icon-warming-stripes.svg'
+import CodeIcon from '@cdc/core/assets/icon-code.svg'
 import RadarChartIcon from '@cdc/core/assets/icon-chart-radar.svg'
 import Icon from '@cdc/core/components/ui/Icon'
 
@@ -317,6 +318,16 @@ const buttons = [
     icon: <GaugeChartIcon />,
     content: `Specify the calculation of a single data point (such as a percentage value) and present it on a horizontal
               scale.`
+  },
+  {
+    id: 26,
+    category: 'General',
+    label: 'Markup Include',
+    type: 'markup-include',
+    subType: null,
+    orientation: null,
+    icon: <CodeIcon />,
+    content: 'Include custom HTML markup or embed content from external URLs.'
   },
   {
     id: 17,

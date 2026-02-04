@@ -9,7 +9,7 @@
     "@cdc/core": "^4.25.11",
     "chroma-js": "^3.1.2",
     "html-react-parser": "^5.2.3",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "papaparse": "^5.5.2",
     "react-accessible-accordion": "^5.0.1",
     "whatwg-fetch": "^3.6.20"
