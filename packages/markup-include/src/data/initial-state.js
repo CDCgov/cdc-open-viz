@@ -1,7 +1,6 @@
 export default {
   contentEditor: {
     inlineHTML: '<strong>Inline HTML</strong>',
-    markupVariables: [],
     showHeader: true,
     srcUrl: '#example',
     title: '',
