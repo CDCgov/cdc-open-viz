@@ -26,13 +26,14 @@ function initializeIframe(iframe) {
   const id = `cove-${iframeCounter++}`
   iframe.setAttribute('data-cove-id', id)
 
-  // Send the ID to the iframe via postMessage
+  // Send the ID and embed page URL to the iframe via postMessage
   const sendId = () => {
     if (iframe.contentWindow) {
       iframe.contentWindow.postMessage(
         {
           type: 'cove:setId',
-          id: id
+          id: id,
+          embedPageUrl: window.location.origin + window.location.pathname
         },
         '*'
       )

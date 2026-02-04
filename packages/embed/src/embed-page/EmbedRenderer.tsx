@@ -1,14 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useCoveContainer } from '../shared/useCoveContainer'
 import { getConfigUrlParam } from '@cdc/core/helpers/embed'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
 import cdcLogo from '@cdc/core/assets/logo2.svg'
 
 /**
- * EmbedRenderer - Phase 1 & 2
+ * EmbedRenderer
  *
  * Creates a COVE container div with proper data attributes.
  * The production main.js (loaded in HTML) will find this div and render the visualization.
  * Also sends resize events to parent window for iframe height adjustment.
+ * Fires embed_loaded analytics event when visualization loads.
  */
 const EmbedRenderer: React.FC = () => {
   const wrapperRef = useRef<HTMLDivElement>(null) // Wrapper for height measurement (includes logo)
@@ -18,10 +21,41 @@ const EmbedRenderer: React.FC = () => {
   const lastHeightRef = useRef<number>(0) // Shared across all resize paths
   const [showLogo, setShowLogo] = useState(false) // Hide logo until chart loads
 
+  // Analytics tracking refs - handle race condition between cove_loaded and setId message
+  const embedPageUrlRef = useRef<string | null>(null) // URL of the page embedding this visualization
+  const vizConfigRef = useRef<any>(null) // Config from cove_loaded event
+  const embedLoadedFiredRef = useRef<boolean>(false) // Ensure we only fire embed_loaded once
+
   const configUrl = getConfigUrlParam()
 
   // Setup COVE container using shared hook
   useCoveContainer(coveContainerRef, configUrl)
+
+  /**
+   * Fire embed_loaded analytics event when we have both the embed page URL and viz config.
+   * Handles race condition - either cove_loaded or setId message can arrive first.
+   * Only fires once, even if dashboard has multiple child visualizations firing cove_loaded.
+   */
+  const tryFireEmbedLoadedEvent = () => {
+    // Only fire once
+    if (embedLoadedFiredRef.current) return
+
+    // Need both pieces of info
+    if (!embedPageUrlRef.current || !vizConfigRef.current) return
+
+    const config = vizConfigRef.current
+    publishAnalyticsEvent({
+      vizType: config?.type || 'unknown',
+      vizSubType: getVizSubType(config),
+      vizTitle: getVizTitle(config),
+      eventType: 'embed_loaded' as const,
+      eventAction: 'load' as const,
+      eventLabel: configUrl || undefined,
+      specifics: `embedPageUrl: ${embedPageUrlRef.current}`
+    })
+
+    embedLoadedFiredRef.current = true
+  }
 
   // Measure height and send resize message (with duplicate detection)
   const measureAndSend = (id: string) => {
@@ -53,12 +87,18 @@ const EmbedRenderer: React.FC = () => {
     iframeIdRef.current = iframeId
   }, [iframeId])
 
-  // Listen for cove_loaded - send resize if we have an ID and show logo
+  // Listen for cove_loaded - send resize if we have an ID, show logo, and fire analytics
   useEffect(() => {
-    const handleCoveLoaded = () => {
+    const handleCoveLoaded = (event: Event) => {
       setShowLogo(true)
       if (iframeIdRef.current) {
         measureAndSend(iframeIdRef.current)
+      }
+
+      // Store config from event for analytics (only on first cove_loaded)
+      if (!vizConfigRef.current) {
+        vizConfigRef.current = (event as CustomEvent).detail?.config || null
+        tryFireEmbedLoadedEvent()
       }
     }
 
@@ -75,6 +115,12 @@ const EmbedRenderer: React.FC = () => {
       if (event.data && event.data.type === 'cove:setId') {
         const newId = event.data.id
         setIframeId(newId)
+
+        // Store embed page URL for analytics (from parent page)
+        if (event.data.embedPageUrl && !embedPageUrlRef.current) {
+          embedPageUrlRef.current = event.data.embedPageUrl
+          tryFireEmbedLoadedEvent()
+        }
       }
     }
 
