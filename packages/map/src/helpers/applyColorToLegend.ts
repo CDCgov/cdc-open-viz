@@ -139,10 +139,11 @@ export const applyColorToLegend = (legendIdx: number, config: MapConfig, result:
   }
 
   // Use lighter color for first category with value "0" in supported sequential palettes
-  // Only applies when: categorical map, first non-special item, value is 0, palette not reversed
+  // Only applies when: categorical map, gradient legend style, first non-special item, value is 0, palette not reversed
   if (
     colorIdx === 0 &&
     legend?.type === 'category' &&
+    legend?.style === 'gradient' &&
     !palette.isReversed &&
     (result[legendIdx]?.value === 0 || result[legendIdx]?.value === '0') &&
     sequentialZeroColors[color]
