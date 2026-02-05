@@ -3,7 +3,7 @@ $grid-gap-max: 64;
 $grid-columns: 12;
 
 @mixin create-grid-selectors($breakpoint: null) {
-  $infix: if($breakpoint == null, '', '-#{$breakpoint}');
+  $infix: if(sass($breakpoint ==null): ""; else: "-#{$breakpoint}");
 
   @for $i from 1 through $grid-columns {
     .col#{$infix}-#{$i} {
