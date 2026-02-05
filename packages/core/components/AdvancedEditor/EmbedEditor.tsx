@@ -211,8 +211,7 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
             ) : (
               <>
                 <p style={{ fontSize: '0.85em', marginBottom: '1em', color: '#666' }}>
-                  Generate embed codes for partners to add this visualization to their websites. Your visualization will
-                  need to be published to Link (www.cdc.gov) before it can be embedded by a partner.
+                  Generate embed codes for partners to add this visualization to their website.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
@@ -461,7 +460,8 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
               {activeTab === 'code' && (
                 <div>
                   <p style={{ marginBottom: '10px', color: '#666' }}>
-                    Copy this code and send it to the partner so they can add it to their site:
+                    Copy this code and send it to a partner so they can add it to their site. Your visualization will
+                    need to be published to Link (www.cdc.gov) before it can be embedded by a partner.
                   </p>
                   <textarea
                     readOnly
