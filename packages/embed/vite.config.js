@@ -29,7 +29,7 @@ export default defineConfig(({ mode }) => ({
           rollupOptions: {
             input: {
               embed: resolve(__dirname, 'index.html'),
-              helper: resolve(__dirname, 'src/embed-helper/index.js')
+              helper: '@cdc/core/helpers/embed/embedHelper.js'
             },
             output: {
               entryFileNames: chunkInfo => {

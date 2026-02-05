@@ -1,6 +1,5 @@
 /**
- * URL validation utilities for the embed package
- *
+ * URL validation utilities for embed functionality
  */
 
 /**

@@ -1,8 +1,6 @@
 /**
- * Utilities for working with COVE filters
+ * Utilities for working with COVE filters in embed contexts
  */
-
-import { CoveConfig } from './useConfigLoader'
 
 export type FilterMetadata = {
   label: string
@@ -22,7 +20,7 @@ export type FilterState = {
  * Extract filter metadata from a COVE config
  * Handles both regular viz filters and dashboard shared filters
  */
-export function extractFilters(config: CoveConfig | null): FilterMetadata[] {
+export function extractFilters(config: any): FilterMetadata[] {
   if (!config) return []
 
   // Try regular filters first (charts, maps, etc.)
@@ -86,15 +84,6 @@ export function initializeFilterState(filters: FilterMetadata[]): Record<string,
   })
 
   return state
-}
-
-/**
- * Check if all filters have setByQueryParameter defined
- * Returns true if all filters can be controlled via URL, or if there are no filters
- */
-export function allFiltersHaveQueryParam(filters: FilterMetadata[]): boolean {
-  if (filters.length === 0) return true
-  return filters.every(filter => !!filter.setByQueryParameter)
 }
 
 /**
