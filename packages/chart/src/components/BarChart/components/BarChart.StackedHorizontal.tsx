@@ -215,8 +215,10 @@ const BarChartStackedHorizontal = () => {
                         y: bar.y,
                         onMouseOver: e => onMouseOverBar(yAxisValue, bar.key, e, data, bar.bar.data[bar.key]),
                         onMouseLeave: onMouseLeaveBar,
-                        tooltipHtml: tooltip,
-                        tooltipId: `cdc-open-viz-tooltip-${config.runtime.uniqueId}`,
+                        ...(config.tooltips.singleSeries && {
+                          tooltipHtml: tooltip,
+                          tooltipId: `cdc-open-viz-tooltip-${config.runtime.uniqueId}`
+                        }),
                         onClick: e => {
                           e.preventDefault()
                           if (setSharedFilter) {

@@ -61,19 +61,8 @@ const BarChart: React.FC<BarChartProps> = ({
           <BarChartType.StackedHorizontal />
           <BarChartType.Vertical />
           <BarChartType.Horizontal />
-          <Bar
-            key={'bars'}
-            display={config.tooltips.singleSeries ? 'none' : 'block'}
-            width={Number(xMax)}
-            height={Number(yMax)}
-            fill={'transparent'}
-            fillOpacity={0.05}
-            onMouseMove={e => {
-              handleTooltipMouseOver(e, data)
-            }}
-            onMouseOut={handleTooltipMouseOff}
-            onClick={e => handleTooltipClick(e, data)}
-          />
+          {/* Transparent overlay removed - individual bars handle their own mouse events.
+              This ensures tooltips only appear when hovering directly over bar shapes. */}
         </Group>
       </BarChartContext.Provider>
     </ErrorBoundary>
