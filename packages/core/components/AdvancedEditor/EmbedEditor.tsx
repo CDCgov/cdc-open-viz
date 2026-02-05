@@ -13,7 +13,7 @@ type EmbedEditorProps = {
   config?: any // Current visualization config
 }
 
-type TabId = 'filters' | 'code'
+type TabId = 'preview' | 'code'
 
 /**
  * EmbedEditor - Provides "Share with Partners" functionality
@@ -24,7 +24,7 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
   const [configUrl, setConfigUrl] = useState<string | null>(null)
   const [showEmbedModal, setShowEmbedModal] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
-  const [activeTab, setActiveTab] = useState<TabId>('filters')
+  const [activeTab, setActiveTab] = useState<TabId>('preview')
   const [embedCodeCopied, setEmbedCodeCopied] = useState(false)
 
   // Extract filters from config
@@ -58,9 +58,8 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
     return allFilters.every((filter: any) => !!filter.setByQueryParameter)
   }, [config])
 
-  // Determine available tabs
+  // Determine if we have valid filters to show
   const hasFilters = filters.length > 0 && filtersAreValid
-  const availableTabs: TabId[] = hasFilters ? ['filters', 'code'] : ['code']
 
   // Generate embed code with current filter settings
   const embedCode = useMemo(() => {
@@ -113,8 +112,7 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
       return
     }
 
-    // Set initial tab based on available tabs
-    setActiveTab(availableTabs[0])
+    setActiveTab('preview')
     setShowEmbedModal(true)
     setEmbedCodeCopied(false)
   }
@@ -305,9 +303,9 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
                 backgroundColor: '#f5f5f5'
               }}
             >
-              {availableTabs.map(tab => {
+              {(['preview', 'code'] as TabId[]).map(tab => {
                 const tabLabels: Record<TabId, string> = {
-                  filters: 'Customize Filters',
+                  preview: 'Preview Visualization',
                   code: 'Get Embed Code'
                 }
 
@@ -342,92 +340,99 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
                 overflow: 'auto'
               }}
             >
-              {/* Filters Tab - Contains both filter controls and preview */}
-              {activeTab === 'filters' && hasFilters && (
+              {/* Preview Tab - Contains filter controls (if filters exist) and preview */}
+              {activeTab === 'preview' && (
                 <div>
-                  <h4 style={{ marginTop: 0, marginBottom: '1rem' }}>Filter Settings</h4>
-                  <p style={{ marginBottom: '1rem', color: '#666' }}>
-                    Set default values and visibility for filters in the partner's embedded visualization.
-                  </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
-                    {filters.map((filter, index) => {
-                      const state = filterState[filter.key] || { value: '', hide: false }
-                      const hasValues = filter.values && filter.values.length > 0
+                  {/* Filter Settings - only shown if there are valid filters */}
+                  {hasFilters && (
+                    <>
+                      <h4 style={{ marginTop: 0, marginBottom: '1rem' }}>Filter Settings</h4>
+                      <p style={{ marginBottom: '1rem', color: '#666' }}>
+                        Set default values and visibility for filters in the partner's embedded visualization.
+                      </p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+                        {filters.map((filter, index) => {
+                          const state = filterState[filter.key] || { value: '', hide: false }
+                          const hasValues = filter.values && filter.values.length > 0
 
-                      return (
-                        <div
-                          key={filter.key || index}
-                          style={{
-                            padding: '1rem',
-                            background: 'white',
-                            border: '1px solid #ddd',
-                            borderRadius: '4px'
-                          }}
-                        >
-                          <label
-                            htmlFor={`filter-${index}`}
-                            style={{
-                              display: 'block',
-                              marginBottom: '0.5rem',
-                              fontWeight: 'bold'
-                            }}
-                          >
-                            {filter.label}
-                          </label>
-
-                          {hasValues ? (
-                            <select
-                              id={`filter-${index}`}
-                              value={state.value}
-                              onChange={e => handleFilterChange(filter.key, e.target.value)}
+                          return (
+                            <div
+                              key={filter.key || index}
                               style={{
-                                width: '100%',
-                                padding: '0.5rem',
-                                fontSize: '0.9rem',
-                                border: '2px solid #d1d5db',
-                                borderRadius: '6px',
-                                backgroundColor: '#f9fafb',
-                                cursor: 'pointer'
+                                padding: '1rem',
+                                background: 'white',
+                                border: '1px solid #ddd',
+                                borderRadius: '4px'
                               }}
                             >
-                              {filter.values?.map((value, valueIndex) => (
-                                <option key={valueIndex} value={value}>
-                                  {value}
-                                </option>
-                              ))}
-                            </select>
-                          ) : (
-                            <div style={{ color: '#999', fontStyle: 'italic' }}>No values available</div>
-                          )}
+                              <label
+                                htmlFor={`filter-${index}`}
+                                style={{
+                                  display: 'block',
+                                  marginBottom: '0.5rem',
+                                  fontWeight: 'bold'
+                                }}
+                              >
+                                {filter.label}
+                              </label>
 
-                          <div style={{ marginTop: '0.75rem' }}>
-                            <label
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                cursor: 'pointer',
-                                fontWeight: 'normal'
-                              }}
-                            >
-                              <input
-                                type='checkbox'
-                                checked={state.hide}
-                                onChange={e => handleHideToggle(filter.key, e.target.checked)}
-                                style={{ marginRight: '0.5rem' }}
-                              />
-                              <span style={{ color: '#666' }}>Hide filter in embed</span>
-                            </label>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
+                              {hasValues ? (
+                                <select
+                                  id={`filter-${index}`}
+                                  value={state.value}
+                                  onChange={e => handleFilterChange(filter.key, e.target.value)}
+                                  style={{
+                                    width: '100%',
+                                    padding: '0.5rem',
+                                    fontSize: '0.9rem',
+                                    border: '2px solid #d1d5db',
+                                    borderRadius: '6px',
+                                    backgroundColor: '#f9fafb',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  {filter.values?.map((value, valueIndex) => (
+                                    <option key={valueIndex} value={value}>
+                                      {value}
+                                    </option>
+                                  ))}
+                                </select>
+                              ) : (
+                                <div style={{ color: '#999', fontStyle: 'italic' }}>No values available</div>
+                              )}
 
-                  {/* Preview Section */}
-                  <h4 style={{ marginBottom: '1rem' }}>Preview</h4>
+                              <div style={{ marginTop: '0.75rem' }}>
+                                <label
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    cursor: 'pointer',
+                                    fontWeight: 'normal'
+                                  }}
+                                >
+                                  <input
+                                    type='checkbox'
+                                    checked={state.hide}
+                                    onChange={e => handleHideToggle(filter.key, e.target.checked)}
+                                    style={{ marginRight: '0.5rem' }}
+                                  />
+                                  <span style={{ color: '#666' }}>Hide filter in embed</span>
+                                </label>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </>
+                  )}
+
+                  {/* Preview Section - title only shown if there are filters */}
+                  {hasFilters && <h4 style={{ marginBottom: '1rem' }}>Preview</h4>}
                   <p style={{ marginBottom: '1rem', color: '#666' }}>
-                    This shows how the visualization will appear on the partner website with your selected settings. The
-                    partner will have control over the width of the embedded visualization.
+                    This shows how the visualization will appear on the partner website
+                    {hasFilters ? ' with your selected settings' : ''}. The partner will have control over the width of
+                    the embedded visualization. If you do not see the latest version of the visualization, save it and
+                    reopen this popup.
                   </p>
                   <div
                     style={{

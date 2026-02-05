@@ -183,13 +183,31 @@ const EmbedRenderer: React.FC = () => {
     )
   }
 
-  // Render the container div that COVE will populate, plus CDC logo
+  // Render the container div that COVE will populate, plus footer with disclaimer and CDC logo
   return (
     <div ref={wrapperRef}>
       <div ref={coveContainerRef} />
       {showLogo && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <img src={cdcLogo} alt='CDC Logo' style={{ height: '40px', width: 'auto' }} />
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: '1rem'
+          }}
+        >
+          <p style={{ fontSize: '16px', marginBottom: '0' }}>
+            Content provided and maintained by the{' '}
+            <a href='https://www.cdc.gov/'>US Centers for Disease Control and Prevention</a> (CDC). Please see our
+            system{' '}
+            <a href='https://tools.cdc.gov/medialibrary/index.aspx#/usageguidelines/info'>
+              usage guidelines and disclaimer
+            </a>
+            .
+          </p>
+          <a href='https://www.cdc.gov' target='_blank' rel='noopener noreferrer'>
+            <img src={cdcLogo} alt='CDC Logo' style={{ height: '40px', width: 'auto', flexShrink: 0 }} />
+          </a>
         </div>
       )}
     </div>
