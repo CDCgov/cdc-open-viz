@@ -12,7 +12,7 @@
  */
 
 import { isValidMessageOrigin } from './urlValidation'
-import { getEmbedBaseUrl } from './embedCodeGenerator'
+import { getEmbedPageUrl } from './embedCodeGenerator'
 
 let iframeCounter = 0
 
@@ -71,7 +71,7 @@ function createIframeFromContainer(container) {
   const [baseConfigUrl, queryString] = configUrl.split('?')
 
   // Build clean URL manually (avoid encoding configUrl path)
-  let iframeSrc = `${getEmbedBaseUrl()}?configUrl=${baseConfigUrl}`
+  let iframeSrc = `${getEmbedPageUrl()}?configUrl=${baseConfigUrl}`
 
   // Add any additional query parameters from the config URL
   if (queryString) {

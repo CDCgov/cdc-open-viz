@@ -3,7 +3,7 @@
  * Used for generating embed codes and managing filter customization
  */
 
-export { generateEmbedCode, getEmbedBaseUrl, getHelperScriptUrl, getEmbedPath, isDevMode } from './embedCodeGenerator'
+export { generateEmbedCode, getEmbedPageUrl, getHelperScriptUrl, isDevMode } from './embedCodeGenerator'
 
 export {
   extractFilters,

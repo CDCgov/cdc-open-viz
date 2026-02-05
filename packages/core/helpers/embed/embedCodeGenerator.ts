@@ -18,25 +18,28 @@ export function isDevMode(): boolean {
 }
 
 /**
- * Get embed base URL for creating iframes
- * Returns full absolute URL including protocol and host
+ * Get the embed page URL for creating iframes.
+ * - In dev mode: returns localhost URL
+ * - On cdc.gov domains: returns relative path for same-origin iframe loading
+ * - On partner sites: returns full absolute URL to www.cdc.gov
  */
-export function getEmbedBaseUrl(): string {
+export function getEmbedPageUrl(): string {
   if (isDevMode()) {
     return 'http://localhost:8080'
   }
-  return 'https://www.cdc.gov/TemplatePackage/contrib/widgets/openVizWrapper/dist/embed/embed.html'
-}
 
-/**
- * Get embed path (without protocol/host) for same-origin usage
- * Use this for preview iframes on the same domain
- */
-export function getEmbedPath(): string {
-  if (isDevMode()) {
-    return 'http://localhost:8080'
+  const embedPath = '/TemplatePackage/contrib/widgets/openVizWrapper/dist/embed/embed.html'
+
+  // On cdc.gov domains, use relative path for same-origin
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname
+    if (hostname === 'cdc.gov' || hostname.endsWith('.cdc.gov')) {
+      return embedPath
+    }
   }
-  return '/TemplatePackage/contrib/widgets/openVizWrapper/dist/embed/embed.html'
+
+  // For partner sites, use full absolute URL
+  return `https://www.cdc.gov${embedPath}`
 }
 
 /**
