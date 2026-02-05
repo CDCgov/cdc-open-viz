@@ -4,6 +4,9 @@
   "description": "Embeddable COVE visualizations for partner websites",
   "license": "Apache-2.0",
   "author": "CDC",
+  "dependencies": {
+    "@cdc/core": "^4.25.11"
+  },
   "devDependencies": {
     "@vitejs/plugin-react": "^5.1.2",
     "vite": "^7.3.1"
