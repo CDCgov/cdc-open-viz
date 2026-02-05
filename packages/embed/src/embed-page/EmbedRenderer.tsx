@@ -193,7 +193,8 @@ const EmbedRenderer: React.FC = () => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'flex-start',
-            gap: '1rem'
+            gap: '1rem',
+            marginTop: '0.5rem'
           }}
         >
           <p style={{ fontSize: '16px', marginBottom: '0' }}>
