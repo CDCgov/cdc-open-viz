@@ -201,23 +201,22 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       return scaleBand<string>({ domain: [], range: [0, Math.max(xMax, 0)] })
     }
 
-    const mappedDates = tableData.map(row => row[dataKey])
-    const hasDateAxis = isDateScale(config?.xAxis)
-    const parseDateValue = (value: string) => {
-      if (parseDate) {
-        return parseDate(value)?.getTime?.() ?? new Date(value).getTime()
-      }
-      return new Date(value).getTime()
+    const mappedValues = tableData.map(row => row[dataKey])
+
+    // Sort domain chronologically for date types, matching the main chart's sort behavior.
+    // Without this, data arriving in reverse chronological order renders the brush backwards.
+    const xAxisType = config?.xAxis?.type
+    let domain: string[]
+    if (xAxisType === 'date' || xAxisType === 'date-time') {
+      const sorted = [...mappedValues].sort((a, b) => {
+        const dateA = parseDate ? parseDate(a) : new Date(a)
+        const dateB = parseDate ? parseDate(b) : new Date(b)
+        return dateA - dateB
+      })
+      domain = config?.xAxis?.sortByRecentDate ? sorted.reverse() : sorted
+    } else {
+      domain = config?.xAxis?.sortByRecentDate ? [...mappedValues].reverse() : mappedValues
     }
-    const domain = hasDateAxis
-      ? [...mappedDates].sort((a, b) =>
-          config?.xAxis?.sortByRecentDate
-            ? parseDateValue(b) - parseDateValue(a)
-            : parseDateValue(a) - parseDateValue(b)
-        )
-      : config?.xAxis?.sortByRecentDate
-      ? [...mappedDates].reverse()
-      : mappedDates
 
     return scaleBand<string>({
       domain,
@@ -225,7 +224,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       paddingInner: 0.1,
       paddingOuter: 0.1
     })
-  }, [tableData, dataKey, config?.xAxis?.sortByRecentDate, xMax])
+  }, [tableData, dataKey, config?.xAxis?.sortByRecentDate, config?.xAxis?.type, parseDate, xMax])
 
   // Simple Y scale for brush (identity mapping)
   const yScale = useMemo(() => scaleLinear<number>({ domain: [0, BRUSH_HEIGHT], range: [BRUSH_HEIGHT, 0] }), [])
