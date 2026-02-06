@@ -2,6 +2,7 @@
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
 import CdcChart from '@cdc/chart/src/CdcChart'
+import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import comboChartConfig from './_mock/combo.json'
 
 export default {
@@ -14,5 +15,14 @@ const Template: Story = args => <CdcChart {...args} />
 export const ComboChart = Template.bind({})
 ComboChart.args = {
   config: comboChartConfig,
+  isEditor: true
+}
+
+export const ComboChartWithBrush = Template.bind({})
+ComboChartWithBrush.args = {
+  config: editConfigKeys(comboChartConfig, [
+    { path: ['xAxis', 'brushActive'], value: true },
+    { path: ['xAxis', 'brushDefaultRecentDateCount'], value: 12 }
+  ]),
   isEditor: true
 }

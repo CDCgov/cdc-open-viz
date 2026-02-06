@@ -2,9 +2,11 @@ import React, { FC, useContext, useMemo, memo, useRef, useEffect, useState, useC
 import { Brush } from '@visx/brush'
 import BaseBrush from '@visx/brush/lib/BaseBrush'
 import { Group } from '@visx/group'
+import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { scaleBand, scaleLinear } from '@visx/scale'
 import { Bounds } from '@visx/brush/lib/types'
 import type { BrushHandleRenderProps } from '@visx/brush/lib/BrushHandle'
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
 import MiniChartPreview from './MiniChartPreview'
 
@@ -115,6 +117,72 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   const dataKey = config.xAxis.dataKey
   const series = config.series || []
 
+  const renderPatternDefs = () => {
+    if (!config.legend?.patterns || Object.keys(config.legend.patterns).length === 0) {
+      return null
+    }
+
+    return (
+      <>
+        {Object.entries(config.legend.patterns).map(([key, pattern]) => {
+          const patternId = `chart-pattern-${key}`
+          const size = pattern.patternSize || 8
+
+          switch (pattern.shape) {
+            case 'circles':
+              return (
+                <PatternCircles
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  fill={pattern.color}
+                  radius={1.25}
+                />
+              )
+            case 'lines':
+              return (
+                <PatternLines
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  stroke={pattern.color}
+                  strokeWidth={0.75}
+                  orientation={['horizontal']}
+                />
+              )
+            case 'diagonalLines':
+              return (
+                <PatternLines
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  stroke={pattern.color}
+                  strokeWidth={0.75}
+                  orientation={['diagonalRightToLeft']}
+                />
+              )
+            case 'waves':
+              return (
+                <PatternWaves
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  fill={pattern.color}
+                  strokeWidth={0.25}
+                />
+              )
+            default:
+              return null
+          }
+        })}
+      </>
+    )
+  }
+
   // Capture initial brush extent after mount and sync accessible extent
   useEffect(() => {
     if (brushRef.current && brushRef.current.state.extent.x0 !== -1) {
@@ -167,6 +235,10 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       return scaleLinear({ domain: [0, 100], range: [BRUSH_HEIGHT - 4, 2] })
     }
 
+    const barSeriesTypes = new Set(['Bar', 'Paired Bar', 'Deviation Bar', 'Combo'])
+    const hasBarSeries =
+      config.visualizationType === 'Bar' ||
+      (config.visualizationType === 'Combo' && series.some(s => barSeriesTypes.has(s.type)))
     const isStacked =
       config.visualizationSubType === 'stacked' &&
       (config.visualizationType === 'Bar' || config.visualizationType === 'Area Chart')
@@ -208,8 +280,8 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
           }
         }
       }
-      // For bar charts, ensure domain includes 0
-      if (config.visualizationType === 'Bar') {
+      // For bar charts (and combo charts with bar series), ensure domain includes 0
+      if (hasBarSeries) {
         minValue = Math.min(0, minValue)
       }
     }
@@ -228,8 +300,8 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       return scaleLinear({ domain: [0, 100], range: [BRUSH_HEIGHT - 4, 2] })
     }
 
-    // Ensure domain includes 0 for bar charts
-    if (config.visualizationType === 'Bar') {
+    // Ensure domain includes 0 for bar charts (and combo with bars)
+    if (hasBarSeries) {
       minValue = Math.min(0, minValue)
     }
 
@@ -1121,6 +1193,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
               shapeRendering='auto'
             />
           </pattern>
+          {renderPatternDefs()}
         </defs>
 
         {/* Mini chart preview */}
