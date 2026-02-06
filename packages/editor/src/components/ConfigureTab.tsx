@@ -33,7 +33,8 @@ export default function ConfigureTab({ containerEl }) {
       if (
         config.visualizationType === 'Waffle' ||
         config.visualizationType === 'TP5 Waffle' ||
-        config.visualizationType === 'Gauge'
+        config.visualizationType === 'Gauge' ||
+        config.visualizationType === 'TP5 Gauge'
       ) {
         return (
           <ErrorBoundary component='CdcWaffleChart'>
