@@ -637,8 +637,7 @@ const CdcWaffleChart = ({
 
   //Load initial config
   useEffect(() => {
-    // eslint-disable-next-line no-console
-    loadConfig().catch(err => console.log(err))
+    loadConfig().catch(err => console.warn(err))
   }, [])
 
   useEffect(() => {
