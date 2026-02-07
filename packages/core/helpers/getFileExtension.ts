@@ -1,9 +1,3 @@
-// export const getFileExtensionx = (path: string): string => {
-//   const regex = /(?:\.([^.]+))?$/
-//   const outCome: RegExpExecArray | null = regex.exec(path)
-//   return outCome ? outCome[1] : ''
-// }
-
 export const getFileExtension = (url: string): string => {
   const regexForExtension = /(?:\.([^.]+))$/
   const regexForQueryParam = /[?&]wt=(csv|json)(?:&|$)/ // Regular expression for 'wt' query parameter

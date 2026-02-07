@@ -1,6 +1,6 @@
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { formatDate } from '@cdc/core/helpers/cove/date.js'
-import { _ } from 'lodash'
+import _ from 'lodash'
 import { compile as vegaLiteCompile } from 'vega-lite'
 import { parse as vegaParse, View as vegaView } from 'vega'
 
