@@ -237,7 +237,7 @@
   "highlightedBarValues": [],
   "series": [
     {
-      "dataKey": "Cases",
+      "dataKey": "Data 1",
       "type": "Area Chart",
       "axis": "Left",
       "tooltip": true
@@ -356,8 +356,8 @@
   "content": "Display an area chart to visualize quantities over time.",
   "visualizationType": "Area Chart",
   "activeVizButtonID": 6,
-  "dataUrl": "/examples/feature/__data__/horizon-chart-cases.json",
-  "dataFileName": "./horizon-chart-cases.json",
+  "dataUrl": "/examples/feature/__data__/horizon-chart-data.json",
+  "dataFileName": "./horizon-chart-data.json",
   "dataFileSourceType": "file",
   "formattedData": null,
   "version": "4.26.2",
