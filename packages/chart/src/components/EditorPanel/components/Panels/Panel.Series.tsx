@@ -50,7 +50,6 @@ const SeriesWrapper = props => {
       forecastingStages.forEach(stage => {
         forecastingStageArr.push({ key: stage })
       })
-      // debugger
       series[index].stages = forecastingStageArr
       series[index].stageColumn = series[index].dataKey
     }
