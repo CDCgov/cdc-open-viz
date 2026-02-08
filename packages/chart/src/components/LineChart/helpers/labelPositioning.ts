@@ -116,25 +116,6 @@ export function calculateLabelPosition(
   value?: string | number
 ): { offsetX: number; offsetY: number } {
   const isNearXAxis = isLowValue(pointY, xAxisY)
-  const distanceFromXAxis = xAxisY - pointY
-
-  // Debug logging
-  const startQ = startingSegmentAngle !== null ? getQuadrant(startingSegmentAngle) : null
-  const endQ = endingSegmentAngle !== null ? getQuadrant(endingSegmentAngle) : null
-  const angleBetween =
-    startingSegmentAngle !== null && endingSegmentAngle !== null
-      ? getAngleBetweenSegments(startingSegmentAngle, endingSegmentAngle)
-      : null
-
-  const pointType = startingSegmentAngle === null ? 'FIRST' : endingSegmentAngle === null ? 'LAST' : 'MIDDLE'
-  const valueStr = value !== undefined ? `Value=${value}` : 'Value=N/A'
-
-  // console.log(
-  //   `[${pointType}] ${valueStr} | PointY=${pointY.toFixed(1)} | Dist=${distanceFromXAxis.toFixed(1)}px | <20px=${isNearXAxis ? 'YES' : 'NO'} | ` +
-  //   `Start=${startingSegmentAngle?.toFixed(1) || 'N/A'}° (Q${startQ || '-'}) | ` +
-  //   `End=${endingSegmentAngle?.toFixed(1) || 'N/A'}° (Q${endQ || '-'}) | ` +
-  //   `Between=${angleBetween?.toFixed(1) || 'N/A'}°`
-  // )
 
   // ===== FIRST POINT (only ending segment: current → next) =====
   if (startingSegmentAngle === null && endingSegmentAngle !== null) {
