@@ -45,6 +45,7 @@ export type VisualizationType =
   | 'Line'
   | 'Paired Bar'
   | 'Pie'
+  | 'Radar'
   | 'Scatter Plot'
   | 'Spark Line'
   | 'Combo'
@@ -270,6 +271,18 @@ export type AllChartsConfig = {
       inactive: string
       default: string
     }
+  }
+  radar?: {
+    gridRings: number
+    showGridRings: boolean
+    gridRingStyle: 'polygons' | 'circles'
+    scaleMin: number
+    scaleMax: number | string
+    fillOpacity: number
+    showPoints: boolean
+    pointRadius: number
+    strokeWidth: number
+    axisLabelOffset: number
   }
 } & MarkupConfig
 

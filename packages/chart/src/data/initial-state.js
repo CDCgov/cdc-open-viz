@@ -299,6 +299,18 @@ const createInitialState = () => {
     area: {
       isStacked: false
     },
+    radar: {
+      gridRings: 5,
+      showGridRings: true,
+      gridRingStyle: 'polygons',
+      scaleMin: 0,
+      scaleMax: '',
+      fillOpacity: 0.3,
+      showPoints: true,
+      pointRadius: 4,
+      strokeWidth: 2,
+      axisLabelOffset: 15
+    },
     sankey: {
       title: {
         defaultColor: 'black'

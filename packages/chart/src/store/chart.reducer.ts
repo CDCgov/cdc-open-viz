@@ -75,5 +75,7 @@ export const reducer = (state: ChartState, action: ChartActions): ChartState => 
       return { ...state, isDraggingAnnotation: action.payload }
     case 'SET_BRUSH_DATA':
       return { ...state, brushData: action.payload }
+    default:
+      return state
   }
 }

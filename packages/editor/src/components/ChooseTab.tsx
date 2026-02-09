@@ -23,6 +23,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import LineIcon from '@cdc/core/assets/icon-chart-line.svg'
 import PairedBarIcon from '@cdc/core/assets/icon-chart-bar-paired.svg'
 import PieIcon from '@cdc/core/assets/icon-chart-pie.svg'
+import RadarChartIcon from '@cdc/core/assets/icon-chart-radar.svg'
 import SankeyIcon from '@cdc/core/assets/icon-sankey.svg'
 import ScatterPlotIcon from '@cdc/core/assets/icon-chart-scatterplot.svg'
 import TableIcon from '@cdc/core/assets/icon-table.svg'
@@ -477,6 +478,16 @@ const buttons = [
     orientation: 'Pie',
     icon: <PieIcon />,
     content: 'Present the numerical proportions of a data series.'
+  },
+  {
+    id: 27,
+    category: 'Charts',
+    label: 'Radar',
+    type: 'chart',
+    subType: 'Radar',
+    orientation: 'vertical',
+    icon: <RadarChartIcon />,
+    content: 'Compare multiple quantitative variables across categories using a radial layout.'
   },
   {
     id: 10,

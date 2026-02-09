@@ -36,6 +36,7 @@ import ParentChildFilters from './_mock/parent-child-filters.json'
 import NestedParentChildFilters from './_mock/nested-parent-child-filters.json'
 import GalleryDataBiteDashboard from './_mock/gallery-data-bite-dashboard.json'
 import TP5TestConfig from './_mock/tp5-test.json'
+import LineChartAnglesConfig from './_mock/dashboard-line-chart-angles.json'
 
 // Dashboard Filter Updates for Ascending, Descending, and Custom Order
 import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
@@ -107,6 +108,13 @@ export const Example_3: Story = {
 export const TP5_Test_Dashboard: Story = {
   args: {
     config: TP5TestConfig,
+    isEditor: false
+  }
+}
+
+export const Line_Chart_Angles: Story = {
+  args: {
+    config: LineChartAnglesConfig,
     isEditor: false
   }
 }

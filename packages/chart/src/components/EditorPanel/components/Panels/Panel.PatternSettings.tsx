@@ -311,7 +311,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
     updateConfig(updatedConfig)
   }
 
-  if (config.visualizationType === 'Warming Stripes') return
+  if (config.visualizationType === 'Warming Stripes' || config.visualizationType === 'Radar') return
 
   return (
     <AccordionItem>
