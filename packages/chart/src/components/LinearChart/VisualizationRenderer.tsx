@@ -10,6 +10,7 @@ import BoxPlotHorizontal from '../BoxPlot/BoxPlot.Horizontal'
 import DeviationBar from '../DeviationBar'
 import Forecasting from '../Forecasting'
 import ForestPlot from '../ForestPlot'
+import { HorizonChart } from '../HorizonChart'
 import LineChart from '../LineChart'
 import PairedBarChart from '../PairedBarChart'
 import ScatterPlot from '../ScatterPlot'
@@ -95,6 +96,20 @@ const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
       {/* Warming Stripes */}
       {visualizationType === 'Warming Stripes' && (
         <WarmingStripes xScale={xScale} yScale={yScale} xMax={xMax} yMax={yMax} />
+      )}
+
+      {/* Horizon Chart */}
+      {visualizationType === 'Horizon Chart' && (
+        <HorizonChart
+          xScale={xScale}
+          yScale={yScale}
+          xMax={xMax}
+          yMax={yMax}
+          handleTooltipMouseOver={handleTooltipMouseOver}
+          handleTooltipMouseOff={handleTooltipMouseOff}
+          tooltipData={tooltipData}
+          showTooltip={showTooltip}
+        />
       )}
 
       {/* Box Plot - Vertical */}

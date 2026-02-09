@@ -16,6 +16,7 @@ export const useEditorPermissions = () => {
     'Deviation Bar',
     'Forecasting',
     // 'Forest Plot',
+    'Horizon Chart',
     'Line',
     'Paired Bar',
     'Pie',
@@ -65,12 +66,13 @@ export const useEditorPermissions = () => {
     const disabledCharts = [
       'Area Chart',
       'Box Plot',
-      'Pie',
-      'Scatter Plot',
-      'Forest Plot',
-      'Spark Line',
-      'Sankey',
       'Bump Chart',
+      'Forest Plot',
+      'Horizon Chart',
+      'Pie',
+      'Sankey',
+      'Scatter Plot',
+      'Spark Line',
       'Warming Stripes'
     ]
     if (disabledCharts.includes(visualizationType)) return false

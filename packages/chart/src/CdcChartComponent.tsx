@@ -276,7 +276,26 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
     }
 
+    // Override palette defaults for Horizon Chart specifically
+    if (loadedConfig?.visualizationType === 'Horizon Chart' && !loadedConfig?.general?.palette) {
+      if (!defaultsWithoutPalette.general) {
+        defaultsWithoutPalette.general = {}
+      }
+      defaultsWithoutPalette.general.palette = {
+        isReversed: false,
+        version: '2.0',
+        name: 'sequential_blue'
+      }
+    }
+
     let newConfig = { ...defaultsWithoutPalette, ...loadedConfig }
+
+    // Ensure Horizon Chart has enough palette colors for all layers
+    if (newConfig.visualizationType === 'Horizon Chart') {
+      const numLayers = newConfig.horizon?.numLayers ?? 4
+      const currentCount = _.get(newConfig, 'general.paletteColorCount', 4)
+      _.set(newConfig, 'general.paletteColorCount', Math.max(currentCount, numLayers))
+    }
 
     _.defaultsDeep(newConfig, {
       table: { showVertical: false }
@@ -469,6 +488,22 @@ const CdcChart: React.FC<CdcChartProps> = ({
         newConfig.runtime.areaSeriesKeys.push({ ...series, type: 'Area Chart' })
       })
       newConfig.visualizationSubType = 'stacked'
+    }
+
+    if (newConfig.visualizationType === 'Horizon Chart' && newConfig.series) {
+      // Apply horizon defaults if not set
+      newConfig.horizon = {
+        numLayers: 4,
+        mode: 'offset', // Always offset for now, mirror hidden from UI
+        bandGap: 15,
+        bottomPadding: 15,
+        ...newConfig.horizon
+      }
+
+      // Ensure xAxis is date-based for horizon charts
+      if (!newConfig.xAxis.type || newConfig.xAxis.type === 'categorical') {
+        newConfig.xAxis.type = 'date'
+      }
     }
 
     if (isHorizontalVariant) {

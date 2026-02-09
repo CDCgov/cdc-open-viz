@@ -17,6 +17,9 @@ import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import LegendLineShape from './LegendLine.Shape'
 import LegendGroup from './LegendGroup'
+import LegendValueRange from './LegendValueRange'
+import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
+import { v2ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
 import { getSeriesWithData } from '../../helpers/dataHelpers'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
@@ -28,6 +31,7 @@ interface LegendProps {
   config: ChartConfig
   currentViewport: ViewportSize
   formatLabels: (labels: Label[]) => Label[]
+  formatNumber?: (value: number, axis?: string) => string
   highlight: Function
   handleShowAll: Function
   ref: React.Ref<() => void>
@@ -48,6 +52,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
       handleShowAll,
       currentViewport,
       formatLabels,
+      formatNumber,
       skipId = 'legend',
       dimensions,
       transformedData: data,
@@ -99,6 +104,46 @@ const Legend: React.FC<LegendProps> = forwardRef(
         />
         <LegendGroup formatLabels={formatLabels} />
 
+        {/* Value Range Legend for Horizon Chart (and future chart types) */}
+        {config.visualizationType === 'Horizon Chart' &&
+          (() => {
+            const numLayers = config.horizon?.numLayers || 4
+            const seriesKeys = config.runtime?.seriesKeys || config.series?.map(s => s.dataKey) || []
+
+            // Calculate max value from data
+            let maxValue = 0
+            data?.forEach((row: any) => {
+              seriesKeys.forEach((key: string) => {
+                const value = Math.abs(Number(row[key]) || 0)
+                if (value > maxValue) maxValue = value
+              })
+            })
+
+            // Get layer colors (same logic as HorizonBand)
+            const paletteName = config.general?.palette?.name || 'sequential_blue'
+            const colorPalettes = filterChartColorPalettes(config)
+            const fullPalette = colorPalettes[paletteName] || Object.values(colorPalettes)[0] || ['#4292c6']
+
+            let layerColors: string[]
+            if (fullPalette.length === 9 && numLayers <= 9 && v2ColorDistribution[numLayers]) {
+              layerColors = v2ColorDistribution[numLayers].map((i: number) => fullPalette[i])
+            } else {
+              layerColors = Array.from({ length: numLayers }, (_, i) => fullPalette[i % fullPalette.length])
+            }
+
+            return (
+              <LegendValueRange
+                maxValue={maxValue}
+                numRanges={numLayers}
+                colors={layerColors}
+                formatNumber={formatNumber}
+                innerClasses={innerClasses}
+                shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
+                onClick={undefined}
+              />
+            )
+          })()}
+
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
           {labels => {
             return (
@@ -130,7 +175,11 @@ const Legend: React.FC<LegendProps> = forwardRef(
                         } else className.push('highlighted')
                       }
 
-                      if (config.legend.style === 'gradient' || config.legend.groupBy) {
+                      if (
+                        config.legend.style === 'gradient' ||
+                        config.legend.groupBy ||
+                        config.visualizationType === 'Horizon Chart'
+                      ) {
                         return <></>
                       }
 

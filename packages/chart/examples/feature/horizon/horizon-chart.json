@@ -6,7 +6,7 @@
   "chartMessage": {
     "noData": "No Data Available"
   },
-  "title": "",
+  "title": "Horizon Chart",
   "titleStyle": "small",
   "showTitle": true,
   "showDownloadMediaButton": false,
@@ -30,9 +30,9 @@
     "showZeroValueData": true,
     "hideNullValue": true,
     "palette": {
-      "isReversed": true,
+      "isReversed": false,
       "version": "2.0",
-      "name": "sequential_bluereverse"
+      "name": "sequential_blue"
     },
     "useIntelligentLineChartLabels": false
   },
@@ -68,7 +68,8 @@
     "anchors": [],
     "shoMissingDataLabel": true,
     "showMissingDataLine": true,
-    "categories": []
+    "categories": [],
+    "type": "linear"
   },
   "boxplot": {
     "plots": [],
@@ -107,7 +108,9 @@
   "xAxis": {
     "sortDates": false,
     "anchors": [],
-    "type": "categorical",
+    "type": "date",
+    "dateParseFormat": "%m/%d/%Y",
+    "dateDisplayFormat": "%b %Y",
     "showTargetLabel": true,
     "targetLabel": "Target",
     "hideAxis": false,
@@ -136,8 +139,8 @@
   },
   "table": {
     "label": "Data Table",
-    "expanded": true,
-    "limitHeight": false,
+    "expanded": false,
+    "limitHeight": true,
     "height": "",
     "caption": "",
     "showDownloadUrl": false,
@@ -238,7 +241,25 @@
   "series": [
     {
       "dataKey": "Data 1",
-      "type": "Area Chart",
+      "type": "Horizon Chart",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Data 2",
+      "type": "Horizon Chart",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Data 3",
+      "type": "Horizon Chart",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Data 4",
+      "type": "Horizon Chart",
       "axis": "Left",
       "tooltip": true
     }
@@ -247,6 +268,12 @@
     "opacity": 90,
     "singleSeries": false,
     "dateDisplayFormat": ""
+  },
+  "horizon": {
+    "numLayers": 5,
+    "mode": "offset",
+    "bandGap": 15,
+    "bottomPadding": 15
   },
   "forestPlot": {
     "startAt": 0,
@@ -343,8 +370,8 @@
   "currentViewport": "lg",
   "id": 6,
   "category": "Charts",
-  "label": "Area Chart",
-  "subType": "Area Chart",
+  "label": "Horizon Chart",
+  "subType": "Horizon Chart",
   "icon": {
     "type": {},
     "key": null,
@@ -353,8 +380,8 @@
     "_owner": null,
     "_store": {}
   },
-  "content": "Display an area chart to visualize quantities over time.",
-  "visualizationType": "Area Chart",
+  "content": "Display a horizon chart to visualize quantities over time in a smaller space.",
+  "visualizationType": "Horizon Chart",
   "activeVizButtonID": 6,
   "dataUrl": "/examples/feature/__data__/horizon-chart-data.json",
   "dataFileName": "./horizon-chart-data.json",
