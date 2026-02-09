@@ -1,6 +1,7 @@
 import { Axis } from '@cdc/core/types/Axis'
 import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 import { type ForestPlotConfigSettings } from './ForestPlot'
+import { type HorizonConfigSettings } from './Horizon'
 import { type Column } from '@cdc/core/types/Column'
 import { type Series } from '@cdc/core/types/Series'
 import { Runtime } from '@cdc/core/types/Runtime'
@@ -40,6 +41,7 @@ export type VisualizationType =
   | 'Box Plot'
   | 'Deviation Bar'
   | 'Forest Plot'
+  | 'Horizon Chart'
   | 'Line'
   | 'Paired Bar'
   | 'Pie'
@@ -173,6 +175,7 @@ export type AllChartsConfig = {
     mobileVertical: number
   }
   highlightedBarValues: { value: any; color: string; borderWidth: number; legendLabel: string }[]
+  horizon?: HorizonConfigSettings
   introText: string
   isLollipopChart: boolean
   isLegendValue: boolean
