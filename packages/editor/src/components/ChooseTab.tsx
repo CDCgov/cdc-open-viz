@@ -28,6 +28,7 @@ import EpiChartIcon from '@cdc/core/assets/icon-epi-chart.svg'
 import TableIcon from '@cdc/core/assets/icon-table.svg'
 import WarmingStripesIcon from '@cdc/core/assets/icon-warming-stripes.svg'
 import CodeIcon from '@cdc/core/assets/icon-code.svg'
+import RadarChartIcon from '@cdc/core/assets/icon-chart-radar.svg'
 import Icon from '@cdc/core/components/ui/Icon'
 
 import {
@@ -466,6 +467,16 @@ const buttons = [
     orientation: 'Pie',
     icon: <PieIcon />,
     content: 'Present the numerical proportions of a data series.'
+  },
+  {
+    id: 27,
+    category: 'Charts',
+    label: 'Radar',
+    type: 'chart',
+    subType: 'Radar',
+    orientation: 'vertical',
+    icon: <RadarChartIcon />,
+    content: 'Compare multiple quantitative variables across categories using a radial layout.'
   },
   {
     id: 10,

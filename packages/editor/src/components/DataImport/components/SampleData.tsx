@@ -16,6 +16,7 @@ import validForecastData from './samples/valid-forecast-data.csv?raw'
 import vaidWorldData from './samples/valid-world-data.json?raw'
 import validRegionData from './samples/valid-region-data.json?raw'
 import validSankeyData from './samples/valid-sankey-data.json?raw'
+import validRadarData from './samples/valid-radar-chart.csv?raw'
 import pivotData from './samples/pivotData.json?raw'
 
 // Convert visx cityTemperature data to CSV format
@@ -57,6 +58,11 @@ const sampleData = {
       text: 'Sankey Chart Data',
       fileName: 'valid-sankey-data.json',
       data: validSankeyData
+    },
+    {
+      text: 'Radar Chart Data (Health Indicators)',
+      fileName: 'valid-radar-chart.csv',
+      data: validRadarData
     },
     {
       text: 'Pivot Table Data',
