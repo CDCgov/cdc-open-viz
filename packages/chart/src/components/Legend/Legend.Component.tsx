@@ -86,7 +86,11 @@ const Legend: React.FC<LegendProps> = forwardRef(
         return null
       }
       const numLayers = config.horizon?.numLayers || 4
-      const seriesKeys = config.runtime?.seriesKeys || config.series?.map(s => s.dataKey) || []
+      const runtimeSeriesKeys = config.runtime?.seriesKeys
+      const seriesKeys =
+        (Array.isArray(runtimeSeriesKeys) && runtimeSeriesKeys.length > 0
+          ? runtimeSeriesKeys
+          : config.series?.map(s => s.dataKey)) || []
       const maxValue = getHorizonMaxValue(data, seriesKeys)
       const layerColors = getHorizonLayerColors(config, numLayers)
 

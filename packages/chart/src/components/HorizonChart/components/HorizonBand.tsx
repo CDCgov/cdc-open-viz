@@ -50,19 +50,28 @@ const HorizonBand = ({
   // Get the curve type from config (same as stacked area chart)
   const curveType = allCurves[approvedCurveTypes[config.stackedAreaChartLineType || 'Linear']] || allCurves.curveLinear
 
-  // Here we're assuming the data is coming in as absolute values and not as "offsets"
-  const processedData = useMemo(() => {
-    return data.map(d => ({
-      ...d,
-      [seriesKey]: Math.abs(Number(d[seriesKey]) || 0)
-    }))
+  // Process data: convert to absolute values and compute series max in single pass
+  const { processedData, seriesMax } = useMemo(() => {
+    let max = 0
+    const processed = data.map(d => {
+      const absValue = Math.abs(Number(d[seriesKey]) || 0)
+      if (absValue > max) max = absValue
+      return { ...d, [seriesKey]: absValue }
+    })
+    return { processedData: processed, seriesMax: max }
   }, [data, seriesKey])
 
-  // Get layer colors using shared helper (memoized based on config and numLayers)
+  // Get layer colors using shared helper (memoized based on palette config and numLayers)
   // Must be called before early returns to follow React's rules of hooks
   const layerColors = useMemo(
     () => getHorizonLayerColors(config, numLayers),
-    [config.general?.palette?.name, numLayers]
+    [
+      config.general?.palette?.name,
+      config.general?.palette?.isReversed,
+      config.general?.palette?.version,
+      config.general?.palette?.customColors,
+      numLayers
+    ]
   )
 
   // Use global max for scaling (ensures all series bands are comparable)
@@ -92,8 +101,12 @@ const HorizonBand = ({
   for (let layerIndex = 0; layerIndex < numLayers; layerIndex++) {
     const layerMin = layerIndex * layerThreshold
 
-    // Transform data for this layer
-    // Subtract the layer's base value so values start at 0 for this layer
+    // Short-circuit: if this layer's minimum exceeds the series max,
+    // no remaining layers can have visible data
+    if (layerMin >= seriesMax) break
+
+    // Build layer data and track hasData in a single pass
+    let hasData = false
     const layerData = processedData.map(d => {
       const rawValue = d[seriesKey]
       // Calculate the value relative to this layer's base
@@ -101,14 +114,14 @@ const HorizonBand = ({
       // Clamp to the layer threshold
       const clampedValue = Math.min(layerValue, layerThreshold)
 
+      if (clampedValue > 0) hasData = true
+
       return {
         x: d[xAxisKey],
         y: clampedValue
       }
     })
 
-    // Check if this layer has any visible data
-    const hasData = layerData.some(d => d.y > 0)
     if (!hasData) continue
 
     // Get color for this layer from the distributed layer colors
