@@ -22,7 +22,7 @@ export type HorizonConfigSettings = {
    * More layers = finer granularity, but denser visual
    * @default 4
    */
-  numLayers: number
+  numLayers?: number
 
   /**
    * Rendering mode for data values
@@ -30,20 +30,20 @@ export type HorizonConfigSettings = {
    * - 'mirror': Negative values mirrored with contrasting colors. Not currently used.
    * @default 'offset'
    */
-  mode: 'offset' | 'mirror'
+  mode?: 'offset' | 'mirror'
 
   /**
    * Gap in pixels between series bands
    * Bands will fill available chart height minus gaps
    * @default 15
    */
-  bandGap: number
+  bandGap?: number
 
   /**
    * Padding in pixels below the bottom band (above x-axis)
    * @default 15
    */
-  bottomPadding: number
+  bottomPadding?: number
 
   /**
    * Optional secondary palette for negative values (mirror mode only)
@@ -55,8 +55,9 @@ export type HorizonConfigSettings = {
 
 /**
  * Default configuration for Horizon charts
+ * Use with spread operator: { ...HORIZON_DEFAULTS, ...config.horizon }
  */
-export const HORIZON_DEFAULTS: HorizonConfigSettings = {
+export const HORIZON_DEFAULTS: Required<Omit<HorizonConfigSettings, 'negativePalette'>> = {
   numLayers: 4,
   mode: 'offset',
   bandGap: 15,
