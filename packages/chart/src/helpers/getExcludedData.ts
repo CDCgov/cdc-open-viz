@@ -2,6 +2,10 @@ import { isDateScale } from '@cdc/core/helpers/cove/date'
 import _ from 'lodash'
 import { ChartConfig } from '../types/ChartConfig'
 export const getExcludedData = (newConfig: ChartConfig, data: object[]) => {
+  if (!Array.isArray(data)) {
+    console.warn('COVE: getExcludedData received non-array data:', typeof data)
+    return []
+  }
   let newExcludedData = data
   if (newConfig.exclusions && newConfig.exclusions.active) {
     if (newConfig.xAxis.type === 'categorical' && newConfig.exclusions.keys?.length > 0) {

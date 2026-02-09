@@ -70,6 +70,7 @@ const HorizonChart = ({ xScale, xMax, yMax, handleTooltipMouseOver, handleToolti
   // Early returns after all hooks
   if (!data || data.length === 0) return null
   if (seriesKeys.length === 0) return null
+  if (xMax <= 0 || yMax <= 0) return null
 
   // Calculate band dimensions to fill available space
   const { bandHeight, getRowY } = calculateHorizonBands(
@@ -91,44 +92,38 @@ const HorizonChart = ({ xScale, xMax, yMax, handleTooltipMouseOver, handleToolti
   }
 
   return (
-    data && (
-      <svg height={Number(yMax)} style={{ overflow: 'visible' }}>
-        <ErrorBoundary component='HorizonChart'>
-          <Group className='horizon-chart' key='horizon-wrapper' left={Number(config.yAxis.size)} height={Number(yMax)}>
-            {seriesKeys.map((seriesKey, index) => {
-              const rowY = getRowY(index)
-
-              return (
-                <Group key={seriesKey} top={rowY} className='horizon-band-row'>
-                  {/* Horizon band for this series */}
-                  <HorizonBand
-                    data={data}
-                    seriesKey={seriesKey}
-                    xAxisKey={config.xAxis.dataKey}
-                    getXPosition={getXPosition}
-                    bandHeight={bandHeight}
-                    xMax={xMax}
-                    numLayers={horizonConfig.numLayers}
-                    colorScale={colorScale}
-                    config={config}
-                    globalMax={valueRange.max}
-                  />
-                </Group>
-              )
-            })}
-
-            {/* Transparent bar for tooltip interaction */}
-            <Bar
-              width={Number(xMax)}
-              height={Number(yMax)}
-              fill='transparent'
-              onMouseMove={e => handleTooltipMouseOver(e, rawData)}
-              onMouseLeave={handleTooltipMouseOff}
-            />
-          </Group>
-        </ErrorBoundary>
-      </svg>
-    )
+    <ErrorBoundary component='HorizonChart'>
+      <Group className='horizon-chart' key='horizon-wrapper' left={Number(config.yAxis.size)} height={Number(yMax)}>
+        {seriesKeys.map((seriesKey, index) => {
+          const rowY = getRowY(index)
+          return (
+            <Group key={seriesKey} top={rowY} className='horizon-band-row'>
+              {/* Horizon band for this series */}
+              <HorizonBand
+                data={data}
+                seriesKey={seriesKey}
+                xAxisKey={config.xAxis.dataKey}
+                getXPosition={getXPosition}
+                bandHeight={bandHeight}
+                xMax={xMax}
+                numLayers={horizonConfig.numLayers}
+                colorScale={colorScale}
+                config={config}
+                globalMax={valueRange.max}
+              />
+            </Group>
+          )
+        })}
+        {/* Transparent bar for tooltip interaction */}
+        <Bar
+          width={Number(xMax)}
+          height={Number(yMax)}
+          fill='transparent'
+          onMouseMove={e => handleTooltipMouseOver(e, rawData)}
+          onMouseLeave={handleTooltipMouseOff}
+        />
+      </Group>
+    </ErrorBoundary>
   )
 }
 

@@ -1,5 +1,5 @@
 import parse from 'html-react-parser'
-import React from 'react'
+import React, { useMemo } from 'react'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import LegendShape from '@cdc/core/components/LegendShape'
@@ -18,8 +18,7 @@ import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import LegendLineShape from './LegendLine.Shape'
 import LegendGroup from './LegendGroup'
 import LegendValueRange from './LegendValueRange'
-import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
-import { v2ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
+import { getHorizonLayerColors, getHorizonMaxValue } from '../../components/HorizonChart/helpers/getHorizonLayerColors'
 import { getSeriesWithData } from '../../helpers/dataHelpers'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
@@ -79,6 +78,25 @@ const Legend: React.FC<LegendProps> = forwardRef(
     const { HighLightedBarUtils } = useHighlightedBars(config)
     let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
 
+    const horizonLegendData = useMemo(() => {
+      if (config.visualizationType !== 'Horizon Chart') {
+        return null
+      }
+      const numLayers = config.horizon?.numLayers || 4
+      const seriesKeys = config.runtime?.seriesKeys || config.series?.map(s => s.dataKey) || []
+      const maxValue = getHorizonMaxValue(data, seriesKeys)
+      const layerColors = getHorizonLayerColors(config, numLayers)
+
+      return { numLayers, maxValue, layerColors }
+    }, [
+      config.visualizationType,
+      config.horizon?.numLayers,
+      config.runtime?.seriesKeys,
+      config.series,
+      config.general?.palette?.name,
+      data
+    ])
+
     if (!legend) return null
     return (
       <aside
@@ -105,44 +123,17 @@ const Legend: React.FC<LegendProps> = forwardRef(
         <LegendGroup formatLabels={formatLabels} />
 
         {/* Value Range Legend for Horizon Chart (and future chart types) */}
-        {config.visualizationType === 'Horizon Chart' &&
-          (() => {
-            const numLayers = config.horizon?.numLayers || 4
-            const seriesKeys = config.runtime?.seriesKeys || config.series?.map(s => s.dataKey) || []
-
-            // Calculate max value from data
-            let maxValue = 0
-            data?.forEach((row: any) => {
-              seriesKeys.forEach((key: string) => {
-                const value = Math.abs(Number(row[key]) || 0)
-                if (value > maxValue) maxValue = value
-              })
-            })
-
-            // Get layer colors (same logic as HorizonBand)
-            const paletteName = config.general?.palette?.name || 'sequential_blue'
-            const colorPalettes = filterChartColorPalettes(config)
-            const fullPalette = colorPalettes[paletteName] || Object.values(colorPalettes)[0] || ['#4292c6']
-
-            let layerColors: string[]
-            if (fullPalette.length === 9 && numLayers <= 9 && v2ColorDistribution[numLayers]) {
-              layerColors = v2ColorDistribution[numLayers].map((i: number) => fullPalette[i])
-            } else {
-              layerColors = Array.from({ length: numLayers }, (_, i) => fullPalette[i % fullPalette.length])
-            }
-
-            return (
-              <LegendValueRange
-                maxValue={maxValue}
-                numRanges={numLayers}
-                colors={layerColors}
-                formatNumber={formatNumber}
-                innerClasses={innerClasses}
-                shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
-                onClick={undefined}
-              />
-            )
-          })()}
+        {horizonLegendData && (
+          <LegendValueRange
+            maxValue={horizonLegendData.maxValue}
+            numRanges={horizonLegendData.numLayers}
+            colors={horizonLegendData.layerColors}
+            formatNumber={formatNumber}
+            innerClasses={innerClasses}
+            shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
+            onClick={undefined}
+          />
+        )}
 
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
           {labels => {
@@ -180,7 +171,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                         config.legend.groupBy ||
                         config.visualizationType === 'Horizon Chart'
                       ) {
-                        return <></>
+                        return null
                       }
 
                       return (

@@ -725,7 +725,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           </Group>
           {/* Highlighted regions */}
           {/* Y axis */}
-          {/* Horizon charts don't have a gird but should be rendered with a left axis */}
+          {/* Horizon charts don't have a grid but should be rendered with a left axis */}
           {(!TYPES_WITHOUT_GRID.includes(visualizationType as any) || visualizationType === 'Horizon Chart') &&
             config.yAxis.type !== 'categorical' && (
               <LeftAxis
