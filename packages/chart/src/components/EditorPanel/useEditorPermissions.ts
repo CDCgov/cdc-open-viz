@@ -20,6 +20,7 @@ export const useEditorPermissions = () => {
     'Line',
     'Paired Bar',
     'Pie',
+    'Radar',
     'Scatter Plot',
     'Spark Line',
     'Sankey',
@@ -27,7 +28,7 @@ export const useEditorPermissions = () => {
   ]
 
   const visSupportsDateCategoryAxis = () => {
-    const disabledCharts = ['Forest Plot', 'Sankey']
+    const disabledCharts = ['Forest Plot', 'Radar', 'Sankey']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -70,6 +71,7 @@ export const useEditorPermissions = () => {
       'Forest Plot',
       'Horizon Chart',
       'Pie',
+      'Radar',
       'Sankey',
       'Scatter Plot',
       'Spark Line',
@@ -82,12 +84,12 @@ export const useEditorPermissions = () => {
   const visCanAnimate = () => {
     const disabledCharts = [
       'Area Chart',
-      'Scatter Plot',
       'Box Plot',
-      'Forest Plot',
-      'Spark Line',
-      'Sankey',
       'Bump Chart',
+      'Forest Plot',
+      'Sankey',
+      'Scatter Plot',
+      'Spark Line',
       'Warming Stripes'
     ]
     if (disabledCharts.includes(visualizationType)) return false
@@ -264,7 +266,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsRegions = () => {
-    const disabledCharts = ['Forest Plot', 'Pie', 'Paired Bar', 'Spark Line', 'Sankey', 'Warming Stripes']
+    const disabledCharts = ['Forest Plot', 'Pie', 'Paired Bar', 'Radar', 'Spark Line', 'Sankey', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -340,7 +342,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsLeftValueAxis = () => {
-    const disabledCharts = ['Spark Line', 'Sankey', 'Warming Stripes']
+    const disabledCharts = ['Radar', 'Spark Line', 'Sankey', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
