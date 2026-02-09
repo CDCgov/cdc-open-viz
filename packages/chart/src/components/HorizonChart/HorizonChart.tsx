@@ -39,7 +39,8 @@ const HorizonChart = ({ xScale, xMax, yMax, handleTooltipMouseOver, handleToolti
   }
 
   // Get series keys for rendering rows
-  const seriesKeys = config.runtime?.seriesKeys || config.series?.map(s => s.dataKey) || []
+  const seriesKeys =
+    (config.runtime?.seriesKeys?.length ? config.runtime.seriesKeys : config.series?.map(s => s.dataKey)) || []
 
   // Calculate value range across all horizon series (for consistent scaling)
   // Must be called before early returns to satisfy React hooks rules

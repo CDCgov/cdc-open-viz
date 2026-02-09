@@ -2,7 +2,7 @@
  * generateValueRanges - Creates value range bins for legend display
  *
  * Supports equal interval distribution with scaffolding for future quantile support.
- * Ranges are inclusive with no overlap, starting at 1 (e.g., 1-100, 101-200).
+ * Ranges are inclusive with no overlap, starting at minValue or 0 (e.g., 1-100, 101-200).
  */
 
 export type RangeDistribution = 'equal' | 'quantile'
