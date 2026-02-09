@@ -11,13 +11,13 @@ export default function useRightAxis({ config, yMax = 0, data = [] }) {
   const allRightAxisData = rightSeriesKeys => {
     if (!rightSeriesKeys) return [0]
     let rightAxisData = []
-    rightSeriesKeys.map((key, index) => {
-      return (rightAxisData = [...rightAxisData, ...data.map(item => Number(item[key]))])
+    rightSeriesKeys.forEach(key => {
+      rightAxisData = [...rightAxisData, ...data.map(item => Number(item[key]))]
     })
     return rightAxisData
   }
 
-  let max = Math.max.apply(null, allRightAxisData(rightSeriesKeys))
+  let max = Math.max(...allRightAxisData(rightSeriesKeys))
 
   if (config.yAxis.rightMax > max) {
     max = config.yAxis.rightMax

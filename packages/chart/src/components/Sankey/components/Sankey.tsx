@@ -71,7 +71,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
   let textPositionHorizontal = 5
   const BUFFER = 50
 
-  // Set the sankey diagram properties  console.log('largestGroupWidth', largestGroupWidth)
+  // Set the sankey diagram properties
 
   const sankeyGenerator = sankey<SankeyNode, { source: number; target: number }>()
     .nodeWidth(sankeyConfig.nodeSize.nodeWidth)

@@ -119,7 +119,7 @@ const getMinMax = ({
         axisSeriesKeys.forEach(key => {
           let _seriesData = seriesData.find(s => s.dataKey === key)
           let _data = data.map(d => d[key])
-          let seriesMax = Math.max.apply(null, _data)
+          let seriesMax = Math.max(..._data)
           if (config.visualizationSubType === 'stacked' && axis === 'left' && _seriesData.type === 'Bar') {
             stackedBarMax += seriesMax
           }

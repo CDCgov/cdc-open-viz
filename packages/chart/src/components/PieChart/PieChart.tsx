@@ -4,7 +4,6 @@ import { animated, useTransition, to } from '@react-spring/web'
 // visx
 import { Pie } from '@visx/shape'
 import { Group } from '@visx/group'
-import { Text } from '@visx/text'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
 import { colorPalettesChart as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'

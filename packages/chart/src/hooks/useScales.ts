@@ -210,8 +210,8 @@ const useScales = (properties: useScaleProps) => {
   // handle Scatter plot
   if (config.visualizationType === 'Scatter Plot') {
     if (xAxis.type === 'continuous') {
-      let min = xAxis.min ? xAxis.min : Math.min.apply(null, xScale.domain())
-      let max = xAxis.max ? xAxis.max : Math.max.apply(null, xScale.domain())
+      let min = xAxis.min ? xAxis.min : Math.min(...xScale.domain())
+      let max = xAxis.max ? xAxis.max : Math.max(...xScale.domain())
       xScale = scaleLinear({
         domain: [min, max],
         range: [0, xMax]

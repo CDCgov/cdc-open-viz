@@ -68,7 +68,9 @@ const WarmingStripes = ({ xMax, yMax }: WarmingStripesProps) => {
 
   // Fallback to a default diverging palette if none found
   if (!palette || palette.length < 2) {
-    console.warn(`Palette "${configPalette}" not found or invalid, falling back to default`)
+    console.warn(
+      `WarmingStripes: Palette "${configPalette}" not found or has insufficient colors (need ≥2), using default diverging blue-red palette`
+    )
     // Use a default blue to red palette
     palette = [
       '#053061',
