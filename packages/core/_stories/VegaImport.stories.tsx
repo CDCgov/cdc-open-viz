@@ -131,6 +131,28 @@ const assertRendered = async ({ canvasElement }: { canvasElement: HTMLElement })
   expect(svgs.length).toBeGreaterThan(0)
 }
 
+// --- Shared play function: verify map rendered ---
+const assertMapRendered = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+  await waitFor(
+    () => {
+      const coveModule = canvasElement.querySelector('.cdc-open-viz-module')
+      expect(coveModule).toBeTruthy()
+    },
+    { timeout: 15000 }
+  )
+
+  // For maps, check for either SVG or canvas elements
+  await waitFor(
+    () => {
+      const svgs = canvasElement.querySelectorAll('svg')
+      const canvases = canvasElement.querySelectorAll('canvas')
+      const hasRenderedContent = svgs.length > 0 || canvases.length > 0
+      expect(hasRenderedContent).toBe(true)
+    },
+    { timeout: 15000 }
+  )
+}
+
 // --- Shared play function: verify error configs failed properly ---
 const assertConversionFailed =
   (expectedErrorPattern: string | RegExp) =>
@@ -174,9 +196,9 @@ const mapStory = (key: string): StoryObj => ({
   render: () => {
     const config = convertedConfigs[key]
     if (!config) return <div data-testid='error'>Config "{key}" failed to convert</div>
-    return <CdcMap config={{ ...config }} />
+    return <CdcMap config={{ ...config }} navigationHandler={() => {}} setConfig={() => {}} />
   },
-  play: assertRendered
+  play: assertMapRendered
 })
 
 // --- Helper to build an error story (expects conversion to fail) ---
@@ -289,58 +311,58 @@ const warningStory = (
 // ============================================================================
 
 // bars-with-line.json
-export const BarsWithLine: StoryObj = chartStory('barsWithLine')
+export const BarsWithLineTests: StoryObj = chartStory('barsWithLine')
 
 // bars.json
-export const Bars: StoryObj = chartStory('bars')
+export const BarsTests: StoryObj = chartStory('bars')
 
 // combo-bar-rolling-mean.json
-export const ComboBarRollingMean: StoryObj = chartStory('comboBarRollingMean')
+export const ComboBarRollingMeanTests: StoryObj = chartStory('comboBarRollingMean')
 
 // combo.json
-export const Combo: StoryObj = chartStory('combo')
+export const ComboTests: StoryObj = chartStory('combo')
 
 // grouped-horizontal-bars.json
-export const GroupedHorizontalBars: StoryObj = chartStory('groupedHorizontalBars')
+export const GroupedHorizontalBarsTests: StoryObj = chartStory('groupedHorizontalBars')
 
 // grouped-horizontal-bars2.json
-export const GroupedHorizontalBars2: StoryObj = chartStory('groupedHorizontalBars2')
+export const GroupedHorizontalBars2Tests: StoryObj = chartStory('groupedHorizontalBars2')
 
 // horizontal-bar.json
-export const HorizontalBar: StoryObj = chartStory('horizontalBar')
+export const HorizontalBarTests: StoryObj = chartStory('horizontalBar')
 
 // horizontal-bars-with-bad-colors.json
-export const HorizontalBarsWithBadColors: StoryObj = chartStory('horizontalBarsWithBadColors')
+export const HorizontalBarsWithBadColorsTests: StoryObj = chartStory('horizontalBarsWithBadColors')
 
 // horizontal-bars2.json
-export const HorizontalBars2: StoryObj = chartStory('horizontalBars2')
+export const HorizontalBars2Tests: StoryObj = chartStory('horizontalBars2')
 
 // lines.json
-export const Lines: StoryObj = chartStory('lines')
+export const LinesTests: StoryObj = chartStory('lines')
 
 // measles-bars.json
-export const MeaslesBars: StoryObj = chartStory('measlesBars')
+export const MeaslesBarsTests: StoryObj = chartStory('measlesBars')
 
 // measles-map.json
-export const MeaslesMap: StoryObj = mapStory('measlesMap')
+export const MeaslesMapTests: StoryObj = mapStory('measlesMap')
 
 // measles-stacked-bars.json
-export const MeaslesStackedBars: StoryObj = chartStory('measlesStackedBars')
+export const MeaslesStackedBarsTests: StoryObj = chartStory('measlesStackedBars')
 
 // multi-dataset.json
-export const MultiDataset: StoryObj = chartStory('multiDataset')
+export const MultiDatasetTests: StoryObj = chartStory('multiDataset')
 
 // stacked-area.json
-export const StackedArea: StoryObj = chartStory('stackedArea')
+export const StackedAreaTests: StoryObj = chartStory('stackedArea')
 
 // stacked-bar-with-rect.json
-export const StackedBarWithRect: StoryObj = chartStory('stackedBarWithRect')
+export const StackedBarWithRectTests: StoryObj = chartStory('stackedBarWithRect')
 
 // stacked-bars.json
-export const StackedBars: StoryObj = chartStory('stackedBars')
+export const StackedBarsTests: StoryObj = chartStory('stackedBars')
 
 // stacked-horizontal-bars.json
-export const StackedHorizontalBars: StoryObj = chartStory('stackedHorizontalBars')
+export const StackedHorizontalBarsTests: StoryObj = chartStory('stackedHorizontalBars')
 
 // ============================================================================
 // Error Test Stories (Expected to Fail)
