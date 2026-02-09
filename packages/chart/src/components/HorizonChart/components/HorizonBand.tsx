@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from 'react'
+import React, { memo, useId, useMemo } from 'react'
 
 // visx
 import { AreaClosed } from '@visx/shape'
@@ -6,8 +6,7 @@ import { Group } from '@visx/group'
 import { scaleLinear } from '@visx/scale'
 import * as allCurves from '@visx/curve'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
-import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
-import { v2ColorDistribution } from '@cdc/core/helpers/palettes/colorDistributions'
+import { getHorizonLayerColors } from '../helpers/getHorizonLayerColors'
 
 type HorizonBandProps = {
   data: any[]
@@ -42,6 +41,12 @@ const HorizonBand = ({
   config,
   globalMax
 }: HorizonBandProps) => {
+  // Create a unique, safe ID for clipPath (useId ensures uniqueness across instances)
+  // Must be called before any early returns to follow React's rules of hooks
+  const uniqueId = useId()
+  const safeSeriesKey = seriesKey.replace(/[^a-zA-Z0-9]/g, '-')
+  const clipId = `horizon-clip-${safeSeriesKey}-${uniqueId.replace(/:/g, '')}`
+
   // Get the curve type from config (same as stacked area chart)
   const curveType = allCurves[approvedCurveTypes[config.stackedAreaChartLineType || 'Linear']] || allCurves.curveLinear
 
@@ -53,11 +58,19 @@ const HorizonBand = ({
     }))
   }, [data, seriesKey])
 
+  // Get layer colors using shared helper (memoized based on config and numLayers)
+  // Must be called before early returns to follow React's rules of hooks
+  const layerColors = useMemo(
+    () => getHorizonLayerColors(config, numLayers),
+    [config.general?.palette?.name, numLayers]
+  )
+
   // Use global max for scaling (ensures all series bands are comparable)
   const maxValue = globalMax
 
-  // If no data or max is 0, don't render
+  // If no data, max is 0, or dimensions are invalid, don't render
   if (maxValue === 0) return null
+  if (xMax <= 0 || bandHeight <= 0) return null
 
   // Calculate the threshold for each layer
   // Each layer represents 1/numLayers of the max value
@@ -75,24 +88,6 @@ const HorizonBand = ({
   // Render layers from bottom to top
   // Each layer shows values from (layerIndex * threshold) to ((layerIndex + 1) * threshold)
   const layers = []
-
-  // Get layer colors: access the full palette and distribute based on numLayers
-  const paletteName = config.general?.palette?.name || 'sequential_blue'
-  const colorPalettes = filterChartColorPalettes(config)
-  const fullPalette = colorPalettes[paletteName] || Object.values(colorPalettes)[0] || ['#4292c6']
-
-  // Use v2ColorDistribution if we have a 9-color palette and numLayers <= 9
-  let layerColors: string[]
-  if (fullPalette.length === 9 && numLayers <= 9 && v2ColorDistribution[numLayers]) {
-    const indices = v2ColorDistribution[numLayers]
-    layerColors = indices.map((i: number) => fullPalette[i])
-  } else {
-    // Fallback: take first numLayers colors, or repeat if needed
-    layerColors = []
-    for (let i = 0; i < numLayers; i++) {
-      layerColors.push(fullPalette[i % fullPalette.length])
-    }
-  }
 
   for (let layerIndex = 0; layerIndex < numLayers; layerIndex++) {
     const layerMin = layerIndex * layerThreshold
@@ -139,12 +134,12 @@ const HorizonBand = ({
     <Group className='horizon-band'>
       {/* Clip to band bounds */}
       <defs>
-        <clipPath id={`clip-${seriesKey}`}>
+        <clipPath id={clipId}>
           <rect x={0} y={0} width={xMax} height={bandHeight} />
         </clipPath>
       </defs>
 
-      <Group clipPath={`url(#clip-${seriesKey})`}>{layers}</Group>
+      <Group clipPath={`url(#${clipId})`}>{layers}</Group>
     </Group>
   )
 }

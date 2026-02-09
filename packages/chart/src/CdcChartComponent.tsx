@@ -666,7 +666,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         if (newData) {
           newConfig.data = newData
         }
-      } else if (newConfig.formattedData) {
+      } else if (newConfig.formattedData && Array.isArray(newConfig.formattedData)) {
         newConfig.data = newConfig.formattedData
       } else if (newConfig.dataDescription) {
         // For dashboard contexts, get data from datasets if config.data is undefined
@@ -702,7 +702,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
           updateConfig(preparedConfig, preppedData.data)
         }
       } catch (err) {
-        console.error('Could not Load!')
+        console.error('Could not Load!', err)
       }
     }
 

@@ -435,7 +435,7 @@ const buttons = [
     subType: 'Horizon Chart',
     orientation: 'vertical',
     icon: <HorizonChartIcon />,
-    content: 'Display an horizon chart to visualize quantities over time in a smaller space.'
+    content: 'Display a horizon chart to visualize quantities over time in a smaller space.'
   },
   {
     id: 12,

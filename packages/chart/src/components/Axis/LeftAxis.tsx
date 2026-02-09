@@ -339,7 +339,10 @@ const LeftAxis: React.FC<LeftAxisProps> = ({
               (() => {
                 const horizonConfig = { ...HORIZON_DEFAULTS, ...config.horizon }
 
-                const seriesKeys = runtime?.seriesKeys || []
+                const seriesKeys =
+                  runtime?.seriesKeys && runtime.seriesKeys.length > 0
+                    ? runtime.seriesKeys
+                    : config.series?.map((s: any) => s.dataKey) || []
                 if (seriesKeys.length === 0) return null
 
                 const { bandHeight, getRowY } = calculateHorizonBands(

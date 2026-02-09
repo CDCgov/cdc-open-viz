@@ -45,9 +45,31 @@ export const generateValueRanges = ({
       const rawMin = minValue + i * rangeSize
       const rawMax = minValue + (i + 1) * rangeSize
 
-      // For display: first range starts at 1, subsequent ranges start at previous max + 1
-      const displayMin = i === 0 ? 1 : Math.round(rawMin) + 1
-      const displayMax = Math.round(rawMax)
+      // For display:
+      // - First range starts at floor of minValue
+      // - Subsequent ranges start at previous max + 1 (monotonic constraint)
+      // - Last range ends exactly at ceil of maxValue
+      let displayMin: number
+      let displayMax: number
+
+      if (i === 0) {
+        displayMin = Math.floor(rawMin)
+      } else {
+        // Start at previous range's max + 1 to avoid overlap
+        displayMin = ranges[i - 1].max + 1
+      }
+
+      if (i === numRanges - 1) {
+        // Last range ends exactly at maxValue
+        displayMax = Math.ceil(maxValue)
+      } else {
+        displayMax = Math.floor(rawMax)
+      }
+
+      // Ensure min <= max (can happen with very small ranges)
+      if (displayMin > displayMax) {
+        displayMax = displayMin
+      }
 
       // Format numbers if formatter provided
       const formattedMin = formatNumber ? formatNumber(displayMin, 'left') : displayMin.toLocaleString()
@@ -56,13 +78,13 @@ export const generateValueRanges = ({
       ranges.push({
         min: displayMin,
         max: displayMax,
-        label: `${formattedMin}–${formattedMax}`
+        label: displayMin === displayMax ? formattedMin : `${formattedMin}–${formattedMax}`
       })
     }
   } else if (distribution === 'quantile') {
     // Scaffolding for future quantile-based distribution
     // Would require passing in the actual data values to calculate percentiles
-    console.warn('Quantile distribution not yet implemented, falling back to equal intervals')
+    // Currently, silently fall back to equal interval distribution
     return generateValueRanges({ minValue, maxValue, numRanges, distribution: 'equal', formatNumber })
   }
 
