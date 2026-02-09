@@ -265,31 +265,26 @@ const CdcChart: React.FC<CdcChartProps> = ({
       delete defaultsWithoutPalette.general?.palette
     }
 
-    // Override palette defaults for Line charts specifically
-    if (loadedConfig?.visualizationType === 'Line' && !loadedConfig?.general?.palette) {
-      if (!defaultsWithoutPalette.general) {
-        defaultsWithoutPalette.general = {}
-      }
-      defaultsWithoutPalette.general.palette = {
-        isReversed: false,
-        version: '2.0',
-        name: 'divergent_blue_cyan'
+    // Use defaultsDeep for the merge to preserve nested defaults like general.palette
+    let newConfig = _.defaultsDeep({}, loadedConfig, defaultsWithoutPalette)
+
+    // Apply visualization-specific palette defaults after merge to ensure
+    // they survive even when loadedConfig.general exists but lacks palette
+    if (!newConfig.general?.palette) {
+      if (newConfig.visualizationType === 'Line') {
+        _.set(newConfig, 'general.palette', {
+          isReversed: false,
+          version: '2.0',
+          name: 'divergent_blue_cyan'
+        })
+      } else if (newConfig.visualizationType === 'Horizon Chart') {
+        _.set(newConfig, 'general.palette', {
+          isReversed: false,
+          version: '2.0',
+          name: 'sequential_blue'
+        })
       }
     }
-
-    // Override palette defaults for Horizon Chart specifically
-    if (loadedConfig?.visualizationType === 'Horizon Chart' && !loadedConfig?.general?.palette) {
-      if (!defaultsWithoutPalette.general) {
-        defaultsWithoutPalette.general = {}
-      }
-      defaultsWithoutPalette.general.palette = {
-        isReversed: false,
-        version: '2.0',
-        name: 'sequential_blue'
-      }
-    }
-
-    let newConfig = { ...defaultsWithoutPalette, ...loadedConfig }
 
     // Ensure Horizon Chart has enough palette colors for all layers
     if (newConfig.visualizationType === 'Horizon Chart') {
