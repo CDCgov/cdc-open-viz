@@ -218,10 +218,11 @@ const PanelGeneral: FC<PanelProps> = props => {
               min={1}
               max={9}
               onBlur={e => {
-                const value = parseInt(e.target.value, 10)
-                if (!isNaN(value)) {
+                const parsed = Number(e.target.value)
+                if (!isNaN(parsed)) {
+                  const value = Math.round(parsed)
                   const clamped = Math.min(9, Math.max(1, value))
-                  if (clamped !== value) {
+                  if (clamped !== parsed) {
                     updateField('horizon', null, 'numLayers', clamped)
                   }
                 }
