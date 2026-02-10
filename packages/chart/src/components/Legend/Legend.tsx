@@ -3,7 +3,6 @@ import ConfigContext from '../../ConfigContext'
 import LegendComponent from './Legend.Component'
 import { createFormatLabels } from './helpers/createFormatLabels'
 
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex, jsx-a11y/no-static-element-interactions */
 const Legend = forwardRef((props, ref) => {
   // prettier-ignore
   const {
@@ -42,6 +41,7 @@ const Legend = forwardRef((props, ref) => {
         handleShowAll={handleShowAll}
         currentViewport={currentViewport}
         formatLabels={createLegendLabels}
+        formatNumber={formatNumber}
         interactionLabel={interactionLabel}
       />
     </Fragment>

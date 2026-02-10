@@ -16,6 +16,7 @@ export const useEditorPermissions = () => {
     'Deviation Bar',
     'Forecasting',
     // 'Forest Plot',
+    'Horizon Chart',
     'Line',
     'Paired Bar',
     'Pie',
@@ -66,13 +67,14 @@ export const useEditorPermissions = () => {
     const disabledCharts = [
       'Area Chart',
       'Box Plot',
+      'Bump Chart',
+      'Forest Plot',
+      'Horizon Chart',
       'Pie',
       'Radar',
-      'Scatter Plot',
-      'Forest Plot',
-      'Spark Line',
       'Sankey',
-      'Bump Chart',
+      'Scatter Plot',
+      'Spark Line',
       'Warming Stripes'
     ]
     if (disabledCharts.includes(visualizationType)) return false
@@ -82,12 +84,12 @@ export const useEditorPermissions = () => {
   const visCanAnimate = () => {
     const disabledCharts = [
       'Area Chart',
-      'Scatter Plot',
       'Box Plot',
-      'Forest Plot',
-      'Spark Line',
-      'Sankey',
       'Bump Chart',
+      'Forest Plot',
+      'Sankey',
+      'Scatter Plot',
+      'Spark Line',
       'Warming Stripes'
     ]
     if (disabledCharts.includes(visualizationType)) return false

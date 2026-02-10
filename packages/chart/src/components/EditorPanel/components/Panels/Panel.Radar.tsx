@@ -15,10 +15,10 @@ import { ChartContext } from '../../../../types/ChartContext'
 
 const PanelRadar: FC<PanelProps> = props => {
   const { config, rawData } = useContext<ChartContext>(ConfigContext)
+  const { updateField } = useEditorPanelContext()
 
   if (config.visualizationType !== 'Radar') return null
 
-  const { updateField } = useEditorPanelContext()
   const radar = config.radar || {}
 
   // Get available columns from the data
