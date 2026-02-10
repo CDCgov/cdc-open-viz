@@ -18,7 +18,6 @@ type BarChartProps = {
   seriesScale: PositionScale
   xMax: number
   yMax: number
-  yAxisWidth?: number
   handleTooltipMouseOver: MouseEventHandler<SVGRectElement>
   handleTooltipMouseOff: MouseEventHandler<SVGRectElement>
   handleTooltipClick: MouseEventHandler<SVGRectElement>
@@ -30,7 +29,6 @@ const BarChart: React.FC<BarChartProps> = ({
   seriesScale,
   xMax,
   yMax,
-  yAxisWidth,
   handleTooltipMouseOver,
   handleTooltipMouseOff,
   handleTooltipClick
@@ -49,20 +47,27 @@ const BarChart: React.FC<BarChartProps> = ({
     barChart
   }
 
-  // Use yAxisWidth prop if provided (for horizontal bar charts with dynamic labels)
-  // otherwise fall back to config value
-  const leftOffset = yAxisWidth ?? parseFloat(config.runtime.yAxis.size)
-
   return (
     <ErrorBoundary component='BarChart'>
       <BarChartContext.Provider value={contextValues}>
-        <Group left={leftOffset}>
+        <Group left={parseFloat(config.runtime.yAxis.size)}>
           <BarChartType.StackedVertical />
           <BarChartType.StackedHorizontal />
           <BarChartType.Vertical />
           <BarChartType.Horizontal />
-          {/* Transparent overlay removed - individual bars handle their own mouse events.
-              This ensures tooltips only appear when hovering directly over bar shapes. */}
+          <Bar
+            key={'bars'}
+            display={config.tooltips.singleSeries ? 'none' : 'block'}
+            width={Number(xMax)}
+            height={Number(yMax)}
+            fill={'transparent'}
+            fillOpacity={0.05}
+            onMouseMove={e => {
+              handleTooltipMouseOver(e, data)
+            }}
+            onMouseOut={handleTooltipMouseOff}
+            onClick={e => handleTooltipClick(e, data)}
+          />
         </Group>
       </BarChartContext.Provider>
     </ErrorBoundary>
