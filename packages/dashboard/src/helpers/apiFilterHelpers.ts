@@ -143,14 +143,16 @@ export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
   if (subDefaultQueryParamValue) {
     sharedFilter.subGrouping.active = subDefaultQueryParamValue
   } else if (sharedFilter.subGrouping.defaultValue && currentOption) {
-    const hasDefaultSubOption = currentOption.subOptions.find(
+    const hasDefaultSubOption = currentOption.subOptions?.find(
       opt => opt.value === sharedFilter.subGrouping.defaultValue
     )
     sharedFilter.subGrouping.active = hasDefaultSubOption
       ? sharedFilter.subGrouping.defaultValue
       : sharedFilter.subGrouping.active || subDefaultValue
   } else if (currentOption) {
-    const currentSubOption = currentOption.subOptions.find(option => option.value === sharedFilter.subGrouping.active)
+    const currentSubOption = currentOption.subOptions?.find(
+      option => option.value === sharedFilter.subGrouping.active
+    )
     sharedFilter.subGrouping.active = currentSubOption?.value || subDefaultValue
   } else {
     sharedFilter.subGrouping.active = subDefaultValue
