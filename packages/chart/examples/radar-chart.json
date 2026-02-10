@@ -59,6 +59,7 @@
     "gridRingStyle": "polygons",
     "scaleMin": 0,
     "scaleMax": 100,
+    "showFill": false,
     "fillOpacity": 0.3,
     "showPoints": true,
     "pointRadius": 4,
