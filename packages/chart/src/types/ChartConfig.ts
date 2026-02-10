@@ -278,6 +278,7 @@ export type AllChartsConfig = {
     gridRingStyle: 'polygons' | 'circles'
     scaleMin: number
     scaleMax: number | string
+    showFill: boolean
     fillOpacity: number
     showPoints: boolean
     pointRadius: number
