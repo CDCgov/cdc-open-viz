@@ -1,0 +1,252 @@
+{
+  "general": {
+    "title": "County Map with Patterns",
+    "subtext": "Demonstrating pattern support on county-level maps for accessibility and data layering",
+    "territoriesLabel": "Territories",
+    "type": "data",
+    "geoType": "us-county",
+    "headerColor": "theme-blue",
+    "showSidebar": true,
+    "showTitle": true,
+    "geoBorderColor": "darkGray",
+    "showDownloadButton": true,
+    "expandDataTable": false,
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": false,
+    "language": "en",
+    "hasRegions": false,
+    "fullBorder": false,
+    "palette": {
+      "isReversed": false
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "equalNumberOptIn": true
+  },
+  "map": {
+    "layers": [],
+    "patterns": [
+      {
+        "dataKey": "Coverage Type",
+        "dataValue": "Medicaid",
+        "pattern": "circles",
+        "size": "medium",
+        "color": "#2E5C8A",
+        "label": "Medicaid",
+        "contrastCheck": true
+      },
+      {
+        "dataKey": "Coverage Type",
+        "dataValue": "Private",
+        "pattern": "lines",
+        "size": "small",
+        "color": "#8B4513",
+        "label": "Private Insurance",
+        "contrastCheck": true
+      },
+      {
+        "dataKey": "Risk Level",
+        "dataValue": "High",
+        "pattern": "waves",
+        "size": "large",
+        "color": "#DC143C",
+        "label": "High Risk",
+        "contrastCheck": true
+      }
+    ]
+  },
+  "type": "map",
+  "color": "bluegreenreverse",
+  "columns": {
+    "geo": {
+      "name": "FIPS",
+      "label": "County",
+      "dataTable": true,
+      "tooltip": true
+    },
+    "primary": {
+      "dataTable": true,
+      "label": "Coverage Rate",
+      "name": "Coverage Rate",
+      "prefix": "",
+      "suffix": "%",
+      "tooltip": true,
+      "roundToPlace": 1
+    },
+    "navigate": {
+      "name": ""
+    },
+    "additionalColumn1": {
+      "name": "Coverage Type",
+      "label": "Coverage Type",
+      "dataTable": true,
+      "tooltip": true,
+      "prefix": "",
+      "suffix": ""
+    },
+    "additionalColumn2": {
+      "name": "Risk Level",
+      "label": "Risk Level",
+      "dataTable": true,
+      "tooltip": true,
+      "prefix": "",
+      "suffix": ""
+    },
+    "additionalColumn3": {
+      "name": "County Name",
+      "label": "County",
+      "dataTable": true,
+      "tooltip": true,
+      "prefix": "",
+      "suffix": ""
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "type": "equalnumber",
+    "numberOfItems": 5,
+    "categoryValuesOrder": [],
+    "unified": false,
+    "singleColumn": false,
+    "dynamicDescription": false,
+    "specialClasses": []
+  },
+  "filters": [],
+  "dataTable": {
+    "title": "Data Table",
+    "forceDisplay": true
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "capitalizeLabels": true
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "minBubbleSize": 1,
+    "maxBubbleSize": 20,
+    "extraBubbleBorder": false,
+    "cityStyle": "circle"
+  },
+  "mapPosition": {
+    "coordinates": [0, 30],
+    "zoom": 1
+  },
+  "data": [
+    {
+      "Coverage Rate": 82.5,
+      "Coverage Type": "Medicaid",
+      "Risk Level": "Low",
+      "County Name": "San Francisco",
+      "FIPS": "06075"
+    },
+    {
+      "Coverage Rate": 68.3,
+      "Coverage Type": "Private",
+      "Risk Level": "Medium",
+      "County Name": "Fresno",
+      "FIPS": "06019"
+    },
+    {
+      "Coverage Rate": 91.2,
+      "Coverage Type": "Medicaid",
+      "Risk Level": "High",
+      "County Name": "San Mateo",
+      "FIPS": "06081"
+    },
+    {
+      "Coverage Rate": 75.8,
+      "Coverage Type": "Private",
+      "Risk Level": "Low",
+      "County Name": "Alameda",
+      "FIPS": "06001"
+    },
+    {
+      "Coverage Rate": 58.9,
+      "Coverage Type": "Medicaid",
+      "Risk Level": "High",
+      "County Name": "Kern",
+      "FIPS": "06029"
+    },
+    {
+      "Coverage Rate": 88.4,
+      "Coverage Type": "Private",
+      "Risk Level": "Medium",
+      "County Name": "Santa Clara",
+      "FIPS": "06085"
+    },
+    {
+      "Coverage Rate": 71.6,
+      "Coverage Type": "Medicaid",
+      "Risk Level": "Medium",
+      "County Name": "Riverside",
+      "FIPS": "06065"
+    },
+    {
+      "Coverage Rate": 79.3,
+      "Coverage Type": "Private",
+      "Risk Level": "High",
+      "County Name": "San Diego",
+      "FIPS": "06073"
+    },
+    {
+      "Coverage Rate": 65.7,
+      "Coverage Type": "Medicaid",
+      "Risk Level": "Low",
+      "County Name": "Los Angeles",
+      "FIPS": "06037"
+    },
+    {
+      "Coverage Rate": 84.1,
+      "Coverage Type": "Private",
+      "Risk Level": "Medium",
+      "County Name": "Orange",
+      "FIPS": "06059"
+    },
+    {
+      "Coverage Rate": 73.2,
+      "Coverage Type": "Medicaid",
+      "Risk Level": "High",
+      "County Name": "Sacramento",
+      "FIPS": "06067"
+    },
+    {
+      "Coverage Rate": 69.5,
+      "Coverage Type": "Private",
+      "Risk Level": "Low",
+      "County Name": "Contra Costa",
+      "FIPS": "06013"
+    },
+    {
+      "Coverage Rate": 77.8,
+      "Coverage Type": "Medicaid",
+      "Risk Level": "Medium",
+      "County Name": "San Bernardino",
+      "FIPS": "06071"
+    },
+    {
+      "Coverage Rate": 85.6,
+      "Coverage Type": "Private",
+      "Risk Level": "High",
+      "County Name": "Ventura",
+      "FIPS": "06111"
+    },
+    {
+      "Coverage Rate": 62.4,
+      "Coverage Type": "Medicaid",
+      "Risk Level": "Low",
+      "County Name": "Stanislaus",
+      "FIPS": "06099"
+    }
+  ]
+}
