@@ -5,6 +5,8 @@ import { Line } from '@visx/shape'
 import { Text } from '@visx/text'
 import ConfigContext from '../../ConfigContext'
 import { BlurStrokeText } from '@cdc/core/components/BlurStrokeText'
+import { HORIZON_DEFAULTS } from '../../types/Horizon'
+import { calculateHorizonBands } from '../HorizonChart/helpers/calculateHorizonBands'
 import {
   DEFAULT_TICK_LENGTH,
   LOGARITHMIC_TICK_LENGTH,
@@ -113,219 +115,274 @@ const LeftAxis: React.FC<LeftAxisProps> = ({
                 strokeWidth={ZERO_LINE_STROKE_WIDTH}
               />
             )}
-            {props.ticks.map((tick, i) => {
-              const minY = props.ticks[0].to.y
-              const showTicks = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
-              const tickLength = showTicks === 'block' ? MAJOR_LOG_TICK_LENGTH : 0
-              const to = { x: tick.to.x - tickLength, y: tick.to.y }
+            {visualizationType !== 'Horizon Chart' &&
+              props.ticks.map((tick, i) => {
+                const minY = props.ticks[0].to.y
+                const showTicks = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
+                const tickLength = showTicks === 'block' ? MAJOR_LOG_TICK_LENGTH : 0
+                const to = { x: tick.to.x - tickLength, y: tick.to.y }
 
-              // Vertical value/suffix vars
-              const lastTick = props.ticks.length - 1 === i
-              const useInlineLabel = lastTick && inlineLabel
-              const hideTopTick = lastTick && inlineLabel && !inlineLabelHasNoSpace
-              const valueOnLinePadding = hideAxis ? VALUE_ON_LINE_PADDING_NO_AXIS : VALUE_ON_LINE_PADDING_WITH_AXIS
-              const labelXPadding = labelsAboveGridlines ? valueOnLinePadding : TICK_LABEL_MARGIN_RIGHT
-              const labelYPadding = labelsAboveGridlines ? LABEL_Y_PADDING_ABOVE_GRIDLINES : 0
-              const labelX = tick.to.x - labelXPadding
-              const labelY = tick.to.y - labelYPadding
-              const labelVerticalAnchor = labelsAboveGridlines ? 'end' : 'middle'
-              const combineDomInlineLabelWithValue = inlineLabel && labelsAboveGridlines && lastTick
-              const formattedValue = useInlineLabel
-                ? String(tick?.formattedValue || '').replace(config.dataFormat.suffix, '')
-                : tick?.formattedValue
+                // Vertical value/suffix vars
+                const lastTick = props.ticks.length - 1 === i
+                const useInlineLabel = lastTick && inlineLabel
+                const hideTopTick = lastTick && inlineLabel && !inlineLabelHasNoSpace
+                const valueOnLinePadding = hideAxis ? VALUE_ON_LINE_PADDING_NO_AXIS : VALUE_ON_LINE_PADDING_WITH_AXIS
+                const labelXPadding = labelsAboveGridlines ? valueOnLinePadding : TICK_LABEL_MARGIN_RIGHT
+                const labelYPadding = labelsAboveGridlines ? LABEL_Y_PADDING_ABOVE_GRIDLINES : 0
+                const labelX = tick.to.x - labelXPadding
+                const labelY = tick.to.y - labelYPadding
+                const labelVerticalAnchor = labelsAboveGridlines ? 'end' : 'middle'
+                const combineDomInlineLabelWithValue = inlineLabel && labelsAboveGridlines && lastTick
+                const formattedValue = useInlineLabel
+                  ? String(tick?.formattedValue || '').replace(config.dataFormat.suffix, '')
+                  : tick?.formattedValue
 
-              return (
-                <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
-                  {!runtime.yAxis.hideTicks && !labelsAboveGridlines && !hideTopTick && (
-                    <Line
-                      key={`${tick.value}--hide-hideTicks`}
-                      from={tick.from}
-                      to={isLogarithmicAxis ? to : tick.to}
-                      stroke={config.yAxis.tickColor}
-                      display={orientation === 'horizontal' ? 'none' : 'block'}
-                      fontSize={tickLabelFontSize}
-                    />
-                  )}
-
-                  {orientation === 'horizontal' &&
-                    visualizationType === 'Box Plot' &&
-                    config.yAxis.labelPlacement === 'On Date/Category Axis' &&
-                    !config.yAxis.hideLabel && (
-                      <Text
-                        x={tick.to.x}
-                        y={yScale(tick.value) + yScale.bandwidth() / 2}
-                        transform={`rotate(${
-                          config.orientation === 'horizontal' ? config.runtime.yAxis.tickRotation || 0 : 0
-                        }, ${tick.to.x}, ${tick.to.y})`}
-                        verticalAnchor={'middle'}
-                        textAnchor={'end'}
+                return (
+                  <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
+                    {!runtime.yAxis.hideTicks && !labelsAboveGridlines && !hideTopTick && (
+                      <Line
+                        key={`${tick.value}--hide-hideTicks`}
+                        from={tick.from}
+                        to={isLogarithmicAxis ? to : tick.to}
+                        stroke={config.yAxis.tickColor}
+                        display={orientation === 'horizontal' ? 'none' : 'block'}
                         fontSize={tickLabelFontSize}
-                      >
-                        {tick.formattedValue}
-                      </Text>
+                      />
                     )}
 
-                  {orientation === 'horizontal' &&
-                    visualizationType === 'Bar' &&
-                    config.yAxis.labelPlacement === 'On Date/Category Axis' &&
-                    !config.yAxis.hideLabel &&
-                    (() => {
-                      const barGroupCount =
-                        config.visualizationSubType === 'stacked' ? 1 : config.runtime.seriesKeys.length
-
-                      // Calculate barHeight based on chart type (regular bar vs lollipop)
-                      let barHeight
-                      if (config.isLollipopChart) {
-                        const lollipopBarWidth = LOLLIPOP_SIZES[config.lollipopSize] || LOLLIPOP_SIZES.small
-                        barHeight = lollipopBarWidth * barGroupCount
-                      } else {
-                        barHeight = Number(config.barHeight) * barGroupCount
-                      }
-
-                      const totalBarHeight = barHeight + Number(config.barSpace)
-                      const barGroupY = i === 0 ? 0 : totalBarHeight * i
-                      const labelCenterY = barGroupY + barHeight / 2
-
-                      return (
+                    {orientation === 'horizontal' &&
+                      visualizationType === 'Box Plot' &&
+                      config.yAxis.labelPlacement === 'On Date/Category Axis' &&
+                      !config.yAxis.hideLabel && (
                         <Text
-                          x={tick.from.x - yAxisWidth + horizontalYAxisLabelSpace}
-                          y={labelCenterY}
+                          x={tick.to.x}
+                          y={yScale(tick.value) + yScale.bandwidth() / 2}
+                          transform={`rotate(${
+                            config.orientation === 'horizontal' ? config.runtime.yAxis.tickRotation || 0 : 0
+                          }, ${tick.to.x}, ${tick.to.y})`}
                           verticalAnchor={'middle'}
-                          textAnchor={'start'}
+                          textAnchor={'end'}
                           fontSize={tickLabelFontSize}
-                          width={categoryLabelSpace}
-                          lineHeight={'1.2em'}
                         >
                           {tick.formattedValue}
                         </Text>
-                      )
-                    })()}
+                      )}
 
-                  {orientation === 'horizontal' &&
-                    visualizationType !== 'Bar' &&
-                    visualizationSubType === 'stacked' &&
-                    config.yAxis.labelPlacement === 'On Date/Category Axis' &&
-                    !config.yAxis.hideLabel && (
+                    {orientation === 'horizontal' &&
+                      visualizationType === 'Bar' &&
+                      config.yAxis.labelPlacement === 'On Date/Category Axis' &&
+                      !config.yAxis.hideLabel &&
+                      (() => {
+                        const barGroupCount =
+                          config.visualizationSubType === 'stacked' ? 1 : config.runtime.seriesKeys.length
+
+                        // Calculate barHeight based on chart type (regular bar vs lollipop)
+                        let barHeight
+                        if (config.isLollipopChart) {
+                          const lollipopBarWidth = LOLLIPOP_SIZES[config.lollipopSize] || LOLLIPOP_SIZES.small
+                          barHeight = lollipopBarWidth * barGroupCount
+                        } else {
+                          barHeight = Number(config.barHeight) * barGroupCount
+                        }
+
+                        const totalBarHeight = barHeight + Number(config.barSpace)
+                        const barGroupY = i === 0 ? 0 : totalBarHeight * i
+                        const labelCenterY = barGroupY + barHeight / 2
+
+                        return (
+                          <Text
+                            x={tick.from.x - yAxisWidth + horizontalYAxisLabelSpace}
+                            y={labelCenterY}
+                            verticalAnchor={'middle'}
+                            textAnchor={'start'}
+                            fontSize={tickLabelFontSize}
+                            width={categoryLabelSpace}
+                            lineHeight={'1.2em'}
+                          >
+                            {tick.formattedValue}
+                          </Text>
+                        )
+                      })()}
+
+                    {orientation === 'horizontal' &&
+                      visualizationType !== 'Bar' &&
+                      visualizationSubType === 'stacked' &&
+                      config.yAxis.labelPlacement === 'On Date/Category Axis' &&
+                      !config.yAxis.hideLabel && (
+                        <Text
+                          transform={`translate(${tick.to.x - 5}, ${
+                            tick.to.y - minY + (Number(config.barHeight) - BAR_MIN_HEIGHT) / 2
+                          }) rotate(-${runtime.horizontal ? runtime.yAxis.tickRotation : 0})`}
+                          verticalAnchor={'start'}
+                          textAnchor={'end'}
+                          fontSize={tickLabelFontSize}
+                        >
+                          {tick.formattedValue}
+                        </Text>
+                      )}
+
+                    {orientation === 'horizontal' && visualizationType === 'Paired Bar' && !config.yAxis.hideLabel && (
                       <Text
                         transform={`translate(${tick.to.x - 5}, ${
-                          tick.to.y - minY + (Number(config.barHeight) - BAR_MIN_HEIGHT) / 2
+                          tick.to.y - minY + Number(config.barHeight) / 2
                         }) rotate(-${runtime.horizontal ? runtime.yAxis.tickRotation : 0})`}
-                        verticalAnchor={'start'}
                         textAnchor={'end'}
+                        verticalAnchor='middle'
                         fontSize={tickLabelFontSize}
                       >
                         {tick.formattedValue}
                       </Text>
                     )}
-
-                  {orientation === 'horizontal' && visualizationType === 'Paired Bar' && !config.yAxis.hideLabel && (
-                    <Text
-                      transform={`translate(${tick.to.x - 5}, ${
-                        tick.to.y - minY + Number(config.barHeight) / 2
-                      }) rotate(-${runtime.horizontal ? runtime.yAxis.tickRotation : 0})`}
-                      textAnchor={'end'}
-                      verticalAnchor='middle'
-                      fontSize={tickLabelFontSize}
-                    >
-                      {tick.formattedValue}
-                    </Text>
-                  )}
-                  {orientation === 'horizontal' && visualizationType === 'Deviation Bar' && !config.yAxis.hideLabel && (
-                    <Text
-                      transform={`translate(${tick.to.x - 5}, ${
-                        config.isLollipopChart ? tick.to.y - minY + 2 : tick.to.y - minY + Number(config.barHeight) / 2
-                      }) rotate(-${runtime.horizontal ? runtime.yAxis.tickRotation : 0})`}
-                      textAnchor={'end'}
-                      verticalAnchor='middle'
-                      fontSize={tickLabelFontSize}
-                    >
-                      {tick.formattedValue}
-                    </Text>
-                  )}
-
-                  {orientation === 'vertical' && visualizationType === 'Bump Chart' && !config.yAxis.hideLabel && (
-                    <>
-                      <Text
-                        display={config.useLogScale ? showTicks : 'block'}
-                        dx={config.useLogScale ? -6 : 0}
-                        x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x - 8.5}
-                        y={tick.to.y - 13 + (config.runtime.horizontal ? horizontalTickOffset : 0)}
-                        angle={-Number(config.yAxis.tickRotation) || 0}
-                        verticalAnchor={config.runtime.horizontal ? 'start' : 'middle'}
-                        textAnchor={config.runtime.horizontal ? 'start' : 'end'}
-                        fill={config.yAxis.tickLabelColor}
-                        fontSize={tickLabelFontSize}
-                      >
-                        {config.runtime.seriesLabelsAll[tick.formattedValue - 1]}
-                      </Text>
-
-                      {(seriesHighlight.length === 0 ||
-                        seriesHighlight.includes(config.runtime.seriesLabelsAll[tick.formattedValue - 1])) && (
-                        <rect
-                          x={0 - yAxisWidth}
-                          y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)}
-                          width={yAxisWidth + xScale(xScale.domain()[0])}
-                          height='2'
-                          fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])}
-                        />
+                    {orientation === 'horizontal' &&
+                      visualizationType === 'Deviation Bar' &&
+                      !config.yAxis.hideLabel && (
+                        <Text
+                          transform={`translate(${tick.to.x - 5}, ${
+                            config.isLollipopChart
+                              ? tick.to.y - minY + 2
+                              : tick.to.y - minY + Number(config.barHeight) / 2
+                          }) rotate(-${runtime.horizontal ? runtime.yAxis.tickRotation : 0})`}
+                          textAnchor={'end'}
+                          verticalAnchor='middle'
+                          fontSize={tickLabelFontSize}
+                        >
+                          {tick.formattedValue}
+                        </Text>
                       )}
-                    </>
-                  )}
-                  {orientation === 'vertical' &&
-                    visualizationType !== 'Paired Bar' &&
-                    visualizationType !== 'Bump Chart' &&
-                    !config.yAxis.hideLabel && (
+
+                    {orientation === 'vertical' && visualizationType === 'Bump Chart' && !config.yAxis.hideLabel && (
                       <>
-                        {/* INLINE LABEL BEHAVIOR: Dom suffix for 'inlineLabel' behavior */}
-                        {/* inline label is shown alone and is allowed to 'overflow' to the right */}
-                        {/* SPECIAL ONE CHAR CASE: a one character inlineLabel does not overflow */}
-                        {/* IF VALUES ON LINE: suffix is combined with value to avoid having to calculate varying (now left-aligned) value widths */}
-                        {inlineLabel && lastTick && !labelsAboveGridlines && (
+                        <Text
+                          display={config.useLogScale ? showTicks : 'block'}
+                          dx={config.useLogScale ? -6 : 0}
+                          x={config.runtime.horizontal ? tick.from.x + 2 : tick.to.x - 8.5}
+                          y={tick.to.y - 13 + (config.runtime.horizontal ? horizontalTickOffset : 0)}
+                          angle={-Number(config.yAxis.tickRotation) || 0}
+                          verticalAnchor={config.runtime.horizontal ? 'start' : 'middle'}
+                          textAnchor={config.runtime.horizontal ? 'start' : 'end'}
+                          fill={config.yAxis.tickLabelColor}
+                          fontSize={tickLabelFontSize}
+                        >
+                          {config.runtime.seriesLabelsAll[tick.formattedValue - 1]}
+                        </Text>
+
+                        {(seriesHighlight.length === 0 ||
+                          seriesHighlight.includes(config.runtime.seriesLabelsAll[tick.formattedValue - 1])) && (
+                          <rect
+                            x={0 - yAxisWidth}
+                            y={tick.to.y - 8 + (config.runtime.horizontal ? horizontalTickOffset : 7)}
+                            width={yAxisWidth + xScale(xScale.domain()[0])}
+                            height='2'
+                            fill={colorScale(config.runtime.seriesLabelsAll[tick.formattedValue - 1])}
+                          />
+                        )}
+                      </>
+                    )}
+                    {orientation === 'vertical' &&
+                      visualizationType !== 'Paired Bar' &&
+                      visualizationType !== 'Bump Chart' &&
+                      !config.yAxis.hideLabel && (
+                        <>
+                          {/* INLINE LABEL BEHAVIOR: Dom suffix for 'inlineLabel' behavior */}
+                          {/* inline label is shown alone and is allowed to 'overflow' to the right */}
+                          {/* SPECIAL ONE CHAR CASE: a one character inlineLabel does not overflow */}
+                          {/* IF VALUES ON LINE: suffix is combined with value to avoid having to calculate varying (now left-aligned) value widths */}
+                          {inlineLabel && lastTick && !labelsAboveGridlines && (
+                            <BlurStrokeText
+                              innerRef={suffixRef}
+                              display={isLogarithmicAxis ? showTicks : 'block'}
+                              dx={isLogarithmicAxis ? -6 : 0}
+                              x={labelX}
+                              y={labelY}
+                              angle={-Number(config.yAxis.tickRotation) || 0}
+                              verticalAnchor={labelVerticalAnchor}
+                              textAnchor={inlineLabelHasNoSpace ? 'end' : 'start'}
+                              fill={config.yAxis.tickLabelColor}
+                              stroke={'#fff'}
+                              paintOrder={'stroke'} // keeps stroke under fill
+                              strokeLinejoin='round'
+                              style={{ whiteSpace: 'pre-wrap' }} // prevents leading spaces from being trimmed
+                              fontSize={tickLabelFontSize}
+                            >
+                              {inlineLabel}
+                            </BlurStrokeText>
+                          )}
+
+                          {/* VALUE */}
                           <BlurStrokeText
-                            innerRef={suffixRef}
+                            innerRef={el => lastTick && topYLabelRef && (topYLabelRef.current = el)}
                             display={isLogarithmicAxis ? showTicks : 'block'}
                             dx={isLogarithmicAxis ? -6 : 0}
-                            x={labelX}
-                            y={labelY}
+                            x={inlineLabelHasNoSpace ? labelX - suffixWidth : labelX}
+                            y={labelY + (config.runtime.horizontal ? horizontalTickOffset : 0)}
                             angle={-Number(config.yAxis.tickRotation) || 0}
-                            verticalAnchor={labelVerticalAnchor}
-                            textAnchor={inlineLabelHasNoSpace ? 'end' : 'start'}
+                            verticalAnchor={config.runtime.horizontal ? 'start' : labelVerticalAnchor}
+                            textAnchor={config.runtime.horizontal || labelsAboveGridlines ? 'start' : 'end'}
                             fill={config.yAxis.tickLabelColor}
                             stroke={'#fff'}
-                            paintOrder={'stroke'} // keeps stroke under fill
+                            disableStroke={!labelsAboveGridlines}
                             strokeLinejoin='round'
+                            paintOrder={'stroke'} // keeps stroke under fill
                             style={{ whiteSpace: 'pre-wrap' }} // prevents leading spaces from being trimmed
                             fontSize={tickLabelFontSize}
                           >
-                            {inlineLabel}
+                            {`${formattedValue}${combineDomInlineLabelWithValue ? inlineLabel : ''}`}
                           </BlurStrokeText>
-                        )}
+                        </>
+                      )}
+                  </Group>
+                )
+              })}
 
-                        {/* VALUE */}
-                        <BlurStrokeText
-                          innerRef={el => lastTick && topYLabelRef && (topYLabelRef.current = el)}
-                          display={isLogarithmicAxis ? showTicks : 'block'}
-                          dx={isLogarithmicAxis ? -6 : 0}
-                          x={inlineLabelHasNoSpace ? labelX - suffixWidth : labelX}
-                          y={labelY + (config.runtime.horizontal ? horizontalTickOffset : 0)}
-                          angle={-Number(config.yAxis.tickRotation) || 0}
-                          verticalAnchor={config.runtime.horizontal ? 'start' : labelVerticalAnchor}
-                          textAnchor={config.runtime.horizontal || labelsAboveGridlines ? 'start' : 'end'}
-                          fill={config.yAxis.tickLabelColor}
-                          stroke={'#fff'}
-                          disableStroke={!labelsAboveGridlines}
-                          strokeLinejoin='round'
-                          paintOrder={'stroke'} // keeps stroke under fill
-                          style={{ whiteSpace: 'pre-wrap' }} // prevents leading spaces from being trimmed
+            {/* Horizon Chart series labels - rendered outside ticks loop since it uses custom band positioning */}
+            {visualizationType === 'Horizon Chart' &&
+              (() => {
+                const horizonConfig = { ...HORIZON_DEFAULTS, ...config.horizon }
+
+                const seriesKeys =
+                  runtime?.seriesKeys && runtime.seriesKeys.length > 0
+                    ? runtime.seriesKeys
+                    : config.series?.map((s: any) => s.dataKey) || []
+                if (seriesKeys.length === 0) return null
+
+                const { bandHeight, getRowY } = calculateHorizonBands(
+                  seriesKeys.length,
+                  yMax,
+                  horizonConfig.bandGap,
+                  horizonConfig.bottomPadding
+                )
+
+                return seriesKeys.map((seriesKey, index) => {
+                  const labelY = getRowY(index) + bandHeight / 2
+                  const labelX = -DEFAULT_TICK_LENGTH - TICK_LABEL_MARGIN_RIGHT
+                  return (
+                    <Group key={`horizon-tick-${seriesKey}`} className='horizon-axis-tick'>
+                      {/* Tick mark */}
+                      {!runtime.yAxis.hideTicks && (
+                        <Line
+                          from={{ x: 0, y: labelY }}
+                          to={{ x: -DEFAULT_TICK_LENGTH, y: labelY }}
+                          stroke={(config.yAxis as any).tickColor || '#333'}
+                        />
+                      )}
+                      {/* Series label */}
+                      {!config.yAxis.hideLabel && (
+                        <Text
+                          x={labelX}
+                          y={labelY}
+                          textAnchor='end'
+                          verticalAnchor='middle'
                           fontSize={tickLabelFontSize}
+                          fill={(config.yAxis as any).tickLabelColor || '#1c1d1f'}
                         >
-                          {`${formattedValue}${combineDomInlineLabelWithValue ? inlineLabel : ''}`}
-                        </BlurStrokeText>
-                      </>
-                    )}
-                </Group>
-              )
-            })}
+                          {runtime?.seriesLabels?.[seriesKey] || seriesKey}
+                        </Text>
+                      )}
+                    </Group>
+                  )
+                })
+              })()}
+
             <Text
               className='y-label'
               textAnchor='middle'

@@ -592,6 +592,7 @@ export const useTooltip = props => {
       case 'Line':
       case 'Area Chart':
       case 'Pie':
+      case 'Horizon Chart':
         return common
       case 'Combo':
         return [...common, ...ciItems]

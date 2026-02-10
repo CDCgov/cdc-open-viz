@@ -732,25 +732,27 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           </Group>
           {/* Highlighted regions */}
           {/* Y axis */}
-          {!TYPES_WITHOUT_GRID.includes(visualizationType as any) && config.yAxis.type !== 'categorical' && (
-            <LeftAxis
-              yScale={yScale}
-              xScale={xScale}
-              yMax={yMax}
-              xMax={xMax}
-              yAxisWidth={yAxisWidth}
-              numTicks={handleNumTicks}
-              tickLabelFontSize={tickLabelFontSize}
-              axisLabelFontSize={axisLabelFontSize}
-              handleLeftTickFormatting={handleLeftTickFormatting}
-              topYLabelRef={topYLabelRef}
-              suffixRef={suffixRef}
-              suffixWidth={suffixWidth}
-              horizontalYAxisLabelSpace={horizontalYAxisLabelSpace}
-              categoryLabelSpace={categoryLabelSpace}
-              yLabelOffset={yLabelOffset}
-            />
-          )}
+          {/* Horizon charts don't have a grid but should be rendered with a left axis */}
+          {(!TYPES_WITHOUT_GRID.includes(visualizationType as any) || visualizationType === 'Horizon Chart') &&
+            config.yAxis.type !== 'categorical' && (
+              <LeftAxis
+                yScale={yScale}
+                xScale={xScale}
+                yMax={yMax}
+                xMax={xMax}
+                yAxisWidth={yAxisWidth}
+                numTicks={handleNumTicks}
+                tickLabelFontSize={tickLabelFontSize}
+                axisLabelFontSize={axisLabelFontSize}
+                handleLeftTickFormatting={handleLeftTickFormatting}
+                topYLabelRef={topYLabelRef}
+                suffixRef={suffixRef}
+                suffixWidth={suffixWidth}
+                horizontalYAxisLabelSpace={horizontalYAxisLabelSpace}
+                categoryLabelSpace={categoryLabelSpace}
+                yLabelOffset={yLabelOffset}
+              />
+            )}
           {config.yAxis.type === 'categorical' && config.orientation === 'vertical' && (
             <CategoricalYAxis
               yScale={yScale}
