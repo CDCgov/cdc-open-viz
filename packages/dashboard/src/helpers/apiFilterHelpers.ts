@@ -120,7 +120,7 @@ export const getToFetch = (
 
 export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
   const defaultQueryParamValue = getQueryParam(sharedFilter?.setByQueryParameter)
-  const subDefaultQueryParamValue = getQueryParam(sharedFilter?.subGrouping.setByQueryParameter)
+  const subDefaultQueryParamValue = getQueryParam(sharedFilter?.subGrouping?.setByQueryParameter)
   const defaultValue = dropdownOptions[0]?.value
 
   // Set main group active value
