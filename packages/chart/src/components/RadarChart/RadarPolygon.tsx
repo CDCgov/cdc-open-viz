@@ -29,7 +29,8 @@ const RadarPolygon: React.FC<RadarPolygonProps> = ({
   const { config } = useContext(ConfigContext)
 
   const radarConfig = config.radar
-  const fillOpacity = radarConfig?.fillOpacity ?? 0.3
+  const showFill = radarConfig?.showFill ?? false
+  const fillOpacity = showFill ? (radarConfig?.fillOpacity ?? 0.3) : 0
   const strokeWidth = radarConfig?.strokeWidth ?? 2
   const showPoints = radarConfig?.showPoints ?? true
   const pointRadius = radarConfig?.pointRadius ?? 4

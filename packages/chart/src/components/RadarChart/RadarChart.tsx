@@ -63,6 +63,7 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
     gridRingStyle: 'polygons',
     scaleMin: 0,
     scaleMax: '',
+    showFill: false,
     fillOpacity: 0.3,
     showPoints: true,
     pointRadius: 4,

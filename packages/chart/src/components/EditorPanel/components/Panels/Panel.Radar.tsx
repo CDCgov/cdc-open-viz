@@ -230,27 +230,47 @@ const PanelRadar: FC<PanelProps> = props => {
         <fieldset className='fieldset' style={{ marginTop: '20px' }}>
           <legend style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px' }}>Visual Settings</legend>
 
-          <TextField
-            type='number'
-            value={radar.fillOpacity ?? 0.3}
-            fieldName='fillOpacity'
+          <CheckBox
+            value={radar.showFill ?? false}
+            fieldName='showFill'
             section='radar'
-            label='Fill Opacity'
+            label='Show Fill'
             updateField={updateField}
-            min={0}
-            max={1}
-            step={0.1}
             tooltip={
               <Tooltip style={{ textTransform: 'none' }}>
                 <Tooltip.Target>
                   <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                 </Tooltip.Target>
                 <Tooltip.Content>
-                  <p>Opacity of the polygon fill (0 = transparent, 1 = solid)</p>
+                  <p>Fill the polygon area with color. When off, only the outline is shown.</p>
                 </Tooltip.Content>
               </Tooltip>
             }
           />
+
+          {(radar.showFill ?? false) && (
+            <TextField
+              type='number'
+              value={radar.fillOpacity ?? 0.3}
+              fieldName='fillOpacity'
+              section='radar'
+              label='Fill Opacity'
+              updateField={updateField}
+              min={0}
+              max={1}
+              step={0.1}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>Opacity of the polygon fill (0 = transparent, 1 = solid)</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
+          )}
 
           <TextField
             type='number'
