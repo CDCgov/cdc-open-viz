@@ -559,9 +559,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             handleChartMouseEnter()
           }}
         >
-          {!isDraggingAnnotation && visualizationType !== 'Bar' && (
-            <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>
-          )}{' '}
+          {!isDraggingAnnotation && <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>}{' '}
           {/* GRID LINES */}
           {/* Actual LeftAxis is drawn after visualization */}
           {!TYPES_WITHOUT_GRID.includes(visualizationType as any) && config.yAxis.type !== 'categorical' && (

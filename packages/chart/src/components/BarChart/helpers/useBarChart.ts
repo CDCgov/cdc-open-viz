@@ -208,13 +208,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     if (config.legend.highlightOnHover && config.legend.behavior === 'highlight' && barKey) {
       dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [barKey] })
     }
-
-    // In singleSeries mode, react-tooltip handles tooltips via data-tooltip-html/id attributes
-    // In multi-series mode, use custom tooltip system via handleTooltipMouseOver
-    if (!config.tooltips.singleSeries) {
-      handleTooltipMouseOver(event, data)
-    }
-
+    handleTooltipMouseOver(event, data)
     setHoveredBar(categoryValue)
 
     if (config.tooltips.singleSeries) {
@@ -239,11 +233,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     if (config.legend.highlightOnHover && config.legend.behavior === 'highlight') {
       dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: [] })
     }
-
-    // Only call handleTooltipMouseOff in multi-series mode
-    if (!config.tooltips.singleSeries) {
-      handleTooltipMouseOff()
-    }
+    handleTooltipMouseOff()
   }
 
   return {
