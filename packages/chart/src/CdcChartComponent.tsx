@@ -270,7 +270,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     // Apply visualization-specific palette defaults after merge to ensure
     // they survive even when loadedConfig.general exists but lacks palette
-    if (!newConfig.general?.palette) {
+    // Check loadedConfig (not newConfig) since newConfig already has defaults merged in
+    if (!loadedConfig?.general?.palette) {
       if (newConfig.visualizationType === 'Line') {
         _.set(newConfig, 'general.palette', {
           isReversed: false,
