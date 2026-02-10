@@ -143,6 +143,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const [suffixWidth, setSuffixWidth] = useState(0)
   const [calculatedSvgHeight, setCalculatedSvgHeight] = useState<number | null>(null)
   const [axisUpdateKey, setAxisUpdateKey] = useState(0)
+  const [synchronizedXValue, setSynchronizedXValue] = useState<any>(null)
 
   // REFS
   const axisBottomRef = useRef(null)
@@ -378,11 +379,17 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       y
     })
 
-    smallMultiplesSync.onMouseMove?.(event)
+    // Warming Stripes handles its own sync at the rect level since
+    // getXValueFromCoordinate won't map correctly due to data sampling
+    if (visualizationType !== 'Warming Stripes') {
+      smallMultiplesSync.onMouseMove?.(event)
+    }
   }
 
   const onMouseLeave = () => {
-    smallMultiplesSync.onMouseLeave?.()
+    if (visualizationType !== 'Warming Stripes') {
+      smallMultiplesSync.onMouseLeave?.()
+    }
   }
 
   // Use custom hook to provide programmatic tooltip control for small multiples
@@ -393,7 +400,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     setPoint,
     setShowHoverLine,
     handleTooltipMouseOver,
-    hideTooltip
+    hideTooltip,
+    setSynchronizedXValue
   })
 
   // Make sure the chart is visible if in the editor
@@ -551,9 +559,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             handleChartMouseEnter()
           }}
         >
-          {!isDraggingAnnotation && visualizationType !== 'Bar' && (
-            <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>
-          )}{' '}
+          {!isDraggingAnnotation && <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>}{' '}
           {/* GRID LINES */}
           {/* Actual LeftAxis is drawn after visualization */}
           {!TYPES_WITHOUT_GRID.includes(visualizationType as any) && config.yAxis.type !== 'categorical' && (
@@ -620,6 +626,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             getYAxisData={getYAxisData}
             svgRef={svgRef}
             forestPlotRightLabelRef={forestPlotRightLabelRef}
+            synchronizedXValue={synchronizedXValue}
           />
           {/* Brush moved to separate overlay - no longer in main SVG */}
           {/* y anchors */}
