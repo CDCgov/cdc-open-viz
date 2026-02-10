@@ -55,3 +55,4 @@ lerna-debug.log
 /backstop_data/html_report/
 /backstop_data/ci_report/
 /.github/agents
+package-lock.json
