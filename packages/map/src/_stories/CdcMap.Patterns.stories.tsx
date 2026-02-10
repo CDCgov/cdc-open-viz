@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import CdcMap from '../CdcMap'
 import defaultPatterns from './_mock/default-patterns.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map/Patterns',
@@ -15,6 +16,9 @@ export default meta
 export const Default_Patterns: Story = {
   args: {
     config: defaultPatterns
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -25,5 +29,8 @@ export const Default_Patterns_Dark: Story = {
       { path: ['color'], value: 'bluegreen' },
       { path: ['legend', 'specialClasses'], value: [] }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }

@@ -474,15 +474,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const legendIsLeftOrRight =
       legend?.position !== 'top' && legend?.position !== 'bottom' && !isLegendWrapViewport(currentViewport)
     legendRef.current.style.transform = legendIsLeftOrRight ? `translateY(${topLabelOnGridlineHeight}px)` : 'none'
-  }, [
-    axisBottomRef.current,
-    config,
-    bottomLabelStart,
-    config.xAxis.brushActive,
-    currentViewport,
-    topYLabelRef.current,
-    initialHeight
-  ])
+  }, [axisBottomRef.current, config, config.xAxis.brushActive, currentViewport, topYLabelRef.current, initialHeight])
 
   useEffect(() => {
     if (!tooltipOpen) return

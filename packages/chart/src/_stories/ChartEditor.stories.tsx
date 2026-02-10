@@ -4,6 +4,7 @@ import Chart from '../CdcChartComponent'
 import pieChartExample from './_mock/pie_config.json'
 import urlFilterExample from './_mock/url_filter.json'
 import mockScatterPlot from './_mock/scatterplot_mock.json'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Editor',
@@ -16,6 +17,9 @@ export const Primary: Story = {
   args: {
     config: { ...pieChartExample },
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -27,6 +31,9 @@ export const Url_Filter: Story = {
   args: {
     config: urlFilterExample,
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 

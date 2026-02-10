@@ -1,5 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react-vite'
 import CdcChart from '../CdcChartComponent'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof CdcChart> = {
   title: 'Components/Templates/Chart/HTML in Data Table',
@@ -148,6 +149,9 @@ export const BasicHTMLInFootnoteColumn: Story = {
       }
     },
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -208,6 +212,9 @@ export const HTMLWithLinksAndFormatting: Story = {
       }
     },
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -265,6 +272,9 @@ export const HTMLWithLineBreaks: Story = {
       }
     },
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -315,6 +325,9 @@ export const ComplexHTMLWithLists: Story = {
       }
     },
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -368,6 +381,9 @@ export const HTMLWithInlineStyles: Story = {
       }
     },
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -444,6 +460,9 @@ export const LineChartWithHTMLFootnotes: Story = {
       }
     },
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -516,5 +535,8 @@ export const PieChartWithHTMLFootnotes: Story = {
       }
     },
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }

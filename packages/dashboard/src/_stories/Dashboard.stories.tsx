@@ -808,20 +808,26 @@ export const Nested_Dropdown_With_Parent_Child: Story = {
 
     // Get filter dropdowns
     const regionFilter = (await canvas.findByLabelText('Region', { selector: 'select' })) as HTMLSelectElement
-    const yearQuarterFilter = (await canvas.findByLabelText('Year and Quarter', {
-      selector: 'select'
-    })) as HTMLSelectElement
+    const yearQuarterInput = canvasElement.querySelector('.nested-dropdown input') as HTMLInputElement
 
     const getFilterOptions = (select: HTMLSelectElement) =>
       Array.from(select.options)
         .map(o => o.text)
         .filter(Boolean)
 
+    const getNestedDropdownOptions = () => {
+      const container = yearQuarterInput.closest('.nested-dropdown')
+      if (!container) return []
+      return Array.from(container.querySelectorAll('li[role="treeitem"]'))
+        .map(li => li.getAttribute('aria-label') || li.textContent?.trim() || '')
+        .filter(Boolean)
+    }
+
     const getState = () => ({
       regionOptions: getFilterOptions(regionFilter),
       regionSelected: regionFilter.value,
-      yearQuarterOptions: getFilterOptions(yearQuarterFilter),
-      yearQuarterSelected: yearQuarterFilter.value,
+      yearQuarterOptions: getNestedDropdownOptions(),
+      yearQuarterSelected: yearQuarterInput.value,
       chartRendered: !!canvasElement.querySelector('svg')
     })
 

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChartComponent'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import scatterPlotDownloadImage from './_mock/scatterplot-image-download.json'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Filters',
@@ -13,6 +14,9 @@ type Story = StoryObj<typeof Chart>
 export const Tab_Simple: Story = {
   args: {
     config: editConfigKeys(scatterPlotDownloadImage, [{ path: ['filters', '0', 'filterStyle'], value: 'tab-simple' }])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
