@@ -120,21 +120,40 @@ export const getToFetch = (
 
 export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
   const defaultQueryParamValue = getQueryParam(sharedFilter?.setByQueryParameter)
-  const defaultValue = dropdownOptions[0]?.value
-  const subDefaultValue = dropdownOptions[0]?.subOptions[0].value
   const subDefaultQueryParamValue = getQueryParam(sharedFilter?.subGrouping.setByQueryParameter)
-  if (!sharedFilter.active) {
-    sharedFilter.active = defaultQueryParamValue || defaultValue
-    sharedFilter.subGrouping.active = subDefaultQueryParamValue || subDefaultValue
+  const defaultValue = dropdownOptions[0]?.value
+
+  // Set main group active value
+  // Priority: query string > configured defaultValue > existing active > first option
+  if (defaultQueryParamValue) {
+    sharedFilter.active = defaultQueryParamValue
+  } else if (sharedFilter.defaultValue) {
+    const hasDefaultOption = dropdownOptions.find(opt => opt.value === sharedFilter.defaultValue)
+    sharedFilter.active = hasDefaultOption ? sharedFilter.defaultValue : sharedFilter.active || defaultValue
+  } else if (!sharedFilter.active) {
+    sharedFilter.active = defaultValue
+  }
+
+  // Find the current option based on active value
+  const currentOption = dropdownOptions.find(option => option.value === sharedFilter.active)
+  const subDefaultValue = currentOption?.subOptions?.[0]?.value
+
+  // Set subgroup active value
+  // Priority: query string > configured defaultValue > existing active > first suboption
+  if (subDefaultQueryParamValue) {
+    sharedFilter.subGrouping.active = subDefaultQueryParamValue
+  } else if (sharedFilter.subGrouping.defaultValue && currentOption) {
+    const hasDefaultSubOption = currentOption.subOptions.find(
+      opt => opt.value === sharedFilter.subGrouping.defaultValue
+    )
+    sharedFilter.subGrouping.active = hasDefaultSubOption
+      ? sharedFilter.subGrouping.defaultValue
+      : sharedFilter.subGrouping.active || subDefaultValue
+  } else if (currentOption) {
+    const currentSubOption = currentOption.subOptions.find(option => option.value === sharedFilter.subGrouping.active)
+    sharedFilter.subGrouping.active = currentSubOption?.value || subDefaultValue
   } else {
-    const currentOption = dropdownOptions.find(option => option.value === sharedFilter.active)
-    sharedFilter.active = currentOption ? currentOption.value : defaultValue
-    if (currentOption) {
-      const currentSubOption = currentOption.subOptions.find(option => option.value === sharedFilter.subGrouping.active)
-      sharedFilter.subGrouping.active = currentSubOption?.value || subDefaultValue
-    } else {
-      sharedFilter.subGrouping.active = subDefaultValue
-    }
+    sharedFilter.subGrouping.active = subDefaultValue
   }
 }
 
