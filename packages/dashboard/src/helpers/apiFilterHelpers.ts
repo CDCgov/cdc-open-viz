@@ -130,8 +130,10 @@ export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
   } else if (sharedFilter.defaultValue) {
     const hasDefaultOption = dropdownOptions.find(opt => opt.value === sharedFilter.defaultValue)
     sharedFilter.active = hasDefaultOption ? sharedFilter.defaultValue : sharedFilter.active || defaultValue
-  } else if (!sharedFilter.active) {
-    sharedFilter.active = defaultValue
+  } else {
+    // Normalize active to a valid option if it exists, otherwise use first option
+    const validOption = sharedFilter.active ? dropdownOptions.find(opt => opt.value === sharedFilter.active) : null
+    sharedFilter.active = validOption?.value || defaultValue
   }
 
   // Find the current option based on active value
@@ -150,9 +152,7 @@ export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
       ? sharedFilter.subGrouping.defaultValue
       : sharedFilter.subGrouping.active || subDefaultValue
   } else if (currentOption) {
-    const currentSubOption = currentOption.subOptions?.find(
-      option => option.value === sharedFilter.subGrouping.active
-    )
+    const currentSubOption = currentOption.subOptions?.find(option => option.value === sharedFilter.subGrouping.active)
     sharedFilter.subGrouping.active = currentSubOption?.value || subDefaultValue
   } else {
     sharedFilter.subGrouping.active = subDefaultValue
