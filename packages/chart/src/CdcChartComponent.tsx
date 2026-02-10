@@ -501,9 +501,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
         ...newConfig.horizon
       }
 
-      // Ensure xAxis is date-based for horizon charts
-      if (!newConfig.xAxis.type || newConfig.xAxis.type === 'categorical') {
-        newConfig.xAxis.type = 'date'
+      // Set categorical as default xAxis type for horizon charts if not already set
+      if (!newConfig.xAxis.type) {
+        newConfig.xAxis.type = 'categorical'
       }
     }
 
