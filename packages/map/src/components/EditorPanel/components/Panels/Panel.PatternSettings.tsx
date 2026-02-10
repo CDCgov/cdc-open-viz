@@ -43,12 +43,20 @@ const PatternSettings = ({ name }: PanelProps) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      import(/* webpackChunkName: "us-topo" */ '../../../UsaMap/data/us-topo.json').then(topoJSON => {
-        setUnitedStates(feature(topoJSON, topoJSON.objects.states).features)
-      })
+      if (config.general.geoType === 'us-county') {
+        import(/* webpackChunkName: "cb_2019_us_county_20m" */ '../../../UsaMap/data/cb_2019_us_county_20m.json').then(
+          topoJSON => {
+            setUnitedStates(feature(topoJSON, topoJSON.objects.counties).features)
+          }
+        )
+      } else {
+        import(/* webpackChunkName: "us-topo" */ '../../../UsaMap/data/us-topo.json').then(topoJSON => {
+          setUnitedStates(feature(topoJSON, topoJSON.objects.states).features)
+        })
+      }
     }
     fetchData()
-  }, [])
+  }, [config.general.geoType])
 
   if (!unitedStates) {
     return <></>

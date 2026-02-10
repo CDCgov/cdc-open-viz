@@ -1,0 +1,166 @@
+{
+  "general": {
+    "title": "County Map with Patterns - Test",
+    "subtext": "Testing pattern support on county-level maps",
+    "territoriesLabel": "Territories",
+    "type": "data",
+    "geoType": "us-county",
+    "headerColor": "theme-blue",
+    "showSidebar": true,
+    "showTitle": true,
+    "geoBorderColor": "darkGray",
+    "showDownloadButton": true,
+    "expandDataTable": false,
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": false,
+    "language": "en",
+    "hasRegions": false,
+    "fullBorder": false,
+    "palette": {
+      "isReversed": false
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "statePicked": {
+      "fipsCode": "01",
+      "stateName": "Alabama"
+    },
+    "equalNumberOptIn": true
+  },
+  "map": {
+    "layers": [],
+    "patterns": [
+      {
+        "dataKey": "Coverage Status",
+        "dataValue": "Uninsured",
+        "pattern": "circles",
+        "size": "medium",
+        "color": "#FF0000",
+        "label": "",
+        "contrastCheck": true
+      }
+    ]
+  },
+  "type": "map",
+  "color": "pinkpurple",
+  "columns": {
+    "geo": {
+      "name": "FIPS Codes",
+      "label": "County",
+      "dataTable": true,
+      "tooltip": true
+    },
+    "primary": {
+      "dataTable": true,
+      "label": "Insured Rate",
+      "name": "Insured Rate",
+      "prefix": "",
+      "suffix": "%",
+      "tooltip": true
+    },
+    "navigate": {
+      "name": ""
+    },
+    "additionalColumn1": {
+      "name": "Coverage Status",
+      "label": "Status",
+      "dataTable": true,
+      "tooltip": true,
+      "prefix": "",
+      "suffix": ""
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "type": "equalnumber",
+    "numberOfItems": 5,
+    "categoryValuesOrder": [],
+    "unified": false,
+    "singleColumn": false,
+    "dynamicDescription": false,
+    "specialClasses": []
+  },
+  "filters": [],
+  "dataTable": {
+    "title": "Data Table",
+    "forceDisplay": true
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "capitalizeLabels": true
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "minBubbleSize": 1,
+    "maxBubbleSize": 20,
+    "extraBubbleBorder": false,
+    "cityStyle": "circle"
+  },
+  "mapPosition": {
+    "coordinates": [0, 30],
+    "zoom": 1
+  },
+  "data": [
+    {
+      "Insured Rate": 18,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "06075"
+    },
+    {
+      "Insured Rate": 3,
+      "Coverage Status": "Uninsured",
+      "FIPS Codes": "06027"
+    },
+    {
+      "Insured Rate": 25,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "06029"
+    },
+    {
+      "Insured Rate": 60,
+      "Coverage Status": "Uninsured",
+      "FIPS Codes": "06065"
+    },
+    {
+      "Insured Rate": 45,
+      "Coverage Status": "Uninsured",
+      "FIPS Codes": "06037"
+    },
+    {
+      "Insured Rate": 12,
+      "Coverage Status": "Uninsured",
+      "FIPS Codes": "06073"
+    },
+    {
+      "Insured Rate": 22,
+      "Coverage Status": "Uninsured",
+      "FIPS Codes": "06001"
+    },
+    {
+      "Insured Rate": 35,
+      "Coverage Status": "Insured",
+      "FIPS Codes": "06059"
+    },
+    {
+      "Insured Rate": 8,
+      "Coverage Status": "Uninsured",
+      "FIPS Codes": "06085"
+    },
+    {
+      "Insured Rate": 50,
+      "Coverage Status": "Uninsured",
+      "FIPS Codes": "06013"
+    }
+  ]
+}
