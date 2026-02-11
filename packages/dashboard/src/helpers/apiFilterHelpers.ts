@@ -123,6 +123,7 @@ export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
   const subQueryValue = getQueryParam(sharedFilter?.subGrouping?.setByQueryParameter)
 
   // Priority: query string > configured defaultValue > existing active (if valid) > first option
+  // Note: use loose equality here to match values across possible string/number differences
   const validActive = dropdownOptions.find(option => option.value == sharedFilter.active)
   sharedFilter.active =
     queryValue || sharedFilter.defaultValue || (validActive ? sharedFilter.active : dropdownOptions[0]?.value)
