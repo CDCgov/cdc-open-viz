@@ -35,8 +35,8 @@ const LegendValueRange: React.FC<LegendValueRangeProps> = ({
     <div className={innerClasses.join(' ')}>
       {ranges.map((range, i) => {
         const color = colors[i % colors.length]
-        const className = ['legend-item', `legend-text--range-${i}`]
         const isClickable = typeof onClick === 'function'
+        const className = ['legend-item', `legend-text--range-${i}`, !isClickable && 'not-clickable'].filter(Boolean)
 
         return (
           <LegendItem
