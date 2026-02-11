@@ -25,31 +25,41 @@
   justify-content: space-between;
 }
 
-.dev-sidebar-editor-toggle {
+.dev-sidebar-toggles {
+  display: flex;
+  gap: 4px;
+}
+
+.dev-sidebar-toggle {
   background: none;
   border: 1px solid #45475a;
   border-radius: 4px;
   color: #9399b2;
   cursor: pointer;
-  width: 22px;
-  height: 22px;
-  font-size: 22px;
+  width: 26px;
+  height: 26px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.15s;
-  padding-bottom: 2px;
 }
 
-.dev-sidebar-editor-toggle:hover {
+.dev-sidebar-toggle:hover {
   border-color: #89b4fa;
   color: #89b4fa;
 }
 
-.dev-sidebar-editor-toggle.active {
+.dev-sidebar-toggle.active {
   background: #89b4fa;
   border-color: #89b4fa;
   color: #1e1e2e;
+}
+
+/* Editor toggle uses a larger emoji */
+.dev-sidebar-editor-toggle {
+  font-size: 22px;
+  padding-bottom: 2px;
 }
 
 .dev-sidebar-search {

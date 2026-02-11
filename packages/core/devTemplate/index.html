@@ -15,6 +15,9 @@
     <link rel="stylesheet prefetch" href="https://www.cdc.gov/TemplatePackage/5.0/css/app.min.css?_=71669" />
   </head>
   <body>
+    <script>
+      if (new URLSearchParams(location.search).get('sidebar') !== 'false') document.body.style.marginLeft = '240px'
+    </script>
     <div id="dev-sidebar-root"></div>
     <div id="viz-wrapper">
       <div class="react-container" data-config="/examples/default.json"></div>

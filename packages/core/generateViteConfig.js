@@ -29,19 +29,30 @@ const DEFAULT_PACKAGE_CSS = `
 // Read dev template files
 const readTemplate = () => {
   const html = fs.readFileSync(path.join(devTemplatePath, 'index.html'), 'utf-8')
+  const previewHtml = fs.readFileSync(path.join(devTemplatePath, 'preview.html'), 'utf-8')
   const sidebarCss = fs.readFileSync(path.join(devTemplatePath, 'sidebar.css'), 'utf-8')
   const devJs = fs.readFileSync(path.join(devTemplatePath, 'dev.js'), 'utf-8')
-  return { html, sidebarCss, devJs }
+  return { html, previewHtml, sidebarCss, devJs }
+}
+
+// Apply shared template replacements (sidebar CSS, dev JS, package CSS)
+const applyTemplateReplacements = (template, packageCss, sidebarCss, devJs) => {
+  return template
+    .replace('/* {{PACKAGE_CSS}} */', packageCss)
+    .replace('/* {{SIDEBAR_CSS}} */', sidebarCss)
+    .replace('// {{DEV_JS}}', devJs)
 }
 
 // Generate dev index.html content by combining template files
 const generateDevIndexHtml = (packageCss = DEFAULT_PACKAGE_CSS) => {
   const { html, sidebarCss, devJs } = readTemplate()
+  return applyTemplateReplacements(html, packageCss, sidebarCss, devJs)
+}
 
-  return html
-    .replace('/* {{PACKAGE_CSS}} */', packageCss)
-    .replace('/* {{SIDEBAR_CSS}} */', sidebarCss)
-    .replace('// {{DEV_JS}}', devJs)
+// Generate preview.html content - full CDC Template Package page
+const generatePreviewIndexHtml = (packageCss = DEFAULT_PACKAGE_CSS) => {
+  const { previewHtml, sidebarCss, devJs } = readTemplate()
+  return applyTemplateReplacements(previewHtml, packageCss, sidebarCss, devJs)
 }
 
 // Vite plugin to serve /__examples endpoint
@@ -90,13 +101,17 @@ function listJsonFiles(dir, baseDir) {
 
 // Vite plugin to transform index.html for development
 // Uses transformIndexHtml so React plugin can still inject its preamble
+// Checks ?preview=true to serve the full CDC Template Package page instead
 const coveDevIndexPlugin = css => ({
   name: 'cove-dev-index',
   transformIndexHtml: {
     order: 'pre',
-    handler() {
-      // Replace the entire HTML with our generated version
-      // This runs early ('pre') so other plugins like React can still transform it
+    handler(html, ctx) {
+      // Check if preview mode is requested via URL parameter
+      const url = new URL(ctx.originalUrl, 'http://localhost')
+      if (url.searchParams.get('preview') === 'true') {
+        return generatePreviewIndexHtml(css)
+      }
       return generateDevIndexHtml(css)
     }
   }
