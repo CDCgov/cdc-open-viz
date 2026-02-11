@@ -50,42 +50,42 @@ const testChartRendering = async (canvasElement: HTMLElement, storyName: string)
 
 // Bar Charts
 export const Bar_Chart_Time_Based: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/Example_Bar_Chart.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/Example_Bar_Chart.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Bar Chart Time Based')
   }
 }
 
 export const Bar_Chart_Categorical: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/example-category-bar-char.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/example-category-bar-char.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Bar Chart Categorical')
   }
 }
 
 export const Bar_Chart_With_Highlighted_Value: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/bar-chart-with-highlighte.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/bar-chart-with-highlighte.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Bar Chart With Highlighted Value')
   }
 }
 
 export const Bar_Chart_With_Confidence_Intervals: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/Example_Bar_CI_1.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/Example_Bar_CI_1.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Bar Chart With Confidence Intervals')
   }
 }
 
 export const Bar_Chart_With_Suppressed_Values: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/bar-chart-with-suppressed-values.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/bar-chart-with-suppressed-values.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Bar Chart With Suppressed Values')
   }
 }
 
 export const Horizontal_Bar_Chart: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/Horizontal_Bar_Chart_Viz.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/Horizontal_Bar_Chart_Viz.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Horizontal Bar Chart')
   }
@@ -93,14 +93,14 @@ export const Horizontal_Bar_Chart: Story = {
 
 // Box and Whiskers Plots
 export const Box_Plot_With_Outliers: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/box-plot-outliers.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/box-plot-outliers.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Box Plot With Outliers')
   }
 }
 
 export const Horizontal_Box_Plot: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/horizontal-box-plot.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/horizontal-box-plot.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Horizontal Box Plot')
   }
@@ -108,7 +108,7 @@ export const Horizontal_Box_Plot: Story = {
 
 // Bump Chart
 export const Bump_Chart: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/bump-chart.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/bump-chart.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Bump Chart')
   }
@@ -116,14 +116,14 @@ export const Bump_Chart: Story = {
 
 // Combo Bar/Line Charts
 export const Combo_Bar_And_Area: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/Combo_Bar_Line_Viz.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/Combo_Bar_Line_Viz.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Combo Bar And Area')
   }
 }
 
 export const Epi_Style_Bar_Chart: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/example-epi-style-bar-chart.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/example-epi-style-bar-chart.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Epi Style Bar Chart')
   }
@@ -131,7 +131,7 @@ export const Epi_Style_Bar_Chart: Story = {
 
 // Deviation Bar Chart
 export const Deviation_Bar_Chart: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/example-deviation-bar-chart.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/example-deviation-bar-chart.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Deviation Bar Chart')
   }
@@ -139,14 +139,14 @@ export const Deviation_Bar_Chart: Story = {
 
 // Forecast Charts
 export const Forecast_Chart_Single_CI: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/forecast-chart-one-CI.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/forecast-chart-one-CI.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Forecast Chart Single CI')
   }
 }
 
 export const Forecast_Chart_Multiple_CIs: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/forecast-chart-2-CIs.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/forecast-chart-2-CIs.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Forecast Chart Multiple CIs')
   }
@@ -154,42 +154,42 @@ export const Forecast_Chart_Multiple_CIs: Story = {
 
 // Line Charts
 export const Line_Chart_Standard: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/Line_Chart_Viz.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/Line_Chart_Viz.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Line Chart Standard')
   }
 }
 
 export const Line_Chart_With_Regions: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/Line_Chart_Regions_Viz.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/Line_Chart_Regions_Viz.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Line Chart With Regions')
   }
 }
 
 export const Line_Chart_Isolated: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/Line_Chart_Isolated.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/Line_Chart_Isolated.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Line Chart Isolated')
   }
 }
 
 export const Line_Chart_Line_Weights: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/Line_Chart_Line_Weights.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/Line_Chart_Line_Weights.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Line Chart Line Weights')
   }
 }
 
 export const Line_Chart_With_Open_Circles: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/line-chart-with-open-circles.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/line-chart-with-open-circles.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Line Chart With Open Circles')
   }
 }
 
 export const Line_Chart_With_Suppression: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/line-chart-with-suppression.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/line-chart-with-suppression.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Line Chart With Suppression')
   }
@@ -197,7 +197,7 @@ export const Line_Chart_With_Suppression: Story = {
 
 // Lollipop Bar Chart
 export const Lollipop_Horizontal_Bar_Chart: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/lollipop-style-horizontal-bar-chart.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/lollipop-style-horizontal-bar-chart.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Lollipop Horizontal Bar Chart')
   }
@@ -205,14 +205,14 @@ export const Lollipop_Horizontal_Bar_Chart: Story = {
 
 // Pie and Donut Charts
 export const Pie_Chart: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/Example_Pie_viz.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/Example_Pie_viz.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Pie Chart')
   }
 }
 
 export const Donut_Chart: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/Donut-Chart.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/Donut-Chart.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Donut Chart')
   }
@@ -220,50 +220,43 @@ export const Donut_Chart: Story = {
 
 // Scatter Plots
 export const Scatter_Plot_Negative_Trend: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/scatter-plot-negative-trend.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/scatter-plot-negative-trend.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Scatter Plot Negative Trend')
   }
 }
 
 export const Scatter_Plot_Multi_Series: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/scatter-plot-multi-series.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/scatter-plot-multi-series.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Scatter Plot Multi Series')
   }
 }
 
 export const Scatter_Plot_Nonlinear_Trend: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/scatter-plot-nonlinear-trend.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/scatter-plot-nonlinear-trend.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Scatter Plot Nonlinear Trend')
   }
 }
 
 // Sparklines
-export const Sparkline_Dashboard: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/sparkline-dash.json" />,
-  play: async ({ canvasElement }) => {
-    await testChartRendering(canvasElement, 'Sparkline Dashboard')
-  }
-}
-
 export const Sparkline_2016_Outreach_Var2: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/2016-outreach-2.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/2016-outreach-2.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Sparkline 2016 Outreach Var2')
   }
 }
 
 export const Sparkline_2016_Outreach_Var3: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/2016-outreach-3.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/2016-outreach-3.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Sparkline 2016 Outreach Var3')
   }
 }
 
 export const Sparkline_2016_Outreach_Var4: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/2016-outreach-4.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/2016-outreach-4.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Sparkline 2016 Outreach Var4')
   }
@@ -271,21 +264,21 @@ export const Sparkline_2016_Outreach_Var4: Story = {
 
 // Stacked Area Charts
 export const Stacked_Area_Chart: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/example-stacked-area-chart.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/example-stacked-area-chart.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Stacked Area Chart')
   }
 }
 
 export const Area_Chart_With_Annotations: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/area-chart-with-annotations_1.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/area-chart-with-annotations_1.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Area Chart With Annotations')
   }
 }
 
 export const Area_Chart_With_Categorical_Axis: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/example-area-chart-with-cat-axis.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/example-area-chart-with-cat-axis.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Area Chart With Categorical Axis')
   }
@@ -293,14 +286,14 @@ export const Area_Chart_With_Categorical_Axis: Story = {
 
 // Stacked Bar Charts
 export const Stacked_Horizontal_Bar_Chart: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/example-stacked-horizontal-chart.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/example-stacked-horizontal-chart.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Stacked Horizontal Bar Chart')
   }
 }
 
 export const Stacked_Vertical_Bar_Chart: Story = {
-  render: () => <Chart configUrl="https://www.cdc.gov/cove/examples/Stacked_Bar_Viz.json" />,
+  render: () => <Chart configUrl='https://www.cdc.gov/cove/examples/Stacked_Bar_Viz.json' />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'Stacked Vertical Bar Chart')
   }

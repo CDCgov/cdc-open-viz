@@ -45,6 +45,7 @@ export const CityState: Story = {
     tabbingId: '#asdf',
     columns: CityStateExample.columns,
     applyLegendToRow: () => ['#000'],
+    getPatternForRow: () => null,
     displayGeoName
   },
   decorators: [

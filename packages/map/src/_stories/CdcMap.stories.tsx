@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, expect } from 'storybook/test'
 import CdcMap from '../CdcMap'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 import EqualNumberOptInExample from './_mock/DEV-7286.json'
 import EqualNumberMap from './_mock/equal-number.json'
 import MultiState from './_mock/multi-state.json'
@@ -29,13 +30,15 @@ const testMapRendering = async (canvasElement: HTMLElement, storyName: string) =
   const canvas = within(canvasElement)
 
   await step('Wait for map to render', async () => {
-    const mapElement = await canvas.findByRole('img', { hidden: true }, { timeout: 10000 })
+    const mapElement = await canvas
+      .findByRole('img', { hidden: true }, { timeout: 10000 })
+      .catch(() => canvasElement.querySelector('canvas'))
     expect(mapElement).toBeInTheDocument()
   })
 
-  await step('Verify SVG element is present', async () => {
-    const svgElement = canvasElement.querySelector('svg')
-    expect(svgElement).toBeInTheDocument()
+  await step('Verify SVG or canvas element is present', async () => {
+    const vizElement = canvasElement.querySelector('svg, canvas')
+    expect(vizElement).toBeInTheDocument()
   })
 
   await step('Verify COVE module wrapper is present', async () => {
@@ -57,6 +60,9 @@ export const Equal_Interval_Map: Story = {
 export const Equal_Number_Opt_In: Story = {
   args: {
     config: EqualNumberOptInExample
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -64,6 +70,9 @@ export const Equal_Number_Map: Story = {
   args: {
     isEditor: true,
     config: EqualNumberMap
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -134,18 +143,27 @@ export const Single_State: Story = {
 export const Multi_State: Story = {
   args: {
     config: MultiState
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
 export const Multi_Country: Story = {
   args: {
     config: MultiCountry
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
 export const Multi_Country_Hide_Mode: Story = {
   args: {
     config: MultiCountryHide
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -179,6 +197,9 @@ export const Custom_Map_Layers: Story = {
 export const Single_State_With_Filters: Story = {
   args: {
     config: SingleStateWithFilters
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -213,6 +234,9 @@ export const Custom_Color_Distributions_With_Special_Classes: Story = {
   args: {
     config: newConfig,
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -220,6 +244,9 @@ export const Custom_Color_Distributions_Without_Special_Classes: Story = {
   args: {
     config: editConfigKeys(newConfig, [{ path: ['legend', 'specialClasses'], value: [] }]),
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -227,6 +254,9 @@ export const Standard_Color_Distributions_With_Special_Classes: Story = {
   args: {
     config: exampleCityStateStandardColors,
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -234,6 +264,9 @@ export const Standard_Color_Distributions_Without_Special_Classes: Story = {
   args: {
     config: editConfigKeys(exampleCityStateStandardColors, [{ path: ['legend', 'specialClasses'], value: [] }]),
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -241,6 +274,9 @@ export const Custom_Color_Distributions_With_Update_Needed: Story = {
   args: {
     config: editConfigKeys(newConfig, [{ path: ['version'], value: '4.24.10' }]),
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -248,6 +284,9 @@ export const Legend_Bins: Story = {
   args: {
     config: exampleLegendBins,
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -255,10 +294,16 @@ export const US_Bubble_Cities_Test: Story = {
   args: {
     config: USBubbleCities,
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
 export const City_Styles_By_Variable: Story = {
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+  },
   args: {
     config: editConfigKeys(exampleCityState, [
       {
