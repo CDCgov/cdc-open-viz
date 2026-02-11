@@ -160,9 +160,16 @@ export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
     sharedFilter.subGrouping.active = validSubOption ? subQueryValue : defaultSub
   } else if (sharedFilter.subGrouping.defaultValue && finalOption) {
     const defaultSubOption = finalOption.subOptions?.find(opt => opt.value === sharedFilter.subGrouping.defaultValue)
-    sharedFilter.subGrouping.active = defaultSubOption
-      ? sharedFilter.subGrouping.defaultValue
-      : sharedFilter.subGrouping.active || defaultSub
+    if (defaultSubOption) {
+      // Configured default is valid for this option
+      sharedFilter.subGrouping.active = sharedFilter.subGrouping.defaultValue
+    } else {
+      // Configured default is invalid; fall back to existing active only if it is valid, otherwise to defaultSub
+      const existingActiveOption = finalOption.subOptions?.find(
+        opt => opt.value === sharedFilter.subGrouping.active
+      )
+      sharedFilter.subGrouping.active = existingActiveOption ? existingActiveOption.value : defaultSub
+    }
   } else if (finalOption) {
     const subOption = finalOption.subOptions?.find(option => option.value === sharedFilter.subGrouping.active)
     sharedFilter.subGrouping.active = subOption?.value || defaultSub
