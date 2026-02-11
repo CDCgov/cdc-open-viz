@@ -144,7 +144,8 @@ export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
   }
 
   // Validate and set main group active value with single lookup
-  const currentOption = candidate ? dropdownOptions.find(option => option.value === candidate) : undefined
+  // Use loose equality to handle type coercion (e.g., 2017 == '2017')
+  const currentOption = candidate ? dropdownOptions.find(option => option.value == candidate) : undefined
   sharedFilter.active = currentOption ? candidate : defaultValue
 
   // Re-lookup if we fell back to default
@@ -155,23 +156,21 @@ export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
   // Set subgroup active value
   // Priority: query string > configured defaultValue > existing active > first suboption
   if (subQueryValue) {
-    // Validate query value exists in available suboptions
-    const validSubOption = finalOption?.subOptions?.find(opt => opt.value === subQueryValue)
+    // Validate query value exists in available suboptions (loose equality for type coercion)
+    const validSubOption = finalOption?.subOptions?.find(opt => opt.value == subQueryValue)
     sharedFilter.subGrouping.active = validSubOption ? subQueryValue : defaultSub
   } else if (sharedFilter.subGrouping.defaultValue && finalOption) {
-    const defaultSubOption = finalOption.subOptions?.find(opt => opt.value === sharedFilter.subGrouping.defaultValue)
+    const defaultSubOption = finalOption.subOptions?.find(opt => opt.value == sharedFilter.subGrouping.defaultValue)
     if (defaultSubOption) {
       // Configured default is valid for this option
       sharedFilter.subGrouping.active = sharedFilter.subGrouping.defaultValue
     } else {
       // Configured default is invalid; fall back to existing active only if it is valid, otherwise to defaultSub
-      const existingActiveOption = finalOption.subOptions?.find(
-        opt => opt.value === sharedFilter.subGrouping.active
-      )
+      const existingActiveOption = finalOption.subOptions?.find(opt => opt.value == sharedFilter.subGrouping.active)
       sharedFilter.subGrouping.active = existingActiveOption ? existingActiveOption.value : defaultSub
     }
   } else if (finalOption) {
-    const subOption = finalOption.subOptions?.find(option => option.value === sharedFilter.subGrouping.active)
+    const subOption = finalOption.subOptions?.find(option => option.value == sharedFilter.subGrouping.active)
     sharedFilter.subGrouping.active = subOption?.value || defaultSub
   } else {
     sharedFilter.subGrouping.active = defaultSub
