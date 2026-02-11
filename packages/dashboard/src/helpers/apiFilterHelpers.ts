@@ -138,7 +138,8 @@ export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
 
   // Find the current option based on active value
   const currentOption = dropdownOptions.find(option => option.value === sharedFilter.active)
-  const subDefaultValue = currentOption?.subOptions?.[0]?.value
+  const safeFallbackSubDefault = dropdownOptions[0]?.subOptions?.[0]?.value
+  const subDefaultValue = currentOption?.subOptions?.[0]?.value ?? safeFallbackSubDefault
 
   // Set subgroup active value
   // Priority: query string > configured defaultValue > existing active > first suboption
