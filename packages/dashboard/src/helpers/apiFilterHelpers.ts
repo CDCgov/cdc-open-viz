@@ -119,13 +119,20 @@ export const getToFetch = (
 }
 
 export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
+  // Early return if no options available
+  if (!dropdownOptions || dropdownOptions.length === 0) {
+    sharedFilter.active = undefined
+    sharedFilter.subGrouping.active = undefined
+    return
+  }
+
   const queryValue = getQueryParam(sharedFilter?.setByQueryParameter)
   const subQueryValue = getQueryParam(sharedFilter?.subGrouping?.setByQueryParameter)
   const defaultValue = dropdownOptions[0]?.value
 
   // Determine main group active value
   // Priority: query string > configured defaultValue > existing active > first option
-  let candidate: string
+  let candidate: string | undefined
   if (queryValue) {
     candidate = queryValue
   } else if (sharedFilter.defaultValue) {
@@ -137,7 +144,7 @@ export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
   }
 
   // Validate and set main group active value with single lookup
-  const currentOption = dropdownOptions.find(option => option.value === candidate)
+  const currentOption = candidate ? dropdownOptions.find(option => option.value === candidate) : undefined
   sharedFilter.active = currentOption ? candidate : defaultValue
 
   // Re-lookup if we fell back to default
@@ -148,7 +155,9 @@ export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
   // Set subgroup active value
   // Priority: query string > configured defaultValue > existing active > first suboption
   if (subQueryValue) {
-    sharedFilter.subGrouping.active = subQueryValue
+    // Validate query value exists in available suboptions
+    const validSubOption = finalOption?.subOptions?.find(opt => opt.value === subQueryValue)
+    sharedFilter.subGrouping.active = validSubOption ? subQueryValue : defaultSub
   } else if (sharedFilter.subGrouping.defaultValue && finalOption) {
     const defaultSubOption = finalOption.subOptions?.find(opt => opt.value === sharedFilter.subGrouping.defaultValue)
     sharedFilter.subGrouping.active = defaultSubOption
@@ -164,8 +173,10 @@ export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
 
 export const setActiveMultiDropdown = (dropdownOptions, sharedFilter) => {
   const queryValue = getQueryParam(sharedFilter?.setByQueryParameter)
-  const queryValues = Array.isArray(queryValue) ? queryValue : queryValue?.split(',')
-  const defaultValues = queryValue ? queryValues : [dropdownOptions[0]?.value]
+  const queryValues = (Array.isArray(queryValue) ? queryValue : queryValue?.split(',') || []).filter(
+    v => v !== '' && v != null
+  ) // Remove empty strings and null/undefined
+  const defaultValues = queryValues.length > 0 ? queryValues : [dropdownOptions[0]?.value]
   const currentOption = (Array.isArray(sharedFilter.active) ? sharedFilter.active : []).filter(activeVal =>
     dropdownOptions.find(option => option.value === activeVal)
   )
