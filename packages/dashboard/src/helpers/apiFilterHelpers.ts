@@ -166,7 +166,7 @@ export const setAutoLoadDefaultValue = (
   if (autoLoadFilterIndexes.includes(sharedFilterIndex) || hasQuery) {
     const filterParents = sharedFiltersCopy.filter(f => sharedFilter.parents?.includes(f.key))
     const missingParents = filterParents.some(p => !(p.active || p.queuedActive))
-    if (filterParents && missingParents) return sharedFilter
+    if (missingParents) return sharedFilter
     if (sharedFilter.filterStyle === FILTER_STYLE.multiSelect) {
       setActiveMultiDropdown(dropdownOptions, sharedFilter)
     } else if (sharedFilter.filterStyle === FILTER_STYLE.nestedDropdown) {
