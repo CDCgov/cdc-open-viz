@@ -119,70 +119,26 @@ export const getToFetch = (
 }
 
 export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
-  // Early return if no options available
-  if (!dropdownOptions || dropdownOptions.length === 0) {
-    sharedFilter.active = undefined
-    sharedFilter.subGrouping.active = undefined
-    return
-  }
-
   const queryValue = getQueryParam(sharedFilter?.setByQueryParameter)
   const subQueryValue = getQueryParam(sharedFilter?.subGrouping?.setByQueryParameter)
-  const defaultValue = dropdownOptions[0]?.value
 
-  // Determine main group active value
-  // Priority: query string > configured defaultValue > existing active > first option
-  let candidate: string | undefined
-  if (queryValue) {
-    candidate = queryValue
-  } else if (sharedFilter.defaultValue) {
-    candidate = sharedFilter.defaultValue
-  } else if (sharedFilter.active) {
-    candidate = sharedFilter.active
-  } else {
-    candidate = defaultValue
-  }
+  // Priority: query string > configured defaultValue > existing active (if valid) > first option
+  const validActive = dropdownOptions.find(option => option.value == sharedFilter.active)
+  sharedFilter.active =
+    queryValue || sharedFilter.defaultValue || (validActive ? sharedFilter.active : dropdownOptions[0]?.value)
 
-  // Validate and set main group active value with single lookup
-  // Use loose equality to handle type coercion (e.g., 2017 == '2017')
-  const currentOption = candidate ? dropdownOptions.find(option => option.value == candidate) : undefined
-  sharedFilter.active = currentOption ? candidate : defaultValue
-
-  // Re-lookup if we fell back to default
-  const finalOption = currentOption || dropdownOptions[0]
-  const fallbackSub = dropdownOptions[0]?.subOptions?.[0]?.value
-  const defaultSub = finalOption?.subOptions?.[0]?.value ?? fallbackSub
-
-  // Set subgroup active value
-  // Priority: query string > configured defaultValue > existing active > first suboption
-  if (subQueryValue) {
-    // Validate query value exists in available suboptions (loose equality for type coercion)
-    const validSubOption = finalOption?.subOptions?.find(opt => opt.value == subQueryValue)
-    sharedFilter.subGrouping.active = validSubOption ? subQueryValue : defaultSub
-  } else if (sharedFilter.subGrouping.defaultValue && finalOption) {
-    const defaultSubOption = finalOption.subOptions?.find(opt => opt.value == sharedFilter.subGrouping.defaultValue)
-    if (defaultSubOption) {
-      // Configured default is valid for this option
-      sharedFilter.subGrouping.active = sharedFilter.subGrouping.defaultValue
-    } else {
-      // Configured default is invalid; fall back to existing active only if it is valid, otherwise to defaultSub
-      const existingActiveOption = finalOption.subOptions?.find(opt => opt.value == sharedFilter.subGrouping.active)
-      sharedFilter.subGrouping.active = existingActiveOption ? existingActiveOption.value : defaultSub
-    }
-  } else if (finalOption) {
-    const subOption = finalOption.subOptions?.find(option => option.value == sharedFilter.subGrouping.active)
-    sharedFilter.subGrouping.active = subOption?.value || defaultSub
-  } else {
-    sharedFilter.subGrouping.active = defaultSub
-  }
+  const options = dropdownOptions.find(option => option.value == sharedFilter.active)?.subOptions || []
+  const validSubActive = options.find(o => o.value == sharedFilter.subGrouping?.active)
+  sharedFilter.subGrouping.active =
+    subQueryValue ||
+    sharedFilter.subGrouping?.defaultValue ||
+    (validSubActive ? sharedFilter.subGrouping.active : options[0]?.value)
 }
 
 export const setActiveMultiDropdown = (dropdownOptions, sharedFilter) => {
   const queryValue = getQueryParam(sharedFilter?.setByQueryParameter)
-  const queryValues = (Array.isArray(queryValue) ? queryValue : queryValue?.split(',') || []).filter(
-    v => v !== '' && v != null
-  ) // Remove empty strings and null/undefined
-  const defaultValues = queryValues.length > 0 ? queryValues : [dropdownOptions[0]?.value]
+  const queryValues = Array.isArray(queryValue) ? queryValue : queryValue?.split(',')
+  const defaultValues = queryValue ? queryValues : [dropdownOptions[0]?.value]
   const currentOption = (Array.isArray(sharedFilter.active) ? sharedFilter.active : []).filter(activeVal =>
     dropdownOptions.find(option => option.value === activeVal)
   )
