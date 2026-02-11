@@ -1,0 +1,3412 @@
+{
+  "data": {
+    "name": "vega_data"
+  },
+  "transform": [
+    {
+      "calculate": "datum.country == 'Democratic Republic of Congo' | datum.country == 'Uganda' | datum.country == 'Burundi' | datum.country=='Rwanda' | datum.country == 'Central African Republic' ? datum.country : 'Other'",
+      "as": "country_group"
+    },
+    {
+      "calculate": "utcFormat(datum.epiWeekStart, '%b %d, %Y')",
+      "as": "epiWeekStartStr"
+    },
+    {
+      "calculate": "utcFormat(datum.epiWeekEnd, '%b %d, %Y')",
+      "as": "epiWeekEndStr"
+    },
+    {
+      "calculate": "datum.epiWeekStartStr + ' - ' + datum.epiWeekEndStr",
+      "as": "epiWeekLabel"
+    },
+    {
+      "calculate": "max(datum.epiWeekStart) - 28*1000*60*60*24",
+      "as": "dataLagStart"
+    }
+  ],
+  "layer": [
+    {
+      "mark": {
+        "type": "text",
+        "angle": 270,
+        "align": "left",
+        "dx": -5,
+        "dy": -5,
+        "text": "Incomplete data",
+        "color": "#707070"
+      },
+      "encoding": {
+        "x": {
+          "aggregate": "max",
+          "field": "epiWeekEnd",
+          "type": "temporal"
+        },
+        "y": {
+          "aggregate": "max",
+          "field": "casesConfirmedIncident",
+          "type": "quantitative"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "rect",
+        "color": "#707070",
+        "opacity": 0.3,
+        "tooltip": null
+      },
+      "encoding": {
+        "x": {
+          "aggregate": "max",
+          "field": "dataLagStart",
+          "type": "temporal"
+        },
+        "x2": {
+          "aggregate": "max",
+          "field": "epiWeekEnd",
+          "type": "temporal"
+        }
+      }
+    },
+    {
+      "mark": "bar",
+      "encoding": {
+        "x": {
+          "field": "epiWeekStart",
+          "title": "Report Date",
+          "type": "temporal",
+          "axis": {
+            "grid": false
+          }
+        },
+        "x2": {
+          "field": "epiWeekEnd"
+        },
+        "y": {
+          "aggregate": "sum",
+          "field": "casesConfirmedIncident",
+          "title": "Number of Confirmed Cases"
+        },
+        "color": {
+          "field": "country_group",
+          "title": "Country",
+          "scale": {
+            "domain": [
+              "Democratic Republic of Congo",
+              "Uganda",
+              "Rwanda",
+              "Burundi",
+              "Central African Republic",
+              "Other"
+            ],
+            "range": [
+              "#DDCC77",
+              "#117733",
+              "#44AA99",
+              "#CC6677",
+              "#332288",
+              "#882255"
+            ]
+          }
+        },
+        "tooltip": [
+          {
+            "field": "country_group",
+            "title": "Country"
+          },
+          {
+            "field": "epiWeekLabel",
+            "title": "Week"
+          },
+          {
+            "field": "yearWeek",
+            "title": "Year-Week"
+          },
+          {
+            "field": "sum_casesConfirmedIncident",
+            "title": "Cases"
+          }
+        ]
+      }
+    }
+  ],
+  "height": "container",
+  "width": "container",
+  "datasets": {
+    "vega_data": [
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-01-07T05:00:00.000Z",
+        "epiWeekStart": "2024-01-01T05:00:00.000Z",
+        "yearWeek": "2024-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Thailand",
+        "epiWeekEnd": "2024-01-07T05:00:00.000Z",
+        "epiWeekStart": "2024-01-01T05:00:00.000Z",
+        "yearWeek": "2024-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Tanzania",
+        "epiWeekEnd": "2024-01-07T05:00:00.000Z",
+        "epiWeekStart": "2024-01-01T05:00:00.000Z",
+        "yearWeek": "2024-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United States",
+        "epiWeekEnd": "2024-01-07T05:00:00.000Z",
+        "epiWeekStart": "2024-01-01T05:00:00.000Z",
+        "yearWeek": "2024-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-01-07T05:00:00.000Z",
+        "epiWeekStart": "2024-01-01T05:00:00.000Z",
+        "yearWeek": "2024-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Kenya",
+        "epiWeekEnd": "2024-01-07T05:00:00.000Z",
+        "epiWeekStart": "2024-01-01T05:00:00.000Z",
+        "yearWeek": "2024-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Angola",
+        "epiWeekEnd": "2024-01-07T05:00:00.000Z",
+        "epiWeekStart": "2024-01-01T05:00:00.000Z",
+        "yearWeek": "2024-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-01-07T05:00:00.000Z",
+        "epiWeekStart": "2024-01-01T05:00:00.000Z",
+        "yearWeek": "2024-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Australia",
+        "epiWeekEnd": "2024-01-07T05:00:00.000Z",
+        "epiWeekStart": "2024-01-01T05:00:00.000Z",
+        "yearWeek": "2024-01"
+      },
+      {
+        "casesConfirmedIncident": 16,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-01-07T05:00:00.000Z",
+        "epiWeekStart": "2024-01-01T05:00:00.000Z",
+        "yearWeek": "2024-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Qatar",
+        "epiWeekEnd": "2024-01-07T05:00:00.000Z",
+        "epiWeekStart": "2024-01-01T05:00:00.000Z",
+        "yearWeek": "2024-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-01-07T05:00:00.000Z",
+        "epiWeekStart": "2024-01-01T05:00:00.000Z",
+        "yearWeek": "2024-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Brazil",
+        "epiWeekEnd": "2024-01-07T05:00:00.000Z",
+        "epiWeekStart": "2024-01-01T05:00:00.000Z",
+        "yearWeek": "2024-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-01-21T05:00:00.000Z",
+        "epiWeekStart": "2024-01-15T05:00:00.000Z",
+        "yearWeek": "2024-03"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-01-21T05:00:00.000Z",
+        "epiWeekStart": "2024-01-15T05:00:00.000Z",
+        "yearWeek": "2024-03"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United States",
+        "epiWeekEnd": "2024-01-21T05:00:00.000Z",
+        "epiWeekStart": "2024-01-15T05:00:00.000Z",
+        "yearWeek": "2024-03"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Ireland",
+        "epiWeekEnd": "2024-01-21T05:00:00.000Z",
+        "epiWeekStart": "2024-01-15T05:00:00.000Z",
+        "yearWeek": "2024-03"
+      },
+      {
+        "casesConfirmedIncident": 108,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-01-21T05:00:00.000Z",
+        "epiWeekStart": "2024-01-15T05:00:00.000Z",
+        "yearWeek": "2024-03"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Zambia",
+        "epiWeekEnd": "2024-01-21T05:00:00.000Z",
+        "epiWeekStart": "2024-01-15T05:00:00.000Z",
+        "yearWeek": "2024-03"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "South Africa",
+        "epiWeekEnd": "2024-01-21T05:00:00.000Z",
+        "epiWeekStart": "2024-01-15T05:00:00.000Z",
+        "yearWeek": "2024-03"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Republic of Congo",
+        "epiWeekEnd": "2024-01-21T05:00:00.000Z",
+        "epiWeekStart": "2024-01-15T05:00:00.000Z",
+        "yearWeek": "2024-03"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Pakistan",
+        "epiWeekEnd": "2024-01-21T05:00:00.000Z",
+        "epiWeekStart": "2024-01-15T05:00:00.000Z",
+        "yearWeek": "2024-03"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-01-21T05:00:00.000Z",
+        "epiWeekStart": "2024-01-15T05:00:00.000Z",
+        "yearWeek": "2024-03"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "India",
+        "epiWeekEnd": "2024-01-21T05:00:00.000Z",
+        "epiWeekStart": "2024-01-15T05:00:00.000Z",
+        "yearWeek": "2024-03"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Qatar",
+        "epiWeekEnd": "2024-01-21T05:00:00.000Z",
+        "epiWeekStart": "2024-01-15T05:00:00.000Z",
+        "yearWeek": "2024-03"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-01-21T05:00:00.000Z",
+        "epiWeekStart": "2024-01-15T05:00:00.000Z",
+        "yearWeek": "2024-03"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-02-04T05:00:00.000Z",
+        "epiWeekStart": "2024-01-29T05:00:00.000Z",
+        "yearWeek": "2024-05"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-02-04T05:00:00.000Z",
+        "epiWeekStart": "2024-01-29T05:00:00.000Z",
+        "yearWeek": "2024-05"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-02-04T05:00:00.000Z",
+        "epiWeekStart": "2024-01-29T05:00:00.000Z",
+        "yearWeek": "2024-05"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "India",
+        "epiWeekEnd": "2024-02-04T05:00:00.000Z",
+        "epiWeekStart": "2024-01-29T05:00:00.000Z",
+        "yearWeek": "2024-05"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Switzerland",
+        "epiWeekEnd": "2024-02-04T05:00:00.000Z",
+        "epiWeekStart": "2024-01-29T05:00:00.000Z",
+        "yearWeek": "2024-05"
+      },
+      {
+        "casesConfirmedIncident": 70,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-02-04T05:00:00.000Z",
+        "epiWeekStart": "2024-01-29T05:00:00.000Z",
+        "yearWeek": "2024-05"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Germany",
+        "epiWeekEnd": "2024-02-04T05:00:00.000Z",
+        "epiWeekStart": "2024-01-29T05:00:00.000Z",
+        "yearWeek": "2024-05"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-02-04T05:00:00.000Z",
+        "epiWeekStart": "2024-01-29T05:00:00.000Z",
+        "yearWeek": "2024-05"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Kenya",
+        "epiWeekEnd": "2024-02-04T05:00:00.000Z",
+        "epiWeekStart": "2024-01-29T05:00:00.000Z",
+        "yearWeek": "2024-05"
+      },
+      {
+        "casesConfirmedIncident": 49,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-02-18T05:00:00.000Z",
+        "epiWeekStart": "2024-02-12T05:00:00.000Z",
+        "yearWeek": "2024-07"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Tanzania",
+        "epiWeekEnd": "2024-02-18T05:00:00.000Z",
+        "epiWeekStart": "2024-02-12T05:00:00.000Z",
+        "yearWeek": "2024-07"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-02-18T05:00:00.000Z",
+        "epiWeekStart": "2024-02-12T05:00:00.000Z",
+        "yearWeek": "2024-07"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-02-18T05:00:00.000Z",
+        "epiWeekStart": "2024-02-12T05:00:00.000Z",
+        "yearWeek": "2024-07"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Australia",
+        "epiWeekEnd": "2024-02-18T05:00:00.000Z",
+        "epiWeekStart": "2024-02-12T05:00:00.000Z",
+        "yearWeek": "2024-07"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "France",
+        "epiWeekEnd": "2024-02-18T05:00:00.000Z",
+        "epiWeekStart": "2024-02-12T05:00:00.000Z",
+        "yearWeek": "2024-07"
+      },
+      {
+        "casesConfirmedIncident": 5,
+        "country": "Republic of Congo",
+        "epiWeekEnd": "2024-02-18T05:00:00.000Z",
+        "epiWeekStart": "2024-02-12T05:00:00.000Z",
+        "yearWeek": "2024-07"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-02-18T05:00:00.000Z",
+        "epiWeekStart": "2024-02-12T05:00:00.000Z",
+        "yearWeek": "2024-07"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Switzerland",
+        "epiWeekEnd": "2024-02-18T05:00:00.000Z",
+        "epiWeekStart": "2024-02-12T05:00:00.000Z",
+        "yearWeek": "2024-07"
+      },
+      {
+        "casesConfirmedIncident": 4,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-02-18T05:00:00.000Z",
+        "epiWeekStart": "2024-02-12T05:00:00.000Z",
+        "yearWeek": "2024-07"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Zambia",
+        "epiWeekEnd": "2024-02-18T05:00:00.000Z",
+        "epiWeekStart": "2024-02-12T05:00:00.000Z",
+        "yearWeek": "2024-07"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-03-03T05:00:00.000Z",
+        "epiWeekStart": "2024-02-26T05:00:00.000Z",
+        "yearWeek": "2024-09"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Switzerland",
+        "epiWeekEnd": "2024-03-03T05:00:00.000Z",
+        "epiWeekStart": "2024-02-26T05:00:00.000Z",
+        "yearWeek": "2024-09"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Angola",
+        "epiWeekEnd": "2024-03-03T05:00:00.000Z",
+        "epiWeekStart": "2024-02-26T05:00:00.000Z",
+        "yearWeek": "2024-09"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-03-03T05:00:00.000Z",
+        "epiWeekStart": "2024-02-26T05:00:00.000Z",
+        "yearWeek": "2024-09"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "India",
+        "epiWeekEnd": "2024-03-03T05:00:00.000Z",
+        "epiWeekStart": "2024-02-26T05:00:00.000Z",
+        "yearWeek": "2024-09"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Malawi",
+        "epiWeekEnd": "2024-03-03T05:00:00.000Z",
+        "epiWeekStart": "2024-02-26T05:00:00.000Z",
+        "yearWeek": "2024-09"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Qatar",
+        "epiWeekEnd": "2024-03-03T05:00:00.000Z",
+        "epiWeekStart": "2024-02-26T05:00:00.000Z",
+        "yearWeek": "2024-09"
+      },
+      {
+        "casesConfirmedIncident": 20,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-03-03T05:00:00.000Z",
+        "epiWeekStart": "2024-02-26T05:00:00.000Z",
+        "yearWeek": "2024-09"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-03-03T05:00:00.000Z",
+        "epiWeekStart": "2024-02-26T05:00:00.000Z",
+        "yearWeek": "2024-09"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-03-03T05:00:00.000Z",
+        "epiWeekStart": "2024-02-26T05:00:00.000Z",
+        "yearWeek": "2024-09"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United Arab Emirates",
+        "epiWeekEnd": "2024-03-17T04:00:00.000Z",
+        "epiWeekStart": "2024-03-11T04:00:00.000Z",
+        "yearWeek": "2024-11"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "India",
+        "epiWeekEnd": "2024-03-17T04:00:00.000Z",
+        "epiWeekStart": "2024-03-11T04:00:00.000Z",
+        "yearWeek": "2024-11"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Zimbabwe",
+        "epiWeekEnd": "2024-03-17T04:00:00.000Z",
+        "epiWeekStart": "2024-03-11T04:00:00.000Z",
+        "yearWeek": "2024-11"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-03-17T04:00:00.000Z",
+        "epiWeekStart": "2024-03-11T04:00:00.000Z",
+        "yearWeek": "2024-11"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Australia",
+        "epiWeekEnd": "2024-03-17T04:00:00.000Z",
+        "epiWeekStart": "2024-03-11T04:00:00.000Z",
+        "yearWeek": "2024-11"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Switzerland",
+        "epiWeekEnd": "2024-03-17T04:00:00.000Z",
+        "epiWeekStart": "2024-03-11T04:00:00.000Z",
+        "yearWeek": "2024-11"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "China",
+        "epiWeekEnd": "2024-03-17T04:00:00.000Z",
+        "epiWeekStart": "2024-03-11T04:00:00.000Z",
+        "yearWeek": "2024-11"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-03-17T04:00:00.000Z",
+        "epiWeekStart": "2024-03-11T04:00:00.000Z",
+        "yearWeek": "2024-11"
+      },
+      {
+        "casesConfirmedIncident": 4,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-03-17T04:00:00.000Z",
+        "epiWeekStart": "2024-03-11T04:00:00.000Z",
+        "yearWeek": "2024-11"
+      },
+      {
+        "casesConfirmedIncident": 24,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-03-17T04:00:00.000Z",
+        "epiWeekStart": "2024-03-11T04:00:00.000Z",
+        "yearWeek": "2024-11"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-03-17T04:00:00.000Z",
+        "epiWeekStart": "2024-03-11T04:00:00.000Z",
+        "yearWeek": "2024-11"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Brazil",
+        "epiWeekEnd": "2024-03-31T04:00:00.000Z",
+        "epiWeekStart": "2024-03-25T04:00:00.000Z",
+        "yearWeek": "2024-13"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-03-31T04:00:00.000Z",
+        "epiWeekStart": "2024-03-25T04:00:00.000Z",
+        "yearWeek": "2024-13"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Ireland",
+        "epiWeekEnd": "2024-03-31T04:00:00.000Z",
+        "epiWeekStart": "2024-03-25T04:00:00.000Z",
+        "yearWeek": "2024-13"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Tanzania",
+        "epiWeekEnd": "2024-03-31T04:00:00.000Z",
+        "epiWeekStart": "2024-03-25T04:00:00.000Z",
+        "yearWeek": "2024-13"
+      },
+      {
+        "casesConfirmedIncident": 51,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-03-31T04:00:00.000Z",
+        "epiWeekStart": "2024-03-25T04:00:00.000Z",
+        "yearWeek": "2024-13"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-03-31T04:00:00.000Z",
+        "epiWeekStart": "2024-03-25T04:00:00.000Z",
+        "yearWeek": "2024-13"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Thailand",
+        "epiWeekEnd": "2024-03-31T04:00:00.000Z",
+        "epiWeekStart": "2024-03-25T04:00:00.000Z",
+        "yearWeek": "2024-13"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-03-31T04:00:00.000Z",
+        "epiWeekStart": "2024-03-25T04:00:00.000Z",
+        "yearWeek": "2024-13"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Canada",
+        "epiWeekEnd": "2024-03-31T04:00:00.000Z",
+        "epiWeekStart": "2024-03-25T04:00:00.000Z",
+        "yearWeek": "2024-13"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "China",
+        "epiWeekEnd": "2024-03-31T04:00:00.000Z",
+        "epiWeekStart": "2024-03-25T04:00:00.000Z",
+        "yearWeek": "2024-13"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-03-31T04:00:00.000Z",
+        "epiWeekStart": "2024-03-25T04:00:00.000Z",
+        "yearWeek": "2024-13"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United Arab Emirates",
+        "epiWeekEnd": "2024-03-31T04:00:00.000Z",
+        "epiWeekStart": "2024-03-25T04:00:00.000Z",
+        "yearWeek": "2024-13"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Germany",
+        "epiWeekEnd": "2024-04-14T04:00:00.000Z",
+        "epiWeekStart": "2024-04-08T04:00:00.000Z",
+        "yearWeek": "2024-15"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-04-14T04:00:00.000Z",
+        "epiWeekStart": "2024-04-08T04:00:00.000Z",
+        "yearWeek": "2024-15"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "South Sudan",
+        "epiWeekEnd": "2024-04-14T04:00:00.000Z",
+        "epiWeekStart": "2024-04-08T04:00:00.000Z",
+        "yearWeek": "2024-15"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "France",
+        "epiWeekEnd": "2024-04-14T04:00:00.000Z",
+        "epiWeekStart": "2024-04-08T04:00:00.000Z",
+        "yearWeek": "2024-15"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Tanzania",
+        "epiWeekEnd": "2024-04-14T04:00:00.000Z",
+        "epiWeekStart": "2024-04-08T04:00:00.000Z",
+        "yearWeek": "2024-15"
+      },
+      {
+        "casesConfirmedIncident": 23,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-04-14T04:00:00.000Z",
+        "epiWeekStart": "2024-04-08T04:00:00.000Z",
+        "yearWeek": "2024-15"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Canada",
+        "epiWeekEnd": "2024-04-14T04:00:00.000Z",
+        "epiWeekStart": "2024-04-08T04:00:00.000Z",
+        "yearWeek": "2024-15"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-04-14T04:00:00.000Z",
+        "epiWeekStart": "2024-04-08T04:00:00.000Z",
+        "yearWeek": "2024-15"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "South Africa",
+        "epiWeekEnd": "2024-04-14T04:00:00.000Z",
+        "epiWeekStart": "2024-04-08T04:00:00.000Z",
+        "yearWeek": "2024-15"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-04-14T04:00:00.000Z",
+        "epiWeekStart": "2024-04-08T04:00:00.000Z",
+        "yearWeek": "2024-15"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Zimbabwe",
+        "epiWeekEnd": "2024-04-14T04:00:00.000Z",
+        "epiWeekStart": "2024-04-08T04:00:00.000Z",
+        "yearWeek": "2024-15"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-04-14T04:00:00.000Z",
+        "epiWeekStart": "2024-04-08T04:00:00.000Z",
+        "yearWeek": "2024-15"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-04-28T04:00:00.000Z",
+        "epiWeekStart": "2024-04-22T04:00:00.000Z",
+        "yearWeek": "2024-17"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-04-28T04:00:00.000Z",
+        "epiWeekStart": "2024-04-22T04:00:00.000Z",
+        "yearWeek": "2024-17"
+      },
+      {
+        "casesConfirmedIncident": 47,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-04-28T04:00:00.000Z",
+        "epiWeekStart": "2024-04-22T04:00:00.000Z",
+        "yearWeek": "2024-17"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-04-28T04:00:00.000Z",
+        "epiWeekStart": "2024-04-22T04:00:00.000Z",
+        "yearWeek": "2024-17"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Oman",
+        "epiWeekEnd": "2024-04-28T04:00:00.000Z",
+        "epiWeekStart": "2024-04-22T04:00:00.000Z",
+        "yearWeek": "2024-17"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Zambia",
+        "epiWeekEnd": "2024-04-28T04:00:00.000Z",
+        "epiWeekStart": "2024-04-22T04:00:00.000Z",
+        "yearWeek": "2024-17"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-04-28T04:00:00.000Z",
+        "epiWeekStart": "2024-04-22T04:00:00.000Z",
+        "yearWeek": "2024-17"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Sweden",
+        "epiWeekEnd": "2024-04-28T04:00:00.000Z",
+        "epiWeekStart": "2024-04-22T04:00:00.000Z",
+        "yearWeek": "2024-17"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Malawi",
+        "epiWeekEnd": "2024-04-28T04:00:00.000Z",
+        "epiWeekStart": "2024-04-22T04:00:00.000Z",
+        "yearWeek": "2024-17"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Angola",
+        "epiWeekEnd": "2024-04-28T04:00:00.000Z",
+        "epiWeekStart": "2024-04-22T04:00:00.000Z",
+        "yearWeek": "2024-17"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "India",
+        "epiWeekEnd": "2024-04-28T04:00:00.000Z",
+        "epiWeekStart": "2024-04-22T04:00:00.000Z",
+        "yearWeek": "2024-17"
+      },
+      {
+        "casesConfirmedIncident": 83,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-05-12T04:00:00.000Z",
+        "epiWeekStart": "2024-05-06T04:00:00.000Z",
+        "yearWeek": "2024-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Zimbabwe",
+        "epiWeekEnd": "2024-05-12T04:00:00.000Z",
+        "epiWeekStart": "2024-05-06T04:00:00.000Z",
+        "yearWeek": "2024-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-05-12T04:00:00.000Z",
+        "epiWeekStart": "2024-05-06T04:00:00.000Z",
+        "yearWeek": "2024-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-05-12T04:00:00.000Z",
+        "epiWeekStart": "2024-05-06T04:00:00.000Z",
+        "yearWeek": "2024-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Tanzania",
+        "epiWeekEnd": "2024-05-12T04:00:00.000Z",
+        "epiWeekStart": "2024-05-06T04:00:00.000Z",
+        "yearWeek": "2024-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-05-12T04:00:00.000Z",
+        "epiWeekStart": "2024-05-06T04:00:00.000Z",
+        "yearWeek": "2024-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Thailand",
+        "epiWeekEnd": "2024-05-12T04:00:00.000Z",
+        "epiWeekStart": "2024-05-06T04:00:00.000Z",
+        "yearWeek": "2024-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-05-12T04:00:00.000Z",
+        "epiWeekStart": "2024-05-06T04:00:00.000Z",
+        "yearWeek": "2024-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "India",
+        "epiWeekEnd": "2024-05-12T04:00:00.000Z",
+        "epiWeekStart": "2024-05-06T04:00:00.000Z",
+        "yearWeek": "2024-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "South Africa",
+        "epiWeekEnd": "2024-05-12T04:00:00.000Z",
+        "epiWeekStart": "2024-05-06T04:00:00.000Z",
+        "yearWeek": "2024-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Belgium",
+        "epiWeekEnd": "2024-05-12T04:00:00.000Z",
+        "epiWeekStart": "2024-05-06T04:00:00.000Z",
+        "yearWeek": "2024-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Ireland",
+        "epiWeekEnd": "2024-05-12T04:00:00.000Z",
+        "epiWeekStart": "2024-05-06T04:00:00.000Z",
+        "yearWeek": "2024-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Germany",
+        "epiWeekEnd": "2024-05-12T04:00:00.000Z",
+        "epiWeekStart": "2024-05-06T04:00:00.000Z",
+        "yearWeek": "2024-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Canada",
+        "epiWeekEnd": "2024-05-12T04:00:00.000Z",
+        "epiWeekStart": "2024-05-06T04:00:00.000Z",
+        "yearWeek": "2024-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-05-26T04:00:00.000Z",
+        "epiWeekStart": "2024-05-20T04:00:00.000Z",
+        "yearWeek": "2024-21"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Angola",
+        "epiWeekEnd": "2024-05-26T04:00:00.000Z",
+        "epiWeekStart": "2024-05-20T04:00:00.000Z",
+        "yearWeek": "2024-21"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Zimbabwe",
+        "epiWeekEnd": "2024-05-26T04:00:00.000Z",
+        "epiWeekStart": "2024-05-20T04:00:00.000Z",
+        "yearWeek": "2024-21"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Belgium",
+        "epiWeekEnd": "2024-05-26T04:00:00.000Z",
+        "epiWeekStart": "2024-05-20T04:00:00.000Z",
+        "yearWeek": "2024-21"
+      },
+      {
+        "casesConfirmedIncident": 176,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-05-26T04:00:00.000Z",
+        "epiWeekStart": "2024-05-20T04:00:00.000Z",
+        "yearWeek": "2024-21"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Germany",
+        "epiWeekEnd": "2024-05-26T04:00:00.000Z",
+        "epiWeekStart": "2024-05-20T04:00:00.000Z",
+        "yearWeek": "2024-21"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-05-26T04:00:00.000Z",
+        "epiWeekStart": "2024-05-20T04:00:00.000Z",
+        "yearWeek": "2024-21"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-05-26T04:00:00.000Z",
+        "epiWeekStart": "2024-05-20T04:00:00.000Z",
+        "yearWeek": "2024-21"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "India",
+        "epiWeekEnd": "2024-05-26T04:00:00.000Z",
+        "epiWeekStart": "2024-05-20T04:00:00.000Z",
+        "yearWeek": "2024-21"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-05-26T04:00:00.000Z",
+        "epiWeekStart": "2024-05-20T04:00:00.000Z",
+        "yearWeek": "2024-21"
+      },
+      {
+        "casesConfirmedIncident": 63,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-06-09T04:00:00.000Z",
+        "epiWeekStart": "2024-06-03T04:00:00.000Z",
+        "yearWeek": "2024-23"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Zimbabwe",
+        "epiWeekEnd": "2024-06-09T04:00:00.000Z",
+        "epiWeekStart": "2024-06-03T04:00:00.000Z",
+        "yearWeek": "2024-23"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-06-09T04:00:00.000Z",
+        "epiWeekStart": "2024-06-03T04:00:00.000Z",
+        "yearWeek": "2024-23"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-06-09T04:00:00.000Z",
+        "epiWeekStart": "2024-06-03T04:00:00.000Z",
+        "yearWeek": "2024-23"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-06-09T04:00:00.000Z",
+        "epiWeekStart": "2024-06-03T04:00:00.000Z",
+        "yearWeek": "2024-23"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Canada",
+        "epiWeekEnd": "2024-06-09T04:00:00.000Z",
+        "epiWeekStart": "2024-06-03T04:00:00.000Z",
+        "yearWeek": "2024-23"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-06-09T04:00:00.000Z",
+        "epiWeekStart": "2024-06-03T04:00:00.000Z",
+        "yearWeek": "2024-23"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Tanzania",
+        "epiWeekEnd": "2024-06-09T04:00:00.000Z",
+        "epiWeekStart": "2024-06-03T04:00:00.000Z",
+        "yearWeek": "2024-23"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-06-23T04:00:00.000Z",
+        "epiWeekStart": "2024-06-17T04:00:00.000Z",
+        "yearWeek": "2024-25"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Angola",
+        "epiWeekEnd": "2024-06-23T04:00:00.000Z",
+        "epiWeekStart": "2024-06-17T04:00:00.000Z",
+        "yearWeek": "2024-25"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "China",
+        "epiWeekEnd": "2024-06-23T04:00:00.000Z",
+        "epiWeekStart": "2024-06-17T04:00:00.000Z",
+        "yearWeek": "2024-25"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Republic of Congo",
+        "epiWeekEnd": "2024-06-23T04:00:00.000Z",
+        "epiWeekStart": "2024-06-17T04:00:00.000Z",
+        "yearWeek": "2024-25"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-06-23T04:00:00.000Z",
+        "epiWeekStart": "2024-06-17T04:00:00.000Z",
+        "yearWeek": "2024-25"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United Kingdom",
+        "epiWeekEnd": "2024-06-23T04:00:00.000Z",
+        "epiWeekStart": "2024-06-17T04:00:00.000Z",
+        "yearWeek": "2024-25"
+      },
+      {
+        "casesConfirmedIncident": 106,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-06-23T04:00:00.000Z",
+        "epiWeekStart": "2024-06-17T04:00:00.000Z",
+        "yearWeek": "2024-25"
+      },
+      {
+        "casesConfirmedIncident": 2,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-06-23T04:00:00.000Z",
+        "epiWeekStart": "2024-06-17T04:00:00.000Z",
+        "yearWeek": "2024-25"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-06-23T04:00:00.000Z",
+        "epiWeekStart": "2024-06-17T04:00:00.000Z",
+        "yearWeek": "2024-25"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "France",
+        "epiWeekEnd": "2024-06-23T04:00:00.000Z",
+        "epiWeekStart": "2024-06-17T04:00:00.000Z",
+        "yearWeek": "2024-25"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "France",
+        "epiWeekEnd": "2024-07-07T04:00:00.000Z",
+        "epiWeekStart": "2024-07-01T04:00:00.000Z",
+        "yearWeek": "2024-27"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Canada",
+        "epiWeekEnd": "2024-07-07T04:00:00.000Z",
+        "epiWeekStart": "2024-07-01T04:00:00.000Z",
+        "yearWeek": "2024-27"
+      },
+      {
+        "casesConfirmedIncident": 63,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-07-07T04:00:00.000Z",
+        "epiWeekStart": "2024-07-01T04:00:00.000Z",
+        "yearWeek": "2024-27"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-07-07T04:00:00.000Z",
+        "epiWeekStart": "2024-07-01T04:00:00.000Z",
+        "yearWeek": "2024-27"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Sweden",
+        "epiWeekEnd": "2024-07-07T04:00:00.000Z",
+        "epiWeekStart": "2024-07-01T04:00:00.000Z",
+        "yearWeek": "2024-27"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Brazil",
+        "epiWeekEnd": "2024-07-07T04:00:00.000Z",
+        "epiWeekStart": "2024-07-01T04:00:00.000Z",
+        "yearWeek": "2024-27"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-07-07T04:00:00.000Z",
+        "epiWeekStart": "2024-07-01T04:00:00.000Z",
+        "yearWeek": "2024-27"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Zambia",
+        "epiWeekEnd": "2024-07-07T04:00:00.000Z",
+        "epiWeekStart": "2024-07-01T04:00:00.000Z",
+        "yearWeek": "2024-27"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-07-07T04:00:00.000Z",
+        "epiWeekStart": "2024-07-01T04:00:00.000Z",
+        "yearWeek": "2024-27"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-07-07T04:00:00.000Z",
+        "epiWeekStart": "2024-07-01T04:00:00.000Z",
+        "yearWeek": "2024-27"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United Arab Emirates",
+        "epiWeekEnd": "2024-07-07T04:00:00.000Z",
+        "epiWeekStart": "2024-07-01T04:00:00.000Z",
+        "yearWeek": "2024-27"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Oman",
+        "epiWeekEnd": "2024-07-07T04:00:00.000Z",
+        "epiWeekStart": "2024-07-01T04:00:00.000Z",
+        "yearWeek": "2024-27"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Pakistan",
+        "epiWeekEnd": "2024-07-07T04:00:00.000Z",
+        "epiWeekStart": "2024-07-01T04:00:00.000Z",
+        "yearWeek": "2024-27"
+      },
+      {
+        "casesConfirmedIncident": 199,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-07-21T04:00:00.000Z",
+        "epiWeekStart": "2024-07-15T04:00:00.000Z",
+        "yearWeek": "2024-29"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-07-21T04:00:00.000Z",
+        "epiWeekStart": "2024-07-15T04:00:00.000Z",
+        "yearWeek": "2024-29"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-07-21T04:00:00.000Z",
+        "epiWeekStart": "2024-07-15T04:00:00.000Z",
+        "yearWeek": "2024-29"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United States",
+        "epiWeekEnd": "2024-07-21T04:00:00.000Z",
+        "epiWeekStart": "2024-07-15T04:00:00.000Z",
+        "yearWeek": "2024-29"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Australia",
+        "epiWeekEnd": "2024-07-21T04:00:00.000Z",
+        "epiWeekStart": "2024-07-15T04:00:00.000Z",
+        "yearWeek": "2024-29"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Thailand",
+        "epiWeekEnd": "2024-07-21T04:00:00.000Z",
+        "epiWeekStart": "2024-07-15T04:00:00.000Z",
+        "yearWeek": "2024-29"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United Kingdom",
+        "epiWeekEnd": "2024-07-21T04:00:00.000Z",
+        "epiWeekStart": "2024-07-15T04:00:00.000Z",
+        "yearWeek": "2024-29"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Tanzania",
+        "epiWeekEnd": "2024-07-21T04:00:00.000Z",
+        "epiWeekStart": "2024-07-15T04:00:00.000Z",
+        "yearWeek": "2024-29"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-07-21T04:00:00.000Z",
+        "epiWeekStart": "2024-07-15T04:00:00.000Z",
+        "yearWeek": "2024-29"
+      },
+      {
+        "casesConfirmedIncident": 4,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-07-21T04:00:00.000Z",
+        "epiWeekStart": "2024-07-15T04:00:00.000Z",
+        "yearWeek": "2024-29"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Brazil",
+        "epiWeekEnd": "2024-08-04T04:00:00.000Z",
+        "epiWeekStart": "2024-07-29T04:00:00.000Z",
+        "yearWeek": "2024-31"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "India",
+        "epiWeekEnd": "2024-08-04T04:00:00.000Z",
+        "epiWeekStart": "2024-07-29T04:00:00.000Z",
+        "yearWeek": "2024-31"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-08-04T04:00:00.000Z",
+        "epiWeekStart": "2024-07-29T04:00:00.000Z",
+        "yearWeek": "2024-31"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Zambia",
+        "epiWeekEnd": "2024-08-04T04:00:00.000Z",
+        "epiWeekStart": "2024-07-29T04:00:00.000Z",
+        "yearWeek": "2024-31"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United Arab Emirates",
+        "epiWeekEnd": "2024-08-04T04:00:00.000Z",
+        "epiWeekStart": "2024-07-29T04:00:00.000Z",
+        "yearWeek": "2024-31"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-08-04T04:00:00.000Z",
+        "epiWeekStart": "2024-07-29T04:00:00.000Z",
+        "yearWeek": "2024-31"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Australia",
+        "epiWeekEnd": "2024-08-04T04:00:00.000Z",
+        "epiWeekStart": "2024-07-29T04:00:00.000Z",
+        "yearWeek": "2024-31"
+      },
+      {
+        "casesConfirmedIncident": 3,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-08-04T04:00:00.000Z",
+        "epiWeekStart": "2024-07-29T04:00:00.000Z",
+        "yearWeek": "2024-31"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Thailand",
+        "epiWeekEnd": "2024-08-04T04:00:00.000Z",
+        "epiWeekStart": "2024-07-29T04:00:00.000Z",
+        "yearWeek": "2024-31"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Malawi",
+        "epiWeekEnd": "2024-08-04T04:00:00.000Z",
+        "epiWeekStart": "2024-07-29T04:00:00.000Z",
+        "yearWeek": "2024-31"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Zimbabwe",
+        "epiWeekEnd": "2024-08-04T04:00:00.000Z",
+        "epiWeekStart": "2024-07-29T04:00:00.000Z",
+        "yearWeek": "2024-31"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Kenya",
+        "epiWeekEnd": "2024-08-04T04:00:00.000Z",
+        "epiWeekStart": "2024-07-29T04:00:00.000Z",
+        "yearWeek": "2024-31"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Sweden",
+        "epiWeekEnd": "2024-08-04T04:00:00.000Z",
+        "epiWeekStart": "2024-07-29T04:00:00.000Z",
+        "yearWeek": "2024-31"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United Kingdom",
+        "epiWeekEnd": "2024-08-04T04:00:00.000Z",
+        "epiWeekStart": "2024-07-29T04:00:00.000Z",
+        "yearWeek": "2024-31"
+      },
+      {
+        "casesConfirmedIncident": 31,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-08-04T04:00:00.000Z",
+        "epiWeekStart": "2024-07-29T04:00:00.000Z",
+        "yearWeek": "2024-31"
+      },
+      {
+        "casesConfirmedIncident": 222,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-08-04T04:00:00.000Z",
+        "epiWeekStart": "2024-07-29T04:00:00.000Z",
+        "yearWeek": "2024-31"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Sweden",
+        "epiWeekEnd": "2024-08-18T04:00:00.000Z",
+        "epiWeekStart": "2024-08-12T04:00:00.000Z",
+        "yearWeek": "2024-33"
+      },
+      {
+        "casesConfirmedIncident": 206,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-08-18T04:00:00.000Z",
+        "epiWeekStart": "2024-08-12T04:00:00.000Z",
+        "yearWeek": "2024-33"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-08-18T04:00:00.000Z",
+        "epiWeekStart": "2024-08-12T04:00:00.000Z",
+        "yearWeek": "2024-33"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Australia",
+        "epiWeekEnd": "2024-08-18T04:00:00.000Z",
+        "epiWeekStart": "2024-08-12T04:00:00.000Z",
+        "yearWeek": "2024-33"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "France",
+        "epiWeekEnd": "2024-08-18T04:00:00.000Z",
+        "epiWeekStart": "2024-08-12T04:00:00.000Z",
+        "yearWeek": "2024-33"
+      },
+      {
+        "casesConfirmedIncident": 70,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-08-18T04:00:00.000Z",
+        "epiWeekStart": "2024-08-12T04:00:00.000Z",
+        "yearWeek": "2024-33"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Thailand",
+        "epiWeekEnd": "2024-08-18T04:00:00.000Z",
+        "epiWeekStart": "2024-08-12T04:00:00.000Z",
+        "yearWeek": "2024-33"
+      },
+      {
+        "casesConfirmedIncident": 5,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-08-18T04:00:00.000Z",
+        "epiWeekStart": "2024-08-12T04:00:00.000Z",
+        "yearWeek": "2024-33"
+      },
+      {
+        "casesConfirmedIncident": 2,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-08-18T04:00:00.000Z",
+        "epiWeekStart": "2024-08-12T04:00:00.000Z",
+        "yearWeek": "2024-33"
+      },
+      {
+        "casesConfirmedIncident": 2,
+        "country": "Kenya",
+        "epiWeekEnd": "2024-09-01T04:00:00.000Z",
+        "epiWeekStart": "2024-08-26T04:00:00.000Z",
+        "yearWeek": "2024-35"
+      },
+      {
+        "casesConfirmedIncident": 300,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-09-01T04:00:00.000Z",
+        "epiWeekStart": "2024-08-26T04:00:00.000Z",
+        "yearWeek": "2024-35"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Ireland",
+        "epiWeekEnd": "2024-09-01T04:00:00.000Z",
+        "epiWeekStart": "2024-08-26T04:00:00.000Z",
+        "yearWeek": "2024-35"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-09-01T04:00:00.000Z",
+        "epiWeekStart": "2024-08-26T04:00:00.000Z",
+        "yearWeek": "2024-35"
+      },
+      {
+        "casesConfirmedIncident": 97,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-09-01T04:00:00.000Z",
+        "epiWeekStart": "2024-08-26T04:00:00.000Z",
+        "yearWeek": "2024-35"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Thailand",
+        "epiWeekEnd": "2024-09-01T04:00:00.000Z",
+        "epiWeekStart": "2024-08-26T04:00:00.000Z",
+        "yearWeek": "2024-35"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Malawi",
+        "epiWeekEnd": "2024-09-01T04:00:00.000Z",
+        "epiWeekStart": "2024-08-26T04:00:00.000Z",
+        "yearWeek": "2024-35"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-09-01T04:00:00.000Z",
+        "epiWeekStart": "2024-08-26T04:00:00.000Z",
+        "yearWeek": "2024-35"
+      },
+      {
+        "casesConfirmedIncident": 4,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-09-01T04:00:00.000Z",
+        "epiWeekStart": "2024-08-26T04:00:00.000Z",
+        "yearWeek": "2024-35"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "China",
+        "epiWeekEnd": "2024-09-01T04:00:00.000Z",
+        "epiWeekStart": "2024-08-26T04:00:00.000Z",
+        "yearWeek": "2024-35"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "France",
+        "epiWeekEnd": "2024-09-01T04:00:00.000Z",
+        "epiWeekStart": "2024-08-26T04:00:00.000Z",
+        "yearWeek": "2024-35"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "South Sudan",
+        "epiWeekEnd": "2024-09-01T04:00:00.000Z",
+        "epiWeekStart": "2024-08-26T04:00:00.000Z",
+        "yearWeek": "2024-35"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Brazil",
+        "epiWeekEnd": "2024-09-01T04:00:00.000Z",
+        "epiWeekStart": "2024-08-26T04:00:00.000Z",
+        "yearWeek": "2024-35"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Angola",
+        "epiWeekEnd": "2024-09-01T04:00:00.000Z",
+        "epiWeekStart": "2024-08-26T04:00:00.000Z",
+        "yearWeek": "2024-35"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Ireland",
+        "epiWeekEnd": "2024-09-15T04:00:00.000Z",
+        "epiWeekStart": "2024-09-09T04:00:00.000Z",
+        "yearWeek": "2024-37"
+      },
+      {
+        "casesConfirmedIncident": 8,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-09-15T04:00:00.000Z",
+        "epiWeekStart": "2024-09-09T04:00:00.000Z",
+        "yearWeek": "2024-37"
+      },
+      {
+        "casesConfirmedIncident": 259,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-09-15T04:00:00.000Z",
+        "epiWeekStart": "2024-09-09T04:00:00.000Z",
+        "yearWeek": "2024-37"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Kenya",
+        "epiWeekEnd": "2024-09-15T04:00:00.000Z",
+        "epiWeekStart": "2024-09-09T04:00:00.000Z",
+        "yearWeek": "2024-37"
+      },
+      {
+        "casesConfirmedIncident": 2,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-09-15T04:00:00.000Z",
+        "epiWeekStart": "2024-09-09T04:00:00.000Z",
+        "yearWeek": "2024-37"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-09-15T04:00:00.000Z",
+        "epiWeekStart": "2024-09-09T04:00:00.000Z",
+        "yearWeek": "2024-37"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Switzerland",
+        "epiWeekEnd": "2024-09-15T04:00:00.000Z",
+        "epiWeekStart": "2024-09-09T04:00:00.000Z",
+        "yearWeek": "2024-37"
+      },
+      {
+        "casesConfirmedIncident": 179,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-09-15T04:00:00.000Z",
+        "epiWeekStart": "2024-09-09T04:00:00.000Z",
+        "yearWeek": "2024-37"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-09-29T04:00:00.000Z",
+        "epiWeekStart": "2024-09-23T04:00:00.000Z",
+        "yearWeek": "2024-39"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Pakistan",
+        "epiWeekEnd": "2024-09-29T04:00:00.000Z",
+        "epiWeekStart": "2024-09-23T04:00:00.000Z",
+        "yearWeek": "2024-39"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Republic of Congo",
+        "epiWeekEnd": "2024-09-29T04:00:00.000Z",
+        "epiWeekStart": "2024-09-23T04:00:00.000Z",
+        "yearWeek": "2024-39"
+      },
+      {
+        "casesConfirmedIncident": 20,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-09-29T04:00:00.000Z",
+        "epiWeekStart": "2024-09-23T04:00:00.000Z",
+        "yearWeek": "2024-39"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Angola",
+        "epiWeekEnd": "2024-09-29T04:00:00.000Z",
+        "epiWeekStart": "2024-09-23T04:00:00.000Z",
+        "yearWeek": "2024-39"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-09-29T04:00:00.000Z",
+        "epiWeekStart": "2024-09-23T04:00:00.000Z",
+        "yearWeek": "2024-39"
+      },
+      {
+        "casesConfirmedIncident": 3,
+        "country": "Kenya",
+        "epiWeekEnd": "2024-09-29T04:00:00.000Z",
+        "epiWeekStart": "2024-09-23T04:00:00.000Z",
+        "yearWeek": "2024-39"
+      },
+      {
+        "casesConfirmedIncident": 157,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-09-29T04:00:00.000Z",
+        "epiWeekStart": "2024-09-23T04:00:00.000Z",
+        "yearWeek": "2024-39"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "South Africa",
+        "epiWeekEnd": "2024-09-29T04:00:00.000Z",
+        "epiWeekStart": "2024-09-23T04:00:00.000Z",
+        "yearWeek": "2024-39"
+      },
+      {
+        "casesConfirmedIncident": 314,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-09-29T04:00:00.000Z",
+        "epiWeekStart": "2024-09-23T04:00:00.000Z",
+        "yearWeek": "2024-39"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Zimbabwe",
+        "epiWeekEnd": "2024-10-13T04:00:00.000Z",
+        "epiWeekStart": "2024-10-07T04:00:00.000Z",
+        "yearWeek": "2024-41"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Zambia",
+        "epiWeekEnd": "2024-10-13T04:00:00.000Z",
+        "epiWeekStart": "2024-10-07T04:00:00.000Z",
+        "yearWeek": "2024-41"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Brazil",
+        "epiWeekEnd": "2024-10-13T04:00:00.000Z",
+        "epiWeekStart": "2024-10-07T04:00:00.000Z",
+        "yearWeek": "2024-41"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "South Sudan",
+        "epiWeekEnd": "2024-10-13T04:00:00.000Z",
+        "epiWeekStart": "2024-10-07T04:00:00.000Z",
+        "yearWeek": "2024-41"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United States",
+        "epiWeekEnd": "2024-10-13T04:00:00.000Z",
+        "epiWeekStart": "2024-10-07T04:00:00.000Z",
+        "yearWeek": "2024-41"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Angola",
+        "epiWeekEnd": "2024-10-13T04:00:00.000Z",
+        "epiWeekStart": "2024-10-07T04:00:00.000Z",
+        "yearWeek": "2024-41"
+      },
+      {
+        "casesConfirmedIncident": 183,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-10-13T04:00:00.000Z",
+        "epiWeekStart": "2024-10-07T04:00:00.000Z",
+        "yearWeek": "2024-41"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Kenya",
+        "epiWeekEnd": "2024-10-13T04:00:00.000Z",
+        "epiWeekStart": "2024-10-07T04:00:00.000Z",
+        "yearWeek": "2024-41"
+      },
+      {
+        "casesConfirmedIncident": 38,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-10-13T04:00:00.000Z",
+        "epiWeekStart": "2024-10-07T04:00:00.000Z",
+        "yearWeek": "2024-41"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-10-13T04:00:00.000Z",
+        "epiWeekStart": "2024-10-07T04:00:00.000Z",
+        "yearWeek": "2024-41"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Oman",
+        "epiWeekEnd": "2024-10-13T04:00:00.000Z",
+        "epiWeekStart": "2024-10-07T04:00:00.000Z",
+        "yearWeek": "2024-41"
+      },
+      {
+        "casesConfirmedIncident": 353,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-10-13T04:00:00.000Z",
+        "epiWeekStart": "2024-10-07T04:00:00.000Z",
+        "yearWeek": "2024-41"
+      },
+      {
+        "casesConfirmedIncident": 4,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-10-13T04:00:00.000Z",
+        "epiWeekStart": "2024-10-07T04:00:00.000Z",
+        "yearWeek": "2024-41"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United Arab Emirates",
+        "epiWeekEnd": "2024-10-13T04:00:00.000Z",
+        "epiWeekStart": "2024-10-07T04:00:00.000Z",
+        "yearWeek": "2024-41"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United Arab Emirates",
+        "epiWeekEnd": "2024-10-27T04:00:00.000Z",
+        "epiWeekStart": "2024-10-21T04:00:00.000Z",
+        "yearWeek": "2024-43"
+      },
+      {
+        "casesConfirmedIncident": 222,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-10-27T04:00:00.000Z",
+        "epiWeekStart": "2024-10-21T04:00:00.000Z",
+        "yearWeek": "2024-43"
+      },
+      {
+        "casesConfirmedIncident": 20,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-10-27T04:00:00.000Z",
+        "epiWeekStart": "2024-10-21T04:00:00.000Z",
+        "yearWeek": "2024-43"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "China",
+        "epiWeekEnd": "2024-10-27T04:00:00.000Z",
+        "epiWeekStart": "2024-10-21T04:00:00.000Z",
+        "yearWeek": "2024-43"
+      },
+      {
+        "casesConfirmedIncident": 572,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-10-27T04:00:00.000Z",
+        "epiWeekStart": "2024-10-21T04:00:00.000Z",
+        "yearWeek": "2024-43"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Republic of Congo",
+        "epiWeekEnd": "2024-10-27T04:00:00.000Z",
+        "epiWeekStart": "2024-10-21T04:00:00.000Z",
+        "yearWeek": "2024-43"
+      },
+      {
+        "casesConfirmedIncident": 121,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-10-27T04:00:00.000Z",
+        "epiWeekStart": "2024-10-21T04:00:00.000Z",
+        "yearWeek": "2024-43"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Germany",
+        "epiWeekEnd": "2024-10-27T04:00:00.000Z",
+        "epiWeekStart": "2024-10-21T04:00:00.000Z",
+        "yearWeek": "2024-43"
+      },
+      {
+        "casesConfirmedIncident": 3,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-10-27T04:00:00.000Z",
+        "epiWeekStart": "2024-10-21T04:00:00.000Z",
+        "yearWeek": "2024-43"
+      },
+      {
+        "casesConfirmedIncident": 3,
+        "country": "Kenya",
+        "epiWeekEnd": "2024-11-10T05:00:00.000Z",
+        "epiWeekStart": "2024-11-04T05:00:00.000Z",
+        "yearWeek": "2024-45"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Qatar",
+        "epiWeekEnd": "2024-11-10T05:00:00.000Z",
+        "epiWeekStart": "2024-11-04T05:00:00.000Z",
+        "yearWeek": "2024-45"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Belgium",
+        "epiWeekEnd": "2024-11-10T05:00:00.000Z",
+        "epiWeekStart": "2024-11-04T05:00:00.000Z",
+        "yearWeek": "2024-45"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Canada",
+        "epiWeekEnd": "2024-11-10T05:00:00.000Z",
+        "epiWeekStart": "2024-11-04T05:00:00.000Z",
+        "yearWeek": "2024-45"
+      },
+      {
+        "casesConfirmedIncident": 11,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-11-10T05:00:00.000Z",
+        "epiWeekStart": "2024-11-04T05:00:00.000Z",
+        "yearWeek": "2024-45"
+      },
+      {
+        "casesConfirmedIncident": 66,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-11-10T05:00:00.000Z",
+        "epiWeekStart": "2024-11-04T05:00:00.000Z",
+        "yearWeek": "2024-45"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Australia",
+        "epiWeekEnd": "2024-11-10T05:00:00.000Z",
+        "epiWeekStart": "2024-11-04T05:00:00.000Z",
+        "yearWeek": "2024-45"
+      },
+      {
+        "casesConfirmedIncident": 145,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-11-10T05:00:00.000Z",
+        "epiWeekStart": "2024-11-04T05:00:00.000Z",
+        "yearWeek": "2024-45"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Ireland",
+        "epiWeekEnd": "2024-11-10T05:00:00.000Z",
+        "epiWeekStart": "2024-11-04T05:00:00.000Z",
+        "yearWeek": "2024-45"
+      },
+      {
+        "casesConfirmedIncident": 3,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-11-10T05:00:00.000Z",
+        "epiWeekStart": "2024-11-04T05:00:00.000Z",
+        "yearWeek": "2024-45"
+      },
+      {
+        "casesConfirmedIncident": 532,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-11-10T05:00:00.000Z",
+        "epiWeekStart": "2024-11-04T05:00:00.000Z",
+        "yearWeek": "2024-45"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Tanzania",
+        "epiWeekEnd": "2024-11-10T05:00:00.000Z",
+        "epiWeekStart": "2024-11-04T05:00:00.000Z",
+        "yearWeek": "2024-45"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United States",
+        "epiWeekEnd": "2024-11-10T05:00:00.000Z",
+        "epiWeekStart": "2024-11-04T05:00:00.000Z",
+        "yearWeek": "2024-45"
+      },
+      {
+        "casesConfirmedIncident": 3,
+        "country": "United Kingdom",
+        "epiWeekEnd": "2024-11-10T05:00:00.000Z",
+        "epiWeekStart": "2024-11-04T05:00:00.000Z",
+        "yearWeek": "2024-45"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "China",
+        "epiWeekEnd": "2024-11-24T05:00:00.000Z",
+        "epiWeekStart": "2024-11-18T05:00:00.000Z",
+        "yearWeek": "2024-47"
+      },
+      {
+        "casesConfirmedIncident": 2,
+        "country": "Kenya",
+        "epiWeekEnd": "2024-11-24T05:00:00.000Z",
+        "epiWeekStart": "2024-11-18T05:00:00.000Z",
+        "yearWeek": "2024-47"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "United States",
+        "epiWeekEnd": "2024-11-24T05:00:00.000Z",
+        "epiWeekStart": "2024-11-18T05:00:00.000Z",
+        "yearWeek": "2024-47"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Angola",
+        "epiWeekEnd": "2024-11-24T05:00:00.000Z",
+        "epiWeekStart": "2024-11-18T05:00:00.000Z",
+        "yearWeek": "2024-47"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Sweden",
+        "epiWeekEnd": "2024-11-24T05:00:00.000Z",
+        "epiWeekStart": "2024-11-18T05:00:00.000Z",
+        "yearWeek": "2024-47"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "India",
+        "epiWeekEnd": "2024-11-24T05:00:00.000Z",
+        "epiWeekStart": "2024-11-18T05:00:00.000Z",
+        "yearWeek": "2024-47"
+      },
+      {
+        "casesConfirmedIncident": 187,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-11-24T05:00:00.000Z",
+        "epiWeekStart": "2024-11-18T05:00:00.000Z",
+        "yearWeek": "2024-47"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Germany",
+        "epiWeekEnd": "2024-11-24T05:00:00.000Z",
+        "epiWeekStart": "2024-11-18T05:00:00.000Z",
+        "yearWeek": "2024-47"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Canada",
+        "epiWeekEnd": "2024-11-24T05:00:00.000Z",
+        "epiWeekStart": "2024-11-18T05:00:00.000Z",
+        "yearWeek": "2024-47"
+      },
+      {
+        "casesConfirmedIncident": 517,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-11-24T05:00:00.000Z",
+        "epiWeekStart": "2024-11-18T05:00:00.000Z",
+        "yearWeek": "2024-47"
+      },
+      {
+        "casesConfirmedIncident": 162,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-11-24T05:00:00.000Z",
+        "epiWeekStart": "2024-11-18T05:00:00.000Z",
+        "yearWeek": "2024-47"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "South Africa",
+        "epiWeekEnd": "2024-11-24T05:00:00.000Z",
+        "epiWeekStart": "2024-11-18T05:00:00.000Z",
+        "yearWeek": "2024-47"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-11-24T05:00:00.000Z",
+        "epiWeekStart": "2024-11-18T05:00:00.000Z",
+        "yearWeek": "2024-47"
+      },
+      {
+        "casesConfirmedIncident": 5,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-11-24T05:00:00.000Z",
+        "epiWeekStart": "2024-11-18T05:00:00.000Z",
+        "yearWeek": "2024-47"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Sweden",
+        "epiWeekEnd": "2024-12-08T05:00:00.000Z",
+        "epiWeekStart": "2024-12-02T05:00:00.000Z",
+        "yearWeek": "2024-49"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Pakistan",
+        "epiWeekEnd": "2024-12-08T05:00:00.000Z",
+        "epiWeekStart": "2024-12-02T05:00:00.000Z",
+        "yearWeek": "2024-49"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Canada",
+        "epiWeekEnd": "2024-12-08T05:00:00.000Z",
+        "epiWeekStart": "2024-12-02T05:00:00.000Z",
+        "yearWeek": "2024-49"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United Arab Emirates",
+        "epiWeekEnd": "2024-12-08T05:00:00.000Z",
+        "epiWeekStart": "2024-12-02T05:00:00.000Z",
+        "yearWeek": "2024-49"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Ireland",
+        "epiWeekEnd": "2024-12-08T05:00:00.000Z",
+        "epiWeekStart": "2024-12-02T05:00:00.000Z",
+        "yearWeek": "2024-49"
+      },
+      {
+        "casesConfirmedIncident": 10,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-12-08T05:00:00.000Z",
+        "epiWeekStart": "2024-12-02T05:00:00.000Z",
+        "yearWeek": "2024-49"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Australia",
+        "epiWeekEnd": "2024-12-08T05:00:00.000Z",
+        "epiWeekStart": "2024-12-02T05:00:00.000Z",
+        "yearWeek": "2024-49"
+      },
+      {
+        "casesConfirmedIncident": 3,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-12-08T05:00:00.000Z",
+        "epiWeekStart": "2024-12-02T05:00:00.000Z",
+        "yearWeek": "2024-49"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Zimbabwe",
+        "epiWeekEnd": "2024-12-08T05:00:00.000Z",
+        "epiWeekStart": "2024-12-02T05:00:00.000Z",
+        "yearWeek": "2024-49"
+      },
+      {
+        "casesConfirmedIncident": 5,
+        "country": "Kenya",
+        "epiWeekEnd": "2024-12-08T05:00:00.000Z",
+        "epiWeekStart": "2024-12-02T05:00:00.000Z",
+        "yearWeek": "2024-49"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Switzerland",
+        "epiWeekEnd": "2024-12-08T05:00:00.000Z",
+        "epiWeekStart": "2024-12-02T05:00:00.000Z",
+        "yearWeek": "2024-49"
+      },
+      {
+        "casesConfirmedIncident": 144,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-12-08T05:00:00.000Z",
+        "epiWeekStart": "2024-12-02T05:00:00.000Z",
+        "yearWeek": "2024-49"
+      },
+      {
+        "casesConfirmedIncident": 141,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-12-08T05:00:00.000Z",
+        "epiWeekStart": "2024-12-02T05:00:00.000Z",
+        "yearWeek": "2024-49"
+      },
+      {
+        "casesConfirmedIncident": 522,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-12-08T05:00:00.000Z",
+        "epiWeekStart": "2024-12-02T05:00:00.000Z",
+        "yearWeek": "2024-49"
+      },
+      {
+        "casesConfirmedIncident": 144,
+        "country": "Burundi",
+        "epiWeekEnd": "2024-12-22T05:00:00.000Z",
+        "epiWeekStart": "2024-12-16T05:00:00.000Z",
+        "yearWeek": "2024-51"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "South Africa",
+        "epiWeekEnd": "2024-12-22T05:00:00.000Z",
+        "epiWeekStart": "2024-12-16T05:00:00.000Z",
+        "yearWeek": "2024-51"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "China",
+        "epiWeekEnd": "2024-12-22T05:00:00.000Z",
+        "epiWeekStart": "2024-12-16T05:00:00.000Z",
+        "yearWeek": "2024-51"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Kenya",
+        "epiWeekEnd": "2024-12-22T05:00:00.000Z",
+        "epiWeekStart": "2024-12-16T05:00:00.000Z",
+        "yearWeek": "2024-51"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Brazil",
+        "epiWeekEnd": "2024-12-22T05:00:00.000Z",
+        "epiWeekStart": "2024-12-16T05:00:00.000Z",
+        "yearWeek": "2024-51"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2024-12-22T05:00:00.000Z",
+        "epiWeekStart": "2024-12-16T05:00:00.000Z",
+        "yearWeek": "2024-51"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Qatar",
+        "epiWeekEnd": "2024-12-22T05:00:00.000Z",
+        "epiWeekStart": "2024-12-16T05:00:00.000Z",
+        "yearWeek": "2024-51"
+      },
+      {
+        "casesConfirmedIncident": 534,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2024-12-22T05:00:00.000Z",
+        "epiWeekStart": "2024-12-16T05:00:00.000Z",
+        "yearWeek": "2024-51"
+      },
+      {
+        "casesConfirmedIncident": 5,
+        "country": "Germany",
+        "epiWeekEnd": "2024-12-22T05:00:00.000Z",
+        "epiWeekStart": "2024-12-16T05:00:00.000Z",
+        "yearWeek": "2024-51"
+      },
+      {
+        "casesConfirmedIncident": 99,
+        "country": "Uganda",
+        "epiWeekEnd": "2024-12-22T05:00:00.000Z",
+        "epiWeekStart": "2024-12-16T05:00:00.000Z",
+        "yearWeek": "2024-51"
+      },
+      {
+        "casesConfirmedIncident": 4,
+        "country": "Rwanda",
+        "epiWeekEnd": "2024-12-22T05:00:00.000Z",
+        "epiWeekStart": "2024-12-16T05:00:00.000Z",
+        "yearWeek": "2024-51"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "India",
+        "epiWeekEnd": "2024-12-22T05:00:00.000Z",
+        "epiWeekStart": "2024-12-16T05:00:00.000Z",
+        "yearWeek": "2024-51"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Switzerland",
+        "epiWeekEnd": "2024-12-22T05:00:00.000Z",
+        "epiWeekStart": "2024-12-16T05:00:00.000Z",
+        "yearWeek": "2024-51"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United States",
+        "epiWeekEnd": "2024-12-22T05:00:00.000Z",
+        "epiWeekStart": "2024-12-16T05:00:00.000Z",
+        "yearWeek": "2024-51"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Belgium",
+        "epiWeekEnd": "2024-12-22T05:00:00.000Z",
+        "epiWeekStart": "2024-12-16T05:00:00.000Z",
+        "yearWeek": "2024-51"
+      },
+      {
+        "casesConfirmedIncident": 199,
+        "country": "Uganda",
+        "epiWeekEnd": "2025-01-05T05:00:00.000Z",
+        "epiWeekStart": "2024-12-30T05:00:00.000Z",
+        "yearWeek": "2025-01"
+      },
+      {
+        "casesConfirmedIncident": 5,
+        "country": "Rwanda",
+        "epiWeekEnd": "2025-01-05T05:00:00.000Z",
+        "epiWeekStart": "2024-12-30T05:00:00.000Z",
+        "yearWeek": "2025-01"
+      },
+      {
+        "casesConfirmedIncident": 2,
+        "country": "Zambia",
+        "epiWeekEnd": "2025-01-05T05:00:00.000Z",
+        "epiWeekStart": "2024-12-30T05:00:00.000Z",
+        "yearWeek": "2025-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Pakistan",
+        "epiWeekEnd": "2025-01-05T05:00:00.000Z",
+        "epiWeekStart": "2024-12-30T05:00:00.000Z",
+        "yearWeek": "2025-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "South Africa",
+        "epiWeekEnd": "2025-01-05T05:00:00.000Z",
+        "epiWeekStart": "2024-12-30T05:00:00.000Z",
+        "yearWeek": "2025-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Canada",
+        "epiWeekEnd": "2025-01-05T05:00:00.000Z",
+        "epiWeekStart": "2024-12-30T05:00:00.000Z",
+        "yearWeek": "2025-01"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Germany",
+        "epiWeekEnd": "2025-01-05T05:00:00.000Z",
+        "epiWeekStart": "2024-12-30T05:00:00.000Z",
+        "yearWeek": "2025-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Thailand",
+        "epiWeekEnd": "2025-01-05T05:00:00.000Z",
+        "epiWeekStart": "2024-12-30T05:00:00.000Z",
+        "yearWeek": "2025-01"
+      },
+      {
+        "casesConfirmedIncident": 512,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2025-01-05T05:00:00.000Z",
+        "epiWeekStart": "2024-12-30T05:00:00.000Z",
+        "yearWeek": "2025-01"
+      },
+      {
+        "casesConfirmedIncident": 4,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2025-01-05T05:00:00.000Z",
+        "epiWeekStart": "2024-12-30T05:00:00.000Z",
+        "yearWeek": "2025-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Angola",
+        "epiWeekEnd": "2025-01-05T05:00:00.000Z",
+        "epiWeekStart": "2024-12-30T05:00:00.000Z",
+        "yearWeek": "2025-01"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Belgium",
+        "epiWeekEnd": "2025-01-05T05:00:00.000Z",
+        "epiWeekStart": "2024-12-30T05:00:00.000Z",
+        "yearWeek": "2025-01"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Oman",
+        "epiWeekEnd": "2025-01-05T05:00:00.000Z",
+        "epiWeekStart": "2024-12-30T05:00:00.000Z",
+        "yearWeek": "2025-01"
+      },
+      {
+        "casesConfirmedIncident": 89,
+        "country": "Burundi",
+        "epiWeekEnd": "2025-01-05T05:00:00.000Z",
+        "epiWeekStart": "2024-12-30T05:00:00.000Z",
+        "yearWeek": "2025-01"
+      },
+      {
+        "casesConfirmedIncident": 6,
+        "country": "China",
+        "epiWeekEnd": "2025-01-05T05:00:00.000Z",
+        "epiWeekStart": "2024-12-30T05:00:00.000Z",
+        "yearWeek": "2025-01"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "India",
+        "epiWeekEnd": "2025-01-05T05:00:00.000Z",
+        "epiWeekStart": "2024-12-30T05:00:00.000Z",
+        "yearWeek": "2025-01"
+      },
+      {
+        "casesConfirmedIncident": 297,
+        "country": "Uganda",
+        "epiWeekEnd": "2025-01-19T05:00:00.000Z",
+        "epiWeekStart": "2025-01-13T05:00:00.000Z",
+        "yearWeek": "2025-03"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Belgium",
+        "epiWeekEnd": "2025-01-19T05:00:00.000Z",
+        "epiWeekStart": "2025-01-13T05:00:00.000Z",
+        "yearWeek": "2025-03"
+      },
+      {
+        "casesConfirmedIncident": 120,
+        "country": "Burundi",
+        "epiWeekEnd": "2025-01-19T05:00:00.000Z",
+        "epiWeekStart": "2025-01-13T05:00:00.000Z",
+        "yearWeek": "2025-03"
+      },
+      {
+        "casesConfirmedIncident": 4,
+        "country": "Rwanda",
+        "epiWeekEnd": "2025-01-19T05:00:00.000Z",
+        "epiWeekStart": "2025-01-13T05:00:00.000Z",
+        "yearWeek": "2025-03"
+      },
+      {
+        "casesConfirmedIncident": 2,
+        "country": "Kenya",
+        "epiWeekEnd": "2025-01-19T05:00:00.000Z",
+        "epiWeekStart": "2025-01-13T05:00:00.000Z",
+        "yearWeek": "2025-03"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Thailand",
+        "epiWeekEnd": "2025-01-19T05:00:00.000Z",
+        "epiWeekStart": "2025-01-13T05:00:00.000Z",
+        "yearWeek": "2025-03"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "France",
+        "epiWeekEnd": "2025-01-19T05:00:00.000Z",
+        "epiWeekStart": "2025-01-13T05:00:00.000Z",
+        "yearWeek": "2025-03"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "India",
+        "epiWeekEnd": "2025-01-19T05:00:00.000Z",
+        "epiWeekStart": "2025-01-13T05:00:00.000Z",
+        "yearWeek": "2025-03"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Canada",
+        "epiWeekEnd": "2025-01-19T05:00:00.000Z",
+        "epiWeekStart": "2025-01-13T05:00:00.000Z",
+        "yearWeek": "2025-03"
+      },
+      {
+        "casesConfirmedIncident": 444,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2025-01-19T05:00:00.000Z",
+        "epiWeekStart": "2025-01-13T05:00:00.000Z",
+        "yearWeek": "2025-03"
+      },
+      {
+        "casesConfirmedIncident": 2,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2025-01-19T05:00:00.000Z",
+        "epiWeekStart": "2025-01-13T05:00:00.000Z",
+        "yearWeek": "2025-03"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2025-02-02T05:00:00.000Z",
+        "epiWeekStart": "2025-01-27T05:00:00.000Z",
+        "yearWeek": "2025-05"
+      },
+      {
+        "casesConfirmedIncident": 3,
+        "country": "Rwanda",
+        "epiWeekEnd": "2025-02-02T05:00:00.000Z",
+        "epiWeekStart": "2025-01-27T05:00:00.000Z",
+        "yearWeek": "2025-05"
+      },
+      {
+        "casesConfirmedIncident": 2,
+        "country": "United Kingdom",
+        "epiWeekEnd": "2025-02-02T05:00:00.000Z",
+        "epiWeekStart": "2025-01-27T05:00:00.000Z",
+        "yearWeek": "2025-05"
+      },
+      {
+        "casesConfirmedIncident": 71,
+        "country": "Burundi",
+        "epiWeekEnd": "2025-02-02T05:00:00.000Z",
+        "epiWeekStart": "2025-01-27T05:00:00.000Z",
+        "yearWeek": "2025-05"
+      },
+      {
+        "casesConfirmedIncident": 4,
+        "country": "Republic of Congo",
+        "epiWeekEnd": "2025-02-02T05:00:00.000Z",
+        "epiWeekStart": "2025-01-27T05:00:00.000Z",
+        "yearWeek": "2025-05"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Belgium",
+        "epiWeekEnd": "2025-02-02T05:00:00.000Z",
+        "epiWeekStart": "2025-01-27T05:00:00.000Z",
+        "yearWeek": "2025-05"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "France",
+        "epiWeekEnd": "2025-02-02T05:00:00.000Z",
+        "epiWeekStart": "2025-01-27T05:00:00.000Z",
+        "yearWeek": "2025-05"
+      },
+      {
+        "casesConfirmedIncident": 232,
+        "country": "Uganda",
+        "epiWeekEnd": "2025-02-02T05:00:00.000Z",
+        "epiWeekStart": "2025-01-27T05:00:00.000Z",
+        "yearWeek": "2025-05"
+      },
+      {
+        "casesConfirmedIncident": 5,
+        "country": "Zambia",
+        "epiWeekEnd": "2025-02-02T05:00:00.000Z",
+        "epiWeekStart": "2025-01-27T05:00:00.000Z",
+        "yearWeek": "2025-05"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Brazil",
+        "epiWeekEnd": "2025-02-02T05:00:00.000Z",
+        "epiWeekStart": "2025-01-27T05:00:00.000Z",
+        "yearWeek": "2025-05"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Australia",
+        "epiWeekEnd": "2025-02-02T05:00:00.000Z",
+        "epiWeekStart": "2025-01-27T05:00:00.000Z",
+        "yearWeek": "2025-05"
+      },
+      {
+        "casesConfirmedIncident": 226,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2025-02-02T05:00:00.000Z",
+        "epiWeekStart": "2025-01-27T05:00:00.000Z",
+        "yearWeek": "2025-05"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Switzerland",
+        "epiWeekEnd": "2025-02-16T05:00:00.000Z",
+        "epiWeekStart": "2025-02-10T05:00:00.000Z",
+        "yearWeek": "2025-07"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Belgium",
+        "epiWeekEnd": "2025-02-16T05:00:00.000Z",
+        "epiWeekStart": "2025-02-10T05:00:00.000Z",
+        "yearWeek": "2025-07"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Angola",
+        "epiWeekEnd": "2025-02-16T05:00:00.000Z",
+        "epiWeekStart": "2025-02-10T05:00:00.000Z",
+        "yearWeek": "2025-07"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Zimbabwe",
+        "epiWeekEnd": "2025-02-16T05:00:00.000Z",
+        "epiWeekStart": "2025-02-10T05:00:00.000Z",
+        "yearWeek": "2025-07"
+      },
+      {
+        "casesConfirmedIncident": 39,
+        "country": "Burundi",
+        "epiWeekEnd": "2025-02-16T05:00:00.000Z",
+        "epiWeekStart": "2025-02-10T05:00:00.000Z",
+        "yearWeek": "2025-07"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "India",
+        "epiWeekEnd": "2025-02-16T05:00:00.000Z",
+        "epiWeekStart": "2025-02-10T05:00:00.000Z",
+        "yearWeek": "2025-07"
+      },
+      {
+        "casesConfirmedIncident": 2,
+        "country": "Zambia",
+        "epiWeekEnd": "2025-02-16T05:00:00.000Z",
+        "epiWeekStart": "2025-02-10T05:00:00.000Z",
+        "yearWeek": "2025-07"
+      },
+      {
+        "casesConfirmedIncident": 200,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2025-02-16T05:00:00.000Z",
+        "epiWeekStart": "2025-02-10T05:00:00.000Z",
+        "yearWeek": "2025-07"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2025-02-16T05:00:00.000Z",
+        "epiWeekStart": "2025-02-10T05:00:00.000Z",
+        "yearWeek": "2025-07"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "United Arab Emirates",
+        "epiWeekEnd": "2025-02-16T05:00:00.000Z",
+        "epiWeekStart": "2025-02-10T05:00:00.000Z",
+        "yearWeek": "2025-07"
+      },
+      {
+        "casesConfirmedIncident": 3,
+        "country": "Kenya",
+        "epiWeekEnd": "2025-02-16T05:00:00.000Z",
+        "epiWeekStart": "2025-02-10T05:00:00.000Z",
+        "yearWeek": "2025-07"
+      },
+      {
+        "casesConfirmedIncident": 3,
+        "country": "Republic of Congo",
+        "epiWeekEnd": "2025-02-16T05:00:00.000Z",
+        "epiWeekStart": "2025-02-10T05:00:00.000Z",
+        "yearWeek": "2025-07"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Thailand",
+        "epiWeekEnd": "2025-02-16T05:00:00.000Z",
+        "epiWeekStart": "2025-02-10T05:00:00.000Z",
+        "yearWeek": "2025-07"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "China",
+        "epiWeekEnd": "2025-02-16T05:00:00.000Z",
+        "epiWeekStart": "2025-02-10T05:00:00.000Z",
+        "yearWeek": "2025-07"
+      },
+      {
+        "casesConfirmedIncident": 2,
+        "country": "Rwanda",
+        "epiWeekEnd": "2025-02-16T05:00:00.000Z",
+        "epiWeekStart": "2025-02-10T05:00:00.000Z",
+        "yearWeek": "2025-07"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "United States",
+        "epiWeekEnd": "2025-02-16T05:00:00.000Z",
+        "epiWeekStart": "2025-02-10T05:00:00.000Z",
+        "yearWeek": "2025-07"
+      },
+      {
+        "casesConfirmedIncident": 225,
+        "country": "Uganda",
+        "epiWeekEnd": "2025-02-16T05:00:00.000Z",
+        "epiWeekStart": "2025-02-10T05:00:00.000Z",
+        "yearWeek": "2025-07"
+      },
+      {
+        "casesConfirmedIncident": 178,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2025-03-02T05:00:00.000Z",
+        "epiWeekStart": "2025-02-24T05:00:00.000Z",
+        "yearWeek": "2025-09"
+      },
+      {
+        "casesConfirmedIncident": 294,
+        "country": "Uganda",
+        "epiWeekEnd": "2025-03-02T05:00:00.000Z",
+        "epiWeekStart": "2025-02-24T05:00:00.000Z",
+        "yearWeek": "2025-09"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2025-03-02T05:00:00.000Z",
+        "epiWeekStart": "2025-02-24T05:00:00.000Z",
+        "yearWeek": "2025-09"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Kenya",
+        "epiWeekEnd": "2025-03-02T05:00:00.000Z",
+        "epiWeekStart": "2025-02-24T05:00:00.000Z",
+        "yearWeek": "2025-09"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Brazil",
+        "epiWeekEnd": "2025-03-02T05:00:00.000Z",
+        "epiWeekStart": "2025-02-24T05:00:00.000Z",
+        "yearWeek": "2025-09"
+      },
+      {
+        "casesConfirmedIncident": 4,
+        "country": "South Sudan",
+        "epiWeekEnd": "2025-03-02T05:00:00.000Z",
+        "epiWeekStart": "2025-02-24T05:00:00.000Z",
+        "yearWeek": "2025-09"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "United Kingdom",
+        "epiWeekEnd": "2025-03-02T05:00:00.000Z",
+        "epiWeekStart": "2025-02-24T05:00:00.000Z",
+        "yearWeek": "2025-09"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "France",
+        "epiWeekEnd": "2025-03-02T05:00:00.000Z",
+        "epiWeekStart": "2025-02-24T05:00:00.000Z",
+        "yearWeek": "2025-09"
+      },
+      {
+        "casesConfirmedIncident": 4,
+        "country": "India",
+        "epiWeekEnd": "2025-03-02T05:00:00.000Z",
+        "epiWeekStart": "2025-02-24T05:00:00.000Z",
+        "yearWeek": "2025-09"
+      },
+      {
+        "casesConfirmedIncident": 3,
+        "country": "South Africa",
+        "epiWeekEnd": "2025-03-02T05:00:00.000Z",
+        "epiWeekStart": "2025-02-24T05:00:00.000Z",
+        "yearWeek": "2025-09"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Tanzania",
+        "epiWeekEnd": "2025-03-02T05:00:00.000Z",
+        "epiWeekStart": "2025-02-24T05:00:00.000Z",
+        "yearWeek": "2025-09"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Republic of Congo",
+        "epiWeekEnd": "2025-03-02T05:00:00.000Z",
+        "epiWeekStart": "2025-02-24T05:00:00.000Z",
+        "yearWeek": "2025-09"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Germany",
+        "epiWeekEnd": "2025-03-02T05:00:00.000Z",
+        "epiWeekStart": "2025-02-24T05:00:00.000Z",
+        "yearWeek": "2025-09"
+      },
+      {
+        "casesConfirmedIncident": 41,
+        "country": "Burundi",
+        "epiWeekEnd": "2025-03-02T05:00:00.000Z",
+        "epiWeekStart": "2025-02-24T05:00:00.000Z",
+        "yearWeek": "2025-09"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Ireland",
+        "epiWeekEnd": "2025-03-02T05:00:00.000Z",
+        "epiWeekStart": "2025-02-24T05:00:00.000Z",
+        "yearWeek": "2025-09"
+      },
+      {
+        "casesConfirmedIncident": 3,
+        "country": "Rwanda",
+        "epiWeekEnd": "2025-03-02T05:00:00.000Z",
+        "epiWeekStart": "2025-02-24T05:00:00.000Z",
+        "yearWeek": "2025-09"
+      },
+      {
+        "casesConfirmedIncident": 509,
+        "country": "Uganda",
+        "epiWeekEnd": "2025-03-16T04:00:00.000Z",
+        "epiWeekStart": "2025-03-10T04:00:00.000Z",
+        "yearWeek": "2025-11"
+      },
+      {
+        "casesConfirmedIncident": 34,
+        "country": "Burundi",
+        "epiWeekEnd": "2025-03-16T04:00:00.000Z",
+        "epiWeekStart": "2025-03-10T04:00:00.000Z",
+        "yearWeek": "2025-11"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2025-03-16T04:00:00.000Z",
+        "epiWeekStart": "2025-03-10T04:00:00.000Z",
+        "yearWeek": "2025-11"
+      },
+      {
+        "casesConfirmedIncident": 3,
+        "country": "South Africa",
+        "epiWeekEnd": "2025-03-16T04:00:00.000Z",
+        "epiWeekStart": "2025-03-10T04:00:00.000Z",
+        "yearWeek": "2025-11"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Angola",
+        "epiWeekEnd": "2025-03-16T04:00:00.000Z",
+        "epiWeekStart": "2025-03-10T04:00:00.000Z",
+        "yearWeek": "2025-11"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Australia",
+        "epiWeekEnd": "2025-03-16T04:00:00.000Z",
+        "epiWeekStart": "2025-03-10T04:00:00.000Z",
+        "yearWeek": "2025-11"
+      },
+      {
+        "casesConfirmedIncident": 20,
+        "country": "Tanzania",
+        "epiWeekEnd": "2025-03-16T04:00:00.000Z",
+        "epiWeekStart": "2025-03-10T04:00:00.000Z",
+        "yearWeek": "2025-11"
+      },
+      {
+        "casesConfirmedIncident": 312,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2025-03-16T04:00:00.000Z",
+        "epiWeekStart": "2025-03-10T04:00:00.000Z",
+        "yearWeek": "2025-11"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Rwanda",
+        "epiWeekEnd": "2025-03-16T04:00:00.000Z",
+        "epiWeekStart": "2025-03-10T04:00:00.000Z",
+        "yearWeek": "2025-11"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United Arab Emirates",
+        "epiWeekEnd": "2025-03-16T04:00:00.000Z",
+        "epiWeekStart": "2025-03-10T04:00:00.000Z",
+        "yearWeek": "2025-11"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Canada",
+        "epiWeekEnd": "2025-03-16T04:00:00.000Z",
+        "epiWeekStart": "2025-03-10T04:00:00.000Z",
+        "yearWeek": "2025-11"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Malawi",
+        "epiWeekEnd": "2025-03-16T04:00:00.000Z",
+        "epiWeekStart": "2025-03-10T04:00:00.000Z",
+        "yearWeek": "2025-11"
+      },
+      {
+        "casesConfirmedIncident": 3,
+        "country": "Kenya",
+        "epiWeekEnd": "2025-03-16T04:00:00.000Z",
+        "epiWeekStart": "2025-03-10T04:00:00.000Z",
+        "yearWeek": "2025-11"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "India",
+        "epiWeekEnd": "2025-03-16T04:00:00.000Z",
+        "epiWeekStart": "2025-03-10T04:00:00.000Z",
+        "yearWeek": "2025-11"
+      },
+      {
+        "casesConfirmedIncident": 9,
+        "country": "Tanzania",
+        "epiWeekEnd": "2025-03-30T04:00:00.000Z",
+        "epiWeekStart": "2025-03-24T04:00:00.000Z",
+        "yearWeek": "2025-13"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "China",
+        "epiWeekEnd": "2025-03-30T04:00:00.000Z",
+        "epiWeekStart": "2025-03-24T04:00:00.000Z",
+        "yearWeek": "2025-13"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "India",
+        "epiWeekEnd": "2025-03-30T04:00:00.000Z",
+        "epiWeekStart": "2025-03-24T04:00:00.000Z",
+        "yearWeek": "2025-13"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2025-03-30T04:00:00.000Z",
+        "epiWeekStart": "2025-03-24T04:00:00.000Z",
+        "yearWeek": "2025-13"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Brazil",
+        "epiWeekEnd": "2025-03-30T04:00:00.000Z",
+        "epiWeekStart": "2025-03-24T04:00:00.000Z",
+        "yearWeek": "2025-13"
+      },
+      {
+        "casesConfirmedIncident": 176,
+        "country": "Uganda",
+        "epiWeekEnd": "2025-03-30T04:00:00.000Z",
+        "epiWeekStart": "2025-03-24T04:00:00.000Z",
+        "yearWeek": "2025-13"
+      },
+      {
+        "casesConfirmedIncident": 4,
+        "country": "Republic of Congo",
+        "epiWeekEnd": "2025-03-30T04:00:00.000Z",
+        "epiWeekStart": "2025-03-24T04:00:00.000Z",
+        "yearWeek": "2025-13"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United States",
+        "epiWeekEnd": "2025-03-30T04:00:00.000Z",
+        "epiWeekStart": "2025-03-24T04:00:00.000Z",
+        "yearWeek": "2025-13"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Malawi",
+        "epiWeekEnd": "2025-03-30T04:00:00.000Z",
+        "epiWeekStart": "2025-03-24T04:00:00.000Z",
+        "yearWeek": "2025-13"
+      },
+      {
+        "casesConfirmedIncident": 5,
+        "country": "Zambia",
+        "epiWeekEnd": "2025-03-30T04:00:00.000Z",
+        "epiWeekStart": "2025-03-24T04:00:00.000Z",
+        "yearWeek": "2025-13"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Kenya",
+        "epiWeekEnd": "2025-03-30T04:00:00.000Z",
+        "epiWeekStart": "2025-03-24T04:00:00.000Z",
+        "yearWeek": "2025-13"
+      },
+      {
+        "casesConfirmedIncident": 27,
+        "country": "Burundi",
+        "epiWeekEnd": "2025-03-30T04:00:00.000Z",
+        "epiWeekStart": "2025-03-24T04:00:00.000Z",
+        "yearWeek": "2025-13"
+      },
+      {
+        "casesConfirmedIncident": 208,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2025-03-30T04:00:00.000Z",
+        "epiWeekStart": "2025-03-24T04:00:00.000Z",
+        "yearWeek": "2025-13"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Rwanda",
+        "epiWeekEnd": "2025-03-30T04:00:00.000Z",
+        "epiWeekStart": "2025-03-24T04:00:00.000Z",
+        "yearWeek": "2025-13"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Germany",
+        "epiWeekEnd": "2025-04-13T04:00:00.000Z",
+        "epiWeekStart": "2025-04-07T04:00:00.000Z",
+        "yearWeek": "2025-15"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Australia",
+        "epiWeekEnd": "2025-04-13T04:00:00.000Z",
+        "epiWeekStart": "2025-04-07T04:00:00.000Z",
+        "yearWeek": "2025-15"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "France",
+        "epiWeekEnd": "2025-04-13T04:00:00.000Z",
+        "epiWeekStart": "2025-04-07T04:00:00.000Z",
+        "yearWeek": "2025-15"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "South Africa",
+        "epiWeekEnd": "2025-04-13T04:00:00.000Z",
+        "epiWeekStart": "2025-04-07T04:00:00.000Z",
+        "yearWeek": "2025-15"
+      },
+      {
+        "casesConfirmedIncident": 233,
+        "country": "Uganda",
+        "epiWeekEnd": "2025-04-13T04:00:00.000Z",
+        "epiWeekStart": "2025-04-07T04:00:00.000Z",
+        "yearWeek": "2025-15"
+      },
+      {
+        "casesConfirmedIncident": 22,
+        "country": "Burundi",
+        "epiWeekEnd": "2025-04-13T04:00:00.000Z",
+        "epiWeekStart": "2025-04-07T04:00:00.000Z",
+        "yearWeek": "2025-15"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2025-04-13T04:00:00.000Z",
+        "epiWeekStart": "2025-04-07T04:00:00.000Z",
+        "yearWeek": "2025-15"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "India",
+        "epiWeekEnd": "2025-04-13T04:00:00.000Z",
+        "epiWeekStart": "2025-04-07T04:00:00.000Z",
+        "yearWeek": "2025-15"
+      },
+      {
+        "casesConfirmedIncident": 2,
+        "country": "Republic of Congo",
+        "epiWeekEnd": "2025-04-13T04:00:00.000Z",
+        "epiWeekStart": "2025-04-07T04:00:00.000Z",
+        "yearWeek": "2025-15"
+      },
+      {
+        "casesConfirmedIncident": 2,
+        "country": "Tanzania",
+        "epiWeekEnd": "2025-04-13T04:00:00.000Z",
+        "epiWeekStart": "2025-04-07T04:00:00.000Z",
+        "yearWeek": "2025-15"
+      },
+      {
+        "casesConfirmedIncident": 4,
+        "country": "Kenya",
+        "epiWeekEnd": "2025-04-13T04:00:00.000Z",
+        "epiWeekStart": "2025-04-07T04:00:00.000Z",
+        "yearWeek": "2025-15"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "United Arab Emirates",
+        "epiWeekEnd": "2025-04-13T04:00:00.000Z",
+        "epiWeekStart": "2025-04-07T04:00:00.000Z",
+        "yearWeek": "2025-15"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Rwanda",
+        "epiWeekEnd": "2025-04-13T04:00:00.000Z",
+        "epiWeekStart": "2025-04-07T04:00:00.000Z",
+        "yearWeek": "2025-15"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Switzerland",
+        "epiWeekEnd": "2025-04-13T04:00:00.000Z",
+        "epiWeekStart": "2025-04-07T04:00:00.000Z",
+        "yearWeek": "2025-15"
+      },
+      {
+        "casesConfirmedIncident": 223,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2025-04-13T04:00:00.000Z",
+        "epiWeekStart": "2025-04-07T04:00:00.000Z",
+        "yearWeek": "2025-15"
+      },
+      {
+        "casesConfirmedIncident": 3,
+        "country": "South Sudan",
+        "epiWeekEnd": "2025-04-27T04:00:00.000Z",
+        "epiWeekStart": "2025-04-21T04:00:00.000Z",
+        "yearWeek": "2025-17"
+      },
+      {
+        "casesConfirmedIncident": 2,
+        "country": "Rwanda",
+        "epiWeekEnd": "2025-04-27T04:00:00.000Z",
+        "epiWeekStart": "2025-04-21T04:00:00.000Z",
+        "yearWeek": "2025-17"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Malawi",
+        "epiWeekEnd": "2025-04-27T04:00:00.000Z",
+        "epiWeekStart": "2025-04-21T04:00:00.000Z",
+        "yearWeek": "2025-17"
+      },
+      {
+        "casesConfirmedIncident": 16,
+        "country": "Zambia",
+        "epiWeekEnd": "2025-04-27T04:00:00.000Z",
+        "epiWeekStart": "2025-04-21T04:00:00.000Z",
+        "yearWeek": "2025-17"
+      },
+      {
+        "casesConfirmedIncident": 14,
+        "country": "Kenya",
+        "epiWeekEnd": "2025-04-27T04:00:00.000Z",
+        "epiWeekStart": "2025-04-21T04:00:00.000Z",
+        "yearWeek": "2025-17"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Canada",
+        "epiWeekEnd": "2025-04-27T04:00:00.000Z",
+        "epiWeekStart": "2025-04-21T04:00:00.000Z",
+        "yearWeek": "2025-17"
+      },
+      {
+        "casesConfirmedIncident": 161,
+        "country": "Uganda",
+        "epiWeekEnd": "2025-04-27T04:00:00.000Z",
+        "epiWeekStart": "2025-04-21T04:00:00.000Z",
+        "yearWeek": "2025-17"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2025-04-27T04:00:00.000Z",
+        "epiWeekStart": "2025-04-21T04:00:00.000Z",
+        "yearWeek": "2025-17"
+      },
+      {
+        "casesConfirmedIncident": 31,
+        "country": "Burundi",
+        "epiWeekEnd": "2025-04-27T04:00:00.000Z",
+        "epiWeekStart": "2025-04-21T04:00:00.000Z",
+        "yearWeek": "2025-17"
+      },
+      {
+        "casesConfirmedIncident": 163,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2025-04-27T04:00:00.000Z",
+        "epiWeekStart": "2025-04-21T04:00:00.000Z",
+        "yearWeek": "2025-17"
+      },
+      {
+        "casesConfirmedIncident": 4,
+        "country": "Tanzania",
+        "epiWeekEnd": "2025-04-27T04:00:00.000Z",
+        "epiWeekStart": "2025-04-21T04:00:00.000Z",
+        "yearWeek": "2025-17"
+      },
+      {
+        "casesConfirmedIncident": 1,
+        "country": "Republic of Congo",
+        "epiWeekEnd": "2025-04-27T04:00:00.000Z",
+        "epiWeekStart": "2025-04-21T04:00:00.000Z",
+        "yearWeek": "2025-17"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "South Africa",
+        "epiWeekEnd": "2025-04-27T04:00:00.000Z",
+        "epiWeekStart": "2025-04-21T04:00:00.000Z",
+        "yearWeek": "2025-17"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Zimbabwe",
+        "epiWeekEnd": "2025-04-27T04:00:00.000Z",
+        "epiWeekStart": "2025-04-21T04:00:00.000Z",
+        "yearWeek": "2025-17"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Brazil",
+        "epiWeekEnd": "2025-04-27T04:00:00.000Z",
+        "epiWeekStart": "2025-04-21T04:00:00.000Z",
+        "yearWeek": "2025-17"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "China",
+        "epiWeekEnd": "2025-05-11T04:00:00.000Z",
+        "epiWeekStart": "2025-05-05T04:00:00.000Z",
+        "yearWeek": "2025-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Qatar",
+        "epiWeekEnd": "2025-05-11T04:00:00.000Z",
+        "epiWeekStart": "2025-05-05T04:00:00.000Z",
+        "yearWeek": "2025-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2025-05-11T04:00:00.000Z",
+        "epiWeekStart": "2025-05-05T04:00:00.000Z",
+        "yearWeek": "2025-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2025-05-11T04:00:00.000Z",
+        "epiWeekStart": "2025-05-05T04:00:00.000Z",
+        "yearWeek": "2025-19"
+      },
+      {
+        "casesConfirmedIncident": 32,
+        "country": "Burundi",
+        "epiWeekEnd": "2025-05-11T04:00:00.000Z",
+        "epiWeekStart": "2025-05-05T04:00:00.000Z",
+        "yearWeek": "2025-19"
+      },
+      {
+        "casesConfirmedIncident": 12,
+        "country": "Kenya",
+        "epiWeekEnd": "2025-05-11T04:00:00.000Z",
+        "epiWeekStart": "2025-05-05T04:00:00.000Z",
+        "yearWeek": "2025-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Belgium",
+        "epiWeekEnd": "2025-05-11T04:00:00.000Z",
+        "epiWeekStart": "2025-05-05T04:00:00.000Z",
+        "yearWeek": "2025-19"
+      },
+      {
+        "casesConfirmedIncident": 230,
+        "country": "Uganda",
+        "epiWeekEnd": "2025-05-11T04:00:00.000Z",
+        "epiWeekStart": "2025-05-05T04:00:00.000Z",
+        "yearWeek": "2025-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Germany",
+        "epiWeekEnd": "2025-05-11T04:00:00.000Z",
+        "epiWeekStart": "2025-05-05T04:00:00.000Z",
+        "yearWeek": "2025-19"
+      },
+      {
+        "casesConfirmedIncident": 2,
+        "country": "Tanzania",
+        "epiWeekEnd": "2025-05-11T04:00:00.000Z",
+        "epiWeekStart": "2025-05-05T04:00:00.000Z",
+        "yearWeek": "2025-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2025-05-11T04:00:00.000Z",
+        "epiWeekStart": "2025-05-05T04:00:00.000Z",
+        "yearWeek": "2025-19"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Belgium",
+        "epiWeekEnd": "2025-05-25T04:00:00.000Z",
+        "epiWeekStart": "2025-05-19T04:00:00.000Z",
+        "yearWeek": "2025-21"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Burundi",
+        "epiWeekEnd": "2025-05-25T04:00:00.000Z",
+        "epiWeekStart": "2025-05-19T04:00:00.000Z",
+        "yearWeek": "2025-21"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Rwanda",
+        "epiWeekEnd": "2025-05-25T04:00:00.000Z",
+        "epiWeekStart": "2025-05-19T04:00:00.000Z",
+        "yearWeek": "2025-21"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Pakistan",
+        "epiWeekEnd": "2025-05-25T04:00:00.000Z",
+        "epiWeekStart": "2025-05-19T04:00:00.000Z",
+        "yearWeek": "2025-21"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Tanzania",
+        "epiWeekEnd": "2025-05-25T04:00:00.000Z",
+        "epiWeekStart": "2025-05-19T04:00:00.000Z",
+        "yearWeek": "2025-21"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Central African Republic",
+        "epiWeekEnd": "2025-05-25T04:00:00.000Z",
+        "epiWeekStart": "2025-05-19T04:00:00.000Z",
+        "yearWeek": "2025-21"
+      },
+      {
+        "casesConfirmedIncident": 0,
+        "country": "Democratic Republic of Congo",
+        "epiWeekEnd": "2025-05-25T04:00:00.000Z",
+        "epiWeekStart": "2025-05-19T04:00:00.000Z",
+        "yearWeek": "2025-21"
+      },
+      {
+        "casesConfirmedIncident": 54,
+        "country": "Uganda",
+        "epiWeekEnd": "2025-05-25T04:00:00.000Z",
+        "epiWeekStart": "2025-05-19T04:00:00.000Z",
+        "yearWeek": "2025-21"
+      },
+      {
+        "casesConfirmedIncident": 57,
+        "country": "South Sudan",
+        "epiWeekEnd": "2025-05-25T04:00:00.000Z",
+        "epiWeekStart": "2025-05-19T04:00:00.000Z",
+        "yearWeek": "2025-21"
+      },
+      {
+        "casesConfirmedIncident": 10,
+        "country": "Kenya",
+        "epiWeekEnd": "2025-05-25T04:00:00.000Z",
+        "epiWeekStart": "2025-05-19T04:00:00.000Z",
+        "yearWeek": "2025-21"
+      },
+      {
+        "casesConfirmedIncident": 2,
+        "country": "Malawi",
+        "epiWeekEnd": "2025-05-25T04:00:00.000Z",
+        "epiWeekStart": "2025-05-19T04:00:00.000Z",
+        "yearWeek": "2025-21"
+      }
+    ]
+  },
+  "config": {
+    "background": "#FFFFFF",
+    "bar": {
+      "fill": "#2D72D2"
+    },
+    "arc": {
+      "fill": "#2D72D2"
+    },
+    "area": {
+      "fill": "#2D72D2"
+    },
+    "rect": {
+      "fill": "#2D72D2"
+    },
+    "circle": {
+      "fill": "#2D72D2"
+    },
+    "point": {
+      "stroke": "#2D72D2"
+    },
+    "line": {
+      "stroke": "#2D72D2"
+    },
+    "font": "Source-Sans-Pro",
+    "padding": 20,
+    "mark": {
+      "opacity": 0.75,
+      "tooltip": true
+    },
+    "title": {
+      "color": "#111418",
+      "fontSize": 14,
+      "fontWeight": 600,
+      "anchor": "start",
+      "subtitleColor": "#5F6B7C",
+      "subtitleFontSize": 12,
+      "subtitlePadding": 7
+    },
+    "axis": {
+      "labelFontSize": 12,
+      "titleFontSize": 14,
+      "titleFontWeight": 400,
+      "titlePadding": 10,
+      "titleColor": "#111418",
+      "labelColor": "#738091",
+      "gridColor": "#DCE0E5",
+      "gridOpacity": 1,
+      "domainColor": "#5F6B7C",
+      "tickColor": "#5F6B7C"
+    },
+    "legend": {
+      "titleColor": "#111418",
+      "labelColor": "#111418",
+      "titleFontSize": 12,
+      "labelFontSize": 12,
+      "titleFontWeight": 600
+    },
+    "view": {
+      "stroke": "transparent"
+    },
+    "text": {
+      "color": "#111418",
+      "fontSize": 12,
+      "fontWeight": 400
+    },
+    "range": {
+      "category": [
+        "#2D72D2",
+        "#DB2C6F",
+        "#8EB125",
+        "#9D3F9D",
+        "#00A396",
+        "#D1980B",
+        "#D33D17",
+        "#7961DB",
+        "#29A634",
+        "#946638",
+        "#147EB3"
+      ]
+    }
+  }
+}

@@ -1,0 +1,255 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "name": "Weekly Incident Case Counts"
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "bar",
+        "color": "#3f82e0"
+      },
+      "encoding": {
+        "x": {
+          "field": "date",
+          "type": "temporal",
+          "title": "Date (CCCD)",
+          "axis": {
+            "labelExpr": "[utcFormat(datum.value, '%b'), utcFormat(datum.value, '%m') == '01' ? utcFormat(datum.value, '%Y') : '']"
+          },
+          "scale": {
+            "nice": "month"
+          }
+        },
+        "y": {
+          "field": "sum of cases",
+          "type": "quantitative",
+          "title": "Total Number of Cases",
+          "scale": {
+            "domain": {
+              "unionWith": [
+                0,
+                1
+              ]
+            }
+          }
+        },
+        "color": {
+          "value": "#578edb",
+          "legend": {
+            "title": "Legend"
+          }
+        }
+      }
+    },
+    {
+      "data": {
+        "name": "3 week moving average"
+      },
+      "mark": {
+        "type": "line",
+        "color": "black",
+        "strokeDash": [
+          4,
+          4
+        ]
+      },
+      "encoding": {
+        "x": {
+          "field": "test",
+          "type": "temporal",
+          "title": "Date (CCCD)",
+          "scale": {
+            "nice": "month"
+          }
+        },
+        "y": {
+          "field": "rate",
+          "type": "quantitative",
+          "title": "Total Number of Cases",
+          "scale": {
+            "domain": {
+              "unionWith": [
+                0,
+                1
+              ]
+            }
+          }
+        },
+        "color": {
+          "value": "black",
+          "legend": {
+            "title": "Legend"
+          }
+        }
+      }
+    }
+  ],
+  "height": "container",
+  "width": "container",
+  "datasets": {
+    "Weekly Incident Case Counts": [
+      {
+        "date": "2022-05-09T00:00:00.000Z",
+        "sum of cases": 6
+      },
+      {
+        "date": "2022-05-16T00:00:00.000Z",
+        "sum of cases": 18
+      },
+      {
+        "date": "2022-05-23T00:00:00.000Z",
+        "sum of cases": 15
+      },
+      {
+        "date": "2022-05-30T00:00:00.000Z",
+        "sum of cases": 52
+      },
+      {
+        "date": "2022-06-06T00:00:00.000Z",
+        "sum of cases": 98
+      },
+      {
+        "date": "2022-06-13T00:00:00.000Z",
+        "sum of cases": 194
+      },
+      {
+        "date": "2022-06-20T00:00:00.000Z",
+        "sum of cases": 341
+      },
+      {
+        "date": "2022-06-27T00:00:00.000Z",
+        "sum of cases": 715
+      },
+      {
+        "date": "2022-07-04T00:00:00.000Z",
+        "sum of cases": 1277
+      },
+      {
+        "date": "2022-07-11T00:00:00.000Z",
+        "sum of cases": 2001
+      }
+    ],
+    "3 week moving average": [
+      {
+        "test": "2022-05-09T00:00:00.000Z"
+      },
+      {
+        "test": "2022-05-16T00:00:00.000Z"
+      },
+      {
+        "test": "2022-05-23T00:00:00.000Z",
+        "rate": 13
+      },
+      {
+        "test": "2022-05-30T00:00:00.000Z",
+        "rate": 28.333333333333332
+      },
+      {
+        "test": "2022-06-06T00:00:00.000Z",
+        "rate": 55
+      },
+      {
+        "test": "2022-06-13T00:00:00.000Z",
+        "rate": 114.66666666666667
+      },
+      {
+        "test": "2022-06-20T00:00:00.000Z",
+        "rate": 211
+      },
+      {
+        "test": "2022-06-27T00:00:00.000Z",
+        "rate": 416.6666666666667
+      },
+      {
+        "test": "2022-07-04T00:00:00.000Z",
+        "rate": 777.6666666666666
+      },
+      {
+        "test": "2022-07-11T00:00:00.000Z",
+        "rate": 1331
+      }
+    ]
+  },
+  "config": {
+    "background": "#FFFFFF",
+    "bar": {
+      "fill": "#2D72D2"
+    },
+    "arc": {
+      "fill": "#2D72D2"
+    },
+    "area": {
+      "fill": "#2D72D2"
+    },
+    "rect": {
+      "fill": "#2D72D2"
+    },
+    "circle": {
+      "fill": "#2D72D2"
+    },
+    "point": {
+      "stroke": "#2D72D2"
+    },
+    "line": {
+      "stroke": "#2D72D2"
+    },
+    "font": "Source-Sans-Pro",
+    "padding": 20,
+    "mark": {
+      "opacity": 0.75,
+      "tooltip": true
+    },
+    "title": {
+      "color": "#111418",
+      "fontSize": 14,
+      "fontWeight": 600,
+      "anchor": "start",
+      "subtitleColor": "#5F6B7C",
+      "subtitleFontSize": 12,
+      "subtitlePadding": 7
+    },
+    "axis": {
+      "labelFontSize": 12,
+      "titleFontSize": 14,
+      "titleFontWeight": 400,
+      "titlePadding": 10,
+      "titleColor": "#111418",
+      "labelColor": "#738091",
+      "gridColor": "#DCE0E5",
+      "gridOpacity": 1,
+      "domainColor": "#5F6B7C",
+      "tickColor": "#5F6B7C"
+    },
+    "legend": {
+      "titleColor": "#111418",
+      "labelColor": "#111418",
+      "titleFontSize": 12,
+      "labelFontSize": 12,
+      "titleFontWeight": 600
+    },
+    "view": {
+      "stroke": "transparent"
+    },
+    "text": {
+      "color": "#111418",
+      "fontSize": 12,
+      "fontWeight": 400
+    },
+    "range": {
+      "category": [
+        "#2D72D2",
+        "#DB2C6F",
+        "#8EB125",
+        "#9D3F9D",
+        "#00A396",
+        "#D1980B",
+        "#D33D17",
+        "#7961DB",
+        "#29A634",
+        "#946638",
+        "#147EB3"
+      ]
+    }
+  }
+}

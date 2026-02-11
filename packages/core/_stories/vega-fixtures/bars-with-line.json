@@ -1,0 +1,444 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "name": "Weekly Incident Case Counts"
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "bar",
+        "color": "#3f82e0"
+      },
+      "encoding": {
+        "x": {
+          "field": "date",
+          "type": "temporal",
+          "title": "Date (CCCD)",
+          "axis": {
+            "labelExpr": "[timeFormat(datum.value, '%b'), timeFormat(datum.value, '%m') == '01' ? timeFormat(datum.value, '%Y') : '']"
+          },
+          "scale": {
+            "nice": "month"
+          }
+        },
+        "y": {
+          "field": "totalIncidentCases",
+          "type": "quantitative",
+          "title": "Total Number of Cases",
+          "scale": {
+            "domain": {
+              "unionWith": [
+                0,
+                1
+              ]
+            }
+          }
+        },
+        "color": {
+          "value": "#578edb",
+          "legend": {
+            "title": "Legend"
+          }
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "line",
+        "color": "black",
+        "strokeDash": [
+          4,
+          4
+        ]
+      },
+      "encoding": {
+        "x": {
+          "field": "date",
+          "type": "temporal",
+          "title": "Date (CCCD)",
+          "axis": {
+            "labelExpr": "[timeFormat(datum.value, '%b'), timeFormat(datum.value, '%m') == '01' ? timeFormat(datum.value, '%Y') : '']"
+          },
+          "scale": {
+            "nice": "month"
+          }
+        },
+        "y": {
+          "field": "incidentCasesMovingAverage3",
+          "type": "quantitative",
+          "title": "Total Number of Cases",
+          "scale": {
+            "domain": {
+              "unionWith": [
+                0,
+                1
+              ]
+            }
+          }
+        },
+        "color": {
+          "value": "black",
+          "legend": {
+            "title": "Legend"
+          }
+        }
+      }
+    }
+  ],
+  "height": "container",
+  "width": "container",
+  "datasets": {
+    "Weekly Incident Case Counts": [
+      {
+        "date": "2022-05-14T04:00:00.000Z",
+        "totalIncidentCases": 1
+      },
+      {
+        "date": "2022-06-04T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 7,
+        "totalIncidentCases": 10
+      },
+      {
+        "date": "2022-06-25T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 50.333333333333336,
+        "totalIncidentCases": 79
+      },
+      {
+        "date": "2022-07-16T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 365.6666666666667,
+        "totalIncidentCases": 504
+      },
+      {
+        "date": "2022-08-06T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 580,
+        "totalIncidentCases": 560
+      },
+      {
+        "date": "2022-08-27T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 395,
+        "totalIncidentCases": 275
+      },
+      {
+        "date": "2022-09-17T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 181.66666666666666,
+        "totalIncidentCases": 138
+      },
+      {
+        "date": "2022-10-08T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 79.33333333333333,
+        "totalIncidentCases": 51
+      },
+      {
+        "date": "2022-10-29T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 38,
+        "totalIncidentCases": 24
+      },
+      {
+        "date": "2022-11-19T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 18.666666666666668,
+        "totalIncidentCases": 16
+      },
+      {
+        "date": "2022-12-10T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 7.333333333333333,
+        "totalIncidentCases": 9
+      },
+      {
+        "date": "2022-12-31T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 6,
+        "totalIncidentCases": 4
+      },
+      {
+        "date": "2023-01-21T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 4.666666666666667,
+        "totalIncidentCases": 3
+      },
+      {
+        "date": "2023-02-11T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 3.6666666666666665,
+        "totalIncidentCases": 0
+      },
+      {
+        "date": "2023-03-04T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 2,
+        "totalIncidentCases": 1
+      },
+      {
+        "date": "2023-03-25T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 1.3333333333333333,
+        "totalIncidentCases": 1
+      },
+      {
+        "date": "2023-04-15T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 2.6666666666666665,
+        "totalIncidentCases": 1
+      },
+      {
+        "date": "2023-05-06T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 1,
+        "totalIncidentCases": 2
+      },
+      {
+        "date": "2023-05-27T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 3,
+        "totalIncidentCases": 4
+      },
+      {
+        "date": "2023-06-17T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 5.333333333333333,
+        "totalIncidentCases": 8
+      },
+      {
+        "date": "2023-07-08T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 5,
+        "totalIncidentCases": 4
+      },
+      {
+        "date": "2023-07-29T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 7,
+        "totalIncidentCases": 6
+      },
+      {
+        "date": "2023-08-19T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 6.666666666666667,
+        "totalIncidentCases": 4
+      },
+      {
+        "date": "2023-09-09T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 3.6666666666666665,
+        "totalIncidentCases": 3
+      },
+      {
+        "date": "2023-09-30T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 3,
+        "totalIncidentCases": 3
+      },
+      {
+        "date": "2023-10-21T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 7.333333333333333,
+        "totalIncidentCases": 7
+      },
+      {
+        "date": "2023-11-11T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 10.333333333333334,
+        "totalIncidentCases": 8
+      },
+      {
+        "date": "2023-12-02T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 12.666666666666666,
+        "totalIncidentCases": 12
+      },
+      {
+        "date": "2023-12-23T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 11.333333333333334,
+        "totalIncidentCases": 9
+      },
+      {
+        "date": "2024-01-13T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 15.666666666666666,
+        "totalIncidentCases": 18
+      },
+      {
+        "date": "2024-02-03T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 20.333333333333332,
+        "totalIncidentCases": 22
+      },
+      {
+        "date": "2024-02-24T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 17.333333333333332,
+        "totalIncidentCases": 17
+      },
+      {
+        "date": "2024-03-16T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 22.666666666666668,
+        "totalIncidentCases": 25
+      },
+      {
+        "date": "2024-04-06T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 16.333333333333332,
+        "totalIncidentCases": 12
+      },
+      {
+        "date": "2024-04-27T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 17.666666666666668,
+        "totalIncidentCases": 20
+      },
+      {
+        "date": "2024-05-18T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 13.333333333333334,
+        "totalIncidentCases": 12
+      },
+      {
+        "date": "2024-06-08T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 14,
+        "totalIncidentCases": 11
+      },
+      {
+        "date": "2024-06-29T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 10,
+        "totalIncidentCases": 7
+      },
+      {
+        "date": "2024-07-20T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 8,
+        "totalIncidentCases": 9
+      },
+      {
+        "date": "2024-08-10T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 10.333333333333334,
+        "totalIncidentCases": 11
+      },
+      {
+        "date": "2024-08-31T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 10,
+        "totalIncidentCases": 9
+      },
+      {
+        "date": "2024-09-21T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 6.333333333333333,
+        "totalIncidentCases": 5
+      },
+      {
+        "date": "2024-10-12T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 6.666666666666667,
+        "totalIncidentCases": 1
+      },
+      {
+        "date": "2024-11-02T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 4,
+        "totalIncidentCases": 4
+      },
+      {
+        "date": "2024-11-23T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 4,
+        "totalIncidentCases": 8
+      },
+      {
+        "date": "2024-12-14T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 5.666666666666667,
+        "totalIncidentCases": 6
+      },
+      {
+        "date": "2025-01-04T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 6,
+        "totalIncidentCases": 9
+      },
+      {
+        "date": "2025-01-25T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 3.3333333333333335,
+        "totalIncidentCases": 5
+      },
+      {
+        "date": "2025-02-15T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 2.3333333333333335,
+        "totalIncidentCases": 1
+      },
+      {
+        "date": "2025-03-08T05:00:00.000Z",
+        "incidentCasesMovingAverage3": 1,
+        "totalIncidentCases": 1
+      },
+      {
+        "date": "2025-03-29T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 0.6666666666666666,
+        "totalIncidentCases": 1
+      },
+      {
+        "date": "2025-04-19T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 5,
+        "totalIncidentCases": 11
+      },
+      {
+        "date": "2025-05-10T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 7.666666666666667,
+        "totalIncidentCases": 14
+      },
+      {
+        "date": "2025-05-30T04:00:00.000Z",
+        "incidentCasesMovingAverage3": 3,
+        "totalIncidentCases": 0
+      }
+    ]
+  },
+  "config": {
+    "background": "#FFFFFF",
+    "bar": {
+      "fill": "#2D72D2"
+    },
+    "arc": {
+      "fill": "#2D72D2"
+    },
+    "area": {
+      "fill": "#2D72D2"
+    },
+    "rect": {
+      "fill": "#2D72D2"
+    },
+    "circle": {
+      "fill": "#2D72D2"
+    },
+    "point": {
+      "stroke": "#2D72D2"
+    },
+    "line": {
+      "stroke": "#2D72D2"
+    },
+    "font": "Source-Sans-Pro",
+    "padding": 20,
+    "mark": {
+      "opacity": 0.75,
+      "tooltip": true
+    },
+    "title": {
+      "color": "#111418",
+      "fontSize": 14,
+      "fontWeight": 600,
+      "anchor": "start",
+      "subtitleColor": "#5F6B7C",
+      "subtitleFontSize": 12,
+      "subtitlePadding": 7
+    },
+    "axis": {
+      "labelFontSize": 12,
+      "titleFontSize": 14,
+      "titleFontWeight": 400,
+      "titlePadding": 10,
+      "titleColor": "#111418",
+      "labelColor": "#738091",
+      "gridColor": "#DCE0E5",
+      "gridOpacity": 1,
+      "domainColor": "#5F6B7C",
+      "tickColor": "#5F6B7C"
+    },
+    "legend": {
+      "titleColor": "#111418",
+      "labelColor": "#111418",
+      "titleFontSize": 12,
+      "labelFontSize": 12,
+      "titleFontWeight": 600
+    },
+    "view": {
+      "stroke": "transparent"
+    },
+    "text": {
+      "color": "#111418",
+      "fontSize": 12,
+      "fontWeight": 400
+    },
+    "range": {
+      "category": [
+        "#2D72D2",
+        "#DB2C6F",
+        "#8EB125",
+        "#9D3F9D",
+        "#00A396",
+        "#D1980B",
+        "#D33D17",
+        "#7961DB",
+        "#29A634",
+        "#946638",
+        "#147EB3"
+      ]
+    }
+  }
+}
