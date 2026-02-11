@@ -175,7 +175,7 @@ export const setAutoLoadDefaultValue = (
     } else {
       const defaultValue = dropdownOptions[0]?.value
       if (!sharedFilter.active) {
-        sharedFilter.active = queryValue || defaultValue
+        sharedFilter.active = queryValue ?? defaultValue
       } else {
         const currentOption = dropdownOptions.find(option => option.value == sharedFilter.active) // loose equality required: 2017 should equal '2017'
         sharedFilter.active = currentOption ? currentOption.value : defaultValue
