@@ -50,9 +50,10 @@ const generateDevIndexHtml = (packageCss = DEFAULT_PACKAGE_CSS) => {
 }
 
 // Generate preview.html content - full CDC Template Package page
-const generatePreviewIndexHtml = (packageCss = DEFAULT_PACKAGE_CSS) => {
+// Preview simulates production embedding, so skip the dev-only padding CSS
+const generatePreviewIndexHtml = () => {
   const { previewHtml, sidebarCss, devJs } = readTemplate()
-  return applyTemplateReplacements(previewHtml, packageCss, sidebarCss, devJs)
+  return applyTemplateReplacements(previewHtml, '', sidebarCss, devJs)
 }
 
 // Vite plugin to serve /__examples endpoint
@@ -110,7 +111,7 @@ const coveDevIndexPlugin = css => ({
       // Check if preview mode is requested via URL parameter
       const url = new URL(ctx.originalUrl, 'http://localhost')
       if (url.searchParams.get('preview') === 'true') {
-        return generatePreviewIndexHtml(css)
+        return generatePreviewIndexHtml()
       }
       return generateDevIndexHtml(css)
     }
