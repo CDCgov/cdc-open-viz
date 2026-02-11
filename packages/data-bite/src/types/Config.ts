@@ -43,4 +43,5 @@ export type Config = {
     isCompactStyle: boolean
   }
   version: Version
+  locale: string
 } & MarkupConfig

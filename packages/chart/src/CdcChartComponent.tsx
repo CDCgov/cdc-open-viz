@@ -178,31 +178,36 @@ const CdcChart: React.FC<CdcChartProps> = ({
       title: title
         ? processMarkupVariables(title, config.data || [], config.markupVariables, {
             isEditor,
-            filters: config.filters || []
+            filters: config.filters || [],
+            locale: config.locale
           }).processedContent
         : title,
       superTitle: config.superTitle
         ? processMarkupVariables(config.superTitle, config.data || [], config.markupVariables, {
             isEditor,
-            filters: config.filters || []
+            filters: config.filters || [],
+            locale: config.locale
           }).processedContent
         : config.superTitle,
       introText: config.introText
         ? processMarkupVariables(config.introText, config.data || [], config.markupVariables, {
             isEditor,
-            filters: config.filters || []
+            filters: config.filters || [],
+            locale: config.locale
           }).processedContent
         : config.introText,
       legacyFootnotes: config.legacyFootnotes
         ? processMarkupVariables(config.legacyFootnotes, config.data || [], config.markupVariables, {
             isEditor,
-            filters: config.filters || []
+            filters: config.filters || [],
+            locale: config.locale
           }).processedContent
         : config.legacyFootnotes,
       description: config.description
         ? processMarkupVariables(config.description, config.data || [], config.markupVariables, {
             isEditor,
-            filters: config.filters || []
+            filters: config.filters || [],
+            locale: config.locale
           }).processedContent
         : config.description
     }
@@ -332,7 +337,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
             targetConfig.markupVariables,
             {
               isEditor,
-              filters: targetConfig.filters || []
+              filters: targetConfig.filters || [],
+              locale: targetConfig.locale
             }
           ).processedContent
         }
@@ -343,7 +349,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
             targetConfig.markupVariables,
             {
               isEditor,
-              filters: targetConfig.filters || []
+              filters: targetConfig.filters || [],
+              locale: targetConfig.locale
             }
           ).processedContent
         }
@@ -909,11 +916,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const formatDate = (date, i, ticks) => {
     const displayFormat =
       config.runtime[section].dateDisplayFormat || config.runtime[section].dateParseFormat || '%Y-%m-%d'
-    let formattedDate = coreFormatDate(displayFormat, date)
+    let formattedDate = coreFormatDate(displayFormat, date, config.locale)
     // Show years only once
     if (config.xAxis.showYearsOnce && displayFormat?.includes('%Y') && ticks) {
       const prevDate = ticks[i - 1] ? ticks[i - 1].value : null
-      const prevFormattedDate = coreFormatDate(displayFormat, prevDate)
+      const prevFormattedDate = coreFormatDate(displayFormat, prevDate, config.locale)
       const year = formattedDate.match(/\d{4}/)
       const prevYear = prevFormattedDate.match(/\d{4}/)
       if (year && prevYear && year[0] === prevYear[0]) {
@@ -924,7 +931,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const formatTooltipsDate = date => {
-    return coreFormatDate(config.tooltips.dateDisplayFormat, date)
+    return coreFormatDate(config.tooltips.dateDisplayFormat, date, config.locale)
   }
 
   // Format numeric data based on settings in config OR from passed in settings for Additional Columns
@@ -1066,16 +1073,16 @@ const CdcChart: React.FC<CdcChartProps> = ({
     ) {
       num = num // eslint-disable-line
     } else {
-      num = num.toLocaleString('en-US', stringFormattingOptions)
+      num = num.toLocaleString(config.locale, stringFormattingOptions)
     }
     let result = ''
 
     if (abbreviated && axis === 'left' && shouldAbbreviate) {
-      num = abbreviateNumber(parseFloat(num))
+      num = abbreviateNumber(parseFloat(num), config.locale)
     }
 
     if (bottomAbbreviated && axis === 'bottom' && shouldAbbreviate) {
-      num = abbreviateNumber(parseFloat(num))
+      num = abbreviateNumber(parseFloat(num), config.locale)
     }
 
     if (addColPrefix && axis === 'left') {

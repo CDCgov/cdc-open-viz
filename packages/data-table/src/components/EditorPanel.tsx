@@ -12,6 +12,9 @@ import ColumnsEditor from '@cdc/core/components/EditorPanel/ColumnsEditor'
 import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
 import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 import { EditorPanelDispatch } from '@cdc/core/components/EditorPanel/EditorPanelDispatch'
+import { Select } from '@cdc/core/components/EditorPanel/Inputs'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
+import Icon from '@cdc/core/components/ui/Icon'
 
 import { State } from '../store/dataTable.reducer'
 
@@ -53,6 +56,10 @@ const EditorPanel = ({ state, dispatch }) => {
     dispatch({ type: 'SET_COLUMNS', payload: newColumns })
   }
 
+  const updateConfigField = (_section, _subsection, fieldName, newValue) => {
+    dispatch({ type: 'SET_CONFIG', payload: { ...config, [fieldName]: newValue } })
+  }
+
   return (
     <EditorPanelDispatch
       state={state}
@@ -92,6 +99,29 @@ const EditorPanel = ({ state, dispatch }) => {
                 {/* DATA TABLE EDITOR COMPONENT */}
                 <AccordionItemPanel>
                   <DataTableEditor config={config} columns={Object.keys(data[0] || {})} updateField={updateDataTable} />
+                  <Select
+                    value={config.locale}
+                    fieldName='locale'
+                    label='Language (Locale)'
+                    updateField={updateConfigField}
+                    options={[
+                      { value: 'en-US', label: 'English (en-US)' },
+                      { value: 'es-MX', label: 'Spanish (es-MX)' }
+                    ]}
+                    tooltip={
+                      <Tooltip style={{ textTransform: 'none' }}>
+                        <Tooltip.Target>
+                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                        </Tooltip.Target>
+                        <Tooltip.Content>
+                          <p>
+                            Change the language (locale) for this visualization to alter the way dates and numbers are
+                            formatted.
+                          </p>
+                        </Tooltip.Content>
+                      </Tooltip>
+                    }
+                  />
                 </AccordionItemPanel>
               </AccordionItem>
 

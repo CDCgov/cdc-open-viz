@@ -290,7 +290,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     // Combine viz filters with dashboard filters for markup processing
     const combinedFilters = [...(config.filters || []), ...(config.dashboardFilters || [])]
 
-    const markupOptions = { isEditor, filters: combinedFilters }
+    const markupOptions = { isEditor, filters: combinedFilters, locale: config.locale }
 
     if (title) {
       title = processMarkupVariables(title, config.data || [], config.markupVariables, markupOptions).processedContent

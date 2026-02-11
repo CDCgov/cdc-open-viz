@@ -184,7 +184,8 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       isEditor,
       showNoDataMessage: false,
       allowHideSection: false,
-      filters: config.filters || []
+      filters: config.filters || [],
+      locale: config.locale
     })
 
     return result.processedContent
@@ -313,8 +314,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       if (Number.isNaN(value) || typeof value === 'number') {
         value = String(value)
       }
-      const language = 'en-US'
-      let formattedValue = parseFloat(value).toLocaleString(language, {
+      let formattedValue = parseFloat(value).toLocaleString(config.locale, {
         useGrouping: true,
         maximumFractionDigits: 6
       })
