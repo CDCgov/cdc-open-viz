@@ -136,6 +136,11 @@ export const setActiveNestedDropdown = (dropdownOptions, sharedFilter) => {
     sharedFilter.active = validOption?.value || defaultValue
   }
 
+  // Normalize active to a valid dropdown option; fall back to the first option if needed
+  const hasActiveOption = dropdownOptions.some(option => option.value === sharedFilter.active)
+  if (!hasActiveOption) {
+    sharedFilter.active = defaultValue
+  }
   // Find the current option based on active value
   const currentOption = dropdownOptions.find(option => option.value === sharedFilter.active)
   const safeFallbackSubDefault = dropdownOptions[0]?.subOptions?.[0]?.value
