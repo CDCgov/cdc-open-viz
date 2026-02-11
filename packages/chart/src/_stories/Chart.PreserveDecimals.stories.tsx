@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChartComponent'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Preserve Original Decimals',
@@ -56,6 +57,9 @@ export const Default_With_Forced_Rounding: Story = {
           'Default behavior forces all numbers to 1 decimal place. Notice how whole numbers like 1000 become "1,000.0" and 89.23 gets rounded to "89.2".'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -77,6 +81,9 @@ export const Preserve_Original_Decimals_Enabled: Story = {
           'With "Preserve Original Decimals" enabled, numbers display exactly as they appear in the data: 1000 shows as "1,000", 45.7 shows as "45.7", and 89.23 shows as "89.23". The roundTo setting is ignored.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -97,6 +104,9 @@ export const Comparison_No_Decimals: Story = {
           'Forcing 0 decimal places rounds everything to whole numbers: 45.7 becomes "46", 89.23 becomes "89". This loses precision from the original data.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -117,6 +127,9 @@ export const Comparison_Two_Decimals: Story = {
           'Forcing 2 decimal places adds unnecessary zeros: 1000 becomes "1,000.00", 45.7 becomes "45.70". This can look cluttered for whole numbers.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -139,6 +152,9 @@ export const With_Prefix_And_Suffix: Story = {
           'Preserve Original Decimals works seamlessly with prefix and suffix formatting. Numbers show as "$1,000 USD", "$45.7 USD", etc.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -167,6 +183,9 @@ export const Percentage_Data_Mixed_Precision: Story = {
           'Perfect for percentage data where some values are whole (25%, 50%) and others need decimals (33.3%, 12.75%). Each value displays naturally without forced rounding.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -193,6 +212,9 @@ export const Line_Chart_With_Table: Story = {
           'When enabled, the preserve decimals setting applies to both the chart axis/tooltips AND the data table, ensuring consistency across all displays.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -214,6 +236,9 @@ export const Editor_Mode: Story = {
           'In editor mode, look for the "Preserve Original Decimal Places" checkbox in the Number Formatting section, right below the "Round to decimal point" field. Toggle it to see the effect in real-time.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 

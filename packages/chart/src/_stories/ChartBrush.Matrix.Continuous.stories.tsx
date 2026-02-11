@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChartComponent'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import brushContinuousConfig from './_mock/brush_continuous.json'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/BrushSlider/Matrix/Continuous',
@@ -18,6 +19,9 @@ export const Default: Story = {
     docs: {
       description: { story: 'xAxis.type = "continuous", default ascending numeric order.' }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -30,5 +34,8 @@ export const Reversed: Story = {
     docs: {
       description: { story: 'xAxis.type = "continuous", sortByRecentDate = true.' }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }

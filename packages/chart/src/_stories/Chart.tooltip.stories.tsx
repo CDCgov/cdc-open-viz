@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChartComponent'
 import barChartStacked from './_mock/barchart_labels.mock.json'
 import barChartSuppressed from './_mock/bar-chart-suppressed.json'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Tooltip',
   component: Chart
@@ -20,6 +21,9 @@ export const Increased_Tooltip_Range: Story = {
         singleSeries: true
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -58,6 +62,9 @@ export const Additional_Tooltip: Story = {
         }
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 

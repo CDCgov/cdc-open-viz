@@ -148,7 +148,7 @@
     "sync:check": "syncpack list-mismatches",
     "sync:fix": "syncpack fix-mismatches",
     "sync:format": "syncpack format",
-    "test-storybook": "vitest run --project=storybook -t 'Tests'"
+    "test-storybook": "vitest run --project=storybook"
   },
   "workspaces": [
     "packages/*"

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import boxPlotConfig from './_mock/boxplot_multiseries.json'
 import Chart from '../CdcChartComponent'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Box Plot',
@@ -17,6 +18,9 @@ export const BoxPlot_Vertical: Story = {
       title: 'Vertical Multiseries Box Plot',
       isEditor: false
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -29,6 +33,9 @@ export const BoxPlot_Horizontal: Story = {
       yAxis: { ...boxPlotConfig.yAxis, labelPlacement: 'Above Bar' }
     },
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 

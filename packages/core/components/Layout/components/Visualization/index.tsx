@@ -71,6 +71,10 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
       if (config?.runtime?.editorErrorMessage.length !== 0) classes.push('type-map--has-error')
     }
 
+    if (config.type === 'table') {
+      classes.push('type-data-table')
+    }
+
     if (config.type === 'data-bite') {
       classes.push('cdc-open-viz-module', 'type-data-bite', currentViewport, config.theme, `font-${config.fontSize}`)
       if (isEditor) {
