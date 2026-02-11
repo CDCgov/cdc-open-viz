@@ -161,6 +161,8 @@ const Button = ({
 }) => {
   const buttonClasses = ['btn', 'btn-primary']
 
+  const label = type === 'csv' ? state?.table?.downloadDataLabel || buttonText[type] : buttonText[type]
+
   return (
     <button
       className={buttonClasses.join(' ')}
@@ -168,7 +170,7 @@ const Button = ({
       onClick={() => generateMedia(state, type, elementToCapture, interactionLabel, includeContextInDownload)}
       style={{ lineHeight: '1.4em' }}
     >
-      {buttonText[type]}
+      {label}
     </button>
   )
 }
@@ -184,7 +186,8 @@ const DownloadLink = ({
 }) => {
   const vizType = state?.type === 'map' ? 'Map' : 'Chart'
   const format = type === 'pdf' ? 'PDF' : 'PNG'
-  const linkText = `Download ${vizType} (${format})`
+  const defaultLinkText = `Download ${vizType} (${format})`
+  const linkText = type === 'image' ? state?.table?.downloadImageLabel || defaultLinkText : defaultLinkText
 
   return (
     <a

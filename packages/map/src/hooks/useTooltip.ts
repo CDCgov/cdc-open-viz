@@ -106,7 +106,9 @@ const useTooltip = props => {
           let tooltipValue = handleTooltipSpecialClassText(specialClasses, column, row, '', columnKey)
 
           if (!tooltipValue) {
-            tooltipValue = row ? displayDataAsText(row[column.name], columnKey, config) : 'No Data'
+            tooltipValue = row
+              ? displayDataAsText(row[column.name], columnKey, config)
+              : config.tooltips?.noDataLabel || 'No Data'
           }
 
           toolTipText += handleTooltipPrimaryColumn(tooltipValue, column)

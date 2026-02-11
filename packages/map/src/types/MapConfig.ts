@@ -197,16 +197,19 @@ export type MapConfig = Visualization & {
     limitHeight: boolean
     height: string
     caption: string
+    download: boolean
+    downloadDataLabel?: string
+    downloadImageLabel?: string
     showDownloadUrl: boolean
     showFullGeoNameInCSV: boolean
     forceDisplay: boolean
-    download: boolean
     indexLabel: string
     cellMinWidth: string
   }
   tooltips: {
     appearanceType: 'hover' | 'click'
     linkLabel: string
+    noDataLabel?: string
     opacity: number
   }
   runtime: {
