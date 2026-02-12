@@ -202,7 +202,6 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                     />
                   )}
                   <circle
-                    id={dataKey}
                     fill={`url(#${mapId}--${sanitizedDataKey}--${patternDataIndex})`}
                     r={legendSize / 2}
                     cx={legendSize / 2}
