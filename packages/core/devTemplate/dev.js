@@ -5,6 +5,7 @@
 const params = new URLSearchParams(window.location.search)
 const configParam = params.get('config')
 let editorEnabled = params.get('editor') === 'true'
+const previewEnabled = params.get('preview') === 'true'
 
 if (configParam) {
   document.querySelector('.react-container').setAttribute('data-config', configParam)
@@ -27,6 +28,11 @@ window.reloadVisualization = async configUrl => {
 // Initialize sidebar by default (hide with ?sidebar=false, or for editor package)
 // __COVE_PACKAGE_NAME__ is injected by Vite's define option in generateViteConfig.js
 const sidebarDisabled = params.get('sidebar') === 'false' || __COVE_PACKAGE_NAME__ === 'CdcEditor'
+if (sidebarDisabled) {
+  // Remove sidebar margin (the inline script in the HTML template pre-allocates it for ?sidebar!=false,
+  // but CdcEditor also disables the sidebar without that param)
+  document.body.style.marginLeft = ''
+}
 if (!sidebarDisabled) {
   document.body.classList.add('has-sidebar')
 
@@ -101,8 +107,9 @@ if (!sidebarDisabled) {
   const packageDisplayName = formatPackageName(__COVE_PACKAGE_NAME__)
 
   const editorToggleClass = editorEnabled ? ' active' : ''
+  const previewToggleClass = previewEnabled ? ' active' : ''
   let html = '<nav class="dev-sidebar">'
-  html += `<div class="dev-sidebar-header"><span>${packageDisplayName} Examples</span><button class="dev-sidebar-editor-toggle${editorToggleClass}" id="dev-editor-toggle" title="Toggle Editor">⚙</button></div>`
+  html += `<div class="dev-sidebar-header"><span>${packageDisplayName} Examples</span><div class="dev-sidebar-toggles"><button class="dev-sidebar-toggle${previewToggleClass}" id="dev-preview-toggle" title="Toggle CDC Page Preview"><svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 1.5h7l3.5 3.5V14a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V2a.5.5 0 0 1 .5-.5z"/><path d="M10 1.5V5h3.5"/></svg></button><button class="dev-sidebar-toggle dev-sidebar-editor-toggle${editorToggleClass}" id="dev-editor-toggle" title="Toggle Editor">⚙</button></div></div>`
   html +=
     '<div class="dev-sidebar-search"><input type="text" id="dev-sidebar-search-input" placeholder="Search examples..." /></div>'
   html += '<div class="dev-sidebar-tree">'
@@ -212,5 +219,17 @@ if (!sidebarDisabled) {
     const currentConfig =
       document.querySelector('.react-container')?.getAttribute('data-config') || '/examples/default.json'
     await window.reloadVisualization(currentConfig)
+  })
+
+  // Preview toggle handler - full page reload since server needs to serve different HTML
+  const previewToggle = document.getElementById('dev-preview-toggle')
+  previewToggle.addEventListener('click', () => {
+    const url = new URL(window.location)
+    if (previewEnabled) {
+      url.searchParams.delete('preview')
+    } else {
+      url.searchParams.set('preview', 'true')
+    }
+    window.location.href = url.toString().replace(/%2F/g, '/')
   })
 }
