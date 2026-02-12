@@ -3222,7 +3222,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                               }}
                               label='Custom Color Order'
                               minColors={1}
-                              maxColors={20}
                             />
                           </div>
                         )}
