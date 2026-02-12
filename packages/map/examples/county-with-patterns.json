@@ -24,8 +24,8 @@
     "hideGeoColumnInTooltip": false,
     "hidePrimaryColumnInTooltip": false,
     "statePicked": {
-      "fipsCode": "01",
-      "stateName": "Alabama"
+      "fipsCode": "06",
+      "stateName": "California"
     },
     "equalNumberOptIn": true
   },
