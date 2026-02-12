@@ -6,6 +6,14 @@
     <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <style>
+      body {
+        margin: 0;
+        border-top: none !important;
+      }
+      /* {{PACKAGE_CSS}} */
+      /* {{SIDEBAR_CSS}} */
+    </style>
 
     <link
       rel="apple-touch-icon"
@@ -35,11 +43,9 @@
     <link rel="stylesheet" media="print" href="https://www.cdc.gov/TemplatePackage/5.0/css/print.min.css?_=04929" />
     <link rel="manifest" href="https://www.cdc.gov/TemplatePackage/5.0/json/manifest.json" />
 
-    <script src="https://www.cdc.gov/JScript/dmat/cdc-dmat.min.js?account=cdcgov&_=08871"></script>
-
     <meta property="cdc:template_version" content="5.0" />
 
-    <title>Respiratory Virus Activity Levels | Respiratory Illnesses | CDC</title>
+    <title>COVE Preview - Local Development</title>
     <meta
       name="description"
       content="Updates on how COVID-19, Flu, and RSV may be spreading nationally and in your state"
@@ -95,14 +101,15 @@
     <meta property="cdc:dfe_content_type_version" content="1.4.2" />
   </head>
   <body class="no-js cdc-post-type--cdc-dfe cdc-dfe-cdc_data_surveillance">
+    <script>
+      if (new URLSearchParams(location.search).get('sidebar') !== 'false') document.body.style.marginLeft = '240px'
+    </script>
+    <div id="dev-sidebar-root"></div>
     <div id="skipmenu">
       <a class="usa-skipnav" href="#content">Skip directly to site content</a>
       <a class="usa-skipnav" href="#cdc-search">Skip directly to search</a>
     </div>
 
-    <div data-dtsb="@dtsb-data-visualizations" data-channel="respiratory-viruses" data-entry="chart-timestamps"></div>
-
-    <script defer type="module" src="/ophdst-dtsb-data-viz/apps/respiratory-viruses/v1.5/main/assets/index.js"></script>
     <div class="cdc-page-banner container noindex">
       <div class="cdc-site-gov-notice noindex noprint" aria-label="Official website of the United States government">
         <div class="cdc-page-offset">
@@ -611,7 +618,7 @@
     </header>
     <main class="container cdc-main" role="main" aria-label="Main Content Area">
       <div class="cdc-page-title cdc-page-offset syndicate">
-        <h1>Respiratory Virus Activity Levels</h1>
+        <h1>Visualization Preview</h1>
       </div>
 
       <section class="cdc-page-title-bar cdc-page-offset noindex">
@@ -648,29 +655,6 @@
               >
               <h2 class="editor-block--title" id="heading-lmcgyt_uu3">Level of Respiratory Illness Activity</h2>
               <p>
-                Respiratory illness activity is monitored using the acute respiratory illness (ARI) metric. ARI captures
-                a broad range of diagnoses from emergency department visits for respiratory illnesses, from the common
-                cold to severe infections like influenza, RSV and COVID-19. It captures illnesses that may not present
-                with fever, offering a more complete picture than the previous influenza-like illness (ILI) metric.
-                Refer to
-                <a href="/respiratory-viruses/data/activity-levels.html#cdc_data_surveillance_section_7-data-notes"
-                  >data notes</a
-                >
-                for more details.
-              </p>
-              <div class="dfe-block dfe-block--cdcmodule cdc_page_element dfe-block--width-standard">
-                <div class="dfe-block__inner">
-                  <div class="mb-3"></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="dfe-section" data-section="cdc_data_surveillance_section_1">
-              <a class="onThisPageAnchor" id="cdc_data_surveillance_section_1-by-age" name="By%20Age" title="By Age"
-                ><!-- --></a
-              >
-              <h2 class="editor-block--title" id="heading-ofbadzwize">By Age</h2>
-              <p>
                 Weekly percent of total emergency department visits associated with COVID-19, influenza, and RSV. Refer
                 to
                 <a
@@ -683,60 +667,13 @@
               <div class="dfe-block dfe-block--cdcmodule cdc_page_element dfe-block--width-standard">
                 <div class="dfe-block__inner">
                   <div class="mb-3">
-                    <div class="react-container" data-config="/examples/tech-adoption-with-links.json"></div>
+                    <div id="viz-wrapper">
+                      <div class="react-container" data-config="/examples/default.json"></div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <!--
-              <h3 id="heading-qycei2ctgq">Hospitalization by Age</h3>
-              <p>
-                Weekly hospitalization rates for COVID-19, influenza, and RSV per 100,000 population. Preliminary data
-                are shaded in gray. Refer to
-                <a
-                  href="/respiratory-viruses/data/most-impacted.html#cdc_data_surveillance_section_4-data-notes"
-                  class=""
-                  >data notes</a
-                >
-                for more details.
-              </p>
-              <div class="dfe-block dfe-block--cdcmodule cdc_page_element dfe-block--width-standard">
-                <div class="dfe-block__inner">
-                  <div class="mb-3">
-                    <div
-                      data-language="en"
-                      data-host="www.cdc.gov"
-                      class="wcms-viz-container"
-                      data-config-url="/respiratory-viruses/modules/viral-hospitalizations-demographics/Viral-Hospitalization-Age-Group.json"
-                      data-sid=""
-                    ></div>
-                  </div>
-                </div>
-              </div>
-              <h3 id="heading-skh8xsf9gv">Deaths by Age</h3>
-              <p>
-                Weekly percent of total deaths associated with COVID-19, influenza, and RSV. Preliminary data are shaded
-                in gray. Refer to
-                <a
-                  href="/respiratory-viruses/data/most-impacted.html#cdc_data_surveillance_section_4-data-notes"
-                  class=""
-                  >data notes</a
-                >
-                for more details.
-              </p>
-              <div class="dfe-block dfe-block--cdcmodule cdc_page_element dfe-block--width-standard">
-                <div class="dfe-block__inner">
-                  <div class="mb-3">
-                    <div
-                      data-language="en"
-                      data-host="www.cdc.gov"
-                      class="wcms-viz-container"
-                      data-config-url="/respiratory-viruses/modules/rv-deaths/Viral-Respiratory-Deaths-Age.json"
-                      data-sid=""
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            --></div>
+            </div>
 
             <div class="dfe-section" data-section="cdc_data_surveillance_section_6">
               <a
@@ -781,43 +718,12 @@
                 <h2 class="on-this-page__heading">On This Page</h2>
                 <div class="card-body">
                   <ul>
-                    <li><a href="#cdc_data_surveillance_section_1-summary" title="Summary">Summary</a></li>
+                    <li><a href="" title="Summary">Summary</a></li>
                     <li>
-                      <a
-                        href="#cdc_data_surveillance_section_9-level-of-respiratory-illness-activity"
-                        title="Level of Respiratory Illness Activity"
-                        >Level of Respiratory Illness Activity</a
-                      >
+                      <a href="" title="Level of Respiratory Illness Activity">Level of Respiratory Illness Activity</a>
                     </li>
                     <li>
-                      <a href="#cdc_data_surveillance_section_5-wastewater-map" title="Wastewater Map"
-                        >Wastewater Map</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        href="#cdc_data_surveillance_section_3-emergency-department-visits-for-viral-respiratory-illness"
-                        title="Emergency Department Visits for Viral Respiratory Illness"
-                        >Emergency Department Visits for Viral Respiratory Illness</a
-                      >
-                    </li>
-                    <li>
-                      <a href="#cdc_data_surveillance_section_8-epidemic-trends" title="Epidemic Trends"
-                        >Epidemic Trends</a
-                      >
-                    </li>
-                    <li>
-                      <a
-                        href="#cdc_data_surveillance_section_4-percent-of-tests-positive-for-respiratory-viruses"
-                        title="Percent of Tests Positive for Respiratory Viruses"
-                        >Percent of Tests Positive for Respiratory Viruses</a
-                      >
-                    </li>
-                    <li><a href="#cdc_data_surveillance_section_7-data-notes" title="Data Notes">Data Notes</a></li>
-                    <li>
-                      <a href="#cdc_data_surveillance_section_6-explore-source-data" title="Explore source data"
-                        >Explore source data</a
-                      >
+                      <a href="" title="Explore source data">Explore source data</a>
                     </li>
                   </ul>
                 </div>
@@ -1586,31 +1492,12 @@
       <div class="cdc-page-to-top__bar"><i class="cdc-fa-solid cdc-fa-arrow-up"></i></div>
     </a>
 
-    <script src="/config/cdc_config.js"></script>
-    <script>
-      var CDC_POST = {
-        id: '1263_6532',
-        type: 'cdc_dfe',
-        context: '1263-2',
-        lang: 'en',
-        audience: 'gen',
-        tax: {
-          cdc_topics: ['9fabe33b-d6c5-4e97-b834-7cce10664ce7', 'dac4cf33-6e05-4eaa-be99-e0a90690ee6e'],
-          cdc_categories: ['381b17ad-e843-4d67-b639-0583c20a2f32'],
-          cdc_audiences: ['8de1299b-beee-47ff-a33e-3ab1d2f97e0c']
-        }
-      }
-    </script>
     <script src="https://www.cdc.gov/TemplatePackage/contrib/libs/bootstrap/5x/bootstrap.bundle.min.js?_=04929"></script>
     <script src="https://www.cdc.gov/TemplatePackage/contrib/libs/jquery/latest/jquery.js?_=04929"></script>
     <script src="https://www.cdc.gov/TemplatePackage/5.0/js/app.min.js?_=04929"></script>
-    <script src="https://www.cdc.gov/TemplatePackage/contrib/libs/cdc/c2r/c2r.js?_=04929" type="module"></script>
 
-    <script type="module" src="./src/index.jsx"></script>
-    <script></script>
-    <script></script>
-
-    <script src="/respiratory-viruses/js/redcap-survey.js?v=5475"></script>
-    <script src="/flu/files/2024.banner.js"></script>
+    <script type="module">
+      // {{DEV_JS}}
+    </script>
   </body>
 </html>
