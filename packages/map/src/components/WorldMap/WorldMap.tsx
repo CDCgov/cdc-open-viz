@@ -229,7 +229,7 @@ const WorldMap = () => {
           ? geo.properties.state
           : geo.properties.iso && runtimeData[geo.properties.iso]
           ? geo.properties.iso
-          : geo.properties.name
+          : geo.properties.iso || geo.properties.name
 
       const additionalData = {
         name: geo.properties.name
