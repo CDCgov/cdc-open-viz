@@ -65,7 +65,7 @@ const PatternSettings = ({ name }: PanelProps) => {
   /** Updates the map config with a new pattern item */
   const handleAddGeoPattern = () => {
     const patterns = _.cloneDeep(config.map.patterns)
-    patterns.push({ dataKey: '', pattern: defaultPattern, contrastCheck: true })
+    patterns.push({ dataKey: '', pattern: defaultPattern, contrastCheck: true, color: '', size: 'medium' })
     setConfig({
       ...config,
       map: {
