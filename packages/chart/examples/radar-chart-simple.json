@@ -6,8 +6,8 @@
   "visualizationType": "Radar",
   "animate": false,
   "heights": {
-    "vertical": 350,
-    "horizontal": 350
+    "vertical": 400,
+    "horizontal": 400
   },
   "xAxis": {
     "dataKey": "Program",
