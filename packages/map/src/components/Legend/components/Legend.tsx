@@ -155,7 +155,14 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       config.map.patterns.map((patternData, patternDataIndex) => {
         const { pattern, dataKey, size, color } = patternData
         const patternColor = color || 'black'
-        const sanitizedDataKey = String(dataKey).replace(/\s/g, '-')
+        let sanitizedDataKey = String(dataKey)
+          // Replace any character that is not alphanumeric, underscore, or hyphen with '-'
+          .replace(/[^A-Za-z0-9_-]/g, '-')
+
+        // Ensure the first character is a letter or underscore, as required for robust SVG IDs
+        if (!/^[A-Za-z_]/.test(sanitizedDataKey)) {
+          sanitizedDataKey = `id-${sanitizedDataKey}`
+        }
         const sizes = {
           small: 8,
           medium: 10,
