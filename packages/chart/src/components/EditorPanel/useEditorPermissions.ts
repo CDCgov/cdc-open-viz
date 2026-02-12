@@ -87,6 +87,7 @@ export const useEditorPermissions = () => {
       'Box Plot',
       'Bump Chart',
       'Forest Plot',
+      'Radar',
       'Sankey',
       'Scatter Plot',
       'Spark Line',
