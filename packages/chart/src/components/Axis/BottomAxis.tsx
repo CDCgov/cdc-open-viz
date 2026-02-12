@@ -70,6 +70,11 @@ const BottomAxis: React.FC<BottomAxisProps> = ({
 
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   const isForestPlot = visualizationType === 'Forest Plot'
+
+  // Sort uniqueXAxisDataMapped to match the scale domain order for filterAndShiftLinearDateTicks
+  const sortedUniqueXAxisData = config.xAxis.sortByRecentDate
+    ? [...uniqueXAxisDataMapped].sort((a, b) => Number(b) - Number(a))
+    : [...uniqueXAxisDataMapped].sort((a, b) => Number(a) - Number(b))
   const GET_TEXT_WIDTH_FONT = `normal ${tickLabelFontSize}px Nunito, sans-serif`
 
   return (
@@ -107,9 +112,9 @@ const BottomAxis: React.FC<BottomAxisProps> = ({
 
         // For these charts, we generated all ticks in tickValues above, and now need to filter/shift them
         // so the last tick is always labeled
-        // Use uniqueXAxisDataMapped for date filtering to match the tickValues we set
+        // Use sortedUniqueXAxisData to match the scale's sorted domain for correct index calculations
         if (config.runtime.xAxis.type === 'date' && !config.runtime.xAxis.manual && !hasDynamicCategory) {
-          props.ticks = filterAndShiftLinearDateTicks(config, props, uniqueXAxisDataMapped, formatDate)
+          props.ticks = filterAndShiftLinearDateTicks(config, props, sortedUniqueXAxisData, formatDate)
         }
 
         const distanceBetweenTicks =
