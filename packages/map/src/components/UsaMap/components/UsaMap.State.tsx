@@ -495,6 +495,7 @@ const UsaMap = () => {
                 const hasMatchingValues = patternData.dataValue === geoData?.[patternData.dataKey]
                 const patternColor = patternData.color || getContrastColor('#000', currentFill)
                 const sanitizedDataKey = sanitizeToSvgId(dataKey)
+                const uniquePatternId = `${mapId}--${sanitizedDataKey}--${patternIndex}--geo${geoIndex}`
 
                 if (!hasMatchingValues) return
                 checkColorContrast(currentFill, patternColor)
@@ -503,7 +504,7 @@ const UsaMap = () => {
                   <>
                     {pattern === 'waves' && (
                       <PatternWaves
-                        id={`${mapId}--${sanitizedDataKey}--${patternIndex}`}
+                        id={uniquePatternId}
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
@@ -512,7 +513,7 @@ const UsaMap = () => {
                     )}
                     {pattern === 'circles' && (
                       <PatternCircles
-                        id={`${mapId}--${sanitizedDataKey}--${patternIndex}`}
+                        id={uniquePatternId}
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
@@ -522,7 +523,7 @@ const UsaMap = () => {
                     )}
                     {pattern === 'lines' && (
                       <PatternLines
-                        id={`${mapId}--${sanitizedDataKey}--${patternIndex}`}
+                        id={uniquePatternId}
                         height={patternSizes[size] ?? 6}
                         width={patternSizes[size] ?? 6}
                         stroke={patternColor}
@@ -535,7 +536,7 @@ const UsaMap = () => {
                       tabIndex={-1}
                       stroke='transparent'
                       d={path}
-                      fill={`url(#${mapId}--${sanitizedDataKey}--${patternIndex})`}
+                      fill={`url(#${uniquePatternId})`}
                     />
                   </>
                 )
