@@ -68,7 +68,7 @@ const WorldMap = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      import(/* webpackChunkName: "world-map-2026" */ './data/cove_world_map_2026.json')
+      import(/* webpackChunkName: "world-map-2026" */ './data/world-topo.json')
         .then(topoJSON => {
           // Smart detection of TopoJSON object key
           // Try known keys first, then fall back to first available key
@@ -229,7 +229,7 @@ const WorldMap = () => {
           ? geo.properties.state
           : geo.properties.iso && runtimeData[geo.properties.iso]
           ? geo.properties.iso
-          : geo.properties.name
+          : geo.properties.iso || geo.properties.name
 
       const additionalData = {
         name: geo.properties.name

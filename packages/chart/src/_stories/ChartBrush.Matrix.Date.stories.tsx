@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChartComponent'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import brushDateLargeConfig from './_mock/brush_date_large.json'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 // Helper: add a "Category" column to every row (duplicating for two categories) and add a dropdown filter
 function addFilter(config: any) {
@@ -49,6 +50,9 @@ export const Default: Story = {
         story: 'xAxis.type = "date", default chronological order. ~104 weekly data points.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -61,6 +65,9 @@ export const Reversed: Story = {
     docs: {
       description: { story: 'xAxis.type = "date", sortByRecentDate = true. Most recent dates appear first.' }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -73,6 +80,9 @@ export const ReversedDataOrder: Story = {
           'Data array in reverse chronological order (newest-first in JSON). Verifies the brush sorts its domain correctly regardless of input order.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -82,6 +92,9 @@ export const WithFilter: Story = {
     docs: {
       description: { story: 'xAxis.type = "date" with a dropdown filter applied.' }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -94,5 +107,8 @@ export const Reversed_WithFilter: Story = {
     docs: {
       description: { story: 'sortByRecentDate = true with a dropdown filter.' }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }

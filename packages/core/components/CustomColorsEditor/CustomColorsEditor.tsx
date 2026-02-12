@@ -7,15 +7,13 @@ interface CustomColorsEditorProps {
   onChange: (colors: string[]) => void
   label?: string
   minColors?: number
-  maxColors?: number
 }
 
 const CustomColorsEditor: React.FC<CustomColorsEditorProps> = ({
   colors = [],
   onChange,
   label = 'Custom Colors',
-  minColors = 1,
-  maxColors = 20
+  minColors = 1
 }) => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
 
@@ -26,11 +24,8 @@ const CustomColorsEditor: React.FC<CustomColorsEditorProps> = ({
   }
 
   const handleAddColor = () => {
-    if (colors.length < maxColors) {
-      // Add a new color (default to the last color or a neutral color)
-      const defaultColor = colors.length > 0 ? colors[colors.length - 1] : '#3366cc'
-      onChange([...colors, defaultColor])
-    }
+    const defaultColor = colors.length > 0 ? colors[colors.length - 1] : '#3366cc'
+    onChange([...colors, defaultColor])
   }
 
   const handleRemoveColor = (index: number) => {
@@ -191,7 +186,6 @@ const CustomColorsEditor: React.FC<CustomColorsEditorProps> = ({
       <button
         type="button"
         onClick={handleAddColor}
-        disabled={colors.length >= maxColors}
         className="btn-add-color"
       >
         + Add Color
@@ -200,7 +194,6 @@ const CustomColorsEditor: React.FC<CustomColorsEditorProps> = ({
       <div className="custom-colors-info">
         {colors.length} color{colors.length !== 1 ? 's' : ''}
         {colors.length < minColors && ` (minimum ${minColors} required)`}
-        {colors.length >= maxColors && ` (maximum reached)`}
       </div>
     </div>
   )

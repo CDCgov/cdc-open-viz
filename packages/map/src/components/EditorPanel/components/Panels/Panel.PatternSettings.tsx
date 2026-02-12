@@ -105,7 +105,8 @@ const PatternSettings = ({ name }: PanelProps) => {
     patternIndex: number,
     color: string
   ) => {
-    const geoKey = geo.properties.iso
+    // For county maps, use geo.id (FIPS code), for state maps use geo.properties.iso
+    const geoKey = config.general.geoType === 'us-county' ? geo.id : geo.properties.iso
     const legendColors = getGeoLegendColors(geoKey, runtimeData)
     const currentFill = legendColors?.[0]
 

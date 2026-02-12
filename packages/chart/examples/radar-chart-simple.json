@@ -66,6 +66,7 @@
     "gridRingStyle": "circles",
     "scaleMin": 0,
     "scaleMax": 100,
+    "showFill": false,
     "fillOpacity": 0.25,
     "showPoints": true,
     "pointRadius": 5,

@@ -2369,9 +2369,6 @@ export const BarFiltersTests: Story = {
         { category: 'Q3', y1: 7000, y2: 38000, y3: 74000, y4: 89000 },
         { category: 'Q4', y1: 15000, y2: 41000, y3: 67000, y4: 95000 }
       ],
-      tooltips: {
-        singleSeries: true // Enable tooltip attributes on bars for test data extraction
-      },
       filters: [] // Start with no filters
     },
     isEditor: true
@@ -2390,15 +2387,7 @@ export const BarFiltersTests: Story = {
     const getChartDataState = () => {
       const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
-      // Bars can be:
-      // - path elements with data-tooltip-id (singleSeries mode) - PRIMARY
-      // - path elements with animated-chart class (all modes)
-      // - rect elements with data-tooltip-id (edge cases)
-      // Fallback: any path/rect with onMouseOver handler (has data-tooltip-id or animated-chart)
-      const bars =
-        svg?.querySelectorAll(
-          'path[data-tooltip-id], path.animated-chart, rect[data-tooltip-id], path[class*="animated"], rect[class*="animated"]'
-        ) || []
+      const bars = svg?.querySelectorAll('rect[class*="bar"], rect[data-testid*="bar"], g[class*="bar"] rect') || []
       const filtersList = canvasElement.querySelector('.draggable-field-list')
 
       const filterElements = filtersList?.querySelectorAll('.editor-field-item') || []

@@ -143,6 +143,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const [suffixWidth, setSuffixWidth] = useState(0)
   const [calculatedSvgHeight, setCalculatedSvgHeight] = useState<number | null>(null)
   const [axisUpdateKey, setAxisUpdateKey] = useState(0)
+  const [synchronizedXValue, setSynchronizedXValue] = useState<any>(null)
 
   // REFS
   const axisBottomRef = useRef(null)
@@ -179,7 +180,14 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const initialHeight = useMemo(
     () =>
       visualizationType === 'Warming Stripes' ? WARMING_STRIPES_HEIGHT : calcInitialHeight(config, currentViewport),
-    [visualizationType, currentViewport, config.heights, config.orientation]
+    [
+      visualizationType,
+      currentViewport,
+      config.heights?.vertical,
+      config.heights?.horizontal,
+      config.heights?.mobileVertical,
+      config.orientation
+    ]
   )
   const forestHeight = useMemo(() => initialHeight + forestRowsHeight, [initialHeight, forestRowsHeight])
 
@@ -371,11 +379,17 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
       y
     })
 
-    smallMultiplesSync.onMouseMove?.(event)
+    // Warming Stripes handles its own sync at the rect level since
+    // getXValueFromCoordinate won't map correctly due to data sampling
+    if (visualizationType !== 'Warming Stripes') {
+      smallMultiplesSync.onMouseMove?.(event)
+    }
   }
 
   const onMouseLeave = () => {
-    smallMultiplesSync.onMouseLeave?.()
+    if (visualizationType !== 'Warming Stripes') {
+      smallMultiplesSync.onMouseLeave?.()
+    }
   }
 
   // Use custom hook to provide programmatic tooltip control for small multiples
@@ -386,7 +400,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     setPoint,
     setShowHoverLine,
     handleTooltipMouseOver,
-    hideTooltip
+    hideTooltip,
+    setSynchronizedXValue
   })
 
   // Make sure the chart is visible if in the editor
@@ -474,15 +489,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const legendIsLeftOrRight =
       legend?.position !== 'top' && legend?.position !== 'bottom' && !isLegendWrapViewport(currentViewport)
     legendRef.current.style.transform = legendIsLeftOrRight ? `translateY(${topLabelOnGridlineHeight}px)` : 'none'
-  }, [
-    axisBottomRef.current,
-    config,
-    bottomLabelStart,
-    config.xAxis.brushActive,
-    currentViewport,
-    topYLabelRef.current,
-    initialHeight
-  ])
+  }, [axisBottomRef.current, config, config.xAxis.brushActive, currentViewport, topYLabelRef.current, initialHeight])
 
   useEffect(() => {
     if (!tooltipOpen) return
@@ -544,9 +551,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             handleChartMouseEnter()
           }}
         >
-          {!isDraggingAnnotation && visualizationType !== 'Bar' && (
-            <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>
-          )}{' '}
+          {!isDraggingAnnotation && <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>}{' '}
           {/* GRID LINES */}
           {/* Actual LeftAxis is drawn after visualization */}
           {!TYPES_WITHOUT_GRID.includes(visualizationType as any) && config.yAxis.type !== 'categorical' && (
@@ -613,6 +618,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             getYAxisData={getYAxisData}
             svgRef={svgRef}
             forestPlotRightLabelRef={forestPlotRightLabelRef}
+            synchronizedXValue={synchronizedXValue}
           />
           {/* Brush moved to separate overlay - no longer in main SVG */}
           {/* y anchors */}
@@ -725,25 +731,27 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           </Group>
           {/* Highlighted regions */}
           {/* Y axis */}
-          {!TYPES_WITHOUT_GRID.includes(visualizationType as any) && config.yAxis.type !== 'categorical' && (
-            <LeftAxis
-              yScale={yScale}
-              xScale={xScale}
-              yMax={yMax}
-              xMax={xMax}
-              yAxisWidth={yAxisWidth}
-              numTicks={handleNumTicks}
-              tickLabelFontSize={tickLabelFontSize}
-              axisLabelFontSize={axisLabelFontSize}
-              handleLeftTickFormatting={handleLeftTickFormatting}
-              topYLabelRef={topYLabelRef}
-              suffixRef={suffixRef}
-              suffixWidth={suffixWidth}
-              horizontalYAxisLabelSpace={horizontalYAxisLabelSpace}
-              categoryLabelSpace={categoryLabelSpace}
-              yLabelOffset={yLabelOffset}
-            />
-          )}
+          {/* Horizon charts don't have a grid but should be rendered with a left axis */}
+          {(!TYPES_WITHOUT_GRID.includes(visualizationType as any) || visualizationType === 'Horizon Chart') &&
+            config.yAxis.type !== 'categorical' && (
+              <LeftAxis
+                yScale={yScale}
+                xScale={xScale}
+                yMax={yMax}
+                xMax={xMax}
+                yAxisWidth={yAxisWidth}
+                numTicks={handleNumTicks}
+                tickLabelFontSize={tickLabelFontSize}
+                axisLabelFontSize={axisLabelFontSize}
+                handleLeftTickFormatting={handleLeftTickFormatting}
+                topYLabelRef={topYLabelRef}
+                suffixRef={suffixRef}
+                suffixWidth={suffixWidth}
+                horizontalYAxisLabelSpace={horizontalYAxisLabelSpace}
+                categoryLabelSpace={categoryLabelSpace}
+                yLabelOffset={yLabelOffset}
+              />
+            )}
           {config.yAxis.type === 'categorical' && config.orientation === 'vertical' && (
             <CategoricalYAxis
               yScale={yScale}

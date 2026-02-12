@@ -10,6 +10,7 @@ import BoxPlotHorizontal from '../BoxPlot/BoxPlot.Horizontal'
 import DeviationBar from '../DeviationBar'
 import Forecasting from '../Forecasting'
 import ForestPlot from '../ForestPlot'
+import { HorizonChart } from '../HorizonChart'
 import LineChart from '../LineChart'
 import PairedBarChart from '../PairedBarChart'
 import ScatterPlot from '../ScatterPlot'
@@ -37,6 +38,7 @@ interface VisualizationRendererProps {
   getYAxisData: (d: any, seriesKey: string) => any
   svgRef: React.RefObject<any>
   forestPlotRightLabelRef: React.RefObject<any>
+  synchronizedXValue?: any
 }
 
 const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
@@ -60,7 +62,8 @@ const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
   getXAxisData,
   getYAxisData,
   svgRef,
-  forestPlotRightLabelRef
+  forestPlotRightLabelRef,
+  synchronizedXValue
 }) => {
   const { config, convertLineToBarGraph } = useContext(ConfigContext)
   const { visualizationType, visualizationSubType } = config
@@ -94,7 +97,29 @@ const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
 
       {/* Warming Stripes */}
       {visualizationType === 'Warming Stripes' && (
-        <WarmingStripes xScale={xScale} yScale={yScale} xMax={xMax} yMax={yMax} />
+        <WarmingStripes
+          xScale={xScale}
+          yScale={yScale}
+          xMax={xMax}
+          yMax={yMax}
+          synchronizedXValue={synchronizedXValue}
+          showTooltip={showTooltip}
+          handleTooltipMouseOff={handleTooltipMouseOff}
+        />
+      )}
+
+      {/* Horizon Chart */}
+      {visualizationType === 'Horizon Chart' && (
+        <HorizonChart
+          xScale={xScale}
+          yScale={yScale}
+          xMax={xMax}
+          yMax={yMax}
+          handleTooltipMouseOver={handleTooltipMouseOver}
+          handleTooltipMouseOff={handleTooltipMouseOff}
+          tooltipData={tooltipData}
+          showTooltip={showTooltip}
+        />
       )}
 
       {/* Box Plot - Vertical */}

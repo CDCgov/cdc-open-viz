@@ -7,6 +7,7 @@ import scatterPlotConfig from './_mock/scatterplot_mock.json'
 
 import Chart from '../CdcChartComponent'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Prefix Suffix',
@@ -21,6 +22,9 @@ export const Inline_Label: Story = {
       { path: ['yAxis', 'inlineLabel'], value: ' Somethings per Something' },
       { path: ['yAxis', 'gridLines'], value: true }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 export const Inline_Label_With_Suffix: Story = {
@@ -30,12 +34,18 @@ export const Inline_Label_With_Suffix: Story = {
       { path: ['dataFormat', 'suffix'], value: '%' },
       { path: ['yAxis', 'gridLines'], value: true }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
 export const Inline_Label_Worst_Case: Story = {
   args: {
     config: editConfigKeys(annotationConfig, [{ path: ['yAxis', 'inlineLabel'], value: ' Somethings per Something' }])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -47,6 +57,9 @@ export const Inline_Label_With_Options: Story = {
       { path: ['yAxis', 'tickRotation'], value: 45 },
       { path: ['yAxis', 'tickLabelColor'], value: 'red' }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -56,6 +69,9 @@ export const Inline_Label_No_Space: Story = {
       { path: ['yAxis', 'inlineLabel'], value: 'lbs' },
       { path: ['dataFormat', 'suffix'], value: '' }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -65,12 +81,18 @@ export const Inline_Label_With_Space: Story = {
       { path: ['yAxis', 'inlineLabel'], value: 'lbs of something' },
       { path: ['dataFormat', 'suffix'], value: '' }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
 export const Suffix: Story = {
   args: {
     config: annotationConfig
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -80,6 +102,9 @@ export const Prefix: Story = {
       { path: ['dataFormat', 'prefix'], value: '$' },
       { path: ['dataFormat', 'suffix'], value: '' }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -89,6 +114,9 @@ export const Prefix_Suffix_And_Inline_Title: Story = {
       { path: ['yAxis', 'inlineLabel'], value: 'lbs of something' },
       { path: ['dataFormat', 'prefix'], value: '$' }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 export const Horizontal_Bar: Story = {
@@ -97,6 +125,9 @@ export const Horizontal_Bar: Story = {
       { path: ['dataFormat', 'suffix'], value: ' suf' },
       { path: ['dataFormat', 'prefix'], value: 'pre' }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -109,6 +140,9 @@ export const Inline_Title_On_Line: Story = {
       { path: ['yAxis', 'labelsAboveGridlines'], value: true },
       { path: ['yAxis', 'hideAxis'], value: true }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -120,6 +154,9 @@ export const Values_On_Line_All_Suffix: Story = {
       { path: ['yAxis', 'gridLines'], value: true },
       { path: ['yAxis', 'hideAxis'], value: true }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -131,6 +168,9 @@ export const Values_on_Line_Top_Suffix_Only_Area_Worst_Case: Story = {
       { path: ['yAxis', 'labelsAboveGridlines'], value: true },
       { path: ['yAxis', 'gridLines'], value: true }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -143,6 +183,9 @@ export const Top_Suffix_Above_Gridlines_With_Options: Story = {
       { path: ['yAxis', 'gridLines'], value: true },
       { path: ['yAxis', 'hideAxis'], value: true }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -150,7 +193,9 @@ export const ScatterPlot_Bottom_Commas: Story = {
   args: {
     config: editConfigKeys(scatterPlotConfig, [{ path: ['dataFormat', 'bottomCommas'], value: true }])
   },
-  isEditor: true
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+  }
 }
 
 export default meta

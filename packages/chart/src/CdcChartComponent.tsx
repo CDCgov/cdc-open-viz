@@ -22,7 +22,7 @@ import { Runtime } from '@cdc/core/types/Runtime'
 import { Label } from './types/Label'
 // External Libraries
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
-import { timeParse, timeFormat } from 'd3-time-format'
+import { timeParse } from 'd3-time-format'
 import parse from 'html-react-parser'
 import _ from 'lodash'
 // Primary Components
@@ -31,7 +31,7 @@ import PieChart from './components/PieChart'
 import RadarChart from './components/RadarChart'
 import SankeyChart from './components/Sankey'
 import LinearChart from './components/LinearChart'
-import { isDateScale } from '@cdc/core/helpers/cove/date'
+import { isDateScale, formatDate as coreFormatDate } from '@cdc/core/helpers/cove/date'
 
 import { twoColorPalette } from '@cdc/core/data/colorPalettes'
 import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
@@ -265,19 +265,34 @@ const CdcChart: React.FC<CdcChartProps> = ({
       delete defaultsWithoutPalette.general?.palette
     }
 
-    // Override palette defaults for Line charts specifically
-    if (loadedConfig?.visualizationType === 'Line' && !loadedConfig?.general?.palette) {
-      if (!defaultsWithoutPalette.general) {
-        defaultsWithoutPalette.general = {}
-      }
-      defaultsWithoutPalette.general.palette = {
-        isReversed: false,
-        version: '2.0',
-        name: 'divergent_blue_cyan'
+    // Use defaultsDeep for the merge to preserve nested defaults like general.palette
+    let newConfig = _.defaultsDeep({}, loadedConfig, defaultsWithoutPalette)
+
+    // Apply visualization-specific palette defaults after merge to ensure
+    // they survive even when loadedConfig.general exists but lacks palette
+    // Check loadedConfig (not newConfig) since newConfig already has defaults merged in
+    if (!loadedConfig?.general?.palette) {
+      if (newConfig.visualizationType === 'Line') {
+        _.set(newConfig, 'general.palette', {
+          isReversed: false,
+          version: '2.0',
+          name: 'divergent_blue_cyan'
+        })
+      } else if (newConfig.visualizationType === 'Horizon Chart') {
+        _.set(newConfig, 'general.palette', {
+          isReversed: false,
+          version: '2.0',
+          name: 'sequential_blue'
+        })
       }
     }
 
-    let newConfig = { ...defaultsWithoutPalette, ...loadedConfig }
+    // Ensure Horizon Chart has enough palette colors for all layers
+    if (newConfig.visualizationType === 'Horizon Chart') {
+      const numLayers = newConfig.horizon?.numLayers ?? 4
+      const currentCount = _.get(newConfig, 'general.paletteColorCount', 4)
+      _.set(newConfig, 'general.paletteColorCount', Math.max(currentCount, numLayers))
+    }
 
     _.defaultsDeep(newConfig, {
       table: { showVertical: false }
@@ -477,6 +492,22 @@ const CdcChart: React.FC<CdcChartProps> = ({
       newConfig.visualizationSubType = 'stacked'
     }
 
+    if (newConfig.visualizationType === 'Horizon Chart' && newConfig.series) {
+      // Apply horizon defaults if not set
+      newConfig.horizon = {
+        numLayers: 4,
+        mode: 'offset', // Always offset for now, mirror hidden from UI
+        bandGap: 15,
+        bottomPadding: 15,
+        ...newConfig.horizon
+      }
+
+      // Set categorical as default xAxis type for horizon charts if not already set
+      if (!newConfig.xAxis.type) {
+        newConfig.xAxis.type = 'categorical'
+      }
+    }
+
     if (isHorizontalVariant) {
       // For horizontal charts, axes are swapped, so processedYAxis goes to runtime.xAxis and vice versa
       const horizontalXAxisSource = _.cloneDeep((newConfig.yAxis as any)?.yAxis || newConfig.yAxis)
@@ -637,7 +668,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         if (newData) {
           newConfig.data = newData
         }
-      } else if (newConfig.formattedData) {
+      } else if (newConfig.formattedData && Array.isArray(newConfig.formattedData)) {
         newConfig.data = newConfig.formattedData
       } else if (newConfig.dataDescription) {
         // For dashboard contexts, get data from datasets if config.data is undefined
@@ -673,7 +704,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
           updateConfig(preparedConfig, preppedData.data)
         }
       } catch (err) {
-        console.error('Could not Load!')
+        console.error('Could not Load!', err)
       }
     }
 
@@ -863,15 +894,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const formatDate = (date, i, ticks) => {
     const displayFormat =
       config.runtime[section].dateDisplayFormat || config.runtime[section].dateParseFormat || '%Y-%m-%d'
-    let formattedDate = timeFormat(displayFormat)(date)
-    // Handle the case where all months work with '%b.' except for May
-    if (displayFormat?.includes('%b.') && formattedDate.includes('May.')) {
-      formattedDate = formattedDate.replace(/May\./g, 'May')
-    }
+    let formattedDate = coreFormatDate(displayFormat, date)
     // Show years only once
     if (config.xAxis.showYearsOnce && displayFormat?.includes('%Y') && ticks) {
       const prevDate = ticks[i - 1] ? ticks[i - 1].value : null
-      const prevFormattedDate = timeFormat(displayFormat)(prevDate)
+      const prevFormattedDate = coreFormatDate(displayFormat, prevDate)
       const year = formattedDate.match(/\d{4}/)
       const prevYear = prevFormattedDate.match(/\d{4}/)
       if (year && prevYear && year[0] === prevYear[0]) {
@@ -882,7 +909,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const formatTooltipsDate = date => {
-    return timeFormat(config.tooltips.dateDisplayFormat)(date)
+    return coreFormatDate(config.tooltips.dateDisplayFormat, date)
   }
 
   // Format numeric data based on settings in config OR from passed in settings for Additional Columns

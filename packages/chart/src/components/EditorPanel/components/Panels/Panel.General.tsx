@@ -206,6 +206,86 @@ const PanelGeneral: FC<PanelProps> = props => {
             options={['Below Bar', 'On Date/Category Axis']}
           />
         )}
+        {visualizationType === 'Horizon Chart' && (
+          <>
+            <TextField
+              type='number'
+              value={config.horizon?.numLayers || 4}
+              section='horizon'
+              fieldName='numLayers'
+              label='Number of Layers'
+              updateField={updateField}
+              min={1}
+              max={9}
+              onBlur={e => {
+                const parsed = Number(e.target.value)
+                if (!isNaN(parsed)) {
+                  const value = Math.round(parsed)
+                  const clamped = Math.min(9, Math.max(1, value))
+                  if (clamped !== parsed) {
+                    updateField('horizon', null, 'numLayers', clamped)
+                  }
+                }
+              }}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>
+                      The number of layers determines how many "bands" the horizon chart is divided into. The optimal
+                      number of layers may depend on the data range and the desired level of detail.
+                    </p>
+                    <hr />
+                    <p>Valid range: 1-9. Defaults to 4 layers.</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
+            <TextField
+              type='number'
+              value={config.horizon?.bandGap ?? 15}
+              section='horizon'
+              fieldName='bandGap'
+              label='Band Gap'
+              updateField={updateField}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>The vertical spacing (in pixels) between each series row in the horizon chart.</p>
+                    <hr />
+                    <p>Defaults to 15 pixels.</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
+            <TextField
+              type='number'
+              value={config.horizon?.bottomPadding ?? 15}
+              section='horizon'
+              fieldName='bottomPadding'
+              label='Bottom Padding'
+              updateField={updateField}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>The padding (in pixels) below the last series row in the horizon chart.</p>
+                    <hr />
+                    <p>Defaults to 15 pixels.</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
+          </>
+        )}
+
         {visHasNumbersOnBars() ? (
           <CheckBox
             value={config.yAxis.displayNumbersOnBar}

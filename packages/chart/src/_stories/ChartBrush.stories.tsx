@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChartComponent'
 import brushEnabledConfig from './_mock/brush_enabled.json'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/BrushSlider',
@@ -29,6 +30,9 @@ export const BrushSliderEnabled: Story = {
           'Line chart with brush slider enabled. Drag the handles on the slider below the chart to filter the data range.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -44,6 +48,9 @@ export const BrushSliderInEditor: Story = {
           'Brush slider in editor mode. You can toggle the "Brush Slider" checkbox in the X-Axis section to enable/disable it.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
