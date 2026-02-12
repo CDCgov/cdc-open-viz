@@ -119,15 +119,6 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
   const derivedViewport = getViewport(width)
   const useMobileHeight = config.heights?.mobileVertical && isMobileHeightViewport(derivedViewport)
   const height = Number(useMobileHeight ? config.heights.mobileVertical : config.heights?.vertical) || 400
-  // TODO: remove debug log
-  console.warn('[RadarChart]', {
-    parentWidth: props.parentWidth,
-    derivedViewport,
-    mobileVertical: config.heights?.mobileVertical,
-    vertical: config.heights?.vertical,
-    useMobileHeight,
-    height
-  })
   const margin = { top: 40, right: 40, bottom: 40, left: 40 }
 
   const innerWidth = width - margin.left - margin.right
