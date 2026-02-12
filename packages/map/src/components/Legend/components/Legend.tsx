@@ -153,8 +153,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     if (config.map.patterns) {
       // loop over map patterns
       config.map.patterns.map((patternData, patternDataIndex) => {
-        const { pattern, dataKey, size } = patternData
-        let defaultPatternColor = 'black'
+        const { pattern, dataKey, size, color } = patternData
+        const patternColor = color || 'black'
+        const sanitizedDataKey = String(dataKey).replace(/\s/g, '-')
         const sizes = {
           small: 8,
           medium: 10,
@@ -174,35 +175,35 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 <svg width={legendSize} height={legendSize}>
                   {pattern === 'waves' && (
                     <PatternWaves
-                      id={`${mapId}--${dataKey}--${patternDataIndex}`}
+                      id={`${mapId}--${sanitizedDataKey}--${patternDataIndex}`}
                       height={sizes[size] ?? 10}
                       width={sizes[size] ?? 10}
-                      fill={defaultPatternColor}
+                      fill={patternColor}
                       strokeWidth={0.25}
                     />
                   )}
                   {pattern === 'circles' && (
                     <PatternCircles
-                      id={`${mapId}--${dataKey}--${patternDataIndex}`}
+                      id={`${mapId}--${sanitizedDataKey}--${patternDataIndex}`}
                       height={sizes[size] ?? 10}
                       width={sizes[size] ?? 10}
-                      fill={defaultPatternColor}
+                      fill={patternColor}
                       radius={1.25}
                     />
                   )}
                   {pattern === 'lines' && (
                     <PatternLines
-                      id={`${mapId}--${dataKey}--${patternDataIndex}`}
+                      id={`${mapId}--${sanitizedDataKey}--${patternDataIndex}`}
                       height={sizes[size] ?? 6}
                       width={sizes[size] ?? 10}
-                      stroke={defaultPatternColor}
+                      stroke={patternColor}
                       strokeWidth={0.75}
                       orientation={['diagonalRightToLeft']}
                     />
                   )}
                   <circle
                     id={dataKey}
-                    fill={`url(#${mapId}--${dataKey}--${patternDataIndex})`}
+                    fill={`url(#${mapId}--${sanitizedDataKey}--${patternDataIndex})`}
                     r={legendSize / 2}
                     cx={legendSize / 2}
                     cy={legendSize / 2}
