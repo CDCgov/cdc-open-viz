@@ -8,6 +8,8 @@ import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
 import { useTooltip as useCoveTooltip } from '../../hooks/useTooltip'
 import { useChartHoverAnalytics } from '../../hooks/useChartHoverAnalytics'
 import { handleChartAriaLabels } from '../../helpers/handleChartAriaLabels'
+import getViewport from '@cdc/core/helpers/getViewport'
+import { isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import RadarGrid from './RadarGrid'
@@ -114,7 +116,18 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
 
   // Chart dimensions
   const width = props.parentWidth || 400
-  const height = props.parentHeight || config.heights?.vertical || 300
+  const derivedViewport = getViewport(width)
+  const useMobileHeight = config.heights?.mobileVertical && isMobileHeightViewport(derivedViewport)
+  const height = Number(useMobileHeight ? config.heights.mobileVertical : config.heights?.vertical) || 300
+  // TODO: remove debug log
+  console.warn('[RadarChart]', {
+    parentWidth: props.parentWidth,
+    derivedViewport,
+    mobileVertical: config.heights?.mobileVertical,
+    vertical: config.heights?.vertical,
+    useMobileHeight,
+    height
+  })
   const margin = { top: 40, right: 40, bottom: 40, left: 40 }
 
   const innerWidth = width - margin.left - margin.right
