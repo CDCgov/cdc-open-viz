@@ -66,7 +66,7 @@ const sampleData = {
       data: validSankeyData
     },
     {
-      text: 'Radar Chart Data (Health Indicators)',
+      text: 'Radar Chart Data (Program Comparison)',
       fileName: 'valid-radar-chart.csv',
       data: validRadarData
     },

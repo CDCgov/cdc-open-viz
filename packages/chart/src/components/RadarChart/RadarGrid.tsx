@@ -18,7 +18,7 @@ const RadarGrid: React.FC<RadarGridProps> = ({ radius, axisCount, strokeColor = 
   const { config } = useContext(ConfigContext)
 
   const radarConfig = config.radar
-  const levels = radarConfig?.gridRings ?? 5
+  const levels = Number(radarConfig?.gridRings) || 5
   const showGrid = radarConfig?.showGridRings ?? true
   const gridStyle = radarConfig?.gridRingStyle ?? 'polygons'
   if (!showGrid) return null

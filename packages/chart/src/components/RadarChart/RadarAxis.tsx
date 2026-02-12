@@ -22,12 +22,12 @@ const RadarAxis: React.FC<RadarAxisProps> = ({
   strokeColor = '#999999',
   strokeWidth = 1,
   labelColor = '#333333',
-  fontSize = 12
+  fontSize = 14
 }) => {
   const { config } = useContext(ConfigContext)
 
   const radarConfig = config.radar
-  const labelOffset = radarConfig?.axisLabelOffset ?? 15
+  const labelOffset = Number(radarConfig?.axisLabelOffset) || 15
 
   const labels = useMemo(() => {
     if (!config.series || config.series.length === 0) return []

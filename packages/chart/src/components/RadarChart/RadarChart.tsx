@@ -112,13 +112,13 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
     return Math.ceil(max * 1.1)
   }, [entities, radarConfig.scaleMax])
 
-  const scaleMin = radarConfig.scaleMin || 0
+  const scaleMin = Number(radarConfig.scaleMin) || 0
 
   // Chart dimensions
   const width = props.parentWidth || 400
   const derivedViewport = getViewport(width)
   const useMobileHeight = config.heights?.mobileVertical && isMobileHeightViewport(derivedViewport)
-  const height = Number(useMobileHeight ? config.heights.mobileVertical : config.heights?.vertical) || 300
+  const height = Number(useMobileHeight ? config.heights.mobileVertical : config.heights?.vertical) || 400
   // TODO: remove debug log
   console.warn('[RadarChart]', {
     parentWidth: props.parentWidth,
@@ -132,7 +132,7 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
 
   const innerWidth = width - margin.left - margin.right
   const innerHeight = height - margin.top - margin.bottom
-  const radius = Math.min(innerWidth, innerHeight) / 2 - radarConfig.axisLabelOffset
+  const radius = Math.min(innerWidth, innerHeight) / 2 - Number(radarConfig.axisLabelOffset || 15)
 
   const centerX = width / 2
   const centerY = height / 2

@@ -30,10 +30,10 @@ const RadarPolygon: React.FC<RadarPolygonProps> = ({
 
   const radarConfig = config.radar
   const showFill = radarConfig?.showFill ?? false
-  const fillOpacity = showFill ? (radarConfig?.fillOpacity ?? 0.3) : 0
-  const strokeWidth = radarConfig?.strokeWidth ?? 2
+  const fillOpacity = showFill ? Number(radarConfig?.fillOpacity ?? 0.3) : 0
+  const strokeWidth = Number(radarConfig?.strokeWidth) || 2
   const showPoints = radarConfig?.showPoints ?? true
-  const pointRadius = radarConfig?.pointRadius ?? 4
+  const pointRadius = Number(radarConfig?.pointRadius) || 4
   const [isHovered, setIsHovered] = useState(false)
 
   const points = genPolygonPoints(values, scale)
