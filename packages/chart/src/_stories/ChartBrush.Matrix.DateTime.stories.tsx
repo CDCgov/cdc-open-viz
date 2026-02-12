@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChartComponent'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import brushEnabledConfig from './_mock/brush_enabled.json'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 // Helper: add a "Category" column to every row (duplicating for two categories) and add a dropdown filter
 function addFilter(config: any) {
@@ -43,6 +44,9 @@ export const Default: Story = {
     docs: {
       description: { story: 'xAxis.type = "date-time", default chronological order.' }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -55,6 +59,9 @@ export const Reversed: Story = {
     docs: {
       description: { story: 'xAxis.type = "date-time", sortByRecentDate = true.' }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -64,5 +71,8 @@ export const WithFilter: Story = {
     docs: {
       description: { story: 'xAxis.type = "date-time" with a dropdown filter applied.' }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }

@@ -215,6 +215,18 @@ const PanelGeneral: FC<PanelProps> = props => {
               fieldName='numLayers'
               label='Number of Layers'
               updateField={updateField}
+              min={1}
+              max={9}
+              onBlur={e => {
+                const parsed = Number(e.target.value)
+                if (!isNaN(parsed)) {
+                  const value = Math.round(parsed)
+                  const clamped = Math.min(9, Math.max(1, value))
+                  if (clamped !== parsed) {
+                    updateField('horizon', null, 'numLayers', clamped)
+                  }
+                }
+              }}
               tooltip={
                 <Tooltip style={{ textTransform: 'none' }}>
                   <Tooltip.Target>
@@ -226,7 +238,7 @@ const PanelGeneral: FC<PanelProps> = props => {
                       number of layers may depend on the data range and the desired level of detail.
                     </p>
                     <hr />
-                    <p>Defaults to 4 layers.</p>
+                    <p>Valid range: 1-9. Defaults to 4 layers.</p>
                   </Tooltip.Content>
                 </Tooltip>
               }

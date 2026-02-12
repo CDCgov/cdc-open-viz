@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import Chart from '../CdcChart'
 import forecastComboWithGaps from './_mock/forecast_combo_with_gaps.json'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Forecast Chart',
@@ -30,6 +31,9 @@ export const Forecast_Combo_With_Gaps: Story = {
           'A combo chart with forecast confidence intervals that demonstrates proper gap handling. The forecast areas and lines are split into separate segments when gaps are detected, preventing misleading connections across missing data periods. Invalid data points (NA values) are automatically filtered out.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 

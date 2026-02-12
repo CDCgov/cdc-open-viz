@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import CdcMap from '../CdcMap'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map/Geographic Name Formatting',
@@ -56,6 +57,9 @@ export const DistrictOfColumbia: Story = {
         { State: 'West Virginia', Value: 1775 }
       ]
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -109,6 +113,9 @@ export const USTerritories: Story = {
         { Territory: 'PALAU', Value: 18 }
       ]
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -159,6 +166,9 @@ export const DistrictOfColumbiaVariations: Story = {
         { State: 'WASHINGTON DC', Value: 105 }
       ]
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -216,6 +226,9 @@ export const WorldCountriesAllCaps: Story = {
         { Country: 'HEARD ISLAND AND MCDONALD ISLANDS', Value: 109 }
       ]
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -263,6 +276,9 @@ export const HyphenatedNames: Story = {
         { County: 'SAINT-PIERRE', Value: 102 }
       ]
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -316,5 +332,8 @@ export const MultiWordStateNames: Story = {
         { State: 'RHODE ISLAND', Value: 109 }
       ]
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }

@@ -42,29 +42,37 @@
         align-items: center;
         justify-content: space-between;
       }
-      .dev-sidebar-editor-toggle {
+      .dev-sidebar-toggles {
+        display: flex;
+        gap: 4px;
+      }
+      .dev-sidebar-toggle {
         background: none;
         border: 1px solid #45475a;
         border-radius: 4px;
         color: #9399b2;
         cursor: pointer;
-        width: 22px;
-        height: 22px;
-        font-size: 22px;
+        width: 26px;
+        height: 26px;
+        font-size: 14px;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: all 0.15s;
-        padding-bottom: 2px;
       }
-      .dev-sidebar-editor-toggle:hover {
+      .dev-sidebar-toggle:hover {
         border-color: #89b4fa;
         color: #89b4fa;
       }
-      .dev-sidebar-editor-toggle.active {
+      .dev-sidebar-toggle.active {
         background: #89b4fa;
         border-color: #89b4fa;
         color: #1e1e2e;
+      }
+      /* Editor toggle uses a larger emoji */
+      .dev-sidebar-editor-toggle {
+        font-size: 22px;
+        padding-bottom: 2px;
       }
       .dev-sidebar-search {
         padding: 8px 12px;
@@ -177,7 +185,25 @@
     <nav class="dev-sidebar">
       <div class="dev-sidebar-header">
         <span>All Packages</span>
-        <button class="dev-sidebar-editor-toggle" id="dev-editor-toggle" title="Toggle Editor">⚙</button>
+        <div class="dev-sidebar-toggles">
+          <button class="dev-sidebar-toggle" id="dev-preview-toggle" title="Toggle CDC Page Preview">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 1.5h7l3.5 3.5V14a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V2a.5.5 0 0 1 .5-.5z" />
+              <path d="M10 1.5V5h3.5" />
+            </svg></button
+          ><button class="dev-sidebar-toggle dev-sidebar-editor-toggle" id="dev-editor-toggle" title="Toggle Editor">
+            ⚙
+          </button>
+        </div>
       </div>
       <div class="dev-sidebar-search">
         <input type="text" id="dev-sidebar-search-input" placeholder="Search examples..." />
@@ -213,13 +239,18 @@
       // Check for URL params (for shareable links and browser navigation)
       const portalParams = new URLSearchParams(window.location.search)
       let editorMode = portalParams.get('editor') === 'true'
+      let previewMode = portalParams.get('preview') === 'true'
       const urlPackage = portalParams.get('package')
       const urlConfig = portalParams.get('config')
 
-      // Set initial editor toggle state
+      // Set initial toggle states
       const editorToggle = document.getElementById('dev-editor-toggle')
+      const previewToggle = document.getElementById('dev-preview-toggle')
       if (editorMode) {
         editorToggle.classList.add('active')
+      }
+      if (previewMode) {
+        previewToggle.classList.add('active')
       }
 
       // State (no localStorage - always starts fresh)
@@ -242,9 +273,12 @@
           url.searchParams.set('package', packageName)
           url.searchParams.set('config', configPath)
         }
-        // Keep editor param if present
+        // Keep editor and preview params if present
         if (editorMode) {
           url.searchParams.set('editor', 'true')
+        }
+        if (previewMode) {
+          url.searchParams.set('preview', 'true')
         }
         // Replace encoded slashes with real slashes for readability
         history.pushState({ packageName, configPath }, '', url.toString().replace(/%2F/g, '/'))
@@ -254,7 +288,8 @@
       function loadConfig(packageName, configPath, skipUrlUpdate = false) {
         const port = packages[packageName]
         const editorParam = editorMode ? '&editor=true' : ''
-        main.innerHTML = `<iframe src="http://localhost:${port}?config=${configPath}&sidebar=false${editorParam}"></iframe>`
+        const previewParam = previewMode ? '&preview=true' : ''
+        main.innerHTML = `<iframe src="http://localhost:${port}?config=${configPath}&sidebar=false${editorParam}${previewParam}"></iframe>`
 
         currentSelection = { packageName, configPath }
 
@@ -489,9 +524,27 @@
 
         // Reload iframe with new editor state
         if (currentSelection) {
-          const port = packages[currentSelection.packageName]
-          const editorParam = editorMode ? '&editor=true' : ''
-          main.innerHTML = `<iframe src="http://localhost:${port}?config=${currentSelection.configPath}&sidebar=false${editorParam}"></iframe>`
+          loadConfig(currentSelection.packageName, currentSelection.configPath, true)
+        }
+      })
+
+      // Preview toggle handler
+      previewToggle.addEventListener('click', () => {
+        previewMode = !previewMode
+        previewToggle.classList.toggle('active', previewMode)
+
+        // Update URL
+        const url = new URL(window.location)
+        if (previewMode) {
+          url.searchParams.set('preview', 'true')
+        } else {
+          url.searchParams.delete('preview')
+        }
+        history.pushState({}, '', url.toString().replace(/%2F/g, '/'))
+
+        // Reload iframe with new preview state
+        if (currentSelection) {
+          loadConfig(currentSelection.packageName, currentSelection.configPath, true)
         }
       })
 

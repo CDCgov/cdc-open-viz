@@ -16,7 +16,8 @@ const meta: Meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Stories for visualizations from the CDC ART (Assisted Reproductive Technology) Surveillance State-Specific page (https://www.cdc.gov/art/php/surveillance-state-specific/index.html)'
+        component:
+          'Stories for visualizations from the CDC ART (Assisted Reproductive Technology) Surveillance State-Specific page (https://www.cdc.gov/art/php/surveillance-state-specific/index.html)'
       }
     }
   },
@@ -140,7 +141,7 @@ const testDashboardRendering = async (canvasElement: HTMLElement, storyName: str
       const timeout = 20000
 
       const checkDashboard = () => {
-        const dashboardElement = canvasElement.querySelector('.cove-dashboard')
+        const dashboardElement = canvasElement.querySelector('.type-dashboard')
         const loadingDiv = canvasElement.querySelector('div')
 
         // Log current state for debugging
@@ -161,7 +162,7 @@ const testDashboardRendering = async (canvasElement: HTMLElement, storyName: str
   })
 
   await step('Verify dashboard wrapper is present', async () => {
-    const dashboard = canvasElement.querySelector('.cove-dashboard')
+    const dashboard = canvasElement.querySelector('.type-dashboard')
     expect(dashboard).toBeInTheDocument()
   })
 

@@ -3,6 +3,7 @@ import React from 'react'
 import { Meta, Story } from '@storybook/react'
 import CdcChart from '@cdc/chart/src/CdcChart'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 import comboChartConfig from './_mock/combo.json'
 
 export default {
@@ -17,6 +18,9 @@ ComboChart.args = {
   config: comboChartConfig,
   isEditor: true
 }
+ComboChart.play = async ({ canvasElement }) => {
+  await assertVisualizationRendered(canvasElement)
+}
 
 export const ComboChartWithBrush = Template.bind({})
 ComboChartWithBrush.args = {
@@ -25,4 +29,7 @@ ComboChartWithBrush.args = {
     { path: ['xAxis', 'brushDefaultRecentDateCount'], value: 12 }
   ]),
   isEditor: true
+}
+ComboChartWithBrush.play = async ({ canvasElement }) => {
+  await assertVisualizationRendered(canvasElement)
 }
