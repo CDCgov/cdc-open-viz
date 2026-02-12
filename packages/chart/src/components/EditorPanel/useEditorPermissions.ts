@@ -87,6 +87,7 @@ export const useEditorPermissions = () => {
       'Box Plot',
       'Bump Chart',
       'Forest Plot',
+      'Radar',
       'Sankey',
       'Scatter Plot',
       'Spark Line',
@@ -336,7 +337,7 @@ export const useEditorPermissions = () => {
   }
   const visSupportsMobileChartHeight = () => {
     // TODO: this is a soft release. Support should eventually match visSupportsChartHeight
-    const enabledCharts = ['Bar', 'Line', 'Combo', 'Area Chart']
+    const enabledCharts = ['Bar', 'Line', 'Combo', 'Area Chart', 'Radar']
     if (enabledCharts.includes(visualizationType)) return true
     return false
   }

@@ -396,7 +396,7 @@ const PanelGeneral: FC<PanelProps> = props => {
             />
           </>
         )}
-        {config.visualizationType !== 'Warming Stripes' && (
+        {config.visualizationType !== 'Warming Stripes' && config.visualizationType !== 'Radar' && (
           <CheckBox
             tooltip={
               <Tooltip style={{ textTransform: 'none' }}>

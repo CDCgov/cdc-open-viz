@@ -756,6 +756,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     if (isDateScale(updatedConfig.xAxis) && !updatedConfig.xAxis.padding) {
       updatedConfig.xAxis.padding = 0
     }
+    // Default Radar charts to a taller height
+    if (updatedConfig.visualizationType === 'Radar' && updatedConfig.heights?.vertical <= 400) {
+      updatedConfig.heights.vertical = 400
+    }
     // DEV-8008 - Remove Bar styling when Line is converted to Bar
     if (updatedConfig.visualizationType === 'Line') {
       updatedConfig.visualizationSubType = 'regular'
@@ -4251,7 +4255,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       />
 
                       <CheckBox
-                        display={config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)}
+                        display={
+                          config.visualizationType !== 'Radar' &&
+                          config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)
+                        }
                         value={config.legend.hideSuppressedLabels}
                         section='legend'
                         fieldName='hideSuppressedLabels'
@@ -4275,7 +4282,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         }
                       />
                       <CheckBox
-                        display={config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)}
+                        display={
+                          config.visualizationType !== 'Radar' &&
+                          config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)
+                        }
                         value={config.legend.hideSuppressionLink}
                         section='legend'
                         fieldName='hideSuppressionLink'

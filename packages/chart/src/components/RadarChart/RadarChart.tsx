@@ -8,6 +8,8 @@ import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
 import { useTooltip as useCoveTooltip } from '../../hooks/useTooltip'
 import { useChartHoverAnalytics } from '../../hooks/useChartHoverAnalytics'
 import { handleChartAriaLabels } from '../../helpers/handleChartAriaLabels'
+import getViewport from '@cdc/core/helpers/getViewport'
+import { isMobileHeightViewport } from '@cdc/core/helpers/viewports'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 
 import RadarGrid from './RadarGrid'
@@ -110,16 +112,18 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
     return Math.ceil(max * 1.1)
   }, [entities, radarConfig.scaleMax])
 
-  const scaleMin = radarConfig.scaleMin || 0
+  const scaleMin = Number(radarConfig.scaleMin) || 0
 
   // Chart dimensions
   const width = props.parentWidth || 400
-  const height = props.parentHeight || config.heights?.vertical || 300
+  const derivedViewport = getViewport(width)
+  const useMobileHeight = config.heights?.mobileVertical && isMobileHeightViewport(derivedViewport)
+  const height = Number(useMobileHeight ? config.heights.mobileVertical : config.heights?.vertical) || 400
   const margin = { top: 40, right: 40, bottom: 40, left: 40 }
 
   const innerWidth = width - margin.left - margin.right
   const innerHeight = height - margin.top - margin.bottom
-  const radius = Math.min(innerWidth, innerHeight) / 2 - radarConfig.axisLabelOffset
+  const radius = Math.min(innerWidth, innerHeight) / 2 - Number(radarConfig.axisLabelOffset || 15)
 
   const centerX = width / 2
   const centerY = height / 2
