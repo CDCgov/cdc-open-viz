@@ -757,8 +757,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       updatedConfig.xAxis.padding = 0
     }
     // Default Radar charts to a taller height
-    if (updatedConfig.visualizationType === 'Radar' && updatedConfig.heights?.vertical <= 300) {
-      updatedConfig.heights.vertical = 500
+    if (updatedConfig.visualizationType === 'Radar' && updatedConfig.heights?.vertical <= 400) {
+      updatedConfig.heights.vertical = 400
     }
     // DEV-8008 - Remove Bar styling when Line is converted to Bar
     if (updatedConfig.visualizationType === 'Line') {
