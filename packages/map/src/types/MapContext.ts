@@ -11,7 +11,7 @@ export type MapContext = {
   content: { geoName: string; keyedData: Record<string, any> }
   dimensions: DimensionsType
   displayDataAsText: string | number
-  displayGeoName: (key: string, convertFipsCodes: boolean) => string
+  displayGeoName: (key: string, displayOverride?: string) => string
   filteredCountryCode: string
   generateRuntimeData: (
     configObj: MapConfig,

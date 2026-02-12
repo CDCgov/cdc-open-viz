@@ -1742,6 +1742,30 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           </Tooltip>
                         }
                       />
+                      <label className='mt-2'>
+                        <span className='edit-label column-heading'>
+                          Geography Display Column
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                Optional. Select a column containing alternate display names for geographies (e.g.,
+                                translated names). These will be shown in tooltips, the data table, and navigation menus
+                                instead of the geography column values.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
+                        <Select
+                          value={config.columns.geo?.displayColumn || ''}
+                          options={columnsOptions.map(c => c.key)}
+                          onChange={event => {
+                            editColumn('geo', 'displayColumn', event.target.value)
+                          }}
+                        />
+                      </label>
                     </fieldset>
                     {'navigation' !== config.general.type && (
                       <fieldset className='primary-fieldset edit-block'>

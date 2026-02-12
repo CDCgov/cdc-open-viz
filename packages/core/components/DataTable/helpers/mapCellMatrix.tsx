@@ -22,9 +22,10 @@ const getGeoLabel = (config, row, formatLegendLocation, displayGeoName, runtimeD
   const { geoType, type } = config.general
 
   let labelValue
+  const displayOverride = runtimeData?.[row]?.[config.columns?.geo?.displayColumn]
   if (!['single-state', 'us-county'].includes(geoType) || type === 'us-geocode') {
     // Use the row (UID) for lookup - this allows "US-AL" to become "Alabama"
-    labelValue = displayGeoName(row)
+    labelValue = displayGeoName(row, displayOverride)
 
     // If displayGeoName returned the same value (not found in lookups), use the raw imported data
     if (labelValue === row && runtimeData && config.columns?.geo?.name) {
