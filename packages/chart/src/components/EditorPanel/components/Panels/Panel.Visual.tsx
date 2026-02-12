@@ -419,7 +419,6 @@ const PanelVisual: FC<PanelProps> = props => {
                       }}
                       label='Custom Color Order'
                       minColors={1}
-                      maxColors={20}
                     />
                   </div>
                 )}
