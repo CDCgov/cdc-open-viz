@@ -4251,7 +4251,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       />
 
                       <CheckBox
-                        display={config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)}
+                        display={
+                          config.visualizationType !== 'Radar' &&
+                          config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)
+                        }
                         value={config.legend.hideSuppressedLabels}
                         section='legend'
                         fieldName='hideSuppressedLabels'
@@ -4275,7 +4278,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         }
                       />
                       <CheckBox
-                        display={config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)}
+                        display={
+                          config.visualizationType !== 'Radar' &&
+                          config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)
+                        }
                         value={config.legend.hideSuppressionLink}
                         section='legend'
                         fieldName='hideSuppressionLink'
