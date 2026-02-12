@@ -653,6 +653,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     visHasLegendAxisAlign,
     visHasLegendColorCategory,
     visHasSelectableLegendValues,
+    visSupportsClickingLegend,
     visSupportsDateCategoryAxis,
     visSupportsDateCategoryAxisLabel,
     visSupportsDateCategoryAxisLine,
@@ -4297,7 +4298,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       />
 
                       <Select
-                        display={hasDynamicCategory || hasMultipleSeries}
+                        display={visSupportsClickingLegend() && (hasDynamicCategory || hasMultipleSeries)}
                         value={config.legend.behavior}
                         section='legend'
                         fieldName='behavior'
