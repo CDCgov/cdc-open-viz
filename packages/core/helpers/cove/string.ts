@@ -14,7 +14,7 @@ export const capitalizeSplitAndJoin = function (splittingCharacter: string = ' '
  * Sanitizes a string to be a valid SVG ID.
  * SVG IDs must:
  * - Start with a letter (A-Z, a-z) or underscore
- * - Contain only letters, digits, hyphens, underscores, and colons
+ * - Contain only letters, digits, hyphens, and underscores
  * - Not contain spaces or most special characters
  *
  * @param input - The string to sanitize
