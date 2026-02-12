@@ -3,6 +3,7 @@ import React, { useState, useEffect, useContext, useRef } from 'react'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 
 // United States Topojson resources
 import hexTopoJSON from '../data/us-hex-topo.json'
@@ -488,11 +489,12 @@ const UsaMap = () => {
               <path tabIndex={-1} className='single-geo' strokeWidth={1} d={path} />
 
               {/* apply patterns on top of state path*/}
-              {map?.patterns?.map((patternData, _patternIndex) => {
+              {map?.patterns?.map((patternData, patternIndex) => {
                 const { pattern, dataKey, size } = patternData
                 const currentFill = styles.fill
                 const hasMatchingValues = patternData.dataValue === geoData?.[patternData.dataKey]
                 const patternColor = patternData.color || getContrastColor('#000', currentFill)
+                const sanitizedDataKey = sanitizeToSvgId(dataKey)
 
                 if (!hasMatchingValues) return
                 checkColorContrast(currentFill, patternColor)
@@ -501,7 +503,7 @@ const UsaMap = () => {
                   <>
                     {pattern === 'waves' && (
                       <PatternWaves
-                        id={`${mapId}--${String(dataKey).replace(' ', '-')}--${geoIndex}`}
+                        id={`${mapId}--${sanitizedDataKey}--${patternIndex}`}
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
@@ -510,7 +512,7 @@ const UsaMap = () => {
                     )}
                     {pattern === 'circles' && (
                       <PatternCircles
-                        id={`${mapId}--${String(dataKey).replace(' ', '-')}--${geoIndex}`}
+                        id={`${mapId}--${sanitizedDataKey}--${patternIndex}`}
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
@@ -520,7 +522,7 @@ const UsaMap = () => {
                     )}
                     {pattern === 'lines' && (
                       <PatternLines
-                        id={`${mapId}--${String(dataKey).replace(' ', '-')}--${geoIndex}`}
+                        id={`${mapId}--${sanitizedDataKey}--${patternIndex}`}
                         height={patternSizes[size] ?? 6}
                         width={patternSizes[size] ?? 6}
                         stroke={patternColor}
@@ -529,15 +531,16 @@ const UsaMap = () => {
                       />
                     )}
                     <path
-                      className={`pattern-geoKey--${dataKey}`}
+                      className={`pattern-geoKey--${sanitizedDataKey}`}
                       tabIndex={-1}
                       stroke='transparent'
                       d={path}
-                      fill={`url(#${mapId}--${String(dataKey).replace(' ', '-')}--${geoIndex})`}
+                      fill={`url(#${mapId}--${sanitizedDataKey}--${patternIndex})`}
                     />
                   </>
                 )
               })}
+
               {(displayAsHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
               {displayAsHex && hexMap.type === 'shapes' && getArrowDirection(geoData, geo, legendColors[0])}
             </g>

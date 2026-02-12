@@ -2,6 +2,7 @@
 import { forwardRef, useContext, useMemo } from 'react'
 import parse from 'html-react-parser'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
+import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 
 //types
 import { DimensionsType } from '@cdc/core/types/Dimensions'
@@ -155,14 +156,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       config.map.patterns.map((patternData, patternDataIndex) => {
         const { pattern, dataKey, size, color } = patternData
         const patternColor = color || 'black'
-        let sanitizedDataKey = String(dataKey)
-          // Replace any character that is not alphanumeric, underscore, or hyphen with '-'
-          .replace(/[^A-Za-z0-9_-]/g, '-')
+        let sanitizedDataKey = sanitizeToSvgId(dataKey)
 
-        // Ensure the first character is a letter or underscore, as required for robust SVG IDs
-        if (!/^[A-Za-z_]/.test(sanitizedDataKey)) {
-          sanitizedDataKey = `id-${sanitizedDataKey}`
-        }
         const sizes = {
           small: 8,
           medium: 10,
