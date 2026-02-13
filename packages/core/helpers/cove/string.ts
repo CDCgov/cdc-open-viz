@@ -24,10 +24,16 @@ export function sanitizeToSvgId(input: string): string {
   // Replace any character that is not alphanumeric, underscore, or hyphen with '-'
   let sanitized = String(input).replace(/[^A-Za-z0-9_-]/g, '-')
 
+  // Collapse consecutive hyphens into a single hyphen for cleaner IDs
+  sanitized = sanitized.replace(/-+/g, '-')
+
   // Ensure the first character is a letter or underscore, as required for robust SVG IDs
   if (!/^[A-Za-z_]/.test(sanitized)) {
     sanitized = `id-${sanitized}`
   }
+
+  // Collapse any consecutive hyphens again (in case id- prefix created them)
+  sanitized = sanitized.replace(/-+/g, '-')
 
   return sanitized
 }

@@ -56,7 +56,7 @@ describe('sanitizeToSvgId', () => {
     })
 
     it('replaces multiple consecutive spaces with single hyphen', () => {
-      expect(sanitizeToSvgId('hello   world')).toBe('hello---world')
+      expect(sanitizeToSvgId('hello   world')).toBe('hello-world')
     })
 
     it('replaces special characters with hyphens', () => {
@@ -86,19 +86,19 @@ describe('sanitizeToSvgId', () => {
 
   describe('strings with only special characters', () => {
     it('sanitizes string with only spaces', () => {
-      expect(sanitizeToSvgId('   ')).toBe('id----')
+      expect(sanitizeToSvgId('   ')).toBe('id-')
     })
 
     it('sanitizes string with only special characters', () => {
-      expect(sanitizeToSvgId('###')).toBe('id----')
+      expect(sanitizeToSvgId('###')).toBe('id-')
     })
 
     it('sanitizes string with mixed special characters only', () => {
-      expect(sanitizeToSvgId('@#$%')).toBe('id-----')
+      expect(sanitizeToSvgId('@#$%')).toBe('id-')
     })
 
     it('sanitizes string with only punctuation', () => {
-      expect(sanitizeToSvgId('...')).toBe('id----')
+      expect(sanitizeToSvgId('...')).toBe('id-')
     })
   })
 
@@ -116,7 +116,7 @@ describe('sanitizeToSvgId', () => {
     })
 
     it('handles single hyphen (gets prefixed)', () => {
-      expect(sanitizeToSvgId('-')).toBe('id--')
+      expect(sanitizeToSvgId('-')).toBe('id-')
     })
 
     it('handles single number (gets prefixed)', () => {
@@ -126,11 +126,11 @@ describe('sanitizeToSvgId', () => {
 
   describe('mixed special characters and spaces', () => {
     it('handles spaces at start and end', () => {
-      expect(sanitizeToSvgId(' test ')).toBe('id--test-')
+      expect(sanitizeToSvgId(' test ')).toBe('id-test-')
     })
 
     it('handles complex string with multiple character types', () => {
-      expect(sanitizeToSvgId('My Data! (2023)')).toBe('My-Data---2023-')
+      expect(sanitizeToSvgId('My Data! (2023)')).toBe('My-Data-2023-')
     })
 
     it('handles string with tabs and newlines', () => {
@@ -138,15 +138,15 @@ describe('sanitizeToSvgId', () => {
     })
 
     it('handles percentage symbols and dollar signs', () => {
-      expect(sanitizeToSvgId('Cost: $50 (25%)')).toBe('Cost---50--25--')
+      expect(sanitizeToSvgId('Cost: $50 (25%)')).toBe('Cost-50-25-')
     })
 
     it('handles ampersands', () => {
-      expect(sanitizeToSvgId('Tom & Jerry')).toBe('Tom---Jerry')
+      expect(sanitizeToSvgId('Tom & Jerry')).toBe('Tom-Jerry')
     })
 
     it('handles quotes and apostrophes', () => {
-      expect(sanitizeToSvgId("It's a \"test\"")).toBe('It-s-a--test-')
+      expect(sanitizeToSvgId("It's a \"test\"")).toBe('It-s-a-test-')
     })
   })
 
@@ -160,11 +160,11 @@ describe('sanitizeToSvgId', () => {
     })
 
     it('sanitizes category data with special characters', () => {
-      expect(sanitizeToSvgId('Age Group: 18-24')).toBe('Age-Group--18-24')
+      expect(sanitizeToSvgId('Age Group: 18-24')).toBe('Age-Group-18-24')
     })
 
     it('sanitizes measurement units', () => {
-      expect(sanitizeToSvgId('Temperature (°F)')).toBe('Temperature---F-')
+      expect(sanitizeToSvgId('Temperature (°F)')).toBe('Temperature-F-')
     })
 
     it('sanitizes data keys with colons', () => {
@@ -178,25 +178,25 @@ describe('sanitizeToSvgId', () => {
     })
 
     it('handles emoji', () => {
-      expect(sanitizeToSvgId('happy 😊 face')).toBe('happy----face')
+      expect(sanitizeToSvgId('happy 😊 face')).toBe('happy-face')
     })
 
     it('handles currency symbols', () => {
-      expect(sanitizeToSvgId('Price €100')).toBe('Price--100')
+      expect(sanitizeToSvgId('Price €100')).toBe('Price-100')
     })
   })
 
   describe('consecutive special characters', () => {
-    it('preserves consecutive hyphens from replaced characters', () => {
-      expect(sanitizeToSvgId('a..b..c')).toBe('a--b--c')
+    it('collapses consecutive hyphens from replaced characters', () => {
+      expect(sanitizeToSvgId('a..b..c')).toBe('a-b-c')
     })
 
     it('handles multiple consecutive special characters', () => {
-      expect(sanitizeToSvgId('test!!!###')).toBe('test------')
+      expect(sanitizeToSvgId('test!!!###')).toBe('test-')
     })
 
     it('handles mixed consecutive special characters', () => {
-      expect(sanitizeToSvgId('value@#$%test')).toBe('value----test')
+      expect(sanitizeToSvgId('value@#$%test')).toBe('value-test')
     })
   })
 
