@@ -153,7 +153,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
     if (config.map.patterns) {
       // loop over map patterns
-      config.map.patterns.map((patternData, patternIndex) => {
+      config.map.patterns.forEach((patternData, patternIndex) => {
         const { pattern, dataKey, size, color } = patternData
         const patternColor = color || 'black'
         const sanitizedDataKey = sanitizeToSvgId(dataKey)
@@ -167,56 +167,57 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         const legendSize = 16
 
         legendItems.push(
-          <>
-            <li className={`legend-container__li legend-container__li--geo-pattern`}>
-              <button
-                type='button'
-                className='legend-container__li-btn legend-container__li-btn--pattern'
-                aria-label='Pattern legend item. Toggling patterns is not currently supported.'
-              >
-                <svg width={legendSize} height={legendSize}>
-                  {pattern === 'waves' && (
-                    <PatternWaves
-                      id={`${mapId}--${sanitizedDataKey}--${patternIndex}`}
-                      height={sizes[size] ?? 10}
-                      width={sizes[size] ?? 10}
-                      fill={patternColor}
-                      strokeWidth={0.25}
-                    />
-                  )}
-                  {pattern === 'circles' && (
-                    <PatternCircles
-                      id={`${mapId}--${sanitizedDataKey}--${patternIndex}`}
-                      height={sizes[size] ?? 10}
-                      width={sizes[size] ?? 10}
-                      fill={patternColor}
-                      radius={1.25}
-                    />
-                  )}
-                  {pattern === 'lines' && (
-                    <PatternLines
-                      id={`${mapId}--${sanitizedDataKey}--${patternIndex}`}
-                      height={sizes[size] ?? 6}
-                      width={sizes[size] ?? 10}
-                      stroke={patternColor}
-                      strokeWidth={0.75}
-                      orientation={['diagonalRightToLeft']}
-                    />
-                  )}
-                  <circle
-                    id={`${mapId}--${sanitizedDataKey}--${patternIndex}-circle`}
-                    fill={`url(#${mapId}--${sanitizedDataKey}--${patternIndex})`}
-                    r={legendSize / 2}
-                    cx={legendSize / 2}
-                    cy={legendSize / 2}
-                    stroke='#0000004d'
-                    strokeWidth={1}
+          <li
+            key={`${mapId}--${sanitizedDataKey}--${patternIndex}`}
+            className={`legend-container__li legend-container__li--geo-pattern`}
+          >
+            <button
+              type='button'
+              className='legend-container__li-btn legend-container__li-btn--pattern'
+              aria-label='Pattern legend item. Toggling patterns is not currently supported.'
+            >
+              <svg width={legendSize} height={legendSize}>
+                {pattern === 'waves' && (
+                  <PatternWaves
+                    id={`${mapId}--${sanitizedDataKey}--${patternIndex}`}
+                    height={sizes[size] ?? 10}
+                    width={sizes[size] ?? 10}
+                    fill={patternColor}
+                    strokeWidth={0.25}
                   />
-                </svg>
-                <span>{patternData.label || patternData.dataValue || ''}</span>
-              </button>
-            </li>
-          </>
+                )}
+                {pattern === 'circles' && (
+                  <PatternCircles
+                    id={`${mapId}--${sanitizedDataKey}--${patternIndex}`}
+                    height={sizes[size] ?? 10}
+                    width={sizes[size] ?? 10}
+                    fill={patternColor}
+                    radius={1.25}
+                  />
+                )}
+                {pattern === 'lines' && (
+                  <PatternLines
+                    id={`${mapId}--${sanitizedDataKey}--${patternIndex}`}
+                    height={sizes[size] ?? 6}
+                    width={sizes[size] ?? 10}
+                    stroke={patternColor}
+                    strokeWidth={0.75}
+                    orientation={['diagonalRightToLeft']}
+                  />
+                )}
+                <circle
+                  id={`${mapId}--${sanitizedDataKey}--${patternIndex}-circle`}
+                  fill={`url(#${mapId}--${sanitizedDataKey}--${patternIndex})`}
+                  r={legendSize / 2}
+                  cx={legendSize / 2}
+                  cy={legendSize / 2}
+                  stroke='#0000004d'
+                  strokeWidth={1}
+                />
+              </svg>
+              <span>{patternData.label || patternData.dataValue || ''}</span>
+            </button>
+          </li>
         )
       })
     }
