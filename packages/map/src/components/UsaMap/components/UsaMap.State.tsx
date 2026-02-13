@@ -492,7 +492,9 @@ const UsaMap = () => {
               {map?.patterns?.map((patternData, patternIndex) => {
                 const { pattern, dataKey, size } = patternData
                 const currentFill = styles.fill
-                const hasMatchingValues = patternData.dataValue === geoData?.[patternData.dataKey]
+                // If dataKey is empty/falsy, match all geographies. Otherwise check if values match.
+                const hasMatchingValues =
+                  !patternData.dataKey || patternData.dataValue === geoData?.[patternData.dataKey]
                 const patternColor = patternData.color || getContrastColor('#000', currentFill)
                 const sanitizedDataKey = sanitizeToSvgId(dataKey)
                 const uniquePatternId = `${mapId}--${sanitizedDataKey}--${patternIndex}--geo${geoIndex}`

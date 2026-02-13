@@ -73,7 +73,9 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
 
         {config.map?.patterns?.map((patternData, patternIndex) => {
           const patternColor = patternData.color || getContrastColor('#FFF', backgroundColor)
-          const hasMatchingValues = patternData.dataValue === territoryData?.[patternData.dataKey]
+          // If dataKey is empty/falsy, match all territories. Otherwise check if values match.
+          const hasMatchingValues =
+            !patternData.dataKey || patternData.dataValue === territoryData?.[patternData.dataKey]
 
           if (!hasMatchingValues) return null
           if (!patternData.pattern) return null

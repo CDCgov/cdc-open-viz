@@ -120,7 +120,8 @@ const PatternSettings = ({ name }: PanelProps) => {
 
     if (!currentFill) return
 
-    const hasMatchingValues = pattern.dataValue === runtimeData[geoKey]?.[pattern.dataKey]
+    // If dataKey is empty/falsy, match all geographies. Otherwise check if values match.
+    const hasMatchingValues = !pattern.dataKey || pattern.dataValue === runtimeData[geoKey]?.[pattern.dataKey]
 
     if (hasMatchingValues) {
       const contrastCheck = checkAndLogContrast(
