@@ -58,8 +58,7 @@ export const addValuesToDashboardFilters = (
         const active: string[] = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
         filterCopy.active = active.filter(val => defaultValues.includes(val))
       } else {
-        // Initialize active from defaultValue if not already set
-        // OR if defaultValue exists, always use it (overrides stale active from saved config)
+        // Use defaultValue if set, otherwise keep existing active or use first value
         if (filterCopy.defaultValue) {
           filterCopy.active = filterCopy.defaultValue
         } else if (!filterCopy.active) {
