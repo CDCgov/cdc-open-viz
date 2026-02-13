@@ -503,10 +503,9 @@ const UsaMap = () => {
                 checkColorContrast(currentFill, patternColor)
 
                 return (
-                  <>
+                  <React.Fragment key={uniquePatternId}>
                     {pattern === 'waves' && (
                       <PatternWaves
-                        key={uniquePatternId}
                         id={uniquePatternId}
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
@@ -516,7 +515,6 @@ const UsaMap = () => {
                     )}
                     {pattern === 'circles' && (
                       <PatternCircles
-                        key={uniquePatternId}
                         id={uniquePatternId}
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
@@ -527,7 +525,6 @@ const UsaMap = () => {
                     )}
                     {pattern === 'lines' && (
                       <PatternLines
-                        key={uniquePatternId}
                         id={uniquePatternId}
                         height={patternSizes[size] ?? 6}
                         width={patternSizes[size] ?? 6}
@@ -543,7 +540,7 @@ const UsaMap = () => {
                       d={path}
                       fill={`url(#${uniquePatternId})`}
                     />
-                  </>
+                  </React.Fragment>
                 )
               })}
 
