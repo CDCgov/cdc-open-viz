@@ -153,7 +153,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
     if (config.map.patterns) {
       // loop over map patterns
-      config.map.patterns.map((patternData, patternDataIndex) => {
+      config.map.patterns.map((patternData, patternIndex) => {
         const { pattern, dataKey, size, color } = patternData
         const patternColor = color || 'black'
         const sanitizedDataKey = sanitizeToSvgId(dataKey)
@@ -177,7 +177,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 <svg width={legendSize} height={legendSize}>
                   {pattern === 'waves' && (
                     <PatternWaves
-                      id={`${mapId}--${sanitizedDataKey}--${patternDataIndex}`}
+                      id={`${mapId}--${sanitizedDataKey}--${patternIndex}`}
                       height={sizes[size] ?? 10}
                       width={sizes[size] ?? 10}
                       fill={patternColor}
@@ -186,7 +186,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                   )}
                   {pattern === 'circles' && (
                     <PatternCircles
-                      id={`${mapId}--${sanitizedDataKey}--${patternDataIndex}`}
+                      id={`${mapId}--${sanitizedDataKey}--${patternIndex}`}
                       height={sizes[size] ?? 10}
                       width={sizes[size] ?? 10}
                       fill={patternColor}
@@ -195,7 +195,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                   )}
                   {pattern === 'lines' && (
                     <PatternLines
-                      id={`${mapId}--${sanitizedDataKey}--${patternDataIndex}`}
+                      id={`${mapId}--${sanitizedDataKey}--${patternIndex}`}
                       height={sizes[size] ?? 6}
                       width={sizes[size] ?? 10}
                       stroke={patternColor}
@@ -204,8 +204,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                     />
                   )}
                   <circle
-                    id={`${mapId}--${sanitizedDataKey}--${patternDataIndex}-circle`}
-                    fill={`url(#${mapId}--${sanitizedDataKey}--${patternDataIndex})`}
+                    id={`${mapId}--${sanitizedDataKey}--${patternIndex}-circle`}
+                    fill={`url(#${mapId}--${sanitizedDataKey}--${patternIndex})`}
                     r={legendSize / 2}
                     cx={legendSize / 2}
                     cy={legendSize / 2}
