@@ -497,7 +497,7 @@ const UsaMap = () => {
                 const sanitizedDataKey = sanitizeToSvgId(dataKey)
                 const uniquePatternId = `${mapId}--${sanitizedDataKey}--${patternIndex}--geo${geoIndex}`
 
-                if (!hasMatchingValues) return
+                if (!hasMatchingValues) return null
                 checkColorContrast(currentFill, patternColor)
 
                 return (
