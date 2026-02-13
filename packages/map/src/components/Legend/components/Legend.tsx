@@ -156,7 +156,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       config.map.patterns.map((patternData, patternDataIndex) => {
         const { pattern, dataKey, size, color } = patternData
         const patternColor = color || 'black'
-        let sanitizedDataKey = sanitizeToSvgId(dataKey)
+        const sanitizedDataKey = sanitizeToSvgId(dataKey)
 
         const sizes = {
           small: 8,
