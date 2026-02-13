@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import React, { useContext } from 'react'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import ConfigContext from './../../../../context'
 import { type MapContext } from '../../../../types/MapContext'
@@ -83,7 +83,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
           if (!patternData.pattern) return null
 
           return (
-            <>
+            <React.Fragment key={`${mapId}--territory-${territory}-${sanitizedDataKey}--${patternIndex}`}>
               {patternData?.pattern === 'waves' && (
                 <PatternWaves
                   id={`${mapId}--territory-${territory}-${sanitizedDataKey}--${patternIndex}`}
@@ -141,7 +141,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
               >
                 {label}
               </text>
-            </>
+            </React.Fragment>
           )
         })}
       </g>
