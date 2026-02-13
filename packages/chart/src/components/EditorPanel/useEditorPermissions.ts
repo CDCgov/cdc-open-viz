@@ -162,10 +162,11 @@ export const useEditorPermissions = () => {
   }
   const visHasBrushChart = () => {
     if (config.xAxis.type === 'categorical') return false
-    // Allow Line charts, vertical Bar charts (both stacked and grouped), and vertical Area charts
+    // Allow Line charts, vertical Bar charts (both stacked and grouped), vertical Area charts, and Combo charts
     if (visualizationType === 'Line' && orientation === 'vertical') return true
     if (visualizationType === 'Bar' && orientation === 'vertical') return true
     if (visualizationType === 'Area Chart' && orientation === 'vertical') return true
+    if (visualizationType === 'Combo' && orientation === 'vertical') return true
     return false
   }
 
