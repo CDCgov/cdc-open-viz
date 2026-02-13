@@ -2,7 +2,7 @@
 import { forwardRef, useContext, useMemo } from 'react'
 import parse from 'html-react-parser'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
-
+import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 //types
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 
@@ -155,7 +155,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       config.map.patterns.map((patternData, patternDataIndex) => {
         const { pattern, dataKey, size, color } = patternData
         const patternColor = color || 'black'
-        const sanitizedDataKey = String(dataKey).replace(/\s/g, '-')
+        const sanitizedDataKey = sanitizeToSvgId(dataKey)
         const sizes = {
           small: 8,
           medium: 10,
@@ -202,7 +202,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                     />
                   )}
                   <circle
-                    id={dataKey}
+                    id={sanitizedDataKey}
                     fill={`url(#${mapId}--${sanitizedDataKey}--${patternDataIndex})`}
                     r={legendSize / 2}
                     cx={legendSize / 2}
