@@ -123,7 +123,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                 style={{ pointerEvents: 'none' }}
                 className={[
                   `territory-pattern-${sanitizedDataKey}`,
-                  `territory-pattern-${sanitizedDataKey}--${patternData.dataValue}`
+                  `territory-pattern-${sanitizedDataKey}--${sanitizeToSvgId(String(patternData.dataValue))}`
                 ].join(' ')}
               />
               <text
