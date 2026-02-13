@@ -87,8 +87,8 @@ export const addValuesToDashboardFilters = (
       // Priority order: query string > configured default > existing active > first available value
       let activeValue: string | undefined
 
-      if (queryStringFilterValue) {
-        // 1. Query string parameter takes highest priority
+      if (queryStringFilterValue && currentGroupValues.includes(queryStringFilterValue)) {
+        // 1. Query string parameter takes highest priority (only if valid for the current group)
         activeValue = queryStringFilterValue
       } else if (
         filterCopy.subGrouping.defaultValue &&
