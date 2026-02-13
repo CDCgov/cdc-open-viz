@@ -57,6 +57,12 @@ export const useEditorPermissions = () => {
     return true
   }
 
+  const visSupportsClickingLegend = () => {
+    const disabledCharts = ['Horizon Chart']
+    if (disabledCharts.includes(visualizationType)) return false
+    return true
+  }
+
   const visSupportsDataAnnotations = () => {
     const enabledCharts = ['Line', 'Bar', 'Combo', 'Area Chart', 'Forecasting']
     if (enabledCharts.includes(visualizationType) && config.orientation !== 'horizontal') return true
@@ -267,7 +273,16 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsRegions = () => {
-    const disabledCharts = ['Forest Plot', 'Pie', 'Paired Bar', 'Radar', 'Spark Line', 'Sankey', 'Warming Stripes']
+    const disabledCharts = [
+      'Forest Plot',
+      'Horizon Chart',
+      'Pie',
+      'Paired Bar',
+      'Radar',
+      'Spark Line',
+      'Sankey',
+      'Warming Stripes'
+    ]
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
@@ -428,57 +443,58 @@ export const useEditorPermissions = () => {
   return {
     enabledChartTypes,
     visCanAnimate,
+    visHasaAdditionalLabelsOnBars,
     visHasAnchors,
     visHasBarBorders,
+    visHasBrushChart,
+    visHasCategoricalAxis,
     visHasDataCutoff,
-    visHasLabelOnData,
     visHasDataSuppression,
+    visHasLabelOnData,
     visHasLegend,
     visHasLegendAxisAlign,
     visHasLegendColorCategory,
-    visHasBrushChart,
     visHasNumbersOnBars,
-    visHasaAdditionalLabelsOnBars,
+    visHasSelectableLegendValues,
+    visHasSingleSeriesTooltip,
     visSupportsBarSpace,
     visSupportsBarThickness,
     visSupportsChartHeight,
-    visSupportsMobileChartHeight,
+    visSupportsClickingLegend,
+    visSupportsDataAnnotations,
     visSupportsDateCategoryAxis,
-    visSupportsDateCategoryAxisMin,
-    visSupportsDateCategoryAxisMax,
     visSupportsDateCategoryAxisLabel,
     visSupportsDateCategoryAxisLine,
+    visSupportsDateCategoryAxisMax,
+    visSupportsDateCategoryAxisMin,
+    visSupportsDateCategoryAxisPadding,
     visSupportsDateCategoryAxisTicks,
     visSupportsDateCategoryHeight,
     visSupportsDateCategoryNumTicks,
     visSupportsDateCategoryTickRotation,
-    visSupportsDateCategoryAxisPadding,
+    visSupportsDynamicSeries,
     visSupportsFilters,
     visSupportsFootnotes,
-    visSupportsDataAnnotations,
     visSupportsLeftValueAxis,
+    visSupportsMobileChartHeight,
     visSupportsNonSequentialPallete,
     visSupportsPreliminaryData,
     visSupportsRankByValue,
+    visSupportsReactTooltip,
     visSupportsRegions,
     visSupportsResponsiveTicks,
     visSupportsReverseColorPalette,
     visSupportsSequentialPallete,
+    visSupportsSmallMultiples,
     visSupportsSuperTitle,
     visSupportsTooltipLines,
-    visHasSelectableLegendValues,
     visSupportsTooltipOpacity,
     visSupportsValueAxisGridLines,
     visSupportsValueAxisLabels,
     visSupportsValueAxisLine,
-    visSupportsValueAxisTicks,
-    visSupportsReactTooltip,
     visSupportsValueAxisMax,
     visSupportsValueAxisMin,
-    visSupportsDynamicSeries,
-    visSupportsSmallMultiples,
-    visSupportsYPadding,
-    visHasSingleSeriesTooltip,
-    visHasCategoricalAxis
+    visSupportsValueAxisTicks,
+    visSupportsYPadding
   }
 }
