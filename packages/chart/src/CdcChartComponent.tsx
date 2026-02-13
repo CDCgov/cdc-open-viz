@@ -265,27 +265,31 @@ const CdcChart: React.FC<CdcChartProps> = ({
       delete defaultsWithoutPalette.general?.palette
     }
 
-    // Use defaultsDeep for the merge to preserve nested defaults like general.palette
-    let newConfig = _.defaultsDeep({}, loadedConfig, defaultsWithoutPalette)
-
-    // Apply visualization-specific palette defaults after merge to ensure
-    // they survive even when loadedConfig.general exists but lacks palette
-    // Check loadedConfig (not newConfig) since newConfig already has defaults merged in
-    if (!loadedConfig?.general?.palette) {
-      if (newConfig.visualizationType === 'Line') {
-        _.set(newConfig, 'general.palette', {
-          isReversed: false,
-          version: '2.0',
-          name: 'divergent_blue_cyan'
-        })
-      } else if (newConfig.visualizationType === 'Horizon Chart') {
-        _.set(newConfig, 'general.palette', {
-          isReversed: false,
-          version: '2.0',
-          name: 'sequential_blue'
-        })
+    // Override palette defaults for Line charts specifically
+    if (loadedConfig?.visualizationType === 'Line' && !loadedConfig?.general?.palette) {
+      if (!defaultsWithoutPalette.general) {
+        defaultsWithoutPalette.general = {}
+      }
+      defaultsWithoutPalette.general.palette = {
+        isReversed: false,
+        version: '2.0',
+        name: 'divergent_blue_cyan'
       }
     }
+
+    // Override palette defaults for Horizon Chart specifically
+    if (loadedConfig?.visualizationType === 'Horizon Chart' && !loadedConfig?.general?.palette) {
+      if (!defaultsWithoutPalette.general) {
+        defaultsWithoutPalette.general = {}
+      }
+      defaultsWithoutPalette.general.palette = {
+        isReversed: false,
+        version: '2.0',
+        name: 'sequential_blue'
+      }
+    }
+
+    let newConfig = { ...defaultsWithoutPalette, ...loadedConfig }
 
     // Ensure Horizon Chart has enough palette colors for all layers
     if (newConfig.visualizationType === 'Horizon Chart') {
@@ -1447,7 +1451,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       return (
                         <DataTable
                           /* changing the "key" will force the table to re-render
-                                when the default sort changes while editing */
+                              when the default sort changes while editing */
                           key={dataTableDefaultSortBy}
                           config={dataTableConfig}
                           rawData={dataTableRawData}
