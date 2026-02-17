@@ -9,7 +9,7 @@ import { MarkerArrow } from '@visx/marker'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import useReduceData from '../../../hooks/useReduceData'
 import ConfigContext from '../../../ConfigContext'
-import './../index.scss'
+import './../index.css'
 
 type SparkLineProps = {
   width: string | number

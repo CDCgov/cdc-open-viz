@@ -1,0 +1,68 @@
+.cdc-open-viz-module .shared-filter-modal__title,
+.cove .shared-filter-modal__title,
+.shared-filter-modal__title {
+  margin: unset;
+}
+
+.cdc-open-viz-module .shared-filter-modal__fieldset,
+.cove .shared-filter-modal__fieldset,
+.shared-filter-modal__fieldset {
+  padding: unset;
+}
+
+.cdc-open-viz-module .shared-filter-modal__fieldset span.edit-label,
+.cove .shared-filter-modal__fieldset span.edit-label,
+.shared-filter-modal__fieldset span.edit-label {
+  display: block;
+  font-size: 0.75rem;
+  margin-bottom: 2px;
+  width: 100%;
+}
+
+.cdc-open-viz-module .shared-filter-modal__fieldset label,
+.cove .shared-filter-modal__fieldset label,
+.shared-filter-modal__fieldset label {
+  display: flex !important;
+  flex-wrap: wrap !important;
+}
+
+.cdc-open-viz-module .shared-filter-modal__fieldset h2,
+.cove .shared-filter-modal__fieldset h2,
+.shared-filter-modal__fieldset h2 {
+  margin: unset;
+}
+
+.cdc-open-viz-module .shared-filter-modal__fieldset select,
+.cove .shared-filter-modal__fieldset select,
+.shared-filter-modal__fieldset select {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.cdc-open-viz-module .shared-filter-modal__right-buttons,
+.cove .shared-filter-modal__right-buttons,
+.shared-filter-modal__right-buttons {
+  float: right;
+  overflow: auto;
+}
+
+.cdc-open-viz-module .shared-filter-modal__right-buttons::after,
+.cove .shared-filter-modal__right-buttons::after,
+.shared-filter-modal__right-buttons::after {
+  content: '';
+  clear: both;
+  display: table;
+}
+
+.cdc-open-viz-module .shared-filter-modal .btn--submit,
+.cdc-open-viz-module .shared-filter-modal .btn--warn,
+.cdc-open-viz-module .shared-filter-modal .btn--cancel,
+.cove .shared-filter-modal .btn--submit,
+.cove .shared-filter-modal .btn--warn,
+.cove .shared-filter-modal .btn--cancel,
+.shared-filter-modal .btn--submit,
+.shared-filter-modal .btn--warn,
+.shared-filter-modal .btn--cancel {
+  border-radius: 3px;
+}

@@ -2,7 +2,7 @@ import { useContext, useRef, useEffect } from 'react'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
 
-import './index.scss'
+import './index.css'
 import MultiConfigTabs from '../MultiConfigTabs'
 import { Tab } from '../../types/Tab'
 import _ from 'lodash'

@@ -7,7 +7,7 @@ import { Group } from '@visx/group'
 import { Text } from '@visx/text'
 
 // Cdc
-import './../sankey.scss'
+import './../sankey.css'
 import 'react-tooltip/dist/react-tooltip.css'
 import ConfigContext from '../../../ConfigContext'
 import type { ChartContext } from '../../../types/ChartContext'

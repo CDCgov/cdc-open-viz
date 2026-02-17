@@ -11,7 +11,7 @@ import _ from 'lodash'
 // types
 import { type PanelProps } from './../PanelProps'
 // styles
-import './../panels.scss'
+import './../panels.css'
 
 const PanelAnnotate: React.FC<PanelProps> = props => {
   const { updateConfig, config, transformedData } = useContext(ConfigContext)
