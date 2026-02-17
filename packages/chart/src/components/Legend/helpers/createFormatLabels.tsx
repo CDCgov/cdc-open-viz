@@ -342,6 +342,19 @@ export const createFormatLabels =
       return reverseLabels(seriesLabels)
     }
 
+    // For Radar charts, use the entity names from runtime.seriesKeys (set from xAxis.dataKey values)
+    // not the series names (which are the dimension keys)
+    if (visualizationType === 'Radar') {
+      const entityNames = runtime.seriesKeys || []
+      const radarLabels = entityNames.map((val, i) => ({
+        datum: val,
+        index: i,
+        text: String(val),
+        value: colorScale(val)
+      }))
+      return reverseLabels(radarLabels)
+    }
+
     if (config.series.some(item => item.name)) {
       const uniqueLabels = Array.from(new Set(config.series.map(d => d.name || d.dataKey))).map((val, i) => ({
         datum: val,

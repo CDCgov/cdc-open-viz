@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import DataBite from '../CdcDataBite'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof DataBite> = {
   title: 'Components/Templates/Data Bite',
@@ -21,24 +22,36 @@ type Story = StoryObj<typeof DataBite>
 export const Data_Bite_Circle_Average: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Data_Bite_Circle_Average.json'
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
 export const Data_Bite_Text_Max_Pic: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Data_Bite_Text_Max_Pic.json'
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
 export const Data_Bite_Circle_Sum: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Data_Bite_Circle_Sum.json'
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
 export const Data_Bite_Text_Average_Pic: Story = {
   args: {
     configUrl: 'https://www.cdc.gov/wcms/4.0/cdc-wp/data-presentation/examples/Data_Bite_Text_Average_Pic.json'
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -53,6 +66,9 @@ export const Data_Bite_TP5_Style: Story = {
           'TP5 Style - A new layout style that displays the data value and message side by side, centered. The title appears above, and subtext appears below the message. On mobile devices, the message wraps below the data value. This style mimics the CDC Template Package 5.0 callout component design.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -67,6 +83,9 @@ export const Data_Bite_TP5_White_Background: Story = {
           'TP5 Style with White Background - This variant uses a white background with a 1px border and 6px border radius, providing a cleaner look while maintaining the TP5 layout style.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -83,5 +102,8 @@ export const Editor_Mode_Basic: Story = {
           'Basic editor mode rendering. For comprehensive editor testing with interactions, see "Data Bite/Editor Tests" stories.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }

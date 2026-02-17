@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChart'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Regions/Categorical',
@@ -70,6 +71,9 @@ export const Line_Fixed_From_Fixed_To: Story = {
       ]
     },
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -92,6 +96,9 @@ export const Line_Fixed_From_Last_Date: Story = {
       ]
     },
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -118,6 +125,9 @@ export const Bar_Fixed_From_Fixed_To: Story = {
       ]
     },
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -142,6 +152,9 @@ export const Bar_Fixed_From_Last_Date: Story = {
       ]
     },
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 

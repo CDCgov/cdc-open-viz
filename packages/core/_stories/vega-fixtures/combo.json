@@ -1,0 +1,68 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+  "description": "Plot showing average data with raw values in the background.",
+  "data": {
+    "values": [
+      {
+        "category": "A",
+        "bar_amount": 100,
+        "bar_amount2": 200,
+        "line_amount": 22
+      },
+      {
+        "category": "B",
+        "bar_amount": 30,
+        "bar_amount2": 200,
+        "line_amount": 52
+      },
+      {
+        "category": "C",
+        "bar_amount": 10,
+        "bar_amount2": 11,
+        "line_amount": 82
+      }
+    ]
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "bar"
+      },
+      "encoding": {
+        "x": {
+          "field": "category"
+        },
+        "y": {
+          "field": "bar_amount",
+          "type": "quantitative"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "area"
+      },
+      "encoding": {
+        "x": {
+          "field": "category"
+        },
+        "y": {
+          "field": "bar_amount2",
+          "type": "quantitative"
+        }
+      }
+    },
+    {
+      "mark": "line",
+      "encoding": {
+        "x": {
+          "field": "category"
+        },
+        "y": {
+          "field": "line_amount",
+          "type": "quantitative"
+        }
+      }
+    }
+  ]
+}

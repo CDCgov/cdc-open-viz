@@ -146,6 +146,11 @@
       cursor: pointer;
       transition: 0.2s all;
 
+      &.not-clickable,
+      &.not-clickable .legend-item {
+        cursor: default;
+      }
+
       &.inactive {
         opacity: 0.5;
         transition: 0.2s all;

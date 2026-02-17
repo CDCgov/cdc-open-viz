@@ -1,31 +1,55 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { generateEmbedCode } from '../../helpers/embedCodeGenerator'
+import {
+  generateEmbedCode,
+  extractFilters,
+  initializeFilterState,
+  buildFilterUrlParams,
+  type FilterMetadata,
+  type FilterState
+} from '../../helpers/embed'
+import '../../helpers/embed' // Initialize embed helper for iframe resizing
 
 type EmbedEditorProps = {
   config?: any // Current visualization config
 }
 
+type TabId = 'preview' | 'code'
+
 /**
  * EmbedEditor - Provides "Share with Partners" functionality
  * Generates embed codes for iframe embedding of visualizations
+ * Now includes filter customization, preview, and embed code generation
  */
 export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
   const [configUrl, setConfigUrl] = useState<string | null>(null)
   const [showEmbedModal, setShowEmbedModal] = useState(false)
-  const [embedCode, setEmbedCode] = useState('')
-  const [embedCodeCopied, setEmbedCodeCopied] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
+  const [activeTab, setActiveTab] = useState<TabId>('preview')
+  const [embedCodeCopied, setEmbedCodeCopied] = useState(false)
+
+  // Extract filters from config
+  const filters = useMemo(() => extractFilters(config), [config])
+
+  // Initialize filter state
+  const [filterState, setFilterState] = useState<Record<string, FilterState>>({})
+
+  // Update filter state when filters change
+  useEffect(() => {
+    if (filters.length > 0) {
+      setFilterState(initializeFilterState(filters))
+    }
+  }, [filters])
 
   // Check if all filters have setByQueryParameter
   const filtersAreValid = useMemo(() => {
     if (!config) return true
 
     // Check regular filters
-    const filters = config.filters || []
+    const regularFilters = config.filters || []
     // Check dashboard shared filters
     const sharedFilters = config.dashboard?.sharedFilters || []
 
-    const allFilters = [...filters, ...sharedFilters]
+    const allFilters = [...regularFilters, ...sharedFilters]
 
     // If no filters, valid
     if (allFilters.length === 0) return true
@@ -33,6 +57,20 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
     // All filters must have setByQueryParameter
     return allFilters.every((filter: any) => !!filter.setByQueryParameter)
   }, [config])
+
+  // Determine if we have valid filters to show
+  const hasFilters = filters.length > 0 && filtersAreValid
+
+  // Generate embed code with current filter settings
+  const embedCode = useMemo(() => {
+    if (!configUrl) return ''
+
+    const urlParams = buildFilterUrlParams(filters, filterState)
+    return generateEmbedCode({
+      configUrl,
+      urlParams
+    })
+  }, [configUrl, filters, filterState])
 
   // Detect configUrl from WCMS permalink or use dev fallback
   useEffect(() => {
@@ -74,10 +112,31 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
       return
     }
 
-    const code = generateEmbedCode({ configUrl })
-    setEmbedCode(code)
+    setActiveTab('preview')
     setShowEmbedModal(true)
     setEmbedCodeCopied(false)
+  }
+
+  // Handle filter value change
+  const handleFilterChange = (filterKey: string, value: string) => {
+    setFilterState(prev => ({
+      ...prev,
+      [filterKey]: {
+        ...prev[filterKey],
+        value
+      }
+    }))
+  }
+
+  // Handle filter hide toggle
+  const handleHideToggle = (filterKey: string, hide: boolean) => {
+    setFilterState(prev => ({
+      ...prev,
+      [filterKey]: {
+        ...prev[filterKey],
+        hide
+      }
+    }))
   }
 
   // Handle copying embed code from modal
@@ -97,9 +156,6 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
     setShowEmbedModal(false)
     setEmbedCodeCopied(false)
   }
-
-  // Hide embed section until released
-  return null
 
   return (
     <>
@@ -155,8 +211,7 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
             ) : (
               <>
                 <p style={{ fontSize: '0.85em', marginBottom: '1em', color: '#666' }}>
-                  Generate embed codes for partners to add this visualization to their websites. Your visualization will
-                  need to be published to Link (www.cdc.gov) before it can be embedded by a partner.
+                  Generate embed codes for partners to add this visualization to their website.
                 </p>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
@@ -174,7 +229,7 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
         )}
       </div>
 
-      {/* Embed Code Modal */}
+      {/* Embed Code Modal with Tabs */}
       {showEmbedModal && (
         <div
           className='modal-overlay'
@@ -186,8 +241,9 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
             bottom: 0,
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
             display: 'flex',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             justifyContent: 'center',
+            paddingTop: '5vh',
             zIndex: 9999
           }}
           onClick={handleCloseModal}
@@ -198,12 +254,16 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
               backgroundColor: 'white',
               borderRadius: '8px',
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-              maxWidth: '600px',
+              maxWidth: '800px',
               width: '90%',
-              margin: '20px'
+              maxHeight: '90vh',
+              margin: '20px',
+              display: 'flex',
+              flexDirection: 'column'
             }}
             onClick={e => e.stopPropagation()}
           >
+            {/* Modal Header */}
             <div
               className='modal-header'
               style={{
@@ -216,7 +276,7 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
                 borderRadius: '8px 8px 0 0'
               }}
             >
-              <h3 style={{ color: 'white', margin: 0 }}>Embed Code</h3>
+              <h3 style={{ color: 'white', margin: 0 }}>Share with Partners</h3>
               <button
                 onClick={handleCloseModal}
                 style={{
@@ -234,26 +294,196 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
               </button>
             </div>
 
-            <div className='modal-body' style={{ padding: '20px' }}>
-              <p style={{ marginBottom: '10px', color: '#666' }}>Copy this code and paste it into your website:</p>
-              <textarea
-                readOnly
-                value={embedCode}
-                style={{
-                  width: '100%',
-                  height: '180px',
-                  fontFamily: 'monospace',
-                  fontSize: '0.85em',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  resize: 'vertical',
-                  boxSizing: 'border-box'
-                }}
-                onFocus={e => e.target.select()}
-              />
+            {/* Tab Navigation */}
+            <div
+              style={{
+                display: 'flex',
+                borderBottom: '1px solid #e0e0e0',
+                backgroundColor: '#f5f5f5'
+              }}
+            >
+              {(['preview', 'code'] as TabId[]).map(tab => {
+                const tabLabels: Record<TabId, string> = {
+                  preview: 'Preview Visualization',
+                  code: 'Get Embed Code'
+                }
+
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    style={{
+                      flex: 1,
+                      padding: '12px 16px',
+                      border: 'none',
+                      backgroundColor: activeTab === tab ? 'white' : 'transparent',
+                      borderBottom: activeTab === tab ? '2px solid #005eaa' : '2px solid transparent',
+                      color: activeTab === tab ? '#005eaa' : '#666',
+                      fontWeight: activeTab === tab ? 'bold' : 'normal',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    {tabLabels[tab]}
+                  </button>
+                )
+              })}
             </div>
 
+            {/* Tab Content */}
+            <div
+              className='modal-body'
+              style={{
+                padding: '20px',
+                flex: 1,
+                overflow: 'auto'
+              }}
+            >
+              {/* Preview Tab - Contains filter controls (if filters exist) and preview */}
+              {activeTab === 'preview' && (
+                <div>
+                  {/* Filter Settings - only shown if there are valid filters */}
+                  {hasFilters && (
+                    <>
+                      <h4 style={{ marginTop: 0, marginBottom: '1rem' }}>Filter Settings</h4>
+                      <p style={{ marginBottom: '1rem', color: '#666' }}>
+                        Set default values and visibility for filters in the partner's embedded visualization.
+                      </p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+                        {filters.map((filter, index) => {
+                          const state = filterState[filter.key] || { value: '', hide: false }
+                          const hasValues = filter.values && filter.values.length > 0
+
+                          return (
+                            <div
+                              key={filter.key || index}
+                              style={{
+                                padding: '1rem',
+                                background: 'white',
+                                border: '1px solid #ddd',
+                                borderRadius: '4px'
+                              }}
+                            >
+                              <label
+                                htmlFor={`filter-${index}`}
+                                style={{
+                                  display: 'block',
+                                  marginBottom: '0.5rem',
+                                  fontWeight: 'bold'
+                                }}
+                              >
+                                {filter.label}
+                              </label>
+
+                              {hasValues ? (
+                                <select
+                                  id={`filter-${index}`}
+                                  value={state.value}
+                                  onChange={e => handleFilterChange(filter.key, e.target.value)}
+                                  style={{
+                                    width: '100%',
+                                    padding: '0.5rem',
+                                    fontSize: '0.9rem',
+                                    border: '2px solid #d1d5db',
+                                    borderRadius: '6px',
+                                    backgroundColor: '#f9fafb',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  {filter.values?.map((value, valueIndex) => (
+                                    <option key={valueIndex} value={value}>
+                                      {value}
+                                    </option>
+                                  ))}
+                                </select>
+                              ) : (
+                                <div style={{ color: '#999', fontStyle: 'italic' }}>No values available</div>
+                              )}
+
+                              <div style={{ marginTop: '0.75rem' }}>
+                                <label
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    cursor: 'pointer',
+                                    fontWeight: 'normal'
+                                  }}
+                                >
+                                  <input
+                                    type='checkbox'
+                                    checked={state.hide}
+                                    onChange={e => handleHideToggle(filter.key, e.target.checked)}
+                                    style={{ marginRight: '0.5rem' }}
+                                  />
+                                  <span style={{ color: '#666' }}>Hide filter in embed</span>
+                                </label>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </>
+                  )}
+
+                  {/* Preview Section - title only shown if there are filters */}
+                  {hasFilters && <h4 style={{ marginBottom: '1rem' }}>Preview</h4>}
+                  <p style={{ marginBottom: '1rem', color: '#666' }}>
+                    This shows how the visualization will appear on the partner website
+                    {hasFilters ? ' with your selected settings' : ''}. The partner will have control over the width of
+                    the embedded visualization. If you do not see the latest version of the visualization, save it and
+                    reopen this popup.
+                  </p>
+                  <div
+                    style={{
+                      border: '2px dashed #999',
+                      borderRadius: '4px',
+                      padding: '1rem'
+                    }}
+                  >
+                    <div
+                      key={`${configUrl}-${JSON.stringify(filterState)}`}
+                      data-cove-embed
+                      data-config-url={(() => {
+                        const urlParams = buildFilterUrlParams(filters, filterState)
+                        const params = new URLSearchParams()
+                        Object.entries(urlParams).forEach(([key, value]) => {
+                          if (value) params.set(key, value)
+                        })
+                        return params.toString() ? `${configUrl}?${params.toString()}` : configUrl || ''
+                      })()}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Embed Code Tab */}
+              {activeTab === 'code' && (
+                <div>
+                  <p style={{ marginBottom: '10px', color: '#666' }}>
+                    Copy this code and send it to a partner so they can add it to their site. Your visualization will
+                    need to be published to Link (www.cdc.gov) before it can be embedded by a partner.
+                  </p>
+                  <textarea
+                    readOnly
+                    value={embedCode}
+                    style={{
+                      width: '100%',
+                      height: '200px',
+                      fontFamily: 'monospace',
+                      fontSize: '0.85em',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      resize: 'vertical',
+                      boxSizing: 'border-box'
+                    }}
+                    onFocus={e => e.target.select()}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
             <div
               className='modal-footer'
               style={{
@@ -267,9 +497,11 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
               <button className='btn btn-secondary' onClick={handleCloseModal}>
                 Close
               </button>
-              <button className='btn btn-primary' onClick={handleCopyFromModal} style={{ minWidth: '120px' }}>
-                {embedCodeCopied ? '✓ Copied!' : 'Copy to Clipboard'}
-              </button>
+              {activeTab === 'code' && (
+                <button className='btn btn-primary' onClick={handleCopyFromModal} style={{ minWidth: '120px' }}>
+                  {embedCodeCopied ? '✓ Copied!' : 'Copy to Clipboard'}
+                </button>
+              )}
             </div>
           </div>
         </div>

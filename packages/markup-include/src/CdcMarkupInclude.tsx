@@ -124,7 +124,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
       processedConfig.filters = addValuesToFilters(processedConfig.filters, responseData)
     }
 
-    updateConfig({ ...configObj, ...processedConfig })
+    updateConfig({ ...defaults, ...processedConfig })
     dispatch({ type: 'SET_LOADING', payload: false })
   }
 

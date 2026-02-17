@@ -18,6 +18,8 @@ import { MapConfig } from '../../../types/MapConfig'
 import { DEFAULT_MAP_BACKGROUND, DISABLED_MAP_COLOR } from '../../../helpers/constants'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { createCanvasPattern, PatternType } from '../../../helpers/createCanvasPattern'
+import { getPatternForRow } from '../../../helpers/getPatternForRow'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -201,6 +203,12 @@ const CountyMap = () => {
 
   const resetButton = useRef()
   const canvasRef = useRef()
+  const patternCacheRef = useRef<Map<string, CanvasPattern | null>>(new Map())
+
+  // Clear pattern cache when pattern configuration changes
+  useEffect(() => {
+    patternCacheRef.current.clear()
+  }, [config.map?.patterns])
 
   // If runtimeData is not defined, show loader
   if (!runtimeData || !isTopoReady(topoData, config, runtimeFilters)) {
@@ -631,6 +639,48 @@ const CountyMap = () => {
         context.beginPath()
         path(geo)
         context.fill()
+
+        // Apply patterns if configured
+        if (config.map?.patterns?.length > 0 && geoData) {
+          const patternInfo = getPatternForRow(geoData, config)
+
+          if (patternInfo) {
+            const { pattern, size, color } = patternInfo
+            const patternColor = color || '#000000'
+            const patternSize = size || 'medium'
+
+            // Create cache key
+            const cacheKey = `${pattern}-${patternColor}-${patternSize}`
+
+            // Get from cache or create new pattern
+            let canvasPattern = patternCacheRef.current.get(cacheKey)
+            if (!canvasPattern) {
+              // Get stroke width for lines pattern (matching state map logic)
+              const mapWidth = canvas.width
+              const strokeWidth = mapWidth < 200 ? 1.75 : mapWidth < 375 ? 1.25 : 0.75
+
+              canvasPattern = createCanvasPattern(
+                pattern as PatternType,
+                patternColor,
+                patternSize as 'small' | 'medium' | 'large',
+                strokeWidth
+              )
+
+              if (canvasPattern) {
+                patternCacheRef.current.set(cacheKey, canvasPattern)
+              }
+            }
+
+            // Apply pattern
+            if (canvasPattern) {
+              context.fillStyle = canvasPattern
+              context.beginPath()
+              path(geo)
+              context.fill()
+            }
+          }
+        }
+
         context.stroke()
       })
 

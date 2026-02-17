@@ -14,6 +14,7 @@ import pieCalculatedArea from './_mock/pie_calculated_area.json'
 import areaChartStacked from './_mock/area_chart_stacked.json'
 import multipleLines from './_mock/short_dates.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart',
@@ -26,18 +27,27 @@ export const line_Chart_Two_Points_Regression_Test: Story = {
   args: {
     config: lineChartTwoPointsRegressionTest,
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 export const line_Chart_Two_Points_New_Chart: Story = {
   args: {
     config: lineChartTwoPointsNewChart,
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
 export const multiple_lines: Story = {
   args: {
     config: editConfigKeys(multipleLines, [{ path: ['tooltips', 'dateDisplayFormat'], value: '%b. %d %Y' }])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -45,18 +55,27 @@ export const Lollipop: Story = {
   args: {
     config: lollipop,
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
 export const Forest_Plot: Story = {
   args: {
     config: forestPlot
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
 export const Horizontal_Bar: Story = {
   args: {
     config: horizontalBarConfig
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -64,12 +83,18 @@ export const Horizontal_Bars_Dynamic_Y_Axis: Story = {
   args: {
     config: horizontalBarsDynamicYAxis,
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
 export const BarChart_Labels: Story = {
   args: {
     config: barChartLabels
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -77,12 +102,18 @@ export const Pie: Story = {
   args: {
     config: pieConfig,
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 export const Pie_Calculated_Area: Story = {
   args: {
     config: pieCalculatedArea,
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -90,6 +121,9 @@ export const Paired_Bar: Story = {
   args: {
     config: pairedBar,
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -97,6 +131,9 @@ export const Area_Chart_stacked: Story = {
   args: {
     config: areaChartStacked,
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 

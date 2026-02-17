@@ -1,7 +1,7 @@
 // embed.test.ts
 
 import { expect, describe, it } from 'vitest'
-import { isValidMessageOrigin } from '../shared/urlValidation'
+import { isValidMessageOrigin } from '@cdc/core/helpers/embed/urlValidation'
 
 describe('URL Validation', () => {
   describe('configUrl validation logic', () => {

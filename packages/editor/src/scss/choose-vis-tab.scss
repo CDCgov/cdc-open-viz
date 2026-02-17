@@ -14,7 +14,7 @@
     display: grid;
     gap: 1em;
     &.category_general {
-      grid-template-columns: repeat(5, 160px);
+      grid-template-columns: repeat(6, 160px);
     }
     &.category_charts {
       grid-template-columns: repeat(7, 160px);

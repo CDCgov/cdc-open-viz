@@ -1,6 +1,5 @@
-.cdc-open-viz-module {
+.cdc-open-viz-module.type-chart {
   .annotation__dropdown-list {
-    border: 1px solid red;
     list-style: none;
   }
 

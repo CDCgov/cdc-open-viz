@@ -115,18 +115,32 @@ type MapStory = StoryObj<typeof CdcMap>
 type ChartStory = StoryObj<typeof Chart>
 type DashboardStory = StoryObj<typeof Dashboard>
 
-// Helper function to test map rendering
+// Helper function to test map rendering (supports both SVG and canvas-based maps)
 const testMapRendering = async (canvasElement: HTMLElement, storyName: string) => {
-  const canvas = within(canvasElement)
-
   await step('Wait for map to render', async () => {
-    const mapElement = await canvas.findByRole('img', { hidden: true }, { timeout: 10000 })
-    expect(mapElement).toBeInTheDocument()
+    await new Promise<void>((resolve, reject) => {
+      const startTime = Date.now()
+      const timeout = 15000
+
+      const checkMap = () => {
+        const svgMap = canvasElement.querySelector('svg[role="img"]')
+        const canvasMap = canvasElement.querySelector('canvas')
+        if (svgMap || canvasMap) {
+          resolve()
+        } else if (Date.now() - startTime > timeout) {
+          reject(new Error(`Timeout: No map element (svg or canvas) found after ${timeout}ms`))
+        } else {
+          setTimeout(checkMap, 100)
+        }
+      }
+      checkMap()
+    })
   })
 
-  await step('Verify SVG element is present', async () => {
-    const svgElement = canvasElement.querySelector('svg')
-    expect(svgElement).toBeInTheDocument()
+  await step('Verify map visualization is present', async () => {
+    const svgMap = canvasElement.querySelector('svg[role="img"]')
+    const canvasMap = canvasElement.querySelector('canvas')
+    expect(svgMap || canvasMap).toBeTruthy()
   })
 
   await step('Verify COVE module wrapper is present', async () => {
@@ -167,7 +181,7 @@ const testDashboardRendering = async (canvasElement: HTMLElement, storyName: str
       const timeout = 15000
 
       const checkDashboard = () => {
-        const dashboardElement = canvasElement.querySelector('.cove-dashboard')
+        const dashboardElement = canvasElement.querySelector('.type-dashboard')
         if (dashboardElement) {
           resolve()
         } else if (Date.now() - startTime > timeout) {
@@ -181,7 +195,7 @@ const testDashboardRendering = async (canvasElement: HTMLElement, storyName: str
   })
 
   await step('Verify dashboard wrapper is present', async () => {
-    const dashboard = canvasElement.querySelector('.cove-dashboard')
+    const dashboard = canvasElement.querySelector('.type-dashboard')
     expect(dashboard).toBeInTheDocument()
   })
 
@@ -289,14 +303,14 @@ export const COVID_Time_Period_Map: MapStory = {
  *
  * COVID-19 wastewater data visualization by state.
  */
-export const COVID_State_Level: ChartStory = {
+export const COVID_State_Level: MapStory = {
   render: () => {
     const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidStateLevel)
     if (!config) return <div>Loading...</div>
-    return <Chart config={config} />
+    return <CdcMap config={config} />
   },
   play: async ({ canvasElement }) => {
-    await testChartRendering(canvasElement, 'COVID State Level')
+    await testMapRendering(canvasElement, 'COVID State Level')
   }
 }
 
@@ -325,10 +339,10 @@ export const COVID_State_Level_Rest: ChartStory = {
   render: () => {
     const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidStateLevelRest)
     if (!config) return <div>Loading...</div>
-    return <Chart config={config} />
+    return <Dashboard config={config} />
   },
   play: async ({ canvasElement }) => {
-    await testChartRendering(canvasElement, 'COVID State Level Rest')
+    await testDashboardRendering(canvasElement, 'COVID State Level Rest')
   }
 }
 
@@ -365,50 +379,50 @@ export const All_Wastewater_Visualizations: StoryObj = {
     }
 
     return (
-      <div className="container-fluid p-4">
-        <h1 className="mb-4">NWSS - All Wastewater Visualizations</h1>
+      <div className='container-fluid p-4'>
+        <h1 className='mb-4'>NWSS - All Wastewater Visualizations</h1>
 
-        <section className="mb-5">
+        <section className='mb-5'>
           <h2>NWSS Home Page</h2>
           <Dashboard config={homePageConfig} />
         </section>
 
-        <section className="mb-5">
+        <section className='mb-5'>
           <h2>Measles - Summary Modules</h2>
           <Dashboard config={measlesTopConfig} />
         </section>
 
-        <section className="mb-5">
+        <section className='mb-5'>
           <h2>Measles - US Map</h2>
           <CdcMap config={measlesMapConfig} />
         </section>
 
-        <section className="mb-5">
+        <section className='mb-5'>
           <h2>Measles - Time Period</h2>
           <Dashboard config={measlesTimePeriodConfig} />
         </section>
 
-        <section className="mb-5">
+        <section className='mb-5'>
           <h2>COVID-19 - Summary Modules</h2>
           <Dashboard config={covidTopConfig} />
         </section>
 
-        <section className="mb-5">
+        <section className='mb-5'>
           <h2>COVID-19 - State Map</h2>
           <CdcMap config={covidMapConfig} />
         </section>
 
-        <section className="mb-5">
+        <section className='mb-5'>
           <h2>COVID-19 - State Level Data</h2>
           <Chart config={covidStateLevelConfig} />
         </section>
 
-        <section className="mb-5">
+        <section className='mb-5'>
           <h2>COVID-19 - National and Regional Trends</h2>
           <Chart config={covidNationalRegionalConfig} />
         </section>
 
-        <section className="mb-5">
+        <section className='mb-5'>
           <h2>COVID-19 - State Trends</h2>
           <Chart config={covidStateRestConfig} />
         </section>

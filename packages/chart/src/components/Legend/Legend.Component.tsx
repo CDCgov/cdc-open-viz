@@ -1,5 +1,5 @@
 import parse from 'html-react-parser'
-import React from 'react'
+import React, { useMemo } from 'react'
 import { LegendOrdinal, LegendItem, LegendLabel } from '@visx/legend'
 import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import LegendShape from '@cdc/core/components/LegendShape'
@@ -17,6 +17,8 @@ import { DimensionsType } from '@cdc/core/types/Dimensions'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import LegendLineShape from './LegendLine.Shape'
 import LegendGroup from './LegendGroup'
+import LegendValueRange from './LegendValueRange'
+import { getHorizonLayerColors, getHorizonMaxValue } from '../../components/HorizonChart/helpers/getHorizonLayerColors'
 import { getSeriesWithData } from '../../helpers/dataHelpers'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
@@ -28,6 +30,7 @@ interface LegendProps {
   config: ChartConfig
   currentViewport: ViewportSize
   formatLabels: (labels: Label[]) => Label[]
+  formatNumber?: (value: number, axis?: string) => string
   highlight: Function
   handleShowAll: Function
   ref: React.Ref<() => void>
@@ -48,6 +51,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
       handleShowAll,
       currentViewport,
       formatLabels,
+      formatNumber,
       skipId = 'legend',
       dimensions,
       transformedData: data,
@@ -60,7 +64,10 @@ const Legend: React.FC<LegendProps> = forwardRef(
     const { series } = runtime
 
     const seriesWithData = getSeriesWithData(config)
-    const dontFilterLegendItems = !series.length || legend.unified || !seriesWithData.length
+    // For Radar charts, seriesWithData contains dimension keys but legend shows entity names
+    // so we skip the series filter for radar charts
+    const isRadarChart = config.visualizationType === 'Radar'
+    const dontFilterLegendItems = !series.length || legend.unified || !seriesWithData.length || isRadarChart
 
     const isLegendBottom =
       legend?.position === 'bottom' ||
@@ -73,6 +80,29 @@ const Legend: React.FC<LegendProps> = forwardRef(
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
     let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
+
+    const horizonLegendData = useMemo(() => {
+      if (config.visualizationType !== 'Horizon Chart') {
+        return null
+      }
+      const numLayers = config.horizon?.numLayers || 4
+      const runtimeSeriesKeys = config.runtime?.seriesKeys
+      const seriesKeys =
+        (Array.isArray(runtimeSeriesKeys) && runtimeSeriesKeys.length > 0
+          ? runtimeSeriesKeys
+          : config.series?.map(s => s.dataKey)) || []
+      const maxValue = getHorizonMaxValue(data, seriesKeys)
+      const layerColors = getHorizonLayerColors(config, numLayers)
+
+      return { numLayers, maxValue, layerColors }
+    }, [
+      config.visualizationType,
+      config.horizon?.numLayers,
+      config.runtime?.seriesKeys,
+      config.series,
+      config.general?.palette?.name,
+      data
+    ])
 
     if (!legend) return null
     return (
@@ -98,6 +128,20 @@ const Legend: React.FC<LegendProps> = forwardRef(
           parentPaddingToSubtract={legend.hideBorder ? 0 : LEGEND_PADDING}
         />
         <LegendGroup formatLabels={formatLabels} />
+
+        {/* Value Range Legend for Horizon Chart (and future chart types) */}
+        {horizonLegendData && (
+          <LegendValueRange
+            maxValue={horizonLegendData.maxValue}
+            numRanges={horizonLegendData.numLayers}
+            colors={horizonLegendData.layerColors}
+            formatNumber={formatNumber}
+            innerClasses={innerClasses}
+            shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
+            onClick={undefined}
+            reverseLabelOrder={config.legend.reverseLabelOrder}
+          />
+        )}
 
         <LegendOrdinal scale={colorScale} itemDirection='row' labelMargin='0 20px 0 0' shapeMargin='0 10px 0'>
           {labels => {
@@ -130,8 +174,12 @@ const Legend: React.FC<LegendProps> = forwardRef(
                         } else className.push('highlighted')
                       }
 
-                      if (config.legend.style === 'gradient' || config.legend.groupBy) {
-                        return <></>
+                      if (
+                        config.legend.style === 'gradient' ||
+                        config.legend.groupBy ||
+                        config.visualizationType === 'Horizon Chart'
+                      ) {
+                        return null
                       }
 
                       return (

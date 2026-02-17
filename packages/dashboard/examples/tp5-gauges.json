@@ -1,0 +1,196 @@
+{
+  "type": "dashboard",
+  "title": "TP5 Gauge Dashboard Example",
+  "description": "Three TP5 Gauge charts displaying health metrics",
+  "data": [
+    {
+      "Category": "Adults",
+      "Vaccination Rate": "68.5",
+      "Insured Rate": "87.2",
+      "Screening Rate": "72.8"
+    },
+    {
+      "Category": "Seniors",
+      "Vaccination Rate": "82.3",
+      "Insured Rate": "95.1",
+      "Screening Rate": "84.6"
+    },
+    {
+      "Category": "Youth",
+      "Vaccination Rate": "54.2",
+      "Insured Rate": "92.4",
+      "Screening Rate": "65.3"
+    }
+  ],
+  "dashboard": {
+    "filters": []
+  },
+  "rows": [
+    [
+      { "width": 4, "widget": "gauge1" },
+      { "width": 4, "widget": "gauge2" },
+      { "width": 4, "widget": "gauge3" }
+    ]
+  ],
+  "visualizations": {
+    "gauge1": {
+      "uid": "gauge1",
+      "type": "waffle-chart",
+      "title": "Vaccination Coverage",
+      "visualizationType": "TP5 Gauge",
+      "visualizationSubType": "linear",
+      "showPercent": true,
+      "showDenominator": false,
+      "valueDescription": "",
+      "content": "of the population is vaccinated against seasonal flu",
+      "subtext": "Based on 2024 CDC surveillance data across all age groups",
+      "dataColumn": "Vaccination Rate",
+      "dataFunction": "Mean (Average)",
+      "dataConditionalColumn": "",
+      "dataConditionalOperator": "",
+      "dataConditionalComparate": "",
+      "invalidComparate": false,
+      "customDenom": false,
+      "dataDenom": "100",
+      "dataDenomColumn": "",
+      "dataDenomFunction": "",
+      "prefix": "",
+      "suffix": "%",
+      "roundToPlace": "1",
+      "theme": "theme-blue",
+      "gauge": {
+        "height": 35,
+        "width": "100%"
+      },
+      "visual": {
+        "border": true,
+        "accent": false,
+        "background": false,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false,
+        "whiteBackground": false,
+        "colors": {
+          "theme-blue": "#005eaa",
+          "theme-purple": "#712177",
+          "theme-brown": "#705043",
+          "theme-teal": "#00695c",
+          "theme-pink": "#af4448",
+          "theme-orange": "#bb4d00",
+          "theme-slate": "#29434e",
+          "theme-indigo": "#26418f",
+          "theme-cyan": "#006778",
+          "theme-green": "#4b830d",
+          "theme-amber": "#fbab18"
+        }
+      },
+      "showTitle": true,
+      "overallFontSize": "medium"
+    },
+    "gauge2": {
+      "uid": "gauge2",
+      "type": "waffle-chart",
+      "title": "Health Insurance Coverage Rate",
+      "visualizationType": "TP5 Gauge",
+      "visualizationSubType": "linear",
+      "showPercent": true,
+      "showDenominator": false,
+      "valueDescription": "",
+      "content": "",
+      "subtext": "",
+      "dataColumn": "Insured Rate",
+      "dataFunction": "Mean (Average)",
+      "dataConditionalColumn": "",
+      "dataConditionalOperator": "",
+      "dataConditionalComparate": "",
+      "invalidComparate": false,
+      "customDenom": false,
+      "dataDenom": "100",
+      "dataDenomColumn": "",
+      "dataDenomFunction": "",
+      "prefix": "",
+      "suffix": "%",
+      "roundToPlace": "1",
+      "theme": "theme-teal",
+      "gauge": {
+        "height": 35,
+        "width": "100%"
+      },
+      "visual": {
+        "border": true,
+        "accent": false,
+        "background": false,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false,
+        "whiteBackground": false,
+        "colors": {
+          "theme-blue": "#005eaa",
+          "theme-purple": "#712177",
+          "theme-brown": "#705043",
+          "theme-teal": "#00695c",
+          "theme-pink": "#af4448",
+          "theme-orange": "#bb4d00",
+          "theme-slate": "#29434e",
+          "theme-indigo": "#26418f",
+          "theme-cyan": "#006778",
+          "theme-green": "#4b830d",
+          "theme-amber": "#fbab18"
+        }
+      },
+      "showTitle": true,
+      "overallFontSize": "medium"
+    },
+    "gauge3": {
+      "uid": "gauge3",
+      "type": "waffle-chart",
+      "title": "Cancer Screening Completion",
+      "visualizationType": "TP5 Gauge",
+      "visualizationSubType": "linear",
+      "showPercent": true,
+      "showDenominator": false,
+      "valueDescription": "",
+      "content": "completed recommended cancer screenings including mammography, colonoscopy, and cervical cancer screening",
+      "subtext": "Data from National Health Interview Survey 2024",
+      "dataColumn": "Screening Rate",
+      "dataFunction": "Mean (Average)",
+      "dataConditionalColumn": "",
+      "dataConditionalOperator": "",
+      "dataConditionalComparate": "",
+      "invalidComparate": false,
+      "customDenom": false,
+      "dataDenom": "100",
+      "dataDenomColumn": "",
+      "dataDenomFunction": "",
+      "prefix": "",
+      "suffix": "%",
+      "roundToPlace": "1",
+      "theme": "theme-purple",
+      "gauge": {
+        "height": 35,
+        "width": "100%"
+      },
+      "visual": {
+        "border": true,
+        "accent": false,
+        "background": false,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false,
+        "whiteBackground": false,
+        "colors": {
+          "theme-blue": "#005eaa",
+          "theme-purple": "#712177",
+          "theme-brown": "#705043",
+          "theme-teal": "#00695c",
+          "theme-pink": "#af4448",
+          "theme-orange": "#bb4d00",
+          "theme-slate": "#29434e",
+          "theme-indigo": "#26418f",
+          "theme-cyan": "#006778",
+          "theme-green": "#4b830d",
+          "theme-amber": "#fbab18"
+        }
+      },
+      "showTitle": true,
+      "overallFontSize": "medium"
+    }
+  }
+}

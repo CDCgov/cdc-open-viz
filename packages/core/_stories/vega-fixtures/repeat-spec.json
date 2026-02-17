@@ -1,0 +1,47 @@
+{
+  "data": {
+    "values": [
+      {
+        "Title": "Movie 1",
+        "US Gross": 146083,
+        "Worldwide Gross": 146083,
+        "IMDB Rating": 6.1
+      },
+      {
+        "Title": "Movie 2",
+        "US Gross": 10876,
+        "Worldwide Gross": 10876,
+        "IMDB Rating": 6.9
+      },
+      {
+        "Title": "Movie 3",
+        "US Gross": 203134,
+        "Worldwide Gross": 203134,
+        "IMDB Rating": 6.8
+      }
+    ]
+  },
+  "repeat": {
+    "layer": ["US Gross", "Worldwide Gross"]
+  },
+  "spec": {
+    "mark": "line",
+    "encoding": {
+      "x": {
+        "bin": true,
+        "field": "IMDB Rating",
+        "type": "quantitative"
+      },
+      "y": {
+        "aggregate": "mean",
+        "field": { "repeat": "layer" },
+        "type": "quantitative",
+        "title": "Mean of US and Worldwide Gross"
+      },
+      "color": {
+        "datum": { "repeat": "layer" },
+        "type": "nominal"
+      }
+    }
+  }
+}

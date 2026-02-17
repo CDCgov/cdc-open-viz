@@ -14,10 +14,26 @@ import { setConfig } from 'dompurify'
 const PanelAnnotate: React.FC = props => {
   const { config, setConfig, dimensions, isDraggingAnnotation } = useContext<MapContext>(ConfigContext)
 
+  /**
+   * Get the current SVG/canvas dimensions for saving with annotations.
+   * Uses getBoundingClientRect for consistency with how annotations are rendered.
+   * Falls back to context dimensions if DOM query fails.
+   */
+  const getMapDimensions = (): [number, number] => {
+    const container = document
+      .querySelector('.map-container > section > svg, .map-container > section > canvas')
+      ?.getBoundingClientRect()
+    if (container && container.width > 0 && container.height > 0) {
+      return [container.width, container.height]
+    }
+    // Fallback to context dimensions
+    return dimensions as [number, number]
+  }
+
   const handleAnnotationUpdate = (value, property, index) => {
     const annotations = [...config?.annotations]
     annotations[index][property] = value
-    annotations[index].savedDimensions = [dimensions[0] * 0.73, dimensions[1]]
+    annotations[index].savedDimensions = getMapDimensions()
 
     setConfig({
       ...config,
@@ -26,14 +42,11 @@ const PanelAnnotate: React.FC = props => {
   }
 
   const handleAddAnnotation = () => {
-    const svgContainer = document
-      .querySelector('.map-container > section > svg, .map-container > section > canvas')
-      ?.getBoundingClientRect()
-    const newSvgDims = [svgContainer.width, svgContainer.height]
+    const newSvgDims = getMapDimensions()
 
     const newAnnotation = {
-      text: 'New Annotation',
-      snapToNearestPoint: false,
+      text: 'New annotation',
+      anchorMode: 'fixed',
       fontSize: 16,
       show: {
         desktop: true,
@@ -61,12 +74,10 @@ const PanelAnnotate: React.FC = props => {
       seriesKey: '',
       x: Number(newSvgDims?.[0]) / 2,
       y: Number(newSvgDims?.[1] / 2),
-      xKey: null,
-      yKey: null,
       dx: 0,
       dy: 0,
       opacity: '100',
-      savedDimensions: [dimensions[0] * 0.73, dimensions[1]]
+      savedDimensions: newSvgDims as [number, number]
     }
 
     const annotations = Array.isArray(config.annotations) ? config.annotations : []

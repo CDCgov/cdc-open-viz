@@ -1,0 +1,158 @@
+{
+  "title": "TP5 Gauge Chart",
+  "visualizationType": "TP5 Gauge",
+  "visualizationSubType": "linear",
+  "showPercent": true,
+  "showDenominator": true,
+  "valueDescription": "out of",
+  "content": "of cases occurred in the home",
+  "subtext": "Chart subtext or citation",
+  "orientation": "horizontal",
+  "data": [
+    {
+      "Insured Rate": "43",
+      "Coverage Status": "Insured",
+      "state": "Alabama",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Verified": true
+    },
+    {
+      "Insured Rate": "0",
+      "Coverage Status": "Uninsured",
+      "state": "Alaska",
+      "Year (Good filter option)": "2006",
+      "link": "",
+      "Verified": false
+    },
+    {
+      "Insured Rate": "72.7",
+      "Coverage Status": "Insured",
+      "state": "Arizona",
+      "Year (Good filter option)": "2008",
+      "link": "#lorem",
+      "Verified": true
+    },
+    {
+      "Insured Rate": "78.7",
+      "Coverage Status": "Insured",
+      "state": "Arkansas",
+      "Year (Good filter option)": "2010",
+      "link": "",
+      "Verified": true
+    },
+    {
+      "Insured Rate": "37.2",
+      "Coverage Status": "Insured",
+      "state": "California",
+      "Year (Good filter option)": "2018",
+      "link": "https://search.cdc.gov/search/?query=California&utf8=%E2%9C%93&affiliate=cdc-main",
+      "Verified": true
+    },
+    {
+      "Insured Rate": "50.6",
+      "Coverage Status": "Insured",
+      "state": "Colorado",
+      "Year (Good filter option)": "2014",
+      "link": "",
+      "Verified": false
+    },
+    {
+      "Insured Rate": "83.2",
+      "Coverage Status": "Insured",
+      "state": "Connecticut",
+      "Year (Good filter option)": "2019",
+      "link": "",
+      "Verified": true
+    },
+    {
+      "Insured Rate": "90",
+      "Coverage Status": "Insured",
+      "state": "Delaware",
+      "Year (Good filter option)": "2020",
+      "link": "",
+      "Verified": true
+    },
+    {
+      "Insured Rate": "77.1",
+      "Coverage Status": "Insured",
+      "state": "District of Columbia",
+      "Year (Good filter option)": "2019",
+      "link": "https://search.cdc.gov/search/index.html?query=Washington+D.C.&sitelimit=&utf8=%E2%9C%93&affiliate=cdc-main",
+      "Verified": false
+    },
+    {
+      "Insured Rate": "83",
+      "Coverage Status": "Insured",
+      "state": "Florida",
+      "Year (Good filter option)": "2016",
+      "link": "",
+      "Verified": true
+    },
+    {
+      "Insured Rate": "67.4",
+      "Coverage Status": "Insured",
+      "state": "Georgia",
+      "Year (Good filter option)": "2013",
+      "link": "",
+      "Verified": false
+    }
+  ],
+  "filters": [
+    {
+      "columnName": "Year (Good filter option)",
+      "label": "Year",
+      "showDropdown": true,
+      "order": "desc",
+      "active": true,
+      "values": [],
+      "type": "multi-select"
+    }
+  ],
+  "fontSize": "",
+  "overallFontSize": "medium",
+  "dataColumn": "Insured Rate",
+  "dataFunction": "Mean (Average)",
+  "dataConditionalColumn": "",
+  "dataConditionalOperator": "",
+  "dataConditionalComparate": "",
+  "invalidComparate": false,
+  "customDenom": false,
+  "dataDenom": "100",
+  "dataDenomColumn": "",
+  "dataDenomFunction": "",
+  "prefix": "",
+  "suffix": "%",
+  "roundToPlace": "0",
+  "shape": "circle",
+  "nodeWidth": "10",
+  "nodeSpacer": "2",
+  "theme": "theme-blue",
+  "type": "waffle-chart",
+  "gauge": {
+    "height": 35,
+    "width": "100%"
+  },
+  "visual": {
+    "border": true,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false,
+    "whiteBackground": false,
+    "colors": {
+      "theme-blue": "#005eaa",
+      "theme-purple": "#712177",
+      "theme-brown": "#705043",
+      "theme-teal": "#00695c",
+      "theme-pink": "#af4448",
+      "theme-orange": "#bb4d00",
+      "theme-slate": "#29434e",
+      "theme-indigo": "#26418f",
+      "theme-cyan": "#006778",
+      "theme-green": "#4b830d",
+      "theme-amber": "#fbab18"
+    }
+  },
+  "showTitle": true
+}

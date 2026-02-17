@@ -1,6 +1,7 @@
 import { Axis } from '@cdc/core/types/Axis'
 import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 import { type ForestPlotConfigSettings } from './ForestPlot'
+import { type HorizonConfigSettings } from './Horizon'
 import { type Column } from '@cdc/core/types/Column'
 import { type Series } from '@cdc/core/types/Series'
 import { Runtime } from '@cdc/core/types/Runtime'
@@ -18,6 +19,7 @@ type General = CoreGeneral & {
     customColors?: string[]
     customColorsOrdered?: string[]
   }
+  useIntelligentLineChartLabels?: boolean
 }
 import { type Link } from './../components/Sankey/types'
 import { type DataDescription } from '@cdc/core/types/DataDescription'
@@ -39,9 +41,11 @@ export type VisualizationType =
   | 'Box Plot'
   | 'Deviation Bar'
   | 'Forest Plot'
+  | 'Horizon Chart'
   | 'Line'
   | 'Paired Bar'
   | 'Pie'
+  | 'Radar'
   | 'Scatter Plot'
   | 'Spark Line'
   | 'Combo'
@@ -172,6 +176,7 @@ export type AllChartsConfig = {
     mobileVertical: number
   }
   highlightedBarValues: { value: any; color: string; borderWidth: number; legendLabel: string }[]
+  horizon?: HorizonConfigSettings
   introText: string
   isLollipopChart: boolean
   isLegendValue: boolean
@@ -266,6 +271,19 @@ export type AllChartsConfig = {
       inactive: string
       default: string
     }
+  }
+  radar?: {
+    gridRings: number
+    showGridRings: boolean
+    gridRingStyle: 'polygons' | 'circles'
+    scaleMin: number
+    scaleMax: number | string
+    showFill: boolean
+    fillOpacity: number
+    showPoints: boolean
+    pointRadius: number
+    strokeWidth: number
+    axisLabelOffset: number
   }
 } & MarkupConfig
 

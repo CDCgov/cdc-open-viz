@@ -1,0 +1,264 @@
+{
+  "type": "chart",
+  "title": "Line Chart - Quadrant Angle Testing",
+  "theme": "theme-blue",
+  "animate": false,
+  "fontSize": "medium",
+  "lineDatapointStyle": "always show",
+  "visualizationSubType": "regular",
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "yAxis": {
+    "hideAxis": false,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "68",
+    "gridLines": true,
+    "enablePadding": false,
+    "min": "0",
+    "max": "120",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "axisPadding": 0,
+    "scalePadding": 10,
+    "tickRotation": 0,
+    "label": "Value"
+  },
+  "topAxis": {
+    "hasLine": false
+  },
+  "height": "450",
+  "xAxis": {
+    "sortDates": false,
+    "type": "categorical",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "78",
+    "tickRotation": "0",
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "labelOffset": 0,
+    "axisPadding": 0,
+    "padding": 5,
+    "dataKey": "Category",
+    "label": "Data Points"
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "Data for testing quadrant angle positioning",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "download": true,
+    "showVertical": true,
+    "show": true
+  },
+  "orientation": "vertical",
+  "legend": {
+    "hide": false,
+    "behavior": "highlight",
+    "axisAlign": true,
+    "singleRow": false,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "Different series to test various angle scenarios",
+    "label": "Test Series",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "style": "lines",
+    "subStyle": "linear blocks",
+    "shape": "circle",
+    "hideBorder": {
+      "side": false,
+      "topBottom": true
+    },
+    "position": "right",
+    "hasShape": true
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "palette": "qualitative4",
+  "isPaletteReversed": false,
+  "labels": true,
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": false
+  },
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false,
+    "lineDatapointSymbol": "standard"
+  },
+  "data": [
+    {
+      "Category": "A",
+      "Steep Upward (Q1)": "10",
+      "Gentle Downward (Q2)": "100",
+      "Steep Downward (Q3)": "100",
+      "Gentle Upward (Q4)": "10",
+      "Near Zero Rise": "5",
+      "Near Zero Fall": "5"
+    },
+    {
+      "Category": "B",
+      "Steep Upward (Q1)": "90",
+      "Gentle Downward (Q2)": "80",
+      "Steep Downward (Q3)": "90",
+      "Gentle Upward (Q4)": "20",
+      "Near Zero Rise": "10",
+      "Near Zero Fall": "0"
+    },
+    {
+      "Category": "C",
+      "Steep Upward (Q1)": "100",
+      "Gentle Downward (Q2)": "90",
+      "Steep Downward (Q3)": "10",
+      "Gentle Upward (Q4)": "80",
+      "Near Zero Rise": "80",
+      "Near Zero Fall": "80"
+    },
+    {
+      "Category": "D",
+      "Steep Upward (Q1)": "80",
+      "Gentle Downward (Q2)": "100",
+      "Steep Downward (Q3)": "0",
+      "Gentle Upward (Q4)": "90",
+      "Near Zero Rise": "90",
+      "Near Zero Fall": "90"
+    },
+    {
+      "Category": "E",
+      "Steep Upward (Q1)": "20",
+      "Gentle Downward (Q2)": "90",
+      "Steep Downward (Q3)": "10",
+      "Gentle Upward (Q4)": "100",
+      "Near Zero Rise": "0",
+      "Near Zero Fall": "100"
+    },
+    {
+      "Category": "F",
+      "Steep Upward (Q1)": "100",
+      "Gentle Downward (Q2)": "10",
+      "Steep Downward (Q3)": "100",
+      "Gentle Upward (Q4)": "80",
+      "Near Zero Rise": "5",
+      "Near Zero Fall": "10"
+    },
+    {
+      "Category": "G",
+      "Steep Upward (Q1)": "90",
+      "Gentle Downward (Q2)": "80",
+      "Steep Downward (Q3)": "80",
+      "Gentle Upward (Q4)": "20",
+      "Near Zero Rise": "100",
+      "Near Zero Fall": "5"
+    },
+    {
+      "Category": "H",
+      "Steep Upward (Q1)": "10",
+      "Gentle Downward (Q2)": "100",
+      "Steep Downward (Q3)": "90",
+      "Gentle Upward (Q4)": "90",
+      "Near Zero Rise": "10",
+      "Near Zero Fall": "0"
+    }
+  ],
+  "visualizationType": "Line",
+  "series": [
+    {
+      "dataKey": "Steep Upward (Q1)",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Gentle Downward (Q2)",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Steep Downward (Q3)",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Gentle Upward (Q4)",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Near Zero Rise",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Near Zero Fall",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    }
+  ],
+  "description": "This chart contains multiple line series designed to create various angles for testing quadrant-based label positioning. Each series demonstrates different angle scenarios: Quadrant 1 (1°-89° steep upward), Quadrant 2 (91°-179° gentle downward), Quadrant 3 (180°-269° steep downward), Quadrant 4 (269°-360° gentle upward), and edge cases near the x-axis.",
+  "annotations": [],
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "showTitle": true,
+  "showDownloadMediaButton": false,
+  "lineDatapointColor": "Same as Line",
+  "isResponsiveTicks": false,
+  "general": {
+    "annotationDropdownText": "Annotations",
+    "showDownloadButton": false,
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": true,
+    "hideNullValue": true
+  },
+  "isLegendValue": false,
+  "barSpace": 15,
+  "heights": {
+    "vertical": 450,
+    "horizontal": 750
+  },
+  "columns": {},
+  "brush": {
+    "height": 45,
+    "active": false
+  },
+  "useLogScale": false,
+  "filterBehavior": "Filter Change",
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": ""
+  },
+  "version": "4.25.1"
+}

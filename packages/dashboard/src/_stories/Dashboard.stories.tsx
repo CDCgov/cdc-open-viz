@@ -35,6 +35,8 @@ import CascadingDataFilters from './_mock/filter-cascade.json'
 import ParentChildFilters from './_mock/parent-child-filters.json'
 import NestedParentChildFilters from './_mock/nested-parent-child-filters.json'
 import GalleryDataBiteDashboard from './_mock/gallery-data-bite-dashboard.json'
+import TP5TestConfig from './_mock/tp5-test.json'
+import LineChartAnglesConfig from './_mock/dashboard-line-chart-angles.json'
 
 // Dashboard Filter Updates for Ascending, Descending, and Custom Order
 import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
@@ -99,6 +101,20 @@ export const Example_2: Story = {
 export const Example_3: Story = {
   args: {
     config: ExampleConfig_3,
+    isEditor: false
+  }
+}
+
+export const TP5_Test_Dashboard: Story = {
+  args: {
+    config: TP5TestConfig,
+    isEditor: false
+  }
+}
+
+export const Line_Chart_Angles: Story = {
+  args: {
+    config: LineChartAnglesConfig,
     isEditor: false
   }
 }
@@ -792,20 +808,26 @@ export const Nested_Dropdown_With_Parent_Child: Story = {
 
     // Get filter dropdowns
     const regionFilter = (await canvas.findByLabelText('Region', { selector: 'select' })) as HTMLSelectElement
-    const yearQuarterFilter = (await canvas.findByLabelText('Year and Quarter', {
-      selector: 'select'
-    })) as HTMLSelectElement
+    const yearQuarterInput = canvasElement.querySelector('.nested-dropdown input') as HTMLInputElement
 
     const getFilterOptions = (select: HTMLSelectElement) =>
       Array.from(select.options)
         .map(o => o.text)
         .filter(Boolean)
 
+    const getNestedDropdownOptions = () => {
+      const container = yearQuarterInput.closest('.nested-dropdown')
+      if (!container) return []
+      return Array.from(container.querySelectorAll('li[role="treeitem"]'))
+        .map(li => li.getAttribute('aria-label') || li.textContent?.trim() || '')
+        .filter(Boolean)
+    }
+
     const getState = () => ({
       regionOptions: getFilterOptions(regionFilter),
       regionSelected: regionFilter.value,
-      yearQuarterOptions: getFilterOptions(yearQuarterFilter),
-      yearQuarterSelected: yearQuarterFilter.value,
+      yearQuarterOptions: getNestedDropdownOptions(),
+      yearQuarterSelected: yearQuarterInput.value,
       chartRendered: !!canvasElement.querySelector('svg')
     })
 

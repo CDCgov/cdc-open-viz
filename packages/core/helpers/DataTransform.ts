@@ -287,10 +287,7 @@ export class DataTransform {
   }
 
   // clean out %, $, commas from numbers when needing to do sorting!
-  cleanDataPoint(data, testing = false) {
-    if (testing) console.log('clean', data)
-    let cleaned = ''
-
+  cleanDataPoint(data) {
     // remove comma and dollar signs
     let tmp = ''
     if (typeof data === 'string') {
@@ -299,7 +296,6 @@ export class DataTransform {
       tmp = data !== null && data !== '' ? data : ''
     }
 
-    if (testing) console.log('## cleanedData =', tmp)
     return tmp
   }
 }

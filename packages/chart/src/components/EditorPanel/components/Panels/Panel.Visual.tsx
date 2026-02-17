@@ -242,6 +242,27 @@ const PanelVisual: FC<PanelProps> = props => {
               options={['Same as Line', 'Lighter than Line']}
             />
             <CheckBox
+              value={config.general?.useIntelligentLineChartLabels ?? false}
+              section='general'
+              fieldName='useIntelligentLineChartLabels'
+              label='Use Intelligent Label Positioning'
+              updateField={updateField}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>
+                      Automatically positions data labels to avoid overlapping with line segments based on the direction
+                      and location of data points. When disabled, all labels are positioned above and centered on their
+                      data points.
+                    </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
+            <CheckBox
               value={!(config as LineChartConfig).isolatedDotsSameSize}
               fieldName='isolatedDotsSameSize'
               label='Accentuate isolated data points'
@@ -398,7 +419,6 @@ const PanelVisual: FC<PanelProps> = props => {
                       }}
                       label='Custom Color Order'
                       minColors={1}
-                      maxColors={20}
                     />
                   </div>
                 )}

@@ -3,20 +3,22 @@ import SampleDataContext from './samples/SampleDataContext'
 import { cityTemperature } from '@visx/mock-data'
 
 // Data Samples
-import validMapData from './samples/valid-data-map.csv?raw'
-import validMapDataFootnotes from './samples/valid-data-map-footnotes.csv?raw'
+import pivotData from './samples/pivotData.json?raw'
+import vaidWorldData from './samples/valid-world-data.json?raw'
+import validAreaChart from './samples/valid-area-chart.json?raw'
+import validBoxPlotData from './samples/valid-boxplot.csv?raw'
 import validChartData from './samples/valid-data-chart.csv?raw'
 import validCountyMapData from './samples/valid-county-data.csv?raw'
-import validGeoPoint from './samples/valid-geo-point.csv?raw'
-import validScatterPlot from './samples/valid-scatterplot.csv?raw'
-import validBoxPlotData from './samples/valid-boxplot.csv?raw'
-import validAreaChart from './samples/valid-area-chart.json?raw'
-import validWorldGeocodeData from './samples/valid-world-geocode.json?raw'
 import validForecastData from './samples/valid-forecast-data.csv?raw'
-import vaidWorldData from './samples/valid-world-data.json?raw'
+import validGeoPoint from './samples/valid-geo-point.csv?raw'
+import validHorizonData from './samples/valid-horizon-chart.json?raw'
+import validMapData from './samples/valid-data-map.csv?raw'
+import validMapDataFootnotes from './samples/valid-data-map-footnotes.csv?raw'
+import validRadarData from './samples/valid-radar-chart.csv?raw'
 import validRegionData from './samples/valid-region-data.json?raw'
 import validSankeyData from './samples/valid-sankey-data.json?raw'
-import pivotData from './samples/pivotData.json?raw'
+import validScatterPlot from './samples/valid-scatterplot.csv?raw'
+import validWorldGeocodeData from './samples/valid-world-geocode.json?raw'
 
 // Convert visx cityTemperature data to CSV format
 const visxTemperatureData = (() => {
@@ -54,9 +56,19 @@ const sampleData = {
       data: validForecastData
     },
     {
+      text: 'Horizon Chart Data',
+      fileName: 'valid-horizon-data.json',
+      data: validHorizonData
+    },
+    {
       text: 'Sankey Chart Data',
       fileName: 'valid-sankey-data.json',
       data: validSankeyData
+    },
+    {
+      text: 'Radar Chart Data (Program Comparison)',
+      fileName: 'valid-radar-chart.csv',
+      data: validRadarData
     },
     {
       text: 'Pivot Table Data',

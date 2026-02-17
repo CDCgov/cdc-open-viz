@@ -34,10 +34,7 @@
       "dx": -46,
       "dy": -50,
       "opacity": "100",
-      "savedDimensions": [
-        498.59,
-        560.1875
-      ],
+      "savedDimensions": [498.59, 560.1875],
       "connectionType": "line",
       "originalX": 295.8788908060575,
       "originalDX": -46,
@@ -84,7 +81,7 @@
     "hideLabel": false,
     "hideTicks": false,
     "size": "75",
-    "gridLines": false,
+    "gridLines": true,
     "enablePadding": false,
     "min": "",
     "max": "",

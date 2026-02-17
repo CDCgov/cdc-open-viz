@@ -6,6 +6,7 @@ import WastewaterMap from './_mock/wastewater-map.json'
 import legendTests from './_mock/legends/legend-tests.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import { userEvent, within, expect } from 'storybook/test'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map/Legend',
@@ -19,6 +20,9 @@ export default meta
 export const Legend_Right: Story = {
   args: {
     config: editConfigKeys(SingleStateWithFilters, [{ path: ['legend', 'hideBorder'], value: true }])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -28,6 +32,9 @@ export const Legend_Bottom: Story = {
       { path: ['legend', 'position'], value: 'bottom' },
       { path: ['legend', 'singleRow'], value: false }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -38,6 +45,9 @@ export const Legend_Bottom_Single_Row: Story = {
       { path: ['legend', 'style'], value: 'circles' },
       { path: ['legend', 'singleRow'], value: true }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 

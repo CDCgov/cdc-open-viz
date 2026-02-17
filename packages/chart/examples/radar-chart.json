@@ -1,0 +1,148 @@
+{
+  "type": "chart",
+  "title": "Regional Health Performance Indicators",
+  "showTitle": true,
+  "theme": "theme-blue",
+  "visualizationType": "Radar",
+  "animate": false,
+  "heights": {
+    "vertical": 400,
+    "horizontal": 400
+  },
+  "xAxis": {
+    "dataKey": "Region",
+    "label": "Region"
+  },
+  "yAxis": {
+    "dataKey": ""
+  },
+  "series": [
+    {
+      "dataKey": "Vaccination Rate",
+      "name": "Vaccination Rate",
+      "type": "Radar",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Healthcare Access",
+      "name": "Healthcare Access",
+      "type": "Radar",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Disease Prevention",
+      "name": "Disease Prevention",
+      "type": "Radar",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Health Education",
+      "name": "Health Education",
+      "type": "Radar",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Emergency Response",
+      "name": "Emergency Response",
+      "type": "Radar",
+      "axis": "Left",
+      "tooltip": true
+    }
+  ],
+  "radar": {
+    "gridRings": 5,
+    "showGridRings": true,
+    "gridRingStyle": "polygons",
+    "scaleMin": 0,
+    "scaleMax": 100,
+    "showFill": false,
+    "fillOpacity": 0.3,
+    "showPoints": true,
+    "pointRadius": 4,
+    "strokeWidth": 2,
+    "axisLabelOffset": 20
+  },
+  "legend": {
+    "hide": false,
+    "behavior": "highlight",
+    "singleRow": true,
+    "position": "right",
+    "label": "Regions"
+  },
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false
+  },
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "%",
+    "abbreviated": false
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": true,
+    "show": true,
+    "showDataTableLink": true
+  },
+  "general": {
+    "showDownloadButton": false,
+    "palette": {
+      "name": "qualitative_standard",
+      "version": "2.0",
+      "isReversed": false
+    }
+  },
+  "data": [
+    {
+      "Region": "Northeast",
+      "Vaccination Rate": 85,
+      "Healthcare Access": 78,
+      "Disease Prevention": 82,
+      "Health Education": 75,
+      "Emergency Response": 88
+    },
+    {
+      "Region": "Southeast",
+      "Vaccination Rate": 72,
+      "Healthcare Access": 68,
+      "Disease Prevention": 70,
+      "Health Education": 65,
+      "Emergency Response": 75
+    },
+    {
+      "Region": "Midwest",
+      "Vaccination Rate": 78,
+      "Healthcare Access": 72,
+      "Disease Prevention": 76,
+      "Health Education": 70,
+      "Emergency Response": 80
+    },
+    {
+      "Region": "Southwest",
+      "Vaccination Rate": 70,
+      "Healthcare Access": 65,
+      "Disease Prevention": 68,
+      "Health Education": 72,
+      "Emergency Response": 70
+    },
+    {
+      "Region": "West",
+      "Vaccination Rate": 82,
+      "Healthcare Access": 80,
+      "Disease Prevention": 78,
+      "Health Education": 85,
+      "Emergency Response": 82
+    }
+  ],
+  "description": "Comparison of health performance indicators across five U.S. regions. Each axis represents a different health metric scored on a 0-100 scale.",
+  "filters": [],
+  "exclusions": {
+    "active": false,
+    "keys": []
+  }
+}

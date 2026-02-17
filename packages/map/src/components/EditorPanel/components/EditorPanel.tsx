@@ -3222,7 +3222,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                               }}
                               label='Custom Color Order'
                               minColors={1}
-                              maxColors={20}
                             />
                           </div>
                         )}
@@ -3534,7 +3533,9 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     </p>
                   </AccordionItemPanel>
                 </AccordionItem>
-                {config.general.geoType === 'us' && <Panels.PatternSettings name='Pattern Settings' />}
+                {['us', 'us-county'].includes(config.general.geoType) && (
+                  <Panels.PatternSettings name='Pattern Settings' />
+                )}
                 {config.general.geoType !== 'us-county' && <Panels.Annotate name='Text Annotations' />}
                 <PanelMarkup
                   name='Markup Variables'

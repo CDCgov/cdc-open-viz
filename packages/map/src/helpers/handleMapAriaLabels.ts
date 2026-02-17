@@ -1,5 +1,4 @@
-export const handleMapAriaLabels = (state: MapConfig = '', testing = false) => {
-  if (testing) console.log(`handleMapAriaLabels Testing On: ${state}`) // eslint-disable-line
+export const handleMapAriaLabels = (state: MapConfig = '') => {
   try {
     if (!state.general.geoType) throw Error('handleMapAriaLabels: no geoType found in state')
     const {
@@ -34,5 +33,6 @@ export const handleMapAriaLabels = (state: MapConfig = '', testing = false) => {
     return ariaLabel
   } catch (e) {
     console.error('COVE: ', e.message) // eslint-disable-line
+    return 'Data visualization container'
   }
 }

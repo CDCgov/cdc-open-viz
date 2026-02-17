@@ -592,6 +592,7 @@ export const useTooltip = props => {
       case 'Line':
       case 'Area Chart':
       case 'Pie':
+      case 'Horizon Chart':
         return common
       case 'Combo':
         return [...common, ...ciItems]
@@ -600,6 +601,8 @@ export const useTooltip = props => {
 
       case 'Bar':
         return orientation === 'vertical' ? common : [runtime.yAxis.dataKey, ...runtime?.seriesKeys]
+      case 'Warming Stripes':
+        return common
       default:
         throw new Error('No visualization type found in handleTooltipMouseOver')
     }

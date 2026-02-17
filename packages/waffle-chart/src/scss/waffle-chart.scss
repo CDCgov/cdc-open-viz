@@ -18,7 +18,7 @@
       justify-items: center;
       align-items: flex-start;
 
-      & > svg {
+      &>svg {
         margin: 0.7em 0;
       }
     }
@@ -96,6 +96,7 @@
 }
 
 @at-root {
+
   .cove-waffle-chart.font-small,
   .cove-gauge-chart.font-small #{&} {
     .cove-waffle-chart__data--primary {
@@ -135,6 +136,7 @@
   &.waffle__style--tp5 {
     .cove-component__content {
       background: none !important;
+      container-type: inline-size;
     }
 
     .cdc-callout {
@@ -167,8 +169,21 @@
     }
 
     .cove-waffle-chart {
+      align-items: flex-start;
       padding: 0;
       row-gap: 1rem;
+      flex-wrap: nowrap;
+    }
+
+    // Container query: wrap when width is less than 576px
+    @container (max-width: 576px) {
+      .cove-waffle-chart {
+        flex-wrap: wrap;
+
+        .cove-waffle-chart__chart {
+          width: 100% !important;
+        }
+      }
     }
 
     .cove-waffle-chart__chart {
@@ -190,9 +205,11 @@
       margin-top: 0.5rem;
       font-size: 1rem;
     }
+
     .cove-waffle-chart__subtext {
       font-size: 1rem;
     }
+
     .cove-waffle-chart__data--primary {
       font-size: 2rem;
       color: var(--colors-cyan-60v);
@@ -211,5 +228,121 @@
         box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
       }
     }
+  }
+
+  // TP5 Style for Gauge Chart
+  &.gauge__style--tp5 {
+    .cove-component__content {
+      background: none !important;
+      container-type: inline-size;
+    }
+
+    .cdc-callout {
+      box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+      margin: 0 !important;
+      padding: 1.5rem;
+      background-color: var(--colors-cyan-10, #eff9fa);
+      border: 1px solid var(--colors-cyan-15, #dff2f6);
+      position: relative;
+      border-radius: 0.25rem;
+      gap: 0.5rem;
+    }
+
+    .cdc-callout__flag {
+      position: absolute;
+      top: -0.25rem;
+      right: 1.08rem;
+      width: 1.85rem;
+      height: auto;
+    }
+
+    .cdc-callout__heading {
+      font-family: var(--fonts-nunito) !important;
+      width: 100%;
+      font-size: 1.1rem;
+    }
+
+    .cove-gauge-chart {
+      padding: 0;
+    }
+
+    .cove-gauge-chart__chart {
+      width: 100%;
+    }
+
+    .cove-gauge-chart__chart>svg {
+      display: block;
+      width: 100%;
+    }
+
+    .cove-gauge-chart__body {
+      flex-wrap: nowrap;
+      gap: 1rem;
+      row-gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      align-items: flex-start; // Align to top instead of center when content varies
+    }
+
+    // Container query: wrap when width is less than 576px
+    @container (max-width: 576px) {
+      .cove-gauge-chart__body {
+        flex-wrap: wrap;
+
+        .cove-gauge-chart__value-section {
+          width: 100%;
+        }
+      }
+    }
+
+    .cove-gauge-chart__value-section {
+      width: auto;
+      padding-top: 1px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .cove-gauge-chart__content {
+      font-size: 1rem;
+      min-height: 1rem; // Ensure minimum height even when empty
+    }
+
+    .cove-waffle-chart__data--primary {
+      font-size: 2rem;
+      color: var(--colors-cyan-60v);
+      font-weight: 400;
+      line-height: 1;
+    }
+
+    .cove-waffle-chart__data--text {
+      margin-top: 0;
+      font-size: 1rem;
+    }
+
+    .cove-waffle-chart__subtext {
+      font-size: 1rem;
+      margin-top: auto;
+    }
+
+    // White background variant (when "Use White Background Style" is checked)
+    &.white-background-style {
+      .cove-component__content {
+        background: white !important;
+      }
+
+      .cdc-callout {
+        background: transparent !important;
+        border: 1px solid #009ec1 !important;
+        box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+      }
+    }
+  }
+}
+
+// Center gauge value when there's no message (standalone only, not in dashboard rows)
+.type-waffle-chart.gauge__style--tp5:not(.row *) {
+  .cove-gauge-chart__body.d-flex.justify-content-center {
+    justify-content: center;
+    width: 100%;
   }
 }

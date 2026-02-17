@@ -1,0 +1,2147 @@
+{
+  "data": {
+    "name": "data"
+  },
+  "params": [
+    {
+      "name": "dateExtent",
+      "expr": "extent(pluck(data('data_0'), 'date'))"
+    },
+    {
+      "name": "dateMax",
+      "expr": "dateExtent[1]"
+    }
+  ],
+  "layer": [
+    {
+      "mark": "bar",
+      "encoding": {
+        "x": {
+          "field": "date",
+          "type": "temporal",
+          "timeUnit": "yearmonth",
+          "title": "Month of Report",
+          "axis": {
+            "format": "%b %Y",
+            "grid": false
+          }
+        },
+        "y": {
+          "aggregate": "sum",
+          "field": "measlesTotal",
+          "title": "Number of Cases"
+        },
+        "color": {
+          "field": "whoRegion",
+          "title": "WHO Region",
+          "scale": {
+            "domain": [
+              "AFRO",
+              "AMRO",
+              "EMRO",
+              "EURO",
+              "SEARO",
+              "WPRO"
+            ],
+            "range": [
+              "#2D72D2",
+              "#DB2C6F",
+              "#8EB125",
+              "#9D3F9D",
+              "#00A396",
+              "#D1980B"
+            ]
+          },
+          "legend": {
+            "orient": "top"
+          }
+        },
+        "tooltip": [
+          {
+            "field": "whoRegion",
+            "title": "WHO Region"
+          },
+          {
+            "field": "date",
+            "type": "temporal",
+            "title": "Month",
+            "format": "%b %Y"
+          },
+          {
+            "field": "sum_measlesTotal",
+            "title": "Number of Cases",
+            "type": "quantitative",
+            "format": ","
+          }
+        ]
+      }
+    }
+  ],
+  "height": "container",
+  "width": "container",
+  "datasets": {
+    "data": [
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 26,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 27,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 158,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 173,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 150,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 53,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 174,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 153,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 1,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 3,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 154,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 15,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 0,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 0,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 9,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 1251,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 57,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 2,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 1367,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 19,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 81,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 2,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 1,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 5,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 169,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 1,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 1954,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 32,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 350,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 0,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 0,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 150,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 0,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 1,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 341,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 88,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 8,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 59,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 528,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 63,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 5,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 48,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 11,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 109,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 14,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 12,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 70,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 245,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 7,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 177,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 1544,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 98,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 150,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 1,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 1,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 0,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 1559,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 1,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 1,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 20,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 129,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 235,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 19,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 229,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 4,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 1,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 405,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 152,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 1,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 1,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 1632,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 5,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 0,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 0,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 7,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 390,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 11,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 580,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 58,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 14,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 55,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 1297,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 25,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 43,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 156,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 11,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 7,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 8,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 9,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 385,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 1,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 1557,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 1,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 162,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 2314,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 342,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 11,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 44,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 15,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 65,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 110,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 18,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 437,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 6,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 2,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 82,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 1,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 96,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 0,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 0,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 255,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 166,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 17,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 223,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 13,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 45,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 14,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 7,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 7,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 1,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 1,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 190,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 4,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 69,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 358,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 1,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 0,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 53,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 0,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 0,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 1115,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 4,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 0,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 4,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 0,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 0,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 0,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 0,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 1,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 3,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 0,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 0,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 0,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 0,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 0,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 0,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 0,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 0,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 0,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 0,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 0,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-05-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      }
+    ]
+  },
+  "config": {
+    "background": "#FFFFFF",
+    "bar": {
+      "fill": "#2D72D2"
+    },
+    "arc": {
+      "fill": "#2D72D2"
+    },
+    "area": {
+      "fill": "#2D72D2"
+    },
+    "rect": {
+      "fill": "#2D72D2"
+    },
+    "circle": {
+      "fill": "#2D72D2"
+    },
+    "point": {
+      "stroke": "#2D72D2"
+    },
+    "line": {
+      "stroke": "#2D72D2"
+    },
+    "font": "Source-Sans-Pro",
+    "padding": 20,
+    "mark": {
+      "opacity": 0.75,
+      "tooltip": true
+    },
+    "title": {
+      "color": "#111418",
+      "fontSize": 14,
+      "fontWeight": 600,
+      "anchor": "start",
+      "subtitleColor": "#5F6B7C",
+      "subtitleFontSize": 12,
+      "subtitlePadding": 7
+    },
+    "axis": {
+      "labelFontSize": 12,
+      "titleFontSize": 14,
+      "titleFontWeight": 400,
+      "titlePadding": 10,
+      "titleColor": "#111418",
+      "labelColor": "#738091",
+      "gridColor": "#DCE0E5",
+      "gridOpacity": 1,
+      "domainColor": "#5F6B7C",
+      "tickColor": "#5F6B7C"
+    },
+    "legend": {
+      "titleColor": "#111418",
+      "labelColor": "#111418",
+      "titleFontSize": 12,
+      "labelFontSize": 12,
+      "titleFontWeight": 600
+    },
+    "view": {
+      "stroke": "transparent"
+    },
+    "text": {
+      "color": "#111418",
+      "fontSize": 12,
+      "fontWeight": 400
+    },
+    "range": {
+      "category": [
+        "#2D72D2",
+        "#DB2C6F",
+        "#8EB125",
+        "#9D3F9D",
+        "#00A396",
+        "#D1980B",
+        "#D33D17",
+        "#7961DB",
+        "#29A634",
+        "#946638",
+        "#147EB3"
+      ]
+    }
+  }
+}

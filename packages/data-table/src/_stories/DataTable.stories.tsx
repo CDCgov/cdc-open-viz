@@ -2,6 +2,7 @@ import { Meta, StoryObj } from '@storybook/react-vite'
 import CdcDataTable from '../CdcDataTable'
 
 import DataTableConfig from '../../examples/data-table-example.json'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof CdcDataTable> = {
   title: 'Components/Templates/DataTable',
@@ -14,12 +15,18 @@ export const DataTable: Story = {
   args: {
     config: { ...DataTableConfig, filters: [] },
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 export const DataTable_Filters: Story = {
   args: {
     config: DataTableConfig,
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 

@@ -3,7 +3,7 @@ import ChartActions from './chart.actions'
 
 type ChartState = {
   config?: Config
-  container: any
+  container: HTMLElement | null
   coveLoadedHasRan: boolean
   loading: boolean
   preview: boolean

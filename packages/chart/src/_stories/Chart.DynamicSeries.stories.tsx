@@ -3,6 +3,7 @@ import DynamicSeriesBarConfig from './_mock/dynamic_series_bar_config.json'
 import DynamicSeriesSuppression from './_mock/dynamic_series_suppression_mock.json'
 import { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChartComponent'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Dynamic Series',
@@ -23,6 +24,9 @@ export const LineShowPoints: Story = {
       lineDatapointStyle: 'always show'
     },
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -30,6 +34,9 @@ export const LineSuppression: Story = {
   args: {
     config: DynamicSeriesSuppression,
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -37,6 +44,9 @@ export const LineHoverPoints: Story = {
   args: {
     config: DynamicSeriesConfig,
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -44,6 +54,9 @@ export const Bar_Vertical: Story = {
   args: {
     config: DynamicSeriesBarConfig,
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -51,6 +64,9 @@ export const Bar_Horizontal: Story = {
   args: {
     config: { ...DynamicSeriesBarConfig, orientation: 'horizontal' },
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -62,6 +78,9 @@ export const Legend_Order: Story = {
       legend: { ...DynamicSeriesBarConfig, order: 'desc' }
     },
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 

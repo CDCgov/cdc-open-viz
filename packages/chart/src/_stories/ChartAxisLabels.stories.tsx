@@ -3,6 +3,7 @@ import SimplifiedLineConfig from './_mock/simplified_line.json'
 
 import Chart from '../CdcChartComponent'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Axis Labels',
@@ -17,6 +18,9 @@ export const Abbreviated_Dates: Story = {
       { path: ['xAxis', 'showYearsOnce'], value: true },
       { path: ['tooltips', 'dateDisplayFormat'], value: '%b. %d %Y' }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
