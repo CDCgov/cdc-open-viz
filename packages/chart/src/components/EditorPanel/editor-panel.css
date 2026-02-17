@@ -1,0 +1,17 @@
+.cdc-open-viz-module.type-chart {
+  .viewport-overrides button {
+    width: 100%;
+    padding: 1em;
+    margin-top: 1em;
+    text-align: left;
+
+    span {
+      float: right;
+    }
+  }
+
+  .viewport-overrides .edit-block {
+    margin-top: 0;
+    padding: 1em;
+  }
+}

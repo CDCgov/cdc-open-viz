@@ -1,6 +1,31 @@
-.date-highlight select,
-.date-highlight input {
-  background: var(--lightestGray);
+.date-highlight {
+  select,
+  input {
+    background: var(--lightestGray);
+  }
+
+  .radio-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .group {
+      display: flex;
+    }
+
+    input[type='number'] {
+      margin: 0 10px;
+      min-width: 50px;
+      width: 50px;
+      max-width: 50px;
+    }
+
+    /* reset spacing */
+    input,
+    label {
+      margin-top: 0 !important;
+    }
+  }
 }
 
 .date-highlight__day-selection {
@@ -8,75 +33,52 @@
   flex-direction: row;
   flex-wrap: wrap;
   padding: 20px 0;
-}
 
-.date-highlight__day-selection .week-button {
-  margin-bottom: 0;
-  border-radius: 50%;
-  color: var(--darkGray);
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--lightestGray);
-  margin: 5px 2px 0;
-}
+  .week-button {
+    margin-bottom: 0;
+    border-radius: 50%;
+    color: var(--darkGray);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--lightestGray);
+    margin: 5px 2px 0;
 
-.date-highlight__day-selection .week-button--active {
-  background: var(--primary);
-  color: white;
+    &--active {
+      background: var(--primary);
+      color: white;
+    }
+  }
 }
 
 .date-highlight__occurance {
   display: flex;
-}
 
-.date-highlight__occurance input[type='number']::-webkit-inner-spin-button,
-.date-highlight__occurance input[type='number']::-webkit-outer-spin-button {
-  opacity: 1;
-}
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    opacity: 1;
+  }
 
-.date-highlight__occurance input[type='number'] {
-  margin: 0 10px;
-  min-width: 50px;
-  width: 50px;
-  max-width: 50px;
-}
-
-.date-highlight .radio-group {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.date-highlight .radio-group .group {
-  display: flex;
-}
-
-.date-highlight .radio-group input[type='number'] {
-  margin: 0 10px;
-  min-width: 50px;
-  width: 50px;
-  max-width: 50px;
-}
-
-/* reset spacing */
-.date-highlight .radio-group input,
-.date-highlight .radio-group label {
-  margin-top: 0 !important;
+  input[type='number'] {
+    margin: 0 10px;
+    min-width: 50px;
+    width: 50px;
+    max-width: 50px;
+  }
 }
 
 .sankey__color-input {
   display: flex;
   align-items: center;
   margin: 10px auto;
-}
 
-.sankey__color-input label {
-  align-items: center;
-  padding-left: 5px;
-  margin-top: 0 !important;
+  label {
+    align-items: center;
+    padding-left: 5px;
+    margin-top: 0 !important;
+  }
 }
 
 .annotation-group {

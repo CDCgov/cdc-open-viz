@@ -23,7 +23,7 @@ import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { type Visualization } from '@cdc/core/types/Visualization'
 import { type DataSet } from '@cdc/core/types/DataSet'
 
-import './data-import.scss'
+import './data-import.css'
 import '@cdc/core/styles/v2/components/data-designer.scss'
 
 import { errorMessages, maxFileSize } from '../../../helpers/errorMessages'

@@ -1,5 +1,5 @@
 import React from 'react'
-import './sidebar.styles.scss'
+import './sidebar.styles.css'
 
 type SidebarProps = {
   // whether or not the viz is within a dashboard

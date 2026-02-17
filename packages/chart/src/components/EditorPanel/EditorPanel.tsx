@@ -42,7 +42,7 @@ import { type ChartContext } from '../../types/ChartContext'
 import { type ChartConfig } from '../../types/ChartConfig'
 
 import '@cdc/core/components/EditorPanel/EditorPanel.styles.css'
-import './editor-panel.scss'
+import './editor-panel.css'
 import { Anchor } from '@cdc/core/types/Axis'
 import EditorPanelContext from './EditorPanelContext'
 import _ from 'lodash'
