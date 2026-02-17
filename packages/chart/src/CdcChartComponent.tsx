@@ -135,7 +135,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     coveLoadedEventRan,
     imageId,
     seriesHighlight,
-    colorScale
+    colorScale,
+    brushData
   } = state
   const { description, visualizationType } = config
   const svgRef = useRef(null)
@@ -799,6 +800,16 @@ const CdcChart: React.FC<CdcChartProps> = ({
       stateData.sort(sortData)
     }
   }, [config, stateData]) // eslint-disable-line
+
+  // Clear brush selection when brush slider is disabled
+  useEffect(() => {
+    const isBrushDisabled = !config?.xAxis?.brushActive
+    const hasBrushData = Array.isArray(brushData) && brushData.length > 0
+
+    if (isBrushDisabled && hasBrushData) {
+      dispatch({ type: 'SET_BRUSH_DATA', payload: [] })
+    }
+  }, [config?.xAxis?.brushActive, brushData])
 
   // Updates runtime axis labels when config or data changes when using markup variables
   useEffect(() => {
