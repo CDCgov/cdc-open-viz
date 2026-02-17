@@ -803,7 +803,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Clear brush selection when brush slider is disabled
   useEffect(() => {
-    if (!config?.xAxis?.brushActive && Array.isArray(brushData) && brushData.length > 0) {
+    const isBrushDisabled = !config?.xAxis?.brushActive
+    const hasBrushData = Array.isArray(brushData) && brushData.length > 0
+
+    if (isBrushDisabled && hasBrushData) {
       dispatch({ type: 'SET_BRUSH_DATA', payload: [] })
     }
   }, [config?.xAxis?.brushActive, brushData])
