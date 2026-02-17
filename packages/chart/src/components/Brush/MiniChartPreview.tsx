@@ -22,13 +22,50 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
     }
 
     const bandwidth = xScale.bandwidth?.() || 0
+    const isComboChart = config?.visualizationType === 'Combo'
     const isBarChart = config?.visualizationType === 'Bar'
     const isStacked = config?.visualizationSubType === 'stacked'
     const isAreaChart = config?.visualizationType === 'Area Chart'
+    const barSeriesTypes = new Set(['Bar', 'Paired Bar', 'Deviation Bar', 'Combo'])
+    const barSeries = isComboChart ? series.filter(s => barSeriesTypes.has(s.type)) : series
+    const areaSeries = isComboChart ? series.filter(s => s.type === 'Area Chart') : series
+    const lineSeries = isComboChart
+      ? series.filter(s => !barSeriesTypes.has(s.type) && s.type !== 'Area Chart')
+      : series
+
+    let barElements: React.ReactElement[] = []
 
     // For bar charts, render rectangles
-    if (isBarChart) {
+    if (isBarChart || (isComboChart && barSeries.length > 0)) {
       const bars: React.ReactElement[] = []
+      const barSeriesToRender = isBarChart ? series : barSeries
+
+      const barStrokeColor = config?.barHasBorder === 'true' ? '#000' : 'transparent'
+      const barStrokeWidth = config?.barHasBorder === 'true' ? 1 : 0
+
+      const getPatternUrl = (datum, seriesKey: string, value: string | number) => {
+        if (!config.legend?.patterns || Object.keys(config.legend.patterns).length === 0) {
+          return null
+        }
+
+        for (const [patternKey, patternObj] of Object.entries(config.legend.patterns)) {
+          const pattern = patternObj as any
+          if (pattern.dataKey && pattern.dataValue) {
+            if (pattern.dataKey === seriesKey && String(value) === String(pattern.dataValue)) {
+              return `url(#chart-pattern-${patternKey})`
+            }
+
+            if (!config.runtime?.seriesLabels || !config.runtime.seriesLabels[pattern.dataKey]) {
+              const dataFieldValue = datum[pattern.dataKey]
+              if (String(dataFieldValue) === String(pattern.dataValue)) {
+                return `url(#chart-pattern-${patternKey})`
+              }
+            }
+          }
+        }
+
+        return null
+      }
 
       tableData.forEach((d, i) => {
         const xVal = xScale(d[dataKey])
@@ -47,11 +84,12 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
           let cumulativeValue = 0
           const zeroY = miniYScale(0)
 
-          series.forEach((s, seriesIndex) => {
+          barSeriesToRender.forEach((s, seriesIndex) => {
             const value = parseFloat(d[s.dataKey])
             if (isNaN(value) || value === 0) return
 
             const seriesColor = colorScale?.(config.runtime.seriesLabels?.[s.dataKey] || s.dataKey) || '#666'
+            const patternUrl = getPatternUrl(d, s.dataKey, value)
 
             // Calculate the bottom and top of this segment
             // For stacked bars, each segment sits on top of the previous one
@@ -72,22 +110,41 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
                 width={barWidth}
                 height={barHeight}
                 fill={seriesColor}
-                fillOpacity={0.7}
+                stroke={barStrokeColor}
+                strokeWidth={barStrokeWidth}
+                fillOpacity={1}
                 pointerEvents='none'
               />
             )
+            if (patternUrl) {
+              bars.push(
+                <rect
+                  key={`mini-bar-stacked-pattern-${i}-${seriesIndex}`}
+                  x={x - barWidth / 2}
+                  y={y}
+                  width={barWidth}
+                  height={barHeight}
+                  fill={patternUrl}
+                  stroke='transparent'
+                  strokeWidth={0}
+                  fillOpacity={1}
+                  pointerEvents='none'
+                />
+              )
+            }
           })
         } else {
           // For grouped bars, render bars side by side
-          const seriesCount = series.length
+          const seriesCount = barSeriesToRender.length
           const groupBarWidth = barWidth / seriesCount
           const zeroY = miniYScale(0)
 
-          series.forEach((s, seriesIndex) => {
+          barSeriesToRender.forEach((s, seriesIndex) => {
             const value = parseFloat(d[s.dataKey])
             if (isNaN(value)) return
 
             const seriesColor = colorScale?.(config.runtime.seriesLabels?.[s.dataKey] || s.dataKey) || '#666'
+            const patternUrl = getPatternUrl(d, s.dataKey, value)
 
             // Calculate bar position and height
             const valueY = miniYScale(value)
@@ -100,18 +157,39 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
                 key={`mini-bar-grouped-${i}-${seriesIndex}`}
                 x={barX}
                 y={y}
-                width={groupBarWidth * 0.9} // Wider bars with small gap between them
+                width={groupBarWidth}
                 height={barHeight}
                 fill={seriesColor}
-                fillOpacity={0.7}
+                stroke={barStrokeColor}
+                strokeWidth={barStrokeWidth}
+                fillOpacity={1}
                 pointerEvents='none'
               />
             )
+            if (patternUrl) {
+              bars.push(
+                <rect
+                  key={`mini-bar-grouped-pattern-${i}-${seriesIndex}`}
+                  x={barX}
+                  y={y}
+                  width={groupBarWidth}
+                  height={barHeight}
+                  fill={patternUrl}
+                  stroke='transparent'
+                  strokeWidth={0}
+                  fillOpacity={1}
+                  pointerEvents='none'
+                />
+              )
+            }
           })
         }
       })
 
-      return <>{bars}</>
+      barElements = bars
+      if (isBarChart && !isComboChart) {
+        return <>{barElements}</>
+      }
     }
 
     // For stacked area charts, use AreaStack
@@ -217,10 +295,10 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
       )
     }
 
-    // For line/area charts, render lines or areas
+    // For line/area charts (and combo line/area series), render lines or areas
     return (
       <>
-        {series.map((s, i) => {
+        {(isComboChart ? areaSeries : isAreaChart ? series : []).map((s, i) => {
           const seriesKey = s.dataKey
           const seriesColor = colorScale?.(config.runtime.seriesLabels?.[seriesKey] || seriesKey) || '#666'
 
@@ -243,7 +321,7 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
           const getX = d => xScale(d[dataKey]) + bandwidth / 2
           const getY = d => miniYScale(parseFloat(d[s.dataKey]))
 
-          return isAreaChart ? (
+          return (
             <AreaClosed
               key={`mini-area-${seriesKey}-${i}`}
               data={validData}
@@ -258,7 +336,33 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
               curve={curve}
               pointerEvents='none'
             />
-          ) : (
+          )
+        })}
+        {barElements}
+        {(isAreaChart && !isComboChart ? [] : isComboChart ? lineSeries : series).map((s, i) => {
+          const seriesKey = s.dataKey
+          const seriesColor = colorScale?.(config.runtime.seriesLabels?.[seriesKey] || seriesKey) || '#666'
+
+          // Get series-specific styling
+          const seriesWeight = s.weight || 2
+          const seriesLineType = s.lineType || 'curveLinear'
+          const seriesStyle = s.type || 'solid'
+          const curve = allCurves[seriesLineType] || allCurves.curveLinear
+          const strokeDasharray = handleLineType(seriesStyle)
+
+          // Filter to only valid data points
+          const validData = tableData.filter(d => {
+            const xVal = xScale(d[dataKey])
+            const yVal = parseFloat(d[s.dataKey])
+            return xVal !== undefined && !isNaN(yVal)
+          })
+
+          if (validData.length === 0) return null
+
+          const getX = d => xScale(d[dataKey]) + bandwidth / 2
+          const getY = d => miniYScale(parseFloat(d[s.dataKey]))
+
+          return (
             <LinePath
               key={`mini-line-${seriesKey}-${i}`}
               data={validData}

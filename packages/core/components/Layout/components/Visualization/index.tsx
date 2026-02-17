@@ -71,6 +71,10 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
       if (config?.runtime?.editorErrorMessage.length !== 0) classes.push('type-map--has-error')
     }
 
+    if (config.type === 'table') {
+      classes.push('type-data-table')
+    }
+
     if (config.type === 'data-bite') {
       classes.push('cdc-open-viz-module', 'type-data-bite', currentViewport, config.theme, `font-${config.fontSize}`)
       if (isEditor) {
@@ -99,6 +103,13 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
       // Add TP5 style classes
       if (config.visualizationType === 'TP5 Waffle') {
         classes.push('waffle__style--tp5')
+        if (config.visual?.whiteBackground) {
+          classes.push('white-background-style')
+        }
+      }
+
+      if (config.visualizationType === 'TP5 Gauge') {
+        classes.push('gauge__style--tp5')
         if (config.visual?.whiteBackground) {
           classes.push('white-background-style')
         }

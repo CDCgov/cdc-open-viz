@@ -1,3 +1,4 @@
+// This file has been automatically migrated to valid ESM format by Storybook.
 import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
 import { mergeConfig } from 'vite'
@@ -29,21 +30,12 @@ const config: StorybookConfig = {
     options: {}
   },
 
-  features: {
-    storyStoreV7: true
-  },
-
   core: {
-    builder: getAbsolutePath('@storybook/builder-vite'),
     disableTelemetry: true
   },
 
   typescript: {
     reactDocgen: false // https://github.com/storybookjs/storybook/issues/22164#issuecomment-1603627308
-  },
-
-  docs: {
-    autodocs: 'tag'
   },
 
   viteFinal: async (config, { configType }) => {

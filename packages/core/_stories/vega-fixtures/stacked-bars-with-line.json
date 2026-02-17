@@ -1,0 +1,364 @@
+{
+  "data": {
+    "name": "data"
+  },
+  "params": [
+    {
+      "name": "dateExtent",
+      "expr": "extent(pluck(data('data_0'), 'date'))"
+    },
+    {
+      "name": "dateMax",
+      "expr": "dateExtent[1]"
+    }
+  ],
+  "layer": [
+    {
+      "mark": "bar",
+      "encoding": {
+        "x": {
+          "field": "date",
+          "type": "temporal",
+          "timeUnit": "yearmonth",
+          "title": "Month of Report",
+          "axis": {
+            "format": "%b %Y",
+            "grid": false
+          }
+        },
+        "y": {
+          "aggregate": "sum",
+          "field": "measlesTotal",
+          "title": "Number of Cases"
+        },
+        "color": {
+          "field": "whoRegion",
+          "title": "WHO Region",
+          "scale": {
+            "domain": [
+              "AFRO",
+              "AMRO",
+              "EMRO",
+              "EURO",
+              "SEARO",
+              "WPRO"
+            ],
+            "range": [
+              "#2D72D2",
+              "#DB2C6F",
+              "#8EB125",
+              "#9D3F9D",
+              "#00A396",
+              "#D1980B"
+            ]
+          },
+          "legend": {
+            "orient": "top"
+          }
+        },
+        "tooltip": [
+          {
+            "field": "whoRegion",
+            "title": "WHO Region"
+          },
+          {
+            "field": "date",
+            "type": "temporal",
+            "title": "Month",
+            "format": "%b %Y"
+          },
+          {
+            "field": "sum_measlesTotal",
+            "title": "Number of Cases",
+            "type": "quantitative",
+            "format": ","
+          }
+        ]
+      }
+    },
+    {
+      "transform": [
+        {
+          "filter": "datum.date < dateMax"
+        },
+        {
+          "calculate": "timeOffset('day', datum.date, 14)",
+          "as": "date_shifted"
+        },
+        {
+          "aggregate": [
+            {
+              "op": "sum",
+              "field": "measlesTotal",
+              "as": "cases"
+            }
+          ],
+          "groupby": [
+            "date",
+            "date_shifted"
+          ]
+        },
+        {
+          "window": [
+            {
+              "op": "mean",
+              "field": "cases",
+              "as": "cases_smooth"
+            }
+          ],
+          "frame": [
+            -1,
+            1
+          ],
+          "sort": [
+            {
+              "field": "date_shifted",
+              "order": "ascending"
+            }
+          ]
+        }
+      ],
+      "mark": {
+        "type": "line",
+        "color": "black",
+        "strokeWidth": 2,
+        "strokeDash": [
+          3,
+          3
+        ]
+      },
+      "encoding": {
+        "x": {
+          "field": "date_shifted",
+          "type": "temporal"
+        },
+        "y": {
+          "aggregate": "sum",
+          "field": "cases_smooth"
+        },
+        "strokeWidth": {
+          "datum": "3-month average (all cases)",
+          "title": " ",
+          "legend": {
+            "labelLimit": 250,
+            "orient": "top"
+          }
+        },
+        "tooltip": [
+          {
+            "field": "cases_smooth",
+            "title": "Moving Average",
+            "format": ".1f"
+          }
+        ]
+      }
+    }
+  ],
+  "height": "container",
+  "width": "container",
+  "datasets": {
+    "data": [
+      {
+        "date": "2025-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 2,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2024-11-01T04:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 183,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2024-03-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2024-06-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 57,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2024-12-01T05:00:00.000Z",
+        "whoRegionDesc": "Americas",
+        "measlesTotal": 0,
+        "whoRegion": "AMRO"
+      },
+      {
+        "date": "2024-06-01T04:00:00.000Z",
+        "whoRegionDesc": "Eastern Mediterranean",
+        "measlesTotal": 1793,
+        "whoRegion": "EMRO"
+      },
+      {
+        "date": "2024-12-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 3,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 1597,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2024-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 104,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2024-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 141,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 1,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2024-09-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 1,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 0,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2024-07-01T04:00:00.000Z",
+        "whoRegionDesc": "Southeast Asia",
+        "measlesTotal": 731,
+        "whoRegion": "SEARO"
+      },
+      {
+        "date": "2025-02-01T05:00:00.000Z",
+        "whoRegionDesc": "Western Pacific",
+        "measlesTotal": 0,
+        "whoRegion": "WPRO"
+      },
+      {
+        "date": "2025-04-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 0,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2024-09-01T04:00:00.000Z",
+        "whoRegionDesc": "Africa",
+        "measlesTotal": 2,
+        "whoRegion": "AFRO"
+      },
+      {
+        "date": "2024-08-01T04:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 1,
+        "whoRegion": "EURO"
+      },
+      {
+        "date": "2025-01-01T05:00:00.000Z",
+        "whoRegionDesc": "Europe",
+        "measlesTotal": 20,
+        "whoRegion": "EURO"
+      }
+    ]
+  },
+  "config": {
+    "background": "#FFFFFF",
+    "bar": {
+      "fill": "#2D72D2"
+    },
+    "arc": {
+      "fill": "#2D72D2"
+    },
+    "area": {
+      "fill": "#2D72D2"
+    },
+    "rect": {
+      "fill": "#2D72D2"
+    },
+    "circle": {
+      "fill": "#2D72D2"
+    },
+    "point": {
+      "stroke": "#2D72D2"
+    },
+    "line": {
+      "stroke": "#2D72D2"
+    },
+    "font": "Source-Sans-Pro",
+    "padding": 20,
+    "mark": {
+      "opacity": 0.75,
+      "tooltip": true
+    },
+    "title": {
+      "color": "#111418",
+      "fontSize": 14,
+      "fontWeight": 600,
+      "anchor": "start",
+      "subtitleColor": "#5F6B7C",
+      "subtitleFontSize": 12,
+      "subtitlePadding": 7
+    },
+    "axis": {
+      "labelFontSize": 12,
+      "titleFontSize": 14,
+      "titleFontWeight": 400,
+      "titlePadding": 10,
+      "titleColor": "#111418",
+      "labelColor": "#738091",
+      "gridColor": "#DCE0E5",
+      "gridOpacity": 1,
+      "domainColor": "#5F6B7C",
+      "tickColor": "#5F6B7C"
+    },
+    "legend": {
+      "titleColor": "#111418",
+      "labelColor": "#111418",
+      "titleFontSize": 12,
+      "labelFontSize": 12,
+      "titleFontWeight": 600
+    },
+    "view": {
+      "stroke": "transparent"
+    },
+    "text": {
+      "color": "#111418",
+      "fontSize": 12,
+      "fontWeight": 400
+    },
+    "range": {
+      "category": [
+        "#2D72D2",
+        "#DB2C6F",
+        "#8EB125",
+        "#9D3F9D",
+        "#00A396",
+        "#D1980B",
+        "#D33D17",
+        "#7961DB",
+        "#29A634",
+        "#946638",
+        "#147EB3"
+      ]
+    }
+  }
+}

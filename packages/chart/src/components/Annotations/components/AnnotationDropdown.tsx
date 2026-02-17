@@ -3,17 +3,12 @@ import ConfigContext from '../../../ConfigContext'
 import './AnnotationDropdown.styles.css'
 import Icon from '@cdc/core/components/ui/Icon'
 import Annotation from '..'
-import { APP_FONT_SIZE } from '@cdc/core/helpers/constants'
+import { isMobileAnnotationViewport } from '@cdc/core/helpers/viewports'
 
 const AnnotationDropdown = () => {
   const { currentViewport: viewport, config } = useContext(ConfigContext)
   const [expanded, setExpanded] = useState(false)
-
-  const titleFontSize = ['sm', 'xs', 'xxs'].includes(viewport) ? '13px' : `${APP_FONT_SIZE}px`
-
-  const {
-    config: { annotations }
-  } = useContext(ConfigContext)
+  const isMobile = isMobileAnnotationViewport(viewport)
 
   const limitHeight = {
     maxHeight: config.table.limitHeight && `${config.table.height}px`,
@@ -30,11 +25,13 @@ const AnnotationDropdown = () => {
   }
 
   const handleSectionClasses = () => {
-    const classes = [`data-table-container`, viewport, `d-block`, `d-lg-none`, `w-100`]
+    const classes = [`data-table-container`, viewport, `w-100`, 'mt-4']
 
-    if (config.general.showAnnotationDropdown) {
-      classes.push('d-lg-block')
-      classes.splice(classes.indexOf('d-lg-none'), 1)
+    // Show dropdown in mobile mode or if explicitly enabled
+    if (isMobile || config.general.showAnnotationDropdown) {
+      classes.push('d-block')
+    } else {
+      classes.push('d-none')
     }
     return classes.join(' ')
   }
@@ -43,7 +40,6 @@ const AnnotationDropdown = () => {
     <>
       <section className={handleSectionClasses()}>
         <div
-          style={{ fontSize: titleFontSize }}
           role='button'
           className={handleAccordionClassName()}
           onClick={() => {

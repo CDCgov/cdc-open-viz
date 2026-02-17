@@ -1,0 +1,133 @@
+{
+  "type": "chart",
+  "title": "Program A vs Program B Performance",
+  "showTitle": true,
+  "theme": "theme-blue",
+  "visualizationType": "Radar",
+  "animate": false,
+  "heights": {
+    "vertical": 400,
+    "horizontal": 400
+  },
+  "xAxis": {
+    "dataKey": "Program",
+    "label": "Program"
+  },
+  "yAxis": {
+    "dataKey": ""
+  },
+  "series": [
+    {
+      "dataKey": "Reach",
+      "name": "Reach",
+      "type": "Radar",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Engagement",
+      "name": "Engagement",
+      "type": "Radar",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Effectiveness",
+      "name": "Effectiveness",
+      "type": "Radar",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Adoption",
+      "name": "Adoption",
+      "type": "Radar",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Maintenance",
+      "name": "Maintenance",
+      "type": "Radar",
+      "axis": "Left",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Cost Efficiency",
+      "name": "Cost Efficiency",
+      "type": "Radar",
+      "axis": "Left",
+      "tooltip": true
+    }
+  ],
+  "radar": {
+    "gridRings": 4,
+    "showGridRings": true,
+    "gridRingStyle": "circles",
+    "scaleMin": 0,
+    "scaleMax": 100,
+    "showFill": false,
+    "fillOpacity": 0.25,
+    "showPoints": true,
+    "pointRadius": 5,
+    "strokeWidth": 2,
+    "axisLabelOffset": 25
+  },
+  "legend": {
+    "hide": false,
+    "behavior": "isolate",
+    "singleRow": true,
+    "position": "bottom",
+    "label": ""
+  },
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false
+  },
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": false
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "show": true,
+    "showDataTableLink": true
+  },
+  "general": {
+    "showDownloadButton": false,
+    "palette": {
+      "name": "qualitative_bold",
+      "version": "2.0",
+      "isReversed": false
+    }
+  },
+  "data": [
+    {
+      "Program": "Program A",
+      "Reach": 85,
+      "Engagement": 70,
+      "Effectiveness": 90,
+      "Adoption": 65,
+      "Maintenance": 75,
+      "Cost Efficiency": 80
+    },
+    {
+      "Program": "Program B",
+      "Reach": 60,
+      "Engagement": 85,
+      "Effectiveness": 70,
+      "Adoption": 90,
+      "Maintenance": 80,
+      "Cost Efficiency": 55
+    }
+  ],
+  "description": "RE-AIM framework comparison of two health intervention programs.",
+  "filters": [],
+  "exclusions": {
+    "active": false,
+    "keys": []
+  }
+}

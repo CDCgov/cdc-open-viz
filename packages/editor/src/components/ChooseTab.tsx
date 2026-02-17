@@ -4,30 +4,33 @@ import '../scss/choose-vis-tab.scss'
 import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 
-import DashboardIcon from '@cdc/core/assets/icon-dashboard.svg'
+import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
+import AreaChartIcon from '@cdc/core/assets/icon-area-chart.svg'
 import BarIcon from '@cdc/core/assets/icon-chart-bar.svg'
-import LineIcon from '@cdc/core/assets/icon-chart-line.svg'
-import PieIcon from '@cdc/core/assets/icon-chart-pie.svg'
+import BoxPlotIcon from '@cdc/core/assets/icon-chart-box-whisker.svg'
+import CodeIcon from '@cdc/core/assets/icon-code.svg'
+import ComboChartIcon from '@cdc/core/assets/icon-combo-chart.svg'
+import DashboardIcon from '@cdc/core/assets/icon-dashboard.svg'
+import DataBiteIcon from '@cdc/core/assets/icon-databite.svg'
+import DeviationIcon from '@cdc/core/assets/icon-deviation-bar.svg'
+import EpiChartIcon from '@cdc/core/assets/icon-epi-chart.svg'
+import ForecastIcon from '@cdc/core/assets/icon-chart-forecast.svg'
+import GaugeChartIcon from '@cdc/core/assets/icon-linear-gauge.svg'
 import GlobeIcon from '@cdc/core/assets/icon-map-world.svg'
+import HorizonChartIcon from '@cdc/core/assets/icon-chart-area.svg'
+import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg'
+import Icon from '@cdc/core/components/ui/Icon'
+import LineIcon from '@cdc/core/assets/icon-chart-line.svg'
+import PairedBarIcon from '@cdc/core/assets/icon-chart-bar-paired.svg'
+import PieIcon from '@cdc/core/assets/icon-chart-pie.svg'
+import RadarChartIcon from '@cdc/core/assets/icon-chart-radar.svg'
+import SankeyIcon from '@cdc/core/assets/icon-sankey.svg'
+import ScatterPlotIcon from '@cdc/core/assets/icon-chart-scatterplot.svg'
+import TableIcon from '@cdc/core/assets/icon-table.svg'
 import UsaIcon from '@cdc/core/assets/icon-map-usa.svg'
 import UsaRegionIcon from '@cdc/core/assets/usa-region-graphic.svg'
-import DataBiteIcon from '@cdc/core/assets/icon-databite.svg'
 import WaffleChartIcon from '@cdc/core/assets/icon-grid.svg'
-import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
-import PairedBarIcon from '@cdc/core/assets/icon-chart-bar-paired.svg'
-import HorizontalStackIcon from '@cdc/core/assets/icon-chart-bar-stacked.svg'
-import ScatterPlotIcon from '@cdc/core/assets/icon-chart-scatterplot.svg'
-import BoxPlotIcon from '@cdc/core/assets/icon-chart-box-whisker.svg'
-import AreaChartIcon from '@cdc/core/assets/icon-area-chart.svg'
-import GaugeChartIcon from '@cdc/core/assets/icon-linear-gauge.svg'
-import ForecastIcon from '@cdc/core/assets/icon-chart-forecast.svg'
-import DeviationIcon from '@cdc/core/assets/icon-deviation-bar.svg'
-import SankeyIcon from '@cdc/core/assets/icon-sankey.svg'
-import ComboChartIcon from '@cdc/core/assets/icon-combo-chart.svg'
-import EpiChartIcon from '@cdc/core/assets/icon-epi-chart.svg'
-import TableIcon from '@cdc/core/assets/icon-table.svg'
 import WarmingStripesIcon from '@cdc/core/assets/icon-warming-stripes.svg'
-import Icon from '@cdc/core/components/ui/Icon'
 
 import {
   convertVegaConfig,
@@ -318,6 +321,16 @@ const buttons = [
               scale.`
   },
   {
+    id: 26,
+    category: 'General',
+    label: 'Markup Include',
+    type: 'markup-include',
+    subType: null,
+    orientation: null,
+    icon: <CodeIcon />,
+    content: 'Include custom HTML markup or embed content from external URLs.'
+  },
+  {
     id: 17,
     category: 'General',
     label: 'Waffle Chart',
@@ -416,6 +429,16 @@ const buttons = [
     content: 'Display a forecasting chart to predict future data trends.'
   },
   {
+    id: 27,
+    category: 'Charts',
+    label: 'Horizon Chart',
+    type: 'chart',
+    subType: 'Horizon Chart',
+    orientation: 'vertical',
+    icon: <HorizonChartIcon />,
+    content: 'Display a horizon chart to visualize quantities over time in a smaller space.'
+  },
+  {
     id: 12,
     category: 'Charts',
     label: 'Horizontal Bar (Stacked)',
@@ -455,6 +478,16 @@ const buttons = [
     orientation: 'Pie',
     icon: <PieIcon />,
     content: 'Present the numerical proportions of a data series.'
+  },
+  {
+    id: 27,
+    category: 'Charts',
+    label: 'Radar',
+    type: 'chart',
+    subType: 'Radar',
+    orientation: 'vertical',
+    icon: <RadarChartIcon />,
+    content: 'Compare multiple quantitative variables across categories using a radial layout.'
   },
   {
     id: 10,

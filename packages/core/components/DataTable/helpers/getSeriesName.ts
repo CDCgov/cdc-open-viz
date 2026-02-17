@@ -16,6 +16,12 @@ export const getSeriesName = (column: string, config: TableConfig) => {
     return userDefinedSeries.name
   }
   if (config.runtimeSeriesLabels && config.runtimeSeriesLabels[column]) return config.runtimeSeriesLabels[column]
+
+  // For pie charts, use yAxis.label if the column is the yAxis data key
+  if (config.visualizationType === 'Pie' && column === config.yAxis?.dataKey && config.yAxis?.label) {
+    return config.yAxis.label
+  }
+
   const columnIsDataKey = column === config.xAxis?.dataKey
   const indexLabel = config.table?.indexLabel
   return columnIsDataKey && indexLabel ? indexLabel : getLabel(column, config)

@@ -22,15 +22,16 @@ import { Runtime } from '@cdc/core/types/Runtime'
 import { Label } from './types/Label'
 // External Libraries
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
-import { timeParse, timeFormat } from 'd3-time-format'
+import { timeParse } from 'd3-time-format'
 import parse from 'html-react-parser'
 import _ from 'lodash'
 // Primary Components
 import ConfigContext, { ChartDispatchContext } from './ConfigContext'
 import PieChart from './components/PieChart'
+import RadarChart from './components/RadarChart'
 import SankeyChart from './components/Sankey'
 import LinearChart from './components/LinearChart'
-import { isDateScale } from '@cdc/core/helpers/cove/date'
+import { isDateScale, formatDate as coreFormatDate } from '@cdc/core/helpers/cove/date'
 
 import { twoColorPalette } from '@cdc/core/data/colorPalettes'
 import { filterChartColorPalettes } from '@cdc/core/helpers/filterColorPalettes'
@@ -53,6 +54,7 @@ import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import MediaControls from '@cdc/core/components/MediaControls'
 import Annotation from './components/Annotations'
+import { getVisibleAnnotations } from './components/Annotations/helpers/getVisibleAnnotations'
 // Core Helpers
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
@@ -133,7 +135,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     coveLoadedEventRan,
     imageId,
     seriesHighlight,
-    colorScale
+    colorScale,
+    brushData
   } = state
   const { description, visualizationType } = config
   const svgRef = useRef(null)
@@ -263,7 +266,38 @@ const CdcChart: React.FC<CdcChartProps> = ({
       delete defaultsWithoutPalette.general?.palette
     }
 
+    // Override palette defaults for Line charts specifically
+    if (loadedConfig?.visualizationType === 'Line' && !loadedConfig?.general?.palette) {
+      if (!defaultsWithoutPalette.general) {
+        defaultsWithoutPalette.general = {}
+      }
+      defaultsWithoutPalette.general.palette = {
+        isReversed: false,
+        version: '2.0',
+        name: 'divergent_blue_cyan'
+      }
+    }
+
+    // Override palette defaults for Horizon Chart specifically
+    if (loadedConfig?.visualizationType === 'Horizon Chart' && !loadedConfig?.general?.palette) {
+      if (!defaultsWithoutPalette.general) {
+        defaultsWithoutPalette.general = {}
+      }
+      defaultsWithoutPalette.general.palette = {
+        isReversed: false,
+        version: '2.0',
+        name: 'sequential_blue'
+      }
+    }
+
     let newConfig = { ...defaultsWithoutPalette, ...loadedConfig }
+
+    // Ensure Horizon Chart has enough palette colors for all layers
+    if (newConfig.visualizationType === 'Horizon Chart') {
+      const numLayers = newConfig.horizon?.numLayers ?? 4
+      const currentCount = _.get(newConfig, 'general.paletteColorCount', 4)
+      _.set(newConfig, 'general.paletteColorCount', Math.max(currentCount, numLayers))
+    }
 
     _.defaultsDeep(newConfig, {
       table: { showVertical: false }
@@ -385,6 +419,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
       newConfig.runtime.seriesKeys = _.uniq(pieData.map(d => d[newConfig.xAxis.dataKey]))
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
       newConfig.runtime.isPieChart = true // Flag to know when to use derived keys
+    } else if (newConfig.visualizationType === 'Radar') {
+      // Radar chart: seriesKeys are the entity names from xAxis.dataKey
+      const radarData = currentData.length > 0 ? currentData : newExcludedData
+      newConfig.runtime.seriesKeys = _.uniq(radarData.map(d => d[newConfig.xAxis.dataKey]))
+      newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
     } else {
       const finalData = dataOverride || newConfig.formattedData || newConfig.data
       newConfig.runtime.seriesKeys = (newConfig.runtime.series || []).flatMap(series => {
@@ -456,6 +495,22 @@ const CdcChart: React.FC<CdcChartProps> = ({
         newConfig.runtime.areaSeriesKeys.push({ ...series, type: 'Area Chart' })
       })
       newConfig.visualizationSubType = 'stacked'
+    }
+
+    if (newConfig.visualizationType === 'Horizon Chart' && newConfig.series) {
+      // Apply horizon defaults if not set
+      newConfig.horizon = {
+        numLayers: 4,
+        mode: 'offset', // Always offset for now, mirror hidden from UI
+        bandGap: 15,
+        bottomPadding: 15,
+        ...newConfig.horizon
+      }
+
+      // Set categorical as default xAxis type for horizon charts if not already set
+      if (!newConfig.xAxis.type) {
+        newConfig.xAxis.type = 'categorical'
+      }
     }
 
     if (isHorizontalVariant) {
@@ -618,7 +673,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         if (newData) {
           newConfig.data = newData
         }
-      } else if (newConfig.formattedData) {
+      } else if (newConfig.formattedData && Array.isArray(newConfig.formattedData)) {
         newConfig.data = newConfig.formattedData
       } else if (newConfig.dataDescription) {
         // For dashboard contexts, get data from datasets if config.data is undefined
@@ -654,7 +709,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
           updateConfig(preparedConfig, preppedData.data)
         }
       } catch (err) {
-        console.error('Could not Load!')
+        console.error('Could not Load!', err)
       }
     }
 
@@ -745,6 +800,16 @@ const CdcChart: React.FC<CdcChartProps> = ({
       stateData.sort(sortData)
     }
   }, [config, stateData]) // eslint-disable-line
+
+  // Clear brush selection when brush slider is disabled
+  useEffect(() => {
+    const isBrushDisabled = !config?.xAxis?.brushActive
+    const hasBrushData = Array.isArray(brushData) && brushData.length > 0
+
+    if (isBrushDisabled && hasBrushData) {
+      dispatch({ type: 'SET_BRUSH_DATA', payload: [] })
+    }
+  }, [config?.xAxis?.brushActive, brushData])
 
   // Updates runtime axis labels when config or data changes when using markup variables
   useEffect(() => {
@@ -844,15 +909,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const formatDate = (date, i, ticks) => {
     const displayFormat =
       config.runtime[section].dateDisplayFormat || config.runtime[section].dateParseFormat || '%Y-%m-%d'
-    let formattedDate = timeFormat(displayFormat)(date)
-    // Handle the case where all months work with '%b.' except for May
-    if (displayFormat?.includes('%b.') && formattedDate.includes('May.')) {
-      formattedDate = formattedDate.replace(/May\./g, 'May')
-    }
+    let formattedDate = coreFormatDate(displayFormat, date)
     // Show years only once
     if (config.xAxis.showYearsOnce && displayFormat?.includes('%Y') && ticks) {
       const prevDate = ticks[i - 1] ? ticks[i - 1].value : null
-      const prevFormattedDate = timeFormat(displayFormat)(prevDate)
+      const prevFormattedDate = coreFormatDate(displayFormat, prevDate)
       const year = formattedDate.match(/\d{4}/)
       const prevYear = prevFormattedDate.match(/\d{4}/)
       if (year && prevYear && year[0] === prevYear[0]) {
@@ -863,7 +924,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const formatTooltipsDate = date => {
-    return timeFormat(config.tooltips.dateDisplayFormat)(date)
+    return coreFormatDate(config.tooltips.dateDisplayFormat, date)
   }
 
   // Format numeric data based on settings in config OR from passed in settings for Additional Columns
@@ -1118,6 +1179,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return tableConfig
   }
 
+  // Transform and clean data for chart rendering
+  const transformedData = getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean })
+
+  // Filter annotations to only those visible in current data view
+  const visibleAnnotations = getVisibleAnnotations(config.annotations, transformedData, config.xAxis?.dataKey)
+
   // Prevent render if loading
   let body = <Loading />
 
@@ -1209,7 +1276,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   />
                 )}
                 <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
-                {config.annotations?.length > 0 && (
+                {visibleAnnotations.length > 0 && (
                   <SkipTo
                     skipId={handleChartTabbing(config, legendId)}
                     skipMessage={`Skip over annotations`}
@@ -1239,7 +1306,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     {/* All charts with LinearChart */}
                     {filteredData &&
                       filteredData.length > 0 &&
-                      !['Spark Line', 'Line', 'Sankey', 'Pie', 'Sankey'].includes(config.visualizationType) && (
+                      !['Spark Line', 'Line', 'Sankey', 'Pie', 'Radar'].includes(config.visualizationType) && (
                         <div ref={parentRef} style={{ width: `100%` }}>
                           <ParentSize>
                             {parent => (
@@ -1253,6 +1320,19 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
                         {parent => (
                           <PieChart
+                            ref={svgRef}
+                            parentWidth={parent.width}
+                            parentHeight={parent.height}
+                            interactionLabel={interactionLabel}
+                          />
+                        )}
+                      </ParentSize>
+                    )}
+                    {/* Radar Chart */}
+                    {filteredData && filteredData.length > 0 && config.visualizationType === 'Radar' && (
+                      <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
+                        {parent => (
+                          <RadarChart
                             ref={svgRef}
                             parentWidth={parent.width}
                             parentHeight={parent.height}
@@ -1382,7 +1462,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       return (
                         <DataTable
                           /* changing the "key" will force the table to re-render
-                                  when the default sort changes while editing */
+                              when the default sort changes while editing */
                           key={dataTableDefaultSortBy}
                           config={dataTableConfig}
                           rawData={dataTableRawData}
@@ -1432,7 +1512,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         </MediaControls.Section>
                       </div>
                     )}
-                {config?.annotations?.length > 0 && <Annotation.Dropdown />}
+                {visibleAnnotations.length > 0 && <Annotation.Dropdown />}
                 {/* show pdf or image button */}
                 {processedLegacyFootnotes && (
                   <section className='footnotes pt-2 mt-4'>{parse(processedLegacyFootnotes)}</section>
@@ -1505,10 +1585,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
     setSharedFilterValue,
     svgRef,
     tableData: filteredData || excludedData,
-    transformedData: getTransformedData({ brushData: state.brushData, filteredData, excludedData, clean }),
+    transformedData,
     twoColorPalette,
     unfilteredData: stateData,
-    updateConfig
+    updateConfig,
+    visibleAnnotations
   }
 
   return (

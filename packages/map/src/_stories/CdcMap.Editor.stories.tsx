@@ -2877,7 +2877,7 @@ export const TextAnnotationsSectionTests: Story = {
     await waitForPresence('.cove-accordion__button', canvasElement)
     const annotationAccordionButtons = canvasElement.querySelectorAll('.cove-accordion__button')
     const annotationAccordionButton = Array.from(annotationAccordionButtons).find(
-      btn => btn.textContent?.includes('New Annotation') || btn.textContent?.includes('Select Column')
+      btn => btn.textContent?.includes('New annotation') || btn.textContent?.includes('Select Column')
     ) as HTMLElement
 
     expect(annotationAccordionButton).toBeTruthy()

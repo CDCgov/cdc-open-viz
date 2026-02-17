@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import CdcMapComponent from '../CdcMapComponent'
 import defaultPatterns from './_mock/default-patterns.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof CdcMapComponent> = {
   title: 'Components/Templates/Map/Table',
@@ -13,6 +14,9 @@ type Story = StoryObj<typeof CdcMapComponent>
 export const Show_Non_Geo_Data: Story = {
   args: {
     config: editConfigKeys(defaultPatterns, [{ path: ['table', 'showNonGeoData'], value: true }])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 

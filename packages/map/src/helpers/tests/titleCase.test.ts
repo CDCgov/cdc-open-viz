@@ -73,4 +73,15 @@ describe('titleCase', () => {
       'Commonwealth of the Northern Mariana Islands'
     )
   })
+
+  it('should keep "U.S." and "US" uppercase', () => {
+    expect(titleCase('U.S. VIRGIN ISLANDS')).toBe('U.S. Virgin Islands')
+    expect(titleCase('u.s. virgin islands')).toBe('U.S. Virgin Islands')
+    expect(titleCase('US VIRGIN ISLANDS')).toBe('US Virgin Islands')
+    expect(titleCase('us virgin islands')).toBe('US Virgin Islands')
+  })
+
+  it('should handle "U.S." with other special words', () => {
+    expect(titleCase('DEPARTMENT OF THE U.S. TREASURY')).toBe('Department of the U.S. Treasury')
+  })
 })

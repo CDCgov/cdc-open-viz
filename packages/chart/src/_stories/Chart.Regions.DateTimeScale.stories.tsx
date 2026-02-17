@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChart'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Regions/Date-Time Scale (Continuous)',
@@ -52,6 +53,10 @@ const baseDateTimeConfig = {
   regions: []
 }
 
+const play = async ({ canvasElement }) => {
+  await assertVisualizationRendered(canvasElement)
+}
+
 // LINE CHARTS
 
 export const Line_Fixed_From_Fixed_To: Story = {
@@ -73,7 +78,8 @@ export const Line_Fixed_From_Fixed_To: Story = {
       ]
     },
     isEditor: true
-  }
+  },
+  play
 }
 
 export const Line_Fixed_From_Last_Date: Story = {
@@ -95,7 +101,8 @@ export const Line_Fixed_From_Last_Date: Story = {
       ]
     },
     isEditor: true
-  }
+  },
+  play
 }
 
 export const Line_Previous_Days_Last_Date: Story = {
@@ -117,7 +124,8 @@ export const Line_Previous_Days_Last_Date: Story = {
       ]
     },
     isEditor: true
-  }
+  },
+  play
 }
 
 // BAR CHARTS
@@ -143,7 +151,8 @@ export const Bar_Fixed_From_Fixed_To: Story = {
       ]
     },
     isEditor: true
-  }
+  },
+  play
 }
 
 export const Bar_Fixed_From_Last_Date: Story = {
@@ -167,7 +176,8 @@ export const Bar_Fixed_From_Last_Date: Story = {
       ]
     },
     isEditor: true
-  }
+  },
+  play
 }
 
 export const Bar_Previous_Days_Last_Date: Story = {
@@ -191,7 +201,8 @@ export const Bar_Previous_Days_Last_Date: Story = {
       ]
     },
     isEditor: true
-  }
+  },
+  play
 }
 
 // EDGE CASES
@@ -215,7 +226,8 @@ export const Edge_Region_At_Start: Story = {
       ]
     },
     isEditor: true
-  }
+  },
+  play
 }
 
 export const Edge_Region_At_End: Story = {
@@ -237,7 +249,8 @@ export const Edge_Region_At_End: Story = {
       ]
     },
     isEditor: true
-  }
+  },
+  play
 }
 
 export const Edge_Full_Coverage: Story = {
@@ -259,7 +272,8 @@ export const Edge_Full_Coverage: Story = {
       ]
     },
     isEditor: true
-  }
+  },
+  play
 }
 
 export const Multiple_Regions: Story = {
@@ -291,7 +305,8 @@ export const Multiple_Regions: Story = {
       ]
     },
     isEditor: true
-  }
+  },
+  play
 }
 
 export default meta

@@ -1,10 +1,11 @@
-.cdc-open-viz-module .annotation__desktop-label {
-  display: none;
+.cdc-open-viz-module.type-chart .annotation__desktop-label {
+  line-height: 1.1rem;
+  font-size: 16px;
 }
 
-.cdc-open-viz-module {
+.cdc-open-viz-module.type-chart {
   .annotation__mobile-label-circle {
-    stroke-width: 2;
+    stroke-width: 1;
   }
 
   .annotation__has-dropdown-number {
@@ -12,20 +13,13 @@
     justify-content: center;
     align-items: center;
     border-radius: 50%;
-    padding: 8px;
-    width: 16px;
-    height: 16px;
-    border: 2px solid #666;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    border: 1px solid #666;
     text-align: center;
     font-size: 14px;
-  }
-}
-
-@container content (min-width: 700px) {
-  .cdc-open-viz-module .annotation__mobile-label {
-    display: none;
-  }
-  .cdc-open-viz-module .annotation__desktop-label {
-    display: block;
+    box-sizing: border-box;
   }
 }

@@ -16,10 +16,15 @@ export const filterVizData = (filters: Filter[], data) => {
     return []
   }
 
+  if (!Array.isArray(data)) {
+    console.warn('COVE: Data is not an array, received:', typeof data)
+    return []
+  }
+
   if (!filters) return data
   const filteredData: any[] = []
 
-  data?.forEach(row => {
+  data.forEach(row => {
     let add = true
     filters
       .filter(filter => filter.type !== 'url')

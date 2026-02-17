@@ -37,18 +37,32 @@ const CONFIG_URLS = {
 type MapStory = StoryObj<typeof CdcMap>
 type DashboardStory = StoryObj<typeof Dashboard>
 
-// Helper function to test map rendering
+// Helper function to test map rendering (supports both SVG and canvas-based maps)
 const testMapRendering = async (canvasElement: HTMLElement, storyName: string) => {
-  const canvas = within(canvasElement)
-
   await step('Wait for map to render', async () => {
-    const mapElement = await canvas.findByRole('img', { hidden: true }, { timeout: 10000 })
-    expect(mapElement).toBeInTheDocument()
+    await new Promise<void>((resolve, reject) => {
+      const startTime = Date.now()
+      const timeout = 15000
+
+      const checkMap = () => {
+        const svgMap = canvasElement.querySelector('svg[role="img"]')
+        const canvasMap = canvasElement.querySelector('canvas')
+        if (svgMap || canvasMap) {
+          resolve()
+        } else if (Date.now() - startTime > timeout) {
+          reject(new Error(`Timeout: No map element (svg or canvas) found after ${timeout}ms`))
+        } else {
+          setTimeout(checkMap, 100)
+        }
+      }
+      checkMap()
+    })
   })
 
-  await step('Verify SVG element is present', async () => {
-    const svgElement = canvasElement.querySelector('svg')
-    expect(svgElement).toBeInTheDocument()
+  await step('Verify map visualization is present', async () => {
+    const svgMap = canvasElement.querySelector('svg[role="img"]')
+    const canvasMap = canvasElement.querySelector('canvas')
+    expect(svgMap || canvasMap).toBeTruthy()
   })
 
   await step('Verify COVE module wrapper is present', async () => {
@@ -67,7 +81,7 @@ const testDashboardRendering = async (canvasElement: HTMLElement, storyName: str
       const timeout = 15000
 
       const checkDashboard = () => {
-        const dashboardElement = canvasElement.querySelector('.cove-dashboard')
+        const dashboardElement = canvasElement.querySelector('.type-dashboard')
         if (dashboardElement) {
           resolve()
         } else if (Date.now() - startTime > timeout) {
@@ -81,7 +95,7 @@ const testDashboardRendering = async (canvasElement: HTMLElement, storyName: str
   })
 
   await step('Verify dashboard wrapper is present', async () => {
-    const dashboard = canvasElement.querySelector('.cove-dashboard')
+    const dashboard = canvasElement.querySelector('.type-dashboard')
     expect(dashboard).toBeInTheDocument()
   })
 
@@ -144,25 +158,25 @@ export const Connecticut_2022: MapStory = {
  */
 export const All_EEE_Visualizations: StoryObj = {
   render: () => (
-    <div className="container-fluid p-4">
-      <h1 className="mb-4">Eastern Equine Encephalitis - Historic Data</h1>
+    <div className='container-fluid p-4'>
+      <h1 className='mb-4'>Eastern Equine Encephalitis - Historic Data</h1>
 
-      <section className="mb-5">
+      <section className='mb-5'>
         <h2>Cumulative Data for 2003–2024</h2>
         <Dashboard configUrl={CONFIG_URLS.cumulativeData} />
       </section>
 
-      <section className="mb-5">
+      <section className='mb-5'>
         <h2>Explore Human Data for 2003–2024</h2>
         <Dashboard configUrl={CONFIG_URLS.exploreHumanData} />
       </section>
 
-      <section className="mb-5">
+      <section className='mb-5'>
         <h2>Explore County Level Data for 2003–2024</h2>
         <CdcMap configUrl={CONFIG_URLS.exploreCountyData} />
       </section>
 
-      <section className="mb-5">
+      <section className='mb-5'>
         <h2>Connecticut 2022 Data</h2>
         <CdcMap configUrl={CONFIG_URLS.ct2022} />
       </section>

@@ -8,6 +8,7 @@ interface UseProgrammaticTooltipProps {
   setShowHoverLine: (show: boolean) => void
   handleTooltipMouseOver: (event: MouseEvent, additionalChartData?: any) => void
   hideTooltip: () => void
+  setSynchronizedXValue?: (value: any) => void
 }
 
 /**
@@ -21,7 +22,8 @@ export const useProgrammaticTooltip = ({
   setPoint,
   setShowHoverLine,
   handleTooltipMouseOver,
-  hideTooltip
+  hideTooltip,
+  setSynchronizedXValue
 }: UseProgrammaticTooltipProps) => {
   // Internal SVG ref for DOM manipulation
   const internalSvgRef = useRef<SVGSVGElement>(null)
@@ -50,6 +52,15 @@ export const useProgrammaticTooltip = ({
          * @param {number} yCoordinate - Exact Y coordinate to use
          */
         triggerTooltipAtDataValue: (xAxisValue: any, yCoordinate: number) => {
+          // Warming Stripes positions rects by index (with data sampling), not via xScale,
+          // so synthetic mouse events won't map to the correct data points.
+          // Route through synchronizedXValue state instead, which WarmingStripes
+          // resolves to the matching stripe and calls showTooltip directly.
+          if (config.visualizationType === 'Warming Stripes') {
+            setSynchronizedXValue?.(xAxisValue)
+            return
+          }
+
           const pixelX = getCoordinateFromXValue(xAxisValue)
           const adjustedX = pixelX + Number(config.yAxis.size || 0)
 
@@ -86,10 +97,20 @@ export const useProgrammaticTooltip = ({
         hideTooltip: () => {
           hideTooltip()
           setShowHoverLine(false)
+          setSynchronizedXValue?.(null)
         }
       })
     },
-    [getCoordinateFromXValue, config.yAxis.size, setPoint, setShowHoverLine, handleTooltipMouseOver, hideTooltip]
+    [
+      getCoordinateFromXValue,
+      config.yAxis.size,
+      config.visualizationType,
+      setPoint,
+      setShowHoverLine,
+      handleTooltipMouseOver,
+      hideTooltip,
+      setSynchronizedXValue
+    ]
   )
 
   return internalSvgRef

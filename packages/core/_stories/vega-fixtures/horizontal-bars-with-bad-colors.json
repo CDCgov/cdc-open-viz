@@ -1,0 +1,197 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "name": "barChartData",
+    "values": {
+      "function": "VegaAggregations.VegaBarChartAggregations"
+    }
+  },
+  "mark": "bar",
+  "encoding": {
+    "x": {
+      "field": "value",
+      "type": "quantitative",
+      "title": "Total Number of Cases",
+      "scale": {
+        "domain": {
+          "unionWith": [
+            0,
+            7
+          ]
+        }
+      },
+      "axis": {
+        "format": ",d",
+        "tickMinStep": 1,
+        "tickCount": 5
+      },
+      "format": ",d"
+    },
+    "y": {
+      "field": "label",
+      "type": "nominal",
+      "title": "Age Group",
+      "sort": "descending"
+    },
+    "color": {
+      "field": "label",
+      "type": "nominal",
+      "title": "Age Group",
+      "scale": {
+        "range": [
+          "#E8D166",
+          "#A78F19",
+          "#11B8B8",
+          "#008080",
+          "#005252",
+          "#013B3B",
+          "#E669B9",
+          "#9D3F9D",
+          "#5C255C"
+        ]
+      },
+      "legend": null
+    }
+  },
+  "height": "container",
+  "width": "container",
+  "datasets": {
+    "barChartData": [
+      {
+        "value": 5,
+        "columnName": "cumulativeCasesAgeGroupBin1",
+        "label": "0-10",
+        "date": "2025-05-30"
+      },
+      {
+        "value": 114,
+        "columnName": "cumulativeCasesAgeGroupBin2",
+        "label": "11-20",
+        "date": "2025-05-30"
+      },
+      {
+        "value": 1743,
+        "columnName": "cumulativeCasesAgeGroupBin3",
+        "label": "21-30",
+        "date": "2025-05-30"
+      },
+      {
+        "value": 2554,
+        "columnName": "cumulativeCasesAgeGroupBin4",
+        "label": "31-40",
+        "date": "2025-05-30"
+      },
+      {
+        "value": 1144,
+        "columnName": "cumulativeCasesAgeGroupBin5",
+        "label": "41-50",
+        "date": "2025-05-30"
+      },
+      {
+        "value": 457,
+        "columnName": "cumulativeCasesAgeGroupBin6",
+        "label": "51-60",
+        "date": "2025-05-30"
+      },
+      {
+        "value": 81,
+        "columnName": "cumulativeCasesAgeGroupBin7",
+        "label": "61-70",
+        "date": "2025-05-30"
+      },
+      {
+        "value": 9,
+        "columnName": "cumulativeCasesAgeGroupBin8",
+        "label": "71-84",
+        "date": "2025-05-30"
+      },
+      {
+        "value": 1,
+        "columnName": "cumulativeCasesAgeGroupBin9",
+        "label": "85+",
+        "date": "2025-05-30"
+      }
+    ]
+  },
+  "config": {
+    "background": "#FFFFFF",
+    "bar": {
+      "fill": "#2D72D2"
+    },
+    "arc": {
+      "fill": "#2D72D2"
+    },
+    "area": {
+      "fill": "#2D72D2"
+    },
+    "rect": {
+      "fill": "#2D72D2"
+    },
+    "circle": {
+      "fill": "#2D72D2"
+    },
+    "point": {
+      "stroke": "#2D72D2"
+    },
+    "line": {
+      "stroke": "#2D72D2"
+    },
+    "font": "Source-Sans-Pro",
+    "padding": 20,
+    "mark": {
+      "opacity": 0.75,
+      "tooltip": true
+    },
+    "title": {
+      "color": "#111418",
+      "fontSize": 14,
+      "fontWeight": 600,
+      "anchor": "start",
+      "subtitleColor": "#5F6B7C",
+      "subtitleFontSize": 12,
+      "subtitlePadding": 7
+    },
+    "axis": {
+      "labelFontSize": 12,
+      "titleFontSize": 14,
+      "titleFontWeight": 400,
+      "titlePadding": 10,
+      "titleColor": "#111418",
+      "labelColor": "#738091",
+      "gridColor": "#DCE0E5",
+      "gridOpacity": 1,
+      "domainColor": "#5F6B7C",
+      "tickColor": "#5F6B7C"
+    },
+    "legend": {
+      "titleColor": "#111418",
+      "labelColor": "#111418",
+      "titleFontSize": 12,
+      "labelFontSize": 12,
+      "titleFontWeight": 600
+    },
+    "view": {
+      "stroke": "transparent"
+    },
+    "text": {
+      "color": "#111418",
+      "fontSize": 12,
+      "fontWeight": 400
+    },
+    "range": {
+      "category": [
+        "#2D72D2",
+        "#DB2C6F",
+        "#8EB125",
+        "#9D3F9D",
+        "#00A396",
+        "#D1980B",
+        "#D33D17",
+        "#7961DB",
+        "#29A634",
+        "#946638",
+        "#147EB3"
+      ]
+    }
+  }
+}

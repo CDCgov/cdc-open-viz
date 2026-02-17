@@ -54,7 +54,7 @@ const testWaffleChartRendering = async (canvasElement: HTMLElement, storyName: s
   })
 
   await step('Verify waffle chart container is present', async () => {
-    const waffleContainer = canvasElement.querySelector('.cove-waffle-chart')
+    const waffleContainer = canvasElement.querySelector('.cove-waffle-chart, .cove-gauge-chart')
     expect(waffleContainer).toBeInTheDocument()
   })
 

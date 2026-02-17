@@ -1,0 +1,427 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "A top-k bar chart ranking film directors by revenue.",
+  "width": 500,
+  "height": 410,
+  "padding": 5,
+  "autosize": "fit",
+  "signals": [
+    {
+      "name": "k",
+      "value": 20,
+      "bind": {
+        "input": "range",
+        "min": 10,
+        "max": 30,
+        "step": 1
+      }
+    },
+    {
+      "name": "op",
+      "value": "average",
+      "bind": {
+        "input": "select",
+        "options": [
+          "average",
+          "median",
+          "sum"
+        ]
+      }
+    },
+    {
+      "name": "label",
+      "value": {
+        "average": "Average",
+        "median": "Median",
+        "sum": "Total"
+      }
+    }
+  ],
+  "title": {
+    "text": "top directors",
+    "anchor": "start",
+    "frame": "group"
+  },
+  "marks": [
+    {
+      "type": "rect",
+      "from": {
+        "data": "directors"
+      },
+      "encode": {
+        "update": {
+          "x": {
+            "scale": "x",
+            "value": 0
+          },
+          "x2": {
+            "scale": "x",
+            "field": "Gross"
+          },
+          "y": {
+            "scale": "y",
+            "field": "Director"
+          },
+          "height": {
+            "scale": "y",
+            "band": 1
+          }
+        }
+      }
+    }
+  ],
+  "scales": [
+    {
+      "name": "x",
+      "type": "linear",
+      "domain": {
+        "data": "directors",
+        "field": "Gross"
+      },
+      "range": "width",
+      "nice": true
+    },
+    {
+      "name": "y",
+      "type": "band",
+      "domain": {
+        "data": "directors",
+        "field": "Director",
+        "sort": {
+          "op": "max",
+          "field": "Gross",
+          "order": "descending"
+        }
+      },
+      "range": "height",
+      "padding": 0.1
+    }
+  ],
+  "axes": [
+    {
+      "scale": "x",
+      "orient": "bottom",
+      "format": "$,d",
+      "tickCount": 5
+    },
+    {
+      "scale": "y",
+      "orient": "left"
+    }
+  ],
+  "data": [
+    {
+      "name": "directors",
+      "values": [
+        {
+          "Title": "Following",
+          "US Gross": 44705,
+          "Worldwide Gross": 44705,
+          "US DVD Sales": null,
+          "Production Budget": 6000,
+          "Release Date": "Apr 04 1999",
+          "MPAA Rating": "R",
+          "Running Time min": null,
+          "Distributor": "Zeitgeist",
+          "Source": null,
+          "Major Genre": null,
+          "Creative Type": null,
+          "Director": "Christopher Nolan",
+          "Rotten Tomatoes Rating": null,
+          "IMDB Rating": 7.7,
+          "IMDB Votes": 15133
+        },
+        {
+          "Title": "Pirates",
+          "US Gross": 1641825,
+          "Worldwide Gross": 6341825,
+          "US DVD Sales": null,
+          "Production Budget": 40000000,
+          "Release Date": "Jul 01 1986",
+          "MPAA Rating": "R",
+          "Running Time min": null,
+          "Distributor": null,
+          "Source": null,
+          "Major Genre": null,
+          "Creative Type": null,
+          "Director": "Roman Polanski",
+          "Rotten Tomatoes Rating": 25,
+          "IMDB Rating": 5.8,
+          "IMDB Votes": 3275
+        },
+        {
+          "Title": "Tora, Tora, Tora",
+          "US Gross": 29548291,
+          "Worldwide Gross": 29548291,
+          "US DVD Sales": null,
+          "Production Budget": 25000000,
+          "Release Date": "Sep 23 1970",
+          "MPAA Rating": null,
+          "Running Time min": null,
+          "Distributor": null,
+          "Source": null,
+          "Major Genre": null,
+          "Creative Type": null,
+          "Director": "Richard Fleischer",
+          "Rotten Tomatoes Rating": null,
+          "IMDB Rating": null,
+          "IMDB Votes": null
+        },
+        {
+          "Title": "Darling Lili",
+          "US Gross": 5000000,
+          "Worldwide Gross": 5000000,
+          "US DVD Sales": null,
+          "Production Budget": 22000000,
+          "Release Date": "Jan 01 1970",
+          "MPAA Rating": null,
+          "Running Time min": null,
+          "Distributor": null,
+          "Source": null,
+          "Major Genre": null,
+          "Creative Type": null,
+          "Director": "Blake Edwards",
+          "Rotten Tomatoes Rating": null,
+          "IMDB Rating": 6.1,
+          "IMDB Votes": 858
+        },
+        {
+          "Title": "12 Angry Men",
+          "US Gross": 0,
+          "Worldwide Gross": 0,
+          "US DVD Sales": null,
+          "Production Budget": 340000,
+          "Release Date": "Apr 13 1957",
+          "MPAA Rating": null,
+          "Running Time min": null,
+          "Distributor": "United Artists",
+          "Source": "Original Screenplay",
+          "Major Genre": "Drama",
+          "Creative Type": null,
+          "Director": "Sidney Lumet",
+          "Rotten Tomatoes Rating": null,
+          "IMDB Rating": 8.9,
+          "IMDB Votes": 119101
+        },
+        {
+          "Title": "Twelve Monkeys",
+          "US Gross": 57141459,
+          "Worldwide Gross": 168841459,
+          "US DVD Sales": null,
+          "Production Budget": 29000000,
+          "Release Date": "Dec 27 1995",
+          "MPAA Rating": "R",
+          "Running Time min": null,
+          "Distributor": "Universal",
+          "Source": "Based on Short Film",
+          "Major Genre": "Drama",
+          "Creative Type": "Science Fiction",
+          "Director": "Terry Gilliam",
+          "Rotten Tomatoes Rating": null,
+          "IMDB Rating": 8.1,
+          "IMDB Votes": 169858
+        },
+        {
+          "Title": 1941,
+          "US Gross": 34175000,
+          "Worldwide Gross": 94875000,
+          "US DVD Sales": null,
+          "Production Budget": 32000000,
+          "Release Date": "Dec 14 1979",
+          "MPAA Rating": null,
+          "Running Time min": null,
+          "Distributor": "Universal",
+          "Source": "Original Screenplay",
+          "Major Genre": "Comedy",
+          "Creative Type": "Historical Fiction",
+          "Director": "Steven Spielberg",
+          "Rotten Tomatoes Rating": 33,
+          "IMDB Rating": 5.6,
+          "IMDB Votes": 13364
+        },
+        {
+          "Title": "2001: A Space Odyssey",
+          "US Gross": 56700000,
+          "Worldwide Gross": 68700000,
+          "US DVD Sales": null,
+          "Production Budget": 10500000,
+          "Release Date": "Apr 02 1968",
+          "MPAA Rating": null,
+          "Running Time min": null,
+          "Distributor": null,
+          "Source": "Original Screenplay",
+          "Major Genre": null,
+          "Creative Type": "Science Fiction",
+          "Director": "Stanley Kubrick",
+          "Rotten Tomatoes Rating": 96,
+          "IMDB Rating": 8.4,
+          "IMDB Votes": 160342
+        },
+        {
+          "Title": "20,000 Leagues Under the Sea",
+          "US Gross": 28200000,
+          "Worldwide Gross": 28200000,
+          "US DVD Sales": null,
+          "Production Budget": 5000000,
+          "Release Date": "Dec 23 1954",
+          "MPAA Rating": null,
+          "Running Time min": null,
+          "Distributor": "Walt Disney Pictures",
+          "Source": "Based on Book/Short Story",
+          "Major Genre": "Adventure",
+          "Creative Type": null,
+          "Director": "Richard Fleischer",
+          "Rotten Tomatoes Rating": 92,
+          "IMDB Rating": null,
+          "IMDB Votes": null
+        },
+        {
+          "Title": "24 7: Twenty Four Seven",
+          "US Gross": 72544,
+          "Worldwide Gross": 72544,
+          "US DVD Sales": null,
+          "Production Budget": 2000000,
+          "Release Date": "Apr 15 1998",
+          "MPAA Rating": "R",
+          "Running Time min": null,
+          "Distributor": "October Films",
+          "Source": "Original Screenplay",
+          "Major Genre": "Comedy",
+          "Creative Type": null,
+          "Director": "Shane Meadows",
+          "Rotten Tomatoes Rating": null,
+          "IMDB Rating": 6.9,
+          "IMDB Votes": 1417
+        },
+        {
+          "Title": "Twin Falls Idaho",
+          "US Gross": 985341,
+          "Worldwide Gross": 1027228,
+          "US DVD Sales": null,
+          "Production Budget": 500000,
+          "Release Date": "Jul 30 1999",
+          "MPAA Rating": "R",
+          "Running Time min": null,
+          "Distributor": "Sony Pictures Classics",
+          "Source": "Original Screenplay",
+          "Major Genre": "Drama",
+          "Creative Type": "Contemporary Fiction",
+          "Director": "Michael Polish",
+          "Rotten Tomatoes Rating": 77,
+          "IMDB Rating": 7.1,
+          "IMDB Votes": 2810
+        },
+        {
+          "Title": "3 Men and a Baby",
+          "US Gross": 167780960,
+          "Worldwide Gross": 167780960,
+          "US DVD Sales": null,
+          "Production Budget": 15000000,
+          "Release Date": "Nov 25 1987",
+          "MPAA Rating": null,
+          "Running Time min": null,
+          "Distributor": "Walt Disney Pictures",
+          "Source": "Remake",
+          "Major Genre": "Comedy",
+          "Creative Type": "Contemporary Fiction",
+          "Director": "Leonard Nimoy",
+          "Rotten Tomatoes Rating": null,
+          "IMDB Rating": 5.7,
+          "IMDB Votes": 16764
+        },
+        {
+          "Title": "Four Rooms",
+          "US Gross": 4301000,
+          "Worldwide Gross": 4301000,
+          "US DVD Sales": null,
+          "Production Budget": 4000000,
+          "Release Date": "Dec 25 1995",
+          "MPAA Rating": "R",
+          "Running Time min": null,
+          "Distributor": "Miramax",
+          "Source": "Original Screenplay",
+          "Major Genre": "Comedy",
+          "Creative Type": "Contemporary Fiction",
+          "Director": "Robert Rodriguez",
+          "Rotten Tomatoes Rating": 14,
+          "IMDB Rating": 6.4,
+          "IMDB Votes": 34328
+        },
+        {
+          "Title": "The Four Seasons",
+          "US Gross": 42488161,
+          "Worldwide Gross": 42488161,
+          "US DVD Sales": null,
+          "Production Budget": 6500000,
+          "Release Date": "May 22 1981",
+          "MPAA Rating": null,
+          "Running Time min": null,
+          "Distributor": "Universal",
+          "Source": "Original Screenplay",
+          "Major Genre": "Comedy",
+          "Creative Type": "Contemporary Fiction",
+          "Director": "Alan Alda",
+          "Rotten Tomatoes Rating": 71,
+          "IMDB Rating": 7,
+          "IMDB Votes": 1814
+        },
+        {
+          "Title": "Four Weddings and a Funeral",
+          "US Gross": 52700832,
+          "Worldwide Gross": 242895809,
+          "US DVD Sales": null,
+          "Production Budget": 4500000,
+          "Release Date": "Mar 09 1994",
+          "MPAA Rating": "R",
+          "Running Time min": null,
+          "Distributor": "Gramercy",
+          "Source": "Original Screenplay",
+          "Major Genre": "Romantic Comedy",
+          "Creative Type": "Contemporary Fiction",
+          "Director": "Mike Newell",
+          "Rotten Tomatoes Rating": 96,
+          "IMDB Rating": 7.1,
+          "IMDB Votes": 39003
+        }
+      ],
+      "transform": [
+        {
+          "type": "filter",
+          "expr": "datum.Director != null && datum['Worldwide Gross'] != null"
+        },
+        {
+          "type": "aggregate",
+          "groupby": [
+            "Director"
+          ],
+          "ops": [
+            "average"
+          ],
+          "fields": [
+            "Worldwide Gross"
+          ],
+          "as": [
+            "Gross"
+          ]
+        },
+        {
+          "type": "window",
+          "sort": {
+            "field": "Gross",
+            "order": "descending"
+          },
+          "ops": [
+            "row_number"
+          ],
+          "as": [
+            "rank"
+          ]
+        },
+        {
+          "type": "filter",
+          "expr": "datum.rank <= k"
+        }
+      ]
+    }
+  ]
+}

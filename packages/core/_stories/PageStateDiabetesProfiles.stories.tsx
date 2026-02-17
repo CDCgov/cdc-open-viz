@@ -16,7 +16,8 @@ const meta: Meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Stories for visualizations from the CDC State Diabetes Profiles page (https://www.cdc.gov/diabetes-state-local/php/state-profiles/index.html)'
+        component:
+          'Stories for visualizations from the CDC State Diabetes Profiles page (https://www.cdc.gov/diabetes-state-local/php/state-profiles/index.html)'
       }
     }
   },
@@ -92,12 +93,16 @@ const useConfigWithAbsoluteDataUrl = (configUrl: string) => {
 
               newDatasets[absoluteKey] = {
                 ...dataset,
-                dataFileName: (dataset as any).dataFileName && !(dataset as any).dataFileName.startsWith('http')
-                  ? `https://www.cdc.gov/${(dataset as any).dataFileName.replace(/^(\.\.\/)+/, '').replace(/^\//, '')}`
-                  : (dataset as any).dataFileName,
-                dataUrl: (dataset as any).dataUrl && !(dataset as any).dataUrl.startsWith('http')
-                  ? `https://www.cdc.gov/${(dataset as any).dataUrl.replace(/^(\.\.\/)+/, '').replace(/^\//, '')}`
-                  : (dataset as any).dataUrl
+                dataFileName:
+                  (dataset as any).dataFileName && !(dataset as any).dataFileName.startsWith('http')
+                    ? `https://www.cdc.gov/${(dataset as any).dataFileName
+                        .replace(/^(\.\.\/)+/, '')
+                        .replace(/^\//, '')}`
+                    : (dataset as any).dataFileName,
+                dataUrl:
+                  (dataset as any).dataUrl && !(dataset as any).dataUrl.startsWith('http')
+                    ? `https://www.cdc.gov/${(dataset as any).dataUrl.replace(/^(\.\.\/)+/, '').replace(/^\//, '')}`
+                    : (dataset as any).dataUrl
               }
             }
           })
@@ -139,7 +144,7 @@ const testDashboardRendering = async (canvasElement: HTMLElement, storyName: str
       const timeout = 30000 // Longer timeout for external data loading
 
       const checkDashboard = () => {
-        const dashboardElement = canvasElement.querySelector('.cove-dashboard')
+        const dashboardElement = canvasElement.querySelector('.type-dashboard')
         const loadingDiv = canvasElement.querySelector('div')
 
         // Log current state for debugging
@@ -160,7 +165,7 @@ const testDashboardRendering = async (canvasElement: HTMLElement, storyName: str
   })
 
   await step('Verify dashboard wrapper is present', async () => {
-    const dashboard = canvasElement.querySelector('.cove-dashboard')
+    const dashboard = canvasElement.querySelector('.type-dashboard')
     expect(dashboard).toBeInTheDocument()
   })
 

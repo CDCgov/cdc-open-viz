@@ -653,6 +653,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     visHasLegendAxisAlign,
     visHasLegendColorCategory,
     visHasSelectableLegendValues,
+    visSupportsClickingLegend,
     visSupportsDateCategoryAxis,
     visSupportsDateCategoryAxisLabel,
     visSupportsDateCategoryAxisLine,
@@ -755,6 +756,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     }
     if (isDateScale(updatedConfig.xAxis) && !updatedConfig.xAxis.padding) {
       updatedConfig.xAxis.padding = 0
+    }
+    // Default Radar charts to a taller height
+    if (updatedConfig.visualizationType === 'Radar' && updatedConfig.heights?.vertical <= 400) {
+      updatedConfig.heights.vertical = 400
     }
     // DEV-8008 - Remove Bar styling when Line is converted to Bar
     if (updatedConfig.visualizationType === 'Line') {
@@ -1892,6 +1897,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     </AccordionItem>
                   )}
                 <Panels.BoxPlot name='Measures' />
+                <Panels.Radar name='Radar Chart Settings' />
                 {/* Left Value Axis */}
                 {visSupportsLeftValueAxis() && (
                   <AccordionItem>
@@ -4250,7 +4256,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       />
 
                       <CheckBox
-                        display={config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)}
+                        display={
+                          config.visualizationType !== 'Radar' &&
+                          config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)
+                        }
                         value={config.legend.hideSuppressedLabels}
                         section='legend'
                         fieldName='hideSuppressedLabels'
@@ -4274,7 +4283,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         }
                       />
                       <CheckBox
-                        display={config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)}
+                        display={
+                          config.visualizationType !== 'Radar' &&
+                          config.preliminaryData?.some(pd => pd.label && pd.type === 'suppression' && pd.value)
+                        }
                         value={config.legend.hideSuppressionLink}
                         section='legend'
                         fieldName='hideSuppressionLink'
@@ -4296,7 +4308,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       />
 
                       <Select
-                        display={hasDynamicCategory || hasMultipleSeries}
+                        display={visSupportsClickingLegend() && (hasDynamicCategory || hasMultipleSeries)}
                         value={config.legend.behavior}
                         section='legend'
                         fieldName='behavior'
@@ -4580,14 +4592,16 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                 )}
                 <Panels.Annotate name='Text Annotations' />
                 {/* {(config.visualizationType === 'Bar' || config.visualizationType === 'Line') && <Panels.DateHighlighting name='Date Highlighting' />} */}
-                <PanelMarkup
-                  name='Markup Variables'
-                  markupVariables={config.markupVariables || []}
-                  data={rawData}
-                  enableMarkupVariables={config.enableMarkupVariables || false}
-                  onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
-                  onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
-                />
+                {config.visualizationType !== 'Radar' && (
+                  <PanelMarkup
+                    name='Markup Variables'
+                    markupVariables={config.markupVariables || []}
+                    data={rawData}
+                    enableMarkupVariables={config.enableMarkupVariables || false}
+                    onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
+                    onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
+                  />
+                )}
                 <Panels.SmallMultiples name='Small Multiples' />
               </Accordion>
               {config.type !== 'Spark Line' && (

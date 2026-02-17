@@ -82,7 +82,7 @@ export const generateRuntimeLegend = (
     result.runtimeDataHash = runtimeFilters?.fromHash
 
     // Unified will base the legend off ALL the data maps received. Otherwise, it will use
-    let dataSet = legend.unified ? data : Object?.values(runtimeData)
+    let dataSet = legend.unified ? data : Object.values(runtimeData ?? {})
 
     let domainNums = Array.from(new Set(dataSet?.map(item => item[configObj.columns.primary.name])))
       .filter(d => typeof d === 'number' && !isNaN(d))

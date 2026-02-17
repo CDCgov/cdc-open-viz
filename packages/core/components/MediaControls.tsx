@@ -1,5 +1,4 @@
 import React from 'react'
-// import html2pdf from 'html2pdf.js'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { prepareScreenshotContainer } from '@cdc/core/helpers/prepareScreenshot'

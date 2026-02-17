@@ -729,3 +729,240 @@ export const VisualSectionTests: Story = {
     )
   }
 }
+
+/**
+ * TP5 GAUGE - GENERAL SECTION TESTS
+ * Tests all functionality within the General accordion for TP5 Gauge configs.
+ */
+export const TP5GaugeGeneralSectionTests: Story = {
+  args: {
+    configUrl: '/packages/waffle-chart/examples/tp5-gauge.json',
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'General')
+    await waitForPresence('.cdc-callout', canvasElement)
+
+    // ============================================================================
+    // TEST 1: Chart Type Change (TP5 Gauge <-> TP5 Waffle)
+    // Expectation: Gauge container swaps with waffle container.
+    // ============================================================================
+    const chartTypeSelect = canvas.getByLabelText(/chart type/i) as HTMLSelectElement
+    expect(chartTypeSelect).toBeTruthy()
+
+    const getChartTypeState = () => ({
+      hasGauge: !!canvasElement.querySelector('.cove-gauge-chart'),
+      hasWaffle: !!canvasElement.querySelector('.cove-waffle-chart')
+    })
+
+    await performAndAssert(
+      'TP5 Gauge to TP5 Waffle',
+      getChartTypeState,
+      async () => {
+        await userEvent.selectOptions(chartTypeSelect, 'TP5 Waffle')
+      },
+      (before, after) => before.hasGauge !== after.hasGauge && after.hasWaffle
+    )
+
+    await performAndAssert(
+      'TP5 Waffle to TP5 Gauge',
+      getChartTypeState,
+      async () => {
+        await userEvent.selectOptions(chartTypeSelect, 'TP5 Gauge')
+      },
+      (before, after) => before.hasGauge !== after.hasGauge && after.hasGauge
+    )
+
+    // ============================================================================
+    // TEST 2: Title Update
+    // Expectation: Callout heading text updates.
+    // ============================================================================
+    const titleInput = canvas.getByLabelText(/^title$/i, { selector: 'input' }) as HTMLInputElement
+    await userEvent.clear(titleInput)
+    await userEvent.type(titleInput, 'TP5 Gauge Title Update')
+
+    await performAndAssert(
+      'TP5 Gauge Title Update',
+      () => canvasElement.querySelector('.cdc-callout__heading')?.textContent?.trim() || '',
+      async () => {}, // action already performed above
+      (before, after) => after === 'TP5 Gauge Title Update'
+    )
+
+    // ============================================================================
+    // TEST 3: Show Title Toggle
+    // Expectation: Callout heading appears/disappears.
+    // ============================================================================
+    const showTitleCheckbox = canvasElement.querySelector('input[name="showTitle"]') as HTMLInputElement
+    expect(showTitleCheckbox).toBeTruthy()
+
+    const headingVisible = () => !!canvasElement.querySelector('.cdc-callout__heading')
+    const wasVisible = headingVisible()
+
+    await performAndAssert(
+      'TP5 Gauge Title Toggle',
+      headingVisible,
+      async () => {
+        await userEvent.click(showTitleCheckbox)
+      },
+      (before, after) => after !== before
+    )
+
+    await performAndAssert(
+      'TP5 Gauge Title Toggle Reset',
+      headingVisible,
+      async () => {
+        await userEvent.click(showTitleCheckbox)
+      },
+      (before, after) => after === wasVisible
+    )
+
+    // ============================================================================
+    // TEST 4: Message Update
+    // Expectation: Gauge content text updates.
+    // ============================================================================
+    const messageTextarea = canvas.getByLabelText(/message/i) as HTMLTextAreaElement
+    const newMessage = 'Updated TP5 gauge message text'
+    await userEvent.clear(messageTextarea)
+    await userEvent.type(messageTextarea, newMessage)
+    await waitForTextContent(
+      canvasElement.querySelector('.cove-gauge-chart__content .cove-waffle-chart__data--text') as HTMLElement,
+      newMessage
+    )
+
+    // ============================================================================
+    // TEST 5: Subtext Update
+    // Expectation: Subtext text updates.
+    // ============================================================================
+    const subtextInput = canvas.getByLabelText(/subtext/i) as HTMLInputElement
+    const newSubtext = 'Updated TP5 gauge subtext'
+    await userEvent.clear(subtextInput)
+    await userEvent.type(subtextInput, newSubtext)
+    await waitForTextContent(
+      canvasElement.querySelector('.cove-gauge-chart .cove-waffle-chart__subtext') as HTMLElement,
+      newSubtext
+    )
+  }
+}
+
+/**
+ * TP5 GAUGE - DATA SECTION TESTS
+ * Tests all functionality within the Data accordion for TP5 Gauge configs.
+ */
+export const TP5GaugeDataSectionTests: Story = {
+  args: {
+    configUrl: '/packages/waffle-chart/examples/tp5-gauge.json',
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Data')
+
+    const getPrimaryText = () =>
+      canvasElement.querySelector('.cove-waffle-chart__data--primary')?.textContent?.replace(/\s+/g, ' ').trim() || ''
+
+    // ============================================================================
+    // TEST 1: Data Function Change
+    // Expectation: Primary value text changes.
+    // ============================================================================
+    const dataFunctionSelect = canvasElement.querySelector('select[name="dataFunction"]') as HTMLSelectElement
+    await waitForOptionsToPopulate(dataFunctionSelect, 2)
+    const dataFunctionOptions = Array.from(dataFunctionSelect.options).map(opt => opt.value)
+    const nextFunction = dataFunctionOptions.find(opt => opt && opt !== dataFunctionSelect.value)
+    expect(nextFunction).toBeTruthy()
+
+    await performAndAssert(
+      'TP5 Gauge Data Function Change',
+      getPrimaryText,
+      async () => {
+        await userEvent.selectOptions(dataFunctionSelect, nextFunction as string)
+      },
+      (before, after) => after !== before
+    )
+
+    // ============================================================================
+    // TEST 2: Value Description Update
+    // Expectation: Primary value text includes new descriptor.
+    // ============================================================================
+    const valueDescriptionInput = canvasElement.querySelector(
+      'input[name="null-null-valueDescription"]'
+    ) as HTMLInputElement
+    expect(valueDescriptionInput).toBeTruthy()
+    const newDescription = 'out of total'
+    await userEvent.clear(valueDescriptionInput)
+    await userEvent.type(valueDescriptionInput, newDescription)
+    await performAndAssert(
+      'TP5 Gauge Value Description Update',
+      getPrimaryText,
+      async () => {}, // action already performed above
+      (before, after) => after.includes(newDescription)
+    )
+
+    // ============================================================================
+    // TEST 3: Denominator Update
+    // Expectation: Primary value text changes to include new denominator.
+    // ============================================================================
+    const denominatorInput = canvasElement.querySelector('input[name="null-null-dataDenom"]') as HTMLInputElement
+    expect(denominatorInput).toBeTruthy()
+    await performAndAssert(
+      'TP5 Gauge Denominator Update',
+      getPrimaryText,
+      async () => {
+        await userEvent.clear(denominatorInput)
+        await userEvent.type(denominatorInput, '250')
+      },
+      (before, after) => after !== before && after.includes('250')
+    )
+  }
+}
+
+/**
+ * TP5 GAUGE - VISUAL SECTION TESTS
+ * Tests all functionality within the Visual accordion for TP5 Gauge configs.
+ */
+export const TP5GaugeVisualSectionTests: Story = {
+  args: {
+    configUrl: '/packages/waffle-chart/examples/tp5-gauge.json',
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Visual')
+    await waitForPresence('.cdc-callout', canvasElement)
+
+    // ============================================================================
+    // TEST 1: White Background Toggle
+    // Expectation: Callout classes and flag visibility toggle.
+    // ============================================================================
+    const whiteBackgroundCheckbox = canvas.getByLabelText(/use white background style/i) as HTMLInputElement
+    expect(whiteBackgroundCheckbox).toBeTruthy()
+
+    const getCalloutState = () => {
+      const callout = canvasElement.querySelector('.cdc-callout') as HTMLElement
+      return {
+        classes: callout ? Array.from(callout.classList).sort().join(' ') : '',
+        hasFlag: !!canvasElement.querySelector('.cdc-callout__flag')
+      }
+    }
+
+    await performAndAssert(
+      'TP5 Gauge White Background Toggle',
+      getCalloutState,
+      async () => {
+        await userEvent.click(whiteBackgroundCheckbox)
+      },
+      (before, after) => before.classes !== after.classes || before.hasFlag !== after.hasFlag,
+      after => {
+        if (after.hasFlag) {
+          expect(after.classes.includes('cdc-callout--data')).toBe(true)
+        } else {
+          expect(after.classes.includes('cdc-callout--data')).toBe(false)
+          expect(after.classes.includes('dfe-block')).toBe(false)
+        }
+      }
+    )
+  }
+}

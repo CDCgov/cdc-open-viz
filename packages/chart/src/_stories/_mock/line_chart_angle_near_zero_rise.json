@@ -1,0 +1,195 @@
+{
+  "type": "chart",
+  "title": "Near Zero Rise Angle",
+  "theme": "theme-blue",
+  "animate": false,
+  "fontSize": "medium",
+  "lineDatapointStyle": "always show",
+  "visualizationSubType": "regular",
+  "padding": {
+    "left": 5,
+    "right": 5
+  },
+  "yAxis": {
+    "hideAxis": false,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "68",
+    "gridLines": true,
+    "enablePadding": false,
+    "min": "0",
+    "max": "120",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "axisPadding": 0,
+    "scalePadding": 10,
+    "tickRotation": 0,
+    "label": "Value"
+  },
+  "topAxis": {
+    "hasLine": false
+  },
+  "height": "450",
+  "xAxis": {
+    "sortDates": false,
+    "type": "categorical",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "78",
+    "tickRotation": "0",
+    "min": "",
+    "max": "",
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "numTicks": "",
+    "labelOffset": 0,
+    "axisPadding": 0,
+    "padding": 5,
+    "dataKey": "Category",
+    "label": "Data Points"
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "Testing near-zero rise angles (close to 0°)",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "download": true,
+    "showVertical": true,
+    "show": true
+  },
+  "orientation": "vertical",
+  "legend": {
+    "hide": false,
+    "behavior": "highlight",
+    "axisAlign": true,
+    "singleRow": false,
+    "colorCode": "",
+    "reverseLabelOrder": false,
+    "description": "Near-zero rise angle line",
+    "label": "Series",
+    "lineMode": false,
+    "verticalSorted": false,
+    "highlightOnHover": false,
+    "style": "lines",
+    "subStyle": "linear blocks",
+    "shape": "circle",
+    "hideBorder": {
+      "side": false,
+      "topBottom": true
+    },
+    "position": "right",
+    "hasShape": true
+  },
+  "exclusions": {
+    "active": false,
+    "keys": []
+  },
+  "palette": "qualitative4",
+  "isPaletteReversed": false,
+  "labels": true,
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": "",
+    "abbreviated": false
+  },
+  "confidenceKeys": {},
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true,
+    "verticalHoverLine": false,
+    "horizontalHoverLine": false,
+    "lineDatapointSymbol": "standard"
+  },
+  "data": [
+    {
+      "Category": "A",
+      "Near Zero Rise": "5"
+    },
+    {
+      "Category": "B",
+      "Near Zero Rise": "10"
+    },
+    {
+      "Category": "C",
+      "Near Zero Rise": "80"
+    },
+    {
+      "Category": "D",
+      "Near Zero Rise": "90"
+    },
+    {
+      "Category": "E",
+      "Near Zero Rise": "0"
+    },
+    {
+      "Category": "F",
+      "Near Zero Rise": "5"
+    },
+    {
+      "Category": "G",
+      "Near Zero Rise": "100"
+    },
+    {
+      "Category": "H",
+      "Near Zero Rise": "10"
+    }
+  ],
+  "visualizationType": "Line",
+  "series": [
+    {
+      "dataKey": "Near Zero Rise",
+      "type": "Line",
+      "axis": "Left",
+      "tooltip": true
+    }
+  ],
+  "description": "Testing edge case near-zero rise angles (close to 0°/360°) where the line is nearly horizontal with slight upward movement.",
+  "annotations": [],
+  "debugSvg": false,
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "showTitle": true,
+  "showDownloadMediaButton": false,
+  "lineDatapointColor": "Same as Line",
+  "isResponsiveTicks": false,
+  "general": {
+    "annotationDropdownText": "Annotations",
+    "showDownloadButton": false,
+    "showMissingDataLabel": true,
+    "showSuppressedSymbol": true,
+    "showZeroValueData": true,
+    "hideNullValue": true,
+    "useIntelligentLineChartLabels": true
+  },
+  "isLegendValue": false,
+  "barSpace": 15,
+  "heights": {
+    "vertical": 450,
+    "horizontal": 750
+  },
+  "columns": {},
+  "brush": {
+    "height": 45,
+    "active": false
+  },
+  "useLogScale": false,
+  "filterBehavior": "Filter Change",
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false,
+    "dateDisplayFormat": ""
+  },
+  "version": "4.25.1"
+}

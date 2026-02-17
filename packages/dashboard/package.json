@@ -2,30 +2,9 @@
   "name": "@cdc/dashboard",
   "version": "4.25.11",
   "description": "React component for combining multiple visualizations into a single dashboard",
-  "moduleName": "CdcDashboard",
-  "main": "dist/cdcdashboard",
-  "type": "module",
-  "scripts": {
-    "start": "vite --open",
-    "build": "vite build",
-    "preview": "vite preview",
-    "graph": "nx graph",
-    "prepublishOnly": "lerna run --scope @cdc/dashboard build",
-    "test": "vitest run --reporter verbose",
-    "test-watch": "vitest watch --reporter verbose",
-    "test-watch:ui": "vitest --ui",
-    "coverage": "vitest run --coverage"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/CDCgov/cdc-open-viz",
-    "directory": "packages/dashboard"
-  },
-  "author": "Matthew Pallansch <mpallansch@adittech.com>",
-  "bugs": {
-    "url": "https://github.com/CDCgov/cdc-open-viz/issues"
-  },
   "license": "Apache-2.0",
+  "author": "Matthew Pallansch <mpallansch@adittech.com>",
+  "bugs": "https://github.com/CDCgov/cdc-open-viz/issues",
   "dependencies": {
     "@cdc/chart": "^4.25.11",
     "@cdc/core": "^4.25.11",
@@ -36,20 +15,39 @@
     "@cdc/waffle-chart": "^4.25.11",
     "js-base64": "^2.5.2",
     "react-accessible-accordion": "^5.0.1",
-    "react-dnd": "^14.0.2",
-    "react-dnd-html5-backend": "^14.0.0",
-    "use-debounce": "^6.0.1"
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "use-debounce": "^10.1.0"
   },
+  "devDependencies": {
+    "@rollup/plugin-dsv": "^3.0.2",
+    "@vitejs/plugin-react": "^5.1.2",
+    "sass": "^1.89.2",
+    "vite-plugin-css-injected-by-js": "^2.4.0",
+    "vite-plugin-svgr": "^4.2.0"
+  },
+  "gitHead": "6097de1ff814001880d9ac64bd66becdc092d63c",
+  "main": "dist/cdcdashboard",
+  "moduleName": "CdcDashboard",
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.4",
-    "vite-plugin-css-injected-by-js": "^2.4.0",
-    "vite-plugin-svgr": "^4.2.0",
-    "@rollup/plugin-dsv": "^3.0.2",
-    "sass": "^1.89.2"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CDCgov/cdc-open-viz",
+    "directory": "packages/dashboard"
   },
-  "gitHead": "6097de1ff814001880d9ac64bd66becdc092d63c"
+  "scripts": {
+    "build": "vite build",
+    "coverage": "vitest run --coverage",
+    "graph": "nx graph",
+    "prepublishOnly": "lerna run --scope @cdc/dashboard build",
+    "preview": "vite preview",
+    "start": "vite --open",
+    "test": "vitest run --reporter verbose",
+    "test-watch": "vitest watch --reporter verbose",
+    "test-watch:ui": "vitest --ui"
+  },
+  "type": "module"
 }
