@@ -1,0 +1,65 @@
+// Shared component styles used across multiple packages
+
+.loader {
+  width: 100%;
+  text-align: center;
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+.loader::before {
+  content: '\21BB';
+}
+
+.accordion__button svg.warning-icon,
+.cove-accordion__button svg.warning-icon {
+  position: absolute;
+  right: 35px;
+  left: auto;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.warning-icon {
+  color: #d72f00;
+  width: 15px;
+  height: 15px;
+}
+
+.warning-icon path {
+  fill: #d8000c;
+}
+
+.checkbox-group {
+  padding: 16px;
+  border: 1px solid #c4c4c4;
+  border-radius: 8px;
+  margin-top: 8px;
+  margin-bottom: 24px;
+}
+
+.cove-accordion__panel.panel-visual .checkbox-group label.checkbox,
+.cove-accordion__panel.panel-visual .reverse-labels label.checkbox,
+.panel-visual .checkbox-group label.checkbox,
+.panel-visual .reverse-labels label.checkbox {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin-bottom: 8px !important;
+}
+
+.cove-accordion__panel.panel-visual .checkbox-group label.checkbox input[type='checkbox'],
+.cove-accordion__panel.panel-visual .reverse-labels label.checkbox input[type='checkbox'],
+.panel-visual .checkbox-group label.checkbox input[type='checkbox'],
+.panel-visual .reverse-labels label.checkbox input[type='checkbox'] {
+  flex-shrink: 0 !important;
+  margin-right: 8px !important;
+}
+
+.cove-accordion__panel.panel-visual .checkbox-group label.checkbox span,
+.cove-accordion__panel.panel-visual .reverse-labels label.checkbox span,
+.panel-visual .checkbox-group label.checkbox span,
+.panel-visual .reverse-labels label.checkbox span {
+  flex: 1 !important;
+  display: inline-block !important;
+}
