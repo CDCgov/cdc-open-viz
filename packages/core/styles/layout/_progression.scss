@@ -64,11 +64,11 @@
       transform: scale(0.7);
     }
 
-    div + div {
+    div+div {
       margin-left: 10px;
     }
 
-    > div {
+    >div {
       display: inline-block;
       position: relative;
       width: 20px;
