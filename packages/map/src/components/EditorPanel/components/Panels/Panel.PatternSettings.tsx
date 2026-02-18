@@ -23,7 +23,6 @@ import { feature } from 'topojson-client'
 import { checkColorContrast, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
 import { applyLegendToRow } from '../../../../helpers/applyLegendToRow'
 import { PatternSelection } from '../../../../types/MapConfig'
-import { patternValuesMatch } from '../../../../helpers/patternMatching'
 
 type PanelProps = {
   name: string
@@ -113,7 +112,7 @@ const PatternSettings = ({ name }: PanelProps) => {
 
     if (!currentFill) return
 
-    const hasMatchingValues = patternValuesMatch(pattern.dataValue, runtimeData[geoKey]?.[pattern.dataKey])
+    const hasMatchingValues = pattern.dataValue === runtimeData[geoKey]?.[pattern.dataKey]
 
     if (hasMatchingValues) {
       const contrastCheck = checkAndLogContrast(
