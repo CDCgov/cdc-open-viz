@@ -8,6 +8,7 @@ export type LegendValueRangeProps = GenerateValueRangesOptions & {
   shape?: 'circle' | 'square'
   onClick?: (index: number, range: ValueRange) => void
   innerClasses?: string[]
+  reverseLabelOrder?: boolean
 }
 
 /**
@@ -25,16 +26,21 @@ const LegendValueRange: React.FC<LegendValueRangeProps> = ({
   colors,
   shape = 'square',
   onClick,
-  innerClasses = ['legend-container__inner']
+  innerClasses = ['legend-container__inner'],
+  reverseLabelOrder = false
 }) => {
   const ranges = generateValueRanges({ minValue, maxValue, numRanges, distribution, formatNumber })
 
   if (ranges.length === 0) return null
 
+  // Reverse both ranges and colors when reverseLabelOrder is true
+  const displayRanges = reverseLabelOrder ? [...ranges].reverse() : ranges
+  const displayColors = reverseLabelOrder ? [...colors].reverse() : colors
+
   return (
     <div className={innerClasses.join(' ')}>
-      {ranges.map((range, i) => {
-        const color = colors[i % colors.length]
+      {displayRanges.map((range, i) => {
+        const color = displayColors[i % displayColors.length]
         const isClickable = typeof onClick === 'function'
         const className = ['legend-item', `legend-text--range-${i}`, !isClickable && 'not-clickable'].filter(Boolean)
 

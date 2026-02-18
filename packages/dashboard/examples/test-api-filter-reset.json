@@ -7,12 +7,14 @@
         "type": "urlfilter",
         "columnName": "category",
         "apiFilter": {
-          "apiEndpoint": "http://localhost:8080/examples/api-test/categories.json",
+          "apiEndpoint": "/examples/api-test/categories.json",
           "valueSelector": "category",
           "textSelector": "category"
         },
         "queryParameter": "category",
+        "setByQueryParameter": "category",
         "resetLabel": "- Select Category -",
+        "defaultValue": "Chronic Diseases",
         "showDropdown": true,
         "filterStyle": "dropdown",
         "usedBy": ["chart1"]
@@ -22,11 +24,12 @@
         "type": "urlfilter",
         "columnName": "topic",
         "apiFilter": {
-          "apiEndpoint": "http://localhost:8080/examples/api-test/topics.json",
+          "apiEndpoint": "/examples/api-test/topics.json",
           "valueSelector": "topic",
           "textSelector": "topic"
         },
         "queryParameter": "topic",
+        "setByQueryParameter": "topic",
         "resetLabel": "- Select Topic -",
         "showDropdown": true,
         "parents": [
@@ -40,11 +43,12 @@
         "type": "urlfilter",
         "columnName": "year",
         "apiFilter": {
-          "apiEndpoint": "http://localhost:8080/examples/api-test/years.json",
+          "apiEndpoint": "/examples/api-test/years.json",
           "valueSelector": "year",
           "textSelector": "year"
         },
         "queryParameter": "year",
+        "setByQueryParameter": "year",
         "resetLabel": "- Select -",
         "showDropdown": true,
         "parents": [

@@ -139,6 +139,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
             innerClasses={innerClasses}
             shape={config.legend.style === 'boxes' ? 'square' : 'circle'}
             onClick={undefined}
+            reverseLabelOrder={config.legend.reverseLabelOrder}
           />
         )}
 
