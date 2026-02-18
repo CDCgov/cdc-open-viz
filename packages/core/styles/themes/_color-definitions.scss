@@ -1,0 +1,399 @@
+@use 'sass:string';
+@use 'sass:list';
+
+// Sass variables (used throughout this file and by importers)
+$baseColor: #333;
+$blue: #005eaa;
+$lightestGray: #f2f2f2;
+$lightGray: #c7c7c7;
+$mediumGray: #565656;
+$darkGray: #333;
+$red: #d8000c;
+$white: #fff;
+
+$primary: #005eaa !default;
+$secondary: #88c3ea !default;
+$tertiary: #c0e9ff !default;
+$quaternary: #edf9ff !default;
+
+$purple-primary: #712177 !default;
+$purple-secondary: #b890bb !default;
+$purple-tertiary: #e3d3e4 !default;
+$purple-quaternary: #f7f2f7 !default;
+
+$brown-primary: #705043 !default;
+$brown-secondary: #ad907b !default;
+$brown-tertiary: #d7ccc8 !default;
+$brown-quaternary: #f2ebe8 !default;
+
+$teal-primary: #00695c !default;
+$teal-secondary: #4ebaaa !default;
+$teal-tertiary: #ceece7 !default;
+$teal-quaternary: #ebf7f5 !default;
+
+$pink-primary: #af4448 !default;
+$pink-secondary: #e57373 !default;
+$pink-tertiary: #ffc2c2 !default;
+$pink-quaternary: #ffe7e7 !default;
+
+$orange-primary: #bb4d00 !default;
+$orange-secondary: #ffad42 !default;
+$orange-tertiary: #ffe97d !default;
+$orange-quaternary: #fff4cf !default;
+
+$slate-primary: #29434e !default;
+$slate-secondary: #7e9ba5 !default;
+$slate-tertiary: #b6c6d2 !default;
+$slate-quaternary: #e2e8ed !default;
+
+$indigo-primary: #26418f !default;
+$indigo-secondary: #92a6dd !default;
+$indigo-tertiary: #dee8ff !default;
+$indigo-quaternary: #f2f6ff !default;
+
+$cyan-primary: #006778 !default;
+$cyan-secondary: #65b0bd !default;
+$cyan-tertiary: #cce5e9 !default;
+$cyan-quaternary: #ebf5f6 !default;
+
+$green-primary: #4b830d !default;
+$green-secondary: #84bc49 !default;
+$green-tertiary: #dcedc8 !default;
+$green-quaternary: #f1f8e9 !default;
+
+$amber-primary: #fbab18 !default;
+$amber-secondary: #ffd54f !default;
+$amber-tertiary: #ffecb3 !default;
+$amber-quaternary: #fff7e1 !default;
+
+$theme: (
+  'amber': (
+    '#fbab18',
+    '#ffd54f',
+    '#ffecb3',
+    '#fff7e1'
+  ),
+  'blue': (
+    '#005eaa',
+    '#88c3ea',
+    '#c0e9ff',
+    '#edf9ff'
+  ),
+  'brown': (
+    '#705043',
+    '#ad907b',
+    '#d7ccc8',
+    '#f2ebe8'
+  ),
+  'cyan': (
+    '#007B91',
+    '#65b0bd',
+    '#cce5e9',
+    '#ebf5f6'
+  ),
+  'green': (
+    '#4b830d',
+    '#84bc49',
+    '#dcedc8',
+    '#f1f8e9'
+  ),
+  'indigo': (
+    '#26418f',
+    '#92a6dd',
+    '#dee8ff',
+    '#f2f6ff'
+  ),
+  'orange': (
+    '#bb4d00',
+    '#ffad42',
+    '#ffe97d',
+    '#fff4cf'
+  ),
+  'pink': (
+    '#af4448',
+    '#e57373',
+    '#ffc2c2',
+    '#ffe7e7'
+  ),
+  'purple': (
+    '#712177',
+    '#b890bb',
+    '#e3d3e4',
+    '#f7f2f7'
+  ),
+  'slate': (
+    '#29434e',
+    '#7e9ba5',
+    '#b6c6d2',
+    '#e2e8ed'
+  ),
+  'teal': (
+    '#00695c',
+    '#4ebaaa',
+    '#ceece7',
+    '#ebf7f5'
+  )
+);
+
+// .type-sparkline class used for creating sparklines
+// once v2 is released plz update html structure
+// to use .cove
+.markup-include,
+.type-waffle-chart,
+.type-data-bite,
+.type-filtered-text,
+.cdc-open-viz-module.type-chart.type-sparkline,
+.cove {
+  @each $theme-name, $theme-colors in $theme {
+    // Header
+    .theme-#{$theme-name} {
+      background-color: string.unquote(list.nth($theme-colors, 1));
+      border-color: string.unquote(list.nth($theme-colors, 2));
+      border-bottom-style: solid;
+      border-bottom-width: 4px;
+    }
+
+    &.theme-#{$theme-name} {
+      /// area that appears underneath the title of the component.
+      .cove-component__content {
+        /// when there are borders on a component
+        &:not(.no-borders) {
+          /// borders are the theme color
+          &.component--has-borderColorTheme {
+            border: 1px solid string.unquote(list.nth($theme-colors, 1));
+          }
+          /// using default border color to draw borders
+          &:not(.component--has-borderColorTheme) {
+            border: 1px solid $lightGray;
+          }
+          &.component--has-title {
+            border-top: none !important;
+          }
+        }
+
+        /// left accent bar
+        &.component--has-accent {
+          border-left: 0.5rem solid string.unquote(list.nth($theme-colors, 1)) !important;
+        }
+
+        /// Apply a background color
+        &.component--has-background:not(.component--hideBackgroundColor) {
+          background: string.unquote(list.nth($theme-colors, 3));
+        }
+      }
+
+      .cove-component__header {
+        border-color: string.unquote(list.nth($theme-colors, 2));
+      }
+    }
+
+    &.theme-#{$theme-name} {
+      .cove-component__header {
+        border-color: string.unquote(list.nth($theme-colors, 2));
+      }
+    }
+  }
+}
+
+// Charts filter styles
+.cdc-open-viz-module {
+  @each $theme-name, $theme-colors in $theme {
+    &.theme-#{$theme-name} {
+      .single-filters--tab .tab--active:not(.tab--simple) {
+        border: 1px solid string.unquote(list.nth($theme-colors, 1));
+        border-top: 3px solid string.unquote(list.nth($theme-colors, 1));
+        border-bottom: none;
+      }
+
+      .single-filters--tab .tab:not(.tab--active):not(.tab--simple) {
+        border-bottom: 1px solid string.unquote(list.nth($theme-colors, 1));
+      }
+
+      .single-filters--pill .pill--active {
+        background-color: string.unquote(list.nth($theme-colors, 1));
+        color: #fff;
+      }
+    }
+
+    .theme-#{$theme-name} {
+      .single-filters--tab .tab--active:not(.tab--simple) {
+        border: 1px solid string.unquote(list.nth($theme-colors, 1));
+        border-top: 3px solid string.unquote(list.nth($theme-colors, 1));
+        border-bottom: none;
+      }
+
+      .single-filters--tab .tab:not(.tab--active):not(.tab--simple) {
+        border-bottom: 1px solid string.unquote(list.nth($theme-colors, 1));
+      }
+
+      .single-filters--pill .pill--active {
+        background-color: string.unquote(list.nth($theme-colors, 1));
+        color: #fff;
+      }
+
+      .button__tab-bar--active {
+        outline: 2px solid string.unquote(list.nth($theme-colors, 1));
+      }
+      .apply:not([disabled]) {
+        background-color: string.unquote(list.nth($theme-colors, 1));
+      }
+    }
+  }
+}
+
+// CSS custom properties (migrated from _global-variables.scss)
+$_cove-colors: (
+  'baseColor': #333,
+  'blue': #005eaa,
+  'lightestGray': #f2f2f2,
+  'gray2': #f5f5f5,
+  'lightGray': #c7c7c7,
+  'mediumGray': #565656,
+  'darkGray': #333,
+  'red': #d8000c,
+  'white': #fff,
+  'silver': #eee,
+
+  'primary': #005eaa,
+  'secondary': #88c3ea,
+  'tertiary': #c0e9ff,
+  'quaternary': #edf9ff,
+
+  'purple-primary': #712177,
+  'purple-secondary': #b890bb,
+  'purple-tertiary': #e3d3e4,
+  'purple-quaternary': #f7f2f7,
+
+  'brown-primary': #705043,
+  'brown-secondary': #ad907b,
+  'brown-tertiary': #d7ccc8,
+  'brown-quaternary': #f2ebe8,
+
+  'teal-primary': #00695c,
+  'teal-secondary': #4ebaaa,
+  'teal-tertiary': #ceece7,
+  'teal-quaternary': #ebf7f5,
+
+  'pink-primary': #af4448,
+  'pink-secondary': #e57373,
+  'pink-tertiary': #ffc2c2,
+  'pink-quaternary': #ffe7e7,
+
+  'orange-primary': #bb4d00,
+  'orange-secondary': #ffad42,
+  'orange-tertiary': #ffe97d,
+  'orange-quaternary': #fff4cf,
+
+  'slate-primary': #29434e,
+  'slate-secondary': #7e9ba5,
+  'slate-tertiary': #b6c6d2,
+  'slate-quaternary': #e2e8ed,
+
+  'indigo-primary': #26418f,
+  'indigo-secondary': #92a6dd,
+  'indigo-tertiary': #dee8ff,
+  'indigo-quaternary': #f2f6ff,
+
+  'cyan-primary': #006778,
+  'cyan-secondary': #65b0bd,
+  'cyan-tertiary': #cce5e9,
+  'cyan-quaternary': #ebf5f6,
+
+  'green-primary': #4b830d,
+  'green-secondary': #84bc49,
+  'green-tertiary': #dcedc8,
+  'green-quaternary': #f1f8e9,
+
+  'amber-primary': #fbab18,
+  'amber-secondary': #ffd54f,
+  'amber-tertiary': #ffecb3,
+  'amber-quaternary': #fff7e1,
+
+  'cool-gray-90': #1c1d1f,
+  'cool-gray-50': #71767a,
+  'cool-gray-30': #a9aeb1,
+  'cool-gray-10': #dfe1e2,
+  'colors-blue-vivid-60': #005ea2
+);
+
+:root {
+  @each $key, $value in $_cove-colors {
+    --#{$key}: #{$value};
+  }
+
+  // Spacing
+  --editorContentPadding: 30px;
+  --editorWidth: 350px;
+  --space-between-legend-item-rows: 1rem;
+  --space-between-legend-item-columns: 1.5rem;
+  // Breakpoints
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 768px;
+  --breakpoint-md: 960px;
+  --breakpoint-lg: 1170px;
+  --breakpoint-xl: 1280px;
+  // Font
+  --app-font-main: 'Nunito', sans-serif;
+  --app-font-secondary: 'Poppins', sans-serif;
+  // Font sizes
+  --legend-title-font-size: 1rem;
+  --legend-description-font-size: 1rem;
+  --legend-item-font-size: 0.889rem;
+  --download-link-font-size: 0.772rem;
+  --filter-select-font-size: 0.833rem;
+  --filter-label-font-size: 0.889rem;
+  --filter-buttons-font-size: 0.889rem;
+  --superTitle-font-size: 0.833rem;
+  --title-font-size: 1.222rem;
+  --territory-label-font-size: 0.809rem;
+  --territory-label-font-size-mobile: 0.556rem;
+}
+
+// Heading/palette theme colors (migrated from heading-colors.scss)
+.color-palette li,
+.btn {
+  &.theme-purple {
+    background: #712177;
+    border-bottom-color: #b890bb;
+  }
+  &.theme-brown {
+    background: #705043;
+    border-bottom-color: #ad907b;
+  }
+  &.theme-teal {
+    background: #00695c;
+    border-bottom-color: #4ebaaa;
+  }
+  &.theme-pink {
+    background: #af4448;
+    border-bottom-color: #e57373;
+  }
+  &.theme-orange {
+    background: #bb4d00;
+    border-bottom-color: #ffad42;
+  }
+  &.theme-slate {
+    background: #29434e;
+    border-bottom-color: #7e9ba5;
+  }
+  &.theme-indigo {
+    background: #26418f;
+    border-bottom-color: #92a6dd;
+  }
+  &.theme-cyan {
+    background: #007b91;
+    border-bottom-color: #65b0bd;
+  }
+  &.theme-green {
+    background: #4b830d;
+    border-bottom-color: #84bc49;
+  }
+  &.theme-amber {
+    background: #fbab18;
+    border-bottom-color: #ffd54f;
+  }
+  &.theme-blue {
+    background: #005eaa;
+    border-bottom-color: #88c3ea;
+  }
+}

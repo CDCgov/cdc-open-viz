@@ -24,7 +24,7 @@ import { type Visualization } from '@cdc/core/types/Visualization'
 import { type DataSet } from '@cdc/core/types/DataSet'
 
 import './data-import.css'
-import '@cdc/core/styles/v2/components/data-designer.scss'
+import '@cdc/core/styles/components/data-designer.scss'
 
 import { errorMessages, maxFileSize } from '../../../helpers/errorMessages'
 import { displaySize } from '../helpers/displaySize'

@@ -1,5 +1,5 @@
 import React from 'react'
-import '../styles/loading.scss'
+import '../styles/layout/_progression.scss'
 
 export default function Loading({ viewport = 'lg' }) {
   return (

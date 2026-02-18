@@ -1,4 +1,6 @@
 //TODO: Replace any '.waiting' classes with below
+@import '../utils/mixins';
+
 .waiting-splash {
   @include emptyState;
   padding-top: 0;

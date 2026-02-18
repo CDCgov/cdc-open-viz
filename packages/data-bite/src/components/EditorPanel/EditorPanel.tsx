@@ -7,7 +7,7 @@ import Context from '../../context'
 
 // Components
 import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
-import '@cdc/core/styles/v2/components/editor.scss'
+import '@cdc/core/styles/components/editor.scss'
 import './editor-panel.css'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
