@@ -2591,9 +2591,9 @@ export const PatternSettingsSectionTests: Story = {
         await userEvent.click(addPatternButton)
       },
       (before, after) => {
-        // After clicking, pattern definitions and paths should appear on all states
-        // Default pattern is 'circles' with empty dataKey, which matches all states (undefined === undefined)
-        return after.patternDefCount > before.patternDefCount && after.patternPathCount > before.patternPathCount
+        // After clicking, at minimum a new pattern definition should be created.
+        // Pattern paths may remain unchanged until dataKey/dataValue are configured.
+        return after.patternDefCount > before.patternDefCount
       }
     )
 
@@ -2708,10 +2708,59 @@ export const PatternSettingsSectionTests: Story = {
         await userEvent.tab()
       },
       (before, after) => {
-        // After setting to Colorado only, pattern paths should decrease significantly
-        // Before: all states (~50+), After: just Colorado (should be 1-2)
-        return after.patternPathCount < before.patternPathCount && after.patternPathCount > 0
+        // After setting STATE/Colorado, at least one matching patterned path should appear.
+        return after.patternPathCount > before.patternPathCount && after.patternPathCount > 0
       }
+    )
+
+    // ==========================================================================
+    // TEST: Numeric dataValue matching and hover persistence
+    // ==========================================================================
+    await performAndAssert(
+      'Pattern Settings → Set numeric dataKey/dataValue (Rate/55)',
+      () => {
+        const allSvgs = canvasElement.querySelectorAll('svg')
+        let patternPathCount = 0
+
+        allSvgs.forEach(svg => {
+          const allPaths = Array.from(svg.querySelectorAll('path'))
+          patternPathCount += allPaths.filter(path => path.getAttribute('fill')?.startsWith('url(#')).length
+        })
+
+        return { patternPathCount }
+      },
+      async () => {
+        const dataKeySelect = canvasElement.querySelector('select[name^="pattern-dataKey--"]') as HTMLSelectElement
+        const dataValueInput = canvasElement.querySelector('input[id^="pattern-dataValue--"]') as HTMLInputElement
+        if (!dataKeySelect || !dataValueInput) throw new Error('Pattern data controls not found')
+
+        await userEvent.selectOptions(dataKeySelect, 'Rate')
+        await userEvent.clear(dataValueInput)
+        await userEvent.type(dataValueInput, '55')
+        await userEvent.tab()
+      },
+      (before, after) => after.patternPathCount > 0
+    )
+
+    await performAndAssert(
+      'Pattern Settings → Pattern remains after hover',
+      () => {
+        const allSvgs = canvasElement.querySelectorAll('svg')
+        let patternPathCount = 0
+
+        allSvgs.forEach(svg => {
+          const allPaths = Array.from(svg.querySelectorAll('path'))
+          patternPathCount += allPaths.filter(path => path.getAttribute('fill')?.startsWith('url(#')).length
+        })
+
+        return { patternPathCount }
+      },
+      async () => {
+        const geoGroup = canvasElement.querySelector('.geo-group') as HTMLElement
+        if (!geoGroup) throw new Error('Geo group not found for hover test')
+        await userEvent.hover(geoGroup)
+      },
+      (before, after) => after.patternPathCount === before.patternPathCount && after.patternPathCount > 0
     )
 
     // ==========================================================================

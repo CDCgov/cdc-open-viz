@@ -222,6 +222,65 @@ const CountyMap = () => {
   const runtimeKeys = Object.keys(runtimeData)
   const lineWidth = 1
 
+  const paintCountyGeo = (context, path, geo, geoData, canvasWidth: number) => {
+    const legendValues =
+      geoData !== undefined
+        ? applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+        : false
+
+    const baseFill =
+      legendValues && config.general.type !== 'us-geocode'
+        ? legendValues[0] === '#000000'
+          ? DEFAULT_MAP_BACKGROUND
+          : legendValues[0]
+        : DEFAULT_MAP_BACKGROUND
+
+    context.fillStyle = baseFill
+    context.beginPath()
+    path(geo)
+    context.fill()
+
+    if (config.map?.patterns?.length > 0 && geoData) {
+      const patternInfo = getPatternForRow(geoData, config)
+
+      if (patternInfo) {
+        const { pattern, size, color } = patternInfo
+        const patternColor = color || '#000000'
+        const patternSize = size || 'medium'
+        const strokeWidth = canvasWidth < 200 ? 1.75 : canvasWidth < 375 ? 1.25 : 0.75
+        const cacheKey = `${pattern}-${patternColor}-${patternSize}-${strokeWidth}`
+
+        let canvasPattern = patternCacheRef.current.get(cacheKey)
+        if (!canvasPattern) {
+          canvasPattern = createCanvasPattern(
+            pattern as PatternType,
+            patternColor,
+            patternSize as 'small' | 'medium' | 'large',
+            strokeWidth
+          )
+          if (canvasPattern) {
+            patternCacheRef.current.set(cacheKey, canvasPattern)
+          }
+        }
+
+        if (canvasPattern) {
+          context.fillStyle = canvasPattern
+          context.beginPath()
+          path(geo)
+          context.fill()
+        }
+      }
+    }
+
+    context.strokeStyle = geoStrokeColor
+    context.lineWidth = lineWidth
+    context.beginPath()
+    path(geo)
+    context.stroke()
+
+    return legendValues
+  }
+
   const onReset = () => {
     publishAnalyticsEvent({
       vizType: config.type,
@@ -366,19 +425,13 @@ const CountyMap = () => {
             legendSpecialClassLastMemo
           )
         ) {
-          context.fillStyle = applyLegendToRow(
+          paintCountyGeo(
+            context,
+            path,
+            topoData.mapData[currentTooltipIndex],
             runtimeData[topoData.mapData[currentTooltipIndex].id],
-            config,
-            runtimeLegend,
-            legendMemo,
-            legendSpecialClassLastMemo
-          )[0]
-          context.strokeStyle = geoStrokeColor
-          context.lineWidth = lineWidth
-          context.beginPath()
-          path(topoData.mapData[currentTooltipIndex])
-          context.fill()
-          context.stroke()
+            canvas.width
+          )
         }
 
         let hoveredState
@@ -405,23 +458,17 @@ const CountyMap = () => {
 
         // If the hovered county is found, show the tooltip for that county, otherwise hide the tooltip
         if (county && runtimeData[county.id]) {
-          if (applyLegendToRow(runtimeData[county.id], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)) {
-            let fillColor = applyLegendToRow(
-              runtimeData[county.id],
-              config,
-              runtimeLegend,
-              legendMemo,
-              legendSpecialClassLastMemo
-            )[0]
-            if (fillColor === '#000000') return
+          const legendValues = applyLegendToRow(
+            runtimeData[county.id],
+            config,
+            runtimeLegend,
+            legendMemo,
+            legendSpecialClassLastMemo
+          )
+          if (legendValues) {
+            if (legendValues[0] === '#000000') return
             context.globalAlpha = 1
-            context.fillStyle = fillColor
-            context.strokeStyle = geoStrokeColor
-            context.lineWidth = lineWidth
-            context.beginPath()
-            path(topoData.mapData[countyIndex])
-            context.fill()
-            context.stroke()
+            paintCountyGeo(context, path, topoData.mapData[countyIndex], runtimeData[county.id], canvas.width)
           }
 
           // Track hover analytics event if this is a new location
@@ -626,62 +673,7 @@ const CountyMap = () => {
         const geoData = runtimeData[geo.id]
 
         // Renders state/county
-        const legendValues =
-          geoData !== undefined
-            ? applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
-            : false
-        context.fillStyle =
-          legendValues && config.general.type !== 'us-geocode'
-            ? legendValues[0] === '#000000'
-              ? DEFAULT_MAP_BACKGROUND
-              : legendValues[0]
-            : DEFAULT_MAP_BACKGROUND
-        context.beginPath()
-        path(geo)
-        context.fill()
-
-        // Apply patterns if configured
-        if (config.map?.patterns?.length > 0 && geoData) {
-          const patternInfo = getPatternForRow(geoData, config)
-
-          if (patternInfo) {
-            const { pattern, size, color } = patternInfo
-            const patternColor = color || '#000000'
-            const patternSize = size || 'medium'
-
-            // Create cache key
-            const cacheKey = `${pattern}-${patternColor}-${patternSize}`
-
-            // Get from cache or create new pattern
-            let canvasPattern = patternCacheRef.current.get(cacheKey)
-            if (!canvasPattern) {
-              // Get stroke width for lines pattern (matching state map logic)
-              const mapWidth = canvas.width
-              const strokeWidth = mapWidth < 200 ? 1.75 : mapWidth < 375 ? 1.25 : 0.75
-
-              canvasPattern = createCanvasPattern(
-                pattern as PatternType,
-                patternColor,
-                patternSize as 'small' | 'medium' | 'large',
-                strokeWidth
-              )
-
-              if (canvasPattern) {
-                patternCacheRef.current.set(cacheKey, canvasPattern)
-              }
-            }
-
-            // Apply pattern
-            if (canvasPattern) {
-              context.fillStyle = canvasPattern
-              context.beginPath()
-              path(geo)
-              context.fill()
-            }
-          }
-        }
-
-        context.stroke()
+        paintCountyGeo(context, path, geo, geoData, canvas.width)
       })
 
       // If the focused state is found in the geo data, render it with a thicker outline
