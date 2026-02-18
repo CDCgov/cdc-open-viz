@@ -211,7 +211,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                     strokeWidth={1}
                   />
                 </svg>
-                <span>{patternData.label || String(patternData.dataValue ?? '')}</span>
+                <span>{patternData.label || patternData.dataValue || ''}</span>
               </button>
             </li>
           </>

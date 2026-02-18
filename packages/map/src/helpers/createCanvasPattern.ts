@@ -26,7 +26,7 @@ export function createCirclePattern(color: string, size: PatternSize): CanvasPat
   // Draw circle in center
   ctx.fillStyle = color
   ctx.beginPath()
-  ctx.arc(dimension / 2, dimension / 2, Math.max(1, dimension * 0.12), 0, Math.PI * 2)
+  ctx.arc(dimension / 2, dimension / 2, 0.5, 0, Math.PI * 2)
   ctx.fill()
 
   return ctx.createPattern(canvas, 'repeat')
@@ -48,7 +48,7 @@ export function createWavePattern(color: string, size: PatternSize): CanvasPatte
 
   // Draw wave pattern
   ctx.strokeStyle = color
-  ctx.lineWidth = Math.max(0.8, dimension * 0.1)
+  ctx.lineWidth = 0.25
   ctx.beginPath()
 
   // Create sine wave across the tile

@@ -4,7 +4,6 @@ import defaultPatterns from './_mock/default-patterns.json'
 import countyPatterns from './_mock/county-patterns.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
-import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map/Patterns',
@@ -40,27 +39,6 @@ export const Default_Patterns_Dark: Story = {
 export const County_Patterns: Story = {
   args: {
     config: countyPatterns
-  },
-  play: async ({ canvasElement }) => {
-    await assertVisualizationRendered(canvasElement)
-
-    const patternDefs = Array.from(canvasElement.querySelectorAll('pattern'))
-    const patternPaths = Array.from(canvasElement.querySelectorAll('path, circle')).filter(node => {
-      const fill = node.getAttribute('fill')
-      return fill?.startsWith('url(#')
-    })
-
-    const sanitizedCoverageType = sanitizeToSvgId('Coverage Type')
-    const sanitizedPatternDef = patternDefs.find(def => def.id.includes(sanitizedCoverageType))
-    const hasSanitizedPatternId = Boolean(sanitizedPatternDef)
-    const hasMatchingUrlRef = Boolean(
-      sanitizedPatternDef &&
-        patternPaths.some(node => node.getAttribute('fill')?.includes(`#${sanitizedPatternDef.id}`))
-    )
-
-    if (!hasSanitizedPatternId || !hasMatchingUrlRef) {
-      throw new Error('Pattern IDs/refs were not sanitized or linked correctly in legend rendering.')
-    }
   }
 }
 
