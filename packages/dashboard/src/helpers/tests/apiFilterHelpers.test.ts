@@ -320,6 +320,92 @@ describe('setActiveNestedDropdown', () => {
     expect(sharedFilters[1].active).toEqual('option2')
     expect(sharedFilters[1].subGrouping.active).toEqual('subOption2')
   })
+
+  it('should respect configured defaultValue for nested dropdown group', () => {
+    const filter = {
+      key: 'filter1',
+      active: null,
+      defaultValue: 'option2',
+      filterStyle: FILTER_STYLE.nestedDropdown,
+      subGrouping: { active: null },
+      queuedActive: null,
+      parents: []
+    } as SharedFilter
+
+    setActiveNestedDropdown(dropdownOptions, filter)
+    expect(filter.active).toEqual('option2')
+    expect(filter.subGrouping.active).toEqual('subOption2')
+  })
+
+  it('should respect configured defaultValue for nested dropdown subgroup', () => {
+    const options = [
+      {
+        value: 'option1',
+        subOptions: [{ value: 'subA' }, { value: 'subB' }, { value: 'subC' }]
+      }
+    ]
+
+    const filter = {
+      key: 'filter1',
+      active: null,
+      defaultValue: 'option1',
+      filterStyle: FILTER_STYLE.nestedDropdown,
+      subGrouping: { active: null, defaultValue: 'subC' },
+      queuedActive: null,
+      parents: []
+    } as SharedFilter
+
+    setActiveNestedDropdown(options, filter)
+    expect(filter.active).toEqual('option1')
+    expect(filter.subGrouping.active).toEqual('subC')
+  })
+
+  it('should prioritize query parameter over defaultValue', () => {
+    delete window.location
+    window.location = new URL('https://www.example.com?year=option2&quarter=subOption2')
+
+    const filter = {
+      key: 'filter1',
+      active: null,
+      defaultValue: 'option1',
+      setByQueryParameter: 'year',
+      filterStyle: FILTER_STYLE.nestedDropdown,
+      subGrouping: { active: null, defaultValue: 'subOption1', setByQueryParameter: 'quarter' },
+      queuedActive: null,
+      parents: []
+    } as SharedFilter
+
+    setActiveNestedDropdown(dropdownOptions, filter)
+    expect(filter.active).toEqual('option2')
+    expect(filter.subGrouping.active).toEqual('subOption2')
+  })
+
+  it('should handle type coercion for number and string values (loose equality)', () => {
+    // Simulate dropdown with numeric values but string query params
+    const numericOptions = [
+      { value: 2023, subOptions: [{ value: 1 }, { value: 2 }] },
+      { value: 2024, subOptions: [{ value: 1 }, { value: 2 }] }
+    ]
+
+    delete window.location
+    window.location = new URL('https://www.example.com?year=2023&quarter=2')
+
+    const filter = {
+      key: 'filter1',
+      active: null,
+      setByQueryParameter: 'year',
+      filterStyle: FILTER_STYLE.nestedDropdown,
+      subGrouping: { active: null, setByQueryParameter: 'quarter' },
+      queuedActive: null,
+      parents: []
+    } as SharedFilter
+
+    setActiveNestedDropdown(numericOptions, filter)
+    // Should match '2023' (string) with 2023 (number) using loose equality
+    expect(filter.active).toEqual('2023')
+    // Should match '2' (string) with 2 (number) using loose equality
+    expect(filter.subGrouping.active).toEqual('2')
+  })
 })
 
 describe('setActiveMultiDropdown', () => {
@@ -358,6 +444,23 @@ describe('setActiveMultiDropdown', () => {
     window.location = new URL('https://www.example.com?group=option1,option2')
     setActiveMultiDropdown(dropdownOptions, sharedFilters[1])
     expect(sharedFilters[1].active).toEqual(['option1', 'option2'])
+  })
+
+  it('should fallback to first option when query parameter is empty array', () => {
+    const filter = {
+      key: 'filter',
+      active: null,
+      filterStyle: FILTER_STYLE.multiSelect,
+      setByQueryParameter: 'group',
+      queuedActive: null,
+      parents: []
+    } as SharedFilter
+
+    // Mock getQueryParam to return empty array
+    delete window.location
+    window.location = new URL('https://www.example.com?group=')
+    setActiveMultiDropdown(dropdownOptions, filter)
+    expect(filter.active).toEqual(['option1'])
   })
 })
 
