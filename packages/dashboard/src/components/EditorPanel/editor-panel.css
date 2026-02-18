@@ -1,7 +1,8 @@
 .cdc-open-viz-module.type-dashboard {
+
   .layout-container,
-  .editor-panel + .cdc-dashboard-inner-container,
-  .editor-heading + .cdc-open-viz-module {
+  .editor-panel+.cdc-dashboard-inner-container,
+  .editor-heading+.cdc-open-viz-module {
     position: relative;
     min-height: 80vh;
   }
@@ -33,7 +34,7 @@
       margin-top: 1em;
       justify-content: space-between;
 
-      > label {
+      >label {
         width: 48%;
         margin-top: 0 !important;
       }
@@ -96,7 +97,7 @@
           cursor: pointer;
         }
 
-        & + li {
+        &+li {
           border-top: var(--lightGray) 1px solid;
         }
       }
@@ -197,7 +198,7 @@
     }
   }
 
-  .editor-panel:not(.hidden) + .cdc-dashboard-inner-container {
+  .editor-panel:not(.hidden)+.cdc-dashboard-inner-container {
     padding-left: var(--editorWidth);
   }
 

@@ -3,7 +3,7 @@
     padding-left: 350px;
   }
 
-  .editor-panel.hidden + .spacing-wrapper {
+  .editor-panel.hidden+.spacing-wrapper {
     padding-left: 0;
   }
 
@@ -21,7 +21,7 @@
       margin-top: 1em;
       justify-content: space-between;
 
-      > label {
+      >label {
         width: 48%;
         margin-top: 0 !important;
       }
@@ -49,7 +49,7 @@
         display: flex;
         justify-content: space-between;
 
-        > label {
+        >label {
           margin-top: 0;
           width: 49%;
         }

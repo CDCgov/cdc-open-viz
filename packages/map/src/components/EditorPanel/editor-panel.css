@@ -1,5 +1,6 @@
 .post-type-cdc_visualization {
   .cove {
+
     /* Temp Radio button fix - resets User Agent Style, forms.css overwrites our styles here */
     input[type='radio'] {
       background-color: initial !important;
@@ -15,6 +16,7 @@
 
 .cdc-open-viz-module {
   .editor-panel {
+
     .cove-input-group,
     .cove-accordion__small-inputs {
       position: relative;
@@ -23,14 +25,14 @@
       align-items: stretch;
       width: 100%;
 
-      > .cove-input {
+      >.cove-input {
         position: relative;
         flex: 1 1 auto;
         width: 1%;
         min-width: 0;
       }
 
-      > .cove-input__label {
+      >.cove-input__label {
         display: none;
       }
 
@@ -48,12 +50,12 @@
       }
 
       &.clear {
-        &[flow='left'] > :first-child {
+        &[flow='left']> :first-child {
           border: 0;
           left: 0;
         }
 
-        &[flow='right'] > :last-child {
+        &[flow='right']> :last-child {
           border: 0;
           right: 0;
         }
@@ -133,7 +135,7 @@
         label {
           margin-top: 0;
 
-          & + label {
+          &+label {
             margin-top: 1em;
           }
         }
