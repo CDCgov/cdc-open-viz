@@ -1,3 +1,4 @@
+import './EditorPanel/editor-panel.css'
 import CdcChart from '@cdc/chart/src/CdcChartComponent'
 import { APIFilterDropdowns } from './DashboardFilters'
 import CdcMapComponent from '@cdc/map/src/CdcMapComponent'

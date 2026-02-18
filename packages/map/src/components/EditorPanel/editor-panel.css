@@ -1,10 +1,6 @@
-// Map-specific Editor Panel Styles
-// Common editor panel styles are imported from @cdc/core/styles/editor-panel-base via cove-main.scss
-
 .post-type-cdc_visualization {
   .cove {
-    // Temp Radio button fix
-    // Resets User Agent Style, forms.css is overwriting our styles here.
+    /* Temp Radio button fix - resets User Agent Style, forms.css overwrites our styles here */
     input[type='radio'] {
       background-color: initial !important;
       cursor: default !important;
@@ -14,7 +10,6 @@
       padding: initial !important;
       border: initial !important;
     }
-    // End Temp Radio button fix
   }
 }
 
@@ -28,47 +23,39 @@
       align-items: stretch;
       width: 100%;
 
-      > {
-        .cove-input {
-          position: relative;
-          flex: 1 1 auto;
-          width: 1%;
-          min-width: 0;
-        }
+      > .cove-input {
+        position: relative;
+        flex: 1 1 auto;
+        width: 1%;
+        min-width: 0;
+      }
 
-        .cove-input__label {
-          display: none;
-        }
+      > .cove-input__label {
+        display: none;
       }
 
       &:not(.clear) {
-        > {
-          :not(:first-child) {
-            margin-left: -1px;
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
-          }
+        > :not(:first-child) {
+          margin-left: -1px;
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+        }
 
-          :not(:last-child) {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-          }
+        > :not(:last-child) {
+          border-top-right-radius: 0;
+          border-bottom-right-radius: 0;
         }
       }
 
       &.clear {
-        &[flow='left'] > {
-          :first-child {
-            border: 0;
-            left: 0;
-          }
+        &[flow='left'] > :first-child {
+          border: 0;
+          left: 0;
         }
 
-        &[flow='right'] > {
-          :last-child {
-            border: 0;
-            right: 0;
-          }
+        &[flow='right'] > :last-child {
+          border: 0;
+          right: 0;
         }
 
         .cove-input-group__label {
@@ -101,9 +88,14 @@
 
     .data-toggle {
       list-style: none;
+
       li {
         padding-left: 2em;
         position: relative;
+        transition: 0.2s opacity;
+        cursor: pointer;
+        opacity: 0.7;
+
         &:before {
           content: ' ';
           position: absolute;
@@ -113,6 +105,7 @@
           border-left: rgba(0, 0, 0, 0.2) 4px solid;
           transition: 0.2s all;
         }
+
         &:after {
           content: ' ';
           background: url('../images/inactive-checkmark.svg') no-repeat;
@@ -127,38 +120,44 @@
           opacity: 0.5;
           transition: 0.2s opacity;
         }
-        transition: 0.2s opacity;
-        cursor: pointer;
-        opacity: 0.7;
+
         &:not(:first-child) {
           margin-top: 1em;
         }
+
         input[type='text'],
         input[type='number'] {
           font-size: 1em;
         }
+
         label {
           margin-top: 0;
+
+          & + label {
+            margin-top: 1em;
+          }
         }
-        label + label {
-          margin-top: 1em;
-        }
+
         &:hover {
           &:before {
             border-left: rgba(0, 0, 0, 0.7) 4px solid;
             transition: 0.2s all;
           }
+
           &:after {
             opacity: 1;
             transition: 0.2s all;
           }
         }
+
         &.active {
           position: relative;
           opacity: 1;
+
           &:before {
             border-left: rgba(0, 0, 0, 0.7) 4px solid;
           }
+
           &:after {
             content: ' ';
             background-image: url(../images/active-checkmark.svg);
@@ -170,7 +169,9 @@
     }
   }
 
-  @include breakpointClass(md) {
+  &.md,
+  &.lg,
+  &.xl {
     .waiting {
       background-color: #fff;
     }

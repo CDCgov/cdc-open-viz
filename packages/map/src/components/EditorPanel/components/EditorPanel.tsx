@@ -56,6 +56,7 @@ import generateRuntimeData from '../../../helpers/generateRuntimeData'
 
 import '@cdc/core/styles/v2/components/editor.scss'
 import './editorPanel.styles.css'
+import '../editor-panel.css'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
 import MultiSelect from '@cdc/core/components/MultiSelect'

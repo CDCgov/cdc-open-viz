@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 
 import '@cdc/core/styles/cove-main.scss'
 import '@cdc/core/components/EditorPanel/EditorPanel.styles.css'
+import './components/EditorPanel/editor-panel.css'
 
 import MultiDashboardWrapper from './CdcDashboard'
 

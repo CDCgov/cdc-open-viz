@@ -1,7 +1,6 @@
 @import '@cdc/core/styles/v2/utils/breakpoints';
 
 .cdc-open-viz-module.type-dashboard {
-  @import 'editor-panel';
   @import 'grid';
   .loading > div.la-ball-beat {
     margin-top: 20%;
