@@ -10,6 +10,7 @@ const migrateAnnotationDimensions = config => {
       : Number(config.heights?.vertical) || 300 // default vertical height
 
     config.annotations = config.annotations.map(annotation => {
+      if (!annotation) return annotation
       if (annotation.y !== undefined && chartAreaHeight > 0) {
         // Convert Y from pixels to percentage using the chart area height
         annotation.y = (annotation.y / chartAreaHeight) * 100
@@ -37,6 +38,7 @@ const migrateAnnotationDimensions = config => {
 const migrateAnnotationDataModel = config => {
   if (config.annotations && Array.isArray(config.annotations)) {
     config.annotations = config.annotations.map(annotation => {
+      if (!annotation) return annotation
       // Set all existing annotations to fixed mode
       annotation.anchorMode = 'fixed'
 
