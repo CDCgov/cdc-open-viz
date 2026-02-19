@@ -1,6 +1,6 @@
 .cdc-open-viz-module.markup-include {
   .spacing-wrapper {
-    background-color: var(--lightGray) !important;
+    background-color: var(--cove-lightGray) !important;
   }
   .cove-tooltip-variable {
     display: none;
@@ -17,11 +17,11 @@
   .cove-tooltip-variable {
     position: relative;
     display: inline;
-    background: var(--orange-tertiary);
+    background: var(--cove-orange-tertiary);
     .cove-tooltip-value {
       display: none;
       position: absolute;
-      background: var(--white);
+      background: var(--cove-white);
       border: 1px solid black;
       font-size: 16px;
       padding: 10px;

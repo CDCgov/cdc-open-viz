@@ -1,7 +1,7 @@
 /* Accordion component styles */
 
 .accordion__heading {
-  background: var(--lightestGray);
+  background: var(--cove-lightestGray);
 }
 
 .accordion__button {

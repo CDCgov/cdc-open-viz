@@ -7,8 +7,8 @@
     @media (max-width: 480px) {
       padding: 0.5rem 0.8rem;
     }
-    color: var(--primary);
-    border-color: var(--lightGray);
+    color: var(--cove-primary);
+    border-color: var(--cove-lightGray);
     :is(button) {
       display: none;
       background: none;
@@ -18,15 +18,15 @@
         display: inline-block;
       }
 
-      background: var(--quaternary);
+      background: var(--cove-quaternary);
     }
     &:focus {
       outline: none !important;
     }
 
     &.active {
-      background: var(--primary);
-      border-color: var(--primary);
+      background: var(--cove-primary);
+      border-color: var(--cove-primary);
       color: white;
       font-weight: bold;
     }

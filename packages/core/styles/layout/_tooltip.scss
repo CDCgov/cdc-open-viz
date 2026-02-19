@@ -1,9 +1,5 @@
 //# Must be loaded outside of Tooltip component for animation availability
 
-$cove-tooltip-bg: #fff;
-$cove-tooltip-color: #333;
-$cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
-
 .cove-tooltip {
   position: relative;
 }
@@ -17,8 +13,8 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
   padding: 10px 8px;
   text-align: left;
   font-size: 0.875rem;
-  color: $cove-tooltip-color;
-  background-color: $cove-tooltip-bg;
+  color: var(--cove-baseColor);
+  background-color: var(--cove-white);
   border-radius: 5px;
   user-select: none;
   cursor: default;
@@ -26,41 +22,41 @@ $cove-tooltip-animation: 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
 
   &.place-top {
     &.has-shadow {
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--cove-shadow-tooltip-top);
     }
 
     &.show {
-      animation: tooltip-btt $cove-tooltip-animation;
+      animation: tooltip-btt 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
     }
   }
 
   &.place-right {
     &.has-shadow {
-      box-shadow: -4px 4px 14px rgba(0, 0, 0, 0.15), -4px 4px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--cove-shadow-tooltip-right);
     }
 
     &.show {
-      animation: tooltip-ltr $cove-tooltip-animation;
+      animation: tooltip-ltr 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
     }
   }
 
   &.place-bottom {
     &.has-shadow {
-      box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.15), 0 8px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--cove-shadow-tooltip-bottom);
     }
 
     &.show {
-      animation: tooltip-ttb $cove-tooltip-animation;
+      animation: tooltip-ttb 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
     }
   }
 
   &.place-left {
     &.has-shadow {
-      box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.15), 4px 4px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--cove-shadow-tooltip-left);
     }
 
     &.show {
-      animation: tooltip-rtl $cove-tooltip-animation;
+      animation: tooltip-rtl 500ms cubic-bezier(0.16, 1, 0.3, 1) 50ms 1 forwards;
     }
   }
 }

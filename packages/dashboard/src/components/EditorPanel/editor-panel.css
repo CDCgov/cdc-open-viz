@@ -19,7 +19,7 @@
 
   .editor-panel {
     background: #fff;
-    width: var(--editorWidth);
+    width: var(--cove-editorWidth);
     overflow-y: overlay;
     position: absolute;
     z-index: 8;
@@ -74,7 +74,7 @@
 
     .series-list {
       list-style: none;
-      border: var(--lightGray) 1px solid;
+      border: var(--cove-lightGray) 1px solid;
 
       &:empty {
         border: none !important;
@@ -88,7 +88,7 @@
         font-size: 0.9em;
 
         &:hover {
-          background-color: var(--lightestGray);
+          background-color: var(--cove-lightestGray);
         }
 
         span {
@@ -98,13 +98,13 @@
         }
 
         &+li {
-          border-top: var(--lightGray) 1px solid;
+          border-top: var(--cove-lightGray) 1px solid;
         }
       }
     }
 
     .accordion__heading {
-      background: var(--lightestGray);
+      background: var(--cove-lightestGray);
     }
 
     .accordion__item {
@@ -199,7 +199,7 @@
   }
 
   .editor-panel:not(.hidden)+.cdc-dashboard-inner-container {
-    padding-left: var(--editorWidth);
+    padding-left: var(--cove-editorWidth);
   }
 
   .subheading-3 {

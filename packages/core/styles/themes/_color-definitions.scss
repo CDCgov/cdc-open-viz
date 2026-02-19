@@ -241,79 +241,79 @@ $theme: (
   }
 }
 
-// CSS custom properties (migrated from _global-variables.scss)
+// CSS custom properties — all prefixed with --cove- for namespace safety
 $_cove-colors: (
-  'baseColor': #333,
-  'blue': #005eaa,
-  'lightestGray': #f2f2f2,
-  'gray2': #f5f5f5,
-  'lightGray': #c7c7c7,
-  'mediumGray': #565656,
-  'darkGray': #333,
-  'red': #d8000c,
-  'white': #fff,
-  'silver': #eee,
+  'cove-baseColor': #333,
+  'cove-blue': #005eaa,
+  'cove-lightestGray': #f2f2f2,
+  'cove-gray2': #f5f5f5,
+  'cove-lightGray': #c7c7c7,
+  'cove-mediumGray': #565656,
+  'cove-darkGray': #333,
+  'cove-red': #d8000c,
+  'cove-white': #fff,
+  'cove-silver': #eee,
 
-  'primary': #005eaa,
-  'secondary': #88c3ea,
-  'tertiary': #c0e9ff,
-  'quaternary': #edf9ff,
+  'cove-primary': #005eaa,
+  'cove-secondary': #88c3ea,
+  'cove-tertiary': #c0e9ff,
+  'cove-quaternary': #edf9ff,
 
-  'purple-primary': #712177,
-  'purple-secondary': #b890bb,
-  'purple-tertiary': #e3d3e4,
-  'purple-quaternary': #f7f2f7,
+  'cove-purple-primary': #712177,
+  'cove-purple-secondary': #b890bb,
+  'cove-purple-tertiary': #e3d3e4,
+  'cove-purple-quaternary': #f7f2f7,
 
-  'brown-primary': #705043,
-  'brown-secondary': #ad907b,
-  'brown-tertiary': #d7ccc8,
-  'brown-quaternary': #f2ebe8,
+  'cove-brown-primary': #705043,
+  'cove-brown-secondary': #ad907b,
+  'cove-brown-tertiary': #d7ccc8,
+  'cove-brown-quaternary': #f2ebe8,
 
-  'teal-primary': #00695c,
-  'teal-secondary': #4ebaaa,
-  'teal-tertiary': #ceece7,
-  'teal-quaternary': #ebf7f5,
+  'cove-teal-primary': #00695c,
+  'cove-teal-secondary': #4ebaaa,
+  'cove-teal-tertiary': #ceece7,
+  'cove-teal-quaternary': #ebf7f5,
 
-  'pink-primary': #af4448,
-  'pink-secondary': #e57373,
-  'pink-tertiary': #ffc2c2,
-  'pink-quaternary': #ffe7e7,
+  'cove-pink-primary': #af4448,
+  'cove-pink-secondary': #e57373,
+  'cove-pink-tertiary': #ffc2c2,
+  'cove-pink-quaternary': #ffe7e7,
 
-  'orange-primary': #bb4d00,
-  'orange-secondary': #ffad42,
-  'orange-tertiary': #ffe97d,
-  'orange-quaternary': #fff4cf,
+  'cove-orange-primary': #bb4d00,
+  'cove-orange-secondary': #ffad42,
+  'cove-orange-tertiary': #ffe97d,
+  'cove-orange-quaternary': #fff4cf,
 
-  'slate-primary': #29434e,
-  'slate-secondary': #7e9ba5,
-  'slate-tertiary': #b6c6d2,
-  'slate-quaternary': #e2e8ed,
+  'cove-slate-primary': #29434e,
+  'cove-slate-secondary': #7e9ba5,
+  'cove-slate-tertiary': #b6c6d2,
+  'cove-slate-quaternary': #e2e8ed,
 
-  'indigo-primary': #26418f,
-  'indigo-secondary': #92a6dd,
-  'indigo-tertiary': #dee8ff,
-  'indigo-quaternary': #f2f6ff,
+  'cove-indigo-primary': #26418f,
+  'cove-indigo-secondary': #92a6dd,
+  'cove-indigo-tertiary': #dee8ff,
+  'cove-indigo-quaternary': #f2f6ff,
 
-  'cyan-primary': #006778,
-  'cyan-secondary': #65b0bd,
-  'cyan-tertiary': #cce5e9,
-  'cyan-quaternary': #ebf5f6,
+  'cove-cyan-primary': #006778,
+  'cove-cyan-secondary': #65b0bd,
+  'cove-cyan-tertiary': #cce5e9,
+  'cove-cyan-quaternary': #ebf5f6,
 
-  'green-primary': #4b830d,
-  'green-secondary': #84bc49,
-  'green-tertiary': #dcedc8,
-  'green-quaternary': #f1f8e9,
+  'cove-green-primary': #4b830d,
+  'cove-green-secondary': #84bc49,
+  'cove-green-tertiary': #dcedc8,
+  'cove-green-quaternary': #f1f8e9,
 
-  'amber-primary': #fbab18,
-  'amber-secondary': #ffd54f,
-  'amber-tertiary': #ffecb3,
-  'amber-quaternary': #fff7e1,
+  'cove-amber-primary': #fbab18,
+  'cove-amber-secondary': #ffd54f,
+  'cove-amber-tertiary': #ffecb3,
+  'cove-amber-quaternary': #fff7e1,
 
-  'cool-gray-90': #1c1d1f,
-  'cool-gray-50': #71767a,
-  'cool-gray-30': #a9aeb1,
-  'cool-gray-10': #dfe1e2,
-  'colors-blue-vivid-60': #005ea2
+  'cove-cool-gray-90': #1c1d1f,
+  'cove-cool-gray-50': #71767a,
+  'cove-cool-gray-30': #a9aeb1,
+  'cove-cool-gray-10': #dfe1e2,
+  'cove-colors-blue-vivid-60': #005ea2
 );
 
 :root {
@@ -322,78 +322,120 @@ $_cove-colors: (
   }
 
   // Spacing
-  --editorContentPadding: 30px;
-  --editorWidth: 350px;
-  --space-between-legend-item-rows: 1rem;
-  --space-between-legend-item-columns: 1.5rem;
+  --cove-editorContentPadding: 30px;
+  --cove-editorWidth: 350px;
+  --cove-space-between-legend-item-rows: 1rem;
+  --cove-space-between-legend-item-columns: 1.5rem;
   // Breakpoints
-  --breakpoint-xs: 480px;
-  --breakpoint-sm: 768px;
-  --breakpoint-md: 960px;
-  --breakpoint-lg: 1170px;
-  --breakpoint-xl: 1280px;
-  // Font
-  --app-font-main: 'Nunito', sans-serif;
-  --app-font-secondary: 'Poppins', sans-serif;
+  --cove-breakpoint-xs: 480px;
+  --cove-breakpoint-sm: 768px;
+  --cove-breakpoint-md: 960px;
+  --cove-breakpoint-lg: 1170px;
+  --cove-breakpoint-xl: 1280px;
+  // Font families
+  --cove-app-font-main: 'Nunito', sans-serif;
+  --cove-app-font-secondary: 'Poppins', sans-serif;
   // Font sizes
-  --legend-title-font-size: 1rem;
-  --legend-description-font-size: 1rem;
-  --legend-item-font-size: 0.889rem;
-  --download-link-font-size: 0.772rem;
-  --filter-select-font-size: 0.833rem;
-  --filter-label-font-size: 0.889rem;
-  --filter-buttons-font-size: 0.889rem;
-  --superTitle-font-size: 0.833rem;
-  --title-font-size: 1.222rem;
-  --territory-label-font-size: 0.809rem;
-  --territory-label-font-size-mobile: 0.556rem;
+  --cove-legend-title-font-size: 1rem;
+  --cove-legend-description-font-size: 1rem;
+  --cove-legend-item-font-size: 0.889rem;
+  --cove-download-link-font-size: 0.772rem;
+  --cove-filter-select-font-size: 0.833rem;
+  --cove-filter-label-font-size: 0.889rem;
+  --cove-filter-buttons-font-size: 0.889rem;
+  --cove-superTitle-font-size: 0.833rem;
+  --cove-title-font-size: 1.222rem;
+  --cove-territory-label-font-size: 0.809rem;
+  --cove-territory-label-font-size-mobile: 0.556rem;
+
+  // Semantic UI state colors
+  --cove-color-success: #44aa41;
+  --cove-color-success-hover: #4dbf4a;
+  --cove-color-warn: #d73636;
+  --cove-color-warn-hover: #c22f2f;
+  --cove-color-muted: #a0a0a0;
+  --cove-color-muted-hover: #8c8c8c;
+  --cove-color-focus: rgb(0, 122, 153);
+
+  // Border radius scale
+  --cove-radius-xs: 2px;
+  --cove-radius-sm: 4px;
+  --cove-radius-md: 6px;
+  --cove-radius-lg: 8px;
+  --cove-radius-pill: 50%;
+
+  // Shadow scale
+  --cove-shadow-sm: rgba(0, 0, 0, 0.5) 0 1px 2px;
+  --cove-shadow-md: 0 2px 4px rgb(159 159 159 / 10%);
+  --cove-shadow-tooltip-top: 0 4px 14px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+  --cove-shadow-tooltip-right: -4px 4px 14px rgba(0, 0, 0, 0.15), -4px 4px 8px rgba(0, 0, 0, 0.1);
+  --cove-shadow-tooltip-bottom: 0 -4px 14px rgba(0, 0, 0, 0.15), 0 8px 8px rgba(0, 0, 0, 0.1);
+  --cove-shadow-tooltip-left: 4px 4px 14px rgba(0, 0, 0, 0.15), 4px 4px 8px rgba(0, 0, 0, 0.1);
+  --cove-shadow-modal: 3px 3px 10px rgb(0 0 0 / 20%);
+
+  // Z-index layer system
+  --cove-z-base: 1;
+  --cove-z-above: 2;
+  --cove-z-dropdown: 100;
+  --cove-z-sticky: 200;
+  --cove-z-fixed: 300;
+  --cove-z-modal-backdrop: 400;
+  --cove-z-modal: 500;
+  --cove-z-popover: 600;
+  --cove-z-tooltip: 1000;
+
+  // Transitions
+  --cove-transition-fast: 0.1s all;
+  --cove-transition-base: 0.2s all;
+  --cove-transition-slow: 0.3s all;
+  --cove-transition-spring: 500ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 // Heading/palette theme colors (migrated from heading-colors.scss)
 .color-palette li,
 .btn {
   &.theme-purple {
-    background: #712177;
-    border-bottom-color: #b890bb;
+    background: var(--cove-purple-primary);
+    border-bottom-color: var(--cove-purple-secondary);
   }
   &.theme-brown {
-    background: #705043;
-    border-bottom-color: #ad907b;
+    background: var(--cove-brown-primary);
+    border-bottom-color: var(--cove-brown-secondary);
   }
   &.theme-teal {
-    background: #00695c;
-    border-bottom-color: #4ebaaa;
+    background: var(--cove-teal-primary);
+    border-bottom-color: var(--cove-teal-secondary);
   }
   &.theme-pink {
-    background: #af4448;
-    border-bottom-color: #e57373;
+    background: var(--cove-pink-primary);
+    border-bottom-color: var(--cove-pink-secondary);
   }
   &.theme-orange {
-    background: #bb4d00;
-    border-bottom-color: #ffad42;
+    background: var(--cove-orange-primary);
+    border-bottom-color: var(--cove-orange-secondary);
   }
   &.theme-slate {
-    background: #29434e;
-    border-bottom-color: #7e9ba5;
+    background: var(--cove-slate-primary);
+    border-bottom-color: var(--cove-slate-secondary);
   }
   &.theme-indigo {
-    background: #26418f;
-    border-bottom-color: #92a6dd;
+    background: var(--cove-indigo-primary);
+    border-bottom-color: var(--cove-indigo-secondary);
   }
   &.theme-cyan {
-    background: #007b91;
-    border-bottom-color: #65b0bd;
+    background: var(--cove-cyan-primary);
+    border-bottom-color: var(--cove-cyan-secondary);
   }
   &.theme-green {
-    background: #4b830d;
-    border-bottom-color: #84bc49;
+    background: var(--cove-green-primary);
+    border-bottom-color: var(--cove-green-secondary);
   }
   &.theme-amber {
-    background: #fbab18;
-    border-bottom-color: #ffd54f;
+    background: var(--cove-amber-primary);
+    border-bottom-color: var(--cove-amber-secondary);
   }
   &.theme-blue {
-    background: #005eaa;
-    border-bottom-color: #88c3ea;
+    background: var(--cove-primary);
+    border-bottom-color: var(--cove-secondary);
   }
 }

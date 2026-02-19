@@ -1,7 +1,7 @@
 .visualizations-panel {
   background-color: #fff;
   padding: 1em;
-  width: var(--editorWidth);
+  width: var(--cove-editorWidth);
   border-right: #c7c7c7 1px solid;
   z-index: 1;
   overflow-y: scroll;

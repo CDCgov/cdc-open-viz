@@ -1,6 +1,6 @@
 .geo-buttons {
   list-style: none;
-  color: var(--mediumGray);
+  color: var(--cove-mediumGray);
   display: grid;
   button { width: 100% !important; }
   svg {
@@ -17,7 +17,7 @@
     background: transparent;
     padding: 0.3em 0.75em;
     display: flex;
-    border: var(--lightGray) 1px solid;
+    border: var(--cove-lightGray) 1px solid;
     width: 40%;
     align-items: center;
     margin-right: 1em;

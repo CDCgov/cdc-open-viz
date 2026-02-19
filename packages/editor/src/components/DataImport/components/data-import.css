@@ -6,10 +6,10 @@
     justify-content: flex-end;
 
     .left-col {
-      background: var(--white);
+      background: var(--cove-white);
       padding: var(--data-import-padding);
       width: 50%;
-      border-right: var(--lightGray) 1px solid;
+      border-right: var(--cove-lightGray) 1px solid;
       position: fixed;
       bottom: 0;
       left: 0;
@@ -43,8 +43,8 @@
           list-style: none;
           padding: 0.6rem 0;
           flex-grow: 1;
-          border-bottom: var(--lightGray) 1px solid;
-          color: var(--mediumGray);
+          border-bottom: var(--cove-lightGray) 1px solid;
+          color: var(--cove-mediumGray);
           align-items: center;
 
           svg {
@@ -52,19 +52,19 @@
           }
 
           &:hover {
-            border-bottom-color: var(--mediumGray);
+            border-bottom-color: var(--cove-mediumGray);
           }
 
           &.active {
             border-bottom-width: 5px;
-            border-bottom-color: var(--mediumGray);
-            color: var(--darkGray);
+            border-bottom-color: var(--cove-mediumGray);
+            color: var(--cove-darkGray);
           }
         }
 
         .tab-content {
           padding-top: var(--data-import-padding);
-          border-top: 1px solid var(--baseColor);
+          border-top: 1px solid var(--cove-baseColor);
         }
       }
 
@@ -92,17 +92,17 @@
       .cdcdataviz-file-selector {
         padding: 1rem 3rem;
         text-align: center;
-        border: var(--lightGray) 2px dashed;
+        border: var(--cove-lightGray) 2px dashed;
         border-radius: 0.2rem;
         cursor: pointer;
         font-size: 1em;
-        color: var(--mediumGray);
+        color: var(--cove-mediumGray);
         transition: 0.1s all;
 
         svg {
           max-width: 35px;
           margin: 0 auto 0.5em;
-          color: var(--baseColor);
+          color: var(--cove-baseColor);
           transition: 0.1s all;
 
           path {
@@ -111,7 +111,7 @@
         }
 
         &.drag-active {
-          background-color: var(--lightestGray);
+          background-color: var(--cove-lightestGray);
 
           svg {
             transform: scale(0.8);
@@ -121,7 +121,7 @@
 
         span {
           white-space: pre;
-          color: var(--blue);
+          color: var(--cove-blue);
           text-decoration: underline;
         }
       }
@@ -130,7 +130,7 @@
         font-size: 0.8rem;
         font-style: italic;
         margin: 1em 0 2em 0;
-        color: var(--mediumGray);
+        color: var(--cove-mediumGray);
       }
 
       .btn.active {
@@ -149,7 +149,7 @@
 
       .keep-url {
         font-size: 0.8rem;
-        color: var(--mediumGray);
+        color: var(--cove-mediumGray);
       }
 
       .sample-data-list {
@@ -158,7 +158,7 @@
 
         li {
           margin-top: 0.3rem;
-          color: var(--blue);
+          color: var(--cove-blue);
           text-decoration: underline;
           cursor: pointer;
         }
@@ -256,7 +256,7 @@
 
     .right-col {
       position: relative;
-      background-color: var(--gray2);
+      background-color: var(--cove-gray2);
       padding: var(--data-import-padding);
       width: 50% !important;
 

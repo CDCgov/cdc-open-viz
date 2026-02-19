@@ -1,7 +1,7 @@
 .date-highlight {
   select,
   input {
-    background: var(--lightestGray);
+    background: var(--cove-lightestGray);
   }
 
   .radio-group {
@@ -37,17 +37,17 @@
   .week-button {
     margin-bottom: 0;
     border-radius: 50%;
-    color: var(--darkGray);
+    color: var(--cove-darkGray);
     width: 24px;
     height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--lightestGray);
+    background: var(--cove-lightestGray);
     margin: 5px 2px 0;
 
     &--active {
-      background: var(--primary);
+      background: var(--cove-primary);
       color: white;
     }
   }

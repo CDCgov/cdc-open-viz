@@ -74,21 +74,21 @@
     width: 100%;
     vertical-align: top;
     text-align: left;
-    border: 1px solid var(--cool-gray-10);
+    border: 1px solid var(--cove-cool-gray-10);
     border-radius: 6px;
     position: relative;
 
     h3 {
-      font-size: var(--legend-title-font-size);
+      font-size: var(--cove-legend-title-font-size);
     }
 
     p {
-      font-size: var(--legend-description-font-size);
+      font-size: var(--cove-legend-description-font-size);
     }
 
     tspan,
     div {
-      font-size: var(--legend-item-font-size);
+      font-size: var(--cove-legend-item-font-size);
     }
 
     &.border-0 {
@@ -99,8 +99,8 @@
     &__inner {
       display: flex;
       flex-direction: column;
-      row-gap: var(--space-between-legend-item-rows);
-      column-gap: var(--space-between-legend-item-columns);
+      row-gap: var(--cove-space-between-legend-item-rows);
+      column-gap: var(--cove-space-between-legend-item-columns);
       &.double-column,
       &.single-row {
         display: grid;
@@ -125,7 +125,7 @@
     .legend-item {
       text-align: left;
       user-select: none;
-      line-height: var(--legend-item-font-size);
+      line-height: var(--cove-legend-item-font-size);
       .visx-legend-label {
         word-wrap: break-word;
         white-space: pre-wrap;
@@ -621,7 +621,7 @@
 
 .cdc-open-viz-module .is-editor .cdc-chart-inner-container {
   overflow: hidden;
-  background-color: var(--white);
+  background-color: var(--cove-white);
 }
 
 .isEditor.type-sparkline .cdc-chart-inner-container {
@@ -684,12 +684,12 @@
 
 // Pattern Legend Styles - using Bootstrap classes for layout, CSS for gaps only
 .legend-patterns {
-  gap: var(--space-between-legend-item-rows);
-  margin-top: var(--space-between-legend-item-rows);
+  gap: var(--cove-space-between-legend-item-rows);
+  margin-top: var(--cove-space-between-legend-item-rows);
 
   // When in row layout (top/bottom), override gap for proper row/column spacing
   &.flex-row {
-    row-gap: var(--space-between-legend-item-rows);
-    column-gap: var(--space-between-legend-item-columns);
+    row-gap: var(--cove-space-between-legend-item-rows);
+    column-gap: var(--cove-space-between-legend-item-columns);
   }
 }

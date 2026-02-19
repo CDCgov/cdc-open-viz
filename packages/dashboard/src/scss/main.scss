@@ -91,22 +91,22 @@
 
       li {
         padding: 0.3em 1.5em;
-        color: var(--mediumGray);
+        color: var(--cove-mediumGray);
         cursor: pointer;
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
 
         &.active {
-          border-bottom-color: var(--mediumGray);
+          border-bottom-color: var(--cove-mediumGray);
           border-bottom-style: inherit;
           border-bottom-width: 5px;
-          color: var(--darkGray);
+          color: var(--cove-darkGray);
         }
 
         &:hover {
-          border-bottom-color: var(--darkGray);
-          color: var(--darkGray);
+          border-bottom-color: var(--cove-darkGray);
+          color: var(--cove-darkGray);
         }
       }
 
@@ -133,8 +133,8 @@
 
     // Expand and Collapse Buttons for Multiviz Dashboard
     &.expand-collapse-buttons {
-      background-color: var(--lightestGray);
-      border: 1px var(--lightGray) solid;
+      background-color: var(--cove-lightestGray);
+      border: 1px var(--cove-lightGray) solid;
       color: black;
     }
   }
@@ -145,13 +145,13 @@
 
   .collapsable-multiviz-container {
     position: relative;
-    border: var(--lightGray) 1px solid;
+    border: var(--cove-lightGray) 1px solid;
     clear: both;
     margin-bottom: 20px;
 
     .multi-visualiation-heading {
       position: relative;
-      background: var(--lightestGray);
+      background: var(--cove-lightestGray);
       padding: 0.5em 0.7em;
       cursor: pointer;
 

@@ -4,7 +4,7 @@
   min-height: 80vh;
   .editor-panel {
     :is(form) {
-      border-right: var(--lightGray) 1px solid;
+      border-right: var(--cove-lightGray) 1px solid;
       flex-grow: 1;
     }
   }

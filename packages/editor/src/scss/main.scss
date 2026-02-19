@@ -30,12 +30,12 @@
       li {
         background: #f2f2f2;
         line-height: 3rem;
-        border-bottom: 1px solid var(--lightGray);
+        border-bottom: 1px solid var(--cove-lightGray);
         color: #333;
         flex-grow: 1;
         flex-shrink: 0;
         width: 25%;
-        border-right: 1px solid var(--lightGray);
+        border-right: 1px solid var(--cove-lightGray);
         text-align: center;
         &:last-child {
           border-right: none;
@@ -69,7 +69,7 @@
     }
   }
   .info-box {
-    border: var(--lightGray) 1px solid;
+    border: var(--cove-lightGray) 1px solid;
     padding: 1rem;
     font-size: 0.9rem;
     h4 {

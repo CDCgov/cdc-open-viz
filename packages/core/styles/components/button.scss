@@ -1,22 +1,21 @@
-@use 'sass:color';
 @import '../utils/variables';
 @import '../themes/index';
 
 :root {
-  --cove-button-primary: var(--colors-blue-vivid-60);
+  --cove-button-primary: var(--cove-colors-blue-vivid-60);
   --cove-button-primary-font-color: #fff;
   --cove-button-primary-hover: #0b4778;
-  --cove-button-primary-disabled: var(--cool-gray-10);
-  --cove-button-primary-disabled-font-color: var(--cool-gray-90);
+  --cove-button-primary-disabled: var(--cove-cool-gray-10);
+  --cove-button-primary-disabled-font-color: var(--cove-cool-gray-90);
 
   --cove-button-secondary: #fff;
-  --cove-button-secondary-font-color: var(--colors-blue-vivid-60);
-  --cove-button-secondary-border-color: var(--colors-blue-vivid-60);
+  --cove-button-secondary-font-color: var(--cove-colors-blue-vivid-60);
+  --cove-button-secondary-border-color: var(--cove-colors-blue-vivid-60);
   --cove-button-secondary-hover: #0b4778;
   --cove-button-secondary-hover-font-color: #fff;
   --cove-button-secondary-disabled: #f5f6f7;
-  --cove-button-secondary-disabled-font-color: var(--cool-gray-90);
-  --cove-button-secondary-disabled-border-color: var(--cool-gray-10);
+  --cove-button-secondary-disabled-font-color: var(--cove-cool-gray-90);
+  --cove-button-secondary-disabled-border-color: var(--cove-cool-gray-10);
 }
 
 .sbdocs .cove-button {
@@ -39,7 +38,7 @@
   vertical-align: middle;
   color: var(--cove-button-primary-font-color);
   background-color: var(--cove-button-primary);
-  border-radius: 6px;
+  border-radius: var(--cove-radius-md);
   border: 0;
   outline: none;
   transition: background-color 500ms $transition-expo-out, color 500ms $transition-expo-out,
@@ -81,7 +80,7 @@
     background-color: var(--cove-button-primary-hover);
   }
   &:focus {
-    outline: 2px dashed var(--colors-blue-vivid-60) !important;
+    outline: 2px dashed var(--cove-colors-blue-vivid-60) !important;
     outline-offset: 5px;
   }
 
@@ -108,26 +107,26 @@
   }
 
   &.success {
-    background-color: #44aa41;
+    background-color: var(--cove-color-success);
 
     &:hover {
-      background-color: color.adjust(#44aa41, $lightness: 5%);
+      background-color: var(--cove-color-success-hover);
     }
   }
 
   &.warn {
-    background-color: #d73636;
+    background-color: var(--cove-color-warn);
 
     &:hover {
-      background-color: color.adjust(#d73636, $lightness: -5%);
+      background-color: var(--cove-color-warn-hover);
     }
   }
 
   &.muted {
-    background-color: #a0a0a0;
+    background-color: var(--cove-color-muted);
 
     &:hover {
-      background-color: color.adjust(#a0a0a0, $lightness: -5%);
+      background-color: var(--cove-color-muted-hover);
     }
   }
 

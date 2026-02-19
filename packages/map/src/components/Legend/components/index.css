@@ -8,7 +8,7 @@
   &.lg,
   &.xl {
     .map-container.world aside.side {
-      border-top: var(--cool-gray-10) 1px solid;
+      border-top: var(--cove-cool-gray-10) 1px solid;
       position: absolute;
       box-shadow: rgba(0, 0, 0, 0.2) 0 10px 18px;
     }
@@ -17,7 +17,7 @@
   aside {
     background-color: #fff;
     z-index: 6;
-    border-top: var(--cool-gray-10) 1px solid;
+    border-top: var(--cove-cool-gray-10) 1px solid;
     border-radius: 6px;
 
     /* breakpointClass(md) on aside — &.bottom, &.top */
@@ -27,7 +27,7 @@
     &.lg.top,
     &.xl.bottom,
     &.xl.top {
-      border: var(--cool-gray-10) 1px solid;
+      border: var(--cove-cool-gray-10) 1px solid;
     }
 
     /* breakpointClass(md) on aside — &.side */
@@ -41,7 +41,7 @@
       margin-bottom: 2em;
       align-self: flex-start;
       z-index: 4;
-      border: var(--cool-gray-10) 1px solid;
+      border: var(--cove-cool-gray-10) 1px solid;
       top: 2em;
       right: 1em;
 
@@ -135,18 +135,18 @@
       }
 
       .tspan {
-        font-size: var(--legend-item-font-size) !important;
+        font-size: var(--cove-legend-item-font-size) !important;
       }
 
       .legend-container__title {
-        font-size: var(--legend-title-font-size);
+        font-size: var(--cove-legend-title-font-size);
         font-weight: var(--legend-title-font-weight);
         padding-bottom: 0;
         display: inline-block;
       }
 
       .legend-container__description {
-        font-size: var(--legend-description-font-size);
+        font-size: var(--cove-legend-description-font-size);
       }
 
       .legend-container__reset-button {
@@ -160,8 +160,8 @@
       .legend-container__ul {
         list-style: none;
         line-height: 1;
-        row-gap: var(--space-between-legend-item-rows);
-        column-gap: var(--space-between-legend-item-columns);
+        row-gap: var(--cove-space-between-legend-item-rows);
+        column-gap: var(--cove-space-between-legend-item-columns);
       }
 
       .legend-container__li-btn {
@@ -206,7 +206,7 @@
           }
 
           .legend-container__li {
-            margin-bottom: var(--space-between-legend-item-rows);
+            margin-bottom: var(--cove-space-between-legend-item-rows);
 
             &:last-child {
               margin-bottom: 0;

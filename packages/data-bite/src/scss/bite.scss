@@ -1,66 +1,66 @@
 &.theme-blue {
   .bite-value {
-    color: var(--primary);
+    color: var(--cove-primary);
   }
 }
 
 &.theme-purple {
   .bite-value {
-    color: var(--purple-primary);
+    color: var(--cove-purple-primary);
   }
 }
 
 &.theme-amber {
   .bite-value {
-    color: var(--amber-primary);
+    color: var(--cove-amber-primary);
   }
 }
 
 &.theme-orange {
   .bite-value {
-    color: var(--orange-primary);
+    color: var(--cove-orange-primary);
   }
 }
 
 &.theme-brown {
   .bite-value {
-    color: var(--brown-primary);
+    color: var(--cove-brown-primary);
   }
 }
 
 &.theme-teal {
   .bite-value {
-    color: var(--teal-primary);
+    color: var(--cove-teal-primary);
   }
 }
 
 &.theme-pink {
   .bite-value {
-    color: var(--pink-primary);
+    color: var(--cove-pink-primary);
   }
 }
 
 &.theme-slate {
   .bite-value {
-    color: var(--slate-primary);
+    color: var(--cove-slate-primary);
   }
 }
 
 &.theme-indigo {
   .bite-value {
-    color: var(--indigo-primary);
+    color: var(--cove-indigo-primary);
   }
 }
 
 &.theme-cyan {
   .bite-value {
-    color: var(--cyan-primary);
+    color: var(--cove-cyan-primary);
   }
 }
 
 &.theme-green {
   .bite-value {
-    color: var(--green-primary);
+    color: var(--cove-green-primary);
   }
 }
 
@@ -242,67 +242,67 @@
 
     &.theme-blue {
       .bite-value {
-        color: var(--primary);
+        color: var(--cove-primary);
       }
     }
 
     &.theme-purple {
       .bite-value {
-        color: var(--purple-primary);
+        color: var(--cove-purple-primary);
       }
     }
 
     &.theme-amber {
       .bite-value {
-        color: var(--amber-primary);
+        color: var(--cove-amber-primary);
       }
     }
 
     &.theme-orange {
       .bite-value {
-        color: var(--orange-primary);
+        color: var(--cove-orange-primary);
       }
     }
 
     &.theme-brown {
       .bite-value {
-        color: var(--brown-primary);
+        color: var(--cove-brown-primary);
       }
     }
 
     &.theme-teal {
       .bite-value {
-        color: var(--teal-primary);
+        color: var(--cove-teal-primary);
       }
     }
 
     &.theme-pink {
       .bite-value {
-        color: var(--pink-primary);
+        color: var(--cove-pink-primary);
       }
     }
 
     &.theme-slate {
       .bite-value {
-        color: var(--slate-primary);
+        color: var(--cove-slate-primary);
       }
     }
 
     &.theme-indigo {
       .bite-value {
-        color: var(--indigo-primary);
+        color: var(--cove-indigo-primary);
       }
     }
 
     &.theme-cyan {
       .bite-value {
-        color: var(--cyan-primary);
+        color: var(--cove-cyan-primary);
       }
     }
 
     &.theme-green {
       .bite-value {
-        color: var(--green-primary);
+        color: var(--cove-green-primary);
       }
     }
 
@@ -441,10 +441,10 @@
 }
 
 .cove-component__content {
-  background: var(--lightestGray);
+  background: var(--cove-lightestGray);
 
   &:not(.no-borders) {
-    border-color: var(--lightGray);
+    border-color: var(--cove-lightGray);
     border-width: 1px;
     border-style: solid;
   }

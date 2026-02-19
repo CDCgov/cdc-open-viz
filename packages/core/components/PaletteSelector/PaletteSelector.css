@@ -25,7 +25,7 @@
 
 /* Button-based palette selector (used by charts) */
 .color-palette button:not(.selected) {
-  border: var(--cool-gray-30) 2px solid !important;
+  border: var(--cove-cool-gray-30) 2px solid !important;
 }
 
 .color-palette button.selected {

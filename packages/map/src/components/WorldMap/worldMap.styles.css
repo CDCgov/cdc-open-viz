@@ -1,6 +1,6 @@
 .world {
   &.data .geography-container {
-    border-bottom: var(--lightGray) 1px solid;
+    border-bottom: var(--cove-lightGray) 1px solid;
   }
   .geography-container {
     cursor: move;

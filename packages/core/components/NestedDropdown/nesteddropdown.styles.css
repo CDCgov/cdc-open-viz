@@ -11,12 +11,12 @@
   }
 
   * {
-    font-family: var(--app-font-secondary) !important;
-    font-size: var(--filter-select-font-size) !important;
+    font-family: var(--cove-app-font-secondary) !important;
+    font-size: var(--cove-filter-select-font-size) !important;
   }
 
   .search-input {
-    color: var(--cool-gray-90);
+    color: var(--cove-cool-gray-90);
     font-weight: 300;
 
     border: none;
@@ -25,7 +25,7 @@
     width: 100%;
     padding: 0;
     &::placeholder {
-      color: var(--cool-gray-90);
+      color: var(--cove-cool-gray-90);
     }
   }
 
@@ -35,7 +35,7 @@
 
   [class^='main-nested-dropdown-container-'],
   .nested-dropdown-input-container {
-    border: 1px solid var(--cool-gray-10);
+    border: 1px solid var(--cove-cool-gray-10);
     min-width: 200px;
     padding: 0.4rem 0.75rem;
     font-size: 1em;
@@ -54,7 +54,7 @@
     }
 
     &:hover {
-      background-color: var(--lightGray);
+      background-color: var(--cove-lightGray);
     }
   }
 
@@ -72,9 +72,9 @@
     }
 
     &.disabled {
-      background-color: var(--lightestGray);
+      background-color: var(--cove-lightestGray);
       & > :is(input) {
-        background-color: var(--lightestGray);
+        background-color: var(--cove-lightestGray);
       }
     }
   }

@@ -11,7 +11,7 @@
       display: inherit;
       margin-bottom: 5px;
       font-weight: 700;
-      font-size: var(--filter-label-font-size);
+      font-size: var(--cove-filter-label-font-size);
     }
   }
 
@@ -22,7 +22,7 @@
 
   &__buttons {
     width: 100%;
-    font-size: var(--filter-buttons-font-size);
+    font-size: var(--cove-filter-buttons-font-size);
   }
 }
 
@@ -59,7 +59,7 @@ div.single-filters {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     margin-top: 5px;
-    font-family: var(--app-font-secondary);
+    font-family: var(--cove-app-font-secondary);
     font-size: 1rem;
     text-align: center;
   }
@@ -74,14 +74,14 @@ div.single-filters {
 }
 
 .tab-simple-container {
-  border-bottom: 1px solid var(--cool-gray-10);
+  border-bottom: 1px solid var(--cove-cool-gray-10);
   flex-wrap: wrap;
 
   .tab.tab--simple {
     background: none;
     border: none;
     border-bottom: 0.3rem solid transparent;
-    font-family: var(--app-font-secondary);
+    font-family: var(--cove-app-font-secondary);
     font-size: 1rem;
     font-weight: 300;
     padding: 0.5rem 1rem;
@@ -90,7 +90,7 @@ div.single-filters {
     border-radius: 6px 6px 0 0;
 
     &:hover {
-      color: var(--colors-blue-vivid-60, #005ea2);
+      color: var(--cove-colors-blue-vivid-60, #005ea2);
       background: var(--colors-cyan-cool-10, #eff9fa);
     }
 
@@ -101,7 +101,7 @@ div.single-filters {
 
     &.tab--active {
       font-weight: 500;
-      border-bottom-color: var(--colors-blue-vivid-60, #005ea2);
+      border-bottom-color: var(--cove-colors-blue-vivid-60, #005ea2);
       z-index: 1;
     }
   }

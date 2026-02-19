@@ -240,7 +240,7 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
   }
 
   section.footnotes {
-    border-top: 1px solid var(--cool-gray-10);
+    border-top: 1px solid var(--cove-cool-gray-10);
     width: 100%;
   }
 
@@ -251,14 +251,14 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
   // after migration to TP5 this declaration should be removed and all references
   // to it should be replaced with .form-select
   select.cove-form-select {
-    font-family: var(--app-font-secondary);
+    font-family: var(--cove-app-font-secondary);
     font-weight: 300;
-    font-size: var(--filter-select-font-size);
+    font-size: var(--cove-filter-select-font-size);
     line-height: normal;
     padding-right: 3rem;
     border-radius: 0.333rem;
-    border: 1px solid var(--cool-gray-10) !important;
-    color: var(--cool-gray-90);
+    border: 1px solid var(--cove-cool-gray-10) !important;
+    color: var(--cove-cool-gray-90);
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
     background-repeat: no-repeat;
     background-position: right 0.5rem center;

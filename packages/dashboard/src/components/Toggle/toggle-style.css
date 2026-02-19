@@ -1,5 +1,5 @@
 .cdc-open-viz-module {
-  --border: 1px solid var(--lightGray);
+  --border: 1px solid var(--cove-lightGray);
   .toggle-component {
     display: flex;
     justify-content: right;
@@ -21,11 +21,11 @@
       float: right;
       cursor: pointer;
       &.selected {
-        background-color: var(--primary);
+        background-color: var(--cove-primary);
         color: white;
       }
-      background-color: var(--white);
-      color: var(--primary);
+      background-color: var(--cove-white);
+      color: var(--cove-primary);
       :is(svg) {
         height: 25px;
       }

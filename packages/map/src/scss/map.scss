@@ -58,10 +58,10 @@ $medium: 768px;
     transition: 0.3s all;
 
     text {
-      font-size: var(--territory-label-font-size);
+      font-size: var(--cove-territory-label-font-size);
       font-weight: 900;
       @include breakpointClass(sm) {
-        font-size: var(--territory-label-font-size-mobile);
+        font-size: var(--cove-territory-label-font-size-mobile);
       }
     }
   }

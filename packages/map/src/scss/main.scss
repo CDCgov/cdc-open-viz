@@ -21,7 +21,7 @@
 
   @include breakpointClass(md) {
     .map-container.modal-background::before {
-      border-bottom: var(--lightGray) 1px solid;
+      border-bottom: var(--cove-lightGray) 1px solid;
       margin-bottom: -1px;
       bottom: 1px;
     }
@@ -171,7 +171,7 @@
     padding: 1em;
     z-index: 6;
     width: 100%;
-    border-top: var(--lightGray) 1px solid;
+    border-top: var(--cove-lightGray) 1px solid;
 
     label {
       flex-grow: 1;

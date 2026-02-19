@@ -36,7 +36,7 @@
     top: 0;
     max-width: 350px;
     width: 350px;
-    background-color: var(--white);
+    background-color: var(--cove-white);
     grid-area: panel;
 
     &.editor-panel--hidden.hidden {
@@ -88,7 +88,7 @@
 
     .series-list {
       list-style: none;
-      border: var(--lightGray) 1px solid;
+      border: var(--cove-lightGray) 1px solid;
 
       &:empty {
         border: none !important;
@@ -103,7 +103,7 @@
         position: relative;
 
         &:hover {
-          background-color: var(--lightestGray);
+          background-color: var(--cove-lightestGray);
         }
 
         div {
@@ -178,7 +178,7 @@
         }
 
         & + li {
-          border-top: var(--lightGray) 1px solid;
+          border-top: var(--cove-lightGray) 1px solid;
         }
       }
     }
@@ -274,7 +274,7 @@
     }
 
     .accordion__heading {
-      background: var(--lightestGray);
+      background: var(--cove-lightestGray);
     }
 
     .accordion__item {
@@ -295,7 +295,7 @@
 
       svg {
         width: 60px;
-        color: var(--blue);
+        color: var(--cove-blue);
         margin-right: 1rem;
         height: 60px;
 
@@ -868,7 +868,7 @@
 
   &.editor-panel--visible {
     .form-container {
-      border-right: var(--lightGray) 1px solid;
+      border-right: var(--cove-lightGray) 1px solid;
       flex-grow: 1;
       height: 100%;
       overflow: auto;
