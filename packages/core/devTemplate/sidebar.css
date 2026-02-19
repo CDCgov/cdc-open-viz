@@ -1,28 +1,28 @@
 .dev-sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 240px;
-  height: 100vh;
   background: #1e1e2e;
   border-right: 1px solid #313244;
+  color: #cdd6f4;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 12px;
-  color: #cdd6f4;
+  height: 100vh;
+  left: 0;
   overflow-y: auto;
+  position: fixed;
+  top: 0;
+  width: 240px;
   z-index: 99999;
 }
 
 .dev-sidebar-header {
-  padding: 10px 12px;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #9399b2;
-  border-bottom: 1px solid #313244;
-  display: flex;
   align-items: center;
+  border-bottom: 1px solid #313244;
+  color: #9399b2;
+  display: flex;
+  font-size: 10px;
   justify-content: space-between;
+  letter-spacing: 0.05em;
+  padding: 10px 12px;
+  text-transform: uppercase;
 }
 
 .dev-sidebar-toggles {
@@ -31,18 +31,18 @@
 }
 
 .dev-sidebar-toggle {
+  align-items: center;
   background: none;
   border: 1px solid #45475a;
   border-radius: 4px;
   color: #9399b2;
   cursor: pointer;
-  width: 26px;
-  height: 26px;
-  font-size: 14px;
   display: flex;
-  align-items: center;
+  font-size: 14px;
+  height: 26px;
   justify-content: center;
   transition: all 0.15s;
+  width: 26px;
 }
 
 .dev-sidebar-toggle:hover {
@@ -63,19 +63,19 @@
 }
 
 .dev-sidebar-search {
-  padding: 8px 12px;
   border-bottom: 1px solid #313244;
+  padding: 8px 12px;
 }
 
 .dev-sidebar-search input {
-  width: 100%;
-  padding: 6px 10px;
   background: #313244;
   border: 1px solid #45475a;
   border-radius: 4px;
   color: #cdd6f4;
   font-size: 12px;
   outline: none;
+  padding: 6px 10px;
+  width: 100%;
 }
 
 .dev-sidebar-search input::placeholder {
@@ -91,16 +91,16 @@
 }
 
 .dev-sidebar-item {
-  display: block;
-  width: 100%;
-  padding: 3px 12px;
   background: none;
   border: none;
   color: #cdd6f4;
-  text-align: left;
   cursor: pointer;
+  display: block;
   font-size: 12px;
+  padding: 3px 12px;
+  text-align: left;
   text-decoration: none;
+  width: 100%;
 }
 
 .dev-sidebar-item:hover {
@@ -113,14 +113,14 @@
 }
 
 .dev-sidebar-folder {
-  padding: 4px 12px;
+  align-items: center;
   color: #f9e2af;
+  cursor: pointer;
+  display: flex;
   font-size: 12px;
   font-weight: 500;
-  display: flex;
-  align-items: center;
   gap: 5px;
-  cursor: pointer;
+  padding: 4px 12px;
 }
 
 .dev-sidebar-folder:hover {

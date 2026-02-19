@@ -1,9 +1,9 @@
 .cdc-open-viz-module.type-chart {
   .viewport-overrides button {
-    width: 100%;
-    padding: 1em;
     margin-top: 1em;
+    padding: 1em;
     text-align: left;
+    width: 100%;
 
     span {
       float: right;

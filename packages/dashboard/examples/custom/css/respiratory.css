@@ -6,9 +6,9 @@ div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .
 
 
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .cove-dashboard-filters {
-  max-width: 150px;
   margin: 0.5em !important;
   margin-bottom: 0 !important;
+  max-width: 150px;
   vertical-align: middle;
 }
 
@@ -17,26 +17,26 @@ div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .
 }
 
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .cove-dashboard-filters:nth-child(3)::after{
-  content: 'Reset';
-  padding: .375rem .75rem;
-  font-size: 1rem;
-  color: #fff;
   background-color: #005eaa;
   border-radius: .1875rem;
+  color: #fff;
+  content: 'Reset';
   cursor: pointer;
+  font-size: 1rem;
+  padding: .375rem .75rem;
 }
   
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(1),
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(1) .dashboard-col {
-  margin-bottom: 0 !important;
   display: block;
+  margin-bottom: 0 !important;
 }
 
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row.no-county:nth-child(1)::after {
   content: 'Please select "All" to see values for your state.';
   display: block;
-  margin-left: .5em;
 margin-bottom: 1em;
+  margin-left: .5em;
 }
 
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row.no-county:nth-child(1) .dashboard-col::after {
@@ -50,42 +50,42 @@ div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .
   content: 'County level displays are not available for this state/territory';
   display: block;
   font-weight: bold;
-  margin-left: .5em;
 margin-bottom: 1em;
+  margin-left: .5em;
 }
 
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(4){
+    column-gap: normal !important;
   display: none !important;
   justify-content: normal !important;
-    column-gap: normal !important;
   position: relative;
 }
 
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(4) .cove-component__content {
-  padding-top: 0;
   border: 1px solid gray !important;
-    border-top: none !important;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+    border-top: none !important;
+  padding-top: 0;
 }
   
   
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(4) header {
-  border: 1px solid gray;
   background-color: lightgray;
-  color: black;
+  border: 1px solid gray;
     border-top-left-radius: 0 !important;
     border-top-right-radius: 0 !important;
+  color: black;
 }
   
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(4) header::before {
+  border: 1px solid lightgray;
+  border-radius: .5em;
   content: '';
   display: inline-block;
-  width: 1em;
   height: 1em;
-  border-radius: .5em;
-  border: 1px solid lightgray;
   margin-right: .5em;
+  width: 1em;
 }
   
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(4) .dashboard-col:nth-child(1) header::before {
@@ -109,18 +109,18 @@ div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .
 }
 
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(4) p {
-  padding-top: 1.5em;
   min-height: 3.5em;
+  padding-top: 1.5em;
 }
   
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(4) p::before {
-  content: '\2192';
-  font-weight: 900;
-    font-size: xx-large;
-  display: inline-block;
   color: rgb(15, 102, 200);
-  vertical-align: top;
+  content: '\2192';
+  display: inline-block;
+    font-size: xx-large;
+  font-weight: 900;
   line-height: .5em;
+  vertical-align: top;
 }
   
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(4) p.increasing::before {
@@ -147,16 +147,16 @@ div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .
 }  
   
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(2) .dashboard-col:nth-child(1) {
-  width: calc(150px + 3em);
 margin-left: -.5em;
+  width: calc(150px + 3em);
 } 
   
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(2) .dashboard-col:nth-child(1)::before {
-  position: relative;
   content: 'Selection:';
-  margin-left: 1rem;
-  top: .6em;
   font-weight: bold;
+  margin-left: 1rem;
+  position: relative;
+  top: .6em;
 } 
 
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(2) .dashboard-col:nth-child(2) {
@@ -180,37 +180,37 @@ div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .
 
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(2) .dashboard-col:nth-child(2) header.show-modal::before {
   content: 'x';
+  cursor: pointer;
   position: absolute;
   right: calc(5% + 1em);
   top: -150px;
   z-index: 1;
-  cursor: pointer;
 }
   
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(2) .dashboard-col:nth-child(2) header.show-modal::after {
-  content: 'Groups of counties often share healthcare resources. The data shown for the selected county include emergency department visit data collected for the entire area (which may include multiple counties).';
-  position: absolute;
-  bottom: calc(100% + 1em);
-  right: 5%;
-  padding: .5em 2em 5em .5em;
-  height: 140px;
-  width: 250px;
   background-color: rgb(243,247,251);
-  color: rgb(56,100,151);
   border: 1px solid rgb(56,100,151);
   border-radius: 5px;
-  max-width: 80%;
+  bottom: calc(100% + 1em);
+  color: rgb(56,100,151);
+  content: 'Groups of counties often share healthcare resources. The data shown for the selected county include emergency department visit data collected for the entire area (which may include multiple counties).';
   font-size: .8em;
+  height: 140px;
+  max-width: 80%;
+  padding: .5em 2em 5em .5em;
+  position: absolute;
+  right: 5%;
+  width: 250px;
 }
   
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(2) .dashboard-col:nth-child(2) header h2::after {
+  color:#0000EE;
   content: 'More Info';
-  cursor: pointer;
-  text-decoration: underline;
-  color:#0000EE; 
+  cursor: pointer; 
   float: right;
   font-weight: normal;
   margin-left: 1em;
+  text-decoration: underline;
 }
   
 div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(2) .dashboard-col:nth-child(2) header div {

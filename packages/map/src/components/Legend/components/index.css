@@ -9,16 +9,16 @@
   &.xl {
     .map-container.world aside.side {
       border-top: var(--cove-cool-gray-10) 1px solid;
-      position: absolute;
       box-shadow: rgba(0, 0, 0, 0.2) 0 10px 18px;
+      position: absolute;
     }
   }
 
   aside {
     background-color: #fff;
-    z-index: 6;
-    border-top: var(--cove-cool-gray-10) 1px solid;
     border-radius: 6px;
+    border-top: var(--cove-cool-gray-10) 1px solid;
+    z-index: 6;
 
     /* breakpointClass(md) on aside — &.bottom, &.top */
     &.md.bottom,
@@ -34,21 +34,21 @@
     &.md.side,
     &.lg.side,
     &.xl.side {
-      z-index: 1;
-      box-sizing: content-box;
-      max-width: 450px;
-      margin-top: 2em;
-      margin-bottom: 2em;
       align-self: flex-start;
-      z-index: 4;
       border: var(--cove-cool-gray-10) 1px solid;
-      top: 2em;
+      box-sizing: content-box;
+      margin-bottom: 2em;
+      margin-top: 2em;
+      max-width: 450px;
       right: 1em;
+      top: 2em;
+      z-index: 1;
+      z-index: 4;
 
       ul.vertical-sorted {
-        display: block;
         column-count: 2;
         column-fill: balance;
+        display: block;
 
         > li {
           white-space: nowrap;
@@ -78,9 +78,9 @@
     &.lg.top ul.legend-container__ul.vertical-sorted,
     &.xl.bottom ul.legend-container__ul.vertical-sorted,
     &.xl.top ul.legend-container__ul.vertical-sorted {
-      display: block;
       column-count: 2;
       column-fill: balance;
+      display: block;
     }
 
     /* breakpointClass(md) on aside — &.side .legend-container .legend-container__ul--single-column */
@@ -88,8 +88,8 @@
       &.md,
       &.lg,
       &.xl {
-        width: 25%;
         min-width: 200px;
+        width: 25%;
 
         .legend-section ul {
           flex-direction: column;
@@ -139,10 +139,10 @@
       }
 
       .legend-container__title {
+        display: inline-block;
         font-size: var(--cove-legend-title-font-size);
         font-weight: var(--legend-title-font-weight);
         padding-bottom: 0;
-        display: inline-block;
       }
 
       .legend-container__description {
@@ -158,25 +158,25 @@
       }
 
       .legend-container__ul {
-        list-style: none;
-        line-height: 1;
-        row-gap: var(--cove-space-between-legend-item-rows);
         column-gap: var(--cove-space-between-legend-item-columns);
+        line-height: 1;
+        list-style: none;
+        row-gap: var(--cove-space-between-legend-item-rows);
       }
 
       .legend-container__li-btn {
-        display: flex;
         align-items: center;
-        gap: 0.5em;
-        width: 100%;
         background: none;
         border: none;
-        padding: 0;
-        margin: 0;
-        font: inherit;
         color: inherit;
         cursor: pointer;
+        display: flex;
+        font: inherit;
+        gap: 0.5em;
+        margin: 0;
+        padding: 0;
         text-align: left;
+        width: 100%;
 
         &--pattern {
           cursor: default;
@@ -188,9 +188,9 @@
       }
 
       .legend-container__ul:not(.single-row, .legend-container__ul--single-column) {
-        list-style: none;
         display: grid !important;
         grid-template-columns: 1fr;
+        list-style: none;
 
         @media (min-width: 960px) {
           grid-template-columns: 1fr 1fr;
@@ -219,22 +219,22 @@
         }
 
         .legend-container__li {
-          display: flex;
           align-items: center;
-          gap: 0.5em;
-          width: 100%;
-          padding-right: 1em;
-          vertical-align: middle;
-          transition: 0.1s opacity;
           cursor: pointer;
+          display: flex;
           flex-grow: 1;
+          gap: 0.5em;
+          padding-right: 1em;
+          transition: 0.1s opacity;
+          vertical-align: middle;
           white-space: nowrap;
+          width: 100%;
 
           .legend-item {
-            display: flex;
-            justify-content: center;
             align-items: center;
+            display: flex;
             flex-shrink: 0;
+            justify-content: center;
           }
 
           &:last-child {
@@ -250,29 +250,29 @@
           }
 
           &.legend-container__li--not-disabled {
+            border-radius: 1px;
             outline: 1px solid #005ea2;
             outline-offset: 5px;
-            border-radius: 1px;
           }
         }
       }
 
       .legend-container__ul.single-row {
-        width: 100%;
+        align-items: center;
         cursor: pointer;
-        list-style: none;
         display: flex;
         flex-direction: row;
-        align-items: center;
-        justify-content: flex-start;
         flex-wrap: wrap;
+        justify-content: flex-start;
+        list-style: none;
+        width: 100%;
 
         > li {
-          white-space: wrap;
+          align-items: center;
           display: flex;
           justify-content: center;
-          align-items: center;
           vertical-align: middle;
+          white-space: wrap;
 
           @media (min-width: 960px) {
             white-space: nowrap;
@@ -297,8 +297,8 @@
       }
 
       .legend-container__li {
-        width: 100%;
         white-space: nowrap;
+        width: 100%;
       }
     }
 
@@ -311,10 +311,10 @@
       }
 
       form {
-        margin-top: 0.5em;
-        line-height: 2em;
-        display: flex;
         align-items: flex-end;
+        display: flex;
+        line-height: 2em;
+        margin-top: 0.5em;
 
         section + section {
           margin-left: 0.75em;
@@ -329,11 +329,11 @@
 
     .shape-container {
       &.single-row {
+        align-items: center;
         display: flex;
         flex-direction: row;
-        align-items: center;
-        justify-content: flex-start;
         flex-wrap: wrap;
+        justify-content: flex-start;
 
         > div {
           margin-right: 2em;
@@ -350,13 +350,13 @@
       }
 
       div > svg {
-        width: 25px;
         height: 32px;
+        width: 25px;
       }
 
       div > p {
-        white-space: nowrap;
         margin-top: 1px;
+        white-space: nowrap;
       }
     }
   }

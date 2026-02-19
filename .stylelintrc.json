@@ -1,0 +1,17 @@
+{
+  "plugins": [
+    "stylelint-order"
+  ],
+  "rules": {
+    "order/properties-alphabetical-order": true
+  },
+  "ignoreFiles": [
+    "dist/**",
+    "build/**",
+    "node_modules/**",
+    ".storybook/**",
+    "storybook-static/**",
+    "backstop_data/**",
+    "**/*.scss"
+  ]
+}

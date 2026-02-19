@@ -18,20 +18,20 @@
 
     .two-col-inputs {
       display: flex;
-      margin-top: 1em;
       justify-content: space-between;
+      margin-top: 1em;
 
       >label {
-        width: 48%;
         margin-top: 0 !important;
+        width: 48%;
       }
     }
 
     .accordion__divider {
       border: 0;
       border-top: 1px solid #e2e2e2;
-      margin-top: 1.5rem;
       margin-bottom: 1.5rem;
+      margin-top: 1.5rem;
     }
 
     label {
@@ -59,25 +59,25 @@
 
   .editor-panel__toggle {
     background: #f2f2f2;
-    border-radius: 60px;
-    color: #000;
-    font-size: 1em;
     border: 0;
-    position: absolute;
-    z-index: 100;
-    transition: 0.1s background;
+    border-radius: 60px;
+    box-shadow: rgba(0, 0, 0, 0.5) 0 1px 2px;
+    color: #000;
     cursor: pointer;
-    width: 25px;
+    font-size: 1em;
     height: 25px;
     left: 307px;
-    box-shadow: rgba(0, 0, 0, 0.5) 0 1px 2px;
+    position: absolute;
+    transition: 0.1s background;
+    width: 25px;
+    z-index: 100;
 
     &:before {
-      top: 43%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      position: absolute;
       content: '\00ab';
+      left: 50%;
+      position: absolute;
+      top: 43%;
+      transform: translate(-50%, -50%);
     }
 
     &.collapsed {

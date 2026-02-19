@@ -1,17 +1,17 @@
 .multi-config-tabs {
   .nav-link {
+    border-color: var(--cove-lightGray);
     border-radius: 6px 6px 0 0;
-    font-weight: 400;
+    color: var(--cove-primary);
     display: block;
+    font-weight: 400;
     padding: 0.5rem 1rem;
     @media (max-width: 480px) {
       padding: 0.5rem 0.8rem;
     }
-    color: var(--cove-primary);
-    border-color: var(--cove-lightGray);
     :is(button) {
-      display: none;
       background: none;
+      display: none;
     }
     &:hover {
       :is(button) {
@@ -31,9 +31,9 @@
       font-weight: bold;
     }
     .btn-danger {
-      text-decoration: none;
-      padding: 0px 5px;
       font-size: inherit;
+      padding: 0px 5px;
+      text-decoration: none;
     }
   }
   .add {

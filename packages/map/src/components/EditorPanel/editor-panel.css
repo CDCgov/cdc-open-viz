@@ -3,13 +3,13 @@
 
     /* Temp Radio button fix - resets User Agent Style, forms.css overwrites our styles here */
     input[type='radio'] {
-      background-color: initial !important;
-      cursor: default !important;
       appearance: auto !important;
+      background-color: initial !important;
+      border: initial !important;
       box-sizing: border-box !important;
+      cursor: default !important;
       margin: 3px 3px 0 5px !important;
       padding: initial !important;
-      border: initial !important;
     }
   }
 }
@@ -19,17 +19,17 @@
 
     .cove-input-group,
     .cove-accordion__small-inputs {
-      position: relative;
+      align-items: stretch;
       display: flex;
       flex-wrap: wrap;
-      align-items: stretch;
+      position: relative;
       width: 100%;
 
       >.cove-input {
-        position: relative;
         flex: 1 1 auto;
-        width: 1%;
         min-width: 0;
+        position: relative;
+        width: 1%;
       }
 
       >.cove-input__label {
@@ -38,14 +38,14 @@
 
       &:not(.clear) {
         > :not(:first-child) {
-          margin-left: -1px;
-          border-top-left-radius: 0;
           border-bottom-left-radius: 0;
+          border-top-left-radius: 0;
+          margin-left: -1px;
         }
 
         > :not(:last-child) {
-          border-top-right-radius: 0;
           border-bottom-right-radius: 0;
+          border-top-right-radius: 0;
         }
       }
 
@@ -61,10 +61,10 @@
         }
 
         .cove-input-group__label {
-          position: absolute;
           background-color: transparent;
           height: 100%;
           pointer-events: none;
+          position: absolute;
           user-select: none;
         }
       }
@@ -75,13 +75,13 @@
     }
 
     .helper {
-      position: relative;
-      opacity: 0.7;
-      cursor: pointer;
-      width: 17px;
-      height: 17px;
       align-self: center;
+      cursor: pointer;
+      height: 17px;
       margin-left: 0.3rem;
+      opacity: 0.7;
+      position: relative;
+      width: 17px;
     }
 
     textarea {
@@ -92,35 +92,35 @@
       list-style: none;
 
       li {
+        cursor: pointer;
+        opacity: 0.7;
         padding-left: 2em;
         position: relative;
         transition: 0.2s opacity;
-        cursor: pointer;
-        opacity: 0.7;
 
         &:before {
-          content: ' ';
-          position: absolute;
-          left: 20px;
-          top: 0;
-          bottom: 0;
           border-left: rgba(0, 0, 0, 0.2) 4px solid;
+          bottom: 0;
+          content: ' ';
+          left: 20px;
+          position: absolute;
+          top: 0;
           transition: 0.2s all;
         }
 
         &:after {
-          content: ' ';
           background: url('../images/inactive-checkmark.svg') no-repeat;
-          width: 14px;
-          height: 14px;
           background-size: 14px;
-          position: absolute;
+          content: ' ';
+          height: 14px;
           left: 0;
+          opacity: 0.5;
+          position: absolute;
           top: 50%;
           transform: translateY(-50%);
-          z-index: 40;
-          opacity: 0.5;
           transition: 0.2s opacity;
+          width: 14px;
+          z-index: 40;
         }
 
         &:not(:first-child) {
@@ -153,16 +153,16 @@
         }
 
         &.active {
-          position: relative;
           opacity: 1;
+          position: relative;
 
           &:before {
             border-left: rgba(0, 0, 0, 0.7) 4px solid;
           }
 
           &:after {
-            content: ' ';
             background-image: url(../images/active-checkmark.svg);
+            content: ' ';
             opacity: 1;
             transition: 0.2s opacity;
           }

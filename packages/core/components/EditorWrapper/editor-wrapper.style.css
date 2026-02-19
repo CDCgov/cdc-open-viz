@@ -1,7 +1,7 @@
 .editor-wrapper {
   --editorPanelWidth: 350px;
-  position: relative;
   min-height: 80vh;
+  position: relative;
   .editor-panel {
     :is(form) {
       border-right: var(--cove-lightGray) 1px solid;

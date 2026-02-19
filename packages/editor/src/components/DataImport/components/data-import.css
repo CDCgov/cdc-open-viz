@@ -7,26 +7,26 @@
 
     .left-col {
       background: var(--cove-white);
-      padding: var(--data-import-padding);
-      width: 50%;
       border-right: var(--cove-lightGray) 1px solid;
-      position: fixed;
       bottom: 0;
       left: 0;
-      top: 0;
       margin-top: 3rem;
-      z-index: 1;
       overflow-y: auto;
+      padding: var(--data-import-padding);
+      position: fixed;
+      top: 0;
+      width: 50%;
+      z-index: 1;
 
       .dataset-name-input {
         width: 100%;
       }
 
       .heading-3 {
+        border-top: 1px solid gray;
         font-weight: 600;
         margin-bottom: 0.5em;
         margin-top: 1em;
-        border-top: 1px solid gray;
         padding-top: 0.5em;
       }
 
@@ -38,14 +38,14 @@
         }
 
         .nav-item {
+          align-items: center;
+          border-bottom: var(--cove-lightGray) 1px solid;
+          color: var(--cove-mediumGray);
           display: flex;
+          flex-grow: 1;
           justify-content: center;
           list-style: none;
           padding: 0.6rem 0;
-          flex-grow: 1;
-          border-bottom: var(--cove-lightGray) 1px solid;
-          color: var(--cove-mediumGray);
-          align-items: center;
 
           svg {
             margin-right: 0.3em;
@@ -56,21 +56,21 @@
           }
 
           &.active {
-            border-bottom-width: 5px;
             border-bottom-color: var(--cove-mediumGray);
+            border-bottom-width: 5px;
             color: var(--cove-darkGray);
           }
         }
 
         .tab-content {
-          padding-top: var(--data-import-padding);
           border-top: 1px solid var(--cove-baseColor);
+          padding-top: var(--data-import-padding);
         }
       }
 
       table {
-        width: 100%;
         border: 1px solid gray;
+        width: 100%;
 
         thead {
           background-color: rgb(220, 220, 200);
@@ -78,10 +78,10 @@
         }
 
         td {
-          text-align: center;
-          white-space: nowrap;
-          text-overflow: ellipsis;
           overflow: hidden;
+          text-align: center;
+          text-overflow: ellipsis;
+          white-space: nowrap;
 
           button {
             font-size: 11pt;
@@ -90,19 +90,19 @@
       }
 
       .cdcdataviz-file-selector {
-        padding: 1rem 3rem;
-        text-align: center;
         border: var(--cove-lightGray) 2px dashed;
         border-radius: 0.2rem;
+        color: var(--cove-mediumGray);
         cursor: pointer;
         font-size: 1em;
-        color: var(--cove-mediumGray);
+        padding: 1rem 3rem;
+        text-align: center;
         transition: 0.1s all;
 
         svg {
-          max-width: 35px;
-          margin: 0 auto 0.5em;
           color: var(--cove-baseColor);
+          margin: 0 auto 0.5em;
+          max-width: 35px;
           transition: 0.1s all;
 
           path {
@@ -120,17 +120,17 @@
         }
 
         span {
-          white-space: pre;
           color: var(--cove-blue);
           text-decoration: underline;
+          white-space: pre;
         }
       }
 
       .footnote {
+        color: var(--cove-mediumGray);
         font-size: 0.8rem;
         font-style: italic;
         margin: 1em 0 2em 0;
-        color: var(--cove-mediumGray);
       }
 
       .btn.active {
@@ -138,18 +138,18 @@
       }
 
       .input-group {
-        display: flex;
         align-items: stretch;
+        display: flex;
 
         input[type='text'] {
-          flex-grow: 1;
           border-right: 0;
+          flex-grow: 1;
         }
       }
 
       .keep-url {
-        font-size: 0.8rem;
         color: var(--cove-mediumGray);
+        font-size: 0.8rem;
       }
 
       .sample-data-list {
@@ -157,10 +157,10 @@
         list-style: none;
 
         li {
-          margin-top: 0.3rem;
           color: var(--cove-blue);
-          text-decoration: underline;
           cursor: pointer;
+          margin-top: 0.3rem;
+          text-decoration: underline;
         }
       }
 
@@ -169,8 +169,8 @@
       }
 
       .edit-block {
-        padding-left: 1em;
         border-left: rgba(0, 0, 0, 0.2) 4px solid;
+        padding-left: 1em;
         transition: 0.2s all;
 
         &:not(:first-child) {
@@ -196,8 +196,8 @@
         }
 
         .column-heading {
-          text-transform: uppercase;
           display: block;
+          text-transform: uppercase;
         }
 
         select,
@@ -218,8 +218,8 @@
         }
 
         label {
-          margin-top: 1em;
           display: inline-block;
+          margin-top: 1em;
           width: 100%;
         }
       }
@@ -227,8 +227,8 @@
       .url-source-options,
       .data-source-options {
         display: grid;
-        grid-template-columns: 1fr 100px;
         gap: 10px;
+        grid-template-columns: 1fr 100px;
         margin-bottom: 20px;
 
         .btn {
@@ -240,11 +240,11 @@
           padding: 0.4rem 3rem;
 
           svg {
+            height: 1em;
+            margin: 0;
             position: relative;
             top: 4px;
             width: 1em;
-            height: 1em;
-            margin: 0;
           }
         }
       }
@@ -255,21 +255,21 @@
     }
 
     .right-col {
-      position: relative;
       background-color: var(--cove-gray2);
       padding: var(--data-import-padding);
+      position: relative;
       width: 50% !important;
 
       table {
-        width: 100%;
-        table-layout: unset;
         border-collapse: collapse;
+        table-layout: unset;
+        width: 100%;
 
         th,
         td {
-          white-space: nowrap;
-          text-overflow: ellipsis;
           overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
       }
     }

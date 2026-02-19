@@ -100,6 +100,9 @@
     "./packages/*/src/**/*.{js,jsx,ts,tsx}": [
       "eslint --config .eslintrc.json",
       "npx prettier --write"
+    ],
+    "packages/**/*.css": [
+      "stylelint --fix"
     ]
   },
   "private": true,
@@ -125,6 +128,8 @@
     "dev:portal": "npm run dev:chart -- --no-open & npm run dev:dashboard -- --no-open & npm run dev:data-bite -- --no-open & npm run dev:data-table -- --no-open & npm run dev:filtered-text -- --no-open & npm run dev:map -- --no-open & npm run dev:markup-include -- --no-open & npm run dev:waffle-chart -- --no-open & vite --config dev-portal/vite.config.dev-portal.js --open",
     "dev:chart": "lerna run --scope @cdc/chart start -- --port 3001",
     "dev:dashboard": "lerna run --scope @cdc/dashboard start -- --port 3003",
+    "lint:css": "stylelint 'packages/**/*.css'",
+    "lint:css:fix": "stylelint 'packages/**/*.css' --fix",
     "dev:data-bite": "lerna run --scope @cdc/data-bite start -- --port 3004",
     "dev:data-table": "lerna run --scope @cdc/data-table start -- --port 3005",
     "dev:editor": "lerna run --scope @cdc/editor start -- --port 3006",

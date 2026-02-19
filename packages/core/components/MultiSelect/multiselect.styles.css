@@ -3,45 +3,45 @@
     display: block;
   }
   .wrapper {
-    display: inline-flex;
     align-items: center;
+    display: inline-flex;
     width: 100%;
     .selected {
       &[aria-disabled='true'] {
         background: var(--cove-lightestGray);
       }
       border: 1px solid var(--cove-lightGray);
-      padding: 7px;
-      min-width: 200px;
-      width: 100%;
+      border-radius: 5px;
       display: inline-block;
+      min-width: 200px;
+      padding: 7px;
+      width: 100%;
       :is(button) {
-        border: none;
         background: none;
+        border: none;
       }
       :is(div) {
-        display: inline-block;
-        padding: 0 0 0 5px;
-        margin-right: 5px;
-        margin-bottom: 2px;
         background: var(--cove-lightGray);
         border-radius: 5px;
+        display: inline-block;
+        margin-bottom: 2px;
+        margin-right: 5px;
+        padding: 0 0 0 5px;
       }
       .expand {
-        padding: 2px 0px;
-        margin-right: -6px;
+        color: var(--cove-mediumGray);
         float: right;
         margin-bottom: -3px;
-        color: var(--cove-mediumGray);
+        margin-right: -6px;
+        padding: 2px 0px;
         &:focus {
           outline: none;
         }
       }
-      border-radius: 5px;
     }
     .cove-tooltip__content {
-      position: absolute;
       min-width: 120px;
+      position: absolute;
       :is(p) {
         margin-bottom: 0;
       }
@@ -52,15 +52,15 @@
   }
   .dropdown {
     background: white;
+    border: 1px solid var(--cove-lightGray);
+    margin-top: 0px;
+    max-height: 200px;
+    min-height: 40px;
+    min-width: 200px;
+    overflow-y: scroll;
+    padding-left: 0;
     position: absolute;
     top: var(--select-height);
-    margin-top: 0px;
-    border: 1px solid var(--cove-lightGray);
-    padding-left: 0;
-    min-height: 40px;
-    max-height: 200px;
-    overflow-y: scroll;
-    min-width: 200px;
     z-index: 4;
 
     :is(li) {

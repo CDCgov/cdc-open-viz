@@ -7,12 +7,12 @@
 
 /* List item-based palette selector (used by maps) */
 .color-palette li {
-  width: 1.5em;
-  height: 1.5em;
-  display: inline-block;
-  margin-right: 0.5em;
-  cursor: pointer;
   border: rgba(0, 0, 0, 0.3) 3px solid;
+  cursor: pointer;
+  display: inline-block;
+  height: 1.5em;
+  margin-right: 0.5em;
+  width: 1.5em;
 }
 
 .color-palette li.active {
@@ -33,25 +33,25 @@
 }
 
 .color-palette a {
-  display: inline-block;
   border-bottom: 1px solid rgba(0, 0, 0, 0.8);
+  display: inline-block;
 }
 
 /* Series list variant */
 .color-palette.series-list {
+  border: none;
   flex-direction: column;
   padding: 0;
-  border: none;
 }
 
 .color-palette.series-list li {
-  padding: 0.3em 0.5em;
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: auto;
-  height: auto;
   border: 0;
+  display: flex;
+  height: auto;
+  justify-content: space-between;
+  padding: 0.3em 0.5em;
+  width: auto;
 }
 
 .color-palette.series-list li:not(:last-child) {
@@ -60,18 +60,18 @@
 
 /* Header variant */
 .header .color-palette li {
-  width: 1.5em;
-  height: 1.5em;
   display: inline-block;
+  height: 1.5em;
+  width: 1.5em;
 }
 
 /* Developer rollback component styles */
 .developer-palette-rollback {
-  margin: 8px 0;
-  padding: 8px;
+  background-color: #fffbf0;
   border: 1px dashed #ffc107;
   border-radius: 4px;
-  background-color: #fffbf0;
+  margin: 8px 0;
+  padding: 8px;
 }
 
 .developer-palette-rollback .rollback-info {

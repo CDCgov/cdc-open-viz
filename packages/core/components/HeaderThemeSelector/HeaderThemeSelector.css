@@ -6,8 +6,8 @@
 
 .header .edit-label {
   display: block;
-  margin-bottom: 0.5rem;
   font-weight: 500;
+  margin-bottom: 0.5rem;
 }
 
 .header .color-palette {
@@ -20,13 +20,13 @@
 }
 
 .header .color-palette button {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
   border: 2px solid transparent;
+  border-radius: 50%;
   cursor: pointer;
-  transition: all 0.2s ease;
+  height: 30px;
   outline: none;
+  transition: all 0.2s ease;
+  width: 30px;
 }
 
 .header .color-palette button:hover {

@@ -4,10 +4,10 @@
   }
 
   &.isEditor {
-    overflow: auto;
     display: grid;
-    transition: grid-template-columns 400ms ease-in-out;
     min-height: 100vh;
+    overflow: auto;
+    transition: grid-template-columns 400ms ease-in-out;
 
     .editor-panel__toggle {
       transition: left 400ms ease-in-out;
@@ -31,10 +31,10 @@
     .cove-editor__content,
     .cove-component__content {
       grid-area: content;
-      position: relative;
       left: 0;
-      width: 100% !important;
       padding: 1rem;
+      position: relative;
+      width: 100% !important;
     }
 
     /* Prevent double padding on nested .cove-component__content divs */

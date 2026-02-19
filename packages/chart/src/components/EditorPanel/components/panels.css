@@ -5,8 +5,8 @@
   }
 
   .radio-group {
-    display: flex;
     align-items: center;
+    display: flex;
     justify-content: space-between;
 
     .group {
@@ -15,9 +15,9 @@
 
     input[type='number'] {
       margin: 0 10px;
+      max-width: 50px;
       min-width: 50px;
       width: 50px;
-      max-width: 50px;
     }
 
     /* reset spacing */
@@ -35,16 +35,16 @@
   padding: 20px 0;
 
   .week-button {
-    margin-bottom: 0;
+    align-items: center;
+    background: var(--cove-lightestGray);
     border-radius: 50%;
     color: var(--cove-darkGray);
-    width: 24px;
-    height: 24px;
     display: flex;
-    align-items: center;
+    height: 24px;
     justify-content: center;
-    background: var(--cove-lightestGray);
     margin: 5px 2px 0;
+    margin-bottom: 0;
+    width: 24px;
 
     &--active {
       background: var(--cove-primary);
@@ -63,21 +63,21 @@
 
   input[type='number'] {
     margin: 0 10px;
+    max-width: 50px;
     min-width: 50px;
     width: 50px;
-    max-width: 50px;
   }
 }
 
 .sankey__color-input {
-  display: flex;
   align-items: center;
+  display: flex;
   margin: 10px auto;
 
   label {
     align-items: center;
-    padding-left: 5px;
     margin-top: 0 !important;
+    padding-left: 5px;
   }
 }
 
