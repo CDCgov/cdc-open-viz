@@ -25,6 +25,7 @@ import ConfigContext, { MapDispatchContext } from '../../../context'
 import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { MapContext } from '../../../types/MapContext'
 import { checkColorContrast, getContrastColor, outlinedTextColor } from '@cdc/core/helpers/cove/accessibility'
+import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 import TerritoriesSection from './TerritoriesSection'
 import SmallMultiples from '../../SmallMultiples'
 import { useSynchronizedGeographies } from '../../../hooks/useSynchronizedGeographies'
@@ -47,6 +48,7 @@ import {
   SVG_WIDTH
 } from '../../../helpers'
 import { hashObj } from '@cdc/core/helpers/hashObj'
+import { patternValuesMatch } from '../../../helpers/patternMatching'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
@@ -491,8 +493,10 @@ const UsaMap = () => {
               {map?.patterns?.map((patternData, _patternIndex) => {
                 const { pattern, dataKey, size } = patternData
                 const currentFill = styles.fill
-                const hasMatchingValues = patternData.dataValue === geoData?.[patternData.dataKey]
+                const hasMatchingValues = patternValuesMatch(patternData.dataValue, geoData?.[patternData.dataKey])
                 const patternColor = patternData.color || getContrastColor('#000', currentFill)
+                const sanitizedDataKey = sanitizeToSvgId(dataKey)
+                const patternId = `${mapId}--${sanitizedDataKey}--${geoIndex}`
 
                 if (!hasMatchingValues) return
                 checkColorContrast(currentFill, patternColor)
@@ -501,7 +505,7 @@ const UsaMap = () => {
                   <>
                     {pattern === 'waves' && (
                       <PatternWaves
-                        id={`${mapId}--${String(dataKey).replace(' ', '-')}--${geoIndex}`}
+                        id={patternId}
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
@@ -510,7 +514,7 @@ const UsaMap = () => {
                     )}
                     {pattern === 'circles' && (
                       <PatternCircles
-                        id={`${mapId}--${String(dataKey).replace(' ', '-')}--${geoIndex}`}
+                        id={patternId}
                         height={patternSizes[size] ?? 10}
                         width={patternSizes[size] ?? 10}
                         fill={patternColor}
@@ -520,7 +524,7 @@ const UsaMap = () => {
                     )}
                     {pattern === 'lines' && (
                       <PatternLines
-                        id={`${mapId}--${String(dataKey).replace(' ', '-')}--${geoIndex}`}
+                        id={patternId}
                         height={patternSizes[size] ?? 6}
                         width={patternSizes[size] ?? 6}
                         stroke={patternColor}
@@ -533,7 +537,7 @@ const UsaMap = () => {
                       tabIndex={-1}
                       stroke='transparent'
                       d={path}
-                      fill={`url(#${mapId}--${String(dataKey).replace(' ', '-')}--${geoIndex})`}
+                      fill={`url(#${patternId})`}
                     />
                   </>
                 )

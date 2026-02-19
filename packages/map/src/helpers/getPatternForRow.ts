@@ -1,4 +1,5 @@
 import { MapConfig } from '../types/MapConfig'
+import { patternValuesMatch } from './patternMatching'
 
 interface PatternInfo {
   pattern?: string
@@ -16,7 +17,7 @@ export const getPatternForRow = (rowObj: Record<string, any>, config: MapConfig)
   // Find a pattern that matches this row's data
   for (let i = 0; i < config.map.patterns.length; i++) {
     const patternData = config.map.patterns[i]
-    const hasMatchingValues = patternData.dataValue === rowObj[patternData.dataKey]
+    const hasMatchingValues = patternValuesMatch(patternData.dataValue, rowObj[patternData.dataKey])
 
     if (hasMatchingValues) {
       return {
