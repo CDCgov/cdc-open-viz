@@ -38,7 +38,7 @@ import iconRotateLeft from '../../assets/icon-rotate-left.svg'
 import iconCommand from '../../assets/icon-command.svg'
 import iconMagnifyingGlass from '../../assets/icon-magnifying-glass.svg'
 
-import '../../styles/components/icon.scss'
+import '../../styles/components/icon.css'
 
 const iconHash = {
   caretUp: iconCaretUp,
