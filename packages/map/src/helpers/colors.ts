@@ -11,13 +11,13 @@ import { MapConfig } from '../types/MapConfig'
 export const getGeoStrokeColor = (config: MapConfig) => {
   const bodyStyles = getComputedStyle(document.body)
   if (config.general.geoBorderColor === 'darkGray') {
-    return bodyStyles.getPropertyValue('--cool-gray-90')
+    return bodyStyles.getPropertyValue('--cove-cool-gray-90')
   } else {
-    return bodyStyles.getPropertyValue('--white')
+    return bodyStyles.getPropertyValue('--cove-white')
   }
 }
 
 export const getGeoFillColor = (config: MapConfig) => {
   const bodyStyles = getComputedStyle(document.body)
-  return bodyStyles.getPropertyValue('--cool-gray-10')
+  return bodyStyles.getPropertyValue('--cove-cool-gray-10')
 }

@@ -176,7 +176,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     palette = applyEnhancedColorDistribution(config, palette, numberOfKeys)
 
     const unknownColor = isPercentageMode
-      ? getComputedStyle(document.documentElement).getPropertyValue('--cool-gray-10').trim()
+      ? getComputedStyle(document.documentElement).getPropertyValue('--cove-cool-gray-10').trim()
       : null
 
     return scaleOrdinal({
