@@ -33,16 +33,3 @@ jobs:
 
       - name: Run stylelint
         run: yarn lint:css
-        continue-on-error: false
-
-      - name: Comment on PR (if failed)
-        if: failure()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '❌ **CSS Linting Failed**\n\nCSS properties are not in alphabetical order. Run `yarn lint:css:fix` locally to automatically fix the issues, then commit the changes.'
-            })
