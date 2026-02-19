@@ -48,7 +48,31 @@ This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that i
 3. (If using Windows) Change the import from 'react-table' to 'react-table/src' in the DataTable component of these pacakges: Map, Chart, Editor, Dashboard (TODO: fix this)
 4. Run `lerna run build` to build all of the packages in the correct order.
 5. To begin working on an individual package, run `lerna run --scope @cdc/package_name start`, replacing package_name with the package's name (ex: @cdc/map).
+### Code Quality & Linting
 
+This project uses automated linting tools to maintain code quality and consistency.
+
+**CSS Linting**
+
+All CSS files are automatically linted using [stylelint](https://stylelint.io/) to ensure consistent property ordering and formatting.
+
+- **Pre-commit Hook**: When you commit changes, CSS files are automatically linted and fixed via [lint-staged](https://github.com/okonet/lint-staged)
+- **Manual Linting**: 
+  - Check CSS files: `yarn lint:css`
+  - Auto-fix CSS files: `yarn lint:css:fix`
+- **Rules**: CSS properties are sorted alphabetically for consistency
+- **Scope**: Only `.css` files are linted; `.scss` files are excluded
+
+**JavaScript/TypeScript Linting**
+
+- ESLint runs automatically on `.js`, `.jsx`, `.ts`, `.tsx` files before commit
+- Prettier formats code automatically
+
+**Best Practices**:
+- Run `yarn lint:css:fix` before committing CSS changes if you want to preview fixes
+- Pre-commit hooks will automatically fix most issues
+- Check the [STYLING_GUIDELINES.md](./docs/STYLING_GUIDELINES.md) for CSS best practices
+- See [DESIGN_TOKENS.md](./docs/DESIGN_TOKENS.md) for design system reference
 ### Branching Information
 
 Notice - all pull requests you should branch from and target dev.
