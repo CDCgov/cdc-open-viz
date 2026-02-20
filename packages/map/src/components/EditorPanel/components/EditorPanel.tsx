@@ -2871,6 +2871,14 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         }}
                       />
                       <CheckBox
+                        value={config.table.showBottomCollapse}
+                        section='table'
+                        subsection={null}
+                        fieldName='showBottomCollapse'
+                        label='Show collapse below table'
+                        updateField={updateField}
+                      />
+                      <CheckBox
                         value={config.table.download}
                         fieldName='download'
                         label='Show Download CSV Link'
