@@ -4,10 +4,10 @@
 /* Shared loader component */
 /* Used across: chart, dashboard, data-bite, waffle-chart packages */
 .loader {
-  width: 100%;
-  text-align: center;
-  display: inline-block;
   animation: spin 1s linear infinite;
+  display: inline-block;
+  text-align: center;
+  width: 100%;
 }
 
 .loader::before {
@@ -18,9 +18,9 @@
 /* TODO: Currently different panel classes on different packages */
 .accordion__button svg.warning-icon,
 .cove-accordion__button svg.warning-icon {
+  left: auto;
   position: absolute;
   right: 35px;
-  left: auto;
   top: 50%;
   transform: translateY(-50%);
 
@@ -28,8 +28,8 @@
 
 .warning-icon {
   color: #d72f00;
-  width: 15px;
   height: 15px;
+  width: 15px;
 }
 
 .warning-icon path {
@@ -39,21 +39,21 @@
 /* Shared checkbox group component */
 /* Used across: chart, data-bite, markup-include packages */
 .checkbox-group {
-  padding: 16px;
   border: 1px solid #c4c4c4;
   border-radius: 8px;
-  margin-top: 8px;
   margin-bottom: 24px;
+  margin-top: 8px;
+  padding: 16px;
 }
 
 .cove-accordion__panel.panel-visual .checkbox-group label.checkbox,
 .cove-accordion__panel.panel-visual .reverse-labels label.checkbox,
 .panel-visual .checkbox-group label.checkbox,
 .panel-visual .reverse-labels label.checkbox {
-  display: flex !important;
   align-items: center !important;
-  width: 100% !important;
+  display: flex !important;
   margin-bottom: 8px !important;
+  width: 100% !important;
 }
 
 .cove-accordion__panel.panel-visual .checkbox-group label.checkbox input[type="checkbox"],
@@ -68,6 +68,6 @@
 .cove-accordion__panel.panel-visual .reverse-labels label.checkbox span,
 .panel-visual .checkbox-group label.checkbox span,
 .panel-visual .reverse-labels label.checkbox span {
-  flex: 1 !important;
   display: inline-block !important;
+  flex: 1 !important;
 }

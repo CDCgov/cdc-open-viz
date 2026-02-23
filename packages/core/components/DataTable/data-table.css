@@ -1,8 +1,8 @@
 .cove,
 .cdc-open-viz-module {
   .table {
-    width: unset;
     min-width: 100%;
+    width: unset;
   }
 
   .bs4 .table.table-width-unset {
@@ -14,28 +14,28 @@
   }
 
   .table-container {
-    overflow-x: auto;
-    border-right: 1px solid var(--lightGray);
-    border-left: 1px solid var(--lightGray);
     border-bottom: 1px solid var(--lightGray);
+    border-left: 1px solid var(--lightGray);
+    border-right: 1px solid var(--lightGray);
+    overflow-x: auto;
   }
 
   div.data-table-heading {
-    position: relative;
     border: var(--cool-gray-10) 1px solid;
     border-radius: 6px;
+    position: relative;
 
     svg {
-      position: absolute;
       height: 100%;
-      width: 15px;
-      top: 0;
+      position: absolute;
       right: 1em;
+      top: 0;
+      width: 15px;
     }
 
     &:focus {
-      z-index: 2;
       position: relative;
+      z-index: 2;
     }
   }
 
@@ -48,12 +48,12 @@
   }
 
   table.data-table {
-    margin-bottom: 0;
+    appearance: none;
     background: #fff;
-    position: relative;
     border: none;
     border-collapse: collapse;
-    appearance: none;
+    margin-bottom: 0;
+    position: relative;
     table-layout: fixed;
 
     * {
@@ -61,15 +61,15 @@
     }
 
     thead {
-      user-select: none;
       -moz-user-select: none;
+      user-select: none;
       user-select: none;
 
       button {
         background: none;
-        font-size: initial;
-        color: #fff !important;
         border: 0;
+        color: #fff !important;
+        font-size: initial;
       }
 
       tr {
@@ -81,13 +81,13 @@
       color: #fff !important;
 
       .resizer {
-        cursor: e-resize;
-        width: 10px;
-        position: absolute;
-        top: 0;
         bottom: 0;
+        cursor: e-resize;
+        position: absolute;
         right: 0;
+        top: 0;
         touch-action: none;
+        width: 10px;
       }
 
       tr {
@@ -96,17 +96,17 @@
 
       th,
       td {
-        padding: 0.5em 0.7em;
+        border-right: 1px solid var(--lightGray) !important;
         line-height: normal;
+        padding: 0.5em 0.7em;
         position: relative;
         text-align: left;
-        border-right: 1px solid var(--lightGray) !important;
       }
 
       th {
         background-color: var(--primary);
-        background-repeat: no-repeat;
         background-position: right 0.5em center;
+        background-repeat: no-repeat;
         background-size: 10px 5px;
         color: #fff !important
       }
@@ -134,8 +134,8 @@
 
     th,
     td {
-      padding: 0.3em 0.7em;
       border-right: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 0.3em 0.7em;
       white-space: nowrap;
 
       &:last-child {
@@ -158,32 +158,32 @@
     }
 
     td a {
+      bottom: 0;
+      color: inherit;
+      display: block;
+      left: 0;
       padding: 0.3em 0.7em;
       position: absolute;
-      top: 0;
-      bottom: 0;
       right: 0;
-      left: 0;
-      display: block;
-      color: inherit;
       text-decoration: none;
+      top: 0;
     }
 
     td div a {
-      position: relative;
-      padding: 0;
       display: inline;
+      padding: 0;
+      position: relative;
     }
 
     td span.table-link {
-      text-decoration: underline;
-      cursor: pointer;
       color: #075290;
+      cursor: pointer;
+      text-decoration: underline;
 
       svg {
+        margin-left: 5px;
         max-width: 13px;
         vertical-align: baseline;
-        margin-left: 5px;
       }
     }
 
@@ -197,16 +197,16 @@
     position: relative;
 
     .no-data-message {
-      background: rgba(255, 255, 255, 0.5);
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      position: absolute;
-      text-align: center;
-      display: flex;
       align-items: center;
+      background: rgba(255, 255, 255, 0.5);
+      bottom: 0;
+      display: flex;
       justify-content: center;
+      left: 0;
+      position: absolute;
+      right: 0;
+      text-align: center;
+      top: 0;
       z-index: 7;
 
       :is(h3) {
@@ -231,14 +231,14 @@
   }
 
   .data-table-pagination {
-    margin: 1rem 0;
-    display: flex;
     align-items: center;
+    display: flex;
+    margin: 1rem 0;
 
     ul {
+      display: flex;
       list-style: none;
       margin: 0 1rem 0 0;
-      display: flex;
 
       li+li {
         margin-left: 0.3rem;
@@ -258,8 +258,8 @@
 
       button[disabled] {
         background: var(--mediumGray);
-        opacity: 0.3;
         cursor: default;
+        opacity: 0.3;
 
         &:hover {
           background: var(--mediumGray);
@@ -271,9 +271,9 @@
   .btn-download {
     color: #fff;
     float: right;
+    margin: 1em 0;
     text-decoration: none;
     transition: 0.3s all;
-    margin: 1em 0;
 
     &:hover {
       transition: 0.3s all;
@@ -281,7 +281,7 @@
   }
 
   .download-links a:not(:last-child) {
-    margin-right: 10px;
     display: inline-block;
+    margin-right: 10px;
   }
 }
