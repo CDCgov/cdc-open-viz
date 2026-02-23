@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 import LoadSpin from '../ui/LoadSpin'
 
-import '../../styles/v2/components/button.scss'
+import '../../styles/components/button.scss'
 
 const Button = ({
   style,
