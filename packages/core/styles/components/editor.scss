@@ -1,4 +1,4 @@
-@import '../utils/variables';
+@import '../utils/properties';
 @import '../themes/index';
 @import '../../components/HeaderThemeSelector/HeaderThemeSelector.css';
 @import '../_common-components';
@@ -13,7 +13,7 @@
 
   .cove-editor__panel {
     grid-area: panel;
-    width: $editorWidth;
+    width: var(--editorWidth);
     transition: width 500ms ease;
     font-size: 15px;
     background: #fff;
@@ -30,8 +30,8 @@
   }
 
   .cove-editor__panel-container {
-    width: $editorWidth;
-    min-width: $editorWidth;
+    width: var(--editorWidth);
+    min-width: var(--editorWidth);
   }
 
   .cove-editor__content {
@@ -107,7 +107,7 @@
 
   .series-list {
     list-style: none;
-    border: $lightGray 1px solid;
+    border: var(--lightGray) 1px solid;
 
     &:empty {
       border: none !important;
@@ -121,7 +121,7 @@
       font-size: 0.9em;
 
       &:hover {
-        background-color: $lightestGray;
+        background-color: var(--lightestGray);
       }
 
       span {
@@ -131,13 +131,13 @@
       }
 
       + li {
-        border-top: $lightGray 1px solid;
+        border-top: var(--lightGray) 1px solid;
       }
     }
   }
 
   .form-container {
-    border-right: $lightGray 1px solid;
+    border-right: var(--lightGray) 1px solid;
     flex-grow: 1;
   }
 
@@ -147,7 +147,7 @@
 
     svg {
       width: 60px;
-      color: $blue;
+      color: var(--blue);
       margin-right: 1rem;
       height: 60px; // IE11
 

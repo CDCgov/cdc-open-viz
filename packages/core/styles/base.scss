@@ -1,9 +1,8 @@
 @use 'sass:string';
 
 // Imports
+@import 'utils/properties';
 @import 'reset';
-@import 'variables';
-@import 'global-variables';
 @import 'filters';
 
 body.post-type-cdc_visualization .visx-tooltip {

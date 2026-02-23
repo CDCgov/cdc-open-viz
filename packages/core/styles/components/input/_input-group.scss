@@ -65,10 +65,10 @@
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
-  color: $baseColor;
+  color: var(--baseColor);
   text-align: center;
   white-space: nowrap;
-  background-color: $lightestGray;
-  border: 1px solid $lightGray;
+  background-color: var(--lightestGray);
+  border: 1px solid var(--lightGray);
   border-radius: 0.1875rem;
 }

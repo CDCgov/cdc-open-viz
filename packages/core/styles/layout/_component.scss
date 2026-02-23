@@ -12,7 +12,7 @@
   }
 
   .cove-component__content:not(.component--hideBackgroundColor) {
-    background: $lightestGray;
+    background: var(--lightestGray);
   }
 }
 
