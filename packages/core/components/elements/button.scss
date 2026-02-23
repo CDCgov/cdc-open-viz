@@ -1,6 +1,6 @@
 @use 'sass:color';
-@import '../utils/properties';
-@import '../themes/index';
+@import '../../styles/utils/properties';
+@import '../../styles/themes/index';
 
 :root {
   --cove-button-primary: var(--colors-blue-vivid-60);

@@ -11,7 +11,7 @@ import PropTypes from 'prop-types'
 import Icon from './Icon'
 import Tooltip from './Tooltip'
 
-import '../../styles/components/accordion.scss'
+import './accordion.scss'
 import './accordion.styles.css'
 
 //Define the "slots" to be populated by subcomponents
