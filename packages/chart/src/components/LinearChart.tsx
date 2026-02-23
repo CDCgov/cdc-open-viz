@@ -137,6 +137,15 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   const { visSupportsSmallMultiples } = useEditorPermissions()
   const { hasTopAxis } = getTopAxis(config)
+
+  // Increment on tableData change to force BrushSelector remount when filters change
+  const brushKeyRef = useRef(0)
+  const prevTableDataRef = useRef(tableData)
+  if (prevTableDataRef.current !== tableData) {
+    prevTableDataRef.current = tableData
+    brushKeyRef.current += 1
+  }
+
   const [animatedChart, setAnimatedChart] = useState(false)
   const [showHoverLine, setShowHoverLine] = useState(false)
   const [point, setPoint] = useState({ x: 0, y: 0 })
@@ -875,7 +884,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             }}
             className='brush-overlay'
           >
-            <BrushSelector xMax={Math.max(xMax, BRUSH_MIN_WIDTH)} yMax={BRUSH_HEIGHT} />
+            <BrushSelector key={brushKeyRef.current} xMax={Math.max(xMax, BRUSH_MIN_WIDTH)} yMax={BRUSH_HEIGHT} />
           </div>
         )}
       </div>
