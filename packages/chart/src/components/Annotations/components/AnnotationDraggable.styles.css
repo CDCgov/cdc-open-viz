@@ -1,6 +1,6 @@
 .cdc-open-viz-module.type-chart .annotation__desktop-label {
-  line-height: 1.1rem;
   font-size: 16px;
+  line-height: 1.1rem;
 }
 
 .cdc-open-viz-module.type-chart {
@@ -9,17 +9,17 @@
   }
 
   .annotation__has-dropdown-number {
-    display: flex;
-    justify-content: center;
     align-items: center;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-    min-height: 24px;
     border: 1px solid #666;
-    text-align: center;
-    font-size: 14px;
+    border-radius: 50%;
     box-sizing: border-box;
+    display: flex;
+    font-size: 14px;
+    height: 24px;
+    justify-content: center;
+    min-height: 24px;
+    min-width: 24px;
+    text-align: center;
+    width: 24px;
   }
 }

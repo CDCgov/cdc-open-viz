@@ -1,29 +1,29 @@
 .cdc-open-viz-module.type-map {
   .annotation__title-circle {
-    display: flex;
-    justify-content: center;
     align-items: center;
-    border-radius: 50%;
-    padding: 8px;
-    width: 16px;
-    height: 16px;
-    margin-right: 5px;
-    line-height: 1.5rem;
 
     border: 2px solid #666;
-    text-align: center;
+    border-radius: 50%;
+    display: flex;
     font-size: 14px;
+    height: 16px;
+    justify-content: center;
+    line-height: 1.5rem;
+    margin-right: 5px;
+    padding: 8px;
+    text-align: center;
+    width: 16px;
   }
 
   .annotation__title-wrapper {
+    align-items: center;
     display: flex;
     flex-wrap: nowrap;
-    align-items: center;
   }
 
   .annotation__title-wrapper .annotation__title-text {
-    margin-left: 5px;
     font-size: 16px;
+    margin-left: 5px;
   }
 
   .annotation__subtext {
@@ -39,7 +39,7 @@
   }
 
   .cove-component__content {
-    container-type: inline-size;
     container-name: content;
+    container-type: inline-size;
   }
 }
