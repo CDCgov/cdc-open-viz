@@ -86,6 +86,8 @@
     "sass": "^1.89.2",
     "storybook": "^10.1.11",
     "storybook-addon-fetch-mock": "^2.0.1",
+    "stylelint": "^17.3.0",
+    "stylelint-order": "^7.0.1",
     "syncpack": "^13.0.4",
     "use-debounce": "^10.1.0",
     "vite": "^7.3.1",
@@ -100,6 +102,9 @@
     "./packages/*/src/**/*.{js,jsx,ts,tsx}": [
       "eslint --config .eslintrc.json",
       "npx prettier --write"
+    ],
+    "packages/**/*.css": [
+      "stylelint --fix"
     ]
   },
   "private": true,
@@ -138,6 +143,8 @@
     "knip:unused-exports": "knip --include exports,types",
     "knip:unused-files": "knip --include files",
     "lint": "eslint packages/*/src/**/*.{js,jsx,ts,tsx}",
+    "lint:css": "stylelint 'packages/**/*.css'",
+    "lint:css:fix": "stylelint 'packages/**/*.css' --fix",
     "postinstall": "patch-package",
     "predeploy": "storybook build --output-dir .storybook_build && touch .storybook_build/.nojekyll",
     "prepare": "husky install",

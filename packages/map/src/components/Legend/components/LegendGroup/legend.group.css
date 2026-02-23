@@ -1,15 +1,15 @@
 .group-label {
-  font-weight: 500;
   font-family: Nunito, sans-serif;
   font-size: 1rem;
+  font-weight: 500;
   margin-bottom: 0.5rem;
 }
 .group-list-item {
-  list-style: none;
-  font-weight: 400;
-  font-size: 0.889rem;
-  margin-top: 0.5rem !important;
   cursor: pointer;
+  font-size: 0.889rem;
+  font-weight: 400;
+  list-style: none;
+  margin-top: 0.5rem !important;
 }
 
 .group-container {
@@ -21,7 +21,7 @@
 }
 
 .legend-group-item-not-disable {
+  border-radius: 1px;
   outline: 1px solid #005ea2;
   outline-offset: 5px;
-  border-radius: 1px;
 }

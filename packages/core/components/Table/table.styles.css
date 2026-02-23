@@ -2,9 +2,9 @@
   clip: rect(0 0 0 0);
   clip-path: inset(50%);
   height: 1px;
+  left: -10000px;
   overflow: hidden;
+  position: fixed;
   white-space: nowrap;
   width: 1px;
-  position: fixed;
-  left: -10000px;
 }
