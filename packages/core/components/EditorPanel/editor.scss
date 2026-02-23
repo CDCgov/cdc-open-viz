@@ -1,7 +1,6 @@
 @import '../../styles/utils/properties';
 @import '../../styles/themes/index';
 @import '../HeaderThemeSelector/HeaderThemeSelector.css';
-@import '../../styles/_common-components';
 
 .cove-editor {
   display: grid;
@@ -491,4 +490,59 @@ ul.color-palette {
 // CheckBox component styling for EditorPanel/Inputs
 .edit-checkbox {
   margin-right: 8px;
+}
+
+// Warning icon used in accordion panel headers
+.accordion__button svg.warning-icon,
+.cove-accordion__button svg.warning-icon {
+  left: auto;
+  position: absolute;
+  right: 35px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.warning-icon {
+  color: #d72f00;
+  height: 15px;
+  width: 15px;
+}
+
+.warning-icon path {
+  fill: #d8000c;
+}
+
+// Checkbox group used in editor panel visual sections
+.checkbox-group {
+  border: 1px solid #c4c4c4;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  margin-top: 8px;
+  padding: 16px;
+}
+
+.cove-accordion__panel.panel-visual .checkbox-group label.checkbox,
+.cove-accordion__panel.panel-visual .reverse-labels label.checkbox,
+.panel-visual .checkbox-group label.checkbox,
+.panel-visual .reverse-labels label.checkbox {
+  align-items: center !important;
+  display: flex !important;
+  margin-bottom: 8px !important;
+  width: 100% !important;
+}
+
+.cove-accordion__panel.panel-visual .checkbox-group label.checkbox input[type='checkbox'],
+.cove-accordion__panel.panel-visual .reverse-labels label.checkbox input[type='checkbox'],
+.panel-visual .checkbox-group label.checkbox input[type='checkbox'],
+.panel-visual .reverse-labels label.checkbox input[type='checkbox'] {
+  flex-shrink: 0 !important;
+  margin-right: 8px !important;
+}
+
+.cove-accordion__panel.panel-visual .checkbox-group label.checkbox span,
+.cove-accordion__panel.panel-visual .reverse-labels label.checkbox span,
+.panel-visual .checkbox-group label.checkbox span,
+.panel-visual .reverse-labels label.checkbox span {
+  display: inline-block !important;
+  flex: 1 !important;
 }
