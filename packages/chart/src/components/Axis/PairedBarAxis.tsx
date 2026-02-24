@@ -63,7 +63,9 @@ export const PairedBarAxis: React.FC<PairedBarAxisProps> = ({
     const numberOfTicks = filteredTicks?.length
     const xMaxHalf = xScale.range()[0] || xMax / 2
 
-    const tickWidthAll = filteredTicks.map(tick => getTextWidth(formatNumber(tick.value, 'left', true), tickLabelFont))
+    const tickWidthAll = filteredTicks.map(tick =>
+      getTextWidth(tick.formattedValue ?? formatNumber(tick.value, 'left', true), tickLabelFont)
+    )
     const sumOfTickWidth = tickWidthAll.reduce((a, b) => a + b, BASE_TICK_WIDTH_ACCUMULATOR)
     const spaceBetweenEachTick = (xMaxHalf - sumOfTickWidth) / numberOfTicks
 
@@ -115,7 +117,7 @@ export const PairedBarAxis: React.FC<PairedBarAxisProps> = ({
             textAnchor={textAnchor}
             fontSize={tickLabelFontSize}
           >
-            {formatNumber(tick.value, 'left', true)}
+            {tick.formattedValue ?? formatNumber(tick.value, 'left', true)}
           </Text>
         )}
       </Group>
