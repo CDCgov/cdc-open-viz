@@ -6,7 +6,7 @@ import lineChartTwoPointsNewChart from './_mock/line_chart_two_points_new_chart.
 import lollipop from './_mock/lollipop.json'
 import forestPlot from '../../examples/feature/forest-plot/forest-plot.json'
 import pairedBar from './_mock/paired-bar.json'
-import pairedBarAbbrevivated from './_mock/paired-bar-abbr.json'
+import pairedBarAbbreviated from './_mock/paired-bar-abbr.json'
 import horizontalBarConfig from './_mock/horizontal_bar.json'
 import horizontalBarsDynamicYAxis from './_mock/horizontal-bars-dynamic-y-axis.json'
 import barChartLabels from './_mock/barchart_labels.mock.json'
@@ -130,7 +130,7 @@ export const Paired_Bar: Story = {
 
 export const Paired_Bar_Year_Tick_Format_Regression: Story = {
   args: {
-    config: pairedBarAbbrevivated,
+    config: pairedBarAbbreviated,
     isEditor: true
   },
   play: async ({ canvasElement }) => {
