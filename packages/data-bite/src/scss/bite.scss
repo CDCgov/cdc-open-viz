@@ -155,6 +155,10 @@
       }
     }
 
+    &.use-wrap .cdc-callout__body {
+      flex-wrap: wrap;
+    }
+
     .cdc-callout__databite {
       padding-top: 2px;
       width: auto;

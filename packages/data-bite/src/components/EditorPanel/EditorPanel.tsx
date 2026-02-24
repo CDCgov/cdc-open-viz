@@ -285,6 +285,13 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                 label='Use White Background Style'
                 updateField={updateField}
               />
+              <CheckBox
+                value={config.visual?.useWrap}
+                section='visual'
+                fieldName='useWrap'
+                label='Use Wrap Layout'
+                updateField={updateField}
+              />
               {/* TODO: Uncomment when ready to release Display Border feature
               <CheckBox
                 value={config.visual?.border}
