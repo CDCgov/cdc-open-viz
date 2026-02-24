@@ -18,7 +18,6 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 import 'react-tooltip/dist/react-tooltip.css'
 import { Text } from '@visx/text'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
-import _ from 'lodash'
 
 // CDC Components
 import { isDateScale } from '@cdc/core/helpers/cove/date'

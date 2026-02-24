@@ -16,7 +16,6 @@ import { ChartContext } from '../../../../types/ChartContext'
 import { PanelProps } from '../PanelProps'
 import { checkColorContrast, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
 import { getColorScale } from '../../../../helpers/getColorScale'
-import _ from 'lodash'
 
 const PanelPatternSettings: FC<PanelProps> = props => {
   const { config, updateConfig, transformedData } = useContext<ChartContext>(ConfigContext)
