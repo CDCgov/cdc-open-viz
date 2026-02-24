@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, expect } from 'storybook/test'
 import Dashboard from '@cdc/dashboard'
 import { useEffect, useState } from 'react'
+import fetchRemoteData from '../helpers/fetchRemoteData'
 
 // Fallback step function for test descriptions
 const step = async (description: string, fn: () => Promise<void> | void) => {
@@ -37,8 +38,7 @@ const useConfigWithAbsoluteDataUrl = (configUrl: string) => {
   const [config, setConfig] = useState(null)
 
   useEffect(() => {
-    fetch(configUrl)
-      .then(res => res.json())
+    fetchRemoteData(configUrl)
       .then(data => {
         // Convert relative data URLs to absolute cdc.gov URLs
         if (data.dataUrl) {
@@ -97,8 +97,8 @@ const useConfigWithAbsoluteDataUrl = (configUrl: string) => {
                 dataFileName:
                   (dataset as any).dataFileName && !(dataset as any).dataFileName.startsWith('http')
                     ? `https://www.cdc.gov/${(dataset as any).dataFileName
-                        .replace(/^(\.\.\/)+/, '')
-                        .replace(/^\//, '')}`
+                      .replace(/^(\.\.\/)+/, '')
+                      .replace(/^\//, '')}`
                     : (dataset as any).dataFileName,
                 dataUrl:
                   (dataset as any).dataUrl && !(dataset as any).dataUrl.startsWith('http')
@@ -136,6 +136,43 @@ const useConfigWithAbsoluteDataUrl = (configUrl: string) => {
 }
 
 type DashboardStory = StoryObj<typeof Dashboard>
+
+const ExploreByLocationStory = () => {
+  const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.exploreByLocation)
+  if (!config) return <div>Loading...</div>
+  return <Dashboard config={config} />
+}
+
+const ExploreByTopicStory = () => {
+  const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.exploreByTopic)
+  if (!config) return <div>Loading...</div>
+  return <Dashboard config={config} />
+}
+
+const AllBRFSSDashboardsStory = () => {
+  const locationConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.exploreByLocation)
+  const topicConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.exploreByTopic)
+
+  if (!locationConfig || !topicConfig) {
+    return <div>Loading...</div>
+  }
+
+  return (
+    <div className='container-fluid p-4'>
+      <h1 className='mb-4'>BRFSS Prevalence Data - All Dashboards</h1>
+
+      <section className='mb-5'>
+        <h2>Explore by Location</h2>
+        <Dashboard config={locationConfig} />
+      </section>
+
+      <section className='mb-5'>
+        <h2>Explore by Topic</h2>
+        <Dashboard config={topicConfig} />
+      </section>
+    </div>
+  )
+}
 
 // Helper function to test dashboard rendering
 const testDashboardRendering = async (canvasElement: HTMLElement, storyName: string) => {
@@ -186,11 +223,7 @@ const testDashboardRendering = async (canvasElement: HTMLElement, storyName: str
  * statistical areas (MMSA).
  */
 export const Explore_By_Location: DashboardStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.exploreByLocation)
-    if (!config) return <div>Loading...</div>
-    return <Dashboard config={config} />
-  },
+  render: () => <ExploreByLocationStory />,
   play: async ({ canvasElement }) => {
     await testDashboardRendering(canvasElement, 'Explore By Location Dashboard')
   }
@@ -204,11 +237,7 @@ export const Explore_By_Location: DashboardStory = {
  * categories such as chronic diseases, health behaviors, and preventive practices.
  */
 export const Explore_By_Topic: DashboardStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.exploreByTopic)
-    if (!config) return <div>Loading...</div>
-    return <Dashboard config={config} />
-  },
+  render: () => <ExploreByTopicStory />,
   play: async ({ canvasElement }) => {
     await testDashboardRendering(canvasElement, 'Explore By Topic Dashboard')
   }
@@ -220,30 +249,7 @@ export const Explore_By_Topic: DashboardStory = {
  * Tests both BRFSS dashboards to ensure they all render correctly together.
  */
 export const All_BRFSS_Dashboards: StoryObj = {
-  render: () => {
-    const locationConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.exploreByLocation)
-    const topicConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.exploreByTopic)
-
-    if (!locationConfig || !topicConfig) {
-      return <div>Loading...</div>
-    }
-
-    return (
-      <div className='container-fluid p-4'>
-        <h1 className='mb-4'>BRFSS Prevalence Data - All Dashboards</h1>
-
-        <section className='mb-5'>
-          <h2>Explore by Location</h2>
-          <Dashboard config={locationConfig} />
-        </section>
-
-        <section className='mb-5'>
-          <h2>Explore by Topic</h2>
-          <Dashboard config={topicConfig} />
-        </section>
-      </div>
-    )
-  },
+  render: () => <AllBRFSSDashboardsStory />,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
 

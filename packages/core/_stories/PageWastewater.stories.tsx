@@ -4,6 +4,7 @@ import Chart from '@cdc/chart'
 import CdcMap from '@cdc/map'
 import Dashboard from '@cdc/dashboard'
 import { useEffect, useState } from 'react'
+import fetchRemoteData from '../helpers/fetchRemoteData'
 
 // Fallback step function for test descriptions
 const step = async (description: string, fn: () => Promise<void> | void) => {
@@ -52,8 +53,7 @@ const useConfigWithAbsoluteDataUrl = (configUrl: string) => {
   const [config, setConfig] = useState(null)
 
   useEffect(() => {
-    fetch(configUrl)
-      .then(res => res.json())
+    fetchRemoteData(configUrl)
       .then(data => {
         // Convert relative data URLs to absolute cdc.gov URLs
         if (data.dataUrl) {
@@ -114,6 +114,102 @@ const useConfigWithAbsoluteDataUrl = (configUrl: string) => {
 type MapStory = StoryObj<typeof CdcMap>
 type ChartStory = StoryObj<typeof Chart>
 type DashboardStory = StoryObj<typeof Dashboard>
+
+const ConfiguredDashboard = ({ configUrl }: { configUrl: string }) => {
+  const config = useConfigWithAbsoluteDataUrl(configUrl)
+  if (!config) return <div>Loading...</div>
+  return <Dashboard config={config} />
+}
+
+const ConfiguredMap = ({ configUrl }: { configUrl: string }) => {
+  const config = useConfigWithAbsoluteDataUrl(configUrl)
+  if (!config) return <div>Loading...</div>
+  return <CdcMap config={config} />
+}
+
+const ConfiguredChart = ({ configUrl }: { configUrl: string }) => {
+  const config = useConfigWithAbsoluteDataUrl(configUrl)
+  if (!config) return <div>Loading...</div>
+  return <Chart config={config} />
+}
+
+const AllWastewaterVisualizationsStory = () => {
+  const homePageConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.homePageModules)
+  const measlesTopConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.measlesTopModules)
+  const measlesMapConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.measlesMap)
+  const measlesTimePeriodConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.measlesTimePeriod)
+  const covidTopConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidTopModules)
+  const covidMapConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidTimePeriodMap)
+  const covidStateLevelConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidStateLevel)
+  const covidNationalRegionalConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidNationalRegionalTrends)
+  const covidStateRestConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidStateLevelRest)
+
+  const allLoaded =
+    homePageConfig &&
+    measlesTopConfig &&
+    measlesMapConfig &&
+    measlesTimePeriodConfig &&
+    covidTopConfig &&
+    covidMapConfig &&
+    covidStateLevelConfig &&
+    covidNationalRegionalConfig &&
+    covidStateRestConfig
+
+  if (!allLoaded) {
+    return <div>Loading...</div>
+  }
+
+  return (
+    <div className='container-fluid p-4'>
+      <h1 className='mb-4'>NWSS - All Wastewater Visualizations</h1>
+
+      <section className='mb-5'>
+        <h2>NWSS Home Page</h2>
+        <Dashboard config={homePageConfig} />
+      </section>
+
+      <section className='mb-5'>
+        <h2>Measles - Summary Modules</h2>
+        <Dashboard config={measlesTopConfig} />
+      </section>
+
+      <section className='mb-5'>
+        <h2>Measles - US Map</h2>
+        <CdcMap config={measlesMapConfig} />
+      </section>
+
+      <section className='mb-5'>
+        <h2>Measles - Time Period</h2>
+        <Dashboard config={measlesTimePeriodConfig} />
+      </section>
+
+      <section className='mb-5'>
+        <h2>COVID-19 - Summary Modules</h2>
+        <Dashboard config={covidTopConfig} />
+      </section>
+
+      <section className='mb-5'>
+        <h2>COVID-19 - State Map</h2>
+        <CdcMap config={covidMapConfig} />
+      </section>
+
+      <section className='mb-5'>
+        <h2>COVID-19 - State Level Data</h2>
+        <Chart config={covidStateLevelConfig} />
+      </section>
+
+      <section className='mb-5'>
+        <h2>COVID-19 - National and Regional Trends</h2>
+        <Chart config={covidNationalRegionalConfig} />
+      </section>
+
+      <section className='mb-5'>
+        <h2>COVID-19 - State Trends</h2>
+        <Chart config={covidStateRestConfig} />
+      </section>
+    </div>
+  )
+}
 
 // Helper function to test map rendering (supports both SVG and canvas-based maps)
 const testMapRendering = async (canvasElement: HTMLElement, storyName: string) => {
@@ -208,11 +304,7 @@ const testDashboardRendering = async (canvasElement: HTMLElement, storyName: str
  * Multi-virus wastewater surveillance summary from the main NWSS landing page.
  */
 export const Home_Page_Modules: DashboardStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.homePageModules)
-    if (!config) return <div>Loading...</div>
-    return <Dashboard config={config} />
-  },
+  render: () => <ConfiguredDashboard configUrl={CONFIG_URLS.homePageModules} />,
   play: async ({ canvasElement }) => {
     await testDashboardRendering(canvasElement, 'Home Page Modules')
   }
@@ -224,11 +316,7 @@ export const Home_Page_Modules: DashboardStory = {
  * Key metrics for measles wastewater detections nationwide.
  */
 export const Measles_Top_Modules: DashboardStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.measlesTopModules)
-    if (!config) return <div>Loading...</div>
-    return <Dashboard config={config} />
-  },
+  render: () => <ConfiguredDashboard configUrl={CONFIG_URLS.measlesTopModules} />,
   play: async ({ canvasElement }) => {
     await testDashboardRendering(canvasElement, 'Measles Top Modules')
   }
@@ -240,11 +328,7 @@ export const Measles_Top_Modules: DashboardStory = {
  * Geographic distribution of measles wastewater detections across the United States.
  */
 export const Measles_Map: MapStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.measlesMap)
-    if (!config) return <div>Loading...</div>
-    return <CdcMap config={config} />
-  },
+  render: () => <ConfiguredMap configUrl={CONFIG_URLS.measlesMap} />,
   play: async ({ canvasElement }) => {
     await testMapRendering(canvasElement, 'Measles Map')
   }
@@ -256,11 +340,7 @@ export const Measles_Map: MapStory = {
  * Timeline information for measles wastewater surveillance data.
  */
 export const Measles_Time_Period: DashboardStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.measlesTimePeriod)
-    if (!config) return <div>Loading...</div>
-    return <Dashboard config={config} />
-  },
+  render: () => <ConfiguredDashboard configUrl={CONFIG_URLS.measlesTimePeriod} />,
   play: async ({ canvasElement }) => {
     await testDashboardRendering(canvasElement, 'Measles Time Period')
   }
@@ -272,11 +352,7 @@ export const Measles_Time_Period: DashboardStory = {
  * Key metrics for COVID-19 wastewater surveillance at the national level.
  */
 export const COVID_Top_Modules: DashboardStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidTopModules)
-    if (!config) return <div>Loading...</div>
-    return <Dashboard config={config} />
-  },
+  render: () => <ConfiguredDashboard configUrl={CONFIG_URLS.covidTopModules} />,
   play: async ({ canvasElement }) => {
     await testDashboardRendering(canvasElement, 'COVID Top Modules')
   }
@@ -288,11 +364,7 @@ export const COVID_Top_Modules: DashboardStory = {
  * State-level COVID-19 wastewater activity levels across the US.
  */
 export const COVID_Time_Period_Map: MapStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidTimePeriodMap)
-    if (!config) return <div>Loading...</div>
-    return <CdcMap config={config} />
-  },
+  render: () => <ConfiguredMap configUrl={CONFIG_URLS.covidTimePeriodMap} />,
   play: async ({ canvasElement }) => {
     await testMapRendering(canvasElement, 'COVID Time Period Map')
   }
@@ -304,11 +376,7 @@ export const COVID_Time_Period_Map: MapStory = {
  * COVID-19 wastewater data visualization by state.
  */
 export const COVID_State_Level: MapStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidStateLevel)
-    if (!config) return <div>Loading...</div>
-    return <CdcMap config={config} />
-  },
+  render: () => <ConfiguredMap configUrl={CONFIG_URLS.covidStateLevel} />,
   play: async ({ canvasElement }) => {
     await testMapRendering(canvasElement, 'COVID State Level')
   }
@@ -320,11 +388,7 @@ export const COVID_State_Level: MapStory = {
  * Trends in COVID-19 wastewater viral activity at national and HHS regional levels.
  */
 export const COVID_National_Regional_Trends: ChartStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidNationalRegionalTrends)
-    if (!config) return <div>Loading...</div>
-    return <Chart config={config} />
-  },
+  render: () => <ConfiguredChart configUrl={CONFIG_URLS.covidNationalRegionalTrends} />,
   play: async ({ canvasElement }) => {
     await testChartRendering(canvasElement, 'COVID National Regional Trends')
   }
@@ -336,11 +400,7 @@ export const COVID_National_Regional_Trends: ChartStory = {
  * State-level COVID-19 wastewater trend visualization from the state trend page.
  */
 export const COVID_State_Level_Rest: ChartStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidStateLevelRest)
-    if (!config) return <div>Loading...</div>
-    return <Dashboard config={config} />
-  },
+  render: () => <ConfiguredDashboard configUrl={CONFIG_URLS.covidStateLevelRest} />,
   play: async ({ canvasElement }) => {
     await testDashboardRendering(canvasElement, 'COVID State Level Rest')
   }
@@ -352,83 +412,7 @@ export const COVID_State_Level_Rest: ChartStory = {
  * Tests all visualizations from the NWSS pages to ensure they all render correctly together.
  */
 export const All_Wastewater_Visualizations: StoryObj = {
-  render: () => {
-    const homePageConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.homePageModules)
-    const measlesTopConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.measlesTopModules)
-    const measlesMapConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.measlesMap)
-    const measlesTimePeriodConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.measlesTimePeriod)
-    const covidTopConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidTopModules)
-    const covidMapConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidTimePeriodMap)
-    const covidStateLevelConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidStateLevel)
-    const covidNationalRegionalConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidNationalRegionalTrends)
-    const covidStateRestConfig = useConfigWithAbsoluteDataUrl(CONFIG_URLS.covidStateLevelRest)
-
-    const allLoaded =
-      homePageConfig &&
-      measlesTopConfig &&
-      measlesMapConfig &&
-      measlesTimePeriodConfig &&
-      covidTopConfig &&
-      covidMapConfig &&
-      covidStateLevelConfig &&
-      covidNationalRegionalConfig &&
-      covidStateRestConfig
-
-    if (!allLoaded) {
-      return <div>Loading...</div>
-    }
-
-    return (
-      <div className='container-fluid p-4'>
-        <h1 className='mb-4'>NWSS - All Wastewater Visualizations</h1>
-
-        <section className='mb-5'>
-          <h2>NWSS Home Page</h2>
-          <Dashboard config={homePageConfig} />
-        </section>
-
-        <section className='mb-5'>
-          <h2>Measles - Summary Modules</h2>
-          <Dashboard config={measlesTopConfig} />
-        </section>
-
-        <section className='mb-5'>
-          <h2>Measles - US Map</h2>
-          <CdcMap config={measlesMapConfig} />
-        </section>
-
-        <section className='mb-5'>
-          <h2>Measles - Time Period</h2>
-          <Dashboard config={measlesTimePeriodConfig} />
-        </section>
-
-        <section className='mb-5'>
-          <h2>COVID-19 - Summary Modules</h2>
-          <Dashboard config={covidTopConfig} />
-        </section>
-
-        <section className='mb-5'>
-          <h2>COVID-19 - State Map</h2>
-          <CdcMap config={covidMapConfig} />
-        </section>
-
-        <section className='mb-5'>
-          <h2>COVID-19 - State Level Data</h2>
-          <Chart config={covidStateLevelConfig} />
-        </section>
-
-        <section className='mb-5'>
-          <h2>COVID-19 - National and Regional Trends</h2>
-          <Chart config={covidNationalRegionalConfig} />
-        </section>
-
-        <section className='mb-5'>
-          <h2>COVID-19 - State Trends</h2>
-          <Chart config={covidStateRestConfig} />
-        </section>
-      </div>
-    )
-  },
+  render: () => <AllWastewaterVisualizationsStory />,
   play: async ({ canvasElement }) => {
     await step('Wait for all configs to load', async () => {
       await new Promise<void>(resolve => {

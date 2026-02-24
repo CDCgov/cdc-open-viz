@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, expect } from 'storybook/test'
 import Dashboard from '@cdc/dashboard'
 import { useEffect, useState } from 'react'
+import fetchRemoteData from '../helpers/fetchRemoteData'
 
 // Fallback step function for test descriptions
 const step = async (description: string, fn: () => Promise<void> | void) => {
@@ -36,8 +37,7 @@ const useConfigWithAbsoluteDataUrl = (configUrl: string) => {
   const [config, setConfig] = useState(null)
 
   useEffect(() => {
-    fetch(configUrl)
-      .then(res => res.json())
+    fetchRemoteData(configUrl)
       .then(data => {
         // Convert relative data URLs to absolute cdc.gov URLs
         if (data.dataUrl) {
@@ -96,8 +96,8 @@ const useConfigWithAbsoluteDataUrl = (configUrl: string) => {
                 dataFileName:
                   (dataset as any).dataFileName && !(dataset as any).dataFileName.startsWith('http')
                     ? `https://www.cdc.gov/${(dataset as any).dataFileName
-                        .replace(/^(\.\.\/)+/, '')
-                        .replace(/^\//, '')}`
+                      .replace(/^(\.\.\/)+/, '')
+                      .replace(/^\//, '')}`
                     : (dataset as any).dataFileName,
                 dataUrl:
                   (dataset as any).dataUrl && !(dataset as any).dataUrl.startsWith('http')
@@ -135,6 +135,12 @@ const useConfigWithAbsoluteDataUrl = (configUrl: string) => {
 }
 
 type DashboardStory = StoryObj<typeof Dashboard>
+
+const GTSSDataExplorerStory = () => {
+  const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.dataExplorer)
+  if (!config) return <div>Loading...</div>
+  return <Dashboard config={config} />
+}
 
 // Helper function to test dashboard rendering
 const testDashboardRendering = async (canvasElement: HTMLElement, storyName: string) => {
@@ -189,11 +195,7 @@ const testDashboardRendering = async (canvasElement: HTMLElement, storyName: str
  * attitudes, and exposure to tobacco products and smoke.
  */
 export const GTSS_Data_Explorer: DashboardStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.dataExplorer)
-    if (!config) return <div>Loading...</div>
-    return <Dashboard config={config} />
-  },
+  render: () => <GTSSDataExplorerStory />,
   play: async ({ canvasElement }) => {
     await testDashboardRendering(canvasElement, 'GTSS Data Explorer Dashboard')
   }

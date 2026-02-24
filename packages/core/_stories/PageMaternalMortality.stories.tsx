@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, expect } from 'storybook/test'
 import Dashboard from '@cdc/dashboard'
 import { useEffect, useState } from 'react'
+import fetchRemoteData from '../helpers/fetchRemoteData'
 
 // Fallback step function for test descriptions
 const step = async (description: string, fn: () => Promise<void> | void) => {
@@ -36,8 +37,7 @@ const useConfigWithAbsoluteDataUrl = (configUrl: string) => {
   const [config, setConfig] = useState(null)
 
   useEffect(() => {
-    fetch(configUrl)
-      .then(res => res.json())
+    fetchRemoteData(configUrl)
       .then(data => {
         // Convert relative data URLs to absolute cdc.gov URLs
         if (data.dataUrl) {
@@ -133,6 +133,12 @@ const useConfigWithAbsoluteDataUrl = (configUrl: string) => {
 
 type DashboardStory = StoryObj<typeof Dashboard>
 
+const PMSSDashboardStory = () => {
+  const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.pmssDashboard)
+  if (!config) return <div>Loading...</div>
+  return <Dashboard config={config} />
+}
+
 // Helper function to test dashboard rendering
 const testDashboardRendering = async (canvasElement: HTMLElement, storyName: string) => {
   await step('Wait for dashboard to render', async () => {
@@ -182,11 +188,7 @@ const testDashboardRendering = async (canvasElement: HTMLElement, storyName: str
  * This surveillance system monitors pregnancy-related deaths in the United States.
  */
 export const PMSS_Dashboard: DashboardStory = {
-  render: () => {
-    const config = useConfigWithAbsoluteDataUrl(CONFIG_URLS.pmssDashboard)
-    if (!config) return <div>Loading...</div>
-    return <Dashboard config={config} />
-  },
+  render: () => <PMSSDashboardStory />,
   play: async ({ canvasElement }) => {
     await testDashboardRendering(canvasElement, 'PMSS Dashboard')
   }
