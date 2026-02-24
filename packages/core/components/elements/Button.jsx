@@ -5,10 +5,12 @@ import LoadSpin from '../ui/LoadSpin'
 
 import '../../styles/components/button.scss'
 
+const DEFAULT_HOVER_STYLE = {}
+
 const Button = ({
   style,
   role,
-  hoverStyle = {},
+  hoverStyle = DEFAULT_HOVER_STYLE,
   fluid = false,
   loading = false,
   loadingText = 'Loading...',
