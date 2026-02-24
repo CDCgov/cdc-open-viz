@@ -10,13 +10,14 @@ interface MiniChartPreviewProps {
   dataKey: string
   xScale: any
   miniYScale: any
+  miniRightYScale?: any
   colorScale: any
   config: any
   xMax: number
 }
 
 const MiniChartPreview = memo<MiniChartPreviewProps>(
-  ({ series, tableData, dataKey, xScale, miniYScale, colorScale, config }) => {
+  ({ series, tableData, dataKey, xScale, miniYScale, miniRightYScale, colorScale, config }) => {
     if (!series || !series.length || !tableData || !tableData.length || !xScale || !miniYScale) {
       return null
     }
@@ -309,17 +310,23 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
           const curve = allCurves[seriesLineType] || allCurves.curveLinear
           const strokeDasharray = handleLineType(seriesStyle)
 
-          // Filter to only valid data points
-          const validData = tableData.filter(d => {
-            const xVal = xScale(d[dataKey])
-            const yVal = parseFloat(d[s.dataKey])
-            return xVal !== undefined && !isNaN(yVal)
-          })
+          // Use the right-axis scale when the series is on the right axis
+          const yScaleForSeries = s.axis === 'Right' && miniRightYScale ? miniRightYScale : miniYScale
+
+          // Filter to only valid data points, then sort by X position so the area
+          // renders left-to-right regardless of the original data order.
+          const validData = tableData
+            .filter(d => {
+              const xVal = xScale(d[dataKey])
+              const yVal = parseFloat(d[s.dataKey])
+              return xVal !== undefined && !isNaN(yVal)
+            })
+            .sort((a, b) => (xScale(a[dataKey]) ?? 0) - (xScale(b[dataKey]) ?? 0))
 
           if (validData.length === 0) return null
 
           const getX = d => xScale(d[dataKey]) + bandwidth / 2
-          const getY = d => miniYScale(parseFloat(d[s.dataKey]))
+          const getY = d => yScaleForSeries(parseFloat(d[s.dataKey]))
 
           return (
             <AreaClosed
@@ -327,7 +334,7 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
               data={validData}
               x={getX}
               y={getY}
-              yScale={miniYScale}
+              yScale={yScaleForSeries}
               fill={seriesColor}
               fillOpacity={1}
               stroke={seriesColor}
@@ -350,17 +357,23 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
           const curve = allCurves[seriesLineType] || allCurves.curveLinear
           const strokeDasharray = handleLineType(seriesStyle)
 
-          // Filter to only valid data points
-          const validData = tableData.filter(d => {
-            const xVal = xScale(d[dataKey])
-            const yVal = parseFloat(d[s.dataKey])
-            return xVal !== undefined && !isNaN(yVal)
-          })
+          // Use the right-axis scale when the series is on the right axis
+          const yScaleForSeries = s.axis === 'Right' && miniRightYScale ? miniRightYScale : miniYScale
+
+          // Filter to only valid data points, then sort by X position so the line
+          // connects left-to-right regardless of the original data order.
+          const validData = tableData
+            .filter(d => {
+              const xVal = xScale(d[dataKey])
+              const yVal = parseFloat(d[s.dataKey])
+              return xVal !== undefined && !isNaN(yVal)
+            })
+            .sort((a, b) => (xScale(a[dataKey]) ?? 0) - (xScale(b[dataKey]) ?? 0))
 
           if (validData.length === 0) return null
 
           const getX = d => xScale(d[dataKey]) + bandwidth / 2
-          const getY = d => miniYScale(parseFloat(d[s.dataKey]))
+          const getY = d => yScaleForSeries(parseFloat(d[s.dataKey]))
 
           return (
             <LinePath
