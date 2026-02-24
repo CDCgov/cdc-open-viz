@@ -229,7 +229,52 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   // Simple Y scale for brush (identity mapping)
   const yScale = useMemo(() => scaleLinear<number>({ domain: [0, BRUSH_HEIGHT], range: [BRUSH_HEIGHT, 0] }), [])
 
-  // Mini chart Y scale
+  // Helper to build a mini Y scale from a subset of series
+  const buildMiniYScale = useCallback(
+    (seriesSubset: typeof series, includeZero: boolean) => {
+      const defaultScale = scaleLinear({ domain: [0, 100], range: [BRUSH_HEIGHT - 4, 2] })
+      if (!seriesSubset.length || !tableData.length) return defaultScale
+
+      let minValue = Number.POSITIVE_INFINITY
+      let maxValue = Number.NEGATIVE_INFINITY
+      let hasValidValues = false
+
+      for (const s of seriesSubset) {
+        if (!s.dataKey) continue
+        for (const row of tableData) {
+          const value = parseFloat(row[s.dataKey])
+          if (!isNaN(value) && isFinite(value)) {
+            hasValidValues = true
+            minValue = Math.min(minValue, value)
+            maxValue = Math.max(maxValue, value)
+          }
+        }
+      }
+
+      if (!hasValidValues) return defaultScale
+
+      if (includeZero) minValue = Math.min(0, minValue)
+
+      if (minValue === maxValue) {
+        const padding = Math.abs(minValue) * 0.1 || 10
+        minValue = minValue - padding
+        maxValue = maxValue + padding
+        if (minValue > 0) minValue = 0
+      }
+
+      const domain = [minValue, maxValue]
+      return scaleLinear({ domain, range: [BRUSH_HEIGHT - 4, 2], nice: true })
+    },
+    [tableData]
+  )
+
+  // Determine if we have a right-axis series (dual-axis combo)
+  const hasRightAxis = useMemo(
+    () => config.visualizationType === 'Combo' && series.some(s => s.axis === 'Right'),
+    [series, config.visualizationType]
+  )
+
+  // Mini chart Y scale — left-axis (or all series when there's no right axis)
   const miniYScale = useMemo(() => {
     if (!series.length || !tableData.length) {
       return scaleLinear({ domain: [0, 100], range: [BRUSH_HEIGHT - 4, 2] })
@@ -242,16 +287,19 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     const isStacked =
       config.visualizationSubType === 'stacked' &&
       (config.visualizationType === 'Bar' || config.visualizationType === 'Area Chart')
+
+    // When dual-axis, only use left-axis series for this scale
+    const leftSeries = hasRightAxis ? series.filter(s => s.axis !== 'Right') : series
+
     let minValue = Number.POSITIVE_INFINITY
     let maxValue = Number.NEGATIVE_INFINITY
     let hasValidValues = false
 
     if (isStacked) {
-      // For stacked bars, calculate the sum of all series for each row
       for (const row of tableData) {
         let rowSum = 0
         let hasRowValue = false
-        for (const s of series) {
+        for (const s of leftSeries) {
           if (!s.dataKey) continue
           const value = parseFloat(row[s.dataKey])
           if (!isNaN(value) && isFinite(value)) {
@@ -265,11 +313,9 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
           maxValue = Math.max(maxValue, rowSum)
         }
       }
-      // For stacked charts, ensure domain starts at 0
       minValue = Math.min(0, minValue)
     } else {
-      // For non-stacked charts, use individual series values
-      for (const s of series) {
+      for (const s of leftSeries) {
         if (!s.dataKey) continue
         for (const row of tableData) {
           const value = parseFloat(row[s.dataKey])
@@ -280,19 +326,13 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
           }
         }
       }
-      // For bar charts (and combo charts with bar series), ensure domain includes 0
-      if (hasBarSeries) {
-        minValue = Math.min(0, minValue)
-      }
+      if (hasBarSeries) minValue = Math.min(0, minValue)
     }
 
-    // Handle edge case where all values are the same
     if (hasValidValues && minValue === maxValue) {
-      // Create a domain with some padding around the single value
       const padding = Math.abs(minValue) * 0.1 || 10
       minValue = minValue - padding
       maxValue = maxValue + padding
-      // Ensure 0 is included if we're near it
       if (minValue > 0) minValue = 0
     }
 
@@ -300,14 +340,18 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       return scaleLinear({ domain: [0, 100], range: [BRUSH_HEIGHT - 4, 2] })
     }
 
-    // Ensure domain includes 0 for bar charts (and combo with bars)
-    if (hasBarSeries) {
-      minValue = Math.min(0, minValue)
-    }
+    if (hasBarSeries) minValue = Math.min(0, minValue)
 
     const domain = minValue === maxValue ? [minValue - 1, maxValue + 1] : [minValue, maxValue]
     return scaleLinear({ domain, range: [BRUSH_HEIGHT - 4, 2], nice: true })
-  }, [series, tableData, config.visualizationSubType, config.visualizationType])
+  }, [series, tableData, config.visualizationSubType, config.visualizationType, hasRightAxis])
+
+  // Mini chart Y scale for right-axis series (dual-axis combo charts)
+  const miniRightYScale = useMemo(() => {
+    if (!hasRightAxis) return undefined
+    const rightSeries = series.filter(s => s.axis === 'Right')
+    return buildMiniYScale(rightSeries, false)
+  }, [hasRightAxis, series, buildMiniYScale])
 
   // Fallback: Window mouseup listener to prevent stuck drag states
   useEffect(() => {
@@ -1205,6 +1249,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
               dataKey={dataKey}
               xScale={xScale}
               miniYScale={miniYScale}
+              miniRightYScale={miniRightYScale}
               colorScale={colorScale}
               config={config}
               xMax={safeXMax}
