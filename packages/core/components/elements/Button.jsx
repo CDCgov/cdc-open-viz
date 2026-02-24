@@ -74,7 +74,7 @@ const Button = ({
       buttonRef.current.parentNode.removeChild(ghostSpan)
       buttonRef.current.parentNode.removeChild(ghostLoaderSpan)
     }
-    return () => {}
+    return () => { }
   }, [buttonRef, children, loadingText, role])
 
   useEffect(() => {
