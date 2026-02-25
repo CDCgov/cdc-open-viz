@@ -39,6 +39,15 @@ import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAl
 import { Datasets } from '@cdc/core/types/DataSet'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 
+const MarkupIncludeError = ({ config }) => (
+  <section className='waiting'>
+    <section className='waiting-container'>
+      <h3>Error With Configuration</h3>
+      <p>{config?.runtime.editorErrorMessage}</p>
+    </section>
+  </section>
+)
+
 const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   configUrl,
   config: configObj,
@@ -355,21 +364,12 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     )
   }
 
-  const Error = () => {
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Error With Configuration</h3>
-          <p>{config?.runtime.editorErrorMessage}</p>
-        </section>
-      </section>
-    )
-  }
-
   return (
     <ErrorBoundary component='CdcMarkupInclude'>
       <ConfigContext.Provider value={{ config, updateConfig, loading, data: data, setParentConfig, isDashboard }}>
-        {!config?.newViz && config?.runtime && config?.runtime.editorErrorMessage && <Error />}
+        {!config?.newViz && config?.runtime && config?.runtime.editorErrorMessage && (
+          <MarkupIncludeError config={config} />
+        )}
         <Layout.VisualizationWrapper config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
           {content}
         </Layout.VisualizationWrapper>

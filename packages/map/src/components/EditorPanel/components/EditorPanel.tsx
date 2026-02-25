@@ -72,6 +72,69 @@ type MapEditorPanelProps = {
   datasets?: Datasets
 }
 
+const DynamicDesc = ({ value: stateValue, onDescriptionChange, ...attributes }) => {
+  const [value, setValue] = useState(stateValue)
+  const [debouncedValue] = useDebounce(value, 500)
+
+  useEffect(() => {
+    if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
+      onDescriptionChange(debouncedValue)
+    }
+  }, [debouncedValue])
+
+  const onChange = e => setValue(e.target.value)
+
+  return <textarea onChange={onChange} {...attributes} value={value}></textarea>
+}
+
+const getItemStyle = (isDragging, draggableStyle) => ({
+  ...draggableStyle
+})
+
+const StateOptionList = () => {
+  const arrOfArrays = Object.entries(supportedStatesFipsCodes)
+  const sorted = arrOfArrays.sort((a, b) => a[0].localeCompare(b[0]))
+  const options = []
+  sorted.forEach(state => {
+    options.push(
+      <option key={state[0]} value={state[1]}>
+        {state[1]}
+      </option>
+    )
+  })
+  return options
+}
+
+const CountryOptionList = () => {
+  const countryOptions = getSupportedCountryOptions()
+  return countryOptions.map(({ value, label }) => (
+    <option key={value} value={label}>
+      {label}
+    </option>
+  ))
+}
+
+const CategoryList = ({ values }) =>
+  values
+    .filter(item => !item?.special)
+    .map((value, index) => (
+      <Draggable key={value} draggableId={`item-${value}`} index={index}>
+        {(provided, snapshot) => (
+          <li style={{ position: 'relative' }}>
+            <div
+              className={snapshot.isDragging ? 'currently-dragging' : ''}
+              style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+            >
+              {value}
+            </div>
+          </li>
+        )}
+      </Draggable>
+    ))
+
 const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const {
     setParentConfig,
@@ -235,22 +298,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
         })
       }
     }
-  }
-
-  const DynamicDesc = ({ label, fieldName, value: stateValue, type = 'input', ...attributes }) => {
-    const [value, setValue] = useState(stateValue)
-
-    const [debouncedValue] = useDebounce(value, 500)
-
-    useEffect(() => {
-      if ('string' === typeof debouncedValue && stateValue !== debouncedValue) {
-        handleEditorChanges('changeLegendDescription', [String(activeFilterValueForDescription), debouncedValue])
-      }
-    }, [debouncedValue])
-
-    const onChange = e => setValue(e.target.value)
-
-    return <textarea onChange={onChange} {...attributes} value={value}></textarea>
   }
 
   const handleEditorChanges = async (property, value) => {
@@ -1063,35 +1110,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
   const updateField = updateFieldFactory(config, setConfig)
 
-  const StateOptionList = () => {
-    const arrOfArrays = Object.entries(supportedStatesFipsCodes)
-
-    let sorted = arrOfArrays.sort((a, b) => {
-      return a[0].localeCompare(b[0])
-    })
-
-    let options = []
-    sorted.forEach(state => {
-      options.push(
-        <option key={state[0]} value={state[1]}>
-          {state[1]}
-        </option>
-      )
-    })
-
-    return options
-  }
-
-  const CountryOptionList = () => {
-    const countryOptions = getSupportedCountryOptions()
-
-    return countryOptions.map(({ value, label }) => (
-      <option key={value} value={label}>
-        {label}
-      </option>
-    ))
-  }
-
   const filterValueOptionList = []
 
   if (runtimeFilters.length > 0) {
@@ -1103,10 +1121,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   }
 
   let numberOfItemsLimit = 8
-
-  const getItemStyle = (isDragging, draggableStyle) => ({
-    ...draggableStyle
-  })
 
   const getCategoryValuesOrder = (): string[] | [] => {
     let values =
@@ -1126,28 +1140,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     } else {
       return values
     }
-  }
-
-  const CategoryList = () => {
-    return getCategoryValuesOrder()
-      .filter(item => !item?.special)
-      .map((value, index) => (
-        <Draggable key={value} draggableId={`item-${value}`} index={index}>
-          {(provided, snapshot) => (
-            <li style={{ position: 'relative' }}>
-              <div
-                className={snapshot.isDragging ? 'currently-dragging' : ''}
-                style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)}
-                ref={provided.innerRef}
-                {...provided.draggableProps}
-                {...provided.dragHandleProps}
-              >
-                {value}
-              </div>
-            </li>
-          )}
-        </Draggable>
-      ))
   }
 
   const isLoadedFromUrl = config?.dataKey?.includes('http://') || config?.dataKey?.includes('https://')
@@ -2554,7 +2546,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             <Droppable droppableId='category_order'>
                               {provided => (
                                 <ul {...provided.droppableProps} className='sort-list' ref={provided.innerRef}>
-                                  <CategoryList />
+                                  <CategoryList values={getCategoryValuesOrder()} />
                                   {provided.placeholder}
                                 </ul>
                               )}
@@ -2598,7 +2590,15 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             <span className='subtext'>
                               For {displayFilterLegendValue(activeFilterValueForDescription)}
                             </span>
-                            <DynamicDesc value={legend.descriptions[String(activeFilterValueForDescription)]} />
+                            <DynamicDesc
+                              value={legend.descriptions[String(activeFilterValueForDescription)]}
+                              onDescriptionChange={val =>
+                                handleEditorChanges('changeLegendDescription', [
+                                  String(activeFilterValueForDescription),
+                                  val
+                                ])
+                              }
+                            />
                           </label>
                           <label>
                             <Select
@@ -3458,7 +3458,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
                     {config.map.layers.map((layer, index) => {
                       return (
-                        <>
+                        <React.Fragment key={index}>
                           <Accordion allowZeroExpanded>
                             <AccordionItem className='series-item map-layers-list'>
                               <AccordionItemHeading className='series-item__title map-layers-list--title'>
@@ -3530,7 +3530,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                               </AccordionItemPanel>
                             </AccordionItem>
                           </Accordion>
-                        </>
+                        </React.Fragment>
                       )
                     })}
                     <button className={'btn btn-primary full-width'} onClick={handleAddLayer}>

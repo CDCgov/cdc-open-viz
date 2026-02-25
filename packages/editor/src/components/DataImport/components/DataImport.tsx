@@ -546,7 +546,7 @@ const DataImport = () => {
               <ul className='value-list'>
                 {filter.orderedValues &&
                   filter.orderedValues.map((value, valueIndex) => (
-                    <li>
+                    <li key={value}>
                       {value}
                       <input
                         type='text'

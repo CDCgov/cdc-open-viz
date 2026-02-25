@@ -371,6 +371,7 @@ const UsaMap = () => {
                       if (geoData[item.key] === item.value || Number(geoData[item.key]) === Number(item.value)) {
                         return (
                           <HexIcon
+                            key={itemIndex}
                             textColor={textColor}
                             item={item}
                             index={itemIndex}
@@ -384,6 +385,7 @@ const UsaMap = () => {
                       if (geoData[item.key] !== item.value && Number(geoData[item.key]) !== Number(item.value)) {
                         return (
                           <HexIcon
+                            key={itemIndex}
                             textColor={textColor}
                             item={item}
                             index={itemIndex}
@@ -397,6 +399,7 @@ const UsaMap = () => {
                       if (Number(geoData[item.key]) < Number(item.value)) {
                         return (
                           <HexIcon
+                            key={itemIndex}
                             textColor={textColor}
                             item={item}
                             index={itemIndex}
@@ -410,6 +413,7 @@ const UsaMap = () => {
                       if (Number(geoData[item.key]) > Number(item.value)) {
                         return (
                           <HexIcon
+                            key={itemIndex}
                             textColor={textColor}
                             item={item}
                             index={itemIndex}
@@ -423,6 +427,7 @@ const UsaMap = () => {
                       if (Number(geoData[item.key]) <= Number(item.value)) {
                         return (
                           <HexIcon
+                            key={itemIndex}
                             textColor={textColor}
                             item={item}
                             index={itemIndex}
@@ -437,6 +442,7 @@ const UsaMap = () => {
                         if (Number(geoData[item.key]) >= Number(item.value)) {
                           return (
                             <HexIcon
+                              key={itemIndex}
                               textColor={textColor}
                               item={item}
                               index={itemIndex}
@@ -490,7 +496,7 @@ const UsaMap = () => {
               <path tabIndex={-1} className='single-geo' strokeWidth={1} d={path} />
 
               {/* apply patterns on top of state path*/}
-              {map?.patterns?.map((patternData, _patternIndex) => {
+              {map?.patterns?.map((patternData, patternIndex) => {
                 const { pattern, dataKey, size } = patternData
                 const currentFill = styles.fill
                 const hasMatchingValues = patternValuesMatch(patternData.dataValue, geoData?.[patternData.dataKey])
@@ -502,7 +508,7 @@ const UsaMap = () => {
                 checkColorContrast(currentFill, patternColor)
 
                 return (
-                  <>
+                  <React.Fragment key={patternIndex}>
                     {pattern === 'waves' && (
                       <PatternWaves
                         id={patternId}
@@ -539,7 +545,7 @@ const UsaMap = () => {
                       d={path}
                       fill={`url(#${patternId})`}
                     />
-                  </>
+                  </React.Fragment>
                 )
               })}
               {(displayAsHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
@@ -579,7 +585,7 @@ const UsaMap = () => {
 
     // Bubbles
     if (general.type === 'bubble') {
-      geosJsx.push(<BubbleList runtimeData={dataRef.current} projection={projection} />)
+      geosJsx.push(<BubbleList key='bubbles' runtimeData={dataRef.current} projection={projection} />)
     }
 
     // })

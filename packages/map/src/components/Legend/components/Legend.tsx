@@ -1,5 +1,5 @@
 //TODO: Move legends to core
-import { forwardRef, useContext, useMemo } from 'react'
+import React, { forwardRef, useContext, useMemo } from 'react'
 import parse from 'html-react-parser'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
@@ -165,7 +165,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
         const legendSize = 16
 
         legendItems.push(
-          <>
+          <React.Fragment key={`pattern-${patternDataIndex}`}>
             <li className={`legend-container__li legend-container__li--geo-pattern`}>
               <button
                 type='button'
@@ -214,7 +214,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 <span>{patternData.label || String(patternData.dataValue ?? '')}</span>
               </button>
             </li>
-          </>
+          </React.Fragment>
         )
       })
     }

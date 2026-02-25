@@ -3730,8 +3730,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               <label htmlFor='barHighlight'>Bar Highlighting</label>
                               {config.series.length === 1 &&
                                 highlightedBarValues.map((highlightedBarValue, i) => (
-                                  <fieldset>
-                                    <div className='edit-block' key={`highlighted-bar-${i}`}>
+                                  <fieldset key={`highlighted-bar-${i}`}>
+                                    <div className='edit-block'>
                                       <button
                                         className='btn btn-danger'
                                         onClick={e => handleRemoveHighlightedBar(e, i)}

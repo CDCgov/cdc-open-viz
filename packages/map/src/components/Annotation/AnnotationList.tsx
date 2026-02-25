@@ -27,7 +27,7 @@ const AnnotationList: React.FC<AnnotationListProps> = ({ useBootstrapVisibilityC
       __html: DOMPurify.sanitize(text)
     })
     return (
-      <li key={`annotation-li-item__annotationIndex`}>
+      <li key={`annotation-li-item__${annotationIndex}`}>
         <div className='annotation__title-wrapper'>
           <div className='annotation__title-circle'>{annotationIndex + 1}</div>
           <p className='annotation__subtext' dangerouslySetInnerHTML={sanitizedData()} />

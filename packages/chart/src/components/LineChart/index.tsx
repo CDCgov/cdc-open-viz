@@ -458,7 +458,7 @@ const LineChart = (props: LineChartProps) => {
                     }
                   }
                   if (!lastDatum || legend.position === 'right') {
-                    return <></>
+                    return <React.Fragment key={seriesKey} />
                   }
 
                   let labelText = config.runtime.seriesLabels[seriesKey] || seriesKey
@@ -470,6 +470,7 @@ const LineChart = (props: LineChartProps) => {
 
                   return (
                     <Text
+                      key={seriesKey}
                       display={
                         legend.behavior === 'highlight' ||
                         (seriesHighlight.length === 0 && !legend.dynamicLegend) ||

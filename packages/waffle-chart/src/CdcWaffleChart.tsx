@@ -47,6 +47,36 @@ type CdcWaffleChartProps = {
   interactionLabel?: string
 }
 
+const WaffleChartError = ({ config }) => (
+  <section className='waiting'>
+    <section className='waiting-container'>
+      <h3>Error With Configuration</h3>
+      <p>{config.runtime.editorErrorMessage}</p>
+    </section>
+  </section>
+)
+
+const WaffleChartConfirm = ({ updateConfig, config }) => {
+  const confirmDone = e => {
+    e.preventDefault()
+    let newConfig = { ...config }
+    delete newConfig.newViz
+    updateConfig(newConfig)
+  }
+
+  return (
+    <section className='waiting'>
+      <section className='waiting-container'>
+        <h3>Finish Configuring</h3>
+        <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
+        <button className='btn btn-primary' style={{ margin: '1em auto' }} onClick={confirmDone}>
+          I'm Done
+        </button>
+      </section>
+    </section>
+  )
+}
+
 const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateConfig }) => {
   const {
     title,
@@ -358,45 +388,11 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     range: [0, config.gauge.width]
   })
 
-  const Error = ({ config, updateConfig }) => {
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Error With Configuration</h3>
-          <p>{config.runtime.editorErrorMessage}</p>
-        </section>
-      </section>
-    )
-  }
-
-  const Confirm = ({ updateConfig, config }) => {
-    const confirmDone = e => {
-      e.preventDefault()
-      let newConfig = { ...config }
-      delete newConfig.newViz
-      updateConfig(newConfig)
-    }
-
-    return (
-      <section className='waiting'>
-        <section className='waiting-container'>
-          <h3>Finish Configuring</h3>
-          <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-          <button className='btn btn-primary' style={{ margin: '1em auto' }} onClick={confirmDone}>
-            I'm Done
-          </button>
-        </section>
-      </section>
-    )
-  }
-
   // Render waffle chart content (without title)
   const renderChartContent = () => (
     <>
-      {!config.newViz && config.runtime && config.runtime.editorErrorMessage && (
-        <Error updateConfig={updateConfig} config={config} />
-      )}
-      {config.newViz && showConfigConfirm && <Confirm updateConfig={updateConfig} config={config} />}
+      {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <WaffleChartError config={config} />}
+      {config.newViz && showConfigConfirm && <WaffleChartConfirm updateConfig={updateConfig} config={config} />}
       <div className='cove-component__content-wrap p-0'>
         {(config.visualizationType === 'Gauge' || config.visualizationType === 'TP5 Gauge') && (
           <div className={`cove-gauge-chart${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>

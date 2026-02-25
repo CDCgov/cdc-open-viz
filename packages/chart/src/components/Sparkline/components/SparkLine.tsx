@@ -121,11 +121,10 @@ const SparkLine: React.FC<SparkLineProps> = props => {
         {config.runtime.lineSeriesKeys?.length > 0
           ? config.runtime.lineSeriesKeys
           : config.runtime.seriesKeys.map((seriesKey, index) => (
-              <>
+              <React.Fragment key={`series-${seriesKey}`}>
                 <Group
                   style={{ width }}
                   className='sparkline-group'
-                  key={`series-${seriesKey}`}
                   opacity={
                     config.legend.behavior === 'highlight' &&
                     seriesHighlight.length > 0 &&
@@ -206,7 +205,7 @@ const SparkLine: React.FC<SparkLineProps> = props => {
                     textAnchor: 'middle'
                   })}
                 />
-              </>
+              </React.Fragment>
             ))}
       </svg>
     </ErrorBoundary>

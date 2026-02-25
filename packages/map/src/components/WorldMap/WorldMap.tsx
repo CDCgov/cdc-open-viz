@@ -381,7 +381,7 @@ const WorldMap = () => {
 
     // Bubbles
     if (type === 'bubble') {
-      geosJsx.push(<BubbleList />)
+      geosJsx.push(<BubbleList key='bubbles' />)
     }
 
     return geosJsx

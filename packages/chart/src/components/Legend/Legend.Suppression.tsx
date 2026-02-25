@@ -70,7 +70,7 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) =>
 
       if (visualizationType === 'Combo') {
         return (
-          <React.Fragment>
+          <React.Fragment key={itemKey}>
             {pd.symbol && pd.iconCode && (
               <div style={getStyle(pd.displayGray)} key={itemKey} className={`${baseClass} ${pd.symbol}`}>
                 <span className={pd.symbol}>{pd.iconCode}</span>
