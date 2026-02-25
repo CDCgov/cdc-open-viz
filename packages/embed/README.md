@@ -407,7 +407,10 @@ generateEmbedCode({
 
 ```html
 <div data-cove-embed data-config-url="/data/chart.json?state=Texas&hideState=true"></div>
-<script src="https://www.cdc.gov/TemplatePackage/contrib/widgets/openVizWrapper/dist/embed/embed-helper.js"></script>
+<script
+  type="module"
+  src="https://www.cdc.gov/TemplatePackage/contrib/widgets/openVizWrapper/dist/embed/embed-helper.js"
+></script>
 ```
 
 **What happens when partner includes this:**
