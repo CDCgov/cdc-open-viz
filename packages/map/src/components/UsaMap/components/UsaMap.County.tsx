@@ -215,6 +215,7 @@ const CountyMap = () => {
   const zoomTransformRef = useRef(d3ZoomIdentity)
   const zoomBehaviorRef = useRef()
   const zoomFrameRef = useRef<number | null>(null)
+  const geoPathCacheRef = useRef<Map<string, Path2D>>(new Map())
 
   // Clear pattern cache when pattern configuration changes
   useEffect(() => {
@@ -223,6 +224,23 @@ const CountyMap = () => {
 
   const runtimeKeys = runtimeData ? Object.keys(runtimeData) : []
   const lineWidth = 1
+
+  // Pre-compute Path2D objects for all geo features — avoids expensive geoPath projection on every zoom frame
+  const buildPathCache = () => {
+    const pathGen = geoPath(topoData.projection)
+    const cache = new Map<string, Path2D>()
+    topoData.mapData.forEach(geo => {
+      if (!geo.id) return
+      const d = pathGen(geo)
+      if (d) cache.set(geo.id, new Path2D(d))
+    })
+    topoData.states.forEach(state => {
+      if (!state.id) return
+      const d = pathGen(state)
+      if (d) cache.set('state_border_' + state.id, new Path2D(d))
+    })
+    geoPathCacheRef.current = cache
+  }
 
   const resetZoomTransform = () => {
     zoomTransformRef.current = d3ZoomIdentity
@@ -247,7 +265,7 @@ const CountyMap = () => {
 
   const getZoomScale = () => zoomTransformRef.current?.k || 1
 
-  const paintCountyGeo = (context, path, geo, geoData, canvasWidth: number, strokeWidth?: number) => {
+  const paintCountyGeo = (context, path2d: Path2D, geoData, canvasWidth: number, strokeWidth?: number) => {
     const legendValues =
       geoData !== undefined
         ? applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
@@ -261,9 +279,7 @@ const CountyMap = () => {
         : DEFAULT_MAP_BACKGROUND
 
     context.fillStyle = baseFill
-    context.beginPath()
-    path(geo)
-    context.fill()
+    context.fill(path2d)
 
     if (config.map?.patterns?.length > 0 && geoData) {
       const patternInfo = getPatternForRow(geoData, config)
@@ -290,18 +306,14 @@ const CountyMap = () => {
 
         if (canvasPattern) {
           context.fillStyle = canvasPattern
-          context.beginPath()
-          path(geo)
-          context.fill()
+          context.fill(path2d)
         }
       }
     }
 
     context.strokeStyle = geoStrokeColor
     context.lineWidth = strokeWidth ?? lineWidth
-    context.beginPath()
-    path(geo)
-    context.stroke()
+    context.stroke(path2d)
 
     return legendValues
   }
@@ -341,7 +353,7 @@ const CountyMap = () => {
     if (zoomFrameRef.current) return
     zoomFrameRef.current = window.requestAnimationFrame(() => {
       zoomFrameRef.current = null
-      drawCanvas()
+      renderFrame()
     })
   }
 
@@ -455,7 +467,6 @@ const CountyMap = () => {
     const context = canvas.getContext('2d')
     context.save()
     applyZoomTransform(context)
-    const path = geoPath(topoData.projection, context)
 
     // Handle standard county map hover
     if (config.general.type !== 'us-geocode') {
@@ -471,14 +482,16 @@ const CountyMap = () => {
             legendSpecialClassLastMemo
           )
         ) {
-          paintCountyGeo(
-            context,
-            path,
-            topoData.mapData[currentTooltipIndex],
-            runtimeData[topoData.mapData[currentTooltipIndex].id],
-            canvas.width,
-            lineWidth * strokeScale
-          )
+          const prevPath2d = geoPathCacheRef.current.get(topoData.mapData[currentTooltipIndex].id)
+          if (prevPath2d) {
+            paintCountyGeo(
+              context,
+              prevPath2d,
+              runtimeData[topoData.mapData[currentTooltipIndex].id],
+              canvas.width,
+              lineWidth * strokeScale
+            )
+          }
         }
 
         let hoveredState
@@ -518,14 +531,10 @@ const CountyMap = () => {
               return
             }
             context.globalAlpha = 1
-            paintCountyGeo(
-              context,
-              path,
-              topoData.mapData[countyIndex],
-              runtimeData[county.id],
-              canvas.width,
-              lineWidth * strokeScale
-            )
+            const hoverPath2d = geoPathCacheRef.current.get(county.id)
+            if (hoverPath2d) {
+              paintCountyGeo(context, hoverPath2d, runtimeData[county.id], canvas.width, lineWidth * strokeScale)
+            }
           }
 
           // Track hover analytics event if this is a new location
@@ -676,21 +685,21 @@ const CountyMap = () => {
     }
 
     if (focus.index !== -1) {
-      context.strokeStyle = geoStrokeColor
-      context.lineWidth = lineWidth * strokeScale
-      context.beginPath()
-      path(topoData.mapData[focus.index])
-      context.stroke()
+      const focusPath2d = geoPathCacheRef.current.get(topoData.mapData[focus.index]?.id)
+      if (focusPath2d) {
+        context.strokeStyle = geoStrokeColor
+        context.lineWidth = lineWidth * strokeScale
+        context.stroke(focusPath2d)
+      }
     }
     context.restore()
   }
 
-  // Redraws canvas. Takes as parameters the fips id of a state to center on and the [lat,long] center of that state
+  // Sets up canvas dimensions, projection, and Path2D cache, then renders.
+  // Called on data change, resize, focus change — NOT during zoom/pan.
   const drawCanvas = () => {
     if (canvasRef.current && runtimeLegend.items.length > 0) {
       const canvas = canvasRef.current
-      const context = canvas.getContext('2d')
-      const path = geoPath(topoData.projection, context)
 
       canvas.width = canvas.clientWidth
       canvas.height = canvas.width * 0.6
@@ -704,11 +713,9 @@ const CountyMap = () => {
         if (resetButton.current) resetButton.current.style.display = 'block'
       }
 
-      // Centers the projection on the parameter passed
-      // Centers the projection on the parameter passed
+      // Centers the projection on the focused state
       if (focus.feature) {
         const PADDING = 10
-        // Fit the feature within the canvas dimensions with padding
         const fitExtent = [
           [PADDING, PADDING],
           [canvas.width - 0, canvas.height - PADDING]
@@ -716,131 +723,144 @@ const CountyMap = () => {
         topoData.projection.fitExtent(fitExtent, focus.feature)
       }
 
-      // Erases previous renderings before redrawing map
-      context.setTransform(1, 0, 0, 1, 0, 0)
-      context.clearRect(0, 0, canvas.width, canvas.height)
-      context.save()
-      applyZoomTransform(context)
-      const zoomScale = getZoomScale()
-      const strokeScale = zoomScale ? 1 / zoomScale : 1
-      const countyStrokeWidth = lineWidth * 0.8 * strokeScale
+      // Pre-compute Path2D objects with the current projection
+      buildPathCache()
 
-      // Enforces stroke style of the county lines
-      context.strokeStyle = geoStrokeColor
-      context.lineWidth = countyStrokeWidth
+      // Render the map
+      renderFrame()
+    }
+  }
 
-      // Iterates through each state/county topo and renders it
-      topoData.mapData.forEach(geo => {
-        // If invalid geo item, don't render
-        if (!geo.id) return
-        // If the map is focused on one state, don't render counties that are not in that state
-        if (focus.id && geo.id.length > 2 && geo.id.indexOf(focus.id) !== 0) return
-        // If rendering a geocode map without a focus, don't render counties
-        if (!focus.id && config.general.type === 'us-geocode' && geo.id.length > 2) return
+  // Fast render using cached Path2D objects — called during zoom/pan for smooth performance.
+  // Skips canvas resize and projection setup; only applies the current zoom transform and redraws.
+  const renderFrame = () => {
+    if (!canvasRef.current || !runtimeLegend.items.length) return
 
-        // Gets numeric data associated with the topo data for this state/county
-        const geoData = runtimeData[geo.id]
+    const canvas = canvasRef.current
+    const context = canvas.getContext('2d')
+    const cache = geoPathCacheRef.current
 
-        // Renders state/county
-        paintCountyGeo(context, path, geo, geoData, canvas.width, countyStrokeWidth)
-      })
+    // Clear canvas
+    context.setTransform(1, 0, 0, 1, 0, 0)
+    context.clearRect(0, 0, canvas.width, canvas.height)
+    context.save()
+    applyZoomTransform(context)
+    const zoomScale = getZoomScale()
+    const strokeScale = zoomScale ? 1 / zoomScale : 1
+    const countyStrokeWidth = lineWidth * 0.8 * strokeScale
 
-      // State borders
-      context.lineWidth = lineWidth * 1.5 * strokeScale
-      topoData.states.forEach(state => {
-        if (!state.id) return
-        context.beginPath()
-        path(state)
-        context.stroke()
-      })
+    // Enforces stroke style of the county lines
+    context.strokeStyle = geoStrokeColor
+    context.lineWidth = countyStrokeWidth
 
-      // If the focused state is found in the geo data, render it with a thicker outline
-      if (focus.index !== -1) {
+    // Iterates through each state/county topo and renders it using cached Path2D
+    topoData.mapData.forEach(geo => {
+      if (!geo.id) return
+      if (focus.id && geo.id.length > 2 && geo.id.indexOf(focus.id) !== 0) return
+      if (!focus.id && config.general.type === 'us-geocode' && geo.id.length > 2) return
+
+      const path2d = cache.get(geo.id)
+      if (!path2d) return
+
+      const geoData = runtimeData[geo.id]
+      paintCountyGeo(context, path2d, geoData, canvas.width, countyStrokeWidth)
+    })
+
+    // State borders
+    context.strokeStyle = 'black'
+    context.lineWidth = lineWidth * 1.5 * strokeScale
+    topoData.states.forEach(state => {
+      if (!state.id) return
+      const path2d = cache.get('state_border_' + state.id)
+      if (path2d) {
+        context.stroke(path2d)
+      }
+    })
+
+    // If the focused state is found in the geo data, render it with a thicker outline
+    if (focus.index !== -1) {
+      const focusGeoId = topoData.mapData[focus.index]?.id
+      const path2d = focusGeoId && cache.get(focusGeoId)
+      if (path2d) {
         context.strokeStyle = geoStrokeColor
         context.lineWidth = lineWidth * 2 * strokeScale
-        context.beginPath()
-        path(topoData.mapData[focus.index])
-        context.stroke()
+        context.stroke(path2d)
       }
-
-      // add in custom map layers
-      if (featureArray.length > 0) {
-        featureArray.map(layer => {
-          context.beginPath()
-          path(layer)
-          context.fillStyle = layer.properties.fill
-          context.strokeStyle = geoStrokeColor
-          context.lineWidth = layer.properties['stroke-width']
-          context.fill()
-          context.stroke()
-        })
-      }
-
-      if (config.general.type === 'us-geocode') {
-        context.strokeStyle = geoStrokeColor
-        context.lineWidth = lineWidth * strokeScale
-        const geoRadius = (config.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
-        const { additionalCityStyles } = config.visual || []
-        const cityStyles = Object.values(runtimeData)
-          .filter(d => additionalCityStyles.some(style => String(d[style.column]) === String(style.value)))
-          .map(d => {
-            const conditionsMatched = additionalCityStyles.find(
-              style => String(d[style.column]) === String(style.value)
-            )
-            return { ...conditionsMatched, ...d }
-          })
-
-        let cityPixelCoords = []
-        cityStyles.forEach(city => {
-          cityPixelCoords = topoData.projection([
-            city[config.columns.longitude.name],
-            city[config.columns.latitude.name]
-          ])
-
-          if (cityPixelCoords) {
-            const legendValues = applyLegendToRow(
-              runtimeData[city?.value],
-              config,
-              runtimeLegend,
-              legendMemo,
-              legendSpecialClassLastMemo
-            )
-            if (legendValues) {
-              if (legendValues?.[0] === '#000000') return
-              const shapeType = city?.shape?.toLowerCase()
-              const shapeProperties = createShapeProperties(shapeType, cityPixelCoords, legendValues, config, geoRadius)
-              if (shapeProperties) {
-                drawShape(shapeProperties, context, config, lineWidth * strokeScale)
-              }
-            }
-          }
-        })
-
-        runtimeKeys.forEach(key => {
-          const citiesList = new Set(cityStyles.map(item => item.value))
-
-          const pixelCoords = topoData.projection([
-            runtimeData[key][config.columns.longitude.name],
-            runtimeData[key][config.columns.latitude.name]
-          ])
-          if (pixelCoords && !citiesList.has(key)) {
-            const legendValues =
-              runtimeData[key] !== undefined
-                ? applyLegendToRow(runtimeData[key], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
-                : false
-            if (legendValues) {
-              if (legendValues?.[0] === '#000000' || legendValues?.[0] === DISABLED_MAP_COLOR) return
-              const shapeType = config.visual.cityStyle.toLowerCase()
-              const shapeProperties = createShapeProperties(shapeType, pixelCoords, legendValues, config, geoRadius)
-              if (shapeProperties) {
-                drawShape(shapeProperties, context, config, lineWidth * strokeScale)
-              }
-            }
-          }
-        })
-      }
-      context.restore()
     }
+
+    // Custom map layers (not cached — these are external features)
+    if (featureArray.length > 0) {
+      const layerPath = geoPath(topoData.projection, context)
+      featureArray.map(layer => {
+        context.beginPath()
+        layerPath(layer)
+        context.fillStyle = layer.properties.fill
+        context.strokeStyle = geoStrokeColor
+        context.lineWidth = layer.properties['stroke-width']
+        context.fill()
+        context.stroke()
+      })
+    }
+
+    if (config.general.type === 'us-geocode') {
+      context.strokeStyle = geoStrokeColor
+      context.lineWidth = lineWidth * strokeScale
+      const geoRadius = (config.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
+      const { additionalCityStyles } = config.visual || []
+      const cityStyles = Object.values(runtimeData)
+        .filter(d => additionalCityStyles.some(style => String(d[style.column]) === String(style.value)))
+        .map(d => {
+          const conditionsMatched = additionalCityStyles.find(style => String(d[style.column]) === String(style.value))
+          return { ...conditionsMatched, ...d }
+        })
+
+      let cityPixelCoords = []
+      cityStyles.forEach(city => {
+        cityPixelCoords = topoData.projection([city[config.columns.longitude.name], city[config.columns.latitude.name]])
+
+        if (cityPixelCoords) {
+          const legendValues = applyLegendToRow(
+            runtimeData[city?.value],
+            config,
+            runtimeLegend,
+            legendMemo,
+            legendSpecialClassLastMemo
+          )
+          if (legendValues) {
+            if (legendValues?.[0] === '#000000') return
+            const shapeType = city?.shape?.toLowerCase()
+            const shapeProperties = createShapeProperties(shapeType, cityPixelCoords, legendValues, config, geoRadius)
+            if (shapeProperties) {
+              drawShape(shapeProperties, context, config, lineWidth * strokeScale)
+            }
+          }
+        }
+      })
+
+      runtimeKeys.forEach(key => {
+        const citiesList = new Set(cityStyles.map(item => item.value))
+
+        const pixelCoords = topoData.projection([
+          runtimeData[key][config.columns.longitude.name],
+          runtimeData[key][config.columns.latitude.name]
+        ])
+        if (pixelCoords && !citiesList.has(key)) {
+          const legendValues =
+            runtimeData[key] !== undefined
+              ? applyLegendToRow(runtimeData[key], config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
+              : false
+          if (legendValues) {
+            if (legendValues?.[0] === '#000000' || legendValues?.[0] === DISABLED_MAP_COLOR) return
+            const shapeType = config.visual.cityStyle.toLowerCase()
+            const shapeProperties = createShapeProperties(shapeType, pixelCoords, legendValues, config, geoRadius)
+            if (shapeProperties) {
+              drawShape(shapeProperties, context, config, lineWidth * strokeScale)
+            }
+          }
+        }
+      })
+    }
+    context.restore()
   }
 
   useEffect(() => {
