@@ -1,7 +1,7 @@
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
 import React, { useContext, useEffect, useMemo, useState } from 'react'
 import Toggle from './Toggle'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import { ConfigRow } from '../types/ConfigRow'
 import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
 import CdcMap from '@cdc/map/src/CdcMapComponent'
@@ -201,7 +201,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
         )}
         {Object.keys(dataGroups).map(groupName => {
           const dataValue = dataGroups[groupName]
-          const _row = _.cloneDeep(row) // clone the row to avoid mutating the original row
+          const _row = cloneDeep(row) // clone the row to avoid mutating the original row
           const originalMultiVizColumn = _row.multiVizColumn // store original value before clearing
           _row.multiVizColumn = undefined // reset the multiVizColumn to avoid passing it to the child components
           _row.originalMultiVizColumn = originalMultiVizColumn // store for footnote filtering

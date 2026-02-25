@@ -24,7 +24,21 @@ import { Label } from './types/Label'
 import ParentSize from '@visx/responsive/lib/components/ParentSize'
 import { timeParse } from 'd3-time-format'
 import parse from 'html-react-parser'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import applyDefaults from 'lodash/defaults'
+import defaultsDeep from 'lodash/defaultsDeep'
+import findKey from 'lodash/findKey'
+import forEach from 'lodash/forEach'
+import get from 'lodash/get'
+import isEmpty from 'lodash/isEmpty'
+import isEqual from 'lodash/isEqual'
+import isString from 'lodash/isString'
+import kebabCase from 'lodash/kebabCase'
+import pick from 'lodash/pick'
+import remove from 'lodash/remove'
+import set from 'lodash/set'
+import uniq from 'lodash/uniq'
+import xor from 'lodash/xor'
 // Primary Components
 import ConfigContext, { ChartDispatchContext } from './ConfigContext'
 import PieChart from './components/PieChart'
@@ -248,7 +262,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (config.visualizationType !== 'Pie' || !config.xAxis?.dataKey) return null
     const data = filteredData?.length > 0 ? filteredData : excludedData
     if (!data) return null
-    return _.uniq(data.map(d => d[config.xAxis.dataKey]))
+    return uniq(data.map(d => d[config.xAxis.dataKey]))
   }, [config.visualizationType, config.xAxis?.dataKey, filteredData, excludedData])
 
   const prepareConfig = (loadedConfig: ChartConfig) => {
@@ -295,18 +309,18 @@ const CdcChart: React.FC<CdcChartProps> = ({
     // Ensure Horizon Chart has enough palette colors for all layers
     if (newConfig.visualizationType === 'Horizon Chart') {
       const numLayers = newConfig.horizon?.numLayers ?? 4
-      const currentCount = _.get(newConfig, 'general.paletteColorCount', 4)
-      _.set(newConfig, 'general.paletteColorCount', Math.max(currentCount, numLayers))
+      const currentCount = get(newConfig, 'general.paletteColorCount', 4)
+      set(newConfig, 'general.paletteColorCount', Math.max(currentCount, numLayers))
     }
 
-    _.defaultsDeep(newConfig, {
+    defaultsDeep(newConfig, {
       table: { showVertical: false }
     })
 
-    _.set(newConfig, 'table.show', _.get(newConfig, 'table.show', !isDashboard))
+    set(newConfig, 'table.show', get(newConfig, 'table.show', !isDashboard))
 
-    _.forEach(newConfig.series, series => {
-      _.defaults(series, {
+    forEach(newConfig.series, series => {
+      applyDefaults(series, {
         tooltip: true,
         axis: 'Left'
       })
@@ -408,7 +422,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     const shouldPreserveError = existingErrorMessage && !isPieChartValidationError
 
     newConfig.runtime = {} as Runtime
-    newConfig.runtime.series = _.cloneDeep(newConfig.series)
+    newConfig.runtime.series = cloneDeep(newConfig.series)
     newConfig.runtime.seriesLabels = {}
     newConfig.runtime.seriesLabelsAll = []
     newConfig.runtime.originalXAxis = newConfig.xAxis
@@ -416,22 +430,22 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (newConfig.visualizationType === 'Pie') {
       // Use the same data that will be passed to PieChart (after exclusions and filters)
       const pieData = currentData.length > 0 ? currentData : newExcludedData
-      newConfig.runtime.seriesKeys = _.uniq(pieData.map(d => d[newConfig.xAxis.dataKey]))
+      newConfig.runtime.seriesKeys = uniq(pieData.map(d => d[newConfig.xAxis.dataKey]))
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
       newConfig.runtime.isPieChart = true // Flag to know when to use derived keys
     } else if (newConfig.visualizationType === 'Radar') {
       // Radar chart: seriesKeys are the entity names from xAxis.dataKey
       const radarData = currentData.length > 0 ? currentData : newExcludedData
-      newConfig.runtime.seriesKeys = _.uniq(radarData.map(d => d[newConfig.xAxis.dataKey]))
+      newConfig.runtime.seriesKeys = uniq(radarData.map(d => d[newConfig.xAxis.dataKey]))
       newConfig.runtime.seriesLabelsAll = newConfig.runtime.seriesKeys
     } else {
       const finalData = dataOverride || newConfig.formattedData || newConfig.data
       newConfig.runtime.seriesKeys = (newConfig.runtime.series || []).flatMap(series => {
         if (series.dynamicCategory) {
-          _.remove(newConfig.runtime.seriesLabelsAll, label => label === series.dataKey)
-          _.remove(newConfig.runtime.series, s => s.dataKey === series.dataKey)
+          remove(newConfig.runtime.seriesLabelsAll, label => label === series.dataKey)
+          remove(newConfig.runtime.series, s => s.dataKey === series.dataKey)
           // grab the dynamic series keys from the data
-          const seriesKeys: string[] = _.uniq(finalData.map(d => d[series.dynamicCategory]))
+          const seriesKeys: string[] = uniq(finalData.map(d => d[series.dynamicCategory]))
           // for each of those keys perform side effects
           seriesKeys.forEach(dataKey => {
             newConfig.runtime.seriesLabels[dataKey] = dataKey
@@ -515,8 +529,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     if (isHorizontalVariant) {
       // For horizontal charts, axes are swapped, so processedYAxis goes to runtime.xAxis and vice versa
-      const horizontalXAxisSource = _.cloneDeep((newConfig.yAxis as any)?.yAxis || newConfig.yAxis)
-      const horizontalYAxisSource = _.cloneDeep((newConfig.xAxis as any)?.xAxis || newConfig.xAxis)
+      const horizontalXAxisSource = cloneDeep((newConfig.yAxis as any)?.yAxis || newConfig.yAxis)
+      const horizontalYAxisSource = cloneDeep((newConfig.xAxis as any)?.xAxis || newConfig.xAxis)
       newConfig.runtime.xAxis = {
         ...horizontalXAxisSource,
         label: runtimeXAxisLabel ?? horizontalXAxisSource?.label
@@ -720,7 +734,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
    * When cove has a config and container ref publish the cove_loaded event.
    */
   useEffect(() => {
-    if (container && !isLoading && !_.isEmpty(config) && !coveLoadedEventRan) {
+    if (container && !isLoading && !isEmpty(config) && !coveLoadedEventRan) {
       publish('cove_loaded', { config: config })
       dispatch({ type: 'SET_LOADED_EVENT', payload: true })
     }
@@ -775,7 +789,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }, [externalFilters]) // eslint-disable-line
 
   // Declaratively update runtime series keys for pie charts when derived value changes
-  if (config.runtime?.isPieChart && pieSeriesKeys && !_.isEqual(pieSeriesKeys, config.runtime?.seriesKeys)) {
+  if (config.runtime?.isPieChart && pieSeriesKeys && !isEqual(pieSeriesKeys, config.runtime?.seriesKeys)) {
     const newConfig = {
       ...config,
       runtime: {
@@ -815,7 +829,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   useEffect(() => {
     if (
       !config?.runtime ||
-      _.isEmpty(config.runtime) ||
+      isEmpty(config.runtime) ||
       (!config.runtime.xAxis && !config.runtime.yAxis) ||
       !config.markupVariables?.length
     ) {
@@ -825,7 +839,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
     const dataSource = (stateData && stateData.length ? stateData : config.data) || []
     const { runtimeXAxisLabel, runtimeYAxisLabel, isHorizontalVariant } = getProcessedAxisLabels(config, dataSource)
 
-    const runtimeClone = _.cloneDeep(config.runtime)
+    const runtimeClone = cloneDeep(config.runtime)
 
     if (!runtimeClone?.xAxis || !runtimeClone?.yAxis) {
       return
@@ -864,9 +878,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
       return handleShowAll()
     }
 
-    const newHighlight = _.findKey(config.runtime.seriesLabels, v => v === label.datum) || label.datum
+    const newHighlight = findKey(config.runtime.seriesLabels, v => v === label.datum) || label.datum
 
-    const newSeriesHighlight = _.xor(seriesHighlight, [newHighlight])
+    const newSeriesHighlight = xor(seriesHighlight, [newHighlight])
     dispatch({ type: 'SET_SERIES_HIGHLIGHT', payload: newSeriesHighlight })
   }
   // Called on reset button click, unhighlights all data series
@@ -1143,8 +1157,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (!Array.isArray(data)) return []
     if (config.visualizationType === 'Forecasting') return data
     //  specify keys that needs  to be cleaned to render chart and skip rest
-    const CIkeys: string[] = Object.values(_.get(config, 'confidenceKeys', {})) as string[]
-    const seriesKeys: string[] = _.get(config, 'series', []).map((s: any) => s.dataKey)
+    const CIkeys: string[] = Object.values(get(config, 'confidenceKeys', {})) as string[]
+    const seriesKeys: string[] = get(config, 'series', []).map((s: any) => s.dataKey)
     const keysToClean: string[] = [...(seriesKeys ?? []), ...(CIkeys ?? [])]
 
     // key that does not need to be cleaned
@@ -1166,7 +1180,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       .map(col => col.name)
       .concat([dynamicSeries.dynamicCategory, dynamicSeries.dataKey])
     if (config.xAxis?.dataKey) usedColumns.push(config.xAxis.dataKey)
-    return data.map(d => _.pick(d, usedColumns))
+    return data.map(d => pick(d, usedColumns))
   }
 
   const pivotDynamicSeries = (config: ChartConfig): TableConfig => {
@@ -1189,9 +1203,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
   let body = <Loading />
 
   const makeClassName = string => {
-    if (!_.isString(string)) return undefined
+    if (!isString(string)) return undefined
 
-    return _.kebabCase(string)
+    return kebabCase(string)
   }
   const getChartWrapperClasses = () => {
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)

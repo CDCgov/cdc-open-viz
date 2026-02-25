@@ -1,5 +1,4 @@
 import React, { useEffect, memo, useContext } from 'react'
-import _ from 'lodash'
 
 import ConfigContext from '../ConfigContext'
 
