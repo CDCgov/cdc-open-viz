@@ -1,8 +1,5 @@
 @import 'utils/breakpoints';
 @import 'base';
 @import 'heading-colors';
-@import 'themes/color-definitions';
-@import 'variables';
-@import '_common-components';
-@import 'components/ui/tooltip';
+@import '../components/ui/tooltip';
 @import 'main';

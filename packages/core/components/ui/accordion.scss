@@ -1,5 +1,5 @@
-@import '../utils/variables';
-@import '../themes/index';
+@import '../../styles/utils/properties';
+@import '../../styles/themes/index';
 
 .cove {
   .cove-accordion__item {
@@ -14,7 +14,7 @@
   }
 
   .cove-accordion__heading {
-    background: $lightestGray;
+    background: var(--lightestGray);
   }
 
   .cove-accordion__button {

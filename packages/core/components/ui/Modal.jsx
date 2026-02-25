@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { useGlobalContext } from '../GlobalContext'
 import Icon from './Icon'
 
-import '../../styles/components/modal.scss'
+import './modal.scss'
 
 //Define the "slots" to be populated by subcomponents
 const ModalHeader = () => null

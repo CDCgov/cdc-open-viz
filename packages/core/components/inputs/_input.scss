@@ -6,14 +6,14 @@
   border-style: solid !important; // intentional use of !important for CDC
   border-color: #cbcbcb !important; // intentional use of !important for CDC
   border-radius: 0.1875rem;
-  transition: border-color 200ms $transition-expo-out;
+  transition: border-color 200ms var(--transition-expo-out);
   font-family: sans-serif;
-  color: $baseColor;
+  color: var(--baseColor);
   width: 100%;
   max-width: 100%;
 
   &::placeholder {
-    transition: opacity 400ms $transition-expo-out;
+    transition: opacity 400ms var(--transition-expo-out);
     color: #b3b3b3;
     opacity: 1;
   }
@@ -42,7 +42,7 @@
   display: inline-block;
   margin-bottom: 0.5rem;
   font-size: 0.75rem;
-  color: $baseColor;
+  color: var(--baseColor);
   text-transform: uppercase;
   user-select: none;
 }
@@ -52,7 +52,7 @@
   min-height: 140px;
   max-width: 100%;
   line-height: 1.5em;
-  color: $baseColor;
+  color: var(--baseColor);
 }
 
 .cove-input--hidden {

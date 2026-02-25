@@ -6,7 +6,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 import type { PlacesType } from 'react-tooltip'
 
 // Styles
-import '../../styles/components/ui/tooltip.scss'
+import './tooltip.scss'
 
 const TooltipTarget = children => children
 const TooltipContent = children => children
