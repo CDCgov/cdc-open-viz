@@ -54,12 +54,12 @@ const createInitialState = () => {
     },
     preliminaryData: [],
     yAxis: {
-      hideAxis: false,
+      hideAxis: true,
       displayNumbersOnBar: false,
       hideLabel: false,
-      hideTicks: false,
+      hideTicks: true,
       size: 50,
-      gridLines: false,
+      gridLines: true,
       enablePadding: false,
       min: '',
       max: '',
@@ -73,7 +73,7 @@ const createInitialState = () => {
       rightAxisLabelColor: '#1c1d1f',
       rightAxisTickLabelColor: '#1c1d1f',
       rightAxisTickColor: '#1c1d1f',
-      numTicks: '',
+      numTicks: 4,
       axisPadding: 0,
       scalePadding: 10,
       tickRotation: 0,
@@ -133,7 +133,8 @@ const createInitialState = () => {
       labelColor: '#1c1d1f',
       tickLabelColor: '#1c1d1f',
       tickColor: '#1c1d1f',
-      numTicks: '',
+      numTicks: 6,
+      dateDisplayFormat: '%b. %-d %Y',
       labelOffset: 0,
       axisPadding: 200,
       target: 0,
@@ -146,7 +147,7 @@ const createInitialState = () => {
     },
     table: {
       label: 'Data Table',
-      expanded: true,
+      expanded: false,
       limitHeight: false,
       height: '',
       caption: '',
@@ -156,7 +157,7 @@ const createInitialState = () => {
       indexLabel: '',
       download: false,
       showVertical: true,
-      dateDisplayFormat: '',
+      dateDisplayFormat: '%B %-d, %Y',
       showMissingDataLabel: true,
       showSuppressedSymbol: true,
       collapsible: true
@@ -196,7 +197,7 @@ const createInitialState = () => {
         side: false,
         topBottom: true
       },
-      position: 'right',
+      position: 'top',
       orderedValues: [],
       patterns: {},
       patternField: ''
@@ -224,7 +225,7 @@ const createInitialState = () => {
     },
     labels: false,
     dataFormat: {
-      commas: false,
+      commas: true,
       prefix: '',
       suffix: '',
       abbreviated: false,
@@ -250,7 +251,7 @@ const createInitialState = () => {
     tooltips: {
       opacity: 90,
       singleSeries: false,
-      dateDisplayFormat: ''
+      dateDisplayFormat: '%B %-d, %Y'
     },
     forestPlot: {
       startAt: 0,

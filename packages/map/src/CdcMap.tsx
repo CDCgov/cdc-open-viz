@@ -13,6 +13,18 @@ import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
+// When initial-state.js defaults change, the fill loop (below) would backfill
+// old configs with NEW defaults instead of old ones. This happens because the
+// fill runs BEFORE coveUpdateWorker (migrations). Ideally the order would be
+// reversed, but changing it risks side effects. This object preserves the old
+// defaults so old configs aren't affected. Only add entries here when changing
+// a default in initial-state.js for a property that uses the fill loop. If the
+// order of migrations and the fill loop are changed at some point, this could
+// be moved into a migration.
+const LEGACY_MAP_DEFAULTS = {
+  legend: { style: 'circles', position: 'side', numberOfItems: 3, hideBorder: false }
+}
+
 type CdcMapProps = {
   config: MapConfig
   configUrl?: string
@@ -84,7 +96,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
         if (initialState[key]) {
           Object.keys(initialState[key]).forEach(property => {
             if (undefined === newState[key][property]) {
-              newState[key][property] = initialState[key][property]
+              newState[key][property] = LEGACY_MAP_DEFAULTS[key]?.[property] ?? initialState[key][property]
             }
           })
         }
