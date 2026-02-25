@@ -1,5 +1,5 @@
 .cdc-open-viz-module {
-  @import 'utils/mixins';
+  @import '../styles/utils/mixins';
   .waiting {
     &.collapsed {
       padding: 2em !important;

@@ -32,7 +32,7 @@ import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import { CustomColorsEditor } from '@cdc/core/components/CustomColorsEditor'
 import { getColorScale } from '../../../../helpers/getColorScale'
-import '@cdc/core/styles/components/editor.scss'
+import '@cdc/core/components/EditorPanel/editor.scss'
 import './panelVisual.styles.css'
 
 const PanelVisual: FC<PanelProps> = props => {

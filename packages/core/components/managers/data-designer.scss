@@ -1,5 +1,4 @@
-@import '../utils/variables';
-@import '../themes/color-definitions';
+@import '../../styles/utils/properties';
 
 .cove-modal__content {
   .dataset-selector-container {
@@ -59,7 +58,7 @@
       right: 0;
       bottom: 0;
       left: 0;
-      border: 1px solid $lightGray;
+      border: 1px solid var(--lightGray);
       border-radius: 0.25rem;
     }
   }
@@ -82,20 +81,20 @@
   table {
     font-size: 0.8rem;
     background-color: #fff;
-    border: 1px solid $lightGray;
+    border: 1px solid var(--lightGray);
     border-collapse: collapse;
 
     th {
       color: white;
       text-align: left;
-      background-color: $primary;
+      background-color: var(--primary);
     }
 
     th,
     td {
       padding: 0 5px;
-      border-top: 1px solid $lightGray;
-      border-bottom: 1px solid $lightGray;
+      border-top: 1px solid var(--lightGray);
+      border-bottom: 1px solid var(--lightGray);
     }
   }
 }

@@ -54,7 +54,7 @@ import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs } from '../../../helpers'
 import generateRuntimeData from '../../../helpers/generateRuntimeData'
 
-import '@cdc/core/styles/components/editor.scss'
+import '@cdc/core/components/EditorPanel/editor.scss'
 import './editorPanel.styles.css'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'

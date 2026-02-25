@@ -15,7 +15,7 @@ import { useFilterManagement } from '@cdc/core/hooks/useFilterManagement'
 import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualSection'
 
-import '@cdc/core/styles/components/editor.scss'
+import '@cdc/core/components/EditorPanel/editor.scss'
 import WarningImage from '../images/warning.svg'
 
 import { DATA_OPERATORS, DATA_FUNCTIONS } from '../CdcWaffleChart'

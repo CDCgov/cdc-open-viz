@@ -9,9 +9,9 @@
 }
 
 .cove-data-table__table-wrapper {
-  border-right: 1px solid $lightGray;
-  border-left: 1px solid $lightGray;
-  border-bottom: 1px solid $lightGray;
+  border-right: 1px solid var(--lightGray);
+  border-left: 1px solid var(--lightGray);
+  border-bottom: 1px solid var(--lightGray);
   overflow-x: auto;
 }
 
@@ -22,7 +22,7 @@
   background-size: 15px 15px; // Need to define both for IE11
   background-position: right 0.7em center;
   background-repeat: no-repeat;
-  border: $lightGray 1px solid;
+  border: var(--lightGray) 1px solid;
   border-bottom: 0;
   cursor: pointer;
 
@@ -34,7 +34,7 @@
   &.collapsed {
     //TODO find fix
     //background-image: url(~@cdc/core/core/assets/icon-plus.svg);
-    border-bottom: $lightGray 1px solid;
+    border-bottom: var(--lightGray) 1px solid;
   }
 }
 
@@ -53,7 +53,7 @@
 
   thead {
     color: #fff;
-    background-color: $mediumGray;
+    background-color: var(--mediumGray);
     user-select: none;
 
     tr {
@@ -68,7 +68,7 @@
       position: relative;
       text-align: left;
       cursor: pointer;
-      border-right: 1px solid $lightGray !important;
+      border-right: 1px solid var(--lightGray) !important;
 
       svg {
         margin-left: 1rem;
