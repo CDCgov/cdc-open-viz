@@ -161,7 +161,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                       subsection={null}
                       fieldName='anchorMode'
                       updateField={(section, subsection, fieldName, value) => {
-                        const updatedAnnotations = cloneDeep<any[]>(config?.annotations)
+                        const updatedAnnotations = cloneDeep(config?.annotations)
                         updatedAnnotations[index].anchorMode = value
 
                         // When switching to data mode, ensure seriesKey and dataX are initialized
@@ -191,7 +191,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                       subsection={null}
                       fieldName='seriesKey'
                       updateField={(section, subsection, fieldName, value) => {
-                        const updatedAnnotations = cloneDeep<any[]>(config?.annotations)
+                        const updatedAnnotations = cloneDeep(config?.annotations)
                         updatedAnnotations[index].seriesKey = value || config.series?.[0]?.dataKey
                         updateConfig({
                           ...config,
@@ -207,7 +207,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     <input
                       type='range'
                       onChange={e => {
-                        const updatedAnnotations = cloneDeep<any[]>(config?.annotations)
+                        const updatedAnnotations = cloneDeep(config?.annotations)
                         updatedAnnotations[index].opacity = e.target.value
                         updateConfig({
                           ...config,
@@ -225,7 +225,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     fieldName={`${index}.edit.subject`}
                     label='Edit Subject'
                     updateField={(section, subsection, fieldName, value) => {
-                      const updatedAnnotations = cloneDeep<any[]>(config?.annotations)
+                      const updatedAnnotations = cloneDeep(config?.annotations)
                       updatedAnnotations[index].edit.subject = value
                       updateConfig({
                         ...config,
@@ -240,7 +240,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     fieldName={`${index}.edit.label`}
                     label='Edit Label'
                     updateField={(section, subsection, fieldName, value) => {
-                      const updatedAnnotations = cloneDeep<any[]>(config?.annotations)
+                      const updatedAnnotations = cloneDeep(config?.annotations)
                       updatedAnnotations[index].edit.label = value
                       updateConfig({
                         ...config,
@@ -257,7 +257,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     subsection={null}
                     fieldName='connectionType'
                     updateField={(section, subsection, fieldName, value) => {
-                      const updatedAnnotations = cloneDeep<any[]>(config?.annotations)
+                      const updatedAnnotations = cloneDeep(config?.annotations)
                       updatedAnnotations[index].connectionType = value
                       updateConfig({
                         ...config,
@@ -277,7 +277,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                           max='20'
                           value={config?.annotations[index]?.bezier || 0}
                           onChange={e => {
-                            const updatedAnnotations = cloneDeep<any[]>(config?.annotations)
+                            const updatedAnnotations = cloneDeep(config?.annotations)
                             updatedAnnotations[index].bezier = e.target.value
                             updateConfig({
                               ...config,
@@ -297,7 +297,7 @@ const PanelAnnotate: React.FC<PanelProps> = props => {
                     subsection={null}
                     fieldName='marker'
                     updateField={(section, subsection, fieldName, value) => {
-                      const updatedAnnotations = cloneDeep<any[]>(config?.annotations)
+                      const updatedAnnotations = cloneDeep(config?.annotations)
                       updatedAnnotations[index].marker = value
                       updateConfig({
                         ...config,
