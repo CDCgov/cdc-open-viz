@@ -2487,6 +2487,28 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
                               </>
                             )}
+                            <TextField
+                              value={config.yAxis.minimumAxisRange}
+                              section='yAxis'
+                              fieldName='minimumAxisRange'
+                              type='number'
+                              label='Minimum Axis Range'
+                              placeholder='Auto'
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>
+                                      Sets a floor for the axis max value. Useful when filtered data has small values
+                                      that produce misleading decimal ticks.
+                                    </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                              updateField={updateFieldDeprecated}
+                            />
                           </>
                         )
                       )}
@@ -2905,6 +2927,28 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         updateField={updateFieldDeprecated}
                       />
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
+                      <TextField
+                        value={config.yAxis.rightMinimumAxisRange}
+                        section='yAxis'
+                        fieldName='rightMinimumAxisRange'
+                        type='number'
+                        label='Minimum Axis Range'
+                        placeholder='Auto'
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                Sets a floor for the axis max value. Useful when filtered data has small values that
+                                produce misleading decimal ticks.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        updateField={updateFieldDeprecated}
+                      />
                     </AccordionItemPanel>
                   </AccordionItem>
                 )}

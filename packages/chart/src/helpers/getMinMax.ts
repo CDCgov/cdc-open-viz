@@ -248,6 +248,14 @@ const getMinMax = ({
     min = min / 1.1
   }
 
+  // Enforce minimum axis range so small-data charts don't show misleading decimal ticks
+  if (config.yAxis.minimumAxisRange && max < config.yAxis.minimumAxisRange) {
+    max = config.yAxis.minimumAxisRange
+  }
+  if (config.yAxis.minimumAxisRange && leftMax < config.yAxis.minimumAxisRange) {
+    leftMax = config.yAxis.minimumAxisRange
+  }
+
   return { min, max, leftMax, rightMax }
 }
 export default getMinMax
