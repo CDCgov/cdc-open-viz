@@ -3,7 +3,7 @@
   "version": "4.26.3",
   "visualizationType": "Line",
   "visualizationSubType": "regular",
-  "title": "Minimum Axis Range Demo",
+  "title": "Smallest Maximum Tick Value Demo",
   "titleStyle": "small",
   "showTitle": true,
   "theme": "theme-blue",
@@ -39,7 +39,7 @@
     "label": "",
     "inlineLabel": " cases",
     "type": "linear",
-    "minimumAxisRange": 5
+    "smallestMaxTickValue": 5
   },
   "xAxis": {
     "sortDates": false,

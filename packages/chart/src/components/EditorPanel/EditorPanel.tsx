@@ -2488,11 +2488,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               </>
                             )}
                             <TextField
-                              value={config.yAxis.minimumAxisRange}
+                              value={config.yAxis.smallestMaxTickValue}
                               section='yAxis'
-                              fieldName='minimumAxisRange'
+                              fieldName='smallestMaxTickValue'
                               type='number'
-                              label='Minimum Axis Range'
+                              label='Smallest Maximum Tick Value'
                               placeholder='Auto'
                               tooltip={
                                 <Tooltip style={{ textTransform: 'none' }}>
@@ -2501,8 +2501,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                   </Tooltip.Target>
                                   <Tooltip.Content>
                                     <p>
-                                      Sets a floor for the axis max value. Useful when filtered data has small values
-                                      that produce misleading decimal ticks.
+                                      Example: If your data only goes up to 1, the axis might show 0, 0.2, 0.4, 0.6,
+                                      0.8, 1. Setting this to 5 would make the axis show 0, 1, 2, 3, 4, 5 instead.
                                     </p>
                                   </Tooltip.Content>
                                 </Tooltip>
@@ -2928,11 +2928,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       />
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
                       <TextField
-                        value={config.yAxis.rightMinimumAxisRange}
+                        value={config.yAxis.rightSmallestMaxTickValue}
                         section='yAxis'
-                        fieldName='rightMinimumAxisRange'
+                        fieldName='rightSmallestMaxTickValue'
                         type='number'
-                        label='Minimum Axis Range'
+                        label='Smallest Maximum Tick Value'
                         placeholder='Auto'
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>
@@ -2941,8 +2941,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             </Tooltip.Target>
                             <Tooltip.Content>
                               <p>
-                                Sets a floor for the axis max value. Useful when filtered data has small values that
-                                produce misleading decimal ticks.
+                                Example: If your data only goes up to 1, the axis might show 0, 0.2, 0.4, 0.6, 0.8, 1.
+                                Setting this to 5 would make the axis show 0, 1, 2, 3, 4, 5 instead.
                               </p>
                             </Tooltip.Content>
                           </Tooltip>

@@ -27,9 +27,9 @@ export default function useRightAxis({ config, yMax = 0, data = [] }) {
     minValue = config.yAxis.rightMin
   }
 
-  // Enforce minimum axis range for right axis
-  if (config.yAxis.rightMinimumAxisRange && max < config.yAxis.rightMinimumAxisRange) {
-    max = config.yAxis.rightMinimumAxisRange
+  // Enforce smallest max tick value for right axis
+  if (config.yAxis.rightSmallestMaxTickValue && max < config.yAxis.rightSmallestMaxTickValue) {
+    max = config.yAxis.rightSmallestMaxTickValue
   }
 
   // if there is a bar series & the right axis doesn't include a negative number, default to zero

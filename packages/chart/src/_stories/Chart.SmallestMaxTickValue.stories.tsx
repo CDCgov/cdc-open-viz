@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChartComponent'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
-import minimumAxisRangeConfig from './_mock/minimum_axis_range.json'
+import smallestMaxTickValue from './_mock/smallest_max_tick_value.json'
 import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
-  title: 'Components/Templates/Chart/Minimum Axis Range',
+  title: 'Components/Templates/Chart/Smallest Maximum Tick Value',
   component: Chart
 }
 
@@ -13,12 +13,12 @@ type Story = StoryObj<typeof Chart>
 
 /**
  * Region B is the default filter — data only goes up to 1.
- * Without minimumAxisRange, the Y axis would show decimal ticks (0, 0.2, 0.4…).
- * With minimumAxisRange: 5, the axis extends to at least 5, producing clean integer ticks.
+ * Without smallestMaxTickValue, the Y axis would show decimal ticks (0, 0.2, 0.4…).
+ * With smallestMaxTickValue: 5, the axis extends to at least 5, producing clean integer ticks.
  */
-export const WithMinimumAxisRange: Story = {
+export const WithSmallestMaxTickValue: Story = {
   args: {
-    config: minimumAxisRangeConfig
+    config: smallestMaxTickValue
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
@@ -26,12 +26,12 @@ export const WithMinimumAxisRange: Story = {
 }
 
 /**
- * Same chart without the minimumAxisRange setting.
+ * Same chart without the smallestMaxTickValue setting.
  * Region B data (max 1) causes decimal ticks on the Y axis — the problem this feature solves.
  */
-export const WithoutMinimumAxisRange: Story = {
+export const WithoutSmallestMaxTickValue: Story = {
   args: {
-    config: editConfigKeys(minimumAxisRangeConfig, [{ path: ['yAxis', 'minimumAxisRange'], value: undefined }])
+    config: editConfigKeys(smallestMaxTickValue, [{ path: ['yAxis', 'smallestMaxTickValue'], value: undefined }])
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
@@ -39,12 +39,12 @@ export const WithoutMinimumAxisRange: Story = {
 }
 
 /**
- * Region A has data up to 28, well above the minimumAxisRange of 5.
+ * Region A has data up to 28, well above the smallestMaxTickValue of 5.
  * The axis naturally scales to the data — the minimum range has no effect here.
  */
 export const LargerDataUnaffected: Story = {
   args: {
-    config: editConfigKeys(minimumAxisRangeConfig, [{ path: ['filters', '0', 'active'], value: 'Region A' }])
+    config: editConfigKeys(smallestMaxTickValue, [{ path: ['filters', '0', 'active'], value: 'Region A' }])
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
@@ -52,11 +52,11 @@ export const LargerDataUnaffected: Story = {
 }
 
 /**
- * Editor view so you can see the Minimum Axis Range field in the Left Value Axis section.
+ * Editor view so you can see the Smallest Maximum Tick Value field in the Left Value Axis section.
  */
 export const Editor: Story = {
   args: {
-    config: minimumAxisRangeConfig,
+    config: smallestMaxTickValue,
     isEditor: true
   }
 }
