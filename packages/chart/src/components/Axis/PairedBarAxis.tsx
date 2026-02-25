@@ -63,7 +63,9 @@ export const PairedBarAxis: React.FC<PairedBarAxisProps> = ({
     const numberOfTicks = filteredTicks?.length
     const xMaxHalf = xScale.range()[0] || xMax / 2
 
-    const tickWidthAll = filteredTicks.map(tick => getTextWidth(formatNumber(tick.value, 'left'), tickLabelFont))
+    const tickWidthAll = filteredTicks.map(tick =>
+      getTextWidth(tick.formattedValue ?? formatNumber(tick.value, 'left', true), tickLabelFont)
+    )
     const sumOfTickWidth = tickWidthAll.reduce((a, b) => a + b, BASE_TICK_WIDTH_ACCUMULATOR)
     const spaceBetweenEachTick = (xMaxHalf - sumOfTickWidth) / numberOfTicks
 
@@ -115,7 +117,7 @@ export const PairedBarAxis: React.FC<PairedBarAxisProps> = ({
             textAnchor={textAnchor}
             fontSize={tickLabelFontSize}
           >
-            {formatNumber(tick.value, 'left')}
+            {tick.formattedValue ?? formatNumber(tick.value, 'left', true)}
           </Text>
         )}
       </Group>
@@ -129,7 +131,7 @@ export const PairedBarAxis: React.FC<PairedBarAxisProps> = ({
         top={yMax}
         left={yAxisWidth}
         label={runtime.xAxis.label}
-        tickFormat={isDateScale(runtime.xAxis) ? formatDate : formatNumber}
+        tickFormat={isDateScale(runtime.xAxis) ? formatDate : tick => formatNumber(tick, 'left', true)}
         scale={g1xScale}
         stroke='#333'
         tickStroke='#333'
@@ -150,7 +152,11 @@ export const PairedBarAxis: React.FC<PairedBarAxisProps> = ({
         left={yAxisWidth}
         label={runtime.xAxis.label}
         tickFormat={
-          isDateScale(runtime.xAxis) ? formatDate : runtime.xAxis.dataKey !== 'Year' ? formatNumber : tick => tick
+          isDateScale(runtime.xAxis)
+            ? formatDate
+            : runtime.xAxis.dataKey !== 'Year'
+            ? tick => formatNumber(tick, 'left', true)
+            : tick => tick
         }
         scale={g2xScale}
         stroke='#333'
