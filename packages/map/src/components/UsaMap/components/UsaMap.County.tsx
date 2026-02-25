@@ -767,8 +767,8 @@ const CountyMap = () => {
     })
 
     // State borders
-    context.strokeStyle = 'black'
-    context.lineWidth = lineWidth * 1.5 * strokeScale
+    context.strokeStyle = '#1c1d1f'
+    context.lineWidth = lineWidth * 1.25 * strokeScale
     topoData.states.forEach(state => {
       if (!state.id) return
       const path2d = cache.get('state_border_' + state.id)
