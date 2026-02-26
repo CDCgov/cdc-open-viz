@@ -1459,7 +1459,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     return (
                       <DataTable
                         /* changing the "key" will force the table to re-render
-                              when the default sort changes while editing */
+                            when the default sort changes while editing */
                         key={dataTableDefaultSortBy}
                         config={dataTableConfig}
                         rawData={dataTableRawData}
