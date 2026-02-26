@@ -6,6 +6,7 @@
   &.isEditor {
     overflow: auto;
     display: grid;
+    position: relative;
     transition: grid-template-columns 400ms ease-in-out;
     min-height: 100vh;
 
@@ -15,6 +16,18 @@
 
     .sidebar {
       overflow: hidden;
+    }
+
+    // Override dashboard's .editor-panel absolute positioning that conflicts with the grid layout.
+    // .cdc-open-viz-module.type-dashboard scopes .editor-panel { position: absolute } (specificity 0,3,0),
+    // so we need 4 classes here (specificity 0,4,0) to win.
+    .editor-panel.sidebar {
+      position: static;
+      z-index: auto;
+      overflow: hidden;
+      top: auto;
+      bottom: auto;
+      width: auto;
     }
 
     &.editor-panel--visible {

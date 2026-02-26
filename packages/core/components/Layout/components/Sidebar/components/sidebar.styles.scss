@@ -799,12 +799,6 @@
       font-size: 0.75rem;
     }
 
-    .cove-accordion__button .cove-tooltip {
-      // display: inline-flex;
-      // right: 1.5rem;
-      // line-height: inherit;
-    }
-
     .cove-list-group__item .cove-tooltip {
       width: 100%;
       display: block;
@@ -929,15 +923,10 @@
     }
   }
 
-  &.type-dashboard {
-    .editor-panel__toggle {
-      top: 64px;
-    }
-  }
-
   .editor-panel__toggle-wrapper {
     position: absolute;
     top: 0;
+    left: 0;
   }
 
   .editor-panel__toggle {
