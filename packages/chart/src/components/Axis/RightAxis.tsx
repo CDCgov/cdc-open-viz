@@ -56,7 +56,7 @@ export const RightAxis: React.FC<RightAxisProps> = ({
         return (
           <Group className='right-axis'>
             {props.ticks.map((tick, i) => (
-              <Group key={`vx-tick-${tick.value}-${i}`} className='vx-axis-tick'>
+              <Group key={`vx-tick-${tick.value}`} className='vx-axis-tick'>
                 {!runtime.yAxis.rightHideTicks && (
                   <Line
                     from={tick.from}

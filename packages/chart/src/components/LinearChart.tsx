@@ -579,7 +579,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 const tickPosition = xScale(tickValue)
                 return (
                   <Line
-                    key={`horizontal-gridline-${tickValue}-${i}`}
+                    key={`horizontal-gridline-${tickValue}`}
                     from={{ x: tickPosition, y: 0 }}
                     to={{ x: tickPosition, y: yMax }}
                     stroke='#d6d6d6'
@@ -648,7 +648,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               return (
                 // prettier-ignore
                 <Line
-                  key={`yAxis-${anchor.value}--${index}`}
+                  key={`yAxis-${anchor.value}-${index}`}
                   strokeDasharray={handleLineType(anchor.lineStyle)}
                   stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   className='anchor-y'
@@ -684,7 +684,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               return (
                 // prettier-ignore
                 <Line
-                  key={`xAxis-${anchor.value}--${index}`}
+                  key={`xAxis-${anchor.value}-${index}`}
                   strokeDasharray={handleLineType(anchor.lineStyle)}
                   stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
@@ -841,7 +841,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   {typeof tooltipData === 'object' &&
                     Object.entries(tooltipData.data)
                       .filter(([_, values]) => Array.isArray(values) && !values.includes(undefined))
-                      .map((item, index) => <TooltipListItem item={item} key={index} />)}
+                      .map(item => <TooltipListItem item={item} key={item[0]} />)}
                 </ul>
               </TooltipWithBounds>
             </>

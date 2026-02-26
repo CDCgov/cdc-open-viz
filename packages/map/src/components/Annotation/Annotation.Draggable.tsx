@@ -30,7 +30,7 @@ const Annotations: React.FC<AnnotationsProps> = ({ onDragStateChange }) => {
       return (
         <>
           <Drag
-            key={`annotation--${index}`}
+            key={`annotation-${annotation.x}-${annotation.y}-${index}`}
             width={width}
             height={height}
             x={x}

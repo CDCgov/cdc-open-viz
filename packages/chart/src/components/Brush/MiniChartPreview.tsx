@@ -104,7 +104,7 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
 
             bars.push(
               <rect
-                key={`mini-bar-stacked-${i}-${seriesIndex}`}
+                key={`mini-bar-stacked-${d[dataKey]}-${s.dataKey}`}
                 x={x - barWidth / 2}
                 y={y}
                 width={barWidth}
@@ -119,7 +119,7 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
             if (patternUrl) {
               bars.push(
                 <rect
-                  key={`mini-bar-stacked-pattern-${i}-${seriesIndex}`}
+                  key={`mini-bar-stacked-pattern-${d[dataKey]}-${s.dataKey}`}
                   x={x - barWidth / 2}
                   y={y}
                   width={barWidth}
@@ -154,7 +154,7 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
 
             bars.push(
               <rect
-                key={`mini-bar-grouped-${i}-${seriesIndex}`}
+                key={`mini-bar-grouped-${d[dataKey]}-${s.dataKey}`}
                 x={barX}
                 y={y}
                 width={groupBarWidth}
@@ -169,7 +169,7 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
             if (patternUrl) {
               bars.push(
                 <rect
-                  key={`mini-bar-grouped-pattern-${i}-${seriesIndex}`}
+                  key={`mini-bar-grouped-pattern-${d[dataKey]}-${s.dataKey}`}
                   x={barX}
                   y={y}
                   width={groupBarWidth}
@@ -323,7 +323,7 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
 
           return (
             <AreaClosed
-              key={`mini-area-${seriesKey}-${i}`}
+              key={`mini-area-${seriesKey}`}
               data={validData}
               x={getX}
               y={getY}
@@ -364,7 +364,7 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
 
           return (
             <LinePath
-              key={`mini-line-${seriesKey}-${i}`}
+              key={`mini-line-${seriesKey}`}
               data={validData}
               x={getX}
               y={getY}

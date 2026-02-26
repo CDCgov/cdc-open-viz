@@ -24,8 +24,8 @@ const Accordion = ({ children }) => {
   return (
     <AccordionComponent allowZeroExpanded={true}>
       {accordionSections &&
-        accordionSections.map((section, index) => (
-          <AccordionItem className='cove-accordion__item' key={index}>
+        accordionSections.map(section => (
+          <AccordionItem className='cove-accordion__item' key={section.props.title}>
             <AccordionItemHeading className='cove-accordion__heading'>
               <AccordionItemButton className='cove-accordion__button'>
                 {section.props.icon}

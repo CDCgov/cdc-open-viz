@@ -25,17 +25,15 @@ const StateOutput: React.FC<StateOutputProps> = ({ topoData, path, scale, runtim
 
   const geoStrokeColor = getGeoStrokeColor(config)
 
-  const stateLines = statesPicked.map(s => path(s.geometry))
-
-  return stateLines.map((line, index) => (
+  return statesPicked.map(s => (
     <g
-      key={`single-state-${index}`}
+      key={s.properties.name}
       className='single-state'
       style={{ fill: 'transparent', pointerEvents: 'none' }}
       stroke={geoStrokeColor}
       strokeWidth={2 / scale}
     >
-      <path tabIndex={-1} className='state-path' d={line} />
+      <path tabIndex={-1} className='state-path' d={path(s.geometry)} />
     </g>
   ))
 }

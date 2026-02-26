@@ -184,7 +184,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
             i
           ) => {
             return (
-              <div key={`preliminaryData-${i}`} className='edit-block'>
+              <div key={`preliminaryData-${type}-${value || i}`} className='edit-block'>
                 <p> {type === 'suppression' ? 'Suppressed' : 'Effect'} Data</p>
                 <button
                   type='button'
@@ -547,7 +547,7 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
       {config.yAxis.type === 'categorical' &&
         config.yAxis.categories?.map(({ label, color, height }, i) => {
           return (
-            <div key={`preliminaryData-${i}`} className='edit-block'>
+            <div key={`yAxis-category-${label || i}`} className='edit-block'>
               <p>Axis Category {i + 1}</p>
               <button
                 type='button'
@@ -2504,7 +2504,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             {config.yAxis?.anchors?.map((anchor, index) => (
                               <AccordionItem
                                 className='series-item series-item--chart'
-                                key={`yaxis-anchors-2-${index}`}
+                                key={`yaxis-anchor-${anchor.value}-${index}`}
                               >
                                 <AccordionItemHeading className='series-item__title'>
                                   <>
@@ -2627,7 +2627,10 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           <span className='edit-label column-heading'>Anchors</span>
                           <Accordion allowZeroExpanded>
                             {config.xAxis?.anchors?.map((anchor, index) => (
-                              <AccordionItem className='series-item series-item--chart' key={`xaxis-anchors-${index}`}>
+                              <AccordionItem
+                                className='series-item series-item--chart'
+                                key={`xaxis-anchor-${anchor.value}-${index}`}
+                              >
                                 <AccordionItemHeading className='series-item__title'>
                                   <>
                                     <AccordionItemButton className={'accordion__button accordion__button'}>
@@ -3730,7 +3733,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               <label htmlFor='barHighlight'>Bar Highlighting</label>
                               {config.series.length === 1 &&
                                 highlightedBarValues.map((highlightedBarValue, i) => (
-                                  <fieldset key={`highlighted-bar-${i}`}>
+                                  <fieldset key={`highlighted-bar-${highlightedBarValue.value ?? i}`}>
                                     <div className='edit-block'>
                                       <button
                                         className='btn btn-danger'
@@ -3889,7 +3892,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             {config.xAxis?.anchors?.map((anchor, index) => (
                               <AccordionItem
                                 className='series-item series-item--chart'
-                                key={`xaxis-anchors-2-${index}`}
+                                key={`xaxis-anchor-${anchor.value}-${index}`}
                               >
                                 <AccordionItemHeading className='series-item__title'>
                                   <>
@@ -4015,7 +4018,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             {config.yAxis?.anchors?.map((anchor, index) => (
                               <AccordionItem
                                 className='series-item series-item--chart'
-                                key={`accordion-yaxis-anchors-${index}`}
+                                key={`yaxis-anchor-${anchor.value}-${index}`}
                               >
                                 <AccordionItemHeading className='series-item__title'>
                                   <>
@@ -4372,7 +4375,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           </label>
                           {config.legend.seriesHighlight &&
                             config.legend.seriesHighlight.map((val, i) => (
-                              <fieldset className='edit-block' key={`${val}-${i}`}>
+                              <fieldset className='edit-block' key={val}>
                                 <button
                                   className='btn btn-danger'
                                   onClick={event => {

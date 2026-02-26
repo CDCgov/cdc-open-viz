@@ -233,7 +233,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
             {config.filters && (
               <ul className='filters-list'>
                 {config.filters.map((filter: any, index: number) => (
-                  <fieldset className='edit-block' key={index}>
+                  <fieldset className='edit-block' key={`filter-${filter.columnName || index}`}>
                     <button
                       type='button'
                       className='btn btn-danger'
@@ -392,7 +392,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                     <>
                       <ul>
                         {images.items.map((option: any, index: number) => (
-                          <fieldset className='edit-block' key={index}>
+                          <fieldset className='edit-block' key={`image-item-${option.source || index}`}>
                             <button
                               type='button'
                               className='remove-column'

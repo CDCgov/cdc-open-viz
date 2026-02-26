@@ -135,8 +135,8 @@ const DataDesigner = (props: DataDesignerProps) => {
                 defaultValue={configureData.dataDescription.seriesKey}
               >
                 <option value=''>Choose an option</option>
-                {Object.keys(firstDataRow).map((value, index) => (
-                  <option value={value} key={index}>
+                {Object.keys(firstDataRow).map(value => (
+                  <option value={value} key={value}>
                     {value}
                   </option>
                 ))}
@@ -201,8 +201,8 @@ const DataDesigner = (props: DataDesignerProps) => {
                         defaultValue={configureData.dataDescription.seriesKey}
                       >
                         <option value=''>Choose an option</option>
-                        {Object.keys(firstDataRow).map((value, index) => (
-                          <option value={value} key={index}>
+                        {Object.keys(firstDataRow).map(value => (
+                          <option value={value} key={value}>
                             {value}
                           </option>
                         ))}
@@ -219,8 +219,8 @@ const DataDesigner = (props: DataDesignerProps) => {
                         defaultValue={configureData.dataDescription.xKey}
                       >
                         <option value=''>Choose an option</option>
-                        {Object.keys(firstDataRow).map((value, index) => (
-                          <option value={value} key={index}>
+                        {Object.keys(firstDataRow).map(value => (
+                          <option value={value} key={value}>
                             {value}
                           </option>
                         ))}
@@ -235,7 +235,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                         configureData.dataDescription.valueKeysTallSupport.length > 0 && (
                           <ul className='value-list'>
                             {configureData.dataDescription.valueKeysTallSupport.map((valueKey, index) => (
-                              <li key={`value-keys-list-${index}`}>
+                              <li key={`value-key-${valueKey}`}>
                                 {valueKey}
                                 <button
                                   onClick={() => {
@@ -271,8 +271,8 @@ const DataDesigner = (props: DataDesignerProps) => {
                               !configureData.dataDescription.valueKeysTallSupport ||
                               configureData.dataDescription.valueKeysTallSupport.indexOf(value) === -1
                           )
-                          .map((value, index) => (
-                            <option value={value} key={`value-keys-option-${index}`}>
+                          .map(value => (
+                            <option value={value} key={value}>
                               {value}
                             </option>
                           ))}
@@ -287,7 +287,7 @@ const DataDesigner = (props: DataDesignerProps) => {
                         configureData.dataDescription.ignoredKeys.length > 0 && (
                           <ul className='value-list'>
                             {configureData.dataDescription.ignoredKeys.map((ignoredKey, index) => (
-                              <li key={`value-keys-list-${index}`}>
+                              <li key={`ignored-key-${ignoredKey}`}>
                                 {ignoredKey}
                                 <button
                                   onClick={() => {
@@ -320,8 +320,8 @@ const DataDesigner = (props: DataDesignerProps) => {
                               !configureData.dataDescription.ignoredKeys ||
                               configureData.dataDescription.ignoredKeys.indexOf(value) === -1
                           )
-                          .map((value, index) => (
-                            <option value={value} key={`ignored-keys-option-${index}`}>
+                          .map(value => (
+                            <option value={value} key={value}>
                               {value}
                             </option>
                           ))}
@@ -349,8 +349,8 @@ const DataDesigner = (props: DataDesignerProps) => {
                   defaultValue={'Select'}
                 >
                   <option value=''>Choose an option</option>
-                  {Object.keys(firstDataRow).map((value, index) => (
-                    <option value={value} key={index}>
+                  {Object.keys(firstDataRow).map(value => (
+                    <option value={value} key={value}>
                       {value}
                     </option>
                   ))}
@@ -372,8 +372,8 @@ const DataDesigner = (props: DataDesignerProps) => {
                   defaultValue={'Select'}
                 >
                   <option value=''>Choose an option</option>
-                  {Object.keys(firstDataRow).map((value, index) => (
-                    <option value={value} key={index}>
+                  {Object.keys(firstDataRow).map(value => (
+                    <option value={value} key={value}>
                       {value}
                     </option>
                   ))}
@@ -395,8 +395,8 @@ const DataDesigner = (props: DataDesignerProps) => {
                   defaultValue={'Select'}
                 >
                   <option value=''>Choose an option</option>
-                  {Object.keys(firstDataRow).map((value, index) => (
-                    <option value={value} key={index}>
+                  {Object.keys(firstDataRow).map(value => (
+                    <option value={value} key={value}>
                       {value}
                     </option>
                   ))}
@@ -418,8 +418,8 @@ const DataDesigner = (props: DataDesignerProps) => {
                   defaultValue={'Select'}
                 >
                   <option value=''>Choose an option</option>
-                  {Object.keys(firstDataRow).map((value, index) => (
-                    <option value={value} key={index}>
+                  {Object.keys(firstDataRow).map(value => (
+                    <option value={value} key={value}>
                       {value}
                     </option>
                   ))}

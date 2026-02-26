@@ -100,10 +100,10 @@ export const PairedBarAxis: React.FC<PairedBarAxisProps> = ({
     const textAnchor = angle && tick.index !== 0 ? 'end' : 'middle'
 
     // Skip first tick on right section to avoid overlapping 0's
-    if (isRightSection && !index) return <React.Fragment key={`vx-tick-empty-${index}`} />
+    if (isRightSection && !index) return <React.Fragment key='vx-tick-empty' />
 
     return (
-      <Group key={`vx-tick-${tick.value}-${index}`} className='vx-axis-tick'>
+      <Group key={`vx-tick-${tick.value}`} className='vx-axis-tick'>
         {!runtime.yAxis.hideTicks && <Line from={tick.from} to={tick.to} stroke='#333' />}
         {!runtime.yAxis.hideLabel && (
           <Text

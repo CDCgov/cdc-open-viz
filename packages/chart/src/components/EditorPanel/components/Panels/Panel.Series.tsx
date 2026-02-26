@@ -432,7 +432,7 @@ const SeriesInputWeight = props => {
       <label htmlFor='series-weight'>Line Weight</label>
       <input
         type='number'
-        key={`series-weight-${i}`}
+        key={`series-weight-${series.dataKey}`}
         value={series.weight ? series.weight : ''}
         min='1'
         max='9'
@@ -488,7 +488,7 @@ const SeriesInputName = props => {
       <label htmlFor='series-name'>Series Name</label>
       <input
         type='text'
-        key={`series-name-${i}`}
+        key={`series-name-${series.dataKey}`}
         value={value}
         onChange={event => {
           changeSeriesName(i, event.target.value)
@@ -612,7 +612,7 @@ const SeriesItem = props => {
     <Draggable key={series.dataKey} draggableId={`draggableFilter-${series.dataKey}`} index={i}>
       {(provided, snapshot) => (
         <div
-          key={i}
+          key={series.dataKey}
           className={snapshot.isDragging ? 'currently-dragging' : ''}
           style={getItemStyle(snapshot.isDragging, provided.draggableProps.style, sortableItemStyles)}
           ref={provided.innerRef}
@@ -703,7 +703,7 @@ const SeriesList = props => {
         chartsWithOptions={chartsWithOptions}
         series={series}
         index={i}
-        key={`series-list-${i}`}
+        key={series.dataKey}
       />
     )
   })

@@ -294,10 +294,10 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
               if (!lookup) return null
               const orderedSubGroupValues = lookup.orderedValues || lookup.values
               return (
-                <div key={`group-subgroup-values-${groupName}-${i}`}>
+                <div key={`group-subgroup-values-${groupName || i}`}>
                   <span className='font-weight-bold fw-bold'>{groupName}</span>
                   <FilterOrder
-                    key={`subgroup-values-${groupName}-${i}`}
+                    key={`subgroup-values-${groupName || i}`}
                     orderedValues={orderedSubGroupValues}
                     handleFilterOrder={(sourceIndex, destinationIndex) => {
                       handleSubGroupingCustomOrder(sourceIndex, destinationIndex, orderedSubGroupValues, groupName)

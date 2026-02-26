@@ -125,7 +125,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
       }
 
       return (
-        <li className={handleListItemClass()} key={idx}>
+        <li className={handleListItemClass()} key={`legend-item-${item.label}-${idx}`}>
           <button
             type='button'
             className='legend-container__li-btn'
@@ -373,7 +373,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                   {config.visual.additionalCityStyles.map(
                     ({ shape, label }, index) =>
                       label && (
-                        <div key={`additional-city-style-${index}-${shape}`}>
+                        <div key={`additional-city-style-${shape}-${label}-${index}`}>
                           <svg>
                             <Group top={shape === 'Pin' ? 19 : shape === 'Triangle' ? 13 : 11} left={10}>
                               {cityStyleShapes[shape.toLowerCase()]}

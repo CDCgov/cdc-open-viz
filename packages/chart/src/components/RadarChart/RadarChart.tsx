@@ -282,7 +282,7 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
             <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>{tooltipData.entityName}</div>
             <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
               {tooltipData.values.map((item, index) => (
-                <li key={index} style={{ padding: '2px 0' }}>
+                <li key={item.label ?? index} style={{ padding: '2px 0' }}>
                   <span style={{ fontWeight: 500 }}>{item.label}:</span>{' '}
                   {formatNumber ? formatNumber(item.value, 'left') : item.value}
                 </li>

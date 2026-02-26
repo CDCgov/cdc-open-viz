@@ -427,7 +427,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
               >
                 <ul>
                   {typeof tooltipData === 'object' &&
-                    Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}
+                    Object.entries(tooltipData.data).map(item => <TooltipListItem item={item} key={item[0]} />)}
                 </ul>
               </TooltipWithBounds>
             </>

@@ -138,7 +138,7 @@ const LeftAxis: React.FC<LeftAxisProps> = ({
                   : tick?.formattedValue
 
                 return (
-                  <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
+                  <Group key={`vx-tick-${tick.value}`} className={'vx-axis-tick'}>
                     {!runtime.yAxis.hideTicks && !labelsAboveGridlines && !hideTopTick && (
                       <Line
                         key={`${tick.value}--hide-hideTicks`}

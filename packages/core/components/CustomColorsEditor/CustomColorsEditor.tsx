@@ -96,7 +96,7 @@ const CustomColorsEditor: React.FC<CustomColorsEditorProps> = ({
       <div className="custom-colors-preview">
         {colors.map((color, index) => (
           <div
-            key={index}
+            key={`color-swatch-${color}-${index}`}
             className="preview-swatch"
             style={{ backgroundColor: color }}
             title={`Color ${index + 1}: ${color}`}
@@ -107,7 +107,7 @@ const CustomColorsEditor: React.FC<CustomColorsEditorProps> = ({
       <div className="custom-colors-list">
         {colors.map((color, index) => (
           <div
-            key={index}
+            key={`color-item-${color}-${index}`}
             className={`custom-color-item ${draggedIndex === index ? 'dragging' : ''}`}
             draggable
             onDragStart={() => handleDragStart(index)}

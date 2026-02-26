@@ -239,7 +239,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
       {row.columns.map((col, colIndex) => {
         if (col.width) {
           if (!col.widget)
-            return <div key={`row__${index}__col__${colIndex}`} className={`col-12 col-md-${col.width}`}></div>
+            return <div key={`col-${col.widget ?? colIndex}`} className={`col-12 col-md-${col.width}`}></div>
 
           const visualizationConfig = getVizConfig(
             col.widget,
@@ -306,7 +306,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               : undefined
           return hideVisualization ? null : (
             <VisualizationWrapper
-              key={`vis__${index}__${colIndex}`}
+              key={`vis-${col.widget}`}
               className={vizWrapperClass}
               allExpanded={allExpanded}
               currentViewport={currentViewport}

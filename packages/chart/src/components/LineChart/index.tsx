@@ -97,7 +97,7 @@ const LineChart = (props: LineChartProps) => {
 
           return (
             <Group
-              key={`series-${seriesKey}-${index}`}
+              key={`series-${seriesKey}`}
               opacity={
                 legend.behavior === 'highlight' &&
                 seriesHighlight.length > 0 &&
@@ -279,10 +279,10 @@ const LineChart = (props: LineChartProps) => {
                   />
 
                   {suppressedSegments.map((segment, index) => {
-                    return Object.entries(segment.data).map(([key, value], entryIndex) => {
+                    return Object.entries(segment.data).map(([key, value]) => {
                       return (
                         <LinePath
-                          key={`${index}-${key}-${entryIndex}`}
+                          key={`${index}-${key}`}
                           data={value}
                           x={d => xPos(d)}
                           y={d =>
@@ -404,7 +404,7 @@ const LineChart = (props: LineChartProps) => {
               {circleData.map((item, i) => {
                 return (
                   <circle
-                    key={i}
+                    key={`circle-${item.data?.[dataKey] ?? i}`}
                     cx={xPos(item.data)}
                     cy={
                       seriesAxis === 'Right'

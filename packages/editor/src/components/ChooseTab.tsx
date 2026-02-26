@@ -214,9 +214,9 @@ const ChooseTab: React.FC = (): JSX.Element => {
         </div>
       </a>
 
-      {rowLabels.map((label, index) => {
+      {rowLabels.map(label => {
         return (
-          <React.Fragment key={`row-label-${index}-${label}`}>
+          <React.Fragment key={`row-label-${label}`}>
             <div className='heading-2'>{label}</div>
             <ul className={`visualization-grid category_${label.toLowerCase()}`}>
               {buttons

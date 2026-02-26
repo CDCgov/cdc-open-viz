@@ -136,7 +136,7 @@ const PanelAnnotate: React.FC = props => {
 
         {config?.annotations &&
           config?.annotations.map((annotation, index) => (
-            <Accordion key={index}>
+            <Accordion key={`annotation-${annotation.x}-${annotation.y}-${index}`}>
               <Accordion.Section
                 title={annotation.text ? annotation.text.substring(0, 15) + '...' : `Annotation ${index + 1}`}
               >

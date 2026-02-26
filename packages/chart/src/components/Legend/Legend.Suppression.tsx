@@ -28,7 +28,7 @@ const LegendSuppression: React.FC<LegendProps> = ({ config, isLegendBottom }) =>
         pd.label &&
         pd.type === 'effect' &&
         pd.style && (
-          <div key={index} className='legend-preliminary'>
+          <div key={`preliminary-${pd.label}-${pd.type}`} className='legend-preliminary'>
             <span className={pd.symbol}>{pd.lineCode}</span>
             <p>{pd.label}</p>
           </div>

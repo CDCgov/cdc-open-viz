@@ -512,7 +512,7 @@ export default function CdcDashboard({
             {/* Visualizations */}
             {filteredRows?.map((row, index) => (
               <VisualizationRow
-                key={`row__${index}`}
+                key={`row-${row.uuid ?? index}`}
                 allExpanded={allExpanded}
                 groupName={''}
                 row={row}

@@ -299,7 +299,7 @@ const EditorPanel = memo(props => {
         {config.filters && (
           <ul className='filters-list' style={{ paddingLeft: 0, marginBottom: '1rem' }}>
             {config.filters.map((filter, index) => (
-              <fieldset className='edit-block' key={index}>
+              <fieldset className='edit-block' key={`filter-${filter.columnName || index}`}>
                 <button
                   type='button'
                   className='remove-column'

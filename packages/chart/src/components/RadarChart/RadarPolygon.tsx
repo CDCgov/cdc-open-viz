@@ -71,7 +71,7 @@ const RadarPolygon: React.FC<RadarPolygonProps> = ({
       {showPoints &&
         points.map((point, i) => (
           <circle
-            key={`point-${i}`}
+            key={`point-${point.x.toFixed(2)}-${point.y.toFixed(2)}`}
             cx={point.x}
             cy={point.y}
             r={isHovered ? pointRadius + 1 : pointRadius}

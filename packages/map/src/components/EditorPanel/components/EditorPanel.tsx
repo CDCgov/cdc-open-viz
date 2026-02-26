@@ -242,9 +242,9 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
             <option value='' key={'Select Option'}>
               - Select Option -
             </option>
-            {filteredValues.map((val, i) => {
+            {filteredValues.map(val => {
               return (
-                <option key={i} value={val}>
+                <option key={val} value={val}>
                   {val}
                 </option>
               )
@@ -1900,7 +1900,10 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           />
                         )}
                         {specialClasses.map((specialClass, i) => (
-                          <div className='edit-block' key={`special-class-${i}`}>
+                          <div
+                            className='edit-block'
+                            key={`special-class-${specialClass.key || specialClass.value || i}`}
+                          >
                             <button
                               className='remove-column'
                               onClick={e => {
@@ -3358,7 +3361,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       {config.visual.additionalCityStyles.length > 0 &&
                         config.visual.additionalCityStyles.map(({ label, column, value, shape }, i) => {
                           return (
-                            <div className='edit-block' key={`additional-city-style-${i}`}>
+                            <div className='edit-block' key={`additional-city-style-${shape || i}`}>
                               <button
                                 className='remove-column'
                                 onClick={e => {
@@ -3403,7 +3406,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                               <label>
                                 <span className='edit-label column-heading'>Label</span>
                                 <input
-                                  key={i}
+                                  key={`city-style-label-${shape || i}`}
                                   type='text'
                                   value={label}
                                   onChange={e => {
@@ -3458,7 +3461,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
                     {config.map.layers.map((layer, index) => {
                       return (
-                        <React.Fragment key={index}>
+                        <React.Fragment key={`map-layer-${layer.name || index}`}>
                           <Accordion allowZeroExpanded>
                             <AccordionItem className='series-item map-layers-list'>
                               <AccordionItemHeading className='series-item__title map-layers-list--title'>

@@ -42,7 +42,7 @@ const RadarAxis: React.FC<RadarAxisProps> = ({
       {/* Axis lines from center to edge */}
       {axisPoints.map((point, i) => (
         <Line
-          key={`axis-line-${i}`}
+          key={`axis-line-${labels[i]}`}
           from={{ x: 0, y: 0 }}
           to={point}
           stroke={strokeColor}
@@ -58,7 +58,7 @@ const RadarAxis: React.FC<RadarAxisProps> = ({
 
         return (
           <Text
-            key={`axis-label-${i}`}
+            key={`axis-label-${labels[i]}`}
             x={point.x}
             y={point.y}
             textAnchor={textAnchor}

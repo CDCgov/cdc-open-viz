@@ -213,7 +213,7 @@ const BottomAxis: React.FC<BottomAxisProps> = ({
                   : -Number(config.runtime.xAxis.tickRotation)
 
               return (
-                <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
+                <Group key={`vx-tick-${tick.value}`} className={'vx-axis-tick'}>
                   {!config.xAxis.hideTicks && (
                     <Line
                       from={tick.from}

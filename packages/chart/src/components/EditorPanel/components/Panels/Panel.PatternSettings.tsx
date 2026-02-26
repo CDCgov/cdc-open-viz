@@ -335,7 +335,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
           const dataValueOptions = p.dataKey ? getDataValueOptions(p.dataKey) : []
 
           return (
-            <Accordion allowZeroExpanded key={`pattern-accordion-${index}`}>
+            <Accordion allowZeroExpanded key={`pattern-accordion-${patternKey}`}>
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>

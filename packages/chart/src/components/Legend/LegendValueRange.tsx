@@ -48,7 +48,7 @@ const LegendValueRange: React.FC<LegendValueRangeProps> = ({
           <LegendItem
             className={className.join(' ')}
             tabIndex={isClickable ? 0 : -1}
-            key={`legend-range-${i}`}
+            key={`legend-range-${range.label}`}
             onKeyDown={e => {
               if (isClickable && e.key === 'Enter') {
                 e.preventDefault()

@@ -41,7 +41,7 @@ const LeftAxisGridlines: React.FC<LeftAxisGridlinesProps> = ({
               const hideFirstGridLine = tick.index === 0 && tick.value === 0 && config.xAxis.hideAxis
 
               return (
-                <Group key={`vx-tick-${tick.value}-${i}`} className={'vx-axis-tick'}>
+                <Group key={`vx-tick-${tick.value}`} className={'vx-axis-tick'}>
                   {runtime.yAxis.gridLines && !hideFirstGridLine ? (
                     <Line
                       key={`${tick.value}--hide-hideGridLines`}

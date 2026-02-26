@@ -79,7 +79,9 @@ const Legend: React.FC<LegendProps> = forwardRef(
     }
 
     const { HighLightedBarUtils } = useHighlightedBars(config)
-    let highLightedLegendItems = HighLightedBarUtils.findDuplicates(config.highlightedBarValues)
+    let highLightedLegendItems: typeof config.highlightedBarValues = HighLightedBarUtils.findDuplicates(
+      config.highlightedBarValues
+    )
 
     const horizonLegendData = useMemo(() => {
       if (config.visualizationType !== 'Horizon Chart') {
@@ -186,7 +188,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                         <LegendItem
                           className={className.join(' ')}
                           tabIndex={0}
-                          key={`legend-quantile-${i}`}
+                          key={`legend-quantile-${label.text || i}`}
                           onKeyDown={e => {
                             if (e.key === 'Enter') {
                               e.preventDefault()
@@ -263,7 +265,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                       <LegendItem
                         className={className}
                         tabIndex={0}
-                        key={`legend-quantile-${i}`}
+                        key={`legend-quantile-${bar.legendLabel || i}`}
                         onKeyDown={e => {
                           if (e.key === 'Enter') {
                             e.preventDefault()

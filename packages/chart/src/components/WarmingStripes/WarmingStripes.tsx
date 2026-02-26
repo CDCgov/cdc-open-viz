@@ -168,7 +168,7 @@ const WarmingStripes = ({
 
         return (
           <rect
-            key={`stripe-${index}`}
+            key={`stripe-${item[xAxisDataKey] ?? index}`}
             x={xPosition}
             y={0}
             width={stripeWidth}
