@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react'
+import DOMPurify from 'dompurify'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 
 // visx
@@ -97,7 +98,7 @@ const Annotations: React.FC<AnnotationsProps> = ({ onDragStateChange }) => {
                         // - TabIndex is only supposed to be used on interactive elements. This is a workaround.
                         tabIndex={0}
                         aria-label={`Annotation text that reads: ${annotation.text}`}
-                        dangerouslySetInnerHTML={{ __html: annotation.text }}
+                        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(annotation.text) }}
                       />
                     </HtmlLabel>
 
