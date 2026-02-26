@@ -1,5 +1,4 @@
 import { useContext, FC, useMemo } from 'react'
-import _ from 'lodash'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
 
 // external libraries

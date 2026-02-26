@@ -45,7 +45,10 @@ import '@cdc/core/components/EditorPanel/EditorPanel.styles.css'
 import './editor-panel.scss'
 import { Anchor } from '@cdc/core/types/Axis'
 import EditorPanelContext from './EditorPanelContext'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import flatMap from 'lodash/flatMap'
+import keys from 'lodash/keys'
+import uniq from 'lodash/uniq'
 import { adjustedSymbols as symbolCodes } from '@cdc/core/helpers/footnoteSymbols'
 import { updateFieldRankByValue } from './helpers/updateFieldRankByValue'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
@@ -70,7 +73,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   const hasComboBarSeries = isCombo && barSeriesExists
 
   const getColumnOptions = () => {
-    return _.uniq(_.flatMap(data, _.keys))
+    return uniq(flatMap(data, keys))
   }
 
   const getTypeOptions = () => {
@@ -1558,7 +1561,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   }
 
   const removeAdditionalColumn = columnName => {
-    const newColumns = _.cloneDeep(config.columns)
+    const newColumns = cloneDeep(config.columns)
 
     delete newColumns[columnName]
 
