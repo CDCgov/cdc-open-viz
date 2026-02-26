@@ -111,7 +111,10 @@ const Responsive = ({ children, isEditor }) => {
 
   const onBackClick = () => setDisplayPanel(!displayPanel)
 
-  if (!isEditor || !displayPanel) return children
+  if (!isEditor) {
+    return <div className='cdc-open-viz-module__content'>{children}</div>
+  }
+  if (!displayPanel) return children
 
   return (
     <div className='cove-editor__content' data-grid={displayGrid || null}>

@@ -11,14 +11,15 @@ import { MapConfig } from '@cdc/map/src/types/MapConfig'
 
 type VisualizationWrapper = {
   children: React.ReactNode
+  className?: string
   config:
-    | ChartConfig
-    | DataBiteConfig
-    | WaffleChartConfig
-    | MarkupIncludeConfig
-    | DashboardFilters
-    | MapConfig
-    | DataTableConfig
+  | ChartConfig
+  | DataBiteConfig
+  | WaffleChartConfig
+  | MarkupIncludeConfig
+  | DashboardFilters
+  | MapConfig
+  | DataTableConfig
   currentViewport?: string
   imageId?: string
   isEditor: boolean
@@ -66,41 +67,38 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
       config?.visualizationType === 'Spark Line' && classes.push(`type-sparkline`)
       return classes
     }
+
     if (config.type === 'map') {
       classes.push(`type-map`)
       if (config?.runtime?.editorErrorMessage.length !== 0) classes.push('type-map--has-error')
+      return classes
     }
 
     if (config.type === 'table') {
       classes.push('type-data-table')
+      return classes
     }
 
     if (config.type === 'data-bite') {
-      classes.push('cdc-open-viz-module', 'type-data-bite', currentViewport, config.theme, `font-${config.fontSize}`)
+      classes.push('type-data-bite', `font-${config.fontSize}`)
       if (isEditor) {
         classes.push('is-editor')
       }
+      return classes
     }
 
     if (config.type === 'markup-include') {
-      classes.push('markup-include', 'cdc-open-viz-module')
+      classes.push('type-markup-include')
+      return classes
     }
 
     if (config.type === 'waffle-chart') {
-      classes.push(
-        'cove',
-        'cdc-open-viz-module',
-        'type-waffle-chart',
-        currentViewport,
-        config.theme,
-        'font-' + config.overallFontSize
-      )
+      classes.push('type-waffle-chart', 'font-' + config.overallFontSize)
 
       if (isEditor) {
         classes.push('is-editor')
       }
 
-      // Add TP5 style classes
       if (config.visualizationType === 'TP5 Waffle') {
         classes.push('waffle__style--tp5')
         if (config.visual?.whiteBackground) {
@@ -115,8 +113,9 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
         }
       }
 
-      classes.push('cove-component', 'waffle-chart')
+      return classes
     }
+
     return classes
   }
 

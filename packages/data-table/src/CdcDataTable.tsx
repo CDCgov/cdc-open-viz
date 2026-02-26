@@ -147,33 +147,35 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
       {/* EDITOR */}
       {isEditor && <EditorPanel dispatch={dispatch} state={state} />}
 
-      {/* FILTERS */}
-      <div className='bg-white z-1'>
-        {filters && (
-          <Filters
-            config={config as unknown as Visualization}
-            setConfig={updateFilters}
-            setFilters={newFilters => dispatch({ type: 'SET_FILTERS', payload: newFilters })}
-            filteredData={filteredData}
-            excludedData={data}
-          />
-        )}
+      {/* FILTERS + DATA TABLE */}
+      <Layout.Responsive isEditor={isEditor}>
+        <div className='bg-white z-1'>
+          {filters && (
+            <Filters
+              config={config as unknown as Visualization}
+              setConfig={updateFilters}
+              setFilters={newFilters => dispatch({ type: 'SET_FILTERS', payload: newFilters })}
+              filteredData={filteredData}
+              excludedData={data}
+            />
+          )}
 
-        {/* DATA TABLE */}
-        <DataTable
-          config={config as unknown as TableConfig}
-          tableTitle={label}
-          indexTitle={indexLabel}
-          isEditor={isEditor}
-          rawData={filteredData}
-          runtimeData={filteredData}
-          columns={columns}
-          viewport={currentViewport}
-          tabbingId={'dataTableSection'}
-          expandDataTable={expanded}
-          configUrl={configUrl}
-        />
-      </div>
+          {/* DATA TABLE */}
+          <DataTable
+            config={config as unknown as TableConfig}
+            tableTitle={label}
+            indexTitle={indexLabel}
+            isEditor={isEditor}
+            rawData={filteredData}
+            runtimeData={filteredData}
+            columns={columns}
+            viewport={currentViewport}
+            tabbingId={'dataTableSection'}
+            expandDataTable={expanded}
+            configUrl={configUrl}
+          />
+        </div>
+      </Layout.Responsive>
     </Layout.VisualizationWrapper>
   )
 }

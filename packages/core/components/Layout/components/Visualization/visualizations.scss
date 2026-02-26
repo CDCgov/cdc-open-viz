@@ -2,6 +2,7 @@
   .cdc-chart-inner-container .cove-component__content {
     padding: 0 0 27px 0 !important;
   }
+
   &.isEditor {
     overflow: auto;
     display: grid;
@@ -28,7 +29,8 @@
     }
 
     .cove-editor__content,
-    .cove-component__content {
+    .cove-component__content,
+    .cdc-open-viz-module__content {
       grid-area: content;
       position: relative;
       left: 0;
