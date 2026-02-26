@@ -19,7 +19,6 @@ import { legacyConfigSupport } from './helpers/legacyConfigSupport'
 
 import './scss/main.scss'
 import editorReducer, { EditorState } from '@cdc/core/contexts/editor.reducer'
-import _ from 'lodash'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { WCMSProps } from '@cdc/core/types/WCMSProps'
 import { devToolsStore } from '@cdc/core/helpers/withDevTools'

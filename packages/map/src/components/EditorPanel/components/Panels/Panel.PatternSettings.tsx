@@ -15,7 +15,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 import './Panel.PatternSettings-style.css'
 import Alert from '@cdc/core/components/Alert'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 
 // topojson helpers for checking color contrasts
@@ -65,7 +65,7 @@ const PatternSettings = ({ name }: PanelProps) => {
 
   /** Updates the map config with a new pattern item */
   const handleAddGeoPattern = () => {
-    const patterns = _.cloneDeep(config.map.patterns)
+    const patterns = cloneDeep(config.map.patterns)
     patterns.push({ dataKey: '', pattern: defaultPattern, contrastCheck: true })
     setConfig({
       ...config,

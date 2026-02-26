@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { getVizRowColumnLocator } from '../../../../helpers/getVizRowColumnLocator'
 import { Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import DataTransform from '@cdc/core/helpers/DataTransform'
