@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import ErrorBoundary from '../ErrorBoundary'
-import Layout from '../Layout'
+import { Sidebar } from '../Layout'
 
 export interface EditorPanelDispatchProps<TState = any, TAction = any> {
   state: TState
@@ -62,14 +62,14 @@ export function EditorPanelDispatch<TState = any, TAction = any>({
 
   return (
     <ErrorBoundary component='EditorPanel'>
-      <Layout.Sidebar
+      <Sidebar
         title={title}
         onBackClick={onBackClick}
         displayPanel={showEditorPanel}
         isDashboard={isDashboard}
       >
         {children({ state, dispatch })}
-      </Layout.Sidebar>
+      </Sidebar>
     </ErrorBoundary>
   )
 }

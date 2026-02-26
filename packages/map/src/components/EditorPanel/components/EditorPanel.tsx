@@ -16,7 +16,6 @@ import _ from 'lodash'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import 'react-tooltip/dist/react-tooltip.css'
 import Panels from './Panels'
-import Layout from '@cdc/core/components/Layout'
 
 // Data
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'

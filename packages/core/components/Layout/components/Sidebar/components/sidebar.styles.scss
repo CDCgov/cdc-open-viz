@@ -26,7 +26,7 @@
     height: 100%; // take up the whole container
     top: 0;
     max-width: 350px;
-    width: 350px;
+    min-width: 0;
     background-color: var(--white);
     grid-area: panel;
 
@@ -952,7 +952,7 @@
     cursor: pointer;
     width: 25px;
     height: 25px;
-    right: 10px;
+    left: calc(100% - 35px);
     top: 50%;
     transform: translateY(-50%);
     box-shadow: rgba(0, 0, 0, 0.5) 0 1px 2px;

@@ -3,7 +3,7 @@ import { useCallback, useContext, useEffect, useReducer } from 'react'
 import DataTable from '@cdc/core/components/DataTable'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import Filters from '@cdc/core/components/Filters'
-import Layout from '@cdc/core/components/Layout'
+import { VisualizationContainer } from '@cdc/core/components/Layout'
 import Loading from '@cdc/core/components/Loading'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
@@ -30,8 +30,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
   const [state, dispatch] = useReducer(reducer, initialState)
 
   /* STATES */
-  const { config, showEditorPanel, columns, data, table, filters, currentViewport, filterIntro, filterBehavior } =
-    state as State
+  const { config, columns, data, table, filters, currentViewport, filterIntro, filterBehavior } = state as State
 
   /* CONFIG VARS */
   const { data: inputData, dataUrl, dataDescription } = config || {}
@@ -137,46 +136,41 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
   if (invalidConfig || invalidData) throw new Error('Invalid config or data provided to CdcDataTable component')
 
   return (
-    <Layout.VisualizationWrapper
+    <VisualizationContainer
       ref={outerContainerRef}
       config={config}
       isEditor={isEditor}
-      showEditorPanel={showEditorPanel}
       currentViewport={currentViewport}
+      editorPanel={<EditorPanel dispatch={dispatch} state={state} />}
     >
-      {/* EDITOR */}
-      {isEditor && <EditorPanel dispatch={dispatch} state={state} />}
-
       {/* FILTERS + DATA TABLE */}
-      <Layout.Responsive isEditor={isEditor}>
-        <div className='bg-white z-1'>
-          {filters && (
-            <Filters
-              config={config as unknown as Visualization}
-              setConfig={updateFilters}
-              setFilters={newFilters => dispatch({ type: 'SET_FILTERS', payload: newFilters })}
-              filteredData={filteredData}
-              excludedData={data}
-            />
-          )}
-
-          {/* DATA TABLE */}
-          <DataTable
-            config={config as unknown as TableConfig}
-            tableTitle={label}
-            indexTitle={indexLabel}
-            isEditor={isEditor}
-            rawData={filteredData}
-            runtimeData={filteredData}
-            columns={columns}
-            viewport={currentViewport}
-            tabbingId={'dataTableSection'}
-            expandDataTable={expanded}
-            configUrl={configUrl}
+      <div className='bg-white z-1'>
+        {filters && (
+          <Filters
+            config={config as unknown as Visualization}
+            setConfig={updateFilters}
+            setFilters={newFilters => dispatch({ type: 'SET_FILTERS', payload: newFilters })}
+            filteredData={filteredData}
+            excludedData={data}
           />
-        </div>
-      </Layout.Responsive>
-    </Layout.VisualizationWrapper>
+        )}
+
+        {/* DATA TABLE */}
+        <DataTable
+          config={config as unknown as TableConfig}
+          tableTitle={label}
+          indexTitle={indexLabel}
+          isEditor={isEditor}
+          rawData={filteredData}
+          runtimeData={filteredData}
+          columns={columns}
+          viewport={currentViewport}
+          tabbingId={'dataTableSection'}
+          expandDataTable={expanded}
+          configUrl={configUrl}
+        />
+      </div>
+    </VisualizationContainer>
   )
 }
 

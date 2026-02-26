@@ -16,8 +16,18 @@ const breakpoints = [
 const os =
   navigator.userAgent.indexOf('Win') !== -1 ? 'Win' : navigator.userAgent.indexOf('Mac') !== -1 ? 'MacOS' : null
 
-const Responsive = ({ children, isEditor }) => {
-  const [displayPanel, setDisplayPanel] = useState(false)
+type ResponsiveProps = {
+  children: React.ReactNode
+  displayPanel?: boolean
+  isEditor: boolean
+  onTogglePanel?: () => void
+}
+
+const Responsive = ({ children, isEditor, displayPanel: controlledPanel, onTogglePanel }: ResponsiveProps) => {
+  const [internalPanel, setInternalPanel] = useState(false)
+  const isControlled = controlledPanel !== undefined
+  const displayPanel = isControlled ? controlledPanel : internalPanel
+  const togglePanel = isControlled ? onTogglePanel : () => setInternalPanel(p => !p)
   const [displayGrid, setDisplayGrid] = useState(false)
   const [viewportPreview, setViewportPreview] = useState(null)
   const [rotateAnimation, setRotateAnimation] = useState(false)
@@ -37,7 +47,7 @@ const Responsive = ({ children, isEditor }) => {
 
   const onKeypress = key => {
     if (!isEditor) return key
-    if (key.code === 'KeyL' && key.ctrlKey) setDisplayPanel(display => !display)
+    if (key.code === 'KeyL' && key.ctrlKey) togglePanel()
     const viewportCommandKey = os === 'MacOS' ? key.metaKey : key.altKey
     if (viewportCommandKey) {
       let keyIndex = key.key
@@ -109,12 +119,12 @@ const Responsive = ({ children, isEditor }) => {
     }
   })
 
-  const onBackClick = () => setDisplayPanel(!displayPanel)
+  const onBackClick = () => togglePanel()
 
   if (!isEditor) {
     return <div className='cdc-open-viz-module__content'>{children}</div>
   }
-  if (!displayPanel) return children
+  if (!displayPanel) return <div className='cdc-open-viz-module__content'>{children}</div>
 
   return (
     <div className='cove-editor__content' data-grid={displayGrid || null}>

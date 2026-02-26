@@ -19,7 +19,7 @@ import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import markupIncludeReducer from './store/markupInclude.reducer'
-import Layout from '@cdc/core/components/Layout'
+import { VisualizationContainer } from '@cdc/core/components/Layout'
 // styles
 import './cdcMarkupInclude.style.css'
 import './scss/main.scss'
@@ -299,59 +299,51 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const _showNoDataMessage = processedMarkup.shouldShowNoDataMessage
 
   if (loading === false) {
-    content = (
-      <>
-        {isEditor && <EditorPanel datasets={datasets} />}
-
-        {!hideMarkupInclude && (
-          <Layout.Responsive isEditor={isEditor}>
-            <div className='markup-include-content-container cove-component__content no-borders'>
-              <Title
-                title={title}
-                isDashboard={isDashboard}
-                titleStyle={contentEditor.titleStyle}
+    content = !hideMarkupInclude && (
+      <div className='markup-include-content-container cove-component__content no-borders'>
+        <Title
+          title={title}
+          isDashboard={isDashboard}
+          titleStyle={contentEditor.titleStyle}
+          config={config}
+          classes={[`${theme}`, 'mb-0']}
+          noContent={!markup}
+        />
+        <div className={`markup-include-component ${contentClasses.join(' ')}`}>
+          <div className={`${innerContainerClasses.join(' ')}`}>
+            {/* Filters */}
+            {config.filters && config.filters.length > 0 && (
+              <Filters
                 config={config}
-                classes={[`${theme}`, 'mb-0']}
-                noContent={!markup}
+                setFilters={setFilters}
+                excludedData={data || []}
+                dimensions={[0, 0]}
+                interactionLabel={interactionLabel || 'markup-include'}
               />
-              <div className={`markup-include-component ${contentClasses.join(' ')}`}>
-                <div className={`${innerContainerClasses.join(' ')}`}>
-                  {/* Filters */}
-                  {config.filters && config.filters.length > 0 && (
-                    <Filters
-                      config={config}
-                      setFilters={setFilters}
-                      excludedData={data || []}
-                      dimensions={[0, 0]}
-                      interactionLabel={interactionLabel || 'markup-include'}
-                    />
-                  )}
-                  <div
-                    className={`cove-component__content-wrap${shouldApplyTopPadding ? ' has-top-padding' : ''}${
-                      shouldApplySidePadding ? ' has-side-padding' : ''
-                    }`}
-                  >
-                    {_showNoDataMessage && (
-                      <div className='no-data-message'>
-                        <p>{`${noDataMessageText}`}</p>
-                      </div>
-                    )}
-                    {!markupError && !_showNoDataMessage && <Markup allowElements={!!urlMarkup} content={markup} />}
-                    {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
-                  </div>
+            )}
+            <div
+              className={`cove-component__content-wrap${shouldApplyTopPadding ? ' has-top-padding' : ''}${
+                shouldApplySidePadding ? ' has-side-padding' : ''
+              }`}
+            >
+              {_showNoDataMessage && (
+                <div className='no-data-message'>
+                  <p>{`${noDataMessageText}`}</p>
                 </div>
-              </div>
-              <FootnotesStandAlone
-                config={configObj?.footnotes}
-                filters={config?.filters || []}
-                markupVariables={markupVariables}
-                enableMarkupVariables={config?.enableMarkupVariables}
-                data={data}
-              />
+              )}
+              {!markupError && !_showNoDataMessage && <Markup allowElements={!!urlMarkup} content={markup} />}
+              {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
             </div>
-          </Layout.Responsive>
-        )}
-      </>
+          </div>
+        </div>
+        <FootnotesStandAlone
+          config={configObj?.footnotes}
+          filters={config?.filters || []}
+          markupVariables={markupVariables}
+          enableMarkupVariables={config?.enableMarkupVariables}
+          data={data}
+        />
+      </div>
     )
   }
 
@@ -370,9 +362,9 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     <ErrorBoundary component='CdcMarkupInclude'>
       <ConfigContext.Provider value={{ config, updateConfig, loading, data: data, setParentConfig, isDashboard }}>
         {!config?.newViz && config?.runtime && config?.runtime.editorErrorMessage && <Error />}
-        <Layout.VisualizationWrapper config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
+        <VisualizationContainer config={config} isEditor={isEditor} editorPanel={<EditorPanel datasets={datasets} />}>
           {content}
-        </Layout.VisualizationWrapper>
+        </VisualizationContainer>
       </ConfigContext.Provider>
     </ErrorBoundary>
   )

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef, ReactNode } from 'react'
 import { cloneConfig } from '../../helpers/cloneConfig'
 import ErrorBoundary from '../ErrorBoundary'
-import Layout from '../Layout'
+import { Sidebar } from '../Layout'
 import './EditorPanel.styles.css'
 
 export interface BaseEditorPanelProps<TConfig = any> {
@@ -124,7 +124,7 @@ export function EditorPanel<TConfig = any>({
 
   return (
     <ErrorBoundary component='EditorPanel'>
-      <Layout.Sidebar
+      <Sidebar
         displayPanel={displayPanel}
         isDashboard={isDashboard || false}
         title={title}
@@ -136,7 +136,7 @@ export function EditorPanel<TConfig = any>({
           displayPanel,
           convertStateToConfig
         })}
-      </Layout.Sidebar>
+      </Sidebar>
     </ErrorBoundary>
   )
 }

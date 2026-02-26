@@ -28,7 +28,7 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 
 import './scss/main.scss'
 import Title from '@cdc/core/components/ui/Title'
-import Layout from '@cdc/core/components/Layout'
+import { VisualizationContainer } from '@cdc/core/components/Layout'
 
 // images
 import CalloutFlag from './images/callout-flag.svg?url'
@@ -658,17 +658,12 @@ const CdcWaffleChart = ({
 
   if (loading === false) {
     content = (
-      <>
-        {isEditor && <EditorPanel showConfigConfirm={showConfigConfirm} />}
-        <Layout.Responsive isEditor={isEditor}>
-          <WaffleChart
-            config={config}
-            isEditor={isEditor}
-            showConfigConfirm={showConfigConfirm}
-            updateConfig={updateConfig}
-          />
-        </Layout.Responsive>
-      </>
+      <WaffleChart
+        config={config}
+        isEditor={isEditor}
+        showConfigConfirm={showConfigConfirm}
+        updateConfig={updateConfig}
+      />
     )
   }
 
@@ -677,14 +672,14 @@ const CdcWaffleChart = ({
       <ConfigContext.Provider
         value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef }}
       >
-        <Layout.VisualizationWrapper
+        <VisualizationContainer
           config={config}
           isEditor={isEditor}
           ref={outerContainerRef}
-          showEditorPanel={config?.showEditorPanel}
+          editorPanel={<EditorPanel showConfigConfirm={showConfigConfirm} />}
         >
           {content}
-        </Layout.VisualizationWrapper>
+        </VisualizationContainer>
       </ConfigContext.Provider>
     </ErrorBoundary>
   )

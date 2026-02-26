@@ -10,11 +10,11 @@
     min-height: 100vh;
 
     .editor-panel__toggle {
-      transition: left 400ms ease-in-out;
+      transition: left 400ms ease-in-out, background 0.1s;
     }
 
     .sidebar {
-      transition: left 400ms ease-in-out;
+      overflow: hidden;
     }
 
     &.editor-panel--visible {
@@ -26,6 +26,7 @@
     &.editor-panel--hidden {
       grid-template-areas: 'panel content';
       grid-template-columns: 0px 100%;
+      overflow: hidden;
     }
 
     .cove-editor__content,
@@ -35,7 +36,6 @@
       position: relative;
       left: 0;
       width: 100% !important;
-      grid-area: content;
       padding: 1rem;
 
       // Prevent double padding on nested .cove-component__content divs

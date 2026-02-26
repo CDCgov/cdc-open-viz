@@ -47,7 +47,7 @@ import VisualizationRow from './components/VisualizationRow'
 import { getVizConfig } from './helpers/getVizConfig'
 import { getFilteredData } from './helpers/getFilteredData'
 import { getVizRowColumnLocator } from './helpers/getVizRowColumnLocator'
-import Layout from '@cdc/core/components/Layout'
+import { Responsive } from '@cdc/core/components/Layout'
 import * as reloadURLHelpers from './helpers/reloadURLHelpers'
 import { addValuesToDashboardFilters } from './helpers/addValuesToDashboardFilters'
 import { DashboardFilters } from './types/DashboardFilters'
@@ -497,7 +497,7 @@ export default function CdcDashboard({
             autoDismiss={true}
           />
         ))}
-        <Layout.Responsive isEditor={isEditor}>
+        <Responsive isEditor={isEditor}>
           <div className={`cdc-dashboard-inner-container${isEditor ? ' is-editor' : ''}`}>
             <Title
               title={title}
@@ -640,7 +640,7 @@ export default function CdcDashboard({
                 })
                 .filter(Boolean)}
           </div>
-        </Layout.Responsive>
+        </Responsive>
       </>
     )
   }
