@@ -582,7 +582,7 @@ const PanelGeneral: FC<PanelProps> = props => {
         <Select
           value={config.locale}
           fieldName='locale'
-          label='Language (Locale)'
+          label='Language for dates and numbers'
           updateField={updateField}
           options={[
             { value: 'en-US', label: 'English (en-US)' },

@@ -161,7 +161,12 @@ const Button = ({
 }) => {
   const buttonClasses = ['btn', 'btn-primary']
 
-  const label = type === 'csv' ? state?.table?.downloadDataLabel || buttonText[type] : buttonText[type]
+  const label =
+    type === 'csv'
+      ? state?.table?.downloadDataLabel || buttonText[type]
+      : type === 'image'
+        ? state?.table?.downloadImageLabel || buttonText[type]
+        : buttonText[type]
 
   return (
     <button
