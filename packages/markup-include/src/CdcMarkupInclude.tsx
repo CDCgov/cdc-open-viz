@@ -1,5 +1,4 @@
 import { useEffect, useCallback, useRef, useReducer, useMemo } from 'react'
-import _ from 'lodash'
 // external
 import { Markup } from 'interweave'
 import axios from 'axios'

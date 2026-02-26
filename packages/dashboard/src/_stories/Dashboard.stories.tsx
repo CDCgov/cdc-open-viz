@@ -18,7 +18,8 @@ import PivotFitlerConfig from './_mock/pivot-filter.json'
 import { type DashboardConfig as Config } from '../types/DashboardConfig'
 import { userEvent, within, expect } from 'storybook/test'
 import ToggleExampleConfig from './_mock/toggle-example.json'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import times from 'lodash/times'
 import { footnotesSymbols } from '@cdc/core/helpers/footnoteSymbols'
 import FootnotesConfig from '@cdc/core/types/Footnotes'
 import { ConfigRow } from '../types/ConfigRow'
@@ -40,8 +41,8 @@ import LineChartAnglesConfig from './_mock/dashboard-line-chart-angles.json'
 
 // Dashboard Filter Updates for Ascending, Descending, and Custom Order
 import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
-const DashboardFilterDesc = _.cloneDeep(DashboardFilterAsc)
-const DashboardFilterCust = _.cloneDeep(DashboardFilterAsc)
+const DashboardFilterDesc = cloneDeep(DashboardFilterAsc)
+const DashboardFilterCust = cloneDeep(DashboardFilterAsc)
 DashboardFilterDesc.dashboard.sharedFilters[0].order = 'desc'
 DashboardFilterCust.dashboard.sharedFilters[0].order = 'cust'
 
@@ -177,8 +178,8 @@ export const SingleStateDashboardWithFilters: Story = {
 
 faker.seed(123)
 
-const countries = _.times(5, faker.location.country)
-const categories = _.times(3, val => `category-${val + 1}`)
+const countries = times(5, faker.location.country)
+const categories = times(3, val => `category-${val + 1}`)
 
 const data = []
 countries.forEach((country, i) => {
@@ -257,7 +258,7 @@ const fetchMock = {
         },
         response: {
           status: 200,
-          body: _.times(5, i => ({ [filter]: `Some ${filter} ${i}` }))
+          body: times(5, i => ({ [filter]: `Some ${filter} ${i}` }))
         }
       }
     }),

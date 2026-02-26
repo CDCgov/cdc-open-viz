@@ -12,7 +12,8 @@ import {
 } from 'react-accessible-accordion'
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
 import { useDebounce } from 'use-debounce'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import includes from 'lodash/includes'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import 'react-tooltip/dist/react-tooltip.css'
 import Panels from './Panels'
@@ -296,7 +297,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           legend: {
             ...config.legend,
             position: value,
-            hideBorder: _.includes(['top', 'bottom'], value)
+            hideBorder: includes(['top', 'bottom'], value)
           }
         })
         break
@@ -931,7 +932,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     }
 
     // Remove the legend
-    let strippedLegend = _.cloneDeep(config.legend)
+    let strippedLegend = cloneDeep(config.legend)
 
     delete strippedLegend.disabledAmt
 
@@ -941,7 +942,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     delete strippedState.defaultData
 
     // Remove tooltips if they're active in the editor
-    strippedState.general = _.cloneDeep(config.general)
+    strippedState.general = cloneDeep(config.general)
 
     // Add columns property back to data if it's there
     if (config.columns) {
@@ -963,7 +964,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     const isV1PaletteConfig = isV1Palette(config)
 
     const executeSelection = () => {
-      const _newConfig = _.cloneDeep(config)
+      const _newConfig = cloneDeep(config)
 
       // If v2 migration is disabled, use the original palette name and keep v1 version
       if (!USE_V2_MIGRATION) {
@@ -1163,7 +1164,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     }
 
     // Remove the legend
-    let strippedLegend = _.cloneDeep(config.legend)
+    let strippedLegend = cloneDeep(config.legend)
 
     delete strippedLegend.disabledAmt
 
@@ -1173,7 +1174,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     delete strippedState.defaultData
 
     // Remove tooltips if they're active in the editor
-    strippedState.general = _.cloneDeep(config.general)
+    strippedState.general = cloneDeep(config.general)
 
     strippedState.general.showSidebar = 'hidden'
 
@@ -3276,7 +3277,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           type='checkbox'
                           checked={config.visual.showBubbleZeros}
                           onChange={event => {
-                            const _newConfig = _.cloneDeep(config)
+                            const _newConfig = cloneDeep(config)
                             _newConfig.visual.showBubbleZeros = event.target.checked
                             setConfig(_newConfig)
                           }}

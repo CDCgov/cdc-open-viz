@@ -1,4 +1,5 @@
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import uniq from 'lodash/uniq'
 import { SubGrouping, VizFilter, OrderBy } from '../../../types/VizFilter'
 import { handleSorting } from '../../Filters/helpers/handleSorting'
 import { filterOrderOptions } from '../../../helpers/filterOrderOptions'
@@ -45,12 +46,12 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
 
   const handleGroupingOrderBy = (order: OrderBy) => {
     const groupSortObject = {
-      values: _.cloneDeep(filter.values),
+      values: cloneDeep(filter.values),
       order
     }
     const newOrderedValues = handleSorting(groupSortObject).values
 
-    const newAllFilters = _.cloneDeep(config.filters)
+    const newAllFilters = cloneDeep(config.filters)
     newAllFilters[filterIndex] = { ...filter, values: newOrderedValues, order }
     if (order === 'cust') {
       newAllFilters[filterIndex].orderedValues = newOrderedValues
@@ -68,7 +69,7 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
     const filterGroups = filter.orderedValues?.length ? filter.orderedValues : filter.values
 
     const valuesLookup = filterGroups.reduce((acc, groupName) => {
-      const values: string[] = _.uniq(
+      const values: string[] = uniq(
         rawData
           .map(d => {
             return d[filter.columnName] === groupName ? d[value] : ''
@@ -115,10 +116,10 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
     subGroupingFitlerOrder: string[],
     groupName: string
   ) => {
-    const updatedGroupOrderedValues = _.cloneDeep(subGroupingFitlerOrder)
+    const updatedGroupOrderedValues = cloneDeep(subGroupingFitlerOrder)
     const [movedItem] = updatedGroupOrderedValues.splice(currentIndex, 1)
     updatedGroupOrderedValues.splice(newIndex, 0, movedItem)
-    const newSubGrouping = _.cloneDeep(subGrouping)
+    const newSubGrouping = cloneDeep(subGrouping)
     newSubGrouping.valuesLookup[groupName].values = updatedGroupOrderedValues
     newSubGrouping.valuesLookup[groupName].orderedValues = updatedGroupOrderedValues
     updateSubGroupingFilterProperty({ ...newSubGrouping, order: 'cust' })
