@@ -69,19 +69,6 @@ const PanelPatternSettings: FC<PanelProps> = props => {
     }
   }
 
-  // Get unique values from a specific data field for dropdown options
-  const getDataValueOptions = (dataKey: string) => {
-    if (!dataKey || !Array.isArray(transformedData) || transformedData.length === 0) {
-      return []
-    }
-
-    const uniqueValues = Array.from(new Set(transformedData.map(row => row[dataKey])))
-      .filter(val => val !== undefined && val !== null && val !== '')
-      .sort()
-
-    return uniqueValues.map(value => ({ value: String(value), label: String(value) }))
-  }
-
   const getFieldOptions = () => {
     if (!Array.isArray(transformedData) || transformedData.length === 0) return []
 
@@ -282,11 +269,6 @@ const PanelPatternSettings: FC<PanelProps> = props => {
       [field]: value
     }
 
-    // Clear dataValue if dataKey is being cleared or set to 'Select'
-    if (field === 'dataKey' && (value === 'Select' || value === '')) {
-      updatedPattern.dataValue = ''
-    }
-
     const newPatterns = {
       ...(legendCfg.patterns || {}),
       [patternKey]: updatedPattern
@@ -333,14 +315,17 @@ const PanelPatternSettings: FC<PanelProps> = props => {
         {/* Individual Pattern Configurations */}
         {Object.entries(currentPatterns).map(([patternKey, pattern], index) => {
           const p: LegendPattern = pattern || {}
-          const dataValueOptions = p.dataKey ? getDataValueOptions(p.dataKey) : []
 
           return (
             <Accordion allowZeroExpanded key={`pattern-accordion-${index}`}>
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    {p.dataKey && p.dataValue ? `${p.dataKey}: ${p.dataValue}` : `Pattern ${index + 1}`}
+                    {p.dataKey && p.dataValue
+                      ? `${p.dataKey}: ${p.dataValue}`
+                      : p.dataValue
+                      ? `All Series: ${p.dataValue}`
+                      : `Pattern ${index + 1}`}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
@@ -365,20 +350,16 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                     }
                   />
 
-                  {p.dataKey && (
-                    <>
-                      <label htmlFor={`pattern-datavalue-${patternKey}`}>
-                        Data Value:
-                        <input
-                          type='text'
-                          id={`pattern-datavalue-${patternKey}`}
-                          value={p.dataValue || ''}
-                          onChange={e => handlePatternUpdate(patternKey, 'dataValue', e.target.value)}
-                          placeholder='Enter data value'
-                        />
-                      </label>
-                    </>
-                  )}
+                  <label htmlFor={`pattern-datavalue-${patternKey}`}>
+                    Data Value:
+                    <input
+                      type='text'
+                      id={`pattern-datavalue-${patternKey}`}
+                      value={p.dataValue || ''}
+                      onChange={e => handlePatternUpdate(patternKey, 'dataValue', e.target.value)}
+                      placeholder='Enter data value'
+                    />
+                  </label>
 
                   <label htmlFor={`pattern-label-${patternKey}`}>
                     Label (optional):

@@ -14,6 +14,7 @@ import { type ChartContext } from '../../../types/ChartContext'
 
 import createBarElement from '@cdc/core/components/createBarElement'
 import { getHorizontalBarHeights } from '../helpers/getBarHeights'
+import { getPatternUrl as getPatternUrlForBar } from '../helpers/getPatternUrl'
 
 const BarChartStackedHorizontal = () => {
   const { yMax, yScale, xScale, barChart } = useContext<BarChartContextValues>(BarChartContext)
@@ -166,35 +167,15 @@ const BarChartStackedHorizontal = () => {
                     </li></ul>`
 
                 // Check if this bar should use a pattern
-                const getPatternUrl = (): string | null => {
-                  if (!config.legend.patterns || Object.keys(config.legend.patterns).length === 0) {
-                    return null
-                  }
-
-                  // Find a pattern that matches this specific bar
-                  for (const [patternKey, pattern] of Object.entries(config.legend.patterns)) {
-                    if (pattern.dataKey && pattern.dataValue) {
-                      // For stacked bar charts, check if the pattern's dataKey matches the current bar's series key
-                      // and if the pattern's dataValue matches the current bar's value
-                      const barValue = data[bar.index][bar.key]
-                      if (pattern.dataKey === bar.key && String(barValue) === String(pattern.dataValue)) {
-                        return `url(#chart-pattern-${patternKey})`
-                      }
-                      // Fallback for non-series pattern matching (like the original stacked pattern test)
-                      // Only check this if the pattern dataKey is NOT a series key
-                      else if (!config.runtime.seriesLabels || !config.runtime.seriesLabels[pattern.dataKey]) {
-                        const dataFieldValue = data[bar.index][pattern.dataKey]
-                        if (String(dataFieldValue) === String(pattern.dataValue)) {
-                          return `url(#chart-pattern-${patternKey})`
-                        }
-                      }
-                    }
-                  }
-
-                  return null
-                }
-
-                const patternUrl = getPatternUrl()
+                const patternUrl = getPatternUrlForBar({
+                  patterns: config.legend?.patterns,
+                  datum: data[bar.index],
+                  seriesKey: bar.key,
+                  seriesValue: data[bar.index][bar.key],
+                  seriesLabels: config.runtime?.seriesLabels,
+                  seriesKeys: config.series?.map(series => series.dataKey),
+                  allowNonSeriesFieldMatch: true
+                })
 
                 return (
                   <React.Fragment key={`stack-${stackIndex}-bar-${index}-${barStack.index}`}>
