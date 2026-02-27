@@ -15,6 +15,15 @@
 .cove-visualization.type-chart {
   @import 'DataTable';
 
+  .cove-visualization__title,
+  .cove-visualization__header {
+    margin-bottom: 0 !important;
+  }
+
+  .cove-visualization__body.cove-visualization__body-wrap {
+    padding-top: 1rem !important;
+  }
+
   .legend-top {
     .legend-wrapper .tooltip-boundary {
       display: flex;

@@ -90,6 +90,7 @@ import { Datasets } from '@cdc/core/types/DataSet'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { ENABLE_CHART_DATA_BITE_VISUAL_SETTINGS } from '@cdc/core/helpers/constants'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -1196,6 +1197,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const getChartWrapperClasses = () => {
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
     const classes = ['chart-container', 'p-relative']
+    const visualSettingClasses = [
+      'no-borders',
+      'component--has-border-color-theme',
+      'component--has-accent',
+      'component--has-background',
+      'component--hide-background-color'
+    ]
     if (legend?.position) {
       if (isLegendWrapViewport(currentViewport) && legend?.position !== 'top') {
         classes.push('legend-bottom')
@@ -1209,6 +1217,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (config.xAxis.brushActive && dashboardConfig?.type === 'dashboard' && (!isLegendOnBottom || legend.hide))
       classes.push('dashboard-brush')
     classes.push(...contentClasses)
+
+    if (!ENABLE_CHART_DATA_BITE_VISUAL_SETTINGS) {
+      return classes.filter(className => !visualSettingClasses.includes(className))
+    }
+
     return classes
   }
 
