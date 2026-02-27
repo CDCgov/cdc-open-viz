@@ -222,6 +222,50 @@ export const Footnotes: Story = {
   }
 }
 
+const EqualHeightMixedVizConfig = _.cloneDeep(Dashboard_Filter) as Config
+const equalHeightDataBiteKey = 'equal-height-data-bite-story'
+const equalHeightDataBiteTemplate = Object.values(ExampleConfig_1.visualizations).find(v => v?.type === 'data-bite')
+
+if (equalHeightDataBiteTemplate) {
+  EqualHeightMixedVizConfig.visualizations[equalHeightDataBiteKey] = {
+    ..._.cloneDeep(equalHeightDataBiteTemplate),
+    uid: equalHeightDataBiteKey,
+    theme: 'theme-blue',
+    bitePosition: 'Top',
+    biteStyle: 'title',
+    biteBody:
+      '<span style="font-size: 20px;">Long-form data bite content for equal-height validation.</span><br>This intentionally verbose text creates a taller card so the row can demonstrate that chart, map, and data bite containers normalize to the same height when equal height is enabled.',
+    visualizationType: 'data-bite',
+    type: 'data-bite'
+  }
+}
+
+EqualHeightMixedVizConfig.rows = [
+  {
+    equalHeight: true,
+    columns: [
+      { width: 4, widget: 'chart1699383531543' },
+      { width: 4, widget: 'map1699383540561' },
+      { width: 4, widget: equalHeightDataBiteKey }
+    ]
+  }
+]
+
+export const Equal_Height_Mixed_Viz_Row: Story = {
+  args: {
+    config: EqualHeightMixedVizConfig,
+    isEditor: false
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Demonstrates equal-height row normalization across different visualization types (chart, map, and data-bite) with intentionally uneven content lengths.'
+      }
+    }
+  }
+}
+
 const sleep = ms => {
   return new Promise(r => setTimeout(r, ms))
 }
