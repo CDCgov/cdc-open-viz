@@ -40,6 +40,7 @@ import SparkLine from './components/Sparkline'
 import Legend from './components/Legend'
 import WarmingStripesGradientLegend from './components/WarmingStripes/WarmingStripesGradientLegend'
 import defaults from './data/initial-state'
+import { LEGACY_CHART_DEFAULTS } from './data/legacy-defaults'
 import EditorPanel from './components/EditorPanel'
 import { abbreviateNumber } from './helpers/abbreviateNumber'
 import { handleChartTabbing } from './helpers/handleChartTabbing'
@@ -57,6 +58,7 @@ import Annotation from './components/Annotations'
 import { getVisibleAnnotations } from './components/Annotations/helpers/getVisibleAnnotations'
 // Core Helpers
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
+import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
 import { missingRequiredSections } from '@cdc/core/helpers/missingRequiredSections'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
@@ -376,12 +378,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
     const { processedXAxis, processedYAxis, runtimeXAxisLabel, runtimeYAxisLabel, isHorizontalVariant } =
       getProcessedAxisLabels(newConfig, data || [])
 
-    // Deeper copy
-    Object.keys(defaults).forEach(key => {
-      if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
-        newConfig[key] = { ...defaults[key], ...newConfig[key] }
-      }
-    })
+    // Backfill missing properties from defaults, respecting legacy values
+    backfillDefaults(newConfig, defaults, LEGACY_CHART_DEFAULTS)
 
     const newExcludedData: any[] = getExcludedData(newConfig, dataOverride || stateData)
     dispatch({ type: 'SET_EXCLUDED_DATA', payload: newExcludedData })

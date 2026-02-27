@@ -143,7 +143,11 @@ const createInitialState = () => {
       showYearsOnce: false,
       sortByRecentDate: false,
       brushActive: false,
-      brushDefaultRecentDateCount: undefined
+      brushDefaultRecentDateCount: undefined,
+      viewportNumTicks: {
+        xs: 4,
+        xxs: 4
+      }
     },
     table: {
       label: 'Data Table',
