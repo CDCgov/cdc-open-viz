@@ -123,7 +123,7 @@ const CdcFilteredText = ({
 
   if (loading === false) {
     let body = (
-      <div className={`cove-component__content no-borders`}>
+      <div className='cove-visualization__body no-borders'>
         <Title
           classes={[`${config.theme}`, 'mb-0']}
           title={title}
@@ -132,9 +132,9 @@ const CdcFilteredText = ({
           noContent={!config.textColumn}
         />
         <div
-          className={`${contentClasses.join(' ')} body${shouldApplyTopPadding ? ' has-top-padding' : ''}${
-            shouldApplySidePadding ? ' has-side-padding' : ''
-          }`}
+          className={`${contentClasses.join(' ')} cove-visualization__body-wrap${
+            shouldApplyTopPadding ? ' has-top-padding' : ''
+          }${shouldApplySidePadding ? ' has-side-padding' : ''}`}
         >
           {filterByTextColumn()
             .slice(0, 1)

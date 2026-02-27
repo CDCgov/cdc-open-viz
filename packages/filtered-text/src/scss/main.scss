@@ -18,7 +18,7 @@
     // display: initial;
     float: none;
   }
-  .cove-visualization__body.body:not(:empty) {
+  .cove-visualization__body-wrap:not(:empty) {
     padding: 0;
 
     &.has-top-padding {
