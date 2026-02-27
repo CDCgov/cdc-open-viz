@@ -71,8 +71,35 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     interactionLabel = ''
   } = props
 
+  // Ensure imageData.display and imageData.prefix are always defined
+  const safeConfigObj = {
+    ...configObj,
+    imageData: {
+      ...(configObj?.imageData || {}),
+      display:
+        configObj?.imageData && typeof configObj.imageData.display !== 'undefined'
+          ? configObj.imageData.display
+          : 'static',
+      prefix:
+        configObj?.imageData && typeof configObj.imageData.prefix !== 'undefined' ? configObj.imageData.prefix : ''
+    },
+    dataFormat: {
+      ...(configObj?.dataFormat || {}),
+      prefix:
+        configObj?.dataFormat && typeof configObj.dataFormat.prefix !== 'undefined' ? configObj.dataFormat.prefix : '',
+      suffix:
+        configObj?.dataFormat && typeof configObj.dataFormat.suffix !== 'undefined' ? configObj.dataFormat.suffix : '%',
+      roundToPlace:
+        configObj?.dataFormat && typeof configObj.dataFormat.roundToPlace !== 'undefined'
+          ? configObj.dataFormat.roundToPlace
+          : 0,
+      commas:
+        configObj?.dataFormat && typeof configObj.dataFormat.commas !== 'undefined' ? configObj.dataFormat.commas : true
+    }
+  }
+
   const initialState = {
-    config: configObj ?? defaults,
+    config: safeConfigObj ?? defaults,
     loading: true,
     currentViewport: 'lg',
     coveLoadedHasRan: false,

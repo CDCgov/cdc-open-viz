@@ -1,13 +1,18 @@
 @import '@cdc/core/styles/utils/breakpoints';
 
+button.row-menu__btn[title*='Equal Height Rows'] {
+  margin-left: 15px;
+}
+
 .cdc-open-viz-module.type-dashboard {
   @import 'editor-panel';
   @import 'grid';
-  .loading > div.la-ball-beat {
+
+  .loading>div.la-ball-beat {
     margin-top: 20%;
   }
 
-  > .cove-editor__content {
+  >.cove-editor__content {
     width: 100% !important;
     left: 0px;
   }
@@ -19,22 +24,27 @@
     display: flex;
     width: 100vw;
     z-index: 5;
+
     &.sub-dashboard-viz {
       height: 3em;
     }
+
     .heading-1 {
       min-width: 335px;
       font-size: 1.2em;
       padding-right: 1em;
       margin: 0.5em 1em 0.5em 0;
       border-right: 1px solid black;
+
       &.back-to {
         display: flex;
+
         span {
           font-weight: bold;
           padding-right: 0.3em;
         }
       }
+
       input[type='text'] {
         width: 100%;
         margin-top: 10px;
@@ -83,6 +93,7 @@
       position: relative;
       bottom: -1px;
       border-bottom: #c7c7c7 1px solid;
+
       li {
         padding: 0.3em 1.5em;
         color: var(--mediumGray);
@@ -90,12 +101,14 @@
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
+
         &.active {
           border-bottom-color: var(--mediumGray);
           border-bottom-style: inherit;
           border-bottom-width: 5px;
           color: var(--darkGray);
         }
+
         &:hover {
           border-bottom-color: var(--darkGray);
           color: var(--darkGray);
@@ -122,6 +135,7 @@
   }
 
   .btn {
+
     // Expand and Collapse Buttons for Multiviz Dashboard
     &.expand-collapse-buttons {
       background-color: var(--lightestGray);
@@ -139,11 +153,13 @@
     border: var(--lightGray) 1px solid;
     clear: both;
     margin-bottom: 20px;
+
     .multi-visualiation-heading {
       position: relative;
       background: var(--lightestGray);
       padding: 0.5em 0.7em;
       cursor: pointer;
+
       svg {
         position: absolute;
         height: 100%;
@@ -156,10 +172,12 @@
         z-index: 2;
         position: relative;
       }
+
       @include breakpoint(xs) {
         font-size: 0.9em;
       }
     }
+
     .data-table-heading {
       display: none;
     }
@@ -181,10 +199,11 @@
     margin-bottom: 1.5rem;
 
     // Remove padding from first and last columns to keep content flush to edges
-    > [class*='col-']:first-child {
+    >[class*='col-']:first-child {
       padding-left: 0;
     }
-    > [class*='col-']:last-child {
+
+    >[class*='col-']:last-child {
       padding-right: 0;
     }
 
@@ -199,7 +218,7 @@
     .row {
       margin-bottom: 1.5rem;
 
-      > [class*='col-'] {
+      >[class*='col-'] {
         // Remove side padding when columns stack to full width
         padding-left: 0;
         padding-right: 0;
@@ -207,7 +226,7 @@
       }
 
       // Last column doesn't need margin (row margin handles gap to next row)
-      > [class*='col-']:last-child {
+      >[class*='col-']:last-child {
         margin-bottom: 0;
       }
 
@@ -221,6 +240,7 @@
   .dashboard-row {
     display: flex;
     flex-direction: column;
+
     &.toggle {
       display: block;
     }
@@ -228,9 +248,10 @@
 
   .dashboard-col {
     margin: 0;
+
     // Disable the module individual margin
     .map-container,
-    .cdc-chart-inner-container > * {
+    .cdc-chart-inner-container>* {
       margin-left: 0;
       margin-right: 0;
     }
@@ -261,6 +282,7 @@
     .dashboard-col-8 {
       width: 66%;
     }
+
     .dashboard-col-6 {
       width: 50%;
     }
@@ -300,13 +322,33 @@
       [class*='col-'] {
         display: flex !important;
         flex-direction: column !important;
+        align-items: stretch !important;
 
-        > * {
+        >.cdc-open-viz-module {
           display: flex !important;
           flex-direction: column !important;
-          flex: 1 !important;
-          min-height: 0;
-          width: 100%;
+          flex: 1 1 auto !important;
+          align-items: stretch !important;
+          min-height: 0 !important;
+          width: 100% !important;
+
+          >.cdc-open-viz-module__content {
+            display: flex !important;
+            flex-direction: column !important;
+            flex: 1 1 auto !important;
+            align-items: stretch !important;
+            min-height: 0 !important;
+            width: 100% !important;
+
+            >.cove-component__content {
+              display: flex !important;
+              flex-direction: column !important;
+              flex: 1 1 auto !important;
+              align-items: stretch !important;
+              min-height: 0 !important;
+              width: 100% !important;
+            }
+          }
         }
       }
     }
@@ -321,7 +363,7 @@
         display: flex !important;
         flex-direction: column !important;
 
-        > * {
+        >* {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 !important;
@@ -342,7 +384,7 @@
         display: flex !important;
         flex-direction: column !important;
 
-        > * {
+        >* {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 !important;
@@ -369,8 +411,10 @@
     // TP5 Waffle/Gauge adjustments when there are 2+ in a row
     .row:has(.waffle__style--tp5):has([class*='col-'] ~ [class*='col-']),
     .row:has(.gauge__style--tp5):has([class*='col-'] ~ [class*='col-']) {
+
       .waffle__style--tp5,
       .gauge__style--tp5 {
+
         // Enable flex stretching only in dashboard rows
         .cove-component__content {
           height: 100%;
@@ -412,6 +456,7 @@
 
   .sub-editor {
     margin-top: 40px;
+
     .sub-editor-heading {
       display: flex;
       align-items: center;
@@ -423,6 +468,7 @@
       background-color: red;
       z-index: 101;
     }
+
     .editor-panel {
       top: 40px;
     }

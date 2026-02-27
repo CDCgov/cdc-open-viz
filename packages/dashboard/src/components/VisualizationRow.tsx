@@ -352,6 +352,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                     updateChildConfig(col.widget, newConfig)
                   }}
                   isDashboard={true}
+                  isEditor={config.editing === true}
                   interactionLabel={interactionLabel}
                 />
               )}
