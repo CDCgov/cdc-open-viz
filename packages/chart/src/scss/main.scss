@@ -5,7 +5,7 @@
 }
 
 .cove-visualization.type-dashboard {
-  .cove-visualization.type-chart.isEditor {
+  .cove-visualization.type-chart.is-editor {
     .cove-visualization__body {
       background: white;
     }
@@ -37,7 +37,7 @@
     }
   }
 
-  &.isEditor .cove-visualization__body {
+  &.is-editor .cove-visualization__body {
     background: white;
   }
 
@@ -619,7 +619,7 @@
   }
 }
 
-.cove-visualization.isEditor.type-sparkline .cove-visualization__body {
+.cove-visualization.is-editor.type-sparkline .cove-visualization__body {
   margin: 3em auto 0;
   max-width: 60%;
 }
@@ -651,7 +651,7 @@
     margin-top: 0px;
   }
 
-  .isEditor {
+  .is-editor {
     position: relative;
   }
 }

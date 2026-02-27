@@ -13,7 +13,7 @@
   }
 }
 
-.cove-visualization.markup-include.isEditor {
+.cove-visualization.markup-include.is-editor {
   .cove-tooltip-variable {
     background: var(--orange-tertiary);
     display: inline;

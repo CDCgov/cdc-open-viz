@@ -67,14 +67,14 @@
 // TODO after v2 refactor remove header reference colors
 // Use .font-color/.bg-color, etc. in color definitions or something similar
 // Remove box shadows if we're no longer using them
-&.cove-visualization.isEditor .sidebar + .cove-visualization__body {
+&.cove-visualization.is-editor .sidebar + .cove-visualization__body {
   margin: 3em auto 0 !important;
   max-width: 35em !important;
   background-color: initial;
   height: fit-content;
 }
 
-.sidebar + .cove-visualization__body .bite-content-container:not(.component--hide-background-color) {
+.sidebar + .cove-visualization__body .bite-content-container:not(.component--hideBackgroundColor) {
   background-color: white;
 }
 

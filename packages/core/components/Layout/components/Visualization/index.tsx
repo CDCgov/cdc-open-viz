@@ -44,7 +44,7 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
     }
 
     isEditor && classes.push('spacing-wrapper')
-    isEditor && classes.push('isEditor')
+    isEditor && classes.push('is-editor')
 
     if (isEditor && showEditorPanel) {
       classes = classes.filter(item => item !== 'editor-panel--hidden')

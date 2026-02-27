@@ -135,7 +135,7 @@ function buildContextClone(
 }
 
 function isInEditorMode(element: HTMLElement): boolean {
-  return element.closest('.cove-visualization.isEditor') !== null
+  return element.closest('.cove-visualization.is-editor') !== null
 }
 
 /**
