@@ -27,6 +27,9 @@
     }
 
     &.editor-panel--visible {
+      grid-template-areas: 'panel content';
+      grid-template-columns: 350px calc(100% - 350px);
+
       .cove-visualization__outer {
         overflow: hidden;
       }
