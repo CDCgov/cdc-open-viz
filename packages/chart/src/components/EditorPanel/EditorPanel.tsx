@@ -4603,6 +4603,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     enableMarkupVariables={config.enableMarkupVariables || false}
                     onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
                     onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
+                    dataMetadata={config.dataMetadata}
                   />
                 )}
                 <Panels.SmallMultiples name='Small Multiples' />

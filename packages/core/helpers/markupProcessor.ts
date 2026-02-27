@@ -27,7 +27,8 @@ export const processMarkupVariables = (
     datasets?: Datasets
     configDataKey?: string // Add support for widget's assigned dataset
     locale: string
-  }
+    dataMetadata?: Record<string, string>
+  } = {}
 ): {
   processedContent: string
   shouldHideSection: boolean
@@ -73,35 +74,47 @@ export const processMarkupVariables = (
         const workingVariable = markupVariables.find(variable => variable.tag === variableTag)
         if (!workingVariable) return variableTag
 
-        // Validate that columnName exists
-        if (!workingVariable.columnName) {
-          console.warn(`Markup variable ${variableTag} has no columnName specified`)
-          return variableTag
+        // Resolve the data source for this variable. Metadata-sourced variables
+        // (metadataKey) pull a single value from the data file's top-level fields,
+        // while column-sourced variables (columnName) pull from dataset rows.
+        // Both paths produce a `conditionFilteredData` array so the downstream
+        // extraction, formatting (addCommas), dedup, and hide-check logic is shared.
+        let effectiveColumnName: string
+        let conditionFilteredData: any[]
+
+        if (workingVariable.metadataKey) {
+          // Metadata path: synthesize a single-row array from the file-level metadata
+          // so it flows through the same formatting pipeline as column values.
+          effectiveColumnName = workingVariable.metadataKey
+          const metaValue = options.dataMetadata?.[effectiveColumnName] ?? ''
+          conditionFilteredData = metaValue ? [{ [effectiveColumnName]: metaValue }] : []
+        } else {
+          // Column path: pull values from the dataset, applying filters and conditions.
+          if (!workingVariable.columnName) {
+            console.warn(`Markup variable ${variableTag} has no columnName specified`)
+            return variableTag
+          }
+          effectiveColumnName = workingVariable.columnName
+
+          let variableData = getDataForVariable(workingVariable)
+          if (filters && filters.length > 0) {
+            variableData = filterVizData(filters, variableData)
+          }
+
+          conditionFilteredData =
+            workingVariable.conditions.length === 0
+              ? variableData
+              : filterDataByConditions(variableData, [...workingVariable.conditions])
         }
-
-        // Get the appropriate dataset for this variable
-        let variableData = getDataForVariable(workingVariable)
-
-        // Apply global filters if present
-        if (filters && filters.length > 0) {
-          variableData = filterVizData(filters, variableData)
-        }
-
-        // Filter data with error handling (apply conditions on top of already filtered data)
-        const conditionFilteredData =
-          workingVariable.conditions.length === 0
-            ? variableData
-            : filterDataByConditions(variableData, [...workingVariable.conditions])
 
         // Extract values with error handling
         const variableValues: string[] = _.uniq(
           (conditionFilteredData || []).map(dataObject => {
             try {
-              const dataObjectValue = dataObject[workingVariable.columnName]
+              const dataObjectValue = dataObject[effectiveColumnName]
 
-              // Handle undefined column
               if (dataObjectValue === undefined && isEditor) {
-                console.warn(`Column "${workingVariable.columnName}" not found in data for variable ${variableTag}`)
+                console.warn(`Column "${effectiveColumnName}" not found in data for variable ${variableTag}`)
               }
 
               return workingVariable.addCommas && !isNaN(parseFloat(dataObjectValue))
@@ -199,9 +212,9 @@ export const validateMarkupVariables = (markupVariables: MarkupVariable[], data:
       errors.push(`Variable ${index + 1}: Tag must be in format {{tagName}}`)
     }
 
-    if (!variable.columnName) {
+    if (!variable.metadataKey && !variable.columnName) {
       errors.push(`Variable ${index + 1}: Column name is required`)
-    } else if (availableColumns.length > 0 && !availableColumns.includes(variable.columnName)) {
+    } else if (variable.columnName && availableColumns.length > 0 && !availableColumns.includes(variable.columnName)) {
       errors.push(`Variable ${index + 1}: Column "${variable.columnName}" not found in data`)
     }
 

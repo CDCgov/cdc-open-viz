@@ -3680,6 +3680,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   enableMarkupVariables={config.enableMarkupVariables || false}
                   onMarkupVariablesChange={variables => setConfig({ ...config, markupVariables: variables })}
                   onToggleEnable={enabled => setConfig({ ...config, enableMarkupVariables: enabled })}
+                  dataMetadata={config.dataMetadata}
                 />
                 <Panels.SmallMultiples name='Small Multiples' />
               </Accordion>

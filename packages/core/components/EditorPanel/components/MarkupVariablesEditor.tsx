@@ -22,6 +22,8 @@ type MarkupVariablesEditorProps = {
   enableMarkupVariables?: boolean
   /** Callback when enable/disable toggle changes */
   onToggleEnable?: (enabled: boolean) => void
+  /** File-level metadata extracted from the data source */
+  dataMetadata?: Record<string, string>
 }
 
 export type { MarkupVariablesEditorProps }
@@ -37,7 +39,8 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
   config,
   onChange,
   enableMarkupVariables = false,
-  onToggleEnable
+  onToggleEnable,
+  dataMetadata = {}
 }) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [validationErrors, setValidationErrors] = useState<Record<number, string[]>>({})
@@ -62,6 +65,9 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
 
     return []
   }, [data, datasets, config?.dataKey])
+
+  const metadataKeys = useMemo(() => Object.keys(dataMetadata || {}), [dataMetadata])
+  const hasMetadataKeys = metadataKeys.length > 0
 
   // Get columns from the available data (memoized for performance)
   const getAvailableColumns = useMemo((): string[] => {
@@ -92,18 +98,20 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
     if (!variable.tag || variable.tag.trim() === '') {
       errors.push('Variable tag is required')
     }
-    if (!variable.columnName || variable.columnName.trim() === '') {
+    if (!variable.metadataKey && (!variable.columnName || variable.columnName.trim() === '')) {
       errors.push('Data column is required')
     }
-    // Validate conditions
-    variable.conditions?.forEach((condition, index) => {
-      if (!condition.columnName) {
-        errors.push(`Condition ${index + 1}: Column is required`)
-      }
-      if (!condition.value) {
-        errors.push(`Condition ${index + 1}: Value is required`)
-      }
-    })
+    // Validate conditions (not applicable to metadata-sourced variables)
+    if (!variable.metadataKey) {
+      variable.conditions?.forEach((condition, index) => {
+        if (!condition.columnName) {
+          errors.push(`Condition ${index + 1}: Column is required`)
+        }
+        if (!condition.value) {
+          errors.push(`Condition ${index + 1}: Value is required`)
+        }
+      })
+    }
     return errors
   }, [])
 
@@ -240,9 +248,15 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                         {variable.tag}
                       </div>
                       <div style={{ fontSize: '13px', color: '#6c757d' }}>
-                        Column: <strong>{variable.columnName || 'Not selected'}</strong>
-                        {variable.conditions && variable.conditions.length > 0 && (
-                          <span> • {variable.conditions.length} condition{variable.conditions.length !== 1 ? 's' : ''}</span>
+                        {variable.metadataKey ? (
+                          <>Metadata: <strong>{variable.metadataKey}</strong></>
+                        ) : (
+                          <>
+                            Column: <strong>{variable.columnName || 'Not selected'}</strong>
+                            {variable.conditions && variable.conditions.length > 0 && (
+                              <span> • {variable.conditions.length} condition{variable.conditions.length !== 1 ? 's' : ''}</span>
+                            )}
+                          </>
                         )}
                       </div>
                       {validationErrors[index] && validationErrors[index].length > 0 && (
@@ -270,6 +284,60 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                     <div className='mt-3 pt-3 border-t'>
                       <Accordion>
                         <Accordion.Section title='Basic Settings'>
+                          {hasMetadataKeys && (
+                            <div className='mb-3'>
+                              <Select
+                                value={variable.metadataKey ? 'metadata' : 'column'}
+                                fieldName='variableSource'
+                                label='Source'
+                                options={[
+                                  { value: 'column', label: 'Data Column' },
+                                  { value: 'metadata', label: 'Data File Metadata' }
+                                ]}
+                                updateField={(_section, _subsection, _fieldName, value) => {
+                                  if (value === 'metadata') {
+                                    updateVariable(index, { metadataKey: metadataKeys[0] || '', columnName: '', conditions: [] })
+                                  } else {
+                                    updateVariable(index, { metadataKey: undefined, columnName: '' })
+                                  }
+                                }}
+                              />
+                            </div>
+                          )}
+
+                          {variable.metadataKey !== undefined && variable.metadataKey !== null && hasMetadataKeys ? (
+                            <div className='mb-3'>
+                              <Select
+                                value={variable.metadataKey}
+                                fieldName='metadataKey'
+                                label='Metadata Field'
+                                options={metadataKeys.map(key => ({ value: key, label: `${key}: ${dataMetadata[key]}` }))}
+                                updateField={(_section, _subsection, _fieldName, value) => {
+                                  updateVariable(index, {
+                                    metadataKey: value,
+                                    name: variable.name || value,
+                                    tag: variable.tag || generateTag(value)
+                                  })
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <div className='mb-3'>
+                              <Select
+                                value={variable.columnName}
+                                fieldName='columnName'
+                                label='Data Column'
+                                options={[
+                                  { value: '', label: 'Select Column...' },
+                                  ...getAvailableColumns.map(col => ({ value: col, label: col }))
+                                ]}
+                                updateField={(_section, _subsection, _fieldName, value) => {
+                                  updateVariable(index, { columnName: value })
+                                }}
+                              />
+                            </div>
+                          )}
+
                           <div className='mb-3'>
                             <TextField
                               value={variable.name}
@@ -296,102 +364,88 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                               />
                             </label>
                           </div>
-
-                          <div className='mb-3'>
-                            <Select
-                              value={variable.columnName}
-                              fieldName='columnName'
-                              label='Data Column'
-                              options={[
-                                { value: '', label: 'Select Column...' },
-                                ...getAvailableColumns.map(col => ({ value: col, label: col }))
-                              ]}
-                              updateField={(_section, _subsection, _fieldName, value) => {
-                                updateVariable(index, { columnName: value })
-                              }}
-                            />
-                          </div>
                         </Accordion.Section>
 
-                        <Accordion.Section title='Conditions'>
-                          <div className='text-sm text-gray-500 mb-2'>
-                            Add conditions to filter when this variable should display data
-                          </div>
-
-                          {variable.conditions && variable.conditions.length > 0 && (
-                            <div className='conditions-list mb-2'>
-                              {variable.conditions.map((condition, conditionIndex) => (
-                                <div key={`condition-${index}-${conditionIndex}`} className='condition-item p-2 border rounded mb-2' style={{ backgroundColor: '#f8f9fa' }}>
-                                  <div className='mb-2'>
-                                    <Select
-                                      value={condition.columnName || ''}
-                                      fieldName={`condition-column-${index}-${conditionIndex}`}
-                                      label='Column'
-                                      options={[
-                                        { value: '', label: 'Select Column...' },
-                                        ...getAvailableColumns.map(col => ({ value: col, label: col }))
-                                      ]}
-                                      updateField={(_section, _subsection, _fieldName, newColumnName) => {
-                                        // Reset value when column changes
-                                        updateCondition(index, conditionIndex, {
-                                          columnName: newColumnName,
-                                          value: ''
-                                        })
-                                      }}
-                                    />
-                                  </div>
-                                  <div className='mb-2'>
-                                    <Select
-                                      value={condition.isOrIsNotEqualTo || 'is'}
-                                      fieldName={`condition-operator-${index}-${conditionIndex}`}
-                                      label='Operator'
-                                      options={[
-                                        { value: 'is', label: 'is' },
-                                        { value: 'is not', label: 'is not' }
-                                      ]}
-                                      updateField={(_section, _subsection, _fieldName, value) => {
-                                        updateCondition(index, conditionIndex, { isOrIsNotEqualTo: value as 'is' | 'is not' })
-                                      }}
-                                    />
-                                  </div>
-                                  <div className='mb-2'>
-                                    <Select
-                                      value={condition.value || ''}
-                                      fieldName={`condition-value-${index}-${conditionIndex}`}
-                                      label='Value'
-                                      options={[
-                                        { value: '', label: 'Select Value...' },
-                                        ...(condition.columnName
-                                          ? getColumnValues(condition.columnName).map(val => ({
-                                            value: String(val),
-                                            label: String(val)
-                                          }))
-                                          : [])
-                                      ]}
-                                      updateField={(_section, _subsection, _fieldName, value) => {
-                                        updateCondition(index, conditionIndex, { value })
-                                      }}
-                                    />
-                                  </div>
-                                  <Button
-                                    className='btn-sm btn-danger'
-                                    onClick={() => removeCondition(index, conditionIndex)}
-                                  >
-                                    Remove Condition
-                                  </Button>
-                                </div>
-                              ))}
+                        {!variable.metadataKey && (
+                          <Accordion.Section title='Conditions'>
+                            <div className='text-sm text-gray-500 mb-2'>
+                              Add conditions to filter when this variable should display data
                             </div>
-                          )}
 
-                          <Button
-                            className='btn-sm'
-                            onClick={() => addCondition(index)}
-                          >
-                            <Icon display='plus' size={14} className='mr-1' />
-                            Add Condition
-                          </Button>
-                        </Accordion.Section>
+                            {variable.conditions && variable.conditions.length > 0 && (
+                              <div className='conditions-list mb-2'>
+                                {variable.conditions.map((condition, conditionIndex) => (
+                                  <div key={`condition-${index}-${conditionIndex}`} className='condition-item p-2 border rounded mb-2' style={{ backgroundColor: '#f8f9fa' }}>
+                                    <div className='mb-2'>
+                                      <Select
+                                        value={condition.columnName || ''}
+                                        fieldName={`condition-column-${index}-${conditionIndex}`}
+                                        label='Column'
+                                        options={[
+                                          { value: '', label: 'Select Column...' },
+                                          ...getAvailableColumns.map(col => ({ value: col, label: col }))
+                                        ]}
+                                        updateField={(_section, _subsection, _fieldName, newColumnName) => {
+                                          updateCondition(index, conditionIndex, {
+                                            columnName: newColumnName,
+                                            value: ''
+                                          })
+                                        }}
+                                      />
+                                    </div>
+                                    <div className='mb-2'>
+                                      <Select
+                                        value={condition.isOrIsNotEqualTo || 'is'}
+                                        fieldName={`condition-operator-${index}-${conditionIndex}`}
+                                        label='Operator'
+                                        options={[
+                                          { value: 'is', label: 'is' },
+                                          { value: 'is not', label: 'is not' }
+                                        ]}
+                                        updateField={(_section, _subsection, _fieldName, value) => {
+                                          updateCondition(index, conditionIndex, { isOrIsNotEqualTo: value as 'is' | 'is not' })
+                                        }}
+                                      />
+                                    </div>
+                                    <div className='mb-2'>
+                                      <Select
+                                        value={condition.value || ''}
+                                        fieldName={`condition-value-${index}-${conditionIndex}`}
+                                        label='Value'
+                                        options={[
+                                          { value: '', label: 'Select Value...' },
+                                          ...(condition.columnName
+                                            ? getColumnValues(condition.columnName).map(val => ({
+                                              value: String(val),
+                                              label: String(val)
+                                            }))
+                                            : [])
+                                        ]}
+                                        updateField={(_section, _subsection, _fieldName, value) => {
+                                          updateCondition(index, conditionIndex, { value })
+                                        }}
+                                      />
+                                    </div>
+                                    <Button
+                                      className='btn-sm btn-danger'
+                                      onClick={() => removeCondition(index, conditionIndex)}
+                                    >
+                                      Remove Condition
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            <Button
+                              className='btn-sm'
+                              onClick={() => addCondition(index)}
+                            >
+                              <Icon display='plus' size={14} className='mr-1' />
+                              Add Condition
+                            </Button>
+                          </Accordion.Section>
+                        )}
 
                         <Accordion.Section title='Formatting Options'>
                           <div className='mb-3'>

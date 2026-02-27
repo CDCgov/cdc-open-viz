@@ -92,9 +92,12 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
 
     /* FETCH DATA */
     fetchRemoteData(`${dataUrl}`)
-      .then(resData => {
-        const processedData = processData(resData, dataDescription)
+      .then(({ data: fetchedData, dataMetadata }) => {
+        const processedData = processData(fetchedData, dataDescription)
         dispatch({ type: 'SET_DATA', payload: processedData })
+        if (config && Object.keys(dataMetadata).length > 0) {
+          dispatch({ type: 'SET_CONFIG', payload: { ...config, dataMetadata } as Config })
+        }
       })
       .catch(() => dispatch({ type: 'SET_DATA', payload: null }))
   }

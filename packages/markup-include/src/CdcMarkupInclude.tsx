@@ -255,7 +255,8 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         filters: config?.filters || [],
         datasets,
         configDataKey: config?.dataKey,
-        locale: config?.locale
+        locale: config?.locale,
+        dataMetadata: config?.dataMetadata
       })
     : { processedContent: parseBodyMarkup(urlMarkup), shouldHideSection: false, shouldShowNoDataMessage: false }
 
@@ -312,6 +313,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
           markupVariables={markupVariables}
           enableMarkupVariables={config?.enableMarkupVariables}
           data={data}
+          dataMetadata={config?.dataMetadata}
         />
       </div>
     )

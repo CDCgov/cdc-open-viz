@@ -91,11 +91,12 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
       return prepareDatasets(newConfig)
     } else {
       const dataKey = newConfig.dataFileName || 'backwards-compatibility'
-      const data = await processDataLegacy(config)
+      const { data, dataMetadata } = await processDataLegacy(config)
 
       const datasetsFull = {}
       datasetsFull[dataKey] = {
         data,
+        dataMetadata,
         dataDescription: newConfig.dataDescription
       }
       newConfig.datasets = datasetsFull

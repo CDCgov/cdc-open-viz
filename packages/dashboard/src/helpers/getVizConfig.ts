@@ -90,6 +90,9 @@ export const getVizConfig = (
 
   if (visualizationConfig.formattedData) visualizationConfig.originalFormattedData = visualizationConfig.formattedData
   const filteredVizData = filteredData?.[rowNumber] ?? filteredData?.[visualizationKey]
+  const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
+
+  visualizationConfig.dataMetadata = config.datasets[dataKey]?.dataMetadata || {}
 
   if (filteredVizData) {
     visualizationConfig.data = filteredVizData || []
@@ -97,7 +100,6 @@ export const getVizConfig = (
       visualizationConfig.formattedData = visualizationConfig.data
     }
   } else {
-    const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
     // Clear data for charts/maps when shared filters exist but filtered data
     // hasn't arrived yet — prevents rendering the full unfiltered dataset as DOM.
     // Lighter types (data-bite, waffle-chart, filtered-text, markup-include) are
