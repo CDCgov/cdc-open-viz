@@ -292,6 +292,25 @@
       padding: 1rem;
     }
 
+    // User-configured equal height rows
+    .row.equal-height {
+      display: flex !important;
+      align-items: stretch !important;
+
+      [class*='col-'] {
+        display: flex !important;
+        flex-direction: column !important;
+
+        > * {
+          display: flex !important;
+          flex-direction: column !important;
+          flex: 1 !important;
+          min-height: 0;
+          width: 100%;
+        }
+      }
+    }
+
     // Ensure Bootstrap rows with data bites stretch columns to equal height
     .row:has([class*='bite__style']) {
       display: flex !important;

@@ -70,6 +70,12 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
     updateConfig({ ...config, rows: newRows })
   }
 
+  const toggleEqualHeight = () => {
+    const newRows = _.cloneDeep(rows)
+    newRows[rowIdx].equalHeight = !newRows[rowIdx].equalHeight
+    updateConfig({ ...config, rows: newRows })
+  }
+
   const moveRow = (dir = 'down') => {
     if (rowIdx === rows.length - 1 && dir === 'down') return
 
@@ -179,9 +185,24 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
     </li>
   ]
 
+  const isMultiColumn = curr !== '12' && curr !== 'toggle'
+
   return (
     <nav className='row-menu'>
       <ul className='row-menu__flyout'>{layoutList}</ul>
+      {isMultiColumn && (
+        <button
+          className={`btn row-menu__btn border-0${row.equalHeight ? ' btn-primary' : ''}`}
+          title={row.equalHeight ? 'Disable Equal Height Rows' : 'Enable Equal Height Rows'}
+          onClick={toggleEqualHeight}
+        >
+          <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='25' height='20' fill='#fff'>
+            <rect x='1' y='2' width='9' height='14' rx='1' />
+            <rect x='14' y='2' width='9' height='14' rx='1' />
+            <line x1='0' y1='19' x2='24' y2='19' stroke='#fff' strokeWidth='2' strokeDasharray='3 2' />
+          </svg>
+        </button>
+      )}
       <div className='spacer'></div>
       <button
         className={`btn btn-primary row-menu__btn border-0`}
