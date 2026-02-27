@@ -110,12 +110,15 @@ $theme: (
         }
       }
 
+      .cove-visualization__title,
       .cove-visualization__header {
         border-color: string.unquote(list.nth($theme-colors, 2));
       }
     }
 
     &.theme-#{$theme-name} {
+
+      .cove-visualization__title,
       .cove-visualization__header {
         border-color: string.unquote(list.nth($theme-colors, 2));
       }

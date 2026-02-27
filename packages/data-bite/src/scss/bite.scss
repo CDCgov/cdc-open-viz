@@ -67,19 +67,20 @@
 // TODO after v2 refactor remove header reference colors
 // Use .font-color/.bg-color, etc. in color definitions or something similar
 // Remove box shadows if we're no longer using them
-&.cove-visualization.is-editor .sidebar + .cove-visualization__body {
+&.cove-visualization.is-editor .sidebar+.cove-visualization__body {
   margin: 3em auto 0 !important;
   max-width: 35em !important;
   background-color: initial;
   height: fit-content;
 }
 
-.sidebar + .cove-visualization__body .bite-content-container:not(.component--hide-background-color) {
+.sidebar+.cove-visualization__body .bite-content-container:not(.component--hide-background-color) {
   background-color: white;
 }
 
 .cove-visualization__body {
   padding: 0;
+
   // Visual: Shadow
   &.shadow {
     box-shadow: rgba(0, 0, 0, 0.2) 0 3px 10px;
@@ -106,11 +107,13 @@
     .bite-content {
       flex-direction: row !important;
     }
+
     .bite-value {
       flex-basis: 25%;
       align-self: center;
       text-align: center;
     }
+
     .bite-content__text-wrap {
       flex: 75% !important;
     }
@@ -202,6 +205,7 @@
   // General: Compact View
   &.bite--is-compact-style .bite .cove-visualization__body .bite-content {
     align-items: center;
+
     p.bite-text {
       margin-bottom: 0;
     }
@@ -211,9 +215,11 @@
     align-items: center;
   }
 
-  .cove-visualization__header + .bite {
+  .cove-visualization__title+.bite,
+  .cove-visualization__header+.bite {
     border-top: 0;
   }
+
   .bite {
     position: relative;
     overflow: hidden;
@@ -225,6 +231,7 @@
       border-top-left-radius: 3px;
       border-top-right-radius: 3px;
     }
+
     .bite-content-container.component--hide-background-color {
       background: transparent;
     }
@@ -367,6 +374,7 @@
         width: 33%;
         margin-left: 1.5em;
       }
+
       .cove-visualization__body {
         flex-direction: row-reverse;
       }
@@ -425,6 +433,7 @@
     // General: Compact View
     &.bite--is-compact-style .bite .cove-visualization__body .bite-content {
       align-items: center;
+
       p.bite-text {
         margin-bottom: 0;
       }
@@ -434,7 +443,8 @@
       align-items: center;
     }
 
-    .cove-visualization__header + .bite {
+    .cove-visualization__title+.bite,
+    .cove-visualization__header+.bite {
       border-top: 0;
     }
   }

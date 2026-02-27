@@ -122,7 +122,7 @@ const Responsive = ({ children, isEditor, displayPanel: controlledPanel, onToggl
   const onBackClick = () => togglePanel()
 
   if (!isEditor || !displayPanel) {
-    return <div className='cove-visualization__inner'>{children}</div>
+    return <div className='cove-visualization__outer'>{children}</div>
   }
 
   return (

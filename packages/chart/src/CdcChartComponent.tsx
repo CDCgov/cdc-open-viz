@@ -1231,7 +1231,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         {config.newViz && <Confirm updateConfig={updateConfig} config={config} />}
         {!missingRequiredSections(config) && !config.newViz && (
           <div
-            className={`cove-visualization__body type-${makeClassName(config.visualizationType)}`}
+            className={`cove-visualization__inner type-${makeClassName(config.visualizationType)}`}
             aria-label={handleChartAriaLabels(config)}
             tabIndex={0}
           >
@@ -1241,7 +1241,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
               title={title}
               superTitle={processedSuperTitle}
               titleStyle={config.titleStyle}
-              classes={['chart-title', `${config.theme}`, 'cove-visualization__header', 'mb-3']}
+              classes={['chart-title', `${config.theme}`, 'cove-visualization__title', 'mb-3']}
               style={undefined}
               config={config}
             />
@@ -1255,7 +1255,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
               })()} */}
 
             {/* Visualization Wrapper */}
-            <div className={getChartWrapperClasses().join(' ')}>
+            <div
+              className={`cove-visualization__body cove-visualization__body-wrap ${getChartWrapperClasses().join(' ')}`}
+            >
               {/* Intro Text/Message */}
               {processedIntroText && config.visualizationType !== 'Spark Line' && (
                 <section className={`introText mb-4`}>{parse(processedIntroText)}</section>
@@ -1457,7 +1459,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     return (
                       <DataTable
                         /* changing the "key" will force the table to re-render
-                            when the default sort changes while editing */
+                          when the default sort changes while editing */
                         key={dataTableDefaultSortBy}
                         config={dataTableConfig}
                         rawData={dataTableRawData}

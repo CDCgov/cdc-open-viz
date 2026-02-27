@@ -397,7 +397,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         <Error updateConfig={updateConfig} config={config} />
       )}
       {config.newViz && showConfigConfirm && <Confirm updateConfig={updateConfig} config={config} />}
-      <div className='cove-visualization__body-wrap p-0'>
+      <div className='cove-visualization__body cove-visualization__body-wrap p-0'>
         {(config.visualizationType === 'Gauge' || config.visualizationType === 'TP5 Gauge') && (
           <div className={`cove-gauge-chart${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
             <div className='cove-gauge-chart__chart'>
@@ -539,7 +539,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     }
 
     return (
-      <div className='cove-visualization__body border-0'>
+      <div className='cove-visualization__inner cove-visualization__body border-0'>
         <div className={calloutClasses.join(' ')}>
           {!config.visual?.whiteBackground && (
             <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
@@ -556,7 +556,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
 
   // Original Style: Regular title and content
   return (
-    <div className='cove-visualization__body'>
+    <div className='cove-visualization__inner cove-visualization__body'>
       <Title
         showTitle={config.showTitle}
         title={title}

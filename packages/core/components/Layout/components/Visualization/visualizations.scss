@@ -27,9 +27,9 @@
     }
 
     &.editor-panel--visible {
-      grid-template-areas: 'panel content';
-      grid-template-columns: 350px calc(100% - 350px);
-      overflow: hidden;
+      .cove-visualization__outer {
+        overflow: hidden;
+      }
     }
 
     &.editor-panel--hidden {
@@ -39,18 +39,23 @@
     }
 
     .cove-editor__content,
+    .cove-visualization__outer,
     .cove-visualization__inner {
       grid-area: content;
       position: relative;
       left: 0;
       width: 100% !important;
-      padding: 1rem;
 
       // Prevent double padding on nested body divs
       // (e.g., in markup-include, waffle-chart, filtered-text)
       .cove-visualization__body {
         padding: 0;
       }
+    }
+
+    .cove-editor__content,
+    .cove-visualization__outer {
+      padding: 1rem;
     }
   }
 }
@@ -76,12 +81,32 @@
     z-index: 9999;
   }
 
-  .cove-visualization__inner {
+  .cove-visualization__outer {
     outline: 2px dashed #00a91c;
     position: relative;
 
     &::before {
       background: #00a91c;
+      color: #fff;
+      content: '__outer';
+      font-family: monospace;
+      font-size: 10px;
+      line-height: 1;
+      padding: 2px 4px;
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+    }
+  }
+
+  .cove-visualization__inner {
+    outline: 2px dashed #e52207;
+    position: relative;
+
+    &::before {
+      background: #e52207;
       color: #fff;
       content: '__inner';
       font-family: monospace;
@@ -96,6 +121,7 @@
     }
   }
 
+  .cove-visualization__title,
   .cove-visualization__header {
     outline: 2px dashed #8a2be2;
     position: relative;
@@ -103,7 +129,7 @@
     &::before {
       background: #8a2be2;
       color: #fff;
-      content: '__header';
+      content: '__title';
       font-family: monospace;
       font-size: 10px;
       line-height: 1;
@@ -123,7 +149,7 @@
     &::before {
       background: #e52207;
       color: #fff;
-      content: '__body';
+      content: '__inner';
       font-family: monospace;
       font-size: 10px;
       line-height: 1;
@@ -143,7 +169,7 @@
     &::before {
       background: #e66f0e;
       color: #fff;
-      content: '__body-wrap';
+      content: '__body';
       font-family: monospace;
       font-size: 10px;
       line-height: 1;
@@ -155,4 +181,5 @@
       z-index: 9999;
     }
   }
+
 }
