@@ -54,3 +54,105 @@
     }
   }
 }
+
+// Developer highlight tool — only active when .is-editor + config.visual.highlightWrappers
+// Enabled via ?isCoveDeveloper=true URL param + "Highlight Layout Wrappers" checkbox
+.cove-visualization.is-editor.cove-highlight-wrappers {
+  outline: 2px dashed #0050d8;
+  position: relative;
+
+  &::before {
+    background: #0050d8;
+    color: #fff;
+    content: 'cove-visualization';
+    font-family: monospace;
+    font-size: 10px;
+    line-height: 1;
+    padding: 2px 4px;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+  }
+
+  .cove-visualization__inner {
+    outline: 2px dashed #00a91c;
+    position: relative;
+
+    &::before {
+      background: #00a91c;
+      color: #fff;
+      content: '__inner';
+      font-family: monospace;
+      font-size: 10px;
+      line-height: 1;
+      padding: 2px 4px;
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+    }
+  }
+
+  .cove-visualization__header {
+    outline: 2px dashed #8a2be2;
+    position: relative;
+
+    &::before {
+      background: #8a2be2;
+      color: #fff;
+      content: '__header';
+      font-family: monospace;
+      font-size: 10px;
+      line-height: 1;
+      padding: 2px 4px;
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+    }
+  }
+
+  .cove-visualization__body {
+    outline: 2px dashed #e52207;
+    position: relative;
+
+    &::before {
+      background: #e52207;
+      color: #fff;
+      content: '__body';
+      font-family: monospace;
+      font-size: 10px;
+      line-height: 1;
+      padding: 2px 4px;
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+    }
+  }
+
+  .cove-visualization__body-wrap {
+    outline: 2px dashed #e66f0e;
+    position: relative;
+
+    &::before {
+      background: #e66f0e;
+      color: #fff;
+      content: '__body-wrap';
+      font-family: monospace;
+      font-size: 10px;
+      line-height: 1;
+      padding: 2px 4px;
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+    }
+  }
+}

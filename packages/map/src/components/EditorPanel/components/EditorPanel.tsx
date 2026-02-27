@@ -3445,6 +3445,15 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         />
                       </>
                     )}
+                    {isCoveDeveloperMode() && (
+                      <CheckBox
+                        value={config.visual?.highlightWrappers}
+                        section='visual'
+                        fieldName='highlightWrappers'
+                        label='Highlight Layout Wrappers'
+                        updateField={updateField}
+                      />
+                    )}
                   </AccordionItemPanel>
                 </AccordionItem>
                 <AccordionItem>

@@ -56,6 +56,10 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
       classes.push('editor-panel--hidden')
     }
 
+    if (isEditor && config.visual?.highlightWrappers) {
+      classes.push('cove-highlight-wrappers')
+    }
+
     if (config.type === 'filtered-text') {
       classes.push('type-filtered-text', `font-${config.fontSize}`)
       classes = classes.filter(item => item !== 'cove-visualization__body')

@@ -658,7 +658,7 @@ export const VisualSectionTests: Story = {
 
     // ============================================================================
     // TEST 9: Theme Border Color Toggle
-    // Expectation: Class 'component--has-borderColorTheme' toggles.
+    // Expectation: Class 'component--has-border-color-theme' toggles.
     // ============================================================================
     // Find border color theme checkbox by exact label text
     const borderColorThemeCheckbox = canvas.getByLabelText('Use Border Color Theme') as HTMLInputElement
@@ -712,7 +712,7 @@ export const VisualSectionTests: Story = {
 
     // ============================================================================
     // TEST 12: Hide Background Color Toggle
-    // Expectation: Class 'component--hideBackgroundColor' toggles.
+    // Expectation: Class 'component--hide-background-color' toggles.
     // ============================================================================
     // Find hide background checkbox by exact label text
     const hideBackgroundCheckbox = canvas.getByLabelText('Hide Background Color') as HTMLInputElement

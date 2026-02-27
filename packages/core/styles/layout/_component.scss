@@ -11,7 +11,7 @@
     border: none !important;
   }
 
-  .cove-visualization__body:not(.component--hideBackgroundColor) {
+  .cove-visualization__body:not(.component--hide-background-color) {
     background: $lightestGray;
   }
 }
@@ -19,3 +19,4 @@
 .cove-visualization__body-wrap {
   padding: 0 1rem 1rem;
 }
+

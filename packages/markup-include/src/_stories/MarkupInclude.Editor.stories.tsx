@@ -380,7 +380,7 @@ export const VisualSectionTests: Story = {
       'Border Color Theme Toggle',
       () => ({
         checked: borderColorThemeCheckbox.checked,
-        hasBorderColorTheme: visualContainer().classList.contains('component--has-borderColorTheme')
+        hasBorderColorTheme: visualContainer().classList.contains('component--has-border-color-theme')
       }),
       async () => {
         const checkboxWrapper =
@@ -455,7 +455,7 @@ export const VisualSectionTests: Story = {
       'Hide Background Color Toggle',
       () => ({
         checked: hideBackgroundCheckbox.checked,
-        hideBackground: visualContainer().classList.contains('component--hideBackgroundColor')
+        hideBackground: visualContainer().classList.contains('component--hide-background-color')
       }),
       async () => {
         const checkboxWrapper = hideBackgroundCheckbox.closest('.cove-input__checkbox--small') || hideBackgroundCheckbox

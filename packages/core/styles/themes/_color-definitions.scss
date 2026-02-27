@@ -85,12 +85,12 @@ $theme: (
         &:not(.no-borders) {
 
           /// borders are the theme color
-          &.component--has-borderColorTheme {
+          &.component--has-border-color-theme {
             border: 1px solid string.unquote(list.nth($theme-colors, 1));
           }
 
           /// using default border color to draw borders
-          &:not(.component--has-borderColorTheme) {
+          &:not(.component--has-border-color-theme) {
             border: 1px solid $lightGray;
           }
 
@@ -105,7 +105,7 @@ $theme: (
         }
 
         /// Apply a background color
-        &.component--has-background:not(.component--hideBackgroundColor) {
+        &.component--has-background:not(.component--hide-background-color) {
           background: string.unquote(list.nth($theme-colors, 3));
         }
       }

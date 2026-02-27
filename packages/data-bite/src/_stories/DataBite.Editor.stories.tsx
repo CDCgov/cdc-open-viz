@@ -798,8 +798,8 @@ export const VisualSectionTests: Story = {
         // Check for specific component classes that these controls add
         hasAccentClass: element!.classList.contains('component--has-accent'),
         hasBackgroundClass: element!.classList.contains('component--has-background'),
-        hasBorderColorThemeClass: element!.classList.contains('component--has-borderColorTheme'),
-        hideBackgroundColorClass: element!.classList.contains('component--hideBackgroundColor'),
+        hasBorderColorThemeClass: element!.classList.contains('component--has-border-color-theme'),
+        hideBackgroundColorClass: element!.classList.contains('component--hide-background-color'),
         themeClass: Array.from(element!.classList).find(cls => cls.includes('theme-')) || 'no-theme',
         backgroundStyle: getComputedStyle(element!).backgroundColor
       }

@@ -690,6 +690,15 @@ const PanelVisual: FC<PanelProps> = props => {
             }
           />
         </label>
+        {isCoveDeveloperMode() && (
+          <CheckBox
+            value={visual?.highlightWrappers}
+            section='visual'
+            fieldName='highlightWrappers'
+            label='Highlight Layout Wrappers'
+            updateField={updateField}
+          />
+        )}
       </AccordionItemPanel>
     </AccordionItem>
   )

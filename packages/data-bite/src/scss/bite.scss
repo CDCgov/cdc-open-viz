@@ -74,7 +74,7 @@
   height: fit-content;
 }
 
-.sidebar + .cove-visualization__body .bite-content-container:not(.component--hideBackgroundColor) {
+.sidebar + .cove-visualization__body .bite-content-container:not(.component--hide-background-color) {
   background-color: white;
 }
 
@@ -200,14 +200,14 @@
   }
 
   // General: Compact View
-  &.bite--isCompactStyle .bite .cove-visualization__body .bite-content {
+  &.bite--is-compact-style .bite .cove-visualization__body .bite-content {
     align-items: center;
     p.bite-text {
       margin-bottom: 0;
     }
   }
 
-  &.bite--isCompactStyle .bite .cove-visualization__body {
+  &.bite--is-compact-style .bite .cove-visualization__body {
     align-items: center;
   }
 
@@ -225,7 +225,7 @@
       border-top-left-radius: 3px;
       border-top-right-radius: 3px;
     }
-    .bite-content-container.component--hideBackgroundColor {
+    .bite-content-container.component--hide-background-color {
       background: transparent;
     }
 
@@ -423,14 +423,14 @@
     }
 
     // General: Compact View
-    &.bite--isCompactStyle .bite .cove-visualization__body .bite-content {
+    &.bite--is-compact-style .bite .cove-visualization__body .bite-content {
       align-items: center;
       p.bite-text {
         margin-bottom: 0;
       }
     }
 
-    &.bite--isCompactStyle .bite .cove-visualization__body {
+    &.bite--is-compact-style .bite .cove-visualization__body {
       align-items: center;
     }
 
