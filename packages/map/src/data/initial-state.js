@@ -114,6 +114,11 @@ const createInitialState = () => {
       editorErrorMessage: []
     },
     visual: {
+      border: false,
+      borderColorTheme: false,
+      accent: false,
+      background: false,
+      hideBackgroundColor: false,
       minBubbleSize: 1,
       maxBubbleSize: 20,
       extraBubbleBorder: false,

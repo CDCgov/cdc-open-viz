@@ -47,7 +47,7 @@ import { generateRuntimeLegend } from './helpers/generateRuntimeLegend'
 import generateRuntimeData from './helpers/generateRuntimeData'
 import { reloadURLData } from './helpers/urlDataHelpers'
 import { observeMapSvgLoaded } from './helpers/mapObserverHelpers'
-import { buildSectionClassNames } from './helpers/componentHelpers'
+import { buildBodyWrapClassNames, buildSectionClassNames } from './helpers/componentHelpers'
 import { shouldShowDataTable } from './helpers/dataTableHelpers'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 
@@ -438,7 +438,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   config={config}
                   classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${headerColor}`]}
                 />
-                <div className='cove-visualization__body cove-visualization__body-wrap'>
+                <div className={buildBodyWrapClassNames(config.visual)}>
                   <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
                   {config?.annotations?.length > 0 && (
                     <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
