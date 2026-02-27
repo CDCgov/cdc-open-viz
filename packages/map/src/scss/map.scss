@@ -114,3 +114,8 @@ canvas {
   pointer-events: none;
   display: none;
 }
+
+.county-map-canvas {
+  touch-action: none;
+  cursor: move;
+}
