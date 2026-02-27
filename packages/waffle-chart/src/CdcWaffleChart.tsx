@@ -608,7 +608,9 @@ const CdcWaffleChart = ({
     let responseData = response.data ?? {}
 
     if (response.dataUrl) {
-      responseData = await fetchRemoteData(response.dataUrl)
+      const { data, dataMetadata } = await fetchRemoteData(response.dataUrl)
+      responseData = data
+      response.dataMetadata = dataMetadata
     }
 
     response.data = responseData

@@ -15,7 +15,8 @@ import pieCalculatedArea from './_mock/pie_calculated_area.json'
 import areaChartStacked from './_mock/area_chart_stacked.json'
 import multipleLines from './_mock/short_dates.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
-import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
+import { expect } from 'storybook/test'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart',
@@ -141,6 +142,27 @@ export const Paired_Bar_Year_Tick_Format_Regression: Story = {
 export const Area_Chart_stacked: Story = {
   args: {
     config: areaChartStacked,
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+  }
+}
+
+export const Metadata_In_Description: Story = {
+  args: {
+    configUrl: '/packages/chart/tests/fixtures/chart-config-with-metadata.json'
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    const subtext = await waitForPresence('.subtext', canvasElement)
+    expect(subtext?.textContent).toContain('January 15, 2026')
+  }
+}
+
+export const Metadata_Backward_Compat_Plain_Array: Story = {
+  args: {
+    config: lineChartTwoPointsRegressionTest,
     isEditor: false
   },
   play: async ({ canvasElement }) => {

@@ -560,6 +560,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
               onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
               onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
               withAccordion={false}
+              dataMetadata={config.dataMetadata}
             />
           </Accordion.Section>
           <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />

@@ -90,6 +90,9 @@ export const getVizConfig = (
 
   if (visualizationConfig.formattedData) visualizationConfig.originalFormattedData = visualizationConfig.formattedData
   const filteredVizData = filteredData?.[rowNumber] ?? filteredData?.[visualizationKey]
+  const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
+
+  visualizationConfig.dataMetadata = config.datasets[dataKey]?.dataMetadata || {}
 
   if (filteredVizData) {
     visualizationConfig.data = filteredVizData || []
@@ -97,7 +100,6 @@ export const getVizConfig = (
       visualizationConfig.formattedData = visualizationConfig.data
     }
   } else {
-    const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
     // Markup-includes need data even when shared filters exist (for markup variables)
     const shouldClearData = sharedFilterColumns.length && visualizationConfig.type !== 'markup-include'
     visualizationConfig.data = shouldClearData ? [] : data[dataKey] || []
