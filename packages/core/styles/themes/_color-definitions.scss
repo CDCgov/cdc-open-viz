@@ -61,11 +61,11 @@ $theme: (
 );
 
 // .type-sparkline class used for creating sparklines
-.cdc-open-viz-module.type-markup-include,
-.cdc-open-viz-module.type-waffle-chart,
-.cdc-open-viz-module.type-data-bite,
-.cdc-open-viz-module.type-filtered-text,
-.cdc-open-viz-module.type-chart.type-sparkline {
+.cove-visualization.type-markup-include,
+.cove-visualization.type-waffle-chart,
+.cove-visualization.type-data-bite,
+.cove-visualization.type-filtered-text,
+.cove-visualization.type-chart.type-sparkline {
   @each $theme-name, $theme-colors in $theme {
 
     // Header
@@ -79,7 +79,7 @@ $theme: (
     &.theme-#{$theme-name} {
 
       /// area that appears underneath the title of the component.
-      .cove-component__content {
+      .cove-visualization__body {
 
         /// when there are borders on a component
         &:not(.no-borders) {
@@ -110,13 +110,13 @@ $theme: (
         }
       }
 
-      .cove-component__header {
+      .cove-visualization__header {
         border-color: string.unquote(list.nth($theme-colors, 2));
       }
     }
 
     &.theme-#{$theme-name} {
-      .cove-component__header {
+      .cove-visualization__header {
         border-color: string.unquote(list.nth($theme-colors, 2));
       }
     }
@@ -124,7 +124,7 @@ $theme: (
 }
 
 // Charts filter styles
-.cdc-open-viz-module {
+.cove-visualization {
   @each $theme-name, $theme-colors in $theme {
     &.theme-#{$theme-name} {
       .single-filters--tab .tab--active:not(.tab--simple) {

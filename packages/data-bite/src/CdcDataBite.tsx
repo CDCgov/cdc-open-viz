@@ -624,7 +624,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     body = (
       <>
         <div
-          className={`cove-component__content ${showBite && 'tp5' === biteStyle ? 'bite__style--tp5' : ''} ${
+          className={`cove-visualization__body ${showBite && 'tp5' === biteStyle ? 'bite__style--tp5' : ''} ${
             showBite && 'tp5' === biteStyle && config.visual?.whiteBackground ? 'white-background-style' : ''
           } ${
             showBite && 'tp5' === biteStyle && config.visual?.whiteBackground && config.visual?.border

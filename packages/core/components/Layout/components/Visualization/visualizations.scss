@@ -1,8 +1,4 @@
-.cdc-open-viz-module {
-  .cdc-chart-inner-container .cove-component__content {
-    padding: 0 0 27px 0 !important;
-  }
-
+.cove-visualization {
   &.isEditor {
     overflow: auto;
     display: grid;
@@ -19,7 +15,7 @@
     }
 
     // Override dashboard's .editor-panel absolute positioning that conflicts with the grid layout.
-    // .cdc-open-viz-module.type-dashboard scopes .editor-panel { position: absolute } (specificity 0,3,0),
+    // .cove-visualization.type-dashboard scopes .editor-panel { position: absolute } (specificity 0,3,0),
     // so we need 4 classes here (specificity 0,4,0) to win.
     .editor-panel.sidebar {
       position: static;
@@ -43,17 +39,16 @@
     }
 
     .cove-editor__content,
-    .cove-component__content,
-    .cdc-open-viz-module__content {
+    .cove-visualization__inner {
       grid-area: content;
       position: relative;
       left: 0;
       width: 100% !important;
       padding: 1rem;
 
-      // Prevent double padding on nested .cove-component__content divs
+      // Prevent double padding on nested body divs
       // (e.g., in markup-include, waffle-chart, filtered-text)
-      .cove-component__content {
+      .cove-visualization__body {
         padding: 0;
       }
     }

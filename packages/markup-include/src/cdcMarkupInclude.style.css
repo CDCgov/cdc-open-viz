@@ -1,4 +1,4 @@
-.cdc-open-viz-module.markup-include {
+.cove-visualization.markup-include {
   .spacing-wrapper {
     background-color: var(--lightGray) !important;
   }
@@ -6,14 +6,14 @@
     display: none;
   }
 
-  .markup-include-content-container.cove-component__content {
-    .markup-include-component.cove-component__content:not(.component--hideBackgroundColor, .component--has-background) {
+  .markup-include-content-container.cove-visualization__body {
+    .markup-include-component.cove-visualization__body:not(.component--hideBackgroundColor, .component--has-background) {
       background-color: white;
     }
   }
 }
 
-.cdc-open-viz-module.markup-include.isEditor {
+.cove-visualization.markup-include.isEditor {
   .cove-tooltip-variable {
     background: var(--orange-tertiary);
     display: inline;

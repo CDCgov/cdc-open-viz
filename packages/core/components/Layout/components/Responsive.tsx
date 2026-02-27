@@ -121,10 +121,9 @@ const Responsive = ({ children, isEditor, displayPanel: controlledPanel, onToggl
 
   const onBackClick = () => togglePanel()
 
-  if (!isEditor) {
-    return <div className='cdc-open-viz-module__content'>{children}</div>
+  if (!isEditor || !displayPanel) {
+    return <div className='cove-visualization__inner'>{children}</div>
   }
-  if (!displayPanel) return <div className='cdc-open-viz-module__content'>{children}</div>
 
   return (
     <div className='cove-editor__content' data-grid={displayGrid || null}>

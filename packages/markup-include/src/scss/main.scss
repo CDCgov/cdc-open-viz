@@ -1,5 +1,5 @@
-.cdc-open-viz-module.type-markup-include {
-  .cove-component__content-wrap {
+.cove-visualization.type-markup-include {
+  .cove-visualization__body-wrap {
     padding: 0;
 
     &.has-top-padding {
@@ -24,7 +24,7 @@
     }
   }
 
-  .cove-component__content.component--hideBackgroundColor {
+  .cove-visualization__body.component--hideBackgroundColor {
     background: transparent;
   }
 

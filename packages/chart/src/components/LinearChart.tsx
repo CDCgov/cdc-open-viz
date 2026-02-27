@@ -834,7 +834,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               <TooltipWithBounds
                 ref={tooltipRef}
                 key={Math.random()}
-                className={'tooltip cdc-open-viz-module'}
+                className={'tooltip cove-visualization'}
                 left={tooltipLeft}
                 top={tooltipTop}
               >

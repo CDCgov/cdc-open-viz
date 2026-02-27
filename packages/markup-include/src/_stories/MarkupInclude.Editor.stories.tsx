@@ -138,7 +138,7 @@ export const GeneralSectionTests: Story = {
       'Title Update',
       () => {
         const modernTitle = canvasElement.querySelector('.cove-title')
-        const legacyTitle = canvasElement.querySelector('.cove-component__header h2')
+        const legacyTitle = canvasElement.querySelector('.cove-visualization__header h2')
         const titleElement = modernTitle || legacyTitle
         return titleElement?.textContent?.trim() || ''
       },
@@ -150,7 +150,7 @@ export const GeneralSectionTests: Story = {
     )
 
     const modernHeader = canvasElement.querySelector('.cove-title')
-    const legacyHeader = canvasElement.querySelector('.cove-component__header h2')
+    const legacyHeader = canvasElement.querySelector('.cove-visualization__header h2')
     const headerElement = modernHeader || legacyHeader
     expect(headerElement).toBeTruthy()
     expect(headerElement!.textContent?.trim()).toBe('Updated Markup Include Title E2E')
@@ -226,7 +226,7 @@ export const ContentEditorTests: Story = {
     await performAndAssert(
       'HTML Content Update',
       () => {
-        const contentElement = canvasElement.querySelector('.cove-component__content')
+        const contentElement = canvasElement.querySelector('.cove-visualization__body')
         return contentElement?.innerHTML || ''
       },
       async () => {
@@ -255,7 +255,7 @@ export const ContentEditorTests: Story = {
       'Source URL Update and Content Loading',
       () => ({
         inputValue: srcUrlInput.value,
-        contentText: canvasElement.querySelector('.cove-component__content')?.textContent || ''
+        contentText: canvasElement.querySelector('.cove-visualization__body')?.textContent || ''
       }),
       async () => {
         await userEvent.clear(srcUrlInput)
@@ -296,7 +296,7 @@ export const VisualSectionTests: Story = {
     await waitForEditor(canvas)
     await openAccordion(canvas, 'Visual')
 
-    const contentContainer = () => canvasElement.querySelector('.cove-component__content') as HTMLElement
+    const contentContainer = () => canvasElement.querySelector('.cove-visualization__body') as HTMLElement
     const visualContainer = () => canvasElement.querySelector('.markup-include-component') as HTMLElement
     expect(contentContainer()).toBeTruthy()
     expect(visualContainer()).toBeTruthy()

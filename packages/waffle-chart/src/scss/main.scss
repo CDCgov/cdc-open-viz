@@ -1,16 +1,9 @@
 @import '@cdc/core/styles/accessibility';
 @import 'waffle-chart';
 
-.cdc-open-viz-module.type-waffle-chart {
-  .cove-component__content:not(.component--has-background, .component--hideBackgroundColor) {
+.cove-visualization.type-waffle-chart {
+  .cove-visualization__body:not(.component--has-background, .component--hideBackgroundColor) {
     background-color: white;
   }
 
-  &.is-editor .cove-component {
-    padding-left: 350px;
-  }
-
-  &.is-editor .cove-editor__content .cove-component {
-    padding-left: 0px;
-  }
 }

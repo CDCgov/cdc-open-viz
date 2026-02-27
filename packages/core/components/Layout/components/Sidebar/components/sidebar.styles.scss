@@ -2,20 +2,20 @@
   top: 0;
 }
 
-.cdc-editor .configure .editor-heading + .cdc-open-viz-module .editor-panel__toggle {
+.cdc-editor .configure .editor-heading + .cove-visualization .editor-panel__toggle {
   top: 12px;
   position: relative;
 }
 
-.cdc-editor .configure .cdc-open-viz-module:not(.type-dashboard) .editor-panel__toggle {
+.cdc-editor .configure .cove-visualization:not(.type-dashboard) .editor-panel__toggle {
   position: absolute;
 }
 
-.cdc-editor .configure .cdc-open-viz-module:not(.type-dashboard) .sidebar {
+.cdc-editor .configure .cove-visualization:not(.type-dashboard) .sidebar {
   position: relative;
 }
 
-.cdc-open-viz-module {
+.cove-visualization {
   .waiting {
     padding-top: 0 !important;
     padding-left: 0 !important;

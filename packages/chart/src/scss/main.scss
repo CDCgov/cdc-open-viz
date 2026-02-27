@@ -4,15 +4,15 @@
   overflow-y: auto;
 }
 
-.cdc-open-viz-module.type-dashboard {
-  .cdc-open-viz-module.type-chart.isEditor {
-    .cdc-chart-inner-container {
+.cove-visualization.type-dashboard {
+  .cove-visualization.type-chart.isEditor {
+    .cove-visualization__body {
       background: white;
     }
   }
 }
 
-.cdc-open-viz-module.type-chart {
+.cove-visualization.type-chart {
   @import 'DataTable';
 
   .legend-top {
@@ -37,7 +37,7 @@
     }
   }
 
-  &.isEditor .cdc-chart-inner-container {
+  &.isEditor .cove-visualization__body {
     background: white;
   }
 
@@ -619,17 +619,12 @@
   }
 }
 
-.cdc-open-viz-module .is-editor .cdc-chart-inner-container {
-  overflow: hidden;
-  background-color: var(--white);
-}
-
-.isEditor.type-sparkline .cdc-chart-inner-container {
+.cove-visualization.isEditor.type-sparkline .cove-visualization__body {
   margin: 3em auto 0;
   max-width: 60%;
 }
 
-.cdc-open-viz-module.type-chart.lg.type-sparkline .chart-container > svg {
+.cove-visualization.type-chart.lg.type-sparkline .chart-container > svg {
   width: 100%;
 }
 
@@ -638,16 +633,16 @@
   flex-wrap: wrap !important;
 }
 
-.cdc-open-viz-module.type-chart.type-sparkline {
-  .cove-component__content {
+.cove-visualization.type-chart.type-sparkline {
+  .cove-visualization__body {
     background: #f2f2f2;
   }
 
-  .cove-component__content.component--hideBackgroundColor {
+  .cove-visualization__body.component--hideBackgroundColor {
     background: transparent;
   }
 
-  .cove-component__content .chart-container {
+  .cove-visualization__body .chart-container {
     padding: 1em;
   }
 
@@ -661,11 +656,11 @@
   }
 }
 
-.cdc-open-viz-module .cove-component__content.sparkline {
+.cove-visualization .cove-visualization__body.sparkline {
   padding: 1em;
 }
 
-.cove-component__content.sparkline {
+.cove-visualization__body.sparkline {
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
 
@@ -678,7 +673,7 @@
   }
 }
 
-.cdc-open-viz-module .debug {
+.cove-visualization .debug {
   border: 2px solid red;
 }
 

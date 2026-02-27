@@ -67,18 +67,18 @@
 // TODO after v2 refactor remove header reference colors
 // Use .font-color/.bg-color, etc. in color definitions or something similar
 // Remove box shadows if we're no longer using them
-&.cdc-open-viz-module.isEditor .sidebar + .cove-component__content {
+&.cove-visualization.isEditor .sidebar + .cove-visualization__body {
   margin: 3em auto 0 !important;
   max-width: 35em !important;
   background-color: initial;
   height: fit-content;
 }
 
-.sidebar + .cove-component__content .bite-content-container:not(.component--hide-background-color) {
+.sidebar + .cove-visualization__body .bite-content-container:not(.component--hide-background-color) {
   background-color: white;
 }
 
-.cove-component__content {
+.cove-visualization__body {
   padding: 0;
   // Visual: Shadow
   &.shadow {
@@ -200,18 +200,18 @@
   }
 
   // General: Compact View
-  &.bite--isCompactStyle .bite .cove-component__content .bite-content {
+  &.bite--isCompactStyle .bite .cove-visualization__body .bite-content {
     align-items: center;
     p.bite-text {
       margin-bottom: 0;
     }
   }
 
-  &.bite--isCompactStyle .bite .cove-component__content {
+  &.bite--isCompactStyle .bite .cove-visualization__body {
     align-items: center;
   }
 
-  .cove-component__header + .bite {
+  .cove-visualization__header + .bite {
     border-top: 0;
   }
   .bite {
@@ -318,7 +318,7 @@
       border-radius: 0.3em;
     }
 
-    .cove-component__content {
+    .cove-visualization__body {
       display: flex;
       padding: 1em !important;
       justify-content: space-between;
@@ -367,13 +367,13 @@
         width: 33%;
         margin-left: 1.5em;
       }
-      .cove-component__content {
+      .cove-visualization__body {
         flex-direction: row-reverse;
       }
     }
 
     &.bite-top {
-      .cove-component__content {
+      .cove-visualization__body {
         flex-direction: column;
 
         .bite-image {
@@ -392,7 +392,7 @@
     }
 
     &.bite-bottom {
-      .cove-component__content {
+      .cove-visualization__body {
         flex-direction: column;
 
         .bite-image {
@@ -411,7 +411,7 @@
     }
 
     &.bite-back {
-      .cove-component__content {
+      .cove-visualization__body {
         .bite-image {
           border-radius: 0 0 0.3em 0.3em;
           position: absolute;
@@ -423,24 +423,24 @@
     }
 
     // General: Compact View
-    &.bite--isCompactStyle .bite .cove-component__content .bite-content {
+    &.bite--isCompactStyle .bite .cove-visualization__body .bite-content {
       align-items: center;
       p.bite-text {
         margin-bottom: 0;
       }
     }
 
-    &.bite--isCompactStyle .bite .cove-component__content {
+    &.bite--isCompactStyle .bite .cove-visualization__body {
       align-items: center;
     }
 
-    .cove-component__header + .bite {
+    .cove-visualization__header + .bite {
       border-top: 0;
     }
   }
 }
 
-.cove-component__content {
+.cove-visualization__body {
   background: var(--lightestGray);
 
   &:not(.no-borders) {

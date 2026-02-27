@@ -1,4 +1,4 @@
-.cdc-open-viz-module header.cove-component__header {
+.cove-visualization header.cove-visualization__header {
 
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
@@ -93,7 +93,7 @@
   }
 }
 
-.type-sparkline.type-chart .cove-component__header {
+.type-sparkline.type-chart .cove-visualization__header {
   margin: 0px !important;
 }
 
@@ -101,21 +101,21 @@
    MODERN TITLE
    ============================================================================ */
 
-.cdc-open-viz-module .cove-title--small {
+.cove-visualization .cove-title--small {
   margin-bottom: 0.75rem;
 }
 
-.cdc-open-viz-module .cove-title--large {
+.cove-visualization .cove-title--large {
   margin-bottom: 1.33rem;
 }
 
 /* Used in dashboards to more closely associate a title-only component with the content below it */
-.cdc-open-viz-module .cove-title--no-content {
+.cove-visualization .cove-title--no-content {
   margin-bottom: 0;
   margin-top: 1rem;
 }
 
-.cdc-open-viz-module .cove-title h2 {
+.cove-visualization .cove-title h2 {
   border-bottom: 1px solid var(--cool-gray-10);
   color: #0b4778;
   font-family: var(--app-font-secondary);
@@ -123,12 +123,12 @@
   font-weight: 300;
 }
 
-.cdc-open-viz-module .cove-title h3 {
+.cove-visualization .cove-title h3 {
   font-family: var(--app-font-secondary);
   font-size: 1.5rem;
 }
 
-.cdc-open-viz-module .cove-title sup {
+.cove-visualization .cove-title sup {
   color: #666;
   font-family: var(--app-font-secondary);
   font-size: 0.75rem;

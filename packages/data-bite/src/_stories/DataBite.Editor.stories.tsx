@@ -100,7 +100,7 @@ export const GeneralSectionTests: Story = {
       return {
         hasSvg: !!svg,
         textCount: textElements.length,
-        containerClasses: canvasElement.querySelector('.cdc-open-viz-module')?.className || ''
+        containerClasses: canvasElement.querySelector('.cove-visualization')?.className || ''
       }
     }
 
@@ -145,7 +145,7 @@ export const GeneralSectionTests: Story = {
 
     await performAndAssert(
       'Title Update',
-      () => canvasElement.querySelector('.cove-component__header')?.textContent?.trim() || '',
+      () => canvasElement.querySelector('.cove-visualization__header')?.textContent?.trim() || '',
       async () => {}, // action already performed above
       (before, after) => after === 'Updated Data Bite Title'
     )
@@ -158,7 +158,7 @@ export const GeneralSectionTests: Story = {
     expect(showTitleCheckbox).toBeTruthy()
 
     const getTitleVisibility = () => {
-      const titleElement = canvasElement.querySelector('.cove-component__header') as HTMLElement
+      const titleElement = canvasElement.querySelector('.cove-visualization__header') as HTMLElement
       return titleElement && titleElement.offsetParent !== null
     }
 
@@ -702,7 +702,7 @@ export const VisualSectionTests: Story = {
     // TEST 3: Display Border Toggle
     // Expectation: Border styling changes when toggled (classes or computed styles)
     // ============================================================================
-    const contentContainer = () => canvasElement.querySelector('.cove-component__content') as HTMLElement
+    const contentContainer = () => canvasElement.querySelector('.cove-visualization__body') as HTMLElement
     expect(contentContainer()).toBeTruthy()
 
     // Note: Border checkbox uses name="border", other checkboxes use similar simple names
@@ -736,7 +736,7 @@ export const VisualSectionTests: Story = {
 
     // Test border checkbox with comprehensive boolean testing AND visual validation
     const getBorderVisualState = () => {
-      const element = canvasElement.querySelector('.cove-component__content')
+      const element = canvasElement.querySelector('.cove-visualization__body')
       return {
         classes: Array.from(element!.classList).sort().join(' '),
         hasNoBordersClass: element!.classList.contains('no-borders'),
@@ -792,7 +792,7 @@ export const VisualSectionTests: Story = {
 
     // Test remaining checkboxes with comprehensive boolean testing AND visual validation
     const getGeneralVisualState = () => {
-      const element = canvasElement.querySelector('.cove-component__content')
+      const element = canvasElement.querySelector('.cove-visualization__body')
       return {
         classes: Array.from(element!.classList).sort().join(' '),
         // Check for specific component classes that these controls add

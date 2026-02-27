@@ -4,7 +4,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
   margin-left: 15px;
 }
 
-.cdc-open-viz-module.type-dashboard {
+.cove-visualization.type-dashboard {
   @import 'editor-panel';
   @import 'grid';
 
@@ -251,7 +251,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
 
     // Disable the module individual margin
     .map-container,
-    .cdc-chart-inner-container>* {
+    .cove-visualization.type-chart .cove-visualization__body>* {
       margin-left: 0;
       margin-right: 0;
     }
@@ -324,7 +324,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
         flex-direction: column !important;
         align-items: stretch !important;
 
-        >.cdc-open-viz-module {
+        >.cove-visualization {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
@@ -332,7 +332,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           min-height: 0 !important;
           width: 100% !important;
 
-          >.cdc-open-viz-module__content {
+          >.cove-visualization__content {
             display: flex !important;
             flex-direction: column !important;
             flex: 1 1 auto !important;
@@ -340,7 +340,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
             min-height: 0 !important;
             width: 100% !important;
 
-            >.cove-component__content {
+            >.cove-visualization__body {
               display: flex !important;
               flex-direction: column !important;
               flex: 1 1 auto !important;
@@ -416,7 +416,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       .gauge__style--tp5 {
 
         // Enable flex stretching only in dashboard rows
-        .cove-component__content {
+        .cove-visualization__body {
           height: 100%;
           display: flex;
           flex-direction: column;

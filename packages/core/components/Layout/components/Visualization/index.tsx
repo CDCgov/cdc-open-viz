@@ -37,7 +37,7 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
   } = props
 
   const getWrappingClasses = () => {
-    let classes = ['cdc-open-viz-module', `${currentViewport}`, `${config?.theme}`]
+    let classes = ['cove-visualization', `${currentViewport}`, `${config?.theme}`]
 
     if (className) {
       classes.push(className)
@@ -58,7 +58,7 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
 
     if (config.type === 'filtered-text') {
       classes.push('type-filtered-text', `font-${config.fontSize}`)
-      classes = classes.filter(item => item !== 'cove-component__content')
+      classes = classes.filter(item => item !== 'cove-visualization__body')
       return classes
     }
 
@@ -81,9 +81,6 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
 
     if (config.type === 'data-bite') {
       classes.push('type-data-bite', `font-${config.fontSize}`)
-      if (isEditor) {
-        classes.push('is-editor')
-      }
       return classes
     }
 

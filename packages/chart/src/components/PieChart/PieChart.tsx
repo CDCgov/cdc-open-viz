@@ -421,7 +421,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
                 config.tooltips.opacity / 100
               }) !important`}</style>
               <TooltipWithBounds
-                className={'tooltip cdc-open-viz-module'}
+                className={'tooltip cove-visualization'}
                 left={tooltipLeft + centerX - radius}
                 top={tooltipTop}
               >

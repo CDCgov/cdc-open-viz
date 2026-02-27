@@ -24,7 +24,7 @@ export default function useDataVizClasses(config, viewport = null) {
   }
 
   let innerContainerClasses = ['cove-component__inner']
-  let contentClasses = ['cove-component__content']
+  let contentClasses = ['cove-visualization__body']
 
   if (visualizationType === 'Spark Line' || visualizationType === 'chart') {
     if (title && showTitle) contentClasses.push('component--has-title')

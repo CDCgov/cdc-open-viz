@@ -47,7 +47,7 @@ const Title = (props: HeaderProps) => {
   }
 
   // LEGACY BLOCKY HEADER (Original design with colored backgrounds)
-  const updatedClasses = ['cove-component__header', 'component__header', 'mb-3', ...classes]
+  const updatedClasses = ['cove-visualization__header', 'component__header', 'mb-3', ...classes]
 
   return (
     title &&

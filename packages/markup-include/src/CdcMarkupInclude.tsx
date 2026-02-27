@@ -300,7 +300,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   if (loading === false) {
     content = !hideMarkupInclude && (
-      <div className='markup-include-content-container cove-component__content no-borders'>
+      <div className='markup-include-content-container cove-visualization__body no-borders'>
         <Title
           title={title}
           isDashboard={isDashboard}
@@ -322,7 +322,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
               />
             )}
             <div
-              className={`cove-component__content-wrap${shouldApplyTopPadding ? ' has-top-padding' : ''}${
+              className={`cove-visualization__body-wrap${shouldApplyTopPadding ? ' has-top-padding' : ''}${
                 shouldApplySidePadding ? ' has-side-padding' : ''
               }`}
             >

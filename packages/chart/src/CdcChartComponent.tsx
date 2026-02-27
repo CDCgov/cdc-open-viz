@@ -1231,9 +1231,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         {config.newViz && <Confirm updateConfig={updateConfig} config={config} />}
         {!missingRequiredSections(config) && !config.newViz && (
           <div
-            className={`cdc-chart-inner-container cove-component__content type-${makeClassName(
-              config.visualizationType
-            )}`}
+            className={`cove-visualization__body type-${makeClassName(config.visualizationType)}`}
             aria-label={handleChartAriaLabels(config)}
             tabIndex={0}
           >
@@ -1243,7 +1241,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
               title={title}
               superTitle={processedSuperTitle}
               titleStyle={config.titleStyle}
-              classes={['chart-title', `${config.theme}`, 'cove-component__header', 'mb-3']}
+              classes={['chart-title', `${config.theme}`, 'cove-visualization__header', 'mb-3']}
               style={undefined}
               config={config}
             />

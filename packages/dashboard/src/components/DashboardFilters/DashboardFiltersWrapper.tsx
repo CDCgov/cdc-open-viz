@@ -319,7 +319,7 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
           <div
             className={`${
               isEditor ? ' is-editor' : ''
-            } cove-component__content col-12 cove-dashboard-filters-container`}
+            } cove-visualization__body col-12 cove-dashboard-filters-container`}
           >
             <Filters
               show={visualizationConfig?.sharedFilterIndexes?.map(Number)}

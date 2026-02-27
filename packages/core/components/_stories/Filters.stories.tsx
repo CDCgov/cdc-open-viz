@@ -11,7 +11,7 @@ const meta: Meta<typeof Filters> = {
   component: Filters,
   decorators: [
     Story => (
-      <div className='cdc-open-viz-module'>
+      <div className='cove-visualization'>
         <Story />
       </div>
     )

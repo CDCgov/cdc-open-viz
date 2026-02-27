@@ -7,7 +7,7 @@ const meta: Meta<typeof DashboardFilters> = {
   component: DashboardFilters,
   decorators: [
     Story => (
-      <div className='cdc-open-viz-module type-dashboard'>
+      <div className='cove-visualization type-dashboard'>
         <Story />
       </div>
     )

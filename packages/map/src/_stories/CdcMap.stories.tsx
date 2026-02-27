@@ -42,7 +42,7 @@ const testMapRendering = async (canvasElement: HTMLElement, storyName: string) =
   })
 
   await step('Verify COVE module wrapper is present', async () => {
-    const coveModule = canvasElement.querySelector('.cdc-open-viz-module')
+    const coveModule = canvasElement.querySelector('.cove-visualization')
     expect(coveModule).toBeInTheDocument()
   })
 }
