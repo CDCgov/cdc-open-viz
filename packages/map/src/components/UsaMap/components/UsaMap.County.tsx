@@ -162,6 +162,7 @@ const CountyMap = () => {
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
   const [focus, setFocus] = useState({})
   const [topoData, setTopoData] = useState({})
+  const [hasMoved, setHasMoved] = useState(false)
 
   const pathGenerator = geoPath().projection(geoAlbersUsaTerritories())
 
@@ -209,7 +210,6 @@ const CountyMap = () => {
     return () => window.removeEventListener('resize', debounceOnResize)
   })
 
-  const resetButton = useRef()
   const canvasRef = useRef()
   const patternCacheRef = useRef<Map<string, CanvasPattern | null>>(new Map())
   const zoomTransformRef = useRef(d3ZoomIdentity)
@@ -346,8 +346,55 @@ const CountyMap = () => {
   }
 
   const handleZoomReset = () => {
+    const container = canvasRef.current?.closest('.geography-container') as HTMLElement | null
+    setHasMoved(false)
     onReset()
+    container?.focus()
   }
+
+  const PAN_STEP = 20
+
+  useEffect(() => {
+    if (!config.general.allowMapZoom) return
+
+    const container = canvasRef.current?.closest('.geography-container') as HTMLElement | null
+    if (!container) return
+
+    const handleKeyboardPan = (e: KeyboardEvent) => {
+      if (!canvasRef.current || !zoomBehaviorRef.current) return
+
+      const key = e.key.toLowerCase()
+      let dx = 0
+      let dy = 0
+
+      switch (key) {
+        case 'arrowleft':
+        case 'a':
+          dx = PAN_STEP
+          break
+        case 'arrowright':
+        case 'd':
+          dx = -PAN_STEP
+          break
+        case 'arrowup':
+        case 'w':
+          dy = PAN_STEP
+          break
+        case 'arrowdown':
+        case 's':
+          dy = -PAN_STEP
+          break
+        default:
+          return
+      }
+
+      e.preventDefault()
+      d3Select(canvasRef.current).call(zoomBehaviorRef.current.translateBy, dx, dy)
+    }
+
+    container.addEventListener('keydown', handleKeyboardPan)
+    return () => container.removeEventListener('keydown', handleKeyboardPan)
+  }, [config.general.allowMapZoom, topoData, runtimeLegend, focus])
 
   const scheduleDraw = () => {
     if (zoomFrameRef.current) return
@@ -706,13 +753,6 @@ const CountyMap = () => {
 
       topoData.projection.scale(canvas.width * 1.25).translate([canvas.width / 2, canvas.height / 2])
 
-      // If we are rendering the map without a zoom on a state, hide the reset button
-      if (!focus.id) {
-        if (resetButton.current) resetButton.current.style.display = 'none'
-      } else {
-        if (resetButton.current) resetButton.current.style.display = 'block'
-      }
-
       // Centers the projection on the focused state
       if (focus.feature) {
         const PADDING = 10
@@ -868,12 +908,16 @@ const CountyMap = () => {
       return
     }
 
+    const COUNTY_MAX_ZOOM = 10
     const canvasSelection = d3Select(canvasRef.current)
     const zoomBehavior = d3Zoom()
       .filter(d3Event => (d3Event ? !d3Event.ctrlKey && !d3Event.button : false))
-      .scaleExtent([1, MAX_ZOOM_LEVEL])
+      .scaleExtent([1, COUNTY_MAX_ZOOM])
       .on('zoom', d3Event => {
         zoomTransformRef.current = d3Event.transform
+        const { x, y, k } = d3Event.transform
+        const isAtIdentity = x === 0 && y === 0 && k === 1
+        setHasMoved(!isAtIdentity)
         scheduleDraw()
       })
 
@@ -929,9 +973,11 @@ const CountyMap = () => {
               <line x1='5' y1='12' x2='19' y2='12' />
             </svg>
           </button>
-          <button onClick={handleZoomReset} className='reset' aria-label='Reset Zoom'>
-            Reset Zoom
-          </button>
+          {(hasMoved || focus.id) && (
+            <button onClick={handleZoomReset} className='reset' aria-label='Reset Zoom'>
+              Reset Zoom
+            </button>
+          )}
         </div>
       )}
     </ErrorBoundary>
