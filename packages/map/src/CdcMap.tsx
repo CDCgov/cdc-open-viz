@@ -106,7 +106,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
     let _newConfig = cloneConfig(config ?? initialState)
 
     if (configUrl) {
-      _newConfig = await fetchRemoteData(configUrl)
+      _newConfig = await fetch(configUrl).then(r => r.json())
     }
     if ('object' === typeof _newConfig) {
       loadConfig(_newConfig)
