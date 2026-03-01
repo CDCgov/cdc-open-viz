@@ -47,4 +47,6 @@ const VisualizationContainer = forwardRef<HTMLDivElement, VisualizationContainer
   }
 )
 
+VisualizationContainer.displayName = 'VisualizationContainer'
+
 export default VisualizationContainer

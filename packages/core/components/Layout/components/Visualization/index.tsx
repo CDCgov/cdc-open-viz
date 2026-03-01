@@ -128,4 +128,6 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
   )
 })
 
+Visualization.displayName = 'Visualization'
+
 export default Visualization
