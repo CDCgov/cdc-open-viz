@@ -1,25 +1,12 @@
 // main visualization wrapper
-import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import React, { forwardRef } from 'react'
-import { Config as DataBiteConfig } from '@cdc/data-bite/src/types/Config'
-import { Config as DataTableConfig } from '@cdc/data-table/src/types/Config'
 import './visualizations.scss'
-import { Config as WaffleChartConfig } from '@cdc/waffle-chart/src/types/Config'
-import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
-import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
-import { MapConfig } from '@cdc/map/src/types/MapConfig'
+import type { AnyVisualization } from '@cdc/core/types/Visualization'
 
 type VisualizationWrapper = {
   children: React.ReactNode
   className?: string
-  config:
-  | ChartConfig
-  | DataBiteConfig
-  | WaffleChartConfig
-  | MarkupIncludeConfig
-  | DashboardFilters
-  | MapConfig
-  | DataTableConfig
+  config: AnyVisualization
   currentViewport?: string
   imageId?: string
   isEditor: boolean

@@ -1259,14 +1259,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
               config={config}
             />
 
-            {/* Error Message Display - Show at top before visualization wrapper */}
-            {/* {(() => {
-                const errorMessage = config.runtime?.editorErrorMessage
-                const hasError = errorMessage && typeof errorMessage === 'string' && errorMessage.trim() !== ''
-                const shouldShow = undefined === config.newViz && isEditor && config.runtime && hasError
-                return shouldShow ? <Error errorMessage={errorMessage} /> : null
-              })()} */}
-
             {/* Visualization Wrapper */}
             <div
               className={`cove-visualization__body cove-visualization__body-wrap ${getChartWrapperClasses().join(' ')}`}

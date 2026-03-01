@@ -13,21 +13,17 @@ const breakpoints = [
   '1280' // xl
 ]
 
-const os =
-  navigator.userAgent.indexOf('Win') !== -1 ? 'Win' : navigator.userAgent.indexOf('Mac') !== -1 ? 'MacOS' : null
+const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : ''
+const os = userAgent.indexOf('Win') !== -1 ? 'Win' : userAgent.indexOf('Mac') !== -1 ? 'MacOS' : null
 
 type ResponsiveProps = {
   children: React.ReactNode
-  displayPanel?: boolean
   isEditor: boolean
-  onTogglePanel?: () => void
 }
 
-const Responsive = ({ children, isEditor, displayPanel: controlledPanel, onTogglePanel }: ResponsiveProps) => {
-  const [internalPanel, setInternalPanel] = useState(false)
-  const isControlled = controlledPanel !== undefined
-  const displayPanel = isControlled ? controlledPanel : internalPanel
-  const togglePanel = isControlled ? onTogglePanel : () => setInternalPanel(p => !p)
+const Responsive = ({ children, isEditor }: ResponsiveProps) => {
+  const [displayPanel, setDisplayPanel] = useState(false)
+  const togglePanel = () => setDisplayPanel(p => !p)
   const [displayGrid, setDisplayGrid] = useState(false)
   const [viewportPreview, setViewportPreview] = useState(null)
   const [rotateAnimation, setRotateAnimation] = useState(false)

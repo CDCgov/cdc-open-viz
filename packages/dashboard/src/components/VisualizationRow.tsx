@@ -364,7 +364,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                     updateChildConfig(col.widget, newConfig)
                   }}
                   isDashboard={true}
-                  interactionLabel={link}
+                  interactionLabel={interactionLabel}
                 />
               )}
               {type === 'markup-include' && (
