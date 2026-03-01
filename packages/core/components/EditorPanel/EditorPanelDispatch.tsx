@@ -22,7 +22,7 @@ export interface EditorPanelDispatchChildProps<TState = any, TAction = any> {
  *
  * Provides common wrapper functionality including:
  * - ErrorBoundary for error handling
- * - Layout.Sidebar for consistent panel display
+ * - Sidebar for consistent panel display
  * - State management for panel visibility
  *
  * @example
