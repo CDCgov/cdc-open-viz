@@ -74,7 +74,7 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
 
     if (config.type === 'map') {
       classes.push(`type-map`)
-      if (config?.runtime?.editorErrorMessage.length !== 0) classes.push('type-map--has-error')
+      if (config?.runtime?.editorErrorMessage?.length) classes.push('type-map--has-error')
       return classes
     }
 
@@ -95,10 +95,6 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
 
     if (config.type === 'waffle-chart') {
       classes.push('type-waffle-chart', 'font-' + config.overallFontSize)
-
-      if (isEditor) {
-        classes.push('is-editor')
-      }
 
       if (config.visualizationType === 'TP5 Waffle') {
         classes.push('waffle__style--tp5')
