@@ -71,30 +71,21 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     interactionLabel = ''
   } = props
 
-  // Ensure imageData.display and imageData.prefix are always defined
+  // Ensure imageData and dataFormat sub-fields are always defined before the reducer initializes.
+  // Defaults must match initial-state.js — updateConfig() will enforce them again once loading completes.
   const safeConfigObj = {
     ...configObj,
     imageData: {
       ...(configObj?.imageData || {}),
-      display:
-        configObj?.imageData && typeof configObj.imageData.display !== 'undefined'
-          ? configObj.imageData.display
-          : 'static',
-      prefix:
-        configObj?.imageData && typeof configObj.imageData.prefix !== 'undefined' ? configObj.imageData.prefix : ''
+      display: configObj?.imageData?.display ?? 'none',
+      prefix: configObj?.imageData?.prefix ?? ''
     },
     dataFormat: {
       ...(configObj?.dataFormat || {}),
-      prefix:
-        configObj?.dataFormat && typeof configObj.dataFormat.prefix !== 'undefined' ? configObj.dataFormat.prefix : '',
-      suffix:
-        configObj?.dataFormat && typeof configObj.dataFormat.suffix !== 'undefined' ? configObj.dataFormat.suffix : '%',
-      roundToPlace:
-        configObj?.dataFormat && typeof configObj.dataFormat.roundToPlace !== 'undefined'
-          ? configObj.dataFormat.roundToPlace
-          : 0,
-      commas:
-        configObj?.dataFormat && typeof configObj.dataFormat.commas !== 'undefined' ? configObj.dataFormat.commas : true
+      prefix: configObj?.dataFormat?.prefix ?? '',
+      suffix: configObj?.dataFormat?.suffix ?? '%',
+      roundToPlace: configObj?.dataFormat?.roundToPlace ?? 0,
+      commas: configObj?.dataFormat?.commas ?? true
     }
   }
 
