@@ -6,7 +6,7 @@
     display: none;
   }
 
-  .markup-include-content-container.cove-visualization__body {
+  .markup-include-content-container.cove-visualization__inner {
     .markup-include-component.cove-visualization__body:not(.component--hide-background-color, .component--has-background) {
       background-color: white;
     }

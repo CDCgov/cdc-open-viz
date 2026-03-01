@@ -300,7 +300,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   if (loading === false) {
     content = !hideMarkupInclude && (
-      <div className='markup-include-content-container cove-visualization__inner cove-visualization__body no-borders'>
+      <div className={`markup-include-content-container ${innerContainerClasses.join(' ')}`}>
         <Title
           title={title}
           isDashboard={isDashboard}
@@ -310,30 +310,28 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
           noContent={!markup}
         />
         <div className={`markup-include-component ${contentClasses.join(' ')}`}>
-          <div className={`${innerContainerClasses.join(' ')}`}>
-            {/* Filters */}
-            {config.filters && config.filters.length > 0 && (
-              <Filters
-                config={config}
-                setFilters={setFilters}
-                excludedData={data || []}
-                dimensions={[0, 0]}
-                interactionLabel={interactionLabel || 'markup-include'}
-              />
+          {/* Filters */}
+          {config.filters && config.filters.length > 0 && (
+            <Filters
+              config={config}
+              setFilters={setFilters}
+              excludedData={data || []}
+              dimensions={[0, 0]}
+              interactionLabel={interactionLabel || 'markup-include'}
+            />
+          )}
+          <div
+            className={`cove-visualization__body-wrap${shouldApplyTopPadding ? ' has-top-padding' : ''}${
+              shouldApplySidePadding ? ' has-side-padding' : ''
+            }`}
+          >
+            {_showNoDataMessage && (
+              <div className='no-data-message'>
+                <p>{`${noDataMessageText}`}</p>
+              </div>
             )}
-            <div
-              className={`cove-visualization__body cove-visualization__body-wrap${
-                shouldApplyTopPadding ? ' has-top-padding' : ''
-              }${shouldApplySidePadding ? ' has-side-padding' : ''}`}
-            >
-              {_showNoDataMessage && (
-                <div className='no-data-message'>
-                  <p>{`${noDataMessageText}`}</p>
-                </div>
-              )}
-              {!markupError && !_showNoDataMessage && <Markup allowElements={!!urlMarkup} content={markup} />}
-              {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
-            </div>
+            {!markupError && !_showNoDataMessage && <Markup allowElements={!!urlMarkup} content={markup} />}
+            {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
           </div>
         </div>
         <FootnotesStandAlone
