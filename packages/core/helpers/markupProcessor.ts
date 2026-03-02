@@ -26,9 +26,9 @@ export const processMarkupVariables = (
     filters?: VizFilter[]
     datasets?: Datasets
     configDataKey?: string // Add support for widget's assigned dataset
-    locale: string
+    locale?: string
     dataMetadata?: Record<string, string>
-  }
+  } = {}
 ): {
   processedContent: string
   shouldHideSection: boolean
@@ -40,7 +40,8 @@ export const processMarkupVariables = (
     allowHideSection = false,
     filters = [],
     datasets,
-    configDataKey
+    configDataKey,
+    locale = 'en-US'
   } = options
 
   // Helper function to get data for a specific variable
@@ -118,7 +119,7 @@ export const processMarkupVariables = (
               }
 
               return workingVariable.addCommas && !isNaN(parseFloat(dataObjectValue))
-                ? parseFloat(dataObjectValue).toLocaleString(options.locale, { useGrouping: true })
+                ? parseFloat(dataObjectValue).toLocaleString(locale, { useGrouping: true })
                 : String(dataObjectValue || '')
             } catch (error) {
               console.error(`Error processing data value for ${variableTag}:`, error)
