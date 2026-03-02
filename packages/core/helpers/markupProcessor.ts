@@ -28,7 +28,7 @@ export const processMarkupVariables = (
     configDataKey?: string // Add support for widget's assigned dataset
     locale: string
     dataMetadata?: Record<string, string>
-  } = {}
+  }
 ): {
   processedContent: string
   shouldHideSection: boolean
