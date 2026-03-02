@@ -49,7 +49,8 @@ const createInitialState = () => {
         name: 'FIPS Codes',
         label: 'Location',
         tooltip: false,
-        dataTable: true
+        dataTable: true,
+        displayColumn: ''
       },
       primary: {
         dataTable: true,

@@ -42,4 +42,5 @@ export type Config = {
   visualizationSubType: 'linear' | ''
   visualizationType: 'Gauge' | 'Waffle' | 'TP5 Waffle' | 'TP5 Gauge'
   version: Version
+  locale: string
 }

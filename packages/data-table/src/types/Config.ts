@@ -16,6 +16,7 @@ export type Config = {
   filterBehavior?: FilterBehavior
   filterIntro?: string
   general?: General
+  locale: string
   table: Table
   type: 'table'
   version: Version

@@ -28,6 +28,7 @@ type DeprecatedVisualizationType = {
   filters: VizFilter[]
   general: General
   legend: Legend
+  locale: string
   newViz: boolean
   isResponsiveTicks: boolean
   openModal?: boolean

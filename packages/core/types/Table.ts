@@ -10,6 +10,8 @@ export type Table = {
   dateDisplayFormat?: string
   showNonGeoData?: boolean
   download?: boolean
+  downloadDataLabel?: string
+  downloadImageLabel?: string
   downloadVisibleDataOnly?: boolean
   downloadImageButton?: boolean
   downloadPdfButton?: boolean

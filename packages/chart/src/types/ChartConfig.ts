@@ -184,6 +184,7 @@ export type AllChartsConfig = {
   isPaletteReversed: boolean
   labels: boolean
   legend: Legend
+  locale: string
   lineDatapointColor: 'Same as Line' | 'Lighter than Line'
   lineDatapointStyle: 'hidden' | 'always show' | 'hover'
   lollipopColorStyle: 'regular' | 'two-tone'

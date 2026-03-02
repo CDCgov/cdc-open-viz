@@ -254,7 +254,8 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         allowHideSection,
         filters: config?.filters || [],
         datasets,
-        configDataKey: config?.dataKey
+        configDataKey: config?.dataKey,
+        locale: config?.locale
       })
     : { processedContent: parseBodyMarkup(urlMarkup), shouldHideSection: false, shouldShowNoDataMessage: false }
 

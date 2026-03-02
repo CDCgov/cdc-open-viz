@@ -61,4 +61,50 @@ describe('formatDate', () => {
     const result = formatDate('%b. %-d, %Y', date)
     expect(result).toContain('Jan.')
   })
+
+  describe('locale support', () => {
+    it('formats month names in Spanish when locale is es-MX', () => {
+      const date = new Date(2025, 0, 15) // Jan 15, 2025
+      const result = formatDate('%B %-d, %Y', date, 'es-MX')
+      expect(result).toContain('enero')
+    })
+
+    it('formats abbreviated month names in Spanish when locale is es-MX', () => {
+      const date = new Date(2025, 2, 10) // Mar 10, 2025
+      const result = formatDate('%b %Y', date, 'es-MX')
+      expect(result).toContain('mar')
+    })
+
+    it('formats day names in Spanish when locale is es-MX', () => {
+      const date = new Date(2025, 0, 13) // Monday, Jan 13, 2025
+      const result = formatDate('%A', date, 'es-MX')
+      expect(result).toContain('lunes')
+    })
+
+    it('uses English formatting when locale is en-US', () => {
+      const date = new Date(2025, 0, 15)
+      const result = formatDate('%B %-d, %Y', date, 'en-US')
+      expect(result).toContain('January')
+    })
+
+    it('falls back to default English when locale is unknown', () => {
+      const date = new Date(2025, 0, 15)
+      const result = formatDate('%B %-d, %Y', date, 'xx-XX')
+      expect(result).toContain('January')
+    })
+
+    it('falls back to default English when locale is undefined', () => {
+      const date = new Date(2025, 0, 15)
+      const result = formatDate('%B %-d, %Y', date, undefined)
+      expect(result).toContain('January')
+    })
+
+    it('formats numeric-only patterns identically regardless of locale', () => {
+      const date = new Date(2025, 0, 15)
+      const enResult = formatDate('%Y-%m-%d', date, 'en-US')
+      const esResult = formatDate('%Y-%m-%d', date, 'es-MX')
+      expect(enResult).toBe('2025-01-15')
+      expect(esResult).toBe('2025-01-15')
+    })
+  })
 })
