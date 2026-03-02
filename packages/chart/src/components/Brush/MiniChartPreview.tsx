@@ -35,6 +35,7 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
       ? series.filter(s => !barSeriesTypes.has(s.type) && s.type !== 'Area Chart')
       : series
     const patternSeriesKeys = Array.isArray(series) ? series.map(_series => _series.dataKey) : []
+    const allowGroupedNonSeriesFieldMatch = !config.series || config.series.length <= 1
 
     let barElements: React.ReactElement[] = []
 
@@ -138,7 +139,7 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
               seriesValue: value,
               seriesLabels: config.runtime?.seriesLabels,
               seriesKeys: patternSeriesKeys,
-              allowNonSeriesFieldMatch: true
+              allowNonSeriesFieldMatch: allowGroupedNonSeriesFieldMatch
             })
 
             // Calculate bar position and height
