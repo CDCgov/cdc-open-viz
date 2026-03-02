@@ -32,7 +32,8 @@ export default {
     background: false,
     hideBackgroundColor: false,
     borderColorTheme: false,
-    showTitle: true
+    showTitle: true,
+    useWrap: false
   },
   general: {
     isCompactStyle: false
