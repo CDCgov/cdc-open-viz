@@ -1,6 +1,6 @@
 {
   "name": "@cdc/data-bite",
-  "version": "4.25.11",
+  "version": "4.26.1",
   "description": "React component for displaying a single piece of data in a card module",
   "license": "Apache-2.0",
   "author": "cooms13 <dmo7@cdc.gov>",
