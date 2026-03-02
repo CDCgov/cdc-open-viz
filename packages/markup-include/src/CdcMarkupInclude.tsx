@@ -275,10 +275,9 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
           titleStyle={contentEditor.titleStyle}
           config={config}
           classes={[`${theme}`, 'mb-0']}
-          noContent={!markup}
+          noContent={!sanitizedHTML}
         />
         <div className={`markup-include-component ${contentClasses.join(' ')}`}>
-          {/* Filters */}
           {config.filters && config.filters.length > 0 && (
             <Filters
               config={config}
@@ -298,7 +297,12 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
                 <p>{`${noDataMessageText}`}</p>
               </div>
             )}
-            {!markupError && !_showNoDataMessage && <Markup allowElements={!!urlMarkup} content={markup} />}
+            {!markupError && !_showNoDataMessage && (
+              <div id={scopeId}>
+                {scopedCSS && <style>{scopedCSS}</style>}
+                <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
+              </div>
+            )}
             {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
           </div>
         </div>

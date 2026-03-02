@@ -671,7 +671,8 @@ export const VisualSectionTests: Story = {
       async () => {
         await userEvent.click(borderColorThemeCheckbox)
       },
-      (before, after) => before !== after && (after.includes('borderColorTheme') || before.includes('borderColorTheme'))
+      (before, after) =>
+        before !== after && (after.includes('border-color-theme') || before.includes('border-color-theme'))
     )
 
     // ============================================================================

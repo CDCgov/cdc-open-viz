@@ -2809,7 +2809,7 @@ export const BarVisualTests: Story = {
 
       // Find bar elements in the chart
       const barElements =
-        chartSvg?.querySelectorAll('rect[class*="bar"], path[class*="bar"], g[class*="bar"] rect') || []
+        chartSvg?.querySelectorAll('rect[class*="bar"], path[class*="bar"], g[class*="bar"] path') || []
 
       // Check for border-related styles and attributes
       const barsWithStroke = Array.from(barElements).filter(bar => {

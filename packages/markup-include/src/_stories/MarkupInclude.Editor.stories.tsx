@@ -306,20 +306,15 @@ export const VisualSectionTests: Story = {
     // Expectation: Theme class changes on component
     // ============================================================================
     const getThemeState = () => {
-      // Use the contentContainer like other tests, and check its parent for theme classes
       const content = contentContainer()
       if (!content) return { theme: '', classes: '', element: 'content not found' }
 
-      // Check content itself and its parent for theme classes
+      // Theme is applied to the outer cove-visualization wrapper — traverse up to find it
+      const themeWrapper = content.closest('[class*="theme-"]') as HTMLElement
+      const theme = themeWrapper ? Array.from(themeWrapper.classList).find(cls => cls.startsWith('theme-')) || '' : ''
+
       const contentClasses = Array.from(content.classList).join(' ')
       const parentClasses = content.parentElement ? Array.from(content.parentElement.classList).join(' ') : ''
-
-      const contentTheme = Array.from(content.classList).find(cls => cls.startsWith('theme-')) || ''
-      const parentTheme = content.parentElement
-        ? Array.from(content.parentElement.classList).find(cls => cls.startsWith('theme-')) || ''
-        : ''
-
-      const theme = contentTheme || parentTheme || ''
 
       return {
         theme,

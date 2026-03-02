@@ -223,13 +223,13 @@ export const Footnotes: Story = {
   }
 }
 
-const EqualHeightMixedVizConfig = _.cloneDeep(Dashboard_Filter) as Config
+const EqualHeightMixedVizConfig = cloneDeep(Dashboard_Filter) as Config
 const equalHeightDataBiteKey = 'equal-height-data-bite-story'
 const equalHeightDataBiteTemplate = Object.values(ExampleConfig_1.visualizations).find(v => v?.type === 'data-bite')
 
 if (equalHeightDataBiteTemplate) {
   EqualHeightMixedVizConfig.visualizations[equalHeightDataBiteKey] = {
-    ..._.cloneDeep(equalHeightDataBiteTemplate),
+    ...cloneDeep(equalHeightDataBiteTemplate),
     uid: equalHeightDataBiteKey,
     theme: 'theme-blue',
     bitePosition: 'Top',
