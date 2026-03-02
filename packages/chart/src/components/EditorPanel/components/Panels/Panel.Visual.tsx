@@ -31,6 +31,7 @@ import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import { CustomColorsEditor } from '@cdc/core/components/CustomColorsEditor'
 import { getColorScale } from '../../../../helpers/getColorScale'
+import { ENABLE_CHART_DATA_BITE_VISUAL_SETTINGS } from '@cdc/core/helpers/constants'
 import '@cdc/core/components/EditorPanel/editor.scss'
 import './panelVisual.styles.css'
 
@@ -572,7 +573,7 @@ const PanelVisual: FC<PanelProps> = props => {
             updateField={updateField}
           />
         )}
-        {config.visualizationType === 'Spark Line' && (
+        {ENABLE_CHART_DATA_BITE_VISUAL_SETTINGS && (
           <div className='cove-accordion__panel-section checkbox-group'>
             <CheckBox
               value={visual?.border}
@@ -689,6 +690,15 @@ const PanelVisual: FC<PanelProps> = props => {
             }
           />
         </label>
+        {isCoveDeveloperMode() && (
+          <CheckBox
+            value={visual?.highlightWrappers}
+            section='visual'
+            fieldName='highlightWrappers'
+            label='Highlight Layout Wrappers'
+            updateField={updateField}
+          />
+        )}
       </AccordionItemPanel>
     </AccordionItem>
   )

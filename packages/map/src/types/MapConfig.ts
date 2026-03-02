@@ -10,6 +10,16 @@ import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 export type RuntimeFilters = VizFilter[] & { fromHash?: number }
 
 type MapVisualSettings = {
+  /** border - shows or hides component border */
+  border?: boolean
+  /** borderColorTheme - use themed border color */
+  borderColorTheme?: boolean
+  /** accent - use accent styling */
+  accent?: boolean
+  /** background - use themed background color */
+  background?: boolean
+  /** hideBackgroundColor - hide default background color */
+  hideBackgroundColor?: boolean
   /** minBubbleSize - Minimum Circle Size when the map has a type of bubble */
   minBubbleSize: number
   /** maxBubbleSize - Maximum Circle Size when the map has a type of bubble */

@@ -37,6 +37,94 @@
   max-width: 100%;
   background-color: white;
 
+  .cove-visualization__title,
+  .cove-visualization__header {
+    margin-bottom: 0 !important;
+  }
+
+  &.theme-blue {
+    --map-theme-color: #005eaa;
+    --map-theme-bg: #d9ebf9;
+  }
+
+  &.theme-purple {
+    --map-theme-color: #712177;
+    --map-theme-bg: #f3e4f4;
+  }
+
+  &.theme-brown {
+    --map-theme-color: #705043;
+    --map-theme-bg: #f0e6e1;
+  }
+
+  &.theme-teal {
+    --map-theme-color: #00695c;
+    --map-theme-bg: #d9f2ef;
+  }
+
+  &.theme-pink {
+    --map-theme-color: #af4448;
+    --map-theme-bg: #fde7e8;
+  }
+
+  &.theme-orange {
+    --map-theme-color: #bb4d00;
+    --map-theme-bg: #fff0dd;
+  }
+
+  &.theme-slate {
+    --map-theme-color: #29434e;
+    --map-theme-bg: #e3e8ea;
+  }
+
+  &.theme-indigo {
+    --map-theme-color: #26418f;
+    --map-theme-bg: #e5eaf8;
+  }
+
+  &.theme-cyan {
+    --map-theme-color: #007b91;
+    --map-theme-bg: #dff3f7;
+  }
+
+  &.theme-green {
+    --map-theme-color: #4b830d;
+    --map-theme-bg: #e8f3dc;
+  }
+
+  &.theme-amber {
+    --map-theme-color: #fbab18;
+    --map-theme-bg: #fff6da;
+  }
+
+  .cove-visualization__body {
+    padding: 0 1rem 1rem;
+
+    &:not(.no-borders) {
+      border: 1px solid var(--lightGray);
+    }
+
+    &.component--has-border-color-theme:not(.no-borders) {
+      border-color: var(--map-theme-color, var(--lightGray));
+    }
+
+    &.component--has-accent {
+      border-left: 0.5rem solid var(--map-theme-color, var(--blue));
+    }
+
+    &.component--has-background:not(.component--hide-background-color) {
+      background-color: var(--map-theme-bg, var(--lightestGray));
+    }
+
+    &.component--hide-background-color {
+      background-color: transparent;
+    }
+
+    &.cove-visualization__body-wrap {
+      padding-top: 1rem !important;
+    }
+  }
+
   header.hidden {
     display: none;
   }

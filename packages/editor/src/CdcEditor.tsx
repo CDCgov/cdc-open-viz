@@ -98,7 +98,7 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
     <GlobalContextProvider>
       <ConfigContext.Provider value={{ ...state, setTempConfig: setTempConfigAndUpdate }}>
         <EditorDispatchContext.Provider value={dispatch}>
-          <div className={`cdc-open-viz-module cdc-editor ${state.currentViewport}`} ref={outerContainerRef}>
+          <div className={`cove-visualization cdc-editor ${state.currentViewport}`} ref={outerContainerRef}>
             <Tabs className='top-level'>
               <TabPane title='1. Choose Visualization Type' className='choose-type'>
                 <ChooseTab />

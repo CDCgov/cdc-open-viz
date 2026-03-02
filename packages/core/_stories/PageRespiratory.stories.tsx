@@ -127,7 +127,7 @@ const testMapRendering = async (canvasElement: HTMLElement, storyName: string) =
   })
 
   await step('Verify COVE module wrapper is present', async () => {
-    const coveModule = canvasElement.querySelector('.cdc-open-viz-module')
+    const coveModule = canvasElement.querySelector('.cove-visualization')
     expect(coveModule).toBeInTheDocument()
   })
 
@@ -154,7 +154,7 @@ const testChartRendering = async (canvasElement: HTMLElement, storyName: string)
   })
 
   await step('Verify COVE module wrapper is present', async () => {
-    const coveModule = canvasElement.querySelector('.cdc-open-viz-module')
+    const coveModule = canvasElement.querySelector('.cove-visualization')
     expect(coveModule).toBeInTheDocument()
   })
 
@@ -304,7 +304,7 @@ export const All_Visualizations: StoryObj = {
         const timeout = 20000
 
         const checkModules = () => {
-          const coveModules = canvasElement.querySelectorAll('.cdc-open-viz-module')
+          const coveModules = canvasElement.querySelectorAll('.cove-visualization')
           if (coveModules.length >= 4) {
             resolve()
           } else if (Date.now() - startTime > timeout) {
@@ -323,7 +323,7 @@ export const All_Visualizations: StoryObj = {
     })
 
     await step('Verify exactly 4 COVE modules are present', async () => {
-      const coveModules = canvasElement.querySelectorAll('.cdc-open-viz-module')
+      const coveModules = canvasElement.querySelectorAll('.cove-visualization')
       expect(coveModules.length).toBe(4)
     })
 

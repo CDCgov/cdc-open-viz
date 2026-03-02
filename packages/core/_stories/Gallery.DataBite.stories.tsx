@@ -35,7 +35,7 @@ const testDataBiteRendering = async (canvasElement: HTMLElement, storyName: stri
   })
 
   await step('Verify COVE module wrapper is present', async () => {
-    const coveModule = canvasElement.querySelector('.cdc-open-viz-module')
+    const coveModule = canvasElement.querySelector('.cove-visualization')
     expect(coveModule).toBeInTheDocument()
   })
 

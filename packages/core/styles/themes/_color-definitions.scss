@@ -2,68 +2,57 @@
 @use 'sass:list';
 
 $theme: (
-  'amber': (
-    '#fbab18',
+  'amber': ('#fbab18',
     '#ffd54f',
     '#ffecb3',
     '#fff7e1'
   ),
-  'blue': (
-    '#005eaa',
+  'blue': ('#005eaa',
     '#88c3ea',
     '#c0e9ff',
     '#edf9ff'
   ),
-  'brown': (
-    '#705043',
+  'brown': ('#705043',
     '#ad907b',
     '#d7ccc8',
     '#f2ebe8'
   ),
-  'cyan': (
-    '#007B91',
+  'cyan': ('#007B91',
     '#65b0bd',
     '#cce5e9',
     '#ebf5f6'
   ),
-  'green': (
-    '#4b830d',
+  'green': ('#4b830d',
     '#84bc49',
     '#dcedc8',
     '#f1f8e9'
   ),
-  'indigo': (
-    '#26418f',
+  'indigo': ('#26418f',
     '#92a6dd',
     '#dee8ff',
     '#f2f6ff'
   ),
-  'orange': (
-    '#bb4d00',
+  'orange': ('#bb4d00',
     '#ffad42',
     '#ffe97d',
     '#fff4cf'
   ),
-  'pink': (
-    '#af4448',
+  'pink': ('#af4448',
     '#e57373',
     '#ffc2c2',
     '#ffe7e7'
   ),
-  'purple': (
-    '#712177',
+  'purple': ('#712177',
     '#b890bb',
     '#e3d3e4',
     '#f7f2f7'
   ),
-  'slate': (
-    '#29434e',
+  'slate': ('#29434e',
     '#7e9ba5',
     '#b6c6d2',
     '#e2e8ed'
   ),
-  'teal': (
-    '#00695c',
+  'teal': ('#00695c',
     '#4ebaaa',
     '#ceece7',
     '#ebf7f5'
@@ -71,15 +60,14 @@ $theme: (
 );
 
 // .type-sparkline class used for creating sparklines
-// once v2 is released plz update html structure
-// to use .cove
-.markup-include,
-.type-waffle-chart,
-.type-data-bite,
-.type-filtered-text,
-.cdc-open-viz-module.type-chart.type-sparkline,
-.cove {
+.cove-visualization.type-markup-include,
+.cove-visualization.type-waffle-chart,
+.cove-visualization.type-data-bite,
+.cove-visualization.type-filtered-text,
+.cove-visualization.type-chart,
+.cove-visualization.type-chart.type-sparkline {
   @each $theme-name, $theme-colors in $theme {
+
     // Header
     .theme-#{$theme-name} {
       background-color: string.unquote(list.nth($theme-colors, 1));
@@ -89,18 +77,23 @@ $theme: (
     }
 
     &.theme-#{$theme-name} {
+
       /// area that appears underneath the title of the component.
-      .cove-component__content {
+      .cove-visualization__body {
+
         /// when there are borders on a component
         &:not(.no-borders) {
+
           /// borders are the theme color
-          &.component--has-borderColorTheme {
+          &.component--has-border-color-theme {
             border: 1px solid string.unquote(list.nth($theme-colors, 1));
           }
+
           /// using default border color to draw borders
-          &:not(.component--has-borderColorTheme) {
+          &:not(.component--has-border-color-theme) {
             border: 1px solid var(--lightGray);
           }
+
           &.component--has-title {
             border-top: none !important;
           }
@@ -112,18 +105,21 @@ $theme: (
         }
 
         /// Apply a background color
-        &.component--has-background:not(.component--hideBackgroundColor) {
+        &.component--has-background:not(.component--hide-background-color) {
           background: string.unquote(list.nth($theme-colors, 3));
         }
       }
 
-      .cove-component__header {
+      .cove-visualization__title,
+      .cove-visualization__header {
         border-color: string.unquote(list.nth($theme-colors, 2));
       }
     }
 
     &.theme-#{$theme-name} {
-      .cove-component__header {
+
+      .cove-visualization__title,
+      .cove-visualization__header {
         border-color: string.unquote(list.nth($theme-colors, 2));
       }
     }
@@ -131,7 +127,7 @@ $theme: (
 }
 
 // Charts filter styles
-.cdc-open-viz-module {
+.cove-visualization {
   @each $theme-name, $theme-colors in $theme {
     &.theme-#{$theme-name} {
       .single-filters--tab .tab--active:not(.tab--simple) {
@@ -169,9 +165,74 @@ $theme: (
       .button__tab-bar--active {
         outline: 2px solid string.unquote(list.nth($theme-colors, 1));
       }
+
       .apply:not([disabled]) {
         background-color: string.unquote(list.nth($theme-colors, 1));
       }
     }
   }
 }
+
+$baseColor: #333;
+$blue: #005eaa;
+$lightestGray: #f2f2f2;
+$lightGray: #c7c7c7;
+$mediumGray: #565656;
+$darkGray: #333;
+$red: #d8000c;
+$white: #fff;
+
+$primary: #005eaa !default;
+$secondary: #88c3ea !default;
+$tertiary: #c0e9ff !default;
+$quaternary: #edf9ff !default;
+
+$purple-primary: #712177 !default;
+$purple-secondary: #b890bb !default;
+$purple-tertiary: #e3d3e4 !default;
+$purple-quaternary: #f7f2f7 !default;
+
+$brown-primary: #705043 !default;
+$brown-secondary: #ad907b !default;
+$brown-tertiary: #d7ccc8 !default;
+$brown-quaternary: #f2ebe8 !default;
+
+$teal-primary: #00695c !default;
+$teal-secondary: #4ebaaa !default;
+$teal-tertiary: #ceece7 !default;
+$teal-quaternary: #ebf7f5 !default;
+
+$pink-primary: #af4448 !default;
+$pink-secondary: #e57373 !default;
+$pink-tertiary: #ffc2c2 !default;
+$pink-quaternary: #ffe7e7 !default;
+
+$orange-primary: #bb4d00 !default;
+$orange-secondary: #ffad42 !default;
+$orange-tertiary: #ffe97d !default;
+$orange-quaternary: #fff4cf !default;
+
+$slate-primary: #29434e !default;
+$slate-secondary: #7e9ba5 !default;
+$slate-tertiary: #b6c6d2 !default;
+$slate-quaternary: #e2e8ed !default;
+
+$indigo-primary: #26418f !default;
+$indigo-secondary: #92a6dd !default;
+$indigo-tertiary: #dee8ff !default;
+$indigo-quaternary: #f2f6ff !default;
+
+$cyan-primary: #006778 !default;
+$cyan-secondary: #65b0bd !default;
+$cyan-tertiary: #cce5e9 !default;
+$cyan-quaternary: #ebf5f6 !default;
+
+$green-primary: #4b830d !default;
+$green-secondary: #84bc49 !default;
+$green-tertiary: #dcedc8 !default;
+$green-quaternary: #f1f8e9 !default;
+
+$amber-primary: #fbab18 !default;
+$amber-secondary: #ffd54f !default;
+$amber-tertiary: #ffecb3 !default;
+$amber-quaternary: #fff7e1 !default;

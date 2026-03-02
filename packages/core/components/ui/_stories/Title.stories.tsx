@@ -6,7 +6,7 @@ const meta: Meta = {
   component: Title,
   decorators: [
     Story => (
-      <div className='cdc-open-viz-module'>
+      <div className='cove-visualization'>
         <Story />
       </div>
     )

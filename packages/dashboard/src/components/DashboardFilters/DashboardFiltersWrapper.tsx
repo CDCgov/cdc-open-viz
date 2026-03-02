@@ -7,7 +7,7 @@ import { FilterBehavior } from '../../helpers/FilterBehavior'
 import { getFilteredData } from '../../helpers/getFilteredData'
 import { DashboardFilters } from '../../types/DashboardFilters'
 import { getQueryParams, updateQueryString } from '@cdc/core/helpers/queryStringUtils'
-import Layout from '@cdc/core/components/Layout'
+import { VisualizationWrapper, Sidebar, Responsive } from '@cdc/core/components/Layout'
 import DashboardFiltersEditor from './DashboardFiltersEditor'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import { hasDashboardApplyBehavior } from '../../helpers/hasDashboardApplyBehavior'
@@ -302,24 +302,24 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
   const displayNone = filters?.length ? filters.every(filter => filter.showDropdown === false) : false
   if (displayNone && !isEditor) return <></>
   return (
-    <Layout.VisualizationWrapper config={visualizationConfig} isEditor={isEditor} currentViewport={currentViewport}>
+    <VisualizationWrapper config={visualizationConfig} isEditor={isEditor} currentViewport={currentViewport}>
       {isEditor && (
-        <Layout.Sidebar
+        <Sidebar
           displayPanel={displayPanel}
           isDashboard={true}
           title={'Configure Dashboard Filters'}
           onBackClick={onBackClick}
         >
           <DashboardFiltersEditor updateConfig={updateConfig} vizConfig={visualizationConfig} />
-        </Layout.Sidebar>
+        </Sidebar>
       )}
 
       {!displayNone && (
-        <Layout.Responsive isEditor={isEditor}>
+        <Responsive isEditor={isEditor}>
           <div
             className={`${
               isEditor ? ' is-editor' : ''
-            } cove-component__content col-12 cove-dashboard-filters-container`}
+            } cove-visualization__inner cove-visualization__body col-12 cove-dashboard-filters-container`}
           >
             <Filters
               show={visualizationConfig?.sharedFilterIndexes?.map(Number)}
@@ -337,9 +337,9 @@ const DashboardFiltersWrapper: React.FC<DashboardFiltersProps> = ({
               }
             />
           </div>
-        </Layout.Responsive>
+        </Responsive>
       )}
-    </Layout.VisualizationWrapper>
+    </VisualizationWrapper>
   )
 }
 

@@ -1,4 +1,4 @@
-.cdc-open-viz-module.type-map {
+.cove-visualization.type-map {
   .annotation__title-circle {
     align-items: center;
 
@@ -38,7 +38,7 @@
     margin-top: 5px;
   }
 
-  .cove-component__content {
+  .cove-visualization__body {
     container-name: content;
     container-type: inline-size;
   }

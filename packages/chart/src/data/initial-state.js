@@ -236,8 +236,10 @@ const createInitialState = () => {
     confidenceKeys: {},
     visual: {
       border: true,
+      borderColorTheme: false,
       accent: true,
       background: true,
+      hideBackgroundColor: false,
       verticalHoverLine: false,
       horizontalHoverLine: false,
       lineDatapointSymbol: 'none',

@@ -23,8 +23,8 @@ export default function useDataVizClasses(config, viewport = null) {
     lineDatapointClass = ' chart-line--always'
   }
 
-  let innerContainerClasses = ['cove-component__inner']
-  let contentClasses = ['cove-component__content']
+  let innerContainerClasses = ['cove-visualization__inner']
+  let contentClasses = ['cove-visualization__body']
 
   if (visualizationType === 'Spark Line' || visualizationType === 'chart') {
     if (title && showTitle) contentClasses.push('component--has-title')
@@ -37,14 +37,14 @@ export default function useDataVizClasses(config, viewport = null) {
     contentClasses.push('component--has-title')
   subtext && innerContainerClasses.push('component--has-subtext')
   biteStyle && innerContainerClasses.push(`bite__style--${biteStyle}`)
-  general?.isCompactStyle && innerContainerClasses.push(`component--isCompactStyle`)
+  general?.isCompactStyle && innerContainerClasses.push(`component--is-compact-style`)
 
   !visual?.border && contentClasses.push('no-borders')
   visualizationType === 'Spark Line' && contentClasses.push('sparkline')
-  visual?.borderColorTheme && contentClasses.push('component--has-borderColorTheme')
+  visual?.borderColorTheme && contentClasses.push('component--has-border-color-theme')
   visual?.accent && contentClasses.push('component--has-accent')
   visual?.background && contentClasses.push('component--has-background')
-  visual?.hideBackgroundColor && contentClasses.push('component--hideBackgroundColor')
+  visual?.hideBackgroundColor && contentClasses.push('component--hide-background-color')
 
   // ! these two will be retired.
   shadow && innerContainerClasses.push('shadow')

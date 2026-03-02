@@ -2,20 +2,20 @@
   top: 0;
 }
 
-.cdc-editor .configure .editor-heading + .cdc-open-viz-module .editor-panel__toggle {
+.cdc-editor .configure .editor-heading + .cove-visualization .editor-panel__toggle {
   top: 12px;
   position: relative;
 }
 
-.cdc-editor .configure .cdc-open-viz-module:not(.type-dashboard) .editor-panel__toggle {
+.cdc-editor .configure .cove-visualization:not(.type-dashboard) .editor-panel__toggle {
   position: absolute;
 }
 
-.cdc-editor .configure .cdc-open-viz-module:not(.type-dashboard) .sidebar {
+.cdc-editor .configure .cove-visualization:not(.type-dashboard) .sidebar {
   position: relative;
 }
 
-.cdc-open-viz-module {
+.cove-visualization {
   .waiting {
     padding-top: 0 !important;
     padding-left: 0 !important;
@@ -26,7 +26,7 @@
     height: 100%; // take up the whole container
     top: 0;
     max-width: 350px;
-    width: 350px;
+    min-width: 0;
     background-color: var(--white);
     grid-area: panel;
 
@@ -799,12 +799,6 @@
       font-size: 0.75rem;
     }
 
-    .cove-accordion__button .cove-tooltip {
-      // display: inline-flex;
-      // right: 1.5rem;
-      // line-height: inherit;
-    }
-
     .cove-list-group__item .cove-tooltip {
       width: 100%;
       display: block;
@@ -929,15 +923,10 @@
     }
   }
 
-  &.type-dashboard {
-    .editor-panel__toggle {
-      top: 64px;
-    }
-  }
-
   .editor-panel__toggle-wrapper {
     position: absolute;
     top: 0;
+    left: 0;
   }
 
   .editor-panel__toggle {
@@ -952,7 +941,7 @@
     cursor: pointer;
     width: 25px;
     height: 25px;
-    right: 10px;
+    left: calc(100% - 35px);
     top: 50%;
     transform: translateY(-50%);
     box-shadow: rgba(0, 0, 0, 0.5) 0 1px 2px;

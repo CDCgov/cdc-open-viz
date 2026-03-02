@@ -37,8 +37,8 @@ const getMinMax = ({
   let leftMax = 0
   let rightMax = 0
 
-  if (!data) {
-    return { min, max }
+  if (!data || !config.runtime) {
+    return { min, max, leftMax, rightMax }
   }
 
   const { visualizationType, series } = config
