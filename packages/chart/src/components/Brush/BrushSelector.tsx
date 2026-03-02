@@ -2,9 +2,11 @@ import React, { FC, useContext, useMemo, memo, useRef, useEffect, useState, useC
 import { Brush } from '@visx/brush'
 import BaseBrush from '@visx/brush/lib/BaseBrush'
 import { Group } from '@visx/group'
+import { PatternLines, PatternCircles, PatternWaves } from '@visx/pattern'
 import { scaleBand, scaleLinear } from '@visx/scale'
 import { Bounds } from '@visx/brush/lib/types'
 import type { BrushHandleRenderProps } from '@visx/brush/lib/BrushHandle'
+import { isDateScale } from '@cdc/core/helpers/cove/date'
 import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
 import MiniChartPreview from './MiniChartPreview'
 
@@ -110,10 +112,76 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
   const selectionRef = useRef<HTMLButtonElement>(null)
   const rightHandleRef = useRef<HTMLButtonElement>(null)
 
-  const { tableData, config, colorScale } = useContext(ConfigContext)
+  const { tableData, config, colorScale, parseDate } = useContext(ConfigContext)
   const dispatch = useContext(ChartDispatchContext)
   const dataKey = config.xAxis.dataKey
   const series = config.series || []
+
+  const renderPatternDefs = () => {
+    if (!config.legend?.patterns || Object.keys(config.legend.patterns).length === 0) {
+      return null
+    }
+
+    return (
+      <>
+        {Object.entries(config.legend.patterns).map(([key, pattern]) => {
+          const patternId = `chart-pattern-${key}`
+          const size = pattern.patternSize || 8
+
+          switch (pattern.shape) {
+            case 'circles':
+              return (
+                <PatternCircles
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  fill={pattern.color}
+                  radius={1.25}
+                />
+              )
+            case 'lines':
+              return (
+                <PatternLines
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  stroke={pattern.color}
+                  strokeWidth={0.75}
+                  orientation={['horizontal']}
+                />
+              )
+            case 'diagonalLines':
+              return (
+                <PatternLines
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  stroke={pattern.color}
+                  strokeWidth={0.75}
+                  orientation={['diagonalRightToLeft']}
+                />
+              )
+            case 'waves':
+              return (
+                <PatternWaves
+                  key={patternId}
+                  id={patternId}
+                  height={size}
+                  width={size}
+                  fill={pattern.color}
+                  strokeWidth={0.25}
+                />
+              )
+            default:
+              return null
+          }
+        })}
+      </>
+    )
+  }
 
   // Capture initial brush extent after mount and sync accessible extent
   useEffect(() => {
@@ -133,8 +201,22 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       return scaleBand<string>({ domain: [], range: [0, Math.max(xMax, 0)] })
     }
 
-    const mappedDates = tableData.map(row => row[dataKey])
-    const domain = config?.xAxis?.sortByRecentDate ? [...mappedDates].reverse() : mappedDates
+    const mappedValues = tableData.map(row => row[dataKey])
+
+    // Sort domain chronologically for date types, matching the main chart's sort behavior.
+    // Without this, data arriving in reverse chronological order renders the brush backwards.
+    const xAxisType = config?.xAxis?.type
+    let domain: string[]
+    if (xAxisType === 'date' || xAxisType === 'date-time') {
+      const sorted = [...mappedValues].sort((a, b) => {
+        const dateA = parseDate ? parseDate(a) : new Date(a)
+        const dateB = parseDate ? parseDate(b) : new Date(b)
+        return dateA - dateB
+      })
+      domain = config?.xAxis?.sortByRecentDate ? sorted.reverse() : sorted
+    } else {
+      domain = config?.xAxis?.sortByRecentDate ? [...mappedValues].reverse() : mappedValues
+    }
 
     return scaleBand<string>({
       domain,
@@ -142,30 +224,82 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       paddingInner: 0.1,
       paddingOuter: 0.1
     })
-  }, [tableData, dataKey, config?.xAxis?.sortByRecentDate, xMax])
+  }, [tableData, dataKey, config?.xAxis?.sortByRecentDate, config?.xAxis?.type, parseDate, xMax])
 
   // Simple Y scale for brush (identity mapping)
   const yScale = useMemo(() => scaleLinear<number>({ domain: [0, BRUSH_HEIGHT], range: [BRUSH_HEIGHT, 0] }), [])
 
-  // Mini chart Y scale
+  // Helper to build a mini Y scale from a subset of series
+  const buildMiniYScale = useCallback(
+    (seriesSubset: typeof series, includeZero: boolean) => {
+      const defaultScale = scaleLinear({ domain: [0, 100], range: [BRUSH_HEIGHT - 4, 2] })
+      if (!seriesSubset.length || !tableData.length) return defaultScale
+
+      let minValue = Number.POSITIVE_INFINITY
+      let maxValue = Number.NEGATIVE_INFINITY
+      let hasValidValues = false
+
+      for (const s of seriesSubset) {
+        if (!s.dataKey) continue
+        for (const row of tableData) {
+          const value = parseFloat(row[s.dataKey])
+          if (!isNaN(value) && isFinite(value)) {
+            hasValidValues = true
+            minValue = Math.min(minValue, value)
+            maxValue = Math.max(maxValue, value)
+          }
+        }
+      }
+
+      if (!hasValidValues) return defaultScale
+
+      if (includeZero) minValue = Math.min(0, minValue)
+
+      if (minValue === maxValue) {
+        const padding = Math.abs(minValue) * 0.1 || 10
+        minValue = minValue - padding
+        maxValue = maxValue + padding
+        if (minValue > 0) minValue = 0
+      }
+
+      const domain = [minValue, maxValue]
+      return scaleLinear({ domain, range: [BRUSH_HEIGHT - 4, 2], nice: true })
+    },
+    [tableData]
+  )
+
+  // Determine if we have a right-axis series (dual-axis combo)
+  const hasRightAxis = useMemo(
+    () => config.visualizationType === 'Combo' && series.some(s => s.axis === 'Right'),
+    [series, config.visualizationType]
+  )
+
+  // Mini chart Y scale — left-axis (or all series when there's no right axis)
   const miniYScale = useMemo(() => {
     if (!series.length || !tableData.length) {
       return scaleLinear({ domain: [0, 100], range: [BRUSH_HEIGHT - 4, 2] })
     }
 
+    const barSeriesTypes = new Set(['Bar', 'Paired Bar', 'Deviation Bar', 'Combo'])
+    const hasBarSeries =
+      config.visualizationType === 'Bar' ||
+      (config.visualizationType === 'Combo' && series.some(s => barSeriesTypes.has(s.type)))
     const isStacked =
       config.visualizationSubType === 'stacked' &&
       (config.visualizationType === 'Bar' || config.visualizationType === 'Area Chart')
+
+    // When dual-axis, only use left-axis series for this scale
+    const leftSeries = hasRightAxis ? series.filter(s => s.axis !== 'Right') : series
+
     let minValue = Number.POSITIVE_INFINITY
     let maxValue = Number.NEGATIVE_INFINITY
     let hasValidValues = false
 
     if (isStacked) {
-      // For stacked bars, calculate the sum of all series for each row
       for (const row of tableData) {
         let rowSum = 0
         let hasRowValue = false
-        for (const s of series) {
+        for (const s of leftSeries) {
           if (!s.dataKey) continue
           const value = parseFloat(row[s.dataKey])
           if (!isNaN(value) && isFinite(value)) {
@@ -179,11 +313,9 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
           maxValue = Math.max(maxValue, rowSum)
         }
       }
-      // For stacked charts, ensure domain starts at 0
       minValue = Math.min(0, minValue)
     } else {
-      // For non-stacked charts, use individual series values
-      for (const s of series) {
+      for (const s of leftSeries) {
         if (!s.dataKey) continue
         for (const row of tableData) {
           const value = parseFloat(row[s.dataKey])
@@ -194,19 +326,13 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
           }
         }
       }
-      // For bar charts, ensure domain includes 0
-      if (config.visualizationType === 'Bar') {
-        minValue = Math.min(0, minValue)
-      }
+      if (hasBarSeries) minValue = Math.min(0, minValue)
     }
 
-    // Handle edge case where all values are the same
     if (hasValidValues && minValue === maxValue) {
-      // Create a domain with some padding around the single value
       const padding = Math.abs(minValue) * 0.1 || 10
       minValue = minValue - padding
       maxValue = maxValue + padding
-      // Ensure 0 is included if we're near it
       if (minValue > 0) minValue = 0
     }
 
@@ -214,14 +340,18 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
       return scaleLinear({ domain: [0, 100], range: [BRUSH_HEIGHT - 4, 2] })
     }
 
-    // Ensure domain includes 0 for bar charts
-    if (config.visualizationType === 'Bar') {
-      minValue = Math.min(0, minValue)
-    }
+    if (hasBarSeries) minValue = Math.min(0, minValue)
 
     const domain = minValue === maxValue ? [minValue - 1, maxValue + 1] : [minValue, maxValue]
     return scaleLinear({ domain, range: [BRUSH_HEIGHT - 4, 2], nice: true })
-  }, [series, tableData, config.visualizationSubType, config.visualizationType])
+  }, [series, tableData, config.visualizationSubType, config.visualizationType, hasRightAxis])
+
+  // Mini chart Y scale for right-axis series (dual-axis combo charts)
+  const miniRightYScale = useMemo(() => {
+    if (!hasRightAxis) return undefined
+    const rightSeries = series.filter(s => s.axis === 'Right')
+    return buildMiniYScale(rightSeries, false)
+  }, [hasRightAxis, series, buildMiniYScale])
 
   // Fallback: Window mouseup listener to prevent stuck drag states
   useEffect(() => {
@@ -1107,6 +1237,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
               shapeRendering='auto'
             />
           </pattern>
+          {renderPatternDefs()}
         </defs>
 
         {/* Mini chart preview */}
@@ -1118,6 +1249,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
               dataKey={dataKey}
               xScale={xScale}
               miniYScale={miniYScale}
+              miniRightYScale={miniRightYScale}
               colorScale={colorScale}
               config={config}
               xMax={safeXMax}

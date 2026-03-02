@@ -2,48 +2,45 @@
   "name": "@cdc/markup-include",
   "version": "4.26.1",
   "description": "React component for displaying HTML content from an outside link",
-  "moduleName": "CdcMarkupInclude",
+  "license": "Apache-2.0",
+  "author": "Rob Shelnutt <rob@blackairplane.com>",
+  "bugs": "https://github.com/CDCgov/cdc-open-viz/issues",
+  "dependencies": {
+    "@cdc/core": "^4.25.11",
+    "axios": "^1.13.2",
+    "interweave": "^13.1.1",
+    "lodash": "^4.17.23",
+    "react-accessible-accordion": "^5.0.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-dsv": "^3.0.2",
+    "@vitejs/plugin-react": "^5.1.2",
+    "sass": "^1.89.2",
+    "vite-plugin-css-injected-by-js": "^2.4.0",
+    "vite-plugin-svgr": "^4.2.0"
+  },
+  "gitHead": "6097de1ff814001880d9ac64bd66becdc092d63c",
+  "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
   "main": "dist/cdcmarkupinclude",
-  "type": "module",
-  "scripts": {
-    "start": "vite --open",
-    "build": "vite build",
-    "preview": "vite preview",
-    "graph": "nx graph",
-    "prepublishOnly": "lerna run --scope @cdc/markup-include build",
-    "test": "vitest run --reporter verbose",
-    "test-watch": "vitest watch --reporter verbose",
-    "test-watch:ui": "vitest --ui"
+  "moduleName": "CdcMarkupInclude",
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CDCgov/cdc-open-viz",
     "directory": "packages/markup-include"
   },
-  "author": "Rob Shelnutt <rob@blackairplane.com>",
-  "bugs": {
-    "url": "https://github.com/CDCgov/cdc-open-viz/issues"
+  "scripts": {
+    "build": "vite build",
+    "graph": "nx graph",
+    "prepublishOnly": "lerna run --scope @cdc/markup-include build",
+    "preview": "vite preview",
+    "start": "vite --open",
+    "test": "vitest run --reporter verbose",
+    "test-watch": "vitest watch --reporter verbose",
+    "test-watch:ui": "vitest --ui"
   },
-  "license": "Apache-2.0",
-  "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
-  "dependencies": {
-    "@cdc/core": "^4.26.1",
-    "axios": "^1.9.0",
-    "chroma": "0.0.1",
-    "interweave": "^13.1.1",
-    "lodash": "^4.17.21",
-    "react-accessible-accordion": "^5.0.1"
-  },
-  "peerDependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
-  "devDependencies": {
-    "@rollup/plugin-dsv": "^3.0.2",
-    "@vitejs/plugin-react": "^4.3.4",
-    "sass": "^1.89.2",
-    "vite-plugin-css-injected-by-js": "^2.4.0",
-    "vite-plugin-svgr": "^4.2.0"
-  },
-  "gitHead": "6097de1ff814001880d9ac64bd66becdc092d63c"
+  "type": "module"
 }

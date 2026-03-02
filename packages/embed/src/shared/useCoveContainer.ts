@@ -1,5 +1,5 @@
 import { useEffect, RefObject } from 'react'
-import { isValidConfigUrl } from './urlValidation'
+import { isValidConfigUrl } from '@cdc/core/helpers/embed/urlValidation'
 
 /**
  * Shared hook for setting up a COVE container div

@@ -2,53 +2,48 @@
   "name": "@cdc/core",
   "version": "4.26.1",
   "description": "Core components, styles, hooks, and helpers, for the CDC Open Visualization project",
-  "moduleName": "CdcCore",
-  "main": "dist/cdccore",
-  "type": "module",
-  "scripts": {
-    "test": "vitest run --environment jsdom --reporter verbose",
-    "test-watch": "vitest watch --reporter verbose",
-    "test-watch:ui": "vitest --ui",
-    "build": "sass styles/cove-main.scss dist/cove-main.css"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/CDCgov/cdc-open-viz.git"
-  },
-  "author": "Rob Shelnutt <rob@blackairplane.com>",
-  "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
-  "bugs": {
-    "url": "https://github.com/CDCgov/cdc-open-viz/issues"
-  },
   "license": "Apache-2.0",
+  "author": "Rob Shelnutt <rob@blackairplane.com>",
+  "bugs": "https://github.com/CDCgov/cdc-open-viz/issues",
   "dependencies": {
     "@hello-pangea/dnd": "^16.2.0",
-    "chroma-js": "3.1.2",
-    "dompurify": "^3.2.4",
-    "html-react-parser": "5.2.3",
+    "chroma-js": "^3.1.2",
+    "dompurify": "^3.3.1",
+    "html-react-parser": "^5.2.3",
     "html2canvas": "^1.4.1",
     "json-edit-react": "^1.27.0",
-    "papaparse": "5.5.2",
+    "papaparse": "^5.5.2",
     "prop-types": "^15.8.1",
     "react-accessible-accordion": "^5.0.1",
     "react-select": "^5.3.1",
     "react-tooltip": "5.8.2-beta.3",
     "resize-observer-polyfill": "^1.5.1",
-    "use-debounce": "^10.0.5",
+    "use-debounce": "^10.1.0",
     "vega": "^6.1.0",
     "vega-lite": "^6.1.0"
   },
+  "devDependencies": {
+    "@rollup/plugin-dsv": "^3.0.2",
+    "@vitejs/plugin-react": "^5.1.2",
+    "sass": "^1.89.2",
+    "vite": "^7.3.1",
+    "vite-plugin-css-injected-by-js": "^2.4.0",
+    "vite-plugin-svgr": "^4.2.0"
+  },
+  "gitHead": "9062881d50c824ee6cdd71868bafd016a5e5694d",
+  "homepage": "https://github.com/CDCgov/cdc-open-viz#readme",
+  "main": "dist/cdccore",
+  "moduleName": "CdcCore",
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
-  "gitHead": "9062881d50c824ee6cdd71868bafd016a5e5694d",
-  "devDependencies": {
-    "@rollup/plugin-dsv": "^3.0.2",
-    "@vitejs/plugin-react": "^4.3.4",
-    "sass": "^1.89.2",
-    "vite": "^5.4.21",
-    "vite-plugin-css-injected-by-js": "^2.4.0",
-    "vite-plugin-svgr": "^4.2.0"
-  }
+  "repository": "CDCgov/cdc-open-viz.git",
+  "scripts": {
+    "build": "sass styles/cove-main.scss dist/cove-main.css",
+    "test": "vitest run --environment jsdom --reporter verbose",
+    "test-watch": "vitest watch --reporter verbose",
+    "test-watch:ui": "vitest --ui"
+  },
+  "type": "module"
 }

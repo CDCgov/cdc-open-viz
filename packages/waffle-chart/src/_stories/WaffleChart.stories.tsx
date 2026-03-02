@@ -2,6 +2,7 @@ import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import WaffleChart from '../CdcWaffleChart'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof WaffleChart> = {
   title: 'Components/Templates/WaffleChart',
@@ -105,7 +106,10 @@ export const Person: Story = {
     <>
       <WaffleChart {...args} />
     </>
-  )
+  ),
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+  }
 }
 
 export const Gauge: Story = {
@@ -186,7 +190,10 @@ export const Gauge: Story = {
     <>
       <WaffleChart {...args} />
     </>
-  )
+  ),
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+  }
 }
 
 export const Waffle_Chart_TP5_Style: Story = {
@@ -200,6 +207,9 @@ export const Waffle_Chart_TP5_Style: Story = {
           'TP5 Style - A new layout style that displays the waffle chart in a callout component with a blue background and icon. The title appears inside the callout header. This style mimics the CDC Template Package 5.0 callout component design and includes an optional white background variant.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -214,6 +224,43 @@ export const Waffle_Chart_TP5_Style_White_Background: Story = {
           'TP5 Style with White Background - The white background variant of the TP5 style features a white background with a teal border instead of the default blue background. The icon remains visible in this variant.'
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+  }
+}
+
+export const TP5_Gauge: Story = {
+  args: {
+    configUrl: '/packages/waffle-chart/examples/tp5-gauge.json'
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'TP5 Gauge - A TP5 callout-style gauge with a blue background, callout flag, and title inside the callout header.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+  }
+}
+
+export const TP5_Gauge_White_Background: Story = {
+  args: {
+    configUrl: '/packages/waffle-chart/examples/tp5-gauge-white.json'
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'TP5 Gauge with White Background - The white background variant of the TP5 gauge features a white callout with a teal border and no callout flag.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 

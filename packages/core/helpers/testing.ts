@@ -314,6 +314,50 @@ export const testBooleanControl = async (checkbox: HTMLInputElement, getVisualSt
 }
 
 // ============================================================================
+// VISUALIZATION RENDERING ASSERTIONS
+// ============================================================================
+
+/**
+ * Assert that a visualization has rendered successfully.
+ * Uses performAndAssert to poll until one of these conditions is met:
+ *   ((svgCount > 0 || canvasCount > 0) && hasCoveModule) || isDataBite || isDataTable
+ *
+ * Handles all visualization types:
+ * - Charts (SVG-based)
+ * - Maps with SVG rendering (US state, world, hex, etc.)
+ * - Maps with canvas rendering (county maps via UsaMap.County)
+ * - Data bites (.bite-content)
+ * - Data tables (.data-table)
+ * - Waffle charts (SVG-based)
+ *
+ * Use as a play function in any Components/Templates/ story:
+ *   play: async ({ canvasElement }) => {
+ *     await assertVisualizationRendered(canvasElement)
+ *   }
+ *
+ * @param vizElement The story's canvas element (Storybook's canvasElement)
+ */
+export const assertVisualizationRendered = async (vizElement: HTMLElement) => {
+  await performAndAssert(
+    'Wait for visualization to render',
+    () => {
+      const svgCount = vizElement.querySelectorAll('svg').length
+      const canvasCount = vizElement.querySelectorAll('canvas').length
+      const hasCoveModule = !!vizElement.querySelector('.cdc-open-viz-module')
+      const isDataBite = !!vizElement.querySelector('.bite-content')
+      const isDataTable = !!vizElement.querySelector('.type-data-table')
+      return { svgCount, canvasCount, hasCoveModule, isDataBite, isDataTable }
+    },
+    async () => {},
+    (_before, after) => {
+      return (
+        ((after.svgCount > 0 || after.canvasCount > 0) && after.hasCoveModule) || after.isDataBite || after.isDataTable
+      )
+    }
+  )
+}
+
+// ============================================================================
 // DATA EXTRACTION HELPERS
 // ============================================================================
 

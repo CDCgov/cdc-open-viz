@@ -1,0 +1,1589 @@
+{
+  "annotations": [],
+  "general": {
+    "navigationTarget": "_self",
+    "noDataMessage": "No State Selected",
+    "annotationDropdownText": "Annotations",
+    "geoBorderColor": "darkGray",
+    "headerColor": "theme-blue",
+    "title": "",
+    "showTitle": true,
+    "titleStyle": "small",
+    "showSidebar": "hidden",
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": true,
+    "territoriesAlwaysShow": false,
+    "language": "en",
+    "geoType": "us",
+    "geoLabelOverride": "",
+    "hasRegions": false,
+    "fullBorder": false,
+    "type": "data",
+    "convertFipsCodes": true,
+    "palette": {
+      "isReversed": false,
+      "name": "sequential_blue",
+      "version": "2.0"
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "statesPicked": [],
+    "expandDataTable": false
+  },
+  "type": "map",
+  "columns": {
+    "geo": {
+      "name": "geography",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "dataTable": true,
+      "tooltip": true,
+      "prefix": "",
+      "suffix": "",
+      "name": "cases_range",
+      "label": "cases_range",
+      "roundToPlace": 0
+    },
+    "navigate": {
+      "name": ""
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [],
+    "unified": false,
+    "singleColumn": false,
+    "singleRow": false,
+    "verticalSorted": false,
+    "showSpecialClassesLast": false,
+    "dynamicDescription": false,
+    "type": "category",
+    "numberOfItems": 3,
+    "position": "top",
+    "title": "",
+    "style": "gradient",
+    "subStyle": "linear blocks",
+    "tickRotation": "",
+    "singleColumnLegend": false,
+    "hideBorder": true,
+    "groupBy": "",
+    "additionalCategories": []
+  },
+  "filters": [],
+  "table": {
+    "wrapColumns": false,
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showDownloadLinkBelow": true,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": true,
+    "indexLabel": "",
+    "cellMinWidth": "0",
+    "collapsible": true
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "opacity": 90
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "minBubbleSize": 1,
+    "maxBubbleSize": 20,
+    "extraBubbleBorder": false,
+    "cityStyle": "circle",
+    "cityStyleLabel": "",
+    "showBubbleZeros": false,
+    "additionalCityStyles": [],
+    "geoCodeCircleSize": 8
+  },
+  "mapPosition": {
+    "coordinates": [0, 30],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": [
+      {
+        "legendTitle": "",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "",
+            "shape": "Arrow Up",
+            "column": "",
+            "operator": "=",
+            "value": ""
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
+  "filterIntro": "",
+  "smallMultiples": {
+    "mode": "",
+    "tileColumn": "",
+    "tilesPerRowDesktop": 2,
+    "tilesPerRowMobile": 1,
+    "tileOrderType": "asc",
+    "tileOrder": [],
+    "tileTitles": {},
+    "synchronizedTooltips": true
+  },
+  "markupVariables": [],
+  "enableMarkupVariables": false,
+  "errors": [],
+  "currentViewport": "lg",
+  "id": 19,
+  "category": "Maps",
+  "label": "United States (State- or County-Level)",
+  "subType": "us",
+  "icon": {
+    "type": {},
+    "key": null,
+    "ref": null,
+    "props": {},
+    "_owner": null,
+    "_store": {}
+  },
+  "content": "Present a U.S. choropleth map at state or county level.",
+  "position": "right",
+  "activeVizButtonID": 19,
+  "dataFileName": "https://www.cdc.gov/wcms/vizdata/measles/MeaslesCasesMap.json",
+  "dataFileSourceType": "url",
+  "version": "4.26.1",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "data": [
+    {
+      "geography": "Alabama",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "1",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Alabama",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "1",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Alabama",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "1",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Alaska",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "4",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Alaska",
+      "cases_range": "1-9",
+      "cases_calendar_year": "4",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "4",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Alaska",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "4",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Arizona",
+      "cases_range": "1-9",
+      "cases_calendar_year": "5",
+      "year": "2024",
+      "cases_2026": 7,
+      "cases_2025": "214",
+      "cases_2024": "5"
+    },
+    {
+      "geography": "Arizona",
+      "cases_range": "100-500",
+      "cases_calendar_year": "214",
+      "year": "2025",
+      "cases_2026": 7,
+      "cases_2025": "214",
+      "cases_2024": "5"
+    },
+    {
+      "geography": "Arizona",
+      "cases_range": "1-9",
+      "cases_calendar_year": "7",
+      "year": "2026",
+      "cases_2026": 7,
+      "cases_2025": "214",
+      "cases_2024": "5"
+    },
+    {
+      "geography": "Arkansas",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "8",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Arkansas",
+      "cases_range": "1-9",
+      "cases_calendar_year": "8",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "8",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Arkansas",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "8",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "California",
+      "cases_range": "10-49",
+      "cases_calendar_year": "13",
+      "year": "2024",
+      "cases_2026": 1,
+      "cases_2025": "26",
+      "cases_2024": "13"
+    },
+    {
+      "geography": "California",
+      "cases_range": "10-49",
+      "cases_calendar_year": "26",
+      "year": "2025",
+      "cases_2026": 1,
+      "cases_2025": "26",
+      "cases_2024": "13"
+    },
+    {
+      "geography": "California",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2026",
+      "cases_2026": 1,
+      "cases_2025": "26",
+      "cases_2024": "13"
+    },
+    {
+      "geography": "Colorado",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "35",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Colorado",
+      "cases_range": "10-49",
+      "cases_calendar_year": "35",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "35",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Colorado",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "35",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Connecticut",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "1",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Connecticut",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "1",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Connecticut",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "1",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Delaware",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Delaware",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Delaware",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "District of Columbia",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "District of Columbia",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "District of Columbia",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Florida",
+      "cases_range": "10-49",
+      "cases_calendar_year": "11",
+      "year": "2024",
+      "cases_2026": 6,
+      "cases_2025": "8",
+      "cases_2024": "11"
+    },
+    {
+      "geography": "Florida",
+      "cases_range": "1-9",
+      "cases_calendar_year": "8",
+      "year": "2025",
+      "cases_2026": 6,
+      "cases_2025": "8",
+      "cases_2024": "11"
+    },
+    {
+      "geography": "Florida",
+      "cases_range": "1-9",
+      "cases_calendar_year": "6",
+      "year": "2026",
+      "cases_2026": 6,
+      "cases_2025": "8",
+      "cases_2024": "11"
+    },
+    {
+      "geography": "Georgia",
+      "cases_range": "1-9",
+      "cases_calendar_year": "5",
+      "year": "2024",
+      "cases_2026": 1,
+      "cases_2025": "10",
+      "cases_2024": "5"
+    },
+    {
+      "geography": "Georgia",
+      "cases_range": "10-49",
+      "cases_calendar_year": "10",
+      "year": "2025",
+      "cases_2026": 1,
+      "cases_2025": "10",
+      "cases_2024": "5"
+    },
+    {
+      "geography": "Georgia",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2026",
+      "cases_2026": 1,
+      "cases_2025": "10",
+      "cases_2024": "5"
+    },
+    {
+      "geography": "Hawaii",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "2",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Hawaii",
+      "cases_range": "1-9",
+      "cases_calendar_year": "2",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "2",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Hawaii",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "2",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Idaho",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 2,
+      "cases_2025": "14",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Idaho",
+      "cases_range": "10-49",
+      "cases_calendar_year": "14",
+      "year": "2025",
+      "cases_2026": 2,
+      "cases_2025": "14",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Idaho",
+      "cases_range": "1-9",
+      "cases_calendar_year": "2",
+      "year": "2026",
+      "cases_2026": 2,
+      "cases_2025": "14",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Illinois",
+      "cases_range": "50-99",
+      "cases_calendar_year": "67",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "14",
+      "cases_2024": "67"
+    },
+    {
+      "geography": "Illinois",
+      "cases_range": "10-49",
+      "cases_calendar_year": "14",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "14",
+      "cases_2024": "67"
+    },
+    {
+      "geography": "Illinois",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "14",
+      "cases_2024": "67"
+    },
+    {
+      "geography": "Indiana",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "10",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Indiana",
+      "cases_range": "10-49",
+      "cases_calendar_year": "10",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "10",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Indiana",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "10",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Iowa",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "9",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Iowa",
+      "cases_range": "1-9",
+      "cases_calendar_year": "9",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "9",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Iowa",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "9",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Kansas",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "91",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Kansas",
+      "cases_range": "50-99",
+      "cases_calendar_year": "91",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "91",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Kansas",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "91",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Kentucky",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 2,
+      "cases_2025": "13",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Kentucky",
+      "cases_range": "10-49",
+      "cases_calendar_year": "13",
+      "year": "2025",
+      "cases_2026": 2,
+      "cases_2025": "13",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Kentucky",
+      "cases_range": "1-9",
+      "cases_calendar_year": "2",
+      "year": "2026",
+      "cases_2026": 2,
+      "cases_2025": "13",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Louisiana",
+      "cases_range": "1-9",
+      "cases_calendar_year": "2",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "3",
+      "cases_2024": "2"
+    },
+    {
+      "geography": "Louisiana",
+      "cases_range": "1-9",
+      "cases_calendar_year": "3",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "3",
+      "cases_2024": "2"
+    },
+    {
+      "geography": "Louisiana",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "3",
+      "cases_2024": "2"
+    },
+    {
+      "geography": "Maine",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Maine",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Maine",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Maryland",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "3",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Maryland",
+      "cases_range": "1-9",
+      "cases_calendar_year": "3",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "3",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Maryland",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "3",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Massachusetts",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Massachusetts",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Massachusetts",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Michigan",
+      "cases_range": "1-9",
+      "cases_calendar_year": "7",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "29",
+      "cases_2024": "7"
+    },
+    {
+      "geography": "Michigan",
+      "cases_range": "10-49",
+      "cases_calendar_year": "29",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "29",
+      "cases_2024": "7"
+    },
+    {
+      "geography": "Michigan",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "29",
+      "cases_2024": "7"
+    },
+    {
+      "geography": "Minnesota",
+      "cases_range": "50-99",
+      "cases_calendar_year": "65",
+      "year": "2024",
+      "cases_2026": 1,
+      "cases_2025": "26",
+      "cases_2024": "65"
+    },
+    {
+      "geography": "Minnesota",
+      "cases_range": "10-49",
+      "cases_calendar_year": "26",
+      "year": "2025",
+      "cases_2026": 1,
+      "cases_2025": "26",
+      "cases_2024": "65"
+    },
+    {
+      "geography": "Minnesota",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2026",
+      "cases_2026": 1,
+      "cases_2025": "26",
+      "cases_2024": "65"
+    },
+    {
+      "geography": "Mississippi",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Mississippi",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Mississippi",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Missouri",
+      "cases_range": "1-9",
+      "cases_calendar_year": "2",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "6",
+      "cases_2024": "2"
+    },
+    {
+      "geography": "Missouri",
+      "cases_range": "1-9",
+      "cases_calendar_year": "6",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "6",
+      "cases_2024": "2"
+    },
+    {
+      "geography": "Missouri",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "6",
+      "cases_2024": "2"
+    },
+    {
+      "geography": "Montana",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "36",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Montana",
+      "cases_range": "10-49",
+      "cases_calendar_year": "36",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "36",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Montana",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "36",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Nebraska",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "5",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Nebraska",
+      "cases_range": "1-9",
+      "cases_calendar_year": "5",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "5",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Nebraska",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "5",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Nevada",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "2",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Nevada",
+      "cases_range": "1-9",
+      "cases_calendar_year": "2",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "2",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Nevada",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "2",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "New Hampshire",
+      "cases_range": "1-9",
+      "cases_calendar_year": "2",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "2"
+    },
+    {
+      "geography": "New Hampshire",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "2"
+    },
+    {
+      "geography": "New Hampshire",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "2"
+    },
+    {
+      "geography": "New Jersey",
+      "cases_range": "1-9",
+      "cases_calendar_year": "7",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "11",
+      "cases_2024": "7"
+    },
+    {
+      "geography": "New Jersey",
+      "cases_range": "10-49",
+      "cases_calendar_year": "11",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "11",
+      "cases_2024": "7"
+    },
+    {
+      "geography": "New Jersey",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "11",
+      "cases_2024": "7"
+    },
+    {
+      "geography": "New Mexico",
+      "cases_range": "1-9",
+      "cases_calendar_year": "2",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "100",
+      "cases_2024": "2"
+    },
+    {
+      "geography": "New Mexico",
+      "cases_range": "100-500",
+      "cases_calendar_year": "100",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "100",
+      "cases_2024": "2"
+    },
+    {
+      "geography": "New Mexico",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "100",
+      "cases_2024": "2"
+    },
+    {
+      "geography": "New York",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "26",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "New York",
+      "cases_range": "10-49",
+      "cases_calendar_year": "26",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "26",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "New York",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "26",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "New York City",
+      "cases_range": "10-49",
+      "cases_calendar_year": "13",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "15",
+      "cases_2024": "13"
+    },
+    {
+      "geography": "New York City",
+      "cases_range": "10-49",
+      "cases_calendar_year": "15",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "15",
+      "cases_2024": "13"
+    },
+    {
+      "geography": "New York City",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "15",
+      "cases_2024": "13"
+    },
+    {
+      "geography": "North Carolina",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2024",
+      "cases_2026": 9,
+      "cases_2025": "2",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "North Carolina",
+      "cases_range": "1-9",
+      "cases_calendar_year": "2",
+      "year": "2025",
+      "cases_2026": 9,
+      "cases_2025": "2",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "North Carolina",
+      "cases_range": "1-9",
+      "cases_calendar_year": "9",
+      "year": "2026",
+      "cases_2026": 9,
+      "cases_2025": "2",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "North Dakota",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "36",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "North Dakota",
+      "cases_range": "10-49",
+      "cases_calendar_year": "36",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "36",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "North Dakota",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "36",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Ohio",
+      "cases_range": "1-9",
+      "cases_calendar_year": "7",
+      "year": "2024",
+      "cases_2026": 3,
+      "cases_2025": "40",
+      "cases_2024": "7"
+    },
+    {
+      "geography": "Ohio",
+      "cases_range": "10-49",
+      "cases_calendar_year": "40",
+      "year": "2025",
+      "cases_2026": 3,
+      "cases_2025": "40",
+      "cases_2024": "7"
+    },
+    {
+      "geography": "Ohio",
+      "cases_range": "1-9",
+      "cases_calendar_year": "3",
+      "year": "2026",
+      "cases_2026": 3,
+      "cases_2025": "40",
+      "cases_2024": "7"
+    },
+    {
+      "geography": "Oklahoma",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "17",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Oklahoma",
+      "cases_range": "10-49",
+      "cases_calendar_year": "17",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "17",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Oklahoma",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "17",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Oregon",
+      "cases_range": "10-49",
+      "cases_calendar_year": "31",
+      "year": "2024",
+      "cases_2026": 3,
+      "cases_2025": "1",
+      "cases_2024": "31"
+    },
+    {
+      "geography": "Oregon",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2025",
+      "cases_2026": 3,
+      "cases_2025": "1",
+      "cases_2024": "31"
+    },
+    {
+      "geography": "Oregon",
+      "cases_range": "1-9",
+      "cases_calendar_year": "3",
+      "year": "2026",
+      "cases_2026": 3,
+      "cases_2025": "1",
+      "cases_2024": "31"
+    },
+    {
+      "geography": "Pennsylvania",
+      "cases_range": "1-9",
+      "cases_calendar_year": "6",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "16",
+      "cases_2024": "6"
+    },
+    {
+      "geography": "Pennsylvania",
+      "cases_range": "10-49",
+      "cases_calendar_year": "16",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "16",
+      "cases_2024": "6"
+    },
+    {
+      "geography": "Pennsylvania",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "16",
+      "cases_2024": "6"
+    },
+    {
+      "geography": "Rhode Island",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "1",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Rhode Island",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "1",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Rhode Island",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "1",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "South Carolina",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2024",
+      "cases_2026": 338,
+      "cases_2025": "311",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "South Carolina",
+      "cases_range": "100-500",
+      "cases_calendar_year": "311",
+      "year": "2025",
+      "cases_2026": 338,
+      "cases_2025": "311",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "South Carolina",
+      "cases_range": "100-500",
+      "cases_calendar_year": "338",
+      "year": "2026",
+      "cases_2026": 338,
+      "cases_2025": "311",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "South Dakota",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "16",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "South Dakota",
+      "cases_range": "10-49",
+      "cases_calendar_year": "16",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "16",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "South Dakota",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "16",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Tennessee",
+      "cases_range": "1-9",
+      "cases_calendar_year": "4",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "8",
+      "cases_2024": "4"
+    },
+    {
+      "geography": "Tennessee",
+      "cases_range": "1-9",
+      "cases_calendar_year": "8",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "8",
+      "cases_2024": "4"
+    },
+    {
+      "geography": "Tennessee",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "8",
+      "cases_2024": "4"
+    },
+    {
+      "geography": "Texas",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "803",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Texas",
+      "cases_range": "800+",
+      "cases_calendar_year": "803",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "803",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Texas",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "803",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Utah",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 32,
+      "cases_2025": "187",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Utah",
+      "cases_range": "100-500",
+      "cases_calendar_year": "187",
+      "year": "2025",
+      "cases_2026": 32,
+      "cases_2025": "187",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Utah",
+      "cases_range": "10-49",
+      "cases_calendar_year": "32",
+      "year": "2026",
+      "cases_2026": 32,
+      "cases_2025": "187",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Vermont",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "2",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Vermont",
+      "cases_range": "1-9",
+      "cases_calendar_year": "2",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "2",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Vermont",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "2",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Virginia",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2024",
+      "cases_2026": 2,
+      "cases_2025": "6",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Virginia",
+      "cases_range": "1-9",
+      "cases_calendar_year": "6",
+      "year": "2025",
+      "cases_2026": 2,
+      "cases_2025": "6",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Virginia",
+      "cases_range": "1-9",
+      "cases_calendar_year": "2",
+      "year": "2026",
+      "cases_2026": 2,
+      "cases_2025": "6",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Washington",
+      "cases_range": "1-9",
+      "cases_calendar_year": "6",
+      "year": "2024",
+      "cases_2026": 6,
+      "cases_2025": "11",
+      "cases_2024": "6"
+    },
+    {
+      "geography": "Washington",
+      "cases_range": "10-49",
+      "cases_calendar_year": "11",
+      "year": "2025",
+      "cases_2026": 6,
+      "cases_2025": "11",
+      "cases_2024": "6"
+    },
+    {
+      "geography": "Washington",
+      "cases_range": "1-9",
+      "cases_calendar_year": "6",
+      "year": "2026",
+      "cases_2026": 6,
+      "cases_2025": "11",
+      "cases_2024": "6"
+    },
+    {
+      "geography": "West Virginia",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "West Virginia",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "West Virginia",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "0",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Wisconsin",
+      "cases_range": "1-9",
+      "cases_calendar_year": "1",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "36",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Wisconsin",
+      "cases_range": "10-49",
+      "cases_calendar_year": "36",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "36",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Wisconsin",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "36",
+      "cases_2024": "1"
+    },
+    {
+      "geography": "Wyoming",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2024",
+      "cases_2026": 0,
+      "cases_2025": "15",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Wyoming",
+      "cases_range": "10-49",
+      "cases_calendar_year": "15",
+      "year": "2025",
+      "cases_2026": 0,
+      "cases_2025": "15",
+      "cases_2024": "0"
+    },
+    {
+      "geography": "Wyoming",
+      "cases_range": "0",
+      "cases_calendar_year": "0",
+      "year": "2026",
+      "cases_2026": 0,
+      "cases_2025": "15",
+      "cases_2024": "0"
+    }
+  ],
+  "datasets": {}
+}

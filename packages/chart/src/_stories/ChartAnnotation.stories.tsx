@@ -3,6 +3,7 @@ import annotationConfig from './_mock/annotation_category_mock.json'
 import annotationConfigDateLinear from './_mock/annotation_date-linear_mock.json'
 import annotationConfigDateTime from './_mock/annotation_date-time_mock.json'
 import Chart from '../CdcChartComponent'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Annotation',
@@ -15,6 +16,9 @@ export const Chart_Annotation_Categorical: Story = {
   args: {
     config: annotationConfig,
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -22,6 +26,9 @@ export const Chart_Annotation_Date_Linear: Story = {
   args: {
     config: annotationConfigDateLinear,
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -29,6 +36,9 @@ export const Chart_Annotation_Date_Time: Story = {
   args: {
     config: annotationConfigDateTime,
     isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 

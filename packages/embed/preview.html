@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en-us" class="cdc-theme-cdc cdc-root-home cdc-page-type--content">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport" />
+
+    <link rel="stylesheet prefetch" href="/TemplatePackage/5.0/css/app.min.css" />
+
+    <title>CDC COVE Embed Preview - Local Testing</title>
+  </head>
+  <body class="no-js">
+    <div id="skipmenu">
+      <a class="usa-skipnav" href="#content">Skip directly to site content</a>
+    </div>
+
+    <header class="container cdc-header noindex" role="banner">
+      <div class="cdc-header__desktop">
+        <div class="cdc-page-offset">
+          <div class="cdc-header__cdc-logo">
+            <a href="https://www.cdc.gov">
+              <img
+                src="https://www.cdc.gov/TemplatePackage/5.0/img/logo/logo-notext.svg"
+                alt="Centers for Disease Control and Prevention. CDC twenty four seven. Saving Lives, Protecting People"
+              />
+            </a>
+          </div>
+          <div class="cdc-header__body">
+            <div class="cdc-header__title">
+              <span class="cdc-header__title-link">COVE Embed Preview</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container cdc-main" role="main" aria-label="Main Content Area">
+      <div class="cdc-page-title cdc-page-offset syndicate">
+        <h1>CDC COVE Embed Preview</h1>
+        <p style="color: #666">This page demonstrates how COVE embeds work for partner websites.</p>
+      </div>
+
+      <div id="content" class="cdc-page-content cdc-page-offset syndicate container">
+        <div class="cdc-dfe-body">
+          <div class="cdc-dfe-body__top">
+            <div class="dfe-section">
+              <h2>Embedded Visualization Example</h2>
+              <p>
+                Below is an embedded CDC Open Visualization. The embed-helper script automatically creates the iframe
+                and handles dynamic resizing.
+              </p>
+
+              <div class="dfe-block dfe-block--cdcmodule cdc_page_element dfe-block--width-standard">
+                <div class="dfe-block__inner">
+                  <div class="mb-3">
+                    <!-- COVE Embed Container -->
+                    <div data-cove-embed data-config-url="/examples/line-chart-states.json?geography=Florida"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="container cdc-footer noindex" role="contentinfo">
+      <div class="cdc-footer__body">
+        <div class="row cdc-footer__inner">
+          <div class="col-lg-3 cdc-footer__body-logo">
+            <a href="https://www.cdc.gov/">
+              <img
+                src="https://www.cdc.gov/TemplatePackage/5.0/img/logo/cdc-logo-tag-right.svg"
+                alt="Centers for Disease Control and Prevention"
+              />
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Load CDC Template Scripts -->
+    <script src="https://www.cdc.gov/TemplatePackage/contrib/libs/bootstrap/5x/bootstrap.bundle.min.js"></script>
+    <script src="https://www.cdc.gov/TemplatePackage/5.0/js/app.min.js"></script>
+
+    <!-- Load Embed Helper from core package (dev mode) -->
+    <script type="module">
+      import '@cdc/core/helpers/embed'
+    </script>
+  </body>
+</html>

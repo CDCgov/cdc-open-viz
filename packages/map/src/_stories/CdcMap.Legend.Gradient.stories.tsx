@@ -3,6 +3,7 @@ import CdcMap from '../CdcMap'
 import UsGradient from './_mock/usa-state-gradient.json'
 import WastewaterMap from './_mock/wastewater-map.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof CdcMap> = {
   title: 'Components/Templates/Map/Legend/Gradient',
@@ -16,12 +17,18 @@ export default meta
 export const Gradient: Story = {
   args: {
     config: UsGradient
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
 export const Gradient_Smooth: Story = {
   args: {
     config: editConfigKeys(UsGradient, [{ path: ['legend', 'subStyle'], value: 'smooth' }])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 export const Gradient_With_Box: Story = {
@@ -30,6 +37,9 @@ export const Gradient_With_Box: Story = {
       { path: ['legend', 'subStyle'], value: 'linear blocks' },
       { path: ['legend', 'hideBorder'], value: false }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -40,6 +50,9 @@ export const Gradient_With_Space: Story = {
       { path: ['legend', 'spaces'], value: '2' },
       { path: ['legend', 'hideBorder'], value: false }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -50,6 +63,9 @@ export const Gradient_With_Text: Story = {
       { path: ['legend', 'description'], value: 'Description' },
       { path: ['legend', 'hideBorder'], value: true }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 export const Gradient_With_Text_And_Box: Story = {
@@ -59,12 +75,18 @@ export const Gradient_With_Text_And_Box: Story = {
       { path: ['legend', 'description'], value: 'Description' },
       { path: ['legend', 'hideBorder'], value: false }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
 export const Gradient_With_Patterns: Story = {
   args: {
     config: WastewaterMap
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 export const Gradient_Reversed: Story = {
@@ -82,5 +104,8 @@ export const Gradient_Reversed: Story = {
       },
       { path: ['color'], value: 'greenblue' }
     ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }

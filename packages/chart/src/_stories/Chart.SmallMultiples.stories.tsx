@@ -5,6 +5,7 @@ import smallMultiplesBigDataBars from './_mock/small_multiples/small_multiples_b
 import smallMultiplesLinesColors from './_mock/small_multiples/small_multiples_lines_colors.json'
 import smallMultiplesLines from './_mock/small_multiples/small_multiples_lines.json'
 import smallMultiplesStackedBars from './_mock/small_multiples/small_multiples_stacked_bars.json'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Small Multiples',
@@ -17,6 +18,9 @@ export const smallMultiples_Bars: Story = {
   args: {
     config: smallMultiplesBars,
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -24,24 +28,36 @@ export const smallMultiples_BigDataBars: Story = {
   args: {
     config: smallMultiplesBigDataBars,
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 export const smallMultiples_LinesColors: Story = {
   args: {
     config: smallMultiplesLinesColors,
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 export const smallMultiples_Lines: Story = {
   args: {
     config: smallMultiplesLines,
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 export const smallMultiples_StackedBars: Story = {
   args: {
     config: smallMultiplesStackedBars,
     isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 export default meta

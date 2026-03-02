@@ -4,6 +4,7 @@ import longXLabelsConfig from './_mock/large_x_axis_labels.json'
 import pairedBarConfig from './_mock/paired-bar.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import { ChartConfig } from '../types/ChartConfig'
+import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Axis Titles',
@@ -17,6 +18,9 @@ type Story = StoryObj<typeof Chart>
 export const Dynamic_Labels: Story = {
   args: {
     config: editConfigKeys(longXLabelsConfig, [{ path: ['xAxis', 'label'], value: 'This is the title' }])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
@@ -43,11 +47,17 @@ export const Rotated_Labels: StoryObj<{ config: ChartConfig; tickRotation: numbe
     ])
 
     return <Chart config={config} />
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
 export const Paired_Bar: Story = {
   args: {
     config: pairedBarConfig
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }

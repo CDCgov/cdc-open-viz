@@ -1,7 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo, useReducer, useContext } from 'react'
-
-// IE11
-// import 'core-js/stable'
 import 'whatwg-fetch'
 import ResizeObserver from 'resize-observer-polyfill'
 

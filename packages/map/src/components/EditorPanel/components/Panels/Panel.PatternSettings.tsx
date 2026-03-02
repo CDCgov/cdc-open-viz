@@ -23,6 +23,7 @@ import { feature } from 'topojson-client'
 import { checkColorContrast, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
 import { applyLegendToRow } from '../../../../helpers/applyLegendToRow'
 import { PatternSelection } from '../../../../types/MapConfig'
+import { patternValuesMatch } from '../../../../helpers/patternMatching'
 
 type PanelProps = {
   name: string
@@ -43,12 +44,20 @@ const PatternSettings = ({ name }: PanelProps) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      import(/* webpackChunkName: "us-topo" */ '../../../UsaMap/data/us-topo.json').then(topoJSON => {
-        setUnitedStates(feature(topoJSON, topoJSON.objects.states).features)
-      })
+      if (config.general.geoType === 'us-county') {
+        import(/* webpackChunkName: "cb_2019_us_county_20m" */ '../../../UsaMap/data/cb_2019_us_county_20m.json').then(
+          topoJSON => {
+            setUnitedStates(feature(topoJSON, topoJSON.objects.counties).features)
+          }
+        )
+      } else {
+        import(/* webpackChunkName: "us-topo" */ '../../../UsaMap/data/us-topo.json').then(topoJSON => {
+          setUnitedStates(feature(topoJSON, topoJSON.objects.states).features)
+        })
+      }
     }
     fetchData()
-  }, [])
+  }, [config.general.geoType])
 
   if (!unitedStates) {
     return <></>
@@ -97,13 +106,14 @@ const PatternSettings = ({ name }: PanelProps) => {
     patternIndex: number,
     color: string
   ) => {
-    const geoKey = geo.properties.iso
+    // For county maps, use geo.id (FIPS code), for state maps use geo.properties.iso
+    const geoKey = config.general.geoType === 'us-county' ? geo.id : geo.properties.iso
     const legendColors = getGeoLegendColors(geoKey, runtimeData)
     const currentFill = legendColors?.[0]
 
     if (!currentFill) return
 
-    const hasMatchingValues = pattern.dataValue === runtimeData[geoKey]?.[pattern.dataKey]
+    const hasMatchingValues = patternValuesMatch(pattern.dataValue, runtimeData[geoKey]?.[pattern.dataKey])
 
     if (hasMatchingValues) {
       const contrastCheck = checkAndLogContrast(

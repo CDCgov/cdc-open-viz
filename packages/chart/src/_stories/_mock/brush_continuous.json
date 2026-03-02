@@ -1,0 +1,86 @@
+{
+  "type": "chart",
+  "title": "Sensor Readings by Temperature - Continuous Axis Demo",
+  "showTitle": true,
+  "theme": "theme-blue",
+  "visualizationType": "Line",
+  "orientation": "vertical",
+  "xAxis": {
+    "type": "continuous",
+    "dataKey": "Temperature",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 75,
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333",
+    "brushActive": true
+  },
+  "yAxis": {
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 50,
+    "gridLines": false,
+    "labelColor": "#333",
+    "tickLabelColor": "#333",
+    "tickColor": "#333"
+  },
+  "legend": {
+    "hide": false,
+    "behavior": "isolate",
+    "position": "right"
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true
+  },
+  "series": [
+    {
+      "dataKey": "Pressure",
+      "type": "Line",
+      "lineType": "curveMonotoneX",
+      "weight": 3,
+      "axis": "Left",
+      "name": "Pressure (kPa)",
+      "tooltip": true
+    },
+    {
+      "dataKey": "Humidity",
+      "type": "dashed-md",
+      "lineType": "curveLinear",
+      "weight": 2,
+      "axis": "Left",
+      "name": "Humidity (%)",
+      "tooltip": true
+    }
+  ],
+  "data": [
+    { "Temperature": "10", "Pressure": "101.2", "Humidity": "85" },
+    { "Temperature": "15", "Pressure": "101.0", "Humidity": "82" },
+    { "Temperature": "20", "Pressure": "100.8", "Humidity": "78" },
+    { "Temperature": "25", "Pressure": "100.5", "Humidity": "74" },
+    { "Temperature": "30", "Pressure": "100.2", "Humidity": "70" },
+    { "Temperature": "35", "Pressure": "99.8", "Humidity": "65" },
+    { "Temperature": "40", "Pressure": "99.4", "Humidity": "60" },
+    { "Temperature": "45", "Pressure": "99.0", "Humidity": "56" },
+    { "Temperature": "50", "Pressure": "98.5", "Humidity": "52" },
+    { "Temperature": "55", "Pressure": "98.0", "Humidity": "48" },
+    { "Temperature": "60", "Pressure": "97.4", "Humidity": "45" },
+    { "Temperature": "65", "Pressure": "96.8", "Humidity": "42" },
+    { "Temperature": "70", "Pressure": "96.1", "Humidity": "40" },
+    { "Temperature": "75", "Pressure": "95.4", "Humidity": "38" },
+    { "Temperature": "80", "Pressure": "94.6", "Humidity": "36" },
+    { "Temperature": "85", "Pressure": "93.8", "Humidity": "35" },
+    { "Temperature": "90", "Pressure": "92.9", "Humidity": "34" },
+    { "Temperature": "95", "Pressure": "92.0", "Humidity": "33" },
+    { "Temperature": "100", "Pressure": "91.0", "Humidity": "32" },
+    { "Temperature": "105", "Pressure": "90.0", "Humidity": "31" },
+    { "Temperature": "110", "Pressure": "88.9", "Humidity": "30" },
+    { "Temperature": "115", "Pressure": "87.7", "Humidity": "29" },
+    { "Temperature": "120", "Pressure": "86.5", "Humidity": "28" },
+    { "Temperature": "125", "Pressure": "85.2", "Humidity": "27" },
+    { "Temperature": "130", "Pressure": "83.8", "Humidity": "26" }
+  ]
+}

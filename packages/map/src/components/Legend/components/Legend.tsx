@@ -2,7 +2,7 @@
 import { forwardRef, useContext, useMemo } from 'react'
 import parse from 'html-react-parser'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
-
+import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 //types
 import { DimensionsType } from '@cdc/core/types/Dimensions'
 
@@ -153,8 +153,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
     if (config.map.patterns) {
       // loop over map patterns
       config.map.patterns.map((patternData, patternDataIndex) => {
-        const { pattern, dataKey, size } = patternData
-        let defaultPatternColor = 'black'
+        const { pattern, dataKey, size, color } = patternData
+        const patternColor = color || 'black'
+        const sanitizedDataKey = sanitizeToSvgId(dataKey)
         const sizes = {
           small: 8,
           medium: 10,
@@ -174,35 +175,35 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                 <svg width={legendSize} height={legendSize}>
                   {pattern === 'waves' && (
                     <PatternWaves
-                      id={`${mapId}--${dataKey}--${patternDataIndex}`}
+                      id={`${mapId}--${sanitizedDataKey}--${patternDataIndex}`}
                       height={sizes[size] ?? 10}
                       width={sizes[size] ?? 10}
-                      fill={defaultPatternColor}
+                      fill={patternColor}
                       strokeWidth={0.25}
                     />
                   )}
                   {pattern === 'circles' && (
                     <PatternCircles
-                      id={`${mapId}--${dataKey}--${patternDataIndex}`}
+                      id={`${mapId}--${sanitizedDataKey}--${patternDataIndex}`}
                       height={sizes[size] ?? 10}
                       width={sizes[size] ?? 10}
-                      fill={defaultPatternColor}
+                      fill={patternColor}
                       radius={1.25}
                     />
                   )}
                   {pattern === 'lines' && (
                     <PatternLines
-                      id={`${mapId}--${dataKey}--${patternDataIndex}`}
+                      id={`${mapId}--${sanitizedDataKey}--${patternDataIndex}`}
                       height={sizes[size] ?? 6}
                       width={sizes[size] ?? 10}
-                      stroke={defaultPatternColor}
+                      stroke={patternColor}
                       strokeWidth={0.75}
                       orientation={['diagonalRightToLeft']}
                     />
                   )}
                   <circle
-                    id={dataKey}
-                    fill={`url(#${mapId}--${dataKey}--${patternDataIndex})`}
+                    id={sanitizedDataKey}
+                    fill={`url(#${mapId}--${sanitizedDataKey}--${patternDataIndex})`}
                     r={legendSize / 2}
                     cx={legendSize / 2}
                     cy={legendSize / 2}
@@ -210,7 +211,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                     strokeWidth={1}
                   />
                 </svg>
-                <span>{patternData.label || patternData.dataValue || ''}</span>
+                <span>{patternData.label || String(patternData.dataValue ?? '')}</span>
               </button>
             </li>
           </>

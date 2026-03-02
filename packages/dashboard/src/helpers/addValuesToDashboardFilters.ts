@@ -58,8 +58,7 @@ export const addValuesToDashboardFilters = (
         const active: string[] = Array.isArray(filterCopy.active) ? filterCopy.active : [filterCopy.active]
         filterCopy.active = active.filter(val => defaultValues.includes(val))
       } else {
-        // Initialize active from defaultValue if not already set
-        // OR if defaultValue exists, always use it (overrides stale active from saved config)
+        // Use defaultValue if set, otherwise keep existing active or use first value
         if (filterCopy.defaultValue) {
           filterCopy.active = filterCopy.defaultValue
         } else if (!filterCopy.active) {
@@ -82,17 +81,24 @@ export const addValuesToDashboardFilters = (
       }
       const queryStringFilterValue = getQueryStringFilterValue(subGroupingFilter)
       const groupActive = groupName || filterCopy.values[0]
-      const defaultSubValue = filterCopy.subGrouping.valuesLookup[groupActive as string]?.values[0]
+      const currentGroupValues = filterCopy.subGrouping.valuesLookup[groupActive as string]?.values || []
+      const defaultSubValue = currentGroupValues[0]
 
-      // Priority order: query string > existing active > configured default > first available value
-      let activeValue = queryStringFilterValue || filterCopy.subGrouping.active
+      // Priority order: query string > configured default > existing active > first available value
+      let activeValue: string | undefined
 
-      // If we have a configured default value and it exists in the current group's options, use it
-      if (!activeValue && filterCopy.subGrouping.defaultValue) {
-        const currentGroupValues = filterCopy.subGrouping.valuesLookup[groupActive as string]?.values || []
-        if (currentGroupValues.includes(filterCopy.subGrouping.defaultValue)) {
-          activeValue = filterCopy.subGrouping.defaultValue
-        }
+      if (queryStringFilterValue && currentGroupValues.includes(queryStringFilterValue)) {
+        // 1. Query string parameter takes highest priority (only if valid for the current group)
+        activeValue = queryStringFilterValue
+      } else if (
+        filterCopy.subGrouping.defaultValue &&
+        currentGroupValues.includes(filterCopy.subGrouping.defaultValue)
+      ) {
+        // 2. Use configured defaultValue if it exists and is valid for the current group
+        activeValue = filterCopy.subGrouping.defaultValue
+      } else if (filterCopy.subGrouping.active && currentGroupValues.includes(filterCopy.subGrouping.active)) {
+        // 3. Keep existing active value if it's valid for the current group
+        activeValue = filterCopy.subGrouping.active
       }
 
       filterCopy.subGrouping.active = activeValue || defaultSubValue

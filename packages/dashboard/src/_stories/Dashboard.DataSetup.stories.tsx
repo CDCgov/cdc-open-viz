@@ -151,7 +151,8 @@ export const MultiVizConfigurationWorkflow: Story = {
     // ========================================================================
     await sleep(500)
 
-    const dataSourceSelect = canvas.getByRole('combobox')
+    const comboboxes = canvas.getAllByRole('combobox')
+    const dataSourceSelect = comboboxes[comboboxes.length - 1]
     await user.selectOptions(dataSourceSelect, 'Demo')
     await sleep(500)
 

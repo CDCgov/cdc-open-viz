@@ -11,6 +11,7 @@ import { General } from './General'
 import { Runtime } from './Runtime'
 import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
 import Footnotes from './Footnotes'
+import { TwoColorConfig } from './Palette'
 
 // This was originally created as a catchall for the different types of visualizations.
 // Currently it includes properties that ares specific to one Visualization type.
@@ -44,6 +45,11 @@ type DeprecatedVisualizationType = {
   visualizationType: string
   xAxis: Axis
   preliminaryData: { type: 'effect' | 'suppression'; value: string }[]
+  twoColor?: TwoColorConfig
+  /** @deprecated Legacy v1 palette name - use general.palette.name instead */
+  palette?: string
+  /** @deprecated Legacy v1 color name - use general.palette.name instead */
+  color?: string
 }
 
 type StatefulProperties = {
