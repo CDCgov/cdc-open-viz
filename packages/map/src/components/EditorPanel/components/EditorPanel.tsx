@@ -1650,6 +1650,29 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
                   </label> */}
+                    <Select
+                      value={config.locale}
+                      fieldName='locale'
+                      label='Language for dates and numbers'
+                      updateField={updateField}
+                      options={[
+                        { value: 'en-US', label: 'English (en-US)' },
+                        { value: 'es-MX', label: 'Spanish (es-MX)' }
+                      ]}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>
+                              Change the language (locale) for this visualization to alter the way dates and numbers are
+                              formatted.
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
                   </AccordionItemPanel>
                 </AccordionItem>
                 <AccordionItem>
@@ -1720,6 +1743,30 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           </Tooltip>
                         }
                       />
+                      <label className='mt-2'>
+                        <span className='edit-label column-heading'>
+                          Geography Display Column
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                Optional. Select a column containing alternate display names for geographies (e.g.,
+                                translated names). These will be shown in tooltips, the data table, and navigation menus
+                                instead of the geography column values.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
+                        <Select
+                          value={config.columns.geo?.displayColumn || ''}
+                          options={columnsOptions.map(c => c.key)}
+                          onChange={event => {
+                            editColumn('geo', 'displayColumn', event.target.value)
+                          }}
+                        />
+                      </label>
                     </fieldset>
                     {'navigation' !== config.general.type && (
                       <fieldset className='primary-fieldset edit-block'>
@@ -2908,6 +2955,16 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             section='table'
                             updateField={updateField}
                           />
+                          <div className='ms-4 mt-2' style={{ maxWidth: 'calc(100% - 1.5rem)' }}>
+                            <TextField
+                              value={config.table.downloadDataLabel}
+                              section='table'
+                              fieldName='downloadDataLabel'
+                              label='Download Data Link Text'
+                              placeholder='Download Data (CSV)'
+                              updateField={updateField}
+                            />
+                          </div>
                         </>
                       )}
                       {isDashboard && (
@@ -2953,28 +3010,40 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         }}
                       />
                       {config.general.showDownloadImgButton && (
-                        <CheckBox
-                          value={config.general.includeContextInDownload}
-                          section='general'
-                          subsection={null}
-                          className='ms-4'
-                          fieldName='includeContextInDownload'
-                          label='Include Heading & Context'
-                          updateField={updateField}
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>
-                                  When enabled, the image download will include the section heading (H2 or H3) and any
-                                  explanatory paragraphs that appear before the visualization
-                                </p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
+                        <>
+                          <CheckBox
+                            value={config.general.includeContextInDownload}
+                            section='general'
+                            subsection={null}
+                            className='ms-4'
+                            fieldName='includeContextInDownload'
+                            label='Include Heading & Context'
+                            updateField={updateField}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    When enabled, the image download will include the section heading (H2 or H3) and any
+                                    explanatory paragraphs that appear before the visualization
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                          <div className='ms-4 mt-2' style={{ maxWidth: 'calc(100% - 1.5rem)' }}>
+                            <TextField
+                              value={config.table.downloadImageLabel}
+                              section='table'
+                              fieldName='downloadImageLabel'
+                              label='Download Image Link Text'
+                              placeholder='Download Map (PNG)'
+                              updateField={updateField}
+                            />
+                          </div>
+                        </>
                       )}
 
                       {/* <label className='checkbox'>
@@ -3032,6 +3101,14 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         updateField={updateField}
                       />
                     )}
+                    <TextField
+                      value={tooltips.noDataLabel}
+                      section='tooltips'
+                      fieldName='noDataLabel'
+                      label='No Data Tooltip Text'
+                      placeholder='No Data'
+                      updateField={updateField}
+                    />
                   </AccordionItemPanel>
                 </AccordionItem>
                 <AccordionItem>
