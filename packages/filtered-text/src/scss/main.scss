@@ -1,4 +1,4 @@
-.cdc-open-viz-module.isEditor {
+.cove-visualization.is-editor {
   background: transparent;
 }
 
@@ -12,13 +12,13 @@
   }
 }
 
-.cdc-open-viz-module.type-filtered-text {
+.cove-visualization.type-filtered-text {
   .cove-accordion__panel-section .cove-input__checkbox--small {
     // float: initial;
     // display: initial;
     float: none;
   }
-  .cove-component__content.body:not(:empty) {
+  .cove-visualization__body-wrap:not(:empty) {
     padding: 0;
 
     &.has-top-padding {

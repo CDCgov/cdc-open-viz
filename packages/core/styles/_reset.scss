@@ -1,17 +1,4 @@
-// Imports
-@import 'utils/properties';
-@import 'base/reset';
-
-body.post-type-cdc_visualization .visx-tooltip {
-  z-index: 1000000;
-}
-
-body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
-  top: 0 !important;
-}
-
 .cove-visualization {
-  position: relative;
   margin: 0;
   font-family: var(--app-font-main);
   font-size: 1em;
@@ -19,21 +6,21 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
   font-weight: 400;
   font-style: normal;
   text-rendering: optimizeLegibility;
-  // Force printing chart images
-  -webkit-print-color-adjust: exact !important; /* Chrome, Safari 6 – 15.3, Edge */
-  color-adjust: exact !important; /* Firefox 48 – 96 */
-  print-color-adjust: exact !important; /* Firefox 97+, Safari 15.4+ */
 
   .outline-none {
     outline: none !important;
   }
-
-  // Normalize margins, padding, borders, and font inheritance for all common
-  // HTML elements so host-page styles don't bleed into visualizations.
+}
+.cove-visualization {
   applet,
   object,
   iframe,
-  h1, h2, h3, h4, h5, h6,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
   p,
   blockquote,
   pre,
@@ -107,25 +94,31 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
 
   sub,
   sup {
+    /* Specified in % so that the sup/sup is the
+      right size relative to the surrounding text */
     font-size: 75%;
+
+    /* Zero out the line-height so that it doesn't
+      interfere with the positioning that follows */
     line-height: 0;
+
+    /* Where the magic happens: makes all browsers position
+      the sup/sup properly, relative to the surrounding text */
     position: relative;
+
+    /* Note that if you're using Eric Meyer's reset.css, this
+      is already set and you can emove this rule */
     vertical-align: baseline;
   }
 
   sup {
+    /* Move the superscripted text up */
     top: -0.5em;
   }
 
   sub {
+    /* Move the subscripted text down, but only
+      half as far down as the superscript moved up */
     bottom: -0.25em;
-  }
-
-  @import 'global';
-  @import 'button-section';
-  @import 'series-list';
-
-  input[type='range'] {
-    appearance: auto !important;
   }
 }

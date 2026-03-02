@@ -413,7 +413,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   // Make sure the chart is visible if in the editor
   useEffect(() => {
-    const element = document.querySelector('.isEditor')
+    const element = document.querySelector('.is-editor')
     if (element) {
       setAnimatedChart(true)
     }
@@ -832,7 +832,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               <TooltipWithBounds
                 ref={tooltipRef}
                 key={Math.random()}
-                className={'tooltip cdc-open-viz-module'}
+                className={'tooltip cove-visualization'}
                 left={tooltipLeft}
                 top={tooltipTop}
               >

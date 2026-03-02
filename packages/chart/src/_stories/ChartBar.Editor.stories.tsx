@@ -92,7 +92,7 @@ export const BarGeneralTests: Story = {
 
     const getChartSubtypeVisualization = () => {
       // Target the chart visualization SVG specifically, not editor UI icons
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
       const legendContainer = canvasElement.querySelector('.legend, [class*="legend"]')
 
@@ -160,7 +160,7 @@ export const BarGeneralTests: Story = {
 
     const getOrientationVisualization = () => {
       // Target the chart visualization SVG specifically, not editor UI icons
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Look for bar elements - different structures for horizontal vs vertical
@@ -273,7 +273,7 @@ export const BarGeneralTests: Story = {
 
     const getBarStyleVisualization = () => {
       // Target the chart visualization SVG specifically, not editor UI icons
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       return {
@@ -528,7 +528,7 @@ export const BarLeftValueAxisTests: Story = {
 
     const getAxisTypeVisualization = () => {
       // Target the chart visualization SVG specifically, not editor UI icons
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Find the left axis specifically
@@ -693,7 +693,7 @@ export const BarLeftValueAxisTests: Story = {
 
     const getAxisLabelVisualization = () => {
       // Target the chart visualization SVG specifically, not editor UI icons
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Find Y-axis label elements with multiple possible selectors
@@ -795,7 +795,9 @@ export const BarLeftValueAxisTests: Story = {
         expect(yAxisLabelInput.value).toBe('Custom Y-Axis Label')
 
         // Debug: Log the label element to confirm selection
-        const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+        const chartContainer = canvasElement.querySelector(
+          '.cove-visualization__body, .chart-container, .visualization'
+        )
         const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
         const labelElement = svg?.querySelector('text.y-label')
 
@@ -853,7 +855,7 @@ export const BarLeftValueAxisTests: Story = {
 
     const getInlineLabelVisualization = () => {
       // Target the chart visualization SVG specifically, not editor UI icons
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Find the Y-axis area to locate the top tick area
@@ -989,7 +991,7 @@ export const BarLeftValueAxisTests: Story = {
 
     const getNumTicksVisualization = () => {
       // Target the chart visualization SVG specifically, not editor UI icons
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Find the left axis specifically
@@ -1190,7 +1192,7 @@ export const DateCategoryAxisSectionTests: StoryObj<typeof Chart> = {
       // Method 2: Look for SVG in chart container areas
       if (!svgElement) {
         const chartContainer = canvasElement.querySelector(
-          '.cove-component__content, .chart-container, .visualization, .linear'
+          '.cove-visualization__body, .chart-container, .visualization, .linear'
         )
         if (chartContainer) {
           svgElement = chartContainer.querySelector('svg')
@@ -1541,7 +1543,7 @@ export const BarRegionsSectionTests: Story = {
     await performAndAssert(
       'Configure Fixed-to-Fixed region with label and colors',
       () => {
-        const chartContainer = canvasElement.querySelector('.cove-component__content')
+        const chartContainer = canvasElement.querySelector('.cove-visualization__body')
         const chartSvg = chartContainer?.querySelector('svg')
         const regionElements = chartSvg?.querySelectorAll('rect[fill*="rgba"], rect[style*="rgba"]') || []
 
@@ -1905,7 +1907,7 @@ export const BarLegendTests: Story = {
       const rightLegend = canvasElement.querySelector('.legend-container.right')
       const bottomLegend = canvasElement.querySelector('.legend-container.bottom')
       const topLegend = canvasElement.querySelector('.legend-container.top')
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
 
       return {
         hasLeftLegend: !!leftLegend,
@@ -2385,7 +2387,7 @@ export const BarFiltersTests: Story = {
     // Helper function to get chart data visualization state
     // Tests VISUALIZATION OUTPUT (filtered data in chart) not control state
     const getChartDataState = () => {
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
       const bars = svg?.querySelectorAll('rect[class*="bar"], rect[data-testid*="bar"], g[class*="bar"] rect') || []
       const filtersList = canvasElement.querySelector('.draggable-field-list')
@@ -2687,7 +2689,7 @@ export const BarVisualTests: Story = {
     // Helper function to capture animation visualization state
     const getAnimationVisualizationState = () => {
       // Find the actual chart SVG, not UI icons or other SVGs
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const chartSvg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Animation affects SVG classes and chart elements
@@ -2802,12 +2804,12 @@ export const BarVisualTests: Story = {
 
     // Helper function to capture bar border visualization state
     const getBarBorderVisualizationState = () => {
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const chartSvg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Find bar elements in the chart
       const barElements =
-        chartSvg?.querySelectorAll('rect[class*="bar"], path[class*="bar"], g[class*="bar"] rect') || []
+        chartSvg?.querySelectorAll('rect[class*="bar"], path[class*="bar"], g[class*="bar"] path') || []
 
       // Check for border-related styles and attributes
       const barsWithStroke = Array.from(barElements).filter(bar => {
@@ -2938,7 +2940,7 @@ export const BarPatternSettingsTests: Story = {
 
     // Helper function to capture SVG pattern visualization state
     const getPatternVisualizationState = () => {
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const chartSvg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Find SVG <defs> section with pattern definitions
@@ -3402,7 +3404,7 @@ export const BarTextAnnotationsTests: Story = {
 
     // Helper function to capture SVG annotation visualization state
     const getAnnotationVisualizationState = () => {
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const chartSvg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Find annotation accordion sections (nested accordions for each annotation)

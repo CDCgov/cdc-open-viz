@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef, ReactNode } from 'react'
 import { cloneConfig } from '../../helpers/cloneConfig'
 import ErrorBoundary from '../ErrorBoundary'
-import Layout from '../Layout'
+import { Sidebar } from '../Layout'
 import './EditorPanel.styles.css'
 
 export interface BaseEditorPanelProps<TConfig = any> {
@@ -101,7 +101,6 @@ export function EditorPanel<TConfig = any>({
 
   /**
    * Toggle the editor panel visibility and update config to reflect the change.
-   * In dashboard context, also sets editing to false to return to dashboard editor.
    */
   const onBackClick = () => {
     const newDisplayPanel = !displayPanel
@@ -109,10 +108,6 @@ export function EditorPanel<TConfig = any>({
     const newConfig: TConfig = {
       ...config,
       showEditorPanel: newDisplayPanel
-    }
-    // If in dashboard mode, set editing to false to return to dashboard editor
-    if (isDashboard) {
-      (newConfig as any).editing = false
     }
 
     // Update local config - the useEffect will handle syncing to parent
@@ -124,7 +119,7 @@ export function EditorPanel<TConfig = any>({
 
   return (
     <ErrorBoundary component='EditorPanel'>
-      <Layout.Sidebar
+      <Sidebar
         displayPanel={displayPanel}
         isDashboard={isDashboard || false}
         title={title}
@@ -136,7 +131,7 @@ export function EditorPanel<TConfig = any>({
           displayPanel,
           convertStateToConfig
         })}
-      </Layout.Sidebar>
+      </Sidebar>
     </ErrorBoundary>
   )
 }

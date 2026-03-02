@@ -1,12 +1,12 @@
 // Remove custom theme mixin - use core styles instead
 
-.type-dashboard .type-waffle-chart .cove-component__content {
+.type-dashboard .type-waffle-chart .cove-visualization__body {
   padding-top: 0;
 }
 
 // Let core styles handle color palette
 
-.cove {
+.cove-visualization.type-waffle-chart {
   .cove-gauge-chart {
     &__chart {
       width: 85%;
@@ -134,7 +134,7 @@
 // TP5 Style for Waffle Chart
 .type-waffle-chart {
   &.waffle__style--tp5 {
-    .cove-component__content {
+    .cove-visualization__body {
       background: none !important;
       container-type: inline-size;
     }
@@ -218,7 +218,7 @@
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
-      .cove-component__content {
+      .cove-visualization__body {
         background: white !important;
       }
 
@@ -232,7 +232,7 @@
 
   // TP5 Style for Gauge Chart
   &.gauge__style--tp5 {
-    .cove-component__content {
+    .cove-visualization__body {
       background: none !important;
       container-type: inline-size;
     }
@@ -326,7 +326,7 @@
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
-      .cove-component__content {
+      .cove-visualization__body {
         background: white !important;
       }
 

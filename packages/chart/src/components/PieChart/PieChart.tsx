@@ -216,7 +216,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
 
   // Make sure the chart is visible if in the editor
   useEffect(() => {
-    const element = document.querySelector('.isEditor')
+    const element = document.querySelector('.is-editor')
     if (element) {
       // parent element is visible
       setAnimatePie(true)
@@ -421,7 +421,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
                 config.tooltips.opacity / 100
               }) !important`}</style>
               <TooltipWithBounds
-                className={'tooltip cdc-open-viz-module'}
+                className={'tooltip cove-visualization'}
                 left={tooltipLeft + centerX - radius}
                 top={tooltipTop}
               >

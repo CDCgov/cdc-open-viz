@@ -17,7 +17,6 @@ import includes from 'lodash/includes'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import 'react-tooltip/dist/react-tooltip.css'
 import Panels from './Panels'
-import Layout from '@cdc/core/components/Layout'
 
 // Data
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
@@ -62,7 +61,7 @@ import { Datasets } from '@cdc/core/types/DataSet'
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { isV1Palette, getCurrentPaletteName, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
-import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
+import { ENABLE_MAP_DATA_BITE_VISUAL_SETTINGS, USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
 import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
 import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
@@ -3135,6 +3134,46 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       }}
                     />
 
+                    {ENABLE_MAP_DATA_BITE_VISUAL_SETTINGS && (
+                      <>
+                        <CheckBox
+                          value={config.visual?.border}
+                          section='visual'
+                          fieldName='border'
+                          label='Display Border'
+                          updateField={updateField}
+                        />
+                        <CheckBox
+                          value={config.visual?.borderColorTheme}
+                          section='visual'
+                          fieldName='borderColorTheme'
+                          label='Use Border Color Theme'
+                          updateField={updateField}
+                        />
+                        <CheckBox
+                          value={config.visual?.accent}
+                          section='visual'
+                          fieldName='accent'
+                          label='Use Accent Style'
+                          updateField={updateField}
+                        />
+                        <CheckBox
+                          value={config.visual?.background}
+                          section='visual'
+                          fieldName='background'
+                          label='Use Theme Background Color'
+                          updateField={updateField}
+                        />
+                        <CheckBox
+                          value={config.visual?.hideBackgroundColor}
+                          section='visual'
+                          fieldName='hideBackgroundColor'
+                          label='Hide Background Color'
+                          updateField={updateField}
+                        />
+                      </>
+                    )}
+
                     {'navigation' === config.general.type && (
                       <CheckBox
                         value={config.general.fullBorder || false}
@@ -3523,6 +3562,15 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           updateField={updateField}
                         />
                       </>
+                    )}
+                    {isCoveDeveloperMode() && (
+                      <CheckBox
+                        value={config.visual?.highlightWrappers}
+                        section='visual'
+                        fieldName='highlightWrappers'
+                        label='Highlight Layout Wrappers'
+                        updateField={updateField}
+                      />
                     )}
                   </AccordionItemPanel>
                 </AccordionItem>

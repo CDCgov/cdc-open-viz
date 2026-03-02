@@ -472,7 +472,7 @@ export const SmallMultiplesSectionTests: Story = {
     // ============================================================================
 
     const getChartCounts = () => {
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const tiles = canvasElement.querySelectorAll('.small-multiple-tile, [class*="tile"]')
       const svgElements = chartContainer?.querySelectorAll('svg[role="img"], svg.chart') || []
 
