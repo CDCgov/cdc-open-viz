@@ -43,6 +43,7 @@ import {
   DATA_FUNCTION_MEDIAN,
   DATA_FUNCTION_MODE,
   DATA_FUNCTION_MIN,
+  DATA_FUNCTION_PASSTHROUGH,
   DATA_FUNCTION_RANGE,
   DATA_FUNCTION_SUM
 } from '@cdc/core/helpers/constants'
@@ -342,6 +343,15 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       }
     })
 
+    if (dataFunction === DATA_FUNCTION_PASSTHROUGH) {
+      const sourceData = filteredData.length ? filteredData : config.data
+      if (sourceData && sourceData.length > 0) {
+        const rawValue = sourceData[0][dataColumn]
+        dataBite = rawValue !== undefined && rawValue !== null ? String(rawValue) : ''
+      }
+      return includePrefixSuffix ? dataFormat.prefix + dataBite + dataFormat.suffix : dataBite
+    }
+
     let numericalData = []
     // Get the column's data
     if (filteredData.length) {
@@ -605,7 +615,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
               showBite && 'tp5' === biteStyle && config.visual?.whiteBackground && config.visual?.border
                 ? 'display-border'
                 : ''
-            }`}
+            } ${showBite && 'tp5' === biteStyle && config.visual?.useWrap ? 'use-wrap' : ''}`}
           >
             {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
             {(!config.dataColumn || !config.dataFunction) && <Confirm />}
