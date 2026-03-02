@@ -91,7 +91,7 @@ $theme: (
 
           /// using default border color to draw borders
           &:not(.component--has-border-color-theme) {
-            border: 1px solid $lightGray;
+            border: 1px solid var(--lightGray);
           }
 
           &.component--has-title {
