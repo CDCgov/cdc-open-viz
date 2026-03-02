@@ -43,6 +43,7 @@ import {
   DATA_FUNCTION_MEDIAN,
   DATA_FUNCTION_MODE,
   DATA_FUNCTION_MIN,
+  DATA_FUNCTION_PASSTHROUGH,
   DATA_FUNCTION_RANGE,
   DATA_FUNCTION_SUM
 } from '@cdc/core/helpers/constants'
@@ -202,7 +203,8 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       isEditor,
       showNoDataMessage: false,
       allowHideSection: false,
-      filters: config.filters || []
+      filters: config.filters || [],
+      locale: config.locale
     })
 
     return result.processedContent
@@ -331,8 +333,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       if (Number.isNaN(value) || typeof value === 'number') {
         value = String(value)
       }
-      const language = 'en-US'
-      let formattedValue = parseFloat(value).toLocaleString(language, {
+      let formattedValue = parseFloat(value).toLocaleString(config.locale, {
         useGrouping: true,
         maximumFractionDigits: 6
       })
@@ -359,6 +360,15 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
         return false
       }
     })
+
+    if (dataFunction === DATA_FUNCTION_PASSTHROUGH) {
+      const sourceData = filteredData.length ? filteredData : config.data
+      if (sourceData && sourceData.length > 0) {
+        const rawValue = sourceData[0][dataColumn]
+        dataBite = rawValue !== undefined && rawValue !== null ? String(rawValue) : ''
+      }
+      return includePrefixSuffix ? dataFormat.prefix + dataBite + dataFormat.suffix : dataBite
+    }
 
     let numericalData = []
     // Get the column's data

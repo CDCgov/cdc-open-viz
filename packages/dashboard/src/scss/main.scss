@@ -53,6 +53,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
 
     .heading-body {
       display: flex;
+      align-items: flex-start;
 
       .wrap {
         display: inline-flex;

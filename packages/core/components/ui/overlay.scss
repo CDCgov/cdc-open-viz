@@ -1,5 +1,5 @@
-@import '../utils/variables';
-@import '../themes/index';
+@import '../../styles/utils/properties';
+@import '../../styles/themes/index';
 
 .cove-overlay {
   display: flex;
@@ -14,21 +14,21 @@
 
   &.animate-in {
     .cove-overlay__bg {
-      animation: fadeIn 400ms $transition-expo-out 0s 1 forwards;
+      animation: fadeIn 400ms var(--transition-expo-out) 0s 1 forwards;
     }
 
     .cove-overlay__container {
-      animation: fadeInUp 700ms $transition-expo-out 50ms 1 forwards;
+      animation: fadeInUp 700ms var(--transition-expo-out) 50ms 1 forwards;
     }
   }
 
   &.animate-out {
     .cove-overlay__bg {
-      animation: fadeOut 400ms $transition-expo-out 0s 1 forwards;
+      animation: fadeOut 400ms var(--transition-expo-out) 0s 1 forwards;
     }
 
     .cove-overlay__container {
-      animation: fadeOut 400ms $transition-expo-out 0s 1 forwards;
+      animation: fadeOut 400ms var(--transition-expo-out) 0s 1 forwards;
       transform: translateY(0);
     }
   }

@@ -16,11 +16,11 @@ import {
  * Converts a geographic key to its display name.
  *
  * @param {string} key - The geographic key to convert.
- * @param {boolean} [convertFipsCodes=true] - Whether to convert FIPS codes.
+ * @param {string} [displayOverride] - If provided, returns this value immediately (used for translated/alternate display names).
  * @returns {string} - The display name for the geographic key.
  */
-export const displayGeoName = (key: string, convertFipsCodes = true): string => {
-  if (!convertFipsCodes) return key
+export const displayGeoName = (key: string, displayOverride?: string): string => {
+  if (displayOverride) return displayOverride
   let value = key
   let wasLookedUp = false
 

@@ -39,7 +39,9 @@ import { type SharedFilter } from './types/SharedFilter'
 import { type WCMSProps } from '@cdc/core/types/WCMSProps'
 import { type InitialState } from './types/InitialState'
 import MultiTabs from './components/MultiConfigTabs'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import pick from 'lodash/pick'
+import pickBy from 'lodash/pickBy'
 import EditorContext from '@cdc/core/contexts/EditorContext'
 import { APIFilterDropdowns } from './components/DashboardFilters'
 import { ViewPort } from '@cdc/core/types/ViewPort'
@@ -236,7 +238,7 @@ export default function CdcDashboard({
       }
     }
 
-    const datasetsWithFiles = _.pickBy(newDatasets, dataset => !dataset.dataUrl)
+    const datasetsWithFiles = pickBy(newDatasets, dataset => !dataset.dataUrl)
 
     if (dataWasFetched || Object.keys(datasetsWithFiles).length) {
       const dataFiles = Object.keys(datasetsWithFiles).reduce((acc, key) => {
@@ -291,7 +293,7 @@ export default function CdcDashboard({
   }
 
   const setSharedFilter = (key, datum) => {
-    const { config: newConfig, filteredData } = _.cloneDeep(state)
+    const { config: newConfig, filteredData } = cloneDeep(state)
 
     for (let i = 0; i < newConfig.dashboard.sharedFilters.length; i++) {
       const filter = newConfig.dashboard.sharedFilters[i]
@@ -319,7 +321,7 @@ export default function CdcDashboard({
         return acc
       }, {})
       const newConfig = { ...state, data: { ...data, ...newDatasets } }
-      const newFilteredData = getFilteredData(newConfig, _.cloneDeep(filteredData))
+      const newFilteredData = getFilteredData(newConfig, cloneDeep(filteredData))
       dispatch({ type: 'SET_FILTERED_DATA', payload: newFilteredData })
       dispatch({ type: 'SET_DATA', payload: { ...data, ...newDatasets } })
     } catch (e) {
@@ -375,14 +377,14 @@ export default function CdcDashboard({
 
   const updateChildConfig = (visualizationKey, newConfig) => {
     const config = cloneConfig(state.config)
-    const updatedConfig = _.pick(config, ['visualizations', 'multiDashboards'])
+    const updatedConfig = pick(config, ['visualizations', 'multiDashboards'])
     updatedConfig.visualizations[visualizationKey] = newConfig
     updatedConfig.visualizations[visualizationKey].formattedData = config.visualizations[visualizationKey].formattedData
     if (config.multiDashboards) {
       const activeDashboard = config.activeDashboard
       const multiDashboards = [...config.multiDashboards]
       const label = multiDashboards[activeDashboard].label
-      const toSave = { label, visualizations: updatedConfig.visualizations, ..._.pick(config, ['dashboard', 'rows']) }
+      const toSave = { label, visualizations: updatedConfig.visualizations, ...pick(config, ['dashboard', 'rows']) }
       multiDashboards[activeDashboard] = toSave
       updatedConfig.multiDashboards = multiDashboards
     }

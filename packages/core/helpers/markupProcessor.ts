@@ -26,13 +26,21 @@ export const processMarkupVariables = (
     filters?: VizFilter[]
     datasets?: Datasets
     configDataKey?: string // Add support for widget's assigned dataset
-  } = {}
+    locale: string
+  }
 ): {
   processedContent: string
   shouldHideSection: boolean
   shouldShowNoDataMessage: boolean
 } => {
-  const { isEditor = false, showNoDataMessage = false, allowHideSection = false, filters = [], datasets, configDataKey } = options
+  const {
+    isEditor = false,
+    showNoDataMessage = false,
+    allowHideSection = false,
+    filters = [],
+    datasets,
+    configDataKey
+  } = options
 
   // Helper function to get data for a specific variable
   const getDataForVariable = (variable: MarkupVariable): any[] => {
@@ -93,13 +101,11 @@ export const processMarkupVariables = (
 
               // Handle undefined column
               if (dataObjectValue === undefined && isEditor) {
-                console.warn(
-                  `Column "${workingVariable.columnName}" not found in data for variable ${variableTag}`
-                )
+                console.warn(`Column "${workingVariable.columnName}" not found in data for variable ${variableTag}`)
               }
 
               return workingVariable.addCommas && !isNaN(parseFloat(dataObjectValue))
-                ? parseFloat(dataObjectValue).toLocaleString('en-US', { useGrouping: true })
+                ? parseFloat(dataObjectValue).toLocaleString(options.locale, { useGrouping: true })
                 : String(dataObjectValue || '')
             } catch (error) {
               console.error(`Error processing data value for ${variableTag}:`, error)
@@ -153,13 +159,12 @@ const filterDataByConditions = (data: any[], conditions: MarkupCondition[]): any
   const [currentCondition, ...remainingConditions] = conditions
   const { columnName, isOrIsNotEqualTo, value } = currentCondition
 
-  const filteredData = isOrIsNotEqualTo === 'is'
-    ? data.filter(dataObject => String(dataObject[columnName]) === value)
-    : data.filter(dataObject => String(dataObject[columnName]) !== value)
+  const filteredData =
+    isOrIsNotEqualTo === 'is'
+      ? data.filter(dataObject => String(dataObject[columnName]) === value)
+      : data.filter(dataObject => String(dataObject[columnName]) !== value)
 
-  return remainingConditions.length === 0
-    ? filteredData
-    : filterDataByConditions(filteredData, remainingConditions)
+  return remainingConditions.length === 0 ? filteredData : filterDataByConditions(filteredData, remainingConditions)
 }
 
 /**
@@ -180,10 +185,7 @@ const formatValuesList = (values: string[], conjunction: string): string[] => {
 /**
  * Validates markup variables configuration
  */
-export const validateMarkupVariables = (
-  markupVariables: MarkupVariable[],
-  data: any[]
-): string[] => {
+export const validateMarkupVariables = (markupVariables: MarkupVariable[], data: any[]): string[] => {
   const errors: string[] = []
 
   if (!markupVariables || !Array.isArray(markupVariables)) {
@@ -207,7 +209,9 @@ export const validateMarkupVariables = (
       if (!condition.columnName) {
         errors.push(`Variable ${index + 1}, Condition ${condIndex + 1}: Column name is required`)
       } else if (availableColumns.length > 0 && !availableColumns.includes(condition.columnName)) {
-        errors.push(`Variable ${index + 1}, Condition ${condIndex + 1}: Column "${condition.columnName}" not found in data`)
+        errors.push(
+          `Variable ${index + 1}, Condition ${condIndex + 1}: Column "${condition.columnName}" not found in data`
+        )
       }
 
       if (!condition.value) {

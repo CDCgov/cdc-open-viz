@@ -1,6 +1,6 @@
 @use 'sass:color';
-@import '../utils/variables';
-@import '../themes/index';
+@import '../../styles/utils/properties';
+@import '../../styles/themes/index';
 
 :root {
   --cove-button-primary: var(--colors-blue-vivid-60);
@@ -42,8 +42,8 @@
   border-radius: 6px;
   border: 0;
   outline: none;
-  transition: background-color 500ms $transition-expo-out, color 500ms $transition-expo-out,
-    border-color 500ms $transition-expo-out;
+  transition: background-color 500ms var(--transition-expo-out), color 500ms var(--transition-expo-out),
+    border-color 500ms var(--transition-expo-out);
 
   &.secondary {
     background-color: var(--cove-button-secondary);
@@ -140,7 +140,7 @@
 
 .cove-button__text {
   position: relative;
-  transition: width 500ms $transition-expo-out;
+  transition: width 500ms var(--transition-expo-out);
   align-self: stretch;
 
   .cove-button__text--loading {
@@ -157,7 +157,7 @@
     top: 0;
     left: 0;
     white-space: nowrap;
-    transition: all 500ms $transition-expo-out;
+    transition: all 500ms var(--transition-expo-out);
   }
 }
 
@@ -170,6 +170,6 @@
 .cove-button__text--loading,
 .cove-button__load-spin {
   white-space: nowrap;
-  transition: all 500ms $transition-expo-out;
+  transition: all 500ms var(--transition-expo-out);
   opacity: 0;
 }

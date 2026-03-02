@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo } from 'react'
 import { useDebounce } from 'use-debounce'
 
-import '../../styles/components/input/index.scss'
+import './index.scss'
 
 const InputText = memo(({ label, section = null, subsection = null, fieldName, updateField, value: stateValue, type = 'input', tooltip, placeholder, i = null, min = null, max = null, className, ...attributes }) => {
   const [value, setValue] = useState(stateValue)

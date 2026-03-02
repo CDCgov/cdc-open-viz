@@ -7,7 +7,7 @@ import Context from '../../context'
 
 // Components
 import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
-import '@cdc/core/styles/components/editor.scss'
+import '@cdc/core/components/EditorPanel/editor.scss'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
@@ -137,6 +137,29 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                       Enter supporting text to display below the data visualization, if applicable. The following HTML
                       tags are supported: strong, em, sup, and sub. You can also use markup variables like{' '}
                       {'{{variable-name}}'} to display dynamic data.
+                    </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
+            <Select
+              value={config.locale}
+              fieldName='locale'
+              label='Language for dates and numbers'
+              updateField={updateField}
+              options={[
+                { value: 'en-US', label: 'English (en-US)' },
+                { value: 'es-MX', label: 'Spanish (es-MX)' }
+              ]}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>
+                      Change the language (locale) for this visualization to alter the way dates and numbers are
+                      formatted.
                     </p>
                   </Tooltip.Content>
                 </Tooltip>
@@ -283,6 +306,13 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                 section='visual'
                 fieldName='whiteBackground'
                 label='Use White Background Style'
+                updateField={updateField}
+              />
+              <CheckBox
+                value={config.visual?.useWrap}
+                section='visual'
+                fieldName='useWrap'
+                label='Use Wrap Layout'
                 updateField={updateField}
               />
               {/* TODO: Uncomment when ready to release Display Border feature

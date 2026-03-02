@@ -74,7 +74,7 @@ export function generateEmbedCode(options: EmbedCodeOptions): string {
   data-cove-embed
   data-config-url="${fullConfigUrl}"
 ></div>
-<script src="${getHelperScriptUrl()}"></script>`
+<script type="module" src="${getHelperScriptUrl()}"></script>`
 
   return embedCode
 }

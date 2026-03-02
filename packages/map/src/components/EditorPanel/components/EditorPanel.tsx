@@ -12,7 +12,8 @@ import {
 } from 'react-accessible-accordion'
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd'
 import { useDebounce } from 'use-debounce'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import includes from 'lodash/includes'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import 'react-tooltip/dist/react-tooltip.css'
 import Panels from './Panels'
@@ -53,7 +54,7 @@ import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs } from '../../../helpers'
 import generateRuntimeData from '../../../helpers/generateRuntimeData'
 
-import '@cdc/core/styles/components/editor.scss'
+import '@cdc/core/components/EditorPanel/editor.scss'
 import './editorPanel.styles.css'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import { Datasets } from '@cdc/core/types/DataSet'
@@ -295,7 +296,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
           legend: {
             ...config.legend,
             position: value,
-            hideBorder: _.includes(['top', 'bottom'], value)
+            hideBorder: includes(['top', 'bottom'], value)
           }
         })
         break
@@ -930,7 +931,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     }
 
     // Remove the legend
-    let strippedLegend = _.cloneDeep(config.legend)
+    let strippedLegend = cloneDeep(config.legend)
 
     delete strippedLegend.disabledAmt
 
@@ -940,7 +941,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     delete strippedState.defaultData
 
     // Remove tooltips if they're active in the editor
-    strippedState.general = _.cloneDeep(config.general)
+    strippedState.general = cloneDeep(config.general)
 
     // Add columns property back to data if it's there
     if (config.columns) {
@@ -962,7 +963,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     const isV1PaletteConfig = isV1Palette(config)
 
     const executeSelection = () => {
-      const _newConfig = _.cloneDeep(config)
+      const _newConfig = cloneDeep(config)
 
       // If v2 migration is disabled, use the original palette name and keep v1 version
       if (!USE_V2_MIGRATION) {
@@ -1162,7 +1163,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     }
 
     // Remove the legend
-    let strippedLegend = _.cloneDeep(config.legend)
+    let strippedLegend = cloneDeep(config.legend)
 
     delete strippedLegend.disabledAmt
 
@@ -1172,7 +1173,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     delete strippedState.defaultData
 
     // Remove tooltips if they're active in the editor
-    strippedState.general = _.cloneDeep(config.general)
+    strippedState.general = cloneDeep(config.general)
 
     strippedState.general.showSidebar = 'hidden'
 
@@ -1648,6 +1649,29 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     <input type="checkbox" checked={ state.general.showDownloadMediaButton } onChange={(event) => { handleEditorChanges("toggleDownloadMediaButton", event.target.checked) }} />
                     <span className="edit-label">Enable Media Download</span>
                   </label> */}
+                    <Select
+                      value={config.locale}
+                      fieldName='locale'
+                      label='Language for dates and numbers'
+                      updateField={updateField}
+                      options={[
+                        { value: 'en-US', label: 'English (en-US)' },
+                        { value: 'es-MX', label: 'Spanish (es-MX)' }
+                      ]}
+                      tooltip={
+                        <Tooltip style={{ textTransform: 'none' }}>
+                          <Tooltip.Target>
+                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                          </Tooltip.Target>
+                          <Tooltip.Content>
+                            <p>
+                              Change the language (locale) for this visualization to alter the way dates and numbers are
+                              formatted.
+                            </p>
+                          </Tooltip.Content>
+                        </Tooltip>
+                      }
+                    />
                   </AccordionItemPanel>
                 </AccordionItem>
                 <AccordionItem>
@@ -1718,6 +1742,30 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           </Tooltip>
                         }
                       />
+                      <label className='mt-2'>
+                        <span className='edit-label column-heading'>
+                          Geography Display Column
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                Optional. Select a column containing alternate display names for geographies (e.g.,
+                                translated names). These will be shown in tooltips, the data table, and navigation menus
+                                instead of the geography column values.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        </span>
+                        <Select
+                          value={config.columns.geo?.displayColumn || ''}
+                          options={columnsOptions.map(c => c.key)}
+                          onChange={event => {
+                            editColumn('geo', 'displayColumn', event.target.value)
+                          }}
+                        />
+                      </label>
                     </fieldset>
                     {'navigation' !== config.general.type && (
                       <fieldset className='primary-fieldset edit-block'>
@@ -2906,6 +2954,16 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             section='table'
                             updateField={updateField}
                           />
+                          <div className='ms-4 mt-2' style={{ maxWidth: 'calc(100% - 1.5rem)' }}>
+                            <TextField
+                              value={config.table.downloadDataLabel}
+                              section='table'
+                              fieldName='downloadDataLabel'
+                              label='Download Data Link Text'
+                              placeholder='Download Data (CSV)'
+                              updateField={updateField}
+                            />
+                          </div>
                         </>
                       )}
                       {isDashboard && (
@@ -2951,28 +3009,40 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         }}
                       />
                       {config.general.showDownloadImgButton && (
-                        <CheckBox
-                          value={config.general.includeContextInDownload}
-                          section='general'
-                          subsection={null}
-                          className='ms-4'
-                          fieldName='includeContextInDownload'
-                          label='Include Heading & Context'
-                          updateField={updateField}
-                          tooltip={
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>
-                                  When enabled, the image download will include the section heading (H2 or H3) and any
-                                  explanatory paragraphs that appear before the visualization
-                                </p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          }
-                        />
+                        <>
+                          <CheckBox
+                            value={config.general.includeContextInDownload}
+                            section='general'
+                            subsection={null}
+                            className='ms-4'
+                            fieldName='includeContextInDownload'
+                            label='Include Heading & Context'
+                            updateField={updateField}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    When enabled, the image download will include the section heading (H2 or H3) and any
+                                    explanatory paragraphs that appear before the visualization
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                          <div className='ms-4 mt-2' style={{ maxWidth: 'calc(100% - 1.5rem)' }}>
+                            <TextField
+                              value={config.table.downloadImageLabel}
+                              section='table'
+                              fieldName='downloadImageLabel'
+                              label='Download Image Link Text'
+                              placeholder='Download Map (PNG)'
+                              updateField={updateField}
+                            />
+                          </div>
+                        </>
                       )}
 
                       {/* <label className='checkbox'>
@@ -3030,6 +3100,14 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         updateField={updateField}
                       />
                     )}
+                    <TextField
+                      value={tooltips.noDataLabel}
+                      section='tooltips'
+                      fieldName='noDataLabel'
+                      label='No Data Tooltip Text'
+                      placeholder='No Data'
+                      updateField={updateField}
+                    />
                   </AccordionItemPanel>
                 </AccordionItem>
                 <AccordionItem>
@@ -3315,7 +3393,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           type='checkbox'
                           checked={config.visual.showBubbleZeros}
                           onChange={event => {
-                            const _newConfig = _.cloneDeep(config)
+                            const _newConfig = cloneDeep(config)
                             _newConfig.visual.showBubbleZeros = event.target.checked
                             setConfig(_newConfig)
                           }}
