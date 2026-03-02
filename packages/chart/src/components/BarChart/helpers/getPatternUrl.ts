@@ -53,17 +53,25 @@ export const getPatternUrl = ({
   seriesKeys,
   allowNonSeriesFieldMatch = true
 }: GetPatternUrlArgs): string | null => {
-  if (!patterns || Object.keys(patterns).length === 0) {
+  if (!patterns) {
     return null
   }
 
-  const entries = Object.entries(patterns)
-  const specificPatterns = entries.filter(([, pattern]) => normalizeString(pattern?.dataKey) !== '')
-  const broadPatterns = entries.filter(([, pattern]) => normalizeString(pattern?.dataKey) === '')
+  let broadMatchUrl: string | null = null
 
-  for (const [patternKey, pattern] of specificPatterns) {
+  for (const patternKey in patterns) {
+    if (!Object.prototype.hasOwnProperty.call(patterns, patternKey)) continue
+    const pattern = patterns[patternKey]
     const dataKey = normalizeString(pattern.dataKey)
+
     if (!hasPatternValue(pattern.dataValue)) {
+      continue
+    }
+
+    if (dataKey === '') {
+      if (!broadMatchUrl && valuesMatch(seriesValue, pattern.dataValue)) {
+        broadMatchUrl = `url(#chart-pattern-${patternKey})`
+      }
       continue
     }
 
@@ -80,15 +88,5 @@ export const getPatternUrl = ({
     }
   }
 
-  for (const [patternKey, pattern] of broadPatterns) {
-    if (!hasPatternValue(pattern.dataValue)) {
-      continue
-    }
-
-    if (valuesMatch(seriesValue, pattern.dataValue)) {
-      return `url(#chart-pattern-${patternKey})`
-    }
-  }
-
-  return null
+  return broadMatchUrl
 }
