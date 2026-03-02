@@ -1,0 +1,21 @@
+.cove-visualization {
+  border-radius: 3px;
+}
+
+.cove-visualization__body {
+  border: solid 1px #ccc;
+  border-top: none;
+  border-radius: 0 0 3px 3px;
+
+  &.no-borders {
+    border: none !important;
+  }
+
+  .cove-visualization__body:not(.component--hide-background-color) {
+    background: $lightestGray;
+  }
+}
+
+.cove-visualization__body-wrap {
+  padding: 0 1rem 1rem;
+}

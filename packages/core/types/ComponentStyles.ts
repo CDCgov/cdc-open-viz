@@ -4,4 +4,5 @@ export type ComponentStyles = {
   background: boolean
   hideBackgroundColor: boolean
   borderColorTheme: boolean
+  highlightWrappers?: boolean
 }

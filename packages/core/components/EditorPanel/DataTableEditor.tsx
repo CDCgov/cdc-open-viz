@@ -27,7 +27,7 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
   }, [config.columns])
 
   const groupPivotColumns = useMemo(() => {
-    const columns: string[] = config.data.flatMap(Object.keys)
+    const columns: string[] = (config.data ?? []).flatMap(Object.keys)
     const cols = _.uniq(columns).filter(key => {
       return true
     })
@@ -259,6 +259,16 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
             section='table'
             updateField={updateField}
           />
+          <div className='ms-4 mt-2' style={{ maxWidth: 'calc(100% - 1.5rem)' }}>
+            <TextField
+              value={config.table.downloadDataLabel}
+              section='table'
+              fieldName='downloadDataLabel'
+              label='Download Data Link Text'
+              placeholder='Download Data (CSV)'
+              updateField={updateField}
+            />
+          </div>
         </>
       )}
       {isDashboard && config.type !== 'table' && (
@@ -289,28 +299,40 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
         />
       )}
       {config.type !== 'table' && config.table.showDownloadImgButton && (
-        <CheckBox
-          value={config.table.includeContextInDownload}
-          fieldName='includeContextInDownload'
-          className='ms-4'
-          label='Include Heading & Context'
-          section='table'
-          updateField={updateField}
-          tooltip={
-            <Tooltip style={{ textTransform: 'none' }}>
-              <Tooltip.Target>
-                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-              </Tooltip.Target>
-              <Tooltip.Content>
-                <p>
-                  When enabled, the image download will include the section heading (H2 or H3) and any explanatory
-                  paragraphs that appear immediately before the visualization. Be sure to test the image download on the
-                  published page to ensure the correct context is included.
-                </p>
-              </Tooltip.Content>
-            </Tooltip>
-          }
-        />
+        <>
+          <CheckBox
+            value={config.table.includeContextInDownload}
+            fieldName='includeContextInDownload'
+            className='ms-4'
+            label='Include Heading & Context'
+            section='table'
+            updateField={updateField}
+            tooltip={
+              <Tooltip style={{ textTransform: 'none' }}>
+                <Tooltip.Target>
+                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                </Tooltip.Target>
+                <Tooltip.Content>
+                  <p>
+                    When enabled, the image download will include the section heading (H2 or H3) and any explanatory
+                    paragraphs that appear immediately before the visualization. Be sure to test the image download on
+                    the published page to ensure the correct context is included.
+                  </p>
+                </Tooltip.Content>
+              </Tooltip>
+            }
+          />
+          <div className='ms-4 mt-2' style={{ maxWidth: 'calc(100% - 1.5rem)' }}>
+            <TextField
+              value={config.table.downloadImageLabel}
+              section='table'
+              fieldName='downloadImageLabel'
+              label='Download Image Link Text'
+              placeholder={`Download ${config.type === 'map' ? 'Map' : 'Chart'} (PNG)`}
+              updateField={updateField}
+            />
+          </div>
+        </>
       )}
       <label>
         <span className='edit-label column-heading'>Table Cell Min Width</span>

@@ -68,14 +68,14 @@ const WorldMap = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      import(/* webpackChunkName: "world-map-2026" */ './data/world-topo.json')
+      import(/* webpackChunkName: "world-map-2026" */ './data/world-topo-updated.json')
         .then(topoJSON => {
           // Smart detection of TopoJSON object key
           // Try known keys first, then fall back to first available key
           const objectKey = topoJSON.objects.countries
             ? 'countries'
-            : topoJSON.objects.Cove_World_Map_2025
-            ? 'Cove_World_Map_2025'
+            : topoJSON.objects.Cove_World_Map_2026_corr
+            ? 'Cove_World_Map_2026_corr'
             : Object.keys(topoJSON.objects)[0]
 
           if (!objectKey) {
@@ -238,7 +238,7 @@ const WorldMap = () => {
 
       let geoData = runtimeData[geoKey]
 
-      const geoDisplayName = displayGeoName(supportedCountries[geo.properties.iso]?.[0])
+      const geoDisplayName = displayGeoName(geo.properties.iso)
       let legendColors
 
       // Once we receive data for this geographic item, setup variables.

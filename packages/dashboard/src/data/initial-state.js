@@ -4,7 +4,7 @@ export default {
     titleStyle: 'small',
     sharedFilters: []
   },
-  rows: [[{ width: 12 }, {}, {}]],
+  rows: [{ columns: [{ width: 12 }] }],
   visualizations: {},
   table: {
     label: 'Data Table',

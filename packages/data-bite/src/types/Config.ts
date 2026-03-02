@@ -38,9 +38,11 @@ export type Config = {
     borderColorTheme: boolean
     showTitle: boolean
     whiteBackground: boolean
+    useWrap?: boolean
   }
   general: {
     isCompactStyle: boolean
   }
   version: Version
+  locale: string
 } & MarkupConfig

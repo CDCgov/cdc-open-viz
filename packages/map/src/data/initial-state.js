@@ -49,7 +49,8 @@ const createInitialState = () => {
         name: 'FIPS Codes',
         label: 'Location',
         tooltip: false,
-        dataTable: true
+        dataTable: true,
+        displayColumn: ''
       },
       primary: {
         dataTable: true,
@@ -114,6 +115,11 @@ const createInitialState = () => {
       editorErrorMessage: []
     },
     visual: {
+      border: false,
+      borderColorTheme: false,
+      accent: false,
+      background: false,
+      hideBackgroundColor: false,
       minBubbleSize: 1,
       maxBubbleSize: 20,
       extraBubbleBorder: false,

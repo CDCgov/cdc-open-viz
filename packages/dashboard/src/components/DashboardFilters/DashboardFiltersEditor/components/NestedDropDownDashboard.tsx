@@ -1,6 +1,7 @@
 import { DashboardConfig } from '../../../../types/DashboardConfig'
 import { SharedFilter } from '../../../../types/SharedFilter'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import uniq from 'lodash/uniq'
 import { SubGrouping, OrderBy } from '@cdc/core/types/VizFilter'
 import { TextField, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import { handleSorting } from '@cdc/core/components/Filters/helpers/handleSorting'
@@ -72,7 +73,7 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
     const order = subGrouping?.order || 'asc'
 
     const valuesLookup = filter.values.reduce((acc, groupName) => {
-      const rawValues: string[] = _.uniq(
+      const rawValues: string[] = uniq(
         config.datasets[selectedOptionDatasetName].data
           .map(d => {
             return d[filter.columnName] === groupName ? d[newColumnName] : ''
@@ -104,7 +105,7 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
   // Handle group order change (asc/desc/cust)
   const handleGroupingOrderBy = (order: OrderBy) => {
     const groupSortObject = {
-      values: _.cloneDeep(filter.values),
+      values: cloneDeep(filter.values),
       order
     }
     const { values: newOrderedValues } = handleSorting(groupSortObject)
@@ -128,7 +129,7 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
   const handleGroupingCustomOrder = (sourceIndex: number, destinationIndex: number) => {
     if (sourceIndex === undefined || destinationIndex === undefined || sourceIndex === destinationIndex) return
 
-    const orderedValues = _.cloneDeep(filter.orderedValues || filter.values)
+    const orderedValues = cloneDeep(filter.orderedValues || filter.values)
     const [movedItem] = orderedValues.splice(sourceIndex, 1)
     orderedValues.splice(destinationIndex, 0, movedItem)
 
@@ -143,7 +144,7 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
   const handleSubGroupingOrderBy = (order: OrderBy) => {
     const newValuesLookup = Object.keys(subGrouping.valuesLookup).reduce((acc, groupName) => {
       const subGroup = subGrouping.valuesLookup[groupName]
-      const { values: sortedValues } = handleSorting({ values: _.cloneDeep(subGroup.values), order })
+      const { values: sortedValues } = handleSorting({ values: cloneDeep(subGroup.values), order })
 
       acc[groupName] = {
         values: sortedValues,
@@ -170,11 +171,11 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
   ) => {
     if (sourceIndex === undefined || destinationIndex === undefined || sourceIndex === destinationIndex) return
 
-    const updatedGroupOrderedValues = _.cloneDeep(currentOrderedValues)
+    const updatedGroupOrderedValues = cloneDeep(currentOrderedValues)
     const [movedItem] = updatedGroupOrderedValues.splice(sourceIndex, 1)
     updatedGroupOrderedValues.splice(destinationIndex, 0, movedItem)
 
-    const newSubGrouping = _.cloneDeep(subGrouping)
+    const newSubGrouping = cloneDeep(subGrouping)
     newSubGrouping.valuesLookup[groupName].values = updatedGroupOrderedValues
     newSubGrouping.valuesLookup[groupName].orderedValues = updatedGroupOrderedValues
     newSubGrouping.order = 'cust'

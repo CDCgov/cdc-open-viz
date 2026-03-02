@@ -1,5 +1,5 @@
-.markup-include {
-  .cove-component__content-wrap {
+.cove-visualization.type-markup-include {
+  .cove-visualization__body-wrap {
     padding: 0;
 
     &.has-top-padding {
@@ -24,7 +24,7 @@
     }
   }
 
-  .cove-component__content.component--hideBackgroundColor {
+  .cove-visualization__body.component--hide-background-color {
     background: transparent;
   }
 
@@ -47,6 +47,7 @@
     float: left;
   }
 }
+
 .cove-editor .cove-editor__content {
   padding-left: 350px;
   display: flex;

@@ -1,0 +1,175 @@
+@use 'sass:color';
+@import '../../styles/utils/properties';
+@import '../../styles/themes/index';
+
+:root {
+  --cove-button-primary: var(--colors-blue-vivid-60);
+  --cove-button-primary-font-color: #fff;
+  --cove-button-primary-hover: #0b4778;
+  --cove-button-primary-disabled: var(--cool-gray-10);
+  --cove-button-primary-disabled-font-color: var(--cool-gray-90);
+
+  --cove-button-secondary: #fff;
+  --cove-button-secondary-font-color: var(--colors-blue-vivid-60);
+  --cove-button-secondary-border-color: var(--colors-blue-vivid-60);
+  --cove-button-secondary-hover: #0b4778;
+  --cove-button-secondary-hover-font-color: #fff;
+  --cove-button-secondary-disabled: #f5f6f7;
+  --cove-button-secondary-disabled-font-color: var(--cool-gray-90);
+  --cove-button-secondary-disabled-border-color: var(--cool-gray-10);
+}
+
+.sbdocs .cove-button {
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+
+  &.fluid {
+    width: 100%;
+    margin-right: 0;
+  }
+}
+
+.cove-visualization button.cove-button {
+  display: inline-block;
+  position: relative;
+  min-height: 2.125rem;
+  padding: 0.375rem 0.75rem;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  color: var(--cove-button-primary-font-color);
+  background-color: var(--cove-button-primary);
+  border-radius: 6px;
+  border: 0;
+  outline: none;
+  transition: background-color 500ms var(--transition-expo-out), color 500ms var(--transition-expo-out),
+    border-color 500ms var(--transition-expo-out);
+
+  &.secondary {
+    background-color: var(--cove-button-secondary);
+    color: var(--cove-button-secondary-font-color);
+    border: 1px solid var(--cove-button-secondary-border-color);
+
+    &:hover {
+      background-color: var(--cove-button-secondary-hover);
+      color: var(--cove-button-secondary-hover-font-color);
+    }
+
+    &:disabled {
+      background-color: var(--cove-button-secondary-disabled);
+      color: var(--cove-button-secondary-disabled-font-color);
+      border: 1px solid var(--cove-button-secondary-disabled-border-color);
+    }
+  }
+
+  * {
+    pointer-events: none;
+    user-select: none;
+  }
+
+  &:disabled {
+    background-color: var(--cove-button-primary-disabled);
+    color: var(--cove-button-primary-disabled-font-color);
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled) {
+    cursor: pointer;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: var(--cove-button-primary-hover);
+  }
+  &:focus {
+    outline: 2px dashed var(--colors-blue-vivid-60) !important;
+    outline-offset: 5px;
+  }
+
+  &:not(.loading) {
+    &:focus,
+    &:active {
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 0.3125em;
+        margin: -2px;
+        pointer-events: none;
+      }
+    }
+  }
+
+  &.loading:disabled {
+    cursor: default;
+  }
+
+  &.fluid {
+    width: 100%;
+  }
+
+  &.success {
+    background-color: #44aa41;
+
+    &:hover {
+      background-color: color.adjust(#44aa41, $lightness: 5%);
+    }
+  }
+
+  &.warn {
+    background-color: #d73636;
+
+    &:hover {
+      background-color: color.adjust(#d73636, $lightness: -5%);
+    }
+  }
+
+  &.muted {
+    background-color: #a0a0a0;
+
+    &:hover {
+      background-color: color.adjust(#a0a0a0, $lightness: -5%);
+    }
+  }
+
+  &.cove-button--flex-center {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.cove-button__text {
+  position: relative;
+  transition: width 500ms var(--transition-expo-out);
+  align-self: stretch;
+
+  .cove-button__text--loading {
+    opacity: 0;
+  }
+
+  .cove-button__text--children {
+    opacity: 1;
+  }
+
+  .cove-button__text--loading,
+  .cove-button__text--children {
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
+    transition: all 500ms var(--transition-expo-out);
+  }
+}
+
+.cove-button__load-spin {
+  display: flex;
+  width: 0;
+  overflow: hidden;
+}
+
+.cove-button__text--loading,
+.cove-button__load-spin {
+  white-space: nowrap;
+  transition: all 500ms var(--transition-expo-out);
+  opacity: 0;
+}

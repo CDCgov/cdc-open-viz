@@ -8,7 +8,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 // Core Components
 import DataTable from '@cdc/core/components/DataTable'
 import Filters from '@cdc/core/components/Filters'
-import Layout from '@cdc/core/components/Layout'
+import { VisualizationContainer } from '@cdc/core/components/Layout'
 import MediaControls from '@cdc/core/components/MediaControls'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Title from '@cdc/core/components/ui/Title'
@@ -47,7 +47,7 @@ import { generateRuntimeLegend } from './helpers/generateRuntimeLegend'
 import generateRuntimeData from './helpers/generateRuntimeData'
 import { reloadURLData } from './helpers/urlDataHelpers'
 import { observeMapSvgLoaded } from './helpers/mapObserverHelpers'
-import { buildSectionClassNames } from './helpers/componentHelpers'
+import { buildBodyWrapClassNames, buildSectionClassNames } from './helpers/componentHelpers'
 import { shouldShowDataTable } from './helpers/dataTableHelpers'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 
@@ -290,7 +290,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     // Combine viz filters with dashboard filters for markup processing
     const combinedFilters = [...(config.filters || []), ...(config.dashboardFilters || [])]
 
-    const markupOptions = { isEditor, filters: combinedFilters }
+    const markupOptions = { isEditor, filters: combinedFilters, locale: config.locale }
 
     if (title) {
       title = processMarkupVariables(title, config.data || [], config.markupVariables, markupOptions).processedContent
@@ -408,38 +408,37 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     <LegendMemoProvider legendMemo={legendMemo} legendSpecialClassLastMemo={legendSpecialClassLastMemo}>
       <ConfigContext.Provider value={mapProps}>
         <MapDispatchContext.Provider value={dispatch}>
-          <Layout.VisualizationWrapper
+          <VisualizationContainer
             config={config}
             isEditor={isEditor}
             ref={outerContainerRef}
             currentViewport={currentViewport}
             imageId={imageId}
-            showEditorPanel={config.showEditorPanel}
+            editorPanel={<EditorPanel datasets={datasets} />}
           >
-            {isEditor && <EditorPanel datasets={datasets} />}
-            <Layout.Responsive isEditor={isEditor}>
-              {requiredColumns?.length > 0 && (
-                <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
-              )}
-              {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
-                <section
-                  className={buildSectionClassNames(
-                    currentViewport,
-                    headerColor,
-                    config?.runtime?.editorErrorMessage.length > 0
-                  )}
-                  aria-label={'Map: ' + title}
-                  ref={innerContainerRef}
-                >
-                  {config?.runtime?.editorErrorMessage.length > 0 && <Error />}
-                  <Title
-                    title={title}
-                    superTitle={processedSuperTitle}
-                    titleStyle={general.titleStyle}
-                    showTitle={general.showTitle}
-                    config={config}
-                    classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${headerColor}`]}
-                  />
+            {requiredColumns?.length > 0 && (
+              <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
+            )}
+            {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
+              <section
+                className={buildSectionClassNames(
+                  currentViewport,
+                  headerColor,
+                  config?.runtime?.editorErrorMessage.length > 0
+                )}
+                aria-label={'Map: ' + title}
+                ref={innerContainerRef}
+              >
+                {config?.runtime?.editorErrorMessage.length > 0 && <Error />}
+                <Title
+                  title={title}
+                  superTitle={processedSuperTitle}
+                  titleStyle={general.titleStyle}
+                  showTitle={general.showTitle}
+                  config={config}
+                  classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${headerColor}`]}
+                />
+                <div className={buildBodyWrapClassNames(config.visual)}>
                   <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
                   {config?.annotations?.length > 0 && (
                     <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
@@ -575,41 +574,41 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   {config.annotations?.length > 0 && <Annotation.Dropdown />}
 
                   {processedFootnotes && <section className='footnotes pt-2 mt-4'>{parse(processedFootnotes)}</section>}
-                </section>
-              )}
+                </div>
+              </section>
+            )}
 
-              <div aria-live='assertive' className='cdcdataviz-sr-only'>
-                {accessibleStatus}
-              </div>
+            <div aria-live='assertive' className='cdcdataviz-sr-only'>
+              {accessibleStatus}
+            </div>
 
-              {!isDraggingAnnotation && 'hover' === tooltips.appearanceType && (
-                <ReactTooltip
-                  id={`tooltip__${tooltipId}`}
-                  float={true}
-                  className={`tooltip tooltip-test`}
-                  style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
-                />
-              )}
-              <div
-                ref={tooltipRef}
-                id={`tooltip__${tooltipId}-canvas`}
-                className='tooltip'
-                style={{
-                  background: `rgba(255,255,255,${config.tooltips.opacity / 100})`,
-                  position: 'absolute',
-                  whiteSpace: 'nowrap',
-                  display: 'none' // can't use d-none here
-                }}
-              ></div>
-              <FootnotesStandAlone
-                config={config.footnotes}
-                filters={config.filters?.filter(f => f.filterFootnotes)}
-                markupVariables={config.markupVariables}
-                enableMarkupVariables={config.enableMarkupVariables}
-                data={config.data}
+            {!isDraggingAnnotation && 'hover' === tooltips.appearanceType && (
+              <ReactTooltip
+                id={`tooltip__${tooltipId}`}
+                float={true}
+                className={`tooltip tooltip-test`}
+                style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
               />
-            </Layout.Responsive>
-          </Layout.VisualizationWrapper>
+            )}
+            <div
+              ref={tooltipRef}
+              id={`tooltip__${tooltipId}-canvas`}
+              className='tooltip'
+              style={{
+                background: `rgba(255,255,255,${config.tooltips.opacity / 100})`,
+                position: 'absolute',
+                whiteSpace: 'nowrap',
+                display: 'none' // can't use d-none here
+              }}
+            ></div>
+            <FootnotesStandAlone
+              config={config.footnotes}
+              filters={config.filters?.filter(f => f.filterFootnotes)}
+              markupVariables={config.markupVariables}
+              enableMarkupVariables={config.enableMarkupVariables}
+              data={config.data}
+            />
+          </VisualizationContainer>
         </MapDispatchContext.Provider>
       </ConfigContext.Provider>
     </LegendMemoProvider>

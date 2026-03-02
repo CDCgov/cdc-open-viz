@@ -16,7 +16,7 @@ const APIModal: React.FC<APIModalProps> = ({ filter, isNestedDropdown, updateAPI
   const [APISubGroupValueSelector, setAPISubGroupValueSelector] = useState(filter.apiFilter?.subgroupValueSelector)
   const [APISubGroupTextSelector, setAPISubGroupTextSelector] = useState(filter.apiFilter?.subgroupTextSelector)
   return (
-    <fieldset className='mb-1 px-3 cdc-open-viz-module'>
+    <fieldset className='mb-1 px-3 cove-visualization'>
       <label className='d-block'>
         <span>API Endpoint: </span>
         <textarea
