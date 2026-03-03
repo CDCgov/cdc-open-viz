@@ -16,6 +16,7 @@ import { ChartContext } from '../../../../types/ChartContext'
 import { PanelProps } from '../PanelProps'
 import { checkColorContrast, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
 import { getColorScale } from '../../../../helpers/getColorScale'
+import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 import _ from 'lodash'
 
 const PanelPatternSettings: FC<PanelProps> = props => {
@@ -315,6 +316,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
         {/* Individual Pattern Configurations */}
         {Object.entries(currentPatterns).map(([patternKey, pattern], index) => {
           const p: LegendPattern = pattern || {}
+          const domPatternKey = `${sanitizeToSvgId(patternKey)}-${index}`
 
           return (
             <Accordion allowZeroExpanded key={`pattern-accordion-${index}`}>
@@ -344,28 +346,28 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                     value={p.dataKey || ''}
                     options={fieldOptions}
                     initial='Select Data Key'
-                    fieldName={`pattern-datakey-${patternKey}`}
+                    fieldName={`pattern-datakey-${domPatternKey}`}
                     updateField={(section, subsection, fieldName, value) =>
                       handlePatternUpdate(patternKey, 'dataKey', value)
                     }
                   />
 
-                  <label htmlFor={`pattern-datavalue-${patternKey}`}>
+                  <label htmlFor={`pattern-datavalue-${domPatternKey}`}>
                     Data Value:
                     <input
                       type='text'
-                      id={`pattern-datavalue-${patternKey}`}
+                      id={`pattern-datavalue-${domPatternKey}`}
                       value={p.dataValue || ''}
                       onChange={e => handlePatternUpdate(patternKey, 'dataValue', e.target.value)}
                       placeholder='Enter data value'
                     />
                   </label>
 
-                  <label htmlFor={`pattern-label-${patternKey}`}>
+                  <label htmlFor={`pattern-label-${domPatternKey}`}>
                     Label (optional):
                     <input
                       type='text'
-                      id={`pattern-label-${patternKey}`}
+                      id={`pattern-label-${domPatternKey}`}
                       value={p.label || ''}
                       onChange={e => handlePatternUpdate(patternKey, 'label', e.target.value)}
                     />
@@ -375,7 +377,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                     label='Pattern Type:'
                     value={p.shape || 'circles'}
                     options={patternTypes}
-                    fieldName={`pattern-type-${patternKey}`}
+                    fieldName={`pattern-type-${domPatternKey}`}
                     updateField={(section, subsection, fieldName, value) =>
                       handlePatternUpdate(patternKey, 'shape', value)
                     }
@@ -385,14 +387,14 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                     label='Pattern Size:'
                     value={getPatternSizeText(p.patternSize || 8)}
                     options={patternSizes}
-                    fieldName={`pattern-size-${patternKey}`}
+                    fieldName={`pattern-size-${domPatternKey}`}
                     updateField={(section, subsection, fieldName, value) =>
                       handlePatternUpdate(patternKey, 'patternSize', getPatternSizeNumeric(value))
                     }
                   />
 
                   <div className='mt-3'>
-                    <label htmlFor={`pattern-color-${patternKey}`}>
+                    <label htmlFor={`pattern-color-${domPatternKey}`}>
                       Pattern Color
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
@@ -411,7 +413,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                       <input
                         type='text'
                         value={p.color || ''}
-                        id={`pattern-color-${patternKey}`}
+                        id={`pattern-color-${domPatternKey}`}
                         onChange={e => handlePatternUpdate(patternKey, 'color', e.target.value)}
                         placeholder='#666666'
                       />
