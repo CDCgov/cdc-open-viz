@@ -36,7 +36,6 @@ export type DataTableProps = {
   expandDataTable: boolean
   formatLegendLocation?: (row: string, runtimeLookup: string) => string
   groupBy?: string
-  headerColor?: string
   imageRef?: string
   indexTitle?: string
   isDebug?: boolean
@@ -79,7 +78,6 @@ const DataTable = (props: DataTableProps) => {
     displayGeoName,
     expandDataTable,
     formatLegendLocation,
-    headerColor,
     rawData,
     runtimeData: parentRuntimeData,
     tabbingId,
@@ -394,7 +392,6 @@ const DataTable = (props: DataTableProps) => {
             <DownloadButton
               rawData={getDownloadData()}
               fileName={`${vizTitle || 'data-table'}.csv`}
-              headerColor={headerColor}
               interactionLabel={interactionLabel}
               config={config}
             />

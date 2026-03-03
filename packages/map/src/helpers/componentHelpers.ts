@@ -11,8 +11,8 @@ type MapVisualClasses = {
   hideBackgroundColor?: boolean
 }
 
-export const buildSectionClassNames = (viewport: string, headerColor: string, hasError: boolean): string => {
-  const classes = ['cove-visualization__inner', 'cdc-map-inner-container', viewport, headerColor]
+export const buildSectionClassNames = (viewport: string, hasError: boolean): string => {
+  const classes = ['cove-visualization__inner', 'cdc-map-inner-container', viewport]
   if (hasError) classes.push('type-map--has-error')
   return classes.join(' ')
 }
