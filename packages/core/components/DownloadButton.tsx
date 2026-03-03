@@ -6,8 +6,7 @@ import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 type DownloadButtonProps = {
   rawData: any[]
   fileName: string
-  headerColor: string
-  skipId: string | number
+  skipId?: string | number
   configUrl?: string
   interactionLabel?: string
   title?: string
@@ -17,7 +16,6 @@ type DownloadButtonProps = {
 const DownloadButton = ({
   rawData,
   fileName,
-  headerColor,
   skipId,
   interactionLabel,
   configUrl,
@@ -69,8 +67,8 @@ const DownloadButton = ({
       type='button'
       onClick={handleDownload}
       aria-label='Download this data in a CSV file format.'
-      className={`${headerColor} no-border`}
-      id={`${skipId}`}
+      className='no-border'
+      id={skipId != null ? `${skipId}` : undefined}
       data-html2canvas-ignore
       role='button'
       style={{ cursor: 'pointer' }}
