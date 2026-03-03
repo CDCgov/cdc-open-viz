@@ -60,15 +60,15 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
   versions.forEach(([version, updateFunction, alwaysRun]: [string, UpdateFunction, boolean?]) => {
     if (versionNeedsUpdate(initialVersion, version) || alwaysRun) {
       genConfig = updateFunction(genConfig)
-
-      if (genConfig.multiDashboards) {
-        genConfig.multiDashboards.forEach((dashboard, index) => {
-          dashboard.type = 'dashboard'
-          genConfig.multiDashboards[index] = coveUpdateWorker(dashboard, genConfig.version)
-        })
-      }
     }
   })
+
+  if (genConfig.multiDashboards) {
+    genConfig.multiDashboards.forEach((dashboard, index) => {
+      dashboard.type = 'dashboard'
+      genConfig.multiDashboards[index] = coveUpdateWorker(dashboard, initialVersion)
+    })
+  }
 
   // Always set to the latest version
   genConfig.version = versions[versions.length - 1][0]
