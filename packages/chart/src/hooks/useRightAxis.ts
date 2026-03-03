@@ -27,6 +27,11 @@ export default function useRightAxis({ config, yMax = 0, data = [] }) {
     minValue = config.yAxis.rightMin
   }
 
+  // Enforce smallest max tick value for right axis
+  if (config.yAxis.rightSmallestMaxTickValue && max < config.yAxis.rightSmallestMaxTickValue) {
+    max = config.yAxis.rightSmallestMaxTickValue
+  }
+
   // if there is a bar series & the right axis doesn't include a negative number, default to zero
   const hasBarSeries = config.runtime?.barSeriesKeys?.length > 0
   const hasLineSeries = config.runtime?.lineSeriesKeys?.length > 0
