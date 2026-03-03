@@ -622,17 +622,20 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     }
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction
+    const isTp5 = showBite && biteStyle === 'tp5'
+    const outerBodyClass = [
+      'cove-visualization__inner',
+      'cove-visualization__body',
+      isTp5 ? 'bite__style--tp5' : '',
+      isTp5 && config.visual?.whiteBackground ? 'white-background-style' : '',
+      isTp5 && config.visual?.whiteBackground && config.visual?.border ? 'display-border' : '',
+      !config.visual?.border ? 'no-borders' : ''
+    ]
+      .filter(Boolean)
+      .join(' ')
     body = (
       <>
-        <div
-          className={`cove-visualization__inner cove-visualization__body ${
-            showBite && 'tp5' === biteStyle ? 'bite__style--tp5' : ''
-          } ${showBite && 'tp5' === biteStyle && config.visual?.whiteBackground ? 'white-background-style' : ''} ${
-            showBite && 'tp5' === biteStyle && config.visual?.whiteBackground && config.visual?.border
-              ? 'display-border'
-              : ''
-          }`}
-        >
+        <div className={outerBodyClass}>
           {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
           {(!config.dataColumn || !config.dataFunction) && <Confirm />}
           {showBite && biteStyle === 'tp5' ? (
