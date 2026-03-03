@@ -1,4 +1,4 @@
-.cdc-open-viz-module.type-chart {
+.cove-visualization.type-chart {
   .annotation__title-circle {
     align-items: center;
     border: 1px solid #666;
@@ -32,7 +32,7 @@
     margin-top: 5px;
   }
 
-  .cove-component__content {
+  .cove-visualization__body {
     container-name: content;
     container-type: inline-size;
   }

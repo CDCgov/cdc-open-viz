@@ -21,7 +21,7 @@ describe('processMarkupVariables', () => {
       ]
 
       const content = 'The state is {{state}}'
-      const result = processMarkupVariables(content, testData, variables)
+      const result = processMarkupVariables(content, testData, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toBe('The state is California, Texas, and Florida')
       expect(result.shouldHideSection).toBe(false)
@@ -35,7 +35,7 @@ describe('processMarkupVariables', () => {
       ]
 
       const content = 'Data for {{state}} in {{year}}'
-      const result = processMarkupVariables(content, testData, variables)
+      const result = processMarkupVariables(content, testData, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toContain('California, Texas, and Florida')
       expect(result.processedContent).toContain('2023')
@@ -43,18 +43,16 @@ describe('processMarkupVariables', () => {
 
     it('should return original content if no variables defined', () => {
       const content = 'Text with {{undefined}}'
-      const result = processMarkupVariables(content, testData, [])
+      const result = processMarkupVariables(content, testData, [], { locale: 'en-US' })
 
       expect(result.processedContent).toBe('Text with {{undefined}}')
     })
 
     it('should leave unknown variable tags unchanged', () => {
-      const variables: MarkupVariable[] = [
-        { name: 'State', tag: '{{state}}', columnName: 'state', conditions: [] }
-      ]
+      const variables: MarkupVariable[] = [{ name: 'State', tag: '{{state}}', columnName: 'state', conditions: [] }]
 
       const content = 'Known: {{state}}, Unknown: {{unknown}}'
-      const result = processMarkupVariables(content, testData, variables)
+      const result = processMarkupVariables(content, testData, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toContain('California, Texas, and Florida')
       expect(result.processedContent).toContain('{{unknown}}')
@@ -74,7 +72,7 @@ describe('processMarkupVariables', () => {
       ]
 
       const content = 'Population: {{population}}'
-      const result = processMarkupVariables(content, testData, variables)
+      const result = processMarkupVariables(content, testData, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toContain('39,538,223')
       expect(result.processedContent).toContain('29,145,505')
@@ -93,7 +91,7 @@ describe('processMarkupVariables', () => {
       ]
 
       const content = 'Population: {{population}}'
-      const result = processMarkupVariables(content, testData, variables)
+      const result = processMarkupVariables(content, testData, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toContain('39538223')
       expect(result.processedContent).not.toContain('39,538,223')
@@ -107,14 +105,12 @@ describe('processMarkupVariables', () => {
           name: 'State',
           tag: '{{state}}',
           columnName: 'state',
-          conditions: [
-            { columnName: 'state', isOrIsNotEqualTo: 'is', value: 'California' }
-          ]
+          conditions: [{ columnName: 'state', isOrIsNotEqualTo: 'is', value: 'California' }]
         }
       ]
 
       const content = 'The state is {{state}}'
-      const result = processMarkupVariables(content, testData, variables)
+      const result = processMarkupVariables(content, testData, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toBe('The state is California')
     })
@@ -125,14 +121,12 @@ describe('processMarkupVariables', () => {
           name: 'State',
           tag: '{{state}}',
           columnName: 'state',
-          conditions: [
-            { columnName: 'state', isOrIsNotEqualTo: 'is not', value: 'California' }
-          ]
+          conditions: [{ columnName: 'state', isOrIsNotEqualTo: 'is not', value: 'California' }]
         }
       ]
 
       const content = 'States: {{state}}'
-      const result = processMarkupVariables(content, testData, variables)
+      const result = processMarkupVariables(content, testData, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toBe('States: Texas and Florida')
       expect(result.processedContent).not.toContain('California')
@@ -158,7 +152,7 @@ describe('processMarkupVariables', () => {
       ]
 
       const content = 'State: {{state}}'
-      const result = processMarkupVariables(content, dataWithYears, variables)
+      const result = processMarkupVariables(content, dataWithYears, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toBe('State: California')
     })
@@ -169,14 +163,12 @@ describe('processMarkupVariables', () => {
           name: 'State',
           tag: '{{state}}',
           columnName: 'state',
-          conditions: [
-            { columnName: 'state', isOrIsNotEqualTo: 'is', value: 'NonExistent' }
-          ]
+          conditions: [{ columnName: 'state', isOrIsNotEqualTo: 'is', value: 'NonExistent' }]
         }
       ]
 
       const content = 'State: {{state}}'
-      const result = processMarkupVariables(content, testData, variables)
+      const result = processMarkupVariables(content, testData, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toBe('State: ')
     })
@@ -184,70 +176,45 @@ describe('processMarkupVariables', () => {
 
   describe('Empty Values and Null Handling', () => {
     it('should filter out empty string values', () => {
-      const dataWithEmpty = [
-        { name: 'Alice' },
-        { name: '' },
-        { name: 'Bob' },
-        { name: '' }
-      ]
+      const dataWithEmpty = [{ name: 'Alice' }, { name: '' }, { name: 'Bob' }, { name: '' }]
 
-      const variables: MarkupVariable[] = [
-        { name: 'Name', tag: '{{name}}', columnName: 'name', conditions: [] }
-      ]
+      const variables: MarkupVariable[] = [{ name: 'Name', tag: '{{name}}', columnName: 'name', conditions: [] }]
 
       const content = 'Names: {{name}}'
-      const result = processMarkupVariables(content, dataWithEmpty, variables)
+      const result = processMarkupVariables(content, dataWithEmpty, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toBe('Names: Alice and Bob')
     })
 
     it('should handle null values gracefully', () => {
-      const dataWithNull = [
-        { value: 'A' },
-        { value: null },
-        { value: 'B' }
-      ]
+      const dataWithNull = [{ value: 'A' }, { value: null }, { value: 'B' }]
 
-      const variables: MarkupVariable[] = [
-        { name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }
-      ]
+      const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
 
       const content = 'Values: {{value}}'
-      const result = processMarkupVariables(content, dataWithNull, variables)
+      const result = processMarkupVariables(content, dataWithNull, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toBe('Values: A and B')
     })
 
     it('should handle undefined values', () => {
-      const dataWithUndefined = [
-        { value: 'A' },
-        { value: undefined },
-        { value: 'B' }
-      ]
+      const dataWithUndefined = [{ value: 'A' }, { value: undefined }, { value: 'B' }]
 
-      const variables: MarkupVariable[] = [
-        { name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }
-      ]
+      const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
 
       const content = 'Values: {{value}}'
-      const result = processMarkupVariables(content, dataWithUndefined, variables)
+      const result = processMarkupVariables(content, dataWithUndefined, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toBe('Values: A and B')
     })
 
     it('should return empty when all values are empty/null', () => {
-      const dataEmpty = [
-        { value: '' },
-        { value: null },
-        { value: undefined }
-      ]
+      const dataEmpty = [{ value: '' }, { value: null }, { value: undefined }]
 
-      const variables: MarkupVariable[] = [
-        { name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }
-      ]
+      const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
 
       const content = 'Values: {{value}}'
-      const result = processMarkupVariables(content, dataEmpty, variables)
+      const result = processMarkupVariables(content, dataEmpty, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toBe('Values: ')
     })
@@ -256,36 +223,30 @@ describe('processMarkupVariables', () => {
   describe('List Formatting', () => {
     it('should format two items with "and" in production mode', () => {
       const data = [{ state: 'CA' }, { state: 'TX' }]
-      const variables: MarkupVariable[] = [
-        { name: 'State', tag: '{{state}}', columnName: 'state', conditions: [] }
-      ]
+      const variables: MarkupVariable[] = [{ name: 'State', tag: '{{state}}', columnName: 'state', conditions: [] }]
 
       const content = '{{state}}'
-      const result = processMarkupVariables(content, data, variables, { isEditor: false })
+      const result = processMarkupVariables(content, data, variables, { isEditor: false, locale: 'en-US' })
 
       expect(result.processedContent).toBe('CA and TX')
     })
 
     it('should format three items with Oxford comma and "and"', () => {
       const data = [{ state: 'CA' }, { state: 'TX' }, { state: 'FL' }]
-      const variables: MarkupVariable[] = [
-        { name: 'State', tag: '{{state}}', columnName: 'state', conditions: [] }
-      ]
+      const variables: MarkupVariable[] = [{ name: 'State', tag: '{{state}}', columnName: 'state', conditions: [] }]
 
       const content = '{{state}}'
-      const result = processMarkupVariables(content, data, variables, { isEditor: false })
+      const result = processMarkupVariables(content, data, variables, { isEditor: false, locale: 'en-US' })
 
       expect(result.processedContent).toBe('CA, TX, and FL')
     })
 
     it('should use "or" conjunction in editor mode', () => {
       const data = [{ state: 'CA' }, { state: 'TX' }]
-      const variables: MarkupVariable[] = [
-        { name: 'State', tag: '{{state}}', columnName: 'state', conditions: [] }
-      ]
+      const variables: MarkupVariable[] = [{ name: 'State', tag: '{{state}}', columnName: 'state', conditions: [] }]
 
       const content = '{{state}}'
-      const result = processMarkupVariables(content, data, variables, { isEditor: true })
+      const result = processMarkupVariables(content, data, variables, { isEditor: true, locale: 'en-US' })
 
       expect(result.processedContent).toBe('CA or TX')
     })
@@ -293,17 +254,12 @@ describe('processMarkupVariables', () => {
 
   describe('XSS Prevention and Security', () => {
     it('should handle data with HTML tags safely', () => {
-      const maliciousData = [
-        { value: '<script>alert("xss")</script>' },
-        { value: '<img src=x onerror=alert(1)>' }
-      ]
+      const maliciousData = [{ value: '<script>alert("xss")</script>' }, { value: '<img src=x onerror=alert(1)>' }]
 
-      const variables: MarkupVariable[] = [
-        { name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }
-      ]
+      const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
 
       const content = 'Data: {{value}}'
-      const result = processMarkupVariables(content, maliciousData, variables)
+      const result = processMarkupVariables(content, maliciousData, variables, { locale: 'en-US' })
 
       // Should return the raw strings, parsing responsibility is on the component using html-react-parser
       expect(result.processedContent).toContain('<script>')
@@ -311,17 +267,12 @@ describe('processMarkupVariables', () => {
     })
 
     it('should handle special characters in data', () => {
-      const specialData = [
-        { value: 'Test & Value' },
-        { value: 'Price: $100 < $200' }
-      ]
+      const specialData = [{ value: 'Test & Value' }, { value: 'Price: $100 < $200' }]
 
-      const variables: MarkupVariable[] = [
-        { name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }
-      ]
+      const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
 
       const content = '{{value}}'
-      const result = processMarkupVariables(content, specialData, variables)
+      const result = processMarkupVariables(content, specialData, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toContain('Test & Value')
       expect(result.processedContent).toContain('Price: $100 < $200')
@@ -331,14 +282,13 @@ describe('processMarkupVariables', () => {
   describe('Hide Section Logic', () => {
     it('should set shouldHideSection when allowHideSection is true and values are empty', () => {
       const emptyData = [{ value: '' }]
-      const variables: MarkupVariable[] = [
-        { name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }
-      ]
+      const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
 
       const content = '{{value}}'
       const result = processMarkupVariables(content, emptyData, variables, {
         allowHideSection: true,
-        isEditor: false
+        isEditor: false,
+        locale: 'en-US'
       })
 
       expect(result.shouldHideSection).toBe(true)
@@ -346,14 +296,13 @@ describe('processMarkupVariables', () => {
 
     it('should not hide section in editor mode even if values are empty', () => {
       const emptyData = [{ value: '' }]
-      const variables: MarkupVariable[] = [
-        { name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }
-      ]
+      const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
 
       const content = '{{value}}'
       const result = processMarkupVariables(content, emptyData, variables, {
         allowHideSection: true,
-        isEditor: true
+        isEditor: true,
+        locale: 'en-US'
       })
 
       expect(result.shouldHideSection).toBe(false)
@@ -363,14 +312,13 @@ describe('processMarkupVariables', () => {
   describe('No Data Message Logic', () => {
     it('should set shouldShowNoDataMessage when enabled and values are empty', () => {
       const emptyData = [{ value: '' }]
-      const variables: MarkupVariable[] = [
-        { name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }
-      ]
+      const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
 
       const content = '{{value}}'
       const result = processMarkupVariables(content, emptyData, variables, {
         showNoDataMessage: true,
-        isEditor: false
+        isEditor: false,
+        locale: 'en-US'
       })
 
       expect(result.shouldShowNoDataMessage).toBe(true)
@@ -379,51 +327,39 @@ describe('processMarkupVariables', () => {
 
   describe('Edge Cases', () => {
     it('should handle empty data array', () => {
-      const variables: MarkupVariable[] = [
-        { name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }
-      ]
+      const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
 
       const content = '{{value}}'
-      const result = processMarkupVariables(content, [], variables)
+      const result = processMarkupVariables(content, [], variables, { locale: 'en-US' })
 
       expect(result.processedContent).toBe('')
     })
 
     it('should handle empty content string', () => {
-      const variables: MarkupVariable[] = [
-        { name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }
-      ]
+      const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
 
-      const result = processMarkupVariables('', testData, variables)
+      const result = processMarkupVariables('', testData, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toBe('')
     })
 
     it('should handle single item (no conjunction)', () => {
       const data = [{ state: 'California' }]
-      const variables: MarkupVariable[] = [
-        { name: 'State', tag: '{{state}}', columnName: 'state', conditions: [] }
-      ]
+      const variables: MarkupVariable[] = [{ name: 'State', tag: '{{state}}', columnName: 'state', conditions: [] }]
 
       const content = '{{state}}'
-      const result = processMarkupVariables(content, data, variables)
+      const result = processMarkupVariables(content, data, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toBe('California')
     })
 
     it('should remove duplicate values from list', () => {
-      const duplicateData = [
-        { state: 'California' },
-        { state: 'Texas' },
-        { state: 'California' }
-      ]
+      const duplicateData = [{ state: 'California' }, { state: 'Texas' }, { state: 'California' }]
 
-      const variables: MarkupVariable[] = [
-        { name: 'State', tag: '{{state}}', columnName: 'state', conditions: [] }
-      ]
+      const variables: MarkupVariable[] = [{ name: 'State', tag: '{{state}}', columnName: 'state', conditions: [] }]
 
       const content = '{{state}}'
-      const result = processMarkupVariables(content, duplicateData, variables)
+      const result = processMarkupVariables(content, duplicateData, variables, { locale: 'en-US' })
 
       expect(result.processedContent).toBe('California and Texas')
     })
@@ -431,9 +367,7 @@ describe('processMarkupVariables', () => {
 })
 
 describe('validateMarkupVariables', () => {
-  const testData = [
-    { state: 'CA', population: '1000' }
-  ]
+  const testData = [{ state: 'CA', population: '1000' }]
 
   it('should return no errors for valid configuration', () => {
     const variables: MarkupVariable[] = [

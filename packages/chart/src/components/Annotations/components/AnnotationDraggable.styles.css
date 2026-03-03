@@ -1,9 +1,9 @@
-.cdc-open-viz-module.type-chart .annotation__desktop-label {
+.cove-visualization.type-chart .annotation__desktop-label {
   font-size: 16px;
   line-height: 1.1rem;
 }
 
-.cdc-open-viz-module.type-chart {
+.cove-visualization.type-chart {
   .annotation__mobile-label-circle {
     stroke-width: 1;
   }

@@ -1,23 +1,25 @@
-.cdc-open-viz-module.markup-include {
+.cove-visualization.markup-include {
   .spacing-wrapper {
     background-color: var(--lightGray) !important;
   }
+
   .cove-tooltip-variable {
     display: none;
   }
 
-  .markup-include-content-container.cove-component__content {
-    .markup-include-component.cove-component__content:not(.component--hideBackgroundColor, .component--has-background) {
+  c .markup-include-content-container.cove-visualization__inner {
+    .markup-include-component.cove-visualization__body:not(.component--hide-background-color, .component--has-background) {
       background-color: white;
     }
   }
 }
 
-.cdc-open-viz-module.markup-include.isEditor {
+.cove-visualization.markup-include.is-editor {
   .cove-tooltip-variable {
     background: var(--orange-tertiary);
     display: inline;
     position: relative;
+
     .cove-tooltip-value {
       background: var(--white);
       border: 1px solid black;
@@ -29,10 +31,12 @@
       width: 100vw;
       z-index: 9999;
     }
-    &:hover > .cove-tooltip-value {
+
+    &:hover>.cove-tooltip-value {
       display: block;
     }
   }
+
   .cove-markup-include-variable-value {
     display: none !important;
   }

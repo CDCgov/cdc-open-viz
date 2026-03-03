@@ -356,7 +356,7 @@ export const GeneralSectionTests: Story = {
     expect(showTitleCheckbox).toBeTruthy()
 
     const getTitleVisibility = () => {
-      const titleElement = canvasElement.querySelector('.cove-title, header.cove-component__header')
+      const titleElement = canvasElement.querySelector('.cove-title, header.cove-visualization__header')
       return {
         isPresent: Boolean(titleElement)
       }
@@ -414,7 +414,7 @@ export const GeneralSectionTests: Story = {
 
     const getTitleStyleVisual = () => {
       const coveTitleElement = canvasElement.querySelector('.cove-title')
-      const legacyTitleElement = canvasElement.querySelector('header.cove-component__header')
+      const legacyTitleElement = canvasElement.querySelector('header.cove-visualization__header')
 
       // For modern titles, check for h2 (large) or h3 (small) elements
       const hasH2 = Boolean(coveTitleElement?.querySelector('h2'))
@@ -1738,7 +1738,7 @@ export const FiltersSectionTests: Story = {
         const labelText = labels.join(',')
 
         // Verify filter dropdown is rendered
-        const vizContainer = canvasElement.querySelector('.cdc-open-viz-module')
+        const vizContainer = canvasElement.querySelector('.cove-visualization')
         const filterSelect = Array.from(vizContainer?.querySelectorAll('select') || []).find(select => {
           const options = Array.from(select.options).map(opt => opt.value)
           return options.includes('Alabama')
@@ -2220,7 +2220,7 @@ export const VisualSectionTests: StoryObj<typeof CdcMap> = {
     await performAndAssert(
       'Show Title → Toggle off',
       () => {
-        const titleElement = canvasElement.querySelector('.cove-title, header.cove-component__header')
+        const titleElement = canvasElement.querySelector('.cove-title, header.cove-visualization__header')
         return {
           isPresent: Boolean(titleElement)
         }
@@ -2237,7 +2237,7 @@ export const VisualSectionTests: StoryObj<typeof CdcMap> = {
     await performAndAssert(
       'Show Title → Toggle back on',
       () => {
-        const titleElement = canvasElement.querySelector('.cove-title, header.cove-component__header')
+        const titleElement = canvasElement.querySelector('.cove-title, header.cove-visualization__header')
         return {
           isPresent: Boolean(titleElement)
         }

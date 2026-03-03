@@ -10,6 +10,16 @@ import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 export type RuntimeFilters = VizFilter[] & { fromHash?: number }
 
 type MapVisualSettings = {
+  /** border - shows or hides component border */
+  border?: boolean
+  /** borderColorTheme - use themed border color */
+  borderColorTheme?: boolean
+  /** accent - use accent styling */
+  accent?: boolean
+  /** background - use themed background color */
+  background?: boolean
+  /** hideBackgroundColor - hide default background color */
+  hideBackgroundColor?: boolean
   /** minBubbleSize - Minimum Circle Size when the map has a type of bubble */
   minBubbleSize: number
   /** maxBubbleSize - Maximum Circle Size when the map has a type of bubble */
@@ -51,7 +61,7 @@ type BaseColumnProperties = Pick<EditorColumnProperties, 'name'> &
 type SimpleColumnProperties = Pick<EditorColumnProperties, 'name'>
 
 // Specific column types for better semantics
-type GeoColumnProperties = BaseColumnProperties
+type GeoColumnProperties = BaseColumnProperties & { displayColumn?: string }
 type LatitudeColumnProperties = SimpleColumnProperties
 type LongitudeColumnProperties = SimpleColumnProperties
 type NavigateColumnProperties = SimpleColumnProperties
@@ -197,16 +207,19 @@ export type MapConfig = Visualization & {
     limitHeight: boolean
     height: string
     caption: string
+    download: boolean
+    downloadDataLabel?: string
+    downloadImageLabel?: string
     showDownloadUrl: boolean
     showFullGeoNameInCSV: boolean
     forceDisplay: boolean
-    download: boolean
     indexLabel: string
     cellMinWidth: string
   }
   tooltips: {
     appearanceType: 'hover' | 'click'
     linkLabel: string
+    noDataLabel?: string
     opacity: number
   }
   runtime: {

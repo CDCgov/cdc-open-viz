@@ -138,7 +138,7 @@ export const GeneralSectionTests: Story = {
       'Title Update',
       () => {
         const modernTitle = canvasElement.querySelector('.cove-title')
-        const legacyTitle = canvasElement.querySelector('.cove-component__header h2')
+        const legacyTitle = canvasElement.querySelector('.cove-visualization__header h2')
         const titleElement = modernTitle || legacyTitle
         return titleElement?.textContent?.trim() || ''
       },
@@ -150,7 +150,7 @@ export const GeneralSectionTests: Story = {
     )
 
     const modernHeader = canvasElement.querySelector('.cove-title')
-    const legacyHeader = canvasElement.querySelector('.cove-component__header h2')
+    const legacyHeader = canvasElement.querySelector('.cove-visualization__header h2')
     const headerElement = modernHeader || legacyHeader
     expect(headerElement).toBeTruthy()
     expect(headerElement!.textContent?.trim()).toBe('Updated Markup Include Title E2E')
@@ -226,7 +226,7 @@ export const ContentEditorTests: Story = {
     await performAndAssert(
       'HTML Content Update',
       () => {
-        const contentElement = canvasElement.querySelector('.cove-component__content')
+        const contentElement = canvasElement.querySelector('.cove-visualization__body')
         return contentElement?.innerHTML || ''
       },
       async () => {
@@ -255,7 +255,7 @@ export const ContentEditorTests: Story = {
       'Source URL Update and Content Loading',
       () => ({
         inputValue: srcUrlInput.value,
-        contentText: canvasElement.querySelector('.cove-component__content')?.textContent || ''
+        contentText: canvasElement.querySelector('.cove-visualization__body')?.textContent || ''
       }),
       async () => {
         await userEvent.clear(srcUrlInput)
@@ -296,7 +296,7 @@ export const VisualSectionTests: Story = {
     await waitForEditor(canvas)
     await openAccordion(canvas, 'Visual')
 
-    const contentContainer = () => canvasElement.querySelector('.cove-component__content') as HTMLElement
+    const contentContainer = () => canvasElement.querySelector('.cove-visualization__body') as HTMLElement
     const visualContainer = () => canvasElement.querySelector('.markup-include-component') as HTMLElement
     expect(contentContainer()).toBeTruthy()
     expect(visualContainer()).toBeTruthy()
@@ -306,20 +306,15 @@ export const VisualSectionTests: Story = {
     // Expectation: Theme class changes on component
     // ============================================================================
     const getThemeState = () => {
-      // Use the contentContainer like other tests, and check its parent for theme classes
       const content = contentContainer()
       if (!content) return { theme: '', classes: '', element: 'content not found' }
 
-      // Check content itself and its parent for theme classes
+      // Theme is applied to the outer cove-visualization wrapper — traverse up to find it
+      const themeWrapper = content.closest('[class*="theme-"]') as HTMLElement
+      const theme = themeWrapper ? Array.from(themeWrapper.classList).find(cls => cls.startsWith('theme-')) || '' : ''
+
       const contentClasses = Array.from(content.classList).join(' ')
       const parentClasses = content.parentElement ? Array.from(content.parentElement.classList).join(' ') : ''
-
-      const contentTheme = Array.from(content.classList).find(cls => cls.startsWith('theme-')) || ''
-      const parentTheme = content.parentElement
-        ? Array.from(content.parentElement.classList).find(cls => cls.startsWith('theme-')) || ''
-        : ''
-
-      const theme = contentTheme || parentTheme || ''
 
       return {
         theme,
@@ -380,7 +375,7 @@ export const VisualSectionTests: Story = {
       'Border Color Theme Toggle',
       () => ({
         checked: borderColorThemeCheckbox.checked,
-        hasBorderColorTheme: visualContainer().classList.contains('component--has-borderColorTheme')
+        hasBorderColorTheme: visualContainer().classList.contains('component--has-border-color-theme')
       }),
       async () => {
         const checkboxWrapper =
@@ -455,7 +450,7 @@ export const VisualSectionTests: Story = {
       'Hide Background Color Toggle',
       () => ({
         checked: hideBackgroundCheckbox.checked,
-        hideBackground: visualContainer().classList.contains('component--hideBackgroundColor')
+        hideBackground: visualContainer().classList.contains('component--hide-background-color')
       }),
       async () => {
         const checkboxWrapper = hideBackgroundCheckbox.closest('.cove-input__checkbox--small') || hideBackgroundCheckbox

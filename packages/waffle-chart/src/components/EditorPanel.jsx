@@ -1,5 +1,4 @@
 import React, { useEffect, memo, useContext } from 'react'
-import _ from 'lodash'
 
 import ConfigContext from '../ConfigContext'
 
@@ -115,6 +114,28 @@ const EditorPanel = memo(props => {
                 <p>
                   Enter supporting text to display below the data visualization, if applicable. The following HTML tags
                   are supported: strong, em, sup, and sub.
+                </p>
+              </Tooltip.Content>
+            </Tooltip>
+          }
+        />
+        <Select
+          value={config.locale}
+          fieldName='locale'
+          label='Language for dates and numbers'
+          updateField={updateField}
+          options={[
+            { value: 'en-US', label: 'English (en-US)' },
+            { value: 'es-MX', label: 'Spanish (es-MX)' }
+          ]}
+          tooltip={
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>
+                  Change the language (locale) for this visualization to alter the way dates and numbers are formatted.
                 </p>
               </Tooltip.Content>
             </Tooltip>

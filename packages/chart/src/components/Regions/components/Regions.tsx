@@ -91,7 +91,7 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
         ? new Date(domain[domain.length - 1] as string | number).getTime()
         : new Date(region.to)
 
-    const toFormatted = formatDate(config.xAxis.dateParseFormat, toRefDate)
+    const toFormatted = formatDate(config.xAxis.dateParseFormat, toRefDate, config.locale)
     const toDate = new Date(toFormatted)
     const fromDate = new Date(toDate)
     fromDate.setDate(fromDate.getDate() - previousDays)
@@ -99,7 +99,7 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
     let closestValue: unknown
 
     if (axisType === 'date') {
-      const fromTime = new Date(formatDate(xAxis.dateParseFormat, fromDate)).getTime()
+      const fromTime = new Date(formatDate(xAxis.dateParseFormat, fromDate, config.locale)).getTime()
       closestValue = findClosestDate(fromTime, domain as number[], d => d)
     } else if (axisType === 'categorical') {
       const fromTime = fromDate.getTime()
@@ -151,7 +151,7 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       // For date scale (band), we need to find the value in the domain
       // Parse the region date to match the format in the domain
       const date = new Date(region.from)
-      const parsedDate = parseDate(formatDate(config.xAxis.dateParseFormat, date)).getTime()
+      const parsedDate = parseDate(formatDate(config.xAxis.dateParseFormat, date, config.locale)).getTime()
 
       // For band scales, find the closest date in the domain
       const domain = xScale.domain() as number[]
@@ -193,7 +193,7 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       return from + Number(config.yAxis.size)
     }
     const date = new Date(region.from)
-    const parsedDate = parseDate(formatDate(config.xAxis.dateParseFormat, date)).getTime()
+    const parsedDate = parseDate(formatDate(config.xAxis.dateParseFormat, date, config.locale)).getTime()
     let from = xScale(parsedDate)
     // For date-time, xScale returns correct position (no bandwidth), just add left padding
     return from + Number(config.yAxis.size)
@@ -252,7 +252,7 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
     }
     // For date scale (band), we need to find the value in the domain
     const date = new Date(region.from)
-    const parsedDate = parseDate(formatDate(config.xAxis.dateParseFormat, date)).getTime()
+    const parsedDate = parseDate(formatDate(config.xAxis.dateParseFormat, date, config.locale)).getTime()
 
     // For band scales, find the closest date in the domain
     const domain = xScale.domain() as number[]
@@ -281,7 +281,7 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       from = calculatePreviousDaysFrom(region, 'date-time')
     } else {
       const date = new Date(region.from)
-      const parsedDate = parseDate(formatDate(config.xAxis.dateParseFormat, date)).getTime()
+      const parsedDate = parseDate(formatDate(config.xAxis.dateParseFormat, date, config.locale)).getTime()
       from = xScale(parsedDate)
     }
     return from - getBarOffset()

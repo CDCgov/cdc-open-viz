@@ -142,6 +142,29 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                 </Tooltip>
               }
             />
+            <Select
+              value={config.locale}
+              fieldName='locale'
+              label='Language for dates and numbers'
+              updateField={updateField}
+              options={[
+                { value: 'en-US', label: 'English (en-US)' },
+                { value: 'es-MX', label: 'Spanish (es-MX)' }
+              ]}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>
+                      Change the language (locale) for this visualization to alter the way dates and numbers are
+                      formatted.
+                    </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
           </Accordion.Section>
 
           <Accordion.Section title='Data'>
@@ -283,6 +306,13 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                 section='visual'
                 fieldName='whiteBackground'
                 label='Use White Background Style'
+                updateField={updateField}
+              />
+              <CheckBox
+                value={config.visual?.useWrap}
+                section='visual'
+                fieldName='useWrap'
+                label='Use Wrap Layout'
                 updateField={updateField}
               />
               {/* TODO: Uncomment when ready to release Display Border feature

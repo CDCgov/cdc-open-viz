@@ -1,7 +1,6 @@
 import { useEffect, useCallback, useRef, useReducer, useMemo } from 'react'
-import _ from 'lodash'
 // external
-import { Markup } from 'interweave'
+import DOMPurify from 'dompurify'
 import axios from 'axios'
 
 // cdc
@@ -19,7 +18,7 @@ import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import markupIncludeReducer from './store/markupInclude.reducer'
-import Layout from '@cdc/core/components/Layout'
+import { VisualizationContainer } from '@cdc/core/components/Layout'
 // styles
 import './cdcMarkupInclude.style.css'
 import './scss/main.scss'
@@ -203,63 +202,29 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   }
 
   /**
-   * Transforms HTML by extracting <style> tags and applying their CSS rules as inline styles.
-   * This ensures that the CSS is applied only to this COVE visualization.
+   * Extracts <style> tags from HTML and scopes them using CSS nesting under the given scope ID.
    */
-  const applyStyleTagsAsInlineStyles = (html: string): string => {
-    if (!html || typeof html !== 'string') return html
+  const extractAndScopeStyles = (html: string, scopeId: string): { scopedCSS: string; cleanHTML: string } => {
+    if (!html || typeof html !== 'string') return { scopedCSS: '', cleanHTML: html }
 
-    // Use DOMParser to parse HTML
     const parser = new DOMParser()
     const doc = parser.parseFromString(html, 'text/html')
 
-    // Extract all <style> elements
     const styleElements = doc.querySelectorAll('style')
-    if (styleElements.length === 0) return html
+    if (styleElements.length === 0) return { scopedCSS: '', cleanHTML: html }
 
-    // Parse CSS rules
-    const sheet = new CSSStyleSheet()
-    const cssRules: Array<{ selector: string; styles: string }> = []
-
+    const cssFragments: string[] = []
     styleElements.forEach(styleEl => {
-      try {
-        // replaceSync parses the CSS and throws if invalid
-        sheet.replaceSync(styleEl.textContent || '')
-
-        // Extract parsed rules from the stylesheet
-        for (let i = 0; i < sheet.cssRules.length; i++) {
-          const rule = sheet.cssRules[i]
-          if (rule instanceof CSSStyleRule) {
-            cssRules.push({
-              selector: rule.selectorText,
-              styles: rule.style.cssText
-            })
-          }
-        }
-      } catch (e) {
-        console.warn('Markup Include: Invalid CSS in style tag', e)
+      const text = styleEl.textContent?.trim()
+      if (text) {
+        cssFragments.push(text)
       }
-
       styleEl.remove()
     })
 
-    // Apply each CSS rule to matching elements
-    for (const rule of cssRules) {
-      try {
-        const elements = doc.body.querySelectorAll(rule.selector)
+    const scopedCSS = cssFragments.length > 0 ? `#${scopeId} {\n${cssFragments.join('\n')}\n}` : ''
 
-        elements.forEach(el => {
-          const existingStyle = el.getAttribute('style') || ''
-          const newStyle = existingStyle ? `${existingStyle}; ${rule.styles}` : rule.styles
-          el.setAttribute('style', newStyle)
-        })
-      } catch (e) {
-        // Skip invalid selectors (e.g., pseudo-selectors like :hover won't match)
-        console.warn(`Markup Include: Could not apply CSS rule for selector "${rule.selector}"`, e)
-      }
-    }
-
-    return doc.body.innerHTML
+    return { scopedCSS, cleanHTML: doc.body.innerHTML }
   }
 
   //Load initial config
@@ -289,69 +254,66 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         allowHideSection,
         filters: config?.filters || [],
         datasets,
-        configDataKey: config?.dataKey
+        configDataKey: config?.dataKey,
+        locale: config?.locale
       })
     : { processedContent: parseBodyMarkup(urlMarkup), shouldHideSection: false, shouldShowNoDataMessage: false }
 
-  const markup = applyStyleTagsAsInlineStyles(processedMarkup.processedContent)
+  const scopeId = `cove-mi-${config?.runtime?.uniqueId || 'default'}`
+  const { scopedCSS, cleanHTML } = extractAndScopeStyles(processedMarkup.processedContent, scopeId)
+  const sanitizedHTML = cleanHTML ? DOMPurify.sanitize(cleanHTML) : ''
 
   const hideMarkupInclude = processedMarkup.shouldHideSection
   const _showNoDataMessage = processedMarkup.shouldShowNoDataMessage
 
   if (loading === false) {
-    content = (
-      <>
-        {isEditor && <EditorPanel datasets={datasets} />}
-
-        {!hideMarkupInclude && (
-          <Layout.Responsive isEditor={isEditor}>
-            <div className='markup-include-content-container cove-component__content no-borders'>
-              <Title
-                title={title}
-                isDashboard={isDashboard}
-                titleStyle={contentEditor.titleStyle}
-                config={config}
-                classes={[`${theme}`, 'mb-0']}
-                noContent={!markup}
-              />
-              <div className={`markup-include-component ${contentClasses.join(' ')}`}>
-                <div className={`${innerContainerClasses.join(' ')}`}>
-                  {/* Filters */}
-                  {config.filters && config.filters.length > 0 && (
-                    <Filters
-                      config={config}
-                      setFilters={setFilters}
-                      excludedData={data || []}
-                      dimensions={[0, 0]}
-                      interactionLabel={interactionLabel || 'markup-include'}
-                    />
-                  )}
-                  <div
-                    className={`cove-component__content-wrap${shouldApplyTopPadding ? ' has-top-padding' : ''}${
-                      shouldApplySidePadding ? ' has-side-padding' : ''
-                    }`}
-                  >
-                    {_showNoDataMessage && (
-                      <div className='no-data-message'>
-                        <p>{`${noDataMessageText}`}</p>
-                      </div>
-                    )}
-                    {!markupError && !_showNoDataMessage && <Markup allowElements={!!urlMarkup} content={markup} />}
-                    {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
-                  </div>
-                </div>
+    content = !hideMarkupInclude && (
+      <div className={`markup-include-content-container ${innerContainerClasses.join(' ')}`}>
+        <Title
+          title={title}
+          isDashboard={isDashboard}
+          titleStyle={contentEditor.titleStyle}
+          config={config}
+          classes={[`${theme}`, 'mb-0']}
+          noContent={!sanitizedHTML}
+        />
+        <div className={`markup-include-component ${contentClasses.join(' ')}`}>
+          {config.filters && config.filters.length > 0 && (
+            <Filters
+              config={config}
+              setFilters={setFilters}
+              excludedData={data || []}
+              dimensions={[0, 0]}
+              interactionLabel={interactionLabel || 'markup-include'}
+            />
+          )}
+          <div
+            className={`cove-visualization__body-wrap${shouldApplyTopPadding ? ' has-top-padding' : ''}${
+              shouldApplySidePadding ? ' has-side-padding' : ''
+            }`}
+          >
+            {_showNoDataMessage && (
+              <div className='no-data-message'>
+                <p>{`${noDataMessageText}`}</p>
               </div>
-              <FootnotesStandAlone
-                config={configObj?.footnotes}
-                filters={config?.filters || []}
-                markupVariables={markupVariables}
-                enableMarkupVariables={config?.enableMarkupVariables}
-                data={data}
-              />
-            </div>
-          </Layout.Responsive>
-        )}
-      </>
+            )}
+            {!markupError && !_showNoDataMessage && (
+              <div id={scopeId}>
+                {scopedCSS && <style>{scopedCSS}</style>}
+                <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
+              </div>
+            )}
+            {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
+          </div>
+        </div>
+        <FootnotesStandAlone
+          config={configObj?.footnotes}
+          filters={config?.filters || []}
+          markupVariables={markupVariables}
+          enableMarkupVariables={config?.enableMarkupVariables}
+          data={data}
+        />
+      </div>
     )
   }
 
@@ -370,9 +332,9 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     <ErrorBoundary component='CdcMarkupInclude'>
       <ConfigContext.Provider value={{ config, updateConfig, loading, data: data, setParentConfig, isDashboard }}>
         {!config?.newViz && config?.runtime && config?.runtime.editorErrorMessage && <Error />}
-        <Layout.VisualizationWrapper config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
+        <VisualizationContainer config={config} isEditor={isEditor} editorPanel={<EditorPanel datasets={datasets} />}>
           {content}
-        </Layout.VisualizationWrapper>
+        </VisualizationContainer>
       </ConfigContext.Provider>
     </ErrorBoundary>
   )

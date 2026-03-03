@@ -11,9 +11,19 @@ type DownloadButtonProps = {
   configUrl?: string
   interactionLabel?: string
   title?: string
+  config?: any
 }
 
-const DownloadButton = ({ rawData, fileName, headerColor, skipId, interactionLabel, configUrl, title, config }: DownloadButtonProps) => {
+const DownloadButton = ({
+  rawData,
+  fileName,
+  headerColor,
+  skipId,
+  interactionLabel,
+  configUrl,
+  title,
+  config
+}: DownloadButtonProps) => {
   const linkRef = useRef<HTMLAnchorElement>(null)
 
   const handleDownload = (event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -65,7 +75,7 @@ const DownloadButton = ({ rawData, fileName, headerColor, skipId, interactionLab
       role='button'
       style={{ cursor: 'pointer' }}
     >
-      Download Data (CSV)
+      {config?.table?.downloadDataLabel || 'Download Data (CSV)'}
     </a>
   )
 }

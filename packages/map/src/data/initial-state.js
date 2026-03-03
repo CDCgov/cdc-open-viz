@@ -49,7 +49,8 @@ const createInitialState = () => {
         name: 'FIPS Codes',
         label: 'Location',
         tooltip: false,
-        dataTable: true
+        dataTable: true,
+        displayColumn: ''
       },
       primary: {
         dataTable: true,
@@ -76,14 +77,14 @@ const createInitialState = () => {
       showSpecialClassesLast: false,
       dynamicDescription: false,
       type: 'equalnumber',
-      numberOfItems: 3,
-      position: 'side',
+      numberOfItems: 5,
+      position: 'top',
       title: '',
-      style: 'circles',
+      style: 'gradient',
       subStyle: 'linear blocks',
       tickRotation: '',
       singleColumnLegend: false,
-      hideBorder: false,
+      hideBorder: true,
       groupBy: ''
     },
     filters: [],
@@ -114,6 +115,11 @@ const createInitialState = () => {
       editorErrorMessage: []
     },
     visual: {
+      border: false,
+      borderColorTheme: false,
+      accent: false,
+      background: false,
+      hideBackgroundColor: false,
       minBubbleSize: 1,
       maxBubbleSize: 20,
       extraBubbleBorder: false,
