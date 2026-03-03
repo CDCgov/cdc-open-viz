@@ -5,6 +5,7 @@ import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 import EqualNumberOptInExample from './_mock/DEV-7286.json'
 import EqualNumberMap from './_mock/equal-number.json'
 import MultiState from './_mock/multi-state.json'
+import MultiStateShowUnselected from './_mock/multi-state-show-unselected.json'
 import MultiCountry from './_mock/multi-country.json'
 import MultiCountryHide from './_mock/multi-country-hide.json'
 import SingleStateWithFilters from './_mock/DEV-8942.json'
@@ -143,6 +144,15 @@ export const Single_State: Story = {
 export const Multi_State: Story = {
   args: {
     config: MultiState
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+  }
+}
+
+export const Multi_State_Show_Unselected: Story = {
+  args: {
+    config: MultiStateShowUnselected
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
