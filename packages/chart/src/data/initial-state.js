@@ -240,10 +240,10 @@ const createInitialState = () => {
     filters: [],
     confidenceKeys: {},
     visual: {
-      border: true,
+      border: false,
       borderColorTheme: false,
-      accent: true,
-      background: true,
+      accent: false,
+      background: false,
       hideBackgroundColor: false,
       verticalHoverLine: false,
       horizontalHoverLine: false,
