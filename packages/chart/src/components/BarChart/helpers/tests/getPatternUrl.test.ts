@@ -1,4 +1,5 @@
 import { getPatternUrl } from '../getPatternUrl'
+import { getChartPatternId } from '../../../../helpers/getChartPatternId'
 
 describe('getPatternUrl', () => {
   it('matches specific series patterns by series key and value', () => {
@@ -99,5 +100,20 @@ describe('getPatternUrl', () => {
     })
 
     expect(patternUrl).toBeNull()
+  })
+
+  it('sanitizes special-character pattern keys in returned url fragments', () => {
+    const patternKey = 'Pattern 1 / @ value'
+    const patternUrl = getPatternUrl({
+      patterns: {
+        [patternKey]: { dataKey: 'y1', dataValue: '19000' }
+      },
+      datum: { category: 'Q1', y1: 19000, y2: 47000 },
+      seriesKey: 'y1',
+      seriesValue: 19000,
+      seriesLabels: { y1: 'Series 1', y2: 'Series 2' }
+    })
+
+    expect(patternUrl).toBe(`url(#${getChartPatternId(patternKey)})`)
   })
 })

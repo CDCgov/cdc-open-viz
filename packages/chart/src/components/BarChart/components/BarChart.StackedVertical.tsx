@@ -9,6 +9,7 @@ import { addMinimumBarHeights } from '../helpers'
 
 import createBarElement from '@cdc/core/components/createBarElement'
 import { getPatternUrl as getPatternUrlForBar } from '../helpers/getPatternUrl'
+import { getChartPatternId } from '../../../helpers/getChartPatternId'
 
 const BarChartStackedVertical = () => {
   const [barWidth, setBarWidth] = useState(0)
@@ -41,7 +42,7 @@ const BarChartStackedVertical = () => {
     return (
       <defs>
         {Object.entries(config.legend.patterns).map(([key, pattern]) => {
-          const patternId = `chart-pattern-${key}`
+          const patternId = getChartPatternId(key)
           const size = pattern.patternSize || 8
 
           switch (pattern.shape) {

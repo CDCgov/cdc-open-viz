@@ -1,3 +1,5 @@
+import { getChartPatternId } from '../../../helpers/getChartPatternId'
+
 type LegendPattern = {
   dataKey?: string
   dataValue?: string | number
@@ -70,13 +72,13 @@ export const getPatternUrl = ({
 
     if (dataKey === '') {
       if (!broadMatchUrl && valuesMatch(seriesValue, pattern.dataValue)) {
-        broadMatchUrl = `url(#chart-pattern-${patternKey})`
+        broadMatchUrl = `url(#${getChartPatternId(patternKey)})`
       }
       continue
     }
 
     if (dataKey === seriesKey && valuesMatch(seriesValue, pattern.dataValue)) {
-      return `url(#chart-pattern-${patternKey})`
+      return `url(#${getChartPatternId(patternKey)})`
     }
 
     if (
@@ -84,7 +86,7 @@ export const getPatternUrl = ({
       !isSeriesDataKey(dataKey, seriesLabels, seriesKeys) &&
       valuesMatch(datum?.[dataKey], pattern.dataValue)
     ) {
-      return `url(#chart-pattern-${patternKey})`
+      return `url(#${getChartPatternId(patternKey)})`
     }
   }
 

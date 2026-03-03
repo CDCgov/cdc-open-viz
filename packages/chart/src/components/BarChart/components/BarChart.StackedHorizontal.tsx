@@ -15,6 +15,7 @@ import { type ChartContext } from '../../../types/ChartContext'
 import createBarElement from '@cdc/core/components/createBarElement'
 import { getHorizontalBarHeights } from '../helpers/getBarHeights'
 import { getPatternUrl as getPatternUrlForBar } from '../helpers/getPatternUrl'
+import { getChartPatternId } from '../../../helpers/getChartPatternId'
 
 const BarChartStackedHorizontal = () => {
   const { yMax, yScale, xScale, barChart } = useContext<BarChartContextValues>(BarChartContext)
@@ -56,7 +57,7 @@ const BarChartStackedHorizontal = () => {
     return (
       <defs>
         {Object.entries(config.legend.patterns).map(([key, pattern]) => {
-          const patternId = `chart-pattern-${key}`
+          const patternId = getChartPatternId(key)
           const size = pattern.patternSize || 8
 
           switch (pattern.shape) {

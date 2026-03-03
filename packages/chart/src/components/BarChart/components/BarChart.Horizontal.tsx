@@ -25,6 +25,7 @@ import _ from 'lodash'
 import { getBarData } from '../helpers/getBarData'
 import { getHorizontalBarHeights } from '../helpers/getBarHeights'
 import { getPatternUrl as getPatternUrlForBar } from '../helpers/getPatternUrl'
+import { getChartPatternId } from '../../../helpers/getChartPatternId'
 
 const BarChartHorizontal = () => {
   const { xScale, yScale, yMax, seriesScale, barChart } = useContext<BarChartContextValues>(BarChartContext)
@@ -73,7 +74,7 @@ const BarChartHorizontal = () => {
     return (
       <defs>
         {Object.entries(config.legend.patterns).map(([key, pattern]) => {
-          const patternId = `chart-pattern-${key}`
+          const patternId = getChartPatternId(key)
           const size = pattern.patternSize || 8
 
           switch (pattern.shape) {
