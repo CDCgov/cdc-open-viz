@@ -106,7 +106,7 @@ import { Datasets } from '@cdc/core/types/DataSet'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
-import { ENABLE_CHART_DATA_BITE_VISUAL_SETTINGS } from '@cdc/core/helpers/constants'
+import { ENABLE_CHART_VISUAL_SETTINGS } from '@cdc/core/helpers/constants'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -1237,7 +1237,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       classes.push('dashboard-brush')
     classes.push(...contentClasses)
 
-    if (!ENABLE_CHART_DATA_BITE_VISUAL_SETTINGS) {
+    if (!ENABLE_CHART_VISUAL_SETTINGS) {
       return classes.filter(className => !visualSettingClasses.includes(className))
     }
 

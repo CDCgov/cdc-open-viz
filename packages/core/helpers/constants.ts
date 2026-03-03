@@ -11,8 +11,8 @@ export const USE_V2_MIGRATION = true // Set to true to enable v2 migration and c
 // Map editor feature flag for Data Bite-style visual controls
 export const ENABLE_MAP_DATA_BITE_VISUAL_SETTINGS = true
 
-// Chart feature flag for Data Bite-style visual controls
-export const ENABLE_CHART_DATA_BITE_VISUAL_SETTINGS = true
+// Chart feature flag for visual controls (border, accent, background)
+export const ENABLE_CHART_VISUAL_SETTINGS = false
 
 // Data operators for conditional logic
 export const DATA_OPERATOR_LESS = '<'
