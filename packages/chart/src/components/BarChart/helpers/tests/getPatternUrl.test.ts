@@ -2,6 +2,9 @@ import { getPatternUrl } from '../getPatternUrl'
 import { getChartPatternId } from '../../../../helpers/getChartPatternId'
 
 describe('getPatternUrl', () => {
+  const pattern1Url = `url(#${getChartPatternId('Pattern1')})`
+  const pattern2Url = `url(#${getChartPatternId('Pattern2')})`
+
   it('matches specific series patterns by series key and value', () => {
     const patternUrl = getPatternUrl({
       patterns: {
@@ -13,7 +16,7 @@ describe('getPatternUrl', () => {
       seriesLabels: { y1: 'Series 1', y2: 'Series 2' }
     })
 
-    expect(patternUrl).toBe('url(#chart-pattern-Pattern1)')
+    expect(patternUrl).toBe(pattern1Url)
   })
 
   it('matches specific non-series field patterns', () => {
@@ -27,7 +30,7 @@ describe('getPatternUrl', () => {
       seriesLabels: { y1: 'Series 1', y2: 'Series 2' }
     })
 
-    expect(patternUrl).toBe('url(#chart-pattern-Pattern1)')
+    expect(patternUrl).toBe(pattern1Url)
   })
 
   it('does not match non-series field patterns when non-series matching is disabled', () => {
@@ -56,7 +59,7 @@ describe('getPatternUrl', () => {
       seriesLabels: { y1: 'Series 1', y2: 'Series 2' }
     })
 
-    expect(patternUrl).toBe('url(#chart-pattern-Pattern1)')
+    expect(patternUrl).toBe(pattern1Url)
   })
 
   it('does not match blank dataKey pattern with empty dataValue', () => {
@@ -85,7 +88,7 @@ describe('getPatternUrl', () => {
       seriesLabels: { y1: 'Series 1', y2: 'Series 2' }
     })
 
-    expect(patternUrl).toBe('url(#chart-pattern-Pattern2)')
+    expect(patternUrl).toBe(pattern2Url)
   })
 
   it('uses seriesKeys as fallback to identify series keys when seriesLabels are missing', () => {
@@ -115,5 +118,17 @@ describe('getPatternUrl', () => {
     })
 
     expect(patternUrl).toBe(`url(#${getChartPatternId(patternKey)})`)
+  })
+
+  it('creates distinct ids for keys that sanitize to the same base id', () => {
+    const keyA = 'A B'
+    const keyB = 'A@B'
+
+    const idA = getChartPatternId(keyA)
+    const idB = getChartPatternId(keyB)
+
+    expect(idA).not.toBe(idB)
+    expect(idA.startsWith('chart-pattern-A-B-')).toBe(true)
+    expect(idB.startsWith('chart-pattern-A-B-')).toBe(true)
   })
 })
