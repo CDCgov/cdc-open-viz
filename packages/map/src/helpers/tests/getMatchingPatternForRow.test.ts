@@ -3,6 +3,35 @@ import { getMatchingPatternForRow } from '../getMatchingPatternForRow'
 import { PatternSelection } from '../../types/MapConfig'
 
 describe('getMatchingPatternForRow', () => {
+  it('uses the last matching specific pattern when multiple specific patterns match', () => {
+    const row = { Rate: 55 }
+    const patterns: PatternSelection[] = [
+      {
+        dataKey: 'Rate',
+        dataValue: '55',
+        pattern: 'lines',
+        size: 'small',
+        color: '#111',
+        label: '',
+        contrastCheck: true
+      },
+      {
+        dataKey: 'Rate',
+        dataValue: '55',
+        pattern: 'circles',
+        size: 'medium',
+        color: '#000',
+        label: '',
+        contrastCheck: true
+      }
+    ]
+
+    const result = getMatchingPatternForRow(row, patterns)
+
+    expect(result?.patternIndex).toBe(1)
+    expect(result?.pattern.pattern).toBe('circles')
+  })
+
   it('matches specific dataKey patterns first', () => {
     const row = { Rate: 55, Status: '55' }
     const patterns: PatternSelection[] = [
@@ -88,5 +117,34 @@ describe('getMatchingPatternForRow', () => {
 
     expect(result?.matchedDataKey).toBe('Rate')
     expect(result?.patternIndex).toBe(0)
+  })
+
+  it('uses the last matching broad pattern when multiple broad patterns match', () => {
+    const row = { Category: 'Target' }
+    const patterns: PatternSelection[] = [
+      {
+        dataKey: '',
+        dataValue: 'Target',
+        pattern: 'lines',
+        size: 'small',
+        color: '#111',
+        label: '',
+        contrastCheck: true
+      },
+      {
+        dataKey: '',
+        dataValue: 'Target',
+        pattern: 'waves',
+        size: 'large',
+        color: '#333',
+        label: '',
+        contrastCheck: true
+      }
+    ]
+
+    const result = getMatchingPatternForRow(row, patterns)
+
+    expect(result?.patternIndex).toBe(1)
+    expect(result?.pattern.pattern).toBe('waves')
   })
 })

@@ -2772,23 +2772,50 @@ export const PatternSettingsSectionTests: Story = {
       'Pattern Settings → Specific match beats broad match',
       () => {
         const allSvgs = canvasElement.querySelectorAll('svg')
-        let linePatternElements = 0
-        let circlePatternElements = 0
+        const patternTypeById: Record<string, 'lines' | 'circles' | 'waves' | 'unknown'> = {}
+        const appliedRatePatternTypes = new Set<string>()
 
         allSvgs.forEach(svg => {
           const patterns = svg.querySelectorAll('pattern')
           patterns.forEach(pattern => {
-            linePatternElements += pattern.querySelectorAll('line').length
-            circlePatternElements += pattern.querySelectorAll('circle').length
+            const patternId = pattern.getAttribute('id')
+            if (!patternId) return
+
+            if (pattern.querySelector('circle')) patternTypeById[patternId] = 'circles'
+            else if (pattern.querySelector('line')) patternTypeById[patternId] = 'lines'
+            else if (pattern.querySelector('path')) patternTypeById[patternId] = 'waves'
+            else patternTypeById[patternId] = 'unknown'
+          })
+
+          const ratePatternNodes = Array.from(svg.querySelectorAll('path.pattern-geoKey--Rate')).filter(node =>
+            node.getAttribute('fill')?.startsWith('url(#')
+          )
+
+          ratePatternNodes.forEach(node => {
+            const fill = node.getAttribute('fill')
+            const match = fill?.match(/^url\(#(.+)\)$/)
+            const patternId = match?.[1]
+            if (!patternId) return
+            appliedRatePatternTypes.add(patternTypeById[patternId] || 'unknown')
           })
         })
 
-        return { linePatternElements, circlePatternElements }
+        return {
+          hasRateCircle: appliedRatePatternTypes.has('circles'),
+          hasRateWave: appliedRatePatternTypes.has('waves')
+        }
       },
       async () => {
-        const firstPatternType = canvasElement.querySelector('select[name^="pattern-type--0"]') as HTMLSelectElement
-        if (!firstPatternType) throw new Error('First pattern type select not found')
-        await userEvent.selectOptions(firstPatternType, 'lines')
+        const firstDataKey = canvasElement.querySelector('select[name="pattern-dataKey--0"]') as HTMLSelectElement
+        const firstDataValue = canvasElement.querySelector('input[id="pattern-dataValue--0"]') as HTMLInputElement
+        const firstPatternType = canvasElement.querySelector('select[name="pattern-type--0"]') as HTMLSelectElement
+        if (!firstDataKey || !firstDataValue || !firstPatternType) {
+          throw new Error('First pattern controls not found')
+        }
+        await userEvent.selectOptions(firstDataKey, 'Rate')
+        await userEvent.clear(firstDataValue)
+        await userEvent.type(firstDataValue, '55')
+        await userEvent.selectOptions(firstPatternType, 'circles')
 
         const buttons = Array.from(canvasElement.querySelectorAll('button'))
         const addPatternButton = buttons.find(btn => btn.textContent?.includes('Add Geo Pattern'))
@@ -2809,12 +2836,12 @@ export const PatternSettingsSectionTests: Story = {
           throw new Error('Second pattern controls not found')
         }
 
-        await userEvent.selectOptions(secondDataKey, 'Rate')
+        await userEvent.selectOptions(secondDataKey, '')
         await userEvent.clear(secondDataValue)
         await userEvent.type(secondDataValue, '55')
-        await userEvent.selectOptions(secondPatternType, 'circles')
+        await userEvent.selectOptions(secondPatternType, 'waves')
       },
-      (before, after) => after.circlePatternElements > 0 && after.circlePatternElements >= before.circlePatternElements
+      (before, after) => after.hasRateCircle && !after.hasRateWave
     )
 
     await performAndAssert(

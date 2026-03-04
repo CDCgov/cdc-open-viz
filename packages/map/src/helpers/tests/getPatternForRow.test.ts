@@ -137,4 +137,41 @@ describe('getPatternForRow', () => {
     const row = { STATE: 'Colorado' }
     expect(getPatternForRow(row, config)).toBeNull()
   })
+
+  it('returns the last matching specific pattern to preserve dominant visual overlay behavior', () => {
+    const config = {
+      map: {
+        patterns: [
+          {
+            dataKey: 'Rate',
+            dataValue: '55',
+            pattern: 'lines',
+            size: 'small',
+            color: '#111',
+            label: '',
+            contrastCheck: true
+          },
+          {
+            dataKey: 'Rate',
+            dataValue: '55',
+            pattern: 'waves',
+            size: 'large',
+            color: '#222',
+            label: '',
+            contrastCheck: true
+          }
+        ]
+      }
+    }
+    const row = { Rate: 55 }
+    const result = getPatternForRow(row, config)
+
+    expect(result).toEqual({
+      pattern: 'waves',
+      dataKey: 'Rate',
+      size: 'large',
+      patternIndex: 1,
+      color: '#222'
+    })
+  })
 })

@@ -18,6 +18,9 @@ export const getMatchingPatternForRow = (
   }
 
   // First pass: specific key matches always win over broad matches.
+  // If multiple specific patterns match, keep the last configured one to
+  // preserve prior "last overlay wins" map behavior.
+  let lastSpecificMatch: MatchedPattern | null = null
   for (let i = 0; i < patterns.length; i++) {
     const pattern = patterns[i]
     const dataKey = pattern?.dataKey ?? ''
@@ -27,16 +30,21 @@ export const getMatchingPatternForRow = (
     }
 
     if (patternValuesMatch(pattern.dataValue, rowObj[dataKey])) {
-      return {
+      lastSpecificMatch = {
         pattern,
         patternIndex: i,
         matchedDataKey: dataKey
       }
     }
   }
+  if (lastSpecificMatch) {
+    return lastSpecificMatch
+  }
 
   // Second pass: broad matches (blank dataKey) compare against all row values.
+  // If multiple broad patterns match, keep the last configured one.
   const rowEntries = Object.entries(rowObj)
+  let lastBroadMatch: MatchedPattern | null = null
   for (let i = 0; i < patterns.length; i++) {
     const pattern = patterns[i]
 
@@ -46,7 +54,7 @@ export const getMatchingPatternForRow = (
 
     for (const [rowKey, rowValue] of rowEntries) {
       if (patternValuesMatch(pattern.dataValue, rowValue)) {
-        return {
+        lastBroadMatch = {
           pattern,
           patternIndex: i,
           matchedDataKey: rowKey
@@ -55,5 +63,5 @@ export const getMatchingPatternForRow = (
     }
   }
 
-  return null
+  return lastBroadMatch
 }
