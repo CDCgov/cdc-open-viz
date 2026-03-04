@@ -419,12 +419,7 @@ const CountyMap = () => {
 
     // If the user clicked outside of all states, no behavior
     if (clickedState) {
-      setConfig({
-        ...config,
-        mapPosition: { coordinates: [0, 30], zoom: 3 }
-      })
-
-      // If a county within the state was also clicked and has data, call parent click handler
+      // If a county within the state was clicked and has data, call parent click handler
       if (topoData.countyIndecies[clickedState.id]) {
         let county
         for (
@@ -442,25 +437,31 @@ const CountyMap = () => {
         }
       }
 
-      let focusIndex = -1
-      for (let i = 0; i < topoData.mapData.length; i++) {
-        if (topoData.mapData[i].id === clickedState.id) {
-          focusIndex = i
-          break
-        }
-      }
+      if (config.general.allowMapZoom) {
+        setConfig({
+          ...config,
+          mapPosition: { coordinates: [0, 30], zoom: 3 }
+        })
 
-      // Redraw with focus on state
-      setFocus({ id: clickedState.id, index: focusIndex, center: geoCentroid(clickedState), feature: clickedState })
-      publishAnalyticsEvent({
-        vizType: config.type,
-        vizSubType: getVizSubType(config),
-        eventType: `zoom_in`,
-        eventAction: 'click',
-        eventLabel: interactionLabel,
-        vizTitle: getVizTitle(config),
-        specifics: `zoom_level: 3, location: ${clickedState.properties.name}`
-      })
+        let focusIndex = -1
+        for (let i = 0; i < topoData.mapData.length; i++) {
+          if (topoData.mapData[i].id === clickedState.id) {
+            focusIndex = i
+            break
+          }
+        }
+
+        setFocus({ id: clickedState.id, index: focusIndex, center: geoCentroid(clickedState), feature: clickedState })
+        publishAnalyticsEvent({
+          vizType: config.type,
+          vizSubType: getVizSubType(config),
+          eventType: `zoom_in`,
+          eventAction: 'click',
+          eventLabel: interactionLabel,
+          vizTitle: getVizTitle(config),
+          specifics: `zoom_level: 3, location: ${clickedState.properties.name}`
+        })
+      }
     }
     if (config.general.type === 'us-geocode') {
       const geoRadius = (config.visual.geoCodeCircleSize || 5) * (focus.id ? 2 : 1)
@@ -904,6 +905,14 @@ const CountyMap = () => {
   }
 
   useEffect(() => {
+    if (!config.general.allowMapZoom) {
+      setFocus({})
+      setHasMoved(false)
+      resetZoomTransform()
+    }
+  }, [config.general.allowMapZoom])
+
+  useEffect(() => {
     if (!canvasRef.current || !config.general.allowMapZoom) {
       return
     }
@@ -958,6 +967,7 @@ const CountyMap = () => {
         }}
         onClick={canvasClick}
         className='county-map-canvas'
+        style={config.general.allowMapZoom ? undefined : { cursor: 'default' }}
       ></canvas>
 
       {config.general.allowMapZoom && (
