@@ -1,9 +1,9 @@
 import GenerateViteConfig from '@cdc/core/generateViteConfig.js'
 import { moduleName } from './package.json'
 
-// Dashboard uses isDashboardEditor instead of isEditor for the padding selector
+// Dashboard uses is-dashboard-editor instead of is-editor for the padding selector
 const dashboardCss = `
-      .cdc-open-viz-module.type-dashboard:not(.isDashboardEditor) {
+      .cove-visualization.type-dashboard:not(.is-dashboard-editor) {
         padding: 1rem;
       }`
 
