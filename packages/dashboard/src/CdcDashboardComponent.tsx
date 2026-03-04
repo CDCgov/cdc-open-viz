@@ -649,7 +649,7 @@ export default function CdcDashboard({
 
   const dashboardContainerClasses = ['cove-visualization', 'type-dashboard', `${currentViewport}`]
   if (isEditor) {
-    dashboardContainerClasses.push('isDashboardEditor')
+    dashboardContainerClasses.push('is-dashboard-editor')
   }
 
   return (
