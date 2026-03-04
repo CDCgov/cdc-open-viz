@@ -20,9 +20,9 @@ const __dirname = path.dirname(__filename)
 const devTemplatePath = path.join(__dirname, 'devTemplate')
 
 // Default editor padding CSS - can be overridden by passing custom CSS to devOptions
-// Dashboard overrides this with .cdc-open-viz-module.type-dashboard:not(.isDashboardEditor)
+// Dashboard overrides this with .cove-visualization.type-dashboard:not(.is-dashboard-editor)
 const DEFAULT_PACKAGE_CSS = `
-      .cdc-open-viz-module:not(.isEditor) {
+      .cove-visualization:not(.is-editor) {
         padding: 1rem;
       }`
 
