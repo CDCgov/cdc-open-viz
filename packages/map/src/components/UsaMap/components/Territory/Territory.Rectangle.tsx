@@ -6,7 +6,7 @@ import { patternSizes } from '../../helpers/patternSizes'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
 import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 import { type TerritoryShape } from './TerritoryShape'
-import { patternValuesMatch } from '../../../../helpers/patternMatching'
+import { getMatchingPatternForRow } from '../../../../helpers/getMatchingPatternForRow'
 
 const TerritoryRectangle: React.FC<TerritoryShape> = ({
   dataTooltipId,
@@ -73,14 +73,19 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
           {label}
         </text>
 
-        {config.map?.patterns?.map((patternData, patternIndex) => {
+        {(() => {
+          const matchedPattern = getMatchingPatternForRow(territoryData, config.map?.patterns)
+
+          if (!matchedPattern) {
+            return null
+          }
+
+          const { pattern: patternData, patternIndex, matchedDataKey } = matchedPattern
           const patternColor = patternData.color || getContrastColor('#FFF', backgroundColor)
-          const hasMatchingValues = patternValuesMatch(patternData.dataValue, territoryData?.[patternData.dataKey])
           const sanitizedTerritory = sanitizeToSvgId(territory || label)
-          const sanitizedDataKey = sanitizeToSvgId(patternData?.dataKey || '')
+          const sanitizedDataKey = sanitizeToSvgId(matchedDataKey)
           const patternId = `${mapId}--territory-${sanitizedTerritory}-${sanitizedDataKey}--${patternIndex}`
 
-          if (!hasMatchingValues) return null
           if (!patternData.pattern) return null
 
           return (
@@ -123,8 +128,8 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
                 fill={`url(#${patternId})`}
                 style={{ pointerEvents: 'none' }}
                 className={[
-                  `territory-pattern-${patternData?.dataKey}`,
-                  `territory-pattern-${patternData?.dataKey}--${patternData.dataValue}`
+                  `territory-pattern-${matchedDataKey}`,
+                  `territory-pattern-${matchedDataKey}--${patternData.dataValue}`
                 ].join(' ')}
               />
               <text
@@ -144,7 +149,7 @@ const TerritoryRectangle: React.FC<TerritoryShape> = ({
               </text>
             </>
           )
-        })}
+        })()}
       </g>
     </svg>
   )

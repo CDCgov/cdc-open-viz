@@ -2743,6 +2743,81 @@ export const PatternSettingsSectionTests: Story = {
     )
 
     await performAndAssert(
+      'Pattern Settings → Broad match with blank dataKey (value 55)',
+      () => {
+        const allSvgs = canvasElement.querySelectorAll('svg')
+        let patternPathCount = 0
+
+        allSvgs.forEach(svg => {
+          const allPaths = Array.from(svg.querySelectorAll('path'))
+          patternPathCount += allPaths.filter(path => path.getAttribute('fill')?.startsWith('url(#')).length
+        })
+
+        return { patternPathCount }
+      },
+      async () => {
+        const dataKeySelect = canvasElement.querySelector('select[name^="pattern-dataKey--"]') as HTMLSelectElement
+        const dataValueInput = canvasElement.querySelector('input[id^="pattern-dataValue--"]') as HTMLInputElement
+        if (!dataKeySelect || !dataValueInput) throw new Error('Pattern data controls not found')
+
+        await userEvent.selectOptions(dataKeySelect, '')
+        await userEvent.clear(dataValueInput)
+        await userEvent.type(dataValueInput, '55')
+        await userEvent.tab()
+      },
+      (before, after) => after.patternPathCount > 0
+    )
+
+    await performAndAssert(
+      'Pattern Settings → Specific match beats broad match',
+      () => {
+        const allSvgs = canvasElement.querySelectorAll('svg')
+        let linePatternElements = 0
+        let circlePatternElements = 0
+
+        allSvgs.forEach(svg => {
+          const patterns = svg.querySelectorAll('pattern')
+          patterns.forEach(pattern => {
+            linePatternElements += pattern.querySelectorAll('line').length
+            circlePatternElements += pattern.querySelectorAll('circle').length
+          })
+        })
+
+        return { linePatternElements, circlePatternElements }
+      },
+      async () => {
+        const firstPatternType = canvasElement.querySelector('select[name^="pattern-type--0"]') as HTMLSelectElement
+        if (!firstPatternType) throw new Error('First pattern type select not found')
+        await userEvent.selectOptions(firstPatternType, 'lines')
+
+        const buttons = Array.from(canvasElement.querySelectorAll('button'))
+        const addPatternButton = buttons.find(btn => btn.textContent?.includes('Add Geo Pattern'))
+        if (!addPatternButton) throw new Error('Add Geo Pattern button not found')
+        await userEvent.click(addPatternButton)
+
+        const accordionButtons = Array.from(canvasElement.querySelectorAll('.accordion__button'))
+        const selectColumnButtons = accordionButtons.filter(btn => btn.textContent?.includes('Select Column'))
+        const secondPatternAccordionButton = selectColumnButtons[selectColumnButtons.length - 1] as HTMLElement
+        if (!secondPatternAccordionButton) throw new Error('Second pattern accordion not found')
+        await userEvent.click(secondPatternAccordionButton)
+
+        const secondDataKey = canvasElement.querySelector('select[name="pattern-dataKey--1"]') as HTMLSelectElement
+        const secondDataValue = canvasElement.querySelector('input[id="pattern-dataValue--1"]') as HTMLInputElement
+        const secondPatternType = canvasElement.querySelector('select[name="pattern-type--1"]') as HTMLSelectElement
+
+        if (!secondDataKey || !secondDataValue || !secondPatternType) {
+          throw new Error('Second pattern controls not found')
+        }
+
+        await userEvent.selectOptions(secondDataKey, 'Rate')
+        await userEvent.clear(secondDataValue)
+        await userEvent.type(secondDataValue, '55')
+        await userEvent.selectOptions(secondPatternType, 'circles')
+      },
+      (before, after) => after.circlePatternElements > 0 && after.circlePatternElements >= before.circlePatternElements
+    )
+
+    await performAndAssert(
       'Pattern Settings → Pattern remains after hover',
       () => {
         const allSvgs = canvasElement.querySelectorAll('svg')
