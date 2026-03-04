@@ -65,7 +65,8 @@ $theme: (
 .cove-visualization.type-data-bite,
 .cove-visualization.type-filtered-text,
 .cove-visualization.type-chart,
-.cove-visualization.type-chart.type-sparkline {
+.cove-visualization.type-chart.type-sparkline,
+.cove-visualization.type-map {
   @each $theme-name, $theme-colors in $theme {
 
     // Header

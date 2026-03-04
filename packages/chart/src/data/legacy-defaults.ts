@@ -13,5 +13,6 @@ export const LEGACY_CHART_DEFAULTS: Record<string, Record<string, unknown>> = {
   table: { expanded: true, dateDisplayFormat: '' },
   legend: { position: 'right' },
   dataFormat: { commas: false },
-  tooltips: { dateDisplayFormat: '' }
+  tooltips: { dateDisplayFormat: '' },
+  visual: { border: false, accent: false, background: false }
 }

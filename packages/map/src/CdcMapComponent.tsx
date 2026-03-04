@@ -421,11 +421,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
             )}
             {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
               <section
-                className={buildSectionClassNames(
-                  currentViewport,
-                  headerColor,
-                  config?.runtime?.editorErrorMessage.length > 0
-                )}
+                className={buildSectionClassNames(currentViewport, config?.runtime?.editorErrorMessage.length > 0)}
                 aria-label={'Map: ' + title}
                 ref={innerContainerRef}
               >
@@ -520,7 +516,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       formatLegendLocation={key =>
                         formatLegendLocation(key, dataTableRuntimeData?.[key]?.[config.columns.geo.name])
                       }
-                      headerColor={general.headerColor}
                       imageRef={imageId}
                       indexTitle={table.indexLabel}
                       innerContainerRef={innerContainerRef}
