@@ -1,6 +1,5 @@
 // Imports
 @import 'utils/properties';
-@import 'base/reset';
 
 body.post-type-cdc_visualization .visx-tooltip {
   z-index: 1000000;
@@ -11,6 +10,8 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
 }
 
 .cove-visualization {
+  @import 'base/reset';
+
   position: relative;
   margin: 0;
   font-family: var(--app-font-main);
