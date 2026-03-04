@@ -145,6 +145,14 @@ $theme: (
         background-color: string.unquote(list.nth($theme-colors, 1));
         color: #fff;
       }
+
+      .button__tab-bar--active {
+        outline: 2px solid string.unquote(list.nth($theme-colors, 1));
+      }
+
+      .apply:not([disabled]) {
+        background-color: string.unquote(list.nth($theme-colors, 1));
+      }
     }
 
     .theme-#{$theme-name} {
