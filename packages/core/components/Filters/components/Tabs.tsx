@@ -28,11 +28,11 @@ const Tabs: React.FC<TabsProps> = ({ filter, index: outerIndex, changeFilterActi
         classList = ['button__tab-bar', isActive && 'button__tab-bar--active']
         break
       case 'pill':
-        classList = ['pill', isActive && 'pill--active', theme && theme]
+        classList = ['pill', isActive && 'pill--active']
         break
       default:
         const tabSimple = filter.filterStyle === 'tab-simple' && 'tab--simple'
-        classList = ['tab', isActive && 'tab--active', theme && theme, tabSimple]
+        classList = ['tab', isActive && 'tab--active', tabSimple]
         break
     }
     return classList.filter(Boolean).join(' ')
