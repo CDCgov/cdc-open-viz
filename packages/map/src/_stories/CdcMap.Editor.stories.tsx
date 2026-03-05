@@ -2189,22 +2189,29 @@ export const VisualSectionTests: StoryObj<typeof CdcMap> = {
     await performAndAssert(
       'Header Theme → Select purple theme',
       () => {
-        const innerContainer = canvasElement.querySelector('.cdc-map-inner-container')
-        const currentTheme = Array.from(innerContainer?.classList || []).find(cls => cls.startsWith('theme-'))
+        // Check via the HeaderThemeSelector's selected button state
+        const colorPalettes = canvasElement.querySelectorAll('.color-palette')
+        const themeColorPalette = Array.from(colorPalettes).find(palette =>
+          Array.from(palette.querySelectorAll('button')).some(btn => btn.classList.contains('theme-purple'))
+        )
+        const selectedThemeBtn = themeColorPalette?.querySelector('button.selected') as HTMLElement | null
         return {
-          currentTheme: currentTheme || ''
+          currentTheme: selectedThemeBtn
+            ? Array.from(selectedThemeBtn.classList).find(cls => cls.startsWith('theme-')) || ''
+            : ''
         }
       },
       async () => {
-        // Find the color palette and click on the purple theme button
-        const colorPalette = canvasElement.querySelector('.color-palette')
-        const purpleTheme = Array.from(colorPalette?.querySelectorAll('button') || []).find(button =>
-          button.classList.contains('theme-purple')
-        ) as HTMLElement
+        // Find the header theme selector and click purple
+        const colorPalettes = canvasElement.querySelectorAll('.color-palette')
+        const themeColorPalette = Array.from(colorPalettes).find(palette =>
+          Array.from(palette.querySelectorAll('button')).some(btn => btn.classList.contains('theme-purple'))
+        )
+        const purpleTheme = themeColorPalette?.querySelector('button.theme-purple') as HTMLElement
         await userEvent.click(purpleTheme)
       },
       (before, after) => {
-        // After clicking, the header should have the purple theme
+        // After clicking, the purple theme button should be selected
         return after.currentTheme === 'theme-purple'
       }
     )
