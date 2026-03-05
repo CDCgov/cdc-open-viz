@@ -5,6 +5,7 @@ import { VizFilter } from '@cdc/core/types/VizFilter'
 export type Config = {
   type: string
   data: Object[]
+  dataMetadata?: Record<string, string>
   dataBite: string
   dataFunction: string
   dataColumn: string

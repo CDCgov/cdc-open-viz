@@ -5,12 +5,13 @@ export type MarkupCondition = {
 }
 
 export type MarkupVariable = {
-  columnName: string
+  columnName?: string
   conditions: MarkupCondition[]
   name: string
   tag: string
   addCommas?: boolean
   hideOnNull?: boolean
+  metadataKey?: string
 }
 
 export type MarkupConfig = {

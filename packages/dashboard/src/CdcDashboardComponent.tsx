@@ -209,9 +209,9 @@ export default function CdcDashboard({
 
           setAPILoading(true)
           await fetchRemoteData(dataUrlFinal)
-            .then(responseData => {
-              let data: any[] = responseData
-              if (responseData && dataset.dataDescription) {
+            .then(({ data: fetchedData, dataMetadata }) => {
+              let data: any[] = fetchedData
+              if (data && dataset.dataDescription) {
                 try {
                   data = transform.autoStandardize(data)
                   data = transform.developerStandardize(data, dataset.dataDescription)
@@ -221,6 +221,7 @@ export default function CdcDashboard({
                 }
               }
               newDatasets[datasetKey].data = data
+              newDatasets[datasetKey].dataMetadata = dataMetadata
               newDatasets[datasetKey].runtimeDataUrl = dataUrlFinal
               newData[datasetKey] = data
             })

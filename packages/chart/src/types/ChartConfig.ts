@@ -156,6 +156,7 @@ export type AllChartsConfig = {
   columns: ChartColumns
   confidenceKeys: ConfidenceInterval
   data: Object[]
+  dataMetadata?: Record<string, string>
   dataUrl: string
   dataCutoff: number
   dataDescription: Partial<DataDescription>

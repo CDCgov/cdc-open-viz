@@ -1,6 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { faker } from '@faker-js/faker'
-import { waitForOptionsToPopulate, performAndAssert } from '@cdc/core/helpers/testing'
+import {
+  waitForOptionsToPopulate,
+  performAndAssert,
+  assertVisualizationRendered,
+  waitForPresence
+} from '@cdc/core/helpers/testing'
 import APIFiltersMapData from './_mock/api-filter-map.json'
 import APIFiltersChartData from './_mock/api-filter-chart.json'
 import APIFilterErrorConfig from './_mock/api-filter-error.json'
@@ -4747,6 +4752,19 @@ export const Nested_Dropdown_With_Parent_Child: Story = {
         after.yearQuarterOptions.some(opt => opt.includes('2024')) &&
         after.chartRendered
     )
+  }
+}
+
+export const Metadata_In_Dashboard: Story = {
+  args: {
+    configUrl: '/packages/dashboard/tests/fixtures/dashboard-config-with-metadata.json'
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    const subtext = await waitForPresence('.subtext', canvasElement)
+    expect(subtext?.textContent).toContain('January 15, 2026')
+    const biteSubtext = await waitForPresence('.bite-subtext', canvasElement)
+    expect(biteSubtext?.textContent).toContain('CDC NREVSS')
   }
 }
 

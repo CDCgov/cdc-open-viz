@@ -10,6 +10,7 @@ import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
 import ConfigContext from './ConfigContext'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import EditorPanel from '../src/components/EditorPanel'
 import defaults from './data/initial-state'
 
@@ -111,8 +112,9 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     let responseData = response.data ?? {}
 
     if (response.dataUrl) {
-      const dataString = await fetch(response.dataUrl)
-      responseData = await dataString.json()
+      const { data, dataMetadata } = await fetchRemoteData(response.dataUrl)
+      responseData = data
+      response.dataMetadata = dataMetadata
     }
 
     response.data = responseData
@@ -255,7 +257,8 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         filters: config?.filters || [],
         datasets,
         configDataKey: config?.dataKey,
-        locale: config?.locale
+        locale: config?.locale,
+        dataMetadata: config?.dataMetadata
       })
     : { processedContent: parseBodyMarkup(urlMarkup), shouldHideSection: false, shouldShowNoDataMessage: false }
 
@@ -312,6 +315,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
           markupVariables={markupVariables}
           enableMarkupVariables={config?.enableMarkupVariables}
           data={data}
+          dataMetadata={config?.dataMetadata}
         />
       </div>
     )
