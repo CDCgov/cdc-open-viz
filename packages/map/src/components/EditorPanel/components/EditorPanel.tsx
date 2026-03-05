@@ -3401,7 +3401,9 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         <span className='edit-label'>Show Data with Zero's on Bubble Map</span>
                       </label>
                     )}
-                    {(config.general.geoType === 'world' || config.general.geoType === 'single-state') && (
+                    {(config.general.geoType === 'world' ||
+                      config.general.geoType === 'single-state' ||
+                      config.general.geoType === 'us-county') && (
                       <label className='checkbox'>
                         <input
                           type='checkbox'
