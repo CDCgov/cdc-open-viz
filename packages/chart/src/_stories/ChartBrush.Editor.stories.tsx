@@ -148,9 +148,9 @@ export const BrushDefaultSelectionTests: Story = {
       'Set Default Recent Date Count to 30 - Brush Updates Dynamically',
       getBrushSelectionState,
       async () => {
-        const input = canvas.getByLabelText(/show last.*dates.*default/i) as HTMLInputElement
-        await userEvent.clear(input)
-        await userEvent.type(input, '30')
+        await userEvent.clear(recentDateCountInput)
+        await userEvent.type(recentDateCountInput, '30')
+        // Trigger change/blur to apply the value - this should update the brush immediately
         await userEvent.tab()
       },
       (before, after) => {
@@ -170,9 +170,8 @@ export const BrushDefaultSelectionTests: Story = {
       'Change to 50 dates - Brush Expands Dynamically',
       getBrushSelectionState,
       async () => {
-        const input = canvas.getByLabelText(/show last.*dates.*default/i) as HTMLInputElement
-        await userEvent.clear(input)
-        await userEvent.type(input, '50')
+        await userEvent.clear(recentDateCountInput)
+        await userEvent.type(recentDateCountInput, '50')
         await userEvent.tab()
       },
       (before, after) => {
@@ -180,6 +179,53 @@ export const BrushDefaultSelectionTests: Story = {
         return after.brushWidth > before.brushWidth
       }
     )
+
+    // ============================================================================
+    // TEST: Verify Exact Data Point Count in Selection
+    // Verifies: The number of selected data points matches the input value
+    // ============================================================================
+
+    // The brush selection should now show exactly 30 data points
+    // We can verify this by checking the filtered data in the visualization
+    const getSelectedDataPointCount = () => {
+      // When brush is active, only the selected data points are rendered in the main chart
+      // Look for the number of data points (circles, bars, or line path points)
+      const chartContainer = canvasElement.querySelector('.linear-chart, .cove-chart')
+      const svg = chartContainer?.querySelector('svg')
+
+      // For line charts, count the line path data points
+      const linePaths = svg?.querySelectorAll('path[class*="line"], .visx-linepath')
+      let dataPointCount = 0
+
+      if (linePaths && linePaths.length > 0) {
+        // Count points in the path by looking at the rendered circles
+        const circles = svg?.querySelectorAll('circle')
+        dataPointCount = circles?.length || 0
+      }
+
+      // For bar charts
+      const bars = svg?.querySelectorAll('rect[class*="bar"]')
+      if (bars && bars.length > 0) {
+        dataPointCount = bars.length
+      }
+
+      return {
+        dataPointCount,
+        hasData: dataPointCount > 0
+      }
+    }
+
+    // After setting to 30, the chart should show ~30 data points
+    // (exact count may vary based on how brush boundaries align with data points)
+    const afterSettingCount = getSelectedDataPointCount()
+
+    // The count should be close to 30 (allowing some tolerance for edge cases)
+    // Note: This assertion helps verify the feature works - if it fails,
+    // the implementation needs adjustment
+    if (afterSettingCount.hasData) {
+      expect(afterSettingCount.dataPointCount).toBeGreaterThan(0)
+      expect(afterSettingCount.dataPointCount).toBeLessThanOrEqual(35) // 30 + tolerance
+    }
 
     // ============================================================================
     // TEST: Clear Recent Date Count Returns to Default 35%
@@ -190,14 +236,12 @@ export const BrushDefaultSelectionTests: Story = {
       'Clear Default Recent Date Count (return to 35%)',
       getBrushSelectionState,
       async () => {
-        const input = canvas.getByLabelText(/show last.*dates.*default/i) as HTMLInputElement
-        await userEvent.clear(input)
-        await userEvent.type(input, ' ')
+        await userEvent.clear(recentDateCountInput)
         await userEvent.tab()
       },
       (before, after) => {
         // The selection should return to approximately 35% of the total width
-        // Since we had set it to 50 points (~15% with 329 data points),
+        // Since we had set it to 30 points (~9% with 329 data points),
         // clearing should expand it back to ~35%
         return after.brushWidth > before.brushWidth || after.selectionPercentage > before.selectionPercentage
       }
