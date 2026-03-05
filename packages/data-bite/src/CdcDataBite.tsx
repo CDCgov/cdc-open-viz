@@ -367,6 +367,14 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
         const rawValue = sourceData[0][dataColumn]
         dataBite = rawValue !== undefined && rawValue !== null ? String(rawValue) : ''
       }
+
+      if (typeof numberFromString(dataBite) === 'number') {
+        dataBite = applyPrecision(dataBite)
+        if (config.dataFormat.commas) {
+          dataBite = applyLocaleString(dataBite)
+        }
+      }
+
       return includePrefixSuffix ? dataFormat.prefix + dataBite + dataFormat.suffix : dataBite
     }
 
@@ -629,6 +637,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       isTp5 ? 'bite__style--tp5' : '',
       isTp5 && config.visual?.whiteBackground ? 'white-background-style' : '',
       isTp5 && config.visual?.whiteBackground && config.visual?.border ? 'display-border' : '',
+      isTp5 && config.visual?.useWrap ? 'use-wrap' : '',
       !config.visual?.border ? 'no-borders' : ''
     ]
       .filter(Boolean)
