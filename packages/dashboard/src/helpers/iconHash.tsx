@@ -20,7 +20,16 @@ export const iconHash = {
   'filtered-text': <Icon display='filtered-text' base />,
   dashboardFilters: <Icon display='dashboardFilters' base />,
   table: <Icon display='table' base />,
-  Sankey: <Icon display='sankey' base />
+  Sankey: <Icon display='sankey' base />,
+  Combo: <Icon display='chartBar' base />,
+  'Scatter Plot': <Icon display='chartBar' base />,
+  'Area Chart': <Icon display='chartLine' base />,
+  'Deviation Bar': <Icon display='chartBar' base />,
+  'Paired Bar': <Icon display='chartBar' base />,
+  'Box Plot': <Icon display='chartBar' base />,
+  'Forest Plot': <Icon display='chartBar' base />,
+  Forecasting: <Icon display='chartLine' base />,
+  'Warming Stripes': <Icon display='chartBar' base />
 }
 
 export const getIcon = (visualization: AnyVisualization) => {
