@@ -312,7 +312,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                 value={config.visual?.useWrap}
                 section='visual'
                 fieldName='useWrap'
-                label='Use Wrap Layout'
+                label='Value Above Message'
                 updateField={updateField}
               />
               {/* TODO: Uncomment when ready to release Display Border feature
