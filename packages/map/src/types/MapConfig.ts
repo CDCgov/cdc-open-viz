@@ -39,9 +39,9 @@ type MapVisualSettings = {
 }
 
 export type PatternSelection = {
-  // dropdown selection for getting the column used on a pattern
+  // column used to match patterns; empty string means match dataValue across all row columns
   dataKey: string
-  // text field input to match values found in the column
+  // value to match (numeric-like values are compared numerically)
   dataValue: string
   // style of pattern to use
   pattern: 'lines' | 'circles' | 'waves'

@@ -48,7 +48,7 @@ import {
   SVG_WIDTH
 } from '../../../helpers'
 import { hashObj } from '@cdc/core/helpers/hashObj'
-import { patternValuesMatch } from '../../../helpers/patternMatching'
+import { getMatchingPatternForRow } from '../../../helpers/getMatchingPatternForRow'
 const { features: unitedStatesHex } = topoFeature(hexTopoJSON, hexTopoJSON.objects.states)
 
 const offsets = {
@@ -490,15 +490,20 @@ const UsaMap = () => {
               <path tabIndex={-1} className='single-geo' strokeWidth={1} d={path} />
 
               {/* apply patterns on top of state path*/}
-              {map?.patterns?.map((patternData, _patternIndex) => {
-                const { pattern, dataKey, size } = patternData
+              {(() => {
+                const matchedPattern = getMatchingPatternForRow(geoData, map?.patterns)
+
+                if (!matchedPattern) {
+                  return null
+                }
+
+                const { pattern: patternData, matchedDataKey } = matchedPattern
+                const { pattern, size } = patternData
                 const currentFill = styles.fill
-                const hasMatchingValues = patternValuesMatch(patternData.dataValue, geoData?.[patternData.dataKey])
                 const patternColor = patternData.color || getContrastColor('#000', currentFill)
-                const sanitizedDataKey = sanitizeToSvgId(dataKey)
+                const sanitizedDataKey = sanitizeToSvgId(matchedDataKey)
                 const patternId = `${mapId}--${sanitizedDataKey}--${geoIndex}`
 
-                if (!hasMatchingValues) return
                 checkColorContrast(currentFill, patternColor)
 
                 return (
@@ -533,7 +538,7 @@ const UsaMap = () => {
                       />
                     )}
                     <path
-                      className={`pattern-geoKey--${dataKey}`}
+                      className={`pattern-geoKey--${matchedDataKey}`}
                       tabIndex={-1}
                       stroke='transparent'
                       d={path}
@@ -541,7 +546,7 @@ const UsaMap = () => {
                     />
                   </>
                 )
-              })}
+              })()}
               {(displayAsHex || showLabel) && geoLabel(geo, legendColors[0], projection)}
               {displayAsHex && hexMap.type === 'shapes' && getArrowDirection(geoData, geo, legendColors[0])}
             </g>

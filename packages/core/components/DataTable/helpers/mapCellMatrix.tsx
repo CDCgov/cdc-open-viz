@@ -5,6 +5,7 @@ import { ReactNode } from 'react'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import _ from 'lodash'
 import { hashObj } from '../../../helpers/hashObj'
+import { sanitizeToSvgId } from '../../../helpers/cove/string'
 
 type MapRowsProps = DataTableProps & {
   rows: string[]
@@ -129,6 +130,7 @@ const mapCellArray = ({
           // Check for pattern information
           const patternInfo = getPatternForRow(rowObj, config)
           const mapId = config.runtime?.uniqueId || 'map'
+          const sanitizedPatternDataKey = sanitizeToSvgId(patternInfo?.dataKey || '')
 
           return (
             <div className='col-12'>
@@ -138,7 +140,7 @@ const mapCellArray = ({
                     fill={legendColor[0]}
                     patternInfo={{
                       pattern: patternInfo.pattern,
-                      patternId: `${mapId}--${patternInfo.dataKey}--${patternInfo.patternIndex}--table`,
+                      patternId: `${mapId}--${sanitizedPatternDataKey}--${patternInfo.patternIndex}--table`,
                       size: patternInfo.size,
                       color: patternInfo.color
                     }}

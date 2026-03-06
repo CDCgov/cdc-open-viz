@@ -1,5 +1,5 @@
 import { MapConfig } from '../types/MapConfig'
-import { patternValuesMatch } from './patternMatching'
+import { getMatchingPatternForRow } from './getMatchingPatternForRow'
 
 interface PatternInfo {
   pattern?: string
@@ -10,25 +10,18 @@ interface PatternInfo {
 }
 
 export const getPatternForRow = (rowObj: Record<string, any>, config: MapConfig): PatternInfo | null => {
-  if (!config.map?.patterns || !rowObj) {
+  const matchedPattern = getMatchingPatternForRow(rowObj, config.map?.patterns)
+
+  if (!matchedPattern) {
     return null
   }
 
-  // Find a pattern that matches this row's data
-  for (let i = 0; i < config.map.patterns.length; i++) {
-    const patternData = config.map.patterns[i]
-    const hasMatchingValues = patternValuesMatch(patternData.dataValue, rowObj[patternData.dataKey])
-
-    if (hasMatchingValues) {
-      return {
-        pattern: patternData.pattern,
-        dataKey: patternData.dataKey,
-        size: patternData.size,
-        patternIndex: i,
-        color: patternData.color
-      }
-    }
+  return {
+    pattern: matchedPattern.pattern.pattern,
+    // Broad matches resolve to the row key that matched, so IDs/classes stay stable.
+    dataKey: matchedPattern.matchedDataKey,
+    size: matchedPattern.pattern.size,
+    patternIndex: matchedPattern.patternIndex,
+    color: matchedPattern.pattern.color
   }
-
-  return null
 }

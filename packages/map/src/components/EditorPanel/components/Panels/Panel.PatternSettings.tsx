@@ -217,6 +217,9 @@ const PatternSettings = ({ name }: PanelProps) => {
                           handlePatternFieldUpdate('dataKey', value, patternIndex)
                         }
                       />
+                      <p className='edit-label mb-2'>
+                        Leave Data Key as &quot;Select&quot; to match this value across all columns.
+                      </p>
                       <label htmlFor={`pattern-dataValue--${patternIndex}`}>
                         Data Value:
                         <input
