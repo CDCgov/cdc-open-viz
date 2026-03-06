@@ -62,8 +62,9 @@ const ChartHeader = ({
     if (columnHeaderText === notApplicableText) return
 
     return (
-      <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'
-        }  order`}</span>
+      <span className='cdcdataviz-sr-only'>{`Press command, modifier, or enter key to sort by ${columnHeaderText} in ${
+        sortBy.column !== columnHeaderText ? 'ascending' : sortBy.column === 'desc' ? 'descending' : 'ascending'
+      }  order`}</span>
     )
   }
 
@@ -101,14 +102,13 @@ const ChartHeader = ({
           const text = getSeriesName(column, config)
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
-          const isSortedCol = column === sortBy.column && !hasRowType
 
           return (
             <th
               style={{
                 minWidth: (config.table.cellMinWidth || 0) + 'px',
                 textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
-                paddingRight: isSortedCol ? '1.3em' : ''
+                paddingRight: '1.3em'
               }}
               key={`col-header-${column}__${index}`}
               tabIndex={0}
@@ -123,7 +123,9 @@ const ChartHeader = ({
                   eventAction: 'click',
                   eventLabel: interactionLabel,
                   vizTitle: getVizTitle(config),
-                  specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                  specifics: `column: ${newSortBy.column || 'none'}, order: ${
+                    newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'
+                  }`
                 })
                 setSortBy(newSortBy)
               }}
@@ -137,11 +139,14 @@ const ChartHeader = ({
                     eventAction: 'keyboard',
                     eventLabel: interactionLabel,
                     vizTitle: getVizTitle(config),
-                    specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                    specifics: `column: ${newSortBy.column || 'none'}, order: ${
+                      newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'
+                    }`
                   })
                   setSortBy(newSortBy)
                 }
               }}
+              className={sortBy.column === column ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
               {...(sortBy.column === column
                 ? sortBy.asc
                   ? { 'aria-sort': 'ascending' }
@@ -149,7 +154,7 @@ const ChartHeader = ({
                 : null)}
             >
               <ColumnHeadingText text={text} config={config} />
-              {isSortedCol && <SortIcon ascending={sortByAsc} />}
+              <SortIcon ascending={sortByAsc} />
               <ScreenReaderSortByText sortBy={sortBy} config={config} text={text} />
             </th>
           )
@@ -169,13 +174,12 @@ const ChartHeader = ({
             row !== '__series__' ? getChartCellValue(row, column, config, data, rightAxisItemsMap) : '__series__'
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.colIndex === index ? sortBy.asc : undefined
-          const isSortedCol = index === sortBy.colIndex && !hasRowType
           return (
             <th
               style={{
                 minWidth: (config.table.cellMinWidth || 0) + 'px',
                 textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
-                paddingRight: isSortedCol ? '1.3em' : ''
+                paddingRight: '1.3em'
               }}
               key={`col-header-${text}__${index}`}
               tabIndex={0}
@@ -190,7 +194,9 @@ const ChartHeader = ({
                   eventAction: 'click',
                   eventLabel: interactionLabel,
                   vizTitle: getVizTitle(config),
-                  specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                  specifics: `column: ${newSortBy.column || 'none'}, order: ${
+                    newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'
+                  }`
                 })
                 setSortBy(newSortBy)
               }}
@@ -203,11 +209,14 @@ const ChartHeader = ({
                     eventAction: 'keyboard',
                     eventLabel: interactionLabel,
                     vizTitle: getVizTitle(config),
-                    specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                    specifics: `column: ${newSortBy.column || 'none'}, order: ${
+                      newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'
+                    }`
                   })
                   setSortBy(newSortBy)
                 }
               }}
+              className={sortBy.colIndex === index ? (sortBy.asc ? 'sort sort-asc' : 'sort sort-desc') : 'sort'}
               {...(sortBy.column === text
                 ? sortBy.asc
                   ? { 'aria-sort': 'ascending' }
@@ -215,7 +224,7 @@ const ChartHeader = ({
                 : null)}
             >
               <ColumnHeadingText text={text} config={config} />
-              {isSortedCol && <SortIcon ascending={sortByAsc} />}
+              <SortIcon ascending={sortByAsc} />
 
               <ScreenReaderSortByText text={text} config={config} sortBy={sortBy} />
             </th>

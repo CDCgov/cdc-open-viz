@@ -14,7 +14,8 @@ export default {
     showVertical: true,
     dateDisplayFormat: '',
     showMissingDataLabel: true,
-    showSuppressedSymbol: true
+    showSuppressedSymbol: true,
+    defaultSort: {}
   },
   columns: {},
   dataFormat: {}
