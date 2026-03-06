@@ -57,6 +57,7 @@ import generateRuntimeData from '../../../helpers/generateRuntimeData'
 import '@cdc/core/components/EditorPanel/editor.scss'
 import './editorPanel.styles.css'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
+import CustomSortOrder from '@cdc/core/components/EditorPanel/CustomSortOrder'
 import { Datasets } from '@cdc/core/types/DataSet'
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
@@ -2925,6 +2926,66 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         label='Show collapse below table'
                         updateField={updateField}
                       />
+                      <Select
+                        value={config.table.defaultSort?.column || ''}
+                        fieldName='column'
+                        section='table'
+                        subsection='defaultSort'
+                        label='Default Sort Column'
+                        initial='-Select-'
+                        options={Object.keys(config.columns)
+                          .filter(key => config.columns[key].dataTable !== false && config.columns[key].name)
+                          .map(key => ({
+                            label: config.columns[key].label || config.columns[key].name || key,
+                            value: key
+                          }))}
+                        updateField={(_section, _subSection, _fieldName, value) => {
+                          if (value === '' || value === '-Select-') {
+                            updateField('table', null, 'defaultSort', {})
+                          } else {
+                            updateField('table', null, 'defaultSort', { column: value, sortDirection: 'asc' })
+                          }
+                        }}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Choose a column to sort the data table by when it first loads.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                      {config.table.defaultSort?.column && (
+                        <Select
+                          value={config.table.defaultSort?.sortDirection || 'asc'}
+                          fieldName='sortDirection'
+                          section='table'
+                          subsection='defaultSort'
+                          label='Sort Direction'
+                          options={[
+                            { label: 'Ascending', value: 'asc' },
+                            { label: 'Descending', value: 'desc' },
+                            { label: 'Custom', value: 'custom' }
+                          ]}
+                          updateField={(_section, _subSection, _fieldName, value) => {
+                            const newDefaultSort = { ...config.table.defaultSort, sortDirection: value }
+                            if (value !== 'custom') delete newDefaultSort.customOrder
+                            updateField('table', null, 'defaultSort', newDefaultSort)
+                          }}
+                        />
+                      )}
+                      {config.table.defaultSort?.column && config.table.defaultSort?.sortDirection === 'custom' && (
+                        <CustomSortOrder
+                          column={
+                            config.columns[config.table.defaultSort.column]?.name || config.table.defaultSort.column
+                          }
+                          data={config.data}
+                          customOrder={config.table.defaultSort.customOrder}
+                          updateField={updateField}
+                        />
+                      )}
                       <CheckBox
                         value={config.table.download}
                         fieldName='download'
