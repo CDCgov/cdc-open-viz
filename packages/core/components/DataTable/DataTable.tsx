@@ -6,6 +6,7 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import Loading from '@cdc/core/components/Loading'
 import DownloadButton from '../DownloadButton'
 import { customSort } from './helpers/customSort'
+import { applyCustomOrder } from './helpers/applyCustomOrder'
 import ChartHeader from './components/ChartHeader'
 import BoxplotHeader from './components/BoxplotHeader'
 import MapHeader from './components/MapHeader'
@@ -31,7 +32,6 @@ export type DataTableProps = {
   columns?: Record<string, Column>
   config: TableConfig
   dataConfig?: Object
-  defaultSortBy?: string
   displayGeoName?: (row: string) => string
   expandDataTable: boolean
   formatLegendLocation?: (row: string, runtimeLookup: string) => string
@@ -74,7 +74,6 @@ const DataTable = (props: DataTableProps) => {
     columns,
     config,
     dataConfig,
-    defaultSortBy,
     displayGeoName,
     expandDataTable,
     formatLegendLocation,
@@ -104,11 +103,32 @@ const DataTable = (props: DataTableProps) => {
   }, [parentRuntimeData, config.table.pivot?.columnName, config.table.pivot?.valueColumns])
 
   const [expanded, setExpanded] = useState(expandDataTable)
-  const [sortBy, setSortBy] = useState<any>({
-    column: defaultSortBy || '',
-    asc: false,
-    colIndex: null
+
+  // Initialize sort state from config.table.defaultSort
+  const defaultSort = config.table?.defaultSort
+  const [sortBy, setSortBy] = useState<any>(() => {
+    if (defaultSort?.column) {
+      return {
+        column: defaultSort.column,
+        asc: defaultSort.sortDirection === 'asc' ? true : defaultSort.sortDirection === 'custom' ? null : false,
+        colIndex: null
+      }
+    }
+    return { column: '', asc: false, colIndex: null }
   })
+
+  // Re-sync sort state when defaultSort changes in the editor
+  useEffect(() => {
+    if (defaultSort?.column) {
+      setSortBy({
+        column: defaultSort.column,
+        asc: defaultSort.sortDirection === 'asc' ? true : defaultSort.sortDirection === 'custom' ? null : false,
+        colIndex: null
+      })
+    } else {
+      setSortBy({ column: '', asc: false, colIndex: null })
+    }
+  }, [defaultSort?.column, defaultSort?.sortDirection, defaultSort?.customOrder])
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
 
@@ -155,6 +175,14 @@ const DataTable = (props: DataTableProps) => {
   }
 
   const rawRows = Object.keys(runtimeData).filter(column => column != 'columns')
+
+  // Determine if custom order sort is active (user hasn't overridden by clicking a column header)
+  const isCustomOrderActive =
+    sortBy.asc === null &&
+    defaultSort?.sortDirection === 'custom' &&
+    defaultSort?.customOrder?.length > 0 &&
+    sortBy.column === defaultSort.column
+
   const rows =
     isVertical && sortBy.column
       ? rawRows.sort((a, b) => {
@@ -172,6 +200,10 @@ const DataTable = (props: DataTableProps) => {
           if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date-time') {
             dataA = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[a][config.xAxis.dataKey])
             dataB = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[b][config.xAxis.dataKey])
+          }
+          // Use custom order when active
+          if (isCustomOrderActive && dataA !== undefined && dataB !== undefined) {
+            return applyCustomOrder(dataA, dataB, defaultSort.customOrder)
           }
           return dataA || dataB ? customSort(dataA, dataB, sortBy, config) : 0
         })

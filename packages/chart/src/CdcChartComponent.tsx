@@ -250,10 +250,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const { lineDatapointClass, contentClasses, sparkLineStyles } = useDataVizClasses(config)
   const legendId = useId()
 
-  const hasDateAxis =
-    (config.xAxis || config.yAxis) && ['date-time', 'date'].includes((config.xAxis || config.yAxis).type)
-  const dataTableDefaultSortBy = hasDateAxis && config.xAxis.dataKey
-
   const convertLineToBarGraph = isConvertLineToBarGraph(config, filteredData)
 
   // Declaratively calculate series keys for pie charts based on filtered data
@@ -391,6 +387,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     // Backfill missing properties from defaults, respecting legacy values
     backfillDefaults(newConfig, defaults, LEGACY_CHART_DEFAULTS)
+
+    // Auto-populate table.defaultSort for date-axis charts if not already set by user
+    const hasDateAxisType = ['date-time', 'date'].includes(newConfig.xAxis?.type)
+    if (hasDateAxisType && newConfig.xAxis?.dataKey && !newConfig.table?.defaultSort?.column) {
+      newConfig.table = {
+        ...newConfig.table,
+        defaultSort: { column: newConfig.xAxis.dataKey, sortDirection: 'desc' }
+      }
+    }
 
     const newExcludedData: any[] = getExcludedData(newConfig, dataOverride || stateData)
     dispatch({ type: 'SET_EXCLUDED_DATA', payload: newExcludedData })
@@ -1475,13 +1480,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       <DataTable
                         /* changing the "key" will force the table to re-render
                         when the default sort changes while editing */
-                        key={dataTableDefaultSortBy}
+                        key={config.table?.defaultSort?.column || ''}
                         config={dataTableConfig}
                         rawData={dataTableRawData}
                         runtimeData={dataTableRuntimeData}
                         expandDataTable={config.table.expanded}
                         columns={dataTableColumns}
-                        defaultSortBy={dataTableDefaultSortBy}
                         displayGeoName={name => name}
                         applyLegendToRow={applyLegendToRow}
                         tableTitle={config.table.label}
