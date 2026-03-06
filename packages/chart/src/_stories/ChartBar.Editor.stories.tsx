@@ -2912,10 +2912,11 @@ export const BarPatternSettingsTests: Story = {
         type: 'continuous',
         dataKey: 'y1'
       },
+      series: [{ dataKey: 'y1' }, { dataKey: 'y2' }, { dataKey: 'y3' }, { dataKey: 'y4' }],
       // Override with data suitable for pattern testing
       data: [
         { category: 'Q1', y1: 19000, y2: 47000, y3: 59000, y4: 91000 },
-        { category: 'Q2', y1: 18000, y2: 32000, y3: 68000, y4: 89000 },
+        { category: 'Q2', y1: 18000, y2: 32000, y3: 19000, y4: 89000 },
         { category: 'Q3', y1: 7000, y2: 38000, y3: 74000, y4: 89000 },
         { category: 'Q4', y1: 15000, y2: 41000, y3: 67000, y4: 95000 }
       ],
@@ -2950,8 +2951,10 @@ export const BarPatternSettingsTests: Story = {
       // Find pattern overlays (visual application of patterns)
       const patternOverlays = chartSvg?.querySelectorAll('.pattern-overlay') || []
 
-      // Find bars with pattern fills
-      const barsWithPatterns = chartSvg?.querySelectorAll('rect[fill*="url(#chart-pattern-"]') || []
+      // Find bars with pattern fills (works for both fragment refs and absolute URL refs)
+      const barsWithPatterns = Array.from(chartSvg?.querySelectorAll('path, rect') || []).filter(shape =>
+        (shape.getAttribute('fill') || '').includes('chart-pattern-')
+      )
 
       // Get pattern configuration UI state
       const patternConfigSections = canvasElement.querySelectorAll('.accordion__panel .accordion .accordion__item')
@@ -3100,6 +3103,43 @@ export const BarPatternSettingsTests: Story = {
 
         // Pattern overlays may appear for visual application
         expect(after.patternOverlaysCount).toBeGreaterThanOrEqual(before.patternOverlaysCount)
+
+        return true
+      }
+    )
+
+    await performAndAssert(
+      'Clear Pattern Data Key - Existing data value applies across all series',
+      getPatternVisualizationState,
+      async () => {
+        const dataKeyDropdown = canvasElement.querySelector('select[id*="pattern-datakey-"]') as HTMLSelectElement
+
+        if (dataKeyDropdown) {
+          await userEvent.selectOptions(dataKeyDropdown, '')
+        }
+      },
+      (before, after) => {
+        // Clearing data key should keep value matching active and broaden the match across series.
+        expect(after.hasBarsWithPatterns).toBe(true)
+        expect(after.barsWithPatternsCount).toBeGreaterThan(before.barsWithPatternsCount)
+
+        return true
+      }
+    )
+
+    await performAndAssert(
+      'Clear Pattern Data Value - Pattern stops rendering when value is empty',
+      getPatternVisualizationState,
+      async () => {
+        const dataValueInput = canvasElement.querySelector('input[id*="pattern-datavalue-"]') as HTMLInputElement
+
+        if (dataValueInput) {
+          await userEvent.clear(dataValueInput)
+        }
+      },
+      (before, after) => {
+        expect(before.barsWithPatternsCount).toBeGreaterThan(0)
+        expect(after.barsWithPatternsCount).toBe(0)
 
         return true
       }
