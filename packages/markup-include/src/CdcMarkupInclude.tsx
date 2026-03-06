@@ -272,7 +272,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         <Title
           title={title}
           isDashboard={isDashboard}
-          titleStyle={contentEditor.titleStyle}
+          titleStyle={contentEditor?.titleStyle}
           config={config}
           classes={[`${theme}`, 'mb-0']}
           noContent={!sanitizedHTML}
