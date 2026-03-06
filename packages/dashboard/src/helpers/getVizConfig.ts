@@ -98,8 +98,16 @@ export const getVizConfig = (
     }
   } else {
     const dataKey = visualizationConfig.dataKey || 'backwards-compatibility'
-    // Markup-includes need data even when shared filters exist (for markup variables)
-    const shouldClearData = sharedFilterColumns.length && visualizationConfig.type !== 'markup-include'
+    // Clear data for charts/maps when shared filters exist but filtered data
+    // hasn't arrived yet — prevents rendering the full unfiltered dataset as DOM.
+    // Lighter types (data-bite, waffle-chart, filtered-text, markup-include) are
+    // excluded: they only compute scalars or single elements, and their editor
+    // panels need data to populate column dropdowns. Ideally data filters would
+    // apply synchronously before render, but they currently go through the same
+    // async loadAPIFilters pipeline as API filters, so filtered data isn't
+    // available on first render.
+    const heavyVizTypes = ['chart', 'map']
+    const shouldClearData = sharedFilterColumns.length && heavyVizTypes.includes(visualizationConfig.type)
     visualizationConfig.data = shouldClearData ? [] : data[dataKey] || []
     if (visualizationConfig.formattedData) {
       visualizationConfig.formattedData =

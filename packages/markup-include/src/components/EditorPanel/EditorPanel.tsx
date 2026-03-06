@@ -67,7 +67,7 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
               updateField={updateField}
             />
             <Select
-              value={contentEditor.titleStyle || 'small'}
+              value={contentEditor?.titleStyle || 'small'}
               section='contentEditor'
               fieldName='titleStyle'
               label='Title Style'
