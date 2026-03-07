@@ -37,8 +37,8 @@ const Widget = ({
   const dispatch = useContext(DashboardDispatchContext)
 
   const [isEditing, setIsEditing] = useState(false)
-  const [toggleName, setToggleName] = useState(
-    columnData?.toggleName || labelHash[config?.visualizations[columnData?.widget]?.type] || ''
+  const [toggleName, setToggleName] = useState<string>(
+    columnData?.toggleName ?? labelHash[config?.visualizations[columnData?.widget]?.type] ?? ''
   )
 
   const transform = new DataTransform()

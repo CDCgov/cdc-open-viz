@@ -431,6 +431,15 @@ export default function CdcDashboard({
         state.data,
         state.filteredData
       )
+
+      // Ensure editing flag from the stored config is respected even if
+      // getVizConfig returns a minimal object (e.g., when rowNumber is undefined)
+      if (visualizationConfig && visualizationConfig.editing === undefined) {
+        const baseViz = state.config.visualizations[visualizationKey] as Visualization | undefined
+        if (baseViz && baseViz.editing !== undefined) {
+          visualizationConfig.editing = baseViz.editing
+        }
+      }
       visualizationConfig.uid = visualizationKey
       const setsSharedFilter =
         state.config.dashboard.sharedFilters &&
