@@ -378,8 +378,12 @@ export default function CdcDashboard({
   const updateChildConfig = (visualizationKey, newConfig) => {
     const config = cloneConfig(state.config)
     const updatedConfig = pick(config, ['visualizations', 'multiDashboards'])
-    updatedConfig.visualizations[visualizationKey] = newConfig
-    updatedConfig.visualizations[visualizationKey].formattedData = config.visualizations[visualizationKey].formattedData
+    updatedConfig.visualizations[visualizationKey] = {
+      ...newConfig,
+      formattedData: config.visualizations[visualizationKey].formattedData,
+      editing: config.visualizations[visualizationKey].editing,
+      showEditorPanel: config.visualizations[visualizationKey].showEditorPanel
+    }
     if (config.multiDashboards) {
       const activeDashboard = config.activeDashboard
       const multiDashboards = [...config.multiDashboards]
