@@ -2912,6 +2912,7 @@ export const BarPatternSettingsTests: Story = {
         type: 'continuous',
         dataKey: 'y1'
       },
+      series: [{ dataKey: 'y1' }, { dataKey: 'y2' }, { dataKey: 'y3' }, { dataKey: 'y4' }],
       // Override with data suitable for pattern testing
       data: [
         { category: 'Q1', y1: 19000, y2: 47000, y3: 59000, y4: 91000 },
@@ -2950,8 +2951,10 @@ export const BarPatternSettingsTests: Story = {
       // Find pattern overlays (visual application of patterns)
       const patternOverlays = chartSvg?.querySelectorAll('.pattern-overlay') || []
 
-      // Find bars with pattern fills
-      const barsWithPatterns = chartSvg?.querySelectorAll('rect[fill*="url(#chart-pattern-"]') || []
+      // Find bars with pattern fills (works for both fragment refs and absolute URL refs)
+      const barsWithPatterns = Array.from(chartSvg?.querySelectorAll('path, rect') || []).filter(shape =>
+        (shape.getAttribute('fill') || '').includes('chart-pattern-')
+      )
 
       // Get pattern configuration UI state
       const patternConfigSections = canvasElement.querySelectorAll('.accordion__panel .accordion .accordion__item')
