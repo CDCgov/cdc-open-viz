@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useReducer, useContext } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, useReducer, useContext, useRef } from 'react'
 import 'whatwg-fetch'
 import ResizeObserver from 'resize-observer-polyfill'
 
@@ -396,17 +396,31 @@ export default function CdcDashboard({
     }
   }
 
-  const resizeObserver = new ResizeObserver(entries => {
-    for (let entry of entries) {
-      let newViewport = getViewport(entry.contentRect.width)
-
-      setCurrentViewport(newViewport)
-    }
-  })
+  const resizeObserverRef = useRef<ResizeObserver | null>(null)
 
   const outerContainerRef = useCallback(node => {
+    if (resizeObserverRef.current) {
+      resizeObserverRef.current.disconnect()
+      resizeObserverRef.current = null
+    }
+
     if (node !== null) {
-      resizeObserver.observe(node)
+      resizeObserverRef.current = new ResizeObserver(entries => {
+        for (let entry of entries) {
+          const newViewport = getViewport(entry.contentRect.width)
+          setCurrentViewport(newViewport)
+        }
+      })
+      resizeObserverRef.current.observe(node)
+    }
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect()
+        resizeObserverRef.current = null
+      }
     }
   }, [])
 

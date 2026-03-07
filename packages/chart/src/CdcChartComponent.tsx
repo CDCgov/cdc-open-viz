@@ -1622,7 +1622,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
           currentViewport={currentViewport}
           ref={outerContainerRef}
           imageId={imageId}
-          editorPanel={<EditorPanel datasets={datasets} />}
+          editorPanel={!isLoading ? <EditorPanel datasets={datasets} /> : null}
         >
           {body}
         </VisualizationContainer>
