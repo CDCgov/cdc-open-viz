@@ -371,47 +371,6 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       }
     }
 
-    // Ensure Bootstrap rows with data bites stretch columns to equal height
-    .row:has([class*='bite__style']) {
-      display: flex !important;
-      align-items: stretch !important;
-
-      // Ensure Bootstrap columns are flex containers
-      [class*='col-'] {
-        display: flex !important;
-        flex-direction: column !important;
-
-        >* {
-          display: flex !important;
-          flex-direction: column !important;
-          flex: 1 !important;
-          min-height: 0;
-          width: 100%;
-        }
-      }
-    }
-
-    // Ensure Bootstrap rows with TP5 waffle/gauge charts stretch columns to equal height
-    .row:has(.waffle__style--tp5),
-    .row:has(.gauge__style--tp5) {
-      display: flex !important;
-      align-items: stretch !important;
-
-      // Ensure Bootstrap columns are flex containers
-      [class*='col-'] {
-        display: flex !important;
-        flex-direction: column !important;
-
-        >* {
-          display: flex !important;
-          flex-direction: column !important;
-          flex: 1 !important;
-          min-height: 0;
-          width: 100%;
-        }
-      }
-    }
-
     // TP5 adjustments when there are 2+ data bites in a row
     .row:has(.bite__style--tp5):has([class*='col-'] ~ [class*='col-']) {
       .bite__style--tp5 {
@@ -432,13 +391,6 @@ button.row-menu__btn[title*='Equal Height Rows'] {
 
       .waffle__style--tp5,
       .gauge__style--tp5 {
-
-        // Enable flex stretching only in dashboard rows
-        .cove-visualization__body {
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-        }
 
         .cdc-callout {
           flex: 1;
