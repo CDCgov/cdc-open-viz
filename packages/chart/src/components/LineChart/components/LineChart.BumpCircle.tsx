@@ -1,6 +1,4 @@
-import { useState } from 'react'
 import { Group } from '@visx/group'
-import { type Column } from '@cdc/core/types/Column'
 import React from 'react'
 import { type ChartConfig } from '../../../types/ChartConfig'
 import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
@@ -9,20 +7,16 @@ type LineChartBumpCircleProp = {
   config: ChartConfig
   xScale: any
   yScale: any
-  parseDate: any
 }
 
 const LineChartBumpCircle = (props: LineChartBumpCircleProp) => {
-  const { config, xScale, yScale, parseDate } = props
+  const { config, xScale, yScale } = props
 
   // get xScale and yScale...
   if (!config?.runtime?.series) return
 
   const handleX = xValue => {
-    if (config.xAxis.type === 'date') {
-      return parseDate(xValue).getTime()
-    }
-    if (config.xAxis.type === 'date-time') {
+    if (config.xAxis.type === 'date' || config.xAxis.type === 'date-time') {
       return new Date(xValue)
     }
     if (config.xAxis.type === 'categorical') {
@@ -34,20 +28,26 @@ const LineChartBumpCircle = (props: LineChartBumpCircleProp) => {
     return xScale.bandwidth ? xScale.bandwidth() / 2 + Number(xValue) : Number(xValue)
   }
 
-  const getListItems = dataRow => {
-    return Object.values(config.columns)
+  const getTooltip = (dataRow, series) => {
+    const xAxisLabel = config.xAxis.label || config.xAxis.dataKey
+    const xValue = dataRow[config.xAxis.dataKey]
+    const seriesLabel = series.label || series.dataKey
+    const rank = dataRow[series.dataKey]
+
+    const columnItems = Object.values(config.columns)
       ?.filter(column => column.tooltips)
       .map(column => {
         const label = column.label || column.name
-        return `
-        <li className='tooltip-body'>
-          <strong>${label}</strong>: ${dataRow[column.name]}
-        </li>`
+        return `<li class='tooltip-body'><strong>${label}</strong>: ${dataRow[column.name]}</li>`
       })
-      .join(' ')
-  }
+      .join('')
 
-  const getTooltip = dataRow => `<ul> ${getListItems(dataRow)} </ul>`
+    return `<ul>
+      <li class='tooltip-body'><strong>${xAxisLabel}</strong>: ${xValue}</li>
+      <li class='tooltip-body'><strong>${seriesLabel}</strong>: ${rank}</li>
+      ${columnItems}
+    </ul>`
+  }
 
   const circles = config.runtime?.series.map(series => {
     return config.data.map((d, dataIndex) => {
@@ -60,7 +60,7 @@ const LineChartBumpCircle = (props: LineChartBumpCircleProp) => {
               <>
                 <circle
                   key={`bump-circle-${series_dataKey}-${dataIndex}`}
-                  data-tooltip-html={getTooltip(d)}
+                  data-tooltip-html={getTooltip(d, series)}
                   data-tooltip-id={`bump-chart`}
                   r={10}
                   cx={Number(checkBandScale(xScale(handleX(axis_dataKey))))}
