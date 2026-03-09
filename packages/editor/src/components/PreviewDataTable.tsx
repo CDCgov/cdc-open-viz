@@ -20,13 +20,13 @@ import { errorMessages } from '../helpers/errorMessages'
 import { DataSet } from '@cdc/core/types/DataSet'
 import Icon from '@cdc/core/components/ui/Icon'
 
-const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }: any) => {
+const TableFilter = memo(({ globalFilter, setGlobalFilter = () => {}, disabled = false }: any) => {
   const [filterValue, setFilterValue] = useState(globalFilter ?? '')
 
   const [debouncedValue] = useDebounce(filterValue, 200)
 
   useEffect(() => {
-    if ('string' === typeof debouncedValue) {
+    if ('string' === typeof debouncedValue && typeof setGlobalFilter === 'function') {
       const nextFilter = debouncedValue.trim() ? debouncedValue : undefined
       if (nextFilter !== globalFilter) {
         setGlobalFilter(nextFilter)
