@@ -1,14 +1,23 @@
 import { useEffect, useId, useState } from 'react'
 import { VizFilter } from '../../../types/VizFilter'
 
-type TabsProps = {
-  filter: VizFilter
-  index: number
-  changeFilterActive: Function
-  theme: string
+type TabCompatibleFilter = {
+  filterStyle: string
+  values: string[]
+  active?: string | string[]
+  queuedActive?: string | string[]
+  labels?: Record<string, string>
 }
 
-const Tabs: React.FC<TabsProps> = ({ filter, index: outerIndex, changeFilterActive, theme }) => {
+type TabsProps = {
+  filter: VizFilter | TabCompatibleFilter
+  index: number
+  changeFilterActive: Function
+  theme?: string
+  loading?: boolean
+}
+
+const Tabs: React.FC<TabsProps> = ({ filter, index: outerIndex, changeFilterActive, loading }) => {
   const [selectedFilter, setSelectedFilter] = useState<EventTarget>(null)
 
   const id = useId()
@@ -21,7 +30,8 @@ const Tabs: React.FC<TabsProps> = ({ filter, index: outerIndex, changeFilterActi
   }, [selectedFilter])
 
   const getClassList = value => {
-    const isActive = filter.active === value
+    const activeValue = filter.queuedActive || filter.active
+    const isActive = activeValue === value
     let classList = []
     switch (filter.filterStyle) {
       case 'tab bar':
@@ -41,9 +51,11 @@ const Tabs: React.FC<TabsProps> = ({ filter, index: outerIndex, changeFilterActi
   const Tabs = filter.values.map((value, index) => {
     return (
       <button
+        type='button'
         key={`${value}-${outerIndex}-${index}-${id}`}
         id={`${value}-${outerIndex}-${index}-${id}`}
         className={getClassList(value)}
+        disabled={loading}
         onClick={e => {
           changeFilterActive(outerIndex, value)
           setSelectedFilter(e.target)
@@ -55,7 +67,7 @@ const Tabs: React.FC<TabsProps> = ({ filter, index: outerIndex, changeFilterActi
           }
         }}
       >
-        {value}
+        {filter.labels?.[value] || value}
       </button>
     )
   })
