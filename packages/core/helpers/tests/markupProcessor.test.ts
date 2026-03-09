@@ -325,6 +325,220 @@ describe('processMarkupVariables', () => {
     })
   })
 
+  describe('Metadata-Sourced Variables', () => {
+    it('should resolve metadata variable from dataMetadata', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Last Updated',
+          tag: '{{lastUpdated}}',
+          metadataKey: 'lastUpdated',
+          conditions: []
+        }
+      ]
+
+      const content = 'Data last updated {{lastUpdated}}'
+      const result = processMarkupVariables(content, testData, variables, {
+        dataMetadata: { lastUpdated: 'January 15, 2026' }
+      })
+
+      expect(result.processedContent).toBe('Data last updated January 15, 2026')
+      expect(result.shouldHideSection).toBe(false)
+      expect(result.shouldShowNoDataMessage).toBe(false)
+    })
+
+    it('should return empty string when dataMetadata does not contain the key', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Last Updated',
+          tag: '{{lastUpdated}}',
+          metadataKey: 'lastUpdated',
+          conditions: []
+        }
+      ]
+
+      const content = 'Data last updated {{lastUpdated}}'
+      const result = processMarkupVariables(content, testData, variables, {
+        dataMetadata: { source: 'CDC' }
+      })
+
+      expect(result.processedContent).toBe('Data last updated ')
+    })
+
+    it('should resolve metadata variable even when conditions are defined', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Last Updated',
+          tag: '{{lastUpdated}}',
+          metadataKey: 'lastUpdated',
+          conditions: [{ columnName: 'state', isOrIsNotEqualTo: 'is', value: 'California' }]
+        }
+      ]
+
+      const content = '{{lastUpdated}}'
+      const result = processMarkupVariables(content, testData, variables, {
+        dataMetadata: { lastUpdated: 'January 15, 2026' }
+      })
+
+      expect(result.processedContent).toBe('January 15, 2026')
+    })
+
+    it('should handle mixed metadata and column variables in the same content', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Last Updated',
+          tag: '{{lastUpdated}}',
+          metadataKey: 'lastUpdated',
+          conditions: []
+        },
+        {
+          name: 'State',
+          tag: '{{state}}',
+          columnName: 'state',
+          conditions: [{ columnName: 'state', isOrIsNotEqualTo: 'is', value: 'California' }]
+        }
+      ]
+
+      const content = '{{state}} data last updated {{lastUpdated}}'
+      const result = processMarkupVariables(content, testData, variables, {
+        dataMetadata: { lastUpdated: 'January 15, 2026' }
+      })
+
+      expect(result.processedContent).toBe('California data last updated January 15, 2026')
+    })
+
+    it('should not trigger columnName warning for metadata variable without columnName', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Source',
+          tag: '{{source}}',
+          metadataKey: 'source',
+          conditions: []
+        }
+      ]
+
+      const content = 'Source: {{source}}'
+      const result = processMarkupVariables(content, testData, variables, {
+        dataMetadata: { source: 'CDC NREVSS' }
+      })
+
+      expect(result.processedContent).toBe('Source: CDC NREVSS')
+    })
+
+    it('should return empty string for metadata variable when dataMetadata is empty', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Last Updated',
+          tag: '{{lastUpdated}}',
+          metadataKey: 'lastUpdated',
+          conditions: []
+        }
+      ]
+
+      const content: string = 'Updated: {{lastUpdated}}'
+      const result = processMarkupVariables(content, testData, variables, {
+        dataMetadata: {}
+      })
+
+      expect(result.processedContent).toBe('Updated: ')
+    })
+
+    it('should return empty string for metadata variable when dataMetadata is undefined', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Last Updated',
+          tag: '{{lastUpdated}}',
+          metadataKey: 'lastUpdated',
+          conditions: []
+        }
+      ]
+
+      const content = 'Updated: {{lastUpdated}}'
+      const result = processMarkupVariables(content, testData, variables)
+
+      expect(result.processedContent).toBe('Updated: ')
+    })
+
+    it('should format numeric metadata value with commas when addCommas is true', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Count',
+          tag: '{{count}}',
+          metadataKey: 'count',
+          conditions: [],
+          addCommas: true
+        }
+      ]
+
+      const content = 'Total: {{count}}'
+      const result = processMarkupVariables(content, testData, variables, {
+        dataMetadata: { count: '1234567' }
+      })
+
+      expect(result.processedContent).toBe('Total: 1,234,567')
+    })
+
+    it('should not format non-numeric metadata value even when addCommas is true', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Source',
+          tag: '{{source}}',
+          metadataKey: 'source',
+          conditions: [],
+          addCommas: true
+        }
+      ]
+
+      const content = 'Source: {{source}}'
+      const result = processMarkupVariables(content, testData, variables, {
+        dataMetadata: { source: 'CDC' }
+      })
+
+      expect(result.processedContent).toBe('Source: CDC')
+    })
+
+    it('should set shouldHideSection when metadata value is empty and allowHideSection is true', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Last Updated',
+          tag: '{{lastUpdated}}',
+          metadataKey: 'lastUpdated',
+          conditions: [],
+          hideOnNull: true
+        }
+      ]
+
+      const content = '{{lastUpdated}}'
+      const result = processMarkupVariables(content, testData, variables, {
+        dataMetadata: {},
+        allowHideSection: true,
+        isEditor: false
+      })
+
+      expect(result.shouldHideSection).toBe(true)
+    })
+
+    it('should not set shouldHideSection when metadata value exists', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Last Updated',
+          tag: '{{lastUpdated}}',
+          metadataKey: 'lastUpdated',
+          conditions: [],
+          hideOnNull: true
+        }
+      ]
+
+      const content = '{{lastUpdated}}'
+      const result = processMarkupVariables(content, testData, variables, {
+        dataMetadata: { lastUpdated: 'Jan 2026' },
+        allowHideSection: true,
+        isEditor: false
+      })
+
+      expect(result.shouldHideSection).toBe(false)
+    })
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty data array', () => {
       const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
@@ -468,5 +682,48 @@ describe('validateMarkupVariables', () => {
 
     const errors3 = validateMarkupVariables('not an array' as any, testData)
     expect(errors3).toHaveLength(0)
+  })
+
+  it('should skip columnName validation when variable has metadataKey', () => {
+    const variables: MarkupVariable[] = [
+      {
+        name: 'Last Updated',
+        tag: '{{lastUpdated}}',
+        metadataKey: 'lastUpdated',
+        conditions: []
+      }
+    ]
+
+    const errors = validateMarkupVariables(variables, testData)
+    expect(errors).toHaveLength(0)
+    expect(errors).not.toContain('Variable 1: Column name is required')
+  })
+
+  it('should still require columnName when neither metadataKey nor columnName is set', () => {
+    const variables: MarkupVariable[] = [
+      {
+        name: 'Bad Variable',
+        tag: '{{bad}}',
+        conditions: []
+      }
+    ]
+
+    const errors = validateMarkupVariables(variables, testData)
+    expect(errors).toContain('Variable 1: Column name is required')
+  })
+
+  it('should skip column-not-found validation when variable has metadataKey', () => {
+    const variables: MarkupVariable[] = [
+      {
+        name: 'Source',
+        tag: '{{source}}',
+        metadataKey: 'source',
+        conditions: []
+      }
+    ]
+
+    const errors = validateMarkupVariables(variables, testData)
+    expect(errors).toHaveLength(0)
+    expect(errors.find(e => e.includes('not found in data'))).toBeUndefined()
   })
 })
