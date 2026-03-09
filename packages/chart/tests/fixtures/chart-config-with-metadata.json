@@ -1,0 +1,29 @@
+{
+  "type": "chart",
+  "visualizationType": "Bar",
+  "dataUrl": "/packages/chart/tests/fixtures/data-with-metadata.json",
+  "enableMarkupVariables": true,
+  "markupVariables": [
+    {
+      "name": "Last Updated",
+      "tag": "{{lastUpdated}}",
+      "metadataKey": "lastUpdated",
+      "conditions": []
+    },
+    {
+      "name": "State",
+      "tag": "{{state}}",
+      "columnName": "STATE",
+      "conditions": []
+    }
+  ],
+  "description": "Data last updated {{lastUpdated}}",
+  "xAxis": {
+    "dataKey": "STATE"
+  },
+  "series": [
+    {
+      "dataKey": "Rate"
+    }
+  ]
+}

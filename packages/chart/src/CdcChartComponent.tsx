@@ -191,41 +191,32 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
     }
 
+    const markupOptions = {
+      isEditor,
+      filters: config.filters || [],
+      locale: config.locale,
+      dataMetadata: config.dataMetadata
+    }
+
     return {
       title: title
-        ? processMarkupVariables(title, config.data || [], config.markupVariables, {
-            isEditor,
-            filters: config.filters || [],
-            locale: config.locale
-          }).processedContent
+        ? processMarkupVariables(title, config.data || [], config.markupVariables, markupOptions).processedContent
         : title,
       superTitle: config.superTitle
-        ? processMarkupVariables(config.superTitle, config.data || [], config.markupVariables, {
-            isEditor,
-            filters: config.filters || [],
-            locale: config.locale
-          }).processedContent
+        ? processMarkupVariables(config.superTitle, config.data || [], config.markupVariables, markupOptions)
+            .processedContent
         : config.superTitle,
       introText: config.introText
-        ? processMarkupVariables(config.introText, config.data || [], config.markupVariables, {
-            isEditor,
-            filters: config.filters || [],
-            locale: config.locale
-          }).processedContent
+        ? processMarkupVariables(config.introText, config.data || [], config.markupVariables, markupOptions)
+            .processedContent
         : config.introText,
       legacyFootnotes: config.legacyFootnotes
-        ? processMarkupVariables(config.legacyFootnotes, config.data || [], config.markupVariables, {
-            isEditor,
-            filters: config.filters || [],
-            locale: config.locale
-          }).processedContent
+        ? processMarkupVariables(config.legacyFootnotes, config.data || [], config.markupVariables, markupOptions)
+            .processedContent
         : config.legacyFootnotes,
       description: config.description
-        ? processMarkupVariables(config.description, config.data || [], config.markupVariables, {
-            isEditor,
-            filters: config.filters || [],
-            locale: config.locale
-          }).processedContent
+        ? processMarkupVariables(config.description, config.data || [], config.markupVariables, markupOptions)
+            .processedContent
         : config.description
     }
   }, [
@@ -347,16 +338,18 @@ const CdcChart: React.FC<CdcChartProps> = ({
       let processedYAxis = targetConfig.yAxis?.label
 
       if (targetConfig.enableMarkupVariables && targetConfig.markupVariables?.length) {
+        const axisMarkupOptions = {
+          isEditor,
+          filters: targetConfig.filters || [],
+          locale: targetConfig.locale,
+          dataMetadata: targetConfig.dataMetadata
+        }
         if (targetConfig.xAxis?.label) {
           processedXAxis = processMarkupVariables(
             targetConfig.xAxis.label,
             dataSource || [],
             targetConfig.markupVariables,
-            {
-              isEditor,
-              filters: targetConfig.filters || [],
-              locale: targetConfig.locale
-            }
+            axisMarkupOptions
           ).processedContent
         }
         if (targetConfig.yAxis?.label) {
@@ -364,11 +357,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
             targetConfig.yAxis.label,
             dataSource || [],
             targetConfig.markupVariables,
-            {
-              isEditor,
-              filters: targetConfig.filters || [],
-              locale: targetConfig.locale
-            }
+            axisMarkupOptions
           ).processedContent
         }
       }
@@ -679,7 +668,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
       if (newConfig.dataUrl && !urlFilters) {
         // handle urls with spaces in the name.
         if (newConfig.dataUrl) newConfig.dataUrl = `${newConfig.dataUrl}`
-        let newData = await fetchRemoteData(newConfig.dataUrl)
+        let { data: newData, dataMetadata } = await fetchRemoteData(newConfig.dataUrl)
+        newConfig.dataMetadata = dataMetadata
 
         if (newConfig.vegaConfig) {
           newData = extractCoveData(updateVegaData(newConfig.vegaConfig, newData))
@@ -1546,6 +1536,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
               markupVariables={config.markupVariables}
               enableMarkupVariables={config.enableMarkupVariables}
               data={config.data}
+              dataMetadata={config.dataMetadata}
             />
           </div>
         )}

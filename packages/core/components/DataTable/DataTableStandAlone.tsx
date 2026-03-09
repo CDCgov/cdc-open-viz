@@ -78,6 +78,7 @@ const DataTableStandAlone: React.FC<StandAloneProps> = ({
         markupVariables={config['markupVariables']}
         enableMarkupVariables={config['enableMarkupVariables']}
         data={config.data}
+        dataMetadata={config['dataMetadata']}
       />
     </>
   )

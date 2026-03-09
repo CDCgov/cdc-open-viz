@@ -109,7 +109,7 @@ const PreviewDataTable = () => {
   const fetchDatasetData = async (datasetKey, datasetConfig) => {
     if (datasetConfig.preview) {
       if (datasetConfig.dataUrl) {
-        const remoteData = await fetchRemoteData(datasetConfig.dataUrl)
+        const { data: remoteData } = await fetchRemoteData(datasetConfig.dataUrl)
         if (Array.isArray(remoteData)) {
           setTableData(remoteData)
         }
@@ -132,7 +132,7 @@ const PreviewDataTable = () => {
           await handleDashboardData(config.datasets)
         } else {
           if (config.dataUrl) {
-            const remoteData = await fetchRemoteData(config.dataUrl)
+            const { data: remoteData } = await fetchRemoteData(config.dataUrl)
             if (Array.isArray(remoteData)) {
               setTableData(remoteData)
             }

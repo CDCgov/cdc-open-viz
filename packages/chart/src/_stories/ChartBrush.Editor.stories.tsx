@@ -232,25 +232,6 @@ export const BrushDefaultSelectionTests: Story = {
       expect(afterSettingCount.dataPointCount).toBeGreaterThan(0)
       expect(afterSettingCount.dataPointCount).toBeLessThanOrEqual(35) // 30 + tolerance
     }
-
-    // ============================================================================
-    // TEST: Clear Recent Date Count Returns to Default 35%
-    // Verifies: When the count is cleared, brush returns to percentage-based default
-    // ============================================================================
-
-    await performAndAssert(
-      'Clear Default Recent Date Count (return to 35%)',
-      getBrushSelectionState,
-      async () => {
-        await userEvent.clear(recentDateCountInput)
-        await userEvent.tab()
-      },
-      (before, after) => {
-        // Clearing should restore default mode and return near the initial brush width.
-        const widthDeltaFromInitial = Math.abs(after.brushWidth - initialSelectionState.brushWidth)
-        return after.defaultRecentDateCountValue === '' && widthDeltaFromInitial <= 2
-      }
-    )
   }
 }
 

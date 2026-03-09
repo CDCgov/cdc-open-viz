@@ -18,6 +18,7 @@ export type MarkupIncludeConfig = Visualization & {
     useInlineHTML: boolean
   }
   data?: Object[]
+  dataMetadata?: Record<string, string>
   enableMarkupVariables?: boolean
   filters?: VizFilter[]
   formattedData: {}

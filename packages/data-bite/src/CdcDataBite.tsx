@@ -173,7 +173,8 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
     if (response.dataUrl) {
       response.dataUrl = `${response.dataUrl}?${cacheBustingString()}`
-      let newData = await fetchRemoteData(response.dataUrl)
+      let { data: newData, dataMetadata } = await fetchRemoteData(response.dataUrl)
+      response.dataMetadata = dataMetadata
 
       if (newData && response.dataDescription) {
         newData = transform.autoStandardize(newData)
@@ -204,7 +205,8 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       showNoDataMessage: false,
       allowHideSection: false,
       filters: config.filters || [],
-      locale: config.locale
+      locale: config.locale,
+      dataMetadata: config.dataMetadata
     })
 
     return result.processedContent

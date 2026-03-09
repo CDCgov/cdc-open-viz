@@ -12,6 +12,7 @@ import EditorPanel from './components/EditorPanel'
 
 // helpers
 import DataTransform from '@cdc/core/helpers/DataTransform'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { VisualizationContainer } from '@cdc/core/components/Layout'
@@ -51,9 +52,9 @@ const CdcFilteredText = ({
     let data = response.formattedData || response.data || {}
 
     if (response.dataUrl) {
-      const dataString = await fetch(response.dataUrl)
-
-      data = await dataString.json()
+      const { data: fetchedData, dataMetadata } = await fetchRemoteData(response.dataUrl)
+      data = fetchedData
+      response.dataMetadata = dataMetadata
       if (response.dataDescription) {
         data = transform.autoStandardize(data)
         data = transform.developerStandardize(data, response.dataDescription)

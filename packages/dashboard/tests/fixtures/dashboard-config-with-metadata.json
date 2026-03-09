@@ -1,0 +1,89 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "title": "Metadata Test Dashboard",
+    "sharedFilters": [
+      {
+        "values": ["Alabama", "Alaska"],
+        "columnName": "Location",
+        "showDropdown": true,
+        "usedBy": ["chart-metadata-test", "databite-metadata-test"],
+        "tier": 1,
+        "type": "datafilter"
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        { "width": 12, "widget": "legacySharedFilters" }
+      ]
+    },
+    {
+      "columns": [
+        { "width": 6, "widget": "chart-metadata-test" },
+        { "width": 6, "widget": "databite-metadata-test" }
+      ]
+    }
+  ],
+  "visualizations": {
+    "chart-metadata-test": {
+      "type": "chart",
+      "visualizationType": "Bar",
+      "uid": "chart-metadata-test",
+      "title": "Amount by Year",
+      "description": "Data last updated {{lastUpdated}}",
+      "enableMarkupVariables": true,
+      "markupVariables": [
+        {
+          "name": "Last Updated",
+          "tag": "{{lastUpdated}}",
+          "metadataKey": "lastUpdated",
+          "conditions": []
+        }
+      ],
+      "xAxis": { "dataKey": "Year" },
+      "series": [{ "dataKey": "Amount", "type": "Bar" }],
+      "dataKey": "metadata-test-data",
+      "theme": "theme-blue"
+    },
+    "databite-metadata-test": {
+      "type": "data-bite",
+      "visualizationType": "data-bite",
+      "uid": "databite-metadata-test",
+      "title": "",
+      "subtext": "Source: {{source}}",
+      "enableMarkupVariables": true,
+      "markupVariables": [
+        {
+          "name": "Source",
+          "tag": "{{source}}",
+          "metadataKey": "source",
+          "conditions": []
+        }
+      ],
+      "dataColumn": "Amount",
+      "dataFunction": "Sum",
+      "biteStyle": "title",
+      "bitePosition": "Left",
+      "biteFontSize": 24,
+      "fontSize": "medium",
+      "dataFormat": { "roundToPlace": 0, "commas": true },
+      "dataKey": "metadata-test-data",
+      "theme": "theme-orange"
+    },
+    "legacySharedFilters": {
+      "type": "dashboardFilters",
+      "visualizationType": "dashboardFilters",
+      "sharedFilterIndexes": [0],
+      "filterBehavior": "Filter Change",
+      "uid": "legacySharedFilters"
+    }
+  },
+  "table": { "label": "Data Table", "show": false },
+  "data": [],
+  "dataFileName": "metadata-test-data",
+  "dataFileSourceType": "",
+  "dataUrl": "/packages/dashboard/examples/data/data-with-metadata.json",
+  "type": "dashboard"
+}

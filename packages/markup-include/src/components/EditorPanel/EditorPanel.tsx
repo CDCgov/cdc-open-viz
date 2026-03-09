@@ -170,6 +170,7 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
               onChange={handleMarkupVariablesChange}
               enableMarkupVariables={config.enableMarkupVariables || false}
               onToggleEnable={handleToggleEnable}
+              dataMetadata={config.dataMetadata}
             />
           </Accordion.Section>
         </Accordion>
