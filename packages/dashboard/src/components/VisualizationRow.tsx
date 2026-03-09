@@ -155,6 +155,18 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     }
   }, [index, row, config, filteredDataOverride])
 
+  const isMultiColumn = row.columns.filter(c => c.width).length > 1
+  const hasTP5Content =
+    isMultiColumn &&
+    row.columns.some(col => {
+      if (!col.widget) return false
+      const viz = config.visualizations[col.widget]
+      return (
+        viz?.biteStyle === 'tp5' || viz?.visualizationType === 'TP5 Waffle' || viz?.visualizationType === 'TP5 Gauge'
+      )
+    })
+  const needsEqualHeight = row.equalHeight || hasTP5Content
+
   const show = useMemo(() => {
     if (row.toggle) {
       return row.columns.map((col, i) => i === toggledRow)
@@ -229,7 +241,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
 
   return (
     <div
-      className={`row${row.equalHeight ? ' equal-height' : ''}${row.toggle ? ' toggle' : ''}`}
+      className={`row${needsEqualHeight ? ' equal-height' : ''}${row.toggle ? ' toggle' : ''}`}
       key={`row__${index}`}
       data-row-index={index}
     >

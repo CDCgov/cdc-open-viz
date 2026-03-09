@@ -1,0 +1,35 @@
+{
+  "type": "data-bite",
+  "dataUrl": "/packages/data-bite/tests/fixtures/data-with-metadata.json",
+  "dataBite": "",
+  "dataFunction": "Mean (Average)",
+  "dataColumn": "Insured Rate",
+  "bitePosition": "Left",
+  "biteFontSize": "24",
+  "imageData": {
+    "display": "none",
+    "url": "",
+    "options": []
+  },
+  "biteBody": "Test data bite body text",
+  "dataFormat": {
+    "roundToPlace": 0,
+    "commas": true,
+    "prefix": "",
+    "suffix": "%"
+  },
+  "filters": [],
+  "biteStyle": "graphic",
+  "enableMarkupVariables": true,
+  "markupVariables": [
+    {
+      "name": "Last Updated",
+      "tag": "{{lastUpdated}}",
+      "metadataKey": "lastUpdated",
+      "conditions": []
+    }
+  ],
+  "subtext": "Data last updated {{lastUpdated}}",
+  "title": "Insurance Coverage Rate",
+  "theme": "theme-blue"
+}
