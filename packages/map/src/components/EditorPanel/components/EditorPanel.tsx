@@ -2971,7 +2971,18 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           ]}
                           updateField={(_section, _subSection, _fieldName, value) => {
                             const newDefaultSort = { ...config.table.defaultSort, sortDirection: value }
-                            if (value !== 'custom') delete newDefaultSort.customOrder
+                            if (value !== 'custom') {
+                              delete newDefaultSort.customOrder
+                            } else if (!newDefaultSort.customOrder?.length) {
+                              // Auto-populate customOrder with unique values so the table updates immediately
+                              const col = newDefaultSort.column
+                              const dataCol = config.columns?.[col]?.name || col
+                              if (dataCol && config.data?.length) {
+                                newDefaultSort.customOrder = _.uniq(
+                                  config.data.map(row => String(row[dataCol] ?? '')).filter(v => v !== '')
+                                )
+                              }
+                            }
                             updateField('table', null, 'defaultSort', newDefaultSort)
                           }}
                         />
