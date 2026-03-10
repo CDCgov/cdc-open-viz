@@ -1,0 +1,30 @@
+# Keep this file conservative: broad fallback ownership, then narrower package-level
+# ownership where commit history shows a clear maintainer. Replace individual users
+# with GitHub teams later if the repo formalizes team-based review routing.
+
+# Default owners for anything not matched more specifically.
+* @adamdoe @Viseghoh @khartco
+
+# Repo-level workflows and shared tooling.
+/.github/ @adamdoe
+/docs/ @adamdoe
+/scripts/ @adamdoe
+/package.json @adamdoe @Viseghoh @khartco
+/yarn.lock @adamdoe
+
+# Foundation and heavily shared packages.
+/packages/core/ @adamdoe @Viseghoh @khartco
+
+# Orchestrators.
+/packages/dashboard/ @adamdoe @Viseghoh @khartco @jayb @Mgetz10
+/packages/editor/ @adamdoe @Viseghoh @khartco
+
+# Standalone visualizations.
+/packages/chart/ @adamdoe @Viseghoh @khartco @jayb @Mgetz10
+/packages/map/ @adamdoe
+/packages/data-table/ @Viseghoh
+/packages/data-bite/ @Viseghoh
+/packages/filtered-text/ @khartco
+/packages/markup-include/ @adamdoe
+/packages/waffle-chart/ @adamdoe
+/packages/embed/ @jayb
