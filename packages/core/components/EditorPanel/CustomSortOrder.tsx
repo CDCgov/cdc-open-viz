@@ -7,13 +7,21 @@ type CustomSortOrderProps = {
   data: Record<string, any>[]
   customOrder?: string[]
   updateField: Function
+  /** Optional transform for display labels (e.g. displayGeoName for maps) */
+  displayTransform?: (value: string) => string
 }
 
 /**
  * Editor component for drag-and-drop custom sort ordering.
  * Shows unique values from the selected column and allows reordering via DnD.
  */
-const CustomSortOrder: React.FC<CustomSortOrderProps> = ({ column, data, customOrder, updateField }) => {
+const CustomSortOrder: React.FC<CustomSortOrderProps> = ({
+  column,
+  data,
+  customOrder,
+  updateField,
+  displayTransform
+}) => {
   // Compute unique values from the selected column
   const uniqueValues = useMemo(() => {
     if (!column || !data?.length) return []
@@ -68,7 +76,7 @@ const CustomSortOrder: React.FC<CustomSortOrderProps> = ({ column, data, customO
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                       >
-                        {value}
+                        {displayTransform ? displayTransform(value) : value}
                       </div>
                     </li>
                   )}

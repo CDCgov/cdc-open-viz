@@ -22,6 +22,7 @@ import Panels from './Panels'
 import { mapColorPalettes as colorPalettes } from '@cdc/core/data/colorPalettes'
 import { supportedStatesFipsCodes, supportedCountries } from '../../../data/supported-geos.js'
 import { getSupportedCountryOptions } from '../../../helpers/getCountriesPicked'
+import { displayGeoName } from '../../../helpers/displayGeoName'
 
 // Components - Core
 import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
@@ -2978,8 +2979,8 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                               const col = newDefaultSort.column
                               const dataCol = config.columns?.[col]?.name || col
                               if (dataCol && config.data?.length) {
-                                newDefaultSort.customOrder = _.uniq(
-                                  config.data.map(row => String(row[dataCol] ?? '')).filter(v => v !== '')
+                                newDefaultSort.customOrder = Array.from(
+                                  new Set(config.data.map(row => String(row[dataCol] ?? '')).filter(v => v !== ''))
                                 )
                               }
                             }
@@ -2995,6 +2996,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           data={config.data}
                           customOrder={config.table.defaultSort.customOrder}
                           updateField={updateField}
+                          displayTransform={config.table.defaultSort.column === 'geo' ? displayGeoName : undefined}
                         />
                       )}
                       <CheckBox
