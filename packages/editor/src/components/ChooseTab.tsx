@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import '../scss/choose-vis-tab.scss'
 
 import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
@@ -51,6 +51,23 @@ interface ButtonProps {
   orientation?: string | null
 }
 
+interface VizButtonProps extends ButtonProps {
+  activeVizButtonID?: number
+  onConfigure: (props: Record<string, unknown>) => void
+}
+
+const VizButton: React.FC<VizButtonProps> = ({ activeVizButtonID, onConfigure, ...buttonProps }) => {
+  const { label, icon, id } = buttonProps
+  const isActive = id === activeVizButtonID || 0
+
+  return (
+    <button className={isActive ? 'active' : ''} onClick={() => onConfigure(buttonProps)} aria-label={label}>
+      {icon}
+      <span className='mt-1'>{label}</span>
+    </button>
+  )
+}
+
 const ChooseTab: React.FC = (): JSX.Element => {
   const { config, tempConfig } = useContext(ConfigContext)
 
@@ -58,6 +75,12 @@ const ChooseTab: React.FC = (): JSX.Element => {
 
   const dispatch = useContext(EditorDispatchContext)
   const rowLabels = ['General', , 'Charts', 'Maps']
+
+  useEffect(() => {
+    if (tempConfig) {
+      dispatch({ type: 'EDITOR_SAVE', payload: tempConfig })
+    }
+  }, [dispatch, tempConfig])
 
   const handleUpload = e => {
     const file = e.target.files[0]
@@ -174,25 +197,6 @@ const ChooseTab: React.FC = (): JSX.Element => {
     dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 1 })
   }
 
-  const VizButton: React.FC<ButtonProps> = props => {
-    const { label, icon, id } = props
-    const isActive = id === config?.activeVizButtonID || 0
-    const handleClick = () => {
-      configureTabs(props)
-    }
-
-    if (tempConfig) {
-      dispatch({ type: 'EDITOR_SAVE', payload: tempConfig })
-    }
-
-    return (
-      <button className={isActive ? 'active' : ''} onClick={handleClick} aria-label={label}>
-        {icon}
-        <span className='mt-1'>{label}</span>
-      </button>
-    )
-  }
-
   return (
     <div className='choose-vis'>
       <a
@@ -221,7 +225,11 @@ const ChooseTab: React.FC = (): JSX.Element => {
                   <li key={`${label}-button-${buttonIndex}`}>
                     <Tooltip position='right'>
                       <Tooltip.Target>
-                        <VizButton {...button} />
+                        <VizButton
+                          {...button}
+                          activeVizButtonID={config?.activeVizButtonID}
+                          onConfigure={configureTabs}
+                        />
                       </Tooltip.Target>
                       <Tooltip.Content>{button.content}</Tooltip.Content>
                     </Tooltip>
