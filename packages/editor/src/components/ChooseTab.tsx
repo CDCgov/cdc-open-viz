@@ -98,12 +98,15 @@ const ChooseTab: React.FC = (): JSX.Element => {
       newConfig = JSON.parse(text)
     } catch (e) {
       alert('The JSON that was entered is invalid.')
-      throw new Error()
+      return
     }
 
     const isVega = isVegaConfig(newConfig)
     if (isVega) {
       newConfig = importVegaConfig(newConfig)
+      if (!newConfig) {
+        return
+      }
     }
 
     dispatch({ type: 'EDITOR_SET_CONFIG', payload: newConfig })
@@ -135,7 +138,7 @@ const ChooseTab: React.FC = (): JSX.Element => {
 
     const errorText = vegaErrors.join('\n\n')
     alert(errorText)
-    throw new Error(errorText)
+    return null
   }
 
   const generateNewConfig = props => {
