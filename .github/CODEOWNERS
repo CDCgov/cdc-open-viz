@@ -16,15 +16,15 @@
 /packages/core/ @adamdoe @Viseghoh @khartco
 
 # Orchestrators.
-/packages/dashboard/ @adamdoe @Viseghoh @khartco @jboice @Mgetz10
+/packages/dashboard/ @adamdoe @Viseghoh @khartco @jayb @Mgetz10
 /packages/editor/ @adamdoe @Viseghoh @khartco
 
 # Standalone visualizations.
-/packages/chart/ @adamdoe @Viseghoh @khartco @jboice @Mgetz10
+/packages/chart/ @adamdoe @Viseghoh @khartco @jayb @Mgetz10
 /packages/map/ @adamdoe
 /packages/data-table/ @Viseghoh
 /packages/data-bite/ @Viseghoh
 /packages/filtered-text/ @khartco
 /packages/markup-include/ @adamdoe
 /packages/waffle-chart/ @adamdoe
-/packages/embed/ @jboice
+/packages/embed/ @jayb
