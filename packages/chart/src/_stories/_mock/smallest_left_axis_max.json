@@ -1,0 +1,104 @@
+{
+  "type": "chart",
+  "version": "4.26.3",
+  "visualizationType": "Line",
+  "visualizationSubType": "regular",
+  "title": "Smallest Left Axis Maximum Demo",
+  "titleStyle": "small",
+  "showTitle": true,
+  "theme": "theme-blue",
+  "animate": false,
+  "fontSize": "medium",
+  "lineDatapointStyle": "hover",
+  "lineDatapointColor": "Same as Line",
+  "isResponsiveTicks": false,
+  "general": {
+    "showDownloadButton": false,
+    "showMissingDataLabel": true,
+    "hideNullValue": true
+  },
+  "padding": { "left": 5, "right": 5 },
+  "heights": { "vertical": "300", "horizontal": 750 },
+  "barThickness": 0.35,
+  "orientation": "vertical",
+  "yAxis": {
+    "hideAxis": true,
+    "displayNumbersOnBar": false,
+    "hideLabel": false,
+    "hideTicks": true,
+    "size": "25",
+    "gridLines": true,
+    "enablePadding": false,
+    "min": "",
+    "max": "",
+    "numTicks": "5",
+    "scalePadding": "0",
+    "tickRotation": "",
+    "anchors": [],
+    "categories": [],
+    "label": "",
+    "inlineLabel": " cases",
+    "type": "linear",
+    "smallestLeftAxisMax": 5
+  },
+  "xAxis": {
+    "sortDates": false,
+    "anchors": [],
+    "type": "categorical",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": "0",
+    "tickRotation": "0",
+    "numTicks": "",
+    "labelOffset": 0,
+    "padding": "4",
+    "dataKey": "Month",
+    "label": "Month",
+    "tickWidthMax": 100
+  },
+  "table": {
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "show": true,
+    "showDownloadUrl": false,
+    "showVertical": true
+  },
+  "series": [{ "dataKey": "Cases", "type": "Line", "axis": "Left", "tooltip": true }],
+  "tooltips": { "opacity": 90, "singleSeries": false },
+  "legend": {
+    "hide": true
+  },
+  "filters": [
+    {
+      "values": ["Region A", "Region B", "Region C"],
+      "active": "Region B",
+      "order": "asc",
+      "columnName": "Region",
+      "filterStyle": "dropdown"
+    }
+  ],
+  "data": [
+    { "Month": "Jan", "Cases": "12", "Region": "Region A" },
+    { "Month": "Feb", "Cases": "18", "Region": "Region A" },
+    { "Month": "Mar", "Cases": "15", "Region": "Region A" },
+    { "Month": "Apr", "Cases": "22", "Region": "Region A" },
+    { "Month": "May", "Cases": "28", "Region": "Region A" },
+    { "Month": "Jun", "Cases": "20", "Region": "Region A" },
+
+    { "Month": "Jan", "Cases": "1", "Region": "Region B" },
+    { "Month": "Feb", "Cases": "0", "Region": "Region B" },
+    { "Month": "Mar", "Cases": "1", "Region": "Region B" },
+    { "Month": "Apr", "Cases": "0", "Region": "Region B" },
+    { "Month": "May", "Cases": "1", "Region": "Region B" },
+    { "Month": "Jun", "Cases": "0", "Region": "Region B" },
+
+    { "Month": "Jan", "Cases": "45", "Region": "Region C" },
+    { "Month": "Feb", "Cases": "52", "Region": "Region C" },
+    { "Month": "Mar", "Cases": "48", "Region": "Region C" },
+    { "Month": "Apr", "Cases": "60", "Region": "Region C" },
+    { "Month": "May", "Cases": "55", "Region": "Region C" },
+    { "Month": "Jun", "Cases": "50", "Region": "Region C" }
+  ]
+}
