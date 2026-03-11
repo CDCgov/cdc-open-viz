@@ -41,6 +41,7 @@ const createInitialState = () => {
       allowMapZoom: true,
       hideGeoColumnInTooltip: false,
       hidePrimaryColumnInTooltip: false,
+      hideUnselectedStates: true,
       statesPicked: []
     },
     type: 'map',

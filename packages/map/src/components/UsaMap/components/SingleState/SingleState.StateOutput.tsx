@@ -4,6 +4,8 @@ import ConfigContext from '../../../../context'
 import { getGeoStrokeColor } from '../../../../helpers/colors'
 import { getStatesPicked } from '../../../../helpers/getStatesPicked'
 
+const GRAYED_OUT_COLOR = '#d3d3d3'
+
 type StateOutputProps = {
   topoData: Topology
   path: any
@@ -15,29 +17,42 @@ const StateOutput: React.FC<StateOutputProps> = ({ topoData, path, scale, runtim
   const { config } = useContext(ConfigContext)
   if (!topoData?.states) return null
 
-  // Use filter-aware state selection instead of direct config access
   const statesPickedData = getStatesPicked(config, runtimeData)
   const stateNames = statesPickedData.map(sp => sp.stateName)
 
-  const statesPicked = topoData.states.filter(s => {
-    return stateNames.includes(s.properties.name)
-  })
+  const showUnselected = config.general.hideUnselectedStates === false
+
+  const selectedStates = topoData.states.filter(s => stateNames.includes(s.properties.name))
+  const unselectedStates = showUnselected ? topoData.states.filter(s => !stateNames.includes(s.properties.name)) : []
 
   const geoStrokeColor = getGeoStrokeColor(config)
 
-  const stateLines = statesPicked.map(s => path(s.geometry))
-
-  return stateLines.map((line, index) => (
-    <g
-      key={`single-state-${index}`}
-      className='single-state'
-      style={{ fill: 'transparent', pointerEvents: 'none' }}
-      stroke={geoStrokeColor}
-      strokeWidth={2 / scale}
-    >
-      <path tabIndex={-1} className='state-path' d={line} />
-    </g>
-  ))
+  return (
+    <>
+      {unselectedStates.map((s, index) => (
+        <g
+          key={`unselected-state-${index}`}
+          className='single-state unselected'
+          style={{ fill: GRAYED_OUT_COLOR, opacity: 0.3, pointerEvents: 'none' }}
+          stroke={geoStrokeColor}
+          strokeWidth={1 / scale}
+        >
+          <path tabIndex={-1} className='state-path' d={path(s.geometry)} />
+        </g>
+      ))}
+      {selectedStates.map((s, index) => (
+        <g
+          key={`single-state-${index}`}
+          className='single-state'
+          style={{ fill: 'transparent', pointerEvents: 'none' }}
+          stroke={geoStrokeColor}
+          strokeWidth={2 / scale}
+        >
+          <path tabIndex={-1} className='state-path' d={path(s.geometry)} />
+        </g>
+      ))}
+    </>
+  )
 }
 
 export default StateOutput
