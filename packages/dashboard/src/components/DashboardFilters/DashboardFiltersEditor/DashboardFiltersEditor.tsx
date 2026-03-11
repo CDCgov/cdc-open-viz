@@ -102,6 +102,9 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
       // changing a api filter and want to load the api data into the preview.
       // automatically dispatches SET_SHARED_FILTERS
       loadAPIFilters(newSharedFilters, {})
+    } else if (prop === 'defaultValue') {
+      newSharedFilters[index].active = value
+      dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
     } else {
       handleSorting(newSharedFilters[index])
       dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })

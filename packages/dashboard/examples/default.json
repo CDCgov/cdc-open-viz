@@ -4,46 +4,20 @@
     "title": "Amount Filtered by Location and Type ",
     "sharedFilters": [
       {
-        "values": [
-          "Alabama",
-          "Alaska",
-          "American Samoa",
-          "Arizona",
-          "Arkansas"
-        ],
+        "values": ["Alabama", "Alaska", "American Samoa", "Arizona", "Arkansas"],
         "columnName": "Location",
         "showDropdown": true,
-        "usedBy": [
-          "data-bite1628875468150",
-          "chart1628875631849",
-          "data-bite1628876561387",
-          "data-bite1628877031319"
-        ],
+        "usedBy": ["data-bite1628875468150", "chart1628875631849", "data-bite1628876561387", "data-bite1628877031319"],
         "tier": 1,
         "type": "datafilter",
         "order": "cust",
-        "orderedValues": [
-          "Alabama",
-          "Alaska",
-          "American Samoa",
-          "Arizona",
-          "Arkansas"
-        ]
+        "orderedValues": ["Alabama", "Alaska", "American Samoa", "Arizona", "Arkansas"]
       },
       {
-        "values": [
-          "Federal",
-          "Local",
-          "State"
-        ],
+        "values": ["Federal", "Local", "State"],
         "columnName": "Type",
         "showDropdown": true,
-        "usedBy": [
-          "data-bite1628875468150",
-          "chart1628875631849",
-          "data-bite1628876561387",
-          "data-bite1628877031319"
-        ],
+        "usedBy": ["data-bite1628875468150", "chart1628875631849", "data-bite1628876561387", "data-bite1628877031319"],
         "tier": 1
       }
     ]
@@ -247,10 +221,7 @@
     "legacySharedFilters": {
       "type": "dashboardFilters",
       "visualizationType": "dashboardFilters",
-      "sharedFilterIndexes": [
-        0,
-        1
-      ],
+      "sharedFilterIndexes": [0, 1],
       "filterBehavior": "Filter Change",
       "uid": "legacySharedFilters"
     }
