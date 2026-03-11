@@ -36,6 +36,8 @@ import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 let projection = geoMercator()
 
+const GRAYED_OUT_COLOR = '#d3d3d3'
+
 type MapPosition = { coordinates: number[]; zoom: number }
 
 const WorldMap = () => {
@@ -275,8 +277,9 @@ const WorldMap = () => {
       }
 
       let styles: Record<string, string | Record<string, string>> = {
-        fill: geoFillColor,
-        cursor: 'default'
+        fill: isGreyedOut ? GRAYED_OUT_COLOR : geoFillColor,
+        cursor: 'default',
+        ...(isGreyedOut && { opacity: '0.3' })
       }
 
       // Scale stroke width inversely with zoom level to maintain consistent visual thickness
@@ -290,13 +293,13 @@ const WorldMap = () => {
       if (legendColors && legendColors[0] !== '#000000' && type !== 'bubble') {
         styles = {
           ...styles,
-          fill: isGreyedOut ? geoFillColor : type !== 'world-geocode' ? legendColors[0] : geoFillColor,
+          fill: isGreyedOut ? GRAYED_OUT_COLOR : type !== 'world-geocode' ? legendColors[0] : geoFillColor,
           cursor: 'default',
           '&:hover': {
-            fill: isGreyedOut ? geoFillColor : type !== 'world-geocode' ? legendColors[1] : geoFillColor
+            fill: isGreyedOut ? GRAYED_OUT_COLOR : type !== 'world-geocode' ? legendColors[1] : geoFillColor
           },
           '&:active': {
-            fill: isGreyedOut ? geoFillColor : type !== 'world-geocode' ? legendColors[2] : geoFillColor
+            fill: isGreyedOut ? GRAYED_OUT_COLOR : type !== 'world-geocode' ? legendColors[2] : geoFillColor
           }
         }
 
