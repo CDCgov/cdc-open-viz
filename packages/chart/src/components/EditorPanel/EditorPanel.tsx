@@ -2490,6 +2490,28 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
                               </>
                             )}
+                            <TextField
+                              value={config.yAxis.smallestLeftAxisMax}
+                              section='yAxis'
+                              fieldName='smallestLeftAxisMax'
+                              type='number'
+                              label='Smallest Left Axis Maximum'
+                              placeholder='Auto'
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>
+                                      Example: If your data only goes up to 1, the axis might show 0, 0.2, 0.4, 0.6,
+                                      0.8, 1. Setting this to 5 would make the axis show 0, 1, 2, 3, 4, 5 instead.
+                                    </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                              updateField={updateFieldDeprecated}
+                            />
                           </>
                         )
                       )}
@@ -2889,7 +2911,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       />
 
                       <TextField
-                        value={config.yAxis.max}
+                        value={config.yAxis.rightMax}
                         section='yAxis'
                         fieldName='rightMax'
                         type='number'
@@ -2899,7 +2921,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       />
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.rightMaxMessage}</span>
                       <TextField
-                        value={config.yAxis.min}
+                        value={config.yAxis.rightMin}
                         section='yAxis'
                         fieldName='rightMin'
                         type='number'
@@ -2908,6 +2930,28 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         updateField={updateFieldDeprecated}
                       />
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
+                      <TextField
+                        value={config.yAxis.smallestRightAxisMax}
+                        section='yAxis'
+                        fieldName='smallestRightAxisMax'
+                        type='number'
+                        label='Smallest Right Axis Maximum'
+                        placeholder='Auto'
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                Example: If your data only goes up to 1, the axis might show 0, 0.2, 0.4, 0.6, 0.8, 1.
+                                Setting this to 5 would make the axis show 0, 1, 2, 3, 4, 5 instead.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        updateField={updateFieldDeprecated}
+                      />
                     </AccordionItemPanel>
                   </AccordionItem>
                 )}
