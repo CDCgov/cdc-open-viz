@@ -2908,7 +2908,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       />
 
                       <TextField
-                        value={config.yAxis.max}
+                        value={config.yAxis.rightMax}
                         section='yAxis'
                         fieldName='rightMax'
                         type='number'
@@ -2918,7 +2918,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       />
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.rightMaxMessage}</span>
                       <TextField
-                        value={config.yAxis.min}
+                        value={config.yAxis.rightMin}
                         section='yAxis'
                         fieldName='rightMin'
                         type='number'
