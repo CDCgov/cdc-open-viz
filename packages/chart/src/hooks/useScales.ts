@@ -9,6 +9,7 @@ import {
   getTicks
 } from '@visx/scale'
 import { useContext } from 'react'
+import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import ConfigContext from '../ConfigContext'
 import { ChartConfig } from '../types/ChartConfig'
 import { ChartContext } from '../types/ChartContext'
@@ -59,9 +60,8 @@ const useScales = (properties: useScaleProps) => {
   } = properties
 
   const context = useContext<ChartContext>(ConfigContext)
-  const { rawData, dimensions, convertLineToBarGraph = false } = context
+  const { rawData, convertLineToBarGraph = false } = context
 
-  const [screenWidth] = dimensions
   const isHorizontal = config.orientation === 'horizontal'
   const { visualizationType, xAxis, forestPlot, runtime } = config
   const isForestPlot = visualizationType === 'Forest Plot'
@@ -313,60 +313,33 @@ const useScales = (properties: useScaleProps) => {
     })
 
     const xAxisPadding = 5
+    const [plotStart, plotEnd] = getForestPlotRange(config, data as Record<string, any>[], xMax)
 
-    const leftWidthOffset = (Number(forestPlot.leftWidthOffset) / 100) * xMax
-    const rightWidthOffset = (Number(forestPlot.rightWidthOffset) / 100) * xMax
+    if (forestPlot.type === 'Linear') {
+      xScale = scaleLinear<LinearScaleConfig>({
+        domain: [
+          Math.min(...data.map(d => parseFloat(d[forestPlot.lower]))) - xAxisPadding,
+          Math.max(...data.map(d => parseFloat(d[forestPlot.upper]))) + xAxisPadding
+        ],
+        range: [plotStart, plotEnd],
+        type: scaleTypes.LINEAR
+      })
+      xScale.type = scaleTypes.LINEAR
+    }
 
-    const rightWidthOffsetMobile = (Number(forestPlot.rightWidthOffsetMobile) / 100) * xMax
-    const leftWidthOffsetMobile = (Number(forestPlot.leftWidthOffsetMobile) / 100) * xMax
+    if (forestPlot.type === 'Logarithmic') {
+      const max = Math.max(...data.map(d => parseFloat(d[forestPlot.upper])))
+      const fp_min = Math.min(...data.map(d => parseFloat(d[forestPlot.lower])))
 
-    if (screenWidth > 480) {
-      if (forestPlot.type === 'Linear') {
-        xScale = scaleLinear({
-          domain: [
-            Math.min(...data.map(d => parseFloat(d[forestPlot.lower]))) - xAxisPadding,
-            Math.max(...data.map(d => parseFloat(d[forestPlot.upper]))) + xAxisPadding
-          ],
-          range: [leftWidthOffset, Number(screenWidth) - rightWidthOffset]
-        })
-        xScale.type = scaleTypes.LINEAR
-      }
-      if (forestPlot.type === 'Logarithmic') {
-        let max = Math.max(...data.map(d => parseFloat(d[forestPlot.upper])))
-        let fp_min = Math.min(...data.map(d => parseFloat(d[forestPlot.lower])))
-
-        xScale = scaleLog<LogScaleConfig>({
-          domain: [fp_min, max],
-          range: [leftWidthOffset, xMax - rightWidthOffset],
-          nice: true
-        })
-        xScale.type = scaleTypes.LOG
-      }
-    } else {
-      if (forestPlot.type === 'Linear') {
-        xScale = scaleLinear<LinearScaleConfig>({
-          domain: [
-            Math.min(...data.map(d => parseFloat(d[forestPlot.lower]))) - xAxisPadding,
-            Math.max(...data.map(d => parseFloat(d[forestPlot.upper]))) + xAxisPadding
-          ],
-          range: [leftWidthOffsetMobile, xMax - rightWidthOffsetMobile],
-          type: scaleTypes.LINEAR
-        })
-      }
-
-      if (forestPlot.type === 'Logarithmic') {
-        let max = Math.max(...data.map(d => parseFloat(d[forestPlot.upper])))
-        let fp_min = Math.min(...data.map(d => parseFloat(d[forestPlot.lower])))
-
-        xScale = scaleLog<LogScaleConfig>({
-          domain: [fp_min, max],
-          range: [leftWidthOffset, xMax - rightWidthOffset],
-          nice: true,
-          base: max > 1 ? 10 : 2,
-          round: false,
-          type: scaleTypes.LOG
-        })
-      }
+      xScale = scaleLog<LogScaleConfig>({
+        domain: [fp_min, max],
+        range: [plotStart, plotEnd],
+        nice: true,
+        base: max > 1 ? 10 : 2,
+        round: false,
+        type: scaleTypes.LOG
+      })
+      xScale.type = scaleTypes.LOG
     }
   }
   return {
@@ -525,3 +498,66 @@ const sortXAxisData = (xAxisData, sortByRecentDate) => {
     return xAxisData.sort((a, b) => Number(a) - Number(b))
   }
 }
+
+const FOREST_PLOT_FONT = 'normal 12px Nunito, sans-serif'
+const FOREST_PLOT_GAP = 24
+const FOREST_PLOT_MIN_WIDTH = 120
+const FOREST_PLOT_MAX_LEFT_RATIO = 0.45
+const FOREST_PLOT_MAX_RIGHT_RATIO = 0.35
+
+const getForestPlotRange = (config: ChartConfig, data: Record<string, any>[], xMax: number): [number, number] => {
+  if (!xMax) return [0, 0]
+
+  const leftReserve = getForestPlotLeftReserve(config, data, xMax)
+  const rightReserve = getForestPlotRightReserve(config, data, xMax)
+  const availableReserve = Math.max(xMax - FOREST_PLOT_MIN_WIDTH, 0)
+  const totalReserve = leftReserve + rightReserve
+
+  if (totalReserve <= availableReserve) {
+    return [leftReserve, xMax - rightReserve]
+  }
+
+  if (!availableReserve || !totalReserve) {
+    return [0, xMax]
+  }
+
+  const reserveScale = availableReserve / totalReserve
+  return [leftReserve * reserveScale, xMax - rightReserve * reserveScale]
+}
+
+const getForestPlotLeftReserve = (config: ChartConfig, data: Record<string, any>[], xMax: number) => {
+  const { forestPlot, xAxis } = config
+  const columns = Object.values(config.columns || {}) as Record<string, any>[]
+  const studyTextWidth = forestPlot.hideDateCategoryCol
+    ? 0
+    : getForestPlotTextWidth([xAxis.dataKey, ...data.map(row => row?.[xAxis.dataKey])])
+
+  const leftColumnExtent = columns
+    .filter(column => column?.forestPlot && !column?.forestPlotAlignRight)
+    .reduce((maxExtent, column) => {
+      const columnStart = Number(column.forestPlotStartingPoint ?? column.startingPoint ?? 0)
+      const columnWidth = getForestPlotTextWidth([column.label, ...data.map(row => row?.[column.name])])
+      return Math.max(maxExtent, columnStart + columnWidth)
+    }, 0)
+
+  const reserve = Math.max(studyTextWidth, leftColumnExtent)
+  return reserve ? Math.min(reserve + FOREST_PLOT_GAP, xMax * FOREST_PLOT_MAX_LEFT_RATIO) : 0
+}
+
+const getForestPlotRightReserve = (config: ChartConfig, data: Record<string, any>[], xMax: number) => {
+  const columns = Object.values(config.columns || {}) as Record<string, any>[]
+  const rightColumnWidth = columns
+    .filter(column => column?.forestPlot && column?.forestPlotAlignRight)
+    .reduce((maxWidth, column) => {
+      const columnWidth = getForestPlotTextWidth([column.label, ...data.map(row => row?.[column.name])])
+      return Math.max(maxWidth, columnWidth)
+    }, 0)
+
+  return rightColumnWidth ? Math.min(rightColumnWidth + FOREST_PLOT_GAP, xMax * FOREST_PLOT_MAX_RIGHT_RATIO) : 0
+}
+
+const getForestPlotTextWidth = (values: unknown[]) =>
+  values.reduce((maxWidth, value) => {
+    const text = value === null || value === undefined ? '' : String(value)
+    return Math.max(maxWidth, getTextWidth(text, FOREST_PLOT_FONT) || 0)
+  }, 0)

@@ -91,6 +91,8 @@ const ForestPlot = ({
   }, [config.forestPlot.type])
 
   const pooledData = config.data.find(d => d[config.xAxis.dataKey] === config.forestPlot.pooledResult.column)
+  const [plotStart, plotEnd] = [...xScale.range()].sort((a, b) => a - b)
+  const plotWidth = plotEnd - plotStart
 
   const regressionPoints = pooledData
     ? [
@@ -112,12 +114,12 @@ const ForestPlot = ({
 
   const topLine = [
     { x: 0, y: topMarginOffset },
-    { x: width, y: topMarginOffset }
+    { x: plotEnd, y: topMarginOffset }
   ]
 
   const bottomLine = [
     { x: 0, y: height },
-    { x: width, y: height }
+    { x: plotEnd, y: height }
   ]
 
   type Columns = {
@@ -293,7 +295,8 @@ const ForestPlot = ({
         <Bar
           key='forest-plot-tooltip-area'
           className='forest-plot-tooltip-area'
-          width={width}
+          x={plotStart}
+          width={plotWidth}
           height={height}
           fill={false ? 'red' : 'transparent'}
           fillOpacity={0.5}
@@ -304,15 +307,17 @@ const ForestPlot = ({
       <Line
         from={topLine[0]}
         to={topLine[1]}
-        style={{ stroke: 'black', strokeWidth: 2 }}
+        style={{ stroke: '#333', strokeWidth: 1 }}
         className='forestplot__top-line'
       />
-      <Line
-        from={bottomLine[0]}
-        to={bottomLine[1]}
-        style={{ stroke: 'black', strokeWidth: 2 }}
-        className='forestplot__bottom-line'
-      />
+      {config.xAxis.hideAxis && (
+        <Line
+          from={bottomLine[0]}
+          to={bottomLine[1]}
+          style={{ stroke: '#333', strokeWidth: 1 }}
+          className='forestplot__bottom-line'
+        />
+      )}
 
       {/* column data */}
       {columnsOnChart.map((column, colIndex) => {

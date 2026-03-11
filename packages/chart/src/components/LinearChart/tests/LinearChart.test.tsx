@@ -4,6 +4,7 @@ import { describe, expect, it, vi, beforeAll } from 'vitest'
 import LinearChart from '../../LinearChart'
 import ConfigContext from '../../../ConfigContext'
 import { createMockChartContext } from './mockConfigContext'
+import forestPlotConfig from '../../../../examples/feature/forest-plot/forest-plot.json'
 
 // Mock ResizeObserver
 vi.stubGlobal(
@@ -146,6 +147,64 @@ describe('LinearChart', () => {
         visualizationSubType: 'stacked'
       })
       expect(container).toBeTruthy()
+    })
+
+    it('keeps forest plot lines inside the computed plot bounds at narrow and wide widths', () => {
+      const forestContextOverrides = {
+        transformedData: forestPlotConfig.data,
+        rawData: forestPlotConfig.data
+      }
+
+      const narrowRender = renderLinearChart(forestPlotConfig as any, forestContextOverrides, {
+        parentWidth: 320,
+        parentHeight: 500
+      })
+      const wideRender = renderLinearChart(forestPlotConfig as any, forestContextOverrides, {
+        parentWidth: 960,
+        parentHeight: 500
+      })
+
+      const narrowTopLine = narrowRender.container.querySelector('.forestplot__top-line')
+      const wideTopLine = wideRender.container.querySelector('.forestplot__top-line')
+      const narrowCiLine = narrowRender.container.querySelector('line[class^="line-"]')
+      const wideCiLine = wideRender.container.querySelector('line[class^="line-"]')
+
+      expect(narrowTopLine).toBeTruthy()
+      expect(wideTopLine).toBeTruthy()
+      expect(narrowCiLine).toBeTruthy()
+      expect(wideCiLine).toBeTruthy()
+
+      const narrowStart = Number(narrowTopLine?.getAttribute('x1'))
+      const narrowEnd = Number(narrowTopLine?.getAttribute('x2'))
+      const wideStart = Number(wideTopLine?.getAttribute('x1'))
+      const wideEnd = Number(wideTopLine?.getAttribute('x2'))
+
+      expect(narrowStart).toBe(0)
+      expect(narrowEnd).toBeLessThanOrEqual(320)
+      expect(wideStart).toBe(0)
+      expect(wideEnd).toBeLessThanOrEqual(960)
+      expect(wideEnd - wideStart).toBeGreaterThan(narrowEnd - narrowStart)
+
+      expect(Number(narrowCiLine?.getAttribute('x1'))).toBeGreaterThan(narrowStart)
+      expect(Number(narrowCiLine?.getAttribute('x2'))).toBeLessThanOrEqual(narrowEnd)
+      expect(Number(wideCiLine?.getAttribute('x1'))).toBeGreaterThan(wideStart)
+      expect(Number(wideCiLine?.getAttribute('x2'))).toBeLessThanOrEqual(wideEnd)
+    })
+
+    it('avoids rendering a duplicate manual bottom border when the forest plot x-axis is visible', () => {
+      const { container } = renderLinearChart(
+        forestPlotConfig as any,
+        {
+          transformedData: forestPlotConfig.data,
+          rawData: forestPlotConfig.data
+        },
+        { parentWidth: 800, parentHeight: 500 }
+      )
+
+      expect(container.querySelector('.forestplot__top-line')).toBeTruthy()
+      expect(container.querySelector('.forestplot__bottom-line')).toBeFalsy()
+      const bottomAxisLine = container.querySelector('.bottom-axis > line[stroke="#333"]')
+      expect(bottomAxisLine?.getAttribute('x1')).toBe('0')
     })
   })
 
