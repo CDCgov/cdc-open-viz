@@ -166,6 +166,7 @@ export type MapConfig = Visualization & {
       fipsCode: string
       stateName: string
     }[]
+    hideUnselectedStates?: boolean
     countriesPicked?: {
       iso: string
       name: string

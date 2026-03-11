@@ -1321,20 +1321,31 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     {/* Type */}
                     {/* Select > Filter a state */}
                     {config.general.geoType === 'single-state' && (
-                      <label>
-                        <span>States Selector</span>
-                        <MultiSelect
-                          selected={config.general.statesPicked.map(state => state.stateName)}
-                          options={StateOptionList().map(option => ({
-                            value: option.props.value,
-                            label: option.props.children
-                          }))}
-                          fieldName={'statesPicked'}
-                          updateField={(_, __, ___, selectedOptions) => {
-                            handleEditorChanges('chooseState', selectedOptions)
-                          }}
-                        />
-                      </label>
+                      <>
+                        <label>
+                          <span>States Selector</span>
+                          <MultiSelect
+                            selected={config.general.statesPicked.map(state => state.stateName)}
+                            options={StateOptionList().map(option => ({
+                              value: option.props.value,
+                              label: option.props.children
+                            }))}
+                            fieldName={'statesPicked'}
+                            updateField={(_, __, ___, selectedOptions) => {
+                              handleEditorChanges('chooseState', selectedOptions)
+                            }}
+                          />
+                        </label>
+                        {config.general.statesPicked && config.general.statesPicked.length > 0 && (
+                          <CheckBox
+                            value={config.general.hideUnselectedStates !== false}
+                            fieldName='hideUnselectedStates'
+                            label='Hide Unselected States'
+                            updateField={updateField}
+                            section='general'
+                          />
+                        )}
+                      </>
                     )}
                     {/* Country Selection for World Maps */}
                     {config.general.geoType === 'world' && (
