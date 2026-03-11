@@ -3,6 +3,12 @@ export type Pivot = {
   valueColumns: string[]
 }
 
+export type DefaultSort = {
+  column?: string
+  sortDirection?: 'asc' | 'desc' | 'custom'
+  customOrder?: string[]
+}
+
 export type Table = {
   caption?: string
   cellMinWidth?: number
@@ -33,4 +39,5 @@ export type Table = {
   showDownloadPdfButton?: boolean
   showDownloadUrl?: boolean
   showVertical?: boolean
+  defaultSort?: DefaultSort
 }

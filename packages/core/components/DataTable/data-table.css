@@ -8,7 +8,7 @@
     width: unset;
   }
 
-  .collapsed+.table-container {
+  .collapsed + .table-container {
     border-bottom: none;
   }
 
@@ -39,7 +39,6 @@
   }
 
   table.horizontal {
-
     th,
     td {
       min-width: 200px;
@@ -107,7 +106,8 @@
         background-position: right 0.5em center;
         background-repeat: no-repeat;
         background-size: 10px 5px;
-        color: #fff !important
+        color: #fff !important;
+        cursor: pointer;
       }
 
       th:last-child,
@@ -153,7 +153,6 @@
           margin-left: 0 !important;
         }
       }
-
     }
 
     td a {
@@ -239,7 +238,7 @@
       list-style: none;
       margin: 0 1rem 0 0;
 
-      li+li {
+      li + li {
         margin-left: 0.3rem;
       }
 

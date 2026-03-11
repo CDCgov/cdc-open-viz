@@ -49,7 +49,7 @@ const MapHeader = ({
               style={{
                 minWidth: (config.table.cellMinWidth || 0) + 'px',
                 textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
-                paddingRight: '1.3em'
+                paddingRight: '1.8em'
               }}
               key={`col-header-${column}__${index}`}
               id={column}
@@ -64,7 +64,9 @@ const MapHeader = ({
                   eventAction: 'click',
                   eventLabel: interactionLabel,
                   vizTitle: getVizTitle(config),
-                  specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                  specifics: `column: ${newSortBy.column || 'none'}, order: ${
+                    newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'
+                  }`
                 })
                 setSortBy(newSortBy)
               }}
@@ -77,7 +79,9 @@ const MapHeader = ({
                     eventAction: 'keyboard',
                     eventLabel: interactionLabel,
                     vizTitle: getVizTitle(config),
-                    specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                    specifics: `column: ${newSortBy.column || 'none'}, order: ${
+                      newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'
+                    }`
                   })
                   setSortBy(newSortBy)
                 }
@@ -91,12 +95,13 @@ const MapHeader = ({
             >
               <ColumnHeadingText text={text} config={config} />
               <SortIcon ascending={sortByAsc} />
-              <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
-                } order`}</span>
+              <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${
+                sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
+              } order`}</span>
             </th>
           )
         })}
-    </tr >
+    </tr>
   )
 }
 

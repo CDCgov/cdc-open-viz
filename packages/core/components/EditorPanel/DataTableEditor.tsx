@@ -7,6 +7,7 @@ import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import { Visualization } from '../../types/Visualization'
 import _ from 'lodash'
 import { Column } from '../../types/Column'
+import CustomSortOrder from './CustomSortOrder'
 
 interface DataTableProps {
   config: Partial<Visualization>
@@ -38,6 +39,56 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
     if (value === PLACEHOLDER) value = undefined
     updateField('table', null, 'groupBy', value)
   }
+
+  const changeSortColumn = (value: string) => {
+    if (value === '' || value === PLACEHOLDER) {
+      // Clear entire defaultSort when column is deselected
+      updateField('table', null, 'defaultSort', {})
+      return
+    }
+    // Set column and reset to ascending, clear custom order
+    updateField('table', null, 'defaultSort', { column: value, sortDirection: 'asc' })
+  }
+
+  const changeSortDirection = (value: string) => {
+    const newDefaultSort = { ...config.table.defaultSort, sortDirection: value }
+    // Clear customOrder when switching away from custom
+    if (value !== 'custom') {
+      delete newDefaultSort.customOrder
+    } else if (!newDefaultSort.customOrder?.length) {
+      // Auto-populate customOrder with unique values so the table updates immediately
+      const col = newDefaultSort.column
+      const dataCol = config.type === 'map' && config.columns?.[col]?.name ? config.columns[col].name : col
+      if (dataCol && config.data?.length) {
+        newDefaultSort.customOrder = _.uniq(config.data.map(row => String(row[dataCol] ?? '')).filter(v => v !== ''))
+      }
+    }
+    updateField('table', null, 'defaultSort', newDefaultSort)
+  }
+
+  // Build sort column options based on visualization type
+  // Maps use config.columns keys (geo, primary, etc.); other types use data column names
+  const sortColumnOptions = useMemo(() => {
+    if (config.type === 'map' && config.columns) {
+      return Object.keys(config.columns)
+        .filter(key => config.columns[key].dataTable !== false && config.columns[key].name)
+        .map(key => ({
+          label: config.columns[key].label || config.columns[key].name || key,
+          value: key
+        }))
+    }
+    return dataColumns.map(col => ({ label: col, value: col }))
+  }, [config.type, config.columns, dataColumns])
+
+  // For custom sort, resolve the actual data column name to get unique values
+  const customSortDataColumn = useMemo(() => {
+    const col = config.table?.defaultSort?.column
+    if (!col) return ''
+    if (config.type === 'map' && config.columns?.[col]?.name) {
+      return config.columns[col].name
+    }
+    return col
+  }, [config.type, config.columns, config.table?.defaultSort?.column])
 
   const excludeColumns = (section, subSection, fieldName, excludedColNames: string[]) => {
     const newColumns = _.cloneDeep(config.columns)
@@ -231,6 +282,49 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           fieldName='showBottomCollapse'
           label='Show collapse below table'
           section='table'
+          updateField={updateField}
+        />
+      )}
+      <Select
+        value={config.table.defaultSort?.column || ''}
+        fieldName='column'
+        section='table'
+        subsection='defaultSort'
+        label='Default Sort Column'
+        initial={PLACEHOLDER}
+        options={sortColumnOptions}
+        updateField={(_section, _subSection, _fieldName, value) => changeSortColumn(value)}
+        tooltip={
+          <Tooltip style={{ textTransform: 'none' }}>
+            <Tooltip.Target>
+              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+            </Tooltip.Target>
+            <Tooltip.Content>
+              <p>Choose a column to sort the data table by when it first loads.</p>
+            </Tooltip.Content>
+          </Tooltip>
+        }
+      />
+      {config.table.defaultSort?.column && (
+        <Select
+          value={config.table.defaultSort?.sortDirection || 'asc'}
+          fieldName='sortDirection'
+          section='table'
+          subsection='defaultSort'
+          label='Sort Direction'
+          options={[
+            { label: 'Ascending', value: 'asc' },
+            { label: 'Descending', value: 'desc' },
+            { label: 'Custom', value: 'custom' }
+          ]}
+          updateField={(_section, _subSection, _fieldName, value) => changeSortDirection(value)}
+        />
+      )}
+      {config.table.defaultSort?.column && config.table.defaultSort?.sortDirection === 'custom' && (
+        <CustomSortOrder
+          column={customSortDataColumn}
+          data={config.data}
+          customOrder={config.table.defaultSort.customOrder}
           updateField={updateField}
         />
       )}
