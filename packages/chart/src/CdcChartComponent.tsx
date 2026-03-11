@@ -1404,9 +1404,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
                       <div style={{ height: `100px`, width: `100%`, ...sparkLineStyles }}>
                         <ParentSize>{parent => <SparkLine width={parent.width} height={parent.height} />}</ParentSize>
                       </div>
-                      {description && (
+                      {processedDescription && (
                         <div className='subtext' style={{ padding: '35px 0 15px' }}>
-                          {parse(description)}
+                          {parse(processedDescription)}
                         </div>
                       )}
                     </>
