@@ -108,7 +108,7 @@ const ChartHeader = ({
               style={{
                 minWidth: (config.table.cellMinWidth || 0) + 'px',
                 textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
-                paddingRight: '1.3em'
+                paddingRight: '1.8em'
               }}
               key={`col-header-${column}__${index}`}
               tabIndex={0}
@@ -179,7 +179,7 @@ const ChartHeader = ({
               style={{
                 minWidth: (config.table.cellMinWidth || 0) + 'px',
                 textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
-                paddingRight: '1.3em'
+                paddingRight: '1.8em'
               }}
               key={`col-header-${text}__${index}`}
               tabIndex={0}
