@@ -60,7 +60,7 @@ const useScales = (properties: useScaleProps) => {
   } = properties
 
   const context = useContext<ChartContext>(ConfigContext)
-  const { rawData, convertLineToBarGraph = false } = context
+  const { convertLineToBarGraph = false } = context
 
   const isHorizontal = config.orientation === 'horizontal'
   const { visualizationType, xAxis, forestPlot, runtime } = config
@@ -308,7 +308,7 @@ const useScales = (properties: useScaleProps) => {
     }
 
     yScale = scaleLinear({
-      domain: [0, rawData.length],
+      domain: [0, data.length],
       range: resolvedYRange()
     })
 

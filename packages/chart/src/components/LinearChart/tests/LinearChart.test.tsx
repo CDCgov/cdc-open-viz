@@ -206,6 +206,24 @@ describe('LinearChart', () => {
       const bottomAxisLine = container.querySelector('.bottom-axis > line[stroke="#333"]')
       expect(bottomAxisLine?.getAttribute('x1')).toBe('0')
     })
+
+    it('renders forest plot rows from transformedData instead of rawData', () => {
+      const filteredData = forestPlotConfig.data.slice(0, 2)
+      const { container } = renderLinearChart(
+        forestPlotConfig as any,
+        {
+          transformedData: filteredData,
+          rawData: forestPlotConfig.data
+        },
+        { parentWidth: 800, parentHeight: 500 }
+      )
+
+      expect(container.querySelectorAll('.lower-ci')).toHaveLength(filteredData.length)
+      expect(container.querySelectorAll('line[class^="line-"]')).toHaveLength(filteredData.length)
+      expect(container.textContent).not.toContain(
+        String(forestPlotConfig.data[forestPlotConfig.data.length - 1]['Author(s) and Year'])
+      )
+    })
   })
 
   describe('axis rendering', () => {
