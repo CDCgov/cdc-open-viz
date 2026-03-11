@@ -249,11 +249,17 @@ const getMinMax = ({
   }
 
   // Enforce smallest left axis max so small-data charts don't show misleading decimal ticks
-  if (config.yAxis.smallestLeftAxisMax && max < config.yAxis.smallestLeftAxisMax) {
-    max = config.yAxis.smallestLeftAxisMax
-  }
-  if (config.yAxis.smallestLeftAxisMax && leftMax < config.yAxis.smallestLeftAxisMax) {
-    leftMax = config.yAxis.smallestLeftAxisMax
+  const smallestLeftAxisMaxRaw = config.yAxis.smallestLeftAxisMax
+  if (smallestLeftAxisMaxRaw !== null && smallestLeftAxisMaxRaw !== '') {
+    const smallestLeftAxisMax = Number(smallestLeftAxisMaxRaw)
+    if (!Number.isNaN(smallestLeftAxisMax)) {
+      if (max < smallestLeftAxisMax) {
+        max = smallestLeftAxisMax
+      }
+      if (leftMax < smallestLeftAxisMax) {
+        leftMax = smallestLeftAxisMax
+      }
+    }
   }
 
   return { min, max, leftMax, rightMax }
