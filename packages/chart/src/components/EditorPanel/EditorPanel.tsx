@@ -2488,11 +2488,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               </>
                             )}
                             <TextField
-                              value={config.yAxis.smallestMaxTickValue}
+                              value={config.yAxis.smallestLeftAxisMax}
                               section='yAxis'
-                              fieldName='smallestMaxTickValue'
+                              fieldName='smallestLeftAxisMax'
                               type='number'
-                              label='Smallest Maximum Tick Value'
+                              label='Smallest Left Axis Maximum'
                               placeholder='Auto'
                               tooltip={
                                 <Tooltip style={{ textTransform: 'none' }}>
@@ -2928,11 +2928,11 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       />
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
                       <TextField
-                        value={config.yAxis.rightSmallestMaxTickValue}
+                        value={config.yAxis.smallestRightAxisMax}
                         section='yAxis'
-                        fieldName='rightSmallestMaxTickValue'
+                        fieldName='smallestRightAxisMax'
                         type='number'
-                        label='Smallest Maximum Tick Value'
+                        label='Smallest Right Axis Maximum'
                         placeholder='Auto'
                         tooltip={
                           <Tooltip style={{ textTransform: 'none' }}>

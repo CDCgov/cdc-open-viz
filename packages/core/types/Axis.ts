@@ -27,7 +27,7 @@ export type Axis = {
   max?: string
   maxTickRotation?: number
   min?: string
-  smallestMaxTickValue?: number
+  smallestLeftAxisMax?: number
   numTicks?: number
   padding?: number
   paddingPercent?: number
@@ -38,7 +38,7 @@ export type Axis = {
   rightLabel?: string
   rightLabelOffsetSize?: number
   rightMax?: string
-  rightSmallestMaxTickValue?: number
+  smallestRightAxisMax?: number
   rightNumTicks?: number
   sortDates?: boolean
   sortKey?: string

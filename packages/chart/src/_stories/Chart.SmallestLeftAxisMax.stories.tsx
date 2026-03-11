@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import Chart from '../CdcChartComponent'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
-import smallestLeftAxisMaxConfig from './_mock/smallest_max_tick_value.json'
+import smallestLeftAxisMaxConfig from './_mock/smallest_left_axis_max.json'
 import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 
 const meta: Meta<typeof Chart> = {
