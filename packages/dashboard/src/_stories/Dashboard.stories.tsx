@@ -43,6 +43,7 @@ import NestedParentChildFilters from './_mock/nested-parent-child-filters.json'
 import GalleryDataBiteDashboard from './_mock/gallery-data-bite-dashboard.json'
 import TP5TestConfig from './_mock/tp5-test.json'
 import LineChartAnglesConfig from './_mock/dashboard-line-chart-angles.json'
+import TabSimpleFilterConfig from './_mock/tab-simple-filter.json'
 
 // Dashboard Filter Updates for Ascending, Descending, and Custom Order
 import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
@@ -4765,6 +4766,28 @@ export const Metadata_In_Dashboard: Story = {
     expect(subtext?.textContent).toContain('January 15, 2026')
     const biteSubtext = await waitForPresence('.bite-subtext', canvasElement)
     expect(biteSubtext?.textContent).toContain('CDC NREVSS')
+  }
+}
+
+export const Tab_Simple_Filter: Story = {
+  args: {
+    config: TabSimpleFilterConfig as unknown as Config,
+    isEditor: false
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Demonstrates the tab-simple filter style on a dashboard. Uses tab buttons instead of a dropdown to switch between filter values.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await canvas.findByText('Sales by Category')
+    const tabContainer = canvasElement.querySelector('.tab-simple-container')
+    await expect(tabContainer).toBeTruthy()
   }
 }
 
