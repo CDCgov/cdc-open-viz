@@ -296,7 +296,14 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                 ]}
                                 updateField={(_section, _subsection, _fieldName, value) => {
                                   if (value === 'metadata') {
-                                    updateVariable(index, { metadataKey: metadataKeys[0] || '', columnName: '', conditions: [] })
+                                    const defaultMetadataKey = metadataKeys[0] || ''
+                                    updateVariable(index, {
+                                      metadataKey: defaultMetadataKey,
+                                      columnName: '',
+                                      conditions: [],
+                                      name: defaultMetadataKey,
+                                      tag: generateTag(defaultMetadataKey)
+                                    })
                                   } else {
                                     updateVariable(index, { metadataKey: undefined, columnName: '' })
                                   }
@@ -315,8 +322,8 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                 updateField={(_section, _subsection, _fieldName, value) => {
                                   updateVariable(index, {
                                     metadataKey: value,
-                                    name: variable.name || value,
-                                    tag: variable.tag || generateTag(value)
+                                    name: value,
+                                    tag: generateTag(value)
                                   })
                                 }}
                               />
@@ -332,7 +339,11 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                   ...getAvailableColumns.map(col => ({ value: col, label: col }))
                                 ]}
                                 updateField={(_section, _subsection, _fieldName, value) => {
-                                  updateVariable(index, { columnName: value })
+                                  updateVariable(index, {
+                                    columnName: value,
+                                    name: value,
+                                    tag: generateTag(value)
+                                  })
                                 }}
                               />
                             </div>

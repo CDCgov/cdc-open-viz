@@ -1,3 +1,8 @@
+:is(footer).cove-footnotes-footer {
+  margin: 0.25rem 0 0;
+  padding: 0;
+}
+
 :is(ul).cove-footnotes {
   :is(li) {
     list-style: none;
