@@ -2,6 +2,15 @@ import { Column } from '@cdc/core/types/Column'
 import { Series } from '@cdc/core/types/Series'
 
 type ChartColumns = Record<string, Partial<Column>>
+type SeriesItem = Series[number]
+type ColumnFormattingParams = {
+  addColPrefix?: string
+  addColSuffix?: string
+  addColRoundTo?: number
+  addColCommas?: boolean
+}
+
+const hasOwn = (object: object, key: keyof Column) => Object.prototype.hasOwnProperty.call(object, key)
 
 export const createDefaultSeriesColumnConfig = (columnName: string): Column => ({
   name: columnName,
@@ -21,7 +30,7 @@ export const createDefaultSeriesColumnConfig = (columnName: string): Column => (
   forestPlotStartingPoint: 0
 })
 
-export const getSeriesOwnedColumnNames = (series: Partial<Series>[] = []): string[] => {
+export const getSeriesOwnedColumnNames = (series: Partial<SeriesItem>[] = []): string[] => {
   return series.map(item => item?.dataKey).filter(Boolean)
 }
 
@@ -58,14 +67,48 @@ export const upsertSeriesColumnConfig = (
   seriesKey: string,
   updates: Partial<Column>
 ): ChartColumns => {
-  const { columnKey, columnConfig } = getSeriesColumnConfig(columns, seriesKey)
+  const existingEntry = findColumnConfigByName(columns, seriesKey)
+  const columnKey = existingEntry?.columnKey || seriesKey
+  const nextColumnConfig = {
+    ...(existingEntry?.columnConfig || {}),
+    ...updates,
+    name: seriesKey
+  }
+
+  if (
+    nextColumnConfig.label === undefined &&
+    !hasOwn(existingEntry?.columnConfig || {}, 'label') &&
+    !hasOwn(updates, 'label')
+  ) {
+    delete nextColumnConfig.label
+  }
 
   return {
     ...columns,
-    [columnKey]: {
-      ...columnConfig,
-      ...updates,
-      name: seriesKey
-    }
+    [columnKey]: nextColumnConfig
   }
+}
+
+export const getSeriesColumnFormattingParams = (columnConfig?: Partial<Column>): ColumnFormattingParams | undefined => {
+  if (!columnConfig) return undefined
+
+  const formattingParams: ColumnFormattingParams = {}
+
+  if (hasOwn(columnConfig, 'prefix')) {
+    formattingParams.addColPrefix = columnConfig.prefix ?? ''
+  }
+
+  if (hasOwn(columnConfig, 'suffix')) {
+    formattingParams.addColSuffix = columnConfig.suffix ?? ''
+  }
+
+  if (hasOwn(columnConfig, 'roundToPlace')) {
+    formattingParams.addColRoundTo = columnConfig.roundToPlace ?? 0
+  }
+
+  if (hasOwn(columnConfig, 'commas')) {
+    formattingParams.addColCommas = columnConfig.commas ?? false
+  }
+
+  return Object.keys(formattingParams).length ? formattingParams : undefined
 }

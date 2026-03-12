@@ -2,6 +2,7 @@ import {
   createDefaultSeriesColumnConfig,
   findColumnConfigByName,
   getSeriesColumnConfig,
+  getSeriesColumnFormattingParams,
   getSeriesOwnedColumnNames,
   upsertSeriesColumnConfig
 } from '../seriesColumnSettings'
@@ -43,7 +44,6 @@ describe('seriesColumnSettings', () => {
 
     expect(updatedColumns).toEqual({
       additionalColumn1: {
-        ...createDefaultSeriesColumnConfig('cases'),
         name: 'cases',
         label: 'Cases',
         dataTable: false,
@@ -51,5 +51,34 @@ describe('seriesColumnSettings', () => {
         commas: true
       }
     })
+  })
+
+  it('does not persist display defaults when creating a new series-owned column config', () => {
+    expect(upsertSeriesColumnConfig({}, 'cases', { label: 'Cases' })).toEqual({
+      cases: {
+        name: 'cases',
+        label: 'Cases'
+      }
+    })
+  })
+
+  it('only returns explicit formatting overrides and preserves falsey values', () => {
+    expect(
+      getSeriesColumnFormattingParams({
+        prefix: '',
+        suffix: ' units',
+        roundToPlace: 0,
+        commas: false
+      })
+    ).toEqual({
+      addColPrefix: '',
+      addColSuffix: ' units',
+      addColRoundTo: 0,
+      addColCommas: false
+    })
+  })
+
+  it('returns undefined when no formatting overrides were explicitly configured', () => {
+    expect(getSeriesColumnFormattingParams({ label: 'Cases' })).toBeUndefined()
   })
 })

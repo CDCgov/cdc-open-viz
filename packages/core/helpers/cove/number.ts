@@ -113,15 +113,22 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   }
 
   if (axis === 'right') {
+    let rightRoundToPlace
+    if (addColRoundTo !== undefined) {
+      rightRoundToPlace = Number(addColRoundTo) || 0
+    } else {
+      rightRoundToPlace = rightRoundTo ? Number(rightRoundTo) : 0
+    }
+
     if (preserveOriginalDecimals) {
       stringFormattingOptions = {
-        useGrouping: config.dataFormat.rightCommas ? true : false
+        useGrouping: addColCommas !== undefined ? addColCommas : config.dataFormat.rightCommas ? true : false
       }
     } else {
       stringFormattingOptions = {
-        useGrouping: config.dataFormat.rightCommas ? true : false,
-        minimumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0,
-        maximumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0
+        useGrouping: addColCommas !== undefined ? addColCommas : config.dataFormat.rightCommas ? true : false,
+        minimumFractionDigits: rightRoundToPlace,
+        maximumFractionDigits: rightRoundToPlace
       }
     }
   }
@@ -183,7 +190,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   }
 
   if (!inlineLabel || addColPrefix) {
-    if (addColPrefix !== undefined && axis === 'left') {
+    if (addColPrefix !== undefined && ['left', 'right'].includes(axis)) {
       result = addColPrefix + result
     } else {
       if (prefix && axis === 'left') {
@@ -191,7 +198,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
       }
     }
 
-    if (rightPrefix && axis === 'right') {
+    if (rightPrefix && axis === 'right' && addColPrefix === undefined) {
       result += rightPrefix
     }
 
@@ -203,7 +210,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   result += num
 
   if (!inlineLabel || addColSuffix) {
-    if (addColSuffix !== undefined && axis === 'left') {
+    if (addColSuffix !== undefined && ['left', 'right'].includes(axis)) {
       result += addColSuffix
     } else {
       if (suffix && axis === 'left') {
@@ -211,7 +218,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
       }
     }
 
-    if (rightSuffix && axis === 'right') {
+    if (rightSuffix && axis === 'right' && addColSuffix === undefined) {
       result += rightSuffix
     }
 

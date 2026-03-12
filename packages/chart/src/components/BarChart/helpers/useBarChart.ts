@@ -52,6 +52,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
     isBarAndLegendIsolate && seriesHighlight?.length
       ? seriesHighlight
       : config.runtime.barSeriesKeys || config.runtime.seriesKeys
+  const seriesOwnedColumnNames = getSeriesOwnedColumnNames(config.series)
 
   useEffect(() => {
     if (orientation === 'horizontal' && !config.yAxis.labelPlacement) {
@@ -170,7 +171,6 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
   const getAdditionalColumn = (series, xAxisDataValue) => {
     if (!xAxisDataValue) return ''
     const columns = config.columns
-    const seriesOwnedColumnNames = getSeriesOwnedColumnNames(config.series)
     const columnsWithTooltips = []
     let additionalTooltipItems = ''
     const dynamicCategorySeries = config.runtime?.series?.find(series => series?.dynamicCategory)

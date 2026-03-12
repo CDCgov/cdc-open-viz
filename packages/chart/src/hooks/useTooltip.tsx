@@ -10,7 +10,11 @@ import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
 import _, { get } from 'lodash'
 import { getHorizontalBarHeights } from '../components/BarChart/helpers/getBarHeights'
-import { findColumnConfigByName, getSeriesOwnedColumnNames } from '../helpers/seriesColumnSettings'
+import {
+  findColumnConfigByName,
+  getSeriesColumnFormattingParams,
+  getSeriesOwnedColumnNames
+} from '../helpers/seriesColumnSettings'
 
 export const useTooltip = props => {
   // Track the last X-axis value to prevent duplicate analytics events
@@ -74,16 +78,10 @@ export const useTooltip = props => {
 
   const getFormattedValue = (seriesKey, value, config, getAxisPosition) => {
     // handle case where data is missing
-    const showMissingDataValue = config.general.showMissingDataLabel && (!value || value === 'null')
+    const showMissingDataValue =
+      config.general.showMissingDataLabel && (value === null || value === undefined || value === '' || value === 'null')
     const seriesColumnConfig = findColumnConfigByName(config.columns || {}, seriesKey)?.columnConfig
-    const formattingParams = seriesColumnConfig
-      ? {
-          addColPrefix: seriesColumnConfig.prefix,
-          addColSuffix: seriesColumnConfig.suffix,
-          addColRoundTo: seriesColumnConfig.roundToPlace || '',
-          addColCommas: seriesColumnConfig.commas
-        }
-      : undefined
+    const formattingParams = getSeriesColumnFormattingParams(seriesColumnConfig)
     const formattedValue =
       seriesKey === config.xAxis.dataKey
         ? value
