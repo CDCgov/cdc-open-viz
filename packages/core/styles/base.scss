@@ -127,22 +127,9 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
     bottom: -0.25em;
   }
 
-  // Restore standard list styles in content/prose areas where user-authored
-  // HTML is rendered via parse() or dangerouslySetInnerHTML. The global reset
-  // above zeroes out padding and list-style on all ul/ol/li, which is correct
-  // for UI components but breaks prose content.
-  .introText,
-  .subtext,
-  .bite-subtext,
-  .footnotes,
-  .cove-footnotes,
-  .annotation__subtext,
-  .markup-include-component .cove-visualization__body-wrap,
-  .cove-waffle-chart__data--text,
-  .bite-content__text-wrap,
-  .cdc-callout__content,
-  .filters-section__intro-text,
-  &.type-filtered-text .cove-visualization__body-wrap {
+  // Restore standard list styles in prose/rich-text containers that opt in to
+  // the shared .cove-prose contract.
+  .cove-prose {
     ul {
       list-style: disc;
       padding-left: 1.5em;

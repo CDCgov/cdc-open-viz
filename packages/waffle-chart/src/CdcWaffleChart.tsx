@@ -471,7 +471,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                   </div>
                   <div className='cove-gauge-chart__content flex-grow-1 d-flex flex-column min-w-0'>
                     {processedContent ? (
-                      <div className='cove-waffle-chart__data--text'>{parse(processedContent)}</div>
+                      <div className='cove-waffle-chart__data--text cove-prose'>{parse(processedContent)}</div>
                     ) : (
                       <div className='cove-waffle-chart__data--text' aria-hidden='true'>
                         &nbsp;
@@ -509,7 +509,9 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                   </Group>
                 </svg>
                 {processedSubtext && (
-                  <div className='cove-waffle-chart__subtext subtext fst-italic mt-2'>{parse(processedSubtext)}</div>
+                  <div className='cove-waffle-chart__subtext subtext cove-prose fst-italic mt-2'>
+                    {parse(processedSubtext)}
+                  </div>
                 )}
               </>
             ) : (
@@ -520,7 +522,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                   {suffix ? suffix + ' ' : ' '} {processedValueDescription}{' '}
                   {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
                 </div>
-                <div className='cove-waffle-chart__data--text'>{parse(processedContent)}</div>
+                <div className='cove-waffle-chart__data--text cove-prose'>{parse(processedContent)}</div>
                 <svg height={config.gauge.height} width={'100%'}>
                   <Group>
                     <Bar
@@ -545,7 +547,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                     />
                   </Group>
                 </svg>
-                <div className={'cove-waffle-chart__subtext subtext'}>{parse(processedSubtext)}</div>
+                <div className={'cove-waffle-chart__subtext subtext cove-prose'}>{parse(processedSubtext)}</div>
               </>
             )}
           </div>
@@ -573,10 +575,14 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                   {suffix ? suffix : null}
                 </div>
               )}
-              {processedContent && <div className='cove-waffle-chart__data--text'>{parse(processedContent)}</div>}
+              {processedContent && (
+                <div className='cove-waffle-chart__data--text cove-prose'>{parse(processedContent)}</div>
+              )}
 
               {processedSubtext && (
-                <div className='cove-waffle-chart__subtext subtext fst-italic'>{parse(processedSubtext)}</div>
+                <div className='cove-waffle-chart__subtext subtext cove-prose fst-italic'>
+                  {parse(processedSubtext)}
+                </div>
               )}
             </div>
           )}
@@ -602,7 +608,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
             <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
           )}
           {config.showTitle && processedTitle && processedTitle.trim() && (
-            <h3 className='cdc-callout__heading fw-bold flex-shrink-0'>{parse(processedTitle)}</h3>
+            <h3 className='cdc-callout__heading cove-prose fw-bold flex-shrink-0'>{parse(processedTitle)}</h3>
           )}
           <div className='w-100 mw-100 overflow-hidden'>{renderChartContent()}</div>
         </div>

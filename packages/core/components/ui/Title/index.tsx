@@ -41,7 +41,7 @@ const Title = (props: HeaderProps) => {
       title &&
       showTitle && (
         <div
-          className={`cove-title cove-title--${titleStyle}${noContent ? ' cove-title--no-content' : ''}`}
+          className={`cove-title cove-title--${titleStyle}${noContent ? ' cove-title--no-content' : ''} cove-prose`}
           style={props.style}
         >
           {superTitle && <sup>{parse(superTitle)}</sup>}
@@ -55,6 +55,7 @@ const Title = (props: HeaderProps) => {
   const updatedClasses = [
     'cove-visualization__title',
     'cove-visualization__header',
+    'cove-prose',
     ...(isDashboard ? ['mb-3'] : []),
     ...classes
   ]
@@ -71,7 +72,9 @@ const Title = (props: HeaderProps) => {
         </header>
         {SHOW_SHIM_TITLE && (
           <div className='cove-title__legacy-preview'>
-            <header class="cove-component__header component__header theme-blue mb-0"><h2>Medicaid Coverage of Cessation Treatments, 2024-Q2</h2></header>
+            <header class='cove-component__header component__header theme-blue mb-0'>
+              <h2>Medicaid Coverage of Cessation Treatments, 2024-Q2</h2>
+            </header>
           </div>
         )}
       </>

@@ -230,7 +230,7 @@ const Filters: React.FC<FilterProps> = ({
   return (
     <section className={getClasses().join(' ')}>
       {visualizationConfig.filterIntro && (
-        <p className='filters-section__intro-text mb-3'>{parse(visualizationConfig.filterIntro)}</p>
+        <p className='filters-section__intro-text cove-prose mb-3'>{parse(visualizationConfig.filterIntro)}</p>
       )}
       <div className='d-flex flex-wrap w-100 filters-section__wrapper align-items-end'>
         <>
