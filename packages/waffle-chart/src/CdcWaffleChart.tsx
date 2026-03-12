@@ -25,6 +25,7 @@ import { publish } from '@cdc/core/helpers/events'
 import chartReducer from './store/chart.reducer'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
+import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 
 import './scss/main.scss'
 import Title from '@cdc/core/components/ui/Title'
@@ -71,6 +72,59 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     dataDenomFunction,
     roundToPlace
   } = config
+
+  const processedTextFields = useMemo(() => {
+    if (!config.enableMarkupVariables || !config.markupVariables?.length) {
+      return {
+        title,
+        content,
+        subtext,
+        valueDescription: config.valueDescription
+      }
+    }
+
+    const markupOptions = {
+      isEditor,
+      showNoDataMessage: false,
+      allowHideSection: false,
+      filters: config.filters || [],
+      locale: config.locale,
+      dataMetadata: config.dataMetadata
+    }
+
+    return {
+      title: title
+        ? processMarkupVariables(title, config.data || [], config.markupVariables, markupOptions).processedContent
+        : title,
+      content: content
+        ? processMarkupVariables(content, config.data || [], config.markupVariables, markupOptions).processedContent
+        : content,
+      subtext: subtext
+        ? processMarkupVariables(subtext, config.data || [], config.markupVariables, markupOptions).processedContent
+        : subtext,
+      valueDescription: config.valueDescription
+        ? processMarkupVariables(config.valueDescription, config.data || [], config.markupVariables, markupOptions)
+            .processedContent
+        : config.valueDescription
+    }
+  }, [
+    config.enableMarkupVariables,
+    config.markupVariables,
+    config.data,
+    config.filters,
+    config.locale,
+    config.dataMetadata,
+    config.valueDescription,
+    title,
+    content,
+    subtext,
+    isEditor
+  ])
+
+  const processedTitle = processedTextFields.title
+  const processedContent = processedTextFields.content
+  const processedSubtext = processedTextFields.subtext
+  const processedValueDescription = processedTextFields.valueDescription
 
   const gaugeColor = config.visual.colors[config.theme]
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
@@ -405,20 +459,20 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                 <>
                   <div
                     className={`cove-gauge-chart__body d-flex flex-row align-items-start flex-grow-1${
-                      !content ? ' justify-content-center' : ''
+                      !processedContent ? ' justify-content-center' : ''
                     }`}
                   >
                     <div className='cove-gauge-chart__value-section flex-shrink-0'>
                       <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
                         {prefix ? prefix : ' '}
                         {config.showPercent ? dataPercentage : waffleNumerator}
-                        {suffix ? suffix + ' ' : ' '} {config.valueDescription}{' '}
+                        {suffix ? suffix + ' ' : ' '} {processedValueDescription}{' '}
                         {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
                       </div>
                     </div>
                     <div className='cove-gauge-chart__content flex-grow-1 d-flex flex-column min-w-0'>
-                      {content ? (
-                        <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
+                      {processedContent ? (
+                        <div className='cove-waffle-chart__data--text'>{parse(processedContent)}</div>
                       ) : (
                         <div className='cove-waffle-chart__data--text' aria-hidden='true'>
                           &nbsp;
@@ -455,8 +509,8 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                       />
                     </Group>
                   </svg>
-                  {subtext && (
-                    <div className='cove-waffle-chart__subtext subtext fst-italic mt-2'>{parse(subtext)}</div>
+                  {processedSubtext && (
+                    <div className='cove-waffle-chart__subtext subtext fst-italic mt-2'>{parse(processedSubtext)}</div>
                   )}
                 </>
               ) : (
@@ -464,10 +518,10 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                   <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
                     {prefix ? prefix : ' '}
                     {config.showPercent ? dataPercentage : waffleNumerator}
-                    {suffix ? suffix + ' ' : ' '} {config.valueDescription}{' '}
+                    {suffix ? suffix + ' ' : ' '} {processedValueDescription}{' '}
                     {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
                   </div>
-                  <div className='cove-waffle-chart__data--text'>{parse(content)}</div>
+                  <div className='cove-waffle-chart__data--text'>{parse(processedContent)}</div>
                   <svg height={config.gauge.height} width={'100%'}>
                     <Group>
                       <Bar
@@ -492,7 +546,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                       />
                     </Group>
                   </svg>
-                  <div className={'cove-waffle-chart__subtext subtext'}>{parse(subtext)}</div>
+                  <div className={'cove-waffle-chart__subtext subtext'}>{parse(processedSubtext)}</div>
                 </>
               )}
             </div>
@@ -511,7 +565,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                 </Group>
               </svg>
             </div>
-            {(dataPercentage || content) && (
+            {(dataPercentage || processedContent) && (
               <div className='cove-waffle-chart__data'>
                 {dataPercentage && (
                   <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
@@ -520,9 +574,11 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                     {suffix ? suffix : null}
                   </div>
                 )}
-                {content && <div className='cove-waffle-chart__data--text'>{parse(content)}</div>}
+                {processedContent && <div className='cove-waffle-chart__data--text'>{parse(processedContent)}</div>}
 
-                {subtext && <div className='cove-waffle-chart__subtext subtext fst-italic'>{parse(subtext)}</div>}
+                {processedSubtext && (
+                  <div className='cove-waffle-chart__subtext subtext fst-italic'>{parse(processedSubtext)}</div>
+                )}
               </div>
             )}
           </div>
@@ -544,8 +600,8 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
           {!config.visual?.whiteBackground && (
             <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
           )}
-          {config.showTitle && title && title.trim() && (
-            <h3 className='cdc-callout__heading fw-bold flex-shrink-0'>{parse(title)}</h3>
+          {config.showTitle && processedTitle && processedTitle.trim() && (
+            <h3 className='cdc-callout__heading fw-bold flex-shrink-0'>{parse(processedTitle)}</h3>
           )}
           <div className='w-100 mw-100 overflow-hidden'>{renderChartContent()}</div>
         </div>
@@ -559,7 +615,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     <div className='cove-visualization__inner cove-visualization__body'>
       <Title
         showTitle={config.showTitle}
-        title={title}
+        title={processedTitle}
         titleStyle='legacy'
         config={config}
         classes={['chart-title', `${config.theme}`, 'mb-0']}

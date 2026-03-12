@@ -16,6 +16,7 @@ export type Config = {
   dataDenomFunction: string
   dataFunction: string
   dataUrl?: string
+  dataMetadata?: any
   filters: any[]
   // data point font size (main number)
   fontSize: string
@@ -43,4 +44,6 @@ export type Config = {
   visualizationType: 'Gauge' | 'Waffle' | 'TP5 Waffle' | 'TP5 Gauge'
   version: Version
   locale: string
+  markupVariables?: any[]
+  enableMarkupVariables?: boolean
 }
