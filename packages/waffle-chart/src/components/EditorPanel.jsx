@@ -13,6 +13,7 @@ import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { useFilterManagement } from '@cdc/core/hooks/useFilterManagement'
 import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualSection'
+import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 
 import '@cdc/core/components/EditorPanel/editor.scss'
 import WarningImage from '../images/warning.svg'
@@ -452,6 +453,18 @@ const EditorPanel = memo(props => {
           />
         </Accordion.Section>
       )}
+      <Accordion.Section title='Markup Variables'>
+        <PanelMarkup
+          name='Markup Variables'
+          markupVariables={config.markupVariables || []}
+          data={data}
+          enableMarkupVariables={config.enableMarkupVariables || false}
+          onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
+          onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
+          withAccordion={false}
+          dataMetadata={config.dataMetadata}
+        />
+      </Accordion.Section>
     </Accordion>
   )
 
