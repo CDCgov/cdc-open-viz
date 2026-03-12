@@ -27,6 +27,36 @@ describe('update_4_26_4', () => {
     expect(result.version).toBe('4.26.4')
   })
 
+  it('sets markup-include contentEditor.style to legacy when missing', () => {
+    const config: any = {
+      type: 'markup-include',
+      version: '4.26.3',
+      contentEditor: {
+        title: 'Title'
+      }
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.contentEditor.style).toBe('legacy')
+    expect(result.version).toBe('4.26.4')
+  })
+
+  it('does not overwrite existing markup-include contentEditor.style', () => {
+    const config: any = {
+      type: 'markup-include',
+      version: '4.26.3',
+      contentEditor: {
+        title: 'Title',
+        style: 'tp5'
+      }
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.contentEditor.style).toBe('tp5')
+  })
+
   it('turns off extra visual settings for chart visualizations inside dashboards only', () => {
     const config: any = {
       type: 'dashboard',
@@ -50,6 +80,19 @@ describe('update_4_26_4', () => {
             background: true,
             hideBackgroundColor: true
           }
+        },
+        markup1: {
+          type: 'markup-include',
+          contentEditor: {
+            title: 'Markup 1'
+          }
+        },
+        markup2: {
+          type: 'markup-include',
+          contentEditor: {
+            title: 'Markup 2',
+            style: 'tp5'
+          }
         }
       }
     }
@@ -69,9 +112,23 @@ describe('update_4_26_4', () => {
       background: true,
       hideBackgroundColor: true
     })
+    expect(result.visualizations.markup1.contentEditor.style).toBe('legacy')
+    expect(result.visualizations.markup2.contentEditor.style).toBe('tp5')
   })
 
-  it('does not mutate the original config', () => {
+  it('creates contentEditor object when missing on markup-include', () => {
+    const config: any = {
+      type: 'markup-include',
+      version: '4.26.3'
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.contentEditor).toBeTruthy()
+    expect(result.contentEditor.style).toBe('legacy')
+  })
+
+  it('does not mutate original chart config', () => {
     const config: any = {
       type: 'chart',
       version: '4.26.3',
@@ -84,5 +141,20 @@ describe('update_4_26_4', () => {
 
     expect(config.visual.accent).toBe(true)
     expect(result.visual.accent).toBe(false)
+  })
+
+  it('does not mutate original markup-include config', () => {
+    const config: any = {
+      type: 'markup-include',
+      version: '4.26.3',
+      contentEditor: {
+        title: 'Title'
+      }
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(config.contentEditor.style).toBeUndefined()
+    expect(result.contentEditor.style).toBe('legacy')
   })
 })

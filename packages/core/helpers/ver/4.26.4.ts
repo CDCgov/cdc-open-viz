@@ -12,10 +12,27 @@ const disableExtraChartVisualSettings = config => {
       hideBackgroundColor: false
     }
   }
+}
+
+const addMarkupIncludeStyle = config => {
+  if (config.type === 'markup-include') {
+    if (!config.contentEditor) {
+      config.contentEditor = {}
+    }
+
+    if (!config.contentEditor.style) {
+      config.contentEditor.style = 'legacy'
+    }
+  }
+}
+
+const run_4_26_4_migrations = config => {
+  disableExtraChartVisualSettings(config)
+  addMarkupIncludeStyle(config)
 
   if (config.type === 'dashboard' && config.visualizations) {
     Object.values((config as DashboardConfig).visualizations).forEach(visualization => {
-      disableExtraChartVisualSettings(visualization)
+      run_4_26_4_migrations(visualization)
     })
   }
 }
@@ -23,7 +40,7 @@ const disableExtraChartVisualSettings = config => {
 const update_4_26_4 = config => {
   const ver = '4.26.4'
   const newConfig = cloneConfig(config)
-  disableExtraChartVisualSettings(newConfig)
+  run_4_26_4_migrations(newConfig)
   newConfig.version = ver
   return newConfig
 }

@@ -53,5 +53,35 @@ describe('coveUpdateWorker', () => {
 
       expect(result.multiDashboards[0].version).toBeUndefined()
     })
+
+    it('should apply 4.26.4 markup-include style migration to sub-dashboards', () => {
+      const config: any = {
+        type: 'dashboard',
+        version: '4.26.3',
+        dashboard: { title: 'Parent Dashboard' },
+        rows: [],
+        visualizations: {},
+        multiDashboards: [
+          {
+            type: 'dashboard',
+            dashboard: { title: 'Sub Dashboard' },
+            rows: [],
+            visualizations: {
+              mi1: {
+                type: 'markup-include',
+                contentEditor: {
+                  title: 'Legacy markup include'
+                }
+              }
+            }
+          }
+        ]
+      }
+
+      const result = coveUpdateWorker(config)
+      const subDash = result.multiDashboards[0]
+
+      expect(subDash.visualizations.mi1.contentEditor.style).toBe('legacy')
+    })
   })
 })

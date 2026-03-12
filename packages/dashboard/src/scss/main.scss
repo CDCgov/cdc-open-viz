@@ -371,7 +371,8 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           .cove-visualization__outer,
           .cove-visualization__inner,
           .cove-visualization__body,
-          .cove-visualization__body-wrap {
+          .cove-visualization__body-wrap,
+          .markup-include-tp5 {
             display: flex !important;
             flex-direction: column !important;
             flex: 1 1 auto !important;
@@ -518,6 +519,21 @@ button.row-menu__btn[title*='Equal Height Rows'] {
         // Hide icon when in multi-column layout, unless using white background
         &:not(.white-background-style) .cdc-callout__icon {
           display: none;
+        }
+      }
+    }
+
+    // TP5 Markup Include adjustments when there are 2+ in a row
+    .row:has(.markup-include__style--tp5):has([class*='col-'] ~ [class*='col-']) {
+      .markup-include__style--tp5 {
+        .markup-include-tp5 {
+          flex: 1;
+        }
+
+        .cdc-callout__heading {
+          min-height: 3em;
+          display: flex;
+          align-items: flex-start;
         }
       }
     }

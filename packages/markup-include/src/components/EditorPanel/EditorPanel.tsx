@@ -29,8 +29,9 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
   const { config, data, isDashboard, loading, setParentConfig, updateConfig } = useContext(ConfigContext)
   const { contentEditor, theme, visual } = config || {}
   const { inlineHTML, srcUrl, title, useInlineHTML } = contentEditor || {}
+  const isTp5Style = contentEditor?.style === 'tp5'
   const updateField = updateFieldFactory(config, updateConfig, true)
-  const styleTreatment = visual?.tp5Treatment ? 'tp5' : 'legacy'
+  const styleTreatment = (visual as any)?.tp5Treatment ? 'tp5' : 'legacy'
 
   const handleStyleTreatmentChange = (value: string) => {
     const useTp5Treatment = value === 'tp5'
@@ -74,6 +75,17 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
       {() => (
         <Accordion>
           <Accordion.Section title='General'>
+            <Select
+              value={contentEditor?.style || 'legacy'}
+              section='contentEditor'
+              fieldName='style'
+              label='Style'
+              updateField={updateField}
+              options={[
+                { value: 'legacy', label: 'Legacy' },
+                { value: 'tp5', label: 'TP5' }
+              ]}
+            />
             <TextField
               value={title || ''}
               section='contentEditor'
@@ -82,32 +94,34 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
               placeholder='Markup Include Title'
               updateField={updateField}
             />
-            <Select
-              value={contentEditor?.titleStyle || 'small'}
-              section='contentEditor'
-              fieldName='titleStyle'
-              label='Title Style'
-              updateField={updateField}
-              options={[
-                { value: 'small', label: 'Small (h3)' },
-                { value: 'large', label: 'Large (h2)' },
-                { value: 'legacy', label: 'Legacy' }
-              ]}
-              tooltip={
-                <Tooltip style={{ textTransform: 'none' }}>
-                  <Tooltip.Target>
-                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                  </Tooltip.Target>
-                  <Tooltip.Content>
-                    <p>Choose the visual style for the title.</p>
-                    <p>
-                      Consider heading order on your page when selecting the title style. For 508 reasons, ensure your
-                      page follows a proper heading order.
-                    </p>
-                  </Tooltip.Content>
-                </Tooltip>
-              }
-            />
+            {!isTp5Style && (
+              <Select
+                value={contentEditor?.titleStyle || 'small'}
+                section='contentEditor'
+                fieldName='titleStyle'
+                label='Title Style'
+                updateField={updateField}
+                options={[
+                  { value: 'small', label: 'Small (h3)' },
+                  { value: 'large', label: 'Large (h2)' },
+                  { value: 'legacy', label: 'Legacy' }
+                ]}
+                tooltip={
+                  <Tooltip style={{ textTransform: 'none' }}>
+                    <Tooltip.Target>
+                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                    </Tooltip.Target>
+                    <Tooltip.Content>
+                      <p>Choose the visual style for the title.</p>
+                      <p>
+                        Consider heading order on your page when selecting the title style. For 508 reasons, ensure your
+                        page follows a proper heading order.
+                      </p>
+                    </Tooltip.Content>
+                  </Tooltip>
+                }
+              />
+            )}
             <Select
               value={config.locale}
               fieldName='locale'
@@ -174,19 +188,29 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
               selectedTheme={config.theme}
               onThemeSelect={theme => updateConfig({ ...config, theme })}
             />
-            <StyleTreatmentSection
-              styleTreatment={styleTreatment}
-              onStyleTreatmentChange={handleStyleTreatmentChange}
-              showStyleTreatment={false}
-              border={config.visual?.border}
-              borderColorTheme={config.visual?.borderColorTheme}
-              accent={config.visual?.accent}
-              background={config.visual?.background}
-              hideBackgroundColor={config.visual?.hideBackgroundColor}
-              showBackground
-              showHideBackgroundColor
-              updateField={updateField}
-            />
+            {isTp5Style ? (
+              <CheckBox
+                value={visual?.background}
+                section='visual'
+                fieldName='background'
+                label='Use White Background Style'
+                updateField={updateField}
+              />
+            ) : (
+              <StyleTreatmentSection
+                styleTreatment={styleTreatment}
+                onStyleTreatmentChange={handleStyleTreatmentChange}
+                showStyleTreatment={false}
+                border={config.visual?.border}
+                borderColorTheme={config.visual?.borderColorTheme}
+                accent={config.visual?.accent}
+                background={config.visual?.background}
+                hideBackgroundColor={config.visual?.hideBackgroundColor}
+                showBackground
+                showHideBackgroundColor
+                updateField={updateField}
+              />
+            )}
           </Accordion.Section>
           {isDashboard && (
             <Accordion.Section title='Footnotes'>

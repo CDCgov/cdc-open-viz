@@ -55,4 +55,26 @@ export const image_with_text: Story = {
   }
 }
 
+export const TP5_Test: Story = {
+  args: {
+    config: {
+      ...primary,
+      contentEditor: {
+        ...primary.contentEditor,
+        style: 'tp5',
+        title: 'TP5 Markup Include Test',
+        useInlineHTML: true,
+        inlineHTML:
+          '<p>This is a TP5 style markup include test story.</p><p>Clear the title in the editor to verify TP5 title hide behavior.</p>'
+      },
+      visual: {
+        ...primary.visual,
+        border: true,
+        background: true
+      }
+    },
+    isEditor: true
+  }
+}
+
 export default meta

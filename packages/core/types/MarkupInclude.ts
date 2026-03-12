@@ -13,6 +13,7 @@ export type MarkupIncludeConfig = Visualization & {
     showNoDataMessage?: boolean
     noDataMessageText?: string
     srcUrl: string
+    style?: 'legacy' | 'tp5'
     title: string
     titleStyle?: 'legacy' | 'large' | 'small'
     useInlineHTML: boolean
