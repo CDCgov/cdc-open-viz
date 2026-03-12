@@ -204,7 +204,7 @@ const BottomAxis: React.FC<BottomAxisProps> = ({
               const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
               const tickLength = showTick === 'block' ? MAJOR_TICK_LENGTH : DEFAULT_TICK_LENGTH
               const to = { x: tick.to.x, y: tickLength }
-              const limitedWidth = 100 / propsTicks.length
+              const limitedWidth = Math.max(maxLengthOfTick, 0)
 
               // Configure rotation using effective values (computed above without mutations)
               const tickRotation =
