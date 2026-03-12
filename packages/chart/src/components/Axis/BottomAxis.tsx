@@ -199,7 +199,7 @@ const BottomAxis: React.FC<BottomAxisProps> = ({
 
         return (
           <Group className='bottom-axis' width={parentWidth}>
-            {filteredTicks.map((tick, i, propsTicks) => {
+            {filteredTicks.map((tick, i) => {
               // when using LogScale show major ticks values only
               const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
               const tickLength = showTick === 'block' ? MAJOR_TICK_LENGTH : DEFAULT_TICK_LENGTH
