@@ -6,6 +6,7 @@ import { getPaletteColors } from '@cdc/core/helpers/palettes/utils'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
 import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
+import { getSeriesOwnedColumnNames } from '../../../helpers/seriesColumnSettings'
 
 export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, configContext) => {
   const {
@@ -169,6 +170,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
   const getAdditionalColumn = (series, xAxisDataValue) => {
     if (!xAxisDataValue) return ''
     const columns = config.columns
+    const seriesOwnedColumnNames = getSeriesOwnedColumnNames(config.series)
     const columnsWithTooltips = []
     let additionalTooltipItems = ''
     const dynamicCategorySeries = config.runtime?.series?.find(series => series?.dynamicCategory)
@@ -179,6 +181,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
       }) || {}
     Object.keys(columns).forEach(colKeys => {
       const colConfig = config.columns[colKeys]
+      if (seriesOwnedColumnNames.includes(colConfig.name || colKeys)) return
       if (series && colConfig.series && colConfig.series !== series && !colConfig.tooltips) return
       const formattingParams = {
         addColPrefix: config.columns[colKeys].prefix,

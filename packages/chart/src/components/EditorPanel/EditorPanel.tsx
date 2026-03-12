@@ -58,6 +58,7 @@ import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { paletteMigrationMap, twoColorPaletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { isV1Palette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
+import { getSeriesOwnedColumnNames } from '../../helpers/seriesColumnSettings'
 
 interface PreliminaryProps {
   config: ChartConfig
@@ -938,6 +939,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
   // Extract column names from data with memoization (replaces getColumns)
   const allColumns = useDataColumns(dataSourceForColumns)
+  const seriesOwnedColumnNames = useMemo(() => getSeriesOwnedColumnNames(config.series), [config.series])
 
   // Filter out series columns and confidence key columns (except lower and upper)
   const filteredColumns = useMemo(() => {
@@ -1521,44 +1523,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     'Paired Bar',
     'Deviation Bar'
   ]
-
-  const columnsOptions = [
-    <option value='' key={'Select Option'}>
-      - Select Option -
-    </option>
-  ]
-
-  if (config.data && config.series) {
-    Object.keys(config.data?.[0] || []).map(colName => {
-      // OMIT ANY COLUMNS THAT ARE IN DATA SERIES!
-      const found = config?.series.some(series => series.dataKey === colName)
-      if (colName !== config.xAxis.dataKey && !found) {
-        // if not the index then add it
-        return columnsOptions.push(
-          <option value={colName} key={colName}>
-            {colName}
-          </option>
-        )
-      }
-    })
-  }
-
-  // for pie charts
-  if (!config.data && data) {
-    if (!data[0]) return
-    Object.keys(data[0]).map(colName => {
-      // OMIT ANY COLUMNS THAT ARE IN DATA SERIES!
-      const found = data.some(el => el.dataKey === colName)
-      if (colName !== config.xAxis.dataKey && !found) {
-        // if not the index then add it
-        return columnsOptions.push(
-          <option value={colName} key={colName}>
-            {colName}
-          </option>
-        )
-      }
-    })
-  }
 
   const removeAdditionalColumn = columnName => {
     const newColumns = cloneDeep(config.columns)
@@ -4146,6 +4110,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         config={config}
                         updateField={updateFieldDeprecated}
                         deleteColumn={removeAdditionalColumn}
+                        hiddenColumnNames={seriesOwnedColumnNames}
                       />{' '}
                     </AccordionItemPanel>
                   </AccordionItem>

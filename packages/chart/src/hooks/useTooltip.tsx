@@ -10,6 +10,7 @@ import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
 import _, { get } from 'lodash'
 import { getHorizontalBarHeights } from '../components/BarChart/helpers/getBarHeights'
+import { findColumnConfigByName, getSeriesOwnedColumnNames } from '../helpers/seriesColumnSettings'
 
 export const useTooltip = props => {
   // Track the last X-axis value to prevent duplicate analytics events
@@ -27,6 +28,7 @@ export const useTooltip = props => {
   } = useContext<ChartContext>(ConfigContext)
   const { xScale, yScale, seriesScale, showTooltip, hideTooltip, interactionLabel = '' } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
+  const seriesOwnedColumnNames = getSeriesOwnedColumnNames(config.series)
 
   // Track the latest xScale in a ref to prevent stale closures
   const xScaleRef = useRef(xScale)
@@ -73,7 +75,19 @@ export const useTooltip = props => {
   const getFormattedValue = (seriesKey, value, config, getAxisPosition) => {
     // handle case where data is missing
     const showMissingDataValue = config.general.showMissingDataLabel && (!value || value === 'null')
-    const formattedValue = seriesKey === config.xAxis.dataKey ? value : formatNumber(value, getAxisPosition(seriesKey))
+    const seriesColumnConfig = findColumnConfigByName(config.columns || {}, seriesKey)?.columnConfig
+    const formattingParams = seriesColumnConfig
+      ? {
+          addColPrefix: seriesColumnConfig.prefix,
+          addColSuffix: seriesColumnConfig.suffix,
+          addColRoundTo: seriesColumnConfig.roundToPlace || '',
+          addColCommas: seriesColumnConfig.commas
+        }
+      : undefined
+    const formattedValue =
+      seriesKey === config.xAxis.dataKey
+        ? value
+        : formatColNumber(value, getAxisPosition(seriesKey), true, config, formattingParams)
 
     return showMissingDataValue ? 'N/A' : formattedValue
   }
@@ -98,6 +112,9 @@ export const useTooltip = props => {
     const columnsWithTooltips = []
     const tooltipItems = [] as any[][]
     for (const [colKey, column] of Object.entries(config.columns)) {
+      const columnName = column.name || colKey
+      if (seriesOwnedColumnNames.includes(columnName)) continue
+
       const formattingParams = {
         addColPrefix: column.prefix,
         addColSuffix: column.suffix,
@@ -633,7 +650,9 @@ export const useTooltip = props => {
    */
   const getSeriesNameFromLabel = originalColumnName => {
     let series = config.runtime.series.filter(s => s.dataKey === originalColumnName)
-    if (series[0]?.name) return series[0]?.name
+    if (series[0] && series[0].name !== undefined) return series[0]?.name
+    const columnConfig = findColumnConfigByName(config.columns || {}, originalColumnName)?.columnConfig
+    if (columnConfig?.label !== undefined) return columnConfig.label
     return originalColumnName
   }
 
