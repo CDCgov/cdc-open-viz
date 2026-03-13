@@ -474,67 +474,40 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       }
     }
 
-    // TP5 adjustments when there are 2+ data bites in a row
-    .row:has(.bite__style--tp5):has([class*='col-'] ~ [class*='col-']) {
-      .bite__style--tp5 {
-        .cdc-callout__heading {
-          padding-right: 0;
-        }
-      }
-
-      // Hide flag when in multi-column layout
-      .bite__style--tp5 .cdc-callout__flag {
-        display: none;
-      }
-    }
-
-    // TP5 Waffle/Gauge adjustments when there are 2+ in a row
-    .row:has(.waffle__style--tp5):has([class*='col-'] ~ [class*='col-']),
-    .row:has(.gauge__style--tp5):has([class*='col-'] ~ [class*='col-']) {
-
-      .waffle__style--tp5,
-      .gauge__style--tp5 {
-
-        .cdc-callout {
-          flex: 1;
-        }
-
-        // Hide icon when in multi-column layout
-        .cdc-callout__icon {
-          display: none;
-        }
-
-        // Hide flag when in multi-column layout
+    // Shared TP5 adjustments for multi-column rows (any TP5 type)
+    .row:has(.tp5-element):has([class*='col-'] ~ [class*='col-']) {
+      .tp5-element {
         .cdc-callout__flag {
           display: none;
         }
 
         .cdc-callout__heading {
-          // Fixed minimum height to align titles - adjust based on design needs
           min-height: 3em;
           display: flex;
           align-items: flex-start;
         }
+      }
 
-        // Hide icon when in multi-column layout, unless using white background
+      // Data bite: remove heading right padding in multi-column
+      .bite__style--tp5 .cdc-callout__heading {
+        padding-right: 0;
+      }
+
+      // Waffle/Gauge: stretch callout, hide icon
+      .waffle__style--tp5,
+      .gauge__style--tp5 {
+        .cdc-callout {
+          flex: 1;
+        }
+
         &:not(.white-background-style) .cdc-callout__icon {
           display: none;
         }
       }
-    }
 
-    // TP5 Markup Include adjustments when there are 2+ in a row
-    .row:has(.markup-include__style--tp5):has([class*='col-'] ~ [class*='col-']) {
-      .markup-include__style--tp5 {
-        .markup-include-tp5 {
-          flex: 1;
-        }
-
-        .cdc-callout__heading {
-          min-height: 3em;
-          display: flex;
-          align-items: flex-start;
-        }
+      // Markup Include: stretch inner container
+      .markup-include__style--tp5 .markup-include-tp5 {
+        flex: 1;
       }
     }
 

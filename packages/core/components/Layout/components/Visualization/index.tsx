@@ -88,13 +88,16 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
 
     if (config.type === 'data-bite') {
       classes.push('type-data-bite', `font-${config.fontSize}`)
+      if (config.biteStyle === 'tp5') {
+        classes.push('tp5-element')
+      }
       return classes
     }
 
     if (config.type === 'markup-include') {
       classes.push('type-markup-include')
       if (config.contentEditor?.style === 'tp5') {
-        classes.push('markup-include__style--tp5')
+        classes.push('markup-include__style--tp5', 'tp5-element')
       }
       return classes
     }
@@ -103,14 +106,14 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
       classes.push('type-waffle-chart', 'font-' + config.overallFontSize)
 
       if (config.visualizationType === 'TP5 Waffle') {
-        classes.push('waffle__style--tp5')
+        classes.push('waffle__style--tp5', 'tp5-element')
         if (config.visual?.whiteBackground) {
           classes.push('white-background-style')
         }
       }
 
       if (config.visualizationType === 'TP5 Gauge') {
-        classes.push('gauge__style--tp5')
+        classes.push('gauge__style--tp5', 'tp5-element')
         if (config.visual?.whiteBackground) {
           classes.push('white-background-style')
         }

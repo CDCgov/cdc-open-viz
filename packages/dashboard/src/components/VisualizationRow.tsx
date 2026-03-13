@@ -55,6 +55,12 @@ const VisualizationWrapper: React.FC<VisualizationWrapperProps> = ({
   )
 }
 
+const isTP5Visualization = (viz: any) =>
+  viz?.biteStyle === 'tp5' ||
+  viz?.visualizationType === 'TP5 Waffle' ||
+  viz?.visualizationType === 'TP5 Gauge' ||
+  viz?.contentEditor?.style === 'tp5'
+
 type VizRowProps = {
   allExpanded: boolean
   filteredDataOverride?: Object[]
@@ -138,7 +144,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     return () => resizeObserver.disconnect()
   }
 
-  // Equalize TP5 callout title heights and TP5 gauge message blocks for like visualizations in the same row
+  // Equalize TP5 callout title heights across all types, plus type-specific body alignment
   useEffect(() => {
     if (!row.equalHeight) return
 
@@ -146,11 +152,8 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     if (!rowElement) return
 
     const cleanups = [
-      setupTP5MinHeightEqualizer(rowElement, '.bite__style--tp5 .cdc-callout__heading'),
-      setupTP5MinHeightEqualizer(rowElement, '.waffle__style--tp5 .cdc-callout__heading'),
-      setupTP5MinHeightEqualizer(rowElement, '.gauge__style--tp5 .cdc-callout__heading'),
-      setupTP5MinHeightEqualizer(rowElement, '.gauge__style--tp5 .cove-gauge-chart__content'),
-      setupTP5MinHeightEqualizer(rowElement, '.markup-include__style--tp5 .cdc-callout__heading')
+      setupTP5MinHeightEqualizer(rowElement, '.tp5-element .cdc-callout__heading'),
+      setupTP5MinHeightEqualizer(rowElement, '.gauge__style--tp5 .cove-gauge-chart__content')
     ].filter(Boolean) as Array<() => void>
 
     return () => {
@@ -166,13 +169,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     isMultiColumn &&
     row.columns.some(col => {
       if (!col.widget) return false
-      const viz = config.visualizations[col.widget]
-      return (
-        viz?.biteStyle === 'tp5' ||
-        viz?.visualizationType === 'TP5 Waffle' ||
-        viz?.visualizationType === 'TP5 Gauge' ||
-        viz?.contentEditor?.style === 'tp5'
-      )
+      return isTP5Visualization(config.visualizations[col.widget])
     })
   const needsEqualHeight = (row.equalHeight || hasTP5Content) && !isFilterRow
 
