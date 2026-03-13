@@ -40,6 +40,11 @@
       { "width": 4, "widget": "gauge1" },
       { "width": 4, "widget": "gauge2" },
       { "width": 4, "widget": "gauge3" }
+    ],
+    [
+      { "width": 4, "widget": "mixed_waffle" },
+      { "width": 4, "widget": "mixed_bite" },
+      { "width": 4, "widget": "mixed_gauge" }
     ]
   ],
   "visualizations": {
@@ -261,6 +266,68 @@
       "visual": {
         "hideBackgroundColor": false
       }
+    },
+    "mixed_waffle": {
+      "uid": "mixed_waffle",
+      "type": "waffle-chart",
+      "title": "Vaccination Coverage (Waffle)",
+      "visualizationType": "TP5 Waffle",
+      "visualizationSubType": "linear",
+      "showPercent": true,
+      "showDenominator": false,
+      "content": "of the population is vaccinated",
+      "subtext": "",
+      "dataColumn": "Vaccination Rate",
+      "dataFunction": "Mean (Average)",
+      "customDenom": false,
+      "dataDenom": "100",
+      "suffix": "%",
+      "roundToPlace": "1",
+      "theme": "theme-blue",
+      "shape": "square",
+      "visual": { "whiteBackground": false },
+      "showTitle": true,
+      "overallFontSize": "medium"
+    },
+    "mixed_bite": {
+      "uid": "mixed_bite",
+      "type": "data-bite",
+      "title": "Insurance Rate (Data Bite)",
+      "biteStyle": "tp5",
+      "dataColumn": "Insured Rate",
+      "dataFunction": "Mean (Average)",
+      "biteBody": "have health insurance coverage",
+      "subtext": "",
+      "dataFormat": {
+        "roundToPlace": 1,
+        "commas": true,
+        "prefix": "",
+        "suffix": "%"
+      },
+      "theme": "theme-teal",
+      "visual": { "hideBackgroundColor": false }
+    },
+    "mixed_gauge": {
+      "uid": "mixed_gauge",
+      "type": "waffle-chart",
+      "title": "Screening Rate (Gauge)",
+      "visualizationType": "TP5 Gauge",
+      "visualizationSubType": "linear",
+      "showPercent": true,
+      "showDenominator": false,
+      "content": "completed cancer screenings",
+      "subtext": "",
+      "dataColumn": "Screening Rate",
+      "dataFunction": "Mean (Average)",
+      "customDenom": false,
+      "dataDenom": "100",
+      "suffix": "%",
+      "roundToPlace": "1",
+      "theme": "theme-purple",
+      "gauge": { "height": 35, "width": "100%" },
+      "visual": { "whiteBackground": false },
+      "showTitle": true,
+      "overallFontSize": "medium"
     }
   }
 }
