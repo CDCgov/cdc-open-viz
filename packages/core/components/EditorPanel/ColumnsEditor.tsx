@@ -14,6 +14,7 @@ interface ColumnsEditorProps {
   config: Partial<Visualization>
   updateField: UpdateFieldFunc<string | boolean | string[] | number | Column | Record<string, Partial<Column>>>
   deleteColumn: (colName: string) => void
+  hiddenColumnNames?: string[]
 }
 
 type OpenControls = [Record<string, boolean>, Function] // useState type
@@ -22,6 +23,7 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
   config,
   deleteColumn,
   updateField,
+  hiddenColumnNames = [],
   colKey,
   controls
 }) => {
@@ -63,12 +65,13 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
     const cols = allColumns.filter(key => {
       if (config.table.groupBy === key) return false
       if (configuredColumns.includes(key)) return false
+      if (hiddenColumnNames.includes(key)) return false
       return true
     })
     // Add current column name if it exists
     if (config.columns[colKey]?.name) cols.push(config.columns[colKey].name)
     return cols
-  }, [allColumns, config.table.groupBy, config.columns, colKey])
+  }, [allColumns, config.table.groupBy, config.columns, colKey, hiddenColumnNames])
 
   const colName = config.columns[colKey]?.name
 
@@ -264,9 +267,12 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
   )
 }
 
-const ColumnsEditor: React.FC<ColumnsEditorProps> = ({ config, updateField, deleteColumn }) => {
+const ColumnsEditor: React.FC<ColumnsEditorProps> = ({ config, updateField, deleteColumn, hiddenColumnNames = [] }) => {
   const openControls = useState({})
-  const additionalColumns = Object.keys(config.columns)
+  const additionalColumns = Object.keys(config.columns).filter(colKey => {
+    const columnName = config.columns[colKey]?.name || colKey
+    return !hiddenColumnNames.includes(columnName)
+  })
 
   // just adds a new column but not set to any data yet
   const addColumnConfig = number => {
@@ -314,6 +320,7 @@ const ColumnsEditor: React.FC<ColumnsEditorProps> = ({ config, updateField, dele
               config={config}
               deleteColumn={deleteColumn}
               updateField={updateField}
+              hiddenColumnNames={hiddenColumnNames}
               colKey={val}
             />
           ))}

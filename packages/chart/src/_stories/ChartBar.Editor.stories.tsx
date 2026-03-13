@@ -1682,6 +1682,17 @@ export const BarColumnsSectionTests: Story = {
     // Open Columns accordion
     await openAccordion(canvas, 'Columns')
 
+    const getFirstColumnConfig = async () => {
+      const columnSelect = (await canvas.findAllByLabelText(/^column$/i))[0]
+      const fieldset = columnSelect.closest('fieldset')
+
+      if (!fieldset) {
+        throw new Error('Unable to find the first column configuration fieldset')
+      }
+
+      return within(fieldset as HTMLElement)
+    }
+
     // Test 1: Add first column configuration and verify fields appear
     await performAndAssert(
       'Add first column configuration and verify fields appear',
@@ -1714,9 +1725,10 @@ export const BarColumnsSectionTests: Story = {
     await performAndAssert(
       'Configure column with data column and custom label',
       () => {
-        const labelInputs = canvas.queryAllByLabelText(/^label$/i)
+        const fieldsets = canvasElement.querySelectorAll('fieldset.edit-block')
+        const labelInput = fieldsets[0]?.querySelector('input[name*="label"]') as HTMLInputElement | null
         return {
-          labelValue: (labelInputs[0] as HTMLInputElement)?.value || ''
+          labelValue: labelInput?.value || ''
         }
       },
       async () => {
@@ -1726,8 +1738,8 @@ export const BarColumnsSectionTests: Story = {
         await userEvent.selectOptions(columnSelect, 'Year')
 
         // Set custom label
-        const labelInputs = await canvas.findAllByLabelText(/^label$/i)
-        const labelInput = labelInputs[0]
+        const firstColumnConfig = await getFirstColumnConfig()
+        const labelInput = await firstColumnConfig.findByLabelText(/^label$/i)
         await userEvent.clear(labelInput)
         await userEvent.type(labelInput, 'Report Year')
       },
@@ -1743,39 +1755,42 @@ export const BarColumnsSectionTests: Story = {
     await performAndAssert(
       'Enable tooltip display and configure number formatting',
       () => {
-        const tooltipCheckboxes = canvas.queryAllByLabelText(/show in tooltip/i)
-        const commasCheckboxes = canvas.queryAllByLabelText(/add commas to numbers/i)
+        const firstColumnSelect = canvas.queryAllByLabelText(/^column$/i)[0]
+        const fieldset = firstColumnSelect?.closest('fieldset')
+        const scopedFieldset = fieldset ? within(fieldset as HTMLElement) : null
+        const tooltipCheckbox = scopedFieldset?.queryByLabelText(/show in tooltip/i) as HTMLInputElement | null
+        const commasCheckbox = scopedFieldset?.queryByLabelText(/add commas to numbers/i) as HTMLInputElement | null
+        const prefixInput = scopedFieldset?.queryByLabelText(/^prefix$/i) as HTMLInputElement | null
+        const suffixInput = scopedFieldset?.queryByLabelText(/^suffix$/i) as HTMLInputElement | null
 
         return {
-          tooltipChecked: (tooltipCheckboxes[0] as HTMLInputElement)?.checked || false,
-          commasChecked: (commasCheckboxes[0] as HTMLInputElement)?.checked || false
+          tooltipChecked: tooltipCheckbox?.checked || false,
+          commasChecked: commasCheckbox?.checked || false,
+          prefixValue: prefixInput?.value || '',
+          suffixValue: suffixInput?.value || ''
         }
       },
       async () => {
+        const firstColumnConfig = await getFirstColumnConfig()
+
         // Enable tooltip display
-        const tooltipCheckboxes = await canvas.findAllByLabelText(/show in tooltip/i)
-        const tooltipCheckbox = tooltipCheckboxes[0] as HTMLInputElement
+        const tooltipCheckbox = (await firstColumnConfig.findByLabelText(/show in tooltip/i)) as HTMLInputElement
         if (!tooltipCheckbox.checked) {
           await userEvent.click(tooltipCheckbox)
         }
 
         // Enable commas for numbers
-        const commasCheckboxes = await canvas.findAllByLabelText(/add commas to numbers/i)
-        const commasCheckbox = commasCheckboxes[0] as HTMLInputElement
+        const commasCheckbox = (await firstColumnConfig.findByLabelText(/add commas to numbers/i)) as HTMLInputElement
         if (!commasCheckbox.checked) {
           await userEvent.click(commasCheckbox)
         }
 
         // Add prefix and suffix
-        const prefixInputs = await canvas.findAllByLabelText(/prefix/i)
-
-        const prefixInput = prefixInputs[1]
-
+        const prefixInput = await firstColumnConfig.findByLabelText(/^prefix$/i)
         await userEvent.clear(prefixInput)
         await userEvent.type(prefixInput, 'Year: ')
 
-        const suffixInputs = await canvas.findAllByLabelText(/suffix/i)
-        const suffixInput = suffixInputs[1]
+        const suffixInput = await firstColumnConfig.findByLabelText(/^suffix$/i)
         await userEvent.clear(suffixInput)
         await userEvent.type(suffixInput, ' AD')
       },
@@ -1783,6 +1798,8 @@ export const BarColumnsSectionTests: Story = {
         // Checkboxes should be enabled
         expect(after.tooltipChecked).toBe(true)
         expect(after.commasChecked).toBe(true)
+        expect(after.prefixValue).toBe('Year: ')
+        expect(after.suffixValue).toBe(' AD')
 
         return true
       }

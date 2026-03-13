@@ -42,7 +42,7 @@ const meta: Meta = {
       }
     }
   },
-  tags: ['autodocs']
+  tags: ['autodocs', '!test']
 }
 
 export default meta
