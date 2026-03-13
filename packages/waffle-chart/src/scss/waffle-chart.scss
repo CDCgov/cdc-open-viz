@@ -193,6 +193,17 @@
     .cove-waffle-chart__data {
       margin-bottom: 0;
       align-content: flex-start;
+
+      .cove-waffle-chart__data--primary {
+        font-size: 2rem;
+        color: var(--colors-cyan-60v);
+        font-weight: 400;
+      }
+
+      .cove-waffle-chart__data--text {
+        margin-top: 0.5rem;
+        font-size: 1rem;
+      }
     }
 
     .cdc-callout__heading {
@@ -201,19 +212,8 @@
       font-size: 1.1rem;
     }
 
-    .cove-waffle-chart__data--text {
-      margin-top: 0.5rem;
-      font-size: 1rem;
-    }
-
     .cove-waffle-chart__subtext {
       font-size: 1rem;
-    }
-
-    .cove-waffle-chart__data--primary {
-      font-size: 2rem;
-      color: var(--colors-cyan-60v);
-      font-weight: 400;
     }
 
     // White background variant (when "Use White Background Style" is checked)
