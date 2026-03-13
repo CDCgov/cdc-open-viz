@@ -65,7 +65,8 @@ export const Lollipop: Story = {
 
 export const Forest_Plot: Story = {
   args: {
-    config: forestPlot
+    config: forestPlot,
+    isEditor: true
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
