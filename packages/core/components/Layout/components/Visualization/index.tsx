@@ -32,8 +32,10 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
     className
   } = props
 
+  const themeClass = config.type === 'map' ? config?.general?.headerColor || config?.theme : config?.theme
+
   const getWrappingClasses = () => {
-    let classes = ['cove-visualization', 'cdc-open-viz-module', `${currentViewport}`, `${config?.theme}`]
+    let classes = ['cove-visualization', 'cdc-open-viz-module', `${currentViewport}`, `${themeClass}`]
 
     if (className) {
       classes.push(className)

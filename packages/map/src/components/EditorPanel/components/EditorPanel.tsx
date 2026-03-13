@@ -3242,20 +3242,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           label='Use Accent Style'
                           updateField={updateField}
                         />
-                        <CheckBox
-                          value={config.visual?.background}
-                          section='visual'
-                          fieldName='background'
-                          label='Use Theme Background Color'
-                          updateField={updateField}
-                        />
-                        <CheckBox
-                          value={config.visual?.hideBackgroundColor}
-                          section='visual'
-                          fieldName='hideBackgroundColor'
-                          label='Hide Background Color'
-                          updateField={updateField}
-                        />
                       </>
                     )}
 

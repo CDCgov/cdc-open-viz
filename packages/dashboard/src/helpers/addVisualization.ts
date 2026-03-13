@@ -26,6 +26,13 @@ export const addVisualization = (type, subType) => {
     case 'map':
       newVisualizationConfig.general = {}
       newVisualizationConfig.general.geoType = subType
+      newVisualizationConfig.visual = {
+        border: false,
+        borderColorTheme: false,
+        accent: false,
+        background: false,
+        hideBackgroundColor: false
+      }
       break
     case 'data-bite' || 'waffle-chart' || 'filtered-text':
       newVisualizationConfig.visualizationType = type

@@ -1211,12 +1211,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   const getChartWrapperClasses = () => {
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
     const classes = ['chart-container', 'p-relative']
-    const visualSettingClasses = [
-      'component--has-border-color-theme',
-      'component--has-accent',
-      'component--has-background',
-      'component--hide-background-color'
-    ]
+    const visualSettingClasses = ['component--has-border-color-theme', 'component--has-accent']
     if (legend?.position) {
       if (isLegendWrapViewport(currentViewport) && legend?.position !== 'top') {
         classes.push('legend-bottom')

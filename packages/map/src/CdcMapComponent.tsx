@@ -436,9 +436,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 bodyClassName={[
                   !config.visual?.border ? 'no-borders' : '',
                   config.visual?.borderColorTheme ? 'component--has-border-color-theme' : '',
-                  config.visual?.accent ? 'component--has-accent' : '',
-                  config.visual?.background ? 'component--has-background' : '',
-                  config.visual?.hideBackgroundColor ? 'component--hide-background-color' : ''
+                  config.visual?.accent ? 'component--has-accent' : ''
                 ]
                   .filter(Boolean)
                   .join(' ')}

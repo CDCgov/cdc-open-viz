@@ -50,4 +50,18 @@ describe('VisualizationContainer', () => {
 
     expect(container.querySelector('.cove-visualization')).toHaveClass('editor-panel--hidden')
   })
+
+  it('uses the map header theme on the shared visualization shell', () => {
+    const { container } = render(
+      <VisualizationContainer
+        config={{ type: 'map', general: { headerColor: 'theme-purple' } }}
+        currentViewport='lg'
+        isEditor={false}
+      >
+        <div>Map body</div>
+      </VisualizationContainer>
+    )
+
+    expect(container.querySelector('.cove-visualization')).toHaveClass('type-map', 'theme-purple')
+  })
 })
