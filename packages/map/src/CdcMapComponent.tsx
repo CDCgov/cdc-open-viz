@@ -48,7 +48,7 @@ import generateRuntimeData from './helpers/generateRuntimeData'
 import { reloadURLData } from './helpers/urlDataHelpers'
 import { observeMapSvgLoaded } from './helpers/mapObserverHelpers'
 import { buildBodyWrapClassNames, buildSectionClassNames } from './helpers/componentHelpers'
-import { shouldShowDataTable } from './helpers/dataTableHelpers'
+import { shouldShowDataTable, filterCountyTableRuntimeDataByStateFips } from './helpers/dataTableHelpers'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 
 // Child Components
@@ -118,6 +118,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     modal,
     accessibleStatus,
     filteredCountryCode,
+    filteredStateFIPSCode,
     position,
     scale,
     translate,
@@ -349,6 +350,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     customNavigationHandler,
     dimensions,
     filteredCountryCode,
+    filteredStateFIPSCode,
     isDashboard,
     isEditor,
     logo,
@@ -360,6 +362,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeLegend,
     scale,
     setConfig,
+    setFilteredStateFIPSCode: (stateFips: string) =>
+      dispatch({ type: 'SET_FILTERED_STATE_FIPS_CODE', payload: stateFips }),
     setSharedFilter,
     setSharedFilterValue,
     config,
@@ -407,6 +411,10 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     dataTableConfig = prepared.config
     dataTableColumns = prepared.columns
     dataTableRuntimeData = prepared.runtimeData
+  }
+
+  if (config.general.geoType === 'us-county' && filteredStateFIPSCode) {
+    dataTableRuntimeData = filterCountyTableRuntimeDataByStateFips(dataTableRuntimeData, filteredStateFIPSCode)
   }
 
   return (

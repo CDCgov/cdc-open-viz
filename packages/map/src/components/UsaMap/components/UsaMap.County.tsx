@@ -148,6 +148,7 @@ const CountyMap = () => {
     runtimeFilters,
     runtimeLegend,
     setConfig,
+    setFilteredStateFIPSCode,
     config,
     tooltipId,
     tooltipRef,
@@ -331,6 +332,7 @@ const CountyMap = () => {
       ...config,
       mapPosition: { coordinates: [0, 30], zoom: 1 }
     })
+    setFilteredStateFIPSCode?.('')
     setFocus({})
     resetZoomTransform()
   }
@@ -442,6 +444,7 @@ const CountyMap = () => {
           ...config,
           mapPosition: { coordinates: [0, 30], zoom: 3 }
         })
+        setFilteredStateFIPSCode?.(clickedState.id)
 
         let focusIndex = -1
         for (let i = 0; i < topoData.mapData.length; i++) {
@@ -906,6 +909,7 @@ const CountyMap = () => {
 
   useEffect(() => {
     if (!config.general.allowMapZoom) {
+      setFilteredStateFIPSCode?.('')
       setFocus({})
       setHasMoved(false)
       resetZoomTransform()
