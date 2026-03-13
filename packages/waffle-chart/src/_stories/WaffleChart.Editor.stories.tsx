@@ -416,6 +416,45 @@ export const DataSectionTests: Story = {
       },
       (before, after) => after !== before && after.endsWith('deaths')
     )
+
+    // ============================================================================
+    // TEST 16: Value Descriptor Placeholder Visibility
+    // Expectation: Value Descriptor input is visible in waffle mode with guidance placeholder.
+    // ============================================================================
+    const valueDescriptionInput = canvasElement.querySelector(
+      'input[name="null-null-valueDescription"]'
+    ) as HTMLInputElement
+    expect(valueDescriptionInput).toBeTruthy()
+    expect(valueDescriptionInput.placeholder).toBe('e.g., out of')
+
+    // ============================================================================
+    // TEST 17: Value Descriptor Update in Waffle Mode
+    // Expectation: Primary value text includes descriptor text.
+    // ============================================================================
+    await performAndAssert(
+      'Waffle Value Descriptor Update',
+      getValueText,
+      async () => {
+        await userEvent.clear(valueDescriptionInput)
+        await userEvent.type(valueDescriptionInput, 'out of total')
+      },
+      (_before, after) => after.includes('out of total')
+    )
+
+    // ============================================================================
+    // TEST 18: Show Percentage Toggle in Waffle Mode
+    // Expectation: Primary value text changes when switching value type.
+    // ============================================================================
+    const showPercentCheckbox = canvasElement.querySelector('input[name="showPercent"]') as HTMLInputElement
+    expect(showPercentCheckbox).toBeTruthy()
+    await performAndAssert(
+      'Waffle Show Percentage Toggle',
+      getValueText,
+      async () => {
+        await userEvent.click(showPercentCheckbox)
+      },
+      (before, after) => after !== before
+    )
   }
 }
 
@@ -900,6 +939,7 @@ export const TP5GaugeDataSectionTests: Story = {
       async () => {}, // action already performed above
       (before, after) => after.includes(newDescription)
     )
+    expect(valueDescriptionInput.placeholder).toBe('e.g., out of')
 
     // ============================================================================
     // TEST 3: Denominator Update

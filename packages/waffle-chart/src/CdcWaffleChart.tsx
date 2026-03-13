@@ -132,7 +132,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   const [dataPercentage, waffleDenominator, waffleNumerator] = useMemo(() => {
     //If either the column or function aren't set, do not calculate
     if (!dataColumn || !dataFunction) {
-      return ''
+      return ['', null, '']
     }
 
     const getColumnSum = arr => {
@@ -407,6 +407,16 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
 
   const { contentClasses } = useDataVizClasses(config)
 
+  const primaryValue = (
+    <>
+      {prefix ? prefix : ' '}
+      {config.showPercent ? dataPercentage : waffleNumerator}
+      {suffix ? suffix + ' ' : ' '} {processedValueDescription}{' '}
+      {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
+    </>
+  )
+  const hasPrimaryValue = (config.showPercent ? dataPercentage : waffleNumerator) !== ''
+
   const xScale = scaleLinear({
     domain: [0, waffleDenominator],
     range: [0, config.gauge.width]
@@ -463,10 +473,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                 >
                   <div className='cove-gauge-chart__value-section flex-shrink-0'>
                     <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
-                      {prefix ? prefix : ' '}
-                      {config.showPercent ? dataPercentage : waffleNumerator}
-                      {suffix ? suffix + ' ' : ' '} {processedValueDescription}{' '}
-                      {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
+                      {primaryValue}
                     </div>
                   </div>
                   <div className='cove-gauge-chart__content flex-grow-1 d-flex flex-column min-w-0'>
@@ -515,10 +522,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
             ) : (
               <>
                 <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
-                  {prefix ? prefix : ' '}
-                  {config.showPercent ? dataPercentage : waffleNumerator}
-                  {suffix ? suffix + ' ' : ' '} {processedValueDescription}{' '}
-                  {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
+                  {primaryValue}
                 </div>
                 <div className='cove-waffle-chart__data--text'>{parse(processedContent)}</div>
                 <svg height={config.gauge.height} width={'100%'}>
@@ -564,13 +568,11 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
               </Group>
             </svg>
           </div>
-          {(dataPercentage || processedContent) && (
+          {(hasPrimaryValue || processedContent) && (
             <div className='cove-waffle-chart__data'>
-              {dataPercentage && (
+              {hasPrimaryValue && (
                 <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
-                  {prefix ? prefix : null}
-                  {dataPercentage}
-                  {suffix ? suffix : null}
+                  {primaryValue}
                 </div>
               )}
               {processedContent && <div className='cove-waffle-chart__data--text'>{parse(processedContent)}</div>}
