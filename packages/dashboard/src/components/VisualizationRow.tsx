@@ -110,18 +110,28 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   }, [toggledRow, row.toggle])
 
   const setupTP5MinHeightEqualizer = (rowElement: Element, itemSelector: string) => {
-    const items = Array.from(rowElement.querySelectorAll(itemSelector)) as HTMLElement[]
-    if (items.length <= 1) return undefined
+    const resizeObserver = new ResizeObserver(() => equalizeHeights())
+    const trackedItems = new Set<HTMLElement>()
 
     const equalizeHeights = () => {
+      const items = Array.from(rowElement.querySelectorAll(itemSelector)) as HTMLElement[]
+
+      items.forEach(item => {
+        if (!trackedItems.has(item)) {
+          trackedItems.add(item)
+          resizeObserver.observe(item)
+        }
+      })
+
       items.forEach(item => {
         item.style.minHeight = ''
       })
 
+      if (items.length <= 1) return
+
       let maxHeight = 0
       items.forEach(item => {
-        const height = item.offsetHeight
-        if (height > maxHeight) maxHeight = height
+        if (item.offsetHeight > maxHeight) maxHeight = item.offsetHeight
       })
 
       if (maxHeight > 0) {
@@ -131,17 +141,16 @@ const VisualizationRow: React.FC<VizRowProps> = ({
       }
     }
 
+    // Detect child components finishing loading (headings appearing in the DOM)
+    const mutationObserver = new MutationObserver(() => equalizeHeights())
+    mutationObserver.observe(rowElement, { childList: true, subtree: true })
+
     equalizeHeights()
 
-    const resizeObserver = new ResizeObserver(() => {
-      equalizeHeights()
-    })
-
-    items.forEach(item => {
-      resizeObserver.observe(item)
-    })
-
-    return () => resizeObserver.disconnect()
+    return () => {
+      mutationObserver.disconnect()
+      resizeObserver.disconnect()
+    }
   }
 
   // Equalize TP5 callout title heights across all types, plus type-specific body alignment
@@ -154,7 +163,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     const cleanups = [
       setupTP5MinHeightEqualizer(rowElement, '.tp5-element .cdc-callout__heading'),
       setupTP5MinHeightEqualizer(rowElement, '.gauge__style--tp5 .cove-gauge-chart__content')
-    ].filter(Boolean) as Array<() => void>
+    ]
 
     return () => {
       cleanups.forEach(cleanup => cleanup())
