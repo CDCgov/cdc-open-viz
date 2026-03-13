@@ -35,6 +35,7 @@ export const OldConfig_Preserves_Legacy_Defaults: Story = {
     await assertVisualizationRendered(canvasElement)
 
     await waitForPresence('aside[aria-label="Legend"]', canvasElement)
+    await waitForPresence('.legend-container__li', canvasElement)
     const legend = canvasElement.querySelector('aside[aria-label="Legend"]')
     expect(legend).toBeInTheDocument()
     expect(legend?.classList.contains('side')).toBe(true)

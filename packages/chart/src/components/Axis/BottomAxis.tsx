@@ -246,7 +246,13 @@ const BottomAxis: React.FC<BottomAxisProps> = ({
                 </Group>
               )
             })}
-            {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
+            {!config.xAxis.hideAxis && (
+              <Line
+                from={isForestPlot ? { ...props.axisFromPoint, x: 0 } : props.axisFromPoint}
+                to={props.axisToPoint}
+                stroke='#333'
+              />
+            )}
             <Text
               innerRef={xAxisTitleRef}
               className='x-axis-title-label'

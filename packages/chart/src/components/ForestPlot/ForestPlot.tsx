@@ -26,7 +26,7 @@ const ForestPlot = ({
   handleTooltipMouseOver,
   forestPlotRightLabelRef
 }: ForestPlotProps) => {
-  const { rawData: data, updateConfig } = useContext<ChartContext>(ConfigContext)
+  const { transformedData: data, updateConfig } = useContext<ChartContext>(ConfigContext)
   const { forestPlot } = config as ChartConfig
   const labelPosition = config.xAxis.tickWidthMax + 10
   const [initialLogTicksSet, setInitialLogTicks] = useState(false)
@@ -90,7 +90,9 @@ const ForestPlot = ({
     }
   }, [config.forestPlot.type])
 
-  const pooledData = config.data.find(d => d[config.xAxis.dataKey] === config.forestPlot.pooledResult.column)
+  const pooledData = data.find(d => d[config.xAxis.dataKey] === config.forestPlot.pooledResult.column)
+  const [plotStart, plotEnd] = [...xScale.range()].sort((a, b) => a - b)
+  const plotWidth = plotEnd - plotStart
 
   const regressionPoints = pooledData
     ? [
@@ -112,12 +114,12 @@ const ForestPlot = ({
 
   const topLine = [
     { x: 0, y: topMarginOffset },
-    { x: width, y: topMarginOffset }
+    { x: plotEnd, y: topMarginOffset }
   ]
 
   const bottomLine = [
     { x: 0, y: height },
-    { x: width, y: height }
+    { x: plotEnd, y: height }
   ]
 
   type Columns = {
@@ -289,30 +291,21 @@ const ForestPlot = ({
             {forestPlot.regression.description}
           </Text>
         )}
-
-        <Bar
-          key='forest-plot-tooltip-area'
-          className='forest-plot-tooltip-area'
-          width={width}
-          height={height}
-          fill={false ? 'red' : 'transparent'}
-          fillOpacity={0.5}
-          onMouseMove={e => handleTooltipMouseOver(e, data)}
-          onMouseOut={handleTooltipMouseOff}
-        />
       </Group>
       <Line
         from={topLine[0]}
         to={topLine[1]}
-        style={{ stroke: 'black', strokeWidth: 2 }}
+        style={{ stroke: '#333', strokeWidth: 1 }}
         className='forestplot__top-line'
       />
-      <Line
-        from={bottomLine[0]}
-        to={bottomLine[1]}
-        style={{ stroke: 'black', strokeWidth: 2 }}
-        className='forestplot__bottom-line'
-      />
+      {config.xAxis.hideAxis && (
+        <Line
+          from={bottomLine[0]}
+          to={bottomLine[1]}
+          style={{ stroke: '#333', strokeWidth: 1 }}
+          className='forestplot__bottom-line'
+        />
+      )}
 
       {/* column data */}
       {columnsOnChart.map((column, colIndex) => {
@@ -400,6 +393,17 @@ const ForestPlot = ({
           {forestPlot.rightLabel}
         </Text>
       )}
+      <Bar
+        key='forest-plot-tooltip-area'
+        className='forest-plot-tooltip-area'
+        x={0}
+        width={width}
+        height={height}
+        fill={false ? 'red' : 'transparent'}
+        fillOpacity={0.5}
+        onMouseMove={e => handleTooltipMouseOver(e, data)}
+        onMouseOut={handleTooltipMouseOff}
+      />
     </>
   )
 }
