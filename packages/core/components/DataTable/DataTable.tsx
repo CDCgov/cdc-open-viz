@@ -26,6 +26,7 @@ import isRightAlignedTableValue from '@cdc/core/helpers/isRightAlignedTableValue
 import './data-table.css'
 import _ from 'lodash'
 import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
+import { getMapDataTableColumnKeys } from './helpers/getMapDataTableColumnKeys'
 
 export type DataTableProps = {
   colorScale?: Function
@@ -280,6 +281,10 @@ const DataTable = (props: DataTableProps) => {
       const filterColumns = [...sharedFilterColumns, ...vizFilterColumns]
       const getVisibleColumns = () => {
         if (!config.columns) return []
+
+        if (config.type === 'map') {
+          return getMapDataTableColumnKeys(config.columns).map(columnKey => config.columns[columnKey].name)
+        }
 
         return Object.values(config.columns)
           .filter(col => col.dataTable !== false)
