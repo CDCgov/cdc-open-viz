@@ -64,7 +64,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   // Custom States
   const container = useRef()
 
-  const { innerContainerClasses, contentClasses } = useDataVizClasses(config || {})
+  const { innerContainerClasses, contentClasses: rawContentClasses } = useDataVizClasses(config || {})
   const { contentEditor, theme, visual } = config || {}
   const {
     showNoDataMessage,
@@ -80,6 +80,10 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const { inlineHTML, srcUrl, title, useInlineHTML, style: contentStyle } = contentEditor || {}
   const markupIncludeStyle = contentStyle || 'legacy'
   const isTp5Style = markupIncludeStyle === 'tp5'
+
+  const contentClasses = isTp5Style
+    ? rawContentClasses.filter(cls => cls !== 'component--has-accent')
+    : rawContentClasses
 
   const shouldApplyTopPadding =
     !isTp5Style &&
