@@ -2,7 +2,7 @@ export default {
   contentEditor: {
     inlineHTML: '<strong>Inline HTML</strong>',
     showHeader: true,
-    style: 'legacy',
+    style: 'default',
     srcUrl: '#example',
     title: '',
     titleStyle: 'small',

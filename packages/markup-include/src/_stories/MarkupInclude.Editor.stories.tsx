@@ -75,7 +75,7 @@ const testConfig = {
   contentEditor: {
     inlineHTML: '<h2>Test Markup Include</h2><p>{{test_variable}}</p>',
     showHeader: true,
-    style: 'legacy',
+    style: 'default',
     srcUrl: '',
     title: 'Test Markup Include Title',
     titleStyle: 'small',

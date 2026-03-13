@@ -81,7 +81,7 @@ describe('coveUpdateWorker', () => {
       const result = coveUpdateWorker(config)
       const subDash = result.multiDashboards[0]
 
-      expect(subDash.visualizations.mi1.contentEditor.style).toBe('legacy')
+      expect(subDash.visualizations.mi1.contentEditor.style).toBe('default')
     })
   })
 })

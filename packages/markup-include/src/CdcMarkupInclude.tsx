@@ -78,7 +78,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const markupVariables = config?.markupVariables || contentEditorMarkupVariables || []
 
   const { inlineHTML, srcUrl, title, useInlineHTML, style: contentStyle } = contentEditor || {}
-  const markupIncludeStyle = contentStyle || 'legacy'
+  const markupIncludeStyle = contentStyle || 'default'
   const isTp5Style = markupIncludeStyle === 'tp5'
 
   const contentClasses = isTp5Style

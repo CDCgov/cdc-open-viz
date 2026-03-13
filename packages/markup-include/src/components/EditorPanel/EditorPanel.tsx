@@ -76,13 +76,13 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
         <Accordion>
           <Accordion.Section title='General'>
             <Select
-              value={contentEditor?.style || 'legacy'}
+              value={contentEditor?.style || 'default'}
               section='contentEditor'
               fieldName='style'
               label='Style'
               updateField={updateField}
               options={[
-                { value: 'legacy', label: 'Legacy' },
+                { value: 'default', label: 'Default' },
                 { value: 'tp5', label: 'TP5' }
               ]}
             />

@@ -21,7 +21,7 @@ const addMarkupIncludeStyle = config => {
     }
 
     if (!config.contentEditor.style) {
-      config.contentEditor.style = 'legacy'
+      config.contentEditor.style = 'default'
     }
   }
 }

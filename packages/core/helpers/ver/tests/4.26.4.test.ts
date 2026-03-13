@@ -27,7 +27,7 @@ describe('update_4_26_4', () => {
     expect(result.version).toBe('4.26.4')
   })
 
-  it('sets markup-include contentEditor.style to legacy when missing', () => {
+  it('should set markup-include contentEditor.style to default when missing', () => {
     const config: any = {
       type: 'markup-include',
       version: '4.26.3',
@@ -38,7 +38,7 @@ describe('update_4_26_4', () => {
 
     const result = update_4_26_4(config)
 
-    expect(result.contentEditor.style).toBe('legacy')
+    expect(result.contentEditor.style).toBe('default')
     expect(result.version).toBe('4.26.4')
   })
 
@@ -112,7 +112,7 @@ describe('update_4_26_4', () => {
       background: true,
       hideBackgroundColor: true
     })
-    expect(result.visualizations.markup1.contentEditor.style).toBe('legacy')
+    expect(result.visualizations.markup1.contentEditor.style).toBe('default')
     expect(result.visualizations.markup2.contentEditor.style).toBe('tp5')
   })
 
@@ -125,7 +125,7 @@ describe('update_4_26_4', () => {
     const result = update_4_26_4(config)
 
     expect(result.contentEditor).toBeTruthy()
-    expect(result.contentEditor.style).toBe('legacy')
+    expect(result.contentEditor.style).toBe('default')
   })
 
   it('does not mutate original chart config', () => {
@@ -155,6 +155,6 @@ describe('update_4_26_4', () => {
     const result = update_4_26_4(config)
 
     expect(config.contentEditor.style).toBeUndefined()
-    expect(result.contentEditor.style).toBe('legacy')
+    expect(result.contentEditor.style).toBe('default')
   })
 })
