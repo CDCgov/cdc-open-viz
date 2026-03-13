@@ -190,9 +190,9 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
             />
             {isTp5Style ? (
               <CheckBox
-                value={visual?.background}
+                value={visual?.whiteBackground}
                 section='visual'
-                fieldName='background'
+                fieldName='whiteBackground'
                 label='Use White Background Style'
                 updateField={updateField}
               />
