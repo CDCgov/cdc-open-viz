@@ -313,7 +313,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         }
         footer={
           <FootnotesStandAlone
-            config={configObj?.footnotes}
+            config={config?.footnotes}
             filters={config?.filters || []}
             markupVariables={markupVariables}
             enableMarkupVariables={config?.enableMarkupVariables}
