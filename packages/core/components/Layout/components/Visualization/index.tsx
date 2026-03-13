@@ -3,10 +3,19 @@ import React, { forwardRef } from 'react'
 import './visualizations.scss'
 import type { AnyVisualization } from '@cdc/core/types/Visualization'
 
+export type VisualizationShellConfig = Partial<AnyVisualization> & {
+  type?: AnyVisualization['type'] | 'dashboard'
+  theme?: string
+  visual?: {
+    highlightWrappers?: boolean
+    whiteBackground?: boolean
+  }
+}
+
 type VisualizationWrapper = {
   children: React.ReactNode
   className?: string
-  config: AnyVisualization
+  config: VisualizationShellConfig
   currentViewport?: string
   imageId?: string
   isEditor: boolean
@@ -50,6 +59,11 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
     if (config.type === 'filtered-text') {
       classes.push('type-filtered-text', `font-${config.fontSize}`)
       classes = classes.filter(item => item !== 'cove-visualization__body')
+      return classes
+    }
+
+    if (config.type === 'dashboard') {
+      classes.push('type-dashboard')
       return classes
     }
 

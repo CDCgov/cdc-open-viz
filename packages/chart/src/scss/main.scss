@@ -20,10 +20,6 @@
     margin-bottom: 0 !important;
   }
 
-  .cove-visualization__body.cove-visualization__body-wrap {
-    padding-top: 1rem !important;
-  }
-
   .legend-top {
     .legend-wrapper .tooltip-boundary {
       display: flex;
@@ -280,6 +276,24 @@
     align-items: flex-start;
     flex-wrap: wrap;
     justify-content: space-between;
+    min-width: 0;
+    max-width: 100%;
+
+    .legend-wrapper {
+      min-width: 0;
+      max-width: 100%;
+
+      > div,
+      > aside {
+        min-width: 0;
+        max-width: 100%;
+      }
+    }
+
+    .tooltip-boundary {
+      min-width: 0;
+      max-width: 100%;
+    }
 
     &.legend-top:not(.legend-hidden) {
       .legend-wrapper {
@@ -682,9 +696,6 @@
       }
     }
 
-    .chart-container {
-      padding: 1em;
-    }
   }
 
   .subtext,

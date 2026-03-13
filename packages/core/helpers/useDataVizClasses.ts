@@ -23,8 +23,8 @@ export default function useDataVizClasses(config, viewport = null) {
     lineDatapointClass = ' chart-line--always'
   }
 
-  let innerContainerClasses = ['cove-visualization__inner']
-  let contentClasses = ['cove-visualization__body']
+  let innerContainerClasses = []
+  let contentClasses = []
 
   if (visualizationType === 'Spark Line' || visualizationType === 'chart') {
     if (title && showTitle) contentClasses.push('component--has-title')

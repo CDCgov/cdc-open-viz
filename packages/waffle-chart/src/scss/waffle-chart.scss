@@ -37,7 +37,6 @@
   .cove-waffle-chart {
     display: flex;
     flex-wrap: wrap;
-    padding: 1em 1em 0;
     justify-content: flex-start;
 
     &.cove-waffle-chart--verical {
@@ -52,14 +51,12 @@
 
   .cove-waffle-chart__chart {
     padding-right: 1rem;
-    margin-bottom: 1rem;
     box-sizing: content-box;
   }
 
   .cove-waffle-chart__data {
     flex: 1 1 0;
     min-width: 175px;
-    margin-bottom: 1rem;
   }
 
   .cove-waffle-chart__data {

@@ -5,7 +5,7 @@ import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
 // Core components
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import { VisualizationContainer } from '@cdc/core/components/Layout'
+import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 import Confirm from '@cdc/core/components/elements/Confirm'
 import Error from '@cdc/core/components/elements/Error'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
@@ -1229,7 +1229,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (!config.barHasBorder) classes.push('chart-bar--no-border')
     if (config.xAxis.brushActive && dashboardConfig?.type === 'dashboard' && (!isLegendOnBottom || legend.hide))
       classes.push('dashboard-brush')
-    classes.push(...contentClasses)
 
     if (!ENABLE_CHART_VISUAL_SETTINGS) {
       const filtered = classes.filter(className => !visualSettingClasses.includes(className))
@@ -1258,291 +1257,286 @@ const CdcChart: React.FC<CdcChartProps> = ({
       <>
         {config.newViz && <Confirm updateConfig={updateConfig} config={config} />}
         {!missingRequiredSections(config) && !config.newViz && (
-          <div
-            className={`cove-visualization__inner type-${makeClassName(config.visualizationType)}`}
-            aria-label={handleChartAriaLabels(config)}
-            tabIndex={0}
+          <VisualizationContent
+            innerClassName={`type-${makeClassName(config.visualizationType)}`}
+            innerProps={{ 'aria-label': handleChartAriaLabels(config), tabIndex: 0 }}
+            bodyClassName={contentClasses.join(' ')}
+            bodyWrapClassName={getChartWrapperClasses().join(' ')}
+            header={
+              <Title
+                showTitle={config.showTitle}
+                isDashboard={isDashboard}
+                title={title}
+                superTitle={processedSuperTitle}
+                titleStyle={config.titleStyle}
+                classes={['chart-title', `${config.theme}`, 'cove-visualization__title', 'mb-3']}
+                style={undefined}
+                config={config}
+              />
+            }
+            footer={
+              <FootnotesStandAlone
+                config={configObj.footnotes}
+                filters={config.filters?.filter(f => f.filterFootnotes)}
+                markupVariables={config.markupVariables}
+                enableMarkupVariables={config.enableMarkupVariables}
+                data={config.data}
+                dataMetadata={config.dataMetadata}
+              />
+            }
           >
-            <Title
-              showTitle={config.showTitle}
-              isDashboard={isDashboard}
-              title={title}
-              superTitle={processedSuperTitle}
-              titleStyle={config.titleStyle}
-              classes={['chart-title', `${config.theme}`, 'cove-visualization__title', 'mb-3']}
-              style={undefined}
-              config={config}
-            />
+            {/* Intro Text/Message */}
+            {processedIntroText && config.visualizationType !== 'Spark Line' && (
+              <section className={`introText mb-4`}>{parse(processedIntroText)}</section>
+            )}
 
-            {/* Visualization Wrapper */}
-            <div
-              className={`cove-visualization__body cove-visualization__body-wrap ${getChartWrapperClasses().join(' ')}`}
-            >
-              {/* Intro Text/Message */}
-              {processedIntroText && config.visualizationType !== 'Spark Line' && (
-                <section className={`introText mb-4`}>{parse(processedIntroText)}</section>
-              )}
+            {/* Filters */}
+            {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
+              <Filters
+                config={config}
+                setFilters={setFilters}
+                excludedData={excludedData}
+                dimensions={dimensions}
+                interactionLabel={interactionLabel}
+              />
+            )}
+            <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
+            {visibleAnnotations.length > 0 && (
+              <SkipTo
+                skipId={handleChartTabbing(config, legendId)}
+                skipMessage={`Skip over annotations`}
+                key={`skip-annotations`}
+              />
+            )}
+            <LegendWrapper>
+              <div
+                className={
+                  legend.hide || isLegendWrapViewport(currentViewport)
+                    ? 'w-100'
+                    : legend.position === 'bottom' ||
+                      legend.position === 'top' ||
+                      visualizationType === 'Sankey' ||
+                      visualizationType === 'Spark Line'
+                    ? 'w-100'
+                    : 'w-75'
+                }
+              >
+                {/* Check if there is data to display */}
+                {(!filteredData || filteredData.length === 0) && (
+                  <div className='no-data-message' style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
+                    {config.chartMessage?.noData || 'No Data Available'}
+                  </div>
+                )}
 
-              {/* Filters */}
-              {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
-                <Filters
-                  config={config}
-                  setFilters={setFilters}
-                  excludedData={excludedData}
-                  dimensions={dimensions}
-                  interactionLabel={interactionLabel}
-                />
-              )}
-              <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
-              {visibleAnnotations.length > 0 && (
-                <SkipTo
-                  skipId={handleChartTabbing(config, legendId)}
-                  skipMessage={`Skip over annotations`}
-                  key={`skip-annotations`}
-                />
-              )}
-              <LegendWrapper>
-                <div
-                  className={
-                    legend.hide || isLegendWrapViewport(currentViewport)
-                      ? 'w-100'
-                      : legend.position === 'bottom' ||
-                        legend.position === 'top' ||
-                        visualizationType === 'Sankey' ||
-                        visualizationType === 'Spark Line'
-                      ? 'w-100'
-                      : 'w-75'
-                  }
-                >
-                  {/* Check if there is data to display */}
-                  {(!filteredData || filteredData.length === 0) && (
-                    <div className='no-data-message' style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
-                      {config.chartMessage?.noData || 'No Data Available'}
+                {/* All charts with LinearChart */}
+                {filteredData &&
+                  filteredData.length > 0 &&
+                  !['Spark Line', 'Line', 'Sankey', 'Pie', 'Radar'].includes(config.visualizationType) && (
+                    <div ref={parentRef} style={{ width: `100%` }}>
+                      <ParentSize>
+                        {parent => <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />}
+                      </ParentSize>
                     </div>
                   )}
 
-                  {/* All charts with LinearChart */}
-                  {filteredData &&
-                    filteredData.length > 0 &&
-                    !['Spark Line', 'Line', 'Sankey', 'Pie', 'Radar'].includes(config.visualizationType) && (
-                      <div ref={parentRef} style={{ width: `100%` }}>
-                        <ParentSize>
-                          {parent => (
-                            <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
-                          )}
-                        </ParentSize>
-                      </div>
-                    )}
-
-                  {filteredData && filteredData.length > 0 && config.visualizationType === 'Pie' && (
-                    <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
-                      {parent => (
-                        <PieChart
-                          ref={svgRef}
-                          parentWidth={parent.width}
-                          parentHeight={parent.height}
-                          interactionLabel={interactionLabel}
-                        />
-                      )}
-                    </ParentSize>
-                  )}
-                  {/* Radar Chart */}
-                  {filteredData && filteredData.length > 0 && config.visualizationType === 'Radar' && (
-                    <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
-                      {parent => (
-                        <RadarChart
-                          ref={svgRef}
-                          parentWidth={parent.width}
-                          parentHeight={parent.height}
-                          interactionLabel={interactionLabel}
-                        />
-                      )}
-                    </ParentSize>
-                  )}
-                  {/* Line Chart */}
-                  {filteredData &&
-                    filteredData.length > 0 &&
-                    config.visualizationType === 'Line' &&
-                    (convertLineToBarGraph ? (
-                      <div ref={parentRef} style={{ width: `100%` }}>
-                        <ParentSize>
-                          {parent => (
-                            <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
-                          )}
-                        </ParentSize>
-                      </div>
-                    ) : (
-                      <div ref={parentRef} style={{ width: '100%' }}>
-                        <ParentSize>
-                          {parent => {
-                            const labelMargin = 120
-                            const widthReduction =
-                              config.showLineSeriesLabels && (config.legend.position !== 'right' || config.legend.hide)
-                                ? labelMargin
-                                : 0
-                            return (
-                              <LinearChart
-                                ref={svgRef}
-                                parentWidth={parent.width - widthReduction}
-                                parentHeight={parent.height}
-                              />
-                            )
-                          }}
-                        </ParentSize>
-                      </div>
-                    ))}
-                  {/* Sparkline */}
-                  {config.visualizationType === 'Spark Line' && (
-                    <>
-                      <Filters
-                        config={config}
-                        setFilters={setFilters}
-                        excludedData={excludedData}
-                        dimensions={dimensions}
+                {filteredData && filteredData.length > 0 && config.visualizationType === 'Pie' && (
+                  <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
+                    {parent => (
+                      <PieChart
+                        ref={svgRef}
+                        parentWidth={parent.width}
+                        parentHeight={parent.height}
                         interactionLabel={interactionLabel}
                       />
-                      {processedIntroText && (
-                        <section className='introText mb-4' style={{ padding: '0px 0 35px' }}>
-                          {parse(processedIntroText)}
-                        </section>
-                      )}
-                      <div style={{ height: `100px`, width: `100%`, ...sparkLineStyles }}>
-                        <ParentSize>{parent => <SparkLine width={parent.width} height={parent.height} />}</ParentSize>
-                      </div>
-                      {processedDescription && (
-                        <div className='subtext' style={{ padding: '35px 0 15px' }}>
-                          {parse(processedDescription)}
-                        </div>
-                      )}
-                    </>
-                  )}
-                  {/* Sankey */}
-                  {config.visualizationType === 'Sankey' && (
-                    <ParentSize aria-hidden='true'>
-                      {parent => <SankeyChart runtime={config.runtime} width={parent.width} height={parent.height} />}
-                    </ParentSize>
-                  )}
-                </div>
-                {/* Legend */}
-                {!config.legend.hide &&
-                  config.visualizationType !== 'Spark Line' &&
-                  config.visualizationType !== 'Sankey' &&
-                  !(config.visualizationType === 'Warming Stripes' && config.legend?.style === 'gradient') &&
-                  !(config.visualizationType === 'Warming Stripes' && config.smallMultiples?.mode) && (
-                    <Legend
-                      ref={legendRef}
-                      skipId={handleChartTabbing(config, legendId)}
+                    )}
+                  </ParentSize>
+                )}
+                {/* Radar Chart */}
+                {filteredData && filteredData.length > 0 && config.visualizationType === 'Radar' && (
+                  <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
+                    {parent => (
+                      <RadarChart
+                        ref={svgRef}
+                        parentWidth={parent.width}
+                        parentHeight={parent.height}
+                        interactionLabel={interactionLabel}
+                      />
+                    )}
+                  </ParentSize>
+                )}
+                {/* Line Chart */}
+                {filteredData &&
+                  filteredData.length > 0 &&
+                  config.visualizationType === 'Line' &&
+                  (convertLineToBarGraph ? (
+                    <div ref={parentRef} style={{ width: `100%` }}>
+                      <ParentSize>
+                        {parent => <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />}
+                      </ParentSize>
+                    </div>
+                  ) : (
+                    <div ref={parentRef} style={{ width: '100%' }}>
+                      <ParentSize>
+                        {parent => {
+                          const labelMargin = 120
+                          const widthReduction =
+                            config.showLineSeriesLabels && (config.legend.position !== 'right' || config.legend.hide)
+                              ? labelMargin
+                              : 0
+                          return (
+                            <LinearChart
+                              ref={svgRef}
+                              parentWidth={parent.width - widthReduction}
+                              parentHeight={parent.height}
+                            />
+                          )
+                        }}
+                      </ParentSize>
+                    </div>
+                  ))}
+                {/* Sparkline */}
+                {config.visualizationType === 'Spark Line' && (
+                  <>
+                    <Filters
+                      config={config}
+                      setFilters={setFilters}
+                      excludedData={excludedData}
+                      dimensions={dimensions}
                       interactionLabel={interactionLabel}
                     />
-                  )}
-                {config.visualizationType === 'Warming Stripes' &&
-                  config.legend?.style === 'gradient' &&
-                  !config.smallMultiples?.mode && <WarmingStripesGradientLegend />}
-              </LegendWrapper>
-              {/* Link */}
-              {isDashboard && config.table && config.table.show && config.table.showDataTableLink
-                ? tableLink
-                : link && link}
-              {/* Description */}
-
-              {processedDescription && config.visualizationType !== 'Spark Line' && (
-                <div className={getChartSubTextClasses().join(' ')}>{parse(processedDescription)}</div>
-              )}
-
-              {/* Data Table */}
-              {(config.xAxis.dataKey &&
-                config.table.show &&
-                config.visualizationType !== 'Spark Line' &&
-                config.visualizationType !== 'Sankey') ||
-              (config.visualizationType === 'Sankey' && config.table.show)
-                ? (() => {
-                    let dataTableConfig = pivotDynamicSeries(config)
-                    let dataTableColumns = config.columns
-                    let dataTableRuntimeData = getTableRuntimeData()
-                    let dataTableRawData =
-                      config.visualizationType === 'Sankey'
-                        ? config?.data?.[0]?.tableData
-                        : config.table.customTableConfig
-                        ? filterVizData(config.filters, config.data)
-                        : config.data
-
-                    if (config.smallMultiples?.mode) {
-                      const prepared = prepareSmallMultiplesDataTable(config, config.columns, dataTableRuntimeData)
-                      dataTableConfig = prepared.config
-                      dataTableColumns = prepared.columns
-                      dataTableRuntimeData = prepared.runtimeData
-                      if (config.smallMultiples.mode === 'by-column') {
-                        dataTableRawData = prepared.config.data
-                      }
-                    }
-
-                    return (
-                      <DataTable
-                        /* changing the "key" will force the table to re-render
-                        when the default sort changes while editing */
-                        key={config.table?.defaultSort?.column || ''}
-                        config={dataTableConfig}
-                        rawData={dataTableRawData}
-                        runtimeData={dataTableRuntimeData}
-                        expandDataTable={config.table.expanded}
-                        columns={dataTableColumns}
-                        displayGeoName={name => name}
-                        applyLegendToRow={applyLegendToRow}
-                        tableTitle={config.table.label}
-                        indexTitle={config.table.indexLabel}
-                        vizTitle={title}
-                        viewport={currentViewport}
-                        tabbingId={handleChartTabbing(config, legendId)}
-                        colorScale={colorScale}
-                        imageRef={imageId}
-                        showDownloadImgButton={config.table.showDownloadImgButton}
-                        showDownloadPdfButton={config.table.showDownloadPdfButton}
-                        includeContextInDownload={config.table?.includeContextInDownload}
-                        interactionLabel={interactionLabel}
-                      />
-                    )
-                  })()
-                : (config.table.showDownloadImgButton || config.table.showDownloadPdfButton) && (
-                    <div className='w-100 d-flex justify-content-end'>
-                      <MediaControls.Section classes={['download-links', 'mt-4', 'mb-2']}>
-                        {config.table.showDownloadImgButton && (
-                          <MediaControls.DownloadLink
-                            type='image'
-                            title='Download Chart as Image'
-                            state={config}
-                            elementToCapture={imageId}
-                            interactionLabel={interactionLabel}
-                            includeContextInDownload={config.table?.includeContextInDownload}
-                          />
-                        )}
-                        {config.table.showDownloadPdfButton && (
-                          <MediaControls.DownloadLink
-                            type='pdf'
-                            title='Download Chart as PDF'
-                            state={config}
-                            elementToCapture={imageId}
-                            interactionLabel={interactionLabel}
-                            includeContextInDownload={config.table?.includeContextInDownload}
-                          />
-                        )}
-                      </MediaControls.Section>
+                    {processedIntroText && (
+                      <section className='introText mb-4' style={{ padding: '0px 0 35px' }}>
+                        {parse(processedIntroText)}
+                      </section>
+                    )}
+                    <div style={{ height: `100px`, width: `100%`, ...sparkLineStyles }}>
+                      <ParentSize>{parent => <SparkLine width={parent.width} height={parent.height} />}</ParentSize>
                     </div>
-                  )}
-              {visibleAnnotations.length > 0 && <Annotation.Dropdown />}
-              {/* show pdf or image button */}
-              {processedLegacyFootnotes && (
-                <section className='footnotes pt-2 mt-4'>{parse(processedLegacyFootnotes)}</section>
-              )}
-            </div>
-            <FootnotesStandAlone
-              config={configObj.footnotes}
-              filters={config.filters?.filter(f => f.filterFootnotes)}
-              markupVariables={config.markupVariables}
-              enableMarkupVariables={config.enableMarkupVariables}
-              data={config.data}
-              dataMetadata={config.dataMetadata}
-            />
-          </div>
+                    {processedDescription && (
+                      <div className='subtext' style={{ padding: '35px 0 15px' }}>
+                        {parse(processedDescription)}
+                      </div>
+                    )}
+                  </>
+                )}
+                {/* Sankey */}
+                {config.visualizationType === 'Sankey' && (
+                  <ParentSize aria-hidden='true'>
+                    {parent => <SankeyChart runtime={config.runtime} width={parent.width} height={parent.height} />}
+                  </ParentSize>
+                )}
+              </div>
+              {/* Legend */}
+              {!config.legend.hide &&
+                config.visualizationType !== 'Spark Line' &&
+                config.visualizationType !== 'Sankey' &&
+                !(config.visualizationType === 'Warming Stripes' && config.legend?.style === 'gradient') &&
+                !(config.visualizationType === 'Warming Stripes' && config.smallMultiples?.mode) && (
+                  <Legend
+                    ref={legendRef}
+                    skipId={handleChartTabbing(config, legendId)}
+                    interactionLabel={interactionLabel}
+                  />
+                )}
+              {config.visualizationType === 'Warming Stripes' &&
+                config.legend?.style === 'gradient' &&
+                !config.smallMultiples?.mode && <WarmingStripesGradientLegend />}
+            </LegendWrapper>
+            {/* Link */}
+            {isDashboard && config.table && config.table.show && config.table.showDataTableLink
+              ? tableLink
+              : link && link}
+            {/* Description */}
+
+            {processedDescription && config.visualizationType !== 'Spark Line' && (
+              <div className={getChartSubTextClasses().join(' ')}>{parse(processedDescription)}</div>
+            )}
+
+            {/* Data Table */}
+            {(config.xAxis.dataKey &&
+              config.table.show &&
+              config.visualizationType !== 'Spark Line' &&
+              config.visualizationType !== 'Sankey') ||
+            (config.visualizationType === 'Sankey' && config.table.show)
+              ? (() => {
+                  let dataTableConfig = pivotDynamicSeries(config)
+                  let dataTableColumns = config.columns
+                  let dataTableRuntimeData = getTableRuntimeData()
+                  let dataTableRawData =
+                    config.visualizationType === 'Sankey'
+                      ? config?.data?.[0]?.tableData
+                      : config.table.customTableConfig
+                      ? filterVizData(config.filters, config.data)
+                      : config.data
+
+                  if (config.smallMultiples?.mode) {
+                    const prepared = prepareSmallMultiplesDataTable(config, config.columns, dataTableRuntimeData)
+                    dataTableConfig = prepared.config
+                    dataTableColumns = prepared.columns
+                    dataTableRuntimeData = prepared.runtimeData
+                    if (config.smallMultiples.mode === 'by-column') {
+                      dataTableRawData = prepared.config.data
+                    }
+                  }
+
+                  return (
+                    <DataTable
+                      /* changing the "key" will force the table to re-render
+                        when the default sort changes while editing */
+                      key={config.table?.defaultSort?.column || ''}
+                      config={dataTableConfig}
+                      rawData={dataTableRawData}
+                      runtimeData={dataTableRuntimeData}
+                      expandDataTable={config.table.expanded}
+                      columns={dataTableColumns}
+                      displayGeoName={name => name}
+                      applyLegendToRow={applyLegendToRow}
+                      tableTitle={config.table.label}
+                      indexTitle={config.table.indexLabel}
+                      vizTitle={title}
+                      viewport={currentViewport}
+                      tabbingId={handleChartTabbing(config, legendId)}
+                      colorScale={colorScale}
+                      imageRef={imageId}
+                      showDownloadImgButton={config.table.showDownloadImgButton}
+                      showDownloadPdfButton={config.table.showDownloadPdfButton}
+                      includeContextInDownload={config.table?.includeContextInDownload}
+                      interactionLabel={interactionLabel}
+                    />
+                  )
+                })()
+              : (config.table.showDownloadImgButton || config.table.showDownloadPdfButton) && (
+                  <div className='w-100 d-flex justify-content-end'>
+                    <MediaControls.Section classes={['download-links', 'mt-4', 'mb-2']}>
+                      {config.table.showDownloadImgButton && (
+                        <MediaControls.DownloadLink
+                          type='image'
+                          title='Download Chart as Image'
+                          state={config}
+                          elementToCapture={imageId}
+                          interactionLabel={interactionLabel}
+                          includeContextInDownload={config.table?.includeContextInDownload}
+                        />
+                      )}
+                      {config.table.showDownloadPdfButton && (
+                        <MediaControls.DownloadLink
+                          type='pdf'
+                          title='Download Chart as PDF'
+                          state={config}
+                          elementToCapture={imageId}
+                          interactionLabel={interactionLabel}
+                          includeContextInDownload={config.table?.includeContextInDownload}
+                        />
+                      )}
+                    </MediaControls.Section>
+                  </div>
+                )}
+            {visibleAnnotations.length > 0 && <Annotation.Dropdown />}
+            {/* show pdf or image button */}
+            {processedLegacyFootnotes && (
+              <section className='footnotes pt-2 mt-4'>{parse(processedLegacyFootnotes)}</section>
+            )}
+          </VisualizationContent>
         )}
       </>
     )

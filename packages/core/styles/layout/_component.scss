@@ -6,6 +6,9 @@
   border: solid 1px #ccc;
   border-top: none;
   border-radius: 0 0 3px 3px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 1rem !important;
 
   &.no-borders {
     border: none !important;
@@ -17,5 +20,7 @@
 }
 
 .cove-visualization__body-wrap {
-  padding: 0 1rem 1rem;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0;
 }

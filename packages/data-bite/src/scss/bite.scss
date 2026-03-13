@@ -86,7 +86,7 @@
     box-shadow: rgba(0, 0, 0, 0.2) 0 3px 10px;
   }
 
-  .cove-visualization__inner {
+  > .cove-visualization__body-wrap {
     padding: 1rem !important;
   }
 
@@ -221,11 +221,6 @@
 
   &.bite--is-compact-style .bite .cove-visualization__body {
     align-items: center;
-  }
-
-  .cove-visualization__title+.bite,
-  .cove-visualization__header+.bite {
-    border-top: 0;
   }
 
   .bite {
@@ -451,10 +446,6 @@
       align-items: center;
     }
 
-    .cove-visualization__title+.bite,
-    .cove-visualization__header+.bite {
-      border-top: 0;
-    }
   }
 }
 

@@ -98,8 +98,6 @@
   }
 
   .cove-visualization__body {
-    padding: 0 1rem 1rem;
-
     &:not(.no-borders) {
       border: 1px solid var(--lightGray);
     }
@@ -118,10 +116,6 @@
 
     &.component--hide-background-color {
       background-color: transparent;
-    }
-
-    &.cove-visualization__body-wrap {
-      padding-top: 1rem !important;
     }
   }
 

@@ -19,7 +19,7 @@ import Loading from '@cdc/core/components/Loading'
 import Filters from '@cdc/core/components/Filters'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import markupIncludeReducer from './store/markupInclude.reducer'
-import { VisualizationContainer } from '@cdc/core/components/Layout'
+import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 // styles
 import './cdcMarkupInclude.style.css'
 import './scss/main.scss'
@@ -78,10 +78,6 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const markupVariables = config?.markupVariables || contentEditorMarkupVariables || []
 
   const { inlineHTML, srcUrl, title, useInlineHTML } = contentEditor || {}
-
-  const shouldApplyTopPadding =
-    visual?.border || visual?.background || (contentEditor?.title && contentEditor?.titleStyle === 'legacy')
-  const shouldApplySidePadding = visual?.border || visual?.accent || visual?.background
 
   // Default Functions
   const updateConfig = newConfig => {
@@ -271,53 +267,52 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   if (loading === false) {
     content = !hideMarkupInclude && (
-      <div className={`markup-include-content-container ${innerContainerClasses.join(' ')}`}>
-        <Title
-          title={title}
-          isDashboard={isDashboard}
-          titleStyle={contentEditor?.titleStyle}
-          config={config}
-          classes={[`${theme}`, 'mb-0']}
-          noContent={!sanitizedHTML}
-        />
-        <div className={`markup-include-component ${contentClasses.join(' ')}`}>
-          {config.filters && config.filters.length > 0 && (
-            <Filters
-              config={config}
-              setFilters={setFilters}
-              excludedData={data || []}
-              dimensions={[0, 0]}
-              interactionLabel={interactionLabel || 'markup-include'}
-            />
-          )}
-          <div
-            className={`cove-visualization__body-wrap${shouldApplyTopPadding ? ' has-top-padding' : ''}${
-              shouldApplySidePadding ? ' has-side-padding' : ''
-            }`}
-          >
-            {_showNoDataMessage && (
-              <div className='no-data-message'>
-                <p>{`${noDataMessageText}`}</p>
-              </div>
-            )}
-            {!markupError && !_showNoDataMessage && (
-              <div id={scopeId}>
-                {scopedCSS && <style>{scopedCSS}</style>}
-                <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
-              </div>
-            )}
-            {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
+      <VisualizationContent
+        innerClassName={`markup-include-content-container ${innerContainerClasses.join(' ')}`.trim()}
+        bodyClassName={`markup-include-component ${contentClasses.join(' ')}`.trim()}
+        header={
+          <Title
+            title={title}
+            isDashboard={isDashboard}
+            titleStyle={contentEditor?.titleStyle}
+            config={config}
+            classes={[`${theme}`, 'mb-0']}
+            noContent={!sanitizedHTML}
+          />
+        }
+        footer={
+          <FootnotesStandAlone
+            config={configObj?.footnotes}
+            filters={config?.filters || []}
+            markupVariables={markupVariables}
+            enableMarkupVariables={config?.enableMarkupVariables}
+            data={data}
+            dataMetadata={config?.dataMetadata}
+          />
+        }
+      >
+        {config.filters && config.filters.length > 0 && (
+          <Filters
+            config={config}
+            setFilters={setFilters}
+            excludedData={data || []}
+            dimensions={[0, 0]}
+            interactionLabel={interactionLabel || 'markup-include'}
+          />
+        )}
+        {_showNoDataMessage && (
+          <div className='no-data-message'>
+            <p>{`${noDataMessageText}`}</p>
           </div>
-        </div>
-        <FootnotesStandAlone
-          config={configObj?.footnotes}
-          filters={config?.filters || []}
-          markupVariables={markupVariables}
-          enableMarkupVariables={config?.enableMarkupVariables}
-          data={data}
-          dataMetadata={config?.dataMetadata}
-        />
-      </div>
+        )}
+        {!markupError && !_showNoDataMessage && (
+          <div id={scopeId}>
+            {scopedCSS && <style>{scopedCSS}</style>}
+            <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
+          </div>
+        )}
+        {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
+      </VisualizationContent>
     )
   }
 

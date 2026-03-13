@@ -29,7 +29,7 @@ import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 
 import './scss/main.scss'
 import Title from '@cdc/core/components/ui/Title'
-import { VisualizationContainer } from '@cdc/core/components/Layout'
+import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 
 // images
 import CalloutFlag from './images/callout-flag.svg?url'
@@ -405,7 +405,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     return setRatio() + 2
   }, [nodeWidth, nodeSpacer, config.visualizationType])
 
-  const { innerContainerClasses, contentClasses } = useDataVizClasses(config)
+  const { contentClasses } = useDataVizClasses(config)
 
   const xScale = scaleLinear({
     domain: [0, waffleDenominator],
@@ -451,139 +451,137 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         <Error updateConfig={updateConfig} config={config} />
       )}
       {config.newViz && showConfigConfirm && <Confirm updateConfig={updateConfig} config={config} />}
-      <div className='cove-visualization__body-wrap p-0'>
-        {(config.visualizationType === 'Gauge' || config.visualizationType === 'TP5 Gauge') && (
-          <div className={`cove-gauge-chart${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
-            <div className='cove-gauge-chart__chart'>
-              {config.visualizationType === 'TP5 Gauge' ? (
-                <>
-                  <div
-                    className={`cove-gauge-chart__body d-flex flex-row align-items-start flex-grow-1${
-                      !processedContent ? ' justify-content-center' : ''
-                    }`}
-                  >
-                    <div className='cove-gauge-chart__value-section flex-shrink-0'>
-                      <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
-                        {prefix ? prefix : ' '}
-                        {config.showPercent ? dataPercentage : waffleNumerator}
-                        {suffix ? suffix + ' ' : ' '} {processedValueDescription}{' '}
-                        {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
+      {(config.visualizationType === 'Gauge' || config.visualizationType === 'TP5 Gauge') && (
+        <div className={`cove-gauge-chart${config.overallFontSize ? ' font-' + config.overallFontSize : ''}`}>
+          <div className='cove-gauge-chart__chart'>
+            {config.visualizationType === 'TP5 Gauge' ? (
+              <>
+                <div
+                  className={`cove-gauge-chart__body d-flex flex-row align-items-start flex-grow-1${
+                    !processedContent ? ' justify-content-center' : ''
+                  }`}
+                >
+                  <div className='cove-gauge-chart__value-section flex-shrink-0'>
+                    <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
+                      {prefix ? prefix : ' '}
+                      {config.showPercent ? dataPercentage : waffleNumerator}
+                      {suffix ? suffix + ' ' : ' '} {processedValueDescription}{' '}
+                      {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
+                    </div>
+                  </div>
+                  <div className='cove-gauge-chart__content flex-grow-1 d-flex flex-column min-w-0'>
+                    {processedContent ? (
+                      <div className='cove-waffle-chart__data--text'>{parse(processedContent)}</div>
+                    ) : (
+                      <div className='cove-waffle-chart__data--text' aria-hidden='true'>
+                        &nbsp;
                       </div>
-                    </div>
-                    <div className='cove-gauge-chart__content flex-grow-1 d-flex flex-column min-w-0'>
-                      {processedContent ? (
-                        <div className='cove-waffle-chart__data--text'>{parse(processedContent)}</div>
-                      ) : (
-                        <div className='cove-waffle-chart__data--text' aria-hidden='true'>
-                          &nbsp;
-                        </div>
-                      )}
-                    </div>
+                    )}
                   </div>
-                  <svg
-                    height={config.gauge.height + 2}
-                    width={'100%'}
-                    className='mt-2'
-                    style={{ overflow: 'visible', padding: '1px' }}
-                  >
-                    <Group>
-                      <Bar
-                        x={0}
-                        y={0}
-                        width={config.gauge.width}
-                        height={config.gauge.height}
-                        fill='#dff2f6'
-                        stroke='#007A99'
-                        strokeWidth={1}
-                        rx={10}
-                        ry={10}
-                      />
-                      <Bar
-                        x={0}
-                        y={0}
-                        width={xScale(waffleNumerator)}
-                        height={config.gauge.height}
-                        fill='#007A99'
-                        rx={10}
-                        ry={10}
-                      />
-                    </Group>
-                  </svg>
-                  {processedSubtext && (
-                    <div className='cove-waffle-chart__subtext subtext fst-italic mt-2'>{parse(processedSubtext)}</div>
-                  )}
-                </>
-              ) : (
-                <>
-                  <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
-                    {prefix ? prefix : ' '}
-                    {config.showPercent ? dataPercentage : waffleNumerator}
-                    {suffix ? suffix + ' ' : ' '} {processedValueDescription}{' '}
-                    {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
-                  </div>
-                  <div className='cove-waffle-chart__data--text'>{parse(processedContent)}</div>
-                  <svg height={config.gauge.height} width={'100%'}>
-                    <Group>
-                      <Bar
-                        x={0}
-                        y={0}
-                        width={config.gauge.width}
-                        height={config.gauge.height}
-                        fill='#e0e0e0'
-                        stroke='#999'
-                        strokeWidth={1}
-                        rx={4}
-                        ry={4}
-                      />
-                      <Bar
-                        x={0}
-                        y={0}
-                        width={xScale(waffleNumerator)}
-                        height={config.gauge.height}
-                        fill={gaugeColor}
-                        rx={4}
-                        ry={4}
-                      />
-                    </Group>
-                  </svg>
-                  <div className={'cove-waffle-chart__subtext subtext'}>{parse(processedSubtext)}</div>
-                </>
-              )}
-            </div>
-          </div>
-        )}
-        {config.visualizationType !== 'Gauge' && config.visualizationType !== 'TP5 Gauge' && (
-          <div
-            className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${
-              config.overallFontSize ? ' font-' + config.overallFontSize : ''
-            }`}
-          >
-            <div className='cove-waffle-chart__chart' style={{ width: setRatio() }}>
-              <svg width={setSvgSize()} height={setSvgSize()} style={{ display: 'block' }}>
-                <Group top={1} left={1}>
-                  {buildWaffle()}
-                </Group>
-              </svg>
-            </div>
-            {(dataPercentage || processedContent) && (
-              <div className='cove-waffle-chart__data'>
-                {dataPercentage && (
-                  <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
-                    {prefix ? prefix : null}
-                    {dataPercentage}
-                    {suffix ? suffix : null}
-                  </div>
-                )}
-                {processedContent && <div className='cove-waffle-chart__data--text'>{parse(processedContent)}</div>}
-
+                </div>
+                <svg
+                  height={config.gauge.height + 2}
+                  width={'100%'}
+                  className='mt-2'
+                  style={{ overflow: 'visible', padding: '1px' }}
+                >
+                  <Group>
+                    <Bar
+                      x={0}
+                      y={0}
+                      width={config.gauge.width}
+                      height={config.gauge.height}
+                      fill='#dff2f6'
+                      stroke='#007A99'
+                      strokeWidth={1}
+                      rx={10}
+                      ry={10}
+                    />
+                    <Bar
+                      x={0}
+                      y={0}
+                      width={xScale(waffleNumerator)}
+                      height={config.gauge.height}
+                      fill='#007A99'
+                      rx={10}
+                      ry={10}
+                    />
+                  </Group>
+                </svg>
                 {processedSubtext && (
-                  <div className='cove-waffle-chart__subtext subtext fst-italic'>{parse(processedSubtext)}</div>
+                  <div className='cove-waffle-chart__subtext subtext fst-italic mt-2'>{parse(processedSubtext)}</div>
                 )}
-              </div>
+              </>
+            ) : (
+              <>
+                <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
+                  {prefix ? prefix : ' '}
+                  {config.showPercent ? dataPercentage : waffleNumerator}
+                  {suffix ? suffix + ' ' : ' '} {processedValueDescription}{' '}
+                  {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
+                </div>
+                <div className='cove-waffle-chart__data--text'>{parse(processedContent)}</div>
+                <svg height={config.gauge.height} width={'100%'}>
+                  <Group>
+                    <Bar
+                      x={0}
+                      y={0}
+                      width={config.gauge.width}
+                      height={config.gauge.height}
+                      fill='#e0e0e0'
+                      stroke='#999'
+                      strokeWidth={1}
+                      rx={4}
+                      ry={4}
+                    />
+                    <Bar
+                      x={0}
+                      y={0}
+                      width={xScale(waffleNumerator)}
+                      height={config.gauge.height}
+                      fill={gaugeColor}
+                      rx={4}
+                      ry={4}
+                    />
+                  </Group>
+                </svg>
+                <div className={'cove-waffle-chart__subtext subtext'}>{parse(processedSubtext)}</div>
+              </>
             )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+      {config.visualizationType !== 'Gauge' && config.visualizationType !== 'TP5 Gauge' && (
+        <div
+          className={`cove-waffle-chart${orientation === 'vertical' ? ' cove-waffle-chart--verical' : ''}${
+            config.overallFontSize ? ' font-' + config.overallFontSize : ''
+          }`}
+        >
+          <div className='cove-waffle-chart__chart' style={{ width: setRatio() }}>
+            <svg width={setSvgSize()} height={setSvgSize()} style={{ display: 'block' }}>
+              <Group top={1} left={1}>
+                {buildWaffle()}
+              </Group>
+            </svg>
+          </div>
+          {(dataPercentage || processedContent) && (
+            <div className='cove-waffle-chart__data'>
+              {dataPercentage && (
+                <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
+                  {prefix ? prefix : null}
+                  {dataPercentage}
+                  {suffix ? suffix : null}
+                </div>
+              )}
+              {processedContent && <div className='cove-waffle-chart__data--text'>{parse(processedContent)}</div>}
+
+              {processedSubtext && (
+                <div className='cove-waffle-chart__subtext subtext fst-italic'>{parse(processedSubtext)}</div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </>
   )
 
@@ -595,7 +593,11 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     }
 
     return (
-      <div className='cove-visualization__inner cove-visualization__body no-borders'>
+      <VisualizationContent
+        bodyClassName={['no-borders', ...contentClasses].filter(Boolean).join(' ')}
+        bodyWrapClassName='p-0'
+        footer={link && link}
+      >
         <div className={calloutClasses.join(' ')}>
           {!config.visual?.whiteBackground && (
             <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
@@ -605,24 +607,28 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
           )}
           <div className='w-100 mw-100 overflow-hidden'>{renderChartContent()}</div>
         </div>
-        {link && link}
-      </div>
+      </VisualizationContent>
     )
   }
 
   // Original Style: Regular title and content
   return (
-    <div className='cove-visualization__inner cove-visualization__body'>
-      <Title
-        showTitle={config.showTitle}
-        title={processedTitle}
-        titleStyle='legacy'
-        config={config}
-        classes={['chart-title', `${config.theme}`, 'mb-0']}
-      />
-      <div className={contentClasses.join(' ')}>{renderChartContent()}</div>
-      {link && link}
-    </div>
+    <VisualizationContent
+      bodyClassName={contentClasses.join(' ')}
+      bodyWrapClassName='p-0'
+      header={
+        <Title
+          showTitle={config.showTitle}
+          title={processedTitle}
+          titleStyle='legacy'
+          config={config}
+          classes={['chart-title', `${config.theme}`, 'mb-0']}
+        />
+      }
+      footer={link && link}
+    >
+      {renderChartContent()}
+    </VisualizationContent>
   )
 }
 
@@ -733,6 +739,7 @@ const CdcWaffleChart = ({
         <VisualizationContainer
           config={config}
           isEditor={isEditor}
+          currentViewport={currentViewport}
           ref={outerContainerRef}
           editorPanel={<EditorPanel showConfigConfirm={showConfigConfirm} />}
         >

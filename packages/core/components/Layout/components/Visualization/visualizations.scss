@@ -1,4 +1,8 @@
 .cove-visualization {
+  .cove-visualization__body {
+    padding: 1rem;
+  }
+
   &.is-editor {
     overflow: auto;
     display: grid;
@@ -48,12 +52,6 @@
       position: relative;
       left: 0;
       width: 100% !important;
-
-      // Prevent double padding on nested body divs
-      // (e.g., in markup-include, waffle-chart, filtered-text)
-      .cove-visualization__body {
-        padding: 0;
-      }
     }
 
     .cove-editor__content,
