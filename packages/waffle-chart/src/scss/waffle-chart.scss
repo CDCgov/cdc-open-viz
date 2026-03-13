@@ -18,7 +18,7 @@
       justify-items: center;
       align-items: flex-start;
 
-      &>svg {
+      & > svg {
         margin: 0.7em 0;
       }
     }
@@ -96,7 +96,6 @@
 }
 
 @at-root {
-
   .cove-waffle-chart.font-small,
   .cove-gauge-chart.font-small #{&} {
     .cove-waffle-chart__data--primary {
@@ -203,6 +202,7 @@
       .cove-waffle-chart__data--text {
         margin-top: 0.5rem;
         font-size: 1rem;
+        line-height: 1.5rem;
       }
     }
 
@@ -214,6 +214,7 @@
 
     .cove-waffle-chart__subtext {
       font-size: 1rem;
+      margin-top: 1rem;
     }
 
     // White background variant (when "Use White Background Style" is checked)
@@ -270,7 +271,7 @@
       width: 100%;
     }
 
-    .cove-gauge-chart__chart>svg {
+    .cove-gauge-chart__chart > svg {
       display: block;
       width: 100%;
     }
