@@ -20,7 +20,6 @@ import Dashboard from '../CdcDashboard'
 import StandaloneTable from './_mock/standalone-table.json'
 import GroupPivotConfig from './_mock/group-pivot-filter.json'
 import PivotFitlerConfig from './_mock/pivot-filter.json'
-import { type DashboardConfig as Config } from '../types/DashboardConfig'
 import { userEvent, within, expect } from 'storybook/test'
 import ToggleExampleConfig from './_mock/toggle-example.json'
 import cloneDeep from 'lodash/cloneDeep'
@@ -44,6 +43,9 @@ import GalleryDataBiteDashboard from './_mock/gallery-data-bite-dashboard.json'
 import TP5TestConfig from './_mock/tp5-test.json'
 import LineChartAnglesConfig from './_mock/dashboard-line-chart-angles.json'
 import TabSimpleFilterConfig from './_mock/tab-simple-filter.json'
+import DataBiteTp5Config from '../../../data-bite/examples/tp5-style.json'
+import WaffleTp5Config from '../../../waffle-chart/examples/tp5-style.json'
+import MarkupPrimaryConfig from '../../../markup-include/src/_stories/_mock/primary.json'
 
 // Dashboard Filter Updates for Ascending, Descending, and Custom Order
 import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
@@ -4080,6 +4082,233 @@ export const Equal_Height_Mixed_Viz_Row: Story = {
           'Demonstrates equal-height row normalization across different visualization types (chart, map, and data-bite) with intentionally uneven content lengths.'
       }
     }
+  }
+}
+
+const equalHeightVisualSettings = {
+  border: true,
+  accent: true,
+  background: true,
+  borderColorTheme: true,
+  highlightWrappers: true
+}
+
+const withEqualHeightVisualSettings = (config: any, overrides: any = {}) => {
+  const nextConfig = cloneDeep(config)
+
+  return {
+    ...nextConfig,
+    ...overrides,
+    visual: {
+      ...(nextConfig.visual || {}),
+      ...(overrides.visual || {}),
+      ...equalHeightVisualSettings
+    },
+    showEditorPanel: false
+  }
+}
+
+const withMarkupIncludeWidgetSettings = (overrides: any = {}) =>
+  withEqualHeightVisualSettings(MarkupPrimaryConfig, {
+    visualizationType: 'markup-include',
+    showEditorPanel: false,
+    markupVariables: [],
+    enableMarkupVariables: false,
+    contentEditor: {
+      showHeader: true,
+      titleStyle: 'small',
+      showNoDataMessage: false,
+      noDataMessageText: 'No Data Available',
+      ...(MarkupPrimaryConfig.contentEditor || {}),
+      ...(overrides.contentEditor || {})
+    },
+    ...overrides
+  })
+
+const withLegacyDataBiteWidgetSettings = (overrides: any = {}) =>
+  withEqualHeightVisualSettings(DataBiteTp5Config, {
+    visualizationType: 'data-bite',
+    biteStyle: 'title',
+    bitePosition: 'Top',
+    showEditorPanel: false,
+    visual: {
+      showTitle: true,
+      ...(overrides.visual || {})
+    },
+    ...overrides
+  })
+
+const equalHeightVisualSettingsRows = [
+  {
+    items: [
+      {
+        key: 'equal-height-waffle-short',
+        config: withEqualHeightVisualSettings(WaffleTp5Config, {
+          uid: 'equal-height-waffle-short',
+          title: 'Short TP5 waffle',
+          content: 'Short supporting sentence.',
+          subtext: 'Short note.'
+        })
+      },
+      {
+        key: 'equal-height-markup-short',
+        config: withMarkupIncludeWidgetSettings({
+          uid: 'equal-height-markup-short',
+          contentEditor: {
+            title: 'Short markup include',
+            useInlineHTML: true,
+            srcUrl: '',
+            inlineHTML: '<p>Short inline HTML content.</p>'
+          }
+        })
+      },
+      {
+        key: 'equal-height-data-bite-short',
+        config: withLegacyDataBiteWidgetSettings({
+          uid: 'equal-height-data-bite-short',
+          title: 'Short legacy data bite',
+          biteBody: 'A compact message keeps this card shallow.',
+          subtext: 'Short citation.'
+        })
+      }
+    ]
+  },
+  {
+    items: [
+      {
+        key: 'equal-height-waffle-medium',
+        config: withEqualHeightVisualSettings(WaffleTp5Config, {
+          uid: 'equal-height-waffle-medium',
+          title: 'Medium TP5 waffle chart',
+          content:
+            'This card uses a moderately long description so the title and content area wrap across more than one line.',
+          subtext: 'Medium supporting note for the equal-height wrapper check.'
+        })
+      },
+      {
+        key: 'equal-height-markup-medium',
+        config: withMarkupIncludeWidgetSettings({
+          uid: 'equal-height-markup-medium',
+          contentEditor: {
+            title: 'Medium markup include',
+            useInlineHTML: true,
+            srcUrl: '',
+            inlineHTML:
+              '<p>This markup include uses a longer paragraph and a follow-up sentence to create a mid-height card for equal-height comparison.</p><p>It keeps the same visual settings enabled.</p>'
+          }
+        })
+      },
+      {
+        key: 'equal-height-data-bite-medium',
+        config: withLegacyDataBiteWidgetSettings({
+          uid: 'equal-height-data-bite-medium',
+          title: 'Medium legacy data bite',
+          biteBody:
+            'This data bite adds a second sentence so the card grows beyond the shortest variation and makes row balancing easier to inspect.',
+          subtext: 'Medium-length supporting note for the visual settings wrapper.'
+        })
+      }
+    ]
+  },
+  {
+    items: [
+      {
+        key: 'equal-height-waffle-gauge',
+        config: withEqualHeightVisualSettings(WaffleTp5Config, {
+          uid: 'equal-height-waffle-gauge',
+          title: 'TP5 gauge with long content for equal-height validation',
+          visualizationType: 'TP5 Gauge',
+          content:
+            'This gauge variant uses a longer explanatory sentence so the card height differs from the other waffle examples while keeping the same border, accent, and background styling active.',
+          subtext: 'Longer subtext helps confirm that the full visualization card, not just the SVG region, expands to the equal-height row.'
+        })
+      },
+      {
+        key: 'equal-height-markup-long',
+        config: withMarkupIncludeWidgetSettings({
+          uid: 'equal-height-markup-long',
+          contentEditor: {
+            title: 'Long markup include for wrapper inspection',
+            useInlineHTML: true,
+            srcUrl: '',
+            inlineHTML:
+              '<p>This inline HTML block is intentionally longer so the card stretches well beyond the others in the row.</p><p>It includes multiple paragraphs to surface whether equal-height is wrapping the full dashboard visualization container, including the border, accent bar, and themed background, rather than only the inner markup body.</p><p><strong>Regression target:</strong> the outer card should normalize to the row height.</p>'
+          }
+        })
+      },
+      {
+        key: 'equal-height-data-bite-long',
+        config: withLegacyDataBiteWidgetSettings({
+          uid: 'equal-height-data-bite-long',
+          title: 'Long-form legacy data bite for equal-height validation',
+          biteBody:
+            'This intentionally verbose data bite creates a noticeably taller content area. It gives the border, accent bar, and background enough room to show whether the equal-height wrapper is landing on the full visualization container or only on an internal child element.',
+          subtext: 'Long citation text keeps the footer area engaged and surfaces wrapper clipping issues.'
+        })
+      }
+    ]
+  }
+]
+
+const equalHeightVisualizations = Object.fromEntries(
+  equalHeightVisualSettingsRows.flatMap(row => row.items.map(item => [item.key, item.config]))
+)
+
+const equalHeightDatasets = Object.fromEntries(
+  equalHeightVisualSettingsRows.flatMap(row =>
+    row.items.flatMap(item => {
+      if (!Array.isArray(item.config?.data)) return []
+
+      return [
+        [
+          `${item.key}-dataset`,
+          {
+            data: cloneDeep(item.config.data)
+          }
+        ]
+      ]
+    })
+  )
+)
+
+Object.entries(equalHeightVisualizations).forEach(([key, config]: [string, any]) => {
+  if (!Array.isArray(config?.data)) return
+
+  config.dataKey = `${key}-dataset`
+})
+
+const EqualHeightVisualSettingsConfig = {
+  dashboard: {
+    theme: 'theme-blue',
+    title: 'Equal Height Visual Settings Regression'
+  },
+  rows: equalHeightVisualSettingsRows.map(row => ({
+    equalHeight: true,
+    columns: row.items.map(item => ({
+      width: 4,
+      widget: item.key
+    }))
+  })),
+  visualizations: equalHeightVisualizations,
+  datasets: equalHeightDatasets
+}
+
+export const Equal_Height_Visual_Settings_Cards: Story = {
+  args: {
+    config: EqualHeightVisualSettingsConfig,
+    isEditor: true
+  },
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        story:
+          'Regression story for equal-height dashboard rows using data bites, markup includes, and waffle charts with border, background, accent, and wrapper highlighting enabled.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
   }
 }
 
