@@ -6,6 +6,7 @@ import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import _ from 'lodash'
 import { hashObj } from '../../../helpers/hashObj'
 import { sanitizeToSvgId } from '../../../helpers/cove/string'
+import { getMapDataTableColumnKeys } from './getMapDataTableColumnKeys'
 
 type MapRowsProps = DataTableProps & {
   rows: string[]
@@ -69,11 +70,13 @@ export const getMapRowData = (
   displayGeoName: (row: string) => string,
   filterColumns: string[]
 ) => {
+  const orderedColumnKeys = getMapDataTableColumnKeys(columns as any)
+
   return rows.map((row: string) => {
     const dataRow = {}
     ;[
       ...filterColumns,
-      ...Object.keys(columns).filter(column => columns[column].dataTable === true && columns[column].name)
+      ...orderedColumnKeys
     ].map(column => {
       const label = columns[column]?.label || columns[column]?.name || column
       if (column === 'geo') {
@@ -105,10 +108,10 @@ const mapCellArray = ({
   getPatternForRow
 }: MapRowsProps): ReactNode[][] => {
   const { allowMapZoom, geoType, type } = config.general
+  const orderedColumnKeys = getMapDataTableColumnKeys(columns as any)
+
   return rows.map(row =>
-    Object.keys(columns)
-      .filter(column => columns[column].dataTable === true && columns[column].name)
-      .map(column => {
+    orderedColumnKeys.map(column => {
         if (column === 'geo') {
           const rowObj = runtimeData[row]
           if (!rowObj) {
