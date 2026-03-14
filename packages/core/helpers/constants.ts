@@ -14,6 +14,9 @@ export const ENABLE_MAP_DATA_BITE_VISUAL_SETTINGS = true
 // Chart feature flag for visual controls (border, accent, background)
 export const ENABLE_CHART_VISUAL_SETTINGS = true
 
+// Shared TP5 treatment flag for chart and map visualizations
+export const ENABLE_CHART_MAP_TP5_TREATMENT = true
+
 // Data operators for conditional logic
 export const DATA_OPERATOR_LESS = '<'
 export const DATA_OPERATOR_GREATER = '>'

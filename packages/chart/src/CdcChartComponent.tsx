@@ -106,7 +106,8 @@ import { Datasets } from '@cdc/core/types/DataSet'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
-import { ENABLE_CHART_VISUAL_SETTINGS } from '@cdc/core/helpers/constants'
+import { ENABLE_CHART_MAP_TP5_TREATMENT, ENABLE_CHART_VISUAL_SETTINGS } from '@cdc/core/helpers/constants'
+import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -1199,6 +1200,32 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Filter annotations to only those visible in current data view
   const visibleAnnotations = getVisibleAnnotations(config.annotations, transformedData, config.xAxis?.dataKey)
+  const isTp5Treatment = ENABLE_CHART_MAP_TP5_TREATMENT && config.visual?.tp5Treatment
+  const visualSettingClasses = new Set([
+    'component--has-border-color-theme',
+    'component--has-accent',
+    'component--has-background',
+    'component--hide-background-color'
+  ])
+  const tp5Classes = new Set(['component--tp5-treatment', 'component--tp5-treatment-background'])
+  const bodyClasses = contentClasses.filter(className => {
+    if (!ENABLE_CHART_VISUAL_SETTINGS && visualSettingClasses.has(className)) return false
+    if (!ENABLE_CHART_MAP_TP5_TREATMENT && tp5Classes.has(className)) return false
+    return true
+  })
+  if (isTp5Treatment && !bodyClasses.includes('no-borders')) bodyClasses.push('no-borders')
+  const chartTitle = (
+    <Title
+      showTitle={config.showTitle}
+      isDashboard={isDashboard}
+      title={title}
+      superTitle={processedSuperTitle}
+      titleStyle={isTp5Treatment ? 'small' : config.titleStyle}
+      classes={['chart-title', `${config.theme}`, 'cove-visualization__title', isTp5Treatment ? '' : 'mb-3']}
+      style={undefined}
+      config={config}
+    />
+  )
 
   // Prevent render if loading
   let body = <Loading />
@@ -1255,20 +1282,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
           <VisualizationContent
             innerClassName={`type-${makeClassName(config.visualizationType)}`}
             innerProps={{ 'aria-label': handleChartAriaLabels(config), tabIndex: 0 }}
-            bodyClassName={contentClasses.join(' ')}
-            bodyWrapClassName={getChartWrapperClasses().join(' ')}
-            header={
-              <Title
-                showTitle={config.showTitle}
-                isDashboard={isDashboard}
-                title={title}
-                superTitle={processedSuperTitle}
-                titleStyle={config.titleStyle}
-                classes={['chart-title', `${config.theme}`, 'cove-visualization__title', 'mb-3']}
-                style={undefined}
-                config={config}
-              />
-            }
+            bodyClassName={bodyClasses.join(' ')}
+            bodyWrapClassName={isTp5Treatment ? 'cdc-callout d-flex flex-column tp5-chart-callout' : ''}
+            header={isTp5Treatment ? null : chartTitle}
             footer={
               <FootnotesStandAlone
                 config={configObj.footnotes}
@@ -1280,6 +1296,23 @@ const CdcChart: React.FC<CdcChartProps> = ({
               />
             }
           >
+            {isTp5Treatment && (
+              <img
+                src={CalloutFlag}
+                alt=''
+                className='cdc-callout__flag'
+                aria-hidden='true'
+                style={{
+                  position: 'absolute',
+                  top: '-0.36rem',
+                  right: '1.08rem',
+                  width: '1.84rem',
+                  height: 'auto'
+                }}
+              />
+            )}
+            {isTp5Treatment && chartTitle}
+
             {/* Intro Text/Message */}
             {processedIntroText && config.visualizationType !== 'Spark Line' && (
               <section className={`introText mb-4`}>{parse(processedIntroText)}</section>
@@ -1303,140 +1336,146 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 key={`skip-annotations`}
               />
             )}
-            <LegendWrapper>
-              <div
-                className={
-                  legend.hide || isLegendWrapViewport(currentViewport)
-                    ? 'w-100'
-                    : legend.position === 'bottom' ||
-                      legend.position === 'top' ||
-                      visualizationType === 'Sankey' ||
-                      visualizationType === 'Spark Line'
-                    ? 'w-100'
-                    : 'w-75'
-                }
-              >
-                {/* Check if there is data to display */}
-                {(!filteredData || filteredData.length === 0) && (
-                  <div className='no-data-message' style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
-                    {config.chartMessage?.noData || 'No Data Available'}
-                  </div>
-                )}
-
-                {/* All charts with LinearChart */}
-                {filteredData &&
-                  filteredData.length > 0 &&
-                  !['Spark Line', 'Line', 'Sankey', 'Pie', 'Radar'].includes(config.visualizationType) && (
-                    <div ref={parentRef} style={{ width: `100%` }}>
-                      <ParentSize>
-                        {parent => <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />}
-                      </ParentSize>
+            <div className={getChartWrapperClasses().join(' ')}>
+              <LegendWrapper>
+                <div
+                  className={
+                    legend.hide || isLegendWrapViewport(currentViewport)
+                      ? 'w-100'
+                      : legend.position === 'bottom' ||
+                        legend.position === 'top' ||
+                        visualizationType === 'Sankey' ||
+                        visualizationType === 'Spark Line'
+                      ? 'w-100'
+                      : 'w-75'
+                  }
+                >
+                  {/* Check if there is data to display */}
+                  {(!filteredData || filteredData.length === 0) && (
+                    <div className='no-data-message' style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
+                      {config.chartMessage?.noData || 'No Data Available'}
                     </div>
                   )}
 
-                {filteredData && filteredData.length > 0 && config.visualizationType === 'Pie' && (
-                  <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
-                    {parent => (
-                      <PieChart
-                        ref={svgRef}
-                        parentWidth={parent.width}
-                        parentHeight={parent.height}
-                        interactionLabel={interactionLabel}
-                      />
-                    )}
-                  </ParentSize>
-                )}
-                {/* Radar Chart */}
-                {filteredData && filteredData.length > 0 && config.visualizationType === 'Radar' && (
-                  <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
-                    {parent => (
-                      <RadarChart
-                        ref={svgRef}
-                        parentWidth={parent.width}
-                        parentHeight={parent.height}
-                        interactionLabel={interactionLabel}
-                      />
-                    )}
-                  </ParentSize>
-                )}
-                {/* Line Chart */}
-                {filteredData &&
-                  filteredData.length > 0 &&
-                  config.visualizationType === 'Line' &&
-                  (convertLineToBarGraph ? (
-                    <div ref={parentRef} style={{ width: `100%` }}>
-                      <ParentSize>
-                        {parent => <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />}
-                      </ParentSize>
-                    </div>
-                  ) : (
-                    <div ref={parentRef} style={{ width: '100%' }}>
-                      <ParentSize>
-                        {parent => {
-                          const labelMargin = 120
-                          const widthReduction =
-                            config.showLineSeriesLabels && (config.legend.position !== 'right' || config.legend.hide)
-                              ? labelMargin
-                              : 0
-                          return (
-                            <LinearChart
-                              ref={svgRef}
-                              parentWidth={parent.width - widthReduction}
-                              parentHeight={parent.height}
-                            />
-                          )
-                        }}
-                      </ParentSize>
-                    </div>
-                  ))}
-                {/* Sparkline */}
-                {config.visualizationType === 'Spark Line' && (
-                  <>
-                    <Filters
-                      config={config}
-                      setFilters={setFilters}
-                      excludedData={excludedData}
-                      dimensions={dimensions}
-                      interactionLabel={interactionLabel}
-                    />
-                    {processedIntroText && (
-                      <section className='introText mb-4' style={{ padding: '0px 0 35px' }}>
-                        {parse(processedIntroText)}
-                      </section>
-                    )}
-                    <div style={{ height: `100px`, width: `100%`, ...sparkLineStyles }}>
-                      <ParentSize>{parent => <SparkLine width={parent.width} height={parent.height} />}</ParentSize>
-                    </div>
-                    {processedDescription && (
-                      <div className='subtext' style={{ padding: '35px 0 15px' }}>
-                        {parse(processedDescription)}
+                  {/* All charts with LinearChart */}
+                  {filteredData &&
+                    filteredData.length > 0 &&
+                    !['Spark Line', 'Line', 'Sankey', 'Pie', 'Radar'].includes(config.visualizationType) && (
+                      <div ref={parentRef} style={{ width: `100%` }}>
+                        <ParentSize>
+                          {parent => (
+                            <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
+                          )}
+                        </ParentSize>
                       </div>
                     )}
-                  </>
-                )}
-                {/* Sankey */}
-                {config.visualizationType === 'Sankey' && (
-                  <ParentSize aria-hidden='true'>
-                    {parent => <SankeyChart runtime={config.runtime} width={parent.width} height={parent.height} />}
-                  </ParentSize>
-                )}
-              </div>
-              {/* Legend */}
-              {!config.legend.hide &&
-                config.visualizationType !== 'Spark Line' &&
-                config.visualizationType !== 'Sankey' &&
-                !(config.visualizationType === 'Warming Stripes' && config.legend?.style === 'gradient') &&
-                !(config.visualizationType === 'Warming Stripes' && config.smallMultiples?.mode) && (
-                  <Legend
-                    ref={legendRef}
-                    skipId={handleChartTabbing(config, legendId)}
-                    interactionLabel={interactionLabel}
-                  />
-                )}
-              {config.visualizationType === 'Warming Stripes' &&
-                config.legend?.style === 'gradient' &&
-                !config.smallMultiples?.mode && <WarmingStripesGradientLegend />}
-            </LegendWrapper>
+
+                  {filteredData && filteredData.length > 0 && config.visualizationType === 'Pie' && (
+                    <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
+                      {parent => (
+                        <PieChart
+                          ref={svgRef}
+                          parentWidth={parent.width}
+                          parentHeight={parent.height}
+                          interactionLabel={interactionLabel}
+                        />
+                      )}
+                    </ParentSize>
+                  )}
+                  {/* Radar Chart */}
+                  {filteredData && filteredData.length > 0 && config.visualizationType === 'Radar' && (
+                    <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
+                      {parent => (
+                        <RadarChart
+                          ref={svgRef}
+                          parentWidth={parent.width}
+                          parentHeight={parent.height}
+                          interactionLabel={interactionLabel}
+                        />
+                      )}
+                    </ParentSize>
+                  )}
+                  {/* Line Chart */}
+                  {filteredData &&
+                    filteredData.length > 0 &&
+                    config.visualizationType === 'Line' &&
+                    (convertLineToBarGraph ? (
+                      <div ref={parentRef} style={{ width: `100%` }}>
+                        <ParentSize>
+                          {parent => (
+                            <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
+                          )}
+                        </ParentSize>
+                      </div>
+                    ) : (
+                      <div ref={parentRef} style={{ width: '100%' }}>
+                        <ParentSize>
+                          {parent => {
+                            const labelMargin = 120
+                            const widthReduction =
+                              config.showLineSeriesLabels && (config.legend.position !== 'right' || config.legend.hide)
+                                ? labelMargin
+                                : 0
+                            return (
+                              <LinearChart
+                                ref={svgRef}
+                                parentWidth={parent.width - widthReduction}
+                                parentHeight={parent.height}
+                              />
+                            )
+                          }}
+                        </ParentSize>
+                      </div>
+                    ))}
+                  {/* Sparkline */}
+                  {config.visualizationType === 'Spark Line' && (
+                    <>
+                      <Filters
+                        config={config}
+                        setFilters={setFilters}
+                        excludedData={excludedData}
+                        dimensions={dimensions}
+                        interactionLabel={interactionLabel}
+                      />
+                      {processedIntroText && (
+                        <section className='introText mb-4' style={{ padding: '0px 0 35px' }}>
+                          {parse(processedIntroText)}
+                        </section>
+                      )}
+                      <div style={{ height: `100px`, width: `100%`, ...sparkLineStyles }}>
+                        <ParentSize>{parent => <SparkLine width={parent.width} height={parent.height} />}</ParentSize>
+                      </div>
+                      {processedDescription && (
+                        <div className='subtext' style={{ padding: '35px 0 15px' }}>
+                          {parse(processedDescription)}
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {/* Sankey */}
+                  {config.visualizationType === 'Sankey' && (
+                    <ParentSize aria-hidden='true'>
+                      {parent => <SankeyChart runtime={config.runtime} width={parent.width} height={parent.height} />}
+                    </ParentSize>
+                  )}
+                </div>
+                {/* Legend */}
+                {!config.legend.hide &&
+                  config.visualizationType !== 'Spark Line' &&
+                  config.visualizationType !== 'Sankey' &&
+                  !(config.visualizationType === 'Warming Stripes' && config.legend?.style === 'gradient') &&
+                  !(config.visualizationType === 'Warming Stripes' && config.smallMultiples?.mode) && (
+                    <Legend
+                      ref={legendRef}
+                      skipId={handleChartTabbing(config, legendId)}
+                      interactionLabel={interactionLabel}
+                    />
+                  )}
+                {config.visualizationType === 'Warming Stripes' &&
+                  config.legend?.style === 'gradient' &&
+                  !config.smallMultiples?.mode && <WarmingStripesGradientLegend />}
+              </LegendWrapper>
+            </div>
             {/* Link */}
             {isDashboard && config.table && config.table.show && config.table.showDataTableLink
               ? tableLink

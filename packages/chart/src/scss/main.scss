@@ -15,6 +15,14 @@
 .cove-visualization.type-chart {
   @import 'DataTable';
 
+  .cove-visualization__body.component--tp5-treatment {
+    background: transparent !important;
+  }
+
+  .cove-visualization__body.component--tp5-treatment > .cove-visualization__body-wrap.cdc-callout.tp5-chart-callout {
+    background: transparent !important;
+  }
+
   .cove-visualization__title,
   .cove-visualization__header {
     margin-bottom: 0 !important;

@@ -73,6 +73,8 @@ import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import useModal from './hooks/useModal'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { ENABLE_CHART_MAP_TP5_TREATMENT } from '@cdc/core/helpers/constants'
+import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 
 type CdcMapComponent = {
   config: MapConfig
@@ -338,6 +340,17 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   if (!table.label || table.label === '') table.label = 'Data Table'
+  const isTp5Treatment = ENABLE_CHART_MAP_TP5_TREATMENT && config.visual?.tp5Treatment
+  const mapTitle = (
+    <Title
+      title={title}
+      superTitle={processedSuperTitle}
+      titleStyle={isTp5Treatment ? 'small' : general.titleStyle}
+      showTitle={general.showTitle}
+      config={config}
+      classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${headerColor}`]}
+    />
+  )
 
   const mapProps = {
     setParentConfig,
@@ -434,156 +447,173 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   .join(' ')}
                 innerProps={{ 'aria-label': 'Map: ' + title, ref: innerContainerRef }}
                 bodyClassName={[
-                  !config.visual?.border ? 'no-borders' : '',
+                  !config.visual?.border || isTp5Treatment ? 'no-borders' : '',
                   config.visual?.borderColorTheme ? 'component--has-border-color-theme' : '',
-                  config.visual?.accent ? 'component--has-accent' : ''
+                  config.visual?.accent ? 'component--has-accent' : '',
+                  isTp5Treatment ? 'component--tp5-treatment' : ''
                 ]
                   .filter(Boolean)
                   .join(' ')}
-                header={
-                  <Title
-                    title={title}
-                    superTitle={processedSuperTitle}
-                    titleStyle={general.titleStyle}
-                    showTitle={general.showTitle}
-                    config={config}
-                    classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${headerColor}`]}
-                  />
-                }
+                header={isTp5Treatment ? null : mapTitle}
               >
-                {config?.runtime?.editorErrorMessage.length > 0 && <Error />}
-                <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
-                {config?.annotations?.length > 0 && (
-                  <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
-                )}
-
-                {processedIntroText && <section className='introText mb-4'>{parse(processedIntroText)}</section>}
-
-                {config?.filters?.length > 0 && (
-                  <Filters
-                    config={config}
-                    setConfig={setConfig}
-                    filteredData={runtimeFilters}
-                    setFilters={_setRuntimeData}
-                    dimensions={dimensions}
-                    standaloneMap={!config}
-                    interactionLabel={interactionLabel}
-                  />
-                )}
-
                 <div
-                  role='region'
-                  tabIndex={0}
-                  className={getMapContainerClasses(config, modal).join(' ')}
-                  onClick={e => closeModal(e, modal)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') {
-                      closeModal(e, modal)
-                    }
-                  }}
+                  className={
+                    isTp5Treatment ? ['cdc-callout', 'd-flex', 'flex-column'].filter(Boolean).join(' ') : undefined
+                  }
+                  style={isTp5Treatment ? { position: 'relative', background: 'transparent' } : undefined}
                 >
-                  <MapContainer
-                    config={config}
-                    modal={modal}
-                    currentViewport={currentViewport}
-                    geoType={geoType}
-                    general={general}
-                    logo={logo}
-                    mapSvgRef={mapSvg}
-                  />
+                  {isTp5Treatment && (
+                    <img
+                      src={CalloutFlag}
+                      alt=''
+                      className='cdc-callout__flag'
+                      aria-hidden='true'
+                      style={{
+                        position: 'absolute',
+                        top: '-0.36rem',
+                        right: '1.08rem',
+                        width: '1.84rem',
+                        height: 'auto'
+                      }}
+                    />
+                  )}
+                  {isTp5Treatment && mapTitle}
+                  {config?.runtime?.editorErrorMessage.length > 0 && <Error />}
+                  <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
+                  {config?.annotations?.length > 0 && (
+                    <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
+                  )}
 
-                  {general.showSidebar && 'navigation' !== general.type && (
-                    <Legend
+                  {processedIntroText && <section className='introText mb-4'>{parse(processedIntroText)}</section>}
+
+                  {config?.filters?.length > 0 && (
+                    <Filters
+                      config={config}
+                      setConfig={setConfig}
+                      filteredData={runtimeFilters}
+                      setFilters={_setRuntimeData}
                       dimensions={dimensions}
-                      ref={legendRef}
-                      skipId={tabId}
-                      containerWidthPadding={0}
-                      currentViewport={currentViewport}
+                      standaloneMap={!config}
                       interactionLabel={interactionLabel}
                     />
                   )}
+
+                  <div
+                    role='region'
+                    tabIndex={0}
+                    className={getMapContainerClasses(config, modal).join(' ')}
+                    onClick={e => closeModal(e, modal)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        closeModal(e, modal)
+                      }
+                    }}
+                  >
+                    <MapContainer
+                      config={config}
+                      modal={modal}
+                      currentViewport={currentViewport}
+                      geoType={geoType}
+                      general={general}
+                      logo={logo}
+                      mapSvgRef={mapSvg}
+                    />
+
+                    {general.showSidebar && 'navigation' !== general.type && (
+                      <Legend
+                        dimensions={dimensions}
+                        ref={legendRef}
+                        skipId={tabId}
+                        containerWidthPadding={0}
+                        currentViewport={currentViewport}
+                        interactionLabel={interactionLabel}
+                      />
+                    )}
+                  </div>
+
+                  {'navigation' === general.type && (
+                    <NavigationMenu
+                      mapTabbingID={tabId}
+                      displayGeoName={displayGeoName}
+                      data={runtimeData}
+                      options={general}
+                      columns={config.columns}
+                      navigationHandler={val => navigationHandler('_blank', val, customNavigationHandler)}
+                    />
+                  )}
+
+                  {/* Link (to data table?) */}
+                  {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink
+                    ? tableLink
+                    : link && link}
+
+                  {processedSubtext.length > 0 && <p className='subtext mt-4'>{parse(processedSubtext)}</p>}
+
+                  {/* Data Table or Download Links */}
+                  {shouldShowDataTable(config, table, general, loading) ? (
+                    <DataTable
+                      columns={dataTableColumns}
+                      config={dataTableConfig}
+                      currentViewport={currentViewport}
+                      displayGeoName={displayGeoName}
+                      expandDataTable={table.expanded}
+                      formatLegendLocation={key =>
+                        formatLegendLocation(key, dataTableRuntimeData?.[key]?.[config.columns.geo.name])
+                      }
+                      imageRef={imageId}
+                      indexTitle={table.indexLabel}
+                      innerContainerRef={innerContainerRef}
+                      legendMemo={legendMemo}
+                      legendSpecialClassLastMemo={legendSpecialClassLastMemo}
+                      navigationHandler={navigationHandler}
+                      outerContainerRef={outerContainerRef}
+                      rawData={dataTableConfig.data}
+                      runtimeData={dataTableRuntimeData}
+                      runtimeLegend={runtimeLegend}
+                      showDownloadImgButton={showDownloadImgButton}
+                      showDownloadPdfButton={showDownloadPdfButton}
+                      includeContextInDownload={config.general?.includeContextInDownload}
+                      tabbingId={tabId}
+                      tableTitle={table.label}
+                      vizTitle={general.title}
+                      applyLegendToRow={applyLegendToRow}
+                      getPatternForRow={getPatternForRow}
+                      wrapColumns={table.wrapColumns}
+                      interactionLabel={interactionLabel}
+                    />
+                  ) : (
+                    (showDownloadImgButton || showDownloadPdfButton) && (
+                      <div className='w-100 d-flex justify-content-end'>
+                        <MediaControls.Section classes={['download-links', 'mt-4', 'mb-2']}>
+                          {showDownloadImgButton && (
+                            <MediaControls.DownloadLink
+                              type='image'
+                              title='Download Map as Image'
+                              state={config}
+                              elementToCapture={imageId}
+                              interactionLabel={interactionLabel}
+                              includeContextInDownload={config.general?.includeContextInDownload}
+                            />
+                          )}
+                          {showDownloadPdfButton && (
+                            <MediaControls.DownloadLink
+                              type='pdf'
+                              title='Download Map as PDF'
+                              state={config}
+                              elementToCapture={imageId}
+                              interactionLabel={interactionLabel}
+                              includeContextInDownload={config.general?.includeContextInDownload}
+                            />
+                          )}
+                        </MediaControls.Section>
+                      </div>
+                    )
+                  )}
+
+                  {config.annotations?.length > 0 && <Annotation.Dropdown />}
+
+                  {processedFootnotes && <section className='footnotes pt-2 mt-4'>{parse(processedFootnotes)}</section>}
                 </div>
-
-                {'navigation' === general.type && (
-                  <NavigationMenu
-                    mapTabbingID={tabId}
-                    displayGeoName={displayGeoName}
-                    data={runtimeData}
-                    options={general}
-                    columns={config.columns}
-                    navigationHandler={val => navigationHandler('_blank', val, customNavigationHandler)}
-                  />
-                )}
-
-                {/* Link (to data table?) */}
-                {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink ? tableLink : link && link}
-
-                {processedSubtext.length > 0 && <p className='subtext mt-4'>{parse(processedSubtext)}</p>}
-
-                {/* Data Table or Download Links */}
-                {shouldShowDataTable(config, table, general, loading) ? (
-                  <DataTable
-                    columns={dataTableColumns}
-                    config={dataTableConfig}
-                    currentViewport={currentViewport}
-                    displayGeoName={displayGeoName}
-                    expandDataTable={table.expanded}
-                    formatLegendLocation={key =>
-                      formatLegendLocation(key, dataTableRuntimeData?.[key]?.[config.columns.geo.name])
-                    }
-                    imageRef={imageId}
-                    indexTitle={table.indexLabel}
-                    innerContainerRef={innerContainerRef}
-                    legendMemo={legendMemo}
-                    legendSpecialClassLastMemo={legendSpecialClassLastMemo}
-                    navigationHandler={navigationHandler}
-                    outerContainerRef={outerContainerRef}
-                    rawData={dataTableConfig.data}
-                    runtimeData={dataTableRuntimeData}
-                    runtimeLegend={runtimeLegend}
-                    showDownloadImgButton={showDownloadImgButton}
-                    showDownloadPdfButton={showDownloadPdfButton}
-                    includeContextInDownload={config.general?.includeContextInDownload}
-                    tabbingId={tabId}
-                    tableTitle={table.label}
-                    vizTitle={general.title}
-                    applyLegendToRow={applyLegendToRow}
-                    getPatternForRow={getPatternForRow}
-                    wrapColumns={table.wrapColumns}
-                    interactionLabel={interactionLabel}
-                  />
-                ) : (
-                  (showDownloadImgButton || showDownloadPdfButton) && (
-                    <div className='w-100 d-flex justify-content-end'>
-                      <MediaControls.Section classes={['download-links', 'mt-4', 'mb-2']}>
-                        {showDownloadImgButton && (
-                          <MediaControls.DownloadLink
-                            type='image'
-                            title='Download Map as Image'
-                            state={config}
-                            elementToCapture={imageId}
-                            interactionLabel={interactionLabel}
-                            includeContextInDownload={config.general?.includeContextInDownload}
-                          />
-                        )}
-                        {showDownloadPdfButton && (
-                          <MediaControls.DownloadLink
-                            type='pdf'
-                            title='Download Map as PDF'
-                            state={config}
-                            elementToCapture={imageId}
-                            interactionLabel={interactionLabel}
-                            includeContextInDownload={config.general?.includeContextInDownload}
-                          />
-                        )}
-                      </MediaControls.Section>
-                    </div>
-                  )
-                )}
-
-                {config.annotations?.length > 0 && <Annotation.Dropdown />}
-
-                {processedFootnotes && <section className='footnotes pt-2 mt-4'>{parse(processedFootnotes)}</section>}
               </VisualizationContent>
             )}
 

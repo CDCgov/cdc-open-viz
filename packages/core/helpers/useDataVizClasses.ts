@@ -43,6 +43,7 @@ export default function useDataVizClasses(config, viewport = null) {
   visualizationType === 'Spark Line' && contentClasses.push('sparkline')
   visual?.borderColorTheme && contentClasses.push('component--has-border-color-theme')
   visual?.accent && contentClasses.push('component--has-accent')
+  visual?.tp5Treatment && contentClasses.push('component--tp5-treatment')
 
   // ! these two will be retired.
   shadow && innerContainerClasses.push('shadow')
