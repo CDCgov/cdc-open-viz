@@ -1,9 +1,77 @@
 import { feature } from 'topojson-client'
 import usExtendedGeography from './../data/us-extended-geography.json'
+import worldTopo from '../../WorldMap/data/world-topo.json'
+
+type TopoTransform = {
+  scale: [number, number]
+  translate: [number, number]
+}
+
+type TopoGeometry = {
+  type: 'Polygon' | 'MultiPolygon'
+  arcs: number[] | number[][] | number[][][]
+  id?: string
+  properties?: Record<string, unknown>
+}
+
+type TopoGeometryCollection = {
+  type: 'GeometryCollection'
+  geometries: TopoGeometry[]
+}
+
+export type FreelyAssociatedStatesTopology = {
+  type: 'Topology'
+  transform: TopoTransform
+  arcs: number[][][]
+  objects: {
+    states: TopoGeometryCollection
+    counties: TopoGeometryCollection
+  }
+}
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
 }
+
+const WORLD_TO_FAS_UID = {
+  FSM: 'US-FM',
+  MHL: 'US-MH',
+  PLW: 'US-PW'
+} as const
+
+export const buildFreelyAssociatedStatesTopoFromWorld = () => {
+  const worldObject = worldTopo.objects.Cove_World_Map_2026_corr
+  const geometries = worldObject.geometries
+    .filter(geometry => geometry.properties?.GENC_3A_CO && WORLD_TO_FAS_UID[geometry.properties.GENC_3A_CO])
+    .map(geometry => ({
+      ...geometry,
+      id: WORLD_TO_FAS_UID[geometry.properties.GENC_3A_CO],
+      properties: {
+        ...geometry.properties,
+        name: geometry.properties.SHORT_FORM
+      }
+    }))
+
+  return {
+    type: 'Topology',
+    transform: worldTopo.transform,
+    arcs: worldTopo.arcs,
+    objects: {
+      states: {
+        type: 'GeometryCollection',
+        geometries
+      },
+      counties: {
+        type: 'GeometryCollection',
+        geometries: geometries.map(geometry => ({
+          ...geometry
+        }))
+      }
+    }
+  } as FreelyAssociatedStatesTopology
+}
+
+const freelyAssociatedStatesTopo: FreelyAssociatedStatesTopology = buildFreelyAssociatedStatesTopoFromWorld()
 
 export const getTopoData = year => {
   return new Promise((resolve, reject) => {
@@ -14,8 +82,12 @@ export const getTopoData = year => {
         response = await response.json()
       }
 
-      const counties = [response, usExtendedGeography].flatMap(topo => feature(topo, topo.objects.counties).features)
-      const states = [response, usExtendedGeography].flatMap(topo => feature(topo, topo.objects.states).features)
+      const counties = [response, usExtendedGeography]
+        .flatMap(topo => feature(topo, topo.objects.counties).features)
+        .concat(feature(freelyAssociatedStatesTopo, freelyAssociatedStatesTopo.objects.counties).features)
+      const states = [response, usExtendedGeography]
+        .flatMap(topo => feature(topo, topo.objects.states).features)
+        .concat(feature(freelyAssociatedStatesTopo, freelyAssociatedStatesTopo.objects.states).features)
 
       const topoData = {
         year: year || 'default',

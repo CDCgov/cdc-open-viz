@@ -33,9 +33,11 @@ const memoizedFindUID = (
   const lookup = geoLookups[type]
   if (caseInsensitive) {
     const lowerGeoName = geoName.toLowerCase()
-    return lookup.keys.find(key => lookup.data[key].some(name => name.toLowerCase() === lowerGeoName))
+    return lookup.keys.find(
+      key => key.toLowerCase() === lowerGeoName || lookup.data[key].some(name => name.toLowerCase() === lowerGeoName)
+    )
   }
-  return lookup.keys.find(key => lookup.data[key].includes(geoName))
+  return lookup.keys.find(key => key === geoName || lookup.data[key].includes(geoName))
 }
 
 const hasValidCoordinates = (row: Row, columns: GeoConfig['columns']): boolean => {
@@ -139,8 +141,13 @@ export const addUIDs = (configObj: MapConfig, fromColumn: string) => {
 
       case GEO_TYPES.US_COUNTY:
       case GEO_TYPES.SINGLE_STATE:
-        if (geocodeType !== GEOCODE_TYPES.US) {
+        if (geocodeType === GEOCODE_TYPES.US) {
+          uid = handleUSLocation(row, geo.name, displayAsHex)
+        } else {
           uid = handleCountyLocation(row, geo.name)
+          if (!uid) {
+            uid = memoizedFindUID(normalizeGeoName(row[geo.name]), 'territory')
+          }
         }
         break
     }

@@ -3,6 +3,7 @@ import { displayGeoName } from '../helpers/displayGeoName'
 
 const useTooltip = props => {
   const { config, supportedStatesFipsCodes } = props
+  const countyFipsPattern = /^\d{5}$/
 
   /**
    * On county maps there's a need to append the state name
@@ -13,8 +14,17 @@ const useTooltip = props => {
   const handleTooltipStateNameColumn = (toolTipText, row) => {
     const { geoType, type, hideGeoColumnInTooltip } = config.general
     if (geoType === 'us-county' && type !== 'us-geocode') {
-      let stateFipsCode = row[config.columns.geo.name].substring(0, 2)
+      const geoValue = String(row?.[config.columns.geo.name] || '')
+      if (!countyFipsPattern.test(geoValue)) {
+        return toolTipText
+      }
+
+      let stateFipsCode = geoValue.substring(0, 2)
       const stateName = supportedStatesFipsCodes[stateFipsCode]
+      if (!stateName) {
+        return toolTipText
+      }
+
       toolTipText += hideGeoColumnInTooltip
         ? `<strong>${stateName}</strong><br/>`
         : `<strong>Location:  ${stateName}</strong><br/>`
@@ -38,7 +48,7 @@ const useTooltip = props => {
           toolTipText = 'State: '
           break
         case 'us-county':
-          toolTipText = 'County: '
+          toolTipText = countyFipsPattern.test(String(row?.[config.columns.geo.name] || '')) ? 'County: ' : 'Location: '
           break
         case 'single-state':
           toolTipText = 'County: '

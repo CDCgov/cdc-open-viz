@@ -11,6 +11,7 @@ import MultiCountryHide from './_mock/multi-country-hide.json'
 import SingleStateWithFilters from './_mock/DEV-8942.json'
 import exampleCityState from './_mock/example-city-state.json'
 import USBubbleCities from './_mock/us-bubble-cities.json'
+import CountyAvailableTerritories from './_mock/county-available-territories.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import exampleLegendBins from './_mock/legend-bins.json'
 
@@ -210,6 +211,28 @@ export const Single_State_With_Filters: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+  }
+}
+
+export const County_Map_Available_Territories: Story = {
+  args: {
+    config: CountyAvailableTerritories
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+
+    const section = canvasElement.querySelector('.county-territories-section')
+    expect(section).toBeInTheDocument()
+    expect(within(section as HTMLElement).getByText('Freely associated states')).toBeInTheDocument()
+    expect(within(section as HTMLElement).getByText('Federated States of Micronesia')).toBeInTheDocument()
+    expect(within(section as HTMLElement).getByText('Marshall Islands')).toBeInTheDocument()
+    expect(within(section as HTMLElement).getByText('Palau')).toBeInTheDocument()
+
+    const territoryCards = section?.querySelectorAll('.county-territories-section__card')
+    expect(territoryCards?.length).toBe(8)
+    territoryCards?.forEach(card => {
+      expect(card.querySelector('path')?.getAttribute('d')).toBeTruthy()
+    })
   }
 }
 

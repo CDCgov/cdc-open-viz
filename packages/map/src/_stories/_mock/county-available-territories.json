@@ -1,0 +1,162 @@
+{
+  "annotations": [],
+  "general": {
+    "geoType": "us-county",
+    "type": "data",
+    "geoBorderColor": "darkGray",
+    "headerColor": "theme-blue",
+    "title": "County Map with Available Territories",
+    "showTitle": true,
+    "showSidebar": true,
+    "showDownloadButton": true,
+    "showDownloadMediaButton": false,
+    "showDownloadImgButton": true,
+    "displayAsHex": false,
+    "displayStateLabels": false,
+    "showAvailableTerritories": true,
+    "territoriesLabel": "Territories",
+    "territoriesAlwaysShow": false,
+    "language": "en",
+    "geoLabelOverride": "",
+    "hasRegions": false,
+    "fullBorder": false,
+    "convertFipsCodes": true,
+    "palette": {
+      "isReversed": false
+    },
+    "allowMapZoom": true,
+    "hideGeoColumnInTooltip": false,
+    "hidePrimaryColumnInTooltip": false,
+    "statePicked": {
+      "fipsCode": "01",
+      "stateName": "Alabama"
+    },
+    "expandDataTable": false,
+    "equalNumberOptIn": true,
+    "navigationTarget": "_self"
+  },
+  "type": "map",
+  "color": "sequential-blue-2(MPX)",
+  "columns": {
+    "geo": {
+      "name": "Location",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "dataTable": true,
+      "tooltip": true,
+      "prefix": "",
+      "suffix": "",
+      "name": "Value",
+      "label": "Value",
+      "roundToPlace": 0
+    },
+    "navigate": {
+      "name": ""
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [],
+    "unified": false,
+    "singleColumn": false,
+    "singleRow": false,
+    "verticalSorted": false,
+    "showSpecialClassesLast": false,
+    "dynamicDescription": false,
+    "type": "equalnumber",
+    "numberOfItems": 4,
+    "position": "side",
+    "title": "Legend"
+  },
+  "filters": [],
+  "table": {
+    "wrapColumns": false,
+    "label": "Data Table",
+    "expanded": false,
+    "limitHeight": false,
+    "height": "",
+    "caption": "",
+    "showDownloadUrl": false,
+    "showDataTableLink": true,
+    "showFullGeoNameInCSV": false,
+    "forceDisplay": true,
+    "download": true,
+    "indexLabel": ""
+  },
+  "tooltips": {
+    "appearanceType": "hover",
+    "linkLabel": "Learn More",
+    "capitalizeLabels": true,
+    "opacity": 90
+  },
+  "runtime": {
+    "editorErrorMessage": []
+  },
+  "visual": {
+    "minBubbleSize": 1,
+    "maxBubbleSize": 20,
+    "extraBubbleBorder": false,
+    "cityStyle": "circle",
+    "cityStyleLabel": "",
+    "showBubbleZeros": false,
+    "additionalCityStyles": [],
+    "geoCodeCircleSize": 8
+  },
+  "mapPosition": {
+    "coordinates": [0, 30],
+    "zoom": 1
+  },
+  "map": {
+    "layers": [],
+    "patterns": []
+  },
+  "hexMap": {
+    "type": "",
+    "shapeGroups": [
+      {
+        "legendTitle": "",
+        "legendDescription": "",
+        "items": [
+          {
+            "key": "",
+            "shape": "Arrow Up",
+            "column": "",
+            "operator": "=",
+            "value": ""
+          }
+        ]
+      }
+    ]
+  },
+  "filterBehavior": "Filter Change",
+  "datasets": {},
+  "data": [
+    { "Location": "01001", "Value": 12 },
+    { "Location": "01003", "Value": 38 },
+    { "Location": "60010", "Value": 52 },
+    { "Location": "60020", "Value": 47 },
+    { "Location": "66010", "Value": 61 },
+    { "Location": "69110", "Value": 71 },
+    { "Location": "72001", "Value": 43 },
+    { "Location": "78010", "Value": 57 },
+    { "Location": "Micronesia", "Value": 65 },
+    { "Location": "Marshall Islands", "Value": 49 },
+    { "Location": "Palau", "Value": 54 }
+  ],
+  "dataFileName": "county-available-territories.csv",
+  "dataFileSourceType": "file",
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
+  "version": "4.25.1"
+}

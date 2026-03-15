@@ -1,0 +1,44 @@
+.county-territories-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.county-territories-section__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.county-territories-section__heading {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.county-territories-section__cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.county-territories-section__card {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 116px;
+}
+
+.county-territories-section__map {
+  height: 88px;
+  overflow: visible;
+  width: 116px;
+}
+
+.county-territories-section__label {
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  text-align: center;
+}

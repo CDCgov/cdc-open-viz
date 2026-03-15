@@ -1490,6 +1490,17 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     />
                     <HexSetting.ShapeColumns columnsOptions={columnsOptions} />
 
+                    {'us-county' === config.general.geoType && (
+                      <CheckBox
+                        value={general.showAvailableTerritories ?? true}
+                        section='general'
+                        subsection={null}
+                        fieldName='showAvailableTerritories'
+                        label='Show Available Territories'
+                        updateField={updateField}
+                      />
+                    )}
+
                     {'us' === config.general.geoType &&
                       'bubble' !== config.general.type &&
                       false === config.general.displayAsHex && (

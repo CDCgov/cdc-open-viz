@@ -160,6 +160,7 @@ export type MapConfig = Visualization & {
     showDownloadImgButton: boolean
     includeContextInDownload?: boolean
     showDownloadPdfButton: boolean
+    showAvailableTerritories?: boolean
     showSidebar: boolean
     showTitle: boolean
     statesPicked: {
