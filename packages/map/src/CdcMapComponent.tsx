@@ -448,6 +448,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 innerProps={{ 'aria-label': 'Map: ' + title, ref: innerContainerRef }}
                 bodyClassName={[
                   !config.visual?.border || isTp5Treatment ? 'no-borders' : '',
+                  config.visual?.border && !isTp5Treatment ? 'component--has-legacy-border' : '',
                   config.visual?.borderColorTheme ? 'component--has-border-color-theme' : '',
                   config.visual?.accent ? 'component--has-accent' : '',
                   config.visual?.background ? 'component--has-background' : '',
@@ -457,6 +458,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   .filter(Boolean)
                   .join(' ')}
                 header={isTp5Treatment ? null : mapTitle}
+                message={
+                  processedIntroText ? <section className='introText mb-4'>{parse(processedIntroText)}</section> : null
+                }
               >
                 <div
                   className={
@@ -485,8 +489,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   {config?.annotations?.length > 0 && (
                     <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
                   )}
-
-                  {processedIntroText && <section className='introText mb-4'>{parse(processedIntroText)}</section>}
 
                   {config?.filters?.length > 0 && (
                     <Filters

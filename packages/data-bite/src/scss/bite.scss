@@ -1,3 +1,5 @@
+@import '@cdc/core/styles/layout/wrapper-padding';
+
 &.theme-blue {
   .bite-value {
     color: var(--primary);
@@ -79,7 +81,7 @@
 }
 
 .cove-visualization__body {
-  padding: 0;
+  @include cove-visualization-body-padding;
 
   // Visual: Shadow
   &.shadow {
@@ -87,7 +89,7 @@
   }
 
   > .cove-visualization__body-wrap {
-    padding: 1rem !important;
+    padding: 0 !important;
   }
 
   // General: Bite Style > Graphic
@@ -121,7 +123,6 @@
 
   // TP5 Style (default: callout with blue background)
   &.bite__style--tp5 {
-    padding: 0 !important;
     border: none !important;
     background: none !important;
     container-type: inline-size;
@@ -235,7 +236,7 @@
       border-top-right-radius: 3px;
     }
 
-    .bite-content-container.component--hide-background-color {
+    .cove-visualization__body.component--hide-background-color .bite-content-container {
       background: transparent;
     }
 
@@ -450,8 +451,6 @@
 }
 
 .cove-visualization__body {
-  background: var(--lightestGray);
-
   &:not(.no-borders) {
     border-color: var(--lightGray);
     border-width: 1px;

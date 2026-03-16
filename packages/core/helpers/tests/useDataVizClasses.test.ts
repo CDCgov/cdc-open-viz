@@ -18,6 +18,7 @@ describe('useDataVizClasses', () => {
       }
     })
 
+    expect(contentClasses).not.toContain('component--has-legacy-border')
     expect(contentClasses).toContain('component--has-border-color-theme')
     expect(contentClasses).toContain('component--has-accent')
     expect(contentClasses).toContain('component--has-background')
@@ -48,5 +49,18 @@ describe('useDataVizClasses', () => {
     expect(chartClasses).not.toContain('component--hide-background-color')
     expect(mapClasses).not.toContain('component--has-background')
     expect(mapClasses).not.toContain('component--hide-background-color')
+  })
+
+  it('adds an explicit class when the legacy border checkbox is enabled', () => {
+    const { contentClasses } = useDataVizClasses({
+      type: 'chart',
+      visualizationType: 'Bar',
+      visual: {
+        border: true
+      }
+    })
+
+    expect(contentClasses).toContain('component--has-legacy-border')
+    expect(contentClasses).not.toContain('no-borders')
   })
 })

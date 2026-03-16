@@ -684,7 +684,9 @@
   }
 
   .cove-visualization__body {
-    background: #f2f2f2;
+    &:not(.component--has-background):not(.component--hide-background-color) {
+      background: #f2f2f2;
+    }
 
     &.component--hide-background-color {
       background: transparent;

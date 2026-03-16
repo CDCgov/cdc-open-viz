@@ -122,6 +122,10 @@ const PanelVisual: FC<PanelProps> = props => {
             border={visual?.border}
             borderColorTheme={visual?.borderColorTheme}
             accent={visual?.accent}
+            background={visual?.background}
+            hideBackgroundColor={visual?.hideBackgroundColor}
+            showBackground={config.visualizationType === 'Spark Line'}
+            showHideBackgroundColor={config.visualizationType === 'Spark Line'}
             updateField={updateField}
           />
         )}

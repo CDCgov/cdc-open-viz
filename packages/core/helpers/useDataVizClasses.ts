@@ -40,6 +40,7 @@ export default function useDataVizClasses(config, viewport = null) {
   biteStyle && innerContainerClasses.push(`bite__style--${biteStyle}`)
   general?.isCompactStyle && innerContainerClasses.push(`component--is-compact-style`)
 
+  visual?.border && contentClasses.push('component--has-legacy-border')
   !visual?.border && contentClasses.push('no-borders')
   visualizationType === 'Spark Line' && contentClasses.push('sparkline')
   visual?.borderColorTheme && contentClasses.push('component--has-border-color-theme')

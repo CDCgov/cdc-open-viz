@@ -38,6 +38,38 @@ describe('VisualizationContent', () => {
     expect(container.querySelector('.cove-visualization__body-wrap')?.textContent).toContain('Wrapped content')
   })
 
+  it('renders message content inside the body but outside the body-wrap', () => {
+    const { container } = render(
+      <VisualizationContent message={<div data-testid='message'>Message</div>}>
+        <div>Wrapped content</div>
+      </VisualizationContent>
+    )
+
+    const body = container.querySelector('.cove-visualization__body')
+    const message = container.querySelector('.cove-visualization__message-section')
+    const bodyWrap = container.querySelector('.cove-visualization__body-wrap')
+
+    expect(screen.getByTestId('message')).toBeInTheDocument()
+    expect(body?.firstElementChild).toBe(message)
+    expect(body?.lastElementChild).toBe(bodyWrap)
+  })
+
+  it('renders subtext content inside the body after the body-wrap', () => {
+    const { container } = render(
+      <VisualizationContent subtext={<div data-testid='subtext'>Subtext</div>}>
+        <div>Wrapped content</div>
+      </VisualizationContent>
+    )
+
+    const body = container.querySelector('.cove-visualization__body')
+    const bodyWrap = container.querySelector('.cove-visualization__body-wrap')
+    const subtext = container.querySelector('.cove-visualization__subtext-section')
+
+    expect(screen.getByTestId('subtext')).toBeInTheDocument()
+    expect(body?.firstElementChild).toBe(bodyWrap)
+    expect(body?.lastElementChild).toBe(subtext)
+  })
+
   it('passes through non-class inner div props, including refs', () => {
     const innerRef = React.createRef<HTMLDivElement>()
 

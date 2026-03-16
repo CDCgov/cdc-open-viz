@@ -10,6 +10,10 @@ type StyleTreatmentSectionProps = {
   border?: boolean
   borderColorTheme?: boolean
   accent?: boolean
+  background?: boolean
+  hideBackgroundColor?: boolean
+  showBackground?: boolean
+  showHideBackgroundColor?: boolean
   updateField: Function
 }
 
@@ -21,6 +25,10 @@ const StyleTreatmentSection = ({
   border,
   borderColorTheme,
   accent,
+  background,
+  hideBackgroundColor,
+  showBackground = false,
+  showHideBackgroundColor = false,
   updateField
 }: StyleTreatmentSectionProps) => {
   return (
@@ -61,6 +69,24 @@ const StyleTreatmentSection = ({
             label='Use Accent Style'
             updateField={updateField}
           />
+          {showBackground && (
+            <CheckBox
+              value={background}
+              section='visual'
+              fieldName='background'
+              label='Use Theme Background Color'
+              updateField={updateField}
+            />
+          )}
+          {showHideBackgroundColor && (
+            <CheckBox
+              value={hideBackgroundColor}
+              section='visual'
+              fieldName='hideBackgroundColor'
+              label='Hide Background Color'
+              updateField={updateField}
+            />
+          )}
         </>
       )}
     </div>

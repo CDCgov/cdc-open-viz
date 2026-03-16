@@ -1,6 +1,12 @@
+@import '@cdc/core/styles/layout/wrapper-padding';
+
 .cove-visualization.type-markup-include {
+  .cove-visualization__body {
+    @include cove-visualization-body-padding;
+  }
+
   .cove-visualization__body-wrap {
-    padding: 0;
+    @include cove-visualization-body-wrap-inline-padding;
 
     h1,
     h2,

@@ -1,14 +1,16 @@
+@import 'wrapper-padding';
+
 .cove-visualization {
   border-radius: 3px;
 }
 
-.cove-visualization__body {
+.cove-visualization .cove-visualization__body {
   border: solid 1px #ccc;
   border-top: none;
   border-radius: 0 0 3px 3px;
   min-width: 0;
   max-width: 100%;
-  padding: 1rem !important;
+  @include cove-visualization-body-padding;
 
   &.no-borders {
     border: none !important;
@@ -97,8 +99,18 @@
   }
 }
 
-.cove-visualization__body-wrap {
+.cove-visualization .cove-visualization__body-wrap {
   min-width: 0;
   max-width: 100%;
   padding: 0;
+}
+
+.cove-visualization .cove-visualization__message-section {
+  width: 100%;
+  padding-bottom: 1rem;
+}
+
+.cove-visualization .cove-visualization__subtext-section {
+  width: 100%;
+  padding-top: 1rem;
 }

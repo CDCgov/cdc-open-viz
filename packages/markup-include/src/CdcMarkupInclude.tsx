@@ -270,6 +270,17 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
       <VisualizationContent
         innerClassName={`markup-include-content-container ${innerContainerClasses.join(' ')}`.trim()}
         bodyClassName={`markup-include-component ${contentClasses.join(' ')}`.trim()}
+        message={
+          config.filters && config.filters.length > 0 ? (
+            <Filters
+              config={config}
+              setFilters={setFilters}
+              excludedData={data || []}
+              dimensions={[0, 0]}
+              interactionLabel={interactionLabel || 'markup-include'}
+            />
+          ) : null
+        }
         header={
           <Title
             title={title}
@@ -291,15 +302,6 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
           />
         }
       >
-        {config.filters && config.filters.length > 0 && (
-          <Filters
-            config={config}
-            setFilters={setFilters}
-            excludedData={data || []}
-            dimensions={[0, 0]}
-            interactionLabel={interactionLabel || 'markup-include'}
-          />
-        )}
         {_showNoDataMessage && (
           <div className='no-data-message'>
             <p>{`${noDataMessageText}`}</p>

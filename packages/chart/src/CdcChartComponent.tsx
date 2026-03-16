@@ -1213,6 +1213,12 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (!ENABLE_CHART_MAP_TP5_TREATMENT && tp5Classes.has(className)) return false
     return true
   })
+  if (config.visualizationType === 'Spark Line' && config.visual?.background) {
+    bodyClasses.push('component--has-background')
+  }
+  if (config.visualizationType === 'Spark Line' && config.visual?.hideBackgroundColor) {
+    bodyClasses.push('component--hide-background-color')
+  }
   if (isTp5Treatment && !bodyClasses.includes('no-borders')) bodyClasses.push('no-borders')
   const chartTitle = (
     <Title
@@ -1286,6 +1292,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
             bodyClassName={bodyClasses.join(' ')}
             bodyWrapClassName={isTp5Treatment ? 'cdc-callout d-flex flex-column tp5-chart-callout' : ''}
             header={isTp5Treatment ? null : chartTitle}
+            message={
+              config.visualizationType !== 'Spark Line' && processedIntroText ? (
+                <section className='introText mb-4'>{parse(processedIntroText)}</section>
+              ) : null
+            }
             footer={
               <FootnotesStandAlone
                 config={configObj.footnotes}
@@ -1314,12 +1325,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
             )}
             {isTp5Treatment && chartTitle}
 
-            {/* Intro Text/Message */}
-            {processedIntroText && config.visualizationType !== 'Spark Line' && (
-              <section className={`introText mb-4`}>{parse(processedIntroText)}</section>
-            )}
-
-            {/* Filters */}
             {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
               <Filters
                 config={config}

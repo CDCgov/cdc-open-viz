@@ -648,6 +648,11 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       <>
         <VisualizationContent
           bodyClassName={bodyClasses}
+          subtext={
+            subtext && !config.general.isCompactStyle && !isTp5 ? (
+              <p className='bite-subtext'>{parse(processContentWithMarkup(subtext))}</p>
+            ) : null
+          }
           header={
             !isTp5 ? (
               <Title
@@ -729,9 +734,6 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                           {calculateDataBite()}
                         </span>
                       )}
-                      {subtext && !config.general.isCompactStyle && (
-                        <p className='bite-subtext'>{parse(processContentWithMarkup(subtext))}</p>
-                      )}
                     </div>
                   </Fragment>
                 </div>
@@ -777,6 +779,11 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
         >
           <VisualizationContent
             bodyClassName={[...innerContainerClasses, ...contentClasses].filter(Boolean).join(' ')}
+            subtext={
+              subtext && !config.general.isCompactStyle ? (
+                <p className='bite-subtext'>{parse(processContentWithMarkup(subtext))}</p>
+              ) : null
+            }
             footer={link && link}
           >
             {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
