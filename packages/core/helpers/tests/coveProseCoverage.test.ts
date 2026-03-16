@@ -25,7 +25,7 @@ const EXEMPT_FROM_COVE_PROSE = new Set([
   'packages/chart/src/components/Annotations/components/AnnotationDraggable.tsx',
   'packages/map/src/components/Annotation/AnnotationList.tsx',
   'packages/map/src/components/Annotation/Annotation.Draggable.tsx',
-  // Alert
+  // Alert modal content is intentionally non-prose.
   'packages/core/components/Alert/components/Alert.tsx'
 ])
 
