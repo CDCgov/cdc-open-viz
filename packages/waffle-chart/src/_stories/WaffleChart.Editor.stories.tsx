@@ -435,7 +435,7 @@ export const VisualSectionTests: Story = {
     await openAccordion(canvas, 'Chart Settings')
     // Core helper functions used throughout the visual tests
     const waffleRoot = () => canvasElement.querySelector('.cove-waffle-chart') as HTMLElement
-    const contentContainer = () => canvasElement.querySelector('.cove-visualization__body > div') as HTMLElement
+    const contentContainer = () => canvasElement.querySelector('.cove-visualization__body') as HTMLElement
     expect(waffleRoot()).toBeTruthy()
 
     // ============================================================================

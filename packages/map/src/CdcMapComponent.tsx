@@ -450,6 +450,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   !config.visual?.border || isTp5Treatment ? 'no-borders' : '',
                   config.visual?.borderColorTheme ? 'component--has-border-color-theme' : '',
                   config.visual?.accent ? 'component--has-accent' : '',
+                  config.visual?.background ? 'component--has-background' : '',
+                  config.visual?.hideBackgroundColor ? 'component--hide-background-color' : '',
                   isTp5Treatment ? 'component--tp5-treatment' : ''
                 ]
                   .filter(Boolean)

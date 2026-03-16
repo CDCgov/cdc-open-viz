@@ -1247,6 +1247,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
     }
     if (legend?.hide) classes.push('legend-hidden')
+    if (contentClasses.includes('sparkline')) classes.push('sparkline')
     if (lineDatapointClass) classes.push(lineDatapointClass)
     if (!config.barHasBorder) classes.push('chart-bar--no-border')
     if (config.xAxis.brushActive && dashboardConfig?.type === 'dashboard' && (!isLegendOnBottom || legend.hide))
