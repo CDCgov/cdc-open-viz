@@ -18,9 +18,18 @@ type CountyTerritoriesSectionProps = {
   tooltipId: string
 }
 
-const MINI_MAP_WIDTH = 116
-const MINI_MAP_HEIGHT = 88
-const MINI_MAP_PADDING = 8
+const GROUP_DIMENSIONS = {
+  territories: {
+    width: 164,
+    height: 118,
+    padding: 10
+  },
+  'freely-associated': {
+    width: 260,
+    height: 184,
+    padding: 2
+  }
+} as const
 
 const CountyTerritoriesSection: React.FC<CountyTerritoriesSectionProps> = ({
   territoryCounties,
@@ -65,11 +74,12 @@ const CountyTerritoriesSection: React.FC<CountyTerritoriesSectionProps> = ({
         ? COUNTY_TERRITORY_UIDS.includes(group.territoryId)
         : FREELY_ASSOCIATED_STATE_UIDS.includes(group.territoryId)
     )
+    const dimensions = GROUP_DIMENSIONS[heading]
 
     if (!groups.length) return null
 
     return (
-      <div className='county-territories-section__group'>
+      <div className={`county-territories-section__group county-territories-section__group--${heading}`}>
         <h3 className='county-territories-section__heading'>
           {heading === 'territories' ? 'U.S. territories' : 'Freely associated states'}
         </h3>
@@ -77,8 +87,8 @@ const CountyTerritoriesSection: React.FC<CountyTerritoriesSectionProps> = ({
           {groups.map(group => {
             const projection = geoMercator().fitExtent(
               [
-                [MINI_MAP_PADDING, MINI_MAP_PADDING],
-                [MINI_MAP_WIDTH - MINI_MAP_PADDING, MINI_MAP_HEIGHT - MINI_MAP_PADDING]
+                [dimensions.padding, dimensions.padding],
+                [dimensions.width - dimensions.padding, dimensions.height - dimensions.padding]
               ],
               {
                 type: 'FeatureCollection',
@@ -92,7 +102,7 @@ const CountyTerritoriesSection: React.FC<CountyTerritoriesSectionProps> = ({
             return (
               <article className='county-territories-section__card' key={group.territoryId}>
                 <svg
-                  viewBox={`0 0 ${MINI_MAP_WIDTH} ${MINI_MAP_HEIGHT}`}
+                  viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
                   className='county-territories-section__map'
                   aria-label={displayGeoName(group.territoryId)}
                 >

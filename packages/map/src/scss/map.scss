@@ -115,6 +115,10 @@ canvas {
   display: none;
 }
 
+.county-map-canvas-wrapper {
+  position: relative;
+}
+
 .county-map-canvas {
   touch-action: none;
   cursor: move;

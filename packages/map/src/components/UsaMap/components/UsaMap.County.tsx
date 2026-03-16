@@ -892,18 +892,41 @@ const CountyMap = () => {
 
   return (
     <ErrorBoundary component='CountyMap'>
-      <canvas
-        ref={canvasRef}
-        aria-label={handleMapAriaLabels(config)}
-        onMouseMove={canvasHover}
-        onMouseOut={() => {
-          tooltipRef.current.style.display = 'none'
-          tooltipRef.current.setAttribute('data-index', null)
-        }}
-        onClick={canvasClick}
-        className='county-map-canvas'
-        style={config.general.allowMapZoom ? undefined : { cursor: 'default' }}
-      ></canvas>
+      <div className='county-map-canvas-wrapper'>
+        <canvas
+          ref={canvasRef}
+          aria-label={handleMapAriaLabels(config)}
+          onMouseMove={canvasHover}
+          onMouseOut={() => {
+            tooltipRef.current.style.display = 'none'
+            tooltipRef.current.setAttribute('data-index', null)
+          }}
+          onClick={canvasClick}
+          className='county-map-canvas'
+          style={config.general.allowMapZoom ? undefined : { cursor: 'default' }}
+        ></canvas>
+
+        {config.general.allowMapZoom && (
+          <div className='zoom-controls' data-html2canvas-ignore='true'>
+            <button onClick={handleZoomIn} aria-label='Zoom In'>
+              <svg viewBox='0 0 24 24' stroke='currentColor' strokeWidth='3'>
+                <line x1='12' y1='5' x2='12' y2='19' />
+                <line x1='5' y1='12' x2='19' y2='12' />
+              </svg>
+            </button>
+            <button onClick={handleZoomOut} aria-label='Zoom Out'>
+              <svg viewBox='0 0 24 24' stroke='currentColor' strokeWidth='3'>
+                <line x1='5' y1='12' x2='19' y2='12' />
+              </svg>
+            </button>
+            {(hasMoved || focus.id) && (
+              <button onClick={handleZoomReset} className='reset' aria-label='Reset Zoom'>
+                Reset Zoom
+              </button>
+            )}
+          </div>
+        )}
+      </div>
 
       {showAvailableTerritories && (
         <CountyTerritoriesSection
@@ -911,27 +934,6 @@ const CountyMap = () => {
           territoryStates={topoData.territoryStates || []}
           tooltipId={tooltipId}
         />
-      )}
-
-      {config.general.allowMapZoom && (
-        <div className='zoom-controls' data-html2canvas-ignore='true'>
-          <button onClick={handleZoomIn} aria-label='Zoom In'>
-            <svg viewBox='0 0 24 24' stroke='currentColor' strokeWidth='3'>
-              <line x1='12' y1='5' x2='12' y2='19' />
-              <line x1='5' y1='12' x2='19' y2='12' />
-            </svg>
-          </button>
-          <button onClick={handleZoomOut} aria-label='Zoom Out'>
-            <svg viewBox='0 0 24 24' stroke='currentColor' strokeWidth='3'>
-              <line x1='5' y1='12' x2='19' y2='12' />
-            </svg>
-          </button>
-          {(hasMoved || focus.id) && (
-            <button onClick={handleZoomReset} className='reset' aria-label='Reset Zoom'>
-              Reset Zoom
-            </button>
-          )}
-        </div>
       )}
     </ErrorBoundary>
   )
