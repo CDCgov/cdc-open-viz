@@ -32,14 +32,14 @@ import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import { CustomColorsEditor } from '@cdc/core/components/CustomColorsEditor'
 import StyleTreatmentSection from '@cdc/core/components/EditorPanel/sections/StyleTreatmentSection'
 import { getColorScale } from '../../../../helpers/getColorScale'
-import { ENABLE_CHART_MAP_TP5_TREATMENT, ENABLE_CHART_VISUAL_SETTINGS } from '@cdc/core/helpers/constants'
+import { ENABLE_CHART_MAP_TP5_TREATMENT_SELECTION, ENABLE_CHART_VISUAL_SETTINGS } from '@cdc/core/helpers/constants'
 import '@cdc/core/components/EditorPanel/editor.scss'
 import './panelVisual.styles.css'
 
 const PanelVisual: FC<PanelProps> = props => {
   const { config, updateConfig, colorPalettes, twoColorPalette } = useContext<ChartContext>(ConfigContext)
   const { visual } = config
-  const styleTreatment = visual?.tp5Treatment ? 'tp5' : 'legacy'
+  const styleTreatment = config.titleStyle === 'legacy' && !visual?.tp5Treatment ? 'legacy' : 'tp5'
 
   const { setLollipopShape, updateField, handlePaletteSelection, handleTwoColorPaletteSelection } =
     useEditorPanelContext()
@@ -118,7 +118,7 @@ const PanelVisual: FC<PanelProps> = props => {
           <StyleTreatmentSection
             styleTreatment={styleTreatment}
             onStyleTreatmentChange={handleStyleTreatmentChange}
-            showStyleTreatment={ENABLE_CHART_MAP_TP5_TREATMENT}
+            showStyleTreatment={ENABLE_CHART_MAP_TP5_TREATMENT_SELECTION}
             border={visual?.border}
             borderColorTheme={visual?.borderColorTheme}
             accent={visual?.accent}

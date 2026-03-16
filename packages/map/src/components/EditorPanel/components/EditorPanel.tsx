@@ -65,7 +65,7 @@ import MultiSelect from '@cdc/core/components/MultiSelect'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { isV1Palette, getCurrentPaletteName, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import {
-  ENABLE_CHART_MAP_TP5_TREATMENT,
+  ENABLE_CHART_MAP_TP5_TREATMENT_SELECTION,
   ENABLE_MAP_DATA_BITE_VISUAL_SETTINGS,
   USE_V2_MIGRATION
 } from '@cdc/core/helpers/constants'
@@ -1088,6 +1088,25 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     })
   }
 
+  const handleTitleStyleChange = (newTitleStyle: string) => {
+    setConfig({
+      ...config,
+      general: {
+        ...config.general,
+        titleStyle: newTitleStyle
+      },
+      visual:
+        newTitleStyle === 'legacy'
+          ? config.visual
+          : {
+              ...config.visual,
+              border: undefined,
+              borderColorTheme: undefined,
+              accent: undefined
+            }
+    })
+  }
+
   const StateOptionList = () => {
     const arrOfArrays = Object.entries(supportedStatesFipsCodes)
 
@@ -1578,12 +1597,12 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       section='general'
                       fieldName='titleStyle'
                       label='Title Style'
-                      updateField={updateField}
                       options={[
                         { value: 'small', label: 'Small (h3)' },
                         { value: 'large', label: 'Large (h2)' },
                         { value: 'legacy', label: 'Legacy' }
                       ]}
+                      onChange={event => handleTitleStyleChange(event.target.value)}
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
@@ -3233,9 +3252,11 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     />
                     {ENABLE_MAP_DATA_BITE_VISUAL_SETTINGS && (
                       <StyleTreatmentSection
-                        styleTreatment={config.visual?.tp5Treatment ? 'tp5' : 'legacy'}
+                        styleTreatment={
+                          config.general.titleStyle === 'legacy' && !config.visual?.tp5Treatment ? 'legacy' : 'tp5'
+                        }
                         onStyleTreatmentChange={handleStyleTreatmentChange}
-                        showStyleTreatment={ENABLE_CHART_MAP_TP5_TREATMENT}
+                        showStyleTreatment={ENABLE_CHART_MAP_TP5_TREATMENT_SELECTION}
                         border={config.visual?.border}
                         borderColorTheme={config.visual?.borderColorTheme}
                         accent={config.visual?.accent}

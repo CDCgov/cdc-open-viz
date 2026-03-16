@@ -17,6 +17,9 @@ export const ENABLE_CHART_VISUAL_SETTINGS = true
 // Shared TP5 treatment flag for chart and map visualizations
 export const ENABLE_CHART_MAP_TP5_TREATMENT = true
 
+// Editor-only flag for exposing TP5 treatment selection in chart and map visual panels
+export const ENABLE_CHART_MAP_TP5_TREATMENT_SELECTION = false
+
 // Data operators for conditional logic
 export const DATA_OPERATOR_LESS = '<'
 export const DATA_OPERATOR_GREATER = '>'
