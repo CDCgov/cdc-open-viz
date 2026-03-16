@@ -39,6 +39,7 @@ export type Config = {
   valueDescription: string
   visual: ComponentStyles & {
     whiteBackground?: boolean
+    useWrap?: boolean
   }
   visualizationSubType: 'linear' | ''
   visualizationType: 'Gauge' | 'Waffle' | 'TP5 Waffle' | 'TP5 Gauge'
