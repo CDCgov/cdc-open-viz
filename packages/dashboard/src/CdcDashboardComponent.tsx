@@ -683,7 +683,7 @@ export default function CdcDashboard({
             config={state.config}
             currentViewport={currentViewport}
             imageId={imageId}
-            isEditor={isEditor && !isPreview}
+            isEditor={false}
             ref={outerContainerRef}
             renderResponsive={false}
           >
