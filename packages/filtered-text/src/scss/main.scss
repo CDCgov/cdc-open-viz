@@ -18,17 +18,4 @@
     // display: initial;
     float: none;
   }
-
-  .cove-visualization__body-wrap:not(:empty) {
-
-    &.has-top-padding {
-      padding-top: 1rem;
-      padding-bottom: 1rem;
-    }
-
-    &.has-side-padding {
-      padding-left: 1rem;
-      padding-right: 1rem;
-    }
-  }
 }

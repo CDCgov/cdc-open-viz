@@ -39,10 +39,6 @@ const CdcFilteredText = ({
   let { title, filters } = config
 
   const { contentClasses, innerContainerClasses } = useDataVizClasses(config)
-  const { visual } = config
-
-  const shouldApplyTopPadding = visual?.border || visual?.background || (config.title && config.titleStyle === 'legacy')
-  const shouldApplySidePadding = visual?.border || visual?.accent || visual?.background
 
   // Default Functions
 
@@ -127,9 +123,6 @@ const CdcFilteredText = ({
       <VisualizationContent
         innerClassName={innerContainerClasses.join(' ')}
         bodyClassName={contentClasses.join(' ')}
-        bodyWrapClassName={`${shouldApplyTopPadding ? 'has-top-padding ' : ''}${
-          shouldApplySidePadding ? 'has-side-padding' : ''
-        }`.trim()}
         header={
           <Title
             classes={[`${config.theme}`, 'mb-0']}
