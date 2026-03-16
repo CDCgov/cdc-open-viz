@@ -1292,11 +1292,10 @@ const CdcChart: React.FC<CdcChartProps> = ({
             bodyClassName={bodyClasses.join(' ')}
             bodyWrapClassName={isTp5Treatment ? 'cdc-callout d-flex flex-column tp5-chart-callout' : ''}
             header={isTp5Treatment ? null : chartTitle}
-            message={
-              config.visualizationType !== 'Spark Line' && processedIntroText ? (
-                <section className='introText mb-4'>{parse(processedIntroText)}</section>
-              ) : null
+            messageClassName={
+              config.visualizationType !== 'Spark Line' && processedIntroText ? 'introText mb-4' : undefined
             }
+            message={config.visualizationType !== 'Spark Line' && processedIntroText ? parse(processedIntroText) : null}
             footer={
               <FootnotesStandAlone
                 config={configObj.footnotes}

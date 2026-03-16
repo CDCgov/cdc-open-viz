@@ -11,6 +11,7 @@ type VisualizationContentProps = {
   innerClassName?: string
   innerProps?: VisualizationContentInnerProps
   message?: React.ReactNode
+  messageClassName?: string
   subtext?: React.ReactNode
 }
 
@@ -23,6 +24,7 @@ const VisualizationContent = ({
   innerClassName,
   innerProps,
   message,
+  messageClassName,
   subtext
 }: VisualizationContentProps) => {
   const resolvedInnerClasses = ['cove-visualization__inner', innerClassName].filter(Boolean).join(' ')
@@ -33,8 +35,18 @@ const VisualizationContent = ({
     <div {...innerProps} className={resolvedInnerClasses}>
       {header}
       <div className={bodyClasses}>
-        {message ? <section className='cove-visualization__message-section'>{message}</section> : null}
-        <div className={bodyWrapClasses}>{children}</div>
+        <div className={bodyWrapClasses}>
+          {message ? (
+            <section
+              className={['cove-visualization__message', 'cove-visualization__message-section', messageClassName]
+                .filter(Boolean)
+                .join(' ')}
+            >
+              {message}
+            </section>
+          ) : null}
+          {children}
+        </div>
         {subtext ? <section className='cove-visualization__subtext-section'>{subtext}</section> : null}
       </div>
       {footer}

@@ -1,6 +1,7 @@
 @import '@cdc/core/styles/utils/breakpoints';
 @import 'editor-panel';
 @import '@cdc/core/styles/utils/accessibility';
+@import '@cdc/core/styles/layout/wrapper-padding';
 
 .type-map--has-error {
   .waiting {
@@ -98,6 +99,8 @@
   }
 
   .cove-visualization__body {
+    @include cove-visualization-body-padding;
+
     &:not(.no-borders) {
       border: 1px solid var(--lightGray);
     }

@@ -1,4 +1,5 @@
 @import '@cdc/core/styles/utils/breakpoints';
+@import '@cdc/core/styles/layout/wrapper-padding';
 
 .form-container {
   overflow-y: auto;
@@ -14,6 +15,10 @@
 
 .cove-visualization.type-chart {
   @import 'DataTable';
+
+  .cove-visualization__body {
+    @include cove-visualization-body-padding;
+  }
 
   .cove-visualization__body.component--tp5-treatment {
     background: transparent !important;

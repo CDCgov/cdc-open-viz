@@ -38,7 +38,7 @@ describe('VisualizationContent', () => {
     expect(container.querySelector('.cove-visualization__body-wrap')?.textContent).toContain('Wrapped content')
   })
 
-  it('renders message content inside the body but outside the body-wrap', () => {
+  it('renders message content inside the body-wrap before the wrapped content', () => {
     const { container } = render(
       <VisualizationContent message={<div data-testid='message'>Message</div>}>
         <div>Wrapped content</div>
@@ -46,12 +46,27 @@ describe('VisualizationContent', () => {
     )
 
     const body = container.querySelector('.cove-visualization__body')
+    const messageLayer = container.querySelector('.cove-visualization__message')
     const message = container.querySelector('.cove-visualization__message-section')
     const bodyWrap = container.querySelector('.cove-visualization__body-wrap')
 
     expect(screen.getByTestId('message')).toBeInTheDocument()
-    expect(body?.firstElementChild).toBe(message)
-    expect(body?.lastElementChild).toBe(bodyWrap)
+    expect(messageLayer).toBe(message)
+    expect(body?.firstElementChild).toBe(bodyWrap)
+    expect(bodyWrap?.firstElementChild).toBe(message)
+  })
+
+  it('applies custom classes to the message wrapper', () => {
+    const { container } = render(
+      <VisualizationContent message={<div data-testid='message'>Message</div>} messageClassName='introText mb-4'>
+        <div>Wrapped content</div>
+      </VisualizationContent>
+    )
+
+    const message = container.querySelector('.cove-visualization__message')
+
+    expect(message).toHaveClass('introText')
+    expect(message).toHaveClass('mb-4')
   })
 
   it('renders subtext content inside the body after the body-wrap', () => {

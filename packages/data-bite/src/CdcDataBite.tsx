@@ -481,6 +481,10 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   }
 
   let body = <Loading />
+  const bodySubtext =
+    subtext && !config.general.isCompactStyle ? (
+      <p className='bite-subtext'>{parse(processContentWithMarkup(subtext))}</p>
+    ) : null
 
   const DataImage = useCallback(() => {
     let operators = {
@@ -648,11 +652,6 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       <>
         <VisualizationContent
           bodyClassName={bodyClasses}
-          subtext={
-            subtext && !config.general.isCompactStyle && !isTp5 ? (
-              <p className='bite-subtext'>{parse(processContentWithMarkup(subtext))}</p>
-            ) : null
-          }
           header={
             !isTp5 ? (
               <Title
@@ -734,6 +733,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                           {calculateDataBite()}
                         </span>
                       )}
+                      {!isTp5 && bodySubtext}
                     </div>
                   </Fragment>
                 </div>
@@ -778,17 +778,14 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
           editorPanel={<EditorPanel />}
         >
           <VisualizationContent
-            bodyClassName={[...innerContainerClasses, ...contentClasses].filter(Boolean).join(' ')}
-            subtext={
-              subtext && !config.general.isCompactStyle ? (
-                <p className='bite-subtext'>{parse(processContentWithMarkup(subtext))}</p>
-              ) : null
-            }
+            bodyClassName={[...innerContainerClasses, ...contentClasses, 'bite__style--gradient']
+              .filter(Boolean)
+              .join(' ')}
             footer={link && link}
           >
             {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
             {(!config.dataColumn || !config.dataFunction) && <Confirm />}
-            <GradientBite label={config.title} value={calculateDataBite()} />
+            <GradientBite label={config.title} value={calculateDataBite()} subtext={bodySubtext} />
           </VisualizationContent>
         </VisualizationContainer>
       )}

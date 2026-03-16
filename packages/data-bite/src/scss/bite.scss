@@ -72,20 +72,29 @@
 &.cove-visualization.is-editor .sidebar+.cove-visualization__body {
   margin: 3em auto 0 !important;
   max-width: 35em !important;
-  background-color: initial;
+  background-color: var(--lightestGray);
   height: fit-content;
 }
 
 .sidebar+.cove-visualization__body .bite-content-container:not(.component--hide-background-color) {
-  background-color: white;
+  background-color: var(--lightestGray);
 }
 
 .cove-visualization__body {
-  @include cove-visualization-body-padding;
+  padding: 1rem !important;
+  background: var(--lightestGray);
+
+  &.component--hide-background-color {
+    background: transparent;
+  }
 
   // Visual: Shadow
   &.shadow {
     box-shadow: rgba(0, 0, 0, 0.2) 0 3px 10px;
+  }
+
+  &.bite__style--gradient {
+    background: transparent !important;
   }
 
   > .cove-visualization__body-wrap {
@@ -94,8 +103,38 @@
 
   // General: Bite Style > Graphic
   &.bite__style--graphic {
+    .bite-content-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+    }
+
     .bite-content {
       flex: 1;
+      min-width: 0;
+      justify-content: space-between;
+      gap: 0;
+      align-self: stretch;
+    }
+
+    .bite-content__text-wrap {
+      flex: 0 0 auto;
+    }
+
+    .bite-subtext {
+      align-self: flex-end;
+      width: 100%;
+      margin-top: 0;
+    }
+
+    .bite-right .bite-content-container,
+    .bite-bottom .bite-content-container {
+      flex-direction: row-reverse;
+    }
+
+    .callout {
+      width: 33%;
+      margin: 0;
     }
   }
 
@@ -331,7 +370,7 @@
 
     .cove-visualization__body {
       display: flex;
-      padding: 1em !important;
+      padding: 1rem !important;
       justify-content: space-between;
 
       .bite-content {

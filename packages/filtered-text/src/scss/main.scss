@@ -1,3 +1,5 @@
+@import '@cdc/core/styles/layout/wrapper-padding';
+
 .cove-visualization.is-editor {
   background: transparent;
 }
@@ -13,6 +15,10 @@
 }
 
 .cove-visualization.type-filtered-text {
+  .cove-visualization__body {
+    @include cove-visualization-body-padding;
+  }
+
   .cove-accordion__panel-section .cove-input__checkbox--small {
     // float: initial;
     // display: initial;

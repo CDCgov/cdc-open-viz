@@ -459,7 +459,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   .join(' ')}
                 header={isTp5Treatment ? null : mapTitle}
                 message={
-                  processedIntroText ? <section className='introText mb-4'>{parse(processedIntroText)}</section> : null
+                  processedIntroText ? <section className='introText'>{parse(processedIntroText)}</section> : null
                 }
               >
                 <div

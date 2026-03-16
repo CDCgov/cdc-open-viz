@@ -159,6 +159,26 @@
     }
   }
 
+  .cove-visualization__message {
+    outline: 2px dashed #0050d8;
+    position: relative;
+
+    &::before {
+      background: #0050d8;
+      color: #fff;
+      content: '__message';
+      font-family: monospace;
+      font-size: 10px;
+      line-height: 1;
+      padding: 2px 4px;
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+    }
+  }
+
   .cove-visualization__body-wrap {
     outline: 2px dashed #e66f0e;
     position: relative;

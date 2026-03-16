@@ -8,7 +8,7 @@
     padding-inline: 1rem !important;
   }
 
-  &.no-borders {
+  &.no-borders:not(.component--has-legacy-border):not(.component--has-border-color-theme):not(.component--has-background):not(.component--has-accent) {
     padding: 1rem 0 !important;
   }
 }
