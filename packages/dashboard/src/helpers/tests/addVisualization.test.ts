@@ -41,4 +41,12 @@ describe('addVisualization', () => {
       }
     })
   })
+
+  it('preserves visualizationType for data-bite family visualizations', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(12345)
+
+    expect(addVisualization('data-bite')).toMatchObject({ visualizationType: 'data-bite' })
+    expect(addVisualization('waffle-chart')).toMatchObject({ visualizationType: 'waffle-chart' })
+    expect(addVisualization('filtered-text')).toMatchObject({ visualizationType: 'filtered-text' })
+  })
 })

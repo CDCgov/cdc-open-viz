@@ -37,4 +37,20 @@ describe('VisualizationContent', () => {
     expect(screen.getByTestId('footer')).toBeInTheDocument()
     expect(container.querySelector('.cove-visualization__body-wrap')?.textContent).toContain('Wrapped content')
   })
+
+  it('passes through non-class inner div props, including refs', () => {
+    const innerRef = React.createRef<HTMLDivElement>()
+
+    const { container } = render(
+      <VisualizationContent innerClassName='inner-extra' innerProps={{ 'aria-label': 'Visualization content', ref: innerRef }}>
+        <div>Inner content</div>
+      </VisualizationContent>
+    )
+
+    const inner = container.querySelector('.cove-visualization__inner')
+
+    expect(inner).toHaveAttribute('aria-label', 'Visualization content')
+    expect(inner).toHaveClass('inner-extra')
+    expect(innerRef.current).toBe(inner)
+  })
 })

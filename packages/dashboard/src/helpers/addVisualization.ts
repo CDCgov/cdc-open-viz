@@ -34,7 +34,9 @@ export const addVisualization = (type, subType) => {
         hideBackgroundColor: false
       }
       break
-    case 'data-bite' || 'waffle-chart' || 'filtered-text':
+    case 'data-bite':
+    case 'waffle-chart':
+    case 'filtered-text':
       newVisualizationConfig.visualizationType = type
       break
     case 'table': {

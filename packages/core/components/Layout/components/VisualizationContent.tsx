@@ -1,5 +1,7 @@
 import React from 'react'
 
+type VisualizationContentInnerProps = Omit<React.ComponentPropsWithRef<'div'>, 'className'>
+
 type VisualizationContentProps = {
   bodyClassName?: string
   bodyWrapClassName?: string
@@ -7,7 +9,7 @@ type VisualizationContentProps = {
   footer?: React.ReactNode
   header?: React.ReactNode
   innerClassName?: string
-  innerProps?: React.HTMLAttributes<HTMLDivElement>
+  innerProps?: VisualizationContentInnerProps
 }
 
 const VisualizationContent = ({
@@ -24,7 +26,7 @@ const VisualizationContent = ({
   const bodyWrapClasses = ['cove-visualization__body-wrap', bodyWrapClassName].filter(Boolean).join(' ')
 
   return (
-    <div className={resolvedInnerClasses} {...innerProps}>
+    <div {...innerProps} className={resolvedInnerClasses}>
       {header}
       <div className={bodyClasses}>
         <div className={bodyWrapClasses}>{children}</div>

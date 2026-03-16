@@ -158,7 +158,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   // Refs
-  const innerContainerRef = useRef()
+  const innerContainerRef = useRef<HTMLDivElement | null>(null)
   const legendRef = useRef(null)
   const mapSvg = useRef(null)
   const tooltipRef = useRef(null)
