@@ -81,7 +81,7 @@
 }
 
 .cove-visualization__body {
-  padding: 1rem !important;
+  @include cove-visualization-body-padding;
   background: var(--lightestGray);
 
   &.component--hide-background-color {
@@ -98,7 +98,14 @@
   }
 
   >.cove-visualization__body-wrap {
-    padding: 0 !important;
+    @include cove-visualization-body-wrap-inline-padding;
+  }
+
+  &:not(.bite__style--tp5):not(.component--hide-background-color)
+    > .cove-visualization__body-wrap
+    > .cove-visualization__content-section {
+    padding-right: 1rem;
+    padding-left: 1rem;
   }
 
   // General: Bite Style > Graphic
@@ -125,6 +132,8 @@
       align-self: flex-end;
       width: 100%;
       margin-top: 0;
+      font-size: var(--visualization-meta-font-size);
+      line-height: var(--visualization-body-line-height);
     }
 
     .bite-right .bite-content-container,
@@ -226,6 +235,8 @@
     .bite-subtext {
       margin-top: auto; // Push to bottom on desktop
       font-style: italic;
+      font-size: var(--visualization-meta-font-size);
+      line-height: var(--visualization-body-line-height);
     }
 
     // White background variant (when "Use White Background Style" is checked)

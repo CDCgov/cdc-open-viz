@@ -595,7 +595,6 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     return (
       <VisualizationContent
         bodyClassName={['no-borders', ...contentClasses].filter(Boolean).join(' ')}
-        bodyWrapClassName='p-0'
         footer={link && link}
       >
         <div className={calloutClasses.join(' ')}>
@@ -615,7 +614,6 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   return (
     <VisualizationContent
       bodyClassName={contentClasses.join(' ')}
-      bodyWrapClassName='p-0'
       header={
         <Title
           showTitle={config.showTitle}

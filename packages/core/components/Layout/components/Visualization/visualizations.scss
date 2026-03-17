@@ -236,22 +236,15 @@
     font-size: var(--visualization-meta-font-size, 0.889rem);
   }
 
-  .cove-visualization__body-wrap > :first-child {
-    padding-top: var(--cove-visualization-section-gap, 1.5rem) !important;
-  }
+  .cove-visualization__body-wrap {
+    display: flex;
+    flex-direction: column;
+    row-gap: var(--cove-visualization-section-gap, 1.5rem);
+    padding-top: var(--cove-visualization-section-gap, 1.5rem);
+    padding-bottom: var(--cove-visualization-section-gap, 1.5rem);
 
-  .cove-visualization__message-section {
-    padding-bottom: var(--cove-visualization-section-gap, 1.5rem) !important;
-  }
-
-  .cove-visualization__body.cove-visualization__body--no-subtext > .cove-visualization__body-wrap > :last-child {
-    padding-bottom: var(--cove-visualization-section-gap, 1.5rem) !important;
-  }
-
-  .cove-visualization__body-wrap > .cove-visualization__content-section + .cove-visualization__body-subtext-section,
-  .cove-visualization__body-wrap > .cove-visualization__content-section + .cove-visualization__body-footer-section,
-  .cove-visualization__body-wrap > .cove-visualization__body-subtext-section + .cove-visualization__body-footer-section,
-  .cove-visualization__body > .cove-visualization__subtext-section {
-    padding-top: var(--cove-visualization-section-gap, 1.5rem) !important;
+    // Prevent content margins from stacking with row-gap
+    > * > :first-child { margin-top: 0; }
+    > * > :last-child { margin-bottom: 0; }
   }
 }

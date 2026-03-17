@@ -8,6 +8,7 @@ type VisualizationContentProps = {
   bodyClassName?: string
   bodyWrapClassName?: string
   children: React.ReactNode
+  filters?: React.ReactNode
   footer?: React.ReactNode
   header?: React.ReactNode
   innerClassName?: string
@@ -15,7 +16,6 @@ type VisualizationContentProps = {
   message?: React.ReactNode
   messageClassName?: string
   messageIsIntroText?: boolean
-  subtext?: React.ReactNode
 }
 
 const VisualizationContent = ({
@@ -24,6 +24,7 @@ const VisualizationContent = ({
   bodyClassName,
   bodyWrapClassName,
   children,
+  filters,
   footer,
   header,
   innerClassName,
@@ -56,13 +57,14 @@ const VisualizationContent = ({
               {message}
             </section>
           ) : null}
+          {filters ? <section className='cove-visualization__filters-section'>{filters}</section> : null}
           <section className='cove-visualization__content-section'>{children}</section>
           {bodySubtext ? (
             <section className='cove-visualization__body-subtext-section'>{bodySubtext}</section>
           ) : null}
           {bodyFooter ? <section className='cove-visualization__body-footer-section'>{bodyFooter}</section> : null}
+          {subtext ? <section className='cove-visualization__subtext-section'>{subtext}</section> : null}
         </div>
-        {subtext ? <section className='cove-visualization__subtext-section'>{subtext}</section> : null}
       </div>
       {footer}
     </div>

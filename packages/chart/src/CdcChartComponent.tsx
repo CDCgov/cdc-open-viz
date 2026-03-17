@@ -1291,6 +1291,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
             innerProps={{ 'aria-label': handleChartAriaLabels(config), tabIndex: 0 }}
             bodyClassName={bodyClasses.join(' ')}
             bodyWrapClassName={isTp5Treatment ? 'cdc-callout d-flex flex-column tp5-chart-callout' : ''}
+            filters={
+              config.filters?.length > 0 && !externalFilters && config.visualizationType !== 'Spark Line' ? (
+                <Filters
+                  config={config}
+                  setFilters={setFilters}
+                  excludedData={excludedData}
+                  dimensions={dimensions}
+                  interactionLabel={interactionLabel}
+                />
+              ) : undefined
+            }
             bodySubtext={
               processedDescription && config.visualizationType !== 'Spark Line' ? (
                 <div className={getChartSubTextClasses().join(' ')}>{parse(processedDescription)}</div>
@@ -1414,25 +1425,15 @@ const CdcChart: React.FC<CdcChartProps> = ({
               />
             )}
             {isTp5Treatment && chartTitle}
-
-            {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
-              <Filters
-                config={config}
-                setFilters={setFilters}
-                excludedData={excludedData}
-                dimensions={dimensions}
-                interactionLabel={interactionLabel}
-              />
-            )}
-            <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
-            {visibleAnnotations.length > 0 && (
-              <SkipTo
-                skipId={handleChartTabbing(config, legendId)}
-                skipMessage={`Skip over annotations`}
-                key={`skip-annotations`}
-              />
-            )}
             <div className={getChartWrapperClasses().join(' ')}>
+              <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
+              {visibleAnnotations.length > 0 && (
+                <SkipTo
+                  skipId={handleChartTabbing(config, legendId)}
+                  skipMessage={`Skip over annotations`}
+                  key={`skip-annotations`}
+                />
+              )}
               <LegendWrapper>
                 <div
                   className={

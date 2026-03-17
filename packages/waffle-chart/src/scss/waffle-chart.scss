@@ -3,6 +3,12 @@
 // Let core styles handle color palette
 
 .cove-visualization.type-waffle-chart {
+  .cove-waffle-chart__subtext.subtext,
+  .cove-waffle-chart__subtext.subtext.fst-italic {
+    font-size: var(--visualization-meta-font-size) !important;
+    line-height: var(--visualization-body-line-height);
+  }
+
   .cove-visualization__body {
     @include cove-visualization-body-padding;
   }
@@ -24,7 +30,8 @@
 
     &__subtext {
       font-style: italic;
-      font-size: 0.9em !important;
+      font-size: var(--visualization-meta-font-size) !important;
+      line-height: var(--visualization-body-line-height);
     }
 
     &__text {
@@ -62,8 +69,6 @@
     display: flex;
     flex-wrap: wrap;
     align-content: space-between;
-
-    font-size: 14px;
 
     .cove-waffle-chart__data--primary {
       font-size: 70px;
@@ -203,7 +208,8 @@
     }
 
     .cove-waffle-chart__subtext {
-      font-size: 1rem;
+      font-size: var(--visualization-meta-font-size) !important;
+      line-height: var(--visualization-body-line-height);
     }
 
     .cove-waffle-chart__data--primary {
@@ -316,7 +322,8 @@
     }
 
     .cove-waffle-chart__subtext {
-      font-size: 1rem;
+      font-size: var(--visualization-meta-font-size) !important;
+      line-height: var(--visualization-body-line-height);
       margin-top: auto;
     }
 

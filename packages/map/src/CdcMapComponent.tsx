@@ -457,6 +457,19 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 ]
                   .filter(Boolean)
                   .join(' ')}
+                filters={
+                  config?.filters?.length > 0 ? (
+                    <Filters
+                      config={config}
+                      setConfig={setConfig}
+                      filteredData={runtimeFilters}
+                      setFilters={_setRuntimeData}
+                      dimensions={dimensions}
+                      standaloneMap={!config}
+                      interactionLabel={interactionLabel}
+                    />
+                  ) : undefined
+                }
                 bodySubtext={processedSubtext.length > 0 ? <p className='subtext'>{parse(processedSubtext)}</p> : null}
                 bodyFooter={
                   <>
@@ -560,18 +573,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
                   {config?.annotations?.length > 0 && (
                     <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
-                  )}
-
-                  {config?.filters?.length > 0 && (
-                    <Filters
-                      config={config}
-                      setConfig={setConfig}
-                      filteredData={runtimeFilters}
-                      setFilters={_setRuntimeData}
-                      dimensions={dimensions}
-                      standaloneMap={!config}
-                      interactionLabel={interactionLabel}
-                    />
                   )}
 
                   <div
