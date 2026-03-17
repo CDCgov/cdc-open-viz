@@ -339,6 +339,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       data: trendSourceData,
       trendIndicator,
       mainDataFunction: dataFunction,
+      mainDataColumn: dataColumn,
       allowNumericMode: false
     })
 

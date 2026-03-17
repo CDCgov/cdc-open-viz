@@ -24,15 +24,10 @@ export type TrendIndicatorMapping = {
   arrowType: TrendArrowType
 }
 
-export type TrendIndicatorNumericRules = {
-  upThreshold: number
-  downThreshold: number
-}
-
 export type TrendIndicatorConfig = {
   mode?: TrendMode | null
   column?: string
-  numericRules?: TrendIndicatorNumericRules
+  numericThreshold?: number
   mappings?: TrendIndicatorMapping[]
 }
 
@@ -83,6 +78,7 @@ type ResolveTrendIndicatorArgs = {
   data: Record<string, any>[]
   trendIndicator?: TrendIndicatorConfig
   mainDataFunction?: string
+  mainDataColumn?: string
   allowNumericMode?: boolean
 }
 
@@ -90,6 +86,7 @@ export const resolveTrendIndicator = ({
   data = [],
   trendIndicator,
   mainDataFunction,
+  mainDataColumn,
   allowNumericMode = false
 }: ResolveTrendIndicatorArgs): TrendResolution => {
   if (!trendIndicator?.mode) {
@@ -102,8 +99,7 @@ export const resolveTrendIndicator = ({
 
   if (trendIndicator.mode === TREND_MODE_CATEGORICAL) {
     const usePassthroughFirstRow = mainDataFunction === DATA_FUNCTION_PASSTHROUGH
-    const sourceRow =
-      data.length === 1 ? data[0] : usePassthroughFirstRow && data.length > 1 ? data[0] : undefined
+    const sourceRow = data.length === 1 ? data[0] : usePassthroughFirstRow && data.length > 1 ? data[0] : undefined
 
     if (!sourceRow) {
       return { state: 'ambiguous' }
@@ -133,35 +129,43 @@ export const resolveTrendIndicator = ({
       return { state: 'invalid' }
     }
 
+    if (!mainDataColumn || trendIndicator.numericThreshold === undefined) {
+      return { state: 'invalid' }
+    }
+
+    const threshold = Number(trendIndicator.numericThreshold)
+
+    if (!Number.isFinite(threshold) || threshold < 0) {
+      return { state: 'invalid' }
+    }
+
+    const currentNumericValues = data
+      .map(row => numberFromString(row[mainDataColumn]))
+      .filter(value => typeof value === 'number' && Number.isFinite(value)) as number[]
+
+    const historicalNumericValues = data
+      .map(row => numberFromString(row[trendIndicator.column]))
+      .filter(value => typeof value === 'number' && Number.isFinite(value)) as number[]
+
+    const currentAggregatedValue = aggregateByDataFunction(currentNumericValues, mainDataFunction)
+    const historicalAggregatedValue = aggregateByDataFunction(historicalNumericValues, mainDataFunction)
+
     if (
-      trendIndicator.numericRules?.upThreshold === undefined ||
-      trendIndicator.numericRules?.downThreshold === undefined
+      currentAggregatedValue === null ||
+      historicalAggregatedValue === null ||
+      !Number.isFinite(currentAggregatedValue) ||
+      !Number.isFinite(historicalAggregatedValue)
     ) {
       return { state: 'invalid' }
     }
 
-    const upThreshold = Number(trendIndicator.numericRules.upThreshold)
-    const downThreshold = Number(trendIndicator.numericRules.downThreshold)
+    const delta = currentAggregatedValue - historicalAggregatedValue
 
-    if (!Number.isFinite(upThreshold) || !Number.isFinite(downThreshold)) {
-      return { state: 'invalid' }
-    }
-
-    const numericValues = data
-      .map(row => numberFromString(row[trendIndicator.column]))
-      .filter(value => typeof value === 'number' && Number.isFinite(value)) as number[]
-
-    const aggregatedValue = aggregateByDataFunction(numericValues, mainDataFunction)
-    if (aggregatedValue === null || !Number.isFinite(aggregatedValue)) {
-      return { state: 'invalid' }
-    }
-
-    // Strict comparisons prevent overlap and keep equality as no-arrow.
-    if (aggregatedValue > upThreshold) {
+    if (delta > threshold) {
       return { state: 'resolved', arrowType: TREND_ARROW_UP }
     }
 
-    if (aggregatedValue < downThreshold) {
+    if (delta < -threshold) {
       return { state: 'resolved', arrowType: TREND_ARROW_DOWN }
     }
 
@@ -170,4 +174,3 @@ export const resolveTrendIndicator = ({
 
   return { state: 'invalid' }
 }
-
