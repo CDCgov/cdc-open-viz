@@ -7,6 +7,8 @@ const configParam = params.get('config')
 let editorEnabled = params.get('editor') === 'true'
 const previewEnabled = params.get('preview') === 'true'
 const sectionGapParam = params.get('sectionGap')
+const fontSizeParam = params.get('fontSize')
+const metaFontSizeParam = params.get('metaFontSize')
 
 if (sectionGapParam) {
   const numericGap = Number(sectionGapParam)
@@ -15,14 +17,44 @@ if (sectionGapParam) {
   }
 }
 
+if (fontSizeParam) {
+  const numericFontSize = Number(fontSizeParam)
+  if (!Number.isNaN(numericFontSize) && numericFontSize > 0) {
+    document.documentElement.style.setProperty('--visualization-body-font-size', `${numericFontSize}px`)
+  }
+}
+
+if (metaFontSizeParam) {
+  const numericMetaFontSize = Number(metaFontSizeParam)
+  if (!Number.isNaN(numericMetaFontSize) && numericMetaFontSize > 0) {
+    document.documentElement.style.setProperty('--visualization-meta-font-size', `${numericMetaFontSize}px`)
+  }
+}
+
 window.addEventListener('message', event => {
   const { data } = event
-  if (!data || data.type !== 'cove:setSectionGap') return
+  if (!data) return
 
-  const numericGap = Number(data.value)
-  if (Number.isNaN(numericGap) || numericGap < 0) return
+  if (data.type === 'cove:setSectionGap') {
+    const numericGap = Number(data.value)
+    if (Number.isNaN(numericGap) || numericGap < 0) return
 
-  document.documentElement.style.setProperty('--cove-visualization-section-gap', `${numericGap}px`)
+    document.documentElement.style.setProperty('--cove-visualization-section-gap', `${numericGap}px`)
+  }
+
+  if (data.type === 'cove:setFontSize') {
+    const numericFontSize = Number(data.value)
+    if (Number.isNaN(numericFontSize) || numericFontSize <= 0) return
+
+    document.documentElement.style.setProperty('--visualization-body-font-size', `${numericFontSize}px`)
+  }
+
+  if (data.type === 'cove:setMetaFontSize') {
+    const numericMetaFontSize = Number(data.value)
+    if (Number.isNaN(numericMetaFontSize) || numericMetaFontSize <= 0) return
+
+    document.documentElement.style.setProperty('--visualization-meta-font-size', `${numericMetaFontSize}px`)
+  }
 })
 
 if (configParam) {
