@@ -4,6 +4,7 @@ import { SortIcon } from './SortIcon'
 import { getNewSortBy } from '../helpers/getNewSortBy'
 import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { getMapDataTableColumnKeys } from '../helpers/getMapDataTableColumnKeys'
 
 type MapHeaderProps = DataTableProps & {
   sortBy: { column; asc }
@@ -28,11 +29,11 @@ const MapHeader = ({
   rightAlignedCols,
   interactionLabel = ''
 }: MapHeaderProps) => {
+  const orderedColumnKeys = getMapDataTableColumnKeys(columns)
+
   return (
     <tr>
-      {Object.keys(columns)
-        .filter(column => columns[column].dataTable === true && columns[column].name)
-        .map((column, index) => {
+      {orderedColumnKeys.map((column, index) => {
           let text
           if (column && column !== 'geo') {
             text = columns[column].label ? columns[column].label : columns[column].name

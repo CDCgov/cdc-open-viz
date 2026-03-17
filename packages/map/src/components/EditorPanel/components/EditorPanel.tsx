@@ -873,6 +873,11 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
     }
   }
 
+  const updateColumnOrder = (columnName, value) => {
+    const parsedValue = Number.parseInt(value, 10)
+    editColumn(columnName, 'order', Number.isNaN(parsedValue) ? undefined : parsedValue)
+  }
+
   // just adds a new column but not set to any data yet
   const addAdditionalColumn = number => {
     const columnKey = `additionalColumn${number}`
@@ -1822,6 +1827,18 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           }}
                         />
                       </label>
+                      <label className='mt-2'>
+                        <span className='edit-label column-heading'>Order</span>
+                        <input
+                          onWheel={e => e.currentTarget.blur()}
+                          type='number'
+                          min='1'
+                          value={config.columns.geo?.order ?? ''}
+                          onChange={event => {
+                            updateColumnOrder('geo', event.target.value)
+                          }}
+                        />
+                      </label>
                     </fieldset>
                     {'navigation' !== config.general.type && (
                       <fieldset className='primary-fieldset edit-block'>
@@ -1932,6 +1949,18 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             label='Show in Tooltips'
                             updateField={updateField}
                           />
+                          <label>
+                            <span className='edit-label column-heading'>Order</span>
+                            <input
+                              onWheel={e => e.currentTarget.blur()}
+                              type='number'
+                              min='1'
+                              value={config.columns.primary?.order ?? ''}
+                              onChange={event => {
+                                updateColumnOrder('primary', event.target.value)
+                              }}
+                            />
+                          </label>
                         </ul>
                       </fieldset>
                     )}
@@ -2215,6 +2244,18 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                                   editColumn(val, 'tooltip', event.target.checked)
                                 }}
                               />
+                              <label>
+                                <span className='edit-label column-heading'>Order</span>
+                                <input
+                                  onWheel={e => e.currentTarget.blur()}
+                                  type='number'
+                                  min='1'
+                                  value={config.columns[val]?.order ?? ''}
+                                  onChange={event => {
+                                    updateColumnOrder(val, event.target.value)
+                                  }}
+                                />
+                              </label>
                             </ul>
                           </fieldset>
                         ))}
