@@ -6,6 +6,24 @@ const params = new URLSearchParams(window.location.search)
 const configParam = params.get('config')
 let editorEnabled = params.get('editor') === 'true'
 const previewEnabled = params.get('preview') === 'true'
+const sectionGapParam = params.get('sectionGap')
+
+if (sectionGapParam) {
+  const numericGap = Number(sectionGapParam)
+  if (!Number.isNaN(numericGap) && numericGap >= 0) {
+    document.documentElement.style.setProperty('--cove-visualization-section-gap', `${numericGap}px`)
+  }
+}
+
+window.addEventListener('message', event => {
+  const { data } = event
+  if (!data || data.type !== 'cove:setSectionGap') return
+
+  const numericGap = Number(data.value)
+  if (Number.isNaN(numericGap) || numericGap < 0) return
+
+  document.documentElement.style.setProperty('--cove-visualization-section-gap', `${numericGap}px`)
+})
 
 if (configParam) {
   document.querySelector('.react-container').setAttribute('data-config', configParam)

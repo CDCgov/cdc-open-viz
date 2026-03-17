@@ -537,9 +537,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 message={processedIntroText ? parse(processedIntroText) : null}
               >
                 <div
-                  className={
-                    isTp5Treatment ? ['cdc-callout', 'd-flex', 'flex-column'].filter(Boolean).join(' ') : undefined
-                  }
+                  className={[isTp5Treatment ? 'cdc-callout d-flex flex-column' : ''].filter(Boolean).join(' ')}
                   style={isTp5Treatment ? { position: 'relative', background: 'transparent' } : undefined}
                 >
                   {isTp5Treatment && (
@@ -579,7 +577,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   <div
                     role='region'
                     tabIndex={0}
-                    className={getMapContainerClasses(config, modal).join(' ')}
+                    className={getMapContainerClasses(config, modal, currentViewport).join(' ')}
                     onClick={e => closeModal(e, modal)}
                     onKeyDown={e => {
                       if (e.key === 'Enter') {

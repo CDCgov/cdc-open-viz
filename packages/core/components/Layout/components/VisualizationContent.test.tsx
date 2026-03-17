@@ -14,12 +14,14 @@ describe('VisualizationContent', () => {
     const inner = container.querySelector('.cove-visualization__inner')
     const body = container.querySelector('.cove-visualization__body')
     const bodyWrap = container.querySelector('.cove-visualization__body-wrap')
+    const content = container.querySelector('.cove-visualization__content-section')
 
     expect(inner).toHaveClass('inner-extra')
     expect(body).toHaveClass('body-extra')
     expect(bodyWrap).toHaveClass('wrap-extra')
     expect(inner?.firstElementChild).toBe(body)
     expect(body?.firstElementChild).toBe(bodyWrap)
+    expect(bodyWrap?.firstElementChild).toBe(content)
     expect(screen.getByText('Inner content')).toBeInTheDocument()
   })
 
@@ -49,11 +51,33 @@ describe('VisualizationContent', () => {
     const messageLayer = container.querySelector('.cove-visualization__message')
     const message = container.querySelector('.cove-visualization__message-section')
     const bodyWrap = container.querySelector('.cove-visualization__body-wrap')
+    const content = container.querySelector('.cove-visualization__content-section')
 
     expect(screen.getByTestId('message')).toBeInTheDocument()
     expect(messageLayer).toBe(message)
     expect(body?.firstElementChild).toBe(bodyWrap)
     expect(bodyWrap?.firstElementChild).toBe(message)
+    expect(bodyWrap?.children[1]).toBe(content)
+  })
+
+  it('adds the shared no-subtext body state only when outer subtext is absent', () => {
+    const { container: withoutSubtext } = render(
+      <VisualizationContent header={<div>Header</div>} message={<div>Message</div>}>
+        <div>Wrapped content</div>
+      </VisualizationContent>
+    )
+    const { container: withSubtext } = render(
+      <VisualizationContent header={<div>Header</div>} subtext={<div>Subtext</div>}>
+        <div>Wrapped content</div>
+      </VisualizationContent>
+    )
+
+    expect(withoutSubtext.querySelector('.cove-visualization__body')).toHaveClass(
+      'cove-visualization__body--no-subtext'
+    )
+    expect(withSubtext.querySelector('.cove-visualization__body')).not.toHaveClass(
+      'cove-visualization__body--no-subtext'
+    )
   })
 
   it('applies custom classes to the message wrapper', () => {
@@ -95,6 +119,9 @@ describe('VisualizationContent', () => {
     expect(screen.getByTestId('subtext')).toBeInTheDocument()
     expect(body?.firstElementChild).toBe(bodyWrap)
     expect(body?.lastElementChild).toBe(subtext)
+    expect(subtext).not.toHaveClass('mt-4')
+    expect(subtext).not.toHaveClass('mb-4')
+    expect(subtext).not.toHaveAttribute('style')
   })
 
   it('renders body subtext content inside the body-wrap after the wrapped content', () => {
@@ -105,10 +132,15 @@ describe('VisualizationContent', () => {
     )
 
     const bodyWrap = container.querySelector('.cove-visualization__body-wrap')
+    const content = container.querySelector('.cove-visualization__content-section')
     const bodySubtext = container.querySelector('.cove-visualization__body-subtext-section')
 
     expect(screen.getByTestId('body-subtext')).toBeInTheDocument()
     expect(bodyWrap?.lastElementChild).toBe(bodySubtext)
+    expect(bodyWrap?.firstElementChild).toBe(content)
+    expect(bodySubtext).not.toHaveClass('mt-4')
+    expect(bodySubtext).not.toHaveClass('mb-4')
+    expect(bodySubtext).not.toHaveAttribute('style')
   })
 
   it('renders body footer content inside the body-wrap after body subtext', () => {
@@ -122,10 +154,12 @@ describe('VisualizationContent', () => {
     )
 
     const bodyWrap = container.querySelector('.cove-visualization__body-wrap')
+    const content = container.querySelector('.cove-visualization__content-section')
     const bodySubtext = container.querySelector('.cove-visualization__body-subtext-section')
     const bodyFooter = container.querySelector('.cove-visualization__body-footer-section')
 
     expect(screen.getByTestId('body-footer')).toBeInTheDocument()
+    expect(bodyWrap?.children[0]).toBe(content)
     expect(bodyWrap?.children[1]).toBe(bodySubtext)
     expect(bodyWrap?.lastElementChild).toBe(bodyFooter)
   })

@@ -34,7 +34,7 @@ const VisualizationContent = ({
   subtext
 }: VisualizationContentProps) => {
   const resolvedInnerClasses = ['cove-visualization__inner', innerClassName].filter(Boolean).join(' ')
-  const bodyClasses = ['cove-visualization__body', bodyClassName].filter(Boolean).join(' ')
+  const bodyClasses = ['cove-visualization__body', !subtext && 'cove-visualization__body--no-subtext', bodyClassName].filter(Boolean).join(' ')
   const bodyWrapClasses = ['cove-visualization__body-wrap', bodyWrapClassName].filter(Boolean).join(' ')
 
   return (
@@ -56,13 +56,13 @@ const VisualizationContent = ({
               {message}
             </section>
           ) : null}
-          {children}
+          <section className='cove-visualization__content-section'>{children}</section>
           {bodySubtext ? (
-            <section className='cove-visualization__body-subtext-section mt-4 mb-4'>{bodySubtext}</section>
+            <section className='cove-visualization__body-subtext-section'>{bodySubtext}</section>
           ) : null}
           {bodyFooter ? <section className='cove-visualization__body-footer-section'>{bodyFooter}</section> : null}
         </div>
-        {subtext ? <section className='cove-visualization__subtext-section mt-4 mb-4'>{subtext}</section> : null}
+        {subtext ? <section className='cove-visualization__subtext-section'>{subtext}</section> : null}
       </div>
       {footer}
     </div>

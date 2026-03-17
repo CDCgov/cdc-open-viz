@@ -37,6 +37,7 @@
     .legend-wrapper .tooltip-boundary {
       display: flex;
       flex-wrap: wrap;
+      row-gap: var(--cove-visualization-section-gap, 1.5rem);
       order: 2;
 
       aside {
@@ -50,9 +51,11 @@
     .legend-wrapper {
       display: flex;
       flex-wrap: wrap;
+      row-gap: var(--cove-visualization-section-gap, 1.5rem);
 
       aside {
         width: 100%;
+        margin-top: var(--cove-visualization-section-gap, 1.5rem) !important;
       }
     }
   }
@@ -462,15 +465,6 @@
         stroke: none;
       }
     }
-  }
-
-  .cove-visualization__body-wrap:has(> .cove-visualization__message-section) .visualization-container {
-    padding-top: 1.5rem;
-  }
-
-  .visualization-container:has(+ .subtext),
-  .visualization-container:has(+ .subtext--responsive-ticks) {
-    padding-bottom: 1.5rem;
   }
 
   @include breakpointClass(sm) {
