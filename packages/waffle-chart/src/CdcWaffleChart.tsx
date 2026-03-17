@@ -31,8 +31,9 @@ import './scss/main.scss'
 import Title from '@cdc/core/components/ui/Title'
 import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 import TrendArrow from '@cdc/core/components/ui/TrendArrow'
-import { resolveTrendIndicator } from '@cdc/core/helpers/trendIndicator'
+import { resolveTrendIndicator, TREND_MODE_NUMERIC } from '@cdc/core/helpers/trendIndicator'
 import type { TrendResolution } from '@cdc/core/helpers/trendIndicator'
+import { resolveWaffleNumericTrend } from './helpers/waffleNumericTrend'
 
 // images
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
@@ -144,14 +145,12 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
 
     const getColumnSum = arr => {
       if (Array.isArray(arr) && arr.length > 0) {
-        const sum = arr.reduce((sum, x) => sum + x)
-        return applyPrecision(sum)
+        return arr.reduce((sum, x) => sum + x)
       }
     }
 
     const getColumnMean = arr => {
-      const mean = arr.length > 1 ? arr.reduce((a, b) => a + b) / arr.length : arr[0]
-      return applyPrecision(mean)
+      return arr.length > 1 ? arr.reduce((a, b) => a + b) / arr.length : arr[0]
     }
 
     const getMode = arr => {
@@ -182,8 +181,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     const getMedian = arr => {
       const mid = Math.floor(arr.length / 2),
         nums = [...arr].sort((a, b) => a - b)
-      const value = arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2
-      return applyPrecision(value)
+      return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2
     }
 
     const applyPrecision = value => {
@@ -242,13 +240,23 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     }
 
     //Get the column's data
-    const columnData =
-      conditionalData.length > 0 ? conditionalData.map(a => a[dataColumn]) : filteredData.map(a => a[dataColumn])
-    const denomColumnData = filteredData.map(a => a[dataDenomColumn])
     const trendSourceData = conditionalData.length > 0 ? conditionalData : filteredData
+    const columnData = trendSourceData.map(a => a[dataColumn])
+    const denomColumnData = filteredData.map(a => a[dataDenomColumn])
+    const historicalColumnData = trendSourceData.map(a => a[trendIndicator?.column])
 
     //Filter the column's data for numerical values only
     let numericalData = columnData
+      .filter(value => {
+        let include = false
+        if (Number(value) || Number.isFinite(Number(value))) {
+          include = true
+        }
+        return include
+      })
+      .map(Number)
+
+    let historicalNumericalData = historicalColumnData
       .filter(value => {
         let include = false
         if (Number(value) || Number.isFinite(Number(value))) {
@@ -268,47 +276,74 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       })
       .map(Number)
 
-    // Calculate numerator  ------------------
-    let waffleNumerator = ''
+    const calculateByFunction = (values, fn, shouldRound = true) => {
+      const toOutput = value => {
+        if (value === undefined || value === null) {
+          return ''
+        }
 
-    const numerFunctionList = {
-      [DATA_FUNCTION_COUNT]: String(numericalData.length),
-      [DATA_FUNCTION_SUM]: String(getColumnSum(numericalData)),
-      [DATA_FUNCTION_MEAN]: String(getColumnMean(numericalData)),
-      [DATA_FUNCTION_MEDIAN]: getMedian(numericalData).toString(),
-      [DATA_FUNCTION_MAX]: Math.max(...numericalData).toString(),
-      [DATA_FUNCTION_MIN]: Math.min(...numericalData).toString(),
-      [DATA_FUNCTION_MODE]: getMode(numericalData).join(', ')
+        if (!shouldRound) {
+          return String(value)
+        }
+
+        return Number.isFinite(Number(value)) ? String(applyPrecision(value)) : String(value)
+      }
+
+      switch (fn) {
+        case DATA_FUNCTION_COUNT:
+          return String(values.length)
+        case DATA_FUNCTION_SUM:
+          return toOutput(getColumnSum(values))
+        case DATA_FUNCTION_MEAN:
+          return toOutput(getColumnMean(values))
+        case DATA_FUNCTION_MEDIAN: {
+          const median = getMedian(values)
+          return toOutput(median)
+        }
+        case DATA_FUNCTION_MAX:
+          return values.length ? toOutput(Math.max(...values)) : ''
+        case DATA_FUNCTION_MIN:
+          return values.length ? toOutput(Math.min(...values)) : ''
+        case DATA_FUNCTION_MODE:
+          return getMode(values).join(', ')
+        default:
+          return ''
+      }
     }
 
-    waffleNumerator = numerFunctionList[dataFunction]
+    // Calculate numerator  ------------------
+    const trendCurrentNumerator = calculateByFunction(numericalData, dataFunction, false)
+    const trendHistoricalNumerator = calculateByFunction(historicalNumericalData, dataFunction, false)
+    const waffleNumerator = calculateByFunction(numericalData, dataFunction)
 
     // Calculate denominator ------------------
     let waffleDenominator = null
-
-    const denomFunctionList = {
-      [DATA_FUNCTION_COUNT]: String(numericalDenomData.length),
-      [DATA_FUNCTION_SUM]: String(getColumnSum(numericalDenomData)),
-      [DATA_FUNCTION_MEAN]: String(getColumnMean(numericalDenomData)),
-      [DATA_FUNCTION_MEDIAN]: getMedian(numericalDenomData).toString(),
-      [DATA_FUNCTION_MAX]: Math.max(...numericalDenomData).toString(),
-      [DATA_FUNCTION_MIN]: Math.min(...numericalDenomData).toString(),
-      [DATA_FUNCTION_MODE]: getMode(numericalDenomData).join(', ')
-    }
+    let trendDenominator = null
 
     if (customDenom && dataDenomColumn && dataDenomFunction) {
-      waffleDenominator = denomFunctionList[dataDenomFunction]
+      waffleDenominator = calculateByFunction(numericalDenomData, dataDenomFunction)
+      trendDenominator = calculateByFunction(numericalDenomData, dataDenomFunction, false)
     } else {
       waffleDenominator = dataDenom > 0 ? dataDenom : 100
+      trendDenominator = waffleDenominator
     }
 
-    const resolvedTrend = resolveTrendIndicator({
-      data: trendSourceData,
-      trendIndicator,
-      mainDataFunction: dataFunction,
-      mainDataColumn: dataColumn,
-      allowNumericMode: false
-    })
+    const resolvedTrend =
+      trendIndicator?.mode === TREND_MODE_NUMERIC
+        ? resolveWaffleNumericTrend({
+            trendIndicator,
+            mainDataFunction: dataFunction,
+            currentNumerator: Number(trendCurrentNumerator),
+            historicalNumerator: Number(trendHistoricalNumerator),
+            denominator: Number(trendDenominator)
+          })
+        : resolveTrendIndicator({
+            data: trendSourceData,
+            trendIndicator,
+            mainDataFunction: dataFunction,
+            mainDataColumn: dataColumn,
+            allowNumericMode: false
+          })
 
     // @ts-ignore
     return [
