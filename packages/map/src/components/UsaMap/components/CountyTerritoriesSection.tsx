@@ -104,6 +104,7 @@ const CountyTerritoriesSection: React.FC<CountyTerritoriesSectionProps> = ({
                 <svg
                   viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
                   className='county-territories-section__map'
+                  role='img'
                   aria-label={displayGeoName(group.territoryId)}
                 >
                   <g className='county-territories-section__counties'>

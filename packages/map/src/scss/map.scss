@@ -108,7 +108,8 @@ canvas {
   width: 100%;
 }
 
-.county-map-canvas + .tooltip {
+.county-map-canvas + .tooltip,
+.county-map-canvas-wrapper + .tooltip {
   position: fixed;
   background-color: white;
   pointer-events: none;

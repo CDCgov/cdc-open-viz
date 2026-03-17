@@ -25,6 +25,8 @@ const geoLookups: Record<string, GeoLookup> = {
   country: { keys: countryKeys, data: supportedCountries }
 }
 
+const COUNTY_TERRITORY_DIRECT_UIDS = new Set(['US-FM', 'US-MH', 'US-PW'])
+
 const memoizedFindUID = (
   geoName: string,
   type: keyof typeof geoLookups,
@@ -98,6 +100,11 @@ const handleCountyLocation = (row: DataRow, geoColumn: string): string | undefin
   return countyKeys.find(key => key === fips)
 }
 
+const handleCountyTerritoryLocation = (row: DataRow, geoColumn: string): string | undefined => {
+  const territoryUid = memoizedFindUID(normalizeGeoName(row[geoColumn]), 'territory')
+  return territoryUid && COUNTY_TERRITORY_DIRECT_UIDS.has(territoryUid) ? territoryUid : undefined
+}
+
 const setRowUID = (row: DataRow, uid: string | null): void => {
   if (uid) {
     Object.defineProperty(row, 'uid', {
@@ -146,7 +153,7 @@ export const addUIDs = (configObj: MapConfig, fromColumn: string) => {
         } else {
           uid = handleCountyLocation(row, geo.name)
           if (!uid) {
-            uid = memoizedFindUID(normalizeGeoName(row[geo.name]), 'territory')
+            uid = handleCountyTerritoryLocation(row, geo.name)
           }
         }
         break

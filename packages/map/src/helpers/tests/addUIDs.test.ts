@@ -44,4 +44,12 @@ describe('addUIDs', () => {
     expect(config.data[0].uid).toBe('01001')
     expect(config.data[1].uid).toBe('60010')
   })
+
+  it('does not map territory-level names without direct county-map features', () => {
+    const config = buildCountyConfig([{ Location: 'Puerto Rico', Value: 43 }])
+
+    addUIDs(config, 'Location')
+
+    expect(config.data[0].uid).toBeUndefined()
+  })
 })
