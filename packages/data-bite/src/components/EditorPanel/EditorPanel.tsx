@@ -2,6 +2,7 @@ import { useContext, useMemo } from 'react'
 
 import {
   DATA_FUNCTIONS,
+  DATA_FUNCTION_PASSTHROUGH,
   DATA_FUNCTION_MAX,
   DATA_FUNCTION_MEAN,
   DATA_FUNCTION_MEDIAN,
@@ -38,7 +39,7 @@ type DataBiteEditorPanelProps = {
 }
 
 const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
-  const { config, updateConfig, loading, data, setParentConfig, isDashboard } = useContext(Context)
+  const { config, updateConfig, loading, data, editorData, setParentConfig, isDashboard } = useContext(Context)
 
   const updateField = updateFieldFactory(config, updateConfig, true)
 
@@ -76,13 +77,15 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
     DATA_FUNCTION_MAX
   ]
   const isNumericModeEligible = numericModeEligibleFunctions.includes(config.dataFunction)
+  const isPassthroughFunction = config.dataFunction === DATA_FUNCTION_PASSTHROUGH
 
   const trendColumnValues = useMemo(() => {
     const trendColumn = config.trendIndicator?.column
     if (!trendColumn) return []
 
+    const trendSourceData = Array.isArray(editorData) && editorData.length ? editorData : data
     const uniqueValues = new Set<string>()
-    data?.forEach(row => {
+    trendSourceData?.forEach(row => {
       const value = row?.[trendColumn]
       if (value !== undefined && value !== null) {
         uniqueValues.add(String(value))
@@ -90,7 +93,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
     })
 
     return Array.from(uniqueValues).sort()
-  }, [data, config.trendIndicator?.column])
+  }, [editorData, data, config.trendIndicator?.column])
 
   const setTrendMode = (mode: string) => {
     updateConfig({
@@ -315,100 +318,105 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
               />
               <hr className='accordion__divider' />
 
-              <span className='divider-heading'>Trend Indicator</span>
-              <Select
-                value={trendMode}
-                fieldName='mode'
-                label='Trend Mode'
-                options={[
-                  { value: '', label: 'Off' },
-                  { value: TREND_MODE_CATEGORICAL, label: 'Categorical' },
-                  { value: TREND_MODE_NUMERIC, label: 'Numeric' }
-                ]}
-                onChange={e => setTrendMode(e.target.value)}
-              />
-              {trendMode && (
-                <>
-                  <Select
-                    value={config.trendIndicator?.column || ''}
-                    section='trendIndicator'
-                    fieldName='column'
-                    label='Trend Column'
-                    updateField={updateField}
-                    initial='Select'
-                    options={columns}
-                  />
-                  {trendMode === TREND_MODE_CATEGORICAL && (
-                    <>
-                      <p style={{ marginBottom: '0.75rem' }}>
-                        Arrow appears only when filters resolve to exactly one row/value.
-                      </p>
-                      {trendColumnValues.length === 0 && (
-                        <p style={{ marginBottom: '0.75rem' }}>No values found in the selected trend column.</p>
-                      )}
-                      {trendColumnValues.map(sourceValue => {
-                        const selectedArrowType =
-                          trendMappings.find(mapping => mapping.sourceValue === sourceValue)?.arrowType || ''
+              <div className='checkbox-group'>
+                <span className='divider-heading' style={{ marginTop: 0 }}>
+                  Trend Indicator
+                </span>
+                <Select
+                  value={trendMode}
+                  fieldName='mode'
+                  label='Trend Mode'
+                  options={[
+                    { value: '', label: 'Off' },
+                    { value: TREND_MODE_CATEGORICAL, label: 'Categorical' },
+                    { value: TREND_MODE_NUMERIC, label: 'Numeric' }
+                  ]}
+                  onChange={e => setTrendMode(e.target.value)}
+                />
+                {trendMode && (
+                  <>
+                    <Select
+                      value={config.trendIndicator?.column || ''}
+                      section='trendIndicator'
+                      fieldName='column'
+                      label='Trend Column'
+                      updateField={updateField}
+                      initial='Select'
+                      options={columns}
+                    />
+                    {trendMode === TREND_MODE_CATEGORICAL && (
+                      <>
+                        {!isPassthroughFunction && (
+                          <span className='subtext' style={{ marginBottom: '0.75rem' }}>
+                            In categorical mode, arrows appear only when filters resolve to exactly one row.
+                          </span>
+                        )}
+                        {trendColumnValues.map(sourceValue => {
+                          const selectedArrowType =
+                            trendMappings.find(mapping => mapping.sourceValue === sourceValue)?.arrowType || ''
 
-                        return (
-                          <div className='cove-accordion__panel-row align-center mb-2' key={sourceValue}>
-                            <div className='cove-accordion__panel-col flex-grow'>{sourceValue}</div>
-                            <div className='cove-accordion__panel-col flex-grow'>
-                              <Select
-                                label=''
-                                value={selectedArrowType}
-                                options={[
-                                  { value: '', label: 'No Arrow' },
-                                  ...TREND_ARROW_TYPES.map(arrowType => ({
-                                    value: arrowType,
-                                    label: TREND_ARROW_TYPE_LABELS[arrowType]
-                                  }))
-                                ]}
-                                onChange={e => updateTrendMapping(sourceValue, e.target.value)}
-                              />
+                          return (
+                            <div className='cove-accordion__panel-row align-center mb-2' key={sourceValue}>
+                              <div className='cove-accordion__panel-col flex-grow'>{sourceValue}</div>
+                              <div className='cove-accordion__panel-col flex-grow'>
+                                <Select
+                                  label=''
+                                  value={selectedArrowType}
+                                  options={[
+                                    { value: '', label: 'No Arrow' },
+                                    ...TREND_ARROW_TYPES.map(arrowType => ({
+                                      value: arrowType,
+                                      label: TREND_ARROW_TYPE_LABELS[arrowType]
+                                    }))
+                                  ]}
+                                  onChange={e => updateTrendMapping(sourceValue, e.target.value)}
+                                />
+                              </div>
                             </div>
-                          </div>
-                        )
-                      })}
-                    </>
-                  )}
-                  {trendMode === TREND_MODE_NUMERIC && (
-                    <>
-                      <p style={{ marginBottom: '0.5rem' }}>Aggregation is locked to the main Data Function.</p>
-                      {!isNumericModeEligible && (
-                        <p className='cove-accordion__panel-error' style={{ marginBottom: '0.5rem' }}>
-                          Numeric mode only supports Sum, Mean (Average), Median, Min, and Max.
-                        </p>
-                      )}
-                      <ul className='column-edit'>
-                        <li className='two-col'>
-                          <TextField
-                            type='number'
-                            value={config.trendIndicator?.numericRules?.upThreshold ?? 0}
-                            section='trendIndicator'
-                            subsection='numericRules'
-                            fieldName='upThreshold'
-                            label='Up Threshold'
-                            updateField={updateField}
-                          />
-                          <TextField
-                            type='number'
-                            value={config.trendIndicator?.numericRules?.downThreshold ?? 0}
-                            section='trendIndicator'
-                            subsection='numericRules'
-                            fieldName='downThreshold'
-                            label='Down Threshold'
-                            updateField={updateField}
-                          />
-                        </li>
-                      </ul>
-                      <p style={{ marginBottom: '0.75rem' }}>
-                        If value is between thresholds (or equal to either threshold), no arrow is shown.
-                      </p>
-                    </>
-                  )}
-                </>
-              )}
+                          )
+                        })}
+                      </>
+                    )}
+                    {trendMode === TREND_MODE_NUMERIC && (
+                      <>
+                        <span className='subtext' style={{ marginBottom: '0.5rem' }}>
+                          Aggregation is locked to the main Data Function.
+                        </span>
+                        {!isNumericModeEligible && (
+                          <p className='cove-accordion__panel-error' style={{ marginBottom: '0.5rem' }}>
+                            Numeric mode only supports Sum, Mean (Average), Median, Min, and Max.
+                          </p>
+                        )}
+                        <ul className='column-edit'>
+                          <li className='two-col'>
+                            <TextField
+                              type='number'
+                              value={config.trendIndicator?.numericRules?.upThreshold ?? 0}
+                              section='trendIndicator'
+                              subsection='numericRules'
+                              fieldName='upThreshold'
+                              label='Up Threshold'
+                              updateField={updateField}
+                            />
+                            <TextField
+                              type='number'
+                              value={config.trendIndicator?.numericRules?.downThreshold ?? 0}
+                              section='trendIndicator'
+                              subsection='numericRules'
+                              fieldName='downThreshold'
+                              label='Down Threshold'
+                              updateField={updateField}
+                            />
+                          </li>
+                        </ul>
+                        <span className='subtext' style={{ marginBottom: '0.75rem' }}>
+                          If value is between thresholds (or equal to either threshold), no arrow is shown.
+                        </span>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
               <hr className='accordion__divider' />
 
               <label style={{ marginBottom: '1rem' }}>

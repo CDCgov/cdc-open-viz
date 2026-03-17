@@ -1,5 +1,6 @@
 import numberFromString from './numberFromString'
 import {
+  DATA_FUNCTION_PASSTHROUGH,
   DATA_FUNCTION_MAX,
   DATA_FUNCTION_MEAN,
   DATA_FUNCTION_MEDIAN,
@@ -100,11 +101,15 @@ export const resolveTrendIndicator = ({
   }
 
   if (trendIndicator.mode === TREND_MODE_CATEGORICAL) {
-    if (data.length !== 1) {
+    const usePassthroughFirstRow = mainDataFunction === DATA_FUNCTION_PASSTHROUGH
+    const sourceRow =
+      data.length === 1 ? data[0] : usePassthroughFirstRow && data.length > 1 ? data[0] : undefined
+
+    if (!sourceRow) {
       return { state: 'ambiguous' }
     }
 
-    const sourceValue = data[0]?.[trendIndicator.column]
+    const sourceValue = sourceRow?.[trendIndicator.column]
     if (sourceValue === undefined || sourceValue === null) {
       return { state: 'invalid' }
     }

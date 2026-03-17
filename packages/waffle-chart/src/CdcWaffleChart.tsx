@@ -46,6 +46,7 @@ type CdcWaffleChartProps = {
   config?: Config
   isDashboard?: boolean
   isEditor?: boolean
+  rawData?: Record<string, any>[]
   link?: string
   setConfig?: () => void
   interactionLabel?: string
@@ -659,6 +660,7 @@ const CdcWaffleChart = ({
   config: configObj,
   isDashboard = false,
   isEditor = false,
+  rawData = [],
   setConfig: setParentConfig,
   interactionLabel = ''
 }: CdcWaffleChartProps) => {
@@ -756,7 +758,16 @@ const CdcWaffleChart = ({
   return (
     <ErrorBoundary component='WaffleChart'>
       <ConfigContext.Provider
-        value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef }}
+        value={{
+          config,
+          updateConfig,
+          loading,
+          data: config.data,
+          editorData: isDashboard && isEditor && Array.isArray(rawData) && rawData.length ? rawData : config.data,
+          setParentConfig,
+          isDashboard,
+          outerContainerRef
+        }}
       >
         <VisualizationContainer
           config={config}

@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { DATA_FUNCTION_PASSTHROUGH } from '../constants'
 import {
   resolveTrendIndicator,
   TREND_MODE_CATEGORICAL,
@@ -26,7 +27,7 @@ describe('resolveTrendIndicator', () => {
     expect(result).toEqual({ state: 'resolved', arrowType: TREND_ARROW_UP })
   })
 
-  it('categorical mode returns ambiguous when more than one row resolves', () => {
+  it('categorical mode returns ambiguous when more than one row resolves for non-passthrough functions', () => {
     const result = resolveTrendIndicator({
       data: [{ trend: 'increase' }, { trend: 'decrease' }],
       trendIndicator: {
@@ -37,6 +38,23 @@ describe('resolveTrendIndicator', () => {
     })
 
     expect(result.state).toBe('ambiguous')
+  })
+
+  it('categorical mode uses first row for passthrough when more than one row resolves', () => {
+    const result = resolveTrendIndicator({
+      data: [{ trend: 'increase' }, { trend: 'decrease' }],
+      mainDataFunction: DATA_FUNCTION_PASSTHROUGH,
+      trendIndicator: {
+        mode: TREND_MODE_CATEGORICAL,
+        column: 'trend',
+        mappings: [
+          { sourceValue: 'increase', arrowType: TREND_ARROW_UP },
+          { sourceValue: 'decrease', arrowType: TREND_ARROW_DOWN }
+        ]
+      }
+    })
+
+    expect(result).toEqual({ state: 'resolved', arrowType: TREND_ARROW_UP })
   })
 
   it('categorical mode returns unmapped when value has no mapping', () => {
