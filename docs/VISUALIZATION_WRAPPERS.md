@@ -47,8 +47,8 @@ Default shape:
 .cove-visualization__inner
   header?
   .cove-visualization__body
-    .cove-visualization__message-section?
     .cove-visualization__body-wrap
+      .cove-visualization__message-section?
       children
     .cove-visualization__subtext-section?
   footer?
