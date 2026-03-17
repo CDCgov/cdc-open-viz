@@ -332,7 +332,7 @@ const CountyMap = () => {
       ...config,
       mapPosition: { coordinates: [0, 30], zoom: 1 }
     })
-    setFilteredStateCode?.('')
+    setFilteredStateCode('')
     setFocus({})
     resetZoomTransform()
   }
@@ -444,7 +444,7 @@ const CountyMap = () => {
           ...config,
           mapPosition: { coordinates: [0, 30], zoom: 3 }
         })
-        setFilteredStateCode?.(clickedState.id)
+        setFilteredStateCode(clickedState.id)
 
         let focusIndex = -1
         for (let i = 0; i < topoData.mapData.length; i++) {
@@ -909,7 +909,7 @@ const CountyMap = () => {
 
   useEffect(() => {
     if (!config.general.allowMapZoom) {
-      setFilteredStateCode?.('')
+      setFilteredStateCode('')
       setFocus({})
       setHasMoved(false)
       resetZoomTransform()

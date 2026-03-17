@@ -376,6 +376,30 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     interactionLabel
   }
 
+  // Memoize data table preparation and county filtering to avoid recomputing on unrelated renders.
+  const { dataTableConfig, dataTableColumns, dataTableRuntimeData } = useMemo(() => {
+    let preparedConfig = config
+    let preparedColumns = columns
+    let preparedRuntimeData = runtimeData
+
+    if (config.smallMultiples?.mode) {
+      const prepared = prepareSmallMultiplesDataTable(config, columns, runtimeData)
+      preparedConfig = prepared.config
+      preparedColumns = prepared.columns
+      preparedRuntimeData = prepared.runtimeData
+    }
+
+    if (config.general.geoType === 'us-county' && filteredStateCode) {
+      preparedRuntimeData = filterCountyTableRuntimeDataByStateCode(preparedRuntimeData, filteredStateCode, config)
+    }
+
+    return {
+      dataTableConfig: preparedConfig,
+      dataTableColumns: preparedColumns,
+      dataTableRuntimeData: preparedRuntimeData
+    }
+  }, [config, columns, runtimeData, filteredStateCode])
+
   if (!config.data) return <></>
 
   const tabId = handleMapTabbing(config, loading, legendId)
@@ -400,21 +424,6 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       {config.dataKey} (Go to Table)
     </a>
   )
-
-  // Prepare data table props (pivot if small multiples mode is enabled)
-  let dataTableConfig = config
-  let dataTableColumns = columns
-  let dataTableRuntimeData = runtimeData
-  if (config.smallMultiples?.mode) {
-    const prepared = prepareSmallMultiplesDataTable(config, columns, runtimeData)
-    dataTableConfig = prepared.config
-    dataTableColumns = prepared.columns
-    dataTableRuntimeData = prepared.runtimeData
-  }
-
-  if (config.general.geoType === 'us-county' && filteredStateCode) {
-    dataTableRuntimeData = filterCountyTableRuntimeDataByStateCode(dataTableRuntimeData, filteredStateCode, config)
-  }
 
   return (
     <LegendMemoProvider legendMemo={legendMemo} legendSpecialClassLastMemo={legendSpecialClassLastMemo}>
