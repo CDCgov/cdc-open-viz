@@ -32,7 +32,7 @@ import Title from '@cdc/core/components/ui/Title'
 import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 
 // images
-import CalloutFlag from './images/callout-flag.svg?url'
+import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 
 // TP5 Style Constants
 const TP5_NODE_WIDTH = 13

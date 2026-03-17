@@ -35,7 +35,7 @@ import dataBiteReducer from './store/db.reducer'
 import { IMAGE_POSITION_LEFT, IMAGE_POSITION_RIGHT, IMAGE_POSITION_TOP, IMAGE_POSITION_BOTTOM } from './constants'
 
 // images
-import CalloutFlag from './images/callout-flag.svg?url'
+import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 
 import {
   DATA_FUNCTION_COUNT,

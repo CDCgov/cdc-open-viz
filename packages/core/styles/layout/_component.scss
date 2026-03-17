@@ -13,7 +13,7 @@
   @include cove-visualization-body-padding;
 
   &.no-borders {
-    border: none !important;
+    border: none;
   }
 
   &:not(.component--hide-background-color) {
@@ -21,7 +21,7 @@
   }
 
   &.component--tp5-treatment {
-    background: transparent !important;
+    background: transparent;
 
     >.cove-visualization__body-wrap {
       padding: 0;
@@ -29,12 +29,12 @@
 
     .cdc-callout {
       box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
-      border: 1px solid #dff2f6 !important;
-      margin: 0 !important;
+      border: 1px solid #dff2f6;
+      margin: 0;
       padding: 1.25rem;
       border-radius: 0.25rem;
       position: relative;
-      background: transparent !important;
+      background: transparent;
 
 
       .cdc-callout__flag {
@@ -47,18 +47,18 @@
 
       .cove-visualization__title,
       .cove-visualization__header {
-        background: transparent !important;
-        border: 0 !important;
-        color: var(--cool-gray-90, #1f2937) !important;
-        margin: 0 0 1rem !important;
-        padding: 0 !important;
-        border-radius: 0 !important;
+        background: transparent;
+        border: 0;
+        color: var(--cool-gray-90, #1f2937);
+        margin: 0 0 1rem;
+        padding: 0;
+        border-radius: 0;
       }
 
       .cove-visualization__title h2,
       .cove-visualization__header h2 {
-        color: var(--cool-gray-90, #1f2937) !important;
-        font-family: var(--fonts-nunito, var(--app-font-secondary)) !important;
+        color: var(--cool-gray-90, #1f2937);
+        font-family: var(--fonts-nunito, var(--app-font-secondary));
         font-size: 1.1rem;
         font-weight: 700;
       }
@@ -69,11 +69,10 @@
 .cove-visualization.type-chart,
 .cove-visualization.type-map {
   .cove-visualization__body.component--tp5-treatment {
-    background: transparent !important;
+    background: transparent;
 
-    .cdc-callout,
     .cdc-callout {
-      background: transparent !important;
+      background: transparent;
     }
   }
 }
