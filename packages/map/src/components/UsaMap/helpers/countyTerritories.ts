@@ -1,4 +1,5 @@
 import { FREELY_ASSOCIATED_STATE_UIDS } from '../../../helpers/freelyAssociatedStateUIDs'
+export { FREELY_ASSOCIATED_STATE_UIDS } from '../../../helpers/freelyAssociatedStateUIDs'
 
 export const COUNTY_TERRITORY_STATE_ID_TO_UID: Record<string, string> = {
   '60': 'US-AS',
