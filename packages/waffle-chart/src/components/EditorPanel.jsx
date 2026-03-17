@@ -20,7 +20,8 @@ import WarningImage from '../images/warning.svg'
 
 import { DATA_OPERATORS, DATA_FUNCTIONS } from '../CdcWaffleChart'
 import { TREND_ARROW_TYPE_LABELS, TREND_ARROW_TYPES } from '@cdc/core/helpers/constants'
-import { TREND_MODE_CATEGORICAL } from '@cdc/core/helpers/trendIndicator'
+import { TREND_MODE_CATEGORICAL, TREND_MODE_NUMERIC } from '@cdc/core/helpers/trendIndicator'
+import { WAFFLE_NUMERIC_ELIGIBLE_FUNCTIONS } from '../helpers/waffleNumericTrend'
 
 const EditorPanel = memo(props => {
   const { config, updateConfig, loading, data, editorData, setParentConfig, isDashboard } = useContext(ConfigContext)
@@ -65,6 +66,7 @@ const EditorPanel = memo(props => {
 
   const trendMode = config.trendIndicator?.mode || ''
   const trendMappings = config.trendIndicator?.mappings || []
+  const isNumericModeEligible = WAFFLE_NUMERIC_ELIGIBLE_FUNCTIONS.has(config.dataFunction)
   const trendColumnValues = useMemo(() => {
     const trendColumn = config.trendIndicator?.column
     if (!trendColumn) return []
@@ -365,47 +367,81 @@ const EditorPanel = memo(props => {
             label='Trend Mode'
             options={[
               { value: '', label: 'Off' },
-              { value: TREND_MODE_CATEGORICAL, label: 'Categorical' }
+              { value: TREND_MODE_CATEGORICAL, label: 'Categorical' },
+              { value: TREND_MODE_NUMERIC, label: 'Numeric' }
             ]}
             onChange={e => setTrendMode(e.target.value)}
           />
-          {trendMode === TREND_MODE_CATEGORICAL && (
+          {trendMode === TREND_MODE_NUMERIC && !isNumericModeEligible && (
+            <p className='cove-accordion__panel-error' style={{ marginBottom: '0.5rem' }}>
+              Numeric mode only supports Sum, Mean (Average), Median, Min, and Max.
+            </p>
+          )}
+          {trendMode && !(trendMode === TREND_MODE_NUMERIC && !isNumericModeEligible) && (
             <>
               <Select
                 value={config.trendIndicator?.column || ''}
                 section='trendIndicator'
                 fieldName='column'
-                label='Trend Column'
+                label={trendMode === TREND_MODE_NUMERIC ? 'Historical Numerator Column' : 'Trend Column'}
                 updateField={updateField}
                 initial='Select'
                 options={columns}
               />
-              <span className='subtext' style={{ marginBottom: '0.75rem' }}>
-                In categorical mode, arrows appear only when filters resolve to exactly one row.
-              </span>
-              {trendColumnValues.map(sourceValue => {
-                const selectedArrowType =
-                  trendMappings.find(mapping => mapping.sourceValue === sourceValue)?.arrowType || ''
-                return (
-                  <div className='cove-accordion__panel-row align-center mb-2' key={sourceValue}>
-                    <div className='cove-accordion__panel-col flex-grow'>{sourceValue}</div>
-                    <div className='cove-accordion__panel-col flex-grow'>
-                      <Select
-                        label=''
-                        value={selectedArrowType}
-                        options={[
-                          { value: '', label: 'No Arrow' },
-                          ...TREND_ARROW_TYPES.map(arrowType => ({
-                            value: arrowType,
-                            label: TREND_ARROW_TYPE_LABELS[arrowType]
-                          }))
-                        ]}
-                        onChange={e => updateTrendMapping(sourceValue, e.target.value)}
-                      />
-                    </div>
-                  </div>
-                )
-              })}
+              {trendMode === TREND_MODE_CATEGORICAL && (
+                <>
+                  <span className='subtext' style={{ marginBottom: '0.75rem' }}>
+                    In categorical mode, arrows appear only when filters resolve to exactly one row.
+                  </span>
+                  {trendColumnValues.map(sourceValue => {
+                    const selectedArrowType =
+                      trendMappings.find(mapping => mapping.sourceValue === sourceValue)?.arrowType || ''
+                    return (
+                      <div className='cove-accordion__panel-row align-center mb-2' key={sourceValue}>
+                        <div className='cove-accordion__panel-col flex-grow'>{sourceValue}</div>
+                        <div className='cove-accordion__panel-col flex-grow'>
+                          <Select
+                            label=''
+                            value={selectedArrowType}
+                            options={[
+                              { value: '', label: 'No Arrow' },
+                              ...TREND_ARROW_TYPES.map(arrowType => ({
+                                value: arrowType,
+                                label: TREND_ARROW_TYPE_LABELS[arrowType]
+                              }))
+                            ]}
+                            onChange={e => updateTrendMapping(sourceValue, e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })}
+                </>
+              )}
+              {trendMode === TREND_MODE_NUMERIC && (
+                <TextField
+                  type='number'
+                  value={config.trendIndicator?.numericThreshold ?? 0}
+                  section='trendIndicator'
+                  fieldName='numericThreshold'
+                  label='Threshold'
+                  updateField={updateField}
+                  min={0}
+                  tooltip={
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                      </Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>
+                          An arrow is shown when the current displayed percentage differs from the historical displayed
+                          percentage by more than this many percentage points.
+                        </p>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  }
+                />
+              )}
             </>
           )}
         </div>
