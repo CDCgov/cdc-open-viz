@@ -258,9 +258,10 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       data: trendDataRows,
       trendIndicator,
       mainDataFunction: dataFunction,
+      mainDataColumn: dataColumn,
       allowNumericMode: true
     })
-  }, [trendIndicator, dataFunction, getRowsForMainNumericCalculation, getFilteredDataRows])
+  }, [trendIndicator, dataFunction, dataColumn, getRowsForMainNumericCalculation, getFilteredDataRows])
 
   const renderTrendArrow = () => {
     if (trendResolution.state !== 'resolved' || !trendResolution.arrowType) {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { DATA_FUNCTION_PASSTHROUGH } from '../constants'
+import { DATA_FUNCTION_MEAN, DATA_FUNCTION_MAX, DATA_FUNCTION_PASSTHROUGH } from '../constants'
 import {
   resolveTrendIndicator,
   TREND_MODE_CATEGORICAL,
@@ -70,102 +70,206 @@ describe('resolveTrendIndicator', () => {
     expect(result.state).toBe('unmapped')
   })
 
-  it('numeric mode resolves up when aggregate is above upThreshold', () => {
+  it('numeric mode resolves up when current aggregate exceeds historical aggregate by threshold', () => {
     const result = resolveTrendIndicator({
-      data: [{ val: 12 }, { val: 9 }],
-      mainDataFunction: 'Mean (Average)',
+      data: [
+        { current: 12, previous: 9 },
+        { current: 10, previous: 8 }
+      ],
+      mainDataFunction: DATA_FUNCTION_MEAN,
+      mainDataColumn: 'current',
       allowNumericMode: true,
       trendIndicator: {
         mode: TREND_MODE_NUMERIC,
-        column: 'val',
-        numericRules: { upThreshold: 9, downThreshold: 4 }
+        column: 'previous',
+        numericThreshold: 1
       }
     })
 
     expect(result).toEqual({ state: 'resolved', arrowType: TREND_ARROW_UP })
   })
 
-  it('numeric mode resolves down when aggregate is below downThreshold', () => {
+  it('numeric mode resolves down when current aggregate trails historical aggregate by threshold', () => {
     const result = resolveTrendIndicator({
-      data: [{ val: 2 }, { val: 3 }],
-      mainDataFunction: 'Mean (Average)',
+      data: [
+        { current: 2, previous: 6 },
+        { current: 4, previous: 8 }
+      ],
+      mainDataFunction: DATA_FUNCTION_MEAN,
+      mainDataColumn: 'current',
       allowNumericMode: true,
       trendIndicator: {
         mode: TREND_MODE_NUMERIC,
-        column: 'val',
-        numericRules: { upThreshold: 10, downThreshold: 4 }
+        column: 'previous',
+        numericThreshold: 1
       }
     })
 
     expect(result).toEqual({ state: 'resolved', arrowType: TREND_ARROW_DOWN })
   })
 
-  it('numeric mode returns unmapped for values between thresholds', () => {
+  it('numeric mode returns unmapped for deltas within threshold band', () => {
     const result = resolveTrendIndicator({
-      data: [{ val: 5 }, { val: 7 }],
-      mainDataFunction: 'Mean (Average)',
+      data: [
+        { current: 8, previous: 7.8 },
+        { current: 8, previous: 8.2 }
+      ],
+      mainDataFunction: DATA_FUNCTION_MEAN,
+      mainDataColumn: 'current',
       allowNumericMode: true,
       trendIndicator: {
         mode: TREND_MODE_NUMERIC,
-        column: 'val',
-        numericRules: { upThreshold: 8, downThreshold: 4 }
+        column: 'previous',
+        numericThreshold: 0.5
       }
     })
 
     expect(result.state).toBe('unmapped')
   })
 
-  it('numeric mode uses strict comparisons and equality resolves to no arrow', () => {
-    const equalToUp = resolveTrendIndicator({
-      data: [{ val: 5 }, { val: 5 }],
-      mainDataFunction: 'Mean (Average)',
+  it('numeric mode with zero threshold resolves up/down from delta sign', () => {
+    const up = resolveTrendIndicator({
+      data: [{ current: 8, previous: 7 }],
+      mainDataFunction: DATA_FUNCTION_MEAN,
+      mainDataColumn: 'current',
       allowNumericMode: true,
       trendIndicator: {
         mode: TREND_MODE_NUMERIC,
-        column: 'val',
-        numericRules: { upThreshold: 5, downThreshold: 0 }
+        column: 'previous',
+        numericThreshold: 0
       }
     })
 
-    const equalToDown = resolveTrendIndicator({
-      data: [{ val: 0 }, { val: 0 }],
-      mainDataFunction: 'Mean (Average)',
+    const down = resolveTrendIndicator({
+      data: [{ current: 7, previous: 8 }],
+      mainDataFunction: DATA_FUNCTION_MEAN,
+      mainDataColumn: 'current',
       allowNumericMode: true,
       trendIndicator: {
         mode: TREND_MODE_NUMERIC,
-        column: 'val',
-        numericRules: { upThreshold: 10, downThreshold: 0 }
+        column: 'previous',
+        numericThreshold: 0
       }
     })
 
-    expect(equalToUp.state).toBe('unmapped')
-    expect(equalToDown.state).toBe('unmapped')
+    expect(up).toEqual({ state: 'resolved', arrowType: TREND_ARROW_UP })
+    expect(down).toEqual({ state: 'resolved', arrowType: TREND_ARROW_DOWN })
   })
 
-  it('numeric mode allows non-ordered thresholds and resolves deterministically', () => {
+  it('numeric mode resolves no arrow when delta equals threshold boundary', () => {
     const result = resolveTrendIndicator({
-      data: [{ val: 8 }],
-      mainDataFunction: 'Max',
+      data: [{ current: 10, previous: 8 }],
+      mainDataFunction: DATA_FUNCTION_MEAN,
+      mainDataColumn: 'current',
       allowNumericMode: true,
       trendIndicator: {
         mode: TREND_MODE_NUMERIC,
-        column: 'val',
-        numericRules: { upThreshold: 7, downThreshold: 9 }
+        column: 'previous',
+        numericThreshold: 2
       }
     })
 
-    expect(result).toEqual({ state: 'resolved', arrowType: TREND_ARROW_UP })
+    expect(result.state).toBe('unmapped')
   })
 
-  it('numeric mode returns invalid when column values are non-numeric', () => {
+  it('numeric mode returns invalid when historical trend column is missing', () => {
     const result = resolveTrendIndicator({
-      data: [{ val: 'N/A' }],
-      mainDataFunction: 'Max',
+      data: [{ current: 10, previous: 8 }],
+      mainDataFunction: DATA_FUNCTION_MEAN,
+      mainDataColumn: 'current',
       allowNumericMode: true,
       trendIndicator: {
         mode: TREND_MODE_NUMERIC,
-        column: 'val',
-        numericRules: { upThreshold: 7, downThreshold: 3 }
+        numericThreshold: 0
+      }
+    })
+
+    expect(result.state).toBe('invalid')
+  })
+
+  it('numeric mode returns invalid when main data column is missing', () => {
+    const result = resolveTrendIndicator({
+      data: [{ current: 10, previous: 8 }],
+      mainDataFunction: DATA_FUNCTION_MEAN,
+      allowNumericMode: true,
+      trendIndicator: {
+        mode: TREND_MODE_NUMERIC,
+        column: 'previous',
+        numericThreshold: 0
+      }
+    })
+
+    expect(result.state).toBe('invalid')
+  })
+
+  it('numeric mode returns invalid when threshold is non-numeric or negative', () => {
+    const nonNumericThreshold = resolveTrendIndicator({
+      data: [{ current: 10, previous: 8 }],
+      mainDataFunction: DATA_FUNCTION_MEAN,
+      mainDataColumn: 'current',
+      allowNumericMode: true,
+      trendIndicator: {
+        mode: TREND_MODE_NUMERIC,
+        column: 'previous',
+        numericThreshold: Number('not-a-number')
+      }
+    })
+
+    const negativeThreshold = resolveTrendIndicator({
+      data: [{ current: 10, previous: 8 }],
+      mainDataFunction: DATA_FUNCTION_MEAN,
+      mainDataColumn: 'current',
+      allowNumericMode: true,
+      trendIndicator: {
+        mode: TREND_MODE_NUMERIC,
+        column: 'previous',
+        numericThreshold: -1
+      }
+    })
+
+    expect(nonNumericThreshold.state).toBe('invalid')
+    expect(negativeThreshold.state).toBe('invalid')
+  })
+
+  it('numeric mode returns invalid when either series has no numeric values', () => {
+    const noCurrentValues = resolveTrendIndicator({
+      data: [{ current: 'N/A', previous: 7 }],
+      mainDataFunction: DATA_FUNCTION_MAX,
+      mainDataColumn: 'current',
+      allowNumericMode: true,
+      trendIndicator: {
+        mode: TREND_MODE_NUMERIC,
+        column: 'previous',
+        numericThreshold: 0
+      }
+    })
+
+    const noComparisonValues = resolveTrendIndicator({
+      data: [{ current: 7, previous: 'N/A' }],
+      mainDataFunction: DATA_FUNCTION_MAX,
+      mainDataColumn: 'current',
+      allowNumericMode: true,
+      trendIndicator: {
+        mode: TREND_MODE_NUMERIC,
+        column: 'previous',
+        numericThreshold: 0
+      }
+    })
+
+    expect(noCurrentValues.state).toBe('invalid')
+    expect(noComparisonValues.state).toBe('invalid')
+  })
+
+  it('numeric mode returns invalid for unsupported data functions', () => {
+    const result = resolveTrendIndicator({
+      data: [{ current: 7, previous: 6 }],
+      mainDataFunction: DATA_FUNCTION_PASSTHROUGH,
+      mainDataColumn: 'current',
+      allowNumericMode: true,
+      trendIndicator: {
+        mode: TREND_MODE_NUMERIC,
+        column: 'previous',
+        numericThreshold: 0
       }
     })
 
