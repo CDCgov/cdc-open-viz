@@ -110,6 +110,7 @@ export const getTopoData = async (year, options: GetTopoDataOptions = {}) => {
 
   return {
     year: year || 'default',
+    includesFreelyAssociatedStates: includeFreelyAssociatedStates,
     fulljson: topoResponse,
     counties,
     states

@@ -114,10 +114,18 @@ const CountyMap = () => {
     }
   })
 
+  const showAvailableTerritories = config.general.showAvailableTerritories ?? true
+  const shouldIncludeFreelyAssociatedStates = useMemo(() => {
+    if (!showAvailableTerritories || !config.data?.length) return false
+    return config.data.some(row => isFreelyAssociatedStateUid(row.uid))
+  }, [config.data, showAvailableTerritories])
+
   useEffect(() => {
     let currentYear = getCurrentTopoYear(config, runtimeFilters)
+    const topoMatchesFreelyAssociatedStates =
+      topoData.includesFreelyAssociatedStates === shouldIncludeFreelyAssociatedStates
 
-    if (currentYear !== topoData.year) {
+    if (currentYear !== topoData.year || !topoMatchesFreelyAssociatedStates) {
       getTopoData(currentYear, {
         includeFreelyAssociatedStates: shouldIncludeFreelyAssociatedStates
       }).then(response => {
@@ -131,7 +139,8 @@ const CountyMap = () => {
   }, [
     config.general.countyCensusYear,
     config.general.filterControlsCountyYear,
-    JSON.stringify(runtimeFilters)
+    JSON.stringify(runtimeFilters),
+    shouldIncludeFreelyAssociatedStates
   ])
 
   // Whenever the memo at the top is triggered and the map is called to re-render, call drawCanvas and update
@@ -168,11 +177,6 @@ const CountyMap = () => {
 
   const runtimeKeys = runtimeData ? Object.keys(runtimeData) : []
   const lineWidth = 1
-  const showAvailableTerritories = config.general.showAvailableTerritories ?? true
-  const shouldIncludeFreelyAssociatedStates = useMemo(() => {
-    if (!showAvailableTerritories || !config.data?.length) return false
-    return config.data.some(row => isFreelyAssociatedStateUid(row.uid))
-  }, [config.data, showAvailableTerritories])
 
   // Pre-compute Path2D objects for all geo features — avoids expensive geoPath projection on every zoom frame
   const buildPathCache = () => {
