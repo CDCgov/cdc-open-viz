@@ -48,7 +48,7 @@ import generateRuntimeData from './helpers/generateRuntimeData'
 import { reloadURLData } from './helpers/urlDataHelpers'
 import { observeMapSvgLoaded } from './helpers/mapObserverHelpers'
 import { buildBodyWrapClassNames, buildSectionClassNames } from './helpers/componentHelpers'
-import { shouldShowDataTable, filterCountyTableRuntimeDataByStateFips } from './helpers/dataTableHelpers'
+import { shouldShowDataTable, filterCountyTableRuntimeDataByStateCode } from './helpers/dataTableHelpers'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 
 // Child Components
@@ -118,7 +118,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     modal,
     accessibleStatus,
     filteredCountryCode,
-    filteredStateFIPSCode,
+    filteredStateCode,
     position,
     scale,
     translate,
@@ -350,7 +350,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     customNavigationHandler,
     dimensions,
     filteredCountryCode,
-    filteredStateFIPSCode,
+    filteredStateCode,
     isDashboard,
     isEditor,
     logo,
@@ -362,8 +362,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeLegend,
     scale,
     setConfig,
-    setFilteredStateFIPSCode: (stateFips: string) =>
-      dispatch({ type: 'SET_FILTERED_STATE_FIPS_CODE', payload: stateFips }),
+    setFilteredStateCode: (stateCode: string) => dispatch({ type: 'SET_FILTERED_STATE_CODE', payload: stateCode }),
     setSharedFilter,
     setSharedFilterValue,
     config,
@@ -413,8 +412,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     dataTableRuntimeData = prepared.runtimeData
   }
 
-  if (config.general.geoType === 'us-county' && filteredStateFIPSCode) {
-    dataTableRuntimeData = filterCountyTableRuntimeDataByStateFips(dataTableRuntimeData, filteredStateFIPSCode)
+  if (config.general.geoType === 'us-county' && filteredStateCode) {
+    dataTableRuntimeData = filterCountyTableRuntimeDataByStateCode(dataTableRuntimeData, filteredStateCode, config)
   }
 
   return (

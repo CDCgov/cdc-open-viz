@@ -148,7 +148,7 @@ const CountyMap = () => {
     runtimeFilters,
     runtimeLegend,
     setConfig,
-    setFilteredStateFIPSCode,
+    setFilteredStateCode,
     config,
     tooltipId,
     tooltipRef,
@@ -332,7 +332,7 @@ const CountyMap = () => {
       ...config,
       mapPosition: { coordinates: [0, 30], zoom: 1 }
     })
-    setFilteredStateFIPSCode?.('')
+    setFilteredStateCode?.('')
     setFocus({})
     resetZoomTransform()
   }
@@ -444,7 +444,7 @@ const CountyMap = () => {
           ...config,
           mapPosition: { coordinates: [0, 30], zoom: 3 }
         })
-        setFilteredStateFIPSCode?.(clickedState.id)
+        setFilteredStateCode?.(clickedState.id)
 
         let focusIndex = -1
         for (let i = 0; i < topoData.mapData.length; i++) {
@@ -591,8 +591,8 @@ const CountyMap = () => {
           // Track hover analytics event if this is a new location
           if (isNaN(currentTooltipIndex) || currentTooltipIndex !== countyIndex) {
             const countyName = displayGeoName(county.id).replace(/[^a-zA-Z0-9]/g, ' ')
-            const stateFips = county.id.slice(0, 2)
-            const stateName = supportedStatesFipsCodes[stateFips]?.replace(/[^a-zA-Z0-9]/g, '_') || 'unknown'
+            const stateCode = county.id.slice(0, 2)
+            const stateName = supportedStatesFipsCodes[stateCode]?.replace(/[^a-zA-Z0-9]/g, '_') || 'unknown'
             const locationName = `${countyName}, ${stateName}`
             publishAnalyticsEvent({
               vizType: config.type,
@@ -909,7 +909,7 @@ const CountyMap = () => {
 
   useEffect(() => {
     if (!config.general.allowMapZoom) {
-      setFilteredStateFIPSCode?.('')
+      setFilteredStateCode?.('')
       setFocus({})
       setHasMoved(false)
       resetZoomTransform()
