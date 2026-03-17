@@ -205,12 +205,35 @@
 }
 
 .cove-visualization {
+  .cove-visualization__body,
+  .cove-visualization__body-wrap,
+  .cove-visualization__message-section,
+  .cove-visualization__content-section,
+  .cove-visualization__body-subtext-section,
+  .cove-visualization__body-footer-section,
+  .cove-visualization__subtext-section {
+    color: var(--baseColor);
+    font-family: var(--visualization-body-font-family, var(--app-font-main));
+    line-height: var(--visualization-body-line-height, 1.5);
+  }
+
   .cove-visualization__content-section,
   .cove-visualization__message-section,
   .cove-visualization__body-subtext-section,
   .cove-visualization__body-footer-section,
   .cove-visualization__subtext-section {
     width: 100%;
+  }
+
+  .cove-visualization__message-section,
+  .cove-visualization__content-section {
+    font-size: var(--visualization-body-font-size, 1rem);
+  }
+
+  .cove-visualization__body-subtext-section,
+  .cove-visualization__body-footer-section,
+  .cove-visualization__subtext-section {
+    font-size: var(--visualization-meta-font-size, 0.889rem);
   }
 
   .cove-visualization__body-wrap > :first-child {

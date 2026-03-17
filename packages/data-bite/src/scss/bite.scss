@@ -97,7 +97,7 @@
     background: transparent !important;
   }
 
-  > .cove-visualization__body-wrap {
+  >.cove-visualization__body-wrap {
     padding: 0 !important;
   }
 
@@ -222,9 +222,6 @@
       height: auto;
     }
 
-    .cdc-callout__content {
-      font-size: 1rem;
-    }
 
     .bite-subtext {
       margin-top: auto; // Push to bottom on desktop

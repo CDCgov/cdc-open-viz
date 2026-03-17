@@ -123,6 +123,10 @@ $colors: (
   --title-font-size: 1.222rem;
   --territory-label-font-size: 0.809rem;
   --territory-label-font-size-mobile: 0.556rem;
+  --visualization-body-font-family: var(--app-font-main);
+  --visualization-body-font-size: 1rem;
+  --visualization-meta-font-size: 0.889rem;
+  --visualization-body-line-height: 1.5;
   // Transitions
   --transition-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
