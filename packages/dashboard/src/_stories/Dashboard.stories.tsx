@@ -4083,6 +4083,96 @@ export const Equal_Height_Mixed_Viz_Row: Story = {
   }
 }
 
+const mixedHeightMarkupIncludeKey = 'mixed-height-markup-include-story'
+const Mixed_Height_Content_Row_Config = cloneDeep(TP5TestConfig)
+
+Mixed_Height_Content_Row_Config.dashboard = {
+  theme: 'theme-blue',
+  sharedFilters: []
+}
+
+Mixed_Height_Content_Row_Config.visualizations.bite1 = {
+  ...Mixed_Height_Content_Row_Config.visualizations.bite1,
+  title: 'Short data bite',
+  biteBody: 'Adults met the sample prevention target.',
+  subtext: 'Brief note.'
+}
+
+Mixed_Height_Content_Row_Config.visualizations.waffle2 = {
+  ...Mixed_Height_Content_Row_Config.visualizations.waffle2,
+  title: 'Medium waffle chart',
+  content: 'completed the sample prevention checklist across the reporting period',
+  subtext: 'Adds a second line of explanatory context without matching the markup include height.'
+}
+
+Mixed_Height_Content_Row_Config.visualizations[mixedHeightMarkupIncludeKey] = {
+  uid: mixedHeightMarkupIncludeKey,
+  type: 'markup-include',
+  visualizationType: 'markup-include',
+  filters: [],
+  filterBehavior: 'Filter Change',
+  openModal: false,
+  showEditorPanel: false,
+  theme: 'theme-orange',
+  contentEditor: {
+    title: 'Long markup include',
+    titleStyle: 'small',
+    showHeader: true,
+    srcUrl: '#example',
+    useInlineHTML: true,
+    allowHideSection: false,
+    showNoDataMessage: false,
+    inlineHTML: `
+      <p>This markup include is intentionally longer than the neighboring data bite and waffle chart.</p>
+      <p>Use it to validate mixed dashboard rows where cards should keep their natural heights instead of being normalized.</p>
+      <ul>
+        <li>Short card: data bite</li>
+        <li>Medium card: waffle chart</li>
+        <li>Long card: markup include</li>
+      </ul>
+    `
+  },
+  visual: {
+    border: true,
+    accent: true,
+    background: true,
+    hideBackgroundColor: false,
+    borderColorTheme: true
+  }
+}
+
+Mixed_Height_Content_Row_Config.rows = [
+  {
+    equalHeight: false,
+    columns: [
+      { width: 4, widget: 'bite1' },
+      { width: 4, widget: 'waffle2' },
+      { width: 4, widget: mixedHeightMarkupIncludeKey }
+    ]
+  }
+]
+
+export const Mixed_Viz_Different_Heights_Row: Story = {
+  args: {
+    config: Mixed_Height_Content_Row_Config,
+    isEditor: false
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Demonstrates a dashboard row with intentionally uneven data-bite, waffle-chart, and markup-include content heights.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('.cove-markup-include', canvasElement)
+    await waitForPresence('.cove-waffle-chart, .cove-gauge-chart', canvasElement)
+    await waitForPresence('.bite, .cdc-callout', canvasElement)
+  }
+}
+
 const sleep = ms => {
   return new Promise(r => setTimeout(r, ms))
 }

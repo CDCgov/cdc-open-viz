@@ -323,9 +323,21 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       [class*='col-'] {
         display: flex !important;
         flex-direction: column !important;
+        flex: 1 1 auto !important;
         align-items: stretch !important;
+        min-height: 0 !important;
 
-        >.cove-visualization {
+        > * {
+          display: flex !important;
+          flex-direction: column !important;
+          flex: 1 1 auto !important;
+          align-items: stretch !important;
+          min-height: 0 !important;
+          width: 100% !important;
+        }
+
+        .collapsable-multiviz-container,
+        .cove-visualization {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
@@ -367,6 +379,49 @@ button.row-menu__btn[title*='Equal Height Rows'] {
             min-height: 0 !important;
             width: 100% !important;
           }
+        }
+
+        .bite,
+        .bite-content-container,
+        .bite-content,
+        .bite-content__text-wrap,
+        .cdc-callout,
+        .cdc-callout__content {
+          display: flex !important;
+          flex-direction: column !important;
+          flex: 1 1 auto !important;
+          min-height: 0 !important;
+        }
+
+        .cdc-callout__body {
+          flex: 1 1 auto !important;
+          min-height: 0 !important;
+        }
+
+        .cove-visualization__body.bite__style--tp5 > .cove-visualization__body-wrap {
+          display: flex !important;
+          flex-direction: column !important;
+          flex: 1 1 auto !important;
+          min-height: 0 !important;
+        }
+
+        .cove-visualization__body.bite__style--tp5 > .cove-visualization__body-wrap > .cdc-callout {
+          display: flex !important;
+          flex-direction: column !important;
+          flex: 1 1 auto !important;
+          min-height: 100% !important;
+        }
+
+        .cove-visualization__body.bite__style--tp5 .cdc-callout__body {
+          display: flex !important;
+          flex: 1 1 auto !important;
+          align-items: stretch !important;
+          min-height: 0 !important;
+        }
+
+        .cove-visualization__body.bite__style--tp5 .cdc-callout__content {
+          flex: 1 1 auto !important;
+          min-height: 0 !important;
         }
       }
     }

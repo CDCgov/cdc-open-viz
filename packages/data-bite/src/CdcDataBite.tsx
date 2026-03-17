@@ -29,6 +29,7 @@ import { publish } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
 import { Config } from './types/Config'
 import dataBiteReducer from './store/db.reducer'
 import { IMAGE_POSITION_LEFT, IMAGE_POSITION_RIGHT, IMAGE_POSITION_TOP, IMAGE_POSITION_BOTTOM } from './constants'
@@ -75,18 +76,29 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   // Ensure imageData and dataFormat sub-fields are always defined before the reducer initializes.
   // Defaults must match initial-state.js — updateConfig() will enforce them again once loading completes.
   const safeConfigObj = {
+    ...defaults,
     ...configObj,
     imageData: {
+      ...defaults.imageData,
       ...(configObj?.imageData || {}),
       display: configObj?.imageData?.display ?? 'none',
       prefix: configObj?.imageData?.prefix ?? ''
     },
     dataFormat: {
+      ...defaults.dataFormat,
       ...(configObj?.dataFormat || {}),
       prefix: configObj?.dataFormat?.prefix ?? '',
       suffix: configObj?.dataFormat?.suffix ?? '%',
       roundToPlace: configObj?.dataFormat?.roundToPlace ?? 0,
       commas: configObj?.dataFormat?.commas ?? true
+    },
+    visual: {
+      ...defaults.visual,
+      ...(configObj?.visual || {})
+    },
+    general: {
+      ...defaults.general,
+      ...(configObj?.general || {})
     }
   }
 
@@ -130,12 +142,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   })
 
   const updateConfig = newConfig => {
-    // Deeper copy
-    Object.keys(defaults).forEach(key => {
-      if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
-        newConfig[key] = { ...defaults[key], ...newConfig[key] }
-      }
-    })
+    backfillDefaults(newConfig, defaults)
 
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {}
@@ -481,10 +488,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   }
 
   let body = <Loading />
+  const isCompactStyle = config.general?.isCompactStyle ?? false
   const bodySubtext =
-    subtext && !config.general.isCompactStyle ? (
-      <p className='bite-subtext'>{parse(processContentWithMarkup(subtext))}</p>
-    ) : null
+    subtext && !isCompactStyle ? <p className='bite-subtext'>{parse(processContentWithMarkup(subtext))}</p> : null
 
   const DataImage = useCallback(() => {
     let operators = {
@@ -687,7 +693,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                 {showBite && <div className='cdc-callout__databite flex-shrink-0  me-3'>{calculateDataBite(true)}</div>}
                 <div className='cdc-callout__content flex-grow-1 d-flex flex-column  min-w-0'>
                   <p className='mb-0'>{parse(processContentWithMarkup(biteBody))}</p>
-                  {subtext && !config.general.isCompactStyle && (
+                  {subtext && !isCompactStyle && (
                     <p className='bite-subtext fst-italic flex-shrink-0 mt-3'>
                       {parse(processContentWithMarkup(subtext))}
                     </p>
