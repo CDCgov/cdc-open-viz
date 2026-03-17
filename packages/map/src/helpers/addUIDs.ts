@@ -14,8 +14,8 @@ import {
 } from './../data/supported-geos'
 
 import { SUPPORTED_DC_NAMES, GEO_TYPES, GEOCODE_TYPES } from './constants'
+import { FREELY_ASSOCIATED_STATE_UIDS } from './freelyAssociatedStateUIDs'
 import { DataRow, MapConfig } from '../types/MapConfig'
-import { FREELY_ASSOCIATED_STATE_UIDS } from '../../../../components/UsaMap/helpers/countyTerritories'
 
 // Note: Key arrays are now imported from supported-geos for better performance
 

@@ -1,3 +1,5 @@
+import { FREELY_ASSOCIATED_STATE_UIDS } from '../../../helpers/freelyAssociatedStateUIDs'
+
 export const COUNTY_TERRITORY_STATE_ID_TO_UID: Record<string, string> = {
   '60': 'US-AS',
   '66': 'US-GU',
@@ -7,7 +9,6 @@ export const COUNTY_TERRITORY_STATE_ID_TO_UID: Record<string, string> = {
 }
 
 export const COUNTY_TERRITORY_UIDS = Object.values(COUNTY_TERRITORY_STATE_ID_TO_UID)
-export const FREELY_ASSOCIATED_STATE_UIDS = ['US-FM', 'US-MH', 'US-PW']
 
 export const COUNTY_TERRITORY_GROUPS = [
   { territoryId: 'US-AS', stateId: '60', group: 'territory' },
