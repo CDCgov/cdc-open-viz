@@ -49,7 +49,7 @@ import {
   DATA_FUNCTION_RANGE,
   DATA_FUNCTION_SUM
 } from '@cdc/core/helpers/constants'
-import { resolveTrendIndicator, TREND_MODE_NUMERIC } from '@cdc/core/helpers/trendIndicator'
+import { resolveTrendIndicator, TREND_MODE_CATEGORICAL, TREND_MODE_NUMERIC } from '@cdc/core/helpers/trendIndicator'
 
 // styles
 import './scss/main.scss'
@@ -59,6 +59,7 @@ type CdcDataBiteProps = {
   configUrl: string
   isDashboard: boolean
   isEditor: boolean
+  rawData?: Record<string, any>[]
   setConfig: () => {}
   link: any
   interactionLabel: string
@@ -70,6 +71,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     config: configObj,
     isDashboard = false,
     isEditor = false,
+    rawData = [],
     setConfig: setParentConfig,
     link,
     interactionLabel = ''
@@ -248,7 +250,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
   const trendResolution = useMemo(() => {
     const mode = trendIndicator?.mode
-    const trendDataRows = mode === TREND_MODE_NUMERIC ? getRowsForMainNumericCalculation() : getFilteredDataRows()
+    const shouldUseMainCalculationRows =
+      mode === TREND_MODE_NUMERIC || (mode === TREND_MODE_CATEGORICAL && dataFunction === DATA_FUNCTION_PASSTHROUGH)
+    const trendDataRows = shouldUseMainCalculationRows ? getRowsForMainNumericCalculation() : getFilteredDataRows()
 
     return resolveTrendIndicator({
       data: trendDataRows,
@@ -809,7 +813,16 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
   return (
     <Context.Provider
-      value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, isEditor }}
+      value={{
+        config,
+        updateConfig,
+        loading,
+        data: config.data,
+        editorData: isDashboard && isEditor && Array.isArray(rawData) && rawData.length ? rawData : config.data,
+        setParentConfig,
+        isDashboard,
+        isEditor
+      }}
     >
       {biteStyle !== 'gradient' && (
         <VisualizationContainer

@@ -23,7 +23,7 @@ import { TREND_ARROW_TYPE_LABELS, TREND_ARROW_TYPES } from '@cdc/core/helpers/co
 import { TREND_MODE_CATEGORICAL } from '@cdc/core/helpers/trendIndicator'
 
 const EditorPanel = memo(props => {
-  const { config, updateConfig, loading, data, setParentConfig, isDashboard } = useContext(ConfigContext)
+  const { config, updateConfig, loading, data, editorData, setParentConfig, isDashboard } = useContext(ConfigContext)
   const { showConfigConfirm } = props
   const inputSelectStyle = condition => (condition ? { backgroundColor: '#ffd2d2', color: '#d8000c' } : {})
 
@@ -69,8 +69,9 @@ const EditorPanel = memo(props => {
     const trendColumn = config.trendIndicator?.column
     if (!trendColumn) return []
 
+    const trendSourceData = Array.isArray(editorData) && editorData.length ? editorData : data
     const uniqueValues = new Set()
-    data?.forEach(row => {
+    trendSourceData?.forEach(row => {
       const value = row?.[trendColumn]
       if (value !== undefined && value !== null) {
         uniqueValues.add(String(value))
@@ -78,7 +79,7 @@ const EditorPanel = memo(props => {
     })
 
     return Array.from(uniqueValues).sort()
-  }, [data, config.trendIndicator?.column])
+  }, [editorData, data, config.trendIndicator?.column])
 
   const setTrendMode = mode => {
     updateConfig({
@@ -356,6 +357,58 @@ const EditorPanel = memo(props => {
             />
           </div>
         </>
+        <hr className='cove-accordion__divider' />
+        <div className='checkbox-group'>
+          <h4 style={{ fontWeight: '600', marginTop: 0 }}>Trend Indicator</h4>
+          <Select
+            value={trendMode}
+            label='Trend Mode'
+            options={[
+              { value: '', label: 'Off' },
+              { value: TREND_MODE_CATEGORICAL, label: 'Categorical' }
+            ]}
+            onChange={e => setTrendMode(e.target.value)}
+          />
+          {trendMode === TREND_MODE_CATEGORICAL && (
+            <>
+              <Select
+                value={config.trendIndicator?.column || ''}
+                section='trendIndicator'
+                fieldName='column'
+                label='Trend Column'
+                updateField={updateField}
+                initial='Select'
+                options={columns}
+              />
+              <span className='subtext' style={{ marginBottom: '0.75rem' }}>
+                In categorical mode, arrows appear only when filters resolve to exactly one row.
+              </span>
+              {trendColumnValues.map(sourceValue => {
+                const selectedArrowType =
+                  trendMappings.find(mapping => mapping.sourceValue === sourceValue)?.arrowType || ''
+                return (
+                  <div className='cove-accordion__panel-row align-center mb-2' key={sourceValue}>
+                    <div className='cove-accordion__panel-col flex-grow'>{sourceValue}</div>
+                    <div className='cove-accordion__panel-col flex-grow'>
+                      <Select
+                        label=''
+                        value={selectedArrowType}
+                        options={[
+                          { value: '', label: 'No Arrow' },
+                          ...TREND_ARROW_TYPES.map(arrowType => ({
+                            value: arrowType,
+                            label: TREND_ARROW_TYPE_LABELS[arrowType]
+                          }))
+                        ]}
+                        onChange={e => updateTrendMapping(sourceValue, e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )
+              })}
+            </>
+          )}
+        </div>
         <label style={{ marginBottom: '1rem' }}>
           <span className='edit-label'>
             Data Point Filters
@@ -411,59 +464,6 @@ const EditorPanel = memo(props => {
         <Button onClick={addNewFilter} fluid>
           Add Filter
         </Button>
-        <hr className='cove-accordion__divider' />
-        <h4 style={{ fontWeight: '600' }}>Trend Indicator</h4>
-        <Select
-          value={trendMode}
-          label='Trend Mode'
-          options={[
-            { value: '', label: 'Off' },
-            { value: TREND_MODE_CATEGORICAL, label: 'Categorical' }
-          ]}
-          onChange={e => setTrendMode(e.target.value)}
-        />
-        {trendMode === TREND_MODE_CATEGORICAL && (
-          <>
-            <Select
-              value={config.trendIndicator?.column || ''}
-              section='trendIndicator'
-              fieldName='column'
-              label='Trend Column'
-              updateField={updateField}
-              initial='Select'
-              options={columns}
-            />
-            <p style={{ marginBottom: '0.75rem' }}>
-              Arrow appears only when filters/conditions resolve to exactly one row/value.
-            </p>
-            {trendColumnValues.length === 0 && (
-              <p style={{ marginBottom: '0.75rem' }}>No values found in the selected trend column.</p>
-            )}
-            {trendColumnValues.map(sourceValue => {
-              const selectedArrowType =
-                trendMappings.find(mapping => mapping.sourceValue === sourceValue)?.arrowType || ''
-              return (
-                <div className='cove-accordion__panel-row align-center mb-2' key={sourceValue}>
-                  <div className='cove-accordion__panel-col flex-grow'>{sourceValue}</div>
-                  <div className='cove-accordion__panel-col flex-grow'>
-                    <Select
-                      label=''
-                      value={selectedArrowType}
-                      options={[
-                        { value: '', label: 'No Arrow' },
-                        ...TREND_ARROW_TYPES.map(arrowType => ({
-                          value: arrowType,
-                          label: TREND_ARROW_TYPE_LABELS[arrowType]
-                        }))
-                      ]}
-                      onChange={e => updateTrendMapping(sourceValue, e.target.value)}
-                    />
-                  </div>
-                </div>
-              )
-            })}
-          </>
-        )}
       </Accordion.Section>
       {config.visualizationType !== 'Gauge' && config.visualizationType !== 'TP5 Gauge' && (
         <Accordion.Section title='Chart Settings'>
