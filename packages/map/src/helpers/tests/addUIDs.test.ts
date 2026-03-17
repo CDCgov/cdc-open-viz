@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { addUIDs } from '../addUIDs'
 
-const buildCountyConfig = (data: Array<Record<string, string | number>>) =>
+const buildCountyConfig = (data: Array<Record<string, string | number>>, type = 'data') =>
   ({
     general: {
       displayAsHex: false,
       geoType: 'us-county',
-      type: 'data'
+      type
     },
     columns: {
       geo: {
@@ -51,5 +51,22 @@ describe('addUIDs', () => {
     addUIDs(config, 'Location')
 
     expect(config.data[0].uid).toBeUndefined()
+  })
+
+  it('preserves raw geo values for county us-geocode rows to avoid uid collisions', () => {
+    const config = buildCountyConfig(
+      [
+        { Location: 'Alabama', latitude: 32.4, longitude: -86.3, Value: 12 },
+        { Location: 'Alabama', latitude: 33.5, longitude: -87.4, Value: 18 }
+      ],
+      'us-geocode'
+    )
+    config.columns.latitude.name = 'latitude'
+    config.columns.longitude.name = 'longitude'
+
+    addUIDs(config, 'Location')
+
+    expect(config.data[0].uid).toBe('Alabama')
+    expect(config.data[1].uid).toBe('Alabama')
   })
 })

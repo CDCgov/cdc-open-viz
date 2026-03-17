@@ -149,9 +149,7 @@ export const addUIDs = (configObj: MapConfig, fromColumn: string) => {
 
       case GEO_TYPES.US_COUNTY:
       case GEO_TYPES.SINGLE_STATE:
-        if (geocodeType === GEOCODE_TYPES.US) {
-          uid = handleUSLocation(row, geo.name, displayAsHex)
-        } else {
+        if (geocodeType !== GEOCODE_TYPES.US) {
           uid = handleCountyLocation(row, geo.name)
           if (!uid) {
             uid = handleCountyTerritoryLocation(row, geo.name)
