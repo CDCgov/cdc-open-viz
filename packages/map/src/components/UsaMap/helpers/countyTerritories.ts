@@ -1,5 +1,6 @@
-import { FREELY_ASSOCIATED_STATE_UIDS } from '../../../helpers/freelyAssociatedStateUIDs'
+import { FREELY_ASSOCIATED_STATE_UIDS, isFreelyAssociatedStateUid } from '../../../helpers/freelyAssociatedStateUIDs'
 export { FREELY_ASSOCIATED_STATE_UIDS } from '../../../helpers/freelyAssociatedStateUIDs'
+export { isFreelyAssociatedStateUid } from '../../../helpers/freelyAssociatedStateUIDs'
 
 export const COUNTY_TERRITORY_STATE_ID_TO_UID: Record<string, string> = {
   '60': 'US-AS',
@@ -31,7 +32,7 @@ const countyTerritoryStateIds = new Set([
 export const getCountyTerritoryUidForCountyId = (countyId?: string): string | undefined => {
   if (!countyId) return undefined
 
-  if (FREELY_ASSOCIATED_STATE_UIDS.includes(countyId)) {
+  if (isFreelyAssociatedStateUid(countyId)) {
     return countyId
   }
 
@@ -41,7 +42,7 @@ export const getCountyTerritoryUidForCountyId = (countyId?: string): string | un
 
 export const isCountyTerritoryCountyId = (countyId?: string): boolean => {
   if (!countyId) return false
-  if (FREELY_ASSOCIATED_STATE_UIDS.includes(countyId)) return true
+  if (isFreelyAssociatedStateUid(countyId)) return true
   return countyTerritoryPrefixes.has(String(countyId).slice(0, 2))
 }
 

@@ -26,7 +26,7 @@ const geoLookups: Record<string, GeoLookup> = {
   country: { keys: countryKeys, data: supportedCountries }
 }
 
-const COUNTY_TERRITORY_DIRECT_UIDS = new Set(FREELY_ASSOCIATED_STATE_UIDS)
+const COUNTY_TERRITORY_DIRECT_UIDS = new Set<string>(FREELY_ASSOCIATED_STATE_UIDS)
 
 const memoizedFindUID = (
   geoName: string,

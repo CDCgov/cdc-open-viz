@@ -8,7 +8,7 @@ import {
   COUNTY_TERRITORY_GROUPS,
   getCountyTerritoryUidForCountyId,
   COUNTY_TERRITORY_UIDS,
-  FREELY_ASSOCIATED_STATE_UIDS
+  isFreelyAssociatedStateUid
 } from '../helpers/countyTerritories'
 import './CountyTerritoriesSection.styles.css'
 
@@ -72,7 +72,7 @@ const CountyTerritoriesSection: React.FC<CountyTerritoriesSectionProps> = ({
     const groups = sectionGroups.filter(group =>
       heading === 'territories'
         ? COUNTY_TERRITORY_UIDS.includes(group.territoryId)
-        : FREELY_ASSOCIATED_STATE_UIDS.includes(group.territoryId)
+        : isFreelyAssociatedStateUid(group.territoryId)
     )
     const dimensions = GROUP_DIMENSIONS[heading]
 
