@@ -6,6 +6,7 @@ export const getMapContainerClasses = (state: MapConfig, modal) => {
 
   let mapContainerClasses = [
     'map-container',
+    'visualization-container',
     state.legend?.position,
     state.general.type,
     state.general.geoType,

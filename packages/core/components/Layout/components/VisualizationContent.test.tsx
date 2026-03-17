@@ -69,6 +69,18 @@ describe('VisualizationContent', () => {
     expect(message).toHaveClass('mb-4')
   })
 
+  it('applies the introText wrapper class when requested', () => {
+    const { container } = render(
+      <VisualizationContent message={<div data-testid='message'>Message</div>} messageIsIntroText>
+        <div>Wrapped content</div>
+      </VisualizationContent>
+    )
+
+    const message = container.querySelector('.cove-visualization__message')
+
+    expect(message).toHaveClass('introText')
+  })
+
   it('renders subtext content inside the body after the body-wrap', () => {
     const { container } = render(
       <VisualizationContent subtext={<div data-testid='subtext'>Subtext</div>}>
@@ -83,6 +95,39 @@ describe('VisualizationContent', () => {
     expect(screen.getByTestId('subtext')).toBeInTheDocument()
     expect(body?.firstElementChild).toBe(bodyWrap)
     expect(body?.lastElementChild).toBe(subtext)
+  })
+
+  it('renders body subtext content inside the body-wrap after the wrapped content', () => {
+    const { container } = render(
+      <VisualizationContent bodySubtext={<div data-testid='body-subtext'>Body Subtext</div>}>
+        <div>Wrapped content</div>
+      </VisualizationContent>
+    )
+
+    const bodyWrap = container.querySelector('.cove-visualization__body-wrap')
+    const bodySubtext = container.querySelector('.cove-visualization__body-subtext-section')
+
+    expect(screen.getByTestId('body-subtext')).toBeInTheDocument()
+    expect(bodyWrap?.lastElementChild).toBe(bodySubtext)
+  })
+
+  it('renders body footer content inside the body-wrap after body subtext', () => {
+    const { container } = render(
+      <VisualizationContent
+        bodySubtext={<div data-testid='body-subtext'>Body Subtext</div>}
+        bodyFooter={<div data-testid='body-footer'>Body Footer</div>}
+      >
+        <div>Wrapped content</div>
+      </VisualizationContent>
+    )
+
+    const bodyWrap = container.querySelector('.cove-visualization__body-wrap')
+    const bodySubtext = container.querySelector('.cove-visualization__body-subtext-section')
+    const bodyFooter = container.querySelector('.cove-visualization__body-footer-section')
+
+    expect(screen.getByTestId('body-footer')).toBeInTheDocument()
+    expect(bodyWrap?.children[1]).toBe(bodySubtext)
+    expect(bodyWrap?.lastElementChild).toBe(bodyFooter)
   })
 
   it('passes through non-class inner div props, including refs', () => {

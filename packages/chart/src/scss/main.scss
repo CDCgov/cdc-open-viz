@@ -24,7 +24,7 @@
     background: transparent !important;
   }
 
-  .cove-visualization__body.component--tp5-treatment > .cove-visualization__body-wrap.cdc-callout.tp5-chart-callout {
+  .cove-visualization__body.component--tp5-treatment>.cove-visualization__body-wrap.cdc-callout.tp5-chart-callout {
     background: transparent !important;
   }
 
@@ -66,10 +66,6 @@
   .chart-description {
     margin-bottom: 20px;
   }
-
-  .subtext,
-  .subtext--responsive-ticks,
-  .section-subtext {}
 
   .type-pie {
     svg.animated-pie {
@@ -284,7 +280,7 @@
     position: relative;
   }
 
-  .chart-container {
+  .visualization-container {
     display: flex;
     align-items: flex-start;
     flex-wrap: wrap;
@@ -296,8 +292,8 @@
       min-width: 0;
       max-width: 100%;
 
-      > div,
-      > aside {
+      >div,
+      >aside {
         min-width: 0;
         max-width: 100%;
       }
@@ -468,8 +464,17 @@
     }
   }
 
+  .cove-visualization__body-wrap:has(> .cove-visualization__message-section) .visualization-container {
+    padding-top: 1.5rem;
+  }
+
+  .visualization-container:has(+ .subtext),
+  .visualization-container:has(+ .subtext--responsive-ticks) {
+    padding-bottom: 1.5rem;
+  }
+
   @include breakpointClass(sm) {
-    .chart-container {
+    .visualization-container {
       .no-wrap {
         flex-wrap: nowrap;
       }
@@ -495,7 +500,7 @@
   }
 
   @include breakpointClass(md) {
-    .chart-container {
+    .visualization-container {
       >svg {
         font-size: 16px;
         width: 75%;
@@ -679,11 +684,11 @@
 }
 
 .cove-visualization.type-chart.type-sparkline {
-  &.lg .chart-container>svg {
+  &.lg .visualization-container>svg {
     width: 100%;
   }
 
-  .chart-container.sparkline {
+  .visualization-container.sparkline {
     display: flex !important;
     flex-wrap: wrap !important;
   }

@@ -22,7 +22,7 @@
   }
 
   @include breakpointClass(md) {
-    .map-container.modal-background::before {
+    .visualization-container.modal-background::before {
       border-bottom: var(--lightGray) 1px solid;
       margin-bottom: -1px;
       bottom: 1px;
@@ -130,7 +130,7 @@
     border: 0;
   }
 
-  .map-container {
+  .visualization-container {
     display: flex;
     position: relative;
     flex-direction: column;
@@ -225,6 +225,10 @@
         }
       }
     }
+  }
+
+  .cove-visualization__body-wrap:has(> .cove-visualization__message-section) .visualization-container {
+    padding-top: 1.5rem;
   }
 
   p.subtext {
