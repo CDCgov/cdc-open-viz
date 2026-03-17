@@ -1,6 +1,5 @@
 import { feature } from 'topojson-client'
 import usExtendedGeography from './../data/us-extended-geography.json'
-import worldTopo from '../../WorldMap/data/world-topo.json'
 
 type TopoTransform = {
   scale: [number, number]
@@ -33,45 +32,17 @@ const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
 }
 
-const WORLD_TO_FAS_UID = {
-  FSM: 'US-FM',
-  MHL: 'US-MH',
-  PLW: 'US-PW'
-} as const
+let freelyAssociatedStatesTopoPromise: Promise<FreelyAssociatedStatesTopology> | undefined
 
-export const buildFreelyAssociatedStatesTopoFromWorld = () => {
-  const worldObject = worldTopo.objects.Cove_World_Map_2026_corr
-  const geometries = worldObject.geometries
-    .filter(geometry => geometry.properties?.GENC_3A_CO && WORLD_TO_FAS_UID[geometry.properties.GENC_3A_CO])
-    .map(geometry => ({
-      ...geometry,
-      id: WORLD_TO_FAS_UID[geometry.properties.GENC_3A_CO],
-      properties: {
-        ...geometry.properties,
-        name: geometry.properties.SHORT_FORM
-      }
-    }))
+export const getFreelyAssociatedStatesTopo = async (): Promise<FreelyAssociatedStatesTopology> => {
+  if (!freelyAssociatedStatesTopoPromise) {
+    freelyAssociatedStatesTopoPromise = import(
+      /* webpackChunkName: "freely-associated-states-topo" */ './../data/freely-associated-states-topo.json'
+    ).then(module => module.default as FreelyAssociatedStatesTopology)
+  }
 
-  return {
-    type: 'Topology',
-    transform: worldTopo.transform,
-    arcs: worldTopo.arcs,
-    objects: {
-      states: {
-        type: 'GeometryCollection',
-        geometries
-      },
-      counties: {
-        type: 'GeometryCollection',
-        geometries: geometries.map(geometry => ({
-          ...geometry
-        }))
-      }
-    }
-  } as FreelyAssociatedStatesTopology
+  return freelyAssociatedStatesTopoPromise
 }
-
-const freelyAssociatedStatesTopo: FreelyAssociatedStatesTopology = buildFreelyAssociatedStatesTopoFromWorld()
 
 export const getTopoData = year => {
   return new Promise((resolve, reject) => {
@@ -81,6 +52,8 @@ export const getTopoData = year => {
       } else {
         response = await response.json()
       }
+
+      const freelyAssociatedStatesTopo = await getFreelyAssociatedStatesTopo()
 
       const counties = [response, usExtendedGeography]
         .flatMap(topo => feature(topo, topo.objects.counties).features)

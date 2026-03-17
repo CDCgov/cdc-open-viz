@@ -318,6 +318,7 @@ export const CountyAvailableTerritoriesTypeTests: Story = {
 
     await waitForEditor(canvas)
     await waitForPresence('.map-container', canvasElement)
+    await waitForPresence('.county-territories-section', canvasElement)
     await openAccordion(canvas, 'Type')
 
     const territoriesCheckbox = canvas.getByLabelText(/Show Available Territories/i) as HTMLInputElement

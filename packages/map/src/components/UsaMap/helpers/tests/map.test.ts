@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { feature } from 'topojson-client'
 import worldTopo from '../../../WorldMap/data/world-topo.json'
-import { buildFreelyAssociatedStatesTopoFromWorld, type FreelyAssociatedStatesTopology } from '../map'
+import freelyAssociatedStatesTopo from '../../data/freely-associated-states-topo.json'
+import { type FreelyAssociatedStatesTopology } from '../map'
 
-describe('buildFreelyAssociatedStatesTopoFromWorld', () => {
-  it('borrows FAS geometries from world-topo and remaps them to county-map IDs', () => {
-    const topo = buildFreelyAssociatedStatesTopoFromWorld()
-    const states = feature(topo as FreelyAssociatedStatesTopology, topo.objects.states).features
+describe('freely-associated-states-topo.json', () => {
+  it('contains the expected FAS county-map IDs', () => {
+    const states = feature(
+      freelyAssociatedStatesTopo as FreelyAssociatedStatesTopology,
+      freelyAssociatedStatesTopo.objects.states
+    ).features
     const fipsIds = states
       .filter(stateFeature => ['US-FM', 'US-MH', 'US-PW'].includes(stateFeature.id))
       .map(stateFeature => stateFeature.id)
@@ -15,11 +18,10 @@ describe('buildFreelyAssociatedStatesTopoFromWorld', () => {
     expect(fipsIds).toEqual(['US-FM', 'US-MH', 'US-PW'])
   })
 
-  it('uses the same world-topo geometry for Micronesia that the world map already trusts', () => {
-    const borrowedTopo = buildFreelyAssociatedStatesTopoFromWorld()
+  it('preserves the trusted Micronesia geometry from world-topo', () => {
     const borrowedFeatures = feature(
-      borrowedTopo as FreelyAssociatedStatesTopology,
-      borrowedTopo.objects.states
+      freelyAssociatedStatesTopo as FreelyAssociatedStatesTopology,
+      freelyAssociatedStatesTopo.objects.states
     ).features
     const borrowedMicronesia = borrowedFeatures.find(geo => geo.id === 'US-FM')
     const worldFeatures = feature(worldTopo, worldTopo.objects.Cove_World_Map_2026_corr).features

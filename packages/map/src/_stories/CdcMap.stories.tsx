@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, expect } from 'storybook/test'
 import CdcMap from '../CdcMap'
-import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
 import EqualNumberOptInExample from './_mock/DEV-7286.json'
 import EqualNumberMap from './_mock/equal-number.json'
 import MultiState from './_mock/multi-state.json'
@@ -220,6 +220,7 @@ export const County_Map_Available_Territories: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+    await waitForPresence('.county-territories-section', canvasElement)
 
     const section = canvasElement.querySelector('.county-territories-section')
     expect(section).toBeInTheDocument()

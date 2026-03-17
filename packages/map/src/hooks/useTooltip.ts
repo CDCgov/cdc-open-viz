@@ -1,9 +1,10 @@
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import { displayGeoName } from '../helpers/displayGeoName'
 
+const COUNTY_FIPS_PATTERN = /^\d{5}$/
+
 const useTooltip = props => {
   const { config, supportedStatesFipsCodes } = props
-  const countyFipsPattern = /^\d{5}$/
 
   /**
    * On county maps there's a need to append the state name
@@ -15,7 +16,7 @@ const useTooltip = props => {
     const { geoType, type, hideGeoColumnInTooltip } = config.general
     if (geoType === 'us-county' && type !== 'us-geocode') {
       const geoValue = String(row?.[config.columns.geo.name] || '')
-      if (!countyFipsPattern.test(geoValue)) {
+      if (!COUNTY_FIPS_PATTERN.test(geoValue)) {
         return toolTipText
       }
 
@@ -48,7 +49,9 @@ const useTooltip = props => {
           toolTipText = 'State: '
           break
         case 'us-county':
-          toolTipText = countyFipsPattern.test(String(row?.[config.columns.geo.name] || '')) ? 'County: ' : 'Location: '
+          toolTipText = COUNTY_FIPS_PATTERN.test(String(row?.[config.columns.geo.name] || ''))
+            ? 'County: '
+            : 'Location: '
           break
         case 'single-state':
           toolTipText = 'County: '
