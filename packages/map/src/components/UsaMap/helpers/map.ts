@@ -91,18 +91,22 @@ const loadCountyTopoResponse = async requestedYear => {
   }
 }
 
-export const getTopoData = async year => {
+type GetTopoDataOptions = {
+  includeFreelyAssociatedStates?: boolean
+}
+
+export const getTopoData = async (year, options: GetTopoDataOptions = {}) => {
+  const { includeFreelyAssociatedStates = false } = options
   const requestedYear = getRequestedCountyTopoYear(year)
   const topoResponse = await loadCountyTopoResponse(requestedYear)
+  const topoSources = [topoResponse, usExtendedGeography]
 
-  const freelyAssociatedStatesTopo = await getFreelyAssociatedStatesTopo()
+  if (includeFreelyAssociatedStates) {
+    topoSources.push(await getFreelyAssociatedStatesTopo())
+  }
 
-  const counties = [topoResponse, usExtendedGeography]
-    .flatMap(topo => feature(topo, topo.objects.counties).features)
-    .concat(feature(freelyAssociatedStatesTopo, freelyAssociatedStatesTopo.objects.counties).features)
-  const states = [topoResponse, usExtendedGeography]
-    .flatMap(topo => feature(topo, topo.objects.states).features)
-    .concat(feature(freelyAssociatedStatesTopo, freelyAssociatedStatesTopo.objects.states).features)
+  const counties = topoSources.flatMap(topo => feature(topo, topo.objects.counties).features)
+  const states = topoSources.flatMap(topo => feature(topo, topo.objects.states).features)
 
   return {
     year: year || 'default',

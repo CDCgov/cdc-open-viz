@@ -114,7 +114,7 @@ const CountyMap = () => {
     let currentYear = getCurrentTopoYear(config, runtimeFilters)
 
     if (currentYear !== topoData.year) {
-      getTopoData(currentYear).then(response => {
+      getTopoData(currentYear, { includeFreelyAssociatedStates: true }).then(response => {
         if (canvasRef.current) {
           const context = canvasRef.current.getContext('2d')
           context.clearRect(canvasRef.current.width, canvasRef.current.height)

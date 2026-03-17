@@ -593,7 +593,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
             <div
               ref={tooltipRef}
               id={`tooltip__${tooltipId}-canvas`}
-              className='tooltip'
+              className='tooltip tooltip--canvas'
               style={{
                 background: `rgba(255,255,255,${config.tooltips.opacity / 100})`,
                 position: 'absolute',
