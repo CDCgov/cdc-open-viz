@@ -4881,4 +4881,419 @@ export const Tab_Simple_Filter: Story = {
   }
 }
 
+const EqualHeightThreeRowsConfig = {
+  type: 'dashboard',
+  data: [
+    {
+      Category: 'Adults',
+      Rate: '68.5',
+      Target: '80.0',
+      Screened: '72.8',
+      Location: 'Alabama',
+      Year: '2021',
+      Type: 'State',
+      Amount: 1454
+    },
+    {
+      Category: 'Seniors',
+      Rate: '82.3',
+      Target: '90.0',
+      Screened: '84.6',
+      Location: 'Alaska',
+      Year: '2021',
+      Type: 'State',
+      Amount: 1690
+    },
+    {
+      Category: 'Youth',
+      Rate: '54.2',
+      Target: '70.0',
+      Screened: '65.3',
+      Location: 'Arizona',
+      Year: '2021',
+      Type: 'State',
+      Amount: 1572
+    }
+  ],
+  dashboard: { theme: 'theme-blue', sharedFilters: [] },
+  rows: [
+    {
+      equalHeight: true,
+      columns: [
+        { width: 4, widget: 'row1-bite' },
+        { width: 4, widget: 'row1-markup' },
+        { width: 4, widget: 'row1-waffle' }
+      ]
+    },
+    {
+      equalHeight: true,
+      columns: [
+        { width: 4, widget: 'row2-waffle' },
+        { width: 4, widget: 'row2-bite' },
+        { width: 4, widget: 'row2-markup' }
+      ]
+    },
+    {
+      equalHeight: true,
+      columns: [
+        { width: 4, widget: 'row3-markup' },
+        { width: 4, widget: 'row3-waffle' },
+        { width: 4, widget: 'row3-bite' }
+      ]
+    },
+    {
+      equalHeight: true,
+      columns: [
+        { width: 4, widget: 'row4-chart' },
+        { width: 4, widget: 'row4-map' },
+        { width: 4, widget: 'row4-bite' }
+      ]
+    },
+    {
+      equalHeight: true,
+      columns: [
+        { width: 4, widget: 'row5-bite' },
+        { width: 4, widget: 'row5-waffle' },
+        { width: 4, widget: 'row5-markup' }
+      ]
+    }
+  ],
+  table: { label: 'Data Table', show: false },
+  visualizations: {
+    'row1-bite': {
+      uid: 'row1-bite',
+      type: 'data-bite',
+      title: 'Vaccination Coverage',
+      biteStyle: 'tp5',
+      dataColumn: 'Rate',
+      dataFunction: 'Mean (Average)',
+      biteBody: 'of adults received the seasonal flu vaccine.',
+      subtext: 'Based on 2024 CDC surveillance data.',
+      dataFormat: { roundToPlace: 1, commas: true, prefix: '', suffix: '%' },
+      theme: 'theme-blue',
+      visual: { hideBackgroundColor: false }
+    },
+    'row1-markup': {
+      uid: 'row1-markup',
+      type: 'markup-include',
+      visualizationType: 'markup-include',
+      filters: [],
+      filterBehavior: 'Filter Change',
+      openModal: false,
+      showEditorPanel: false,
+      theme: 'theme-blue',
+      contentEditor: {
+        title: 'About Vaccination Data',
+        titleStyle: 'small',
+        showHeader: true,
+        srcUrl: '#example',
+        useInlineHTML: true,
+        allowHideSection: false,
+        showNoDataMessage: false,
+        inlineHTML: `
+          <p>This section provides context for the vaccination coverage metrics shown in this row.</p>
+          <p>Data is collected annually from a nationally representative household survey. Results are weighted to reflect the U.S. adult population aged 18 and older.</p>
+        `
+      },
+      visual: { border: true, accent: true, background: true, hideBackgroundColor: false, borderColorTheme: false }
+    },
+    'row1-waffle': {
+      uid: 'row1-waffle',
+      type: 'waffle-chart',
+      title: 'Flu Vaccination Rate',
+      visualizationType: 'TP5 Waffle',
+      visualizationSubType: 'linear',
+      showPercent: true,
+      showDenominator: false,
+      content: 'of adults vaccinated.',
+      subtext: '',
+      dataColumn: 'Rate',
+      dataFunction: 'Mean (Average)',
+      customDenom: false,
+      dataDenom: '100',
+      suffix: '%',
+      roundToPlace: '1',
+      theme: 'theme-blue',
+      shape: 'square',
+      visual: { whiteBackground: false },
+      showTitle: true,
+      overallFontSize: 'medium'
+    },
+    'row2-waffle': {
+      uid: 'row2-waffle',
+      type: 'waffle-chart',
+      title: 'Health Insurance Coverage',
+      visualizationType: 'TP5 Waffle',
+      visualizationSubType: 'linear',
+      showPercent: true,
+      showDenominator: false,
+      content: 'of seniors have health insurance coverage through Medicare, Medicaid, or a private insurer.',
+      subtext: 'Includes all government and private plan types reported in the survey.',
+      dataColumn: 'Target',
+      dataFunction: 'Mean (Average)',
+      customDenom: false,
+      dataDenom: '100',
+      suffix: '%',
+      roundToPlace: '1',
+      theme: 'theme-teal',
+      shape: 'person',
+      visual: { whiteBackground: false },
+      showTitle: true,
+      overallFontSize: 'medium'
+    },
+    'row2-bite': {
+      uid: 'row2-bite',
+      type: 'data-bite',
+      title: 'Insurance Target Met',
+      biteStyle: 'tp5',
+      dataColumn: 'Target',
+      dataFunction: 'Mean (Average)',
+      biteBody:
+        'average insurance coverage target across all age groups, exceeding the Healthy People 2030 benchmark of 92.5%. Results reflect multi-year trend data collected from the National Health Interview Survey.',
+      subtext: 'Source: NHIS 2024.',
+      dataFormat: { roundToPlace: 1, commas: true, prefix: '', suffix: '%' },
+      theme: 'theme-teal',
+      visual: { hideBackgroundColor: false }
+    },
+    'row2-markup': {
+      uid: 'row2-markup',
+      type: 'markup-include',
+      visualizationType: 'markup-include',
+      filters: [],
+      filterBehavior: 'Filter Change',
+      openModal: false,
+      showEditorPanel: false,
+      theme: 'theme-teal',
+      contentEditor: {
+        title: 'Coverage Notes',
+        titleStyle: 'small',
+        showHeader: true,
+        srcUrl: '#example',
+        useInlineHTML: true,
+        allowHideSection: false,
+        showNoDataMessage: false,
+        inlineHTML: `<p>Short note about coverage methodology.</p>`
+      },
+      visual: { border: true, accent: true, background: true, hideBackgroundColor: false, borderColorTheme: false }
+    },
+    'row3-markup': {
+      uid: 'row3-markup',
+      type: 'markup-include',
+      visualizationType: 'markup-include',
+      filters: [],
+      filterBehavior: 'Filter Change',
+      openModal: false,
+      showEditorPanel: false,
+      theme: 'theme-purple',
+      contentEditor: {
+        title: 'Cancer Screening Background',
+        titleStyle: 'small',
+        showHeader: true,
+        srcUrl: '#example',
+        useInlineHTML: true,
+        allowHideSection: false,
+        showNoDataMessage: false,
+        inlineHTML: `
+          <p>Cancer screening completion rates reflect the percentage of eligible adults who completed recommended preventive screenings during the reporting period.</p>
+          <p>Recommended screenings tracked in this dashboard include:</p>
+          <ul>
+            <li>Mammography (women aged 40–74)</li>
+            <li>Colonoscopy or FOBT (adults aged 45–75)</li>
+            <li>Cervical cancer screening via Pap smear or HPV co-test (women aged 21–65)</li>
+            <li>Lung cancer low-dose CT (high-risk adults aged 50–80)</li>
+          </ul>
+          <p>All rates are age-adjusted to the 2000 U.S. standard population.</p>
+        `
+      },
+      visual: { border: true, accent: true, background: true, hideBackgroundColor: false, borderColorTheme: false }
+    },
+    'row3-waffle': {
+      uid: 'row3-waffle',
+      type: 'waffle-chart',
+      title: 'Cancer Screening Completion',
+      visualizationType: 'TP5 Waffle',
+      visualizationSubType: 'linear',
+      showPercent: true,
+      showDenominator: false,
+      content: 'completed at least one recommended cancer screening in the past 12 months.',
+      subtext: 'Data from NHIS 2024.',
+      dataColumn: 'Screened',
+      dataFunction: 'Mean (Average)',
+      customDenom: false,
+      dataDenom: '100',
+      suffix: '%',
+      roundToPlace: '1',
+      theme: 'theme-purple',
+      shape: 'circle',
+      visual: { whiteBackground: false },
+      showTitle: true,
+      overallFontSize: 'medium'
+    },
+    'row3-bite': {
+      uid: 'row3-bite',
+      type: 'data-bite',
+      title: 'Screening Rate',
+      biteStyle: 'tp5',
+      dataColumn: 'Screened',
+      dataFunction: 'Mean (Average)',
+      biteBody: '',
+      subtext: '',
+      dataFormat: { roundToPlace: 1, commas: true, prefix: '', suffix: '%' },
+      theme: 'theme-purple',
+      visual: { hideBackgroundColor: false }
+    },
+    'row4-bite': {
+      uid: 'row4-bite',
+      type: 'data-bite',
+      title: 'Average Amount',
+      biteStyle: 'tp5',
+      dataColumn: 'Amount',
+      dataFunction: 'Mean (Average)',
+      biteBody:
+        'average value across the three-state comparison set used to validate equal-height behavior with chart and map cards in the same row.',
+      subtext: 'Synthetic dashboard story data.',
+      dataFormat: { roundToPlace: 0, commas: true, prefix: '', suffix: '' },
+      theme: 'theme-blue',
+      visual: { hideBackgroundColor: false }
+    },
+    'row5-bite': {
+      uid: 'row5-bite',
+      type: 'data-bite',
+      title: 'Legacy Screening Summary',
+      biteStyle: 'title',
+      bitePosition: 'Top',
+      dataColumn: 'Screened',
+      dataFunction: 'Mean (Average)',
+      biteBody:
+        'of respondents completed at least one recommended screening, with a longer explanatory sentence to make this legacy card taller than its neighbors before equal-height normalization.',
+      subtext: 'Legacy data bite layout.',
+      dataFormat: { roundToPlace: 1, commas: true, prefix: '', suffix: '%' },
+      theme: 'theme-purple',
+      visual: {
+        border: true,
+        accent: true,
+        background: true,
+        hideBackgroundColor: false,
+        borderColorTheme: false
+      }
+    },
+    'row5-waffle': {
+      uid: 'row5-waffle',
+      type: 'waffle-chart',
+      title: 'Legacy Waffle',
+      visualizationType: 'Waffle',
+      visualizationSubType: 'linear',
+      showPercent: true,
+      showDenominator: false,
+      content: 'of adults completed the standard prevention checklist.',
+      subtext: 'Standard waffle layout for equal-height validation.',
+      dataColumn: 'Rate',
+      dataFunction: 'Mean (Average)',
+      customDenom: false,
+      dataDenom: '100',
+      suffix: '%',
+      roundToPlace: '1',
+      theme: 'theme-purple',
+      shape: 'square',
+      visual: {
+        border: true,
+        accent: true,
+        background: true,
+        hideBackgroundColor: false,
+        borderColorTheme: false
+      },
+      showTitle: true,
+      overallFontSize: 'medium'
+    },
+    'row5-markup': {
+      uid: 'row5-markup',
+      type: 'markup-include',
+      visualizationType: 'markup-include',
+      filters: [],
+      filterBehavior: 'Filter Change',
+      openModal: false,
+      showEditorPanel: false,
+      theme: 'theme-purple',
+      contentEditor: {
+        title: 'Legacy Markup Include',
+        titleStyle: 'small',
+        showHeader: true,
+        srcUrl: '#example',
+        useInlineHTML: true,
+        allowHideSection: false,
+        showNoDataMessage: false,
+        inlineHTML: `
+          <p>This legacy markup include is paired with a non-TP5 data bite and a standard waffle chart.</p>
+          <p>Its content length is intentionally different so the equal-height row has to normalize three legacy card layouts in the same row.</p>
+        `
+      },
+      visual: { border: true, accent: true, background: true, hideBackgroundColor: false, borderColorTheme: false }
+    }
+  }
+}
+
+const equalHeightChartTemplate = cloneDeep(EqualHeightMixedVizConfig.visualizations.chart1699383531543)
+const equalHeightMapTemplate = cloneDeep(EqualHeightMixedVizConfig.visualizations.map1699383540561)
+
+if (equalHeightChartTemplate) {
+  EqualHeightThreeRowsConfig.visualizations['row4-chart'] = {
+    ...equalHeightChartTemplate,
+    uid: 'row4-chart',
+    title: 'Average Amount by State',
+    showTitle: true,
+    theme: 'theme-blue',
+    filters: [],
+    dashboardFilters: [],
+    xAxis: {
+      ...equalHeightChartTemplate.xAxis,
+      dataKey: 'Location'
+    },
+    series: [
+      {
+        dataKey: 'Amount',
+        type: 'Bar',
+        axis: 'Left',
+        tooltip: true
+      }
+    ]
+  }
+}
+
+if (equalHeightMapTemplate) {
+  EqualHeightThreeRowsConfig.visualizations['row4-map'] = {
+    ...equalHeightMapTemplate,
+    uid: 'row4-map',
+    filters: [],
+    theme: 'theme-blue',
+    general: {
+      ...equalHeightMapTemplate.general,
+      title: 'State Amount Map',
+      showTitle: true
+    }
+  }
+}
+
+export const Equal_Height_Data_Bite_Markup_Waffle: Story = {
+  args: {
+    config: EqualHeightThreeRowsConfig as unknown as Config,
+    isEditor: false
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Five equal-height rows mixing TP5 and non-TP5 data-bite, markup-include, waffle-chart, chart, and map. Tests that equal-height normalization works across multiple visualization types with intentionally uneven content lengths.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    await waitForPresence('.cove-markup-include', canvasElement)
+    await waitForPresence('.cove-waffle-chart, .cove-gauge-chart', canvasElement)
+    await waitForPresence('.bite, .cdc-callout', canvasElement)
+    await waitForPresence('.cove-chart', canvasElement)
+    await waitForPresence('.cdc-open-viz-module.type-map', canvasElement)
+  }
+}
+
 export default meta

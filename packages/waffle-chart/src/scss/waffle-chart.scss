@@ -135,9 +135,18 @@
 // TP5 Style for Waffle Chart
 .type-waffle-chart {
   &.waffle__style--tp5 {
-    .cove-visualization__body {
+    .cove-visualization__body,
+    .cove-visualization__body.component--has-legacy-border,
+    .cove-visualization__body.component--has-border-color-theme,
+    .cove-visualization__body.component--has-background,
+    .cove-visualization__body.component--has-accent {
+      padding: 0 !important;
       background: none !important;
       container-type: inline-size;
+
+      > .cove-visualization__body-wrap {
+        padding: 0 !important;
+      }
     }
 
     .cdc-callout {
@@ -220,8 +229,17 @@
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
-      .cove-visualization__body {
+      .cove-visualization__body,
+      .cove-visualization__body.component--has-legacy-border,
+      .cove-visualization__body.component--has-border-color-theme,
+      .cove-visualization__body.component--has-background,
+      .cove-visualization__body.component--has-accent {
+        padding: 0 !important;
         background: white !important;
+
+        > .cove-visualization__body-wrap {
+          padding: 0 !important;
+        }
       }
 
       .cdc-callout {
@@ -234,9 +252,18 @@
 
   // TP5 Style for Gauge Chart
   &.gauge__style--tp5 {
-    .cove-visualization__body {
+    .cove-visualization__body,
+    .cove-visualization__body.component--has-legacy-border,
+    .cove-visualization__body.component--has-border-color-theme,
+    .cove-visualization__body.component--has-background,
+    .cove-visualization__body.component--has-accent {
+      padding: 0 !important;
       background: none !important;
       container-type: inline-size;
+
+      > .cove-visualization__body-wrap {
+        padding: 0 !important;
+      }
     }
 
     .cdc-callout {
@@ -329,8 +356,17 @@
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
-      .cove-visualization__body {
+      .cove-visualization__body,
+      .cove-visualization__body.component--has-legacy-border,
+      .cove-visualization__body.component--has-border-color-theme,
+      .cove-visualization__body.component--has-background,
+      .cove-visualization__body.component--has-accent {
+        padding: 0 !important;
         background: white !important;
+
+        > .cove-visualization__body-wrap {
+          padding: 0 !important;
+        }
       }
 
       .cdc-callout {

@@ -16,6 +16,7 @@ type VisualizationContentProps = {
   message?: React.ReactNode
   messageClassName?: string
   messageIsIntroText?: boolean
+  subtext?: React.ReactNode
 }
 
 const VisualizationContent = ({
@@ -63,8 +64,8 @@ const VisualizationContent = ({
             <section className='cove-visualization__body-subtext-section'>{bodySubtext}</section>
           ) : null}
           {bodyFooter ? <section className='cove-visualization__body-footer-section'>{bodyFooter}</section> : null}
-          {subtext ? <section className='cove-visualization__subtext-section'>{subtext}</section> : null}
         </div>
+        {subtext ? <section className='cove-visualization__subtext-section'>{subtext}</section> : null}
       </div>
       {footer}
     </div>

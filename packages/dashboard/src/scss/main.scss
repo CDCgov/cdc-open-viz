@@ -398,28 +398,75 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           min-height: 0 !important;
         }
 
-        .cove-visualization__body.bite__style--tp5 > .cove-visualization__body-wrap {
+        .cove-visualization .cove-visualization__body.bite__style--tp5 > .cove-visualization__body-wrap {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
           min-height: 0 !important;
         }
 
-        .cove-visualization__body.bite__style--tp5 > .cove-visualization__body-wrap > .cdc-callout {
+        .cove-visualization .cove-visualization__body.bite__style--tp5 > .cove-visualization__body-wrap > .cove-visualization__content-section {
+          display: flex !important;
+          flex-direction: column !important;
+          flex: 1 1 auto !important;
+          min-height: 0 !important;
+          width: 100% !important;
+        }
+
+        .cove-visualization
+          .cove-visualization__body.bite__style--tp5
+          > .cove-visualization__body-wrap
+          > .cove-visualization__content-section
+          > .cdc-callout {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
           min-height: 100% !important;
+          width: 100% !important;
         }
 
-        .cove-visualization__body.bite__style--tp5 .cdc-callout__body {
+        .cove-visualization.waffle__style--tp5 .cove-visualization__body > .cove-visualization__body-wrap,
+        .cove-visualization.gauge__style--tp5 .cove-visualization__body > .cove-visualization__body-wrap {
+          display: flex !important;
+          flex-direction: column !important;
+          flex: 1 1 auto !important;
+          min-height: 0 !important;
+        }
+
+        .cove-visualization.waffle__style--tp5 .cove-visualization__body > .cove-visualization__body-wrap > .cove-visualization__content-section,
+        .cove-visualization.gauge__style--tp5 .cove-visualization__body > .cove-visualization__body-wrap > .cove-visualization__content-section {
+          display: flex !important;
+          flex-direction: column !important;
+          flex: 1 1 auto !important;
+          min-height: 0 !important;
+          width: 100% !important;
+        }
+
+        .cove-visualization.waffle__style--tp5
+          .cove-visualization__body
+          > .cove-visualization__body-wrap
+          > .cove-visualization__content-section
+          > .cdc-callout,
+        .cove-visualization.gauge__style--tp5
+          .cove-visualization__body
+          > .cove-visualization__body-wrap
+          > .cove-visualization__content-section
+          > .cdc-callout {
+          display: flex !important;
+          flex-direction: column !important;
+          flex: 1 1 auto !important;
+          min-height: 100% !important;
+          width: 100% !important;
+        }
+
+        .cove-visualization .cove-visualization__body.bite__style--tp5 .cdc-callout__body {
           display: flex !important;
           flex: 1 1 auto !important;
           align-items: stretch !important;
           min-height: 0 !important;
         }
 
-        .cove-visualization__body.bite__style--tp5 .cdc-callout__content {
+        .cove-visualization .cove-visualization__body.bite__style--tp5 .cdc-callout__content {
           flex: 1 1 auto !important;
           min-height: 0 !important;
         }

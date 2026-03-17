@@ -172,8 +172,13 @@
   // TP5 Style (default: callout with blue background)
   &.bite__style--tp5 {
     border: none !important;
+    padding: 0 !important;
     background: none !important;
     container-type: inline-size;
+
+    > .cove-visualization__body-wrap {
+      padding: 0 !important;
+    }
 
     .cdc-callout {
       gap: 0.7rem;
@@ -241,7 +246,12 @@
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
+      padding: 0 !important;
       background: white;
+
+      > .cove-visualization__body-wrap {
+        padding: 0 !important;
+      }
 
       .cdc-callout {
         border: 1px solid #009ec1 !important;
