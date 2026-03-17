@@ -131,8 +131,7 @@ const CountyMap = () => {
   }, [
     config.general.countyCensusYear,
     config.general.filterControlsCountyYear,
-    JSON.stringify(runtimeFilters),
-    shouldIncludeFreelyAssociatedStates
+    JSON.stringify(runtimeFilters)
   ])
 
   // Whenever the memo at the top is triggered and the map is called to re-render, call drawCanvas and update
