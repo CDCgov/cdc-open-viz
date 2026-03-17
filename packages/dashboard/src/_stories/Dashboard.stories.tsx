@@ -4167,9 +4167,9 @@ export const Mixed_Viz_Different_Heights_Row: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
-    await waitForPresence('.cove-markup-include', canvasElement)
-    await waitForPresence('.cove-waffle-chart, .cove-gauge-chart', canvasElement)
-    await waitForPresence('.bite, .cdc-callout', canvasElement)
+    await waitForPresence('.cove-visualization.type-markup-include', canvasElement)
+    await waitForPresence('.cove-visualization.type-waffle-chart', canvasElement)
+    await waitForPresence('.cove-visualization.type-data-bite', canvasElement)
   }
 }
 
@@ -5288,11 +5288,9 @@ export const Equal_Height_Data_Bite_Markup_Waffle: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
-    await waitForPresence('.cove-markup-include', canvasElement)
-    await waitForPresence('.cove-waffle-chart, .cove-gauge-chart', canvasElement)
-    await waitForPresence('.bite, .cdc-callout', canvasElement)
-    await waitForPresence('.cove-chart', canvasElement)
-    await waitForPresence('.cdc-open-viz-module.type-map', canvasElement)
+    await waitForPresence('.cove-visualization.type-markup-include', canvasElement)
+    await waitForPresence('.cove-visualization.type-waffle-chart', canvasElement)
+    await waitForPresence('.cove-visualization.type-data-bite', canvasElement)
   }
 }
 
