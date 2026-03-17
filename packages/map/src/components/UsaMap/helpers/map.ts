@@ -34,12 +34,16 @@ const getCountyTopoURL = year => {
 
 let freelyAssociatedStatesTopoPromise: Promise<FreelyAssociatedStatesTopology> | undefined
 
+const normalizeJsonModule = <T>(module: T | { default: T }): T => {
+  return ((module as { default?: T }).default ?? module) as T
+}
+
 export const getFreelyAssociatedStatesTopo = async (): Promise<FreelyAssociatedStatesTopology> => {
   if (!freelyAssociatedStatesTopoPromise) {
     freelyAssociatedStatesTopoPromise = import(
       /* webpackChunkName: "freely-associated-states-topo" */ './../data/freely-associated-states-topo.json'
     )
-      .then(module => module.default as FreelyAssociatedStatesTopology)
+      .then(module => normalizeJsonModule<FreelyAssociatedStatesTopology>(module))
       .catch(error => {
         freelyAssociatedStatesTopoPromise = undefined
         throw error
@@ -50,7 +54,7 @@ export const getFreelyAssociatedStatesTopo = async (): Promise<FreelyAssociatedS
 }
 
 const getRequestedCountyTopoYear = year => {
-  const numericYear = parseInt(year)
+  const numericYear = parseInt(year, 10)
 
   if (isNaN(numericYear)) return 2019
   if (numericYear > 2022) return 2022
@@ -73,13 +77,23 @@ const getRequestedCountyTopoYear = year => {
   }
 }
 
+const loadLocalCountyTopo = async () => {
+  const module = await import(/* webpackChunkName: "cb_2019_us_county_20m" */ './../data/cb_2019_us_county_20m.json')
+  return normalizeJsonModule(module)
+}
+
+const loadCountyTopoResponse = async requestedYear => {
+  try {
+    const response = await fetch(getCountyTopoURL(requestedYear))
+    return response.status !== 200 ? await loadLocalCountyTopo() : await response.json()
+  } catch {
+    return loadLocalCountyTopo()
+  }
+}
+
 export const getTopoData = async year => {
   const requestedYear = getRequestedCountyTopoYear(year)
-  const response = await fetch(getCountyTopoURL(requestedYear))
-  const topoResponse =
-    response.status !== 200
-      ? await import(/* webpackChunkName: "cb_2019_us_county_20m" */ './../data/cb_2019_us_county_20m.json')
-      : await response.json()
+  const topoResponse = await loadCountyTopoResponse(requestedYear)
 
   const freelyAssociatedStatesTopo = await getFreelyAssociatedStatesTopo()
 
