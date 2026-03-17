@@ -15,6 +15,7 @@ import {
 
 import { SUPPORTED_DC_NAMES, GEO_TYPES, GEOCODE_TYPES } from './constants'
 import { DataRow, MapConfig } from '../types/MapConfig'
+import { FREELY_ASSOCIATED_STATE_UIDS } from '../../../../components/UsaMap/helpers/countyTerritories'
 
 // Note: Key arrays are now imported from supported-geos for better performance
 
@@ -25,7 +26,7 @@ const geoLookups: Record<string, GeoLookup> = {
   country: { keys: countryKeys, data: supportedCountries }
 }
 
-const COUNTY_TERRITORY_DIRECT_UIDS = new Set(['US-FM', 'US-MH', 'US-PW'])
+const COUNTY_TERRITORY_DIRECT_UIDS = new Set(FREELY_ASSOCIATED_STATE_UIDS)
 
 const memoizedFindUID = (
   geoName: string,
