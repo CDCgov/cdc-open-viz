@@ -38,6 +38,15 @@ export default {
   general: {
     isCompactStyle: false
   },
+  trendIndicator: {
+    mode: null,
+    column: '',
+    numericRules: {
+      upThreshold: 0,
+      downThreshold: 0
+    },
+    mappings: []
+  },
   markupVariables: [],
   enableMarkupVariables: false
 }

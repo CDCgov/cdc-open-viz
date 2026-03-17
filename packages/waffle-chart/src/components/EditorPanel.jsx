@@ -1,4 +1,4 @@
-import React, { useEffect, memo, useContext } from 'react'
+import React, { useEffect, useMemo, memo, useContext } from 'react'
 
 import ConfigContext from '../ConfigContext'
 
@@ -19,6 +19,8 @@ import '@cdc/core/components/EditorPanel/editor.scss'
 import WarningImage from '../images/warning.svg'
 
 import { DATA_OPERATORS, DATA_FUNCTIONS } from '../CdcWaffleChart'
+import { TREND_ARROW_TYPE_LABELS, TREND_ARROW_TYPES } from '@cdc/core/helpers/constants'
+import { TREND_MODE_CATEGORICAL } from '@cdc/core/helpers/trendIndicator'
 
 const EditorPanel = memo(props => {
   const { config, updateConfig, loading, data, setParentConfig, isDashboard } = useContext(ConfigContext)
@@ -60,6 +62,59 @@ const EditorPanel = memo(props => {
     { value: 'Gauge', label: 'Gauge' },
     { value: 'TP5 Gauge', label: 'TP5 Style Gauge' }
   ]
+
+  const trendMode = config.trendIndicator?.mode || ''
+  const trendMappings = config.trendIndicator?.mappings || []
+  const trendColumnValues = useMemo(() => {
+    const trendColumn = config.trendIndicator?.column
+    if (!trendColumn) return []
+
+    const uniqueValues = new Set()
+    data?.forEach(row => {
+      const value = row?.[trendColumn]
+      if (value !== undefined && value !== null) {
+        uniqueValues.add(String(value))
+      }
+    })
+
+    return Array.from(uniqueValues).sort()
+  }, [data, config.trendIndicator?.column])
+
+  const setTrendMode = mode => {
+    updateConfig({
+      ...config,
+      trendIndicator: {
+        ...config.trendIndicator,
+        mode: mode || null
+      }
+    })
+  }
+
+  const updateTrendMapping = (sourceValue, arrowType) => {
+    const nextMappings = [...trendMappings]
+    const existingIndex = nextMappings.findIndex(mapping => mapping.sourceValue === sourceValue)
+
+    if (!arrowType) {
+      if (existingIndex > -1) {
+        nextMappings.splice(existingIndex, 1)
+      }
+    } else {
+      const nextMapping = { sourceValue, arrowType }
+      if (existingIndex > -1) {
+        nextMappings[existingIndex] = nextMapping
+      } else {
+        nextMappings.push(nextMapping)
+      }
+    }
+
+    updateConfig({
+      ...config,
+      trendIndicator: {
+        ...config.trendIndicator,
+        mappings: nextMappings
+      }
+    })
+  }
 
   const editorContent = (
     <Accordion>
@@ -356,6 +411,59 @@ const EditorPanel = memo(props => {
         <Button onClick={addNewFilter} fluid>
           Add Filter
         </Button>
+        <hr className='cove-accordion__divider' />
+        <h4 style={{ fontWeight: '600' }}>Trend Indicator</h4>
+        <Select
+          value={trendMode}
+          label='Trend Mode'
+          options={[
+            { value: '', label: 'Off' },
+            { value: TREND_MODE_CATEGORICAL, label: 'Categorical' }
+          ]}
+          onChange={e => setTrendMode(e.target.value)}
+        />
+        {trendMode === TREND_MODE_CATEGORICAL && (
+          <>
+            <Select
+              value={config.trendIndicator?.column || ''}
+              section='trendIndicator'
+              fieldName='column'
+              label='Trend Column'
+              updateField={updateField}
+              initial='Select'
+              options={columns}
+            />
+            <p style={{ marginBottom: '0.75rem' }}>
+              Arrow appears only when filters/conditions resolve to exactly one row/value.
+            </p>
+            {trendColumnValues.length === 0 && (
+              <p style={{ marginBottom: '0.75rem' }}>No values found in the selected trend column.</p>
+            )}
+            {trendColumnValues.map(sourceValue => {
+              const selectedArrowType =
+                trendMappings.find(mapping => mapping.sourceValue === sourceValue)?.arrowType || ''
+              return (
+                <div className='cove-accordion__panel-row align-center mb-2' key={sourceValue}>
+                  <div className='cove-accordion__panel-col flex-grow'>{sourceValue}</div>
+                  <div className='cove-accordion__panel-col flex-grow'>
+                    <Select
+                      label=''
+                      value={selectedArrowType}
+                      options={[
+                        { value: '', label: 'No Arrow' },
+                        ...TREND_ARROW_TYPES.map(arrowType => ({
+                          value: arrowType,
+                          label: TREND_ARROW_TYPE_LABELS[arrowType]
+                        }))
+                      ]}
+                      onChange={e => updateTrendMapping(sourceValue, e.target.value)}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+          </>
+        )}
       </Accordion.Section>
       {config.visualizationType !== 'Gauge' && config.visualizationType !== 'TP5 Gauge' && (
         <Accordion.Section title='Chart Settings'>

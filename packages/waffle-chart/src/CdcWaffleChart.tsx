@@ -30,6 +30,9 @@ import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import './scss/main.scss'
 import Title from '@cdc/core/components/ui/Title'
 import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
+import TrendArrow from '@cdc/core/components/ui/TrendArrow'
+import { resolveTrendIndicator } from '@cdc/core/helpers/trendIndicator'
+import type { TrendResolution } from '@cdc/core/helpers/trendIndicator'
 
 // images
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
@@ -70,7 +73,8 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     dataDenom,
     dataDenomColumn,
     dataDenomFunction,
-    roundToPlace
+    roundToPlace,
+    trendIndicator
   } = config
 
   const processedTextFields = useMemo(() => {
@@ -129,10 +133,12 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   const gaugeColor = config.visual.colors[config.theme]
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
-  const [dataPercentage, waffleDenominator, waffleNumerator] = useMemo(() => {
+  const [dataPercentage, waffleDenominator, waffleNumerator, trendResolution] = useMemo<
+    [number | string, number | string | null, number | string, TrendResolution]
+  >(() => {
     //If either the column or function aren't set, do not calculate
     if (!dataColumn || !dataFunction) {
-      return ['', null, '']
+      return ['', null, '', { state: 'disabled' }]
     }
 
     const getColumnSum = arr => {
@@ -271,6 +277,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     const columnData =
       conditionalData.length > 0 ? conditionalData.map(a => a[dataColumn]) : filteredData.map(a => a[dataColumn])
     const denomColumnData = filteredData.map(a => a[dataDenomColumn])
+    const trendSourceData = conditionalData.length > 0 ? conditionalData : filteredData
 
     //Filter the column's data for numerical values only
     let numericalData = columnData
@@ -327,11 +334,19 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       waffleDenominator = dataDenom > 0 ? dataDenom : 100
     }
 
+    const resolvedTrend = resolveTrendIndicator({
+      data: trendSourceData,
+      trendIndicator,
+      mainDataFunction: dataFunction,
+      allowNumericMode: false
+    })
+
     // @ts-ignore
     return [
-      applyPrecision((waffleNumerator / waffleDenominator) * 100),
+      applyPrecision((Number(waffleNumerator) / Number(waffleDenominator)) * 100),
       waffleDenominator,
-      applyPrecision(waffleNumerator)
+      applyPrecision(waffleNumerator),
+      resolvedTrend
     ]
   }, [
     config.data,
@@ -345,7 +360,8 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     dataDenom,
     dataDenomColumn,
     dataDenomFunction,
-    roundToPlace
+    roundToPlace,
+    trendIndicator
   ])
 
   const waffleRenderConfig = useMemo(() => {
@@ -412,6 +428,13 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     nodeWidth,
     nodeSpacer
   ])
+  const renderTrendArrow = () => {
+    if (trendResolution?.state !== 'resolved' || !trendResolution?.arrowType) {
+      return null
+    }
+
+    return <TrendArrow arrowType={trendResolution.arrowType} ariaLabel={`Trend ${trendResolution.arrowType}`} />
+  }
 
   const buildWaffle = useCallback(() => {
     let waffleData = []
@@ -433,8 +456,8 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         x: calculatePos(shape, 'x', i, nodeWidthNum, nodeSpacerNum, columns, rows),
         y: calculatePos(shape, 'y', i, nodeWidthNum, nodeSpacerNum, columns, rows),
         color: config.visual.colors[theme],
-        opacity: isFilled ? 1 : 0.2,
-        isFilled
+        opacity: i + 1 > 100 - Math.round(Number(dataPercentage)) ? 1 : 0.2,
+        isFilled: i + 1 > 100 - Math.round(Number(dataPercentage))
       }
       waffleData.push(newNode)
     }
@@ -530,7 +553,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   const hasPrimaryValue = (config.showPercent ? dataPercentage : waffleNumerator) !== ''
 
   const xScale = scaleLinear({
-    domain: [0, waffleDenominator],
+    domain: [0, Number(waffleDenominator) || 0],
     range: [0, config.gauge.width]
   })
 
@@ -584,7 +607,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                   }`}
                 >
                   <div className='cove-gauge-chart__value-section flex-shrink-0'>
-                    <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
+                    <div className='cove-waffle-chart__data--primary cove-value-with-trend' style={dataFontSize}>
                       {primaryValue}
                     </div>
                   </div>
@@ -635,7 +658,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
               </>
             ) : (
               <>
-                <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
+                <div className='cove-waffle-chart__data--primary cove-value-with-trend' style={dataFontSize}>
                   {primaryValue}
                 </div>
                 <div className='cove-waffle-chart__data--text cove-prose'>{parse(processedContent)}</div>
@@ -685,7 +708,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
           {(hasPrimaryValue || processedContent) && (
             <div className='cove-waffle-chart__data'>
               {hasPrimaryValue && (
-                <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
+                <div className='cove-waffle-chart__data--primary cove-value-with-trend' style={dataFontSize}>
                   {primaryValue}
                 </div>
               )}

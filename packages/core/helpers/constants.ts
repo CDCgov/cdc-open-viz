@@ -56,3 +56,13 @@ export const DATA_FUNCTIONS = [
   DATA_FUNCTION_RANGE,
   DATA_FUNCTION_SUM
 ]
+
+export const TREND_ARROW_TYPE_UP = 'up'
+export const TREND_ARROW_TYPE_DOWN = 'down'
+
+export const TREND_ARROW_TYPES = [TREND_ARROW_TYPE_UP, TREND_ARROW_TYPE_DOWN]
+
+export const TREND_ARROW_TYPE_LABELS = {
+  [TREND_ARROW_TYPE_UP]: 'Up',
+  [TREND_ARROW_TYPE_DOWN]: 'Down'
+}

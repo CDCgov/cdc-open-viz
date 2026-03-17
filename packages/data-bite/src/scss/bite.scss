@@ -69,14 +69,14 @@
 // TODO after v2 refactor remove header reference colors
 // Use .font-color/.bg-color, etc. in color definitions or something similar
 // Remove box shadows if we're no longer using them
-&.cove-visualization.is-editor .sidebar+.cove-visualization__body {
+&.cove-visualization.is-editor .sidebar + .cove-visualization__body {
   margin: 3em auto 0 !important;
   max-width: 35em !important;
   background-color: var(--lightestGray);
   height: fit-content;
 }
 
-.sidebar+.cove-visualization__body .bite-content-container:not(.component--hide-background-color) {
+.sidebar + .cove-visualization__body .bite-content-container:not(.component--hide-background-color) {
   background-color: var(--lightestGray);
 }
 
@@ -88,15 +88,18 @@
     background: transparent;
   }
 
+  .cove-value-with-trend {
+    display: inline-flex;
+    align-items: baseline;
+  }
 
   &.bite__style--gradient {
     background: transparent !important;
   }
 
-  >.cove-visualization__body-wrap {
+  > .cove-visualization__body-wrap {
     @include cove-visualization-body-wrap-inline-padding;
   }
-
 
   // General: Bite Style > Graphic
   &.bite__style--graphic {
@@ -164,7 +167,7 @@
     background: none !important;
     container-type: inline-size;
 
-    >.cove-visualization__body-wrap {
+    > .cove-visualization__body-wrap {
       padding: 0 !important;
     }
 
@@ -223,7 +226,6 @@
       height: auto;
     }
 
-
     .cdc-callout__content {
       row-gap: var(--cove-visualization-section-gap, 1.5rem);
     }
@@ -238,7 +240,7 @@
       padding: 0 !important;
       background: white;
 
-      >.cove-visualization__body-wrap {
+      > .cove-visualization__body-wrap {
         padding: 0 !important;
       }
 
@@ -247,7 +249,6 @@
         background: transparent;
       }
     }
-
   }
 
   &.component--hide-background-color .bite .bite-content-container {
@@ -482,7 +483,6 @@
     &.bite--is-compact-style .bite-content-container {
       align-items: center;
     }
-
   }
 }
 
