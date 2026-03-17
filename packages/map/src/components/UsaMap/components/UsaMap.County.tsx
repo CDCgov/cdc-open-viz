@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useContext } from 'react'
+import { useEffect, useState, useRef, useContext, useMemo } from 'react'
 import { geoCentroid, geoPath, geoContains } from 'd3-geo'
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity } from 'd3-zoom'
 import { select as d3Select } from 'd3-selection'
@@ -28,7 +28,11 @@ import { createCanvasPattern, PatternType } from '../../../helpers/createCanvasP
 import { getPatternForRow } from '../../../helpers/getPatternForRow'
 import { getCurrentTopoYear, getTopoData, isTopoReady } from '../helpers/map'
 import CountyTerritoriesSection from './CountyTerritoriesSection'
-import { isCountyTerritoryCountyId, isCountyTerritoryStateId } from '../helpers/countyTerritories'
+import {
+  isCountyTerritoryCountyId,
+  isCountyTerritoryStateId,
+  isFreelyAssociatedStateUid
+} from '../helpers/countyTerritories'
 
 const sortById = (a, b) => {
   if (a.id < b.id) return -1
@@ -114,7 +118,9 @@ const CountyMap = () => {
     let currentYear = getCurrentTopoYear(config, runtimeFilters)
 
     if (currentYear !== topoData.year) {
-      getTopoData(currentYear, { includeFreelyAssociatedStates: true }).then(response => {
+      getTopoData(currentYear, {
+        includeFreelyAssociatedStates: shouldIncludeFreelyAssociatedStates
+      }).then(response => {
         if (canvasRef.current) {
           const context = canvasRef.current.getContext('2d')
           context.clearRect(canvasRef.current.width, canvasRef.current.height)
@@ -122,7 +128,12 @@ const CountyMap = () => {
         setTopoData(buildCountyTopoData(response))
       })
     }
-  }, [config.general.countyCensusYear, config.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
+  }, [
+    config.general.countyCensusYear,
+    config.general.filterControlsCountyYear,
+    JSON.stringify(runtimeFilters),
+    shouldIncludeFreelyAssociatedStates
+  ])
 
   // Whenever the memo at the top is triggered and the map is called to re-render, call drawCanvas and update
   // The resize function so it includes the latest state variables
@@ -159,6 +170,10 @@ const CountyMap = () => {
   const runtimeKeys = runtimeData ? Object.keys(runtimeData) : []
   const lineWidth = 1
   const showAvailableTerritories = config.general.showAvailableTerritories ?? true
+  const shouldIncludeFreelyAssociatedStates = useMemo(() => {
+    if (!showAvailableTerritories || !config.data?.length) return false
+    return config.data.some(row => isFreelyAssociatedStateUid(row.uid))
+  }, [config.data, showAvailableTerritories])
 
   // Pre-compute Path2D objects for all geo features — avoids expensive geoPath projection on every zoom frame
   const buildPathCache = () => {
