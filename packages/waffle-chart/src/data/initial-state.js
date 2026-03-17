@@ -54,6 +54,15 @@ export default {
       'theme-amber': '#fbab18'
     }
   },
+  trendIndicator: {
+    mode: null,
+    column: '',
+    numericRules: {
+      upThreshold: 0,
+      downThreshold: 0
+    },
+    mappings: []
+  },
   markupVariables: [],
   enableMarkupVariables: false
 }

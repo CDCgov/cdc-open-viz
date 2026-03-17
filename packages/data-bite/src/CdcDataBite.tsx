@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useReducer } from 'react'
+import { useEffect, useCallback, useMemo, useReducer } from 'react'
 import { Fragment } from 'react'
 
 // contexts & initial state
@@ -12,6 +12,7 @@ import Title from '@cdc/core/components/ui/Title'
 import CircleCallout from './components/CircleCallout'
 import GradientBite from './components/GradientBite'
 import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
+import TrendArrow from '@cdc/core/components/ui/TrendArrow'
 
 // external
 import ResizeObserver from 'resize-observer-polyfill'
@@ -48,6 +49,7 @@ import {
   DATA_FUNCTION_RANGE,
   DATA_FUNCTION_SUM
 } from '@cdc/core/helpers/constants'
+import { resolveTrendIndicator, TREND_MODE_NUMERIC } from '@cdc/core/helpers/trendIndicator'
 
 // styles
 import './scss/main.scss'
@@ -125,6 +127,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     biteStyle,
     filters,
     subtext,
+    trendIndicator,
     markupVariables,
     enableMarkupVariables
   } = config
@@ -223,6 +226,44 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     })
 
     return result.processedContent
+  }
+
+  const getFilteredDataRows = useCallback(() => {
+    let filteredDataRows = Array.isArray(config.data) ? config.data : []
+
+    ;(filters || []).forEach(filter => {
+      if (filter.columnName && filter.columnValue) {
+        filteredDataRows = filteredDataRows.filter(row => row[filter.columnName] === filter.columnValue)
+      }
+    })
+
+    return filteredDataRows
+  }, [config.data, filters])
+
+  const getRowsForMainNumericCalculation = useCallback(() => {
+    const filteredDataRows = getFilteredDataRows()
+    const allRows = Array.isArray(config.data) ? config.data : []
+    return filteredDataRows.length ? filteredDataRows : allRows
+  }, [config.data, getFilteredDataRows])
+
+  const trendResolution = useMemo(() => {
+    const mode = trendIndicator?.mode
+    const trendDataRows = mode === TREND_MODE_NUMERIC ? getRowsForMainNumericCalculation() : getFilteredDataRows()
+
+    return resolveTrendIndicator({
+      data: trendDataRows,
+      trendIndicator,
+      mainDataFunction: dataFunction,
+      allowNumericMode: true
+    })
+  }, [trendIndicator, dataFunction, getRowsForMainNumericCalculation, getFilteredDataRows])
+
+  const renderTrendArrow = () => {
+    if (trendResolution.state !== 'resolved' || !trendResolution.arrowType) {
+      return null
+    }
+
+    return <TrendArrow arrowType={trendResolution.arrowType} ariaLabel={`Trend ${trendResolution.arrowType}`} />
   }
 
   const calculateDataBite = (includePrefixSuffix = true) => {
@@ -363,18 +404,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
     let dataBite = ''
 
-    //Optionally filter the data based on the user's filter
-    let filteredData = config.data
-
-    filters.map(filter => {
-      if (filter.columnName && filter.columnValue) {
-        return (filteredData = filteredData.filter(function (e) {
-          return e[filter.columnName] === filter.columnValue
-        }))
-      } else {
-        return false
-      }
-    })
+    const filteredData = getFilteredDataRows()
 
     if (dataFunction === DATA_FUNCTION_PASSTHROUGH) {
       const sourceData = filteredData.length ? filteredData : config.data
@@ -696,7 +726,12 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                 </h3>
               )}
               <div className='cdc-callout__body d-flex flex-row align-content-start flex-grow-1'>
-                {showBite && <div className='cdc-callout__databite flex-shrink-0  me-3'>{calculateDataBite(true)}</div>}
+                {showBite && (
+                  <div className='cdc-callout__databite flex-shrink-0  me-3 cove-value-with-trend'>
+                    <span>{calculateDataBite(true)}</span>
+                    {renderTrendArrow()}
+                  </div>
+                )}
                 <div className='cdc-callout__content flex-grow-1 d-flex flex-column  min-w-0'>
                   <p className='mb-0'>{parse(processContentWithMarkup(biteBody))}</p>
                   {subtext && !isCompactStyle && (
@@ -724,7 +759,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                     </div>
                   )}
                   {showBite && 'split' === biteStyle && (
-                    <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
+                    <div className='bite-value cove-value-with-trend' style={{ fontSize: biteFontSize + 'px' }}>
                       {calculateDataBite()}
                     </div>
                   )}
@@ -732,14 +767,20 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                     <div className='bite-content__text-wrap'>
                       <p className='bite-text'>
                         {showBite && 'body' === biteStyle && (
-                          <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
+                          <span
+                            className='bite-value data-bite-body cove-value-with-trend'
+                            style={{ fontSize: biteFontSize + 'px' }}
+                          >
                             {calculateDataBite()}
                           </span>
                         )}
                         {parse(processContentWithMarkup(biteBody))}
                       </p>
                       {showBite && 'end' === biteStyle && (
-                        <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
+                        <span
+                          className='bite-value data-bite-body cove-value-with-trend'
+                          style={{ fontSize: biteFontSize + 'px' }}
+                        >
                           {calculateDataBite()}
                         </span>
                       )}

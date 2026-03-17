@@ -1,6 +1,16 @@
-import { useContext } from 'react'
+import { useContext, useMemo } from 'react'
 
-import { DATA_FUNCTIONS, DATA_OPERATORS } from '@cdc/core/helpers/constants'
+import {
+  DATA_FUNCTIONS,
+  DATA_FUNCTION_MAX,
+  DATA_FUNCTION_MEAN,
+  DATA_FUNCTION_MEDIAN,
+  DATA_FUNCTION_MIN,
+  DATA_FUNCTION_SUM,
+  DATA_OPERATORS,
+  TREND_ARROW_TYPE_LABELS,
+  TREND_ARROW_TYPES
+} from '@cdc/core/helpers/constants'
 
 // Context
 import Context from '../../context'
@@ -21,6 +31,7 @@ import Button from '@cdc/core/components/elements/Button'
 import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualSection'
 import Accordion from '@cdc/core/components/ui/Accordion'
+import { TREND_MODE_CATEGORICAL, TREND_MODE_NUMERIC } from '@cdc/core/helpers/trendIndicator'
 
 type DataBiteEditorPanelProps = {
   // Add any props if needed
@@ -54,6 +65,68 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
       secondArgument: false
     })
   })
+
+  const trendMode = config.trendIndicator?.mode || ''
+  const trendMappings = config.trendIndicator?.mappings || []
+  const numericModeEligibleFunctions = [
+    DATA_FUNCTION_SUM,
+    DATA_FUNCTION_MEAN,
+    DATA_FUNCTION_MEDIAN,
+    DATA_FUNCTION_MIN,
+    DATA_FUNCTION_MAX
+  ]
+  const isNumericModeEligible = numericModeEligibleFunctions.includes(config.dataFunction)
+
+  const trendColumnValues = useMemo(() => {
+    const trendColumn = config.trendIndicator?.column
+    if (!trendColumn) return []
+
+    const uniqueValues = new Set<string>()
+    data?.forEach(row => {
+      const value = row?.[trendColumn]
+      if (value !== undefined && value !== null) {
+        uniqueValues.add(String(value))
+      }
+    })
+
+    return Array.from(uniqueValues).sort()
+  }, [data, config.trendIndicator?.column])
+
+  const setTrendMode = (mode: string) => {
+    updateConfig({
+      ...config,
+      trendIndicator: {
+        ...config.trendIndicator,
+        mode: mode || null
+      }
+    })
+  }
+
+  const updateTrendMapping = (sourceValue: string, arrowType: string) => {
+    const nextMappings = [...trendMappings]
+    const existingIndex = nextMappings.findIndex(mapping => mapping.sourceValue === sourceValue)
+
+    if (!arrowType) {
+      if (existingIndex > -1) {
+        nextMappings.splice(existingIndex, 1)
+      }
+    } else {
+      const nextMapping = { sourceValue, arrowType }
+      if (existingIndex > -1) {
+        nextMappings[existingIndex] = nextMapping
+      } else {
+        nextMappings.push(nextMapping)
+      }
+    }
+
+    updateConfig({
+      ...config,
+      trendIndicator: {
+        ...config.trendIndicator,
+        mappings: nextMappings
+      }
+    })
+  }
 
   // Helper for removing second argument from dynamic image conditions
   const removeDynamicArgument = (index: number) => {
@@ -240,6 +313,102 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                 label='Ignore Zeros'
                 updateField={updateField}
               />
+              <hr className='accordion__divider' />
+
+              <span className='divider-heading'>Trend Indicator</span>
+              <Select
+                value={trendMode}
+                fieldName='mode'
+                label='Trend Mode'
+                options={[
+                  { value: '', label: 'Off' },
+                  { value: TREND_MODE_CATEGORICAL, label: 'Categorical' },
+                  { value: TREND_MODE_NUMERIC, label: 'Numeric' }
+                ]}
+                onChange={e => setTrendMode(e.target.value)}
+              />
+              {trendMode && (
+                <>
+                  <Select
+                    value={config.trendIndicator?.column || ''}
+                    section='trendIndicator'
+                    fieldName='column'
+                    label='Trend Column'
+                    updateField={updateField}
+                    initial='Select'
+                    options={columns}
+                  />
+                  {trendMode === TREND_MODE_CATEGORICAL && (
+                    <>
+                      <p style={{ marginBottom: '0.75rem' }}>
+                        Arrow appears only when filters resolve to exactly one row/value.
+                      </p>
+                      {trendColumnValues.length === 0 && (
+                        <p style={{ marginBottom: '0.75rem' }}>No values found in the selected trend column.</p>
+                      )}
+                      {trendColumnValues.map(sourceValue => {
+                        const selectedArrowType =
+                          trendMappings.find(mapping => mapping.sourceValue === sourceValue)?.arrowType || ''
+
+                        return (
+                          <div className='cove-accordion__panel-row align-center mb-2' key={sourceValue}>
+                            <div className='cove-accordion__panel-col flex-grow'>{sourceValue}</div>
+                            <div className='cove-accordion__panel-col flex-grow'>
+                              <Select
+                                label=''
+                                value={selectedArrowType}
+                                options={[
+                                  { value: '', label: 'No Arrow' },
+                                  ...TREND_ARROW_TYPES.map(arrowType => ({
+                                    value: arrowType,
+                                    label: TREND_ARROW_TYPE_LABELS[arrowType]
+                                  }))
+                                ]}
+                                onChange={e => updateTrendMapping(sourceValue, e.target.value)}
+                              />
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </>
+                  )}
+                  {trendMode === TREND_MODE_NUMERIC && (
+                    <>
+                      <p style={{ marginBottom: '0.5rem' }}>Aggregation is locked to the main Data Function.</p>
+                      {!isNumericModeEligible && (
+                        <p className='cove-accordion__panel-error' style={{ marginBottom: '0.5rem' }}>
+                          Numeric mode only supports Sum, Mean (Average), Median, Min, and Max.
+                        </p>
+                      )}
+                      <ul className='column-edit'>
+                        <li className='two-col'>
+                          <TextField
+                            type='number'
+                            value={config.trendIndicator?.numericRules?.upThreshold ?? 0}
+                            section='trendIndicator'
+                            subsection='numericRules'
+                            fieldName='upThreshold'
+                            label='Up Threshold'
+                            updateField={updateField}
+                          />
+                          <TextField
+                            type='number'
+                            value={config.trendIndicator?.numericRules?.downThreshold ?? 0}
+                            section='trendIndicator'
+                            subsection='numericRules'
+                            fieldName='downThreshold'
+                            label='Down Threshold'
+                            updateField={updateField}
+                          />
+                        </li>
+                      </ul>
+                      <p style={{ marginBottom: '0.75rem' }}>
+                        If value is between thresholds (or equal to either threshold), no arrow is shown.
+                      </p>
+                    </>
+                  )}
+                </>
+              )}
               <hr className='accordion__divider' />
 
               <label style={{ marginBottom: '1rem' }}>
