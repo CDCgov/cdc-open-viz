@@ -67,6 +67,9 @@ import { LegendMemoProvider } from './context/LegendMemoContext'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { getInitialState, mapReducer } from './store/map.reducer'
 import { RuntimeData } from './types/RuntimeData'
+import defaults from './data/initial-state'
+import { LEGACY_MAP_DEFAULTS } from './data/legacy-defaults'
+import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
 import EditorContext from '@cdc/core/contexts/EditorContext'
 import MapActions from './store/map.actions'
 import _ from 'lodash'
@@ -90,6 +93,12 @@ type CdcMapComponent = {
   interactionLabel: string
 }
 
+const cloneAndBackfillDefaults = (config: MapConfig | undefined) => {
+  const configClone = cloneConfig(config || {})
+  backfillDefaults(configClone, defaults, LEGACY_MAP_DEFAULTS)
+  return configClone
+}
+
 const CdcMapComponent: React.FC<CdcMapComponent> = ({
   config: configObj,
   navigationHandler: customNavigationHandler,
@@ -104,7 +113,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   datasets,
   interactionLabel = 'no link provided'
 }) => {
-  const initialState = getInitialState(configObj)
+  const initialState = getInitialState(cloneAndBackfillDefaults(configObj))
 
   const [mapState, dispatch] = useReducer<MapReducerType<MapState, MapActions>>(mapReducer, initialState as MapState)
 
@@ -139,7 +148,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   useEffect(() => {
-    const _newConfig = getInitialState(cloneConfig(configObj)).config
+    const _newConfig = getInitialState(cloneAndBackfillDefaults(configObj)).config
     if (configObj.data) {
       _newConfig.data = configObj.data
     }
