@@ -88,10 +88,6 @@
     background: transparent;
   }
 
-  // Visual: Shadow
-  &.shadow {
-    box-shadow: rgba(0, 0, 0, 0.2) 0 3px 10px;
-  }
 
   &.bite__style--gradient {
     background: transparent !important;
@@ -182,7 +178,6 @@
 
     .cdc-callout {
       gap: 0.7rem;
-      box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
       border: 1px solid #dff2f6 !important;
       margin: 0 !important;
       padding: 1.25rem;
@@ -256,16 +251,9 @@
       .cdc-callout {
         border: 1px solid #009ec1 !important;
         background: transparent;
-        box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
       }
     }
 
-    // White background with border (when both white background and Display Border are checked)
-    &.white-background-style.display-border {
-      .cdc-callout {
-        box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
-      }
-    }
   }
 
   // General: Compact View

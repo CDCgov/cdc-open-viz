@@ -52,7 +52,7 @@ export default function useDataVizClasses(config, viewport = null) {
   visual?.tp5Treatment && contentClasses.push('component--tp5-treatment')
 
   // ! these two will be retired.
-  shadow && innerContainerClasses.push('shadow')
+  shadow && type !== 'data-bite' && innerContainerClasses.push('shadow')
   config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
 
   let sparkLineStyles = {
