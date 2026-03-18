@@ -3,8 +3,6 @@ import CdcMapComponent from './CdcMapComponent'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import initialState from './data/initial-state'
-import { LEGACY_MAP_DEFAULTS } from './data/legacy-defaults'
-import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { addUIDs, validateFipsCodeLength } from './helpers'
 import EditorContext from '@cdc/core/contexts/EditorContext'
@@ -81,8 +79,6 @@ const CdcMap: React.FC<CdcMapProps> = ({
       newState.data = transform.autoStandardize(newState.data)
       newState.data = transform.developerStandardize(newState.data, newState.dataDescription)
     }
-
-    backfillDefaults(newState, initialState, LEGACY_MAP_DEFAULTS)
 
     if (newState.columns.geo.name || newState.columns.geo.fips) {
       addUIDs(newState, newState.columns.geo.name || newState.columns.geo.fips)
