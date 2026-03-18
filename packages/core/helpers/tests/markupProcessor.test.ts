@@ -539,6 +539,91 @@ describe('processMarkupVariables', () => {
     })
   })
 
+  describe('SVG Output', () => {
+    const trendData = [
+      { state: 'California', trend: 'Up' },
+      { state: 'Texas', trend: 'Down' }
+    ]
+
+    it('should render inline SVG when a single mapped value is resolved', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Trend',
+          tag: '{{trend}}',
+          outputType: 'svg',
+          columnName: 'trend',
+          svgMappings: [{ sourceValue: 'Up', svgId: 'trend-arrow-up' }],
+          conditions: [{ columnName: 'state', isOrIsNotEqualTo: 'is', value: 'California' }]
+        }
+      ]
+
+      const content = 'Trend: {{trend}}'
+      const result = processMarkupVariables(content, trendData, variables)
+
+      expect(result.processedContent).toContain('<svg')
+      expect(result.processedContent).toContain('cove-trend-arrow')
+    })
+
+    it('should apply svgScale to the inline SVG style', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Trend',
+          tag: '{{trend}}',
+          outputType: 'svg',
+          columnName: 'trend',
+          svgMappings: [{ sourceValue: 'Up', svgId: 'trend-arrow-up' }],
+          svgScale: 1.5,
+          conditions: []
+        }
+      ]
+
+      const content = '{{trend}}'
+      const result = processMarkupVariables(content, trendData, variables)
+
+      expect(result.processedContent).toContain('transform: scale(1.5)')
+    })
+
+    it('should render multiple SVGs when multiple values are resolved', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Trend',
+          tag: '{{trend}}',
+          outputType: 'svg',
+          columnName: 'trend',
+          svgMappings: [
+            { sourceValue: 'Up', svgId: 'trend-arrow-up' },
+            { sourceValue: 'Down', svgId: 'trend-arrow-down' }
+          ],
+          conditions: []
+        }
+      ]
+
+      const content = '{{trend}}'
+      const result = processMarkupVariables(content, trendData, variables)
+
+      const svgCount = result.processedContent.match(/<svg/g)?.length || 0
+      expect(svgCount).toBe(2)
+    })
+
+    it('should return empty string when the mapped value is missing', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Trend',
+          tag: '{{trend}}',
+          outputType: 'svg',
+          columnName: 'trend',
+          svgMappings: [{ sourceValue: 'Up', svgId: 'trend-arrow-up' }],
+          conditions: [{ columnName: 'state', isOrIsNotEqualTo: 'is', value: 'Texas' }]
+        }
+      ]
+
+      const content = '{{trend}}'
+      const result = processMarkupVariables(content, trendData, variables)
+
+      expect(result.processedContent).toBe('')
+    })
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty data array', () => {
       const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
@@ -725,5 +810,37 @@ describe('validateMarkupVariables', () => {
     const errors = validateMarkupVariables(variables, testData)
     expect(errors).toHaveLength(0)
     expect(errors.find(e => e.includes('not found in data'))).toBeUndefined()
+  })
+
+  it('should validate SVG output requirements', () => {
+    const variables: MarkupVariable[] = [
+      {
+        name: 'Trend',
+        tag: '{{trend}}',
+        outputType: 'svg',
+        columnName: 'trend',
+        svgMappings: [{ sourceValue: 'Up', svgId: 'trend-arrow-up' }],
+        conditions: []
+      }
+    ]
+
+    const errors = validateMarkupVariables(variables, [{ trend: 'Up' }])
+    expect(errors).toHaveLength(0)
+  })
+
+  it('should require SVG mappings when output type is svg', () => {
+    const variables: MarkupVariable[] = [
+      {
+        name: 'Trend',
+        tag: '{{trend}}',
+        outputType: 'svg',
+        columnName: 'trend',
+        svgMappings: [],
+        conditions: []
+      }
+    ]
+
+    const errors = validateMarkupVariables(variables, [{ trend: 'Up' }])
+    expect(errors).toContain('Variable 1: SVG mappings are required')
   })
 })
