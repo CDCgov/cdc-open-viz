@@ -33,6 +33,7 @@ export default function useDataVizClasses(config, viewport = null) {
 
   showTitle && contentClasses.push('component--has-title')
   title &&
+    showTitle &&
     visualizationType !== 'chart' &&
     visualizationType !== 'Spark Line' &&
     contentClasses.push('component--has-title')
