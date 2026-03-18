@@ -45,14 +45,15 @@ describe('dataAggregation helper', () => {
     expect(aggregateMode([1, 2, 2, 3, 3])).toEqual(['2', '3'])
   })
 
-  it('filters non-finite values and returns null for empty numeric aggregates', () => {
-    expect(aggregateSum([1, Number.NaN, Number.POSITIVE_INFINITY, 2])).toBe(3)
-    expect(aggregateMean([Number.NaN, Number.POSITIVE_INFINITY])).toBeNull()
-    expect(aggregateMedian([Number.NaN])).toBeNull()
-    expect(aggregateMin([Number.NaN])).toBeNull()
-    expect(aggregateMax([Number.NaN])).toBeNull()
-    expect(aggregateRange([Number.NaN])).toBeNull()
-    expect(aggregateMode([Number.NaN])).toBeNull()
+  it('preserves non-finite values and empty aggregate outputs', () => {
+    expect(Number.isNaN(aggregateSum([1, Number.NaN, 2]))).toBe(true)
+    expect(aggregateSum([Number.POSITIVE_INFINITY, 1])).toBe(Number.POSITIVE_INFINITY)
+    expect(Number.isNaN(aggregateMean([]))).toBe(true)
+    expect(Number.isNaN(aggregateMedian([]))).toBe(true)
+    expect(aggregateMin([])).toBe(Number.POSITIVE_INFINITY)
+    expect(aggregateMax([])).toBe(Number.NEGATIVE_INFINITY)
+    expect(aggregateRange([])).toEqual([Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY])
+    expect(aggregateMode([])).toEqual([])
   })
 
   it('dispatches by data function and returns null for unsupported functions', () => {

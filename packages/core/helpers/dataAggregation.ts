@@ -17,32 +17,20 @@ export const NUMERIC_TREND_ELIGIBLE_FUNCTIONS = new Set([
   DATA_FUNCTION_MAX
 ])
 
-const sanitizeNumericValues = (values: number[]): number[] => {
-  return values.filter(value => typeof value === 'number' && Number.isFinite(value))
+export const aggregateCount = (values: number[]): number => {
+  return values.length
 }
 
-export const aggregateCount = (values: number[]): number | null => {
-  const numericValues = sanitizeNumericValues(values)
-  return numericValues.length
+export const aggregateSum = (values: number[]): number => {
+  return values.reduce((sum, value) => sum + value, 0)
 }
 
-export const aggregateSum = (values: number[]): number | null => {
-  const numericValues = sanitizeNumericValues(values)
-  if (!numericValues.length) return null
-  return numericValues.reduce((sum, value) => sum + value, 0)
+export const aggregateMean = (values: number[]): number => {
+  return values.reduce((sum, value) => sum + value, 0) / values.length
 }
 
-export const aggregateMean = (values: number[]): number | null => {
-  const numericValues = sanitizeNumericValues(values)
-  if (!numericValues.length) return null
-  return numericValues.reduce((sum, value) => sum + value, 0) / numericValues.length
-}
-
-export const aggregateMedian = (values: number[]): number | null => {
-  const numericValues = sanitizeNumericValues(values)
-  if (!numericValues.length) return null
-
-  const sortedValues = [...numericValues].sort((a, b) => a - b)
+export const aggregateMedian = (values: number[]): number => {
+  const sortedValues = [...values].sort((a, b) => a - b)
   const midpoint = Math.floor(sortedValues.length / 2)
 
   return sortedValues.length % 2 !== 0
@@ -50,14 +38,11 @@ export const aggregateMedian = (values: number[]): number | null => {
     : (sortedValues[midpoint - 1] + sortedValues[midpoint]) / 2
 }
 
-export const aggregateMode = (values: number[]): string[] | null => {
-  const numericValues = sanitizeNumericValues(values)
-  if (!numericValues.length) return null
-
+export const aggregateMode = (values: number[]): string[] => {
   const frequencies: Record<string, number> = {}
   let maxFrequency = -Infinity
 
-  for (const value of numericValues) {
+  for (const value of values) {
     const key = String(value)
     frequencies[key] = (frequencies[key] || 0) + 1
     if (frequencies[key] > maxFrequency) {
@@ -68,22 +53,16 @@ export const aggregateMode = (values: number[]): string[] | null => {
   return Object.keys(frequencies).filter(key => frequencies[key] === maxFrequency)
 }
 
-export const aggregateMin = (values: number[]): number | null => {
-  const numericValues = sanitizeNumericValues(values)
-  if (!numericValues.length) return null
-  return Math.min(...numericValues)
+export const aggregateMin = (values: number[]): number => {
+  return Math.min(...values)
 }
 
-export const aggregateMax = (values: number[]): number | null => {
-  const numericValues = sanitizeNumericValues(values)
-  if (!numericValues.length) return null
-  return Math.max(...numericValues)
+export const aggregateMax = (values: number[]): number => {
+  return Math.max(...values)
 }
 
-export const aggregateRange = (values: number[]): [number, number] | null => {
-  const numericValues = sanitizeNumericValues(values)
-  if (!numericValues.length) return null
-  return [Math.min(...numericValues), Math.max(...numericValues)]
+export const aggregateRange = (values: number[]): [number, number] => {
+  return [Math.min(...values), Math.max(...values)]
 }
 
 export type AggregateResult = number | string[] | [number, number] | null
