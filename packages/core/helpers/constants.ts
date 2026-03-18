@@ -15,8 +15,8 @@ export const ENABLE_MAP_DATA_BITE_VISUAL_SETTINGS = true
 export const ENABLE_CHART_VISUAL_SETTINGS = true
 
 // Turn these to true if we ever want the tp5 treatment for maps/charts
-export const ENABLE_CHART_MAP_TP5_TREATMENT = true
-export const ENABLE_CHART_MAP_TP5_TREATMENT_SELECTION = true
+export const ENABLE_CHART_MAP_TP5_TREATMENT = false
+export const ENABLE_CHART_MAP_TP5_TREATMENT_SELECTION = false
 
 // Data operators for conditional logic
 export const DATA_OPERATOR_LESS = '<'
