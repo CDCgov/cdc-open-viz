@@ -244,7 +244,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     const calculateByFunction = (values, fn, shouldRound = true) => {
       const toOutput = value => {
         if (value === undefined || value === null) {
-          return ''
+          return String(value)
         }
 
         if (!shouldRound) {
@@ -255,9 +255,6 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       }
 
       const aggregated = aggregateByDataFunction(values, fn)
-      if (aggregated === null) {
-        return ''
-      }
 
       if (Array.isArray(aggregated)) {
         return aggregated.join(', ')

@@ -297,37 +297,40 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       // first validation
       if (value === undefined || value === null) {
         console.error('Enter correct value to "applyPrecision()" function ')
-        return
+        return value
       }
+      const numericValue = Number(value)
       // second validation
-      if (Number.isNaN(value)) {
+      if (!Number.isFinite(numericValue)) {
         console.error(' Argunment isNaN, "applyPrecision()" function ')
-        return
+        return String(value)
       }
       let result = value
       let roundToPlace = Number(config.dataFormat.roundToPlace) // default equals to 0
       //  ROUND FIELD  going -1,-2,-3 numbers
       if (roundToPlace < 0) {
         console.error(' ROUND field is below "0", "applyPrecision()" function ')
-        return
+        return String(value)
       }
       if (typeof roundToPlace === 'number' && roundToPlace > -1) {
-        result = Number(result).toFixed(roundToPlace) // returns STRING
+        result = numericValue.toFixed(roundToPlace) // returns STRING
       }
       return String(result)
     }
 
     const applyLocaleString = value => {
-      if (value === undefined || value === null) return
-      if (Number.isNaN(value) || typeof value === 'number') {
-        value = String(value)
+      if (value === undefined || value === null) return value
+      const stringValue = String(value)
+      const numericValue = Number(stringValue)
+      if (!Number.isFinite(numericValue)) {
+        return stringValue
       }
-      let formattedValue = parseFloat(value).toLocaleString(config.locale, {
+      let formattedValue = numericValue.toLocaleString(config.locale, {
         useGrouping: true,
         maximumFractionDigits: 6
       })
       // Add back missing .0 in e.g. 12.0
-      const match = value.match(/\.\d*?(0*)$/)
+      const match = stringValue.match(/\.\d*?(0*)$/)
 
       if (match) {
         formattedValue += /[1-9]/.test(match[0]) ? match[1] : match[0]
@@ -373,7 +376,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       case DATA_FUNCTION_COUNT: {
         const countValues = config.dataFormat.ignoreZeros ? numericalData.filter(item => item && item) : numericalData
         const countResult = aggregateByDataFunction(countValues, DATA_FUNCTION_COUNT)
-        dataBite = countResult === null ? '' : String(countResult)
+        dataBite = String(countResult)
         break
       }
       case DATA_FUNCTION_SUM:
@@ -381,18 +384,18 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       case DATA_FUNCTION_MAX:
       case DATA_FUNCTION_MIN: {
         const aggregateResult = aggregateByDataFunction(numericalData, dataFunction)
-        dataBite = aggregateResult === null ? '' : String(aggregateResult)
+        dataBite = String(aggregateResult)
         break
       }
       case DATA_FUNCTION_MEAN: {
         const meanValues = config.dataFormat.ignoreZeros ? numericalData.filter(num => num !== 0) : numericalData
         const meanResult = aggregateByDataFunction(meanValues, DATA_FUNCTION_MEAN)
-        dataBite = meanResult === null ? '' : String(meanResult)
+        dataBite = String(meanResult)
         break
       }
       case DATA_FUNCTION_MODE: {
         const modeValues = aggregateByDataFunction(numericalData, DATA_FUNCTION_MODE)
-        dataBite = Array.isArray(modeValues) ? modeValues.join('') : ''
+        dataBite = Array.isArray(modeValues) ? modeValues.join('') : String(modeValues)
         break
       }
       case DATA_FUNCTION_RANGE:
@@ -413,7 +416,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
             rangeMax +
             config.dataFormat.suffix
         } else {
-          dataBite = ''
+          dataBite = String(rangeValues)
         }
         break
       default:
