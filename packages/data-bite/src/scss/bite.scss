@@ -128,7 +128,7 @@
       align-self: flex-end;
       width: 100%;
       margin-top: 0;
-      font-size: var(--visualization-meta-font-size);
+      font-size: var(--visualization-body-font-size);
       line-height: var(--visualization-body-line-height);
     }
 
@@ -235,7 +235,7 @@
     .bite-subtext {
       margin-top: auto; // Push to bottom on desktop
       font-style: italic;
-      font-size: var(--visualization-meta-font-size);
+      font-size: var(--visualization-body-font-size);
       line-height: var(--visualization-body-line-height);
     }
 
@@ -400,7 +400,7 @@
         }
 
         .bite-subtext {
-          font-size: 0.9em;
+          font-size: var(--visualization-body-font-size);
           font-style: italic;
           flex-basis: 100%;
           width: 100%;

@@ -3,9 +3,10 @@
 // Let core styles handle color palette
 
 .cove-visualization.type-waffle-chart {
+
   .cove-waffle-chart__subtext.subtext,
   .cove-waffle-chart__subtext.subtext.fst-italic {
-    font-size: var(--visualization-meta-font-size) !important;
+    font-size: var(--visualization-body-font-size) !important;
     line-height: var(--visualization-body-line-height);
   }
 
@@ -30,7 +31,7 @@
 
     &__subtext {
       font-style: italic;
-      font-size: var(--visualization-meta-font-size) !important;
+      font-size: var(--visualization-body-font-size) !important;
       line-height: var(--visualization-body-line-height);
     }
 
@@ -135,6 +136,7 @@
 // TP5 Style for Waffle Chart
 .type-waffle-chart {
   &.waffle__style--tp5 {
+
     .cove-visualization__body,
     .cove-visualization__body.component--has-legacy-border,
     .cove-visualization__body.component--has-border-color-theme,
@@ -144,7 +146,7 @@
       background: none !important;
       container-type: inline-size;
 
-      > .cove-visualization__body-wrap {
+      >.cove-visualization__body-wrap {
         padding: 0 !important;
       }
     }
@@ -203,6 +205,18 @@
     .cove-waffle-chart__data {
       margin-bottom: 0;
       align-content: flex-start;
+
+      .cove-waffle-chart__data--primary {
+        font-size: 2rem;
+        color: var(--colors-cyan-60v);
+        font-weight: 400;
+      }
+
+      .cove-waffle-chart__data--text {
+        margin-top: 0.5rem;
+        font-size: 1rem;
+        line-height: 1.5rem;
+      }
     }
 
     .cdc-callout__heading {
@@ -211,24 +225,14 @@
       font-size: 1.1rem;
     }
 
-    .cove-waffle-chart__data--text {
-      margin-top: 0.5rem;
-      font-size: 1rem;
-    }
-
     .cove-waffle-chart__subtext {
-      font-size: var(--visualization-meta-font-size) !important;
-      line-height: var(--visualization-body-line-height);
-    }
-
-    .cove-waffle-chart__data--primary {
-      font-size: 2rem;
-      color: var(--colors-cyan-60v);
-      font-weight: 400;
+      font-size: var(--visualization-body-font-size);
+      margin-top: 1rem;
     }
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
+
       .cove-visualization__body,
       .cove-visualization__body.component--has-legacy-border,
       .cove-visualization__body.component--has-border-color-theme,
@@ -237,7 +241,7 @@
         padding: 0 !important;
         background: white !important;
 
-        > .cove-visualization__body-wrap {
+        >.cove-visualization__body-wrap {
           padding: 0 !important;
         }
       }
@@ -252,6 +256,7 @@
 
   // TP5 Style for Gauge Chart
   &.gauge__style--tp5 {
+
     .cove-visualization__body,
     .cove-visualization__body.component--has-legacy-border,
     .cove-visualization__body.component--has-border-color-theme,
@@ -261,7 +266,7 @@
       background: none !important;
       container-type: inline-size;
 
-      > .cove-visualization__body-wrap {
+      >.cove-visualization__body-wrap {
         padding: 0 !important;
       }
     }
@@ -349,13 +354,14 @@
     }
 
     .cove-waffle-chart__subtext {
-      font-size: var(--visualization-meta-font-size) !important;
+      font-size: var(--visualization-body-font-size) !important;
       line-height: var(--visualization-body-line-height);
       margin-top: auto;
     }
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
+
       .cove-visualization__body,
       .cove-visualization__body.component--has-legacy-border,
       .cove-visualization__body.component--has-border-color-theme,
@@ -364,7 +370,7 @@
         padding: 0 !important;
         background: white !important;
 
-        > .cove-visualization__body-wrap {
+        >.cove-visualization__body-wrap {
           padding: 0 !important;
         }
       }

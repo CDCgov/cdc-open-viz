@@ -72,7 +72,7 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
   }, [])
 
   useEffect(() => {
-    let strippedConfig = stripConfig(state.config)
+    let strippedConfig = stripConfig(state.config, true)
 
     const parsedData = JSON.stringify(strippedConfig)
     // Emit the data in a regular JS event so it can be consumed by anything.
