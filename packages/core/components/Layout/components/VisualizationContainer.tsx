@@ -1,20 +1,20 @@
 import React, { forwardRef } from 'react'
-import type { AnyVisualization } from '@cdc/core/types/Visualization'
 import Responsive from './Responsive'
-import Visualization from './Visualization'
+import Visualization, { type VisualizationShellConfig } from './Visualization'
 
 type VisualizationContainerProps = {
   children: React.ReactNode
   className?: string
-  config: AnyVisualization
+  config: VisualizationShellConfig
   currentViewport?: string
   editorPanel?: React.ReactNode
   imageId?: string
   isEditor: boolean
+  renderResponsive?: boolean
 }
 
 const VisualizationContainer = forwardRef<HTMLDivElement, VisualizationContainerProps>(
-  ({ children, className, config, currentViewport, editorPanel, imageId, isEditor }, ref) => {
+  ({ children, className, config, currentViewport, editorPanel, imageId, isEditor, renderResponsive = true }, ref) => {
     return (
       <Visualization
         ref={ref}
@@ -26,9 +26,7 @@ const VisualizationContainer = forwardRef<HTMLDivElement, VisualizationContainer
         className={className}
       >
         {isEditor && editorPanel}
-        <Responsive isEditor={isEditor}>
-          {children}
-        </Responsive>
+        {renderResponsive ? <Responsive isEditor={isEditor}>{children}</Responsive> : children}
       </Visualization>
     )
   }

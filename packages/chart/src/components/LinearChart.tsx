@@ -540,7 +540,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
         <svg
           ref={internalSvgRef}
           onMouseMove={onMouseMove}
-          width={parentWidth + config.yAxis.rightAxisSize}
+          width={parentWidth}
           height={isNoDataAvailable ? 1 : calculatedSvgHeight ?? parentHeight}
           className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${
             debugSvg && 'debug'

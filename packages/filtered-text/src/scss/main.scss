@@ -1,3 +1,5 @@
+@import '@cdc/core/styles/layout/wrapper-padding';
+
 .cove-visualization.is-editor {
   background: transparent;
 }
@@ -13,22 +15,13 @@
 }
 
 .cove-visualization.type-filtered-text {
+  .cove-visualization__body {
+    @include cove-visualization-body-padding;
+  }
+
   .cove-accordion__panel-section .cove-input__checkbox--small {
     // float: initial;
     // display: initial;
     float: none;
-  }
-  .cove-visualization__body-wrap:not(:empty) {
-    padding: 0;
-
-    &.has-top-padding {
-      padding-top: 1rem;
-      padding-bottom: 1rem;
-    }
-
-    &.has-side-padding {
-      padding-left: 1rem;
-      padding-right: 1rem;
-    }
   }
 }

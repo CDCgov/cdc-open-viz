@@ -3,7 +3,7 @@ import { useCallback, useContext, useEffect, useReducer } from 'react'
 import DataTable from '@cdc/core/components/DataTable'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import Filters from '@cdc/core/components/Filters'
-import { VisualizationContainer } from '@cdc/core/components/Layout'
+import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 import Loading from '@cdc/core/components/Loading'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
@@ -146,8 +146,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
       currentViewport={currentViewport}
       editorPanel={<EditorPanel dispatch={dispatch} state={state} />}
     >
-      {/* FILTERS + DATA TABLE */}
-      <div className='bg-white z-1'>
+      <VisualizationContent bodyWrapClassName='bg-white z-1'>
         {filters && (
           <Filters
             config={config as unknown as Visualization}
@@ -172,7 +171,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
           expandDataTable={expanded}
           configUrl={configUrl}
         />
-      </div>
+      </VisualizationContent>
     </VisualizationContainer>
   )
 }

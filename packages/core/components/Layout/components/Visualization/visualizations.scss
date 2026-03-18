@@ -48,15 +48,12 @@
       position: relative;
       left: 0;
       width: 100% !important;
-
-      // Prevent double padding on nested body divs
-      // (e.g., in markup-include, waffle-chart, filtered-text)
-      .cove-visualization__body {
-        padding: 0;
-      }
     }
 
-    .cove-editor__content,
+    .cove-editor__content {
+      padding: 1rem;
+    }
+
     .cove-visualization__outer {
       padding: 1rem;
     }
@@ -165,14 +162,14 @@
     }
   }
 
-  .cove-visualization__body-wrap {
-    outline: 2px dashed #e66f0e;
+  .cove-visualization__message {
+    outline: 2px dashed #0050d8;
     position: relative;
 
     &::before {
-      background: #e66f0e;
+      background: #0050d8;
       color: #fff;
-      content: '__body';
+      content: '__message';
       font-family: monospace;
       font-size: 10px;
       line-height: 1;
@@ -185,4 +182,95 @@
     }
   }
 
+  .cove-visualization__body-wrap {
+    outline: 2px dashed #e66f0e;
+    position: relative;
+
+    &::before {
+      background: #e66f0e;
+      color: #fff;
+      content: '__body-wrap';
+      font-family: monospace;
+      font-size: 10px;
+      line-height: 1;
+      padding: 2px 4px;
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+    }
+  }
+
+}
+
+.cove-visualization {
+
+  .cove-visualization__body,
+  .cove-visualization__body-wrap,
+  .cove-visualization__message-section,
+  .cove-visualization__content-section,
+  .cove-visualization__body-subtext-section,
+  .cove-visualization__body-footer-section,
+  .cove-visualization__subtext-section {
+    color: var(--baseColor);
+    font-family: var(--visualization-body-font-family, var(--app-font-main));
+    line-height: var(--visualization-body-line-height, 1.5);
+  }
+
+  .cove-visualization__content-section,
+  .cove-visualization__message-section,
+  .cove-visualization__body-subtext-section,
+  .cove-visualization__body-footer-section,
+  .cove-visualization__subtext-section {
+    width: 100%;
+  }
+
+  .cove-visualization__message-section,
+  .cove-visualization__content-section {
+    font-size: var(--visualization-body-font-size, 1rem);
+  }
+
+  .cove-visualization__body-subtext-section,
+  .cove-visualization__subtext-section {
+    font-size: var(--visualization-body-font-size, 1rem);
+  }
+
+  .cove-visualization__body-footer-section {
+    font-size: var(--visualization-meta-font-size, 0.889rem);
+  }
+
+  .cove-visualization__title~.cove-visualization__body .cove-visualization__body-wrap,
+  .cove-visualization__body.component--has-legacy-border .cove-visualization__body-wrap,
+  .cove-visualization__body.component--has-border-color-theme .cove-visualization__body-wrap,
+  .cove-visualization__body.component--has-background .cove-visualization__body-wrap {
+    padding-top: var(--cove-visualization-section-gap, 1.5rem);
+    padding-bottom: var(--cove-visualization-section-gap, 1.5rem);
+  }
+
+  .cove-visualization__body.component--has-legacy-border .cove-visualization__content-section,
+  .cove-visualization__body.component--has-border-color-theme .cove-visualization__content-section,
+  .cove-visualization__body.component--has-background .cove-visualization__content-section {
+    padding-inline: 0;
+  }
+
+  &.type-data-bite .cove-visualization__body-wrap {
+    padding-top: var(--cove-visualization-section-gap, 1.5rem);
+    padding-bottom: var(--cove-visualization-section-gap, 1.5rem);
+  }
+
+  .cove-visualization__body-wrap {
+    display: flex;
+    flex-direction: column;
+    row-gap: var(--cove-visualization-section-gap, 1.5rem);
+
+    // Prevent content margins from stacking with row-gap
+    >*> :first-child {
+      margin-top: 0;
+    }
+
+    >*> :last-child {
+      margin-bottom: 0;
+    }
+  }
 }

@@ -5,7 +5,7 @@ import ResizeObserver from 'resize-observer-polyfill'
 import 'whatwg-fetch'
 // Core components
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
-import { VisualizationContainer } from '@cdc/core/components/Layout'
+import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 import Confirm from '@cdc/core/components/elements/Confirm'
 import Error from '@cdc/core/components/elements/Error'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
@@ -106,7 +106,8 @@ import { Datasets } from '@cdc/core/types/DataSet'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
-import { ENABLE_CHART_VISUAL_SETTINGS } from '@cdc/core/helpers/constants'
+import { ENABLE_CHART_MAP_TP5_TREATMENT, ENABLE_CHART_VISUAL_SETTINGS } from '@cdc/core/helpers/constants'
+import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 
 interface CdcChartProps {
   config?: ChartConfig
@@ -1199,6 +1200,38 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
   // Filter annotations to only those visible in current data view
   const visibleAnnotations = getVisibleAnnotations(config.annotations, transformedData, config.xAxis?.dataKey)
+  const isTp5Treatment = ENABLE_CHART_MAP_TP5_TREATMENT && config.visual?.tp5Treatment
+  const visualSettingClasses = new Set([
+    'component--has-border-color-theme',
+    'component--has-accent',
+    'component--has-background',
+    'component--hide-background-color'
+  ])
+  const tp5Classes = new Set(['component--tp5-treatment', 'component--tp5-treatment-background'])
+  const bodyClasses = contentClasses.filter(className => {
+    if (!ENABLE_CHART_VISUAL_SETTINGS && visualSettingClasses.has(className)) return false
+    if (!ENABLE_CHART_MAP_TP5_TREATMENT && tp5Classes.has(className)) return false
+    return true
+  })
+  if (config.visualizationType === 'Spark Line' && config.visual?.background) {
+    bodyClasses.push('component--has-background')
+  }
+  if (config.visualizationType === 'Spark Line' && config.visual?.hideBackgroundColor) {
+    bodyClasses.push('component--hide-background-color')
+  }
+  if (isTp5Treatment && !bodyClasses.includes('no-borders')) bodyClasses.push('no-borders')
+  const chartTitle = (
+    <Title
+      showTitle={config.showTitle}
+      isDashboard={isDashboard}
+      title={title}
+      superTitle={processedSuperTitle}
+      titleStyle={isTp5Treatment ? 'small' : config.titleStyle}
+      classes={['chart-title', `${config.theme}`, 'cove-visualization__title', isTp5Treatment ? '' : 'mb-3']}
+      style={undefined}
+      config={config}
+    />
+  )
 
   // Prevent render if loading
   let body = <Loading />
@@ -1210,13 +1243,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
   const getChartWrapperClasses = () => {
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
-    const classes = ['chart-container', 'p-relative']
-    const visualSettingClasses = [
-      'component--has-border-color-theme',
-      'component--has-accent',
-      'component--has-background',
-      'component--hide-background-color'
-    ]
+    const classes = ['chart-container', 'visualization-container', 'p-relative']
+    const visualSettingClasses = ['component--has-border-color-theme', 'component--has-accent']
     if (legend?.position) {
       if (isLegendWrapViewport(currentViewport) && legend?.position !== 'top') {
         classes.push('legend-bottom')
@@ -1225,11 +1253,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
     }
     if (legend?.hide) classes.push('legend-hidden')
+    if (contentClasses.includes('sparkline')) classes.push('sparkline')
     if (lineDatapointClass) classes.push(lineDatapointClass)
     if (!config.barHasBorder) classes.push('chart-bar--no-border')
     if (config.xAxis.brushActive && dashboardConfig?.type === 'dashboard' && (!isLegendOnBottom || legend.hide))
       classes.push('dashboard-brush')
-    classes.push(...contentClasses)
 
     if (!ENABLE_CHART_VISUAL_SETTINGS) {
       const filtered = classes.filter(className => !visualSettingClasses.includes(className))
@@ -1241,7 +1269,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
   }
 
   const getChartSubTextClasses = () => {
-    const classes = ['subtext mt-4']
+    const classes = ['subtext']
     const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
 
     if (config.isResponsiveTicks) classes.push('subtext--responsive-ticks ')
@@ -1258,33 +1286,13 @@ const CdcChart: React.FC<CdcChartProps> = ({
       <>
         {config.newViz && <Confirm updateConfig={updateConfig} config={config} />}
         {!missingRequiredSections(config) && !config.newViz && (
-          <div
-            className={`cove-visualization__inner type-${makeClassName(config.visualizationType)}`}
-            aria-label={handleChartAriaLabels(config)}
-            tabIndex={0}
-          >
-            <Title
-              showTitle={config.showTitle}
-              isDashboard={isDashboard}
-              title={title}
-              superTitle={processedSuperTitle}
-              titleStyle={config.titleStyle}
-              classes={['chart-title', `${config.theme}`, 'cove-visualization__title', 'mb-3']}
-              style={undefined}
-              config={config}
-            />
-
-            {/* Visualization Wrapper */}
-            <div
-              className={`cove-visualization__body cove-visualization__body-wrap ${getChartWrapperClasses().join(' ')}`}
-            >
-              {/* Intro Text/Message */}
-              {processedIntroText && config.visualizationType !== 'Spark Line' && (
-                <section className={`introText mb-4`}>{parse(processedIntroText)}</section>
-              )}
-
-              {/* Filters */}
-              {config.filters && !externalFilters && config.visualizationType !== 'Spark Line' && (
+          <VisualizationContent
+            innerClassName={`type-${makeClassName(config.visualizationType)}`}
+            innerProps={{ 'aria-label': handleChartAriaLabels(config), tabIndex: 0 }}
+            bodyClassName={bodyClasses.join(' ')}
+            bodyWrapClassName={isTp5Treatment ? 'cdc-callout d-flex flex-column tp5-chart-callout' : ''}
+            filters={
+              config.filters?.length > 0 && !externalFilters && config.visualizationType !== 'Spark Line' ? (
                 <Filters
                   config={config}
                   setFilters={setFilters}
@@ -1292,7 +1300,118 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   dimensions={dimensions}
                   interactionLabel={interactionLabel}
                 />
-              )}
+              ) : undefined
+            }
+            bodySubtext={
+              processedDescription && config.visualizationType !== 'Spark Line' ? (
+                <div className={getChartSubTextClasses().join(' ')}>{parse(processedDescription)}</div>
+              ) : null
+            }
+            bodyFooter={
+              <>
+                {isDashboard && config.table && config.table.show && config.table.showDataTableLink
+                  ? tableLink
+                  : link && link}
+                {(config.xAxis.dataKey &&
+                  config.table.show &&
+                  config.visualizationType !== 'Spark Line' &&
+                  config.visualizationType !== 'Sankey') ||
+                (config.visualizationType === 'Sankey' && config.table.show)
+                  ? (() => {
+                      let dataTableConfig = pivotDynamicSeries(config)
+                      let dataTableColumns = config.columns
+                      let dataTableRuntimeData = getTableRuntimeData()
+                      let dataTableRawData =
+                        config.visualizationType === 'Sankey'
+                          ? config?.data?.[0]?.tableData
+                          : config.table.customTableConfig
+                          ? filterVizData(config.filters, config.data)
+                          : config.data
+
+                      if (config.smallMultiples?.mode) {
+                        const prepared = prepareSmallMultiplesDataTable(config, config.columns, dataTableRuntimeData)
+                        dataTableConfig = prepared.config
+                        dataTableColumns = prepared.columns
+                        dataTableRuntimeData = prepared.runtimeData
+                        if (config.smallMultiples.mode === 'by-column') {
+                          dataTableRawData = prepared.config.data
+                        }
+                      }
+
+                      return (
+                        <DataTable
+                          key={config.table?.defaultSort?.column || ''}
+                          config={dataTableConfig}
+                          rawData={dataTableRawData}
+                          runtimeData={dataTableRuntimeData}
+                          expandDataTable={config.table.expanded}
+                          columns={dataTableColumns}
+                          displayGeoName={name => name}
+                          applyLegendToRow={applyLegendToRow}
+                          tableTitle={config.table.label}
+                          indexTitle={config.table.indexLabel}
+                          vizTitle={title}
+                          viewport={currentViewport}
+                          tabbingId={handleChartTabbing(config, legendId)}
+                          colorScale={colorScale}
+                          imageRef={imageId}
+                          showDownloadImgButton={config.table.showDownloadImgButton}
+                          showDownloadPdfButton={config.table.showDownloadPdfButton}
+                          includeContextInDownload={config.table?.includeContextInDownload}
+                          hasSubtextAbove={Boolean(processedDescription && config.visualizationType !== 'Spark Line')}
+                          interactionLabel={interactionLabel}
+                        />
+                      )
+                    })()
+                  : (config.table.showDownloadImgButton || config.table.showDownloadPdfButton) && (
+                      <div className='w-100 d-flex justify-content-end'>
+                        <MediaControls.Section classes={['download-links', 'mt-4', 'mb-2']}>
+                          {config.table.showDownloadImgButton && (
+                            <MediaControls.DownloadLink
+                              type='image'
+                              title='Download Chart as Image'
+                              state={config}
+                              elementToCapture={imageId}
+                              interactionLabel={interactionLabel}
+                              includeContextInDownload={config.table?.includeContextInDownload}
+                            />
+                          )}
+                          {config.table.showDownloadPdfButton && (
+                            <MediaControls.DownloadLink
+                              type='pdf'
+                              title='Download Chart as PDF'
+                              state={config}
+                              elementToCapture={imageId}
+                              interactionLabel={interactionLabel}
+                              includeContextInDownload={config.table?.includeContextInDownload}
+                            />
+                          )}
+                        </MediaControls.Section>
+                      </div>
+                    )}
+                {visibleAnnotations.length > 0 && <Annotation.Dropdown />}
+                {processedLegacyFootnotes && (
+                  <section className='footnotes pt-2 mt-4'>{parse(processedLegacyFootnotes)}</section>
+                )}
+              </>
+            }
+            header={isTp5Treatment ? null : chartTitle}
+            messageIsIntroText={config.visualizationType !== 'Spark Line' && !!processedIntroText}
+            message={config.visualizationType !== 'Spark Line' && processedIntroText ? parse(processedIntroText) : null}
+            footer={
+              <FootnotesStandAlone
+                config={configObj.footnotes}
+                filters={config.filters?.filter(f => f.filterFootnotes)}
+                markupVariables={config.markupVariables}
+                enableMarkupVariables={config.enableMarkupVariables}
+                data={config.data}
+                dataMetadata={config.dataMetadata}
+              />
+            }
+          >
+            {isTp5Treatment && <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />}
+            {isTp5Treatment && chartTitle}
+            <div className={getChartWrapperClasses().join(' ')}>
               <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />
               {visibleAnnotations.length > 0 && (
                 <SkipTo
@@ -1402,7 +1521,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         interactionLabel={interactionLabel}
                       />
                       {processedIntroText && (
-                        <section className='introText mb-4' style={{ padding: '0px 0 35px' }}>
+                        <section className='introText' style={{ padding: '0px 0 35px' }}>
                           {parse(processedIntroText)}
                         </section>
                       )}
@@ -1410,7 +1529,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         <ParentSize>{parent => <SparkLine width={parent.width} height={parent.height} />}</ParentSize>
                       </div>
                       {processedDescription && (
-                        <div className='subtext' style={{ padding: '35px 0 15px' }}>
+                        <div className='subtext' style={{ padding: '35px 0 1.5rem' }}>
                           {parse(processedDescription)}
                         </div>
                       )}
@@ -1439,110 +1558,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   config.legend?.style === 'gradient' &&
                   !config.smallMultiples?.mode && <WarmingStripesGradientLegend />}
               </LegendWrapper>
-              {/* Link */}
-              {isDashboard && config.table && config.table.show && config.table.showDataTableLink
-                ? tableLink
-                : link && link}
-              {/* Description */}
-
-              {processedDescription && config.visualizationType !== 'Spark Line' && (
-                <div className={getChartSubTextClasses().join(' ')}>{parse(processedDescription)}</div>
-              )}
-
-              {/* Data Table */}
-              {(config.xAxis.dataKey &&
-                config.table.show &&
-                config.visualizationType !== 'Spark Line' &&
-                config.visualizationType !== 'Sankey') ||
-              (config.visualizationType === 'Sankey' && config.table.show)
-                ? (() => {
-                    let dataTableConfig = pivotDynamicSeries(config)
-                    let dataTableColumns = config.columns
-                    let dataTableRuntimeData = getTableRuntimeData()
-                    let dataTableRawData =
-                      config.visualizationType === 'Sankey'
-                        ? config?.data?.[0]?.tableData
-                        : config.table.customTableConfig
-                        ? filterVizData(config.filters, config.data)
-                        : config.data
-
-                    if (config.smallMultiples?.mode) {
-                      const prepared = prepareSmallMultiplesDataTable(config, config.columns, dataTableRuntimeData)
-                      dataTableConfig = prepared.config
-                      dataTableColumns = prepared.columns
-                      dataTableRuntimeData = prepared.runtimeData
-                      if (config.smallMultiples.mode === 'by-column') {
-                        dataTableRawData = prepared.config.data
-                      }
-                    }
-
-                    return (
-                      <DataTable
-                        /* changing the "key" will force the table to re-render
-                        when the default sort changes while editing */
-                        key={config.table?.defaultSort?.column || ''}
-                        config={dataTableConfig}
-                        rawData={dataTableRawData}
-                        runtimeData={dataTableRuntimeData}
-                        expandDataTable={config.table.expanded}
-                        columns={dataTableColumns}
-                        displayGeoName={name => name}
-                        applyLegendToRow={applyLegendToRow}
-                        tableTitle={config.table.label}
-                        indexTitle={config.table.indexLabel}
-                        vizTitle={title}
-                        viewport={currentViewport}
-                        tabbingId={handleChartTabbing(config, legendId)}
-                        colorScale={colorScale}
-                        imageRef={imageId}
-                        showDownloadImgButton={config.table.showDownloadImgButton}
-                        showDownloadPdfButton={config.table.showDownloadPdfButton}
-                        includeContextInDownload={config.table?.includeContextInDownload}
-                        interactionLabel={interactionLabel}
-                      />
-                    )
-                  })()
-                : (config.table.showDownloadImgButton || config.table.showDownloadPdfButton) && (
-                    <div className='w-100 d-flex justify-content-end'>
-                      <MediaControls.Section classes={['download-links', 'mt-4', 'mb-2']}>
-                        {config.table.showDownloadImgButton && (
-                          <MediaControls.DownloadLink
-                            type='image'
-                            title='Download Chart as Image'
-                            state={config}
-                            elementToCapture={imageId}
-                            interactionLabel={interactionLabel}
-                            includeContextInDownload={config.table?.includeContextInDownload}
-                          />
-                        )}
-                        {config.table.showDownloadPdfButton && (
-                          <MediaControls.DownloadLink
-                            type='pdf'
-                            title='Download Chart as PDF'
-                            state={config}
-                            elementToCapture={imageId}
-                            interactionLabel={interactionLabel}
-                            includeContextInDownload={config.table?.includeContextInDownload}
-                          />
-                        )}
-                      </MediaControls.Section>
-                    </div>
-                  )}
-              {visibleAnnotations.length > 0 && <Annotation.Dropdown />}
-              {/* show pdf or image button */}
-              {processedLegacyFootnotes && (
-                <section className='footnotes pt-2 mt-4'>{parse(processedLegacyFootnotes)}</section>
-              )}
             </div>
-            <FootnotesStandAlone
-              config={configObj.footnotes}
-              filters={config.filters?.filter(f => f.filterFootnotes)}
-              markupVariables={config.markupVariables}
-              enableMarkupVariables={config.enableMarkupVariables}
-              data={config.data}
-              dataMetadata={config.dataMetadata}
-            />
-          </div>
+          </VisualizationContent>
         )}
       </>
     )

@@ -121,6 +121,8 @@ const createInitialState = () => {
       accent: false,
       background: false,
       hideBackgroundColor: false,
+      tp5Treatment: false,
+      tp5Background: false,
       minBubbleSize: 1,
       maxBubbleSize: 20,
       extraBubbleBorder: false,

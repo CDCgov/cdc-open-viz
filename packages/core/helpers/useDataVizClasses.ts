@@ -2,6 +2,7 @@ import { isBelowBreakpoint } from './viewports'
 
 export default function useDataVizClasses(config, viewport = null) {
   const {
+    type,
     legend,
     lineDatapointStyle,
     showTitle,
@@ -23,8 +24,8 @@ export default function useDataVizClasses(config, viewport = null) {
     lineDatapointClass = ' chart-line--always'
   }
 
-  let innerContainerClasses = ['cove-visualization__inner']
-  let contentClasses = ['cove-visualization__body']
+  let innerContainerClasses = []
+  let contentClasses = []
 
   if (visualizationType === 'Spark Line' || visualizationType === 'chart') {
     if (title && showTitle) contentClasses.push('component--has-title')
@@ -32,6 +33,7 @@ export default function useDataVizClasses(config, viewport = null) {
 
   showTitle && contentClasses.push('component--has-title')
   title &&
+    showTitle &&
     visualizationType !== 'chart' &&
     visualizationType !== 'Spark Line' &&
     contentClasses.push('component--has-title')
@@ -39,15 +41,19 @@ export default function useDataVizClasses(config, viewport = null) {
   biteStyle && innerContainerClasses.push(`bite__style--${biteStyle}`)
   general?.isCompactStyle && innerContainerClasses.push(`component--is-compact-style`)
 
+  visual?.border && contentClasses.push('component--has-legacy-border')
   !visual?.border && contentClasses.push('no-borders')
   visualizationType === 'Spark Line' && contentClasses.push('sparkline')
   visual?.borderColorTheme && contentClasses.push('component--has-border-color-theme')
   visual?.accent && contentClasses.push('component--has-accent')
-  visual?.background && contentClasses.push('component--has-background')
-  visual?.hideBackgroundColor && contentClasses.push('component--hide-background-color')
+  if (type !== 'chart' && type !== 'map') {
+    visual?.background && contentClasses.push('component--has-background')
+    visual?.hideBackgroundColor && contentClasses.push('component--hide-background-color')
+  }
+  visual?.tp5Treatment && contentClasses.push('component--tp5-treatment')
 
   // ! these two will be retired.
-  shadow && innerContainerClasses.push('shadow')
+  shadow && type !== 'data-bite' && innerContainerClasses.push('shadow')
   config?.visual?.roundedBorders && innerContainerClasses.push('bite--has-rounded-borders')
 
   let sparkLineStyles = {

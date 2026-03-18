@@ -50,6 +50,7 @@ import { MapContext } from '../../../types/MapContext.js'
 import Alert from '@cdc/core/components/Alert'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import StyleTreatmentSection from '@cdc/core/components/EditorPanel/sections/StyleTreatmentSection'
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs } from '../../../helpers'
@@ -63,7 +64,11 @@ import { Datasets } from '@cdc/core/types/DataSet'
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { paletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { isV1Palette, getCurrentPaletteName, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
-import { ENABLE_MAP_DATA_BITE_VISUAL_SETTINGS, USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
+import {
+  ENABLE_CHART_MAP_TP5_TREATMENT_SELECTION,
+  ENABLE_MAP_DATA_BITE_VISUAL_SETTINGS,
+  USE_V2_MIGRATION
+} from '@cdc/core/helpers/constants'
 import { isCoveDeveloperMode } from '@cdc/core/helpers/queryStringUtils'
 import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
 import PaletteConversionModal from '@cdc/core/components/PaletteConversionModal'
@@ -1069,6 +1074,44 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
   const updateField = updateFieldFactory(config, setConfig)
 
+  const handleStyleTreatmentChange = (value: string) => {
+    const useTp5Treatment = value === 'tp5'
+
+    setConfig({
+      ...config,
+      general: {
+        ...config.general,
+        titleStyle: useTp5Treatment ? 'small' : 'legacy'
+      },
+      visual: {
+        ...config.visual,
+        tp5Treatment: useTp5Treatment,
+        border: useTp5Treatment ? false : config.visual?.border,
+        borderColorTheme: useTp5Treatment ? false : config.visual?.borderColorTheme,
+        accent: useTp5Treatment ? false : config.visual?.accent
+      }
+    })
+  }
+
+  const handleTitleStyleChange = (newTitleStyle: string) => {
+    setConfig({
+      ...config,
+      general: {
+        ...config.general,
+        titleStyle: newTitleStyle
+      },
+      visual:
+        newTitleStyle === 'legacy'
+          ? config.visual
+          : {
+              ...config.visual,
+              border: undefined,
+              borderColorTheme: undefined,
+              accent: undefined
+            }
+    })
+  }
+
   const StateOptionList = () => {
     const arrOfArrays = Object.entries(supportedStatesFipsCodes)
 
@@ -1559,12 +1602,12 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       section='general'
                       fieldName='titleStyle'
                       label='Title Style'
-                      updateField={updateField}
                       options={[
                         { value: 'small', label: 'Small (h3)' },
                         { value: 'large', label: 'Large (h2)' },
                         { value: 'legacy', label: 'Legacy' }
                       ]}
+                      onChange={event => handleTitleStyleChange(event.target.value)}
                       tooltip={
                         <Tooltip style={{ textTransform: 'none' }}>
                           <Tooltip.Target>
@@ -3248,6 +3291,19 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       onThemeSelect={palette => handleEditorChanges('headerColor', palette)}
                       label='Header Theme'
                     />
+                    {ENABLE_MAP_DATA_BITE_VISUAL_SETTINGS && (
+                      <StyleTreatmentSection
+                        styleTreatment={
+                          config.general.titleStyle === 'legacy' && !config.visual?.tp5Treatment ? 'legacy' : 'tp5'
+                        }
+                        onStyleTreatmentChange={handleStyleTreatmentChange}
+                        showStyleTreatment={ENABLE_CHART_MAP_TP5_TREATMENT_SELECTION}
+                        border={config.visual?.border}
+                        borderColorTheme={config.visual?.borderColorTheme}
+                        accent={config.visual?.accent}
+                        updateField={updateField}
+                      />
+                    )}
                     <CheckBox
                       value={config.general.showTitle || false}
                       section='general'
@@ -3259,46 +3315,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         handleEditorChanges('showTitle', event.target.checked)
                       }}
                     />
-
-                    {ENABLE_MAP_DATA_BITE_VISUAL_SETTINGS && (
-                      <>
-                        <CheckBox
-                          value={config.visual?.border}
-                          section='visual'
-                          fieldName='border'
-                          label='Display Border'
-                          updateField={updateField}
-                        />
-                        <CheckBox
-                          value={config.visual?.borderColorTheme}
-                          section='visual'
-                          fieldName='borderColorTheme'
-                          label='Use Border Color Theme'
-                          updateField={updateField}
-                        />
-                        <CheckBox
-                          value={config.visual?.accent}
-                          section='visual'
-                          fieldName='accent'
-                          label='Use Accent Style'
-                          updateField={updateField}
-                        />
-                        <CheckBox
-                          value={config.visual?.background}
-                          section='visual'
-                          fieldName='background'
-                          label='Use Theme Background Color'
-                          updateField={updateField}
-                        />
-                        <CheckBox
-                          value={config.visual?.hideBackgroundColor}
-                          section='visual'
-                          fieldName='hideBackgroundColor'
-                          label='Hide Background Color'
-                          updateField={updateField}
-                        />
-                      </>
-                    )}
 
                     {'navigation' === config.general.type && (
                       <CheckBox

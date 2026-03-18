@@ -49,7 +49,7 @@ import VisualizationRow from './components/VisualizationRow'
 import { getVizConfig } from './helpers/getVizConfig'
 import { getFilteredData } from './helpers/getFilteredData'
 import { getVizRowColumnLocator } from './helpers/getVizRowColumnLocator'
-import { Responsive } from '@cdc/core/components/Layout'
+import { Responsive, VisualizationContainer } from '@cdc/core/components/Layout'
 import * as reloadURLHelpers from './helpers/reloadURLHelpers'
 import { addValuesToDashboardFilters } from './helpers/addValuesToDashboardFilters'
 import { DashboardFilters } from './types/DashboardFilters'
@@ -662,11 +662,6 @@ export default function CdcDashboard({
     )
   }
 
-  const dashboardContainerClasses = ['cove-visualization', 'type-dashboard', `${currentViewport}`]
-  if (isEditor) {
-    dashboardContainerClasses.push('is-dashboard-editor')
-  }
-
   return (
     <GlobalContextProvider>
       <DashboardContext.Provider
@@ -683,9 +678,17 @@ export default function CdcDashboard({
         }}
       >
         <DashboardDispatchContext.Provider value={dispatch}>
-          <div className={dashboardContainerClasses.join(' ')} ref={outerContainerRef} data-download-id={imageId}>
+          <VisualizationContainer
+            className={isEditor ? 'is-dashboard-editor' : undefined}
+            config={state.config}
+            currentViewport={currentViewport}
+            imageId={imageId}
+            isEditor={false}
+            ref={outerContainerRef}
+            renderResponsive={false}
+          >
             {body}
-          </div>
+          </VisualizationContainer>
           <OverlayFrame />
         </DashboardDispatchContext.Provider>
       </DashboardContext.Provider>

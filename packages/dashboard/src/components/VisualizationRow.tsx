@@ -140,6 +140,8 @@ const VisualizationRow: React.FC<VizRowProps> = ({
 
   // Equalize TP5 callout title heights and TP5 gauge message blocks for like visualizations in the same row
   useEffect(() => {
+    if (!row.equalHeight) return
+
     const rowElement = document.querySelector(`[data-row-index="${index}"]`)
     if (!rowElement) return
 
@@ -155,17 +157,10 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     }
   }, [index, row, config, filteredDataOverride])
 
-  const isMultiColumn = row.columns.filter(c => c.width).length > 1
-  const hasTP5Content =
-    isMultiColumn &&
-    row.columns.some(col => {
-      if (!col.widget) return false
-      const viz = config.visualizations[col.widget]
-      return (
-        viz?.biteStyle === 'tp5' || viz?.visualizationType === 'TP5 Waffle' || viz?.visualizationType === 'TP5 Gauge'
-      )
-    })
-  const needsEqualHeight = row.equalHeight || hasTP5Content
+  const isFilterRow = row.columns.some(
+    col => col.widget && config.visualizations[col.widget]?.type === 'dashboardFilters'
+  )
+  const needsEqualHeight = !!row.equalHeight && !isFilterRow
 
   const show = useMemo(() => {
     if (row.toggle) {

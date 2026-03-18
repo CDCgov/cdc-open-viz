@@ -237,7 +237,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
 
       const filteredRows = _.map(newRows, row => ({
         ...row,
-        columns: _.filter(row.columns, column => column.widget !== uid)
+        columns: row.columns.map(column => (column.widget === uid ? _.omit(column, 'widget') : column))
       }))
 
       return {

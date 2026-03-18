@@ -1,4 +1,5 @@
 @import '@cdc/core/styles/utils/breakpoints';
+@import '@cdc/core/styles/layout/wrapper-padding';
 
 .form-container {
   overflow-y: auto;
@@ -15,19 +16,59 @@
 .cove-visualization.type-chart {
   @import 'DataTable';
 
+  .cove-visualization__body {
+    @include cove-visualization-body-padding;
+  }
+
+  .cove-visualization__body.component--tp5-treatment {
+    background: transparent;
+
+    .cdc-callout {
+      box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+      border: 1px solid #dff2f6;
+      margin: 0;
+      padding: 1.25rem;
+      border-radius: 0.25rem;
+      position: relative;
+      background: transparent;
+
+      .cdc-callout__flag {
+        position: absolute;
+        top: -0.36rem;
+        right: 1.08rem;
+        width: 1.84rem;
+        height: auto;
+      }
+
+      .cove-visualization__title,
+      .cove-visualization__header {
+        background: transparent;
+        border: 0;
+        color: var(--cool-gray-90, #1f2937);
+        margin: 0 0 1rem;
+        padding: 0;
+        border-radius: 0;
+
+        h2 {
+          color: var(--cool-gray-90, #1f2937);
+          font-family: var(--fonts-nunito, var(--app-font-secondary));
+          font-size: 1.1rem;
+          font-weight: 700;
+        }
+      }
+    }
+  }
+
   .cove-visualization__title,
   .cove-visualization__header {
     margin-bottom: 0 !important;
-  }
-
-  .cove-visualization__body.cove-visualization__body-wrap {
-    padding-top: 1rem !important;
   }
 
   .legend-top {
     .legend-wrapper .tooltip-boundary {
       display: flex;
       flex-wrap: wrap;
+      row-gap: var(--cove-visualization-section-gap, 1.5rem);
       order: 2;
 
       aside {
@@ -41,9 +82,11 @@
     .legend-wrapper {
       display: flex;
       flex-wrap: wrap;
+      row-gap: var(--cove-visualization-section-gap, 1.5rem);
 
       aside {
         width: 100%;
+        margin-top: var(--cove-visualization-section-gap, 1.5rem) !important;
       }
     }
   }
@@ -58,10 +101,6 @@
     margin-bottom: 20px;
   }
 
-  .subtext,
-  .subtext--responsive-ticks,
-  .section-subtext {}
-
   .type-pie {
     svg.animated-pie {
       width: auto !important;
@@ -70,7 +109,6 @@
 
   .legend-container {
     #supression-tooltip {
-      font-family: 'Nunito', sans-serif;
       font-size: 0.8337rem;
       font-weight: 400;
       max-width: 16.7rem;
@@ -275,11 +313,29 @@
     position: relative;
   }
 
-  .chart-container {
+  .visualization-container {
     display: flex;
     align-items: flex-start;
     flex-wrap: wrap;
     justify-content: space-between;
+    min-width: 0;
+    max-width: 100%;
+
+    .legend-wrapper {
+      min-width: 0;
+      max-width: 100%;
+
+      >div,
+      >aside {
+        min-width: 0;
+        max-width: 100%;
+      }
+    }
+
+    .tooltip-boundary {
+      min-width: 0;
+      max-width: 100%;
+    }
 
     &.legend-top:not(.legend-hidden) {
       .legend-wrapper {
@@ -442,7 +498,7 @@
   }
 
   @include breakpointClass(sm) {
-    .chart-container {
+    .visualization-container {
       .no-wrap {
         flex-wrap: nowrap;
       }
@@ -468,7 +524,7 @@
   }
 
   @include breakpointClass(md) {
-    .chart-container {
+    .visualization-container {
       >svg {
         font-size: 16px;
         width: 75%;
@@ -652,17 +708,19 @@
 }
 
 .cove-visualization.type-chart.type-sparkline {
-  &.lg .chart-container>svg {
+  &.lg .visualization-container>svg {
     width: 100%;
   }
 
-  .chart-container.sparkline {
+  .visualization-container.sparkline {
     display: flex !important;
     flex-wrap: wrap !important;
   }
 
   .cove-visualization__body {
-    background: #f2f2f2;
+    &:not(.component--has-background):not(.component--hide-background-color) {
+      background: #f2f2f2;
+    }
 
     &.component--hide-background-color {
       background: transparent;
@@ -682,9 +740,6 @@
       }
     }
 
-    .chart-container {
-      padding: 1em;
-    }
   }
 
   .subtext,

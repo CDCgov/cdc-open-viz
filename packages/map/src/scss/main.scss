@@ -1,6 +1,7 @@
 @import '@cdc/core/styles/utils/breakpoints';
 @import 'editor-panel';
 @import '@cdc/core/styles/utils/accessibility';
+@import '@cdc/core/styles/layout/wrapper-padding';
 
 .type-map--has-error {
   .waiting {
@@ -21,7 +22,7 @@
   }
 
   @include breakpointClass(md) {
-    .map-container.modal-background::before {
+    .visualization-container.modal-background::before {
       border-bottom: var(--lightGray) 1px solid;
       margin-bottom: -1px;
       bottom: 1px;
@@ -98,7 +99,7 @@
   }
 
   .cove-visualization__body {
-    padding: 0 1rem 1rem;
+    @include cove-visualization-body-padding;
 
     &:not(.no-borders) {
       border: 1px solid var(--lightGray);
@@ -120,8 +121,43 @@
       background-color: transparent;
     }
 
-    &.cove-visualization__body-wrap {
-      padding-top: 1rem !important;
+    &.component--tp5-treatment {
+      background: transparent;
+
+      .cdc-callout {
+        box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+        border: 1px solid #dff2f6;
+        margin: 0;
+        padding: 1.25rem;
+        border-radius: 0.25rem;
+        position: relative;
+        background: transparent;
+
+        .cdc-callout__flag {
+          position: absolute;
+          top: -0.36rem;
+          right: 1.08rem;
+          width: 1.84rem;
+          height: auto;
+        }
+
+        .cove-visualization__title,
+        .cove-visualization__header {
+          background: transparent;
+          border: 0;
+          color: var(--cool-gray-90, #1f2937);
+          margin: 0 0 1rem;
+          padding: 0;
+          border-radius: 0;
+
+          h2 {
+            color: var(--cool-gray-90, #1f2937);
+            font-family: var(--fonts-nunito, var(--app-font-secondary));
+            font-size: 1.1rem;
+            font-weight: 700;
+          }
+        }
+      }
     }
   }
 
@@ -133,17 +169,23 @@
     border: 0;
   }
 
-  .map-container {
+  .visualization-container {
     display: flex;
     position: relative;
     flex-direction: column;
 
     &.bottom {
       flex-direction: column;
+      row-gap: var(--cove-visualization-section-gap, 1.5rem);
+
+      >.legends {
+        margin-top: var(--cove-visualization-section-gap, 1.5rem) !important;
+      }
     }
 
     &.top {
       flex-direction: column-reverse;
+      row-gap: var(--cove-visualization-section-gap, 1.5rem);
     }
 
     &.modal-background {
@@ -176,7 +218,6 @@
         /* Constrain the modal's height to 90% of the viewport */
         overflow-y: auto;
         /* Enable vertical scrolling if content overflows */
-        font-size: 1rem;
         line-height: 1.4em;
       }
 
@@ -228,6 +269,11 @@
         }
       }
     }
+  }
+
+  .visualization-container.legend-wrapped-bottom>.legends,
+  .legends.legend-wrapped-bottom {
+    margin-top: var(--cove-visualization-section-gap, 1.5rem) !important;
   }
 
   p.subtext {

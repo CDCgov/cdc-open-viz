@@ -20,6 +20,10 @@ type MapVisualSettings = {
   background?: boolean
   /** hideBackgroundColor - hide default background color */
   hideBackgroundColor?: boolean
+  /** tp5Treatment - render the TP5 callout shell */
+  tp5Treatment?: boolean
+  /** tp5Background - enable the TP5 cyan background */
+  tp5Background?: boolean
   /** minBubbleSize - Minimum Circle Size when the map has a type of bubble */
   minBubbleSize: number
   /** maxBubbleSize - Maximum Circle Size when the map has a type of bubble */

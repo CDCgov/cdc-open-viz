@@ -15,7 +15,7 @@ import DataTransform from '@cdc/core/helpers/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import { VisualizationContainer } from '@cdc/core/components/Layout'
+import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 
 // external
 import parse from 'html-react-parser'
@@ -39,10 +39,6 @@ const CdcFilteredText = ({
   let { title, filters } = config
 
   const { contentClasses, innerContainerClasses } = useDataVizClasses(config)
-  const { visual } = config
-
-  const shouldApplyTopPadding = visual?.border || visual?.background || (config.title && config.titleStyle === 'legacy')
-  const shouldApplySidePadding = visual?.border || visual?.accent || visual?.background
 
   // Default Functions
 
@@ -123,27 +119,26 @@ const CdcFilteredText = ({
   let content = <Loading />
 
   if (loading === false) {
-    let body = (
-      <div className={innerContainerClasses.join(' ')}>
-        <Title
-          classes={[`${config.theme}`, 'mb-0']}
-          title={title}
-          titleStyle={config.titleStyle}
-          config={config}
-          noContent={!config.textColumn}
-        />
-        <div
-          className={`${contentClasses.join(' ')} cove-visualization__body-wrap${
-            shouldApplyTopPadding ? ' has-top-padding' : ''
-          }${shouldApplySidePadding ? ' has-side-padding' : ''}`}
-        >
-          {filterByTextColumn()
-            .slice(0, 1)
-            .map((el, i) => (
-              <p key={i}> {parse(el[config.textColumn] || '')} </p>
-            ))}
-        </div>
-      </div>
+    const body = (
+      <VisualizationContent
+        innerClassName={innerContainerClasses.join(' ')}
+        bodyClassName={contentClasses.join(' ')}
+        header={
+          <Title
+            classes={[`${config.theme}`, 'mb-0']}
+            title={title}
+            titleStyle={config.titleStyle}
+            config={config}
+            noContent={!config.textColumn}
+          />
+        }
+      >
+        {filterByTextColumn()
+          .slice(0, 1)
+          .map((el, i) => (
+            <p key={i}> {parse(el[config.textColumn] || '')} </p>
+          ))}
+      </VisualizationContent>
     )
 
     content = body
