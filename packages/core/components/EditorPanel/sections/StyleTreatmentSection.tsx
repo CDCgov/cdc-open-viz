@@ -31,6 +31,9 @@ const StyleTreatmentSection = ({
   showHideBackgroundColor = false,
   updateField
 }: StyleTreatmentSectionProps) => {
+  const hasContent = showStyleTreatment || (showLegacyControls && styleTreatment === 'legacy')
+  if (!hasContent) return null
+
   return (
     <div className='cove-accordion__panel-section checkbox-group'>
       {showStyleTreatment && (
