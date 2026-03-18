@@ -4,6 +4,15 @@ export type MarkupCondition = {
   value: string
 }
 
+import type { SvgRegistryId } from '../helpers/svgRegistry'
+
+export type MarkupVariableOutputType = 'value' | 'svg'
+
+export type MarkupVariableSvgMapping = {
+  sourceValue: string
+  svgId: SvgRegistryId
+}
+
 export type MarkupVariable = {
   columnName?: string
   conditions: MarkupCondition[]
@@ -12,6 +21,9 @@ export type MarkupVariable = {
   addCommas?: boolean
   hideOnNull?: boolean
   metadataKey?: string
+  outputType?: MarkupVariableOutputType
+  svgMappings?: MarkupVariableSvgMapping[]
+  svgScale?: number
 }
 
 export type MarkupConfig = {

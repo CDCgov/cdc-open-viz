@@ -276,7 +276,25 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   const scopeId = `cove-mi-${config?.runtime?.uniqueId || 'default'}`
   const { scopedCSS, cleanHTML } = extractAndScopeStyles(processedMarkup.processedContent, scopeId)
-  const sanitizedHTML = cleanHTML ? DOMPurify.sanitize(cleanHTML) : ''
+  const sanitizedHTML = cleanHTML
+    ? DOMPurify.sanitize(cleanHTML, {
+        ADD_TAGS: ['svg', 'path', 'rect', 'g'],
+        ADD_ATTR: [
+          'viewBox',
+          'role',
+          'aria-label',
+          'width',
+          'height',
+          'class',
+          'fill',
+          'd',
+          'transform',
+          'style',
+          'x',
+          'y'
+        ]
+      })
+    : ''
 
   const hideMarkupInclude = processedMarkup.shouldHideSection
   const _showNoDataMessage = processedMarkup.shouldShowNoDataMessage

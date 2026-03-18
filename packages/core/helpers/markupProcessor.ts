@@ -3,6 +3,7 @@ import { MarkupVariable, MarkupCondition } from '../types/MarkupVariable'
 import { VizFilter } from '../types/VizFilter'
 import { Datasets } from '../types/DataSet'
 import { filterVizData } from './filterVizData'
+import { buildInlineSvg, SVG_REGISTRY, SvgRegistryId } from './svgRegistry'
 
 /**
  * Replaces {{variable}} tags in content with actual data values.
@@ -67,6 +68,28 @@ export const processMarkupVariables = (
     const emptyVariableChecker: boolean[] = []
     const noDataMessageChecker: boolean[] = []
 
+    const resolveSvgIds = (
+      dataRows: Record<string, any>[],
+      sourceColumn: string,
+      mappings: NonNullable<MarkupVariable['svgMappings']>
+    ): SvgRegistryId[] => {
+      const uniqueValues = _.uniq(
+        (dataRows || [])
+          .map(row => row?.[sourceColumn])
+          .filter(value => value !== undefined && value !== null)
+          .map(value => String(value))
+          .filter(value => value !== '')
+      )
+
+      if (uniqueValues.length === 0) {
+        return []
+      }
+
+      return uniqueValues
+        .map(sourceValue => mappings.find(rule => rule.sourceValue === sourceValue)?.svgId)
+        .filter((svgId): svgId is SvgRegistryId => !!svgId && !!SVG_REGISTRY[svgId])
+    }
+
     const variableRegexPattern = /{{(.*?)}}/g
     const processedContent = content.replace(variableRegexPattern, variableTag => {
       try {
@@ -74,6 +97,43 @@ export const processMarkupVariables = (
 
         const workingVariable = markupVariables.find(variable => variable.tag === variableTag)
         if (!workingVariable) return variableTag
+
+        const outputType = workingVariable.outputType === 'svg' ? 'svg' : 'value'
+
+        if (outputType === 'svg') {
+          let svgMarkup = ''
+
+          if (!workingVariable.metadataKey && workingVariable.columnName) {
+            let variableData = getDataForVariable(workingVariable)
+            if (filters && filters.length > 0) {
+              variableData = filterVizData(filters, variableData)
+            }
+
+            const conditionFilteredData =
+              workingVariable.conditions.length === 0
+                ? variableData
+                : filterDataByConditions(variableData, [...workingVariable.conditions])
+
+            const resolvedSvgIds = resolveSvgIds(
+              conditionFilteredData,
+              workingVariable.columnName,
+              workingVariable.svgMappings || []
+            )
+            svgMarkup = resolvedSvgIds.length
+              ? resolvedSvgIds.map(svgId => buildInlineSvg(svgId, { scale: workingVariable.svgScale })).join(' ')
+              : ''
+          }
+
+          if (showNoDataMessage && svgMarkup === '') {
+            noDataMessageChecker.push(true)
+          }
+
+          if (svgMarkup === '' && allowHideSection) {
+            emptyVariableChecker.push(true)
+          }
+
+          return svgMarkup
+        }
 
         // Resolve the data source for this variable. Metadata-sourced variables
         // (metadataKey) pull a single value from the data file's top-level fields,
@@ -209,14 +269,38 @@ export const validateMarkupVariables = (markupVariables: MarkupVariable[], data:
   const availableColumns = data.length > 0 ? Object.keys(data[0]) : []
 
   markupVariables.forEach((variable, index) => {
+    const outputType = variable.outputType === 'svg' ? 'svg' : 'value'
+
     if (!variable.tag || !variable.tag.match(/^{{.+}}$/)) {
       errors.push(`Variable ${index + 1}: Tag must be in format {{tagName}}`)
     }
 
-    if (!variable.metadataKey && !variable.columnName) {
-      errors.push(`Variable ${index + 1}: Column name is required`)
-    } else if (variable.columnName && availableColumns.length > 0 && !availableColumns.includes(variable.columnName)) {
-      errors.push(`Variable ${index + 1}: Column "${variable.columnName}" not found in data`)
+    if (outputType === 'value') {
+      if (!variable.metadataKey && !variable.columnName) {
+        errors.push(`Variable ${index + 1}: Column name is required`)
+      } else if (
+        variable.columnName &&
+        availableColumns.length > 0 &&
+        !availableColumns.includes(variable.columnName)
+      ) {
+        errors.push(`Variable ${index + 1}: Column "${variable.columnName}" not found in data`)
+      }
+    }
+
+    if (outputType === 'svg') {
+      if (variable.metadataKey) {
+        errors.push(`Variable ${index + 1}: SVG output is not supported for metadata variables`)
+      }
+
+      if (!variable.columnName) {
+        errors.push(`Variable ${index + 1}: SVG column is required`)
+      } else if (availableColumns.length > 0 && !availableColumns.includes(variable.columnName)) {
+        errors.push(`Variable ${index + 1}: SVG column "${variable.columnName}" not found in data`)
+      }
+
+      if (!variable.svgMappings || variable.svgMappings.length === 0) {
+        errors.push(`Variable ${index + 1}: SVG mappings are required`)
+      }
     }
 
     variable.conditions.forEach((condition, condIndex) => {
