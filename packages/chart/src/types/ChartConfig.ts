@@ -134,6 +134,8 @@ type Visual = {
   accent?: boolean
   background?: boolean
   hideBackgroundColor?: boolean
+  tp5Treatment?: boolean
+  tp5Background?: boolean
   verticalHoverLine?: boolean
   horizontalHoverLine?: boolean
   lineDatapointSymbol: 'none' | 'standard'

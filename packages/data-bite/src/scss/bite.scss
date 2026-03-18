@@ -1,3 +1,5 @@
+@import '@cdc/core/styles/layout/wrapper-padding';
+
 &.theme-blue {
   .bite-value {
     color: var(--primary);
@@ -70,30 +72,74 @@
 &.cove-visualization.is-editor .sidebar+.cove-visualization__body {
   margin: 3em auto 0 !important;
   max-width: 35em !important;
-  background-color: initial;
+  background-color: var(--lightestGray);
   height: fit-content;
 }
 
 .sidebar+.cove-visualization__body .bite-content-container:not(.component--hide-background-color) {
-  background-color: white;
+  background-color: var(--lightestGray);
 }
 
 .cove-visualization__body {
-  padding: 0;
+  @include cove-visualization-body-padding;
+  background: var(--lightestGray);
 
-  // Visual: Shadow
-  &.shadow {
-    box-shadow: rgba(0, 0, 0, 0.2) 0 3px 10px;
+  &.component--hide-background-color {
+    background: transparent;
   }
 
-  .cove-visualization__inner {
-    padding: 1rem !important;
+
+  &.bite__style--gradient {
+    background: transparent !important;
+  }
+
+  >.cove-visualization__body-wrap {
+    @include cove-visualization-body-wrap-inline-padding;
+  }
+
+  &:not(.bite__style--tp5):not(.component--hide-background-color)
+    > .cove-visualization__body-wrap
+    > .cove-visualization__content-section {
+    padding-right: 1rem;
+    padding-left: 1rem;
   }
 
   // General: Bite Style > Graphic
   &.bite__style--graphic {
+    .bite-content-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+    }
+
     .bite-content {
       flex: 1;
+      min-width: 0;
+      justify-content: space-between;
+      gap: 0;
+      align-self: stretch;
+    }
+
+    .bite-content__text-wrap {
+      flex: 0 0 auto;
+    }
+
+    .bite-subtext {
+      align-self: flex-end;
+      width: 100%;
+      margin-top: 0;
+      font-size: var(--visualization-body-font-size);
+      line-height: var(--visualization-body-line-height);
+    }
+
+    .bite-right .bite-content-container,
+    .bite-bottom .bite-content-container {
+      flex-direction: row-reverse;
+    }
+
+    .callout {
+      width: 33%;
+      margin: 0;
     }
   }
 
@@ -121,14 +167,17 @@
 
   // TP5 Style (default: callout with blue background)
   &.bite__style--tp5 {
-    padding: 0 !important;
     border: none !important;
+    padding: 0 !important;
     background: none !important;
     container-type: inline-size;
 
+    > .cove-visualization__body-wrap {
+      padding: 0 !important;
+    }
+
     .cdc-callout {
       gap: 0.7rem;
-      box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
       border: 1px solid #dff2f6 !important;
       margin: 0 !important;
       padding: 1.25rem;
@@ -182,32 +231,29 @@
       height: auto;
     }
 
-    .cdc-callout__content {
-      font-size: 1rem;
-    }
 
     .bite-subtext {
       margin-top: auto; // Push to bottom on desktop
       font-style: italic;
+      font-size: var(--visualization-body-font-size);
+      line-height: var(--visualization-body-line-height);
     }
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
+      padding: 0 !important;
       background: white;
+
+      > .cove-visualization__body-wrap {
+        padding: 0 !important;
+      }
 
       .cdc-callout {
         border: 1px solid #009ec1 !important;
         background: transparent;
-        box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
       }
     }
 
-    // White background with border (when both white background and Display Border are checked)
-    &.white-background-style.display-border {
-      .cdc-callout {
-        box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
-      }
-    }
   }
 
   // General: Compact View
@@ -223,11 +269,6 @@
     align-items: center;
   }
 
-  .cove-visualization__title+.bite,
-  .cove-visualization__header+.bite {
-    border-top: 0;
-  }
-
   .bite {
     position: relative;
     overflow: hidden;
@@ -240,7 +281,7 @@
       border-top-right-radius: 3px;
     }
 
-    .bite-content-container.component--hide-background-color {
+    .cove-visualization__body.component--hide-background-color .bite-content-container {
       background: transparent;
     }
 
@@ -335,7 +376,7 @@
 
     .cove-visualization__body {
       display: flex;
-      padding: 1em !important;
+      padding: 1rem !important;
       justify-content: space-between;
 
       .bite-content {
@@ -359,7 +400,7 @@
         }
 
         .bite-subtext {
-          font-size: 0.9em;
+          font-size: var(--visualization-body-font-size);
           font-style: italic;
           flex-basis: 100%;
           width: 100%;
@@ -451,16 +492,10 @@
       align-items: center;
     }
 
-    .cove-visualization__title+.bite,
-    .cove-visualization__header+.bite {
-      border-top: 0;
-    }
   }
 }
 
 .cove-visualization__body {
-  background: var(--lightestGray);
-
   &:not(.no-borders) {
     border-color: var(--lightGray);
     border-width: 1px;

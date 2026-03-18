@@ -30,6 +30,7 @@ export type Config = {
   subtext: string
   title: string
   theme: string
+  /** @deprecated shadows have been removed from data bites */
   shadow: boolean
   visual: {
     border: boolean

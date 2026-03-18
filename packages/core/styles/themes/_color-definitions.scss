@@ -105,8 +105,8 @@ $theme: (
           border-left: 0.5rem solid string.unquote(list.nth($theme-colors, 1)) !important;
         }
 
-        /// Apply a background color
-        &.component--has-background:not(.component--hide-background-color) {
+        /// Apply a background color (excluded when TP5 treatment is active)
+        &.component--has-background:not(.component--hide-background-color):not(.component--tp5-treatment) {
           background: string.unquote(list.nth($theme-colors, 3));
         }
       }

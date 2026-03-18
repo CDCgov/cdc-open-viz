@@ -64,6 +64,7 @@ export type DataTableProps = {
   showDownloadImgButton?: boolean
   showDownloadPdfButton?: boolean
   includeContextInDownload?: boolean
+  hasSubtextAbove?: boolean
   // Map-specific props (optional)
   legendMemo?: React.MutableRefObject<Map<any, any>>
   legendSpecialClassLastMemo?: React.MutableRefObject<Map<any, any>>
@@ -89,6 +90,7 @@ const DataTable = (props: DataTableProps) => {
     showDownloadImgButton,
     showDownloadPdfButton,
     includeContextInDownload = false,
+    hasSubtextAbove = false,
     imageRef
   } = props
   const runtimeData = useMemo(() => {
@@ -264,7 +266,7 @@ const DataTable = (props: DataTableProps) => {
       (config.table.download || showDownloadImgButton || showDownloadPdfButton) && !config.table.showDownloadLinkBelow
     const isStandaloneTable = config.type === 'table'
 
-    if (!hasDownloadLinkAbove && !isStandaloneTable) {
+    if (!hasDownloadLinkAbove && !isStandaloneTable && !hasSubtextAbove) {
       classes.push('mt-4')
     }
 

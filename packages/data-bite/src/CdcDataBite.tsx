@@ -11,7 +11,7 @@ import Loading from '@cdc/core/components/Loading'
 import Title from '@cdc/core/components/ui/Title'
 import CircleCallout from './components/CircleCallout'
 import GradientBite from './components/GradientBite'
-import { VisualizationContainer } from '@cdc/core/components/Layout'
+import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 
 // external
 import ResizeObserver from 'resize-observer-polyfill'
@@ -29,12 +29,13 @@ import { publish } from '@cdc/core/helpers/events'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
+import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
 import { Config } from './types/Config'
 import dataBiteReducer from './store/db.reducer'
 import { IMAGE_POSITION_LEFT, IMAGE_POSITION_RIGHT, IMAGE_POSITION_TOP, IMAGE_POSITION_BOTTOM } from './constants'
 
 // images
-import CalloutFlag from './images/callout-flag.svg?url'
+import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 
 import {
   DATA_FUNCTION_COUNT,
@@ -75,18 +76,29 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   // Ensure imageData and dataFormat sub-fields are always defined before the reducer initializes.
   // Defaults must match initial-state.js — updateConfig() will enforce them again once loading completes.
   const safeConfigObj = {
+    ...defaults,
     ...configObj,
     imageData: {
+      ...defaults.imageData,
       ...(configObj?.imageData || {}),
       display: configObj?.imageData?.display ?? 'none',
       prefix: configObj?.imageData?.prefix ?? ''
     },
     dataFormat: {
+      ...defaults.dataFormat,
       ...(configObj?.dataFormat || {}),
       prefix: configObj?.dataFormat?.prefix ?? '',
       suffix: configObj?.dataFormat?.suffix ?? '%',
       roundToPlace: configObj?.dataFormat?.roundToPlace ?? 0,
       commas: configObj?.dataFormat?.commas ?? true
+    },
+    visual: {
+      ...defaults.visual,
+      ...(configObj?.visual || {})
+    },
+    general: {
+      ...defaults.general,
+      ...(configObj?.general || {})
     }
   }
 
@@ -130,12 +142,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   })
 
   const updateConfig = newConfig => {
-    // Deeper copy
-    Object.keys(defaults).forEach(key => {
-      if (newConfig[key] && 'object' === typeof newConfig[key] && !Array.isArray(newConfig[key])) {
-        newConfig[key] = { ...defaults[key], ...newConfig[key] }
-      }
-    })
+    backfillDefaults(newConfig, defaults)
 
     //Enforce default values that need to be calculated at runtime
     newConfig.runtime = {}
@@ -481,6 +488,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   }
 
   let body = <Loading />
+  const isCompactStyle = config.general?.isCompactStyle ?? false
+  const bodySubtext =
+    subtext && !isCompactStyle ? <p className='bite-subtext'>{parse(processContentWithMarkup(subtext))}</p> : null
 
   const DataImage = useCallback(() => {
     let operators = {
@@ -633,9 +643,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction
     const isTp5 = showBite && biteStyle === 'tp5'
-    const outerBodyClass = [
-      'cove-visualization__inner',
-      'cove-visualization__body',
+    const bodyClasses = [
+      ...innerContainerClasses,
+      ...contentClasses,
       isTp5 ? 'bite__style--tp5' : '',
       isTp5 && config.visual?.whiteBackground ? 'white-background-style' : '',
       isTp5 && config.visual?.whiteBackground && config.visual?.border ? 'display-border' : '',
@@ -646,7 +656,22 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       .join(' ')
     body = (
       <>
-        <div className={outerBodyClass}>
+        <VisualizationContent
+          bodyClassName={bodyClasses}
+          header={
+            !isTp5 ? (
+              <Title
+                showTitle={config.visual?.showTitle}
+                titleStyle='legacy'
+                config={config}
+                title={processContentWithMarkup(title)}
+                isDashboard={isDashboard}
+                classes={['bite-header', `${config.theme}`]}
+              />
+            ) : null
+          }
+          footer={link && link}
+        >
           {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
           {(!config.dataColumn || !config.dataFunction) && <Confirm />}
           {showBite && biteStyle === 'tp5' ? (
@@ -655,7 +680,6 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                 !config.visual?.whiteBackground ? 'dfe-block cdc-callout--data' : ''
               }`}
             >
-              {/* Icon shows by default, hidden when white background is enabled */}
               {!config.visual?.whiteBackground && (
                 <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
               )}
@@ -669,7 +693,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                 {showBite && <div className='cdc-callout__databite flex-shrink-0  me-3'>{calculateDataBite(true)}</div>}
                 <div className='cdc-callout__content flex-grow-1 d-flex flex-column  min-w-0'>
                   <p className='mb-0'>{parse(processContentWithMarkup(biteBody))}</p>
-                  {subtext && !config.general.isCompactStyle && (
+                  {subtext && !isCompactStyle && (
                     <p className='bite-subtext fst-italic flex-shrink-0 mt-3'>
                       {parse(processContentWithMarkup(subtext))}
                     </p>
@@ -678,73 +702,60 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
               </div>
             </div>
           ) : (
-            <>
-              <Title
-                showTitle={config.visual?.showTitle}
-                titleStyle='legacy'
-                config={config}
-                title={processContentWithMarkup(title)}
-                isDashboard={isDashboard}
-                classes={['bite-header', `${config.theme}`]}
-              />
-              <div className={`bite ${biteClasses.join(' ')}`}>
-                <div className={`bite-content-container ${contentClasses.join(' ')}`}>
-                  {showBite && 'graphic' === biteStyle && isTop && (
-                    <CircleCallout
-                      theme={config.theme}
-                      text={calculateDataBite()}
-                      biteFontSize={biteFontSize}
-                      dataFormat={dataFormat}
-                    />
+            <div className={`bite ${biteClasses.join(' ')}`}>
+              <div className='bite-content-container'>
+                {showBite && 'graphic' === biteStyle && isTop && (
+                  <CircleCallout
+                    theme={config.theme}
+                    text={calculateDataBite()}
+                    biteFontSize={biteFontSize}
+                    dataFormat={dataFormat}
+                  />
+                )}
+                {isTop && <DataImage />}
+                <div className={`bite-content`}>
+                  {showBite && 'title' === biteStyle && (
+                    <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
+                      {calculateDataBite()}
+                    </div>
                   )}
-                  {isTop && <DataImage />}
-                  <div className={`bite-content`}>
-                    {showBite && 'title' === biteStyle && (
-                      <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
-                        {calculateDataBite()}
-                      </div>
-                    )}
-                    {showBite && 'split' === biteStyle && (
-                      <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
-                        {calculateDataBite()}
-                      </div>
-                    )}
-                    <Fragment>
-                      <div className='bite-content__text-wrap'>
-                        <p className='bite-text'>
-                          {showBite && 'body' === biteStyle && (
-                            <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
-                              {calculateDataBite()}
-                            </span>
-                          )}
-                          {parse(processContentWithMarkup(biteBody))}
-                        </p>
-                        {showBite && 'end' === biteStyle && (
+                  {showBite && 'split' === biteStyle && (
+                    <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
+                      {calculateDataBite()}
+                    </div>
+                  )}
+                  <Fragment>
+                    <div className='bite-content__text-wrap'>
+                      <p className='bite-text'>
+                        {showBite && 'body' === biteStyle && (
                           <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
                             {calculateDataBite()}
                           </span>
                         )}
-                        {subtext && !config.general.isCompactStyle && (
-                          <p className='bite-subtext'>{parse(processContentWithMarkup(subtext))}</p>
-                        )}
-                      </div>
-                    </Fragment>
-                  </div>
-                  {isBottom && <DataImage />}
-                  {showBite && 'graphic' === biteStyle && !isTop && (
-                    <CircleCallout
-                      theme={config.theme}
-                      text={calculateDataBite()}
-                      biteFontSize={biteFontSize}
-                      dataFormat={dataFormat}
-                    />
-                  )}
+                        {parse(processContentWithMarkup(biteBody))}
+                      </p>
+                      {showBite && 'end' === biteStyle && (
+                        <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
+                          {calculateDataBite()}
+                        </span>
+                      )}
+                      {!isTp5 && bodySubtext}
+                    </div>
+                  </Fragment>
                 </div>
+                {isBottom && <DataImage />}
+                {showBite && 'graphic' === biteStyle && !isTop && (
+                  <CircleCallout
+                    theme={config.theme}
+                    text={calculateDataBite()}
+                    biteFontSize={biteFontSize}
+                    dataFormat={dataFormat}
+                  />
+                )}
               </div>
-            </>
+            </div>
           )}
-        </div>
-        {link && link}
+        </VisualizationContent>
       </>
     )
   }
@@ -758,6 +769,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
           ref={outerContainerRef}
           config={config}
           isEditor={isEditor}
+          currentViewport={currentViewport}
           editorPanel={<EditorPanel />}
         >
           {body}
@@ -768,11 +780,19 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
           ref={outerContainerRef}
           config={config}
           isEditor={isEditor}
+          currentViewport={currentViewport}
           editorPanel={<EditorPanel />}
         >
-          {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
-          {(!config.dataColumn || !config.dataFunction) && <Confirm />}
-          <GradientBite label={config.title} value={calculateDataBite()} />
+          <VisualizationContent
+            bodyClassName={[...innerContainerClasses, ...contentClasses, 'bite__style--gradient']
+              .filter(Boolean)
+              .join(' ')}
+            footer={link && link}
+          >
+            {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
+            {(!config.dataColumn || !config.dataFunction) && <Confirm />}
+            <GradientBite label={config.title} value={calculateDataBite()} subtext={bodySubtext} />
+          </VisualizationContent>
         </VisualizationContainer>
       )}
     </Context.Provider>

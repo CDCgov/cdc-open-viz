@@ -20,6 +20,8 @@
 
   .subtext {
     margin-top: 1em;
+    font-size: var(--visualization-body-font-size);
+    line-height: var(--visualization-body-line-height);
   }
 
   .warning {
