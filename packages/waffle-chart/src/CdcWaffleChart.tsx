@@ -31,7 +31,12 @@ import './scss/main.scss'
 import Title from '@cdc/core/components/ui/Title'
 import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 import TrendArrow from '@cdc/core/components/ui/TrendArrow'
-import { resolveTrendIndicator, TREND_MODE_NUMERIC } from '@cdc/core/helpers/trendIndicator'
+import {
+  resolveTrendIndicator,
+  TREND_ARROW_DOWN,
+  TREND_ARROW_UP,
+  TREND_MODE_NUMERIC
+} from '@cdc/core/helpers/trendIndicator'
 import type { TrendResolution } from '@cdc/core/helpers/trendIndicator'
 import { aggregateByDataFunction } from '@cdc/core/helpers/dataAggregation'
 import { resolveWaffleNumericTrend } from './helpers/waffleNumericTrend'
@@ -323,7 +328,16 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       return null
     }
 
-    return <TrendArrow arrowType={trendResolution.arrowType} ariaLabel={`Trend ${trendResolution.arrowType}`} />
+    const trendLabel =
+      trendResolution.arrowType === TREND_ARROW_UP
+        ? trendIndicator?.upLabel
+        : trendResolution.arrowType === TREND_ARROW_DOWN
+        ? trendIndicator?.downLabel
+        : ''
+    const trimmedLabel = typeof trendLabel === 'string' ? trendLabel.trim() : ''
+    const ariaLabel = `Trend ${trendResolution.arrowType}${trimmedLabel ? `: ${trimmedLabel}` : ''}`
+
+    return <TrendArrow arrowType={trendResolution.arrowType} label={trimmedLabel} ariaLabel={ariaLabel} />
   }
 
   const buildWaffle = useCallback(() => {

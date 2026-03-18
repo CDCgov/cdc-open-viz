@@ -50,7 +50,13 @@ import {
   DATA_FUNCTION_RANGE,
   DATA_FUNCTION_SUM
 } from '@cdc/core/helpers/constants'
-import { resolveTrendIndicator, TREND_MODE_CATEGORICAL, TREND_MODE_NUMERIC } from '@cdc/core/helpers/trendIndicator'
+import {
+  resolveTrendIndicator,
+  TREND_ARROW_DOWN,
+  TREND_ARROW_UP,
+  TREND_MODE_CATEGORICAL,
+  TREND_MODE_NUMERIC
+} from '@cdc/core/helpers/trendIndicator'
 
 // styles
 import './scss/main.scss'
@@ -269,7 +275,16 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       return null
     }
 
-    return <TrendArrow arrowType={trendResolution.arrowType} ariaLabel={`Trend ${trendResolution.arrowType}`} />
+    const trendLabel =
+      trendResolution.arrowType === TREND_ARROW_UP
+        ? trendIndicator?.upLabel
+        : trendResolution.arrowType === TREND_ARROW_DOWN
+        ? trendIndicator?.downLabel
+        : ''
+    const trimmedLabel = typeof trendLabel === 'string' ? trendLabel.trim() : ''
+    const ariaLabel = `Trend ${trendResolution.arrowType}${trimmedLabel ? `: ${trimmedLabel}` : ''}`
+
+    return <TrendArrow arrowType={trendResolution.arrowType} label={trimmedLabel} ariaLabel={ariaLabel} />
   }
 
   const calculateDataBite = (includePrefixSuffix = true) => {

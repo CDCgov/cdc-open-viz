@@ -23,6 +23,8 @@ export type TrendIndicatorConfig = {
   column?: string
   numericThreshold?: number
   mappings?: TrendIndicatorMapping[]
+  upLabel?: string
+  downLabel?: string
 }
 
 export type TrendResolutionState = 'resolved' | 'ambiguous' | 'unmapped' | 'invalid' | 'disabled'

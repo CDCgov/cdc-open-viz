@@ -1,14 +1,23 @@
+.cove-trend-arrow__wrap {
+  display: inline-flex;
+  align-items: baseline;
+}
+
 .cove-trend-arrow {
-  height: 1.1em;
-  width: 1.1em;
-  margin-top: -0.7em;
-  margin-bottom: -0.5em;
+  color: var(--cool-gray-90);
+  height: 1rem;
+  width: 1rem;
   margin-left: 0.2em;
   display: inline-block;
   flex-shrink: 0;
 }
 
+.cove-trend-arrow__label {
+  color: var(--cool-gray-90);
+  margin-left: 0.25em;
+  font-size: 1rem;
+}
+
 .cove-trend-arrow.is-down {
   transform: scale(-1, 1) rotate(180deg);
 }
-

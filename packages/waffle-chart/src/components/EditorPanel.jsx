@@ -443,6 +443,22 @@ const EditorPanel = memo(props => {
                   }
                 />
               )}
+              <TextField
+                value={config.trendIndicator?.upLabel || ''}
+                section='trendIndicator'
+                fieldName='upLabel'
+                label='Up Label'
+                placeholder='Increasing'
+                updateField={updateField}
+              />
+              <TextField
+                value={config.trendIndicator?.downLabel || ''}
+                section='trendIndicator'
+                fieldName='downLabel'
+                label='Down Label'
+                placeholder='Decreasing'
+                updateField={updateField}
+              />
             </>
           )}
         </div>
