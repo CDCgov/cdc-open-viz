@@ -440,6 +440,11 @@
 
       &.checkbox {
         display: flex;
+        align-items: center;
+
+        span.edit-label {
+          margin-bottom: 0;
+        }
 
         input {
           margin-left: 0;
