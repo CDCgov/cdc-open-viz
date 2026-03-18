@@ -1,12 +1,6 @@
 import numberFromString from './numberFromString'
-import {
-  DATA_FUNCTION_PASSTHROUGH,
-  DATA_FUNCTION_MAX,
-  DATA_FUNCTION_MEAN,
-  DATA_FUNCTION_MEDIAN,
-  DATA_FUNCTION_MIN,
-  DATA_FUNCTION_SUM
-} from './constants'
+import { DATA_FUNCTION_PASSTHROUGH } from './constants'
+import { aggregateByDataFunction, NUMERIC_TREND_ELIGIBLE_FUNCTIONS } from './dataAggregation'
 
 export const TREND_ARROW_UP = 'up'
 export const TREND_ARROW_DOWN = 'down'
@@ -36,38 +30,6 @@ export type TrendResolutionState = 'resolved' | 'ambiguous' | 'unmapped' | 'inva
 export type TrendResolution = {
   state: TrendResolutionState
   arrowType?: TrendArrowType
-}
-
-const NUMERIC_ELIGIBLE_FUNCTIONS = new Set([
-  DATA_FUNCTION_SUM,
-  DATA_FUNCTION_MEAN,
-  DATA_FUNCTION_MEDIAN,
-  DATA_FUNCTION_MIN,
-  DATA_FUNCTION_MAX
-])
-
-const aggregateByDataFunction = (values: number[], dataFunction: string): number | null => {
-  if (!values.length) return null
-
-  switch (dataFunction) {
-    case DATA_FUNCTION_SUM:
-      return values.reduce((sum, value) => sum + value, 0)
-    case DATA_FUNCTION_MEAN:
-      return values.reduce((sum, value) => sum + value, 0) / values.length
-    case DATA_FUNCTION_MEDIAN: {
-      const sortedValues = [...values].sort((a, b) => a - b)
-      const midpoint = Math.floor(sortedValues.length / 2)
-      return sortedValues.length % 2 !== 0
-        ? sortedValues[midpoint]
-        : (sortedValues[midpoint - 1] + sortedValues[midpoint]) / 2
-    }
-    case DATA_FUNCTION_MIN:
-      return Math.min(...values)
-    case DATA_FUNCTION_MAX:
-      return Math.max(...values)
-    default:
-      return null
-  }
 }
 
 const isValidArrowType = (value: string): value is TrendArrowType => {
@@ -125,7 +87,7 @@ export const resolveTrendIndicator = ({
       return { state: 'invalid' }
     }
 
-    if (!mainDataFunction || !NUMERIC_ELIGIBLE_FUNCTIONS.has(mainDataFunction)) {
+    if (!mainDataFunction || !NUMERIC_TREND_ELIGIBLE_FUNCTIONS.has(mainDataFunction)) {
       return { state: 'invalid' }
     }
 
@@ -147,8 +109,8 @@ export const resolveTrendIndicator = ({
       .map(row => numberFromString(row[trendIndicator.column]))
       .filter(value => typeof value === 'number' && Number.isFinite(value)) as number[]
 
-    const currentAggregatedValue = aggregateByDataFunction(currentNumericValues, mainDataFunction)
-    const historicalAggregatedValue = aggregateByDataFunction(historicalNumericValues, mainDataFunction)
+    const currentAggregatedValue = aggregateByDataFunction(currentNumericValues, mainDataFunction) as number | null
+    const historicalAggregatedValue = aggregateByDataFunction(historicalNumericValues, mainDataFunction) as number | null
 
     if (
       currentAggregatedValue === null ||

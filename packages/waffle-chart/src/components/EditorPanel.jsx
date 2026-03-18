@@ -21,7 +21,7 @@ import WarningImage from '../images/warning.svg'
 import { DATA_OPERATORS, DATA_FUNCTIONS } from '../CdcWaffleChart'
 import { TREND_ARROW_TYPE_LABELS, TREND_ARROW_TYPES } from '@cdc/core/helpers/constants'
 import { TREND_MODE_CATEGORICAL, TREND_MODE_NUMERIC } from '@cdc/core/helpers/trendIndicator'
-import { WAFFLE_NUMERIC_ELIGIBLE_FUNCTIONS } from '../helpers/waffleNumericTrend'
+import { NUMERIC_TREND_ELIGIBLE_FUNCTIONS } from '@cdc/core/helpers/dataAggregation'
 
 const EditorPanel = memo(props => {
   const { config, updateConfig, loading, data, editorData, setParentConfig, isDashboard } = useContext(ConfigContext)
@@ -66,7 +66,7 @@ const EditorPanel = memo(props => {
 
   const trendMode = config.trendIndicator?.mode || ''
   const trendMappings = config.trendIndicator?.mappings || []
-  const isNumericModeEligible = WAFFLE_NUMERIC_ELIGIBLE_FUNCTIONS.has(config.dataFunction)
+  const isNumericModeEligible = NUMERIC_TREND_ELIGIBLE_FUNCTIONS.has(config.dataFunction)
   const trendColumnValues = useMemo(() => {
     const trendColumn = config.trendIndicator?.column
     if (!trendColumn) return []
