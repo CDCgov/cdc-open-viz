@@ -1409,21 +1409,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
               />
             }
           >
-            {isTp5Treatment && (
-              <img
-                src={CalloutFlag}
-                alt=''
-                className='cdc-callout__flag'
-                aria-hidden='true'
-                style={{
-                  position: 'absolute',
-                  top: '-0.36rem',
-                  right: '1.08rem',
-                  width: '1.84rem',
-                  height: 'auto'
-                }}
-              />
-            )}
+            {isTp5Treatment && <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />}
             {isTp5Treatment && chartTitle}
             <div className={getChartWrapperClasses().join(' ')}>
               <SkipTo skipId={handleChartTabbing(config, legendId)} skipMessage='Skip Over Chart Container' />

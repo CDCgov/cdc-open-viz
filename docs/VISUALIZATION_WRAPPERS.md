@@ -43,15 +43,24 @@ Use `VisualizationContent` for the standard inner visualization structure.
 
 Default shape:
 
-```text
-.cove-visualization__inner
-  header?
-  .cove-visualization__body
-    .cove-visualization__body-wrap
-      .cove-visualization__message-section?
-      children
-    .cove-visualization__subtext-section?
-  footer?
+```
+┌─ .cove-visualization__inner ──────────────────────────────────┐
+│  header? (slot)                                               │
+│                                                               │
+│  ┌─ .cove-visualization__body ───────────────────────────┐   │
+│  │  ┌─ .cove-visualization__body-wrap ───────────────┐   │   │
+│  │  │  .cove-visualization__message-section?         │   │   │
+│  │  │  .cove-visualization__filters-section?         │   │   │
+│  │  │  .cove-visualization__content-section          │   │   │
+│  │  │    └─ children                                 │   │   │
+│  │  │  .cove-visualization__body-subtext-section?    │   │   │
+│  │  │  .cove-visualization__body-footer-section?     │   │   │
+│  │  └────────────────────────────────────────────────┘   │   │
+│  │  .cove-visualization__subtext-section?                 │   │
+│  └────────────────────────────────────────────────────────┘   │
+│                                                               │
+│  footer? (slot)                                               │
+└───────────────────────────────────────────────────────────────┘
 ```
 
 ### Preferred Mode

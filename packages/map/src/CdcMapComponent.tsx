@@ -446,6 +446,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   .filter(Boolean)
                   .join(' ')}
                 innerProps={{ 'aria-label': 'Map: ' + title, ref: innerContainerRef }}
+                bodyWrapClassName={isTp5Treatment ? 'cdc-callout d-flex flex-column' : ''}
                 bodyClassName={[
                   !config.visual?.border || isTp5Treatment ? 'no-borders' : '',
                   config.visual?.border && !isTp5Treatment ? 'component--has-legacy-border' : '',
@@ -549,25 +550,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 messageIsIntroText={!!processedIntroText}
                 message={processedIntroText ? parse(processedIntroText) : null}
               >
-                <div
-                  className={[isTp5Treatment ? 'cdc-callout d-flex flex-column' : ''].filter(Boolean).join(' ')}
-                  style={isTp5Treatment ? { position: 'relative', background: 'transparent' } : undefined}
-                >
-                  {isTp5Treatment && (
-                    <img
-                      src={CalloutFlag}
-                      alt=''
-                      className='cdc-callout__flag'
-                      aria-hidden='true'
-                      style={{
-                        position: 'absolute',
-                        top: '-0.36rem',
-                        right: '1.08rem',
-                        width: '1.84rem',
-                        height: 'auto'
-                      }}
-                    />
-                  )}
+                <>
+                  {isTp5Treatment && <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />}
                   {isTp5Treatment && mapTitle}
                   {config?.runtime?.editorErrorMessage.length > 0 && <Error />}
                   <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
@@ -618,7 +602,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       navigationHandler={val => navigationHandler('_blank', val, customNavigationHandler)}
                     />
                   )}
-                </div>
+                </>
               </VisualizationContent>
             )}
 

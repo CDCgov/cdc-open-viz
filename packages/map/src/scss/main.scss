@@ -120,6 +120,45 @@
     &.component--hide-background-color {
       background-color: transparent;
     }
+
+    &.component--tp5-treatment {
+      background: transparent;
+
+      .cdc-callout {
+        box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+        border: 1px solid #dff2f6;
+        margin: 0;
+        padding: 1.25rem;
+        border-radius: 0.25rem;
+        position: relative;
+        background: transparent;
+
+        .cdc-callout__flag {
+          position: absolute;
+          top: -0.36rem;
+          right: 1.08rem;
+          width: 1.84rem;
+          height: auto;
+        }
+
+        .cove-visualization__title,
+        .cove-visualization__header {
+          background: transparent;
+          border: 0;
+          color: var(--cool-gray-90, #1f2937);
+          margin: 0 0 1rem;
+          padding: 0;
+          border-radius: 0;
+
+          h2 {
+            color: var(--cool-gray-90, #1f2937);
+            font-family: var(--fonts-nunito, var(--app-font-secondary));
+            font-size: 1.1rem;
+            font-weight: 700;
+          }
+        }
+      }
+    }
   }
 
   header.hidden {

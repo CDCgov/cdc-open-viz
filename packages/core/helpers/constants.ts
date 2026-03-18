@@ -11,14 +11,12 @@ export const USE_V2_MIGRATION = true // Set to true to enable v2 migration and c
 // Map editor feature flag for Data Bite-style visual controls
 export const ENABLE_MAP_DATA_BITE_VISUAL_SETTINGS = true
 
-// Chart feature flag for visual controls (border, accent, background)
+// Chart feature flag for visual controls (border, accent, background). Intentionally enabled — UI is considered stable.
 export const ENABLE_CHART_VISUAL_SETTINGS = true
 
-// Shared TP5 treatment flag for chart and map visualizations
+// Turn these to true if we ever want the tp5 treatment for maps/charts
 export const ENABLE_CHART_MAP_TP5_TREATMENT = true
-
-// Editor-only flag for exposing TP5 treatment selection in chart and map visual panels
-export const ENABLE_CHART_MAP_TP5_TREATMENT_SELECTION = false
+export const ENABLE_CHART_MAP_TP5_TREATMENT_SELECTION = true
 
 // Data operators for conditional logic
 export const DATA_OPERATOR_LESS = '<'
