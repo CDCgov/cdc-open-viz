@@ -55,7 +55,7 @@
     }
 
     .cove-visualization__outer {
-      padding: 0 1rem;
+      padding: 1rem;
     }
   }
 }
@@ -205,6 +205,7 @@
 }
 
 .cove-visualization {
+
   .cove-visualization__body,
   .cove-visualization__body-wrap,
   .cove-visualization__message-section,
@@ -244,7 +245,12 @@
     padding-bottom: var(--cove-visualization-section-gap, 1.5rem);
 
     // Prevent content margins from stacking with row-gap
-    > * > :first-child { margin-top: 0; }
-    > * > :last-child { margin-bottom: 0; }
+    >*> :first-child {
+      margin-top: 0;
+    }
+
+    >*> :last-child {
+      margin-bottom: 0;
+    }
   }
 }
