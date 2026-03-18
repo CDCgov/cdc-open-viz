@@ -1,6 +1,6 @@
 import { TrendArrowType, TREND_ARROW_DOWN } from '../../helpers/trendIndicator'
 import TrendArrowIcon from '../../assets/trend-arrow.svg'
-import './trend-arrow.scss'
+import './trend-arrow.css'
 
 type TrendArrowProps = {
   arrowType: TrendArrowType
