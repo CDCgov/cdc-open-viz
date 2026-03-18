@@ -59,7 +59,9 @@ export default {
     mode: null,
     column: '',
     numericThreshold: 0,
-    mappings: []
+    mappings: [],
+    upLabel: '',
+    downLabel: ''
   },
   markupVariables: [],
   enableMarkupVariables: false
