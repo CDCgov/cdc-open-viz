@@ -3,11 +3,6 @@ import { useContext, useMemo } from 'react'
 import {
   DATA_FUNCTIONS,
   DATA_FUNCTION_PASSTHROUGH,
-  DATA_FUNCTION_MAX,
-  DATA_FUNCTION_MEAN,
-  DATA_FUNCTION_MEDIAN,
-  DATA_FUNCTION_MIN,
-  DATA_FUNCTION_SUM,
   DATA_OPERATORS,
   TREND_ARROW_TYPE_LABELS,
   TREND_ARROW_TYPES
@@ -33,6 +28,7 @@ import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup
 import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualSection'
 import Accordion from '@cdc/core/components/ui/Accordion'
 import { TREND_MODE_CATEGORICAL, TREND_MODE_NUMERIC } from '@cdc/core/helpers/trendIndicator'
+import { NUMERIC_TREND_ELIGIBLE_FUNCTIONS } from '@cdc/core/helpers/dataAggregation'
 
 type DataBiteEditorPanelProps = {
   // Add any props if needed
@@ -69,14 +65,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
 
   const trendMode = config.trendIndicator?.mode || ''
   const trendMappings = config.trendIndicator?.mappings || []
-  const numericModeEligibleFunctions = [
-    DATA_FUNCTION_SUM,
-    DATA_FUNCTION_MEAN,
-    DATA_FUNCTION_MEDIAN,
-    DATA_FUNCTION_MIN,
-    DATA_FUNCTION_MAX
-  ]
-  const isNumericModeEligible = numericModeEligibleFunctions.includes(config.dataFunction)
+  const isNumericModeEligible = NUMERIC_TREND_ELIGIBLE_FUNCTIONS.has(config.dataFunction)
   const isPassthroughFunction = config.dataFunction === DATA_FUNCTION_PASSTHROUGH
 
   const trendColumnValues = useMemo(() => {

@@ -1,25 +1,11 @@
 import {
-  DATA_FUNCTION_MAX,
-  DATA_FUNCTION_MEAN,
-  DATA_FUNCTION_MEDIAN,
-  DATA_FUNCTION_MIN,
-  DATA_FUNCTION_SUM
-} from '@cdc/core/helpers/constants'
-import {
   TREND_ARROW_DOWN,
   TREND_ARROW_UP,
   TREND_MODE_NUMERIC,
   TrendIndicatorConfig,
   TrendResolution
 } from '@cdc/core/helpers/trendIndicator'
-
-export const WAFFLE_NUMERIC_ELIGIBLE_FUNCTIONS = new Set([
-  DATA_FUNCTION_SUM,
-  DATA_FUNCTION_MEAN,
-  DATA_FUNCTION_MEDIAN,
-  DATA_FUNCTION_MIN,
-  DATA_FUNCTION_MAX
-])
+import { NUMERIC_TREND_ELIGIBLE_FUNCTIONS } from '@cdc/core/helpers/dataAggregation'
 
 type ResolveWaffleNumericTrendArgs = {
   trendIndicator?: TrendIndicatorConfig
@@ -44,7 +30,7 @@ export const resolveWaffleNumericTrend = ({
     return { state: 'invalid' }
   }
 
-  if (!trendIndicator.column || !mainDataFunction || !WAFFLE_NUMERIC_ELIGIBLE_FUNCTIONS.has(mainDataFunction)) {
+  if (!trendIndicator.column || !mainDataFunction || !NUMERIC_TREND_ELIGIBLE_FUNCTIONS.has(mainDataFunction)) {
     return { state: 'invalid' }
   }
 

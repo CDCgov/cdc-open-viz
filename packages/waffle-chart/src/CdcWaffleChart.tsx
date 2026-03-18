@@ -33,6 +33,7 @@ import { VisualizationContainer, VisualizationContent } from '@cdc/core/componen
 import TrendArrow from '@cdc/core/components/ui/TrendArrow'
 import { resolveTrendIndicator, TREND_MODE_NUMERIC } from '@cdc/core/helpers/trendIndicator'
 import type { TrendResolution } from '@cdc/core/helpers/trendIndicator'
+import { aggregateByDataFunction } from '@cdc/core/helpers/dataAggregation'
 import { resolveWaffleNumericTrend } from './helpers/waffleNumericTrend'
 
 // images
@@ -143,47 +144,6 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       return ['', null, '', { state: 'disabled' }]
     }
 
-    const getColumnSum = arr => {
-      if (Array.isArray(arr) && arr.length > 0) {
-        return arr.reduce((sum, x) => sum + x)
-      }
-    }
-
-    const getColumnMean = arr => {
-      return arr.length > 1 ? arr.reduce((a, b) => a + b) / arr.length : arr[0]
-    }
-
-    const getMode = arr => {
-      let freq = {}
-      let max = -Infinity
-
-      for (let i = 0; i < arr.length; i++) {
-        if (freq[arr[i]]) {
-          freq[arr[i]] += 1
-        } else {
-          freq[arr[i]] = 1
-        }
-
-        if (freq[arr[i]] > max) {
-          max = freq[arr[i]]
-        }
-      }
-
-      let res = []
-
-      for (let key in freq) {
-        if (freq[key] === max) res.push(key)
-      }
-
-      return res
-    }
-
-    const getMedian = arr => {
-      const mid = Math.floor(arr.length / 2),
-        nums = [...arr].sort((a, b) => a - b)
-      return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2
-    }
-
     const applyPrecision = value => {
       if ('' !== roundToPlace && !isNaN(roundToPlace) && Number(roundToPlace) > -1) {
         value = Number(value).toFixed(Number(roundToPlace))
@@ -289,26 +249,16 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         return Number.isFinite(Number(value)) ? String(applyPrecision(value)) : String(value)
       }
 
-      switch (fn) {
-        case DATA_FUNCTION_COUNT:
-          return String(values.length)
-        case DATA_FUNCTION_SUM:
-          return toOutput(getColumnSum(values))
-        case DATA_FUNCTION_MEAN:
-          return toOutput(getColumnMean(values))
-        case DATA_FUNCTION_MEDIAN: {
-          const median = getMedian(values)
-          return toOutput(median)
-        }
-        case DATA_FUNCTION_MAX:
-          return values.length ? toOutput(Math.max(...values)) : ''
-        case DATA_FUNCTION_MIN:
-          return values.length ? toOutput(Math.min(...values)) : ''
-        case DATA_FUNCTION_MODE:
-          return getMode(values).join(', ')
-        default:
-          return ''
+      const aggregated = aggregateByDataFunction(values, fn)
+      if (aggregated === null) {
+        return ''
       }
+
+      if (Array.isArray(aggregated)) {
+        return aggregated.join(', ')
+      }
+
+      return toOutput(aggregated)
     }
 
     // Calculate numerator  ------------------

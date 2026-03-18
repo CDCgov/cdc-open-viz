@@ -31,6 +31,7 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
+import { aggregateByDataFunction } from '@cdc/core/helpers/dataAggregation'
 import { Config } from './types/Config'
 import dataBiteReducer from './store/db.reducer'
 import { IMAGE_POSITION_LEFT, IMAGE_POSITION_RIGHT, IMAGE_POSITION_TOP, IMAGE_POSITION_BOTTOM } from './constants'
@@ -301,94 +302,6 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       return String(result)
     }
 
-    // filter null and 0 out from count data
-    const getColumnCount = arr => {
-      if (config.dataFormat.ignoreZeros) {
-        numericalData = numericalData.filter(item => item && item)
-        return numericalData.length
-      } else {
-        return numericalData.length
-      }
-    }
-
-    const getColumnSum = arr => {
-      // first validation
-      if (arr === undefined || arr === null) {
-        console.error('Enter valid value for getColumnSum function ')
-        return
-      }
-      // second validation
-      if (arr.length === 0 || !Array.isArray(arr)) {
-        console.error('Arguments are not valid getColumnSum function ')
-        return
-      }
-      let sum = 0
-      if (arr.length > 1) {
-        /// first convert each element to number then add using reduce method to escape string concatination.
-        sum = arr.map(el => Number(el)).reduce((sum, x) => sum + x)
-      } else {
-        sum = Number(arr[0])
-      }
-      return applyPrecision(sum)
-    }
-
-    const getColumnMean = arr => {
-      // add default params to escape errors on runtime
-      // first validation
-      if (arr === undefined || arr === null || !Array.isArray(arr)) {
-        console.error('Enter valid parameter getColumnMean function')
-        return
-      }
-
-      if (config.dataFormat.ignoreZeros) {
-        arr = arr.filter(num => num !== 0)
-      }
-
-      let mean = 0
-      if (arr.length > 1) {
-        /// first convert each element to number then add using reduce method to escape string concatination.
-        mean = arr.map(el => Number(el)).reduce((a, b) => a + b) / arr.length
-      } else {
-        mean = Number(arr[0])
-      }
-      return applyPrecision(mean)
-    }
-
-    const getMode = (arr = []) => {
-      // add default params to escape errors on runtime
-      // this function accepts any array and returns array of strings
-      let freq = {}
-      let max = -Infinity
-
-      for (let i = 0; i < arr.length; i++) {
-        if (freq[arr[i]]) {
-          freq[arr[i]] += 1
-        } else {
-          freq[arr[i]] = 1
-        }
-
-        if (freq[arr[i]] > max) {
-          max = freq[arr[i]]
-        }
-      }
-
-      let res = []
-
-      for (let key in freq) {
-        if (freq[key] === max) res.push(key)
-      }
-
-      return res
-    }
-
-    const getMedian = arr => {
-      if (!arr.length) return
-      const mid = Math.floor(arr.length / 2),
-        nums = [...arr].sort((a, b) => a - b)
-      const value = arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2
-      return applyPrecision(value)
-    }
-
     const applyLocaleString = value => {
       if (value === undefined || value === null) return
       if (Number.isNaN(value) || typeof value === 'number') {
@@ -442,44 +355,51 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     }
 
     switch (dataFunction) {
-      case DATA_FUNCTION_COUNT:
-        dataBite = getColumnCount(numericalData)
+      case DATA_FUNCTION_COUNT: {
+        const countValues = config.dataFormat.ignoreZeros ? numericalData.filter(item => item && item) : numericalData
+        const countResult = aggregateByDataFunction(countValues, DATA_FUNCTION_COUNT)
+        dataBite = countResult === null ? '' : String(countResult)
         break
+      }
       case DATA_FUNCTION_SUM:
-        dataBite = getColumnSum(numericalData)
-        break
-      case DATA_FUNCTION_MEAN:
-        dataBite = getColumnMean(numericalData)
-        break
       case DATA_FUNCTION_MEDIAN:
-        dataBite = getMedian(numericalData)
-        break
       case DATA_FUNCTION_MAX:
-        dataBite = Math.max(...numericalData)
+      case DATA_FUNCTION_MIN: {
+        const aggregateResult = aggregateByDataFunction(numericalData, dataFunction)
+        dataBite = aggregateResult === null ? '' : String(aggregateResult)
         break
-      case DATA_FUNCTION_MIN:
-        dataBite = Math.min(...numericalData)
+      }
+      case DATA_FUNCTION_MEAN: {
+        const meanValues = config.dataFormat.ignoreZeros ? numericalData.filter(num => num !== 0) : numericalData
+        const meanResult = aggregateByDataFunction(meanValues, DATA_FUNCTION_MEAN)
+        dataBite = meanResult === null ? '' : String(meanResult)
         break
-      case DATA_FUNCTION_MODE:
-        dataBite = getMode(numericalData).join('')
+      }
+      case DATA_FUNCTION_MODE: {
+        const modeValues = aggregateByDataFunction(numericalData, DATA_FUNCTION_MODE)
+        dataBite = Array.isArray(modeValues) ? modeValues.join('') : ''
         break
+      }
       case DATA_FUNCTION_RANGE:
-        let rangeMin = Math.min(...numericalData)
-        let rangeMax = Math.max(...numericalData)
-        rangeMin = applyPrecision(rangeMin)
-        rangeMax = applyPrecision(rangeMax)
-        if (config.dataFormat.commas) {
-          rangeMin = applyLocaleString(rangeMin)
-          rangeMax = applyLocaleString(rangeMax)
+        const rangeValues = aggregateByDataFunction(numericalData, DATA_FUNCTION_RANGE)
+        if (Array.isArray(rangeValues) && rangeValues.length === 2) {
+          let rangeMin = applyPrecision(rangeValues[0])
+          let rangeMax = applyPrecision(rangeValues[1])
+          if (config.dataFormat.commas) {
+            rangeMin = applyLocaleString(rangeMin)
+            rangeMax = applyLocaleString(rangeMax)
+          }
+          dataBite =
+            config.dataFormat.prefix +
+            rangeMin +
+            config.dataFormat.suffix +
+            ' - ' +
+            config.dataFormat.prefix +
+            rangeMax +
+            config.dataFormat.suffix
+        } else {
+          dataBite = ''
         }
-        dataBite =
-          config.dataFormat.prefix +
-          rangeMin +
-          config.dataFormat.suffix +
-          ' - ' +
-          config.dataFormat.prefix +
-          rangeMax +
-          config.dataFormat.suffix
         break
       default:
         console.warn('Data bite function not recognized: ' + dataFunction) // eslint-disable-line no-console
