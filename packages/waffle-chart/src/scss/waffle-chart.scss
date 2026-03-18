@@ -17,6 +17,10 @@
     align-items: baseline;
   }
 
+  .cove-waffle-chart__data--primary.cove-value-with-trend {
+    align-items: center;
+  }
+
   .cove-gauge-chart {
     &__chart {
       margin: 0 auto;
