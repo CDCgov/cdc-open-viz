@@ -232,8 +232,11 @@
   }
 
   .cove-visualization__body-subtext-section,
-  .cove-visualization__body-footer-section,
   .cove-visualization__subtext-section {
+    font-size: var(--visualization-body-font-size, 1rem);
+  }
+
+  .cove-visualization__body-footer-section {
     font-size: var(--visualization-meta-font-size, 0.889rem);
   }
 
