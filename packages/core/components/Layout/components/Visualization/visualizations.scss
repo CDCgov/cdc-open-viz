@@ -240,12 +240,29 @@
     font-size: var(--visualization-meta-font-size, 0.889rem);
   }
 
+  .cove-visualization__title~.cove-visualization__body .cove-visualization__body-wrap,
+  .cove-visualization__body.component--has-legacy-border .cove-visualization__body-wrap,
+  .cove-visualization__body.component--has-border-color-theme .cove-visualization__body-wrap,
+  .cove-visualization__body.component--has-background .cove-visualization__body-wrap {
+    padding-top: var(--cove-visualization-section-gap, 1.5rem);
+    padding-bottom: var(--cove-visualization-section-gap, 1.5rem);
+  }
+
+  .cove-visualization__body.component--has-legacy-border .cove-visualization__content-section,
+  .cove-visualization__body.component--has-border-color-theme .cove-visualization__content-section,
+  .cove-visualization__body.component--has-background .cove-visualization__content-section {
+    padding-inline: 0;
+  }
+
+  &.type-data-bite .cove-visualization__body-wrap {
+    padding-top: var(--cove-visualization-section-gap, 1.5rem);
+    padding-bottom: var(--cove-visualization-section-gap, 1.5rem);
+  }
+
   .cove-visualization__body-wrap {
     display: flex;
     flex-direction: column;
     row-gap: var(--cove-visualization-section-gap, 1.5rem);
-    padding-top: var(--cove-visualization-section-gap, 1.5rem);
-    padding-bottom: var(--cove-visualization-section-gap, 1.5rem);
 
     // Prevent content margins from stacking with row-gap
     >*> :first-child {

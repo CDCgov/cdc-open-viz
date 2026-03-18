@@ -7,6 +7,11 @@
 .cove-visualization .cove-visualization__body {
   border: solid 1px #ccc;
   border-top: none;
+
+  &.component--has-legacy-border:not(.component--has-title),
+  &.component--has-border-color-theme:not(.no-borders):not(.component--has-title) {
+    border-top: solid 1px #ccc;
+  }
   border-radius: 0 0 3px 3px;
   min-width: 0;
   max-width: 100%;
