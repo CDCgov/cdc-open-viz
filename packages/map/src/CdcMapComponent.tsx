@@ -93,12 +93,6 @@ type CdcMapComponent = {
   interactionLabel: string
 }
 
-const cloneAndBackfillDefaults = (config: MapConfig | undefined) => {
-  const configClone = cloneConfig(config || {})
-  backfillDefaults(configClone, defaults, LEGACY_MAP_DEFAULTS)
-  return configClone
-}
-
 const CdcMapComponent: React.FC<CdcMapComponent> = ({
   config: configObj,
   navigationHandler: customNavigationHandler,
@@ -113,7 +107,8 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   datasets,
   interactionLabel = 'no link provided'
 }) => {
-  const initialState = getInitialState(cloneAndBackfillDefaults(configObj))
+  backfillDefaults(configObj, defaults, LEGACY_MAP_DEFAULTS)
+  const initialState = getInitialState(configObj)
 
   const [mapState, dispatch] = useReducer<MapReducerType<MapState, MapActions>>(mapReducer, initialState as MapState)
 
@@ -148,7 +143,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   useEffect(() => {
-    const _newConfig = getInitialState(cloneAndBackfillDefaults(configObj)).config
+    const configClone = cloneConfig(configObj)
+    backfillDefaults(configClone, defaults, LEGACY_MAP_DEFAULTS)
+    const _newConfig = getInitialState(configClone).config
     if (configObj.data) {
       _newConfig.data = configObj.data
     }
