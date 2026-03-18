@@ -157,7 +157,10 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     }
   }, [index, row, config, filteredDataOverride])
 
-  const needsEqualHeight = !!row.equalHeight
+  const isFilterRow = row.columns.some(
+    col => col.widget && config.visualizations[col.widget]?.type === 'dashboardFilters'
+  )
+  const needsEqualHeight = !!row.equalHeight && !isFilterRow
 
   const show = useMemo(() => {
     if (row.toggle) {
