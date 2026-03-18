@@ -297,40 +297,37 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       // first validation
       if (value === undefined || value === null) {
         console.error('Enter correct value to "applyPrecision()" function ')
-        return value
+        return
       }
-      const numericValue = Number(value)
       // second validation
-      if (!Number.isFinite(numericValue)) {
+      if (Number.isNaN(value)) {
         console.error(' Argunment isNaN, "applyPrecision()" function ')
-        return String(value)
+        return
       }
       let result = value
       let roundToPlace = Number(config.dataFormat.roundToPlace) // default equals to 0
       //  ROUND FIELD  going -1,-2,-3 numbers
       if (roundToPlace < 0) {
         console.error(' ROUND field is below "0", "applyPrecision()" function ')
-        return String(value)
+        return
       }
       if (typeof roundToPlace === 'number' && roundToPlace > -1) {
-        result = numericValue.toFixed(roundToPlace) // returns STRING
+        result = Number(result).toFixed(roundToPlace) // returns STRING
       }
       return String(result)
     }
 
     const applyLocaleString = value => {
-      if (value === undefined || value === null) return value
-      const stringValue = String(value)
-      const numericValue = Number(stringValue)
-      if (!Number.isFinite(numericValue)) {
-        return stringValue
+      if (value === undefined || value === null) return
+      if (Number.isNaN(value) || typeof value === 'number') {
+        value = String(value)
       }
-      let formattedValue = numericValue.toLocaleString(config.locale, {
+      let formattedValue = parseFloat(value).toLocaleString(config.locale, {
         useGrouping: true,
         maximumFractionDigits: 6
       })
       // Add back missing .0 in e.g. 12.0
-      const match = stringValue.match(/\.\d*?(0*)$/)
+      const match = value.match(/\.\d*?(0*)$/)
 
       if (match) {
         formattedValue += /[1-9]/.test(match[0]) ? match[1] : match[0]
