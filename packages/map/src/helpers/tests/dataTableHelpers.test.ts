@@ -16,6 +16,20 @@ describe('filterCountyTableRuntimeDataByStateCode', () => {
     expect(filtered['12001']).toBeUndefined()
   })
 
+  it('filters county rows when state fips is provided without leading zero', () => {
+    const runtimeData = {
+      '06001': { uid: '06001', value: 1 },
+      '06013': { uid: '06013', value: 2 },
+      '12001': { uid: '12001', value: 3 }
+    }
+
+    const filtered = filterCountyTableRuntimeDataByStateCode(runtimeData, '6')
+
+    expect(Object.keys(filtered)).toEqual(['06001', '06013'])
+    expect(filtered['06001'].value).toBe(1)
+    expect(filtered['12001']).toBeUndefined()
+  })
+
   it('preserves non-enumerable fromHash metadata', () => {
     const runtimeData = {
       '06001': { uid: '06001', value: 1 },

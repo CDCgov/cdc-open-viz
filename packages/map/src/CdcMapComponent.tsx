@@ -409,7 +409,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     }
 
     if (config.general.geoType === 'us-county' && filteredStateCode) {
-      preparedRuntimeData = filterCountyTableRuntimeDataByStateCode(preparedRuntimeData, filteredStateCode, config)
+      preparedRuntimeData = filterCountyTableRuntimeDataByStateCode(
+        preparedRuntimeData,
+        filteredStateCode,
+        preparedConfig
+      )
     }
 
     return {

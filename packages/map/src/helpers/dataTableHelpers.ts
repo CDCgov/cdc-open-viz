@@ -1,5 +1,5 @@
 import {
-  stateFipsToTwoDigit as stateCodeToAbbreviation,
+  stateFipsToTwoDigit as stateFipsToAbbreviation,
   supportedStatesFipsCodes as supportedStateCodes
 } from '../data/supported-geos'
 
@@ -19,8 +19,9 @@ export const filterCountyTableRuntimeDataByStateCode = (runtimeData: any, stateC
 
   const filtered = {}
   const stateName = supportedStateCodes[stateCode]
-  const stateAbbreviation = stateCodeToAbbreviation[stateCode]
+  const stateAbbreviation = stateFipsToAbbreviation[stateCode]
   const normalizedSelectedStateCode = String(stateCode).replace(/^0+/, '')
+  const paddedSelectedStateCode = normalizedSelectedStateCode.padStart(2, '0')
   const stateColumnNames = Object.values(config?.columns || {})
     .map((column: any) => column?.name)
     .filter((name: string) => !!name && /(state|territory|fips)/i.test(name))
@@ -33,7 +34,10 @@ export const filterCountyTableRuntimeDataByStateCode = (runtimeData: any, stateC
 
   Object.keys(runtimeData).forEach(uid => {
     const row = runtimeData[uid]
-    const matchesUidPrefix = uid.startsWith(stateCode)
+    const uidPrefix = String(uid).slice(0, 2)
+    const normalizedUidPrefix = uidPrefix.startsWith('0') ? uidPrefix.slice(1) : uidPrefix
+    const matchesUidPrefix =
+      uidPrefix === paddedSelectedStateCode || normalizedUidPrefix === normalizedSelectedStateCode
     const matchesStateColumn = stateColumnNames.some((columnName: string) => {
       const rawValue = row?.[columnName]
       if (rawValue === undefined || rawValue === null) return false
