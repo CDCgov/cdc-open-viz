@@ -36,7 +36,7 @@ const Title = (props: HeaderProps) => {
       title &&
       showTitle && (
         <div
-          className={`cove-title cove-visualization__title cove-title--${titleStyle}${noContent ? ' cove-title--no-content' : ''}`}
+          className={`cove-title cove-title--${titleStyle}${noContent ? ' cove-title--no-content' : ''}`}
           style={props.style}
         >
           {superTitle && <sup>{parse(superTitle)}</sup>}
@@ -47,7 +47,12 @@ const Title = (props: HeaderProps) => {
   }
 
   // LEGACY BLOCKY HEADER (Original design with colored backgrounds)
-  const updatedClasses = ['cove-visualization__title', 'cove-visualization__header', ...(isDashboard ? ['mb-3'] : []), ...classes]
+  const updatedClasses = [
+    'cove-visualization__title',
+    'cove-visualization__header',
+    ...(isDashboard ? ['mb-3'] : []),
+    ...classes
+  ]
 
   return (
     title &&
