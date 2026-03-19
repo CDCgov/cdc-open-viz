@@ -14,7 +14,8 @@ import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import MarkupVariablesEditor from '@cdc/core/components/EditorPanel/components/MarkupVariablesEditor'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
-import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualSection'
+import StyleTreatmentSection from '@cdc/core/components/EditorPanel/sections/StyleTreatmentSection'
+import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import { Datasets } from '@cdc/core/types/DataSet'
 
 // styles
@@ -29,6 +30,21 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
   const { contentEditor, theme, visual } = config || {}
   const { inlineHTML, srcUrl, title, useInlineHTML } = contentEditor || {}
   const updateField = updateFieldFactory(config, updateConfig, true)
+  const styleTreatment = visual?.tp5Treatment ? 'tp5' : 'legacy'
+
+  const handleStyleTreatmentChange = (value: string) => {
+    const useTp5Treatment = value === 'tp5'
+    updateConfig({
+      ...config,
+      visual: {
+        ...config.visual,
+        tp5Treatment: useTp5Treatment,
+        border: useTp5Treatment ? false : config.visual?.border,
+        borderColorTheme: useTp5Treatment ? false : config.visual?.borderColorTheme,
+        accent: useTp5Treatment ? false : config.visual?.accent
+      }
+    })
+  }
 
   const textAreaInEditorContainer = useRef(null)
 
@@ -154,7 +170,23 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
             </div>
           </Accordion.Section>
           <Accordion.Section title='Visual'>
-            <VisualSection config={config} updateField={updateField} updateConfig={updateConfig} />
+            <HeaderThemeSelector
+              selectedTheme={config.theme}
+              onThemeSelect={theme => updateConfig({ ...config, theme })}
+            />
+            <StyleTreatmentSection
+              styleTreatment={styleTreatment}
+              onStyleTreatmentChange={handleStyleTreatmentChange}
+              showStyleTreatment={false}
+              border={config.visual?.border}
+              borderColorTheme={config.visual?.borderColorTheme}
+              accent={config.visual?.accent}
+              background={config.visual?.background}
+              hideBackgroundColor={config.visual?.hideBackgroundColor}
+              showBackground
+              showHideBackgroundColor
+              updateField={updateField}
+            />
           </Accordion.Section>
           {isDashboard && (
             <Accordion.Section title='Footnotes'>
