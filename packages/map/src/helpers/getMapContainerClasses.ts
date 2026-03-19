@@ -1,12 +1,18 @@
 import { type MapConfig } from './../types/MapConfig'
 import { isMultiCountryActive } from './getCountriesPicked'
+import { isBelowBreakpoint } from '@cdc/core/helpers/viewports'
 
-export const getMapContainerClasses = (state: MapConfig, modal) => {
+export const getMapContainerClasses = (state: MapConfig, modal, currentViewport?: string) => {
   const { general } = state
+  const legendWrapping =
+    (state.legend?.position === 'left' || state.legend?.position === 'right') &&
+    currentViewport &&
+    (currentViewport === 'md' || isBelowBreakpoint('md', currentViewport))
 
   let mapContainerClasses = [
     'map-container',
-    state.legend?.position,
+    'visualization-container',
+    legendWrapping ? 'legend-wrapped-bottom' : state.legend?.position,
     state.general.type,
     state.general.geoType,
     'outline-none',

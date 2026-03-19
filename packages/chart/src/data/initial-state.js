@@ -245,6 +245,8 @@ const createInitialState = () => {
       accent: false,
       background: false,
       hideBackgroundColor: false,
+      tp5Treatment: false,
+      tp5Background: false,
       verticalHoverLine: false,
       horizontalHoverLine: false,
       lineDatapointSymbol: 'none',

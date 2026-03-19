@@ -1,15 +1,20 @@
-// Remove custom theme mixin - use core styles instead
-
-.type-dashboard .type-waffle-chart .cove-visualization__body {
-  padding-top: 0;
-}
+@import '@cdc/core/styles/layout/wrapper-padding';
 
 // Let core styles handle color palette
 
 .cove-visualization.type-waffle-chart {
+
+  .cove-waffle-chart__subtext.subtext,
+  .cove-waffle-chart__subtext.subtext.fst-italic {
+    line-height: var(--visualization-body-line-height);
+  }
+
+  .cove-visualization__body {
+    @include cove-visualization-body-padding;
+  }
+
   .cove-gauge-chart {
     &__chart {
-      width: 85%;
       margin: 0 auto;
       margin-left: auto;
       height: auto;
@@ -18,14 +23,14 @@
       justify-items: center;
       align-items: flex-start;
 
-      & > svg {
+      &>svg {
         margin: 0.7em 0;
       }
     }
 
     &__subtext {
       font-style: italic;
-      font-size: 0.9em !important;
+      line-height: var(--visualization-body-line-height);
     }
 
     &__text {
@@ -37,7 +42,6 @@
   .cove-waffle-chart {
     display: flex;
     flex-wrap: wrap;
-    padding: 1em 1em 0;
     justify-content: flex-start;
 
     &.cove-waffle-chart--verical {
@@ -52,22 +56,18 @@
 
   .cove-waffle-chart__chart {
     padding-right: 1rem;
-    margin-bottom: 1rem;
     box-sizing: content-box;
   }
 
   .cove-waffle-chart__data {
     flex: 1 1 0;
     min-width: 175px;
-    margin-bottom: 1rem;
   }
 
   .cove-waffle-chart__data {
     display: flex;
     flex-wrap: wrap;
     align-content: space-between;
-
-    font-size: 14px;
 
     .cove-waffle-chart__data--primary {
       font-size: 70px;
@@ -96,6 +96,7 @@
 }
 
 @at-root {
+
   .cove-waffle-chart.font-small,
   .cove-gauge-chart.font-small #{&} {
     .cove-waffle-chart__data--primary {
@@ -133,9 +134,19 @@
 // TP5 Style for Waffle Chart
 .type-waffle-chart {
   &.waffle__style--tp5 {
-    .cove-visualization__body {
+
+    .cove-visualization__body,
+    .cove-visualization__body.component--has-legacy-border,
+    .cove-visualization__body.component--has-border-color-theme,
+    .cove-visualization__body.component--has-background,
+    .cove-visualization__body.component--has-accent {
+      padding: 0 !important;
       background: none !important;
       container-type: inline-size;
+
+      >.cove-visualization__body-wrap {
+        padding: 0 !important;
+      }
     }
 
     .cdc-callout {
@@ -213,14 +224,23 @@
     }
 
     .cove-waffle-chart__subtext {
-      font-size: 1rem;
       margin-top: 1rem;
     }
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
-      .cove-visualization__body {
+
+      .cove-visualization__body,
+      .cove-visualization__body.component--has-legacy-border,
+      .cove-visualization__body.component--has-border-color-theme,
+      .cove-visualization__body.component--has-background,
+      .cove-visualization__body.component--has-accent {
+        padding: 0 !important;
         background: white !important;
+
+        >.cove-visualization__body-wrap {
+          padding: 0 !important;
+        }
       }
 
       .cdc-callout {
@@ -233,9 +253,19 @@
 
   // TP5 Style for Gauge Chart
   &.gauge__style--tp5 {
-    .cove-visualization__body {
+
+    .cove-visualization__body,
+    .cove-visualization__body.component--has-legacy-border,
+    .cove-visualization__body.component--has-border-color-theme,
+    .cove-visualization__body.component--has-background,
+    .cove-visualization__body.component--has-accent {
+      padding: 0 !important;
       background: none !important;
       container-type: inline-size;
+
+      >.cove-visualization__body-wrap {
+        padding: 0 !important;
+      }
     }
 
     .cdc-callout {
@@ -271,7 +301,7 @@
       width: 100%;
     }
 
-    .cove-gauge-chart__chart > svg {
+    .cove-gauge-chart__chart>svg {
       display: block;
       width: 100%;
     }
@@ -321,14 +351,24 @@
     }
 
     .cove-waffle-chart__subtext {
-      font-size: 1rem;
+      line-height: var(--visualization-body-line-height);
       margin-top: auto;
     }
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
-      .cove-visualization__body {
+
+      .cove-visualization__body,
+      .cove-visualization__body.component--has-legacy-border,
+      .cove-visualization__body.component--has-border-color-theme,
+      .cove-visualization__body.component--has-background,
+      .cove-visualization__body.component--has-accent {
+        padding: 0 !important;
         background: white !important;
+
+        >.cove-visualization__body-wrap {
+          padding: 0 !important;
+        }
       }
 
       .cdc-callout {

@@ -47,6 +47,22 @@ const PanelGeneral: FC<PanelProps> = props => {
     }
   }
 
+  const handleTitleStyleChange = (newTitleStyle: string) => {
+    updateConfig({
+      ...config,
+      titleStyle: newTitleStyle,
+      visual:
+        newTitleStyle === 'legacy'
+          ? config.visual
+          : {
+              ...config.visual,
+              border: undefined,
+              borderColorTheme: undefined,
+              accent: undefined
+            }
+    })
+  }
+
   return (
     <AccordionItem>
       {' '}
@@ -475,12 +491,12 @@ const PanelGeneral: FC<PanelProps> = props => {
           value={config.titleStyle}
           fieldName='titleStyle'
           label='Title Style'
-          updateField={updateField}
           options={[
             { value: 'small', label: 'Small (h3)' },
             { value: 'large', label: 'Large (h2)' },
             { value: 'legacy', label: 'Legacy' }
           ]}
+          onChange={event => handleTitleStyleChange(event.target.value)}
           tooltip={
             <Tooltip style={{ textTransform: 'none' }}>
               <Tooltip.Target>
