@@ -97,11 +97,9 @@
     @include cove-visualization-body-wrap-inline-padding;
   }
 
-  &:not(.bite__style--tp5):not(.component--hide-background-color)
-    > .cove-visualization__body-wrap
-    > .cove-visualization__content-section {
-    padding-right: 1rem;
-    padding-left: 1rem;
+  &:not(.bite__style--tp5):not(.component--hide-background-color)>.cove-visualization__body-wrap>.cove-visualization__content-section {
+    // padding-right: 1rem;
+    // padding-left: 1rem;
   }
 
   // General: Bite Style > Graphic
@@ -171,7 +169,7 @@
     background: none !important;
     container-type: inline-size;
 
-    > .cove-visualization__body-wrap {
+    >.cove-visualization__body-wrap {
       padding: 0 !important;
     }
 
@@ -243,7 +241,7 @@
       padding: 0 !important;
       background: white;
 
-      > .cove-visualization__body-wrap {
+      >.cove-visualization__body-wrap {
         padding: 0 !important;
       }
 
