@@ -92,8 +92,9 @@
 
     .toolbar__slider-row {
       display: grid;
-      grid-template-columns: repeat(3, minmax(220px, 280px));
-      gap: 12px;
+      <<<<<<< HEAD grid-template-columns: minmax(220px, 280px);
+      =======grid-template-columns: repeat(3, minmax(220px, 280px));
+      >>>>>>>dev gap: 12px;
       align-items: start;
     }
 
@@ -311,7 +312,8 @@
       <div class="toolbar__top">
         <div>
           <h1>UX Compare</h1>
-          <p>All available local examples rendered in a fixed two-column grid for quick wrapper, spacing, and typography checks.</p>
+          <p>All available local examples rendered in a fixed two-column grid for quick wrapper, spacing, and typography
+            checks.</p>
         </div>
         <div class="toolbar__meta" id="summary">Loading examples…</div>
       </div>
@@ -329,14 +331,6 @@
           <div class="toolbar-control">
             <label for="gap-range">Section Gap <span id="gap-value">24px</span></label>
             <input id="gap-range" type="range" min="0" max="48" step="4" value="24" />
-          </div>
-          <div class="toolbar-control">
-            <label for="font-size-range">Body Font Size <span id="font-size-value">16px</span></label>
-            <input id="font-size-range" type="range" min="12" max="24" step="1" value="16" />
-          </div>
-          <div class="toolbar-control">
-            <label for="meta-font-size-range">Meta Font Size <span id="meta-font-size-value">14px</span></label>
-            <input id="meta-font-size-range" type="range" min="10" max="20" step="1" value="14" />
           </div>
         </div>
       </div>
@@ -366,10 +360,6 @@
     const hideAllButton = document.getElementById('hide-all')
     const gapRange = document.getElementById('gap-range')
     const gapValue = document.getElementById('gap-value')
-    const fontSizeRange = document.getElementById('font-size-range')
-    const fontSizeValue = document.getElementById('font-size-value')
-    const metaFontSizeRange = document.getElementById('meta-font-size-range')
-    const metaFontSizeValue = document.getElementById('meta-font-size-value')
 
     let entries = []
     let packageStatus = {}
@@ -377,35 +367,17 @@
     let refreshTimer = null
     const selectedPackages = new Set(Object.keys(packages).filter(packageName => !hiddenPackages.has(packageName)))
     let sectionGap = Number(new URLSearchParams(window.location.search).get('sectionGap') || 24)
-    let fontSize = Number(new URLSearchParams(window.location.search).get('fontSize') || 16)
-    let metaFontSize = Number(new URLSearchParams(window.location.search).get('metaFontSize') || 14)
 
     gapRange.value = String(sectionGap)
     gapValue.textContent = `${sectionGap}px`
-    fontSizeRange.value = String(fontSize)
-    fontSizeValue.textContent = `${fontSize}px`
-    metaFontSizeRange.value = String(metaFontSize)
-    metaFontSizeValue.textContent = `${metaFontSize}px`
 
     function createIframeUrl(packageName, configPath) {
-      return `http://localhost:${packages[packageName]}?config=${configPath}&sidebar=false&sectionGap=${sectionGap}&fontSize=${fontSize}&metaFontSize=${metaFontSize}`
+      return `http://localhost:${packages[packageName]}?config=${configPath}&sidebar=false&sectionGap=${sectionGap}`
     }
 
     function broadcastSectionGap() {
       grid.querySelectorAll('iframe').forEach(frame => {
         frame.contentWindow?.postMessage({ type: 'cove:setSectionGap', value: sectionGap }, '*')
-      })
-    }
-
-    function broadcastFontSize() {
-      grid.querySelectorAll('iframe').forEach(frame => {
-        frame.contentWindow?.postMessage({ type: 'cove:setFontSize', value: fontSize }, '*')
-      })
-    }
-
-    function broadcastMetaFontSize() {
-      grid.querySelectorAll('iframe').forEach(frame => {
-        frame.contentWindow?.postMessage({ type: 'cove:setMetaFontSize', value: metaFontSize }, '*')
       })
     }
 
@@ -415,16 +387,6 @@
         url.searchParams.delete('sectionGap')
       } else {
         url.searchParams.set('sectionGap', String(sectionGap))
-      }
-      if (fontSize === 16) {
-        url.searchParams.delete('fontSize')
-      } else {
-        url.searchParams.set('fontSize', String(fontSize))
-      }
-      if (metaFontSize === 14) {
-        url.searchParams.delete('metaFontSize')
-      } else {
-        url.searchParams.set('metaFontSize', String(metaFontSize))
       }
       history.replaceState({}, '', url.toString().replace(/%2F/g, '/'))
     }
@@ -694,20 +656,6 @@
       gapValue.textContent = `${sectionGap}px`
       syncUrlState()
       broadcastSectionGap()
-    })
-
-    fontSizeRange.addEventListener('input', () => {
-      fontSize = Number(fontSizeRange.value)
-      fontSizeValue.textContent = `${fontSize}px`
-      syncUrlState()
-      broadcastFontSize()
-    })
-
-    metaFontSizeRange.addEventListener('input', () => {
-      metaFontSize = Number(metaFontSizeRange.value)
-      metaFontSizeValue.textContent = `${metaFontSize}px`
-      syncUrlState()
-      broadcastMetaFontSize()
     })
 
     init()

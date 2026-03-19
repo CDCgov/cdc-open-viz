@@ -20,7 +20,7 @@ if (sectionGapParam) {
 if (fontSizeParam) {
   const numericFontSize = Number(fontSizeParam)
   if (!Number.isNaN(numericFontSize) && numericFontSize > 0) {
-    document.documentElement.style.setProperty('--visualization-body-font-size', `${numericFontSize}px`)
+    document.documentElement.style.setProperty('--app-font-size', `${numericFontSize}px`)
   }
 }
 
@@ -46,7 +46,7 @@ window.addEventListener('message', event => {
     const numericFontSize = Number(data.value)
     if (Number.isNaN(numericFontSize) || numericFontSize <= 0) return
 
-    document.documentElement.style.setProperty('--visualization-body-font-size', `${numericFontSize}px`)
+    document.documentElement.style.setProperty('--app-font-size', `${numericFontSize}px`)
   }
 
   if (data.type === 'cove:setMetaFontSize') {
