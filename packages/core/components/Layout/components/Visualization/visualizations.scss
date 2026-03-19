@@ -205,6 +205,7 @@
 }
 
 .cove-visualization {
+  font-size: var(--app-font-size);
 
   .cove-visualization__body,
   .cove-visualization__body-wrap,
@@ -226,21 +227,7 @@
     width: 100%;
   }
 
-  .cove-visualization__message-section,
-  .cove-visualization__content-section {
-    font-size: var(--visualization-body-font-size, 1rem);
-  }
-
-  .cove-visualization__body-subtext-section,
-  .cove-visualization__subtext-section {
-    font-size: var(--visualization-body-font-size, 1rem);
-  }
-
-  .cove-visualization__body-footer-section {
-    font-size: var(--visualization-meta-font-size, 0.889rem);
-  }
-
-  .cove-visualization__title~.cove-visualization__body .cove-visualization__body-wrap,
+.cove-visualization__title~.cove-visualization__body .cove-visualization__body-wrap,
   .cove-visualization__body.component--has-legacy-border .cove-visualization__body-wrap,
   .cove-visualization__body.component--has-border-color-theme .cove-visualization__body-wrap,
   .cove-visualization__body.component--has-background .cove-visualization__body-wrap {
