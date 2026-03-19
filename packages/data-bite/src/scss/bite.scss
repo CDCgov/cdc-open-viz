@@ -232,7 +232,6 @@
     .bite-subtext {
       margin-top: auto; // Push to bottom on desktop
       font-style: italic;
-      font-size: var(--app-font-size);
       line-height: var(--visualization-body-line-height);
     }
 
@@ -397,7 +396,6 @@
         }
 
         .bite-subtext {
-          font-size: var(--app-font-size);
           font-style: italic;
           flex-basis: 100%;
           width: 100%;
