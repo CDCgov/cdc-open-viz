@@ -24,6 +24,7 @@ export const getInitialState = (configObj = {}): MapState => {
     coveLoadedHasRan: false,
     displayPanel: false,
     filteredCountryCode: '',
+    filteredStateCode: '',
     isDraggingAnnotation: false,
     topoData: null,
     translate: [0, 0],
@@ -46,6 +47,7 @@ export type MapState = {
   coveLoadedHasRan: boolean
   displayPanel: boolean
   filteredCountryCode: string
+  filteredStateCode: string
   isDraggingAnnotation: boolean
   topoData: object | null
   translate: number[]
@@ -75,6 +77,8 @@ const reducer = (state: MapState, action: MapActions): MapState => {
       return { ...state, displayPanel: action.payload }
     case 'SET_FILTERED_COUNTRY_CODE':
       return { ...state, filteredCountryCode: action.payload }
+    case 'SET_FILTERED_STATE_CODE':
+      return { ...state, filteredStateCode: action.payload }
     case 'SET_IS_DRAGGING_ANNOTATION':
       return { ...state, isDraggingAnnotation: action.payload }
     case 'SET_TOPO_DATA':

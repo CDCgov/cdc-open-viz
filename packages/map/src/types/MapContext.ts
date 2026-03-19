@@ -13,6 +13,7 @@ export type MapContext = {
   displayDataAsText: string | number
   displayGeoName: (key: string, displayOverride?: string) => string
   filteredCountryCode: string
+  filteredStateCode: string
   generateRuntimeData: (
     configObj: MapConfig,
     filters: VizFilter[],
@@ -36,6 +37,7 @@ export type MapContext = {
   runtimeLegend
   setParentConfig: Function
   setRuntimeData: Function
+  setFilteredStateCode: (stateCode: string) => void
   setSharedFilterValue: Function
   setConfig: (newState: MapConfig) => MapConfig
   config: MapConfig
