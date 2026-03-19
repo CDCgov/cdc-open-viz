@@ -262,14 +262,6 @@ const DataTable = (props: DataTableProps) => {
   const getClassNames = (): string => {
     const classes = ['data-table-container']
 
-    const hasDownloadLinkAbove =
-      (config.table.download || showDownloadImgButton || showDownloadPdfButton) && !config.table.showDownloadLinkBelow
-    const isStandaloneTable = config.type === 'table'
-
-    if (!hasDownloadLinkAbove && !isStandaloneTable && !hasSubtextAbove) {
-      classes.push('mt-4')
-    }
-
     classes.push(viewport)
 
     return classes.join(' ')
@@ -362,7 +354,7 @@ const DataTable = (props: DataTableProps) => {
       const classes = ['download-links']
       if (!belowTable) {
         if (hasDownloadLink) {
-          classes.push('mt-4', 'mb-2')
+          classes.push('mb-2')
         }
       } else {
         if (hasDownloadLink) {
