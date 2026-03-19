@@ -10,12 +10,13 @@ import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 
 // Components
 import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
-import { TextField, Select, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
+import { TextField, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import Button from '@cdc/core/components/elements/Button'
 import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Accordion from '@cdc/core/components/ui/Accordion'
-import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualSection'
+import StyleTreatmentSection from '@cdc/core/components/EditorPanel/sections/StyleTreatmentSection'
+import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 
 type FilteredTextEditorPanelProps = {
   // Add any props if needed
@@ -24,6 +25,21 @@ type FilteredTextEditorPanelProps = {
 const EditorPanel: React.FC<FilteredTextEditorPanelProps> = () => {
   const { config, updateConfig, loading, stateData: data, setParentConfig, isDashboard } = useContext(ConfigContext)
   const updateField = updateFieldFactory(config, updateConfig, true)
+  const styleTreatment = config?.visual?.tp5Treatment ? 'tp5' : 'legacy'
+
+  const handleStyleTreatmentChange = (value: string) => {
+    const useTp5Treatment = value === 'tp5'
+    updateConfig({
+      ...config,
+      visual: {
+        ...config.visual,
+        tp5Treatment: useTp5Treatment,
+        border: useTp5Treatment ? false : config.visual?.border,
+        borderColorTheme: useTp5Treatment ? false : config.visual?.borderColorTheme,
+        accent: useTp5Treatment ? false : config.visual?.accent
+      }
+    })
+  }
 
   // Filters -------------------------
   const { addNewFilter, removeFilter, updateFilterProp, getFilterColumnValues } = useFilterManagement(
@@ -172,7 +188,23 @@ const EditorPanel: React.FC<FilteredTextEditorPanelProps> = () => {
             </Button>
           </Accordion.Section>
           <Accordion.Section title='Visual'>
-            <VisualSection config={config} updateField={updateField} updateConfig={updateConfig} />
+            <HeaderThemeSelector
+              selectedTheme={config.theme}
+              onThemeSelect={theme => updateConfig({ ...config, theme })}
+            />
+            <StyleTreatmentSection
+              styleTreatment={styleTreatment}
+              onStyleTreatmentChange={handleStyleTreatmentChange}
+              showStyleTreatment={false}
+              border={config.visual?.border}
+              borderColorTheme={config.visual?.borderColorTheme}
+              accent={config.visual?.accent}
+              background={config.visual?.background}
+              hideBackgroundColor={config.visual?.hideBackgroundColor}
+              showBackground
+              showHideBackgroundColor
+              updateField={updateField}
+            />
           </Accordion.Section>
         </Accordion>
       )}
