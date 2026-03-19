@@ -577,7 +577,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                 }
                 header={isTp5Treatment ? null : mapTitle}
                 messageIsIntroText={!!processedIntroText}
-                message={processedIntroText ? '<div className="cove-prose">{parse(processedIntroText)}</div>' : null}
+                message={processedIntroText ? <div className='cove-prose'>{parse(processedIntroText)}</div> : null}
               >
                 <>
                   {isTp5Treatment && <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />}

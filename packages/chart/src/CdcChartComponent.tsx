@@ -1398,9 +1398,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
             header={isTp5Treatment ? null : chartTitle}
             messageIsIntroText={config.visualizationType !== 'Spark Line' && !!processedIntroText}
             message={
-              config.visualizationType !== 'Spark Line' && processedIntroText
-                ? '<div className="cove-prose">{parse(processedIntroText)}</div>'
-                : null
+              config.visualizationType !== 'Spark Line' && processedIntroText ? (
+                <div className='cove-prose'>{parse(processedIntroText)}</div>
+              ) : null
             }
             footer={
               <FootnotesStandAlone
