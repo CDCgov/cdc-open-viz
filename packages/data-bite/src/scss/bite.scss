@@ -97,11 +97,9 @@
     @include cove-visualization-body-wrap-inline-padding;
   }
 
-  &:not(.bite__style--tp5):not(.component--hide-background-color)
-    > .cove-visualization__body-wrap
-    > .cove-visualization__content-section {
-    padding-right: 1rem;
-    padding-left: 1rem;
+  &:not(.bite__style--tp5):not(.component--hide-background-color)>.cove-visualization__body-wrap>.cove-visualization__content-section {
+    // padding-right: 1rem;
+    // padding-left: 1rem;
   }
 
   // General: Bite Style > Graphic
@@ -128,7 +126,6 @@
       align-self: flex-end;
       width: 100%;
       margin-top: 0;
-      font-size: var(--visualization-body-font-size);
       line-height: var(--visualization-body-line-height);
     }
 
@@ -172,7 +169,7 @@
     background: none !important;
     container-type: inline-size;
 
-    > .cove-visualization__body-wrap {
+    >.cove-visualization__body-wrap {
       padding: 0 !important;
     }
 
@@ -235,7 +232,6 @@
     .bite-subtext {
       margin-top: auto; // Push to bottom on desktop
       font-style: italic;
-      font-size: var(--visualization-body-font-size);
       line-height: var(--visualization-body-line-height);
     }
 
@@ -244,7 +240,7 @@
       padding: 0 !important;
       background: white;
 
-      > .cove-visualization__body-wrap {
+      >.cove-visualization__body-wrap {
         padding: 0 !important;
       }
 
@@ -400,7 +396,6 @@
         }
 
         .bite-subtext {
-          font-size: var(--visualization-body-font-size);
           font-style: italic;
           flex-basis: 100%;
           width: 100%;

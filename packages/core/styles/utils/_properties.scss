@@ -111,6 +111,8 @@ $colors: (
   // Font
   --app-font-main: 'Nunito', sans-serif;
   --app-font-secondary: 'Poppins', sans-serif;
+  --app-font-size: 1rem;
+
   // Font sizes
   --legend-title-font-size: 1rem;
   --legend-description-font-size: 1rem;
@@ -124,7 +126,6 @@ $colors: (
   --territory-label-font-size: 0.809rem;
   --territory-label-font-size-mobile: 0.556rem;
   --visualization-body-font-family: var(--app-font-main);
-  --visualization-body-font-size: 1rem;
   --visualization-meta-font-size: 0.889rem;
   --visualization-body-line-height: 1.5;
   // Transitions

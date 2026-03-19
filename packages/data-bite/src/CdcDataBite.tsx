@@ -197,6 +197,12 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
     const processedConfig = { ...coveUpdateWorker(response) }
 
+    // Migrate: borders always showed in previous versions regardless of config,
+    // so treat any existing config without an explicit border setting as having borders on.
+    if (processedConfig.visual && processedConfig.visual.border === false) {
+      processedConfig.visual.border = true
+    }
+
     updateConfig({ ...defaults, ...processedConfig })
     dispatch({ type: 'SET_LOADING', payload: false })
   }

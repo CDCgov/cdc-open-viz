@@ -6,7 +6,6 @@
 
   .cove-waffle-chart__subtext.subtext,
   .cove-waffle-chart__subtext.subtext.fst-italic {
-    font-size: var(--visualization-body-font-size) !important;
     line-height: var(--visualization-body-line-height);
   }
 
@@ -31,7 +30,6 @@
 
     &__subtext {
       font-style: italic;
-      font-size: var(--visualization-body-font-size) !important;
       line-height: var(--visualization-body-line-height);
     }
 
@@ -226,7 +224,6 @@
     }
 
     .cove-waffle-chart__subtext {
-      font-size: var(--visualization-body-font-size);
       margin-top: 1rem;
     }
 
@@ -354,7 +351,6 @@
     }
 
     .cove-waffle-chart__subtext {
-      font-size: var(--visualization-body-font-size) !important;
       line-height: var(--visualization-body-line-height);
       margin-top: auto;
     }
