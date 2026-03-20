@@ -1,7 +1,7 @@
 import React from 'react'
 import '../scss/kpi.scss'
 
-export const KPIComponent = ({ label, value, subtext = null }) => {
+export const KPIComponent = ({ label, value }) => {
   return (
     <div className='cove-component__content kpi-container'>
       <div className='kpi-content'>
@@ -17,7 +17,6 @@ export const KPIComponent = ({ label, value, subtext = null }) => {
             </span>
           </div>
         </div>
-        {subtext ? <div className='kpi-subtext'>{subtext}</div> : null}
       </div>
     </div>
   )

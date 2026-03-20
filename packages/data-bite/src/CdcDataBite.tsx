@@ -496,7 +496,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   let body = <Loading />
   const isCompactStyle = config.general?.isCompactStyle ?? false
   const bodySubtext =
-    subtext && !isCompactStyle ? <p className='bite-subtext'>{parse(processContentWithMarkup(subtext))}</p> : null
+    subtext && !isCompactStyle ? <p className='bite-subtext mt-3'>{parse(processContentWithMarkup(subtext))}</p> : null
 
   const DataImage = useCallback(() => {
     let operators = {
@@ -745,7 +745,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                           {calculateDataBite()}
                         </span>
                       )}
-                      {!isTp5 && bodySubtext}
+                      {bodySubtext}
                     </div>
                   </Fragment>
                 </div>
@@ -794,10 +794,11 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
               .filter(Boolean)
               .join(' ')}
             footer={link && link}
+            subtext={bodySubtext}
           >
             {!config.newViz && config.runtime && config.runtime.editorErrorMessage && <Error />}
             {(!config.dataColumn || !config.dataFunction) && <Confirm />}
-            <GradientBite label={config.title} value={calculateDataBite()} subtext={bodySubtext} />
+            <GradientBite label={config.title} value={calculateDataBite()} />
           </VisualizationContent>
         </VisualizationContainer>
       )}
