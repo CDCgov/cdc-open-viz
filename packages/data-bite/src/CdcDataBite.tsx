@@ -496,7 +496,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   let body = <Loading />
   const isCompactStyle = config.general?.isCompactStyle ?? false
   const bodySubtext =
-    subtext && !isCompactStyle ? <p className='bite-subtext mt-3'>{parse(processContentWithMarkup(subtext))}</p> : null
+    subtext && !isCompactStyle ? <p className='bite-subtext'>{parse(processContentWithMarkup(subtext))}</p> : null
 
   const DataImage = useCallback(() => {
     let operators = {
@@ -700,9 +700,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                 <div className='cdc-callout__content flex-grow-1 d-flex flex-column  min-w-0'>
                   <p className='mb-0'>{parse(processContentWithMarkup(biteBody))}</p>
                   {subtext && !isCompactStyle && (
-                    <p className='bite-subtext fst-italic flex-shrink-0 mt-3'>
-                      {parse(processContentWithMarkup(subtext))}
-                    </p>
+                    <p className='bite-subtext fst-italic flex-shrink-0'>{parse(processContentWithMarkup(subtext))}</p>
                   )}
                 </div>
               </div>
