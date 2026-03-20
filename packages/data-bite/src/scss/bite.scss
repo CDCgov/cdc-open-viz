@@ -121,7 +121,6 @@
     .bite-subtext {
       align-self: flex-end;
       width: 100%;
-      margin-top: 0;
       line-height: var(--visualization-body-line-height);
     }
 
@@ -225,8 +224,11 @@
     }
 
 
+    .cdc-callout__content {
+      row-gap: var(--cove-visualization-section-gap, 1.5rem);
+    }
+
     .bite-subtext {
-      margin-top: auto; // Push to bottom on desktop
       font-style: italic;
       line-height: var(--visualization-body-line-height);
     }
@@ -286,6 +288,7 @@
       display: flex;
       flex-wrap: wrap;
       width: 100%;
+      row-gap: var(--cove-visualization-section-gap, 1.5rem);
     }
 
     &.theme-blue {
@@ -385,7 +388,6 @@
         }
 
         .bite-text {
-          margin-bottom: 15px;
           color: #222;
         }
 
