@@ -70,6 +70,7 @@
   &:disabled {
     background-color: var(--cove-button-primary-disabled);
     color: var(--cove-button-primary-disabled-font-color);
+    border: none;
     cursor: not-allowed;
   }
 
