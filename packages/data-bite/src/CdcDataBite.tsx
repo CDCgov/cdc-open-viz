@@ -496,7 +496,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   let body = <Loading />
   const isCompactStyle = config.general?.isCompactStyle ?? false
   const bodySubtext =
-    subtext && !isCompactStyle ? <p className='bite-subtext mt-3'>{parse(processContentWithMarkup(subtext))}</p> : null
+    subtext && !isCompactStyle ? <p className='bite-subtext mt-0'>{parse(processContentWithMarkup(subtext))}</p> : null
 
   const DataImage = useCallback(() => {
     let operators = {
