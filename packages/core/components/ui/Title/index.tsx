@@ -19,6 +19,7 @@ type HeaderProps = {
 
 const Title = (props: HeaderProps) => {
   const {
+    config,
     isDashboard,
     title,
     superTitle,
@@ -28,6 +29,10 @@ const Title = (props: HeaderProps) => {
     titleStyle,
     noContent = false
   } = props
+
+  // Temporary visual verification gate for the legacy title shim.
+  const SHOW_SHIM_TITLE = false
+  const shimThemeClass = props.theme || config?.theme || 'theme-blue'
 
   if (titleStyle === 'large' || titleStyle === 'small') {
     const TitleElement = titleStyle === 'large' ? 'h2' : 'h3'
@@ -57,12 +62,19 @@ const Title = (props: HeaderProps) => {
   return (
     title &&
     showTitle && (
-      <header className={updatedClasses.join(' ')} style={props.style}>
-        {superTitle && <sup>{parse(superTitle)}</sup>}
-        <h2>
-          {parse(title)} {isDashboard}
-        </h2>
-      </header>
+      <>
+        <header className={updatedClasses.join(' ')} style={props.style}>
+          {superTitle && <sup>{parse(superTitle)}</sup>}
+          <h2>
+            {parse(title)} {isDashboard}
+          </h2>
+        </header>
+        {SHOW_SHIM_TITLE && (
+          <div className='cove-title__legacy-preview'>
+            <header class="cove-component__header component__header theme-blue mb-0"><h2>Medicaid Coverage of Cessation Treatments, 2024-Q2</h2></header>
+          </div>
+        )}
+      </>
     )
   )
 }
