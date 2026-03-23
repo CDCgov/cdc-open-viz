@@ -70,7 +70,7 @@ export const TP5_Test: Story = {
       visual: {
         ...primary.visual,
         border: true,
-        background: true
+        whiteBackground: true
       }
     },
     isEditor: true
