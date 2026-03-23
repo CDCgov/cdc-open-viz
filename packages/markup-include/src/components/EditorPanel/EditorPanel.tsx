@@ -184,10 +184,12 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
             </div>
           </Accordion.Section>
           <Accordion.Section title='Visual'>
-            <HeaderThemeSelector
-              selectedTheme={config.theme}
-              onThemeSelect={theme => updateConfig({ ...config, theme })}
-            />
+            {!isTp5Style && (
+              <HeaderThemeSelector
+                selectedTheme={config.theme}
+                onThemeSelect={theme => updateConfig({ ...config, theme })}
+              />
+            )}
             {isTp5Style ? (
               <CheckBox
                 value={visual?.whiteBackground}

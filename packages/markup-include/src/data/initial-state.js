@@ -23,7 +23,8 @@ export default {
     accent: false,
     background: false,
     hideBackgroundColor: false,
-    borderColorTheme: false
+    borderColorTheme: false,
+    whiteBackground: false
   },
   markupVariables: [],
   enableMarkupVariables: false

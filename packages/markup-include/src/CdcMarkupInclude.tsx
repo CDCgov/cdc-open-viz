@@ -82,7 +82,13 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const isTp5Style = markupIncludeStyle === 'tp5'
 
   const contentClasses = isTp5Style
-    ? rawContentClasses.filter(cls => cls !== 'component--has-accent')
+    ? rawContentClasses.filter(
+        cls =>
+          cls !== 'component--has-accent' &&
+          cls !== 'component--has-background' &&
+          cls !== 'component--hide-background-color' &&
+          cls !== 'component--has-border-color-theme'
+      )
     : rawContentClasses
 
   const shouldApplyTopPadding =
@@ -282,12 +288,12 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         innerClassName={`markup-include-content-container ${innerContainerClasses.join(' ')}`.trim()}
         bodyClassName={`markup-include-component ${contentClasses.join(' ')}${
           isTp5Style ? ' markup-include-component--tp5' : ''
-        }${isTp5Style && visual?.background ? ' white-background-style' : ''}${
-          isTp5Style && visual?.background && visual?.border ? ' display-border' : ''
+        }${isTp5Style && visual?.whiteBackground ? ' white-background-style' : ''}${
+          isTp5Style && visual?.whiteBackground && visual?.border ? ' display-border' : ''
         }`.trim()}
-        bodyWrapClassName={`${
-          isTp5Style ? 'markup-include-body-wrap--tp5' : ''
-        }${shouldApplyTopPadding ? ' has-top-padding' : ''}${shouldApplySidePadding ? ' has-side-padding' : ''}`.trim()}
+        bodyWrapClassName={`${isTp5Style ? 'markup-include-body-wrap--tp5' : ''}${
+          shouldApplyTopPadding ? ' has-top-padding' : ''
+        }${shouldApplySidePadding ? ' has-side-padding' : ''}`.trim()}
         filters={
           config.filters && config.filters.length > 0 ? (
             <Filters
