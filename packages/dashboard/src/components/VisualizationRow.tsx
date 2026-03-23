@@ -55,12 +55,6 @@ const VisualizationWrapper: React.FC<VisualizationWrapperProps> = ({
   )
 }
 
-const isTP5Visualization = (viz: any) =>
-  viz?.biteStyle === 'tp5' ||
-  viz?.visualizationType === 'TP5 Waffle' ||
-  viz?.visualizationType === 'TP5 Gauge' ||
-  viz?.contentEditor?.style === 'tp5'
-
 type VizRowProps = {
   allExpanded: boolean
   filteredDataOverride?: Object[]
@@ -110,28 +104,18 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   }, [toggledRow, row.toggle])
 
   const setupTP5MinHeightEqualizer = (rowElement: Element, itemSelector: string) => {
-    const resizeObserver = new ResizeObserver(() => equalizeHeights())
-    const trackedItems = new Set<HTMLElement>()
+    const items = Array.from(rowElement.querySelectorAll(itemSelector)) as HTMLElement[]
+    if (items.length <= 1) return undefined
 
     const equalizeHeights = () => {
-      const items = Array.from(rowElement.querySelectorAll(itemSelector)) as HTMLElement[]
-
-      items.forEach(item => {
-        if (!trackedItems.has(item)) {
-          trackedItems.add(item)
-          resizeObserver.observe(item)
-        }
-      })
-
       items.forEach(item => {
         item.style.minHeight = ''
       })
 
-      if (items.length <= 1) return
-
       let maxHeight = 0
       items.forEach(item => {
-        if (item.offsetHeight > maxHeight) maxHeight = item.offsetHeight
+        const height = item.offsetHeight
+        if (height > maxHeight) maxHeight = height
       })
 
       if (maxHeight > 0) {
@@ -141,19 +125,20 @@ const VisualizationRow: React.FC<VizRowProps> = ({
       }
     }
 
-    // Detect child components finishing loading (headings appearing in the DOM)
-    const mutationObserver = new MutationObserver(() => equalizeHeights())
-    mutationObserver.observe(rowElement, { childList: true, subtree: true })
-
     equalizeHeights()
 
-    return () => {
-      mutationObserver.disconnect()
-      resizeObserver.disconnect()
-    }
+    const resizeObserver = new ResizeObserver(() => {
+      equalizeHeights()
+    })
+
+    items.forEach(item => {
+      resizeObserver.observe(item)
+    })
+
+    return () => resizeObserver.disconnect()
   }
 
-  // Equalize TP5 callout title heights across all types, plus type-specific body alignment
+  // Equalize TP5 callout title heights and TP5 gauge message blocks for like visualizations in the same row
   useEffect(() => {
     if (!row.equalHeight) return
 
@@ -161,9 +146,12 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     if (!rowElement) return
 
     const cleanups = [
-      setupTP5MinHeightEqualizer(rowElement, '.tp5-element .cdc-callout__heading'),
-      setupTP5MinHeightEqualizer(rowElement, '.gauge__style--tp5 .cove-gauge-chart__content')
-    ]
+      setupTP5MinHeightEqualizer(rowElement, '.bite__style--tp5 .cdc-callout__heading'),
+      setupTP5MinHeightEqualizer(rowElement, '.waffle__style--tp5 .cdc-callout__heading'),
+      setupTP5MinHeightEqualizer(rowElement, '.gauge__style--tp5 .cdc-callout__heading'),
+      setupTP5MinHeightEqualizer(rowElement, '.gauge__style--tp5 .cove-gauge-chart__content'),
+      setupTP5MinHeightEqualizer(rowElement, '.markup-include__style--tp5 .cdc-callout__heading')
+    ].filter(Boolean) as Array<() => void>
 
     return () => {
       cleanups.forEach(cleanup => cleanup())
@@ -178,7 +166,13 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     isMultiColumn &&
     row.columns.some(col => {
       if (!col.widget) return false
-      return isTP5Visualization(config.visualizations[col.widget])
+      const viz = config.visualizations[col.widget]
+      return (
+        viz?.biteStyle === 'tp5' ||
+        viz?.visualizationType === 'TP5 Waffle' ||
+        viz?.visualizationType === 'TP5 Gauge' ||
+        viz?.contentEditor?.style === 'tp5'
+      )
     })
   const needsEqualHeight = (row.equalHeight || hasTP5Content) && !isFilterRow
 
