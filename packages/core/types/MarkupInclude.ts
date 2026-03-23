@@ -32,5 +32,6 @@ export type MarkupIncludeConfig = Visualization & {
     background: boolean
     hideBackgroundColor: boolean
     borderColorTheme: boolean
+    whiteBackground?: boolean
   }
 }
