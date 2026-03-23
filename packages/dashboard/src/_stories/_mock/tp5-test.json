@@ -292,7 +292,7 @@
       "visual": {
         "border": true,
         "accent": false,
-        "background": false,
+        "whiteBackground": false,
         "hideBackgroundColor": false,
         "borderColorTheme": false
       }
@@ -316,7 +316,7 @@
       "visual": {
         "border": true,
         "accent": false,
-        "background": true,
+        "whiteBackground": true,
         "hideBackgroundColor": false,
         "borderColorTheme": false
       }
@@ -340,7 +340,7 @@
       "visual": {
         "border": true,
         "accent": false,
-        "background": false,
+        "whiteBackground": false,
         "hideBackgroundColor": false,
         "borderColorTheme": false
       }
