@@ -626,6 +626,7 @@ const EditorPanel = memo(props => {
           name='Markup Variables'
           markupVariables={config.markupVariables || []}
           data={data}
+          editorData={editorData}
           enableMarkupVariables={config.enableMarkupVariables || false}
           onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
           onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
