@@ -4,6 +4,9 @@ import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr'
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin'
 
+const isQuickStorybookMode = process.env.COVE_QUICK_TESTS === '1'
+const quickStorybookExcludePatterns = ['**/*.smoke.stories.{js,jsx,ts,tsx}']
+
 export default defineConfig({
   plugins: [react({ jsxRuntime: 'automatic' }), (svgr as any)({ exportAsDefault: true })],
   test: {
@@ -23,6 +26,7 @@ export default defineConfig({
           environment: 'jsdom',
           globals: true,
           setupFiles: ['./vitest.setup.ts'],
+          exclude: isQuickStorybookMode ? quickStorybookExcludePatterns : [],
           testTimeout: 600000,
           browser: {
             enabled: true,

@@ -48,13 +48,13 @@ For unit targeting, include the extra `--` after `yarn test-unit` so Yarn 1 forw
   - Example: `yarn test-unit -- --scope @cdc/dashboard -- src/test/CdcDashboardComponent.test.tsx`
 - Storybook tests for one story file:
   - `yarn test-storybook packages/.../_stories/<file>.stories.<js|jsx|ts|tsx>`
-  - Example: `yarn test-storybook packages/chart/src/_stories/Chart.CI.stories.tsx`
+  - Example: `yarn test-storybook packages/chart/src/_stories/ChartEditor.stories.tsx`
 
 ### Quick Suites (For Broad Changes)
 
 - Unit quick mode (bypasses standalone build checks by setting `COVE_QUICK_TESTS=1`):
   - `yarn test-unit:quick`
-- Storybook quick mode (skips render-smoke story files where tests only assert rendering, using `assertVisualizationRendered` and similar helpers):
+- Storybook quick mode (sets `COVE_QUICK_TESTS=1` and excludes files matching `*.smoke.stories.<js|jsx|ts|tsx>`):
   - `yarn test-storybook:quick`
 
 ### Full Suites (Opt-In Only)

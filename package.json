@@ -161,7 +161,7 @@
     "test-unit": "npx lerna run test",
     "test-unit:quick": "COVE_QUICK_TESTS=1 npx lerna run test",
     "test-storybook": "vitest run --project=storybook",
-    "test-storybook:quick": "vitest run --project=storybook"
+    "test-storybook:quick": "COVE_QUICK_TESTS=1 vitest run --project=storybook"
   },
   "workspaces": [
     "packages/*"
