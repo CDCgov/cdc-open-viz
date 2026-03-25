@@ -239,7 +239,10 @@ function expandSvgWidths(clonedViz: HTMLElement): void {
     }
 
     // Remove animation classes to show final state immediately
-    svg.classList.remove('animated', 'animate')
+    const isAnimatedPie = svg.classList.contains('animated-pie')
+    if (!isAnimatedPie) {
+      svg.classList.remove('animated', 'animate')
+    }
   })
 }
 
