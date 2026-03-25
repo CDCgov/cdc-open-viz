@@ -264,7 +264,7 @@ export const DataSectionTests: Story = {
     await userEvent.selectOptions(conditionalColumnSelect, 'Deaths')
     await userEvent.selectOptions(conditionalOperatorSelect, '<')
     // ============================================================================
-    // TEST 4: Conditional Value Entry (<5 fallback 1)
+    // TEST 4: Conditional Value Entry (<50)
     // Expectation: Primary value text changes (filter applied).
     // ============================================================================
     const conditionalValueInput = canvasElement.querySelector(
@@ -275,7 +275,7 @@ export const DataSectionTests: Story = {
       getValueText,
       async () => {
         await userEvent.clear(conditionalValueInput)
-        await userEvent.type(conditionalValueInput, '5')
+        await userEvent.type(conditionalValueInput, '50')
       },
       (before, after) => after !== before
     )
@@ -583,8 +583,7 @@ export const DataSectionTests: Story = {
       'Dynamic Fallback Numerator Greater Than Denominator',
       getWaffleNodeState,
       async () => {
-        await userEvent.clear(staticDenomInput)
-        await userEvent.type(staticDenomInput, '10')
+        await userEvent.selectOptions(dataFunctionSelect, 'Sum')
       },
       (_before, after) => after.total === 100
     )

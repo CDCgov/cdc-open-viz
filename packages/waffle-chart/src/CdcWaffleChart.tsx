@@ -202,31 +202,64 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     let conditionalData = []
 
     if (dataConditionalColumn !== '' && dataConditionalOperator !== '' && dataConditionalComparate !== '') {
+      const numericComparate = Number(dataConditionalComparate)
+      const isNumericComparate = Number.isFinite(numericComparate)
+      const getNumericValue = value => {
+        const numericValue = Number(value)
+        return Number.isFinite(numericValue) ? numericValue : null
+      }
+
       switch (dataConditionalOperator) {
         case '<':
-          conditionalData = filteredData.filter(e => e[dataConditionalColumn] < dataConditionalComparate)
+          conditionalData = isNumericComparate
+            ? filteredData.filter(e => {
+                const numericValue = getNumericValue(e[dataConditionalColumn])
+                return numericValue !== null && numericValue < numericComparate
+              })
+            : []
           break
         case '>':
-          conditionalData = filteredData.filter(e => e[dataConditionalColumn] > dataConditionalComparate)
+          conditionalData = isNumericComparate
+            ? filteredData.filter(e => {
+                const numericValue = getNumericValue(e[dataConditionalColumn])
+                return numericValue !== null && numericValue > numericComparate
+              })
+            : []
           break
         case '<=':
-          conditionalData = filteredData.filter(e => e[dataConditionalColumn] <= dataConditionalComparate)
+          conditionalData = isNumericComparate
+            ? filteredData.filter(e => {
+                const numericValue = getNumericValue(e[dataConditionalColumn])
+                return numericValue !== null && numericValue <= numericComparate
+              })
+            : []
           break
         case '>=':
-          conditionalData = filteredData.filter(e => e[dataConditionalColumn] >= dataConditionalComparate)
+          conditionalData = isNumericComparate
+            ? filteredData.filter(e => {
+                const numericValue = getNumericValue(e[dataConditionalColumn])
+                return numericValue !== null && numericValue >= numericComparate
+              })
+            : []
           break
         case '=':
-          if (isNaN(Number(dataConditionalComparate))) {
+          if (!isNumericComparate) {
             conditionalData = filteredData.filter(e => String(e[dataConditionalColumn]) === dataConditionalComparate)
           } else {
-            conditionalData = filteredData.filter(e => e[dataConditionalColumn] === dataConditionalComparate)
+            conditionalData = filteredData.filter(e => {
+              const numericValue = getNumericValue(e[dataConditionalColumn])
+              return numericValue !== null && numericValue === numericComparate
+            })
           }
           break
         case '≠':
-          if (isNaN(Number(dataConditionalComparate))) {
+          if (!isNumericComparate) {
             conditionalData = filteredData.filter(e => String(e[dataConditionalColumn]) !== dataConditionalComparate)
           } else {
-            conditionalData = filteredData.filter(e => e[dataConditionalColumn] !== dataConditionalComparate)
+            conditionalData = filteredData.filter(e => {
+              const numericValue = getNumericValue(e[dataConditionalColumn])
+              return numericValue !== null && numericValue !== numericComparate
+            })
           }
           break
         default:
