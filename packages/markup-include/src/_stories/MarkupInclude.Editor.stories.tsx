@@ -160,7 +160,7 @@ export const GeneralSectionTests: Story = {
     // TEST 2: Switch to TP5 Style
     // Expectation: TP5 container appears and legacy title wrapper is removed
     // ============================================================================
-    const styleSelect = canvasElement.querySelector('select[name*="contentEditor.style"]') as HTMLSelectElement
+    const styleSelect = canvasElement.querySelector('select[name="style"]') as HTMLSelectElement
     expect(styleSelect).toBeTruthy()
 
     await performAndAssert(

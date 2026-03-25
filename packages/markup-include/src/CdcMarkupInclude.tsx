@@ -325,6 +325,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
             enableMarkupVariables={config?.enableMarkupVariables}
             data={data}
             dataMetadata={config?.dataMetadata}
+            footerClassName={isTp5Style ? 'mt-3' : undefined}
           />
         }
       >
