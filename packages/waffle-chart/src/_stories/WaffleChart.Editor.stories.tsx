@@ -190,6 +190,36 @@ export const DataSectionTests: Story = {
       return el
     }
     const getValueText = () => getPrimaryEl().textContent?.trim() || ''
+    const getWaffleNodeState = () => {
+      const nodes = Array.from(canvasElement.querySelectorAll('.cove-waffle-chart svg .cdc-waffle-chart__node'))
+      const chartType = (canvasElement.querySelector('select[name="visualizationType"]') as HTMLSelectElement)?.value
+      const isTP5 = chartType === 'TP5 Waffle'
+
+      const filled = nodes.filter(node => {
+        const fill = (node.getAttribute('fill') || '').toLowerCase()
+        if (isTP5) {
+          return fill === '#009ec1' || fill === 'rgb(0, 158, 193)'
+        }
+
+        const fillOpacity = node.getAttribute('fill-opacity')
+        if (fillOpacity !== null) {
+          return Number(fillOpacity) >= 1
+        }
+
+        return true
+      }).length
+
+      return {
+        total: nodes.length,
+        filled
+      }
+    }
+
+    const setCheckboxState = async (checkbox: HTMLInputElement, shouldBeChecked: boolean) => {
+      if (checkbox.checked !== shouldBeChecked) {
+        await userEvent.click(checkbox)
+      }
+    }
 
     // ============================================================================
     // TEST 1: Data Column Change (Deaths <-> Total Overdoses)
@@ -446,7 +476,9 @@ export const DataSectionTests: Story = {
     // Expectation: Primary value text changes when switching value type.
     // ============================================================================
     const showPercentCheckbox = canvasElement.querySelector('input[name="showPercent"]') as HTMLInputElement
+    const showDenominatorCheckbox = canvasElement.querySelector('input[name="showDenominator"]') as HTMLInputElement
     expect(showPercentCheckbox).toBeTruthy()
+    expect(showDenominatorCheckbox).toBeTruthy()
     await performAndAssert(
       'Waffle Show Percentage Toggle',
       getValueText,
@@ -454,6 +486,134 @@ export const DataSectionTests: Story = {
         await userEvent.click(showPercentCheckbox)
       },
       (before, after) => after !== before
+    )
+
+    // ============================================================================
+    // TEST 19: Dynamic Denominator Activation (4 out of 10)
+    // Expectation: 10 total nodes, 4 filled nodes.
+    // ============================================================================
+    await performAndAssert(
+      'Dynamic Denominator 4 out of 10',
+      getWaffleNodeState,
+      async () => {
+        await userEvent.selectOptions(dataFunctionSelect, 'Count')
+        await userEvent.selectOptions(conditionalColumnSelect, 'Deaths')
+        await userEvent.selectOptions(conditionalOperatorSelect, '<')
+        await userEvent.clear(conditionalValueInput)
+        await userEvent.type(conditionalValueInput, '50')
+        await setCheckboxState(customDenomCheckbox, false)
+        await userEvent.clear(staticDenomInput)
+        await userEvent.type(staticDenomInput, '10')
+        await setCheckboxState(showPercentCheckbox, false)
+        await setCheckboxState(showDenominatorCheckbox, true)
+      },
+      (_before, after) => after.total === 10 && after.filled === 4
+    )
+
+    // ============================================================================
+    // TEST 20: Show Denominator Off Fallback
+    // Expectation: Falls back to fixed 100 nodes.
+    // ============================================================================
+    await performAndAssert(
+      'Dynamic Fallback Show Denominator Off',
+      getWaffleNodeState,
+      async () => {
+        await setCheckboxState(showDenominatorCheckbox, false)
+      },
+      (_before, after) => after.total === 100
+    )
+
+    // ============================================================================
+    // TEST 21: Percentage On Fallback
+    // Expectation: Falls back to fixed 100 nodes.
+    // ============================================================================
+    await performAndAssert(
+      'Dynamic Fallback Percentage On',
+      getWaffleNodeState,
+      async () => {
+        await setCheckboxState(showDenominatorCheckbox, true)
+        await setCheckboxState(showPercentCheckbox, true)
+      },
+      (_before, after) => after.total === 100
+    )
+
+    // ============================================================================
+    // TEST 22: Denominator >= 100 Fallback
+    // Expectation: Falls back to fixed 100 nodes.
+    // ============================================================================
+    await performAndAssert(
+      'Dynamic Fallback Denominator >= 100',
+      getWaffleNodeState,
+      async () => {
+        await setCheckboxState(showPercentCheckbox, false)
+        await setCheckboxState(showDenominatorCheckbox, true)
+        await userEvent.clear(staticDenomInput)
+        await userEvent.type(staticDenomInput, '250')
+      },
+      (_before, after) => after.total === 100
+    )
+
+    // ============================================================================
+    // TEST 23: Non-Integer Numerator/Denominator Rounding
+    // Expectation: Mean 17.5 and denominator 20.2 round to 18 out of 20.
+    // ============================================================================
+    await performAndAssert(
+      'Dynamic Rounding Non-Integer Values',
+      getWaffleNodeState,
+      async () => {
+        await userEvent.selectOptions(dataFunctionSelect, 'Mean (Average)')
+        await userEvent.selectOptions(dataColumnSelect, 'Deaths')
+        await userEvent.selectOptions(conditionalColumnSelect, 'Deaths')
+        await userEvent.selectOptions(conditionalOperatorSelect, '<')
+        await userEvent.clear(conditionalValueInput)
+        await userEvent.type(conditionalValueInput, '20')
+        await userEvent.clear(staticDenomInput)
+        await userEvent.type(staticDenomInput, '20.2')
+        await setCheckboxState(showPercentCheckbox, false)
+        await setCheckboxState(showDenominatorCheckbox, true)
+      },
+      (_before, after) => after.total === 20 && after.filled === 18
+    )
+
+    // ============================================================================
+    // TEST 24: Numerator Greater Than Denominator Fallback
+    // Expectation: Falls back to fixed 100 nodes.
+    // ============================================================================
+    await performAndAssert(
+      'Dynamic Fallback Numerator Greater Than Denominator',
+      getWaffleNodeState,
+      async () => {
+        await userEvent.clear(staticDenomInput)
+        await userEvent.type(staticDenomInput, '10')
+      },
+      (_before, after) => after.total === 100
+    )
+
+    // ============================================================================
+    // TEST 25: TP5 Waffle Dynamic Denominator (7 out of 12)
+    // Expectation: 12 total TP5 nodes, 7 filled nodes.
+    // ============================================================================
+    await performAndAssert(
+      'TP5 Dynamic Denominator 7 out of 12',
+      getWaffleNodeState,
+      async () => {
+        await openAccordion(canvas, 'General')
+        const chartTypeSelect = canvasElement.querySelector('select[name="visualizationType"]') as HTMLSelectElement
+        await userEvent.selectOptions(chartTypeSelect, 'TP5 Waffle')
+
+        await openAccordion(canvas, 'Data')
+        await userEvent.selectOptions(dataFunctionSelect, 'Count')
+        await userEvent.selectOptions(dataColumnSelect, 'Deaths')
+        await userEvent.selectOptions(conditionalColumnSelect, 'Deaths')
+        await userEvent.selectOptions(conditionalOperatorSelect, '<')
+        await userEvent.clear(conditionalValueInput)
+        await userEvent.type(conditionalValueInput, '151')
+        await userEvent.clear(staticDenomInput)
+        await userEvent.type(staticDenomInput, '12')
+        await setCheckboxState(showPercentCheckbox, false)
+        await setCheckboxState(showDenominatorCheckbox, true)
+      },
+      (_before, after) => after.total === 12 && after.filled === 7
     )
   }
 }
