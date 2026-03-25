@@ -18,6 +18,7 @@ import { Tooltip as ReactTooltip } from 'react-tooltip'
 import 'react-tooltip/dist/react-tooltip.css'
 import { Text } from '@visx/text'
 import { useTooltip, TooltipWithBounds } from '@visx/tooltip'
+import ResizeObserver from 'resize-observer-polyfill'
 // CDC Components
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import ConfigContext from '../ConfigContext'
@@ -150,6 +151,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const [suffixWidth, setSuffixWidth] = useState(0)
   const [calculatedSvgHeight, setCalculatedSvgHeight] = useState<number | null>(null)
   const [axisUpdateKey, setAxisUpdateKey] = useState(0)
+  const [axisBottomSizeKey, setAxisBottomSizeKey] = useState(0)
   const [synchronizedXValue, setSynchronizedXValue] = useState<any>(null)
 
   // REFS
@@ -242,6 +244,17 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   useLayoutEffect(() => {
     setAxisUpdateKey(prev => prev + 1)
   }, [data.length, xAxisDataMapped?.[0], xAxisDataMapped?.[xAxisDataMapped.length - 1]])
+
+  // Recompute heights when bottom axis size changes (e.g., font load or wrap).
+  useEffect(() => {
+    const axisBottomEl = axisBottomRef.current
+    if (!axisBottomEl) return
+    const observer = new ResizeObserver(() => {
+      setAxisBottomSizeKey(prev => prev + 1)
+    })
+    observer.observe(axisBottomEl)
+    return () => observer.disconnect()
+  }, [axisBottomRef.current])
 
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
 
@@ -496,7 +509,16 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     const legendIsLeftOrRight =
       legend?.position !== 'top' && legend?.position !== 'bottom' && !isLegendWrapViewport(currentViewport)
     legendRef.current.style.transform = legendIsLeftOrRight ? `translateY(${topLabelOnGridlineHeight}px)` : 'none'
-  }, [axisBottomRef.current, config, config.xAxis.brushActive, currentViewport, topYLabelRef.current, initialHeight])
+  }, [
+    axisBottomRef.current,
+    config,
+    config.xAxis.brushActive,
+    currentViewport,
+    topYLabelRef.current,
+    initialHeight,
+    parentWidth,
+    axisBottomSizeKey
+  ])
 
   useEffect(() => {
     if (!tooltipOpen) return
