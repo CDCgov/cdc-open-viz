@@ -9,11 +9,7 @@ import svgr from 'vite-plugin-svgr' // Svg Support
 const require = createRequire(import.meta.url)
 
 const config: StorybookConfig = {
-  stories: [
-    '../_stories/*.stories.@(js|jsx|ts|tsx)',
-    '../packages/**/_stories/*.stories.@(js|jsx|ts|tsx)',
-    '../_stories/private/**/*.stories.@(js|jsx|ts|tsx)'
-  ],
+  stories: ['../_stories/**/*.stories.@(js|jsx|ts|tsx)', '../packages/**/_stories/*.stories.@(js|jsx|ts|tsx)'],
 
   addons: [
     getAbsolutePath('@storybook/addon-links'),
