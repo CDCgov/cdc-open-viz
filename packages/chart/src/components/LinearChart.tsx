@@ -63,7 +63,7 @@ const BOTTOM_LABEL_PADDING = 9
 const X_TICK_LABEL_PADDING = 4.5
 const DEFAULT_TICK_LENGTH = 8
 const DEFAULT_MAX_TICK_ROTATION = 90
-const DEFAULT_LEFT_Y_AXIS_WIDTH = 33
+const DEFAULT_LEFT_Y_AXIS_WIDTH = 50
 
 // Font sizes
 const TICK_LABEL_FONT_SIZE = 16
@@ -355,11 +355,13 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     horizontalYAxisLabelSpace
   ])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (parentWidth <= 0) return
+
     if (calculatedYAxisWidth !== currentYAxisWidth) {
       setCurrentYAxisWidth(calculatedYAxisWidth)
     }
-  }, [calculatedYAxisWidth, currentYAxisWidth])
+  }, [calculatedYAxisWidth, currentYAxisWidth, parentWidth])
 
   // Tooltip Helpers
 
