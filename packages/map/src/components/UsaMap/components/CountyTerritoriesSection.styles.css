@@ -1,0 +1,89 @@
+.county-territories-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.county-territories-section__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.county-territories-section__heading {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.county-territories-section__cards {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(164px, 1fr));
+}
+
+.county-territories-section__group--freely-associated .county-territories-section__cards {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.county-territories-section__card {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.county-territories-section__map {
+  height: 118px;
+  max-width: 164px;
+  overflow: visible;
+  width: 100%;
+}
+
+.county-territories-section__group--freely-associated .county-territories-section__map {
+  height: 184px;
+  max-width: 260px;
+}
+
+.county-territories-section__label {
+  font-size: 0.875rem;
+  line-height: 1.2;
+  max-width: 164px;
+  text-align: center;
+}
+
+.county-territories-section__group--freely-associated .county-territories-section__label {
+  max-width: 260px;
+}
+
+@media (max-width: 767px) {
+  .county-territories-section__cards {
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  }
+
+  .county-territories-section__group--freely-associated .county-territories-section__cards {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+
+  .county-territories-section__map {
+    height: 100px;
+    max-width: 148px;
+  }
+
+  .county-territories-section__group--freely-associated .county-territories-section__map {
+    height: 132px;
+    max-width: 190px;
+  }
+
+  .county-territories-section__label {
+    max-width: 148px;
+  }
+
+  .county-territories-section__group--freely-associated .county-territories-section__label {
+    max-width: 190px;
+  }
+}

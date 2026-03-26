@@ -591,7 +591,7 @@ export const supportedTerritories = {
     'COMMONWEALTH OF THE NORTHERN MARIANA ISLANDS',
     'COMMONWEALTH OF THE NORTHERN MARIANA ISLANDS (CNMI)'
   ],
-  'US-FM': ['MICRONESIA', 'FM', 'Federated States of Micronesia'], // Note: Key is not an official ISO code
+  'US-FM': ['FEDERATED STATES OF MICRONESIA', 'FM', 'MICRONESIA'], // Note: Key is not an official ISO code
   'US-PW': ['PALAU', 'PW'], // Note: Key is not an official ISO code
   'US-MH': ['MARSHALL ISLANDS', 'MH', 'RMI'] // Note: Key is not an official ISO code
 }

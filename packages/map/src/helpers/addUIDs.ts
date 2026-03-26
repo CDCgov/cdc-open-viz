@@ -14,6 +14,7 @@ import {
 } from './../data/supported-geos'
 
 import { SUPPORTED_DC_NAMES, GEO_TYPES, GEOCODE_TYPES } from './constants'
+import { FREELY_ASSOCIATED_STATE_UIDS } from './freelyAssociatedStateUIDs'
 import { DataRow, MapConfig } from '../types/MapConfig'
 
 // Note: Key arrays are now imported from supported-geos for better performance
@@ -25,6 +26,8 @@ const geoLookups: Record<string, GeoLookup> = {
   country: { keys: countryKeys, data: supportedCountries }
 }
 
+const COUNTY_TERRITORY_DIRECT_UIDS = new Set<string>(FREELY_ASSOCIATED_STATE_UIDS)
+
 const memoizedFindUID = (
   geoName: string,
   type: keyof typeof geoLookups,
@@ -33,9 +36,11 @@ const memoizedFindUID = (
   const lookup = geoLookups[type]
   if (caseInsensitive) {
     const lowerGeoName = geoName.toLowerCase()
-    return lookup.keys.find(key => lookup.data[key].some(name => name.toLowerCase() === lowerGeoName))
+    return lookup.keys.find(
+      key => key.toLowerCase() === lowerGeoName || lookup.data[key].some(name => name.toLowerCase() === lowerGeoName)
+    )
   }
-  return lookup.keys.find(key => lookup.data[key].includes(geoName))
+  return lookup.keys.find(key => key === geoName || lookup.data[key].includes(geoName))
 }
 
 const hasValidCoordinates = (row: Row, columns: GeoConfig['columns']): boolean => {
@@ -96,6 +101,11 @@ const handleCountyLocation = (row: DataRow, geoColumn: string): string | undefin
   return countyKeys.find(key => key === fips)
 }
 
+const handleCountyTerritoryLocation = (row: DataRow, geoColumn: string): string | undefined => {
+  const territoryUid = memoizedFindUID(normalizeGeoName(row[geoColumn]), 'territory')
+  return territoryUid && COUNTY_TERRITORY_DIRECT_UIDS.has(territoryUid) ? territoryUid : undefined
+}
+
 const setRowUID = (row: DataRow, uid: string | null): void => {
   if (uid) {
     Object.defineProperty(row, 'uid', {
@@ -141,6 +151,9 @@ export const addUIDs = (configObj: MapConfig, fromColumn: string) => {
       case GEO_TYPES.SINGLE_STATE:
         if (geocodeType !== GEOCODE_TYPES.US) {
           uid = handleCountyLocation(row, geo.name)
+          if (!uid) {
+            uid = handleCountyTerritoryLocation(row, geo.name)
+          }
         }
         break
     }

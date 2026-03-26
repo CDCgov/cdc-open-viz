@@ -4,6 +4,7 @@ import CdcMap from '../CdcMap'
 import usaStateGradientConfig from './_mock/usa-state-gradient.json'
 import multiCountryConfig from './_mock/multi-country.json'
 import wastewaterMapSmallMultiplesConfig from './_mock/small_multiples/wastewater-map-small-multiples.json'
+import countyAvailableTerritoriesConfig from './_mock/county-available-territories.json'
 import { performAndAssert, waitForEditor, waitForPresence, openAccordion } from '@cdc/core/helpers/testing'
 
 type Story = StoryObj<typeof CdcMap>
@@ -303,6 +304,51 @@ export const TypeSectionTests: Story = {
         await userEvent.click(territoriesCheckbox)
       },
       (before, after) => before.territorySvgCount !== after.territorySvgCount
+    )
+  }
+}
+
+export const CountyAvailableTerritoriesTypeTests: Story = {
+  args: {
+    isEditor: true,
+    config: countyAvailableTerritoriesConfig
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await waitForPresence('.map-container', canvasElement)
+    await waitForPresence('.county-territories-section', canvasElement)
+    await openAccordion(canvas, 'Type')
+
+    const territoriesCheckbox = canvas.getByLabelText(/Show Available Territories/i) as HTMLInputElement
+    expect(territoriesCheckbox).toBeTruthy()
+
+    const getTerritoriesSectionState = () => {
+      const section = canvasElement.querySelector('.county-territories-section') as HTMLElement | null
+      const cards = canvasElement.querySelectorAll('.county-territories-section__card')
+      return {
+        hasSection: Boolean(section),
+        cardCount: cards.length
+      }
+    }
+
+    await performAndAssert(
+      'Show Available Territories → Disable',
+      getTerritoriesSectionState,
+      async () => {
+        await userEvent.click(territoriesCheckbox)
+      },
+      (before, after) => before.hasSection && !after.hasSection && after.cardCount === 0
+    )
+
+    await performAndAssert(
+      'Show Available Territories → Enable',
+      getTerritoriesSectionState,
+      async () => {
+        await userEvent.click(territoriesCheckbox)
+      },
+      (before, after) => !before.hasSection && after.hasSection && after.cardCount > 0
     )
   }
 }

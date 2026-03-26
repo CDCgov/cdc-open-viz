@@ -1,69 +1,120 @@
 import { feature } from 'topojson-client'
 import usExtendedGeography from './../data/us-extended-geography.json'
 
+type TopoTransform = {
+  scale: [number, number]
+  translate: [number, number]
+}
+
+type TopoGeometry = {
+  type: 'Polygon' | 'MultiPolygon'
+  arcs: number[] | number[][] | number[][][]
+  id?: string
+  properties?: Record<string, unknown>
+}
+
+type TopoGeometryCollection = {
+  type: 'GeometryCollection'
+  geometries: TopoGeometry[]
+}
+
+export type FreelyAssociatedStatesTopology = {
+  type: 'Topology'
+  transform: TopoTransform
+  arcs: number[][][]
+  objects: {
+    states: TopoGeometryCollection
+    counties: TopoGeometryCollection
+  }
+}
+
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
 }
 
-export const getTopoData = year => {
-  return new Promise((resolve, reject) => {
-    const resolveWithTopo = async response => {
-      if (response.status !== 200) {
-        response = await import(/* webpackChunkName: "cb_2019_us_county_20m" */ './../data/cb_2019_us_county_20m.json')
-      } else {
-        response = await response.json()
-      }
+let freelyAssociatedStatesTopoPromise: Promise<FreelyAssociatedStatesTopology> | undefined
 
-      const counties = [response, usExtendedGeography].flatMap(topo => feature(topo, topo.objects.counties).features)
-      const states = [response, usExtendedGeography].flatMap(topo => feature(topo, topo.objects.states).features)
+const normalizeJsonModule = <T>(module: T | { default: T }): T => {
+  return ((module as { default?: T }).default ?? module) as T
+}
 
-      const topoData = {
-        year: year || 'default',
-        fulljson: response,
-        counties,
-        states
-      }
+export const getFreelyAssociatedStatesTopo = async (): Promise<FreelyAssociatedStatesTopology> => {
+  if (!freelyAssociatedStatesTopoPromise) {
+    freelyAssociatedStatesTopoPromise = import(
+      /* webpackChunkName: "freely-associated-states-topo" */ './../data/freely-associated-states-topo.json'
+    )
+      .then(module => normalizeJsonModule<FreelyAssociatedStatesTopology>(module))
+      .catch(error => {
+        freelyAssociatedStatesTopoPromise = undefined
+        throw error
+      })
+  }
 
-      resolve(topoData)
-    }
+  return freelyAssociatedStatesTopoPromise
+}
 
-    const numericYear = parseInt(year)
+const getRequestedCountyTopoYear = year => {
+  const numericYear = parseInt(year, 10)
 
-    if (isNaN(numericYear)) {
-      fetch(getCountyTopoURL(2019)).then(resolveWithTopo)
-    } else if (numericYear > 2022) {
-      fetch(getCountyTopoURL(2022)).then(resolveWithTopo)
-    } else if (numericYear < 2013) {
-      fetch(getCountyTopoURL(2013)).then(resolveWithTopo)
-    } else {
-      switch (numericYear) {
-        case 2022:
-          fetch(getCountyTopoURL(2022)).then(resolveWithTopo)
-          break
-        case 2021:
-          fetch(getCountyTopoURL(2021)).then(resolveWithTopo)
-          break
-        case 2020:
-          fetch(getCountyTopoURL(2020)).then(resolveWithTopo)
-          break
-        case 2018:
-        case 2017:
-        case 2016:
-        case 2015:
-          fetch(getCountyTopoURL(2015)).then(resolveWithTopo)
-          break
-        case 2014:
-          fetch(getCountyTopoURL(2014)).then(resolveWithTopo)
-          break
-        case 2013:
-          fetch(getCountyTopoURL(2013)).then(resolveWithTopo)
-          break
-        default:
-          fetch(getCountyTopoURL(2019)).then(resolveWithTopo)
-          break
-      }
-    }
-  })
+  if (isNaN(numericYear)) return 2019
+  if (numericYear > 2022) return 2022
+  if (numericYear < 2013) return 2013
+
+  switch (numericYear) {
+    case 2022:
+    case 2021:
+    case 2020:
+    case 2014:
+    case 2013:
+      return numericYear
+    case 2018:
+    case 2017:
+    case 2016:
+    case 2015:
+      return 2015
+    default:
+      return 2019
+  }
+}
+
+const loadLocalCountyTopo = async () => {
+  const module = await import(/* webpackChunkName: "cb_2019_us_county_20m" */ './../data/cb_2019_us_county_20m.json')
+  return normalizeJsonModule(module)
+}
+
+const loadCountyTopoResponse = async requestedYear => {
+  try {
+    const response = await fetch(getCountyTopoURL(requestedYear))
+    return response.status !== 200 ? await loadLocalCountyTopo() : await response.json()
+  } catch {
+    return loadLocalCountyTopo()
+  }
+}
+
+type GetTopoDataOptions = {
+  includeFreelyAssociatedStates?: boolean
+}
+
+export const getTopoData = async (year, options: GetTopoDataOptions = {}) => {
+  const { includeFreelyAssociatedStates = false } = options
+  const requestedYear = getRequestedCountyTopoYear(year)
+  const topoResponse = await loadCountyTopoResponse(requestedYear)
+  const topoSources = [topoResponse, usExtendedGeography]
+
+  if (includeFreelyAssociatedStates) {
+    topoSources.push(await getFreelyAssociatedStatesTopo())
+  }
+
+  const counties = topoSources.flatMap(topo => feature(topo, topo.objects.counties).features)
+  const states = topoSources.flatMap(topo => feature(topo, topo.objects.states).features)
+
+  return {
+    year: year || 'default',
+    includesFreelyAssociatedStates: includeFreelyAssociatedStates,
+    fulljson: topoResponse,
+    counties,
+    states
+  }
 }
 
 export const getCurrentTopoYear = (state, runtimeFilters) => {

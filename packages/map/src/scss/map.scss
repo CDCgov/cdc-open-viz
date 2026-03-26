@@ -108,11 +108,14 @@ canvas {
   width: 100%;
 }
 
-.county-map-canvas + .tooltip {
-  position: fixed;
+.tooltip--canvas {
   background-color: white;
   pointer-events: none;
   display: none;
+}
+
+.county-map-canvas-wrapper {
+  position: relative;
 }
 
 .county-map-canvas {

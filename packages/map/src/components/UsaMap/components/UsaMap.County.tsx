@@ -1,8 +1,7 @@
-import { useEffect, useState, useRef, useContext } from 'react'
+import { useEffect, useState, useRef, useContext, useMemo } from 'react'
 import { geoCentroid, geoPath, geoContains } from 'd3-geo'
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity } from 'd3-zoom'
 import { select as d3Select } from 'd3-selection'
-import { feature } from 'topojson-client'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import debounce from 'lodash.debounce'
 import Loading from '@cdc/core/components/Loading'
@@ -22,16 +21,18 @@ import { supportedStatesFipsCodes } from '../../../data/supported-geos'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
 import useApplyTooltipsToGeo from '../../../hooks/useApplyTooltipsToGeo'
-import { MapConfig } from '../../../types/MapConfig'
 import { DEFAULT_MAP_BACKGROUND, DISABLED_MAP_COLOR } from '../../../helpers/constants'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { createCanvasPattern, PatternType } from '../../../helpers/createCanvasPattern'
 import { getPatternForRow } from '../../../helpers/getPatternForRow'
-
-const getCountyTopoURL = year => {
-  return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
-}
+import { getCurrentTopoYear, getTopoData, isTopoReady } from '../helpers/map'
+import CountyTerritoriesSection from './CountyTerritoriesSection'
+import {
+  isCountyTerritoryCountyId,
+  isCountyTerritoryStateId,
+  isFreelyAssociatedStateUid
+} from '../helpers/countyTerritories'
 
 const sortById = (a, b) => {
   if (a.id < b.id) return -1
@@ -39,105 +40,42 @@ const sortById = (a, b) => {
   return 0
 }
 
-const getTopoData = year => {
-  return new Promise(resolve => {
-    const resolveWithTopo = async response => {
-      if (response.status !== 200) {
-        response = await import(/* webpackChunkName: "cb_2019_us_county_20m" */ './../data/cb_2019_us_county_20m.json')
-      } else {
-        response = await response.json()
-      }
+const buildCountyTopoData = topoData => {
+  const allStates = [...(topoData.states || [])].sort(sortById)
+  const allCounties = [...(topoData.counties || [])].sort(sortById)
 
-      let topoData = {
-        year: undefined,
-        counties: undefined,
-        states: undefined,
-        mapData: undefined,
-        countyIndecies: undefined,
-        projection: undefined
-      }
+  const territoryStates = allStates.filter(state => isCountyTerritoryStateId(String(state.id)))
+  const territoryCounties = allCounties.filter(county => isCountyTerritoryCountyId(String(county.id)))
 
-      topoData.year = year || 'default'
-      topoData.counties = feature(response, response.objects.counties).features
-      topoData.states = feature(response, response.objects.states).features
-      topoData.states.sort(sortById)
-      topoData.counties.sort(sortById)
-      topoData.mapData = topoData.states.concat(topoData.counties).filter(geo => geo.id !== '51620') //Not sure why, but Franklin City, VA is very broken and messes up the rendering
-      topoData.countyIndecies = {}
-      topoData.states.forEach(state => {
-        let minIndex = topoData.mapData.length - 1
-        let maxIndex = 0
+  const states = allStates.filter(state => !isCountyTerritoryStateId(String(state.id)))
+  const counties = allCounties.filter(county => !isCountyTerritoryCountyId(String(county.id)))
+  const mapData = states.concat(counties).filter(geo => geo.id !== '51620')
+  const countyIndecies = {}
 
-        for (let i = 0; i < topoData.mapData.length; i++) {
-          if (topoData.mapData[i].id.length > 2 && topoData.mapData[i].id.indexOf(state.id) === 0) {
-            if (i < minIndex) minIndex = i
-            if (i > maxIndex) maxIndex = i
-          }
-        }
+  states.forEach(state => {
+    let minIndex = mapData.length - 1
+    let maxIndex = 0
 
-        topoData.countyIndecies[state.id] = [minIndex, maxIndex]
-      })
-      topoData.projection = geoAlbersUsaTerritories()
-
-      resolve(topoData)
-    }
-
-    const numericYear = parseInt(year)
-
-    if (isNaN(numericYear)) {
-      fetch(getCountyTopoURL(2019)).then(resolveWithTopo)
-    } else if (numericYear > 2022) {
-      fetch(getCountyTopoURL(2022)).then(resolveWithTopo)
-    } else if (numericYear < 2013) {
-      fetch(getCountyTopoURL(2013)).then(resolveWithTopo)
-    } else {
-      switch (numericYear) {
-        case 2022:
-          fetch(getCountyTopoURL(2022)).then(resolveWithTopo)
-          break
-        case 2021:
-          fetch(getCountyTopoURL(2021)).then(resolveWithTopo)
-          break
-        case 2020:
-          fetch(getCountyTopoURL(2020)).then(resolveWithTopo)
-          break
-        case 2018:
-        case 2017:
-        case 2016:
-        case 2015:
-          fetch(getCountyTopoURL(2015)).then(resolveWithTopo)
-          break
-        case 2014:
-          fetch(getCountyTopoURL(2014)).then(resolveWithTopo)
-          break
-        case 2013:
-          fetch(getCountyTopoURL(2013)).then(resolveWithTopo)
-          break
-        default:
-          fetch(getCountyTopoURL(2019)).then(resolveWithTopo)
-          break
+    for (let i = 0; i < mapData.length; i++) {
+      if (String(mapData[i].id).length > 2 && String(mapData[i].id).indexOf(String(state.id)) === 0) {
+        if (i < minIndex) minIndex = i
+        if (i > maxIndex) maxIndex = i
       }
     }
+
+    countyIndecies[state.id] = [minIndex, maxIndex]
   })
-}
 
-const getCurrentTopoYear = (config: MapConfig, runtimeFilters) => {
-  let currentYear = config.general.countyCensusYear
-
-  if (config.general.filterControlsCountyYear && runtimeFilters && runtimeFilters.length > 0) {
-    let yearFilter = runtimeFilters.filter(filter => filter.columnName === config.general.filterControlsCountyYear)
-    if (yearFilter.length > 0 && yearFilter[0].active) {
-      currentYear = yearFilter[0].active
-    }
+  return {
+    ...topoData,
+    states,
+    counties,
+    mapData,
+    countyIndecies,
+    projection: topoData.projection || geoAlbersUsaTerritories(),
+    territoryStates,
+    territoryCounties
   }
-
-  return currentYear || 'default'
-}
-
-const isTopoReady = (topoData, config: MapConfig, runtimeFilters) => {
-  let currentYear = getCurrentTopoYear(config, runtimeFilters)
-
-  return topoData.year && (!currentYear || currentYear === topoData.year)
 }
 
 const CountyMap = () => {
@@ -177,19 +115,34 @@ const CountyMap = () => {
     }
   })
 
+  const showAvailableTerritories = config.general.showAvailableTerritories ?? true
+  const shouldIncludeFreelyAssociatedStates = useMemo(() => {
+    if (!showAvailableTerritories || !config.data?.length) return false
+    return config.data.some(row => isFreelyAssociatedStateUid(row.uid))
+  }, [config.data, showAvailableTerritories])
+
   useEffect(() => {
     let currentYear = getCurrentTopoYear(config, runtimeFilters)
+    const topoMatchesFreelyAssociatedStates =
+      topoData.includesFreelyAssociatedStates === shouldIncludeFreelyAssociatedStates
 
-    if (currentYear !== topoData.year) {
-      getTopoData(currentYear).then(response => {
+    if (currentYear !== topoData.year || !topoMatchesFreelyAssociatedStates) {
+      getTopoData(currentYear, {
+        includeFreelyAssociatedStates: shouldIncludeFreelyAssociatedStates
+      }).then(response => {
         if (canvasRef.current) {
           const context = canvasRef.current.getContext('2d')
-          context.clearRect(canvasRef.current.width, canvasRef.current.height)
+          context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
         }
-        setTopoData(response)
+        setTopoData(buildCountyTopoData(response))
       })
     }
-  }, [config.general.countyCensusYear, config.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
+  }, [
+    config.general.countyCensusYear,
+    config.general.filterControlsCountyYear,
+    JSON.stringify(runtimeFilters),
+    shouldIncludeFreelyAssociatedStates
+  ])
 
   // Whenever the memo at the top is triggered and the map is called to re-render, call drawCanvas and update
   // The resize function so it includes the latest state variables
@@ -961,38 +914,48 @@ const CountyMap = () => {
 
   return (
     <ErrorBoundary component='CountyMap'>
-      <canvas
-        ref={canvasRef}
-        aria-label={handleMapAriaLabels(config)}
-        onMouseMove={canvasHover}
-        onMouseOut={() => {
-          tooltipRef.current.style.display = 'none'
-          tooltipRef.current.setAttribute('data-index', null)
-        }}
-        onClick={canvasClick}
-        className='county-map-canvas'
-        style={config.general.allowMapZoom ? undefined : { cursor: 'default' }}
-      ></canvas>
+      <div className='county-map-canvas-wrapper'>
+        <canvas
+          ref={canvasRef}
+          aria-label={handleMapAriaLabels(config)}
+          onMouseMove={canvasHover}
+          onMouseOut={() => {
+            tooltipRef.current.style.display = 'none'
+            tooltipRef.current.setAttribute('data-index', null)
+          }}
+          onClick={canvasClick}
+          className='county-map-canvas'
+          style={config.general.allowMapZoom ? undefined : { cursor: 'default' }}
+        ></canvas>
 
-      {config.general.allowMapZoom && (
-        <div className='zoom-controls' data-html2canvas-ignore='true'>
-          <button onClick={handleZoomIn} aria-label='Zoom In'>
-            <svg viewBox='0 0 24 24' stroke='currentColor' strokeWidth='3'>
-              <line x1='12' y1='5' x2='12' y2='19' />
-              <line x1='5' y1='12' x2='19' y2='12' />
-            </svg>
-          </button>
-          <button onClick={handleZoomOut} aria-label='Zoom Out'>
-            <svg viewBox='0 0 24 24' stroke='currentColor' strokeWidth='3'>
-              <line x1='5' y1='12' x2='19' y2='12' />
-            </svg>
-          </button>
-          {(hasMoved || focus.id) && (
-            <button onClick={handleZoomReset} className='reset' aria-label='Reset Zoom'>
-              Reset Zoom
+        {config.general.allowMapZoom && (
+          <div className='zoom-controls' data-html2canvas-ignore='true'>
+            <button onClick={handleZoomIn} aria-label='Zoom In'>
+              <svg viewBox='0 0 24 24' stroke='currentColor' strokeWidth='3'>
+                <line x1='12' y1='5' x2='12' y2='19' />
+                <line x1='5' y1='12' x2='19' y2='12' />
+              </svg>
             </button>
-          )}
-        </div>
+            <button onClick={handleZoomOut} aria-label='Zoom Out'>
+              <svg viewBox='0 0 24 24' stroke='currentColor' strokeWidth='3'>
+                <line x1='5' y1='12' x2='19' y2='12' />
+              </svg>
+            </button>
+            {(hasMoved || focus.id) && (
+              <button onClick={handleZoomReset} className='reset' aria-label='Reset Zoom'>
+                Reset Zoom
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {showAvailableTerritories && (
+        <CountyTerritoriesSection
+          territoryCounties={topoData.territoryCounties || []}
+          territoryStates={topoData.territoryStates || []}
+          tooltipId={tooltipId}
+        />
       )}
     </ErrorBoundary>
   )
