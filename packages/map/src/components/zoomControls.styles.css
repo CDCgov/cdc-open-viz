@@ -51,3 +51,19 @@
     margin-right: 0.25em;
   }
 }
+
+.zoom-controls--top-right {
+  bottom: auto;
+  left: auto;
+  right: 1em;
+  top: 1em;
+}
+
+.zoom-controls--top-right > button.reset {
+  background: #005eaa;
+}
+
+.zoom-controls--top-right > button.reset:hover,
+.zoom-controls--top-right > button.reset:focus {
+  background: #004b88;
+}

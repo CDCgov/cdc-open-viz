@@ -416,7 +416,7 @@ const WorldMap = () => {
           </ZoomableGroup>
         </svg>
       )}
-      {(type === 'data' || (type === 'world-geocode' && allowMapZoom) || (type === 'bubble' && allowMapZoom)) && (
+      {allowMapZoom && (
         <ZoomControls handleZoomIn={handleZoomIn} handleZoomOut={handleZoomOut} handleZoomReset={handleZoomReset} />
       )}
     </ErrorBoundary>
