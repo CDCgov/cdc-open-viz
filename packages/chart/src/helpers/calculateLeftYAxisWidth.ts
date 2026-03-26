@@ -62,6 +62,28 @@ export const calculateLeftYAxisWidth = ({
   categoryLabelSpace = 0,
   horizontalYAxisLabelSpace = 0
 }: CalculateLeftYAxisWidthProps): number => {
+  if (config.visualizationType === 'Horizon Chart') {
+    const seriesKeys =
+      config.runtime?.seriesKeys && config.runtime.seriesKeys.length > 0
+        ? config.runtime.seriesKeys
+        : config.series?.map(series => series.dataKey) || []
+    const horizonLabels = seriesKeys.map(seriesKey => String(config.runtime?.seriesLabels?.[seriesKey] || seriesKey))
+    const horizonLabelWidth = horizonLabels.length
+      ? Math.max(...horizonLabels.map(label => getTextWidth(label, tickLabelFont)))
+      : 0
+    const verticalAxisLabelSpace =
+      !config.hideYAxisLabel && config.runtime.yAxis.label ? axisLabelFontSize + AXIS_LABEL_PADDING : 0
+    const estimatedWidth =
+      horizonLabelWidth +
+      DEFAULT_TICK_LENGTH +
+      TICK_LABEL_MARGIN_RIGHT +
+      verticalAxisLabelSpace +
+      Number(config.yAxis.axisPadding || 0)
+    const maxAllowedWidth = Math.max(parentWidth * MAX_LEFT_AXIS_WIDTH_RATIO, MIN_LEFT_AXIS_WIDTH)
+
+    return Math.max(MIN_LEFT_AXIS_WIDTH, Math.min(Math.ceil(estimatedWidth), maxAllowedWidth))
+  }
+
   const tickValues = getTickValues({ config, data, yScale, numTicks })
   const { hideAxis, hideLabel, inlineLabel, labelsAboveGridlines } = config.yAxis
   const inlineLabelHasNoSpace = !inlineLabel?.includes(' ')
