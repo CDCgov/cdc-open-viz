@@ -960,6 +960,11 @@ const CountyMap = () => {
     )
   }
 
+  const showManualZoomControls = config.general.allowMapZoom
+  const showResetControl = (hasMoved || focus.id) && (showManualZoomControls || config.general.type === 'us-geocode')
+  const showTopRightResetControl = showResetControl && config.general.type === 'us-geocode'
+  const showBottomLeftResetControl = showResetControl && config.general.type !== 'us-geocode'
+
   return (
     <ErrorBoundary component='CountyMap'>
       <canvas
@@ -975,7 +980,7 @@ const CountyMap = () => {
         style={config.general.allowMapZoom ? undefined : { cursor: 'default' }}
       ></canvas>
 
-      {config.general.allowMapZoom && (
+      {showManualZoomControls && (
         <div className='zoom-controls' data-html2canvas-ignore='true'>
           <button onClick={handleZoomIn} aria-label='Zoom In'>
             <svg viewBox='0 0 24 24' stroke='currentColor' strokeWidth='3'>
@@ -988,11 +993,18 @@ const CountyMap = () => {
               <line x1='5' y1='12' x2='19' y2='12' />
             </svg>
           </button>
-          {(hasMoved || focus.id) && (
+          {showBottomLeftResetControl && (
             <button onClick={handleZoomReset} className='reset' aria-label='Reset Zoom'>
               Reset Zoom
             </button>
           )}
+        </div>
+      )}
+      {showTopRightResetControl && (
+        <div className='zoom-controls zoom-controls--top-right' data-html2canvas-ignore='true'>
+          <button onClick={handleZoomReset} className='reset' aria-label='Reset Zoom'>
+            Reset Zoom
+          </button>
         </div>
       )}
     </ErrorBoundary>
