@@ -1,5 +1,4 @@
 import React, { useEffect, memo, useContext } from 'react'
-import _ from 'lodash'
 
 import ConfigContext from '../ConfigContext'
 
@@ -14,8 +13,9 @@ import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { useFilterManagement } from '@cdc/core/hooks/useFilterManagement'
 import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualSection'
+import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
 
-import '@cdc/core/styles/v2/components/editor.scss'
+import '@cdc/core/components/EditorPanel/editor.scss'
 import WarningImage from '../images/warning.svg'
 
 import { DATA_OPERATORS, DATA_FUNCTIONS } from '../CdcWaffleChart'
@@ -115,6 +115,28 @@ const EditorPanel = memo(props => {
                 <p>
                   Enter supporting text to display below the data visualization, if applicable. The following HTML tags
                   are supported: strong, em, sup, and sub.
+                </p>
+              </Tooltip.Content>
+            </Tooltip>
+          }
+        />
+        <Select
+          value={config.locale}
+          fieldName='locale'
+          label='Language for dates and numbers'
+          updateField={updateField}
+          options={[
+            { value: 'en-US', label: 'English (en-US)' },
+            { value: 'es-MX', label: 'Spanish (es-MX)' }
+          ]}
+          tooltip={
+            <Tooltip style={{ textTransform: 'none' }}>
+              <Tooltip.Target>
+                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+              </Tooltip.Target>
+              <Tooltip.Content>
+                <p>
+                  Change the language (locale) for this visualization to alter the way dates and numbers are formatted.
                 </p>
               </Tooltip.Content>
             </Tooltip>
@@ -431,6 +453,18 @@ const EditorPanel = memo(props => {
           />
         </Accordion.Section>
       )}
+      <Accordion.Section title='Markup Variables'>
+        <PanelMarkup
+          name='Markup Variables'
+          markupVariables={config.markupVariables || []}
+          data={data}
+          enableMarkupVariables={config.enableMarkupVariables || false}
+          onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
+          onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
+          withAccordion={false}
+          dataMetadata={config.dataMetadata}
+        />
+      </Accordion.Section>
     </Accordion>
   )
 

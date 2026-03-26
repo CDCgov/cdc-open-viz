@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useId } from 'react'
+import './filters.scss'
 import _ from 'lodash'
 import parse from 'html-react-parser'
 
@@ -210,12 +211,9 @@ const Filters: React.FC<FilterProps> = ({
   if (!hasVisibleFilters) return <></>
 
   const getClasses = () => {
-    const { visualizationType, legend } = visualizationConfig || {}
-    const baseClass = 'filters-section'
-    const conditionalClass = standaloneMap ? general.headerColor : visualizationType === 'Spark Line' ? null : theme
+    const { legend } = visualizationConfig || {}
     const legendClass = legend && !legend.hide && legend.position === 'top' ? 'mb-0' : null
-
-    return [baseClass, conditionalClass, legendClass, 'w-100'].filter(Boolean)
+    return ['filters-section', legendClass, 'w-100'].filter(Boolean)
   }
 
   const getNestedGroup = (singleFilter: VizFilter): string[] => {

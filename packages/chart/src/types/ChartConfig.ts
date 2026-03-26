@@ -134,6 +134,8 @@ type Visual = {
   accent?: boolean
   background?: boolean
   hideBackgroundColor?: boolean
+  tp5Treatment?: boolean
+  tp5Background?: boolean
   verticalHoverLine?: boolean
   horizontalHoverLine?: boolean
   lineDatapointSymbol: 'none' | 'standard'
@@ -156,6 +158,7 @@ export type AllChartsConfig = {
   columns: ChartColumns
   confidenceKeys: ConfidenceInterval
   data: Object[]
+  dataMetadata?: Record<string, string>
   dataUrl: string
   dataCutoff: number
   dataDescription: Partial<DataDescription>
@@ -184,6 +187,7 @@ export type AllChartsConfig = {
   isPaletteReversed: boolean
   labels: boolean
   legend: Legend
+  locale: string
   lineDatapointColor: 'Same as Line' | 'Lighter than Line'
   lineDatapointStyle: 'hidden' | 'always show' | 'hover'
   lollipopColorStyle: 'regular' | 'two-tone'

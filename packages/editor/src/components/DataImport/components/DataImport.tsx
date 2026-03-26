@@ -24,7 +24,7 @@ import { type Visualization } from '@cdc/core/types/Visualization'
 import { type DataSet } from '@cdc/core/types/DataSet'
 
 import './data-import.scss'
-import '@cdc/core/styles/v2/components/data-designer.scss'
+import '@cdc/core/components/managers/data-designer.scss'
 
 import { errorMessages, maxFileSize } from '../../../helpers/errorMessages'
 import { displaySize } from '../helpers/displaySize'
@@ -39,6 +39,7 @@ import {
   parseVegaConfig,
   updateVegaData
 } from '@cdc/core/helpers/vegaConfig'
+import { extractDataAndMetadata } from '@cdc/core/helpers/extractDataAndMetadata'
 
 const DataImport = () => {
   const { config, errors, tempConfig, sharepath } = useContext(ConfigContext)
@@ -179,12 +180,13 @@ const DataImport = () => {
     const filereader = new FileReader()
 
     filereader.onload = function () {
-      const handleSetConfig = (newData: Object[], useTempConfig = false) => {
+      const handleSetConfig = (newData: Object[], useTempConfig = false, dataMetadata = {}) => {
         const setDataURL = keepURL && fileSourceType === 'url'
         if (config.type === 'dashboard') {
           const dataFileFormat = mimeType.split('/')[1].toUpperCase()
           const dataset = {
             data: newData,
+            dataMetadata,
             dataFileSize: fileSize,
             dataFileName: fileSource, // new file source
             dataFileSourceType: fileSourceType, // new file source type
@@ -210,6 +212,7 @@ const DataImport = () => {
             ...config,
             ...tempConfig,
             data: newData,
+            dataMetadata,
             dataFileName: fileSource, // new file source
             dataFileSourceType: fileSourceType, // new file source type
             formattedData: transform.developerStandardize(newData, config.dataDescription)
@@ -227,14 +230,16 @@ const DataImport = () => {
         if (config.vegaConfig) {
           return updateDataFromVegaData(result, fileSource, fileSourceType)
         }
-        const text = transform.autoStandardize(result)
+        const { data: extractedData, dataMetadata } = extractDataAndMetadata(result)
+        const text = transform.autoStandardize(extractedData)
         if (config.data && config.series) {
           if (dataExists(text, config.series, config?.xAxis.dataKey)) {
-            handleSetConfig(text, true)
+            handleSetConfig(text, true, dataMetadata)
           } else {
             resetEditor(
               {
                 data: text,
+                dataMetadata,
                 dataFileName: fileSource,
                 dataFileSourceType: fileSourceType
               } as Visualization,
@@ -242,7 +247,7 @@ const DataImport = () => {
             )
           }
         } else {
-          handleSetConfig(text)
+          handleSetConfig(text, false, dataMetadata)
         }
 
         if (editingDataset) {

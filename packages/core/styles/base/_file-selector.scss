@@ -1,0 +1,20 @@
+.cove-file-selector {
+  padding: 1rem 3rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--mediumGray);
+  border: var(--lightGray) 2px dashed;
+  border-radius: 0.2rem;
+  cursor: pointer;
+  transition: 0.1s all;
+
+  &.drag-active {
+    background-color: var(--lightestGray);
+  }
+
+  span {
+    white-space: pre;
+    color: var(--blue);
+    text-decoration: underline;
+  }
+}

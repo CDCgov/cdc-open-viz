@@ -1,25 +1,76 @@
-@import '@cdc/core/styles/v2/utils/breakpoints';
+@import '@cdc/core/styles/utils/breakpoints';
+@import '@cdc/core/styles/layout/wrapper-padding';
 
 .form-container {
   overflow-y: auto;
 }
 
-.cdc-open-viz-module.type-dashboard {
-  .cdc-open-viz-module.type-chart.isEditor {
-    .cdc-chart-inner-container {
+.cove-visualization.type-dashboard {
+  .cove-visualization.type-chart.is-editor {
+    .cove-visualization__body {
       background: white;
     }
   }
 }
 
-.cdc-open-viz-module.type-chart {
+.cove-visualization.type-chart {
   @import 'DataTable';
+
+  .cove-visualization__body {
+    @include cove-visualization-body-padding;
+  }
+
+  .cove-visualization__body.component--tp5-treatment {
+    background: transparent;
+
+    .cdc-callout {
+      box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+      border: 1px solid #dff2f6;
+      margin: 0;
+      padding: 1.25rem;
+      border-radius: 0.25rem;
+      position: relative;
+      background: transparent;
+
+      .cdc-callout__flag {
+        position: absolute;
+        top: -0.36rem;
+        right: 1.08rem;
+        width: 1.84rem;
+        height: auto;
+      }
+
+      .cove-visualization__title,
+      .cove-visualization__header {
+        background: transparent;
+        border: 0;
+        color: var(--cool-gray-90, #1f2937);
+        margin: 0 0 1rem;
+        padding: 0;
+        border-radius: 0;
+
+        h2 {
+          color: var(--cool-gray-90, #1f2937);
+          font-family: var(--fonts-nunito, var(--app-font-secondary));
+          font-size: 1.1rem;
+          font-weight: 700;
+        }
+      }
+    }
+  }
+
+  .cove-visualization__title,
+  .cove-visualization__header {
+    margin-bottom: 0 !important;
+  }
 
   .legend-top {
     .legend-wrapper .tooltip-boundary {
       display: flex;
       flex-wrap: wrap;
+      row-gap: var(--cove-visualization-section-gap, 1.5rem);
       order: 2;
+
       aside {
         width: 100%;
         order: 1;
@@ -31,13 +82,16 @@
     .legend-wrapper {
       display: flex;
       flex-wrap: wrap;
+      row-gap: var(--cove-visualization-section-gap, 1.5rem);
+
       aside {
         width: 100%;
+        margin-top: var(--cove-visualization-section-gap, 1.5rem) !important;
       }
     }
   }
 
-  &.isEditor .cdc-chart-inner-container {
+  &.is-editor .cove-visualization__body {
     background: white;
   }
 
@@ -45,11 +99,6 @@
 
   .chart-description {
     margin-bottom: 20px;
-  }
-
-  .subtext,
-  .subtext--responsive-ticks,
-  .section-subtext {
   }
 
   .type-pie {
@@ -60,7 +109,6 @@
 
   .legend-container {
     #supression-tooltip {
-      font-family: 'Nunito', sans-serif;
       font-size: 0.8337rem;
       font-weight: 400;
       max-width: 16.7rem;
@@ -70,6 +118,7 @@
       white-space: normal;
       line-height: 1.4;
     }
+
     background: #fff;
     width: 100%;
     vertical-align: top;
@@ -101,6 +150,7 @@
       flex-direction: column;
       row-gap: var(--space-between-legend-item-rows);
       column-gap: var(--space-between-legend-item-columns);
+
       &.double-column,
       &.single-row {
         display: grid;
@@ -126,6 +176,7 @@
       text-align: left;
       user-select: none;
       line-height: var(--legend-item-font-size);
+
       .visx-legend-label {
         word-wrap: break-word;
         white-space: pre-wrap;
@@ -137,7 +188,7 @@
       white-space: nowrap;
     }
 
-    .legend-item > .legend-item {
+    .legend-item>.legend-item {
       display: inline-block;
       flex: 0 0 auto;
     }
@@ -155,6 +206,7 @@
         opacity: 0.5;
         transition: 0.2s all;
       }
+
       &.highlighted {
         outline: 1px solid #005ea2;
         outline-offset: 5px;
@@ -170,10 +222,11 @@
         left: 0%;
         top: 108%;
 
-        & > * {
+        &>* {
           margin: 0;
         }
-        & > p,
+
+        &>p,
         a {
           margin-left: 5px;
         }
@@ -182,6 +235,7 @@
   }
 
   .dynamic-legend-list {
+
     // overide traditional legend item that uses !important
     .legend-item {
       align-items: flex-end !important;
@@ -214,7 +268,7 @@
     font-size: 1em;
     vertical-align: middle;
 
-    & > span {
+    &>span {
       display: flex;
       justify-items: center;
       align-items: center;
@@ -224,23 +278,25 @@
       max-height: 1px;
     }
 
-    & > span[class*='Asterisk'] {
+    &>span[class*='Asterisk'] {
       transform: scale(1.8);
       margin-top: 15px;
     }
-    & > span[class*='Dagger'] {
+
+    &>span[class*='Dagger'] {
       margin-top: 2px;
     }
-    & > span[class*='Sign'] {
+
+    &>span[class*='Sign'] {
       margin-top: 1px;
     }
 
-    & > svg {
+    &>svg {
       width: 50px;
       height: 23px;
     }
 
-    & > p {
+    &>p {
       margin: 0;
     }
   }
@@ -257,18 +313,37 @@
     position: relative;
   }
 
-  .chart-container {
+  .visualization-container {
     display: flex;
     align-items: flex-start;
     flex-wrap: wrap;
     justify-content: space-between;
+    min-width: 0;
+    max-width: 100%;
+
+    .legend-wrapper {
+      min-width: 0;
+      max-width: 100%;
+
+      >div,
+      >aside {
+        min-width: 0;
+        max-width: 100%;
+      }
+    }
+
+    .tooltip-boundary {
+      min-width: 0;
+      max-width: 100%;
+    }
 
     &.legend-top:not(.legend-hidden) {
       .legend-wrapper {
-        & > div {
+        &>div {
           order: 2;
           width: 100%;
         }
+
         aside {
           width: 100%;
           order: 1;
@@ -279,10 +354,11 @@
 
     &.legend-left:not(.legend-hidden) {
       .legend-wrapper {
-        & > div {
+        &>div {
           order: 2;
           width: 75%;
         }
+
         aside {
           width: 25%;
           order: 1;
@@ -293,10 +369,11 @@
 
     &.legend-right:not(.legend-hidden) {
       .legend-wrapper {
-        & > div {
+        &>div {
           order: 1;
           width: 75%;
         }
+
         aside {
           width: 25%;
           height: fit-content;
@@ -309,20 +386,25 @@
       display: flex;
       flex-direction: row-reverse;
     }
+
     &.top {
       flex-wrap: nowrap;
       flex-direction: column-reverse;
-      & > div.tooltip-boundary {
+
+      &>div.tooltip-boundary {
         margin-top: 1.5em;
       }
     }
+
     &.bottom {
       flex-wrap: nowrap;
       flex-direction: column;
     }
-    &.legend-hidden > svg {
+
+    &.legend-hidden>svg {
       width: 100% !important;
     }
+
     &.dashboard-brush {
       margin-bottom: 2.5em;
     }
@@ -352,7 +434,7 @@
       pointer-events: none;
     }
 
-    > svg {
+    >svg {
       overflow: visible;
       font-size: 14px;
       margin: 1rem 0 2rem;
@@ -367,7 +449,7 @@
     }
 
     &.chart-line--hover {
-      > svg circle {
+      >svg circle {
         opacity: 0;
 
         &:hover {
@@ -377,12 +459,12 @@
     }
 
     &.chart-line--always {
-      > svg circle {
+      >svg circle {
         opacity: 1;
       }
 
       // Animations for line chart and data points
-      > svg.animated {
+      >svg.animated {
         circle {
           opacity: 0;
           animation: revealLolly 0.25s linear forwards;
@@ -416,7 +498,7 @@
   }
 
   @include breakpointClass(sm) {
-    .chart-container {
+    .visualization-container {
       .no-wrap {
         flex-wrap: nowrap;
       }
@@ -431,6 +513,7 @@
           margin-right: 1em;
           order: 0;
         }
+
         &.bottom,
         &.top {
           width: 100%;
@@ -441,8 +524,8 @@
   }
 
   @include breakpointClass(md) {
-    .chart-container {
-      > svg {
+    .visualization-container {
+      >svg {
         font-size: 16px;
         width: 75%;
         order: 1;
@@ -458,7 +541,6 @@
   // ANIMATIONS
   // Pie Chart Animations
   .animated-pie {
-    margin: auto !important;
     transition: all 0.4s ease-in-out;
     opacity: 0;
     transform-origin: center;
@@ -499,6 +581,7 @@
     &.animated path.animation {
       opacity: 0;
     }
+
     &.animate {
       path.animation {
         opacity: 1;
@@ -506,6 +589,7 @@
         stroke-dashoffset: 4000;
         animation: dash 2s ease-in-out forwards;
       }
+
       @keyframes dash {
         to {
           stroke-dashoffset: 0;
@@ -524,6 +608,7 @@
     }
 
     &.animated {
+
       .vertical path,
       .vertical rect,
       .vertical foreignObject div {
@@ -541,6 +626,7 @@
       }
 
       &.animate {
+
         path,
         rect,
         foreignObject div {
@@ -598,7 +684,8 @@
 .cdc-visualization__paired-bar-chart {
   text-align: center;
   transform: scale(1);
-  > .visx-group[style] {
+
+  >.visx-group[style] {
     transform: scale(1);
   }
 }
@@ -619,36 +706,39 @@
   }
 }
 
-.cdc-open-viz-module .is-editor .cdc-chart-inner-container {
-  overflow: hidden;
-  background-color: var(--white);
-}
-
-.isEditor.type-sparkline .cdc-chart-inner-container {
-  margin: 3em auto 0;
-  max-width: 60%;
-}
-
-.cdc-open-viz-module.type-chart.lg.type-sparkline .chart-container > svg {
-  width: 100%;
-}
-
-.chart-container.sparkline {
-  display: flex !important;
-  flex-wrap: wrap !important;
-}
-
-.cdc-open-viz-module.type-chart.type-sparkline {
-  .cove-component__content {
-    background: #f2f2f2;
+.cove-visualization.type-chart.type-sparkline {
+  &.lg .visualization-container>svg {
+    width: 100%;
   }
 
-  .cove-component__content.component--hideBackgroundColor {
-    background: transparent;
+  .visualization-container.sparkline {
+    display: flex !important;
+    flex-wrap: wrap !important;
   }
 
-  .cove-component__content .chart-container {
-    padding: 1em;
+  .cove-visualization__body {
+    &:not(.component--has-background):not(.component--hide-background-color) {
+      background: #f2f2f2;
+    }
+
+    &.component--hide-background-color {
+      background: transparent;
+    }
+
+    &.sparkline {
+      padding: 1em;
+      border-bottom-left-radius: 3px;
+      border-bottom-right-radius: 3px;
+
+      .visx-axis-tick:first-of-type {
+        transform: translate(20px, 0);
+      }
+
+      .visx-axis-tick:last-of-type {
+        transform: translate(-20px, 0);
+      }
+    }
+
   }
 
   .subtext,
@@ -656,29 +746,12 @@
     margin-top: 0px;
   }
 
-  .isEditor {
+  .is-editor {
     position: relative;
   }
 }
 
-.cdc-open-viz-module .cove-component__content.sparkline {
-  padding: 1em;
-}
-
-.cove-component__content.sparkline {
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-
-  .visx-axis-tick:first-of-type {
-    transform: translate(20px, 0);
-  }
-
-  .visx-axis-tick:last-of-type {
-    transform: translate(-20px, 0);
-  }
-}
-
-.cdc-open-viz-module .debug {
+.cove-visualization .debug {
   border: 2px solid red;
 }
 

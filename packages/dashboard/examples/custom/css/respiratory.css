@@ -61,7 +61,7 @@ div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .
   position: relative;
 }
 
-div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(4) .cove-component__content {
+div[data-config-url="/respiratory-viruses/modules/ed-visits-county-file.json"] .dashboard-row:nth-child(4) .cove-visualization__body {
   padding-top: 0;
   border: 1px solid gray !important;
     border-top: none !important;

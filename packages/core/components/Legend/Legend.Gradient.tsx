@@ -99,7 +99,13 @@ const LegendGradient = ({
   if (style === 'gradient') {
     return (
       // TODO: figure out why bootstrap 'overflow: visible' is not working consistently
-      <svg className={'w-100 overflow-visible'} height={newHeight} style={{ overflow: 'visible' }} width={width}>
+      <svg
+        className={'w-100 overflow-visible'}
+        height={newHeight}
+        style={{ display: 'block', maxWidth: '100%', overflow: 'visible' }}
+        viewBox={`0 0 ${width} ${newHeight}`}
+        width='100%'
+      >
         {/* background border*/}
         <rect x={0} y={0} width={legendWidth + MARGIN * 2} height={boxHeight + MARGIN * 2} fill={BORDER_COLOR} />
         {/* Define the gradient */}

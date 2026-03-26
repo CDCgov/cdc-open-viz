@@ -1,26 +1,27 @@
-.cdc-open-viz-module header.cove-component__header {
-  position: relative;
-  padding: 1rem;
-  margin: 0;
-  color: var(--white);
+.cove-visualization header.cove-visualization__title,
+.cove-visualization header.cove-visualization__header {
 
-  & > sup {
-    font-size: var(--superTitle-font-size);
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  color: var(--white);
+  margin: 0;
+  padding: 1rem;
+  position: relative;
+
+  &>sup {
     font-family: var(--app-font-secondary);
+    font-size: var(--superTitle-font-size);
     font-weight: 500;
     text-transform: uppercase;
     top: 0;
   }
 
   h2 {
-    font-size: var(--title-font-size);
-    font-family: var(--app-font-secondary);
     color: var(--white);
+    font-family: var(--app-font-secondary);
+    font-size: var(--title-font-size);
     margin: 0;
   }
-
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
 
   &.mb-0 {
     margin-bottom: 0 !important;
@@ -35,8 +36,8 @@
   }
 
   &:not(:empty) {
-    border-bottom-width: 4px;
     border-bottom-style: solid;
+    border-bottom-width: 4px;
   }
 
   &.bite-header {
@@ -47,42 +48,52 @@
     background: #712177;
     border-bottom-color: #b890bb;
   }
+
   &.theme-brown {
     background: #705043;
     border-bottom-color: #ad907b;
   }
+
   &.theme-teal {
     background: #00695c;
     border-bottom-color: #4ebaaa;
   }
+
   &.theme-pink {
     background: #af4448;
     border-bottom-color: #e57373;
   }
+
   &.theme-orange {
     background: #bb4d00;
     border-bottom-color: #ffad42;
   }
+
   &.theme-slate {
     background: #29434e;
     border-bottom-color: #7e9ba5;
   }
+
   &.theme-indigo {
     background: #26418f;
     border-bottom-color: #92a6dd;
   }
+
   &.theme-cyan {
     background: #007b91;
     border-bottom-color: #65b0bd;
   }
+
   &.theme-green {
     background: #4b830d;
     border-bottom-color: #84bc49;
   }
+
   &.theme-amber {
     background: #fbab18;
     border-bottom-color: #ffd54f;
   }
+
   &.theme-blue {
     background: #005eaa;
     border-bottom-color: #88c3ea;
@@ -93,47 +104,130 @@
   }
 }
 
-.type-sparkline.type-chart .cove-component__header {
+.type-sparkline.type-chart .cove-visualization__title,
+.type-sparkline.type-chart .cove-visualization__header {
   margin: 0px !important;
+}
+
+/* ============================================================================
+   LEGACY SHIM PREVIEW
+   ============================================================================ */
+
+header.cove-component__header {
+  border-bottom-style: solid;
+  border-bottom-width: 4px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  color: var(--white);
+  margin: 0;
+  padding: 1rem;
+  position: relative;
+
+  h2 {
+    color: var(--white);
+    font-family: var(--app-font-secondary);
+    font-size: var(--title-font-size);
+    margin: 0;
+  }
+
+  &.theme-purple {
+    background: #712177;
+    border-bottom-color: #b890bb;
+  }
+
+  &.theme-brown {
+    background: #705043;
+    border-bottom-color: #ad907b;
+  }
+
+  &.theme-teal {
+    background: #00695c;
+    border-bottom-color: #4ebaaa;
+  }
+
+  &.theme-pink {
+    background: #af4448;
+    border-bottom-color: #e57373;
+  }
+
+  &.theme-orange {
+    background: #bb4d00;
+    border-bottom-color: #ffad42;
+  }
+
+  &.theme-slate {
+    background: #29434e;
+    border-bottom-color: #7e9ba5;
+  }
+
+  &.theme-indigo {
+    background: #26418f;
+    border-bottom-color: #92a6dd;
+  }
+
+  &.theme-cyan {
+    background: #007b91;
+    border-bottom-color: #65b0bd;
+  }
+
+  &.theme-green {
+    background: #4b830d;
+    border-bottom-color: #84bc49;
+  }
+
+  &.theme-amber {
+    background: #fbab18;
+    border-bottom-color: #ffd54f;
+  }
+
+  &.theme-blue {
+    background: #005eaa;
+    border-bottom-color: #88c3ea;
+  }
+
+  &.mb-0 {
+    margin-bottom: 0 !important;
+  }
 }
 
 /* ============================================================================
    MODERN TITLE
    ============================================================================ */
 
-.cdc-open-viz-module .cove-title--small {
+.cove-visualization .cove-title--small {
   margin-bottom: 0.75rem;
 }
 
-.cdc-open-viz-module .cove-title--large {
+.cove-visualization .cove-title--large {
   margin-bottom: 1.33rem;
 }
 
 /* Used in dashboards to more closely associate a title-only component with the content below it */
-.cdc-open-viz-module .cove-title--no-content {
-  margin-top: 1rem;
+.cove-visualization .cove-title--no-content {
   margin-bottom: 0;
+  margin-top: 1rem;
 }
 
-.cdc-open-viz-module .cove-title h2 {
-  color: #0b4778;
-  font-size: 1.95rem;
-  font-family: var(--app-font-secondary);
+.cove-visualization .cove-title h2 {
   border-bottom: 1px solid var(--cool-gray-10);
+  color: #0b4778;
+  font-family: var(--app-font-secondary);
+  font-size: 1.95rem;
   font-weight: 300;
 }
 
-.cdc-open-viz-module .cove-title h3 {
-  font-size: 1.5rem;
+.cove-visualization .cove-title h3 {
   font-family: var(--app-font-secondary);
+  font-size: 1.5rem;
 }
 
-.cdc-open-viz-module .cove-title sup {
+.cove-visualization .cove-title sup {
+  color: #666;
   font-family: var(--app-font-secondary);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
-  color: #666;
+
   sup {
     font-size: 75%;
   }

@@ -159,7 +159,12 @@ export const MultiVizConfigurationWorkflow: Story = {
     // ========================================================================
     // STEP 11: Click "Vertical Values for map" button
     // ========================================================================
-    await sleep(500)
+    await waitFor(
+      () => {
+        expect(canvas.getByRole('button', { name: /vertical values for map/i })).toBeTruthy()
+      },
+      { timeout: 5000 }
+    )
 
     const verticalValuesButton = canvas.getByRole('button', { name: /vertical values for map/i })
     await user.click(verticalValuesButton)

@@ -56,7 +56,8 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
   const isLegendGradient = legend.style === 'gradient'
   const boxDynamicallyHidden = isBelowBreakpoint('md', viewport)
   const legendWrapping =
-    (legend.position === 'left' || legend.position === 'right') && isBelowBreakpoint('md', viewport)
+    (legend.position === 'left' || legend.position === 'right') &&
+    (viewport === 'md' || isBelowBreakpoint('md', viewport))
   const legendOnBottom = legend.position === 'bottom' || legendWrapping
   const needsTopMargin = legend.hideBorder && legendOnBottom
 
@@ -274,7 +275,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
 
   return (
     <ErrorBoundary component='Sidebar'>
-      <div className={`legends ${needsTopMargin ? 'mt-4' : ''}`}>
+      <div className={`legends ${needsTopMargin ? 'mt-4' : ''} ${legendWrapping ? 'legend-wrapped-bottom' : ''}`}>
         <aside
           id={skipId || 'legend'}
           className={legendClasses.aside.join(' ') || ''}
@@ -292,7 +293,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                       config.enableMarkupVariables && config.markupVariables?.length > 0
                         ? processMarkupVariables(legend.title, config.data || [], config.markupVariables, {
                             isEditor: false,
-                            filters: config.filters || []
+                            filters: config.filters || [],
+                            locale: config.locale,
+                            dataMetadata: config.dataMetadata
                           }).processedContent
                         : legend.title
                     )}
@@ -304,7 +307,9 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                       config.enableMarkupVariables && config.markupVariables?.length > 0
                         ? processMarkupVariables(legend.description, config.data || [], config.markupVariables, {
                             isEditor: false,
-                            filters: config.filters || []
+                            filters: config.filters || [],
+                            locale: config.locale,
+                            dataMetadata: config.dataMetadata
                           }).processedContent
                         : legend.description
                     )}

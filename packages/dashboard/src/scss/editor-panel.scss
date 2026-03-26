@@ -4,7 +4,7 @@
 // Shift down for top level Dashboard bar when in edit mode
 .layout-container,
 .editor-panel + .cdc-dashboard-inner-container,
-.editor-heading + .cdc-open-viz-module {
+.editor-heading + .cove-visualization {
   position: relative;
   min-height: 80vh;
 }

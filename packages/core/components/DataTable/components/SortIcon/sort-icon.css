@@ -1,22 +1,22 @@
 .sort-icon {
+  align-items: center;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
 
   position: absolute;
-  right: 4px;
+  right: 13px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 1;
 
   svg {
-    width: 0.75rem;
-    height: 0.75rem;
     fill: rgba(255, 255, 255, 0.5);
+    height: 0.75rem;
+    line-height: 1;
     margin: 0;
     padding: 0;
-    line-height: 1;
+    width: 0.75rem;
 
     &.active {
       fill: white;

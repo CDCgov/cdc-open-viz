@@ -1,4 +1,4 @@
-import React, { useState, useContext, useMemo, useCallback, useEffect, memo } from 'react'
+import React, { useState, useContext, useMemo, useCallback, useEffect, useRef, memo } from 'react'
 import {
   useTable,
   useBlockLayout,
@@ -20,16 +20,19 @@ import { errorMessages } from '../helpers/errorMessages'
 import { DataSet } from '@cdc/core/types/DataSet'
 import Icon from '@cdc/core/components/ui/Icon'
 
-const TableFilter = memo(({ globalFilter, setGlobalFilter, disabled = false }: any) => {
-  const [filterValue, setFilterValue] = useState(globalFilter)
+const TableFilter = memo(({ globalFilter, setGlobalFilter = () => {}, disabled = false }: any) => {
+  const [filterValue, setFilterValue] = useState(globalFilter ?? '')
 
   const [debouncedValue] = useDebounce(filterValue, 200)
 
   useEffect(() => {
-    if ('string' === typeof debouncedValue && debouncedValue !== globalFilter) {
-      setGlobalFilter(debouncedValue ?? '')
+    if ('string' === typeof debouncedValue && typeof setGlobalFilter === 'function') {
+      const nextFilter = debouncedValue.trim() ? debouncedValue : undefined
+      if (nextFilter !== globalFilter) {
+        setGlobalFilter(nextFilter)
+      }
     }
-  }, [debouncedValue])
+  }, [debouncedValue, globalFilter, setGlobalFilter])
 
   const onChange = e => {
     setFilterValue(e.target.value)
@@ -86,30 +89,40 @@ const Footer = memo(({ previousPage, nextPage, canPreviousPage, canNextPage, pag
 ))
 
 const PreviewDataTable = () => {
-  const { config } = useContext(ConfigContext)
+  const { config, errors } = useContext(ConfigContext)
   const previewData = useMemo(() => {
     if (config.type === 'dashboard') {
-      return Object.values(config.datasets).find((dataset: DataSet) => {
+      const previewDataset = Object.values(config.datasets).find((dataset: DataSet) => {
         return dataset.preview && Array.isArray(dataset.data)
       })
+      return previewDataset?.data
     }
     return config.data
   }, [config.type, config.data, config.datasets])
-  const [tableData, _setTableData] = useState(previewData)
+  const [tableData, _setTableData] = useState(Array.isArray(previewData) ? previewData : null)
+  const lastDataSourceRef = useRef<any[]>(null)
   const runSideEffects = (td: any[]) => {
+    if (!Array.isArray(td) || td.length === 0) return td
+
     const isSankey = Object.keys(td[0]).includes('tableData')
-    const newData = generateColumns(isSankey ? td[0].tableData : td)
-    validateFipsCodeLength(newData)
-    return newData
+    const normalizedData = isSankey ? td[0].tableData : td
+    validateFipsCodeLength(normalizedData)
+    return normalizedData
   }
-  const setTableData = td => _setTableData(runSideEffects(td))
+  const setTableData = td => {
+    if (!Array.isArray(td) || td.length === 0) return
+    if (lastDataSourceRef.current === td) return
+
+    lastDataSourceRef.current = td
+    _setTableData(runSideEffects(td))
+  }
 
   const dispatch = useContext(EditorDispatchContext)
 
   const fetchDatasetData = async (datasetKey, datasetConfig) => {
     if (datasetConfig.preview) {
       if (datasetConfig.dataUrl) {
-        const remoteData = await fetchRemoteData(datasetConfig.dataUrl)
+        const { data: remoteData } = await fetchRemoteData(datasetConfig.dataUrl)
         if (Array.isArray(remoteData)) {
           setTableData(remoteData)
         }
@@ -132,7 +145,7 @@ const PreviewDataTable = () => {
           await handleDashboardData(config.datasets)
         } else {
           if (config.dataUrl) {
-            const remoteData = await fetchRemoteData(config.dataUrl)
+            const { data: remoteData } = await fetchRemoteData(config.dataUrl)
             if (Array.isArray(remoteData)) {
               setTableData(remoteData)
             }
@@ -144,16 +157,11 @@ const PreviewDataTable = () => {
     }
 
     loadData()
-  }, [config, config.data, previewData]) // eslint-disable-line
+  }, [config.data, config.dataUrl, config.datasets, config.type, previewData]) // eslint-disable-line
 
   const tableColumns = useMemo(() => {
-    if (!tableData) return []
-    const columns = tableData.columns ?? []
-    if (columns.length > 0 && columns.includes('')) {
-      // todo find a way to call the errors. Currently they are in DataImport.js
-      // maybe these can be moved to a file? but then we need a way to add settings like size...
-      dispatch({ type: 'EDITOR_SET_ERRORS', payload: [errorMessages.emptyCols] })
-    }
+    if (!Array.isArray(tableData)) return []
+    const columns = Object.keys(tableData[0] ?? {})
 
     return columns.map(columnName => {
       const columnConfig = {
@@ -166,27 +174,13 @@ const PreviewDataTable = () => {
     })
   }, [tableData])
 
-  // This adds a columns property just like the D3 function for JSON parsing.
-  const generateColumns = data => {
-    let columns = []
-
-    data.forEach(rowObj => {
-      Object.keys(rowObj).forEach(columnHeading => {
-        if (false === columns.includes(columnHeading)) {
-          columns.push(columnHeading)
-        }
-      })
-    })
-
-    // D3 uses a weird quirk where it attaches a named property to an array. Replicating here.
-    type D3Data = any[] & { columns }
-    const newData: D3Data = [...data] as D3Data
-
-    if (Array.isArray(newData)) {
-      newData.columns = columns
-      return newData
+  useEffect(() => {
+    if (!tableData) return
+    const columns = Object.keys(tableData[0] ?? {})
+    if (columns.length > 0 && columns.includes('') && !errors?.includes(errorMessages.emptyCols)) {
+      dispatch({ type: 'EDITOR_SET_ERRORS', payload: [errorMessages.emptyCols] })
     }
-  }
+  }, [dispatch, errors, tableData])
 
   const {
     getTableProps,
@@ -245,7 +239,8 @@ const PreviewDataTable = () => {
     )
   }
 
-  if (!tableData) return [<Header key='header' />, <PlaceholderTable key='table' />]
+  if (!Array.isArray(tableData) || tableData.length === 0)
+    return [<Header key='header' />, <PlaceholderTable key='table' />]
 
   const footerProps = {
     previousPage,

@@ -92,7 +92,7 @@ export const BarGeneralTests: Story = {
 
     const getChartSubtypeVisualization = () => {
       // Target the chart visualization SVG specifically, not editor UI icons
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
       const legendContainer = canvasElement.querySelector('.legend, [class*="legend"]')
 
@@ -160,7 +160,7 @@ export const BarGeneralTests: Story = {
 
     const getOrientationVisualization = () => {
       // Target the chart visualization SVG specifically, not editor UI icons
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Look for bar elements - different structures for horizontal vs vertical
@@ -273,7 +273,7 @@ export const BarGeneralTests: Story = {
 
     const getBarStyleVisualization = () => {
       // Target the chart visualization SVG specifically, not editor UI icons
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       return {
@@ -528,7 +528,7 @@ export const BarLeftValueAxisTests: Story = {
 
     const getAxisTypeVisualization = () => {
       // Target the chart visualization SVG specifically, not editor UI icons
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Find the left axis specifically
@@ -693,7 +693,7 @@ export const BarLeftValueAxisTests: Story = {
 
     const getAxisLabelVisualization = () => {
       // Target the chart visualization SVG specifically, not editor UI icons
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Find Y-axis label elements with multiple possible selectors
@@ -795,7 +795,9 @@ export const BarLeftValueAxisTests: Story = {
         expect(yAxisLabelInput.value).toBe('Custom Y-Axis Label')
 
         // Debug: Log the label element to confirm selection
-        const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+        const chartContainer = canvasElement.querySelector(
+          '.cove-visualization__body, .chart-container, .visualization'
+        )
         const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
         const labelElement = svg?.querySelector('text.y-label')
 
@@ -853,7 +855,7 @@ export const BarLeftValueAxisTests: Story = {
 
     const getInlineLabelVisualization = () => {
       // Target the chart visualization SVG specifically, not editor UI icons
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Find the Y-axis area to locate the top tick area
@@ -989,7 +991,7 @@ export const BarLeftValueAxisTests: Story = {
 
     const getNumTicksVisualization = () => {
       // Target the chart visualization SVG specifically, not editor UI icons
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Find the left axis specifically
@@ -1190,7 +1192,7 @@ export const DateCategoryAxisSectionTests: StoryObj<typeof Chart> = {
       // Method 2: Look for SVG in chart container areas
       if (!svgElement) {
         const chartContainer = canvasElement.querySelector(
-          '.cove-component__content, .chart-container, .visualization, .linear'
+          '.cove-visualization__body, .chart-container, .visualization, .linear'
         )
         if (chartContainer) {
           svgElement = chartContainer.querySelector('svg')
@@ -1541,7 +1543,7 @@ export const BarRegionsSectionTests: Story = {
     await performAndAssert(
       'Configure Fixed-to-Fixed region with label and colors',
       () => {
-        const chartContainer = canvasElement.querySelector('.cove-component__content')
+        const chartContainer = canvasElement.querySelector('.cove-visualization__body')
         const chartSvg = chartContainer?.querySelector('svg')
         const regionElements = chartSvg?.querySelectorAll('rect[fill*="rgba"], rect[style*="rgba"]') || []
 
@@ -1680,6 +1682,17 @@ export const BarColumnsSectionTests: Story = {
     // Open Columns accordion
     await openAccordion(canvas, 'Columns')
 
+    const getFirstColumnConfig = async () => {
+      const columnSelect = (await canvas.findAllByLabelText(/^column$/i))[0]
+      const fieldset = columnSelect.closest('fieldset')
+
+      if (!fieldset) {
+        throw new Error('Unable to find the first column configuration fieldset')
+      }
+
+      return within(fieldset as HTMLElement)
+    }
+
     // Test 1: Add first column configuration and verify fields appear
     await performAndAssert(
       'Add first column configuration and verify fields appear',
@@ -1712,9 +1725,10 @@ export const BarColumnsSectionTests: Story = {
     await performAndAssert(
       'Configure column with data column and custom label',
       () => {
-        const labelInputs = canvas.queryAllByLabelText(/^label$/i)
+        const fieldsets = canvasElement.querySelectorAll('fieldset.edit-block')
+        const labelInput = fieldsets[0]?.querySelector('input[name*="label"]') as HTMLInputElement | null
         return {
-          labelValue: (labelInputs[0] as HTMLInputElement)?.value || ''
+          labelValue: labelInput?.value || ''
         }
       },
       async () => {
@@ -1724,8 +1738,8 @@ export const BarColumnsSectionTests: Story = {
         await userEvent.selectOptions(columnSelect, 'Year')
 
         // Set custom label
-        const labelInputs = await canvas.findAllByLabelText(/^label$/i)
-        const labelInput = labelInputs[0]
+        const firstColumnConfig = await getFirstColumnConfig()
+        const labelInput = await firstColumnConfig.findByLabelText(/^label$/i)
         await userEvent.clear(labelInput)
         await userEvent.type(labelInput, 'Report Year')
       },
@@ -1741,39 +1755,42 @@ export const BarColumnsSectionTests: Story = {
     await performAndAssert(
       'Enable tooltip display and configure number formatting',
       () => {
-        const tooltipCheckboxes = canvas.queryAllByLabelText(/show in tooltip/i)
-        const commasCheckboxes = canvas.queryAllByLabelText(/add commas to numbers/i)
+        const firstColumnSelect = canvas.queryAllByLabelText(/^column$/i)[0]
+        const fieldset = firstColumnSelect?.closest('fieldset')
+        const scopedFieldset = fieldset ? within(fieldset as HTMLElement) : null
+        const tooltipCheckbox = scopedFieldset?.queryByLabelText(/show in tooltip/i) as HTMLInputElement | null
+        const commasCheckbox = scopedFieldset?.queryByLabelText(/add commas to numbers/i) as HTMLInputElement | null
+        const prefixInput = scopedFieldset?.queryByLabelText(/^prefix$/i) as HTMLInputElement | null
+        const suffixInput = scopedFieldset?.queryByLabelText(/^suffix$/i) as HTMLInputElement | null
 
         return {
-          tooltipChecked: (tooltipCheckboxes[0] as HTMLInputElement)?.checked || false,
-          commasChecked: (commasCheckboxes[0] as HTMLInputElement)?.checked || false
+          tooltipChecked: tooltipCheckbox?.checked || false,
+          commasChecked: commasCheckbox?.checked || false,
+          prefixValue: prefixInput?.value || '',
+          suffixValue: suffixInput?.value || ''
         }
       },
       async () => {
+        const firstColumnConfig = await getFirstColumnConfig()
+
         // Enable tooltip display
-        const tooltipCheckboxes = await canvas.findAllByLabelText(/show in tooltip/i)
-        const tooltipCheckbox = tooltipCheckboxes[0] as HTMLInputElement
+        const tooltipCheckbox = (await firstColumnConfig.findByLabelText(/show in tooltip/i)) as HTMLInputElement
         if (!tooltipCheckbox.checked) {
           await userEvent.click(tooltipCheckbox)
         }
 
         // Enable commas for numbers
-        const commasCheckboxes = await canvas.findAllByLabelText(/add commas to numbers/i)
-        const commasCheckbox = commasCheckboxes[0] as HTMLInputElement
+        const commasCheckbox = (await firstColumnConfig.findByLabelText(/add commas to numbers/i)) as HTMLInputElement
         if (!commasCheckbox.checked) {
           await userEvent.click(commasCheckbox)
         }
 
         // Add prefix and suffix
-        const prefixInputs = await canvas.findAllByLabelText(/prefix/i)
-
-        const prefixInput = prefixInputs[1]
-
+        const prefixInput = await firstColumnConfig.findByLabelText(/^prefix$/i)
         await userEvent.clear(prefixInput)
         await userEvent.type(prefixInput, 'Year: ')
 
-        const suffixInputs = await canvas.findAllByLabelText(/suffix/i)
-        const suffixInput = suffixInputs[1]
+        const suffixInput = await firstColumnConfig.findByLabelText(/^suffix$/i)
         await userEvent.clear(suffixInput)
         await userEvent.type(suffixInput, ' AD')
       },
@@ -1781,6 +1798,8 @@ export const BarColumnsSectionTests: Story = {
         // Checkboxes should be enabled
         expect(after.tooltipChecked).toBe(true)
         expect(after.commasChecked).toBe(true)
+        expect(after.prefixValue).toBe('Year: ')
+        expect(after.suffixValue).toBe(' AD')
 
         return true
       }
@@ -1905,7 +1924,7 @@ export const BarLegendTests: Story = {
       const rightLegend = canvasElement.querySelector('.legend-container.right')
       const bottomLegend = canvasElement.querySelector('.legend-container.bottom')
       const topLegend = canvasElement.querySelector('.legend-container.top')
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
 
       return {
         hasLeftLegend: !!leftLegend,
@@ -2385,7 +2404,7 @@ export const BarFiltersTests: Story = {
     // Helper function to get chart data visualization state
     // Tests VISUALIZATION OUTPUT (filtered data in chart) not control state
     const getChartDataState = () => {
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const svg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
       const bars = svg?.querySelectorAll('rect[class*="bar"], rect[data-testid*="bar"], g[class*="bar"] rect') || []
       const filtersList = canvasElement.querySelector('.draggable-field-list')
@@ -2687,7 +2706,7 @@ export const BarVisualTests: Story = {
     // Helper function to capture animation visualization state
     const getAnimationVisualizationState = () => {
       // Find the actual chart SVG, not UI icons or other SVGs
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const chartSvg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Animation affects SVG classes and chart elements
@@ -2802,12 +2821,12 @@ export const BarVisualTests: Story = {
 
     // Helper function to capture bar border visualization state
     const getBarBorderVisualizationState = () => {
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const chartSvg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Find bar elements in the chart
       const barElements =
-        chartSvg?.querySelectorAll('rect[class*="bar"], path[class*="bar"], g[class*="bar"] rect') || []
+        chartSvg?.querySelectorAll('rect[class*="bar"], path[class*="bar"], g[class*="bar"] path') || []
 
       // Check for border-related styles and attributes
       const barsWithStroke = Array.from(barElements).filter(bar => {
@@ -2910,10 +2929,11 @@ export const BarPatternSettingsTests: Story = {
         type: 'continuous',
         dataKey: 'y1'
       },
+      series: [{ dataKey: 'y1' }, { dataKey: 'y2' }, { dataKey: 'y3' }, { dataKey: 'y4' }],
       // Override with data suitable for pattern testing
       data: [
         { category: 'Q1', y1: 19000, y2: 47000, y3: 59000, y4: 91000 },
-        { category: 'Q2', y1: 18000, y2: 32000, y3: 68000, y4: 89000 },
+        { category: 'Q2', y1: 18000, y2: 32000, y3: 19000, y4: 89000 },
         { category: 'Q3', y1: 7000, y2: 38000, y3: 74000, y4: 89000 },
         { category: 'Q4', y1: 15000, y2: 41000, y3: 67000, y4: 95000 }
       ],
@@ -2938,7 +2958,7 @@ export const BarPatternSettingsTests: Story = {
 
     // Helper function to capture SVG pattern visualization state
     const getPatternVisualizationState = () => {
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const chartSvg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Find SVG <defs> section with pattern definitions
@@ -2948,8 +2968,10 @@ export const BarPatternSettingsTests: Story = {
       // Find pattern overlays (visual application of patterns)
       const patternOverlays = chartSvg?.querySelectorAll('.pattern-overlay') || []
 
-      // Find bars with pattern fills
-      const barsWithPatterns = chartSvg?.querySelectorAll('rect[fill*="url(#chart-pattern-"]') || []
+      // Find bars with pattern fills (works for both fragment refs and absolute URL refs)
+      const barsWithPatterns = Array.from(chartSvg?.querySelectorAll('path, rect') || []).filter(shape =>
+        (shape.getAttribute('fill') || '').includes('chart-pattern-')
+      )
 
       // Get pattern configuration UI state
       const patternConfigSections = canvasElement.querySelectorAll('.accordion__panel .accordion .accordion__item')
@@ -3098,6 +3120,43 @@ export const BarPatternSettingsTests: Story = {
 
         // Pattern overlays may appear for visual application
         expect(after.patternOverlaysCount).toBeGreaterThanOrEqual(before.patternOverlaysCount)
+
+        return true
+      }
+    )
+
+    await performAndAssert(
+      'Clear Pattern Data Key - Existing data value applies across all series',
+      getPatternVisualizationState,
+      async () => {
+        const dataKeyDropdown = canvasElement.querySelector('select[id*="pattern-datakey-"]') as HTMLSelectElement
+
+        if (dataKeyDropdown) {
+          await userEvent.selectOptions(dataKeyDropdown, '')
+        }
+      },
+      (before, after) => {
+        // Clearing data key should keep value matching active and broaden the match across series.
+        expect(after.hasBarsWithPatterns).toBe(true)
+        expect(after.barsWithPatternsCount).toBeGreaterThan(before.barsWithPatternsCount)
+
+        return true
+      }
+    )
+
+    await performAndAssert(
+      'Clear Pattern Data Value - Pattern stops rendering when value is empty',
+      getPatternVisualizationState,
+      async () => {
+        const dataValueInput = canvasElement.querySelector('input[id*="pattern-datavalue-"]') as HTMLInputElement
+
+        if (dataValueInput) {
+          await userEvent.clear(dataValueInput)
+        }
+      },
+      (before, after) => {
+        expect(before.barsWithPatternsCount).toBeGreaterThan(0)
+        expect(after.barsWithPatternsCount).toBe(0)
 
         return true
       }
@@ -3402,7 +3461,7 @@ export const BarTextAnnotationsTests: Story = {
 
     // Helper function to capture SVG annotation visualization state
     const getAnnotationVisualizationState = () => {
-      const chartContainer = canvasElement.querySelector('.cove-component__content, .chart-container, .visualization')
+      const chartContainer = canvasElement.querySelector('.cove-visualization__body, .chart-container, .visualization')
       const chartSvg = chartContainer?.querySelector('svg') || canvasElement.querySelector('svg:not(.icon)')
 
       // Find annotation accordion sections (nested accordions for each annotation)

@@ -12,7 +12,7 @@ import Icon from '@cdc/core/components/ui/Icon'
 import FieldSetWrapper from '@cdc/core/components/EditorPanel/FieldSetWrapper'
 import FilterEditor from './components/FilterEditor'
 import { DashboardContext, DashboardDispatchContext } from '../../../DashboardContext'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import { DashboardFilters } from '../../../types/DashboardFilters'
 import { SharedFilter } from '../../../types/SharedFilter'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
@@ -55,7 +55,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
   const [isNestedDragHovered, setIsNestedDragHovered] = useState(false)
 
   const updateFilterProp = (prop: string, index: number, value) => {
-    const newSharedFilters = _.cloneDeep(sharedFilters)
+    const newSharedFilters = cloneDeep(sharedFilters)
     const {
       apiEndpoint: oldEndpoint,
       valueSelector: oldValueSelector,
@@ -102,6 +102,9 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
       // changing a api filter and want to load the api data into the preview.
       // automatically dispatches SET_SHARED_FILTERS
       loadAPIFilters(newSharedFilters, {})
+    } else if (prop === 'defaultValue') {
+      newSharedFilters[index].active = value
+      dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
     } else {
       handleSorting(newSharedFilters[index])
       dispatch({ type: 'SET_SHARED_FILTERS', payload: newSharedFilters })
@@ -109,7 +112,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
   }
 
   const toggleNestedQueryParameters = (index, checked: boolean) => {
-    const newSharedFilters = _.cloneDeep(sharedFilters)
+    const newSharedFilters = cloneDeep(sharedFilters)
     const filter = newSharedFilters[index]
     const isUrlFilter = filter.type === 'urlfilter'
     const groupColumnName = isUrlFilter ? filter.apiFilter.valueSelector : filter.columnName
@@ -149,7 +152,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
   }
 
   const addNewFilter = () => {
-    const _sharedFilters = _.cloneDeep(sharedFilters) || []
+    const _sharedFilters = cloneDeep(sharedFilters) || []
     const columnName = 'New Dashboard Filter ' + (_sharedFilters.length + 1)
     const newFilter = { key: columnName, showDropdown: true, values: [] } as SharedFilter
     dispatch({ type: 'SET_SHARED_FILTERS', payload: [..._sharedFilters, newFilter] })

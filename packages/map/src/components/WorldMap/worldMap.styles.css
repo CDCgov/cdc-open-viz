@@ -4,8 +4,8 @@
   }
   .geography-container {
     cursor: move;
-    position: relative;
     flex-grow: 1;
+    position: relative;
     width: 100%;
     .geo-point {
       transition: 0.3s all;

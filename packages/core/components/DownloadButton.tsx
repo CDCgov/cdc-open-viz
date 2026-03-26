@@ -6,14 +6,22 @@ import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 type DownloadButtonProps = {
   rawData: any[]
   fileName: string
-  headerColor: string
-  skipId: string | number
+  skipId?: string | number
   configUrl?: string
   interactionLabel?: string
   title?: string
+  config?: any
 }
 
-const DownloadButton = ({ rawData, fileName, headerColor, skipId, interactionLabel, configUrl, title, config }: DownloadButtonProps) => {
+const DownloadButton = ({
+  rawData,
+  fileName,
+  skipId,
+  interactionLabel,
+  configUrl,
+  title,
+  config
+}: DownloadButtonProps) => {
   const linkRef = useRef<HTMLAnchorElement>(null)
 
   const handleDownload = (event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -59,13 +67,13 @@ const DownloadButton = ({ rawData, fileName, headerColor, skipId, interactionLab
       type='button'
       onClick={handleDownload}
       aria-label='Download this data in a CSV file format.'
-      className={`${headerColor} no-border`}
-      id={`${skipId}`}
+      className='no-border'
+      id={skipId != null ? `${skipId}` : undefined}
       data-html2canvas-ignore
       role='button'
       style={{ cursor: 'pointer' }}
     >
-      Download Data (CSV)
+      {config?.table?.downloadDataLabel || 'Download Data (CSV)'}
     </a>
   )
 }

@@ -36,8 +36,6 @@ import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 
 let projection = geoMercator()
 
-const GRAYED_OUT_COLOR = '#d3d3d3'
-
 type MapPosition = { coordinates: number[]; zoom: number }
 
 const WorldMap = () => {
@@ -68,14 +66,14 @@ const WorldMap = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      import(/* webpackChunkName: "world-map-2026" */ './data/world-topo.json')
+      import(/* webpackChunkName: "world-topo" */ './data/world-topo.json')
         .then(topoJSON => {
           // Smart detection of TopoJSON object key
           // Try known keys first, then fall back to first available key
           const objectKey = topoJSON.objects.countries
             ? 'countries'
-            : topoJSON.objects.Cove_World_Map_2025
-            ? 'Cove_World_Map_2025'
+            : topoJSON.objects.Cove_World_Map_2026_corr
+            ? 'Cove_World_Map_2026_corr'
             : Object.keys(topoJSON.objects)[0]
 
           if (!objectKey) {
@@ -238,7 +236,7 @@ const WorldMap = () => {
 
       let geoData = runtimeData[geoKey]
 
-      const geoDisplayName = displayGeoName(supportedCountries[geo.properties.iso]?.[0])
+      const geoDisplayName = displayGeoName(geo.properties.iso)
       let legendColors
 
       // Once we receive data for this geographic item, setup variables.
@@ -277,9 +275,8 @@ const WorldMap = () => {
       }
 
       let styles: Record<string, string | Record<string, string>> = {
-        fill: isGreyedOut ? GRAYED_OUT_COLOR : geoFillColor,
-        cursor: 'default',
-        ...(isGreyedOut && { opacity: '0.3' })
+        fill: geoFillColor,
+        cursor: 'default'
       }
 
       // Scale stroke width inversely with zoom level to maintain consistent visual thickness
@@ -293,13 +290,13 @@ const WorldMap = () => {
       if (legendColors && legendColors[0] !== '#000000' && type !== 'bubble') {
         styles = {
           ...styles,
-          fill: isGreyedOut ? GRAYED_OUT_COLOR : type !== 'world-geocode' ? legendColors[0] : geoFillColor,
+          fill: isGreyedOut ? geoFillColor : type !== 'world-geocode' ? legendColors[0] : geoFillColor,
           cursor: 'default',
           '&:hover': {
-            fill: isGreyedOut ? GRAYED_OUT_COLOR : type !== 'world-geocode' ? legendColors[1] : geoFillColor
+            fill: isGreyedOut ? geoFillColor : type !== 'world-geocode' ? legendColors[1] : geoFillColor
           },
           '&:active': {
-            fill: isGreyedOut ? GRAYED_OUT_COLOR : type !== 'world-geocode' ? legendColors[2] : geoFillColor
+            fill: isGreyedOut ? geoFillColor : type !== 'world-geocode' ? legendColors[2] : geoFillColor
           }
         }
 
@@ -419,7 +416,7 @@ const WorldMap = () => {
           </ZoomableGroup>
         </svg>
       )}
-      {(type === 'data' || (type === 'world-geocode' && allowMapZoom) || (type === 'bubble' && allowMapZoom)) && (
+      {allowMapZoom && (
         <ZoomControls handleZoomIn={handleZoomIn} handleZoomOut={handleZoomOut} handleZoomReset={handleZoomReset} />
       )}
     </ErrorBoundary>

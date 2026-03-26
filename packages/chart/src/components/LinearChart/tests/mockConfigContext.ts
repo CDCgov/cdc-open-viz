@@ -124,6 +124,8 @@ export const createMockChartContext = (
     clean: (s: any) => s,
     formatTooltipsDate: (date: any) => String(date),
     legendId: 'test-legend',
+    rawData: config.data,
+    updateConfig: () => {},
     ...contextOverrides
   } as ChartContext
 }

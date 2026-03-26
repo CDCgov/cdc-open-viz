@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { cleanSharedFilters } from '../formatConfigBeforeSave'
+import { cleanSharedFilters, stripConfig } from '../formatConfigBeforeSave'
 import { DashboardConfig } from '../../types/DashboardConfig'
 
 describe('cleanSharedFilters', () => {
@@ -65,5 +65,85 @@ describe('cleanSharedFilters', () => {
     cleanSharedFilters(config)
 
     expect(config.dashboard.sharedFilters).toEqual([{ id: 1, type: 'urlfilter' }])
+  })
+})
+
+describe('stripConfig', () => {
+  it('removes inline data for non-dashboard URL-backed configs when isEditor is false', () => {
+    const config = {
+      type: 'bar',
+      dataUrl: '/api/data.csv',
+      data: [{ value: 10 }],
+      runtime: { loaded: true },
+      formattedData: [{ value: 10 }]
+    }
+
+    const stripped = stripConfig(config)
+
+    expect(stripped.data).toBeUndefined()
+    expect(stripped.dataUrl).toBe('/api/data.csv')
+    expect(stripped.runtime).toBeUndefined()
+    expect(stripped.formattedData).toBeUndefined()
+  })
+
+  it('preserves inline data for non-dashboard URL-backed configs when isEditor is true', () => {
+    const config = {
+      type: 'bar',
+      dataUrl: '/api/data.csv',
+      data: [{ value: 10 }],
+      runtime: { loaded: true },
+      formattedData: [{ value: 10 }]
+    }
+
+    const stripped = stripConfig(config, true)
+
+    expect(stripped.data).toEqual([{ value: 10 }])
+    expect(stripped.dataUrl).toBe('/api/data.csv')
+    expect(stripped.runtime).toBeUndefined()
+    expect(stripped.formattedData).toBeUndefined()
+  })
+
+  it('removes dashboard dataset data when dataset has dataUrl and isEditor is false', () => {
+    const config = {
+      type: 'dashboard',
+      dashboard: { sharedFilters: [] },
+      datasets: {
+        data_1: {
+          dataUrl: '/api/dashboard.csv',
+          data: [{ a: 1 }],
+          formattedData: [{ a: 1 }]
+        }
+      },
+      visualizations: {},
+      rows: []
+    } as any
+
+    const stripped = stripConfig(config)
+
+    expect(stripped.datasets.data_1.data).toBeUndefined()
+    expect(stripped.datasets.data_1.formattedData).toBeUndefined()
+    expect(stripped.datasets.data_1.dataUrl).toBe('/api/dashboard.csv')
+  })
+
+  it('preserves dashboard dataset data when dataset has dataUrl and isEditor is true', () => {
+    const config = {
+      type: 'dashboard',
+      dashboard: { sharedFilters: [] },
+      datasets: {
+        data_1: {
+          dataUrl: '/api/dashboard.csv',
+          data: [{ a: 1 }],
+          formattedData: [{ a: 1 }]
+        }
+      },
+      visualizations: {},
+      rows: []
+    } as any
+
+    const stripped = stripConfig(config, true)
+
+    expect(stripped.datasets.data_1.data).toEqual([{ a: 1 }])
+    expect(stripped.datasets.data_1.formattedData).toBeUndefined()
+    expect(stripped.datasets.data_1.dataUrl).toBe('/api/dashboard.csv')
   })
 })

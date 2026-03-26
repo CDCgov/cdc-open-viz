@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import DataBite from '../CdcDataBite'
-import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
+import { expect } from 'storybook/test'
 
 const meta: Meta<typeof DataBite> = {
   title: 'Components/Templates/Data Bite',
@@ -86,6 +87,17 @@ export const Data_Bite_TP5_White_Background: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+  }
+}
+
+export const Data_Bite_With_Metadata: Story = {
+  args: {
+    configUrl: '/packages/data-bite/tests/fixtures/data-bite-config-with-metadata.json'
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    const subtext = await waitForPresence('.bite-subtext', canvasElement)
+    expect(subtext?.textContent).toContain('January 15, 2026')
   }
 }
 

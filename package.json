@@ -86,6 +86,8 @@
     "sass": "^1.89.2",
     "storybook": "^10.1.11",
     "storybook-addon-fetch-mock": "^2.0.1",
+    "stylelint": "^17.3.0",
+    "stylelint-order": "^7.0.1",
     "syncpack": "^13.0.4",
     "use-debounce": "^10.1.0",
     "vite": "^7.3.1",
@@ -100,17 +102,22 @@
     "./packages/*/src/**/*.{js,jsx,ts,tsx}": [
       "eslint --config .eslintrc.json",
       "npx prettier --write"
+    ],
+    "packages/**/*.css": [
+      "stylelint --fix"
     ]
   },
   "private": true,
   "resolutions": {
+    "storybook": "10.1.11",
     "esbuild": "^0.25.0",
     "jackspeak": "^2.3.6",
     "js-yaml": "^4.1.1",
     "lodash": ">=4.17.23",
     "qs": "^6.14.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "rollup": "^4.59.0"
   },
   "scripts": {
     "backstop:approve": "backstop approve",
@@ -122,6 +129,7 @@
     "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
     "deploy": "gh-pages -d .storybook_build -t true",
     "dev:all": "npm run dev:chart & npm run dev:dashboard & npm run dev:data-bite & npm run dev:data-table & npm run dev:editor & npm run dev:filtered-text & npm run dev:map & npm run dev:markup-include & npm run dev:waffle-chart & wait",
+    "dev:compare": "npm run dev:chart -- --no-open & npm run dev:dashboard -- --no-open & npm run dev:data-bite -- --no-open & npm run dev:data-table -- --no-open & npm run dev:filtered-text -- --no-open & npm run dev:map -- --no-open & npm run dev:markup-include -- --no-open & npm run dev:waffle-chart -- --no-open & vite --config dev-portal/vite.config.compare.js --open /compare.html",
     "dev:portal": "npm run dev:chart -- --no-open & npm run dev:dashboard -- --no-open & npm run dev:data-bite -- --no-open & npm run dev:data-table -- --no-open & npm run dev:filtered-text -- --no-open & npm run dev:map -- --no-open & npm run dev:markup-include -- --no-open & npm run dev:waffle-chart -- --no-open & vite --config dev-portal/vite.config.dev-portal.js --open",
     "dev:chart": "lerna run --scope @cdc/chart start -- --port 3001",
     "dev:dashboard": "lerna run --scope @cdc/dashboard start -- --port 3003",
@@ -138,6 +146,8 @@
     "knip:unused-exports": "knip --include exports,types",
     "knip:unused-files": "knip --include files",
     "lint": "eslint packages/*/src/**/*.{js,jsx,ts,tsx}",
+    "lint:css": "stylelint 'packages/**/*.css'",
+    "lint:css:fix": "stylelint 'packages/**/*.css' --fix",
     "postinstall": "patch-package",
     "predeploy": "storybook build --output-dir .storybook_build && touch .storybook_build/.nojekyll",
     "prepare": "husky install",

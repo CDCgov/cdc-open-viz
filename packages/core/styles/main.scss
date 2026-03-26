@@ -1,0 +1,61 @@
+@import 'utils';
+@import 'themes';
+
+.cove {
+  @import 'base';
+  font-size: 16px;
+  line-height: 1.4;
+
+  margin: 0;
+  font-family: var(--app-font-main);
+  font-size: 1em;
+  line-height: 1.5;
+  font-weight: 400;
+  font-style: normal;
+  text-rendering: optimizeLegibility;
+
+  strong {
+    font-weight: 600;
+  }
+
+  .subtext {
+    margin-top: 1em;
+    font-size: var(--app-font-size);
+    line-height: var(--visualization-body-line-height);
+  }
+
+  .warning {
+    padding: 0.75em 1em;
+    margin: 1em 0;
+    background-color: #ffd2d2;
+    color: #d8000c;
+    font-size: 0.8em;
+    border: #d8000c 1px solid;
+    border-radius: 0.4em;
+
+    strong {
+      font-weight: 600;
+      display: block;
+    }
+  }
+
+  .sr-only,
+  .sr-only-focusable:not(:focus) {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+    display: flex;
+  }
+
+  @import 'layout';
+
+  @include breakpointClass(md) {
+    font-size: 16px;
+  }
+}

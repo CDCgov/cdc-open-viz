@@ -8,6 +8,7 @@ import { Bounds } from '@visx/brush/lib/types'
 import type { BrushHandleRenderProps } from '@visx/brush/lib/BrushHandle'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import ConfigContext, { ChartDispatchContext } from '../../ConfigContext'
+import { getChartPatternId } from '../../helpers/getChartPatternId'
 import MiniChartPreview from './MiniChartPreview'
 
 interface BrushSelectorProps {
@@ -125,7 +126,7 @@ const BrushSelector: FC<BrushSelectorProps> = ({ xMax, yMax }) => {
     return (
       <>
         {Object.entries(config.legend.patterns).map(([key, pattern]) => {
-          const patternId = `chart-pattern-${key}`
+          const patternId = getChartPatternId(key)
           const size = pattern.patternSize || 8
 
           switch (pattern.shape) {

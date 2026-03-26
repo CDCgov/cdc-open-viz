@@ -1,38 +1,38 @@
 .custom-colors-editor {
-  padding: 0.75rem;
+  background-color: #f8f9fa;
   border: 1px solid #dee2e6;
   border-radius: 0.25rem;
-  background-color: #f8f9fa;
+  padding: 0.75rem;
 }
 
 .custom-colors-editor .custom-colors-label {
+  color: #495057;
   display: block;
+  font-size: 0.875rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  font-size: 0.875rem;
-  color: #495057;
 }
 
 .custom-colors-editor .custom-colors-notice {
-  display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  margin-bottom: 0.75rem;
   background-color: #d1ecf1;
   border: 1px solid #bee5eb;
   border-radius: 0.25rem;
   color: #0c5460;
+  display: flex;
   font-size: 0.8125rem;
+  gap: 0.5rem;
   line-height: 1.5;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
 }
 
 .custom-colors-editor .custom-colors-notice .notice-icon {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  margin-top: 0.125rem;
   color: #17a2b8;
+  flex-shrink: 0;
+  height: 16px;
+  margin-top: 0.125rem;
+  width: 16px;
 }
 
 .custom-colors-editor .custom-colors-notice strong {
@@ -41,8 +41,8 @@
 
 .custom-colors-editor .custom-colors-notice a {
   color: #0c5460;
-  text-decoration: underline;
   font-weight: 500;
+  text-decoration: underline;
 }
 
 .custom-colors-editor .custom-colors-notice a:hover {
@@ -51,21 +51,21 @@
 }
 
 .custom-colors-editor .custom-colors-preview {
-  display: flex;
-  gap: 2px;
-  margin-bottom: 0.75rem;
-  padding: 0.5rem;
   background-color: #fff;
   border: 1px solid #dee2e6;
   border-radius: 0.25rem;
+  display: flex;
+  gap: 2px;
+  margin-bottom: 0.75rem;
   min-height: 36px;
   overflow: hidden;
+  padding: 0.5rem;
 }
 
 .custom-colors-editor .custom-colors-preview .preview-swatch {
+  border-radius: 2px;
   flex: 1;
   min-width: 8px;
-  border-radius: 2px;
   transition: transform 0.15s ease;
 }
 
@@ -110,21 +110,21 @@
 }
 
 .custom-colors-editor .custom-color-item.dragging {
-  opacity: 0.5;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
   cursor: grabbing;
+  opacity: 0.5;
 }
 
 .custom-colors-editor .custom-color-item:hover:not(.dragging) {
-  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
   border-color: #adb5bd;
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
 }
 
 .custom-colors-editor .color-item-controls {
-  display: flex;
   align-items: center;
-  gap: 0.5rem;
+  display: flex;
   flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 @media (max-width: 576px) {
@@ -135,12 +135,12 @@
 
 .custom-colors-editor .color-item-drag-handle {
   color: #adb5bd;
-  font-size: 0.875rem;
   cursor: grab;
-  user-select: none;
-  line-height: 1;
   flex-shrink: 0;
+  font-size: 0.875rem;
+  line-height: 1;
   padding: 0 0.125rem;
+  user-select: none;
 }
 
 .custom-colors-editor .color-item-drag-handle:active {
@@ -152,23 +152,23 @@
 }
 
 .custom-colors-editor .color-item-number {
+  color: #6c757d;
+  flex-shrink: 0;
+  font-size: 0.75rem;
   font-weight: 600;
   min-width: 24px;
   text-align: right;
-  color: #6c757d;
-  font-size: 0.75rem;
-  flex-shrink: 0;
 }
 
 .custom-colors-editor .color-picker {
-  width: 48px;
-  height: 34px;
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
   cursor: pointer;
-  padding: 2px;
   flex-shrink: 0;
+  height: 34px;
+  padding: 2px;
   transition: border-color 0.15s ease;
+  width: 48px;
 }
 
 .custom-colors-editor .color-picker:hover {
@@ -176,15 +176,15 @@
 }
 
 .custom-colors-editor .color-picker:focus {
-  outline: none;
   border-color: #80bdff;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  outline: none;
 }
 
 .custom-colors-editor .color-input-wrapper {
   flex: 1;
-  min-width: 0;
   margin-bottom: 0;
+  min-width: 0;
 }
 
 /* Override TextField label wrapper styles */
@@ -210,26 +210,26 @@
 
 .custom-colors-editor .color-item-buttons {
   display: flex;
+  flex-shrink: 0;
   gap: 0.25rem;
   margin-left: auto;
-  flex-shrink: 0;
 }
 
 .custom-colors-editor .btn-move,
 .custom-colors-editor .btn-remove {
-  padding: 0.25rem 0.5rem;
+  align-items: center;
+  background-color: #fff;
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
-  background-color: #fff;
   cursor: pointer;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  transition: all 0.15s ease;
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 28px;
+  font-size: 0.875rem;
   height: 28px;
+  justify-content: center;
+  line-height: 1.5;
+  min-width: 28px;
+  padding: 0.25rem 0.5rem;
+  transition: all 0.15s ease;
 }
 
 .custom-colors-editor .btn-move:hover:not(:disabled),
@@ -246,39 +246,39 @@
 
 .custom-colors-editor .btn-move:disabled,
 .custom-colors-editor .btn-remove:disabled {
-  opacity: 0.35;
   cursor: not-allowed;
+  opacity: 0.35;
 }
 
 .custom-colors-editor .btn-remove {
   color: #dc3545;
-  font-weight: 700;
   font-size: 1.125rem;
+  font-weight: 700;
 }
 
 .custom-colors-editor .btn-remove:hover:not(:disabled) {
   background-color: #dc3545;
-  color: #fff;
   border-color: #dc3545;
+  color: #fff;
 }
 
 .custom-colors-editor .btn-add-color {
-  width: 100%;
-  padding: 0.5rem;
+  background-color: #fff;
   border: 2px dashed #ced4da;
   border-radius: 0.25rem;
-  background-color: #fff;
   color: #6c757d;
-  font-weight: 600;
-  font-size: 0.875rem;
   cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.5rem;
   transition: all 0.15s ease;
+  width: 100%;
 }
 
 .custom-colors-editor .btn-add-color:hover:not(:disabled) {
+  background-color: #e7f1ff;
   border-color: #007bff;
   color: #007bff;
-  background-color: #e7f1ff;
 }
 
 .custom-colors-editor .btn-add-color:active:not(:disabled) {
@@ -286,14 +286,14 @@
 }
 
 .custom-colors-editor .btn-add-color:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .custom-colors-editor .custom-colors-info {
-  text-align: center;
-  font-size: 0.75rem;
   color: #6c757d;
-  margin-top: 0.5rem;
+  font-size: 0.75rem;
   font-style: italic;
+  margin-top: 0.5rem;
+  text-align: center;
 }

@@ -6,14 +6,14 @@
     margin-bottom: 0.5rem;
 
     .group-item .visx-legend-label {
-      font-weight: 400;
       font-size: 0.889rem;
+      font-weight: 400;
       margin-bottom: 0.5rem;
     }
     .group-label {
-      font-weight: 500;
       font-family: Nunito, sans-serif;
       font-size: 1rem;
+      font-weight: 500;
     }
   }
 
@@ -22,9 +22,9 @@
     grid-gap: 10px;
 
     &.group-item {
+      align-items: flex-start;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
     }
 
     & .inactive {
@@ -32,9 +32,9 @@
       transition: 0.2s all;
     }
     & .highlighted {
+      border-radius: 1px;
       outline: 1px solid #005ea2;
       outline-offset: 5px;
-      border-radius: 1px;
     }
   }
 }

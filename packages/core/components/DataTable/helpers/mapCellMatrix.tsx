@@ -5,6 +5,8 @@ import { ReactNode } from 'react'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
 import _ from 'lodash'
 import { hashObj } from '../../../helpers/hashObj'
+import { sanitizeToSvgId } from '../../../helpers/cove/string'
+import { getMapDataTableColumnKeys } from './getMapDataTableColumnKeys'
 
 type MapRowsProps = DataTableProps & {
   rows: string[]
@@ -22,9 +24,10 @@ const getGeoLabel = (config, row, formatLegendLocation, displayGeoName, runtimeD
   const { geoType, type } = config.general
 
   let labelValue
+  const displayOverride = runtimeData?.[row]?.[config.columns?.geo?.displayColumn]
   if (!['single-state', 'us-county'].includes(geoType) || type === 'us-geocode') {
     // Use the row (UID) for lookup - this allows "US-AL" to become "Alabama"
-    labelValue = displayGeoName(row)
+    labelValue = displayGeoName(row, displayOverride)
 
     // If displayGeoName returned the same value (not found in lookups), use the raw imported data
     if (labelValue === row && runtimeData && config.columns?.geo?.name) {
@@ -67,11 +70,13 @@ export const getMapRowData = (
   displayGeoName: (row: string) => string,
   filterColumns: string[]
 ) => {
+  const orderedColumnKeys = getMapDataTableColumnKeys(columns as any)
+
   return rows.map((row: string) => {
     const dataRow = {}
     ;[
       ...filterColumns,
-      ...Object.keys(columns).filter(column => columns[column].dataTable === true && columns[column].name)
+      ...orderedColumnKeys
     ].map(column => {
       const label = columns[column]?.label || columns[column]?.name || column
       if (column === 'geo') {
@@ -103,10 +108,10 @@ const mapCellArray = ({
   getPatternForRow
 }: MapRowsProps): ReactNode[][] => {
   const { allowMapZoom, geoType, type } = config.general
+  const orderedColumnKeys = getMapDataTableColumnKeys(columns as any)
+
   return rows.map(row =>
-    Object.keys(columns)
-      .filter(column => columns[column].dataTable === true && columns[column].name)
-      .map(column => {
+    orderedColumnKeys.map(column => {
         if (column === 'geo') {
           const rowObj = runtimeData[row]
           if (!rowObj) {
@@ -128,6 +133,7 @@ const mapCellArray = ({
           // Check for pattern information
           const patternInfo = getPatternForRow(rowObj, config)
           const mapId = config.runtime?.uniqueId || 'map'
+          const sanitizedPatternDataKey = sanitizeToSvgId(patternInfo?.dataKey || '')
 
           return (
             <div className='col-12'>
@@ -137,7 +143,7 @@ const mapCellArray = ({
                     fill={legendColor[0]}
                     patternInfo={{
                       pattern: patternInfo.pattern,
-                      patternId: `${mapId}--${patternInfo.dataKey}--${patternInfo.patternIndex}--table`,
+                      patternId: `${mapId}--${sanitizedPatternDataKey}--${patternInfo.patternIndex}--table`,
                       size: patternInfo.size,
                       color: patternInfo.color
                     }}

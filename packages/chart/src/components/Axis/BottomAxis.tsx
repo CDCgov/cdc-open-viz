@@ -199,12 +199,13 @@ const BottomAxis: React.FC<BottomAxisProps> = ({
 
         return (
           <Group className='bottom-axis' width={parentWidth}>
-            {filteredTicks.map((tick, i, propsTicks) => {
+            {filteredTicks.map((tick, i) => {
               // when using LogScale show major ticks values only
               const showTick = String(tick.value).startsWith('1') || tick.value === 0.1 ? 'block' : 'none'
               const tickLength = showTick === 'block' ? MAJOR_TICK_LENGTH : DEFAULT_TICK_LENGTH
               const to = { x: tick.to.x, y: tickLength }
-              const limitedWidth = 100 / propsTicks.length
+              const tickSlotWidth = filteredTicks.length > 0 ? xMax / filteredTicks.length : xMax
+              const limitedWidth = Math.max(Math.min(maxLengthOfTick, tickSlotWidth), 0)
 
               // Configure rotation using effective values (computed above without mutations)
               const tickRotation =
@@ -246,7 +247,13 @@ const BottomAxis: React.FC<BottomAxisProps> = ({
                 </Group>
               )
             })}
-            {!config.xAxis.hideAxis && <Line from={props.axisFromPoint} to={props.axisToPoint} stroke='#333' />}
+            {!config.xAxis.hideAxis && (
+              <Line
+                from={isForestPlot ? { ...props.axisFromPoint, x: 0 } : props.axisFromPoint}
+                to={props.axisToPoint}
+                stroke='#333'
+              />
+            )}
             <Text
               innerRef={xAxisTitleRef}
               className='x-axis-title-label'
