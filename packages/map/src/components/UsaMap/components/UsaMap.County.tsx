@@ -439,7 +439,8 @@ const CountyMap = () => {
         }
       }
 
-      if (config.general.allowMapZoom) {
+      // `us-geocode` maps still need state drilldown even when manual zoom controls are disabled.
+      if (config.general.allowMapZoom || config.general.type === 'us-geocode') {
         setConfig({
           ...config,
           mapPosition: { coordinates: [0, 30], zoom: 3 }
