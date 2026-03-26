@@ -525,7 +525,13 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
         break
       case 'geoType':
         addUIDs(config, config.columns.geo.name)
-        dispatch({ type: 'SET_POSITION', payload: [0, 30] })
+        dispatch({
+          type: 'SET_POSITION',
+          payload: {
+            coordinates: value === 'world' ? [0, 30] : [0, 0],
+            zoom: 1
+          }
+        })
 
         // If we're still working with default data, switch to the world default to show it as an example
         if (true === loadedDefault && 'world' === value) {
