@@ -35,6 +35,7 @@ import { useTickFormatters } from './LinearChart/utils/tickFormatting'
 import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/viewports'
 import { calcInitialHeight } from '../helpers/sizeHelpers'
 import { calculateHorizontalBarCategoryLabelWidth } from '../helpers/calculateHorizontalBarCategoryLabelWidth'
+import { calculateLeftYAxisWidth } from '../helpers/calculateLeftYAxisWidth'
 
 // Hooks
 import useReduceData from '../hooks/useReduceData'
@@ -62,6 +63,7 @@ const BOTTOM_LABEL_PADDING = 9
 const X_TICK_LABEL_PADDING = 4.5
 const DEFAULT_TICK_LENGTH = 8
 const DEFAULT_MAX_TICK_ROTATION = 90
+const DEFAULT_LEFT_Y_AXIS_WIDTH = 33
 
 // Font sizes
 const TICK_LABEL_FONT_SIZE = 16
@@ -176,7 +178,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const isDateTime = config.xAxis.type === 'date-time'
   const inlineLabelHasNoSpace = !inlineLabel?.includes(' ')
   const needsYAxisAutoPadding = inlineLabel && !inlineLabelHasNoSpace
-  const padding = orientation === 'horizontal' ? Number(config.xAxis.size) : Number(config.yAxis.size)
   const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
   const tickLabelFontSize = isMobileFontViewport(vizViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
   const axisLabelFontSize = isMobileFontViewport(vizViewport) ? AXIS_LABEL_FONT_SIZE_SMALL : AXIS_LABEL_FONT_SIZE
@@ -258,11 +259,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   const { yScaleRight, hasRightAxis } = useRightAxis({ config, yMax, data })
 
-  // State for computed y-axis width - allows re-render when horizontal bar label space is calculated
-  const [computedYAxisWidth, setComputedYAxisWidth] = useState<number | null>(null)
-
-  // Use computed width if available, otherwise fall back to config value
-  const yAxisWidth = computedYAxisWidth ?? Number(runtime.yAxis.size)
+  // State for computed left-axis width - shared across all linear-chart types.
+  const [currentYAxisWidth, setCurrentYAxisWidth] = useState<number>(DEFAULT_LEFT_Y_AXIS_WIDTH)
+  const yAxisWidth = currentYAxisWidth
 
   // Chart width calculation using the current y-axis width
   const xMax = parentWidth - yAxisWidth - (hasRightAxis ? config.yAxis.rightAxisSize : 0)
@@ -303,7 +302,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     shouldAbbreviate
   })
 
-  // Calculate category label space for horizontal bar charts
+  // Calculate category label space for horizontal category axes
   const categoryLabelSpace = useMemo(() => {
     return calculateHorizontalBarCategoryLabelWidth({
       yScale,
@@ -318,23 +317,49 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   const horizontalYAxisLabelSpace = runtime.yAxis.label && !config.hideYAxisLabel ? 30 : 0
 
-  // Update y-axis width state when computed value changes (for horizontal bar charts)
-  useEffect(() => {
-    if (isHorizontal && config.visualizationType === 'Bar') {
-      const newWidth = categoryLabelSpace + horizontalYAxisLabelSpace
-      if (newWidth !== computedYAxisWidth) {
-        setComputedYAxisWidth(newWidth)
-      }
-    } else if (computedYAxisWidth !== null) {
-      // Reset to null for non-horizontal bar charts so we use config value
-      setComputedYAxisWidth(null)
-    }
-  }, [isHorizontal, config.visualizationType, categoryLabelSpace, horizontalYAxisLabelSpace, computedYAxisWidth])
-
   const [yTickCount, xTickCount] = ['yAxis', 'xAxis'].map(axis =>
     countNumOfTicks({ axis, max, runtime, currentViewport, isHorizontal, data, config, min })
   )
   const handleNumTicks = isForestPlot ? config.data.length : yTickCount
+
+  const calculatedYAxisWidth = useMemo(() => {
+    if (isHorizontal && config.visualizationType === 'Bar') {
+      return categoryLabelSpace + horizontalYAxisLabelSpace
+    }
+
+    return calculateLeftYAxisWidth({
+      config,
+      data,
+      yScale,
+      numTicks: handleNumTicks,
+      parentWidth,
+      tickLabelFont: GET_TEXT_WIDTH_FONT,
+      tickLabelFontSize,
+      axisLabelFontSize,
+      handleLeftTickFormatting,
+      categoryLabelSpace,
+      horizontalYAxisLabelSpace
+    })
+  }, [
+    config,
+    data,
+    yScale,
+    handleNumTicks,
+    parentWidth,
+    isHorizontal,
+    GET_TEXT_WIDTH_FONT,
+    tickLabelFontSize,
+    axisLabelFontSize,
+    handleLeftTickFormatting,
+    categoryLabelSpace,
+    horizontalYAxisLabelSpace
+  ])
+
+  useEffect(() => {
+    if (calculatedYAxisWidth !== currentYAxisWidth) {
+      setCurrentYAxisWidth(calculatedYAxisWidth)
+    }
+  }, [calculatedYAxisWidth, currentYAxisWidth])
 
   // Tooltip Helpers
 
@@ -353,6 +378,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     xScale,
     yScale,
     seriesScale,
+    yAxisWidth,
     showTooltip,
     hideTooltip,
     interactionLabel
@@ -387,7 +413,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     return manualStep
   }, [config.xAxis.manualStep, config.xAxis.viewportStepCount, currentViewport])
 
-  const smallMultiplesSync = useSmallMultipleSynchronization(xMax, yMax, getXValueFromCoordinate)
+  const smallMultiplesSync = useSmallMultipleSynchronization(xMax, yMax, yAxisWidth, getXValueFromCoordinate)
 
   const onMouseMove = event => {
     const svgRect = event.currentTarget.getBoundingClientRect()
@@ -417,6 +443,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     svgRef,
     getCoordinateFromXValue,
     config,
+    yAxisWidth,
     setPoint,
     setShowHoverLine,
     handleTooltipMouseOver,
@@ -673,8 +700,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   strokeDasharray={handleLineType(anchor.lineStyle)}
                   stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   className='anchor-y'
-                  from={{ x: Number(runtime.yAxis.size), y: position - middleOffset }}
-                  to={{ x: Number(runtime.yAxis.size) + Number(xMax), y: position - middleOffset }}
+                  from={{ x: Number(yAxisWidth), y: position - middleOffset }}
+                  to={{ x: Number(yAxisWidth) + Number(xMax), y: position - middleOffset }}
                 />
               )
             })}
@@ -710,8 +737,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   fill={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
                   className='anchor-x'
-                  from={{ x: Number(anchorPosition) + Number(padding), y: 0 }}
-                  to={{ x: Number(anchorPosition) + Number(padding), y: yMax }}
+                  from={{ x: Number(anchorPosition) + Number(yAxisWidth), y: 0 }}
+                  to={{ x: Number(anchorPosition) + Number(yAxisWidth), y: yMax }}
                 />
               )
             })}
@@ -728,6 +755,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               tooltipData={tooltipData}
               yMax={yMax}
               xMax={xMax}
+              yAxisWidth={yAxisWidth}
             />
           )}
           {isNoDataAvailable && (
@@ -741,8 +769,22 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
           )}
           {showHoverLine && (
             <>
-              <HoverLine xMax={xMax} yMax={yMax} point={point} tooltipData={tooltipData} orientation='horizontal' />
-              <HoverLine xMax={xMax} yMax={yMax} point={point} tooltipData={tooltipData} orientation='vertical' />
+              <HoverLine
+                xMax={xMax}
+                yMax={yMax}
+                point={point}
+                tooltipData={tooltipData}
+                orientation='horizontal'
+                yAxisWidth={yAxisWidth}
+              />
+              <HoverLine
+                xMax={xMax}
+                yMax={yMax}
+                point={point}
+                tooltipData={tooltipData}
+                orientation='vertical'
+                yAxisWidth={yAxisWidth}
+              />
             </>
           )}
           <Group left={yAxisWidth}>

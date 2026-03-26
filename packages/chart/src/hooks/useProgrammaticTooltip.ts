@@ -4,6 +4,7 @@ interface UseProgrammaticTooltipProps {
   svgRef: ForwardedRef<SVGAElement>
   getCoordinateFromXValue: (xAxisValue: any) => number
   config: any
+  yAxisWidth: number
   setPoint: (point: { x: number; y: number }) => void
   setShowHoverLine: (show: boolean) => void
   handleTooltipMouseOver: (event: MouseEvent, additionalChartData?: any) => void
@@ -19,6 +20,7 @@ export const useProgrammaticTooltip = ({
   svgRef,
   getCoordinateFromXValue,
   config,
+  yAxisWidth,
   setPoint,
   setShowHoverLine,
   handleTooltipMouseOver,
@@ -62,7 +64,7 @@ export const useProgrammaticTooltip = ({
           }
 
           const pixelX = getCoordinateFromXValue(xAxisValue)
-          const adjustedX = pixelX + Number(config.yAxis.size || 0)
+          const adjustedX = pixelX + yAxisWidth
 
           const svgRect = internalSvgRef.current!.getBoundingClientRect()
 
@@ -103,7 +105,7 @@ export const useProgrammaticTooltip = ({
     },
     [
       getCoordinateFromXValue,
-      config.yAxis.size,
+      yAxisWidth,
       config.visualizationType,
       setPoint,
       setShowHoverLine,

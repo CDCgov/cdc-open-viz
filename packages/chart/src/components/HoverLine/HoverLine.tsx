@@ -9,9 +9,10 @@ type HoverLineProps = {
   yMax?: number
   point: { x: number; y: number }
   orientation: 'horizontal' | 'vertical'
+  yAxisWidth: number
 }
 
-const HoverLine: React.FC<HoverLineProps> = ({ tooltipData, xMax, yMax, point, orientation }) => {
+const HoverLine: React.FC<HoverLineProps> = ({ tooltipData, xMax, yMax, point, orientation, yAxisWidth }) => {
   const { config } = useContext(ConfigContext)
   const { verticalHoverLine, horizontalHoverLine } = config.visual
   const { visualizationType } = config
@@ -23,8 +24,8 @@ const HoverLine: React.FC<HoverLineProps> = ({ tooltipData, xMax, yMax, point, o
   const showHorizontalHoverLine = horizontalHoverLine || (horizontalHoverLine && isScatterPlot)
 
   const getX = () => {
-    if (point.x > xMax + Number(config.yAxis.size)) return xMax
-    if (point.x < config.yAxis.size) return config.yAxis.size
+    if (point.x > xMax + yAxisWidth) return xMax
+    if (point.x < yAxisWidth) return yAxisWidth
     return point.x
   }
 
@@ -52,11 +53,7 @@ const HoverLine: React.FC<HoverLineProps> = ({ tooltipData, xMax, yMax, point, o
   if (isHorizontal) {
     return (
       showHorizontalHoverLine && (
-        <Group
-          key={`tooltipLine-horizontal${point.y}${point.x}`}
-          className='horizontal-tooltip-line'
-          left={config.yAxis.size ? config.yAxis.size : 0}
-        >
+        <Group key={`tooltipLine-horizontal${point.y}${point.x}`} className='horizontal-tooltip-line' left={yAxisWidth}>
           <Line
             from={{ x: 0, y: getY() }}
             to={{ x: xMax, y: getY() }}

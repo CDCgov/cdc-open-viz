@@ -725,7 +725,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     }
   }, [config.visualizationType])
 
-  const { hasRightAxis } = useRightAxis({ config: config, yMax: config.yAxis.size, data: config.data, updateConfig })
+  const { hasRightAxis } = useRightAxis({ config: config, yMax: 0, data: config.data, updateConfig })
+  const usesDynamicLeftYAxisWidth = config.type === 'chart' && config.visualizationType !== 'Spark Line'
 
   const getItemStyle = (isDragging, draggableStyle) => ({
     ...draggableStyle
@@ -2044,28 +2045,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               </Tooltip>
                             }
                             updateField={updateFieldDeprecated}
-                          />
-                          <TextField
-                            value={config.yAxis.size}
-                            type='number'
-                            section='yAxis'
-                            fieldName='size'
-                            label={config.orientation === 'horizontal' ? 'Size (Height)' : 'Size (Width)'}
-                            className='number-narrow'
-                            updateField={updateFieldDeprecated}
-                            tooltip={
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon
-                                    display='question'
-                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                  />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>{`Increase the size if elements in the ${config.orientation} axis are being crowded or hidden behind other elements.  Decrease if less space is required for the value axis.`}</p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                            }
                           />
                           <TextField
                             display={!visHasCategoricalAxis()}
