@@ -321,13 +321,13 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       align-items: stretch !important;
 
       [class*='col-'] {
-        display: flex !important;
+        display: flex;
         flex-direction: column !important;
         flex: 1 1 auto !important;
         align-items: stretch !important;
         min-height: 0 !important;
 
-        > * {
+        >* {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
@@ -398,14 +398,14 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           min-height: 0 !important;
         }
 
-        .cove-visualization .cove-visualization__body.bite__style--tp5 > .cove-visualization__body-wrap {
+        .cove-visualization .cove-visualization__body.bite__style--tp5>.cove-visualization__body-wrap {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
           min-height: 0 !important;
         }
 
-        .cove-visualization .cove-visualization__body.bite__style--tp5 > .cove-visualization__body-wrap > .cove-visualization__content-section {
+        .cove-visualization .cove-visualization__body.bite__style--tp5>.cove-visualization__body-wrap>.cove-visualization__content-section {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
@@ -413,11 +413,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           width: 100% !important;
         }
 
-        .cove-visualization
-          .cove-visualization__body.bite__style--tp5
-          > .cove-visualization__body-wrap
-          > .cove-visualization__content-section
-          > .cdc-callout {
+        .cove-visualization .cove-visualization__body.bite__style--tp5>.cove-visualization__body-wrap>.cove-visualization__content-section>.cdc-callout {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
@@ -425,16 +421,16 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           width: 100% !important;
         }
 
-        .cove-visualization.waffle__style--tp5 .cove-visualization__body > .cove-visualization__body-wrap,
-        .cove-visualization.gauge__style--tp5 .cove-visualization__body > .cove-visualization__body-wrap {
+        .cove-visualization.waffle__style--tp5 .cove-visualization__body>.cove-visualization__body-wrap,
+        .cove-visualization.gauge__style--tp5 .cove-visualization__body>.cove-visualization__body-wrap {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
           min-height: 0 !important;
         }
 
-        .cove-visualization.waffle__style--tp5 .cove-visualization__body > .cove-visualization__body-wrap > .cove-visualization__content-section,
-        .cove-visualization.gauge__style--tp5 .cove-visualization__body > .cove-visualization__body-wrap > .cove-visualization__content-section {
+        .cove-visualization.waffle__style--tp5 .cove-visualization__body>.cove-visualization__body-wrap>.cove-visualization__content-section,
+        .cove-visualization.gauge__style--tp5 .cove-visualization__body>.cove-visualization__body-wrap>.cove-visualization__content-section {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
@@ -442,16 +438,8 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           width: 100% !important;
         }
 
-        .cove-visualization.waffle__style--tp5
-          .cove-visualization__body
-          > .cove-visualization__body-wrap
-          > .cove-visualization__content-section
-          > .cdc-callout,
-        .cove-visualization.gauge__style--tp5
-          .cove-visualization__body
-          > .cove-visualization__body-wrap
-          > .cove-visualization__content-section
-          > .cdc-callout {
+        .cove-visualization.waffle__style--tp5 .cove-visualization__body>.cove-visualization__body-wrap>.cove-visualization__content-section>.cdc-callout,
+        .cove-visualization.gauge__style--tp5 .cove-visualization__body>.cove-visualization__body-wrap>.cove-visualization__content-section>.cdc-callout {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
