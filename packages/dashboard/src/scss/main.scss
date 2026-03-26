@@ -498,8 +498,6 @@ button.row-menu__btn[title*='Equal Height Rows'] {
         }
 
         .cdc-callout__heading {
-          // Fixed minimum height to align titles - adjust based on design needs
-          min-height: 3em;
           display: flex;
           align-items: flex-start;
         }
