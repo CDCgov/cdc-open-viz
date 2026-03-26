@@ -3,6 +3,7 @@ import CellAnchor from '../components/CellAnchor'
 import { DataTableProps } from '../DataTable'
 import { ReactNode } from 'react'
 import { displayDataAsText } from '@cdc/core/helpers/displayDataAsText'
+import parse from 'html-react-parser'
 import _ from 'lodash'
 import { hashObj } from '../../../helpers/hashObj'
 import { sanitizeToSvgId } from '../../../helpers/cove/string'
@@ -136,24 +137,26 @@ const mapCellArray = ({
           const sanitizedPatternDataKey = sanitizeToSvgId(patternInfo?.dataKey || '')
 
           return (
-            <div className='col-12'>
-              {validColor ? (
-                patternInfo ? (
-                  <LegendShape
-                    fill={legendColor[0]}
-                    patternInfo={{
-                      pattern: patternInfo.pattern,
-                      patternId: `${mapId}--${sanitizedPatternDataKey}--${patternInfo.patternIndex}--table`,
-                      size: patternInfo.size,
-                      color: patternInfo.color
-                    }}
-                  />
+            <div style={{ display: 'flex', alignItems: 'flex-start', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
+              <div style={{ flexShrink: 0 }}>
+                {validColor ? (
+                  patternInfo ? (
+                    <LegendShape
+                      fill={legendColor[0]}
+                      patternInfo={{
+                        pattern: patternInfo.pattern,
+                        patternId: `${mapId}--${sanitizedPatternDataKey}--${patternInfo.patternIndex}--table`,
+                        size: patternInfo.size,
+                        color: patternInfo.color
+                      }}
+                    />
+                  ) : (
+                    <LegendShape fill={legendColor[0]} />
+                  )
                 ) : (
-                  <LegendShape fill={legendColor[0]} />
-                )
-              ) : (
-                <div className='d-inline-block me-2' style={{ width: '1rem', height: '1rem' }} />
-              )}
+                  <div className='me-2' style={{ width: '1rem', height: '1rem' }} />
+                )}
+              </div>
               <CellAnchor
                 markup={labelValue}
                 row={rowObj}
@@ -166,7 +169,8 @@ const mapCellArray = ({
         } else {
           const rowData = runtimeData[row]
           const dataValue = getDataValue(config, rowData, column)
-          return displayDataAsText(dataValue, column, config)
+          const text = displayDataAsText(dataValue, column, config)
+          return typeof text === 'string' ? parse(text) : text
         }
       })
   )
