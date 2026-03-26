@@ -40,7 +40,7 @@ const Sidebar: React.FC<SidebarProps> = props => {
   return (
     <>
       {/* mimic the editor panel title to keep the button visible. */}
-      <section className='editor-panel__toggle-wrapper p-absolute' style={{ height: '49.75px', width: '350px' }}>
+      <section className='editor-panel__toggle-wrapper' style={{ height: '49.75px', width: '350px' }}>
         <button className={getButtonClasses()} title={displayPanel ? `Collapse Editor` : `Expand Editor`} onClick={onBackClick}></button>
       </section>
       <section className={getSectionClasses()}>

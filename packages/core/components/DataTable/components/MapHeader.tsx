@@ -4,6 +4,7 @@ import { SortIcon } from './SortIcon'
 import { getNewSortBy } from '../helpers/getNewSortBy'
 import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { getMapDataTableColumnKeys } from '../helpers/getMapDataTableColumnKeys'
 
 type MapHeaderProps = DataTableProps & {
   sortBy: { column; asc }
@@ -28,11 +29,11 @@ const MapHeader = ({
   rightAlignedCols,
   interactionLabel = ''
 }: MapHeaderProps) => {
+  const orderedColumnKeys = getMapDataTableColumnKeys(columns)
+
   return (
     <tr>
-      {Object.keys(columns)
-        .filter(column => columns[column].dataTable === true && columns[column].name)
-        .map((column, index) => {
+      {orderedColumnKeys.map((column, index) => {
           let text
           if (column && column !== 'geo') {
             text = columns[column].label ? columns[column].label : columns[column].name
@@ -49,7 +50,7 @@ const MapHeader = ({
               style={{
                 minWidth: (config.table.cellMinWidth || 0) + 'px',
                 textAlign: rightAlignedCols && rightAlignedCols[index] ? 'right' : '',
-                paddingRight: '1.3em'
+                paddingRight: '1.8em'
               }}
               key={`col-header-${column}__${index}`}
               id={column}
@@ -64,7 +65,9 @@ const MapHeader = ({
                   eventAction: 'click',
                   eventLabel: interactionLabel,
                   vizTitle: getVizTitle(config),
-                  specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                  specifics: `column: ${newSortBy.column || 'none'}, order: ${
+                    newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'
+                  }`
                 })
                 setSortBy(newSortBy)
               }}
@@ -77,7 +80,9 @@ const MapHeader = ({
                     eventAction: 'keyboard',
                     eventLabel: interactionLabel,
                     vizTitle: getVizTitle(config),
-                    specifics: `column: ${newSortBy.column || 'none'}, order: ${newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'}`
+                    specifics: `column: ${newSortBy.column || 'none'}, order: ${
+                      newSortBy.asc === true ? 'asc' : newSortBy.asc === false ? 'desc' : 'none'
+                    }`
                   })
                   setSortBy(newSortBy)
                 }
@@ -91,12 +96,13 @@ const MapHeader = ({
             >
               <ColumnHeadingText text={text} config={config} />
               <SortIcon ascending={sortByAsc} />
-              <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
-                } order`}</span>
+              <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${
+                sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
+              } order`}</span>
             </th>
           )
         })}
-    </tr >
+    </tr>
   )
 }
 

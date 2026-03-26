@@ -1,0 +1,58 @@
+{
+  "type": "chart",
+  "title": "Rates by State",
+  "showTitle": true,
+  "theme": "theme-blue",
+  "visualizationType": "Bar",
+  "visualizationSubType": "regular",
+  "orientation": "vertical",
+  "dataUrl": "/examples/data/data-with-metadata.json",
+  "enableMarkupVariables": true,
+  "markupVariables": [
+    {
+      "name": "Last Updated",
+      "tag": "{{lastUpdated}}",
+      "metadataKey": "lastUpdated",
+      "conditions": []
+    },
+    {
+      "name": "Source",
+      "tag": "{{source}}",
+      "metadataKey": "source",
+      "conditions": []
+    }
+  ],
+  "description": "Data last updated {{lastUpdated}}. Source: {{source}}.",
+  "xAxis": {
+    "dataKey": "STATE",
+    "label": "State"
+  },
+  "yAxis": {
+    "label": "Rate"
+  },
+  "series": [
+    {
+      "dataKey": "Rate",
+      "type": "Bar",
+      "tooltip": true
+    }
+  ],
+  "table": {
+    "show": true,
+    "label": "Data Table"
+  },
+  "general": {
+    "showDownloadButton": false
+  },
+  "visual": {
+    "border": true,
+    "accent": true,
+    "background": true
+  },
+  "palette": "qualitative3",
+  "dataFormat": {
+    "commas": false,
+    "prefix": "",
+    "suffix": ""
+  }
+}

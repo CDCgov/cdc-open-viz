@@ -1,12 +1,12 @@
-.cdc-open-viz-module {
+.cove-visualization {
   .accordion__panel > .alert {
     margin-bottom: 15px;
   }
 
   .alert {
     align-items: center;
-    justify-content: center;
     display: inline-flex;
+    justify-content: center;
 
     .cove-icon {
       margin: 5px;

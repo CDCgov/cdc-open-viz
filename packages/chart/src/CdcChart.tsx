@@ -5,6 +5,7 @@ import { getFileExtension } from '@cdc/core/helpers/getFileExtension'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { parseCsvWithQuotes } from '@cdc/core/helpers/parseCsvWithQuotes'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
+import { extractDataAndMetadata } from '@cdc/core/helpers/extractDataAndMetadata'
 import Loading from '@cdc/core/components/Loading'
 import _ from 'lodash'
 import EditorContext from '@cdc/core/contexts/EditorContext'
@@ -60,11 +61,12 @@ const CdcChartWrapper: React.FC<CdcChartProps> = ({
 
       const finalUrl = `${dataUrl.origin}${dataUrl.pathname}${new URLSearchParams(qsParams)}`
       const ext = getFileExtension(finalUrl)
-      const data = await fetchAndParseData(finalUrl, ext)
+      const { data, dataMetadata } = await fetchAndParseData(finalUrl, ext)
 
       setConfig(prev => ({
         ...prev,
         data: { ...data, urlFiltered: true },
+        dataMetadata,
         runtimeDataUrl: finalUrl,
         formattedData: { ...data, urlFiltered: true }
       }))
@@ -113,12 +115,14 @@ const fetchAndParseData = async (url: string, ext: string) => {
     const response = await fetch(url)
     if (ext === 'csv' || isSolrCsv(url)) {
       const responseText = await response.text()
-      return parseCsv(responseText)
+      return { data: parseCsv(responseText), dataMetadata: {} }
     } else if (ext === 'json' || isSolrJson(url)) {
-      return await response.json()
+      const json = await response.json()
+      return extractDataAndMetadata(json)
     }
   } catch (error) {
     console.error(`Error parsing URL: ${url}`, error)
-    return []
+    return { data: [], dataMetadata: {} }
   }
+  return { data: [], dataMetadata: {} }
 }

@@ -278,7 +278,7 @@ const RadarChart = React.forwardRef<SVGSVGElement, RadarChartProps>((props, ref)
           <style>{`.tooltip {background-color: rgba(255,255,255, ${
             (config.tooltips?.opacity || 90) / 100
           }) !important`}</style>
-          <TooltipWithBounds className='tooltip cdc-open-viz-module' left={tooltipLeft} top={tooltipTop}>
+          <TooltipWithBounds className='tooltip cove-visualization' left={tooltipLeft} top={tooltipTop}>
             <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>{tooltipData.entityName}</div>
             <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
               {tooltipData.values.map((item, index) => (

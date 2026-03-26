@@ -11,6 +11,7 @@ import { MouseEventHandler } from 'react'
 import Loader from '@cdc/core/components/Loader'
 import _ from 'lodash'
 import { DROPDOWN_STYLES } from '@cdc/core/components/Filters/components/Dropdown'
+import Tabs from '@cdc/core/components/Filters/components/Tabs'
 
 type DashboardFilterProps = {
   show: number[]
@@ -63,7 +64,12 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         const urlFilterType = filter.type === 'urlfilter'
         const label = stripDuplicateLabelIncrement(filter.key || '')
 
-        if (!urlFilterType && !filter.showDropdown && filter.filterStyle !== FILTER_STYLE.nestedDropdown)
+        if (
+          !urlFilterType &&
+          !filter.showDropdown &&
+          filter.filterStyle !== FILTER_STYLE.nestedDropdown &&
+          filter.filterStyle !== FILTER_STYLE.tabSimple
+        )
           return <React.Fragment key={`${filter.key}-filtersection-${filterIndex}-option`} />
         const values: JSX.Element[] = []
 
@@ -125,7 +131,10 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
           )
         }
 
-        const formGroupClass = `form-group me-4 mb-1${loading ? ' loading-filter' : ''}`
+        const isTabSimple = filter.filterStyle === FILTER_STYLE.tabSimple
+        const formGroupClass = `form-group${isTabSimple ? '' : ' me-4'} mb-1${loading ? ' loading-filter' : ''}${
+          isTabSimple ? ' w-100' : ''
+        }`
         return (
           <div className={formGroupClass} key={`${filter.key}-filtersection-${filterIndex}`}>
             {label && (
@@ -133,7 +142,14 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
                 {label}
               </label>
             )}
-            {filter.filterStyle === FILTER_STYLE.multiSelect ? (
+            {filter.filterStyle === FILTER_STYLE.tabSimple ? (
+              <Tabs
+                filter={filter}
+                index={filterIndex}
+                changeFilterActive={(index, value) => handleOnChange(index, value)}
+                loading={loading}
+              />
+            ) : filter.filterStyle === FILTER_STYLE.multiSelect ? (
               <MultiSelect
                 label={label}
                 options={multiValues}

@@ -8,7 +8,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 // Core Components
 import DataTable from '@cdc/core/components/DataTable'
 import Filters from '@cdc/core/components/Filters'
-import Layout from '@cdc/core/components/Layout'
+import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 import MediaControls from '@cdc/core/components/MediaControls'
 import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Title from '@cdc/core/components/ui/Title'
@@ -47,8 +47,8 @@ import { generateRuntimeLegend } from './helpers/generateRuntimeLegend'
 import generateRuntimeData from './helpers/generateRuntimeData'
 import { reloadURLData } from './helpers/urlDataHelpers'
 import { observeMapSvgLoaded } from './helpers/mapObserverHelpers'
-import { buildSectionClassNames } from './helpers/componentHelpers'
-import { shouldShowDataTable } from './helpers/dataTableHelpers'
+import { buildBodyWrapClassNames, buildSectionClassNames } from './helpers/componentHelpers'
+import { shouldShowDataTable, filterCountyTableRuntimeDataByStateCode } from './helpers/dataTableHelpers'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 
 // Child Components
@@ -67,6 +67,9 @@ import { LegendMemoProvider } from './context/LegendMemoContext'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { getInitialState, mapReducer } from './store/map.reducer'
 import { RuntimeData } from './types/RuntimeData'
+import defaults from './data/initial-state'
+import { LEGACY_MAP_DEFAULTS } from './data/legacy-defaults'
+import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
 import EditorContext from '@cdc/core/contexts/EditorContext'
 import MapActions from './store/map.actions'
 import _ from 'lodash'
@@ -74,6 +77,8 @@ import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import useModal from './hooks/useModal'
 import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
+import { ENABLE_CHART_MAP_TP5_TREATMENT } from '@cdc/core/helpers/constants'
+import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 
 type CdcMapComponent = {
   config: MapConfig
@@ -104,6 +109,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   datasets,
   interactionLabel = 'no link provided'
 }) => {
+  backfillDefaults(configObj, defaults, LEGACY_MAP_DEFAULTS)
   const initialState = getInitialState(configObj)
 
   const [mapState, dispatch] = useReducer<MapReducerType<MapState, MapActions>>(mapReducer, initialState as MapState)
@@ -118,6 +124,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     modal,
     accessibleStatus,
     filteredCountryCode,
+    filteredStateCode,
     position,
     scale,
     translate,
@@ -139,7 +146,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   useEffect(() => {
-    const _newConfig = getInitialState(cloneConfig(configObj)).config
+    const configClone = cloneConfig(configObj)
+    backfillDefaults(configClone, defaults, LEGACY_MAP_DEFAULTS)
+    const _newConfig = getInitialState(configClone).config
     if (configObj.data) {
       _newConfig.data = configObj.data
     }
@@ -157,7 +166,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   // Refs
-  const innerContainerRef = useRef()
+  const innerContainerRef = useRef<HTMLDivElement | null>(null)
   const legendRef = useRef(null)
   const mapSvg = useRef(null)
   const tooltipRef = useRef(null)
@@ -290,7 +299,12 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     // Combine viz filters with dashboard filters for markup processing
     const combinedFilters = [...(config.filters || []), ...(config.dashboardFilters || [])]
 
-    const markupOptions = { isEditor, filters: combinedFilters }
+    const markupOptions = {
+      isEditor,
+      filters: combinedFilters,
+      locale: config.locale,
+      dataMetadata: config.dataMetadata
+    }
 
     if (title) {
       title = processMarkupVariables(title, config.data || [], config.markupVariables, markupOptions).processedContent
@@ -334,6 +348,17 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   }
 
   if (!table.label || table.label === '') table.label = 'Data Table'
+  const isTp5Treatment = ENABLE_CHART_MAP_TP5_TREATMENT && config.visual?.tp5Treatment
+  const mapTitle = (
+    <Title
+      title={title}
+      superTitle={processedSuperTitle}
+      titleStyle={isTp5Treatment ? 'small' : general.titleStyle}
+      showTitle={general.showTitle}
+      config={config}
+      classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${headerColor}`]}
+    />
+  )
 
   const mapProps = {
     setParentConfig,
@@ -344,6 +369,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     customNavigationHandler,
     dimensions,
     filteredCountryCode,
+    filteredStateCode,
     isDashboard,
     isEditor,
     logo,
@@ -355,6 +381,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeLegend,
     scale,
     setConfig,
+    setFilteredStateCode: (stateCode: string) => dispatch({ type: 'SET_FILTERED_STATE_CODE', payload: stateCode }),
     setSharedFilter,
     setSharedFilterValue,
     config,
@@ -367,6 +394,34 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     loadConfig,
     interactionLabel
   }
+
+  // Memoize data table preparation and county filtering to avoid recomputing on unrelated renders.
+  const { dataTableConfig, dataTableColumns, dataTableRuntimeData } = useMemo(() => {
+    let preparedConfig = config
+    let preparedColumns = columns
+    let preparedRuntimeData = runtimeData
+
+    if (config.smallMultiples?.mode) {
+      const prepared = prepareSmallMultiplesDataTable(config, columns, runtimeData)
+      preparedConfig = prepared.config
+      preparedColumns = prepared.columns
+      preparedRuntimeData = prepared.runtimeData
+    }
+
+    if (config.general.geoType === 'us-county' && filteredStateCode) {
+      preparedRuntimeData = filterCountyTableRuntimeDataByStateCode(
+        preparedRuntimeData,
+        filteredStateCode,
+        preparedConfig
+      )
+    }
+
+    return {
+      dataTableConfig: preparedConfig,
+      dataTableColumns: preparedColumns,
+      dataTableRuntimeData: preparedRuntimeData
+    }
+  }, [config, columns, runtimeData, filteredStateCode])
 
   if (!config.data) return <></>
 
@@ -393,61 +448,45 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     </a>
   )
 
-  // Prepare data table props (pivot if small multiples mode is enabled)
-  let dataTableConfig = config
-  let dataTableColumns = columns
-  let dataTableRuntimeData = runtimeData
-  if (config.smallMultiples?.mode) {
-    const prepared = prepareSmallMultiplesDataTable(config, columns, runtimeData)
-    dataTableConfig = prepared.config
-    dataTableColumns = prepared.columns
-    dataTableRuntimeData = prepared.runtimeData
-  }
-
   return (
     <LegendMemoProvider legendMemo={legendMemo} legendSpecialClassLastMemo={legendSpecialClassLastMemo}>
       <ConfigContext.Provider value={mapProps}>
         <MapDispatchContext.Provider value={dispatch}>
-          <Layout.VisualizationWrapper
+          <VisualizationContainer
             config={config}
             isEditor={isEditor}
             ref={outerContainerRef}
             currentViewport={currentViewport}
             imageId={imageId}
-            showEditorPanel={config.showEditorPanel}
+            editorPanel={<EditorPanel datasets={datasets} />}
           >
-            {isEditor && <EditorPanel datasets={datasets} />}
-            <Layout.Responsive isEditor={isEditor}>
-              {requiredColumns?.length > 0 && (
-                <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
-              )}
-              {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
-                <section
-                  className={buildSectionClassNames(
-                    currentViewport,
-                    headerColor,
-                    config?.runtime?.editorErrorMessage.length > 0
-                  )}
-                  aria-label={'Map: ' + title}
-                  ref={innerContainerRef}
-                >
-                  {config?.runtime?.editorErrorMessage.length > 0 && <Error />}
-                  <Title
-                    title={title}
-                    superTitle={processedSuperTitle}
-                    titleStyle={general.titleStyle}
-                    showTitle={general.showTitle}
-                    config={config}
-                    classes={['map-title', general.showTitle === true ? 'visible' : 'hidden', `${headerColor}`]}
-                  />
-                  <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
-                  {config?.annotations?.length > 0 && (
-                    <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
-                  )}
-
-                  {processedIntroText && <section className='introText mb-4'>{parse(processedIntroText)}</section>}
-
-                  {config?.filters?.length > 0 && (
+            {requiredColumns?.length > 0 && (
+              <Waiting requiredColumns={requiredColumns} className={displayPanel ? `waiting` : `waiting collapsed`} />
+            )}
+            {!runtimeData.init && (general.type === 'navigation' || runtimeLegend) && (
+              <VisualizationContent
+                innerClassName={[
+                  'cdc-map-inner-container',
+                  currentViewport,
+                  config?.runtime?.editorErrorMessage.length > 0 ? 'type-map--has-error' : ''
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                innerProps={{ 'aria-label': 'Map: ' + title, ref: innerContainerRef }}
+                bodyWrapClassName={isTp5Treatment ? 'cdc-callout d-flex flex-column' : ''}
+                bodyClassName={[
+                  !config.visual?.border || isTp5Treatment ? 'no-borders' : '',
+                  config.visual?.border && !isTp5Treatment ? 'component--has-legacy-border' : '',
+                  config.visual?.borderColorTheme ? 'component--has-border-color-theme' : '',
+                  config.visual?.accent ? 'component--has-accent' : '',
+                  config.visual?.background ? 'component--has-background' : '',
+                  config.visual?.hideBackgroundColor ? 'component--hide-background-color' : '',
+                  isTp5Treatment ? 'component--tp5-treatment' : ''
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                filters={
+                  config?.filters?.length > 0 ? (
                     <Filters
                       config={config}
                       setConfig={setConfig}
@@ -457,12 +496,100 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       standaloneMap={!config}
                       interactionLabel={interactionLabel}
                     />
+                  ) : undefined
+                }
+                bodySubtext={processedSubtext.length > 0 ? <p className='subtext'>{parse(processedSubtext)}</p> : null}
+                bodyFooter={
+                  <>
+                    {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink
+                      ? tableLink
+                      : link && link}
+
+                    {shouldShowDataTable(config, table, general, loading) ? (
+                      <DataTable
+                        columns={dataTableColumns}
+                        config={dataTableConfig}
+                        currentViewport={currentViewport}
+                        displayGeoName={displayGeoName}
+                        expandDataTable={table.expanded}
+                        formatLegendLocation={key =>
+                          formatLegendLocation(key, dataTableRuntimeData?.[key]?.[config.columns.geo.name])
+                        }
+                        imageRef={imageId}
+                        indexTitle={table.indexLabel}
+                        innerContainerRef={innerContainerRef}
+                        legendMemo={legendMemo}
+                        legendSpecialClassLastMemo={legendSpecialClassLastMemo}
+                        navigationHandler={navigationHandler}
+                        outerContainerRef={outerContainerRef}
+                        rawData={dataTableConfig.data}
+                        runtimeData={dataTableRuntimeData}
+                        runtimeLegend={runtimeLegend}
+                        showDownloadImgButton={showDownloadImgButton}
+                        showDownloadPdfButton={showDownloadPdfButton}
+                        includeContextInDownload={config.general?.includeContextInDownload}
+                        tabbingId={tabId}
+                        tableTitle={table.label}
+                        vizTitle={general.title}
+                        applyLegendToRow={applyLegendToRow}
+                        getPatternForRow={getPatternForRow}
+                        wrapColumns={table.wrapColumns}
+                        hasSubtextAbove={processedSubtext.length > 0}
+                        interactionLabel={interactionLabel}
+                      />
+                    ) : (
+                      (showDownloadImgButton || showDownloadPdfButton) && (
+                        <div className='w-100 d-flex justify-content-end'>
+                          <MediaControls.Section classes={['download-links', 'mt-4', 'mb-2']}>
+                            {showDownloadImgButton && (
+                              <MediaControls.DownloadLink
+                                type='image'
+                                title='Download Map as Image'
+                                state={config}
+                                elementToCapture={imageId}
+                                interactionLabel={interactionLabel}
+                                includeContextInDownload={config.general?.includeContextInDownload}
+                              />
+                            )}
+                            {showDownloadPdfButton && (
+                              <MediaControls.DownloadLink
+                                type='pdf'
+                                title='Download Map as PDF'
+                                state={config}
+                                elementToCapture={imageId}
+                                interactionLabel={interactionLabel}
+                                includeContextInDownload={config.general?.includeContextInDownload}
+                              />
+                            )}
+                          </MediaControls.Section>
+                        </div>
+                      )
+                    )}
+
+                    {config.annotations?.length > 0 && <Annotation.Dropdown />}
+
+                    {processedFootnotes && (
+                      <section className='footnotes pt-2 mt-4'>{parse(processedFootnotes)}</section>
+                    )}
+                  </>
+                }
+                header={isTp5Treatment ? null : mapTitle}
+                messageIsIntroText={!!processedIntroText}
+                message={processedIntroText ? parse(processedIntroText) : null}
+              >
+                <>
+                  {isTp5Treatment && <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />}
+                  {isTp5Treatment && mapTitle}
+                  {config?.runtime?.editorErrorMessage.length > 0 && <Error />}
+                  <SkipTo skipId={tabId} skipMessage='Skip Over Map Container' />
+                  {config?.annotations?.length > 0 && (
+                    <SkipTo skipId={tabId} skipMessage={`Skip over annotations`} key={`skip-annotations`} />
                   )}
 
                   <div
                     role='region'
                     tabIndex={0}
-                    className={getMapContainerClasses(config, modal).join(' ')}
+                    className={getMapContainerClasses(config, modal, currentViewport).join(' ')}
                     onClick={e => closeModal(e, modal)}
                     onKeyDown={e => {
                       if (e.key === 'Enter') {
@@ -502,114 +629,42 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                       navigationHandler={val => navigationHandler('_blank', val, customNavigationHandler)}
                     />
                   )}
+                </>
+              </VisualizationContent>
+            )}
 
-                  {/* Link (to data table?) */}
-                  {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink
-                    ? tableLink
-                    : link && link}
+            <div aria-live='assertive' className='cdcdataviz-sr-only'>
+              {accessibleStatus}
+            </div>
 
-                  {processedSubtext.length > 0 && <p className='subtext mt-4'>{parse(processedSubtext)}</p>}
-
-                  {/* Data Table or Download Links */}
-                  {shouldShowDataTable(config, table, general, loading) ? (
-                    <DataTable
-                      columns={dataTableColumns}
-                      config={dataTableConfig}
-                      currentViewport={currentViewport}
-                      displayGeoName={displayGeoName}
-                      expandDataTable={table.expanded}
-                      formatLegendLocation={key =>
-                        formatLegendLocation(key, dataTableRuntimeData?.[key]?.[config.columns.geo.name])
-                      }
-                      headerColor={general.headerColor}
-                      imageRef={imageId}
-                      indexTitle={table.indexLabel}
-                      innerContainerRef={innerContainerRef}
-                      legendMemo={legendMemo}
-                      legendSpecialClassLastMemo={legendSpecialClassLastMemo}
-                      navigationHandler={navigationHandler}
-                      outerContainerRef={outerContainerRef}
-                      rawData={dataTableConfig.data}
-                      runtimeData={dataTableRuntimeData}
-                      runtimeLegend={runtimeLegend}
-                      showDownloadImgButton={showDownloadImgButton}
-                      showDownloadPdfButton={showDownloadPdfButton}
-                      includeContextInDownload={config.general?.includeContextInDownload}
-                      tabbingId={tabId}
-                      tableTitle={table.label}
-                      vizTitle={general.title}
-                      applyLegendToRow={applyLegendToRow}
-                      getPatternForRow={getPatternForRow}
-                      wrapColumns={table.wrapColumns}
-                      interactionLabel={interactionLabel}
-                    />
-                  ) : (
-                    (showDownloadImgButton || showDownloadPdfButton) && (
-                      <div className='w-100 d-flex justify-content-end'>
-                        <MediaControls.Section classes={['download-links', 'mt-4', 'mb-2']}>
-                          {showDownloadImgButton && (
-                            <MediaControls.DownloadLink
-                              type='image'
-                              title='Download Map as Image'
-                              state={config}
-                              elementToCapture={imageId}
-                              interactionLabel={interactionLabel}
-                              includeContextInDownload={config.general?.includeContextInDownload}
-                            />
-                          )}
-                          {showDownloadPdfButton && (
-                            <MediaControls.DownloadLink
-                              type='pdf'
-                              title='Download Map as PDF'
-                              state={config}
-                              elementToCapture={imageId}
-                              interactionLabel={interactionLabel}
-                              includeContextInDownload={config.general?.includeContextInDownload}
-                            />
-                          )}
-                        </MediaControls.Section>
-                      </div>
-                    )
-                  )}
-
-                  {config.annotations?.length > 0 && <Annotation.Dropdown />}
-
-                  {processedFootnotes && <section className='footnotes pt-2 mt-4'>{parse(processedFootnotes)}</section>}
-                </section>
-              )}
-
-              <div aria-live='assertive' className='cdcdataviz-sr-only'>
-                {accessibleStatus}
-              </div>
-
-              {!isDraggingAnnotation && 'hover' === tooltips.appearanceType && (
-                <ReactTooltip
-                  id={`tooltip__${tooltipId}`}
-                  float={true}
-                  className={`tooltip tooltip-test`}
-                  style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
-                />
-              )}
-              <div
-                ref={tooltipRef}
-                id={`tooltip__${tooltipId}-canvas`}
-                className='tooltip'
-                style={{
-                  background: `rgba(255,255,255,${config.tooltips.opacity / 100})`,
-                  position: 'absolute',
-                  whiteSpace: 'nowrap',
-                  display: 'none' // can't use d-none here
-                }}
-              ></div>
-              <FootnotesStandAlone
-                config={config.footnotes}
-                filters={config.filters?.filter(f => f.filterFootnotes)}
-                markupVariables={config.markupVariables}
-                enableMarkupVariables={config.enableMarkupVariables}
-                data={config.data}
+            {!isDraggingAnnotation && 'hover' === tooltips.appearanceType && (
+              <ReactTooltip
+                id={`tooltip__${tooltipId}`}
+                float={true}
+                className={`tooltip tooltip-test`}
+                style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
               />
-            </Layout.Responsive>
-          </Layout.VisualizationWrapper>
+            )}
+            <div
+              ref={tooltipRef}
+              id={`tooltip__${tooltipId}-canvas`}
+              className='tooltip'
+              style={{
+                background: `rgba(255,255,255,${config.tooltips.opacity / 100})`,
+                position: 'absolute',
+                whiteSpace: 'nowrap',
+                display: 'none' // can't use d-none here
+              }}
+            ></div>
+            <FootnotesStandAlone
+              config={config.footnotes}
+              filters={config.filters?.filter(f => f.filterFootnotes)}
+              markupVariables={config.markupVariables}
+              enableMarkupVariables={config.enableMarkupVariables}
+              data={config.data}
+              dataMetadata={config.dataMetadata}
+            />
+          </VisualizationContainer>
         </MapDispatchContext.Provider>
       </ConfigContext.Provider>
     </LegendMemoProvider>

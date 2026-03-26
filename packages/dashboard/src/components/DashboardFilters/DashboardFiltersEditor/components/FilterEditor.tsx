@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { getVizRowColumnLocator } from '../../../../helpers/getVizRowColumnLocator'
 import { Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import DataTransform from '@cdc/core/helpers/DataTransform'
@@ -105,7 +104,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
       let _dataSet = config.datasets[dataKey]
       if (!_dataSet.data && _dataSet.dataUrl) {
         setDataFiltersLoading(true)
-        let data = await fetchRemoteData(_dataSet.dataUrl)
+        let data = (await fetchRemoteData(_dataSet.dataUrl)).data
         if (_dataSet.dataDescription && data && data.length > 0) {
           try {
             data = transform.autoStandardize(data)

@@ -1,4 +1,6 @@
-.cdc-open-viz-module.isEditor {
+@import '@cdc/core/styles/layout/wrapper-padding';
+
+.cove-visualization.is-editor {
   background: transparent;
 }
 
@@ -12,23 +14,14 @@
   }
 }
 
-.cdc-open-viz-module.type-filtered-text {
+.cove-visualization.type-filtered-text {
+  .cove-visualization__body {
+    @include cove-visualization-body-padding;
+  }
+
   .cove-accordion__panel-section .cove-input__checkbox--small {
     // float: initial;
     // display: initial;
     float: none;
-  }
-  .cove-component__content.body:not(:empty) {
-    padding: 0;
-
-    &.has-top-padding {
-      padding-top: 1rem;
-      padding-bottom: 1rem;
-    }
-
-    &.has-side-padding {
-      padding-left: 1rem;
-      padding-right: 1rem;
-    }
   }
 }

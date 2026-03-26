@@ -21,7 +21,7 @@ describe('prepareClonedElements', () => {
         <div class="dfe-section">
           <h2>Title</h2>
           <p>Text</p>
-          <div class="cdc-open-viz-module" data-download-id="viz1">Viz Content</div>
+          <div class="cove-visualization" data-download-id="viz1">Viz Content</div>
         </div>
       `)
       const viz = container.querySelector('[data-download-id="viz1"]') as HTMLElement
@@ -39,7 +39,7 @@ describe('prepareClonedElements', () => {
         <div class="dfe-section">
           <h2>Perfect Title</h2>
           <p>Perfect description</p>
-          <div class="cdc-open-viz-module" data-download-id="viz1">Chart</div>
+          <div class="cove-visualization" data-download-id="viz1">Chart</div>
         </div>
       `)
       const viz = container.querySelector('[data-download-id="viz1"]') as HTMLElement
@@ -59,7 +59,7 @@ describe('prepareClonedElements', () => {
         <div class="dfe-section">
           <h2>Emergency Department Visits</h2>
           <p>Weekly percent of total visits.</p>
-          <div class="cdc-open-viz-module" data-download-id="viz1">Chart</div>
+          <div class="cove-visualization" data-download-id="viz1">Chart</div>
         </div>
       `)
       const viz = container.querySelector('[data-download-id="viz1"]') as HTMLElement
@@ -78,7 +78,7 @@ describe('prepareClonedElements', () => {
         <div class="dfe-section">
           <h3>Emergency Department Visits by Age</h3>
           <p>Weekly percent of total visits.</p>
-          <div class="cdc-open-viz-module" data-download-id="viz1">Chart</div>
+          <div class="cove-visualization" data-download-id="viz1">Chart</div>
         </div>
       `)
       const viz = container.querySelector('[data-download-id="viz1"]') as HTMLElement
@@ -98,7 +98,7 @@ describe('prepareClonedElements', () => {
           <h2>By Age</h2>
           <h3>Emergency Department Visits by Age</h3>
           <p>Weekly percent of total visits.</p>
-          <div class="cdc-open-viz-module" data-download-id="viz1">Chart</div>
+          <div class="cove-visualization" data-download-id="viz1">Chart</div>
         </div>
       `)
       const viz = container.querySelector('[data-download-id="viz1"]') as HTMLElement
@@ -118,7 +118,7 @@ describe('prepareClonedElements', () => {
           <p>First paragraph.</p>
           <p>Second paragraph.</p>
           <p>Third paragraph.</p>
-          <div class="cdc-open-viz-module" data-download-id="viz1">Chart</div>
+          <div class="cove-visualization" data-download-id="viz1">Chart</div>
         </div>
       `)
       const viz = container.querySelector('[data-download-id="viz1"]') as HTMLElement
@@ -138,8 +138,8 @@ describe('prepareClonedElements', () => {
       const container = createDOM(`
         <div class="dfe-section">
           <h2>Title</h2>
-          <div class="cdc-open-viz-module" data-download-id="viz1">Chart 1</div>
-          <div class="cdc-open-viz-module" data-download-id="viz2">Chart 2</div>
+          <div class="cove-visualization" data-download-id="viz1">Chart 1</div>
+          <div class="cove-visualization" data-download-id="viz2">Chart 2</div>
         </div>
       `)
       const viz2 = container.querySelector('[data-download-id="viz2"]') as HTMLElement
@@ -154,9 +154,9 @@ describe('prepareClonedElements', () => {
       const container = createDOM(`
         <div class="dfe-section">
           <h2>First Chart</h2>
-          <div class="cdc-open-viz-module" data-download-id="viz1">Chart 1</div>
+          <div class="cove-visualization" data-download-id="viz1">Chart 1</div>
           <h2>Second Chart</h2>
-          <div class="cdc-open-viz-module" data-download-id="viz2">Chart 2</div>
+          <div class="cove-visualization" data-download-id="viz2">Chart 2</div>
         </div>
       `)
       const viz2 = container.querySelector('[data-download-id="viz2"]') as HTMLElement
@@ -172,11 +172,11 @@ describe('prepareClonedElements', () => {
     it('should ignore heading inside another viz', () => {
       const container = createDOM(`
         <div class="dfe-section">
-          <div class="cdc-open-viz-module" data-download-id="viz1">
+          <div class="cove-visualization" data-download-id="viz1">
             <h2>Title Inside Viz1</h2>
             <div>Chart 1</div>
           </div>
-          <div class="cdc-open-viz-module" data-download-id="viz2">Chart 2</div>
+          <div class="cove-visualization" data-download-id="viz2">Chart 2</div>
         </div>
       `)
       const viz2 = container.querySelector('[data-download-id="viz2"]') as HTMLElement
@@ -191,9 +191,9 @@ describe('prepareClonedElements', () => {
       const container = createDOM(`
         <div class="dfe-section">
           <h2>Title</h2>
-          <div class="cdc-open-viz-module" data-download-id="viz1">Chart 1</div>
-          <div class="cdc-open-viz-module" data-download-id="viz2">Chart 2</div>
-          <div class="cdc-open-viz-module" data-download-id="viz3">Chart 3</div>
+          <div class="cove-visualization" data-download-id="viz1">Chart 1</div>
+          <div class="cove-visualization" data-download-id="viz2">Chart 2</div>
+          <div class="cove-visualization" data-download-id="viz3">Chart 3</div>
         </div>
       `)
       const viz3 = container.querySelector('[data-download-id="viz3"]') as HTMLElement
@@ -207,11 +207,11 @@ describe('prepareClonedElements', () => {
     it('should prefer H3 over H2 between two vizs', () => {
       const container = createDOM(`
         <div class="dfe-section">
-          <div class="cdc-open-viz-module" data-download-id="viz1">Chart 1</div>
+          <div class="cove-visualization" data-download-id="viz1">Chart 1</div>
           <h2>Section</h2>
           <h3>Subsection</h3>
           <p>Description</p>
-          <div class="cdc-open-viz-module" data-download-id="viz2">Chart 2</div>
+          <div class="cove-visualization" data-download-id="viz2">Chart 2</div>
         </div>
       `)
       const viz2 = container.querySelector('[data-download-id="viz2"]') as HTMLElement
@@ -231,10 +231,10 @@ describe('prepareClonedElements', () => {
           <div class="dfe-section">
             <h2>Previous Section</h2>
             <p>Previous content</p>
-            <div class="cdc-open-viz-module" data-download-id="viz0">Other viz</div>
+            <div class="cove-visualization" data-download-id="viz0">Other viz</div>
           </div>
           <div class="dfe-section">
-            <div class="cdc-open-viz-module" data-download-id="viz1">Chart</div>
+            <div class="cove-visualization" data-download-id="viz1">Chart</div>
           </div>
         </div>
       `)
@@ -253,7 +253,7 @@ describe('prepareClonedElements', () => {
         <div class="some-container">
           <h2>Title</h2>
           <p>Description</p>
-          <div class="cdc-open-viz-module" data-download-id="viz1">Chart</div>
+          <div class="cove-visualization" data-download-id="viz1">Chart</div>
         </div>
       `)
       const viz = container.querySelector('[data-download-id="viz1"]') as HTMLElement
@@ -272,7 +272,7 @@ describe('prepareClonedElements', () => {
         <div class="outer-container">
           <h2>Title Above Section</h2>
           <section>
-            <div class="cdc-open-viz-module" data-download-id="viz1">Chart</div>
+            <div class="cove-visualization" data-download-id="viz1">Chart</div>
           </section>
         </div>
       `)
@@ -289,7 +289,7 @@ describe('prepareClonedElements', () => {
         <div class="dfe-section">
           <h2>Outer Title</h2>
           <section>
-            <div class="cdc-open-viz-module" data-download-id="viz1">Chart</div>
+            <div class="cove-visualization" data-download-id="viz1">Chart</div>
           </section>
         </div>
       `)
@@ -307,7 +307,7 @@ describe('prepareClonedElements', () => {
         <section>
           <h2>Section Title</h2>
           <p>Description</p>
-          <div class="cdc-open-viz-module" data-download-id="viz1">Chart</div>
+          <div class="cove-visualization" data-download-id="viz1">Chart</div>
         </section>
       `)
       const viz = container.querySelector('[data-download-id="viz1"]') as HTMLElement
@@ -325,7 +325,7 @@ describe('prepareClonedElements', () => {
       const container = createDOM(`
         <div class="dfe-section">
           <p>Some paragraph without heading</p>
-          <div class="cdc-open-viz-module" data-download-id="viz1">Chart</div>
+          <div class="cove-visualization" data-download-id="viz1">Chart</div>
         </div>
       `)
       const viz = container.querySelector('[data-download-id="viz1"]') as HTMLElement
@@ -341,7 +341,7 @@ describe('prepareClonedElements', () => {
       const container = createDOM(`
         <div class="dfe-section">
           <h2>Title</h2>
-          <div class="cdc-open-viz-module" data-download-id="viz1">Chart</div>
+          <div class="cove-visualization" data-download-id="viz1">Chart</div>
           <p>Content after viz should not be included</p>
         </div>
       `)
@@ -358,7 +358,7 @@ describe('prepareClonedElements', () => {
       const container = createDOM(`
         <div class="dfe-section">
           <h2>Direct H2 Child</h2>
-          <div class="cdc-open-viz-module" data-download-id="viz1">Chart</div>
+          <div class="cove-visualization" data-download-id="viz1">Chart</div>
         </div>
       `)
       const viz = container.querySelector('[data-download-id="viz1"]') as HTMLElement
@@ -375,7 +375,7 @@ describe('prepareClonedElements', () => {
           <div class="heading-wrapper">
             <h2>Nested H2</h2>
           </div>
-          <div class="cdc-open-viz-module" data-download-id="viz1">Chart</div>
+          <div class="cove-visualization" data-download-id="viz1">Chart</div>
         </div>
       `)
       const viz = container.querySelector('[data-download-id="viz1"]') as HTMLElement
@@ -394,7 +394,7 @@ describe('prepareClonedElements', () => {
           <p>Description</p>
           <div class="outer-wrapper">
             <div class="inner-wrapper">
-              <div class="cdc-open-viz-module" data-download-id="viz1">Chart</div>
+              <div class="cove-visualization" data-download-id="viz1">Chart</div>
             </div>
           </div>
         </div>

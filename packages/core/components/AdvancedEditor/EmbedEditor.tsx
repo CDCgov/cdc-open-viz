@@ -7,7 +7,7 @@ import {
   type FilterMetadata,
   type FilterState
 } from '../../helpers/embed'
-import '../../helpers/embed' // Initialize embed helper for iframe resizing
+import '../../helpers/embed/embedHelper.js' // Initialize embed helper for iframe resizing
 
 type EmbedEditorProps = {
   config?: any // Current visualization config

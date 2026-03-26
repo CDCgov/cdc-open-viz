@@ -1,15 +1,20 @@
-// Remove custom theme mixin - use core styles instead
-
-.type-dashboard .type-waffle-chart .cove-component__content {
-  padding-top: 0;
-}
+@import '@cdc/core/styles/layout/wrapper-padding';
 
 // Let core styles handle color palette
 
-.cove {
+.cove-visualization.type-waffle-chart {
+
+  .cove-waffle-chart__subtext.subtext,
+  .cove-waffle-chart__subtext.subtext.fst-italic {
+    line-height: var(--visualization-body-line-height);
+  }
+
+  .cove-visualization__body {
+    @include cove-visualization-body-padding;
+  }
+
   .cove-gauge-chart {
     &__chart {
-      width: 85%;
       margin: 0 auto;
       margin-left: auto;
       height: auto;
@@ -25,7 +30,7 @@
 
     &__subtext {
       font-style: italic;
-      font-size: 0.9em !important;
+      line-height: var(--visualization-body-line-height);
     }
 
     &__text {
@@ -37,7 +42,6 @@
   .cove-waffle-chart {
     display: flex;
     flex-wrap: wrap;
-    padding: 1em 1em 0;
     justify-content: flex-start;
 
     &.cove-waffle-chart--verical {
@@ -52,22 +56,18 @@
 
   .cove-waffle-chart__chart {
     padding-right: 1rem;
-    margin-bottom: 1rem;
     box-sizing: content-box;
   }
 
   .cove-waffle-chart__data {
     flex: 1 1 0;
     min-width: 175px;
-    margin-bottom: 1rem;
   }
 
   .cove-waffle-chart__data {
     display: flex;
     flex-wrap: wrap;
     align-content: space-between;
-
-    font-size: 14px;
 
     .cove-waffle-chart__data--primary {
       font-size: 70px;
@@ -134,9 +134,19 @@
 // TP5 Style for Waffle Chart
 .type-waffle-chart {
   &.waffle__style--tp5 {
-    .cove-component__content {
+
+    .cove-visualization__body,
+    .cove-visualization__body.component--has-legacy-border,
+    .cove-visualization__body.component--has-border-color-theme,
+    .cove-visualization__body.component--has-background,
+    .cove-visualization__body.component--has-accent {
+      padding: 0 !important;
       background: none !important;
       container-type: inline-size;
+
+      >.cove-visualization__body-wrap {
+        padding: 0 !important;
+      }
     }
 
     .cdc-callout {
@@ -144,7 +154,7 @@
       margin: 0 !important;
       padding: 1.5rem;
       background-color: var(--colors-cyan-10, #eff9fa);
-      border: 1px solid var(--colors-cyan-15, #dff2f6);
+      border: 1px solid #dff2f6 !important;
       position: relative;
       border-radius: 0.25rem;
       flex-wrap: wrap;
@@ -193,6 +203,18 @@
     .cove-waffle-chart__data {
       margin-bottom: 0;
       align-content: flex-start;
+
+      .cove-waffle-chart__data--primary {
+        font-size: 2rem;
+        color: var(--colors-cyan-60v);
+        font-weight: 400;
+      }
+
+      .cove-waffle-chart__data--text {
+        margin-top: 0.5rem;
+        font-size: 1rem;
+        line-height: 1.5rem;
+      }
     }
 
     .cdc-callout__heading {
@@ -201,25 +223,24 @@
       font-size: 1.1rem;
     }
 
-    .cove-waffle-chart__data--text {
-      margin-top: 0.5rem;
-      font-size: 1rem;
-    }
-
     .cove-waffle-chart__subtext {
-      font-size: 1rem;
-    }
-
-    .cove-waffle-chart__data--primary {
-      font-size: 2rem;
-      color: var(--colors-cyan-60v);
-      font-weight: 400;
+      margin-top: 1rem;
     }
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
-      .cove-component__content {
+
+      .cove-visualization__body,
+      .cove-visualization__body.component--has-legacy-border,
+      .cove-visualization__body.component--has-border-color-theme,
+      .cove-visualization__body.component--has-background,
+      .cove-visualization__body.component--has-accent {
+        padding: 0 !important;
         background: white !important;
+
+        >.cove-visualization__body-wrap {
+          padding: 0 !important;
+        }
       }
 
       .cdc-callout {
@@ -232,9 +253,19 @@
 
   // TP5 Style for Gauge Chart
   &.gauge__style--tp5 {
-    .cove-component__content {
+
+    .cove-visualization__body,
+    .cove-visualization__body.component--has-legacy-border,
+    .cove-visualization__body.component--has-border-color-theme,
+    .cove-visualization__body.component--has-background,
+    .cove-visualization__body.component--has-accent {
+      padding: 0 !important;
       background: none !important;
       container-type: inline-size;
+
+      >.cove-visualization__body-wrap {
+        padding: 0 !important;
+      }
     }
 
     .cdc-callout {
@@ -320,14 +351,24 @@
     }
 
     .cove-waffle-chart__subtext {
-      font-size: 1rem;
+      line-height: var(--visualization-body-line-height);
       margin-top: auto;
     }
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
-      .cove-component__content {
+
+      .cove-visualization__body,
+      .cove-visualization__body.component--has-legacy-border,
+      .cove-visualization__body.component--has-border-color-theme,
+      .cove-visualization__body.component--has-background,
+      .cove-visualization__body.component--has-accent {
+        padding: 0 !important;
         background: white !important;
+
+        >.cove-visualization__body-wrap {
+          padding: 0 !important;
+        }
       }
 
       .cdc-callout {

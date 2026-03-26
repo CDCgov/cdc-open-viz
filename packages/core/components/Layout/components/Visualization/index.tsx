@@ -1,24 +1,21 @@
 // main visualization wrapper
-import { ChartConfig } from '@cdc/chart/src/types/ChartConfig'
 import React, { forwardRef } from 'react'
-import { Config as DataBiteConfig } from '@cdc/data-bite/src/types/Config'
-import { Config as DataTableConfig } from '@cdc/data-table/src/types/Config'
 import './visualizations.scss'
-import { Config as WaffleChartConfig } from '@cdc/waffle-chart/src/types/Config'
-import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
-import { DashboardFilters } from '@cdc/dashboard/src/types/DashboardFilters'
-import { MapConfig } from '@cdc/map/src/types/MapConfig'
+import type { AnyVisualization } from '@cdc/core/types/Visualization'
+
+export type VisualizationShellConfig = Partial<AnyVisualization> & {
+  type?: AnyVisualization['type'] | 'dashboard'
+  theme?: string
+  visual?: {
+    highlightWrappers?: boolean
+    whiteBackground?: boolean
+  }
+}
 
 type VisualizationWrapper = {
   children: React.ReactNode
-  config:
-    | ChartConfig
-    | DataBiteConfig
-    | WaffleChartConfig
-    | MarkupIncludeConfig
-    | DashboardFilters
-    | MapConfig
-    | DataTableConfig
+  className?: string
+  config: VisualizationShellConfig
   currentViewport?: string
   imageId?: string
   isEditor: boolean
@@ -35,15 +32,17 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
     className
   } = props
 
+  const themeClass = config.type === 'map' ? config?.general?.headerColor || config?.theme : config?.theme
+
   const getWrappingClasses = () => {
-    let classes = ['cdc-open-viz-module', `${currentViewport}`, `${config?.theme}`]
+    let classes = ['cove-visualization', 'cdc-open-viz-module', `${currentViewport}`, `${themeClass}`]
 
     if (className) {
       classes.push(className)
     }
 
     isEditor && classes.push('spacing-wrapper')
-    isEditor && classes.push('isEditor')
+    isEditor && classes.push('is-editor')
 
     if (isEditor && showEditorPanel) {
       classes = classes.filter(item => item !== 'editor-panel--hidden')
@@ -55,9 +54,18 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
       classes.push('editor-panel--hidden')
     }
 
+    if (isEditor && config.visual?.highlightWrappers) {
+      classes.push('cove-highlight-wrappers')
+    }
+
     if (config.type === 'filtered-text') {
       classes.push('type-filtered-text', `font-${config.fontSize}`)
-      classes = classes.filter(item => item !== 'cove-component__content')
+      classes = classes.filter(item => item !== 'cove-visualization__body')
+      return classes
+    }
+
+    if (config.type === 'dashboard') {
+      classes.push('type-dashboard')
       return classes
     }
 
@@ -66,41 +74,31 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
       config?.visualizationType === 'Spark Line' && classes.push(`type-sparkline`)
       return classes
     }
+
     if (config.type === 'map') {
       classes.push(`type-map`)
-      if (config?.runtime?.editorErrorMessage.length !== 0) classes.push('type-map--has-error')
+      if (config?.runtime?.editorErrorMessage?.length) classes.push('type-map--has-error')
+      return classes
     }
 
     if (config.type === 'table') {
       classes.push('type-data-table')
+      return classes
     }
 
     if (config.type === 'data-bite') {
-      classes.push('cdc-open-viz-module', 'type-data-bite', currentViewport, config.theme, `font-${config.fontSize}`)
-      if (isEditor) {
-        classes.push('is-editor')
-      }
+      classes.push('type-data-bite', `font-${config.fontSize}`)
+      return classes
     }
 
     if (config.type === 'markup-include') {
-      classes.push('markup-include', 'cdc-open-viz-module')
+      classes.push('type-markup-include')
+      return classes
     }
 
     if (config.type === 'waffle-chart') {
-      classes.push(
-        'cove',
-        'cdc-open-viz-module',
-        'type-waffle-chart',
-        currentViewport,
-        config.theme,
-        'font-' + config.overallFontSize
-      )
+      classes.push('type-waffle-chart', 'font-' + config.overallFontSize)
 
-      if (isEditor) {
-        classes.push('is-editor')
-      }
-
-      // Add TP5 style classes
       if (config.visualizationType === 'TP5 Waffle') {
         classes.push('waffle__style--tp5')
         if (config.visual?.whiteBackground) {
@@ -115,8 +113,9 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
         }
       }
 
-      classes.push('cove-component', 'waffle-chart')
+      return classes
     }
+
     return classes
   }
 
@@ -131,5 +130,7 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
     </div>
   )
 })
+
+Visualization.displayName = 'Visualization'
 
 export default Visualization

@@ -308,17 +308,15 @@ lerna run --scope @cdc/embed start
 
 ```bash
 # Example: Chart package
-lerna run --scope @cdc/chart start -- --port 3001
-
-# Or use the npm script:
-npm run dev:chart
+lerna run --scope @cdc/chart start
+# Runs on port 8081
 ```
 
 **Step 3: Open the editor**
 
 ```bash
 # Visit the chart editor with a config that exists in BOTH packages
-http://localhost:3001?config=/examples/line-chart-states.json
+http://localhost:8081?config=/examples/line-chart-states.json&editor=true
 ```
 
 **Important Limitation:**
@@ -437,6 +435,8 @@ This allows messages from:
 - `https://*.cdc.gov` (any subdomain)
 - `http://localhost` and `http://127.0.0.1` (development only)
 
+Message validation is applied only to COVE protocol events (`cove:*`). Unrelated `postMessage` traffic is ignored silently to avoid console noise from other scripts/extensions.
+
 ### Config URL Validation
 
 The embed page validates configUrl parameters to prevent loading configs from external domains:
@@ -459,8 +459,10 @@ Implementation: `packages/core/helpers/embed/urlValidation.ts` - `isValidConfigU
 **Iframe not resizing:**
 
 - Check that iframe has `data-cove-id` attribute (added by helper)
-- Check browser console for postMessage errors
+- Check browser console for COVE `postMessage` errors
 - Verify embed page and partner page can communicate
+- Confirm resize messages use `type: "cove:resize"` and are sent from an allowed origin
+- Invalid-origin COVE messages are rejected and logged once with context (`origin`, `type`, `id`)
 
 **Filters not pre-selecting:**
 

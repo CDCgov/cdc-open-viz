@@ -12,9 +12,10 @@ import EditorPanel from './components/EditorPanel'
 
 // helpers
 import DataTransform from '@cdc/core/helpers/DataTransform'
+import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
-import Layout from '@cdc/core/components/Layout'
+import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 
 // external
 import parse from 'html-react-parser'
@@ -38,10 +39,6 @@ const CdcFilteredText = ({
   let { title, filters } = config
 
   const { contentClasses, innerContainerClasses } = useDataVizClasses(config)
-  const { visual } = config
-
-  const shouldApplyTopPadding = visual?.border || visual?.background || (config.title && config.titleStyle === 'legacy')
-  const shouldApplySidePadding = visual?.border || visual?.accent || visual?.background
 
   // Default Functions
 
@@ -51,9 +48,9 @@ const CdcFilteredText = ({
     let data = response.formattedData || response.data || {}
 
     if (response.dataUrl) {
-      const dataString = await fetch(response.dataUrl)
-
-      data = await dataString.json()
+      const { data: fetchedData, dataMetadata } = await fetchRemoteData(response.dataUrl)
+      data = fetchedData
+      response.dataMetadata = dataMetadata
       if (response.dataDescription) {
         data = transform.autoStandardize(data)
         data = transform.developerStandardize(data, response.dataDescription)
@@ -122,39 +119,29 @@ const CdcFilteredText = ({
   let content = <Loading />
 
   if (loading === false) {
-    let body = (
-      <>
-        <Layout.Responsive isEditor={isEditor}>
-          <div className={`cove-component__content no-borders`}>
-            <Title
-              classes={[`${config.theme}`, 'mb-0']}
-              title={title}
-              titleStyle={config.titleStyle}
-              config={config}
-              noContent={!config.textColumn}
-            />
-            <div
-              className={`${contentClasses.join(' ')} body${shouldApplyTopPadding ? ' has-top-padding' : ''}${
-                shouldApplySidePadding ? ' has-side-padding' : ''
-              }`}
-            >
-              {filterByTextColumn()
-                .slice(0, 1)
-                .map((el, i) => (
-                  <p key={i}> {parse(el[config.textColumn] || '')} </p>
-                ))}
-            </div>
-          </div>
-        </Layout.Responsive>
-      </>
+    const body = (
+      <VisualizationContent
+        innerClassName={innerContainerClasses.join(' ')}
+        bodyClassName={contentClasses.join(' ')}
+        header={
+          <Title
+            classes={[`${config.theme}`, 'mb-0']}
+            title={title}
+            titleStyle={config.titleStyle}
+            config={config}
+            noContent={!config.textColumn}
+          />
+        }
+      >
+        {filterByTextColumn()
+          .slice(0, 1)
+          .map((el, i) => (
+            <p key={i}> {parse(el[config.textColumn] || '')} </p>
+          ))}
+      </VisualizationContent>
     )
 
-    content = (
-      <>
-        {isEditor && <EditorPanel />}
-        {body}
-      </>
-    )
+    content = body
   }
   const values = {
     config,
@@ -169,9 +156,9 @@ const CdcFilteredText = ({
   return (
     <ErrorBoundary component='CdcFilteredText'>
       <ConfigContext.Provider value={values}>
-        <Layout.VisualizationWrapper config={config} isEditor={isEditor} showEditorPanel={config?.showEditorPanel}>
+        <VisualizationContainer config={config} isEditor={isEditor} editorPanel={<EditorPanel />}>
           {content}
-        </Layout.VisualizationWrapper>
+        </VisualizationContainer>
       </ConfigContext.Provider>
     </ErrorBoundary>
   )

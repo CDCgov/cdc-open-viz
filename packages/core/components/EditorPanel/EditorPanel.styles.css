@@ -3,9 +3,9 @@
 
 /* Color palette in editor panel context */
 .editor-panel .header .color-palette li {
-  width: 1.5em;
-  height: 1.5em;
   display: inline-block;
+  height: 1.5em;
+  width: 1.5em;
 }
 
 .editor-panel .color-palette {
@@ -13,12 +13,12 @@
 }
 
 .editor-panel .color-palette li {
-  width: 1.5em;
-  height: 1.5em;
-  display: inline-block;
-  margin-right: 0.5em;
-  cursor: pointer;
   border: rgba(0, 0, 0, 0.3) 3px solid;
+  cursor: pointer;
+  display: inline-block;
+  height: 1.5em;
+  margin-right: 0.5em;
+  width: 1.5em;
 }
 
 .editor-panel .color-palette li.active {
@@ -26,24 +26,24 @@
 }
 
 .editor-panel .color-palette a {
-  display: inline-block;
   border-bottom: 1px solid rgba(0, 0, 0, 0.8);
+  display: inline-block;
 }
 
 .editor-panel .color-palette.series-list {
+  border: none;
   flex-direction: column;
   padding: 0;
-  border: none;
 }
 
 .editor-panel .color-palette.series-list li {
-  padding: 0.3em 0.5em;
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: auto;
-  height: auto;
   border: 0;
+  display: flex;
+  height: auto;
+  justify-content: space-between;
+  padding: 0.3em 0.5em;
+  width: auto;
 }
 
 .editor-panel .color-palette.series-list li:not(:last-child) {
@@ -61,10 +61,10 @@
 }
 
 .editor-panel .guidance-link svg {
-  width: 60px;
   color: var(--blue);
-  margin-right: 1rem;
   height: 60px;
+  margin-right: 1rem;
+  width: 60px;
 }
 
 .editor-panel .guidance-link svg path {
@@ -72,18 +72,18 @@
 }
 
 .editor-panel .warning {
-  color: #d8000c;
   background-color: #ffd2d2;
-  padding: 0.75em 1em;
-  margin: 1em 0;
-  font-size: 0.8em;
   border: #d8000c 1px solid;
   border-radius: 0.4em;
+  color: #d8000c;
+  font-size: 0.8em;
+  margin: 1em 0;
+  padding: 0.75em 1em;
 }
 
 .editor-panel .warning strong {
-  font-weight: 600;
   display: block;
+  font-weight: 600;
 }
 
 .editor-panel .advanced {
@@ -96,18 +96,18 @@
 }
 
 .editor-panel .advanced .advanced-toggle-link {
-  padding-top: 1em;
-  display: block;
-  text-align: left;
   cursor: pointer;
+  display: block;
+  padding-top: 1em;
+  text-align: left;
   text-decoration: underline;
 }
 
 .editor-panel .advanced .advanced-toggle-link span {
-  text-decoration: none;
   display: inline-block;
   font-family: monospace;
   padding-right: 5px;
+  text-decoration: none;
 }
 
 .editor-panel .advanced .advanced-toggle-link:hover {
@@ -115,29 +115,29 @@
 }
 
 .editor-panel .advanced textarea {
-  height: 400px;
-  width: 100%;
-  font-size: 0.9em;
-  padding: 0.5em;
-  font-family: monospace;
   box-sizing: border-box;
+  font-family: monospace;
+  font-size: 0.9em;
+  height: 400px;
+  padding: 0.5em;
+  width: 100%;
 }
 
 .editor-panel .heading-2 {
   background: #565656;
+  border-bottom: #565656 3px solid;
   color: #fff;
   font-size: 1.1em;
   padding: 0.6em 1em;
   position: relative;
-  border-bottom: #565656 3px solid;
   z-index: 3;
 }
 
 .editor-panel label {
-  text-transform: uppercase;
   display: block;
   font-size: 0.8em;
   font-weight: 600;
+  text-transform: uppercase;
 }
 
 .editor-panel label:not(:first-child) {
@@ -145,8 +145,8 @@
 }
 
 .editor-panel label span.edit-label {
-  margin-bottom: 0.3em;
   display: block;
+  margin-bottom: 0.3em;
 }
 
 .editor-panel label span.column-heading {
@@ -158,25 +158,25 @@
 }
 
 .editor-panel label.checkbox span {
-  text-transform: none;
   font-size: 1em;
   font-weight: 400;
+  text-transform: none;
 }
 
 .editor-panel label.checkbox input {
-  margin-top: 0;
   margin-right: 0.5em;
+  margin-top: 0;
 }
 
 .editor-panel input[type='checkbox'],
 .editor-panel input[type='radio'] {
-  display: inline-block;
-  width: auto !important;
-  height: auto !important;
-  padding: 0;
-  margin-right: 0.5em;
   cursor: pointer;
+  display: inline-block;
+  height: auto !important;
+  margin-right: 0.5em;
+  padding: 0;
   user-select: none;
+  width: auto !important;
 }
 
 .editor-panel input[type='text'],
@@ -193,8 +193,8 @@
 
 .editor-panel .primary-fieldset {
   border-top: rgba(0, 0, 0, 0.3) 2px solid;
-  padding-top: 2em;
   margin-top: 2em;
+  padding-top: 2em;
 }
 
 .editor-panel ul.column-edit {
@@ -223,28 +223,28 @@
 
 .editor-panel .edit-block {
   border: 1px solid rgba(0, 0, 0, 0.3);
-  padding: 1em;
   margin-top: 1em;
+  padding: 1em;
   position: relative;
 }
 
 .editor-panel .edit-block .remove-column {
-  position: absolute;
-  top: 0;
-  right: 0;
-  border: 0;
   background: rgba(0, 0, 0, 0.1);
+  border: 0;
   color: #000;
+  cursor: pointer;
   font-size: 0.8em;
   padding: 0.3em;
-  cursor: pointer;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 .editor-panel span.subtext {
-  text-transform: none;
   display: block;
   font-size: 0.8em;
   font-weight: 400;
+  text-transform: none;
 }
 
 .editor-panel .sort-list {
@@ -252,12 +252,12 @@
 }
 
 .editor-panel .sort-list li {
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  padding: 0.3em;
-  display: flex;
   align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.2);
   cursor: move;
+  display: flex;
   margin-bottom: 0.3em;
+  padding: 0.3em;
 }
 
 .editor-panel .sort-list li svg {
@@ -265,8 +265,8 @@
 }
 
 .editor-panel .info {
-  margin-top: 1em;
   font-size: 0.9em;
+  margin-top: 1em;
 }
 
 /* React Tags Component styles (third-party library) */
@@ -275,8 +275,8 @@
 }
 
 .editor-panel .react-tags {
-  position: relative;
   cursor: text;
+  position: relative;
 }
 
 .editor-panel .react-tags input.react-tags__search-input {
@@ -296,20 +296,20 @@
 }
 
 .editor-panel .react-tags__selected-tag {
-  display: inline-block;
-  box-sizing: border-box;
+  background: #f1f1f1;
   border: 1px solid #d1d1d1;
   border-radius: 2px;
-  background: #f1f1f1;
-  padding: 0.4em 0.6em;
+  box-sizing: border-box;
+  display: inline-block;
   font-size: 0.8em;
-  margin-right: 0.3em;
   margin-bottom: 0.3em;
+  margin-right: 0.3em;
+  padding: 0.4em 0.6em;
 }
 
 .editor-panel .react-tags__selected-tag:after {
-  content: '\2715';
   color: #aaa;
+  content: '\2715';
   margin-left: 8px;
 }
 
@@ -330,12 +330,12 @@
 }
 
 .editor-panel .react-tags__search input {
-  max-width: 100%;
-  margin: 0;
-  outline: none;
-  padding: 0.5em 0.3em;
   font-size: inherit;
   line-height: inherit;
+  margin: 0;
+  max-width: 100%;
+  outline: none;
+  padding: 0.5em 0.3em;
 }
 
 .editor-panel .react-tags__search input::-ms-clear {
@@ -343,9 +343,9 @@
 }
 
 .editor-panel .react-tags__suggestions {
+  left: 0;
   position: absolute;
   top: 100%;
-  left: 0;
   width: 100%;
 }
 
@@ -356,13 +356,13 @@
 }
 
 .editor-panel .react-tags__suggestions ul {
-  margin: 4px -1px;
-  padding: 0;
-  list-style: none;
   background: white;
   border: 1px solid #d1d1d1;
   border-radius: 2px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  list-style: none;
+  margin: 4px -1px;
+  padding: 0;
 }
 
 .editor-panel .react-tags__suggestions li {
@@ -371,14 +371,14 @@
 }
 
 .editor-panel .react-tags__suggestions li mark {
-  text-decoration: underline;
   background: none;
   font-weight: 600;
+  text-decoration: underline;
 }
 
 .editor-panel .react-tags__suggestions li:hover {
-  cursor: pointer;
   background: #eee;
+  cursor: pointer;
 }
 
 .editor-panel .react-tags__suggestions li.is-active {
@@ -386,23 +386,23 @@
 }
 
 .editor-panel .react-tags__suggestions li.is-disabled {
-  opacity: 0.5;
   cursor: auto;
+  opacity: 0.5;
 }
 
 .editor-toggle {
-  position: fixed;
-  top: 1em;
-  right: 1em;
   background: var(--blue);
-  color: white;
   border: 0;
   border-radius: 0.5em;
-  padding: 0.5em 1em;
-  font-size: 1em;
+  color: white;
   cursor: pointer;
-  z-index: 9999999999;
   display: none;
+  font-size: 1em;
+  padding: 0.5em 1em;
+  position: fixed;
+  right: 1em;
+  top: 1em;
+  z-index: 9999999999;
 }
 
 .editor-toggle.active {
@@ -429,8 +429,8 @@
 }
 
 :is(span).edit-label {
-  margin-bottom: 0.3em;
   display: block;
+  margin-bottom: 0.3em;
 }
 
 .react-tooltip {

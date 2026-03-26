@@ -6,6 +6,7 @@ import MediaControls from '@cdc/core/components/MediaControls'
 import Loading from '@cdc/core/components/Loading'
 import DownloadButton from '../DownloadButton'
 import { customSort } from './helpers/customSort'
+import { applyCustomOrder } from './helpers/applyCustomOrder'
 import ChartHeader from './components/ChartHeader'
 import BoxplotHeader from './components/BoxplotHeader'
 import MapHeader from './components/MapHeader'
@@ -25,18 +26,17 @@ import isRightAlignedTableValue from '@cdc/core/helpers/isRightAlignedTableValue
 import './data-table.css'
 import _ from 'lodash'
 import { getDataSeriesColumns } from './helpers/getDataSeriesColumns'
+import { getMapDataTableColumnKeys } from './helpers/getMapDataTableColumnKeys'
 
 export type DataTableProps = {
   colorScale?: Function
   columns?: Record<string, Column>
   config: TableConfig
   dataConfig?: Object
-  defaultSortBy?: string
   displayGeoName?: (row: string) => string
   expandDataTable: boolean
   formatLegendLocation?: (row: string, runtimeLookup: string) => string
   groupBy?: string
-  headerColor?: string
   imageRef?: string
   indexTitle?: string
   isDebug?: boolean
@@ -64,6 +64,7 @@ export type DataTableProps = {
   showDownloadImgButton?: boolean
   showDownloadPdfButton?: boolean
   includeContextInDownload?: boolean
+  hasSubtextAbove?: boolean
   // Map-specific props (optional)
   legendMemo?: React.MutableRefObject<Map<any, any>>
   legendSpecialClassLastMemo?: React.MutableRefObject<Map<any, any>>
@@ -75,11 +76,9 @@ const DataTable = (props: DataTableProps) => {
     columns,
     config,
     dataConfig,
-    defaultSortBy,
     displayGeoName,
     expandDataTable,
     formatLegendLocation,
-    headerColor,
     rawData,
     runtimeData: parentRuntimeData,
     tabbingId,
@@ -91,6 +90,7 @@ const DataTable = (props: DataTableProps) => {
     showDownloadImgButton,
     showDownloadPdfButton,
     includeContextInDownload = false,
+    hasSubtextAbove = false,
     imageRef
   } = props
   const runtimeData = useMemo(() => {
@@ -106,11 +106,32 @@ const DataTable = (props: DataTableProps) => {
   }, [parentRuntimeData, config.table.pivot?.columnName, config.table.pivot?.valueColumns])
 
   const [expanded, setExpanded] = useState(expandDataTable)
-  const [sortBy, setSortBy] = useState<any>({
-    column: defaultSortBy || '',
-    asc: false,
-    colIndex: null
+
+  // Initialize sort state from config.table.defaultSort
+  const defaultSort = config.table?.defaultSort
+  const [sortBy, setSortBy] = useState<any>(() => {
+    if (defaultSort?.column) {
+      return {
+        column: defaultSort.column,
+        asc: defaultSort.sortDirection === 'asc' ? true : defaultSort.sortDirection === 'custom' ? null : false,
+        colIndex: null
+      }
+    }
+    return { column: '', asc: false, colIndex: null }
   })
+
+  // Re-sync sort state when defaultSort changes in the editor
+  useEffect(() => {
+    if (defaultSort?.column) {
+      setSortBy({
+        column: defaultSort.column,
+        asc: defaultSort.sortDirection === 'asc' ? true : defaultSort.sortDirection === 'custom' ? null : false,
+        colIndex: null
+      })
+    } else {
+      setSortBy({ column: '', asc: false, colIndex: null })
+    }
+  }, [defaultSort?.column, defaultSort?.sortDirection, defaultSort?.customOrder])
 
   const [accessibilityLabel, setAccessibilityLabel] = useState('')
 
@@ -157,6 +178,14 @@ const DataTable = (props: DataTableProps) => {
   }
 
   const rawRows = Object.keys(runtimeData).filter(column => column != 'columns')
+
+  // Determine if custom order sort is active (user hasn't overridden by clicking a column header)
+  const isCustomOrderActive =
+    sortBy.asc === null &&
+    defaultSort?.sortDirection === 'custom' &&
+    defaultSort?.customOrder?.length > 0 &&
+    sortBy.column === defaultSort.column
+
   const rows =
     isVertical && sortBy.column
       ? rawRows.sort((a, b) => {
@@ -174,6 +203,10 @@ const DataTable = (props: DataTableProps) => {
           if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date-time') {
             dataA = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[a][config.xAxis.dataKey])
             dataB = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[b][config.xAxis.dataKey])
+          }
+          // Use custom order when active
+          if (isCustomOrderActive && dataA !== undefined && dataB !== undefined) {
+            return applyCustomOrder(dataA, dataB, defaultSort.customOrder)
           }
           return dataA || dataB ? customSort(dataA, dataB, sortBy, config) : 0
         })
@@ -229,14 +262,6 @@ const DataTable = (props: DataTableProps) => {
   const getClassNames = (): string => {
     const classes = ['data-table-container']
 
-    const hasDownloadLinkAbove =
-      (config.table.download || showDownloadImgButton || showDownloadPdfButton) && !config.table.showDownloadLinkBelow
-    const isStandaloneTable = config.type === 'table'
-
-    if (!hasDownloadLinkAbove && !isStandaloneTable) {
-      classes.push('mt-4')
-    }
-
     classes.push(viewport)
 
     return classes.join(' ')
@@ -250,6 +275,10 @@ const DataTable = (props: DataTableProps) => {
       const filterColumns = [...sharedFilterColumns, ...vizFilterColumns]
       const getVisibleColumns = () => {
         if (!config.columns) return []
+
+        if (config.type === 'map') {
+          return getMapDataTableColumnKeys(config.columns).map(columnKey => config.columns[columnKey].name)
+        }
 
         return Object.values(config.columns)
           .filter(col => col.dataTable !== false)
@@ -325,7 +354,7 @@ const DataTable = (props: DataTableProps) => {
       const classes = ['download-links']
       if (!belowTable) {
         if (hasDownloadLink) {
-          classes.push('mt-4', 'mb-2')
+          classes.push('mb-2')
         }
       } else {
         if (hasDownloadLink) {
@@ -394,7 +423,6 @@ const DataTable = (props: DataTableProps) => {
             <DownloadButton
               rawData={getDownloadData()}
               fileName={`${vizTitle || 'data-table'}.csv`}
-              headerColor={headerColor}
               interactionLabel={interactionLabel}
               config={config}
             />

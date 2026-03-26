@@ -5,6 +5,7 @@ import { VizFilter } from '@cdc/core/types/VizFilter'
 export type Config = {
   type: string
   data: Object[]
+  dataMetadata?: Record<string, string>
   dataBite: string
   dataFunction: string
   dataColumn: string
@@ -29,6 +30,7 @@ export type Config = {
   subtext: string
   title: string
   theme: string
+  /** @deprecated shadows have been removed from data bites */
   shadow: boolean
   visual: {
     border: boolean
@@ -38,9 +40,11 @@ export type Config = {
     borderColorTheme: boolean
     showTitle: boolean
     whiteBackground: boolean
+    useWrap?: boolean
   }
   general: {
     isCompactStyle: boolean
   }
   version: Version
+  locale: string
 } & MarkupConfig

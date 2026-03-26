@@ -1,16 +1,12 @@
-.markup-include {
-  .cove-component__content-wrap {
-    padding: 0;
+@import '@cdc/core/styles/layout/wrapper-padding';
 
-    &.has-top-padding {
-      padding-top: 1rem;
-      padding-bottom: 1rem;
-    }
+.cove-visualization.type-markup-include {
+  .cove-visualization__body {
+    @include cove-visualization-body-padding;
+  }
 
-    &.has-side-padding {
-      padding-left: 1rem;
-      padding-right: 1rem;
-    }
+  .cove-visualization__body-wrap {
+    @include cove-visualization-body-wrap-inline-padding;
 
     h1,
     h2,
@@ -24,7 +20,7 @@
     }
   }
 
-  .cove-component__content.component--hideBackgroundColor {
+  .cove-visualization__body.component--hide-background-color {
     background: transparent;
   }
 
@@ -47,6 +43,7 @@
     float: left;
   }
 }
+
 .cove-editor .cove-editor__content {
   padding-left: 350px;
   display: flex;

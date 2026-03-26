@@ -1,0 +1,30 @@
+{
+  "lastUpdated": "January 15, 2026",
+  "source": "CDC NREVSS",
+  "data": [
+    {
+      "Insured Rate": "43",
+      "Coverage Status": "Insured",
+      "state": "Alabama",
+      "Year (Good filter option)": "2010"
+    },
+    {
+      "Insured Rate": "72.7",
+      "Coverage Status": "Insured",
+      "state": "Arizona",
+      "Year (Good filter option)": "2010"
+    },
+    {
+      "Insured Rate": "37.2",
+      "Coverage Status": "Insured",
+      "state": "California",
+      "Year (Good filter option)": "2010"
+    },
+    {
+      "Insured Rate": "50.6",
+      "Coverage Status": "Insured",
+      "state": "Colorado",
+      "Year (Good filter option)": "2010"
+    }
+  ]
+}

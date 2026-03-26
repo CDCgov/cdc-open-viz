@@ -16,7 +16,7 @@ import { ChartContext } from '../../../../types/ChartContext'
 import { PanelProps } from '../PanelProps'
 import { checkColorContrast, getColorContrast } from '@cdc/core/helpers/cove/accessibility'
 import { getColorScale } from '../../../../helpers/getColorScale'
-import _ from 'lodash'
+import { sanitizeToSvgId } from '@cdc/core/helpers/cove/string'
 
 const PanelPatternSettings: FC<PanelProps> = props => {
   const { config, updateConfig, transformedData } = useContext<ChartContext>(ConfigContext)
@@ -67,19 +67,6 @@ const PanelPatternSettings: FC<PanelProps> = props => {
       default:
         return 8
     }
-  }
-
-  // Get unique values from a specific data field for dropdown options
-  const getDataValueOptions = (dataKey: string) => {
-    if (!dataKey || !Array.isArray(transformedData) || transformedData.length === 0) {
-      return []
-    }
-
-    const uniqueValues = Array.from(new Set(transformedData.map(row => row[dataKey])))
-      .filter(val => val !== undefined && val !== null && val !== '')
-      .sort()
-
-    return uniqueValues.map(value => ({ value: String(value), label: String(value) }))
   }
 
   const getFieldOptions = () => {
@@ -282,11 +269,6 @@ const PanelPatternSettings: FC<PanelProps> = props => {
       [field]: value
     }
 
-    // Clear dataValue if dataKey is being cleared or set to 'Select'
-    if (field === 'dataKey' && (value === 'Select' || value === '')) {
-      updatedPattern.dataValue = ''
-    }
-
     const newPatterns = {
       ...(legendCfg.patterns || {}),
       [patternKey]: updatedPattern
@@ -333,14 +315,18 @@ const PanelPatternSettings: FC<PanelProps> = props => {
         {/* Individual Pattern Configurations */}
         {Object.entries(currentPatterns).map(([patternKey, pattern], index) => {
           const p: LegendPattern = pattern || {}
-          const dataValueOptions = p.dataKey ? getDataValueOptions(p.dataKey) : []
+          const domPatternKey = `${sanitizeToSvgId(patternKey)}-${index}`
 
           return (
             <Accordion allowZeroExpanded key={`pattern-accordion-${index}`}>
               <AccordionItem>
                 <AccordionItemHeading>
                   <AccordionItemButton>
-                    {p.dataKey && p.dataValue ? `${p.dataKey}: ${p.dataValue}` : `Pattern ${index + 1}`}
+                    {p.dataKey && p.dataValue
+                      ? `${p.dataKey}: ${p.dataValue}`
+                      : p.dataValue
+                      ? `All Series: ${p.dataValue}`
+                      : `Pattern ${index + 1}`}
                   </AccordionItemButton>
                 </AccordionItemHeading>
                 <AccordionItemPanel>
@@ -359,32 +345,28 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                     value={p.dataKey || ''}
                     options={fieldOptions}
                     initial='Select Data Key'
-                    fieldName={`pattern-datakey-${patternKey}`}
+                    fieldName={`pattern-datakey-${domPatternKey}`}
                     updateField={(section, subsection, fieldName, value) =>
                       handlePatternUpdate(patternKey, 'dataKey', value)
                     }
                   />
 
-                  {p.dataKey && (
-                    <>
-                      <label htmlFor={`pattern-datavalue-${patternKey}`}>
-                        Data Value:
-                        <input
-                          type='text'
-                          id={`pattern-datavalue-${patternKey}`}
-                          value={p.dataValue || ''}
-                          onChange={e => handlePatternUpdate(patternKey, 'dataValue', e.target.value)}
-                          placeholder='Enter data value'
-                        />
-                      </label>
-                    </>
-                  )}
+                  <label htmlFor={`pattern-datavalue-${domPatternKey}`}>
+                    Data Value:
+                    <input
+                      type='text'
+                      id={`pattern-datavalue-${domPatternKey}`}
+                      value={p.dataValue || ''}
+                      onChange={e => handlePatternUpdate(patternKey, 'dataValue', e.target.value)}
+                      placeholder='Enter data value'
+                    />
+                  </label>
 
-                  <label htmlFor={`pattern-label-${patternKey}`}>
+                  <label htmlFor={`pattern-label-${domPatternKey}`}>
                     Label (optional):
                     <input
                       type='text'
-                      id={`pattern-label-${patternKey}`}
+                      id={`pattern-label-${domPatternKey}`}
                       value={p.label || ''}
                       onChange={e => handlePatternUpdate(patternKey, 'label', e.target.value)}
                     />
@@ -394,7 +376,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                     label='Pattern Type:'
                     value={p.shape || 'circles'}
                     options={patternTypes}
-                    fieldName={`pattern-type-${patternKey}`}
+                    fieldName={`pattern-type-${domPatternKey}`}
                     updateField={(section, subsection, fieldName, value) =>
                       handlePatternUpdate(patternKey, 'shape', value)
                     }
@@ -404,14 +386,14 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                     label='Pattern Size:'
                     value={getPatternSizeText(p.patternSize || 8)}
                     options={patternSizes}
-                    fieldName={`pattern-size-${patternKey}`}
+                    fieldName={`pattern-size-${domPatternKey}`}
                     updateField={(section, subsection, fieldName, value) =>
                       handlePatternUpdate(patternKey, 'patternSize', getPatternSizeNumeric(value))
                     }
                   />
 
                   <div className='mt-3'>
-                    <label htmlFor={`pattern-color-${patternKey}`}>
+                    <label htmlFor={`pattern-color-${domPatternKey}`}>
                       Pattern Color
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
@@ -430,7 +412,7 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                       <input
                         type='text'
                         value={p.color || ''}
-                        id={`pattern-color-${patternKey}`}
+                        id={`pattern-color-${domPatternKey}`}
                         onChange={e => handlePatternUpdate(patternKey, 'color', e.target.value)}
                         placeholder='#666666'
                       />

@@ -1,0 +1,18 @@
+{
+  "lastUpdated": "January 15, 2026",
+  "source": "CDC NREVSS",
+  "data": [
+    { "Location": "Alaska", "Year": "2019", "Type": "Federal", "Amount": "1377" },
+    { "Location": "Alaska", "Year": "2019", "Type": "Local", "Amount": "1613" },
+    { "Location": "Alaska", "Year": "2019", "Type": "State", "Amount": "1495" },
+    { "Location": "Alaska", "Year": "2020", "Type": "Federal", "Amount": "1377" },
+    { "Location": "Alaska", "Year": "2020", "Type": "Local", "Amount": "1613" },
+    { "Location": "Alaska", "Year": "2020", "Type": "State", "Amount": "1495" },
+    { "Location": "Alabama", "Year": "2019", "Type": "Federal", "Amount": "1375" },
+    { "Location": "Alabama", "Year": "2019", "Type": "Local", "Amount": "1611" },
+    { "Location": "Alabama", "Year": "2019", "Type": "State", "Amount": "1493" },
+    { "Location": "Alabama", "Year": "2020", "Type": "Federal", "Amount": "1375" },
+    { "Location": "Alabama", "Year": "2020", "Type": "Local", "Amount": "1611" },
+    { "Location": "Alabama", "Year": "2020", "Type": "State", "Amount": "1493" }
+  ]
+}

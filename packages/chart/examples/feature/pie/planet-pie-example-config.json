@@ -70,6 +70,7 @@
     "hide": false
   },
   "table": {
+    "showDownloadImgButton": true,
     "label": "Data Table",
     "expanded": false
   }

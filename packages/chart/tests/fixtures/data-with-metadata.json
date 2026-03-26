@@ -1,0 +1,10 @@
+{
+  "lastUpdated": "January 15, 2026",
+  "source": "CDC NREVSS",
+  "data": [
+    { "STATE": "AL", "Rate": "10", "Location": "Home" },
+    { "STATE": "AK", "Rate": "12", "Location": "Home" },
+    { "STATE": "FL", "Rate": "10", "Location": "Work" },
+    { "STATE": "GA", "Rate": "12", "Location": "Work" }
+  ]
+}

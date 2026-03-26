@@ -3,6 +3,7 @@ import { LinePath, AreaClosed, AreaStack } from '@visx/shape'
 import * as allCurves from '@visx/curve'
 import { handleLineType } from '../../helpers/handleLineType'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
+import { getPatternUrl as getPatternUrlForBar } from '../BarChart/helpers/getPatternUrl'
 
 interface MiniChartPreviewProps {
   series: any[]
@@ -33,6 +34,8 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
     const lineSeries = isComboChart
       ? series.filter(s => !barSeriesTypes.has(s.type) && s.type !== 'Area Chart')
       : series
+    const patternSeriesKeys = Array.isArray(series) ? series.map(_series => _series.dataKey) : []
+    const allowGroupedNonSeriesFieldMatch = !config.series || config.series.length <= 1
 
     let barElements: React.ReactElement[] = []
 
@@ -43,30 +46,6 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
 
       const barStrokeColor = config?.barHasBorder === 'true' ? '#000' : 'transparent'
       const barStrokeWidth = config?.barHasBorder === 'true' ? 1 : 0
-
-      const getPatternUrl = (datum, seriesKey: string, value: string | number) => {
-        if (!config.legend?.patterns || Object.keys(config.legend.patterns).length === 0) {
-          return null
-        }
-
-        for (const [patternKey, patternObj] of Object.entries(config.legend.patterns)) {
-          const pattern = patternObj as any
-          if (pattern.dataKey && pattern.dataValue) {
-            if (pattern.dataKey === seriesKey && String(value) === String(pattern.dataValue)) {
-              return `url(#chart-pattern-${patternKey})`
-            }
-
-            if (!config.runtime?.seriesLabels || !config.runtime.seriesLabels[pattern.dataKey]) {
-              const dataFieldValue = datum[pattern.dataKey]
-              if (String(dataFieldValue) === String(pattern.dataValue)) {
-                return `url(#chart-pattern-${patternKey})`
-              }
-            }
-          }
-        }
-
-        return null
-      }
 
       tableData.forEach((d, i) => {
         const xVal = xScale(d[dataKey])
@@ -90,7 +69,15 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
             if (isNaN(value) || value === 0) return
 
             const seriesColor = colorScale?.(config.runtime.seriesLabels?.[s.dataKey] || s.dataKey) || '#666'
-            const patternUrl = getPatternUrl(d, s.dataKey, value)
+            const patternUrl = getPatternUrlForBar({
+              patterns: config.legend?.patterns,
+              datum: d,
+              seriesKey: s.dataKey,
+              seriesValue: value,
+              seriesLabels: config.runtime?.seriesLabels,
+              seriesKeys: patternSeriesKeys,
+              allowNonSeriesFieldMatch: true
+            })
 
             // Calculate the bottom and top of this segment
             // For stacked bars, each segment sits on top of the previous one
@@ -145,7 +132,15 @@ const MiniChartPreview = memo<MiniChartPreviewProps>(
             if (isNaN(value)) return
 
             const seriesColor = colorScale?.(config.runtime.seriesLabels?.[s.dataKey] || s.dataKey) || '#666'
-            const patternUrl = getPatternUrl(d, s.dataKey, value)
+            const patternUrl = getPatternUrlForBar({
+              patterns: config.legend?.patterns,
+              datum: d,
+              seriesKey: s.dataKey,
+              seriesValue: value,
+              seriesLabels: config.runtime?.seriesLabels,
+              seriesKeys: patternSeriesKeys,
+              allowNonSeriesFieldMatch: allowGroupedNonSeriesFieldMatch
+            })
 
             // Calculate bar position and height
             const valueY = miniYScale(value)

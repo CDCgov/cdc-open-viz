@@ -38,7 +38,11 @@ export const reducer = (state: State, action: DataTableActions) => {
     case 'SET_CURRENT_VIEWPORT':
       return { ...state, currentViewport: action.payload }
     case 'SET_SHOW_EDITOR_PANEL':
-      return { ...state, showEditorPanel: action.payload }
+      return {
+        ...state,
+        showEditorPanel: action.payload,
+        config: { ...(state.config || {}), showEditorPanel: action.payload }
+      }
     case 'SET_CONFIG':
       return { ...state, config: action.payload }
     case 'SET_COLUMNS':

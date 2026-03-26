@@ -8,8 +8,9 @@ import { colorPalettesChartV1, colorPalettesChartV2, sequentialPalettes } from '
 import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import Icon from '@cdc/core/components/ui/Icon'
-import { Select } from '@cdc/core/components/EditorPanel/Inputs'
+import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import { buildForecastPaletteOptions } from '../../../../helpers/buildForecastPaletteOptions'
+import { getSeriesColumnConfig, upsertSeriesColumnConfig } from '../../../../helpers/seriesColumnSettings'
 
 // Third Party
 import {
@@ -538,6 +539,84 @@ const SeriesDisplayInTooltip = props => {
   )
 }
 
+const SeriesColumnSettings = props => {
+  const { series } = props
+  const { config, updateConfig } = useContext(ConfigContext)
+  const { columnConfig } = getSeriesColumnConfig(config.columns || {}, series.dataKey)
+
+  const updateSeriesColumn = (fieldName, value) => {
+    const columns = upsertSeriesColumnConfig(config.columns || {}, series.dataKey, {
+      [fieldName]: value
+    })
+
+    updateConfig({
+      ...config,
+      columns
+    })
+  }
+
+  return (
+    <>
+      <span className='divider-heading'>Series Column Settings</span>
+      <TextField
+        value={columnConfig.label || ''}
+        section='seriesColumn'
+        subsection={series.dataKey}
+        fieldName='label'
+        label='Label'
+        updateField={(_section, _subsection, _fieldName, value) => updateSeriesColumn('label', value)}
+      />
+      <div className='three-col'>
+        <TextField
+          value={columnConfig.prefix || ''}
+          section='seriesColumn'
+          subsection={series.dataKey}
+          fieldName='prefix'
+          label='Prefix'
+          updateField={(_section, _subsection, _fieldName, value) => updateSeriesColumn('prefix', value)}
+        />
+        <TextField
+          value={columnConfig.suffix || ''}
+          section='seriesColumn'
+          subsection={series.dataKey}
+          fieldName='suffix'
+          label='Suffix'
+          updateField={(_section, _subsection, _fieldName, value) => updateSeriesColumn('suffix', value)}
+        />
+        <TextField
+          type='number'
+          value={columnConfig.roundToPlace ?? 0}
+          section='seriesColumn'
+          subsection={series.dataKey}
+          fieldName='roundToPlace'
+          label='Round'
+          updateField={(_section, _subsection, _fieldName, value) =>
+            updateSeriesColumn('roundToPlace', Number(value) || 0)
+          }
+        />
+      </div>
+      <CheckBox
+        value={columnConfig.commas || false}
+        section='seriesColumn'
+        subsection={series.dataKey}
+        fieldName='commas'
+        label='Add Commas to Numbers'
+        updateField={(_section, _subsection, _fieldName, value) => updateSeriesColumn('commas', value)}
+      />
+      {config.table.showVertical && (
+        <CheckBox
+          value={columnConfig.dataTable ?? true}
+          section='seriesColumn'
+          subsection={series.dataKey}
+          fieldName='dataTable'
+          label='Show in Data Table'
+          updateField={(_section, _subsection, _fieldName, value) => updateSeriesColumn('dataTable', value)}
+        />
+      )}
+    </>
+  )
+}
+
 const SeriesButtonRemove = props => {
   const { config, updateConfig } = useContext(ConfigContext)
   const { series, index } = props
@@ -637,6 +716,7 @@ const SeriesItem = props => {
               {chartsWithOptions.includes(config.visualizationType) && (
                 <AccordionItemPanel>
                   <Series.Input.Name series={series} index={i} />
+                  <Series.Input.ColumnSettings series={series} index={i} />
                   {showDynamicCategory && (
                     <>
                       <Select
@@ -722,7 +802,8 @@ const Series = {
   },
   Input: {
     Name: SeriesInputName,
-    Weight: SeriesInputWeight
+    Weight: SeriesInputWeight,
+    ColumnSettings: SeriesColumnSettings
   },
   Checkbox: {
     DisplayInTooltip: SeriesDisplayInTooltip

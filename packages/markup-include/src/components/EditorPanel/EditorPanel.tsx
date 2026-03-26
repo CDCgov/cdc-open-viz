@@ -14,7 +14,8 @@ import Icon from '@cdc/core/components/ui/Icon'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import MarkupVariablesEditor from '@cdc/core/components/EditorPanel/components/MarkupVariablesEditor'
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
-import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualSection'
+import StyleTreatmentSection from '@cdc/core/components/EditorPanel/sections/StyleTreatmentSection'
+import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import { Datasets } from '@cdc/core/types/DataSet'
 
 // styles
@@ -26,9 +27,24 @@ type MarkupIncludeEditorPanelProps = {
 
 const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
   const { config, data, isDashboard, loading, setParentConfig, updateConfig } = useContext(ConfigContext)
-  const { contentEditor, theme, visual } = config
+  const { contentEditor, theme, visual } = config || {}
   const { inlineHTML, srcUrl, title, useInlineHTML } = contentEditor || {}
   const updateField = updateFieldFactory(config, updateConfig, true)
+  const styleTreatment = visual?.tp5Treatment ? 'tp5' : 'legacy'
+
+  const handleStyleTreatmentChange = (value: string) => {
+    const useTp5Treatment = value === 'tp5'
+    updateConfig({
+      ...config,
+      visual: {
+        ...config.visual,
+        tp5Treatment: useTp5Treatment,
+        border: useTp5Treatment ? false : config.visual?.border,
+        borderColorTheme: useTp5Treatment ? false : config.visual?.borderColorTheme,
+        accent: useTp5Treatment ? false : config.visual?.accent
+      }
+    })
+  }
 
   const textAreaInEditorContainer = useRef(null)
 
@@ -67,7 +83,7 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
               updateField={updateField}
             />
             <Select
-              value={contentEditor.titleStyle || 'small'}
+              value={contentEditor?.titleStyle || 'small'}
               section='contentEditor'
               fieldName='titleStyle'
               label='Title Style'
@@ -87,6 +103,29 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
                     <p>
                       Consider heading order on your page when selecting the title style. For 508 reasons, ensure your
                       page follows a proper heading order.
+                    </p>
+                  </Tooltip.Content>
+                </Tooltip>
+              }
+            />
+            <Select
+              value={config.locale}
+              fieldName='locale'
+              label='Language for dates and numbers'
+              updateField={updateField}
+              options={[
+                { value: 'en-US', label: 'English (en-US)' },
+                { value: 'es-MX', label: 'Spanish (es-MX)' }
+              ]}
+              tooltip={
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>
+                      Change the language (locale) for this visualization to alter the way dates and numbers are
+                      formatted.
                     </p>
                   </Tooltip.Content>
                 </Tooltip>
@@ -131,7 +170,23 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
             </div>
           </Accordion.Section>
           <Accordion.Section title='Visual'>
-            <VisualSection config={config} updateField={updateField} updateConfig={updateConfig} />
+            <HeaderThemeSelector
+              selectedTheme={config.theme}
+              onThemeSelect={theme => updateConfig({ ...config, theme })}
+            />
+            <StyleTreatmentSection
+              styleTreatment={styleTreatment}
+              onStyleTreatmentChange={handleStyleTreatmentChange}
+              showStyleTreatment={false}
+              border={config.visual?.border}
+              borderColorTheme={config.visual?.borderColorTheme}
+              accent={config.visual?.accent}
+              background={config.visual?.background}
+              hideBackgroundColor={config.visual?.hideBackgroundColor}
+              showBackground
+              showHideBackgroundColor
+              updateField={updateField}
+            />
           </Accordion.Section>
           {isDashboard && (
             <Accordion.Section title='Footnotes'>
@@ -147,6 +202,7 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
               onChange={handleMarkupVariablesChange}
               enableMarkupVariables={config.enableMarkupVariables || false}
               onToggleEnable={handleToggleEnable}
+              dataMetadata={config.dataMetadata}
             />
           </Accordion.Section>
         </Accordion>

@@ -226,7 +226,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               data-tooltip-html={data.tooltips && config.enableTooltips && tooltipID !== '' ? sankeyToolTip : null}
               data-tooltip-id={`cdc-open-viz-tooltip-${runtime.uniqueId}-sankey`}
             >
-              {typeof node.value === 'number' ? node.value.toLocaleString() : node.value}
+              {typeof node.value === 'number' ? node.value.toLocaleString(config.locale) : node.value}
             </Text>
             <Text
               width={linkLength()}
@@ -281,7 +281,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
             >
               <tspan className={classStyle}>
                 {sankeyConfig.nodeValueStyle.textBefore +
-                  (typeof node.value === 'number' ? node.value.toLocaleString() : node.value) +
+                  (typeof node.value === 'number' ? node.value.toLocaleString(config.locale) : node.value) +
                   sankeyConfig.nodeValueStyle.textAfter}
               </tspan>
             </text>
@@ -394,7 +394,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
               textAnchor='start'
               style={{ pointerEvents: 'none' }}
             >
-              {typeof node.value === 'number' ? node.value.toLocaleString() : node.value}
+              {typeof node.value === 'number' ? node.value.toLocaleString(config.locale) : node.value}
             </Text>
             <Text
               x={node.x0! + textPositionHorizontal}

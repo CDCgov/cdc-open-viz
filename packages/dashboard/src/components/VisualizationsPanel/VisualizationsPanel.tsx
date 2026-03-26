@@ -1,65 +1,12 @@
 import { useContext, useState } from 'react'
-import type { AnyVisualization } from '@cdc/core/types/Visualization'
 import Widget from '../Widget/Widget'
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
-import { Table } from '@cdc/core/types/Table'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
+import { addVisualization } from '../../helpers/addVisualization'
 import { mapDataToConfig } from '../../helpers/mapDataToConfig'
 import './visualizations-panel-styles.css'
 import { MultiDashboardConfig } from '../../types/MultiDashboard'
 import { stripConfig } from '../../helpers/formatConfigBeforeSave'
-
-const addVisualization = (type, subType) => {
-  const modalWillOpen = type !== 'markup-include'
-  const newVisualizationConfig: Partial<AnyVisualization> = {
-    filters: [],
-    filterBehavior: 'Filter Change',
-    newViz: type !== 'table',
-    openModal: modalWillOpen,
-    uid: type + Date.now(),
-    type
-  }
-
-  switch (type) {
-    case 'chart':
-      newVisualizationConfig.visualizationType = subType
-      break
-    case 'map':
-      newVisualizationConfig.general = {}
-      newVisualizationConfig.general.geoType = subType
-      break
-    case 'data-bite' || 'waffle-chart' || 'filtered-text':
-      newVisualizationConfig.visualizationType = type
-      break
-    case 'table':
-      const tableConfig: Table = {
-        label: 'Data Table',
-        show: true,
-        showDownloadUrl: false,
-        showVertical: true,
-        expanded: true,
-        collapsible: true
-      }
-      newVisualizationConfig.table = tableConfig
-      newVisualizationConfig.columns = {}
-      newVisualizationConfig.dataFormat = {}
-      newVisualizationConfig.visualizationType = type
-      break
-    case 'markup-include':
-      newVisualizationConfig.visualizationType = type
-      break
-    case 'dashboardFilters': {
-      newVisualizationConfig.sharedFilterIndexes = []
-      newVisualizationConfig.visualizationType = type
-      break
-    }
-    default:
-      newVisualizationConfig.visualizationType = type
-      break
-  }
-
-  return newVisualizationConfig
-}
 
 const VisualizationsPanel = () => {
   const [advancedEditing, setAdvancedEditing] = useState(false)

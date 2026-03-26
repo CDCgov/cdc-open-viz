@@ -3,7 +3,9 @@ import Tooltip from '../../ui/Tooltip'
 import Icon from '../../ui/Icon'
 import { Visualization } from '../../../types/Visualization'
 import { UpdateFieldFunc } from '../../../types/UpdateFieldFunc'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import flatten from 'lodash/flatten'
+import uniq from 'lodash/uniq'
 import { MultiSelectFilter, VizFilter, VizFilterStyle } from '../../../types/VizFilter'
 import { handleSorting } from '../../Filters/helpers/handleSorting'
 import { filterOrderOptions } from '../../../helpers/filterOrderOptions'
@@ -27,7 +29,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
   const openControls = useState({})
   const [isNestedDragHovered, setIsNestedDragHovered] = useState(false)
   const dataColumns = useMemo(() => {
-    return _.uniq(_.flatten(rawData?.map(row => Object.keys(row))))
+    return uniq(flatten(rawData?.map(row => Object.keys(row))))
   }, [rawData])
 
   // Helper function to get filter values from various sources
@@ -35,13 +37,13 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
     if (filter.values && filter.values.length > 0) return filter.values
     if (filter.orderedValues && filter.orderedValues.length > 0) return filter.orderedValues
     if (filter.columnName && rawData && rawData.length > 0) {
-      return _.uniq(rawData.map(row => row[filter.columnName]))
+      return uniq(rawData.map(row => row[filter.columnName]))
     }
     return []
   }
 
   const removeFilter = index => {
-    let filters = _.cloneDeep(config.filters)
+    let filters = cloneDeep(config.filters)
 
     filters.splice(index, 1)
 
@@ -53,7 +55,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
   }
 
   const updateFilterDefaultValue = (index, value) => {
-    const filters = _.cloneDeep(config.filters)
+    const filters = cloneDeep(config.filters)
     const currentFilter = { ...filters[index], orderedValues: filters[index].values }
     currentFilter.defaultValue = value
     currentFilter.active = value
@@ -62,7 +64,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
   }
 
   const updateFilterStyle = (index, style: VizFilterStyle) => {
-    const filters = _.cloneDeep(config.filters)
+    const filters = cloneDeep(config.filters)
     const currentFilter = { ...filters[index], orderedValues: filters[index].values }
     currentFilter.filterStyle = style
     if (style === 'multi-select') {
@@ -78,8 +80,8 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
   }
 
   const handleNameChange = (filterIndex, columnName) => {
-    const values = _.uniq(rawData.map(row => row[columnName]))
-    const copiedFilter = { ..._.cloneDeep(config.filters[filterIndex]), columnName, values }
+    const values = uniq(rawData.map(row => row[columnName]))
+    const copiedFilter = { ...cloneDeep(config.filters[filterIndex]), columnName, values }
     handleSorting(copiedFilter) // sorts dropdown values in place
     copiedFilter.active = copiedFilter.values[0]
     const newFilters = config.filters.map((filter, index) => {
@@ -109,7 +111,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
     const [movedItem] = updatedValues.splice(idx1, 1)
     updatedValues.splice(idx2, 0, movedItem)
 
-    const filtersCopy = _.cloneDeep(config.filters)
+    const filtersCopy = cloneDeep(config.filters)
     const filterItem = { ...filtersCopy[filterIndex] }
 
     // Overwrite filterItem.values since thats what we map through in the editor panel
@@ -132,7 +134,7 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
 
   const handleFilterReorder = (idx1: number, idx2: number) => {
     if (idx1 === undefined || idx2 === undefined || idx1 === idx2) return
-    const filters = _.cloneDeep(config.filters)
+    const filters = cloneDeep(config.filters)
     const [movedFilter] = filters.splice(idx1, 1)
     filters.splice(idx2, 0, movedFilter)
     updateField(null, null, 'filters', filters)

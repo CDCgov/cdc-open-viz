@@ -22,6 +22,8 @@ import update_4_25_10 from './ver/4.25.10'
 import update_4_25_11 from './ver/4.25.11'
 import update_4_26_1 from './ver/4.26.1'
 import update_4_26_2 from './ver/4.26.2'
+import update_4_26_3 from './ver/4.26.3'
+import update_4_26_4 from './ver/4.26.4'
 
 import { stripDataFromConfig, restoreDataToConfig } from './configDataHelpers'
 
@@ -50,7 +52,9 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
     ['4.25.10', update_4_25_10, true],
     ['4.25.11', update_4_25_11, true],
     ['4.26.1', update_4_26_1],
-    ['4.26.2', update_4_26_2]
+    ['4.26.2', update_4_26_2],
+    ['4.26.3', update_4_26_3],
+    ['4.26.4', update_4_26_4]
   ]
 
   const initialVersion = genConfig.version
@@ -58,15 +62,15 @@ export const coveUpdateWorker = (config, multiDashboardVersion?) => {
   versions.forEach(([version, updateFunction, alwaysRun]: [string, UpdateFunction, boolean?]) => {
     if (versionNeedsUpdate(initialVersion, version) || alwaysRun) {
       genConfig = updateFunction(genConfig)
-
-      if (genConfig.multiDashboards) {
-        genConfig.multiDashboards.forEach((dashboard, index) => {
-          dashboard.type = 'dashboard'
-          genConfig.multiDashboards[index] = coveUpdateWorker(dashboard, genConfig.version)
-        })
-      }
     }
   })
+
+  if (genConfig.multiDashboards) {
+    genConfig.multiDashboards.forEach((dashboard, index) => {
+      dashboard.type = 'dashboard'
+      genConfig.multiDashboards[index] = coveUpdateWorker(dashboard, initialVersion)
+    })
+  }
 
   // Always set to the latest version
   genConfig.version = versions[versions.length - 1][0]

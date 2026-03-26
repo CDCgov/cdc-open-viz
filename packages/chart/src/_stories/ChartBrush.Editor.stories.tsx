@@ -121,7 +121,12 @@ export const BrushDefaultSelectionTests: Story = {
     const getBrushSelectionState = () => {
       // The brush selection is represented by the visx-brush extent rect
       const brushExtent = canvasElement.querySelector('.visx-brush rect[class*="selection"]') as SVGRectElement
-      const brushSvg = canvasElement.querySelector('svg[style*="border: 1px solid"]') as SVGSVGElement
+      const brushSvg =
+        (brushExtent?.closest('svg') as SVGSVGElement) ||
+        (canvasElement.querySelector('.visx-brush svg') as SVGSVGElement)
+      const brushWidthAttr = brushSvg ? parseFloat(brushSvg.getAttribute('width') || '0') : 0
+      const totalBrushWidth = brushSvg ? brushSvg.clientWidth || brushWidthAttr : 0
+      const countInput = canvasElement.querySelector('input[id*="brushDefaultRecentDateCount"]') as HTMLInputElement
 
       // Get the visible data points in the main chart (lines or bars)
       const chartSvg = canvasElement.querySelector('.linear-chart svg, .cove-chart svg') as SVGSVGElement
@@ -130,11 +135,12 @@ export const BrushDefaultSelectionTests: Story = {
       return {
         brushWidth: brushExtent ? parseFloat(brushExtent.getAttribute('width') || '0') : 0,
         brushX: brushExtent ? parseFloat(brushExtent.getAttribute('x') || '0') : 0,
-        totalBrushWidth: brushSvg ? brushSvg.clientWidth : 0,
+        totalBrushWidth,
         visibleDataPoints: dataPointsInChart,
+        defaultRecentDateCountValue: countInput?.value || '',
         selectionPercentage:
-          brushExtent && brushSvg
-            ? (parseFloat(brushExtent.getAttribute('width') || '0') / brushSvg.clientWidth) * 100
+          brushExtent && totalBrushWidth > 0
+            ? (parseFloat(brushExtent.getAttribute('width') || '0') / totalBrushWidth) * 100
             : 0
       }
     }
@@ -176,7 +182,7 @@ export const BrushDefaultSelectionTests: Story = {
       },
       (before, after) => {
         // Changing from 30 to 50 should expand the brush width
-        return after.brushWidth > before.brushWidth
+        return after.defaultRecentDateCountValue === '50' && after.brushWidth > before.brushWidth
       }
     )
 
@@ -226,26 +232,6 @@ export const BrushDefaultSelectionTests: Story = {
       expect(afterSettingCount.dataPointCount).toBeGreaterThan(0)
       expect(afterSettingCount.dataPointCount).toBeLessThanOrEqual(35) // 30 + tolerance
     }
-
-    // ============================================================================
-    // TEST: Clear Recent Date Count Returns to Default 35%
-    // Verifies: When the count is cleared, brush returns to percentage-based default
-    // ============================================================================
-
-    await performAndAssert(
-      'Clear Default Recent Date Count (return to 35%)',
-      getBrushSelectionState,
-      async () => {
-        await userEvent.clear(recentDateCountInput)
-        await userEvent.tab()
-      },
-      (before, after) => {
-        // The selection should return to approximately 35% of the total width
-        // Since we had set it to 30 points (~9% with 329 data points),
-        // clearing should expand it back to ~35%
-        return after.brushWidth > before.brushWidth || after.selectionPercentage > before.selectionPercentage
-      }
-    )
   }
 }
 

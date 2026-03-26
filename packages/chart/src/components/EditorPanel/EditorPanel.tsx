@@ -45,7 +45,10 @@ import '@cdc/core/components/EditorPanel/EditorPanel.styles.css'
 import './editor-panel.scss'
 import { Anchor } from '@cdc/core/types/Axis'
 import EditorPanelContext from './EditorPanelContext'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
+import flatMap from 'lodash/flatMap'
+import keys from 'lodash/keys'
+import uniq from 'lodash/uniq'
 import { adjustedSymbols as symbolCodes } from '@cdc/core/helpers/footnoteSymbols'
 import { updateFieldRankByValue } from './helpers/updateFieldRankByValue'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
@@ -55,6 +58,7 @@ import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { paletteMigrationMap, twoColorPaletteMigrationMap } from '@cdc/core/helpers/palettes/migratePaletteName'
 import { isV1Palette, migratePaletteWithMap } from '@cdc/core/helpers/palettes/utils'
 import { USE_V2_MIGRATION } from '@cdc/core/helpers/constants'
+import { getSeriesOwnedColumnNames } from '../../helpers/seriesColumnSettings'
 
 interface PreliminaryProps {
   config: ChartConfig
@@ -70,7 +74,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
   const hasComboBarSeries = isCombo && barSeriesExists
 
   const getColumnOptions = () => {
-    return _.uniq(_.flatMap(data, _.keys))
+    return uniq(flatMap(data, keys))
   }
 
   const getTypeOptions = () => {
@@ -935,6 +939,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
   // Extract column names from data with memoization (replaces getColumns)
   const allColumns = useDataColumns(dataSourceForColumns)
+  const seriesOwnedColumnNames = useMemo(() => getSeriesOwnedColumnNames(config.series), [config.series])
 
   // Filter out series columns and confidence key columns (except lower and upper)
   const filteredColumns = useMemo(() => {
@@ -1519,46 +1524,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     'Deviation Bar'
   ]
 
-  const columnsOptions = [
-    <option value='' key={'Select Option'}>
-      - Select Option -
-    </option>
-  ]
-
-  if (config.data && config.series) {
-    Object.keys(config.data?.[0] || []).map(colName => {
-      // OMIT ANY COLUMNS THAT ARE IN DATA SERIES!
-      const found = config?.series.some(series => series.dataKey === colName)
-      if (colName !== config.xAxis.dataKey && !found) {
-        // if not the index then add it
-        return columnsOptions.push(
-          <option value={colName} key={colName}>
-            {colName}
-          </option>
-        )
-      }
-    })
-  }
-
-  // for pie charts
-  if (!config.data && data) {
-    if (!data[0]) return
-    Object.keys(data[0]).map(colName => {
-      // OMIT ANY COLUMNS THAT ARE IN DATA SERIES!
-      const found = data.some(el => el.dataKey === colName)
-      if (colName !== config.xAxis.dataKey && !found) {
-        // if not the index then add it
-        return columnsOptions.push(
-          <option value={colName} key={colName}>
-            {colName}
-          </option>
-        )
-      }
-    })
-  }
-
   const removeAdditionalColumn = columnName => {
-    const newColumns = _.cloneDeep(config.columns)
+    const newColumns = cloneDeep(config.columns)
 
     delete newColumns[columnName]
 
@@ -2487,6 +2454,28 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
                               </>
                             )}
+                            <TextField
+                              value={config.yAxis.smallestLeftAxisMax}
+                              section='yAxis'
+                              fieldName='smallestLeftAxisMax'
+                              type='number'
+                              label='Smallest Left Axis Maximum'
+                              placeholder='Auto'
+                              tooltip={
+                                <Tooltip style={{ textTransform: 'none' }}>
+                                  <Tooltip.Target>
+                                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                  </Tooltip.Target>
+                                  <Tooltip.Content>
+                                    <p>
+                                      Example: If your data only goes up to 1, the axis might show 0, 0.2, 0.4, 0.6,
+                                      0.8, 1. Setting this to 5 would make the axis show 0, 1, 2, 3, 4, 5 instead.
+                                    </p>
+                                  </Tooltip.Content>
+                                </Tooltip>
+                              }
+                              updateField={updateFieldDeprecated}
+                            />
                           </>
                         )
                       )}
@@ -2886,7 +2875,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       />
 
                       <TextField
-                        value={config.yAxis.max}
+                        value={config.yAxis.rightMax}
                         section='yAxis'
                         fieldName='rightMax'
                         type='number'
@@ -2896,7 +2885,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                       />
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.rightMaxMessage}</span>
                       <TextField
-                        value={config.yAxis.min}
+                        value={config.yAxis.rightMin}
                         section='yAxis'
                         fieldName='rightMin'
                         type='number'
@@ -2905,6 +2894,28 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         updateField={updateFieldDeprecated}
                       />
                       <span style={{ color: 'red', display: 'block' }}>{warningMsg.minMsg}</span>
+                      <TextField
+                        value={config.yAxis.smallestRightAxisMax}
+                        section='yAxis'
+                        fieldName='smallestRightAxisMax'
+                        type='number'
+                        label='Smallest Right Axis Maximum'
+                        placeholder='Auto'
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                Example: If your data only goes up to 1, the axis might show 0, 0.2, 0.4, 0.6, 0.8, 1.
+                                Setting this to 5 would make the axis show 0, 1, 2, 3, 4, 5 instead.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                        updateField={updateFieldDeprecated}
+                      />
                     </AccordionItemPanel>
                   </AccordionItem>
                 )}
@@ -4143,6 +4154,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                         config={config}
                         updateField={updateFieldDeprecated}
                         deleteColumn={removeAdditionalColumn}
+                        hiddenColumnNames={seriesOwnedColumnNames}
                       />{' '}
                     </AccordionItemPanel>
                   </AccordionItem>
@@ -4600,6 +4612,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     enableMarkupVariables={config.enableMarkupVariables || false}
                     onMarkupVariablesChange={variables => updateField(null, null, 'markupVariables', variables)}
                     onToggleEnable={enabled => updateField(null, null, 'enableMarkupVariables', enabled)}
+                    dataMetadata={config.dataMetadata}
                   />
                 )}
                 <Panels.SmallMultiples name='Small Multiples' />

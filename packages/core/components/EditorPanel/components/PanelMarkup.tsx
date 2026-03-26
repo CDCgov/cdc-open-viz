@@ -18,6 +18,8 @@ type PanelMarkupProps = {
   onToggleEnable: (enabled: boolean) => void
   /** Optional: wrap in accordion. Default true */
   withAccordion?: boolean
+  /** File-level metadata extracted from the data source */
+  dataMetadata?: Record<string, string>
 }
 
 /**
@@ -31,7 +33,8 @@ const PanelMarkup: React.FC<PanelMarkupProps> = ({
   enableMarkupVariables,
   onMarkupVariablesChange,
   onToggleEnable,
-  withAccordion = true
+  withAccordion = true,
+  dataMetadata
 }) => {
   const content = (
     <MarkupVariablesEditor
@@ -40,6 +43,7 @@ const PanelMarkup: React.FC<PanelMarkupProps> = ({
       onChange={onMarkupVariablesChange}
       enableMarkupVariables={enableMarkupVariables || false}
       onToggleEnable={onToggleEnable}
+      dataMetadata={dataMetadata}
     />
   )
 

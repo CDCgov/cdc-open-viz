@@ -15,7 +15,3 @@ export {
 } from './filterUtils'
 
 export { getConfigUrlParam, isValidConfigUrl, isValidMessageOrigin } from './urlValidation'
-
-// Import embed helper to initialize iframe resizing
-// This runs immediately when imported
-import './embedHelper.js'

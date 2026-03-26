@@ -1,3 +1,5 @@
-.cdc-open-viz-module.type-chart.lg.type-sparkline .filters-section {
-  margin: 0;
+.cove-visualization.type-chart.type-sparkline {
+  &.lg .filters-section {
+    margin: 0;
+  }
 }

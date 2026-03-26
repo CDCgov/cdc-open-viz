@@ -10,6 +10,20 @@ import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 export type RuntimeFilters = VizFilter[] & { fromHash?: number }
 
 type MapVisualSettings = {
+  /** border - shows or hides component border */
+  border?: boolean
+  /** borderColorTheme - use themed border color */
+  borderColorTheme?: boolean
+  /** accent - use accent styling */
+  accent?: boolean
+  /** background - use themed background color */
+  background?: boolean
+  /** hideBackgroundColor - hide default background color */
+  hideBackgroundColor?: boolean
+  /** tp5Treatment - render the TP5 callout shell */
+  tp5Treatment?: boolean
+  /** tp5Background - enable the TP5 cyan background */
+  tp5Background?: boolean
   /** minBubbleSize - Minimum Circle Size when the map has a type of bubble */
   minBubbleSize: number
   /** maxBubbleSize - Maximum Circle Size when the map has a type of bubble */
@@ -29,9 +43,9 @@ type MapVisualSettings = {
 }
 
 export type PatternSelection = {
-  // dropdown selection for getting the column used on a pattern
+  // column used to match patterns; empty string means match dataValue across all row columns
   dataKey: string
-  // text field input to match values found in the column
+  // value to match (numeric-like values are compared numerically)
   dataValue: string
   // style of pattern to use
   pattern: 'lines' | 'circles' | 'waves'
@@ -51,7 +65,7 @@ type BaseColumnProperties = Pick<EditorColumnProperties, 'name'> &
 type SimpleColumnProperties = Pick<EditorColumnProperties, 'name'>
 
 // Specific column types for better semantics
-type GeoColumnProperties = BaseColumnProperties
+type GeoColumnProperties = BaseColumnProperties & { displayColumn?: string }
 type LatitudeColumnProperties = SimpleColumnProperties
 type LongitudeColumnProperties = SimpleColumnProperties
 type NavigateColumnProperties = SimpleColumnProperties
@@ -156,6 +170,7 @@ export type MapConfig = Visualization & {
       fipsCode: string
       stateName: string
     }[]
+    hideUnselectedStates?: boolean
     countriesPicked?: {
       iso: string
       name: string
@@ -197,16 +212,19 @@ export type MapConfig = Visualization & {
     limitHeight: boolean
     height: string
     caption: string
+    download: boolean
+    downloadDataLabel?: string
+    downloadImageLabel?: string
     showDownloadUrl: boolean
     showFullGeoNameInCSV: boolean
     forceDisplay: boolean
-    download: boolean
     indexLabel: string
     cellMinWidth: string
   }
   tooltips: {
     appearanceType: 'hover' | 'click'
     linkLabel: string
+    noDataLabel?: string
     opacity: number
   }
   runtime: {

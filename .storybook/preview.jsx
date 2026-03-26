@@ -5,8 +5,9 @@ import '@cdc/core/dist/cove-main.css'
 export const parameters = {
   options: {
     storySort: {
+      method: 'alphabetical',
       includeNames: true,
-      order: ['Guides', 'Components', ['Atoms', 'Molecules', 'Organisms', 'Templates', 'Pages']]
+      order: ['Guides', 'Components', ['Atoms', 'Molecules', 'Organisms', 'Templates', 'Pages'], 'Regression Tests']
     }
   },
   actions: { argTypesRegex: '^on[A-Z].*' },

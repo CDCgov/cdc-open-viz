@@ -80,7 +80,7 @@ function findNearestHeadingIndex(parentChildren: Element[], vizWrapperIndex: num
     const child = parentChildren[i] as HTMLElement
 
     // STOP: Another visualization found - don't include its content
-    if (child.classList.contains('cdc-open-viz-module') || child.querySelector('.cdc-open-viz-module')) {
+    if (child.classList.contains('cove-visualization') || child.querySelector('.cove-visualization')) {
       return -1
     }
 
@@ -135,7 +135,7 @@ function buildContextClone(
 }
 
 function isInEditorMode(element: HTMLElement): boolean {
-  return element.closest('.cdc-open-viz-module.isEditor') !== null
+  return element.closest('.cove-visualization.is-editor') !== null
 }
 
 /**
@@ -239,7 +239,10 @@ function expandSvgWidths(clonedViz: HTMLElement): void {
     }
 
     // Remove animation classes to show final state immediately
-    svg.classList.remove('animated', 'animate')
+    const isAnimatedPie = svg.classList.contains('animated-pie')
+    if (!isAnimatedPie) {
+      svg.classList.remove('animated', 'animate')
+    }
   })
 }
 

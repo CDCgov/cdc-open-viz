@@ -31,8 +31,13 @@ const isAdditionalColumn = (column: string, config, rowData) => {
   return formattingParams
 }
 
-export const getChartCellValue = (row: string, column: string, config: TableConfig, runtimeData: Object[], rightAxisItemsMap) => {
-
+export const getChartCellValue = (
+  row: string,
+  column: string,
+  config: TableConfig,
+  runtimeData: Object[],
+  rightAxisItemsMap
+) => {
   // Variables for xAxis config
   const { type, dateDisplayFormat, dateParseFormat, dataKey: xAxisDataKey } = config.xAxis || {}
   const { showMissingDataLabel } = config.general || {}
@@ -54,14 +59,13 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
   if (column === xAxisDataKey) {
     const dateFormat = config.table?.dateDisplayFormat || dateDisplayFormat
     if (type === 'date' || type === 'date-time') {
-      cellValue = formatDate(dateFormat, parseDate(dateParseFormat, labelValue))
+      cellValue = formatDate(dateFormat, parseDate(dateParseFormat, labelValue), config.locale)
     } else if (type === 'continuous') {
       cellValue = formatNumber(runtimeData[row][column], 'bottom', false, config)
     } else {
       cellValue = labelValue
     }
   } else {
-
     let addColParams = isAdditionalColumn(column, config, rowObj)
 
     let piePercent = 0
@@ -69,9 +73,8 @@ export const getChartCellValue = (row: string, column: string, config: TableConf
       piePercent = (_.toNumber(runtimeData[row][column]) / _.sumBy(runtimeData, d => _.toNumber(d[column]))) * 100 || 0
     }
 
-    const valueToFormat = config.visualizationType === 'Pie' && !config.dataFormat.showPiePercent
-      ? piePercent
-      : runtimeData[row][column]
+    const valueToFormat =
+      config.visualizationType === 'Pie' && !config.dataFormat.showPiePercent ? piePercent : runtimeData[row][column]
 
     const hasAdditionalParams = Object.keys(addColParams).length > 0
 

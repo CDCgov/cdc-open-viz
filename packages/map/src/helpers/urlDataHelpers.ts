@@ -5,6 +5,7 @@ import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { MapConfig } from '../types/MapConfig'
 import { CSV_PARSE_CONFIG } from './constants'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
+import { extractDataAndMetadata } from '@cdc/core/helpers/extractDataAndMetadata'
 
 const buildQueryString = (params: Record<string, string>): string =>
   Object.keys(params)
@@ -34,6 +35,7 @@ export const reloadURLData = async (config: MapConfig, setConfig: (config: MapCo
 
   let dataUrlFinal = `${dataUrl.origin}${dataUrl.pathname}${buildQueryString(qsParams)}`
   let data
+  let dataMetadata: Record<string, string> = {}
 
   try {
     const regex = /(?:\.([^.]+))?$/
@@ -47,7 +49,10 @@ export const reloadURLData = async (config: MapConfig, setConfig: (config: MapCo
           return parsedCsv.data
         })
     } else if ('json' === ext || isSolrJson(dataUrlFinal)) {
-      data = await fetch(dataUrlFinal).then(response => response.json())
+      const json = await fetch(dataUrlFinal).then(response => response.json())
+      const extracted = extractDataAndMetadata(json)
+      data = extracted.data
+      dataMetadata = extracted.dataMetadata
     } else {
       data = []
     }
@@ -64,6 +69,7 @@ export const reloadURLData = async (config: MapConfig, setConfig: (config: MapCo
 
   const newConfig = cloneConfig(config)
   newConfig.data = data
+  newConfig.dataMetadata = dataMetadata
   newConfig.runtimeDataUrl = dataUrlFinal
 
   setConfig(newConfig)

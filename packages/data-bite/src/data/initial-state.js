@@ -27,12 +27,13 @@ export default {
   theme: 'theme-blue',
   shadow: false,
   visual: {
-    border: false,
+    border: true,
     accent: false,
     background: false,
     hideBackgroundColor: false,
     borderColorTheme: false,
-    showTitle: true
+    showTitle: true,
+    useWrap: false
   },
   general: {
     isCompactStyle: false

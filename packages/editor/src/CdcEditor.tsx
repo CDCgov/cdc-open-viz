@@ -19,7 +19,6 @@ import { legacyConfigSupport } from './helpers/legacyConfigSupport'
 
 import './scss/main.scss'
 import editorReducer, { EditorState } from '@cdc/core/contexts/editor.reducer'
-import _ from 'lodash'
 import { cloneConfig } from '@cdc/core/helpers/cloneConfig'
 import { WCMSProps } from '@cdc/core/types/WCMSProps'
 import { devToolsStore } from '@cdc/core/helpers/withDevTools'
@@ -73,7 +72,7 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
   }, [])
 
   useEffect(() => {
-    let strippedConfig = stripConfig(state.config)
+    let strippedConfig = stripConfig(state.config, true)
 
     const parsedData = JSON.stringify(strippedConfig)
     // Emit the data in a regular JS event so it can be consumed by anything.
@@ -99,7 +98,7 @@ const CdcEditor: React.FC<WCMSProps> = ({ config: configObj, hostname, container
     <GlobalContextProvider>
       <ConfigContext.Provider value={{ ...state, setTempConfig: setTempConfigAndUpdate }}>
         <EditorDispatchContext.Provider value={dispatch}>
-          <div className={`cdc-open-viz-module cdc-editor ${state.currentViewport}`} ref={outerContainerRef}>
+          <div className={`cove-visualization cdc-editor ${state.currentViewport}`} ref={outerContainerRef}>
             <Tabs className='top-level'>
               <TabPane title='1. Choose Visualization Type' className='choose-type'>
                 <ChooseTab />

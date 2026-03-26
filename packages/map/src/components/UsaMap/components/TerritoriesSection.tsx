@@ -39,6 +39,7 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
     })
 
   const isMobileViewport = isMobileTerritoryViewport(vizViewport)
+  const useCompactTerritorySpacing = isMobileViewport || currentViewport === 'sm' || currentViewport === 'md'
   const SVG_GAP = 9
   const SVG_WIDTH = isMobileViewport ? 30 : 45
 
@@ -59,7 +60,7 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
                   U.S. territories
                 </span>
                 <span
-                  className={`${isMobileViewport ? 'mt-1 mb-3' : 'mt-2 mb-4'} d-flex territories`}
+                  className={`${useCompactTerritorySpacing ? 'mt-1 mb-3' : 'mt-2 '} d-flex territories`}
                   style={
                     {
                       minWidth: `${usTerritories.length * SVG_WIDTH + (usTerritories.length - 1) * SVG_GAP}px`,
@@ -78,7 +79,7 @@ const TerritoriesSection: React.FC<TerritoriesSectionProps> = ({ territories, lo
                   Freely associated states
                 </span>
                 <span
-                  className={`${isMobileViewport ? 'mt-1 mb-3' : 'mt-2 mb-4'} d-flex territories`}
+                  className={`${useCompactTerritorySpacing ? 'mt-1 mb-3' : 'mt-2'} d-flex territories`}
                   style={
                     {
                       minWidth: `${

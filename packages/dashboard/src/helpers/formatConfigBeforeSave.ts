@@ -129,7 +129,7 @@ export const stripConfig = (configToStrip, isEditor = false) => {
   } else {
     delete strippedConfig.runtime
     delete strippedConfig.formattedData
-    if (strippedConfig.dataUrl) {
+    if (strippedConfig.dataUrl && !isEditor) {
       delete strippedConfig.data
     }
   }
