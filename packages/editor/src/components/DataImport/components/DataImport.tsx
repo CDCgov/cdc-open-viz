@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import axios from 'axios'
+import { csvFormat } from 'd3'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
@@ -435,6 +436,49 @@ const DataImport = () => {
     dispatch({ type: 'DELETE_DASHBOARD_DATASET', payload: { datasetKey } })
   }
 
+  const downloadCSV = (data: Array<Record<string, unknown>>, filename: string) => {
+    // Normalize filename: strip query/hash, remove path, replace extension with .csv
+    let baseName = filename || ''
+
+    const queryIndex = baseName.indexOf('?')
+    const hashIndex = baseName.indexOf('#')
+    const cutoffIndex = queryIndex === -1 ? hashIndex : hashIndex === -1 ? queryIndex : Math.min(queryIndex, hashIndex)
+    if (cutoffIndex !== -1) {
+      baseName = baseName.substring(0, cutoffIndex)
+    }
+
+    const lastSlash = Math.max(baseName.lastIndexOf('/'), baseName.lastIndexOf('\\'))
+    if (lastSlash !== -1) {
+      baseName = baseName.substring(lastSlash + 1)
+    }
+
+    const lastDot = baseName.lastIndexOf('.')
+    if (lastDot > 0) {
+      baseName = baseName.substring(0, lastDot)
+    }
+
+    if (!baseName) {
+      baseName = 'data'
+    }
+
+    const name = `${baseName}.csv`
+    const blob = new Blob(['\uFEFF' + csvFormat(data)], { type: 'text/csv;charset=utf-8;' })
+    // @ts-ignore
+    if (typeof window.navigator.msSaveBlob === 'function') {
+      // @ts-ignore
+      navigator.msSaveBlob(blob, name)
+    } else {
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = name
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    }
+  }
+
   const updateDataFromVegaConfig = pastedConfig => {
     const vegaConfig = parseVegaConfig(JSON.parse(pastedConfig))
     const newData = extractCoveData(vegaConfig)
@@ -639,7 +683,7 @@ const DataImport = () => {
                   <th>Name</th>
                   <th>Size</th>
                   <th>Type</th>
-                  <th colSpan={3}>Actions</th>
+                  <th colSpan={4}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -656,6 +700,20 @@ const DataImport = () => {
                             onClick={() => setGlobalDatasetProp(datasetKey, 'preview', true)}
                           >
                             Preview
+                          </button>
+                        </td>
+                        <td>
+                          <button
+                            className='btn btn-link p-1'
+                            disabled={!config.datasets[datasetKey].data?.length}
+                            onClick={() =>
+                              downloadCSV(
+                                config.datasets[datasetKey].data,
+                                config.datasets[datasetKey].dataFileName || datasetKey
+                              )
+                            }
+                          >
+                            Download
                           </button>
                         </td>
                         <td>
@@ -719,6 +777,14 @@ const DataImport = () => {
                         )}
                       </div>
                       <div>{resetButton()}</div>
+                      {config.data?.length > 0 && (
+                        <button
+                          className='btn btn-link p-1'
+                          onClick={() => downloadCSV(config.data, config.dataFileName || 'data')}
+                        >
+                          Download CSV
+                        </button>
+                      )}
                     </div>
                   )}
 
@@ -727,6 +793,14 @@ const DataImport = () => {
                       <div className='url-source-options'>
                         <div>{loadDataFromUrl()}</div>
                         <div>{resetButton()}</div>
+                        {config.data?.length > 0 && (
+                          <button
+                            className='btn btn-link p-1'
+                            onClick={() => downloadCSV(config.data, config.dataFileName || 'data')}
+                          >
+                            Download CSV
+                          </button>
+                        )}
                       </div>
                       {config.dataUrl && (config.type === 'chart' || config.type === 'map') && urlFilters}
                     </>
