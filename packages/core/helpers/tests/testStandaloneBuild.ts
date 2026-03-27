@@ -23,6 +23,11 @@ function copyDirSync(src, dest) {
 // Tests if a package can be built in isolation
 // See DOCS/PACKAGE_DEPENDENCIES.md for more details
 export async function testStandaloneBuild(pkgDir) {
+  // Quick mode bypass: run regular unit tests but skip expensive isolated build checks.
+  if (process.env.COVE_QUICK_TESTS === '1') {
+    return true
+  }
+
   pkgDir = pkgDir.replace('/src', '')
   const pkgName = pkgDir.split('/')[pkgDir.split('/').length - 1]
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), `cdc-open-viz-${pkgName}-`))
