@@ -346,7 +346,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
                 {!markupError && !_showNoDataMessage && (
                   <div id={scopeId}>
                     {scopedCSS && <style>{scopedCSS}</style>}
-                    <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
+                    <div className='cove-prose' dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
                   </div>
                 )}
                 {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
@@ -363,7 +363,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
             {!markupError && !_showNoDataMessage && (
               <div id={scopeId}>
                 {scopedCSS && <style>{scopedCSS}</style>}
-                <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
+                <div className='cove-prose' dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
               </div>
             )}
             {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}

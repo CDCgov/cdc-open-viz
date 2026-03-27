@@ -55,7 +55,6 @@ const Title = (props: HeaderProps) => {
   const updatedClasses = [
     'cove-visualization__title',
     'cove-visualization__header',
-    'cove-prose',
     ...(isDashboard ? ['mb-3'] : []),
     ...classes
   ]
@@ -64,7 +63,7 @@ const Title = (props: HeaderProps) => {
     title &&
     showTitle && (
       <>
-        <header className={updatedClasses.join(' ')} style={props.style}>
+        <header className={['cove-prose', ...updatedClasses].join(' ')} style={props.style}>
           {superTitle && <sup>{parse(superTitle)}</sup>}
           <h2>
             {parse(title)} {isDashboard}
