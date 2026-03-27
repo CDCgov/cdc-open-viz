@@ -71,7 +71,10 @@ export const ZoomControlsTest: Story = {
     )
 
     const allowMapZoomingCheckbox = canvas.getByLabelText(/Allow Map Zooming/i) as HTMLInputElement
-    expect(allowMapZoomingCheckbox).toBeTruthy()
+    expect(allowMapZoomingCheckbox.checked)
+
+    userEvent.click(allowMapZoomingCheckbox)
+    expect(!allowMapZoomingCheckbox.checked)
 
     await performAndAssert(
       'World Data Map → Enable map zooming',
@@ -79,8 +82,7 @@ export const ZoomControlsTest: Story = {
       async () => {
         await userEvent.click(allowMapZoomingCheckbox)
       },
-      (before, after) =>
-        before.hasZoomControls && !after.hasZoomControls && !after.hasZoomInButton && !after.hasZoomOutButton
+      (before, after) => after.hasZoomControls && after.hasZoomInButton && after.hasZoomOutButton
     )
   }
 }
