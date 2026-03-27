@@ -20,7 +20,7 @@ const Footnotes: React.FC<FootnotesProps> = ({ footnotes, footerClassName = 'mt-
   }
 
   return (
-    <footer className='col-12 ${footerClassName}'>
+    <footer className={`col-12 ${footerClassName}`}>
       <ul className='cove-footnotes'>
         {footnotes.map((note, i) => {
           return (
