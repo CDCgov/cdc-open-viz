@@ -45,13 +45,18 @@
       { "width": 4, "widget": "markup1" },
       { "width": 4, "widget": "markup2" },
       { "width": 4, "widget": "markup3" }
+    ],
+    [
+      { "width": 4, "widget": "waffle2" },
+      { "width": 4, "widget": "bite3" },
+      { "width": 4, "widget": "markup2" }
     ]
   ],
   "visualizations": {
     "waffle1": {
       "uid": "waffle1",
       "type": "waffle-chart",
-      "title": "Vaccination Coverage",
+      "title": "Vaccination",
       "visualizationType": "TP5 Waffle",
       "visualizationSubType": "linear",
       "showPercent": true,
@@ -76,7 +81,7 @@
     "waffle2": {
       "uid": "waffle2",
       "type": "waffle-chart",
-      "title": "Health Insurance Coverage Rate",
+      "title": "Health",
       "visualizationType": "TP5 Waffle",
       "visualizationSubType": "linear",
       "showPercent": true,
@@ -101,7 +106,7 @@
     "waffle3": {
       "uid": "waffle3",
       "type": "waffle-chart",
-      "title": "Cancer Screening Completion",
+      "title": "Cancer",
       "visualizationType": "TP5 Waffle",
       "visualizationSubType": "linear",
       "showPercent": true,
@@ -250,7 +255,7 @@
     "bite3": {
       "uid": "bite3",
       "type": "data-bite",
-      "title": "Cancer Screening Completion",
+      "title": "Cancer Screening Completion, and a little something else to make the title taller",
       "biteStyle": "tp5",
       "dataColumn": "Screening Rate",
       "dataFunction": "Mean (Average)",
