@@ -26,9 +26,27 @@ const addMarkupIncludeStyle = config => {
   }
 }
 
+const applyWaffleValueDescriptorDefaults = config => {
+  if (
+    config.type === 'waffle-chart' &&
+    (config.visualizationType === 'Waffle' || config.visualizationType === 'TP5 Waffle')
+  ) {
+    config.valueDescription = ''
+    config.showPercent = true
+    config.showDenominator = false
+  }
+
+  if (config.type === 'dashboard' && config.visualizations) {
+    Object.values((config as DashboardConfig).visualizations).forEach(visualization => {
+      applyWaffleValueDescriptorDefaults(visualization)
+    })
+  }
+}
+
 const run_4_26_4_migrations = config => {
   disableExtraChartVisualSettings(config)
   addMarkupIncludeStyle(config)
+  applyWaffleValueDescriptorDefaults(config)
 
   if (config.type === 'dashboard' && config.visualizations) {
     Object.values((config as DashboardConfig).visualizations).forEach(visualization => {
