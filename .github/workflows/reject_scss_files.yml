@@ -18,7 +18,7 @@ jobs:
 
       - name: Check for new .scss files in the PR
         run: |
-          added_files=$(git diff --diff-filter=A --name-only origin/${{ github.event.pull_request.base.ref }}...${{ github.sha }})
+          added_files=$(git diff --diff-filter=A --name-only ${{ github.event.pull_request.base.sha }}...${{ github.sha }})
 
           if echo "$added_files" | grep -q '\.scss$'; then
             echo "Error: PR contains newly added .scss files."

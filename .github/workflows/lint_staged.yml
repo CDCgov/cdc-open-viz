@@ -1,4 +1,4 @@
-name: Lint Staged Files
+name: Lint PR Changed Files
 
 on:
   pull_request:
@@ -28,7 +28,7 @@ jobs:
 
       - name: Lint changed files
         run: |
-          CHANGED_FILES=$(git diff --name-only --diff-filter=AM origin/${{ github.base_ref }}...HEAD | grep -E '\.(js|jsx|ts|tsx)$' || true)
+          CHANGED_FILES=$(git diff --name-only --diff-filter=AM ${{ github.event.pull_request.base.sha }}...HEAD | grep -E '\.(js|jsx|ts|tsx)$' || true)
 
           if [ -n "$CHANGED_FILES" ]; then
             npx eslint $CHANGED_FILES
