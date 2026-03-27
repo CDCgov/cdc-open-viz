@@ -38,6 +38,7 @@ export default {
     border: true,
     accent: false,
     background: false,
+    useWrap: false,
     hideBackgroundColor: false,
     borderColorTheme: false,
     colors: {

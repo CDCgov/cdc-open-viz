@@ -431,6 +431,15 @@ const EditorPanel = memo(props => {
             label='Use White Background Style'
             updateField={updateField}
           />
+          {config.visualizationType === 'TP5 Gauge' && (
+            <CheckBox
+              value={config.visual?.useWrap}
+              section='visual'
+              fieldName='useWrap'
+              label='Value Above Message'
+              updateField={updateField}
+            />
+          )}
         </Accordion.Section>
       )}
 
