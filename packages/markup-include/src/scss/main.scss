@@ -75,6 +75,13 @@
       margin-top: auto;
       margin-bottom: auto;
     }
+
+    // keep markup include images inlines on dashboards
+    // e.g. requested to help here: https://www.cdc.gov/fluview/surveillance/2026-week-10.html
+    // needed for backwards compatibility with existing dashboards, but also to prevent any future issues with images in markup include visualizations being forced to display as blocks
+    span>img {
+      display: inline;
+    }
   }
 
   .cove-visualization__body.component--hide-background-color {
