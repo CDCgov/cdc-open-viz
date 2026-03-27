@@ -122,7 +122,8 @@
     "rollup": "^4.59.0",
     "tar": "^7.5.11",
     "flatted": ">=3.4.2",
-    "effect": ">=3.20.0"
+    "effect": ">=3.20.0",
+    "handlebars": ">=4.7.9"
   },
   "scripts": {
     "backstop:approve": "backstop approve",
