@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import axios from 'axios'
+import { csvFormat } from 'd3'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
@@ -435,6 +436,19 @@ const DataImport = () => {
     dispatch({ type: 'DELETE_DASHBOARD_DATASET', payload: { datasetKey } })
   }
 
+  const downloadCSV = (data: object[], filename: string) => {
+    const name = filename.endsWith('.csv') ? filename : `${filename}.csv`
+    const blob = new Blob(['\uFEFF' + csvFormat(data)], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = name
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
   const updateDataFromVegaConfig = pastedConfig => {
     const vegaConfig = parseVegaConfig(JSON.parse(pastedConfig))
     const newData = extractCoveData(vegaConfig)
@@ -639,7 +653,7 @@ const DataImport = () => {
                   <th>Name</th>
                   <th>Size</th>
                   <th>Type</th>
-                  <th colSpan={3}>Actions</th>
+                  <th colSpan={4}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -656,6 +670,20 @@ const DataImport = () => {
                             onClick={() => setGlobalDatasetProp(datasetKey, 'preview', true)}
                           >
                             Preview
+                          </button>
+                        </td>
+                        <td>
+                          <button
+                            className='btn btn-link p-1'
+                            disabled={!config.datasets[datasetKey].data?.length}
+                            onClick={() =>
+                              downloadCSV(
+                                config.datasets[datasetKey].data,
+                                config.datasets[datasetKey].dataFileName || datasetKey
+                              )
+                            }
+                          >
+                            Download
                           </button>
                         </td>
                         <td>
@@ -719,6 +747,14 @@ const DataImport = () => {
                         )}
                       </div>
                       <div>{resetButton()}</div>
+                      {config.data?.length > 0 && (
+                        <button
+                          className='btn btn-link p-1'
+                          onClick={() => downloadCSV(config.data, config.dataFileName || 'data')}
+                        >
+                          Download CSV
+                        </button>
+                      )}
                     </div>
                   )}
 
@@ -727,6 +763,14 @@ const DataImport = () => {
                       <div className='url-source-options'>
                         <div>{loadDataFromUrl()}</div>
                         <div>{resetButton()}</div>
+                        {config.data?.length > 0 && (
+                          <button
+                            className='btn btn-link p-1'
+                            onClick={() => downloadCSV(config.data, config.dataFileName || 'data')}
+                          >
+                            Download CSV
+                          </button>
+                        )}
                       </div>
                       {config.dataUrl && (config.type === 'chart' || config.type === 'map') && urlFilters}
                     </>
