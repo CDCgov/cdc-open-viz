@@ -75,8 +75,10 @@ const testConfig = {
   contentEditor: {
     inlineHTML: '<h2>Test Markup Include</h2><p>{{test_variable}}</p>',
     showHeader: true,
+    style: 'default',
     srcUrl: '',
     title: 'Test Markup Include Title',
+    titleStyle: 'small',
     useInlineHTML: true,
     showNoDataMessage: false,
     noDataMessageText: 'No data available'
@@ -89,7 +91,6 @@ const testConfig = {
   legend: {},
   newViz: true,
   theme: 'theme-blue',
-  titleStyle: 'small',
   showTitle: true,
   type: 'markup-include',
   visual: {
@@ -154,6 +155,50 @@ export const GeneralSectionTests: Story = {
     const headerElement = modernHeader || legacyHeader
     expect(headerElement).toBeTruthy()
     expect(headerElement!.textContent?.trim()).toBe('Updated Markup Include Title E2E')
+
+    // ============================================================================
+    // TEST 2: Switch to TP5 Style
+    // Expectation: TP5 container appears and legacy title wrapper is removed
+    // ============================================================================
+    const styleSelect = canvasElement.querySelector('select[name="style"]') as HTMLSelectElement
+    expect(styleSelect).toBeTruthy()
+
+    await performAndAssert(
+      'Style Change to TP5',
+      () => ({
+        styleValue: styleSelect.value,
+        hasTp5Container: !!canvasElement.querySelector('.markup-include-component--tp5')
+      }),
+      async () => {
+        await userEvent.selectOptions(styleSelect, 'tp5')
+      },
+      (before, after) =>
+        before.styleValue !== after.styleValue &&
+        after.styleValue === 'tp5' &&
+        before.hasTp5Container !== after.hasTp5Container
+    )
+
+    // ============================================================================
+    // TEST 3: TP5 title visibility
+    // Expectation: TP5 heading hidden when title is empty, shown when title has value
+    // ============================================================================
+    await performAndAssert(
+      'TP5 Title Hidden When Empty',
+      () => !!canvasElement.querySelector('.markup-include-tp5 .cdc-callout__heading span'),
+      async () => {
+        await userEvent.clear(titleInput)
+      },
+      (before, after) => before !== after && after === false
+    )
+
+    await performAndAssert(
+      'TP5 Title Shows With Text',
+      () => canvasElement.querySelector('.markup-include-tp5 .cdc-callout__heading span')?.textContent?.trim() || '',
+      async () => {
+        await userEvent.type(titleInput, 'TP5 Title Test')
+      },
+      (before, after) => before !== after && after === 'TP5 Title Test'
+    )
   }
 }
 

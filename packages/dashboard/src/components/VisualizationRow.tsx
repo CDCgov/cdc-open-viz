@@ -149,7 +149,8 @@ const VisualizationRow: React.FC<VizRowProps> = ({
       setupTP5MinHeightEqualizer(rowElement, '.bite__style--tp5 .cdc-callout__heading'),
       setupTP5MinHeightEqualizer(rowElement, '.waffle__style--tp5 .cdc-callout__heading'),
       setupTP5MinHeightEqualizer(rowElement, '.gauge__style--tp5 .cdc-callout__heading'),
-      setupTP5MinHeightEqualizer(rowElement, '.gauge__style--tp5 .cove-gauge-chart__content')
+      setupTP5MinHeightEqualizer(rowElement, '.gauge__style--tp5 .cove-gauge-chart__content'),
+      setupTP5MinHeightEqualizer(rowElement, '.markup-include__style--tp5 .cdc-callout__heading')
     ].filter(Boolean) as Array<() => void>
 
     return () => {
@@ -160,7 +161,20 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   const isFilterRow = row.columns.some(
     col => col.widget && config.visualizations[col.widget]?.type === 'dashboardFilters'
   )
-  const needsEqualHeight = !!row.equalHeight && !isFilterRow
+  const isMultiColumn = row.columns.filter(c => c.width).length > 1
+  const hasTP5Content =
+    isMultiColumn &&
+    row.columns.some(col => {
+      if (!col.widget) return false
+      const viz = config.visualizations[col.widget]
+      return (
+        viz?.biteStyle === 'tp5' ||
+        viz?.visualizationType === 'TP5 Waffle' ||
+        viz?.visualizationType === 'TP5 Gauge' ||
+        viz?.contentEditor?.style === 'tp5'
+      )
+    })
+  const needsEqualHeight = (row.equalHeight || hasTP5Content) && !isFilterRow
 
   const show = useMemo(() => {
     if (row.toggle) {
