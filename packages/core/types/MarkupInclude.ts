@@ -13,6 +13,7 @@ export type MarkupIncludeConfig = Visualization & {
     showNoDataMessage?: boolean
     noDataMessageText?: string
     srcUrl: string
+    style?: 'default' | 'tp5'
     title: string
     titleStyle?: 'legacy' | 'large' | 'small'
     useInlineHTML: boolean
@@ -31,5 +32,6 @@ export type MarkupIncludeConfig = Visualization & {
     background: boolean
     hideBackgroundColor: boolean
     borderColorTheme: boolean
+    whiteBackground?: boolean
   }
 }

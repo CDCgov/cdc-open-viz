@@ -64,7 +64,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   // Custom States
   const container = useRef()
 
-  const { innerContainerClasses, contentClasses } = useDataVizClasses(config || {})
+  const { innerContainerClasses, contentClasses: rawContentClasses } = useDataVizClasses(config || {})
   const { contentEditor, theme, visual } = config || {}
   const {
     showNoDataMessage,
@@ -77,8 +77,24 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   // Support markupVariables at root level or inside contentEditor
   const markupVariables = config?.markupVariables || contentEditorMarkupVariables || []
 
-  const { inlineHTML, srcUrl, title, useInlineHTML } = contentEditor || {}
+  const { inlineHTML, srcUrl, title, useInlineHTML, style: contentStyle } = contentEditor || {}
+  const markupIncludeStyle = contentStyle || 'default'
+  const isTp5Style = markupIncludeStyle === 'tp5'
 
+  const contentClasses = isTp5Style
+    ? rawContentClasses.filter(
+        cls =>
+          cls !== 'component--has-accent' &&
+          cls !== 'component--has-background' &&
+          cls !== 'component--hide-background-color' &&
+          cls !== 'component--has-border-color-theme'
+      )
+    : rawContentClasses
+
+  const shouldApplyTopPadding =
+    !isTp5Style &&
+    (visual?.border || visual?.background || (contentEditor?.title && contentEditor?.titleStyle === 'legacy'))
+  const shouldApplySidePadding = !isTp5Style && (visual?.border || visual?.accent || visual?.background)
   // Default Functions
   const updateConfig = newConfig => {
     Object.keys(defaults).forEach(key => {
@@ -266,11 +282,19 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const _showNoDataMessage = processedMarkup.shouldShowNoDataMessage
 
   if (loading === false) {
+    const hasTp5Title = title && title.trim()
     content = !hideMarkupInclude && (
       <VisualizationContent
         innerClassName={`markup-include-content-container ${innerContainerClasses.join(' ')}`.trim()}
-        bodyClassName={`markup-include-component ${contentClasses.join(' ')}`.trim()}
-        message={
+        bodyClassName={`markup-include-component ${contentClasses.join(' ')}${
+          isTp5Style ? ' markup-include-component--tp5' : ''
+        }${isTp5Style && visual?.whiteBackground ? ' white-background-style' : ''}${
+          isTp5Style && visual?.whiteBackground && visual?.border ? ' display-border' : ''
+        }`.trim()}
+        bodyWrapClassName={`${isTp5Style ? 'markup-include-body-wrap--tp5' : ''}${
+          shouldApplyTopPadding ? ' has-top-padding' : ''
+        }${shouldApplySidePadding ? ' has-side-padding' : ''}`.trim()}
+        filters={
           config.filters && config.filters.length > 0 ? (
             <Filters
               config={config}
@@ -282,38 +306,69 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
           ) : null
         }
         header={
-          <Title
-            title={title}
-            isDashboard={isDashboard}
-            titleStyle={contentEditor?.titleStyle}
-            config={config}
-            classes={[`${theme}`, 'mb-0']}
-            noContent={!sanitizedHTML}
-          />
+          !isTp5Style ? (
+            <Title
+              title={title}
+              isDashboard={isDashboard}
+              titleStyle={contentEditor?.titleStyle}
+              config={config}
+              classes={[`${theme}`, 'mb-0']}
+              noContent={!sanitizedHTML}
+            />
+          ) : null
         }
         footer={
           <FootnotesStandAlone
-            config={configObj?.footnotes}
+            config={config?.footnotes}
             filters={config?.filters || []}
             markupVariables={markupVariables}
             enableMarkupVariables={config?.enableMarkupVariables}
             data={data}
             dataMetadata={config?.dataMetadata}
+            footerClassName={isTp5Style ? 'mt-3' : undefined}
           />
         }
       >
-        {_showNoDataMessage && (
-          <div className='no-data-message'>
-            <p>{`${noDataMessageText}`}</p>
+        {isTp5Style ? (
+          <div className='markup-include-tp5 cdc-callout d-flex flex-column h-100'>
+            {hasTp5Title && (
+              <h3 className='cdc-callout__heading fw-bold flex-shrink-0 d-flex align-items-start'>
+                <span>{title.trim()}</span>
+              </h3>
+            )}
+            <div className='cdc-callout__body d-flex flex-row align-content-start flex-grow-1'>
+              <div className='cdc-callout__content flex-grow-1 d-flex flex-column min-w-0'>
+                {_showNoDataMessage && (
+                  <div className='no-data-message'>
+                    <p>{`${noDataMessageText}`}</p>
+                  </div>
+                )}
+                {!markupError && !_showNoDataMessage && (
+                  <div id={scopeId}>
+                    {scopedCSS && <style>{scopedCSS}</style>}
+                    <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
+                  </div>
+                )}
+                {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
+              </div>
+            </div>
           </div>
+        ) : (
+          <>
+            {_showNoDataMessage && (
+              <div className='no-data-message'>
+                <p>{`${noDataMessageText}`}</p>
+              </div>
+            )}
+            {!markupError && !_showNoDataMessage && (
+              <div id={scopeId}>
+                {scopedCSS && <style>{scopedCSS}</style>}
+                <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
+              </div>
+            )}
+            {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
+          </>
         )}
-        {!markupError && !_showNoDataMessage && (
-          <div id={scopeId}>
-            {scopedCSS && <style>{scopedCSS}</style>}
-            <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
-          </div>
-        )}
-        {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
       </VisualizationContent>
     )
   }
@@ -333,7 +388,11 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
     <ErrorBoundary component='CdcMarkupInclude'>
       <ConfigContext.Provider value={{ config, updateConfig, loading, data: data, setParentConfig, isDashboard }}>
         {!config?.newViz && config?.runtime && config?.runtime.editorErrorMessage && <Error />}
-        <VisualizationContainer config={config} isEditor={isEditor} editorPanel={<EditorPanel datasets={datasets} />}>
+        <VisualizationContainer
+          config={config as any}
+          isEditor={isEditor}
+          editorPanel={<EditorPanel datasets={datasets} />}
+        >
           {content}
         </VisualizationContainer>
       </ConfigContext.Provider>

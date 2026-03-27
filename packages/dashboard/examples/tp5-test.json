@@ -40,6 +40,11 @@
       { "width": 4, "widget": "gauge1" },
       { "width": 4, "widget": "gauge2" },
       { "width": 4, "widget": "gauge3" }
+    ],
+    [
+      { "width": 4, "widget": "markup1" },
+      { "width": 4, "widget": "markup2" },
+      { "width": 4, "widget": "markup3" }
     ]
   ],
   "visualizations": {
@@ -260,6 +265,78 @@
       "theme": "theme-purple",
       "visual": {
         "hideBackgroundColor": false
+      }
+    },
+    "markup1": {
+      "uid": "markup1",
+      "type": "markup-include",
+      "title": "",
+      "theme": "theme-blue",
+      "contentEditor": {
+        "style": "tp5",
+        "title": "TP5 Markup Include",
+        "titleStyle": "small",
+        "useInlineHTML": true,
+        "inlineHTML": "<p><strong>68.5%</strong> of adults were vaccinated against seasonal flu in this sample dataset.</p>",
+        "srcUrl": "#example",
+        "showHeader": true,
+        "showNoDataMessage": false,
+        "noDataMessageText": "No Data Available"
+      },
+      "visual": {
+        "border": true,
+        "accent": false,
+        "whiteBackground": false,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false
+      }
+    },
+    "markup2": {
+      "uid": "markup2",
+      "type": "markup-include",
+      "title": "",
+      "theme": "theme-teal",
+      "contentEditor": {
+        "style": "tp5",
+        "title": "White Background TP5",
+        "titleStyle": "small",
+        "useInlineHTML": true,
+        "inlineHTML": "<p>This TP5 markup include uses white-background styling with border enabled for comparison.</p>",
+        "srcUrl": "#example",
+        "showHeader": true,
+        "showNoDataMessage": false,
+        "noDataMessageText": "No Data Available"
+      },
+      "visual": {
+        "border": true,
+        "accent": false,
+        "whiteBackground": true,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false
+      }
+    },
+    "markup3": {
+      "uid": "markup3",
+      "type": "markup-include",
+      "title": "",
+      "theme": "theme-purple",
+      "contentEditor": {
+        "style": "tp5",
+        "title": "TP5 Markup Include (No White BG)",
+        "titleStyle": "small",
+        "useInlineHTML": true,
+        "inlineHTML": "<p>This TP5 markup include uses the standard background and border settings for side-by-side alignment testing.</p>",
+        "srcUrl": "#example",
+        "showHeader": true,
+        "showNoDataMessage": false,
+        "noDataMessageText": "No Data Available"
+      },
+      "visual": {
+        "border": true,
+        "accent": false,
+        "whiteBackground": false,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false
       }
     }
   }
