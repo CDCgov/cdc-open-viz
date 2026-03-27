@@ -45,6 +45,11 @@
       { "width": 4, "widget": "markup1" },
       { "width": 4, "widget": "markup2" },
       { "width": 4, "widget": "markup3" }
+    ],
+    [
+      { "width": 4, "widget": "waffle2" },
+      { "width": 4, "widget": "bite3" },
+      { "width": 4, "widget": "markup2" }
     ]
   ],
   "visualizations": {
