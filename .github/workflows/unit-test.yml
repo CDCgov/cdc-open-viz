@@ -1,4 +1,4 @@
-iname: Unit Test CI
+name: Unit Test CI
 
 on:
   pull_request:
