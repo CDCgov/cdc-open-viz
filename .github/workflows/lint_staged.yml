@@ -8,26 +8,30 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '16'  # or the version you're using
+          node-version: '20'
+          cache: 'yarn'
 
       - name: Install dependencies
-        run: |
-          npm install
+        run: yarn install --frozen-lockfile
 
-      - name: Lint staged files
+      - name: Lint changed files
         run: |
-          STAGED_FILES=$(git diff --cached --name-only --diff-filter=AM | grep -E '\.(js|jsx|ts|tsx)$' || true)
+          CHANGED_FILES=$(git diff --name-only --diff-filter=AM origin/${{ github.base_ref }}...HEAD | grep -E '\.(js|jsx|ts|tsx)$' || true)
 
-          if [ -n "$STAGED_FILES" ]; then
-            npx eslint $STAGED_FILES
+          if [ -n "$CHANGED_FILES" ]; then
+            npx eslint $CHANGED_FILES
           else
-            echo "No staged files to lint."
+            echo "No changed files to lint."
           fi
