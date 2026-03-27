@@ -4,7 +4,7 @@ Node script to convert shapefile data from census.gov to topojson, and format/op
 
 
 Usage
-1. Run yarn install at root folder
+1. Run "yarn install" inside the packages/map/topojson-updater folder (this package is not part of the root Yarn workspace)
 2. Download shapefiles from census.gov (https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html) for the year that needs to be supported to the "shapefiles" folder of the project
     - Always choose the options with the smallest file size
     - Shapefiles for both states and counties should be downloaded for each year being added
