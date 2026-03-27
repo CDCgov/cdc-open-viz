@@ -436,17 +436,47 @@ const DataImport = () => {
     dispatch({ type: 'DELETE_DASHBOARD_DATASET', payload: { datasetKey } })
   }
 
-  const downloadCSV = (data: object[], filename: string) => {
-    const name = filename.endsWith('.csv') ? filename : `${filename}.csv`
+  const downloadCSV = (data: Array<Record<string, unknown>>, filename: string) => {
+    // Normalize filename: strip query/hash, remove path, replace extension with .csv
+    let baseName = filename || ''
+
+    const queryIndex = baseName.indexOf('?')
+    const hashIndex = baseName.indexOf('#')
+    const cutoffIndex = queryIndex === -1 ? hashIndex : hashIndex === -1 ? queryIndex : Math.min(queryIndex, hashIndex)
+    if (cutoffIndex !== -1) {
+      baseName = baseName.substring(0, cutoffIndex)
+    }
+
+    const lastSlash = Math.max(baseName.lastIndexOf('/'), baseName.lastIndexOf('\\'))
+    if (lastSlash !== -1) {
+      baseName = baseName.substring(lastSlash + 1)
+    }
+
+    const lastDot = baseName.lastIndexOf('.')
+    if (lastDot > 0) {
+      baseName = baseName.substring(0, lastDot)
+    }
+
+    if (!baseName) {
+      baseName = 'data'
+    }
+
+    const name = `${baseName}.csv`
     const blob = new Blob(['\uFEFF' + csvFormat(data)], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = name
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
+    // @ts-ignore
+    if (typeof window.navigator.msSaveBlob === 'function') {
+      // @ts-ignore
+      navigator.msSaveBlob(blob, name)
+    } else {
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = name
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    }
   }
 
   const updateDataFromVegaConfig = pastedConfig => {
