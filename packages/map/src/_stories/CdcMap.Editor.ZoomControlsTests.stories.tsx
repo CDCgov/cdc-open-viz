@@ -80,7 +80,7 @@ export const ZoomControlsTest: Story = {
         await userEvent.click(allowMapZoomingCheckbox)
       },
       (before, after) =>
-        !before.hasZoomControls && after.hasZoomControls && after.hasZoomInButton && after.hasZoomOutButton
+        before.hasZoomControls && !after.hasZoomControls && !after.hasZoomInButton && !after.hasZoomOutButton
     )
   }
 }
