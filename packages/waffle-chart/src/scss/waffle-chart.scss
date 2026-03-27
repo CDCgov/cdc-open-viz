@@ -3,7 +3,6 @@
 // Let core styles handle color palette
 
 .cove-visualization.type-waffle-chart {
-
   .cove-waffle-chart__subtext.subtext,
   .cove-waffle-chart__subtext.subtext.fst-italic {
     line-height: var(--visualization-body-line-height);
@@ -11,6 +10,15 @@
 
   .cove-visualization__body {
     @include cove-visualization-body-padding;
+  }
+
+  .cove-value-with-trend {
+    display: inline-flex;
+    align-items: baseline;
+  }
+
+  .cove-waffle-chart__data--primary.cove-value-with-trend {
+    align-items: center;
   }
 
   .cove-gauge-chart {
@@ -23,7 +31,7 @@
       justify-items: center;
       align-items: flex-start;
 
-      &>svg {
+      & > svg {
         margin: 0.7em 0;
       }
     }
@@ -96,7 +104,6 @@
 }
 
 @at-root {
-
   .cove-waffle-chart.font-small,
   .cove-gauge-chart.font-small #{&} {
     .cove-waffle-chart__data--primary {
@@ -134,7 +141,6 @@
 // TP5 Style for Waffle Chart
 .type-waffle-chart {
   &.waffle__style--tp5 {
-
     .cove-visualization__body,
     .cove-visualization__body.component--has-legacy-border,
     .cove-visualization__body.component--has-border-color-theme,
@@ -144,7 +150,7 @@
       background: none !important;
       container-type: inline-size;
 
-      >.cove-visualization__body-wrap {
+      > .cove-visualization__body-wrap {
         padding: 0 !important;
       }
     }
@@ -229,7 +235,6 @@
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
-
       .cove-visualization__body,
       .cove-visualization__body.component--has-legacy-border,
       .cove-visualization__body.component--has-border-color-theme,
@@ -238,7 +243,7 @@
         padding: 0 !important;
         background: white !important;
 
-        >.cove-visualization__body-wrap {
+        > .cove-visualization__body-wrap {
           padding: 0 !important;
         }
       }
@@ -253,7 +258,6 @@
 
   // TP5 Style for Gauge Chart
   &.gauge__style--tp5 {
-
     .cove-visualization__body,
     .cove-visualization__body.component--has-legacy-border,
     .cove-visualization__body.component--has-border-color-theme,
@@ -263,7 +267,7 @@
       background: none !important;
       container-type: inline-size;
 
-      >.cove-visualization__body-wrap {
+      > .cove-visualization__body-wrap {
         padding: 0 !important;
       }
     }
@@ -301,7 +305,7 @@
       width: 100%;
     }
 
-    .cove-gauge-chart__chart>svg {
+    .cove-gauge-chart__chart > svg {
       display: block;
       width: 100%;
     }
@@ -357,7 +361,6 @@
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
-
       .cove-visualization__body,
       .cove-visualization__body.component--has-legacy-border,
       .cove-visualization__body.component--has-border-color-theme,
@@ -366,7 +369,7 @@
         padding: 0 !important;
         background: white !important;
 
-        >.cove-visualization__body-wrap {
+        > .cove-visualization__body-wrap {
           padding: 0 !important;
         }
       }

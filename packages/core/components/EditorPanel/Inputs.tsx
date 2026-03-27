@@ -18,6 +18,7 @@ export type TextFieldProps = {
   value: string | number
   type?: 'text' | 'number' | 'textarea' | 'date'
   min?: number
+  step?: number
   maxLength?: number
   max?: number
   i?: number

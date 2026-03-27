@@ -1,0 +1,147 @@
+{
+  "type": "data-bite",
+  "dataBite": "",
+  "dataFunction": "Mean (Average)",
+  "dataColumn": "Rate",
+  "bitePosition": "Left",
+  "biteFontSize": 24,
+  "fontSize": "medium",
+  "biteBody": "",
+  "imageData": {
+    "display": "none",
+    "url": "",
+    "alt": "",
+    "options": []
+  },
+  "dataFormat": {
+    "roundToPlace": 0,
+    "commas": true,
+    "prefix": "",
+    "suffix": "%"
+  },
+  "biteStyle": "tp5",
+  "filters": [],
+  "subtext": "",
+  "title": "",
+  "theme": "theme-blue",
+  "shadow": false,
+  "visual": {
+    "border": true,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false,
+    "showTitle": true,
+    "useWrap": false
+  },
+  "general": {
+    "palette": {
+      "version": "1.0",
+      "backups": [
+        {
+          "name": "__​undefined__",
+          "version": "1.0",
+          "isReversed": "__​undefined__"
+        }
+      ]
+    },
+    "isCompactStyle": false
+  },
+  "trendIndicator": {
+    "mode": "numeric",
+    "column": "oldrate",
+    "numericRules": {
+      "upThreshold": 0,
+      "downThreshold": 0
+    },
+    "mappings": []
+  },
+  "markupVariables": [],
+  "enableMarkupVariables": false,
+  "errors": [],
+  "currentViewport": "lg",
+  "id": 16,
+  "category": "General",
+  "label": "Data Bite",
+  "subType": null,
+  "orientation": null,
+  "icon": {
+    "type": {},
+    "key": null,
+    "ref": null,
+    "props": {},
+    "_owner": null,
+    "_store": {}
+  },
+  "content": "Highlight a single aggregated value (e.g., sum or median).",
+  "visualizationType": null,
+  "activeVizButtonID": 16,
+  "dataMetadata": {
+    "lastUpdated": "January 15, 2026",
+    "source": "CDC NREVSS"
+  },
+  "dataFileName": "./data-with-metadata.json",
+  "dataFileSourceType": "file",
+  "dataDescription": {
+    "horizontal": false,
+    "series": false
+  },
+  "version": "4.26.4",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "locale": "en-US",
+  "data": [
+    {
+      "STATE": "AL",
+      "Rate": "10",
+      "Location": "Home",
+      "oldrate": "7"
+    },
+    {
+      "STATE": "AK",
+      "Rate": "12",
+      "Location": "Home",
+      "oldrate": "13"
+    },
+    {
+      "STATE": "FL",
+      "Rate": "10",
+      "Location": "Work",
+      "oldrate": "10"
+    },
+    {
+      "STATE": "GA",
+      "Rate": "12",
+      "Location": "Work",
+      "oldrate": "11"
+    }
+  ],
+  "formattedData": [
+    {
+      "STATE": "AL",
+      "Rate": "10",
+      "Location": "Home",
+      "oldrate": "7"
+    },
+    {
+      "STATE": "AK",
+      "Rate": "12",
+      "Location": "Home",
+      "oldrate": "13"
+    },
+    {
+      "STATE": "FL",
+      "Rate": "10",
+      "Location": "Work",
+      "oldrate": "10"
+    },
+    {
+      "STATE": "GA",
+      "Rate": "12",
+      "Location": "Work",
+      "oldrate": "11"
+    }
+  ],
+  "datasets": {}
+}

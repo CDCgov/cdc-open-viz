@@ -1,0 +1,21 @@
+.cove-trend-arrow__wrap {
+  align-items: baseline;
+  display: inline-flex;
+}
+
+.cove-trend-arrow {
+  display: inline-block;
+  flex-shrink: 0;
+  height: 1rem;
+  margin-left: 0.2em;
+  width: 1rem;
+}
+
+.cove-trend-arrow__label {
+  font-size: 1rem;
+  margin-left: 0.25em;
+}
+
+.cove-trend-arrow.is-down {
+  transform: scale(-1, 1) rotate(180deg);
+}
