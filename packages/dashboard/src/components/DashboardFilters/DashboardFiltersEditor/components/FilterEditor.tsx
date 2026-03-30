@@ -56,7 +56,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
   const getVizTitle = (viz, vizKey) => {
     let vizName = viz.general?.title || viz.title || vizKey
     if (viz.visualizationType === 'markup-include') {
-      vizName = viz.contentEditor.title || vizKey
+      vizName = viz.contentEditor?.title || vizKey
     }
     return vizName
   }

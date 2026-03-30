@@ -61,6 +61,7 @@
   .nested-dropdown-input-container {
     border-radius: 0.25rem;
     display: block;
+    padding: calc(0.4rem + 1px) 0.75rem;
     position: relative;
     width: calc(100% + 7px);
     & > span.list-arrow {
