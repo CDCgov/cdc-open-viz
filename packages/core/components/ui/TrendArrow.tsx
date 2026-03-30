@@ -4,24 +4,23 @@ import './trend-arrow.css'
 
 type TrendArrowProps = {
   arrowType: TrendArrowType
-  className?: string
+  wrapperClassName?: string
   ariaLabel?: string
   label?: string
 }
 
-const TrendArrow = ({ arrowType, className = '', ariaLabel, label }: TrendArrowProps) => {
+const TrendArrow = ({ arrowType, wrapperClassName = '', ariaLabel, label }: TrendArrowProps) => {
   const isDownArrow = arrowType === TREND_ARROW_DOWN
-  const trendArrowClasses = ['cove-trend-arrow', isDownArrow ? 'is-down' : '', className].filter(Boolean).join(' ')
+  const trendArrowWrapClasses = ['cove-trend-arrow__wrap', wrapperClassName].filter(Boolean).join(' ')
   const trimmedLabel = label?.trim()
   const resolvedAriaLabel = ariaLabel || `Trend ${arrowType}${trimmedLabel ? `: ${trimmedLabel}` : ''}`
 
   return (
-    <span className='cove-trend-arrow__wrap'>
-      <TrendArrowIcon className={trendArrowClasses} role='img' aria-label={resolvedAriaLabel} />
+    <span className={trendArrowWrapClasses}>
       {trimmedLabel && <span className='cove-trend-arrow__label'>{trimmedLabel}</span>}
+      <TrendArrowIcon className={['cove-trend-arrow', isDownArrow ? 'is-down' : ''].filter(Boolean).join(' ')} role='img' aria-label={resolvedAriaLabel} />
     </span>
   )
 }
 
 export default TrendArrow
-

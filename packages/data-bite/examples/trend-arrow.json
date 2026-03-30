@@ -6,7 +6,7 @@
   "bitePosition": "Left",
   "biteFontSize": 24,
   "fontSize": "medium",
-  "biteBody": "",
+  "biteBody": "Highlight a statistic, data point, or key fact about a topic using the relevant layout option:",
   "imageData": {
     "display": "none",
     "url": "",
@@ -21,8 +21,8 @@
   },
   "biteStyle": "tp5",
   "filters": [],
-  "subtext": "",
-  "title": "",
+  "subtext": "This is subtext or a citation.",
+  "title": "Data Bite title",
   "theme": "theme-blue",
   "shadow": false,
   "visual": {

@@ -417,22 +417,60 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     nodeWidth,
     nodeSpacer
   ])
-  const renderTrendArrow = () => {
+  const trendLabel =
+    trendResolution?.arrowType === TREND_ARROW_UP
+      ? trendIndicator?.upLabel
+      : trendResolution?.arrowType === TREND_ARROW_DOWN
+      ? trendIndicator?.downLabel
+      : ''
+  const resolvedTrendLabel = typeof trendLabel === 'string' ? trendLabel.trim() : ''
+  const hasTrendArrow = trendResolution?.state === 'resolved' && !!trendResolution?.arrowType
+  const shouldUseTrendBelow = Boolean(hasTrendArrow && resolvedTrendLabel)
+
+  const renderTrendArrow = ({ wrapperClassName = '' } = {}) => {
     if (trendResolution?.state !== 'resolved' || !trendResolution?.arrowType) {
       return null
     }
+    const ariaLabel = `Trend ${trendResolution.arrowType}${resolvedTrendLabel ? `: ${resolvedTrendLabel}` : ''}`
 
-    const trendLabel =
-      trendResolution.arrowType === TREND_ARROW_UP
-        ? trendIndicator?.upLabel
-        : trendResolution.arrowType === TREND_ARROW_DOWN
-        ? trendIndicator?.downLabel
-        : ''
-    const trimmedLabel = typeof trendLabel === 'string' ? trendLabel.trim() : ''
-    const ariaLabel = `Trend ${trendResolution.arrowType}${trimmedLabel ? `: ${trimmedLabel}` : ''}`
-
-    return <TrendArrow arrowType={trendResolution.arrowType} label={trimmedLabel} ariaLabel={ariaLabel} />
+    return (
+      <TrendArrow
+        arrowType={trendResolution.arrowType}
+        label={resolvedTrendLabel}
+        ariaLabel={ariaLabel}
+        wrapperClassName={wrapperClassName}
+      />
+    )
   }
+
+  const renderPrimaryValueBlock = (valueContent, className = '') => (
+    <div
+      className={['cove-waffle-chart__data--primary', 'cove-waffle-chart__value-block', className]
+        .filter(Boolean)
+        .join(' ')}
+      style={dataFontSize}
+    >
+      <div className='cove-waffle-chart__value-row'>
+        {valueContent}
+        {!shouldUseTrendBelow && hasTrendArrow && (
+          <span className='cove-waffle-chart__trend-slot cove-waffle-chart__trend-slot--inline'>
+            {renderTrendArrow({
+              wrapperClassName: 'cove-trend-arrow__wrap--inline'
+            })}
+          </span>
+        )}
+      </div>
+      {shouldUseTrendBelow && (
+        <div className='cove-waffle-chart__trend-row'>
+          <span className='cove-waffle-chart__trend-slot cove-waffle-chart__trend-slot--below'>
+            {renderTrendArrow({
+              wrapperClassName: 'cove-trend-arrow__wrap--below'
+            })}
+          </span>
+        </div>
+      )}
+    </div>
+  )
 
   const buildWaffle = useCallback(() => {
     let waffleData = []
@@ -605,9 +643,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                   }`}
                 >
                   <div className='cove-gauge-chart__value-section flex-shrink-0'>
-                    <div className='cove-waffle-chart__data--primary cove-value-with-trend' style={dataFontSize}>
-                      {primaryValue}
-                    </div>
+                    {renderPrimaryValueBlock(primaryValue)}
                   </div>
                   <div className='cove-gauge-chart__content flex-grow-1 d-flex flex-column min-w-0'>
                     {processedContent ? (
@@ -656,9 +692,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
               </>
             ) : (
               <>
-                <div className='cove-waffle-chart__data--primary cove-value-with-trend' style={dataFontSize}>
-                  {primaryValue}
-                </div>
+                {renderPrimaryValueBlock(primaryValue)}
                 <div className='cove-waffle-chart__data--text cove-prose'>{parse(processedContent)}</div>
                 <svg height={config.gauge.height} width={'100%'}>
                   <Group>
@@ -705,11 +739,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
           </div>
           {(hasPrimaryValue || processedContent) && (
             <div className='cove-waffle-chart__data'>
-              {hasPrimaryValue && (
-                <div className='cove-waffle-chart__data--primary cove-value-with-trend' style={dataFontSize}>
-                  {primaryValue}
-                </div>
-              )}
+              {hasPrimaryValue && renderPrimaryValueBlock(primaryValue)}
               {processedContent && (
                 <div className='cove-waffle-chart__data--text cove-prose'>{parse(processedContent)}</div>
               )}

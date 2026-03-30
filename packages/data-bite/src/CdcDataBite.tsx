@@ -270,21 +270,35 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     })
   }, [trendIndicator, dataFunction, dataColumn, getRowsForMainNumericCalculation, getFilteredDataRows])
 
-  const renderTrendArrow = () => {
+  const resolvedTrendLabel = useMemo(() => {
     if (trendResolution.state !== 'resolved' || !trendResolution.arrowType) {
-      return null
+      return ''
     }
 
-    const trendLabel =
+    const label =
       trendResolution.arrowType === TREND_ARROW_UP
         ? trendIndicator?.upLabel
         : trendResolution.arrowType === TREND_ARROW_DOWN
         ? trendIndicator?.downLabel
         : ''
-    const trimmedLabel = typeof trendLabel === 'string' ? trendLabel.trim() : ''
-    const ariaLabel = `Trend ${trendResolution.arrowType}${trimmedLabel ? `: ${trimmedLabel}` : ''}`
 
-    return <TrendArrow arrowType={trendResolution.arrowType} label={trimmedLabel} ariaLabel={ariaLabel} />
+    return typeof label === 'string' ? label.trim() : ''
+  }, [trendIndicator?.downLabel, trendIndicator?.upLabel, trendResolution.arrowType, trendResolution.state])
+
+  const renderTrendArrow = ({ wrapperClassName = '' } = {}) => {
+    if (trendResolution.state !== 'resolved' || !trendResolution.arrowType) {
+      return null
+    }
+    const ariaLabel = `Trend ${trendResolution.arrowType}${resolvedTrendLabel ? `: ${resolvedTrendLabel}` : ''}`
+
+    return (
+      <TrendArrow
+        arrowType={trendResolution.arrowType}
+        label={resolvedTrendLabel}
+        ariaLabel={ariaLabel}
+        wrapperClassName={wrapperClassName}
+      />
+    )
   }
 
   const calculateDataBite = (includePrefixSuffix = true) => {
@@ -621,6 +635,18 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction
     const isTp5 = showBite && biteStyle === 'tp5'
+    const hasTrendArrow = trendResolution.state === 'resolved' && !!trendResolution.arrowType
+    const shouldUseTrendBelow = Boolean(hasTrendArrow && resolvedTrendLabel)
+    const shouldUseContentBelow = Boolean(config.visual?.useWrap || shouldUseTrendBelow)
+    const tp5Value = isTp5 ? calculateDataBite(true) : ''
+    const tp5BodyLayoutClasses = [
+      'cdc-callout__body',
+      'flex-grow-1',
+      shouldUseContentBelow ? 'cdc-callout__body--content-below' : 'cdc-callout__body--content-right',
+      shouldUseTrendBelow ? 'cdc-callout__body--trend-below' : 'cdc-callout__body--trend-inline'
+    ]
+      .filter(Boolean)
+      .join(' ')
     const bodyClasses = [
       ...innerContainerClasses,
       ...contentClasses,
@@ -667,14 +693,31 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                   <span>{parse(processContentWithMarkup(title))}</span>
                 </h3>
               )}
-              <div className='cdc-callout__body d-flex flex-row align-content-start flex-grow-1'>
+              <div className={tp5BodyLayoutClasses}>
                 {showBite && (
-                  <div className='cdc-callout__databite flex-shrink-0  me-3 cove-value-with-trend'>
-                    <span>{calculateDataBite(true)}</span>
-                    {renderTrendArrow()}
+                  <div className='cdc-callout__databite cdc-callout__metric-block flex-shrink-0'>
+                    <div className='cdc-callout__value-row'>
+                      <span className='cdc-callout__value'>{tp5Value}</span>
+                      {!shouldUseTrendBelow && hasTrendArrow && (
+                        <span className='cdc-callout__trend-slot cdc-callout__trend-slot--inline'>
+                          {renderTrendArrow({
+                            wrapperClassName: 'cove-trend-arrow__wrap--inline'
+                          })}
+                        </span>
+                      )}
+                    </div>
+                    {shouldUseTrendBelow && hasTrendArrow && (
+                      <div className='cdc-callout__trend-row'>
+                        <span className='cdc-callout__trend-slot cdc-callout__trend-slot--below'>
+                          {renderTrendArrow({
+                            wrapperClassName: 'cove-trend-arrow__wrap--below'
+                          })}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )}
-                <div className='cdc-callout__content cove-prose flex-grow-1 d-flex flex-column  min-w-0'>
+                <div className='cdc-callout__content cove-prose cdc-callout__content-slot flex-grow-1 d-flex flex-column min-w-0'>
                   <p className='mb-0'>{parse(processContentWithMarkup(biteBody))}</p>
                   {subtext && !isCompactStyle && (
                     <p className='bite-subtext fst-italic flex-shrink-0'>{parse(processContentWithMarkup(subtext))}</p>

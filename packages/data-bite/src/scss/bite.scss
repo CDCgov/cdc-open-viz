@@ -189,25 +189,26 @@
     }
 
     .cdc-callout__body {
-      flex-wrap: nowrap;
-      gap: 0.5rem;
+      display: grid;
+      align-items: start;
+      column-gap: 1rem;
+      row-gap: 0.75rem;
       flex: auto;
     }
 
-    // Container query: wrap when width is less than 576px
+    .cdc-callout__body--content-right {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+
     @container (max-width: 576px) {
-      .cdc-callout__body {
-        flex-wrap: wrap;
+      .cdc-callout__body--content-right {
+        grid-template-columns: minmax(0, 1fr);
       }
     }
 
-    &.use-wrap .cdc-callout__body {
-      flex-wrap: wrap;
-
-      .cdc-callout__databite,
-      .cdc-callout__content {
-        flex-basis: 100%;
-      }
+    .cdc-callout__body--content-below,
+    .cdc-callout__body--trend-below {
+      grid-template-columns: minmax(0, 1fr);
     }
 
     .cdc-callout__databite {
@@ -218,8 +219,44 @@
       font-size: 2rem;
     }
 
-    .cdc-callout__databite.cove-value-with-trend {
+    .cdc-callout__metric-block {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      min-width: 0;
+    }
+
+    .cdc-callout__value-row {
+      display: inline-flex;
       align-items: center;
+      gap: 0.2em;
+      line-height: 1;
+      min-width: 0;
+    }
+
+    .cdc-callout__value {
+      display: inline-block;
+    }
+
+    .cdc-callout__trend-slot {
+      display: inline-flex;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .cdc-callout__trend-row {
+      display: flex;
+      align-items: flex-start;
+      min-width: 0;
+    }
+
+    .cdc-callout__trend-slot--below {
+      min-width: 0;
+    }
+
+    .cdc-callout__body--content-below .cdc-callout__content-slot,
+    .cdc-callout__body--trend-below .cdc-callout__content-slot {
+      grid-column: 1;
     }
 
     .cdc-callout__flag {
