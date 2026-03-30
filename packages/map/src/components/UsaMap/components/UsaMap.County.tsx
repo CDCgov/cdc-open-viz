@@ -22,7 +22,6 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { createCanvasPattern, PatternType } from '../../../helpers/createCanvasPattern'
 import { getPatternForRow } from '../../../helpers/getPatternForRow'
-import hsaMapping from '../data/hsa_fips_mapping'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -34,7 +33,7 @@ const sortById = (a, b) => {
   return 0
 }
 
-const getTopoData = year => {
+const getTopoData = (year, showHSABoundaries) => {
   return new Promise(resolve => {
     const resolveWithTopo = async response => {
       if (response.status !== 200) {
@@ -53,23 +52,31 @@ const getTopoData = year => {
         projection: undefined
       }
 
-      const countyGeometries = response.objects.counties.geometries
-      const geometriesByGroup = countyGeometries.reduce((acc, geometry) => {
-        const groupId = hsaMapping[geometry.id]
-        if (!groupId) return acc
-
-        if (!acc[groupId]) acc[groupId] = []
-        acc[groupId].push(geometry)
-        return acc
-      }, {} as Record<string, any[]>)
-
       topoData.year = year || 'default'
       topoData.counties = feature(response, response.objects.counties).features
       topoData.states = feature(response, response.objects.states).features
-      topoData.hsas = Object.entries(geometriesByGroup).map(([groupId, geometries]) => ({
-        groupId,
-        feature: merge(response as any, geometries)
-      }))
+      if (showHSABoundaries) {
+        const mappingResponse = await import(
+          /* webpackChunkName: "hsa_fips_mapping" */ './../data/hsa_fips_mapping.json'
+        )
+        const hsaMapping = mappingResponse.default.reduce((acc, curr) => {
+          acc[curr.county_fips] = curr.hsa_no
+          return acc
+        }, {})
+        const countyGeometries = response.objects.counties.geometries
+        const geometriesByGroup = countyGeometries.reduce((acc, geometry) => {
+          const groupId = hsaMapping[geometry.id]
+          if (!groupId) return acc
+
+          if (!acc[groupId]) acc[groupId] = []
+          acc[groupId].push(geometry)
+          return acc
+        }, {} as Record<string, any[]>)
+        topoData.hsas = Object.entries(geometriesByGroup).map(([groupId, geometries]) => ({
+          groupId,
+          feature: merge(response as any, geometries)
+        }))
+      }
       topoData.states.sort(sortById)
       topoData.counties.sort(sortById)
       topoData.mapData = topoData.states.concat(topoData.counties).filter(geo => geo.id !== '51620') //Not sure why, but Franklin City, VA is very broken and messes up the rendering
@@ -191,7 +198,7 @@ const CountyMap = () => {
     let currentYear = getCurrentTopoYear(config, runtimeFilters)
 
     if (currentYear !== topoData.year) {
-      getTopoData(currentYear).then(response => {
+      getTopoData(currentYear, config.general.showHSABoundaries).then(response => {
         if (canvasRef.current) {
           const context = canvasRef.current.getContext('2d')
           context.clearRect(canvasRef.current.width, canvasRef.current.height)
@@ -840,22 +847,15 @@ const CountyMap = () => {
       }
     })
 
-    // Precompute and cache Path2D objects for HSA boundaries
-    const hsaPathGenerator = geoPath(topoData.projection)
     if (config.general.showHSABoundaries) {
       topoData.hsas.forEach(hsa => {
+        if (!hsa?.groupId) return
         const cacheKey = 'hsa_border_' + hsa.groupId
-        let path2d = cache.get(cacheKey)
-        if (!path2d) {
-          const d = hsaPathGenerator(hsa.feature)
-          if (!d) {
-            return
-          }
-          path2d = new Path2D(d)
-          cache.set(cacheKey, path2d)
-        }
+        const path2d = cache.get(cacheKey)
         context.lineWidth = hsaStrokeWidth
-        context.stroke(path2d)
+        if (path2d) {
+          context.stroke(path2d)
+        }
       })
     }
 
