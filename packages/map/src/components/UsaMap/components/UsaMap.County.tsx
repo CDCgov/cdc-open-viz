@@ -848,7 +848,6 @@ const CountyMap = () => {
     })
 
     if (config.general.showHSABoundaries) {
-      context.strokeStyle = geoStrokeColor
       context.lineWidth = hsaStrokeWidth
       topoData.hsas.forEach(hsa => {
         if (!hsa?.groupId) return
