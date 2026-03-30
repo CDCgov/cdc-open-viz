@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useContext } from 'react'
 import { geoCentroid, geoPath, geoContains } from 'd3-geo'
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity } from 'd3-zoom'
 import { select as d3Select } from 'd3-selection'
-import { feature } from 'topojson-client'
+import { feature, merge } from 'topojson-client'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import debounce from 'lodash.debounce'
 import Loading from '@cdc/core/components/Loading'
@@ -11,13 +11,7 @@ import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { drawShape, createShapeProperties } from '../helpers/shapes'
-import {
-  getGeoStrokeColor,
-  handleMapAriaLabels,
-  displayGeoName,
-  isLegendItemDisabled,
-  MAX_ZOOM_LEVEL
-} from '../../../helpers'
+import { getGeoStrokeColor, handleMapAriaLabels, displayGeoName, isLegendItemDisabled } from '../../../helpers'
 import { supportedStatesFipsCodes } from '../../../data/supported-geos'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
@@ -28,6 +22,7 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { createCanvasPattern, PatternType } from '../../../helpers/createCanvasPattern'
 import { getPatternForRow } from '../../../helpers/getPatternForRow'
+import hsaMapping from '../data/hsa_fips_mapping'
 
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
@@ -52,14 +47,29 @@ const getTopoData = year => {
         year: undefined,
         counties: undefined,
         states: undefined,
+        hsas: undefined,
         mapData: undefined,
         countyIndecies: undefined,
         projection: undefined
       }
 
+      const countyGeometries = response.objects.counties.geometries
+      const geometriesByGroup = countyGeometries.reduce((acc, geometry) => {
+        const groupId = hsaMapping[geometry.id]
+        if (!groupId) return acc
+
+        if (!acc[groupId]) acc[groupId] = []
+        acc[groupId].push(geometry)
+        return acc
+      }, {} as Record<string, any[]>)
+
       topoData.year = year || 'default'
       topoData.counties = feature(response, response.objects.counties).features
       topoData.states = feature(response, response.objects.states).features
+      topoData.hsas = Object.entries(geometriesByGroup).map(([groupId, geometries]) => ({
+        groupId,
+        feature: merge(response as any, geometries)
+      }))
       topoData.states.sort(sortById)
       topoData.counties.sort(sortById)
       topoData.mapData = topoData.states.concat(topoData.counties).filter(geo => geo.id !== '51620') //Not sure why, but Franklin City, VA is very broken and messes up the rendering
@@ -69,7 +79,7 @@ const getTopoData = year => {
         let maxIndex = 0
 
         for (let i = 0; i < topoData.mapData.length; i++) {
-          if (topoData.mapData[i].id.length > 2 && topoData.mapData[i].id.indexOf(state.id) === 0) {
+          if (topoData.mapData[i].id?.length > 2 && topoData.mapData[i].id?.indexOf(state.id) === 0) {
             if (i < minIndex) minIndex = i
             if (i > maxIndex) maxIndex = i
           }
@@ -239,6 +249,11 @@ const CountyMap = () => {
       if (!state.id) return
       const d = pathGen(state)
       if (d) cache.set('state_border_' + state.id, new Path2D(d))
+    })
+    topoData.hsas.forEach(hsa => {
+      if (!hsa.id) return
+      const d = pathGen(hsa)
+      if (d) cache.set('hsa_border_' + hsa.id, new Path2D(d))
     })
     geoPathCacheRef.current = cache
   }
@@ -536,13 +551,14 @@ const CountyMap = () => {
         ) {
           const prevPath2d = geoPathCacheRef.current.get(topoData.mapData[currentTooltipIndex].id)
           if (prevPath2d) {
-            paintCountyGeo(
-              context,
-              prevPath2d,
-              runtimeData[topoData.mapData[currentTooltipIndex].id],
-              canvas.width,
-              lineWidth * strokeScale
-            )
+            // This causes HSA boundaries to disappear on hover.
+            // paintCountyGeo(
+            //   context,
+            //   prevPath2d,
+            //   runtimeData[topoData.mapData[currentTooltipIndex].id],
+            //   canvas.width,
+            //   lineWidth * strokeScale
+            // )
           }
         }
 
@@ -585,7 +601,8 @@ const CountyMap = () => {
             context.globalAlpha = 1
             const hoverPath2d = geoPathCacheRef.current.get(county.id)
             if (hoverPath2d) {
-              paintCountyGeo(context, hoverPath2d, runtimeData[county.id], canvas.width, lineWidth * strokeScale)
+              // This causes HSA boundaries to disappear on hover.
+              //paintCountyGeo(context, hoverPath2d, runtimeData[county.id], canvas.width, lineWidth * strokeScale)
             }
           }
 
@@ -793,6 +810,7 @@ const CountyMap = () => {
     const zoomScale = getZoomScale()
     const strokeScale = zoomScale ? 1 / zoomScale : 1
     const countyStrokeWidth = lineWidth * 0.8 * strokeScale
+    const hsaStrokeWidth = lineWidth * 1.4 * strokeScale
 
     // Enforces stroke style of the county lines
     context.strokeStyle = geoStrokeColor
@@ -821,6 +839,18 @@ const CountyMap = () => {
         context.stroke(path2d)
       }
     })
+
+    const groupedPath = geoPath(topoData.projection, context)
+
+    if (config.general.showHSABoundaries) {
+      topoData.hsas.forEach(hsa => {
+        context.beginPath()
+        groupedPath(hsa.feature)
+        context.strokeStyle = '#111'
+        context.lineWidth = hsaStrokeWidth
+        context.stroke()
+      })
+    }
 
     // If the focused state is found in the geo data, render it with a thicker outline
     if (focus.index !== -1) {
