@@ -2993,7 +2993,11 @@ export default [
   { county_fips: '46099', hsa_no: '939' },
   { county_fips: '46125', hsa_no: '939' },
   { county_fips: '46087', hsa_no: '939' },
-  { county_fips: '36NYC', hsa_no: '94' },
+  { county_fips: '36005', hsa_no: '94' }, // Bronx County, NY
+  { county_fips: '36047', hsa_no: '94' }, // Kings County (Brooklyn), NY
+  { county_fips: '36061', hsa_no: '94' }, // New York County (Manhattan), NY
+  { county_fips: '36081', hsa_no: '94' }, // Queens County, NY
+  { county_fips: '36085', hsa_no: '94' }, // Richmond County (Staten Island), NY
   { county_fips: '38073', hsa_no: '940' },
   { county_fips: '38081', hsa_no: '940' },
   { county_fips: '38039', hsa_no: '940' },
