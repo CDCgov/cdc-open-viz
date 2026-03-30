@@ -136,7 +136,10 @@ const CdcFilteredText = ({
         {filterByTextColumn()
           .slice(0, 1)
           .map((el, i) => (
-            <p key={i}> {parse(el[config.textColumn] || '')} </p>
+            <p key={i} className='cove-prose'>
+              {' '}
+              {parse(el[config.textColumn] || '')}{' '}
+            </p>
           ))}
       </VisualizationContent>
     )

@@ -6,7 +6,6 @@ import { promisify } from 'node:util'
 
 const execAsync = promisify(exec)
 
-
 function copyDirSync(src, dest) {
   fs.mkdirSync(dest, { recursive: true })
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
