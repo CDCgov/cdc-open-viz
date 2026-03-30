@@ -157,4 +157,123 @@ describe('update_4_26_4', () => {
     expect(config.contentEditor.style).toBeUndefined()
     expect(result.contentEditor.style).toBe('default')
   })
+
+  it('overrides waffle mode configs with new value descriptor defaults', () => {
+    const config: any = {
+      type: 'waffle-chart',
+      visualizationType: 'Waffle',
+      valueDescription: 'out of',
+      showPercent: false,
+      showDenominator: true
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.valueDescription).toBe('')
+    expect(result.showPercent).toBe(true)
+    expect(result.showDenominator).toBe(false)
+    expect(result.version).toBe('4.26.4')
+  })
+
+  it('does not modify gauge mode waffle-chart configs', () => {
+    const config: any = {
+      type: 'waffle-chart',
+      visualizationType: 'Gauge',
+      valueDescription: 'out of',
+      showPercent: false,
+      showDenominator: true
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.valueDescription).toBe('out of')
+    expect(result.showPercent).toBe(false)
+    expect(result.showDenominator).toBe(true)
+  })
+
+  it('updates waffle visualizations but not gauge visualizations in mixed dashboards', () => {
+    const config: any = {
+      type: 'dashboard',
+      visualizations: {
+        waffle: {
+          type: 'waffle-chart',
+          visualizationType: 'Waffle',
+          valueDescription: 'legacy',
+          showPercent: false,
+          showDenominator: true
+        },
+        gauge: {
+          type: 'waffle-chart',
+          visualizationType: 'TP5 Gauge',
+          valueDescription: 'keep',
+          showPercent: false,
+          showDenominator: true
+        }
+      }
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.visualizations.waffle.valueDescription).toBe('')
+    expect(result.visualizations.waffle.showPercent).toBe(true)
+    expect(result.visualizations.waffle.showDenominator).toBe(false)
+
+    expect(result.visualizations.gauge.valueDescription).toBe('keep')
+    expect(result.visualizations.gauge.showPercent).toBe(false)
+    expect(result.visualizations.gauge.showDenominator).toBe(true)
+  })
+
+  it('leaves configs with missing or unexpected visualizationType unchanged', () => {
+    const missingTypeConfig: any = {
+      type: 'waffle-chart',
+      valueDescription: 'legacy',
+      showPercent: false,
+      showDenominator: true
+    }
+
+    const unexpectedTypeConfig: any = {
+      type: 'waffle-chart',
+      visualizationType: 'Unknown Mode',
+      valueDescription: 'legacy',
+      showPercent: false,
+      showDenominator: true
+    }
+
+    const missingTypeResult = update_4_26_4(missingTypeConfig)
+    const unexpectedTypeResult = update_4_26_4(unexpectedTypeConfig)
+
+    expect(missingTypeResult.valueDescription).toBe('legacy')
+    expect(missingTypeResult.showPercent).toBe(false)
+    expect(missingTypeResult.showDenominator).toBe(true)
+
+    expect(unexpectedTypeResult.valueDescription).toBe('legacy')
+    expect(unexpectedTypeResult.showPercent).toBe(false)
+    expect(unexpectedTypeResult.showDenominator).toBe(true)
+  })
+
+  it('recursively updates nested dashboard visualizations', () => {
+    const config: any = {
+      type: 'dashboard',
+      visualizations: {
+        nestedDashboard: {
+          type: 'dashboard',
+          visualizations: {
+            nestedWaffle: {
+              type: 'waffle-chart',
+              visualizationType: 'TP5 Waffle',
+              valueDescription: 'legacy',
+              showPercent: false,
+              showDenominator: true
+            }
+          }
+        }
+      }
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.visualizations.nestedDashboard.visualizations.nestedWaffle.valueDescription).toBe('')
+    expect(result.visualizations.nestedDashboard.visualizations.nestedWaffle.showPercent).toBe(true)
+    expect(result.visualizations.nestedDashboard.visualizations.nestedWaffle.showDenominator).toBe(false)
+  })
 })

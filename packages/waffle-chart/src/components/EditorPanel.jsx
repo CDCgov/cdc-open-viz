@@ -277,31 +277,30 @@ const EditorPanel = memo(props => {
             </div>
           </li>
         </ul>
-        {(config.visualizationType === 'Gauge' || config.visualizationType === 'TP5 Gauge') && (
-          <>
-            <hr className='cove-accordion__divider' />
-            <div className='cove-accordion__panel-section reverse-labels'>
-              <TextField
-                value={config.valueDescription}
-                label='Value Descriptor'
-                fieldName='valueDescription'
-                updateField={updateField}
-              />
-              <CheckBox
-                value={config.showPercent}
-                label='Show Percentage'
-                fieldName='showPercent'
-                updateField={updateField}
-              />
-              <CheckBox
-                label='Show Denominator'
-                value={config.showDenominator}
-                fieldName='showDenominator'
-                updateField={updateField}
-              />
-            </div>
-          </>
-        )}
+        <>
+          <hr className='cove-accordion__divider' />
+          <div className='cove-accordion__panel-section reverse-labels'>
+            <TextField
+              value={config.valueDescription}
+              label='Value Descriptor'
+              fieldName='valueDescription'
+              updateField={updateField}
+              placeholder='e.g., out of'
+            />
+            <CheckBox
+              value={config.showPercent}
+              label='Show Percentage'
+              fieldName='showPercent'
+              updateField={updateField}
+            />
+            <CheckBox
+              label='Show Denominator'
+              value={config.showDenominator}
+              fieldName='showDenominator'
+              updateField={updateField}
+            />
+          </div>
+        </>
         <label style={{ marginBottom: '1rem' }}>
           <span className='edit-label'>
             Data Point Filters
