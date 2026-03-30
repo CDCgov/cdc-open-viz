@@ -148,7 +148,7 @@ export type MapConfig = Visualization & {
       | 'bubble'
       | 'single-state'
       | 'google-map'
-    showHSABoundaries: boolean
+    showHSABoundaries?: boolean
     hasRegions: boolean
     headerColor: ComponentThemes
     hideGeoColumnInTooltip: boolean
