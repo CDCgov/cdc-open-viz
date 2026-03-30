@@ -44,7 +44,8 @@ export default {
     numericThreshold: 0,
     mappings: [],
     upLabel: '',
-    downLabel: ''
+    downLabel: '',
+    trendLabel: ''
   },
   markupVariables: [],
   enableMarkupVariables: false

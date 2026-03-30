@@ -284,19 +284,24 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
     return typeof label === 'string' ? label.trim() : ''
   }, [trendIndicator?.downLabel, trendIndicator?.upLabel, trendResolution.arrowType, trendResolution.state])
+  const resolvedTrendFooterLabel =
+    typeof trendIndicator?.trendLabel === 'string' ? trendIndicator.trendLabel.trim() : ''
 
   const renderTrendArrow = ({ wrapperClassName = '' } = {}) => {
     if (trendResolution.state !== 'resolved' || !trendResolution.arrowType) {
       return null
     }
     const ariaLabel = `Trend ${trendResolution.arrowType}${resolvedTrendLabel ? `: ${resolvedTrendLabel}` : ''}`
+    const resolvedWrapperClassName = [wrapperClassName, resolvedTrendLabel ? 'cove-trend-arrow__wrap--with-label' : '']
+      .filter(Boolean)
+      .join(' ')
 
     return (
       <TrendArrow
         arrowType={trendResolution.arrowType}
         label={resolvedTrendLabel}
         ariaLabel={ariaLabel}
-        wrapperClassName={wrapperClassName}
+        wrapperClassName={resolvedWrapperClassName}
       />
     )
   }
@@ -636,7 +641,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     const showBite = undefined !== dataColumn && undefined !== dataFunction
     const isTp5 = showBite && biteStyle === 'tp5'
     const hasTrendArrow = trendResolution.state === 'resolved' && !!trendResolution.arrowType
-    const shouldUseTrendBelow = Boolean(hasTrendArrow && resolvedTrendLabel)
+    const shouldUseTrendBelow = Boolean(hasTrendArrow && (resolvedTrendLabel || resolvedTrendFooterLabel))
     const shouldUseContentBelow = Boolean(config.visual?.useWrap || shouldUseTrendBelow)
     const tp5Value = isTp5 ? calculateDataBite(true) : ''
     const tp5BodyLayoutClasses = [
@@ -713,6 +718,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                             wrapperClassName: 'cove-trend-arrow__wrap--below'
                           })}
                         </span>
+                        {resolvedTrendFooterLabel && (
+                          <span className='cdc-callout__trend-footer-label'>{resolvedTrendFooterLabel}</span>
+                        )}
                       </div>
                     )}
                   </div>

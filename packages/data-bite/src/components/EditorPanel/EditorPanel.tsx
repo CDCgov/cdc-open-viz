@@ -414,6 +414,14 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                         placeholder='Decreasing'
                         updateField={updateField}
                       />
+                      <TextField
+                        value={config.trendIndicator?.trendLabel || ''}
+                        section='trendIndicator'
+                        fieldName='trendLabel'
+                        label='Trend Label'
+                        placeholder='(compared to one year prior)'
+                        updateField={updateField}
+                      />
                     </>
                   ))}
               </div>

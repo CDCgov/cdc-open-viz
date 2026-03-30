@@ -424,21 +424,26 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       ? trendIndicator?.downLabel
       : ''
   const resolvedTrendLabel = typeof trendLabel === 'string' ? trendLabel.trim() : ''
+  const resolvedTrendFooterLabel =
+    typeof trendIndicator?.trendLabel === 'string' ? trendIndicator.trendLabel.trim() : ''
   const hasTrendArrow = trendResolution?.state === 'resolved' && !!trendResolution?.arrowType
-  const shouldUseTrendBelow = Boolean(hasTrendArrow && resolvedTrendLabel)
+  const shouldUseTrendBelow = Boolean(hasTrendArrow && (resolvedTrendLabel || resolvedTrendFooterLabel))
 
   const renderTrendArrow = ({ wrapperClassName = '' } = {}) => {
     if (trendResolution?.state !== 'resolved' || !trendResolution?.arrowType) {
       return null
     }
     const ariaLabel = `Trend ${trendResolution.arrowType}${resolvedTrendLabel ? `: ${resolvedTrendLabel}` : ''}`
+    const resolvedWrapperClassName = [wrapperClassName, resolvedTrendLabel ? 'cove-trend-arrow__wrap--with-label' : '']
+      .filter(Boolean)
+      .join(' ')
 
     return (
       <TrendArrow
         arrowType={trendResolution.arrowType}
         label={resolvedTrendLabel}
         ariaLabel={ariaLabel}
-        wrapperClassName={wrapperClassName}
+        wrapperClassName={resolvedWrapperClassName}
       />
     )
   }
@@ -467,6 +472,9 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
               wrapperClassName: 'cove-trend-arrow__wrap--below'
             })}
           </span>
+          {resolvedTrendFooterLabel && (
+            <span className='cove-waffle-chart__trend-footer-label'>{resolvedTrendFooterLabel}</span>
+          )}
         </div>
       )}
     </div>

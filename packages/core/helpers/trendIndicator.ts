@@ -25,6 +25,7 @@ export type TrendIndicatorConfig = {
   mappings?: TrendIndicatorMapping[]
   upLabel?: string
   downLabel?: string
+  trendLabel?: string
 }
 
 export type TrendResolutionState = 'resolved' | 'ambiguous' | 'unmapped' | 'invalid' | 'disabled'

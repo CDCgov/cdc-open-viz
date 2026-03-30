@@ -84,7 +84,66 @@ describe('Waffle Chart', () => {
     })
 
     expect(container.querySelector('.cove-waffle-chart__trend-slot--inline')).not.toBeInTheDocument()
-    expect(container.querySelector('.mock-trend-arrow-wrap.cove-trend-arrow__wrap--below')).toBeInTheDocument()
+    expect(
+      container.querySelector('.mock-trend-arrow-wrap.cove-trend-arrow__wrap--below.cove-trend-arrow__wrap--with-label')
+    ).toBeInTheDocument()
+  })
+
+  it('moves the trend indicator below the value when a footer trend label is configured', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={{
+          type: 'waffle-chart',
+          title: 'Test Waffle',
+          showTitle: true,
+          visualizationType: 'TP5 Waffle',
+          shape: 'square',
+          data: [{ value: 42, total: 100, trend: 'increase' }],
+          filters: [],
+          content: 'Test content',
+          subtext: 'Test subtext',
+          dataColumn: 'value',
+          dataFunction: 'Sum',
+          customDenom: true,
+          dataDenomColumn: 'total',
+          dataDenomFunction: 'Sum',
+          showPercent: true,
+          showDenominator: false,
+          valueDescription: 'out of',
+          suffix: '%',
+          roundToPlace: 0,
+          nodeWidth: 10,
+          nodeSpacer: 2,
+          theme: 'theme-blue',
+          trendIndicator: {
+            mode: 'categorical',
+            column: 'trend',
+            mappings: [{ sourceValue: 'increase', arrowType: 'up' }],
+            trendLabel: '(compared to one year prior)'
+          },
+          visual: {
+            border: false,
+            accent: false,
+            background: false,
+            hideBackgroundColor: false,
+            borderColorTheme: false,
+            whiteBackground: false,
+            colors: {
+              'theme-blue': '#005eaa'
+            }
+          }
+        }}
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-waffle-chart__trend-footer-label')).toHaveTextContent(
+        '(compared to one year prior)'
+      )
+    })
+    expect(
+      container.querySelector('.mock-trend-arrow-wrap.cove-trend-arrow__wrap--below.cove-trend-arrow__wrap--with-label')
+    ).not.toBeInTheDocument()
   })
 
   it('keeps the trend indicator inline when no trend label is configured', async () => {

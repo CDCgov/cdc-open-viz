@@ -88,7 +88,52 @@ describe('Data Bite', () => {
     expect(container.querySelector('.cdc-callout__trend-slot--below')).toBeInTheDocument()
     expect(container.querySelector('.cdc-callout__trend-slot--inline')).not.toBeInTheDocument()
     expect(container.querySelector('.cdc-callout__body--content-below')).toBeInTheDocument()
-    expect(container.querySelector('.mock-trend-arrow-wrap.cove-trend-arrow__wrap--below')).toBeInTheDocument()
+    expect(
+      container.querySelector('.mock-trend-arrow-wrap.cove-trend-arrow__wrap--below.cove-trend-arrow__wrap--with-label')
+    ).toBeInTheDocument()
+  })
+
+  it('moves the trend indicator below the value when a footer trend label is configured', () => {
+    const { container } = render(
+      <CdcDataBite
+        config={{
+          type: 'data-bite',
+          theme: 'theme-blue',
+          title: 'Test title',
+          biteStyle: 'tp5',
+          biteBody: 'Test body',
+          dataColumn: 'value',
+          dataFunction: 'Pass Through',
+          dataFormat: {
+            prefix: '',
+            suffix: '',
+            commas: false,
+            roundToPlace: 0
+          },
+          visual: {
+            showTitle: true,
+            useWrap: false,
+            whiteBackground: false,
+            border: true
+          },
+          trendIndicator: {
+            mode: 'categorical',
+            column: 'trend',
+            mappings: [{ sourceValue: 'increase', arrowType: 'up' }],
+            trendLabel: '(compared to one year prior)'
+          },
+          data: [{ value: '42', trend: 'increase' }]
+        }}
+      />
+    )
+
+    expect(container.querySelector('.cdc-callout__body--trend-below')).toBeInTheDocument()
+    expect(container.querySelector('.cdc-callout__trend-footer-label')).toHaveTextContent(
+      '(compared to one year prior)'
+    )
+    expect(
+      container.querySelector('.mock-trend-arrow-wrap.cove-trend-arrow__wrap--below.cove-trend-arrow__wrap--with-label')
+    ).not.toBeInTheDocument()
   })
 
   it('keeps the trend indicator inline when no trend label is configured', () => {

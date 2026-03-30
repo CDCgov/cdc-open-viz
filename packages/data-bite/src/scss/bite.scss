@@ -246,12 +246,21 @@
 
     .cdc-callout__trend-row {
       display: flex;
+      flex-direction: column;
       align-items: flex-start;
       min-width: 0;
     }
 
     .cdc-callout__trend-slot--below {
       min-width: 0;
+    }
+
+    .cdc-callout__trend-footer-label {
+      color: var(--cool-gray-90, #1c1d1f);
+      font-family: var(--app-font-main);
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5rem;
     }
 
     .cdc-callout__body--content-below .cdc-callout__content-slot,
