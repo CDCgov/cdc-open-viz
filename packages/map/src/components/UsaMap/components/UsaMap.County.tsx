@@ -848,11 +848,12 @@ const CountyMap = () => {
     })
 
     if (config.general.showHSABoundaries) {
+      context.strokeStyle = geoStrokeColor
+      context.lineWidth = hsaStrokeWidth
       topoData.hsas.forEach(hsa => {
         if (!hsa?.groupId) return
         const cacheKey = 'hsa_border_' + hsa.groupId
         const path2d = cache.get(cacheKey)
-        context.lineWidth = hsaStrokeWidth
         if (path2d) {
           context.stroke(path2d)
         }
