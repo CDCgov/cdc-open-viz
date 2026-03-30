@@ -496,7 +496,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   let body = <Loading />
   const isCompactStyle = config.general?.isCompactStyle ?? false
   const bodySubtext =
-    subtext && !isCompactStyle ? <p className='bite-subtext mt-0'>{parse(processContentWithMarkup(subtext))}</p> : null
+    subtext && !isCompactStyle ? (
+      <p className='bite-subtext cove-prose mt-0'>{parse(processContentWithMarkup(subtext))}</p>
+    ) : null
 
   const DataImage = useCallback(() => {
     let operators = {
@@ -691,13 +693,13 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
               )}
 
               {config.visual?.showTitle && title && title.trim() && (
-                <h3 className='cdc-callout__heading fw-bold flex-shrink-0 d-flex align-items-start'>
+                <h3 className='cdc-callout__heading cove-prose fw-bold flex-shrink-0 d-flex align-items-start'>
                   <span>{parse(processContentWithMarkup(title))}</span>
                 </h3>
               )}
               <div className='cdc-callout__body d-flex flex-row align-content-start flex-grow-1'>
                 {showBite && <div className='cdc-callout__databite flex-shrink-0  me-3'>{calculateDataBite(true)}</div>}
-                <div className='cdc-callout__content flex-grow-1 d-flex flex-column  min-w-0'>
+                <div className='cdc-callout__content cove-prose flex-grow-1 d-flex flex-column  min-w-0'>
                   <p className='mb-0'>{parse(processContentWithMarkup(biteBody))}</p>
                   {subtext && !isCompactStyle && (
                     <p className='bite-subtext fst-italic flex-shrink-0'>{parse(processContentWithMarkup(subtext))}</p>
@@ -729,7 +731,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                     </div>
                   )}
                   <Fragment>
-                    <div className='bite-content__text-wrap'>
+                    <div className='bite-content__text-wrap cove-prose'>
                       <p className='bite-text'>
                         {showBite && 'body' === biteStyle && (
                           <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
