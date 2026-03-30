@@ -840,15 +840,22 @@ const CountyMap = () => {
       }
     })
 
-    const groupedPath = geoPath(topoData.projection, context)
-
+    // Precompute and cache Path2D objects for HSA boundaries
+    const hsaPathGenerator = geoPath(topoData.projection)
     if (config.general.showHSABoundaries) {
       topoData.hsas.forEach(hsa => {
-        context.beginPath()
-        groupedPath(hsa.feature)
-        context.strokeStyle = '#111'
+        const cacheKey = 'hsa_border_' + hsa.groupId
+        let path2d = cache.get(cacheKey)
+        if (!path2d) {
+          const d = hsaPathGenerator(hsa.feature)
+          if (!d) {
+            return
+          }
+          path2d = new Path2D(d)
+          cache.set(cacheKey, path2d)
+        }
         context.lineWidth = hsaStrokeWidth
-        context.stroke()
+        context.stroke(path2d)
       })
     }
 
