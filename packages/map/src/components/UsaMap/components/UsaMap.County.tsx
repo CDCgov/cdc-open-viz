@@ -251,9 +251,9 @@ const CountyMap = () => {
       if (d) cache.set('state_border_' + state.id, new Path2D(d))
     })
     topoData.hsas.forEach(hsa => {
-      if (!hsa.id) return
-      const d = pathGen(hsa)
-      if (d) cache.set('hsa_border_' + hsa.id, new Path2D(d))
+      if (!hsa?.groupId || !hsa?.feature) return
+      const d = pathGen(hsa.feature as any)
+      if (d) cache.set('hsa_border_' + hsa.groupId, new Path2D(d))
     })
     geoPathCacheRef.current = cache
   }
