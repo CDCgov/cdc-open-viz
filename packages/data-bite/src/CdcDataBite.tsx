@@ -643,7 +643,6 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     const hasTrendArrow = trendResolution.state === 'resolved' && !!trendResolution.arrowType
     const shouldUseTrendBelow = Boolean(hasTrendArrow && (resolvedTrendLabel || resolvedTrendFooterLabel))
     const shouldUseContentBelow = Boolean(config.visual?.useWrap || shouldUseTrendBelow)
-    const tp5Value = isTp5 ? calculateDataBite(true) : ''
     const tp5BodyLayoutClasses = [
       'cdc-callout__body',
       'flex-grow-1',
@@ -702,7 +701,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                 {showBite && (
                   <div className='cdc-callout__databite cdc-callout__metric-block flex-shrink-0'>
                     <div className='cdc-callout__value-row'>
-                      <span className='cdc-callout__value'>{tp5Value}</span>
+                      <span className='cdc-callout__value'>{calculateDataBite(true)}</span>
                       {!shouldUseTrendBelow && hasTrendArrow && (
                         <span className='cdc-callout__trend-slot cdc-callout__trend-slot--inline'>
                           {renderTrendArrow({

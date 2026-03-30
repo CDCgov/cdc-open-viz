@@ -501,7 +501,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         y: calculatePos(shape, 'y', i, nodeWidthNum, nodeSpacerNum, columns, rows),
         color: config.visual.colors[theme],
         opacity: isFilled ? 1 : 0.2,
-        isFilled: isFilled
+        isFilled
       }
       waffleData.push(newNode)
     }
