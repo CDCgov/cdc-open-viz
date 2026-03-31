@@ -1,24 +1,29 @@
-import trendArrowSvg from '../assets/trend-arrow.svg?raw'
+import arrowUpSvg from '../assets/user-icons/arrow-up.svg?raw'
+import arrowUpRightFromSquareSvg from '../assets/user-icons/arrow-up-right-from-square.svg?raw'
 
 // Registry SVGs should come from static assets (not inline JSX).
 export const SVG_REGISTRY = {
   'trend-arrow-up': {
-    rawSvg: trendArrowSvg,
+    rawSvg: arrowUpSvg,
     ariaLabel: 'Trend up'
   },
   'trend-arrow-down': {
-    rawSvg: trendArrowSvg,
+    rawSvg: arrowUpSvg,
     ariaLabel: 'Trend down',
     isDown: true
+  },
+  'link-external': {
+    rawSvg: arrowUpRightFromSquareSvg,
+    ariaLabel: 'External link'
   }
 } as const
 
 export type SvgRegistryId = keyof typeof SVG_REGISTRY
 
-export const SVG_REGISTRY_OPTIONS = [
-  { value: 'trend-arrow-up', label: 'Up trend arrow' },
-  { value: 'trend-arrow-down', label: 'Down trend arrow' }
-]
+export const SVG_REGISTRY_OPTIONS = (Object.keys(SVG_REGISTRY) as SvgRegistryId[]).map(key => ({
+  value: key,
+  label: SVG_REGISTRY[key].ariaLabel
+}))
 
 const DEFAULT_SVG_SCALE = 1
 

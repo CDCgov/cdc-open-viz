@@ -3,6 +3,7 @@ import { MarkupVariable, MarkupCondition, MarkupVariableSvgMapping } from '../..
 import { SVG_REGISTRY_OPTIONS } from '../../../helpers/svgRegistry'
 import Button from '../../elements/Button'
 import { TextField, Select, CheckBox } from '../Inputs'
+import SvgIconSelect from './SvgIconSelect'
 import Icon from '../../ui/Icon'
 import Accordion from '../../ui/Accordion'
 import { Datasets } from '../../../types/DataSet'
@@ -513,15 +514,14 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                               >
                                                 <div className='cove-accordion__panel-col flex-grow'>{sourceValue}</div>
                                                 <div className='cove-accordion__panel-col flex-grow'>
-                                                  <Select
-                                                    label=''
+                                                  <SvgIconSelect
                                                     value={selectedSvgId}
                                                     options={[{ value: '', label: 'None' }, ...SVG_REGISTRY_OPTIONS]}
-                                                    onChange={e =>
+                                                    onChange={value =>
                                                       updateSvgMapping(
                                                         index,
                                                         sourceValue,
-                                                        e.target.value as MarkupVariableSvgMapping['svgId'] | ''
+                                                        value as MarkupVariableSvgMapping['svgId'] | ''
                                                       )
                                                     }
                                                   />
