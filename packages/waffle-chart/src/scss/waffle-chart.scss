@@ -39,9 +39,11 @@
   }
 
   .cove-waffle-chart__trend-row {
+    margin-top: 0.1rem;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    row-gap: 0.1rem;
     min-width: 0;
   }
 
