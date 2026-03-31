@@ -16,8 +16,8 @@
 }
 
 .cove-trend-arrow__wrap--inline .cove-trend-arrow {
-  height: 1.5rem;
-  width: 1.5rem;
+  height: 1.3rem;
+  width: 1.3rem;
 }
 
 .cove-trend-arrow__wrap--below .cove-trend-arrow {
@@ -30,7 +30,7 @@
 }
 
 .cove-trend-arrow__wrap--below.cove-trend-arrow__wrap--with-label .cove-trend-arrow {
-  margin-left: 0.2em;
+  margin-left: 0.1em;
 }
 
 .cove-trend-arrow__label {
