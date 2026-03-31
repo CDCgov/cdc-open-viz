@@ -91,7 +91,10 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         title,
         content,
         subtext,
-        valueDescription: config.valueDescription
+        valueDescription: config.valueDescription,
+        upLabel: trendIndicator?.upLabel,
+        downLabel: trendIndicator?.downLabel,
+        trendLabel: trendIndicator?.trendLabel
       }
     }
 
@@ -104,20 +107,17 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       dataMetadata: config.dataMetadata
     }
 
+    const process = (str: string | undefined) =>
+      str ? processMarkupVariables(str, config.data || [], config.markupVariables, markupOptions).processedContent : str
+
     return {
-      title: title
-        ? processMarkupVariables(title, config.data || [], config.markupVariables, markupOptions).processedContent
-        : title,
-      content: content
-        ? processMarkupVariables(content, config.data || [], config.markupVariables, markupOptions).processedContent
-        : content,
-      subtext: subtext
-        ? processMarkupVariables(subtext, config.data || [], config.markupVariables, markupOptions).processedContent
-        : subtext,
-      valueDescription: config.valueDescription
-        ? processMarkupVariables(config.valueDescription, config.data || [], config.markupVariables, markupOptions)
-            .processedContent
-        : config.valueDescription
+      title: process(title),
+      content: process(content),
+      subtext: process(subtext),
+      valueDescription: process(config.valueDescription),
+      upLabel: process(trendIndicator?.upLabel),
+      downLabel: process(trendIndicator?.downLabel),
+      trendLabel: process(trendIndicator?.trendLabel)
     }
   }, [
     config.enableMarkupVariables,
@@ -127,6 +127,9 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     config.locale,
     config.dataMetadata,
     config.valueDescription,
+    trendIndicator?.upLabel,
+    trendIndicator?.downLabel,
+    trendIndicator?.trendLabel,
     title,
     content,
     subtext,
@@ -137,6 +140,9 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   const processedContent = processedTextFields.content
   const processedSubtext = processedTextFields.subtext
   const processedValueDescription = processedTextFields.valueDescription
+  const processedUpLabel = processedTextFields.upLabel
+  const processedDownLabel = processedTextFields.downLabel
+  const processedTrendLabel = processedTextFields.trendLabel
 
   const gaugeColor = config.visual.colors[config.theme]
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
@@ -419,13 +425,12 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   ])
   const trendLabel =
     trendResolution?.arrowType === TREND_ARROW_UP
-      ? trendIndicator?.upLabel
+      ? processedUpLabel
       : trendResolution?.arrowType === TREND_ARROW_DOWN
-      ? trendIndicator?.downLabel
+      ? processedDownLabel
       : ''
   const resolvedTrendLabel = typeof trendLabel === 'string' ? trendLabel.trim() : ''
-  const resolvedTrendFooterLabel =
-    typeof trendIndicator?.trendLabel === 'string' ? trendIndicator.trendLabel.trim() : ''
+  const resolvedTrendFooterLabel = typeof processedTrendLabel === 'string' ? processedTrendLabel.trim() : ''
   const hasTrendArrow = trendResolution?.state === 'resolved' && !!trendResolution?.arrowType
   const shouldUseTrendBelow = Boolean(hasTrendArrow && (resolvedTrendLabel || resolvedTrendFooterLabel))
 

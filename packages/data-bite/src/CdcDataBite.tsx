@@ -282,10 +282,32 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
         ? trendIndicator?.downLabel
         : ''
 
-    return typeof label === 'string' ? label.trim() : ''
-  }, [trendIndicator?.downLabel, trendIndicator?.upLabel, trendResolution.arrowType, trendResolution.state])
-  const resolvedTrendFooterLabel =
-    typeof trendIndicator?.trendLabel === 'string' ? trendIndicator.trendLabel.trim() : ''
+    const raw = typeof label === 'string' ? label.trim() : ''
+    return raw ? processContentWithMarkup(raw) : ''
+  }, [
+    trendIndicator?.downLabel,
+    trendIndicator?.upLabel,
+    trendResolution.arrowType,
+    trendResolution.state,
+    enableMarkupVariables,
+    markupVariables,
+    config.data,
+    config.filters,
+    config.locale,
+    config.dataMetadata
+  ])
+  const resolvedTrendFooterLabel = useMemo(() => {
+    const raw = typeof trendIndicator?.trendLabel === 'string' ? trendIndicator.trendLabel.trim() : ''
+    return raw ? processContentWithMarkup(raw) : ''
+  }, [
+    trendIndicator?.trendLabel,
+    enableMarkupVariables,
+    markupVariables,
+    config.data,
+    config.filters,
+    config.locale,
+    config.dataMetadata
+  ])
 
   const renderTrendArrow = ({ wrapperClassName = '' } = {}) => {
     if (trendResolution.state !== 'resolved' || !trendResolution.arrowType) {
