@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { SVG_REGISTRY, SvgRegistryId, buildInlineSvg } from '../../../helpers/svgRegistry'
+import Icon from '../../ui/Icon'
 
 type Option = { value: string; label: string }
 
@@ -56,9 +57,15 @@ const SvgIconSelect = ({ value, options, onChange }: SvgIconSelectProps) => {
         style={{
           display: 'inline-flex',
           alignItems: 'center',
-          width: 'fit-content',
-          minWidth: '4.5rem',
+          justifyContent: 'space-between',
+          gap: '0.5rem',
+          width: '5rem',
+          minWidth: '5rem',
+          height: '41px',
+          paddingRight: '0.75rem',
           background: 'white',
+          border: '1px solid #d9dce1',
+          borderRadius: '0.25rem',
           cursor: 'pointer',
           textAlign: 'left'
         }}
@@ -66,9 +73,11 @@ const SvgIconSelect = ({ value, options, onChange }: SvgIconSelectProps) => {
         aria-haspopup='listbox'
         aria-expanded={isOpen}
       >
-        <SvgIconPreview svgId={selectedOption?.value} />
-        {!selectedOption?.value && <span style={{ flex: 1 }}>{selectedOption?.label}</span>}
-        <span style={{ paddingLeft: '0.5em' }}>▾</span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', minWidth: 0 }}>
+          <SvgIconPreview svgId={selectedOption?.value} />
+          {!selectedOption?.value && <span style={{ flex: 1 }}>{selectedOption?.label}</span>}
+        </span>
+        <Icon display='caretDown' size={16} color='#5c6670' />
       </button>
       {isOpen && listPos && (
         <ul
@@ -80,10 +89,12 @@ const SvgIconSelect = ({ value, options, onChange }: SvgIconSelectProps) => {
             left: listPos.left,
             zIndex: 99999,
             background: 'white',
-            border: '1px solid #ced4da',
+            border: '1px solid #d9dce1',
+            borderRadius: '0.25rem',
+            boxShadow: '0 4px 12px rgba(28, 29, 31, 0.08)',
             width: 'max-content',
             margin: 0,
-            padding: 0,
+            padding: '0.25rem 0',
             listStyle: 'none',
             maxHeight: '200px',
             overflowY: 'auto'
@@ -98,7 +109,9 @@ const SvgIconSelect = ({ value, options, onChange }: SvgIconSelectProps) => {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                padding: '0.4em 0.5em',
+                gap: '0.5rem',
+                minHeight: '41px',
+                padding: '0.5rem 0.75rem',
                 cursor: 'pointer',
                 background: option.value === value || hoveredValue === option.value ? '#e9ecef' : 'white'
               }}

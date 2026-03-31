@@ -1,6 +1,13 @@
 import React, { useState, useMemo, useCallback } from 'react'
-import { MarkupVariable, MarkupCondition, MarkupVariableSvgMapping } from '../../../types/MarkupVariable'
-import { SVG_REGISTRY_OPTIONS } from '../../../helpers/svgRegistry'
+import {
+  MarkupVariable,
+  MarkupCondition,
+  MarkupVariableSvgMapping,
+  MarkupVariableSourceType,
+  getMarkupVariableSourceType,
+  isDataDrivenIconsVariable
+} from '../../../types/MarkupVariable'
+import { SVG_REGISTRY_OPTIONS, getSvgRegistryLabel } from '../../../helpers/svgRegistry'
 import Button from '../../elements/Button'
 import { TextField, Select, CheckBox } from '../Inputs'
 import SvgIconSelect from './SvgIconSelect'
@@ -30,9 +37,25 @@ type MarkupVariablesEditorProps = {
 
 export type { MarkupVariablesEditorProps }
 
+const METADATA_DOCS_PLACEHOLDER_URL = 'https://example.com/docs/add-metadata'
+const SMALL_NUMBER_FIELD_WRAPPER_STYLE = { maxWidth: '5rem' }
+
+const generateTagFromName = (name: string) => {
+  if (!name) return ''
+
+  // Convert a display name to tag format: "My Variable" -> "{{my-variable}}"
+  return `{{${name
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')}}}`
+}
+
+const removeTagWrappers = (tag: string) => tag.replace(/^{{/, '').replace(/}}$/, '')
+
 /**
  * Editor for creating and managing markup variables with {{variable-name}} syntax.
- * Supports conditional filters, number formatting, and auto-generated tags.
+ * Supports data-driven values, metadata values, static icons, and data-driven icon mappings.
  */
 const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
   markupVariables = [],
@@ -91,13 +114,69 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
       })
       return Array.from(uniqueValues).sort()
     },
-    [data, datasets, config?.dataKey]
+    [getTargetData]
   )
+
+  const getIconDefaults = useCallback((iconId?: MarkupVariable['iconId']) => {
+    const resolvedIconId = iconId || SVG_REGISTRY_OPTIONS[0]?.value
+
+    if (!resolvedIconId) {
+      return {
+        iconId: undefined,
+        name: '',
+        tag: ''
+      }
+    }
+
+    return {
+      iconId: resolvedIconId,
+      name: removeTagWrappers(generateTagFromName(resolvedIconId)),
+      tag: generateTagFromName(resolvedIconId)
+    }
+  }, [])
 
   // Validate a variable and return array of error messages
   const validateVariable = React.useCallback((variable: MarkupVariable): string[] => {
     const errors: string[] = []
-    const outputType = variable.outputType === 'svg' ? 'svg' : 'value'
+    const sourceType = getMarkupVariableSourceType(variable)
+    const usesDataDrivenIcons = isDataDrivenIconsVariable(variable)
+
+    if (sourceType === 'icon') {
+      if (!variable.name || variable.name.trim() === '') {
+        errors.push('Variable name is required')
+      }
+      if (!variable.tag || variable.tag.trim() === '') {
+        errors.push('Variable tag is required')
+      }
+      if (!variable.iconId) {
+        errors.push('Icon is required')
+      }
+
+      if (variable.svgScale !== undefined) {
+        const parsedScale = Number(variable.svgScale)
+        if (!Number.isFinite(parsedScale) || parsedScale <= 0) {
+          errors.push('Icon scale must be greater than 0')
+        }
+      }
+
+      return errors
+    }
+
+    if (sourceType === 'metadata') {
+      if (!variable.metadataKey || variable.metadataKey.trim() === '') {
+        errors.push('Metadata field is required')
+        return errors
+      }
+
+      if (!variable.name || variable.name.trim() === '') {
+        errors.push('Variable name is required')
+      }
+      if (!variable.tag || variable.tag.trim() === '') {
+        errors.push('Variable tag is required')
+      }
+
+      return errors
+    }
 
     if (!variable.name || variable.name.trim() === '') {
       errors.push('Variable name is required')
@@ -105,41 +184,35 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
     if (!variable.tag || variable.tag.trim() === '') {
       errors.push('Variable tag is required')
     }
-    if (
-      outputType === 'value' &&
-      !variable.metadataKey &&
-      (!variable.columnName || variable.columnName.trim() === '')
-    ) {
+
+    if (!variable.columnName || variable.columnName.trim() === '') {
       errors.push('Data column is required')
     }
-    if (outputType === 'svg' && variable.metadataKey) {
-      errors.push('SVG output is not supported for metadata variables')
-    }
-    if (outputType === 'svg' && !variable.metadataKey) {
+
+    if (usesDataDrivenIcons) {
       if (!variable.columnName || variable.columnName.trim() === '') {
-        errors.push('SVG column is required')
+        errors.push('Data-driven icon column is required')
       }
       if (!variable.svgMappings || variable.svgMappings.length === 0) {
-        errors.push('At least one SVG mapping is required')
+        errors.push('At least one icon mapping is required')
       }
       if (variable.svgScale !== undefined) {
         const parsedScale = Number(variable.svgScale)
         if (!Number.isFinite(parsedScale) || parsedScale <= 0) {
-          errors.push('SVG scale must be greater than 0')
+          errors.push('Icon scale must be greater than 0')
         }
       }
     }
-    // Validate conditions (not applicable to metadata-sourced variables)
-    if (!variable.metadataKey) {
-      variable.conditions?.forEach((condition, index) => {
-        if (!condition.columnName) {
-          errors.push(`Condition ${index + 1}: Column is required`)
-        }
-        if (!condition.value) {
-          errors.push(`Condition ${index + 1}: Value is required`)
-        }
-      })
-    }
+
+    variable.conditions?.forEach((condition, index) => {
+      if (!condition.columnName) {
+        errors.push(`Condition ${index + 1}: Column is required`)
+      }
+      if (!condition.value) {
+        errors.push(`Condition ${index + 1}: Value is required`)
+      }
+    })
+
     return errors
   }, [])
 
@@ -162,6 +235,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
 
   const addVariable = () => {
     const newVariable: MarkupVariable = {
+      sourceType: 'column',
       name: '',
       tag: '',
       columnName: '',
@@ -170,6 +244,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
       hideOnNull: false,
       outputType: 'value'
     }
+
     const newVariables = [...safeMarkupVariables, newVariable]
     onChange(newVariables)
     const newIndex = safeMarkupVariables.length
@@ -203,16 +278,6 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
     if (editingIndex === index) {
       setEditingIndex(null)
     }
-  }
-
-  const generateTag = (name: string) => {
-    if (!name) return ''
-    // Convert name to tag format: "My Variable" -> "{{my-variable}}"
-    return `{{${name
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '')}}}`
   }
 
   const addCondition = (variableIndex: number) => {
@@ -266,6 +331,51 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
     updateVariable(variableIndex, { svgMappings: nextMappings })
   }
 
+  const updateSourceType = (index: number, sourceType: MarkupVariableSourceType) => {
+    const variable = safeMarkupVariables[index]
+
+    if (sourceType === 'icon') {
+      const iconDefaults = getIconDefaults(variable.iconId)
+      updateVariable(index, { sourceType, ...iconDefaults })
+      return
+    }
+
+    if (sourceType === 'metadata') {
+      if (!variable.metadataKey && metadataKeys[0]) {
+        updateVariable(index, {
+          sourceType,
+          metadataKey: metadataKeys[0],
+          name: metadataKeys[0],
+          tag: generateTagFromName(metadataKeys[0])
+        })
+        return
+      }
+
+      updateVariable(index, { sourceType, metadataKey: variable.metadataKey || '' })
+      return
+    }
+
+    updateVariable(index, { sourceType })
+  }
+
+  const renderReadonlyField = (label: string, value: string, placeholder: string) => (
+    <div className='mb-3'>
+      <label>
+        <span className='edit-label column-heading'>{label}</span>
+        <input
+          type='text'
+          value={value}
+          placeholder={placeholder}
+          readOnly
+          style={{ backgroundColor: '#e9ecef', cursor: 'not-allowed' }}
+        />
+      </label>
+    </div>
+  )
+
+  const getNumericFieldValue = (value?: number) =>
+    value === undefined || Number.isNaN(Number(value)) ? 1 : Number(value)
+
   return (
     <div className='markup-variables-editor'>
       <div className='mb-3'>
@@ -285,8 +395,8 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
         <>
           <div className='mb-3'>
             <p className='text-sm text-gray-600'>
-              Use variables in your content with <code>{'{{variable-name}}'}</code> syntax. Variables will be replaced
-              with values from your data.
+              Use variables in your content with <code>{'{{variable-name}}'}</code> syntax. Variables can resolve to
+              data values, data file metadata, or selected icons.
             </p>
           </div>
 
@@ -295,10 +405,13 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
               {safeMarkupVariables.map((variable, index) => {
                 if (!variable) return <></>
 
-                const outputType = variable.outputType === 'svg' ? 'svg' : 'value'
+                const sourceType = getMarkupVariableSourceType(variable)
+                const usesDataDrivenIcons = isDataDrivenIconsVariable(variable)
                 const svgSourceValues =
-                  outputType === 'svg' && variable.columnName ? getColumnValues(variable.columnName) : []
-                const dataColumnLabel = outputType === 'svg' ? 'SVG Source Column' : 'Data Column'
+                  sourceType === 'column' && usesDataDrivenIcons && variable.columnName
+                    ? getColumnValues(variable.columnName)
+                    : []
+                const iconLabel = getSvgRegistryLabel(variable.iconId) || 'Not selected'
 
                 return (
                   <div
@@ -317,13 +430,18 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                           {variable.tag}
                         </div>
                         <div style={{ fontSize: '13px', color: '#6c757d' }}>
-                          {variable.metadataKey ? (
+                          {sourceType === 'metadata' ? (
                             <>
-                              Metadata: <strong>{variable.metadataKey}</strong>
+                              Metadata: <strong>{variable.metadataKey || 'Not selected'}</strong>
+                            </>
+                          ) : sourceType === 'icon' ? (
+                            <>
+                              Icon: <strong>{iconLabel}</strong>
                             </>
                           ) : (
                             <>
                               Column: <strong>{variable.columnName || 'Not selected'}</strong>
+                              {usesDataDrivenIcons && <span> • Data-Driven Icons</span>}
                               {variable.conditions && variable.conditions.length > 0 && (
                                 <span>
                                   {' '}
@@ -335,7 +453,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                         </div>
                         {validationErrors[index] && validationErrors[index].length > 0 && (
                           <div style={{ fontSize: '12px', color: '#dc3545', marginTop: '8px' }}>
-                            <strong>⚠ Validation Errors:</strong>
+                            <strong>Validation Errors:</strong>
                             <ul style={{ margin: '4px 0 0 0', paddingLeft: '20px' }}>
                               {validationErrors[index].map((error, errorIndex) => (
                                 <li key={errorIndex}>{error}</li>
@@ -358,200 +476,177 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                       <div className='mt-3 pt-3 border-t'>
                         <Accordion>
                           <Accordion.Section title='Basic Settings'>
-                            {hasMetadataKeys && (
-                              <div className='mb-3'>
-                                <Select
-                                  value={variable.metadataKey ? 'metadata' : 'column'}
-                                  fieldName='variableSource'
-                                  label='Source'
-                                  options={[
-                                    { value: 'column', label: 'Data Column' },
-                                    { value: 'metadata', label: 'Data File Metadata' }
-                                  ]}
-                                  updateField={(_section, _subsection, _fieldName, value) => {
-                                    if (value === 'metadata') {
-                                      const defaultMetadataKey = metadataKeys[0] || ''
-                                      updateVariable(index, {
-                                        metadataKey: defaultMetadataKey,
-                                        columnName: '',
-                                        conditions: [],
-                                        outputType: 'value',
-                                        name: defaultMetadataKey,
-                                        tag: generateTag(defaultMetadataKey)
-                                      })
-                                    } else {
-                                      updateVariable(index, { metadataKey: undefined, columnName: '' })
-                                    }
-                                  }}
-                                />
-                              </div>
-                            )}
-
-                            {variable.metadataKey !== undefined && variable.metadataKey !== null && hasMetadataKeys ? (
-                              <div className='mb-3'>
-                                <Select
-                                  value={variable.metadataKey}
-                                  fieldName='metadataKey'
-                                  label='Metadata Field'
-                                  options={metadataKeys.map(key => ({
-                                    value: key,
-                                    label: `${key}: ${dataMetadata[key]}`
-                                  }))}
-                                  updateField={(_section, _subsection, _fieldName, value) => {
-                                    updateVariable(index, {
-                                      metadataKey: value,
-                                      name: value,
-                                      tag: generateTag(value)
-                                    })
-                                  }}
-                                />
-                              </div>
-                            ) : (
-                              <div className='mb-3'>
-                                <Select
-                                  value={variable.columnName}
-                                  fieldName='columnName'
-                                  label={dataColumnLabel}
-                                  options={[
-                                    { value: '', label: 'Select Column...' },
-                                    ...getAvailableColumns.map(col => ({ value: col, label: col }))
-                                  ]}
-                                  updateField={(_section, _subsection, _fieldName, value) => {
-                                    updateVariable(index, {
-                                      columnName: value,
-                                      name: value,
-                                      tag: generateTag(value)
-                                    })
-                                  }}
-                                />
-                              </div>
-                            )}
-
                             <div className='mb-3'>
-                              <TextField
-                                value={variable.name}
-                                fieldName='name'
-                                label='Variable Name'
-                                placeholder='e.g., "State Name"'
-                                updateField={(section, subsection, fieldName, value) => {
-                                  updateVariable(index, {
-                                    name: value,
-                                    tag: generateTag(value)
-                                  })
+                              <Select
+                                value={sourceType}
+                                fieldName='variableSource'
+                                label='Source'
+                                options={[
+                                  { value: 'column', label: 'Data Column' },
+                                  { value: 'metadata', label: 'Data File Metadata' },
+                                  { value: 'icon', label: 'Icon' }
+                                ]}
+                                updateField={(_section, _subsection, _fieldName, value) => {
+                                  updateSourceType(index, value as MarkupVariableSourceType)
                                 }}
                               />
                             </div>
-                            <div className='mb-3'>
-                              <label>
-                                <span className='edit-label column-heading'>Tag (auto-generated)</span>
-                                <input
-                                  type='text'
-                                  value={variable.tag}
-                                  placeholder='{{variable-name}}'
-                                  readOnly
-                                  style={{ backgroundColor: '#e9ecef', cursor: 'not-allowed' }}
-                                />
-                              </label>
-                            </div>
-                          </Accordion.Section>
 
-                          <Accordion.Section title='SVG Output'>
-                            {variable.metadataKey ? (
-                              <div className='text-sm text-gray-500 mb-2'>
-                                SVG output is not supported for metadata variables.
-                              </div>
-                            ) : (
+                            {sourceType === 'metadata' && (
                               <>
-                                <div className='mb-3'>
-                                  <CheckBox
-                                    value={outputType === 'svg'}
-                                    fieldName='enableSvgOutput'
-                                    label='Enable SVG output'
-                                    updateField={(_section, _subsection, _fieldName, value) => {
-                                      updateVariable(index, { outputType: value ? 'svg' : 'value' })
-                                    }}
-                                  />
-                                </div>
-                                {outputType === 'svg' ? (
+                                {hasMetadataKeys ? (
+                                  <div className='mb-3'>
+                                    <Select
+                                      value={variable.metadataKey || ''}
+                                      fieldName='metadataKey'
+                                      label='Metadata Field'
+                                      options={[
+                                        { value: '', label: 'Select Metadata Field...' },
+                                        ...metadataKeys.map(key => ({
+                                          value: key,
+                                          label: `${key}: ${dataMetadata[key]}`
+                                        }))
+                                      ]}
+                                      updateField={(_section, _subsection, _fieldName, value) => {
+                                        updateVariable(index, {
+                                          sourceType: 'metadata',
+                                          metadataKey: value,
+                                          name: value,
+                                          tag: generateTagFromName(value)
+                                        })
+                                      }}
+                                    />
+                                  </div>
+                                ) : (
+                                  <div className='mb-3 text-sm text-gray-500'>
+                                    <p style={{ marginBottom: '0.5rem' }}>
+                                      This config does not currently contain any data file metadata.
+                                    </p>
+                                    <a href={METADATA_DOCS_PLACEHOLDER_URL} target='_blank' rel='noreferrer'>
+                                      Learn how to add metadata
+                                    </a>
+                                  </div>
+                                )}
+
+                                {hasMetadataKeys && (
                                   <>
-                                    <div className='text-sm text-gray-500 mb-2'>
-                                      SVG output renders one SVG per distinct value after filters/conditions.
-                                    </div>
                                     <div className='mb-3'>
                                       <TextField
-                                        type='number'
-                                        step={0.1}
-                                        value={
-                                          variable.svgScale === undefined || Number.isNaN(Number(variable.svgScale))
-                                            ? 1
-                                            : Number(variable.svgScale)
-                                        }
-                                        fieldName='svgScale'
-                                        label='SVG Scale'
+                                        value={variable.name}
+                                        fieldName='name'
+                                        label='Variable Name'
+                                        placeholder='e.g., "Data Source"'
                                         updateField={(_section, _subsection, _fieldName, value) => {
-                                          const parsedScale = value === '' ? undefined : Number(value)
                                           updateVariable(index, {
-                                            svgScale:
-                                              parsedScale === undefined || Number.isNaN(parsedScale)
-                                                ? undefined
-                                                : parsedScale
+                                            name: value,
+                                            tag: generateTagFromName(value)
                                           })
                                         }}
                                       />
                                     </div>
-                                    {variable.columnName ? (
-                                      <>
-                                        {svgSourceValues.length > 0 ? (
-                                          svgSourceValues.map(sourceValue => {
-                                            const selectedSvgId =
-                                              variable.svgMappings?.find(mapping => mapping.sourceValue === sourceValue)
-                                                ?.svgId || ''
-
-                                            return (
-                                              <div
-                                                className='cove-accordion__panel-row align-center mb-2'
-                                                key={sourceValue}
-                                              >
-                                                <div className='cove-accordion__panel-col flex-grow'>{sourceValue}</div>
-                                                <div className='cove-accordion__panel-col flex-grow'>
-                                                  <SvgIconSelect
-                                                    value={selectedSvgId}
-                                                    options={[{ value: '', label: 'None' }, ...SVG_REGISTRY_OPTIONS]}
-                                                    onChange={value =>
-                                                      updateSvgMapping(
-                                                        index,
-                                                        sourceValue,
-                                                        value as MarkupVariableSvgMapping['svgId'] | ''
-                                                      )
-                                                    }
-                                                  />
-                                                </div>
-                                              </div>
-                                            )
-                                          })
-                                        ) : (
-                                          <div className='text-sm text-gray-500 mb-2'>
-                                            No values found for the selected column.
-                                          </div>
-                                        )}
-                                      </>
-                                    ) : (
-                                      <div className='text-sm text-gray-500 mb-2'>
-                                        Select a data column to map values to SVGs.
-                                      </div>
-                                    )}
+                                    {renderReadonlyField('Tag (auto-generated)', variable.tag, '{{variable-name}}')}
                                   </>
-                                ) : (
-                                  <div className='text-sm text-gray-500 mb-2'></div>
                                 )}
+                              </>
+                            )}
+
+                            {sourceType === 'column' && (
+                              <>
+                                <div className='mb-3'>
+                                  <Select
+                                    value={variable.columnName}
+                                    fieldName='columnName'
+                                    label='Data Column'
+                                    options={[
+                                      { value: '', label: 'Select Column...' },
+                                      ...getAvailableColumns.map(col => ({ value: col, label: col }))
+                                    ]}
+                                    updateField={(_section, _subsection, _fieldName, value) => {
+                                      updateVariable(index, {
+                                        sourceType: 'column',
+                                        columnName: value,
+                                        name: value,
+                                        tag: generateTagFromName(value)
+                                      })
+                                    }}
+                                  />
+                                </div>
+                                <div className='mb-3'>
+                                  <TextField
+                                    value={variable.name}
+                                    fieldName='name'
+                                    label='Variable Name'
+                                    placeholder='e.g., "State Name"'
+                                    updateField={(_section, _subsection, _fieldName, value) => {
+                                      updateVariable(index, {
+                                        name: value,
+                                        tag: generateTagFromName(value)
+                                      })
+                                    }}
+                                  />
+                                </div>
+                                {renderReadonlyField('Tag (auto-generated)', variable.tag, '{{variable-name}}')}
+                              </>
+                            )}
+
+                            {sourceType === 'icon' && (
+                              <>
+                                <div className='mb-3'>
+                                  <span className='edit-label column-heading'>Icon</span>
+                                  <div>
+                                    <SvgIconSelect
+                                      value={variable.iconId || ''}
+                                      options={SVG_REGISTRY_OPTIONS}
+                                      onChange={value => {
+                                        updateVariable(index, {
+                                          sourceType: 'icon',
+                                          ...getIconDefaults(value as MarkupVariable['iconId'])
+                                        })
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                                <div className='mb-3'>
+                                  <TextField
+                                    value={variable.name}
+                                    fieldName='name'
+                                    label='Variable Name'
+                                    placeholder='e.g., "trend-arrow-up-small"'
+                                    updateField={(_section, _subsection, _fieldName, value) => {
+                                      updateVariable(index, {
+                                        name: value,
+                                        tag: generateTagFromName(value)
+                                      })
+                                    }}
+                                  />
+                                </div>
+                                {renderReadonlyField('Tag (auto-generated)', variable.tag, '{{icon-name}}')}
+                                <div className='mb-3' style={SMALL_NUMBER_FIELD_WRAPPER_STYLE}>
+                                  <TextField
+                                    type='number'
+                                    step={0.1}
+                                    value={getNumericFieldValue(variable.svgScale)}
+                                    fieldName='svgScale'
+                                    label='Icon Scale'
+                                    updateField={(_section, _subsection, _fieldName, value) => {
+                                      const parsedScale = value === '' ? undefined : Number(value)
+                                      updateVariable(index, {
+                                        svgScale:
+                                          parsedScale === undefined || Number.isNaN(parsedScale)
+                                            ? undefined
+                                            : parsedScale
+                                      })
+                                    }}
+                                  />
+                                </div>
                               </>
                             )}
                           </Accordion.Section>
 
-                          {!variable.metadataKey && (
+                          {sourceType === 'column' && (
                             <Accordion.Section title='Conditions'>
                               <div className='text-sm text-gray-500 mb-2'>
-                                Add conditions to filter when this variable should display data
+                                Add conditions to filter when this variable should display data.
                               </div>
 
                               {variable.conditions && variable.conditions.length > 0 && (
@@ -632,29 +727,118 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                             </Accordion.Section>
                           )}
 
-                          <Accordion.Section title='Formatting Options'>
-                            <div className='mb-3'>
-                              <CheckBox
-                                value={variable.addCommas || false}
-                                fieldName='addCommas'
-                                label='Format numbers with commas'
-                                updateField={(_section, _subsection, _fieldName, value) =>
-                                  updateVariable(index, { addCommas: value })
-                                }
-                              />
-                            </div>
+                          {(sourceType === 'column' || (sourceType === 'metadata' && hasMetadataKeys)) && (
+                            <Accordion.Section title='Formatting Options'>
+                              <div className='mb-3'>
+                                <CheckBox
+                                  value={variable.addCommas || false}
+                                  fieldName='addCommas'
+                                  label='Format numbers with commas'
+                                  updateField={(_section, _subsection, _fieldName, value) =>
+                                    updateVariable(index, { addCommas: value })
+                                  }
+                                />
+                              </div>
 
-                            <div className='mb-3'>
-                              <CheckBox
-                                value={variable.hideOnNull || false}
-                                fieldName='hideOnNull'
-                                label='Hide section when value is null'
-                                updateField={(_section, _subsection, _fieldName, value) =>
-                                  updateVariable(index, { hideOnNull: value })
-                                }
-                              />
-                            </div>
-                          </Accordion.Section>
+                              <div className='mb-3'>
+                                <CheckBox
+                                  value={variable.hideOnNull || false}
+                                  fieldName='hideOnNull'
+                                  label='Hide section when value is null'
+                                  updateField={(_section, _subsection, _fieldName, value) =>
+                                    updateVariable(index, { hideOnNull: value })
+                                  }
+                                />
+                              </div>
+                            </Accordion.Section>
+                          )}
+
+                          {sourceType === 'column' && (
+                            <Accordion.Section title='Data-Driven Icons'>
+                              <div className='mb-3'>
+                                <CheckBox
+                                  value={usesDataDrivenIcons}
+                                  fieldName='enableSvgOutput'
+                                  label='Enable data-driven icons'
+                                  updateField={(_section, _subsection, _fieldName, value) => {
+                                    updateVariable(index, { outputType: value ? 'svg' : 'value' })
+                                  }}
+                                />
+                              </div>
+
+                              {usesDataDrivenIcons ? (
+                                <>
+                                  <div className='text-sm text-gray-500 mb-2'>
+                                    Map distinct values from this column to icons after filters and conditions are
+                                    applied.
+                                  </div>
+                                  {variable.columnName ? (
+                                    <>
+                                      {svgSourceValues.length > 0 ? (
+                                        svgSourceValues.map(sourceValue => {
+                                          const selectedSvgId =
+                                            variable.svgMappings?.find(mapping => mapping.sourceValue === sourceValue)
+                                              ?.svgId || ''
+
+                                          return (
+                                            <div
+                                              className='cove-accordion__panel-row align-center mb-2'
+                                              key={sourceValue}
+                                            >
+                                              <div className='cove-accordion__panel-col flex-grow'>{sourceValue}</div>
+                                              <div className='cove-accordion__panel-col flex-grow'>
+                                                <SvgIconSelect
+                                                  value={selectedSvgId}
+                                                  options={[{ value: '', label: 'None' }, ...SVG_REGISTRY_OPTIONS]}
+                                                  onChange={value =>
+                                                    updateSvgMapping(
+                                                      index,
+                                                      sourceValue,
+                                                      value as MarkupVariableSvgMapping['svgId'] | ''
+                                                    )
+                                                  }
+                                                />
+                                              </div>
+                                            </div>
+                                          )
+                                        })
+                                      ) : (
+                                        <div className='text-sm text-gray-500 mb-2'>
+                                          No values found for the selected column.
+                                        </div>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <div className='text-sm text-gray-500 mb-2'>
+                                      Select a data column above to map its values to icons.
+                                    </div>
+                                  )}
+                                  <div className='mb-3' style={SMALL_NUMBER_FIELD_WRAPPER_STYLE}>
+                                    <TextField
+                                      type='number'
+                                      step={0.1}
+                                      value={getNumericFieldValue(variable.svgScale)}
+                                      fieldName='svgScale'
+                                      label='Icon Scale'
+                                      updateField={(_section, _subsection, _fieldName, value) => {
+                                        const parsedScale = value === '' ? undefined : Number(value)
+                                        updateVariable(index, {
+                                          svgScale:
+                                            parsedScale === undefined || Number.isNaN(parsedScale)
+                                              ? undefined
+                                              : parsedScale
+                                        })
+                                      }}
+                                    />
+                                  </div>
+                                </>
+                              ) : (
+                                <div className='text-sm text-gray-500 mb-2'>
+                                  Enable this option to map column values to icons instead of text.
+                                </div>
+                              )}
+                            </Accordion.Section>
+                          )}
                         </Accordion>
 
                         <div className='mt-3 pt-3 border-t' style={{ textAlign: 'center' }}>

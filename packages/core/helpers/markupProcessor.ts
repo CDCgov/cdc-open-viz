@@ -1,5 +1,10 @@
 import _ from 'lodash'
-import { MarkupVariable, MarkupCondition } from '../types/MarkupVariable'
+import {
+  MarkupVariable,
+  MarkupCondition,
+  getMarkupVariableSourceType,
+  isDataDrivenIconsVariable
+} from '../types/MarkupVariable'
 import { VizFilter } from '../types/VizFilter'
 import { Datasets } from '../types/DataSet'
 import { filterVizData } from './filterVizData'
@@ -98,12 +103,30 @@ export const processMarkupVariables = (
         const workingVariable = markupVariables.find(variable => variable.tag === variableTag)
         if (!workingVariable) return variableTag
 
-        const outputType = workingVariable.outputType === 'svg' ? 'svg' : 'value'
+        const sourceType = getMarkupVariableSourceType(workingVariable)
+        const usesDataDrivenIcons = isDataDrivenIconsVariable(workingVariable)
 
-        if (outputType === 'svg') {
+        if (sourceType === 'icon') {
+          const svgMarkup =
+            workingVariable.iconId && SVG_REGISTRY[workingVariable.iconId]
+              ? buildInlineSvg(workingVariable.iconId, { scale: workingVariable.svgScale })
+              : ''
+
+          if (showNoDataMessage && svgMarkup === '') {
+            noDataMessageChecker.push(true)
+          }
+
+          if (svgMarkup === '' && allowHideSection) {
+            emptyVariableChecker.push(true)
+          }
+
+          return svgMarkup
+        }
+
+        if (usesDataDrivenIcons) {
           let svgMarkup = ''
 
-          if (!workingVariable.metadataKey && workingVariable.columnName) {
+          if (workingVariable.columnName) {
             let variableData = getDataForVariable(workingVariable)
             if (filters && filters.length > 0) {
               variableData = filterVizData(filters, variableData)
@@ -143,7 +166,7 @@ export const processMarkupVariables = (
         let effectiveColumnName: string
         let conditionFilteredData: any[]
 
-        if (workingVariable.metadataKey) {
+        if (sourceType === 'metadata') {
           // Metadata path: synthesize a single-row array from the file-level metadata
           // so it flows through the same formatting pipeline as column values.
           effectiveColumnName = workingVariable.metadataKey
@@ -269,37 +292,61 @@ export const validateMarkupVariables = (markupVariables: MarkupVariable[], data:
   const availableColumns = data.length > 0 ? Object.keys(data[0]) : []
 
   markupVariables.forEach((variable, index) => {
-    const outputType = variable.outputType === 'svg' ? 'svg' : 'value'
+    const sourceType = getMarkupVariableSourceType(variable)
+    const usesDataDrivenIcons = isDataDrivenIconsVariable(variable)
 
     if (!variable.tag || !variable.tag.match(/^{{.+}}$/)) {
       errors.push(`Variable ${index + 1}: Tag must be in format {{tagName}}`)
     }
 
-    if (outputType === 'value') {
-      if (!variable.metadataKey && !variable.columnName) {
-        errors.push(`Variable ${index + 1}: Column name is required`)
-      } else if (
-        variable.columnName &&
-        availableColumns.length > 0 &&
-        !availableColumns.includes(variable.columnName)
-      ) {
-        errors.push(`Variable ${index + 1}: Column "${variable.columnName}" not found in data`)
+    if (sourceType === 'icon') {
+      if (!variable.iconId) {
+        errors.push(`Variable ${index + 1}: Icon is required`)
       }
+
+      if (variable.svgScale !== undefined) {
+        const parsedScale = Number(variable.svgScale)
+        if (!Number.isFinite(parsedScale) || parsedScale <= 0) {
+          errors.push(`Variable ${index + 1}: Icon scale must be greater than 0`)
+        }
+      }
+
+      return
     }
 
-    if (outputType === 'svg') {
-      if (variable.metadataKey) {
-        errors.push(`Variable ${index + 1}: SVG output is not supported for metadata variables`)
+    if (sourceType === 'metadata') {
+      if (!variable.metadataKey) {
+        errors.push(`Variable ${index + 1}: Metadata field is required`)
       }
 
+      return
+    }
+
+    if (!variable.columnName) {
+      errors.push(`Variable ${index + 1}: Column name is required`)
+    } else if (
+      availableColumns.length > 0 &&
+      !availableColumns.includes(variable.columnName)
+    ) {
+      errors.push(`Variable ${index + 1}: Column "${variable.columnName}" not found in data`)
+    }
+
+    if (usesDataDrivenIcons) {
       if (!variable.columnName) {
-        errors.push(`Variable ${index + 1}: SVG column is required`)
+        errors.push(`Variable ${index + 1}: Data-driven icon column is required`)
       } else if (availableColumns.length > 0 && !availableColumns.includes(variable.columnName)) {
-        errors.push(`Variable ${index + 1}: SVG column "${variable.columnName}" not found in data`)
+        errors.push(`Variable ${index + 1}: Data-driven icon column "${variable.columnName}" not found in data`)
       }
 
       if (!variable.svgMappings || variable.svgMappings.length === 0) {
-        errors.push(`Variable ${index + 1}: SVG mappings are required`)
+        errors.push(`Variable ${index + 1}: Icon mappings are required`)
+      }
+
+      if (variable.svgScale !== undefined) {
+        const parsedScale = Number(variable.svgScale)
+        if (!Number.isFinite(parsedScale) || parsedScale <= 0) {
+          errors.push(`Variable ${index + 1}: Icon scale must be greater than 0`)
+        }
       }
     }
 

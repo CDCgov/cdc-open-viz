@@ -20,6 +20,12 @@ export const SVG_REGISTRY = {
 
 export type SvgRegistryId = keyof typeof SVG_REGISTRY
 
+export const getSvgRegistryLabel = (svgId?: string): string | undefined => {
+  if (!svgId || !(svgId in SVG_REGISTRY)) return undefined
+
+  return SVG_REGISTRY[svgId as SvgRegistryId].ariaLabel
+}
+
 export const SVG_REGISTRY_OPTIONS = (Object.keys(SVG_REGISTRY) as SvgRegistryId[]).map(key => ({
   value: key,
   label: SVG_REGISTRY[key].ariaLabel

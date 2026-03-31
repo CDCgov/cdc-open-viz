@@ -128,6 +128,76 @@ describe('update_4_26_4', () => {
     expect(result.contentEditor.style).toBe('default')
   })
 
+  it('backfills sourceType for standalone markup variables', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.3',
+      markupVariables: [
+        {
+          name: 'State',
+          tag: '{{state}}',
+          columnName: 'state',
+          conditions: []
+        },
+        {
+          name: 'Last Updated',
+          tag: '{{lastUpdated}}',
+          metadataKey: 'lastUpdated',
+          conditions: []
+        }
+      ]
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.markupVariables[0].sourceType).toBe('column')
+    expect(result.markupVariables[1].sourceType).toBe('metadata')
+    expect(config.markupVariables[0].sourceType).toBeUndefined()
+  })
+
+  it('preserves existing markup variable source types', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.3',
+      markupVariables: [
+        {
+          sourceType: 'icon',
+          name: 'Trend Up',
+          tag: '{{trend-arrow-up}}',
+          iconId: 'trend-arrow-up',
+          conditions: []
+        }
+      ]
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.markupVariables[0].sourceType).toBe('icon')
+  })
+
+  it('leaves null and undefined markup variables unchanged during sourceType backfill', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.3',
+      markupVariables: [
+        null,
+        undefined,
+        {
+          name: 'State',
+          tag: '{{state}}',
+          columnName: 'state',
+          conditions: []
+        }
+      ]
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.markupVariables[0]).toBeNull()
+    expect(result.markupVariables[1]).toBeUndefined()
+    expect(result.markupVariables[2].sourceType).toBe('column')
+  })
+
   it('does not mutate original chart config', () => {
     const config: any = {
       type: 'chart',
@@ -275,5 +345,36 @@ describe('update_4_26_4', () => {
     expect(result.visualizations.nestedDashboard.visualizations.nestedWaffle.valueDescription).toBe('')
     expect(result.visualizations.nestedDashboard.visualizations.nestedWaffle.showPercent).toBe(true)
     expect(result.visualizations.nestedDashboard.visualizations.nestedWaffle.showDenominator).toBe(false)
+  })
+
+  it('recursively backfills markup variable source types inside dashboards', () => {
+    const config: any = {
+      type: 'dashboard',
+      version: '4.26.3',
+      visualizations: {
+        nestedChart: {
+          type: 'chart',
+          markupVariables: [
+            {
+              name: 'State',
+              tag: '{{state}}',
+              columnName: 'state',
+              conditions: []
+            },
+            {
+              name: 'Source',
+              tag: '{{source}}',
+              metadataKey: 'source',
+              conditions: []
+            }
+          ]
+        }
+      }
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.visualizations.nestedChart.markupVariables[0].sourceType).toBe('column')
+    expect(result.visualizations.nestedChart.markupVariables[1].sourceType).toBe('metadata')
   })
 })
