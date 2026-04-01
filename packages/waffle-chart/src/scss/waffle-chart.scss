@@ -338,6 +338,17 @@
       min-height: 1rem; // Ensure minimum height even when empty
     }
 
+    &.use-wrap {
+      .cove-gauge-chart__body {
+        flex-wrap: wrap;
+      }
+
+      .cove-gauge-chart__value-section,
+      .cove-gauge-chart__content {
+        flex-basis: 100%;
+      }
+    }
+
     .cove-waffle-chart__data--primary {
       font-size: 2rem;
       color: var(--colors-cyan-60v);
