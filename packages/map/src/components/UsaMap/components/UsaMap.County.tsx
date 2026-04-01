@@ -554,29 +554,6 @@ const CountyMap = () => {
     if (config.general.type !== 'us-geocode') {
       //If no tooltip is shown, or if the current geo associated with the tooltip shown is no longer containing the mouse, then rerender the tooltip
       if (isNaN(currentTooltipIndex) || !geoContains(topoData.mapData[currentTooltipIndex], pointCoordinates)) {
-        if (
-          !isNaN(currentTooltipIndex) &&
-          applyLegendToRow(
-            runtimeData[topoData.mapData[currentTooltipIndex].id],
-            config,
-            runtimeLegend,
-            legendMemo,
-            legendSpecialClassLastMemo
-          )
-        ) {
-          const prevPath2d = geoPathCacheRef.current.get(topoData.mapData[currentTooltipIndex].id)
-          if (prevPath2d) {
-            // This causes HSA boundaries to disappear on hover.
-            // paintCountyGeo(
-            //   context,
-            //   prevPath2d,
-            //   runtimeData[topoData.mapData[currentTooltipIndex].id],
-            //   canvas.width,
-            //   lineWidth * strokeScale
-            // )
-          }
-        }
-
         let hoveredState
         let county
         let countyIndex
@@ -614,11 +591,6 @@ const CountyMap = () => {
               return
             }
             context.globalAlpha = 1
-            const hoverPath2d = geoPathCacheRef.current.get(county.id)
-            if (hoverPath2d) {
-              // This causes HSA boundaries to disappear on hover.
-              //paintCountyGeo(context, hoverPath2d, runtimeData[county.id], canvas.width, lineWidth * strokeScale)
-            }
           }
 
           // Track hover analytics event if this is a new location
