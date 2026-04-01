@@ -1021,7 +1021,7 @@ export const TP5GaugeGeneralSectionTests: Story = {
     // TEST 4: Message Update
     // Expectation: Gauge content text updates.
     // ============================================================================
-    const messageTextarea = canvas.getByLabelText(/message/i) as HTMLTextAreaElement
+    const messageTextarea = canvas.getByRole('textbox', { name: /message/i }) as HTMLTextAreaElement
     const newMessage = 'Updated TP5 gauge message text'
     await userEvent.clear(messageTextarea)
     await userEvent.type(messageTextarea, newMessage)
