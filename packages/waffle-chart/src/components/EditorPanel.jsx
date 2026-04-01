@@ -383,7 +383,7 @@ const EditorPanel = memo(props => {
                 value={config.trendIndicator?.column || ''}
                 section='trendIndicator'
                 fieldName='column'
-                label={trendMode === TREND_MODE_NUMERIC ? 'Historical Numerator Column' : 'Trend Column'}
+                label={trendMode === TREND_MODE_NUMERIC ? 'Trend Numerator Column' : 'Trend Column'}
                 tooltip={
                   trendMode === TREND_MODE_NUMERIC ? (
                     <Tooltip style={{ textTransform: 'none' }}>
@@ -392,8 +392,8 @@ const EditorPanel = memo(props => {
                       </Tooltip.Target>
                       <Tooltip.Content>
                         <p>
-                          Choose the column that contains past data for your metric. It will be run through the same
-                          function selected from the Data Function dropdown.
+                          Choose the column that contains past numerator data for your metric. It will be run through
+                          the same function selected from the Data Function dropdown.
                         </p>
                       </Tooltip.Content>
                     </Tooltip>
@@ -473,14 +473,6 @@ const EditorPanel = memo(props => {
                 placeholder='Decreasing'
                 updateField={updateField}
               />
-              <TextField
-                value={config.trendIndicator?.trendLabel || ''}
-                section='trendIndicator'
-                fieldName='trendLabel'
-                label='Trend Label'
-                placeholder='(compared to one year prior)'
-                updateField={updateField}
-              />
               {trendMode === TREND_MODE_NUMERIC && (
                 <>
                   <CheckBox
@@ -490,18 +482,27 @@ const EditorPanel = memo(props => {
                     label='Show indicator for no change'
                     updateField={updateField}
                   />
-                  {config.trendIndicator?.showNoChangeArrows && (
-                    <TextField
-                      value={config.trendIndicator?.noChangeLabel || ''}
-                      section='trendIndicator'
-                      fieldName='noChangeLabel'
-                      label='No Change Label'
-                      placeholder='No change'
-                      updateField={updateField}
-                    />
-                  )}
                 </>
               )}
+              {(trendMode === TREND_MODE_CATEGORICAL ||
+                (trendMode === TREND_MODE_NUMERIC && config.trendIndicator?.showNoChangeArrows)) && (
+                <TextField
+                  value={config.trendIndicator?.noChangeLabel || ''}
+                  section='trendIndicator'
+                  fieldName='noChangeLabel'
+                  label='No Change Label'
+                  placeholder='No change'
+                  updateField={updateField}
+                />
+              )}
+              <TextField
+                value={config.trendIndicator?.trendLabel || ''}
+                section='trendIndicator'
+                fieldName='trendLabel'
+                label='Trend description'
+                placeholder='(compared to one year prior)'
+                updateField={updateField}
+              />
             </>
           )}
         </div>

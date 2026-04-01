@@ -429,14 +429,6 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                         placeholder='Decreasing'
                         updateField={updateField}
                       />
-                      <TextField
-                        value={config.trendIndicator?.trendLabel || ''}
-                        section='trendIndicator'
-                        fieldName='trendLabel'
-                        label='Trend Label'
-                        placeholder='(compared to one year prior)'
-                        updateField={updateField}
-                      />
                       {trendMode === TREND_MODE_NUMERIC && (
                         <>
                           <CheckBox
@@ -446,18 +438,27 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                             label='Show indicator for no change'
                             updateField={updateField}
                           />
-                          {config.trendIndicator?.showNoChangeArrows && (
-                            <TextField
-                              value={config.trendIndicator?.noChangeLabel || ''}
-                              section='trendIndicator'
-                              fieldName='noChangeLabel'
-                              label='No Change Label'
-                              placeholder='No change'
-                              updateField={updateField}
-                            />
-                          )}
                         </>
                       )}
+                      {(trendMode === TREND_MODE_CATEGORICAL ||
+                        (trendMode === TREND_MODE_NUMERIC && config.trendIndicator?.showNoChangeArrows)) && (
+                        <TextField
+                          value={config.trendIndicator?.noChangeLabel || ''}
+                          section='trendIndicator'
+                          fieldName='noChangeLabel'
+                          label='No Change Label'
+                          placeholder='No change'
+                          updateField={updateField}
+                        />
+                      )}
+                      <TextField
+                        value={config.trendIndicator?.trendLabel || ''}
+                        section='trendIndicator'
+                        fieldName='trendLabel'
+                        label='Trend description'
+                        placeholder='(compared to one year prior)'
+                        updateField={updateField}
+                      />
                     </>
                   ))}
               </div>
