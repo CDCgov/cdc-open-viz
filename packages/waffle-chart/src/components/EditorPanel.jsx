@@ -384,6 +384,21 @@ const EditorPanel = memo(props => {
                 section='trendIndicator'
                 fieldName='column'
                 label={trendMode === TREND_MODE_NUMERIC ? 'Historical Numerator Column' : 'Trend Column'}
+                tooltip={
+                  trendMode === TREND_MODE_NUMERIC ? (
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                      </Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>
+                          Choose the column that contains past data for your metric. It will be run through the same
+                          function selected from the Data Function dropdown.
+                        </p>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  ) : null
+                }
                 updateField={updateField}
                 initial='Select'
                 options={columns}

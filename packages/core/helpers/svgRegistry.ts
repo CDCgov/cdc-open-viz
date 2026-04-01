@@ -36,7 +36,7 @@ export const SVG_REGISTRY_OPTIONS = (Object.keys(SVG_REGISTRY) as SvgRegistryId[
   label: SVG_REGISTRY[key].ariaLabel
 }))
 
-const DEFAULT_SVG_SCALE = 1
+export const DEFAULT_SVG_SCALE = 0.8
 
 const normalizeSvgScale = (scale?: number): number => {
   const parsed = Number(scale)

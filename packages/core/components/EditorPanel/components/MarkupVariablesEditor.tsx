@@ -7,7 +7,7 @@ import {
   getMarkupVariableSourceType,
   isDataDrivenIconsVariable
 } from '../../../types/MarkupVariable'
-import { SVG_REGISTRY_OPTIONS, getSvgRegistryLabel } from '../../../helpers/svgRegistry'
+import { DEFAULT_SVG_SCALE, SVG_REGISTRY_OPTIONS, getSvgRegistryLabel } from '../../../helpers/svgRegistry'
 import Button from '../../elements/Button'
 import { TextField, Select, CheckBox } from '../Inputs'
 import SvgIconSelect from './SvgIconSelect'
@@ -39,6 +39,8 @@ export type { MarkupVariablesEditorProps }
 
 const METADATA_DOCS_PLACEHOLDER_URL = 'https://example.com/docs/add-metadata'
 const SMALL_NUMBER_FIELD_WRAPPER_STYLE = { maxWidth: '5rem' }
+type MarkupVariableEditorSourceType = MarkupVariableSourceType
+type MarkupVariableIconMode = 'static' | 'data-driven'
 
 const generateTagFromName = (name: string) => {
   if (!name) return ''
@@ -52,6 +54,14 @@ const generateTagFromName = (name: string) => {
 }
 
 const removeTagWrappers = (tag: string) => tag.replace(/^{{/, '').replace(/}}$/, '')
+
+const getMarkupVariableEditorSourceType = (variable: Partial<MarkupVariable>): MarkupVariableEditorSourceType => {
+  return isDataDrivenIconsVariable(variable) ? 'icon' : getMarkupVariableSourceType(variable)
+}
+
+const getMarkupVariableIconMode = (variable: Partial<MarkupVariable>): MarkupVariableIconMode => {
+  return isDataDrivenIconsVariable(variable) ? 'data-driven' : 'static'
+}
 
 /**
  * Editor for creating and managing markup variables with {{variable-name}} syntax.
@@ -128,10 +138,28 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
       }
     }
 
+    const defaultName = `icon-${resolvedIconId}`
+
     return {
       iconId: resolvedIconId,
-      name: removeTagWrappers(generateTagFromName(resolvedIconId)),
-      tag: generateTagFromName(resolvedIconId)
+      name: removeTagWrappers(generateTagFromName(defaultName)),
+      tag: generateTagFromName(defaultName)
+    }
+  }, [])
+
+  const getDataDrivenIconDefaults = useCallback((columnName?: string) => {
+    if (!columnName) {
+      return {
+        name: '',
+        tag: ''
+      }
+    }
+
+    const defaultName = `icon-${columnName}`
+
+    return {
+      name: removeTagWrappers(generateTagFromName(defaultName)),
+      tag: generateTagFromName(defaultName)
     }
   }, [])
 
@@ -355,7 +383,34 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
       return
     }
 
+    if (sourceType === 'column') {
+      updateVariable(index, { sourceType, outputType: 'value' })
+      return
+    }
+
     updateVariable(index, { sourceType })
+  }
+
+  const updateIconMode = (index: number, iconMode: MarkupVariableIconMode) => {
+    const variable = safeMarkupVariables[index]
+
+    if (iconMode === 'data-driven') {
+      const dataDrivenIconDefaults = getDataDrivenIconDefaults(variable.columnName)
+      updateVariable(index, {
+        sourceType: 'column',
+        outputType: 'svg',
+        ...dataDrivenIconDefaults
+      })
+      return
+    }
+
+    const iconDefaults = getIconDefaults(variable.iconId)
+    updateVariable(index, {
+      sourceType: 'icon',
+      iconId: iconDefaults.iconId,
+      name: iconDefaults.name,
+      tag: iconDefaults.tag
+    })
   }
 
   const renderReadonlyField = (label: string, value: string, placeholder: string) => (
@@ -374,7 +429,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
   )
 
   const getNumericFieldValue = (value?: number) =>
-    value === undefined || Number.isNaN(Number(value)) ? 1 : Number(value)
+    value === undefined || Number.isNaN(Number(value)) ? DEFAULT_SVG_SCALE : Number(value)
 
   return (
     <div className='markup-variables-editor'>
@@ -406,6 +461,8 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                 if (!variable) return <></>
 
                 const sourceType = getMarkupVariableSourceType(variable)
+                const editorSourceType = getMarkupVariableEditorSourceType(variable)
+                const iconMode = getMarkupVariableIconMode(variable)
                 const usesDataDrivenIcons = isDataDrivenIconsVariable(variable)
                 const svgSourceValues =
                   sourceType === 'column' && usesDataDrivenIcons && variable.columnName
@@ -434,14 +491,27 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                             <>
                               Metadata: <strong>{variable.metadataKey || 'Not selected'}</strong>
                             </>
-                          ) : sourceType === 'icon' ? (
+                          ) : editorSourceType === 'icon' ? (
                             <>
-                              Icon: <strong>{iconLabel}</strong>
+                              {iconMode === 'data-driven' ? (
+                                <>
+                                  Data-Driven Icon: <strong>{variable.columnName || 'Not selected'}</strong>
+                                </>
+                              ) : (
+                                <>
+                                  Icon: <strong>{iconLabel}</strong>
+                                </>
+                              )}
+                              {variable.conditions && variable.conditions.length > 0 && (
+                                <span>
+                                  {' '}
+                                  • {variable.conditions.length} condition{variable.conditions.length !== 1 ? 's' : ''}
+                                </span>
+                              )}
                             </>
                           ) : (
                             <>
                               Column: <strong>{variable.columnName || 'Not selected'}</strong>
-                              {usesDataDrivenIcons && <span> • Data-Driven Icons</span>}
                               {variable.conditions && variable.conditions.length > 0 && (
                                 <span>
                                   {' '}
@@ -478,7 +548,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                           <Accordion.Section title='Basic Settings'>
                             <div className='mb-3'>
                               <Select
-                                value={sourceType}
+                                value={editorSourceType}
                                 fieldName='variableSource'
                                 label='Source'
                                 options={[
@@ -491,6 +561,147 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                 }}
                               />
                             </div>
+
+                            {editorSourceType === 'icon' && (
+                              <>
+                                <div className='mb-3'>
+                                  <Select
+                                    value={iconMode}
+                                    fieldName='iconMode'
+                                    label='Icon Mode'
+                                    options={[
+                                      { value: 'static', label: 'Static Icon' },
+                                      { value: 'data-driven', label: 'Data-Driven Icon' }
+                                    ]}
+                                    updateField={(_section, _subsection, _fieldName, value) => {
+                                      updateIconMode(index, value as MarkupVariableIconMode)
+                                    }}
+                                  />
+                                </div>
+
+                                {iconMode === 'static' ? (
+                                  <div className='mb-3'>
+                                    <span className='edit-label column-heading'>Icon</span>
+                                    <div>
+                                      <SvgIconSelect
+                                        value={variable.iconId || ''}
+                                        options={SVG_REGISTRY_OPTIONS}
+                                        onChange={value => {
+                                          updateVariable(index, {
+                                            sourceType: 'icon',
+                                            ...getIconDefaults(value as MarkupVariable['iconId'])
+                                          })
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <div className='mb-3'>
+                                      <Select
+                                        value={variable.columnName}
+                                        fieldName='columnName'
+                                        label='Data Column'
+                                        options={[
+                                          { value: '', label: 'Select Column...' },
+                                          ...getAvailableColumns.map(col => ({ value: col, label: col }))
+                                        ]}
+                                        updateField={(_section, _subsection, _fieldName, value) => {
+                                          const dataDrivenIconDefaults = getDataDrivenIconDefaults(value)
+                                          updateVariable(index, {
+                                            sourceType: 'column',
+                                            outputType: 'svg',
+                                            columnName: value,
+                                            ...dataDrivenIconDefaults
+                                          })
+                                        }}
+                                      />
+                                    </div>
+
+                                    {variable.columnName ? (
+                                      <>
+                                        {svgSourceValues.length > 0 ? (
+                                          svgSourceValues.map(sourceValue => {
+                                            const selectedSvgId =
+                                              variable.svgMappings?.find(mapping => mapping.sourceValue === sourceValue)
+                                                ?.svgId || ''
+
+                                            return (
+                                              <div
+                                                className='cove-accordion__panel-row align-center mb-2'
+                                                key={sourceValue}
+                                              >
+                                                <div className='cove-accordion__panel-col flex-grow'>{sourceValue}</div>
+                                                <div className='cove-accordion__panel-col flex-grow'>
+                                                  <SvgIconSelect
+                                                    value={selectedSvgId}
+                                                    options={[{ value: '', label: 'None' }, ...SVG_REGISTRY_OPTIONS]}
+                                                    onChange={value =>
+                                                      updateSvgMapping(
+                                                        index,
+                                                        sourceValue,
+                                                        value as MarkupVariableSvgMapping['svgId'] | ''
+                                                      )
+                                                    }
+                                                  />
+                                                </div>
+                                              </div>
+                                            )
+                                          })
+                                        ) : (
+                                          <div className='text-sm text-gray-500 mb-2'>
+                                            No values found for the selected column.
+                                          </div>
+                                        )}
+                                      </>
+                                    ) : (
+                                      <div className='text-sm text-gray-500 mb-2'>
+                                        Select a data column to map its values to icons.
+                                      </div>
+                                    )}
+                                  </>
+                                )}
+
+                                <div className='mb-3'>
+                                  <TextField
+                                    value={variable.name}
+                                    fieldName='name'
+                                    label='Variable Name'
+                                    placeholder={
+                                      iconMode === 'data-driven'
+                                        ? 'e.g., "Trend Indicator"'
+                                        : 'e.g., "trend-arrow-up-small"'
+                                    }
+                                    updateField={(_section, _subsection, _fieldName, value) => {
+                                      updateVariable(index, {
+                                        name: value,
+                                        tag: generateTagFromName(value)
+                                      })
+                                    }}
+                                  />
+                                </div>
+                                {renderReadonlyField('Tag (auto-generated)', variable.tag, '{{icon-name}}')}
+
+                                <div className='mb-3' style={SMALL_NUMBER_FIELD_WRAPPER_STYLE}>
+                                  <TextField
+                                    type='number'
+                                    step={0.1}
+                                    value={getNumericFieldValue(variable.svgScale)}
+                                    fieldName='svgScale'
+                                    label='Icon Scale'
+                                    updateField={(_section, _subsection, _fieldName, value) => {
+                                      const parsedScale = value === '' ? undefined : Number(value)
+                                      updateVariable(index, {
+                                        svgScale:
+                                          parsedScale === undefined || Number.isNaN(parsedScale)
+                                            ? undefined
+                                            : parsedScale
+                                      })
+                                    }}
+                                  />
+                                </div>
+                              </>
+                            )}
 
                             {sourceType === 'metadata' && (
                               <>
@@ -550,7 +761,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                               </>
                             )}
 
-                            {sourceType === 'column' && (
+                            {sourceType === 'column' && editorSourceType !== 'icon' && (
                               <>
                                 <div className='mb-3'>
                                   <Select
@@ -586,59 +797,6 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                   />
                                 </div>
                                 {renderReadonlyField('Tag (auto-generated)', variable.tag, '{{variable-name}}')}
-                              </>
-                            )}
-
-                            {sourceType === 'icon' && (
-                              <>
-                                <div className='mb-3'>
-                                  <span className='edit-label column-heading'>Icon</span>
-                                  <div>
-                                    <SvgIconSelect
-                                      value={variable.iconId || ''}
-                                      options={SVG_REGISTRY_OPTIONS}
-                                      onChange={value => {
-                                        updateVariable(index, {
-                                          sourceType: 'icon',
-                                          ...getIconDefaults(value as MarkupVariable['iconId'])
-                                        })
-                                      }}
-                                    />
-                                  </div>
-                                </div>
-                                <div className='mb-3'>
-                                  <TextField
-                                    value={variable.name}
-                                    fieldName='name'
-                                    label='Variable Name'
-                                    placeholder='e.g., "trend-arrow-up-small"'
-                                    updateField={(_section, _subsection, _fieldName, value) => {
-                                      updateVariable(index, {
-                                        name: value,
-                                        tag: generateTagFromName(value)
-                                      })
-                                    }}
-                                  />
-                                </div>
-                                {renderReadonlyField('Tag (auto-generated)', variable.tag, '{{icon-name}}')}
-                                <div className='mb-3' style={SMALL_NUMBER_FIELD_WRAPPER_STYLE}>
-                                  <TextField
-                                    type='number'
-                                    step={0.1}
-                                    value={getNumericFieldValue(variable.svgScale)}
-                                    fieldName='svgScale'
-                                    label='Icon Scale'
-                                    updateField={(_section, _subsection, _fieldName, value) => {
-                                      const parsedScale = value === '' ? undefined : Number(value)
-                                      updateVariable(index, {
-                                        svgScale:
-                                          parsedScale === undefined || Number.isNaN(parsedScale)
-                                            ? undefined
-                                            : parsedScale
-                                      })
-                                    }}
-                                  />
-                                </div>
                               </>
                             )}
                           </Accordion.Section>
@@ -727,7 +885,8 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                             </Accordion.Section>
                           )}
 
-                          {(sourceType === 'column' || (sourceType === 'metadata' && hasMetadataKeys)) && (
+                          {((sourceType === 'column' && editorSourceType !== 'icon') ||
+                            (sourceType === 'metadata' && hasMetadataKeys)) && (
                             <Accordion.Section title='Formatting Options'>
                               <div className='mb-3'>
                                 <CheckBox
@@ -750,93 +909,6 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                   }
                                 />
                               </div>
-                            </Accordion.Section>
-                          )}
-
-                          {sourceType === 'column' && (
-                            <Accordion.Section title='Data-Driven Icons'>
-                              <div className='mb-3'>
-                                <CheckBox
-                                  value={usesDataDrivenIcons}
-                                  fieldName='enableSvgOutput'
-                                  label='Enable data-driven icons'
-                                  updateField={(_section, _subsection, _fieldName, value) => {
-                                    updateVariable(index, { outputType: value ? 'svg' : 'value' })
-                                  }}
-                                />
-                              </div>
-
-                              {usesDataDrivenIcons ? (
-                                <>
-                                  <div className='text-sm text-gray-500 mb-2'>
-                                    Map distinct values from this column to icons after filters and conditions are
-                                    applied.
-                                  </div>
-                                  {variable.columnName ? (
-                                    <>
-                                      {svgSourceValues.length > 0 ? (
-                                        svgSourceValues.map(sourceValue => {
-                                          const selectedSvgId =
-                                            variable.svgMappings?.find(mapping => mapping.sourceValue === sourceValue)
-                                              ?.svgId || ''
-
-                                          return (
-                                            <div
-                                              className='cove-accordion__panel-row align-center mb-2'
-                                              key={sourceValue}
-                                            >
-                                              <div className='cove-accordion__panel-col flex-grow'>{sourceValue}</div>
-                                              <div className='cove-accordion__panel-col flex-grow'>
-                                                <SvgIconSelect
-                                                  value={selectedSvgId}
-                                                  options={[{ value: '', label: 'None' }, ...SVG_REGISTRY_OPTIONS]}
-                                                  onChange={value =>
-                                                    updateSvgMapping(
-                                                      index,
-                                                      sourceValue,
-                                                      value as MarkupVariableSvgMapping['svgId'] | ''
-                                                    )
-                                                  }
-                                                />
-                                              </div>
-                                            </div>
-                                          )
-                                        })
-                                      ) : (
-                                        <div className='text-sm text-gray-500 mb-2'>
-                                          No values found for the selected column.
-                                        </div>
-                                      )}
-                                    </>
-                                  ) : (
-                                    <div className='text-sm text-gray-500 mb-2'>
-                                      Select a data column above to map its values to icons.
-                                    </div>
-                                  )}
-                                  <div className='mb-3' style={SMALL_NUMBER_FIELD_WRAPPER_STYLE}>
-                                    <TextField
-                                      type='number'
-                                      step={0.1}
-                                      value={getNumericFieldValue(variable.svgScale)}
-                                      fieldName='svgScale'
-                                      label='Icon Scale'
-                                      updateField={(_section, _subsection, _fieldName, value) => {
-                                        const parsedScale = value === '' ? undefined : Number(value)
-                                        updateVariable(index, {
-                                          svgScale:
-                                            parsedScale === undefined || Number.isNaN(parsedScale)
-                                              ? undefined
-                                              : parsedScale
-                                        })
-                                      }}
-                                    />
-                                  </div>
-                                </>
-                              ) : (
-                                <div className='text-sm text-gray-500 mb-2'>
-                                  Enable this option to map column values to icons instead of text.
-                                </div>
-                              )}
                             </Accordion.Section>
                           )}
                         </Accordion>

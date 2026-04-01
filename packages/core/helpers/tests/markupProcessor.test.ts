@@ -674,6 +674,22 @@ describe('processMarkupVariables', () => {
       expect(result.processedContent).toContain('rotate(90deg)')
     })
 
+    it('should default icon scale to 0.8 when no svgScale is provided', () => {
+      const variables: MarkupVariable[] = [
+        {
+          sourceType: 'icon',
+          name: 'Trend Up',
+          tag: '{{trend-arrow-up}}',
+          iconId: 'trend-arrow-up',
+          conditions: []
+        }
+      ]
+
+      const result = processMarkupVariables('{{trend-arrow-up}}', trendData, variables)
+
+      expect(result.processedContent).toContain('transform: scale(0.8)')
+    })
+
     it('should return empty string when the mapped value is missing', () => {
       const variables: MarkupVariable[] = [
         {
