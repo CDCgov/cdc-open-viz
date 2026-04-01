@@ -111,6 +111,11 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
         <CdcMarkupInclude
           key={visualizationKey}
           config={visualizationConfig}
+          rawData={
+            state.data?.[visualizationConfig.dataKey] ||
+            state.config.datasets?.[visualizationConfig.dataKey]?.data ||
+            []
+          }
           isEditor={true}
           setConfig={_updateConfig}
           isDashboard={true}

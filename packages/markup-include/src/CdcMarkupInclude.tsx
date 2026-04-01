@@ -31,6 +31,7 @@ type CdcMarkupIncludeProps = {
   datasets: Datasets
   isDashboard: boolean
   isEditor: boolean
+  rawData?: any[]
   setConfig: any
   interactionLabel?: string
 }
@@ -46,6 +47,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   datasets,
   isDashboard = true,
   isEditor = false,
+  rawData,
   setConfig: setParentConfig,
   interactionLabel = 'no link provided'
 }) => {
@@ -77,6 +79,18 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   // Support markupVariables at root level or inside contentEditor
   const markupVariables = config?.markupVariables || contentEditorMarkupVariables || []
+  const editorData = useMemo(() => {
+    if (isDashboard && isEditor && Array.isArray(rawData) && rawData.length) {
+      return rawData
+    }
+
+    const assignedDatasetData = config?.dataKey ? datasets?.[config.dataKey]?.data : undefined
+    if (Array.isArray(assignedDatasetData) && assignedDatasetData.length) {
+      return assignedDatasetData
+    }
+
+    return data || []
+  }, [config?.dataKey, data, datasets, isDashboard, isEditor, rawData])
 
   const { inlineHTML, srcUrl, title, useInlineHTML, style: contentStyle } = contentEditor || {}
   const markupIncludeStyle = contentStyle || 'default'
@@ -432,7 +446,9 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   return (
     <ErrorBoundary component='CdcMarkupInclude'>
-      <ConfigContext.Provider value={{ config, updateConfig, loading, data: data, setParentConfig, isDashboard }}>
+      <ConfigContext.Provider
+        value={{ config, updateConfig, loading, data: data, editorData, setParentConfig, isDashboard }}
+      >
         {!config?.newViz && config?.runtime && config?.runtime.editorErrorMessage && <Error />}
         <VisualizationContainer
           config={config as any}
