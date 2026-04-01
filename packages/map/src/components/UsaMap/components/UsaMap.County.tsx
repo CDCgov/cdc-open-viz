@@ -194,27 +194,35 @@ const CountyMap = () => {
     }
   })
 
+  const getAndSetTopoData = currentYear => {
+    getTopoData(currentYear, config.general.showHSABoundaries).then(response => {
+      if (canvasRef.current) {
+        const context = canvasRef.current.getContext('2d') as CanvasRenderingContext2D
+        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
+      }
+      setTopoData(response)
+    })
+  }
+
   useEffect(() => {
-    let currentYear = getCurrentTopoYear(config, runtimeFilters)
+    const currentYear = getCurrentTopoYear(config, runtimeFilters)
 
     if (currentYear !== topoData.year) {
-      getTopoData(currentYear, config.general.showHSABoundaries).then(response => {
-        if (canvasRef.current) {
-          const context = canvasRef.current.getContext('2d')
-          context.clearRect(canvasRef.current.width, canvasRef.current.height)
-        }
-        setTopoData(response)
-      })
+      getAndSetTopoData(currentYear)
     }
   }, [config.general.countyCensusYear, config.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
+
+  const prevShowHSABoundariesRef = useRef(config.general.showHSABoundaries)
+  useEffect(() => {
+    if (prevShowHSABoundariesRef.current === config.general.showHSABoundaries) return
+    const currentYear = getCurrentTopoYear(config, runtimeFilters)
+    getAndSetTopoData(currentYear)
+    prevShowHSABoundariesRef.current = config.general.showHSABoundaries
+  }, [config.general.showHSABoundaries])
 
   // Whenever the memo at the top is triggered and the map is called to re-render, call drawCanvas and update
   // The resize function so it includes the latest state variables
   useEffect(() => {
-    if (isTopoReady(topoData, config, runtimeFilters)) {
-      drawCanvas()
-    }
-
     const onResize = () => {
       if (canvasRef.current && isTopoReady(topoData, config, runtimeFilters)) {
         drawCanvas()
@@ -849,7 +857,7 @@ const CountyMap = () => {
 
     if (config.general.showHSABoundaries) {
       context.lineWidth = hsaStrokeWidth
-      topoData.hsas.forEach(hsa => {
+      topoData.hsas?.forEach(hsa => {
         if (!hsa?.groupId) return
         const cacheKey = 'hsa_border_' + hsa.groupId
         const path2d = cache.get(cacheKey)
@@ -988,14 +996,15 @@ const CountyMap = () => {
     resetZoomTransform()
   }, [focus?.id])
 
-  // If runtimeData is not defined, show loader
-  if (!runtimeData || !isTopoReady(topoData, config, runtimeFilters)) {
-    return (
-      <div style={{ height: 300 }}>
-        <Loading />
-      </div>
-    )
-  }
+  const isLoading = !runtimeData || !isTopoReady(topoData, config, runtimeFilters) || !canvasRef.current
+
+  useEffect(() => {
+    if (isLoading) {
+      return
+    }
+
+    drawCanvas()
+  }, [isLoading, topoData, focus, runtimeLegend, runtimeData, featureArray, config])
 
   const showManualZoomControls = config.general.allowMapZoom
   const showResetControl = (hasMoved || focus.id) && (showManualZoomControls || config.general.type === 'us-geocode')
@@ -1004,6 +1013,11 @@ const CountyMap = () => {
 
   return (
     <ErrorBoundary component='CountyMap'>
+      {isLoading && (
+        <div style={{ height: 300 }}>
+          <Loading />
+        </div>
+      )}
       <canvas
         ref={canvasRef}
         aria-label={handleMapAriaLabels(config)}
@@ -1013,12 +1027,12 @@ const CountyMap = () => {
           tooltipRef.current.setAttribute('data-index', null)
         }}
         onClick={canvasClick}
-        className='county-map-canvas'
+        className={'county-map-canvas' + (isLoading ? ' d-none' : '')}
         style={config.general.allowMapZoom ? undefined : { cursor: 'default' }}
       ></canvas>
 
       {showManualZoomControls && (
-        <div className='zoom-controls' data-html2canvas-ignore='true'>
+        <div className={'zoom-controls' + (isLoading ? ' d-none' : '')} data-html2canvas-ignore='true'>
           <button onClick={handleZoomIn} aria-label='Zoom In'>
             <svg viewBox='0 0 24 24' stroke='currentColor' strokeWidth='3'>
               <line x1='12' y1='5' x2='12' y2='19' />
