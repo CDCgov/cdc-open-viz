@@ -12,6 +12,11 @@ export const SVG_REGISTRY = {
     ariaLabel: 'Trend down',
     isDown: true
   },
+  'trend-arrow-no-change': {
+    rawSvg: arrowUpSvg,
+    ariaLabel: 'Trend no change',
+    rotationDegrees: 90
+  },
   'link-external': {
     rawSvg: arrowUpRightFromSquareSvg,
     ariaLabel: 'External link'
@@ -41,9 +46,15 @@ const normalizeSvgScale = (scale?: number): number => {
   return parsed
 }
 
-const buildSvgTransform = (scale: number, isDown?: boolean): string => {
+const buildSvgTransform = (scale: number, isDown?: boolean, rotationDegrees = 0): string => {
   const baseTransform = `scale(${scale})`
-  return isDown ? `${baseTransform} scale(-1, 1) rotate(180deg)` : baseTransform
+  const directionalTransform = isDown
+    ? 'scale(-1, 1) rotate(180deg)'
+    : rotationDegrees
+    ? `rotate(${rotationDegrees}deg)`
+    : ''
+
+  return [baseTransform, directionalTransform].filter(Boolean).join(' ')
 }
 
 export const buildInlineSvg = (
@@ -59,9 +70,10 @@ export const buildInlineSvg = (
 
   const scale = normalizeSvgScale(options.scale)
   const isDown = 'isDown' in entry && entry.isDown
+  const rotationDegrees = 'rotationDegrees' in entry ? entry.rotationDegrees : 0
   const className = ['cove-trend-arrow', isDown ? 'is-down' : '', options.className].filter(Boolean).join(' ')
   const ariaLabel = options.ariaLabel || entry.ariaLabel
-  const style = `width: 1em; height: 1em; transform: ${buildSvgTransform(scale, isDown)}; transform-origin: center;`
+  const style = `width: 1em; height: 1em; transform: ${buildSvgTransform(scale, isDown, rotationDegrees)}; transform-origin: center;`
   const svgMarkup = entry.rawSvg.trim()
 
   return svgMarkup.replace('<svg', `<svg class="${className}" role="img" aria-label="${ariaLabel}" style="${style}"`)

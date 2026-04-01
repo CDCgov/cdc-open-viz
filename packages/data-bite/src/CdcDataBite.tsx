@@ -53,6 +53,7 @@ import {
 import {
   resolveTrendIndicator,
   TREND_ARROW_DOWN,
+  TREND_ARROW_NO_CHANGE,
   TREND_ARROW_UP,
   TREND_MODE_CATEGORICAL,
   TREND_MODE_NUMERIC
@@ -280,12 +281,15 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
         ? trendIndicator?.upLabel
         : trendResolution.arrowType === TREND_ARROW_DOWN
         ? trendIndicator?.downLabel
+        : trendResolution.arrowType === TREND_ARROW_NO_CHANGE
+        ? trendIndicator?.noChangeLabel
         : ''
 
     const raw = typeof label === 'string' ? label.trim() : ''
     return raw ? processContentWithMarkup(raw) : ''
   }, [
     trendIndicator?.downLabel,
+    trendIndicator?.noChangeLabel,
     trendIndicator?.upLabel,
     trendResolution.arrowType,
     trendResolution.state,

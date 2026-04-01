@@ -4,8 +4,9 @@ import { aggregateByDataFunction, NUMERIC_TREND_ELIGIBLE_FUNCTIONS } from './dat
 
 export const TREND_ARROW_UP = 'up'
 export const TREND_ARROW_DOWN = 'down'
+export const TREND_ARROW_NO_CHANGE = 'no-change'
 
-export const TREND_ARROW_TYPES = [TREND_ARROW_UP, TREND_ARROW_DOWN] as const
+export const TREND_ARROW_TYPES = [TREND_ARROW_UP, TREND_ARROW_DOWN, TREND_ARROW_NO_CHANGE] as const
 export type TrendArrowType = (typeof TREND_ARROW_TYPES)[number]
 
 export const TREND_MODE_CATEGORICAL = 'categorical'
@@ -23,8 +24,10 @@ export type TrendIndicatorConfig = {
   column?: string
   numericThreshold?: number
   mappings?: TrendIndicatorMapping[]
+  showNoChangeArrows?: boolean
   upLabel?: string
   downLabel?: string
+  noChangeLabel?: string
   trendLabel?: string
 }
 
@@ -132,6 +135,10 @@ export const resolveTrendIndicator = ({
 
     if (delta < -threshold) {
       return { state: 'resolved', arrowType: TREND_ARROW_DOWN }
+    }
+
+    if (trendIndicator.showNoChangeArrows) {
+      return { state: 'resolved', arrowType: TREND_ARROW_NO_CHANGE }
     }
 
     return { state: 'unmapped' }

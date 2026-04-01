@@ -175,4 +175,85 @@ describe('Data Bite', () => {
     expect(container.querySelector('.cdc-callout__body--content-right')).toBeInTheDocument()
     expect(container.querySelector('.mock-trend-arrow-wrap.cove-trend-arrow__wrap--inline')).toBeInTheDocument()
   })
+
+  it('renders a no-change trend label when numeric no-change arrows are enabled', () => {
+    const { container } = render(
+      <CdcDataBite
+        config={{
+          type: 'data-bite',
+          theme: 'theme-blue',
+          title: 'Test title',
+          biteStyle: 'tp5',
+          biteBody: 'Test body',
+          dataColumn: 'value',
+          dataFunction: 'Mean (Average)',
+          dataFormat: {
+            prefix: '',
+            suffix: '',
+            commas: false,
+            roundToPlace: 0
+          },
+          visual: {
+            showTitle: true,
+            useWrap: false,
+            whiteBackground: false,
+            border: true
+          },
+          trendIndicator: {
+            mode: 'numeric',
+            column: 'historical',
+            numericThreshold: 5,
+            showNoChangeArrows: true,
+            noChangeLabel: 'No change'
+          },
+          data: [
+            { value: 10, historical: 8 },
+            { value: 10, historical: 12 }
+          ]
+        }}
+      />
+    )
+
+    expect(container.querySelector('.mock-trend-arrow')).toHaveTextContent('No change')
+  })
+
+  it('does not render a no-change trend arrow when numeric no-change arrows are disabled', () => {
+    const { container } = render(
+      <CdcDataBite
+        config={{
+          type: 'data-bite',
+          theme: 'theme-blue',
+          title: 'Test title',
+          biteStyle: 'tp5',
+          biteBody: 'Test body',
+          dataColumn: 'value',
+          dataFunction: 'Mean (Average)',
+          dataFormat: {
+            prefix: '',
+            suffix: '',
+            commas: false,
+            roundToPlace: 0
+          },
+          visual: {
+            showTitle: true,
+            useWrap: false,
+            whiteBackground: false,
+            border: true
+          },
+          trendIndicator: {
+            mode: 'numeric',
+            column: 'historical',
+            numericThreshold: 5,
+            noChangeLabel: 'No change'
+          },
+          data: [
+            { value: 10, historical: 8 },
+            { value: 10, historical: 12 }
+          ]
+        }}
+      />
+    )
+
+    expect(container.querySelector('.mock-trend-arrow-wrap')).not.toBeInTheDocument()
+  })
 })

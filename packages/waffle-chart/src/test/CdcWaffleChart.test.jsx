@@ -199,4 +199,117 @@ describe('Waffle Chart', () => {
     expect(container.querySelector('.cove-waffle-chart__trend-slot--below')).not.toBeInTheDocument()
     expect(container.querySelector('.mock-trend-arrow-wrap.cove-trend-arrow__wrap--inline')).toBeInTheDocument()
   })
+
+  it('renders a no-change trend label when numeric no-change arrows are enabled', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={{
+          type: 'waffle-chart',
+          title: 'Test Waffle',
+          showTitle: true,
+          visualizationType: 'TP5 Waffle',
+          shape: 'square',
+          data: [
+            { value: 10, total: 100, historical: 8 },
+            { value: 10, total: 100, historical: 12 }
+          ],
+          filters: [],
+          content: 'Test content',
+          subtext: 'Test subtext',
+          dataColumn: 'value',
+          dataFunction: 'Sum',
+          customDenom: true,
+          dataDenom: '100',
+          dataDenomColumn: '',
+          dataDenomFunction: 'Sum',
+          showPercent: true,
+          showDenominator: false,
+          valueDescription: 'out of',
+          suffix: '%',
+          roundToPlace: 0,
+          nodeWidth: 10,
+          nodeSpacer: 2,
+          theme: 'theme-blue',
+          trendIndicator: {
+            mode: 'numeric',
+            column: 'historical',
+            numericThreshold: 5,
+            showNoChangeArrows: true,
+            noChangeLabel: 'No change'
+          },
+          visual: {
+            border: false,
+            accent: false,
+            background: false,
+            hideBackgroundColor: false,
+            borderColorTheme: false,
+            whiteBackground: false,
+            colors: {
+              'theme-blue': '#005eaa'
+            }
+          }
+        }}
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.mock-trend-arrow')).toHaveTextContent('No change')
+    })
+  })
+
+  it('does not render a no-change trend arrow when numeric no-change arrows are disabled', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={{
+          type: 'waffle-chart',
+          title: 'Test Waffle',
+          showTitle: true,
+          visualizationType: 'TP5 Waffle',
+          shape: 'square',
+          data: [
+            { value: 10, total: 100, historical: 8 },
+            { value: 10, total: 100, historical: 12 }
+          ],
+          filters: [],
+          content: 'Test content',
+          subtext: 'Test subtext',
+          dataColumn: 'value',
+          dataFunction: 'Sum',
+          customDenom: true,
+          dataDenom: '100',
+          dataDenomColumn: '',
+          dataDenomFunction: 'Sum',
+          showPercent: true,
+          showDenominator: false,
+          valueDescription: 'out of',
+          suffix: '%',
+          roundToPlace: 0,
+          nodeWidth: 10,
+          nodeSpacer: 2,
+          theme: 'theme-blue',
+          trendIndicator: {
+            mode: 'numeric',
+            column: 'historical',
+            numericThreshold: 5,
+            noChangeLabel: 'No change'
+          },
+          visual: {
+            border: false,
+            accent: false,
+            background: false,
+            hideBackgroundColor: false,
+            borderColorTheme: false,
+            whiteBackground: false,
+            colors: {
+              'theme-blue': '#005eaa'
+            }
+          }
+        }}
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.mock-trend-arrow-wrap')).not.toBeInTheDocument()
+    })
+  })
 })

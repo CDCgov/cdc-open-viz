@@ -1,5 +1,6 @@
 import {
   TREND_ARROW_DOWN,
+  TREND_ARROW_NO_CHANGE,
   TREND_ARROW_UP,
   TREND_MODE_NUMERIC,
   TrendIndicatorConfig,
@@ -59,6 +60,10 @@ export const resolveWaffleNumericTrend = ({
 
   if (percentDelta < -threshold) {
     return { state: 'resolved', arrowType: TREND_ARROW_DOWN }
+  }
+
+  if (trendIndicator.showNoChangeArrows) {
+    return { state: 'resolved', arrowType: TREND_ARROW_NO_CHANGE }
   }
 
   return { state: 'unmapped' }

@@ -43,8 +43,10 @@ export default {
     column: '',
     numericThreshold: 0,
     mappings: [],
+    showNoChangeArrows: false,
     upLabel: '',
     downLabel: '',
+    noChangeLabel: '',
     trendLabel: ''
   },
   markupVariables: [],

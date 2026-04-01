@@ -54,7 +54,9 @@
       "upThreshold": 0,
       "downThreshold": 0
     },
-    "mappings": []
+    "mappings": [],
+    "showNoChangeArrows": false,
+    "noChangeLabel": ""
   },
   "markupVariables": [],
   "enableMarkupVariables": false,

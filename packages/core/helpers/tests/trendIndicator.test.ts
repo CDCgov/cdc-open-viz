@@ -5,7 +5,8 @@ import {
   TREND_MODE_CATEGORICAL,
   TREND_MODE_NUMERIC,
   TREND_ARROW_UP,
-  TREND_ARROW_DOWN
+  TREND_ARROW_DOWN,
+  TREND_ARROW_NO_CHANGE
 } from '../trendIndicator'
 
 describe('resolveTrendIndicator', () => {
@@ -70,6 +71,19 @@ describe('resolveTrendIndicator', () => {
     expect(result.state).toBe('unmapped')
   })
 
+  it('categorical mode resolves a mapped no-change value', () => {
+    const result = resolveTrendIndicator({
+      data: [{ trend: 'flat' }],
+      trendIndicator: {
+        mode: TREND_MODE_CATEGORICAL,
+        column: 'trend',
+        mappings: [{ sourceValue: 'flat', arrowType: TREND_ARROW_NO_CHANGE }]
+      }
+    })
+
+    expect(result).toEqual({ state: 'resolved', arrowType: TREND_ARROW_NO_CHANGE })
+  })
+
   it('numeric mode resolves up when current aggregate exceeds historical aggregate by threshold', () => {
     const result = resolveTrendIndicator({
       data: [
@@ -127,6 +141,26 @@ describe('resolveTrendIndicator', () => {
     expect(result.state).toBe('unmapped')
   })
 
+  it('numeric mode resolves no-change within threshold band when opt-in is enabled', () => {
+    const result = resolveTrendIndicator({
+      data: [
+        { current: 8, previous: 7.8 },
+        { current: 8, previous: 8.2 }
+      ],
+      mainDataFunction: DATA_FUNCTION_MEAN,
+      mainDataColumn: 'current',
+      allowNumericMode: true,
+      trendIndicator: {
+        mode: TREND_MODE_NUMERIC,
+        column: 'previous',
+        numericThreshold: 0.5,
+        showNoChangeArrows: true
+      }
+    })
+
+    expect(result).toEqual({ state: 'resolved', arrowType: TREND_ARROW_NO_CHANGE })
+  })
+
   it('numeric mode with zero threshold resolves up/down from delta sign', () => {
     const up = resolveTrendIndicator({
       data: [{ current: 8, previous: 7 }],
@@ -170,6 +204,23 @@ describe('resolveTrendIndicator', () => {
     })
 
     expect(result.state).toBe('unmapped')
+  })
+
+  it('numeric mode resolves no-change when delta equals threshold boundary and opt-in is enabled', () => {
+    const result = resolveTrendIndicator({
+      data: [{ current: 10, previous: 8 }],
+      mainDataFunction: DATA_FUNCTION_MEAN,
+      mainDataColumn: 'current',
+      allowNumericMode: true,
+      trendIndicator: {
+        mode: TREND_MODE_NUMERIC,
+        column: 'previous',
+        numericThreshold: 2,
+        showNoChangeArrows: true
+      }
+    })
+
+    expect(result).toEqual({ state: 'resolved', arrowType: TREND_ARROW_NO_CHANGE })
   })
 
   it('numeric mode returns invalid when historical trend column is missing', () => {
@@ -276,4 +327,3 @@ describe('resolveTrendIndicator', () => {
     expect(result.state).toBe('invalid')
   })
 })
-

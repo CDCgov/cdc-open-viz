@@ -47,8 +47,10 @@
     "column": "oldrate",
     "numericThreshold": 0,
     "mappings": [],
+    "showNoChangeArrows": false,
     "upLabel": "",
-    "downLabel": ""
+    "downLabel": "",
+    "noChangeLabel": ""
   },
   "markupVariables": [],
   "enableMarkupVariables": false,

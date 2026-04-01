@@ -34,6 +34,7 @@ import TrendArrow from '@cdc/core/components/ui/TrendArrow'
 import {
   resolveTrendIndicator,
   TREND_ARROW_DOWN,
+  TREND_ARROW_NO_CHANGE,
   TREND_ARROW_UP,
   TREND_MODE_NUMERIC
 } from '@cdc/core/helpers/trendIndicator'
@@ -94,6 +95,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         valueDescription: config.valueDescription,
         upLabel: trendIndicator?.upLabel,
         downLabel: trendIndicator?.downLabel,
+        noChangeLabel: trendIndicator?.noChangeLabel,
         trendLabel: trendIndicator?.trendLabel
       }
     }
@@ -117,6 +119,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       valueDescription: process(config.valueDescription),
       upLabel: process(trendIndicator?.upLabel),
       downLabel: process(trendIndicator?.downLabel),
+      noChangeLabel: process(trendIndicator?.noChangeLabel),
       trendLabel: process(trendIndicator?.trendLabel)
     }
   }, [
@@ -129,6 +132,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     config.valueDescription,
     trendIndicator?.upLabel,
     trendIndicator?.downLabel,
+    trendIndicator?.noChangeLabel,
     trendIndicator?.trendLabel,
     title,
     content,
@@ -142,6 +146,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   const processedValueDescription = processedTextFields.valueDescription
   const processedUpLabel = processedTextFields.upLabel
   const processedDownLabel = processedTextFields.downLabel
+  const processedNoChangeLabel = processedTextFields.noChangeLabel
   const processedTrendLabel = processedTextFields.trendLabel
 
   const gaugeColor = config.visual.colors[config.theme]
@@ -428,6 +433,8 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       ? processedUpLabel
       : trendResolution?.arrowType === TREND_ARROW_DOWN
       ? processedDownLabel
+      : trendResolution?.arrowType === TREND_ARROW_NO_CHANGE
+      ? processedNoChangeLabel
       : ''
   const resolvedTrendLabel = typeof trendLabel === 'string' ? trendLabel.trim() : ''
   const resolvedTrendFooterLabel = typeof processedTrendLabel === 'string' ? processedTrendLabel.trim() : ''

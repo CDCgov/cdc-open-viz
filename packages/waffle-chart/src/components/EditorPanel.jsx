@@ -466,6 +466,27 @@ const EditorPanel = memo(props => {
                 placeholder='(compared to one year prior)'
                 updateField={updateField}
               />
+              {trendMode === TREND_MODE_NUMERIC && (
+                <>
+                  <CheckBox
+                    value={config.trendIndicator?.showNoChangeArrows || false}
+                    section='trendIndicator'
+                    fieldName='showNoChangeArrows'
+                    label='Show indicator for no change'
+                    updateField={updateField}
+                  />
+                  {config.trendIndicator?.showNoChangeArrows && (
+                    <TextField
+                      value={config.trendIndicator?.noChangeLabel || ''}
+                      section='trendIndicator'
+                      fieldName='noChangeLabel'
+                      label='No Change Label'
+                      placeholder='No change'
+                      updateField={updateField}
+                    />
+                  )}
+                </>
+              )}
             </>
           )}
         </div>

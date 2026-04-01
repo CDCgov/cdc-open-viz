@@ -563,6 +563,23 @@ describe('processMarkupVariables', () => {
       expect(result.processedContent).toContain('transform: scale(1.2)')
     })
 
+    it('should render inline SVG for the no-change icon variable', () => {
+      const variables: MarkupVariable[] = [
+        {
+          sourceType: 'icon',
+          name: 'Trend No Change',
+          tag: '{{trend-arrow-no-change}}',
+          iconId: 'trend-arrow-no-change',
+          conditions: []
+        }
+      ]
+
+      const result = processMarkupVariables('Static: {{trend-arrow-no-change}}', trendData, variables)
+
+      expect(result.processedContent).toContain('<svg')
+      expect(result.processedContent).toContain('rotate(90deg)')
+    })
+
     it('should return empty output for an icon variable without an icon id', () => {
       const variables: MarkupVariable[] = [
         {
@@ -636,6 +653,25 @@ describe('processMarkupVariables', () => {
 
       const svgCount = result.processedContent.match(/<svg/g)?.length || 0
       expect(svgCount).toBe(2)
+    })
+
+    it('should render the no-change SVG when a mapped value resolves to it', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Trend',
+          tag: '{{trend}}',
+          outputType: 'svg',
+          columnName: 'trend',
+          svgMappings: [{ sourceValue: 'Up', svgId: 'trend-arrow-no-change' }],
+          conditions: [{ columnName: 'state', isOrIsNotEqualTo: 'is', value: 'California' }]
+        }
+      ]
+
+      const content = '{{trend}}'
+      const result = processMarkupVariables(content, trendData, variables)
+
+      expect(result.processedContent).toContain('<svg')
+      expect(result.processedContent).toContain('rotate(90deg)')
     })
 
     it('should return empty string when the mapped value is missing', () => {
