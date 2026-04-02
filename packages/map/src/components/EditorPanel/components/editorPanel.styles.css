@@ -93,3 +93,13 @@
   }
 }
 
+.column-section__header {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.column-section__title {
+  font-weight: 600;
+}
