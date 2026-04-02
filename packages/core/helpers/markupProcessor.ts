@@ -1,8 +1,14 @@
 import _ from 'lodash'
-import { MarkupVariable, MarkupCondition } from '../types/MarkupVariable'
+import {
+  MarkupVariable,
+  MarkupCondition,
+  getMarkupVariableSourceType,
+  isDataDrivenIconsVariable
+} from '../types/MarkupVariable'
 import { VizFilter } from '../types/VizFilter'
 import { Datasets } from '../types/DataSet'
 import { filterVizData } from './filterVizData'
+import { buildInlineSvg, SVG_REGISTRY, SvgRegistryId } from './svgRegistry'
 
 /**
  * Replaces {{variable}} tags in content with actual data values.
@@ -67,6 +73,28 @@ export const processMarkupVariables = (
     const emptyVariableChecker: boolean[] = []
     const noDataMessageChecker: boolean[] = []
 
+    const resolveSvgIds = (
+      dataRows: Record<string, any>[],
+      sourceColumn: string,
+      mappings: NonNullable<MarkupVariable['svgMappings']>
+    ): SvgRegistryId[] => {
+      const uniqueValues = _.uniq(
+        (dataRows || [])
+          .map(row => row?.[sourceColumn])
+          .filter(value => value !== undefined && value !== null)
+          .map(value => String(value))
+          .filter(value => value !== '')
+      )
+
+      if (uniqueValues.length === 0) {
+        return []
+      }
+
+      return uniqueValues
+        .map(sourceValue => mappings.find(rule => rule.sourceValue === sourceValue)?.svgId)
+        .filter((svgId): svgId is SvgRegistryId => !!svgId && !!SVG_REGISTRY[svgId])
+    }
+
     const variableRegexPattern = /{{(.*?)}}/g
     const processedContent = content.replace(variableRegexPattern, variableTag => {
       try {
@@ -74,6 +102,61 @@ export const processMarkupVariables = (
 
         const workingVariable = markupVariables.find(variable => variable.tag === variableTag)
         if (!workingVariable) return variableTag
+
+        const sourceType = getMarkupVariableSourceType(workingVariable)
+        const usesDataDrivenIcons = isDataDrivenIconsVariable(workingVariable)
+
+        if (sourceType === 'icon') {
+          const svgMarkup =
+            workingVariable.iconId && SVG_REGISTRY[workingVariable.iconId]
+              ? buildInlineSvg(workingVariable.iconId, { scale: workingVariable.svgScale })
+              : ''
+
+          if (showNoDataMessage && svgMarkup === '') {
+            noDataMessageChecker.push(true)
+          }
+
+          if (svgMarkup === '' && allowHideSection) {
+            emptyVariableChecker.push(true)
+          }
+
+          return svgMarkup
+        }
+
+        if (usesDataDrivenIcons) {
+          let svgMarkup = ''
+
+          if (workingVariable.columnName) {
+            let variableData = getDataForVariable(workingVariable)
+            if (filters && filters.length > 0) {
+              variableData = filterVizData(filters, variableData)
+            }
+
+            const conditionFilteredData =
+              workingVariable.conditions.length === 0
+                ? variableData
+                : filterDataByConditions(variableData, [...workingVariable.conditions])
+
+            const resolvedSvgIds = resolveSvgIds(
+              conditionFilteredData,
+              workingVariable.columnName,
+              workingVariable.svgMappings || []
+            )
+            svgMarkup = resolvedSvgIds.length
+              ? resolvedSvgIds.map(svgId => buildInlineSvg(svgId, { scale: workingVariable.svgScale })).join(' ')
+              : ''
+          }
+
+          if (showNoDataMessage && svgMarkup === '') {
+            noDataMessageChecker.push(true)
+          }
+
+          if (svgMarkup === '' && allowHideSection) {
+            emptyVariableChecker.push(true)
+          }
+
+          return svgMarkup
+        }
 
         // Resolve the data source for this variable. Metadata-sourced variables
         // (metadataKey) pull a single value from the data file's top-level fields,
@@ -83,7 +166,7 @@ export const processMarkupVariables = (
         let effectiveColumnName: string
         let conditionFilteredData: any[]
 
-        if (workingVariable.metadataKey) {
+        if (sourceType === 'metadata') {
           // Metadata path: synthesize a single-row array from the file-level metadata
           // so it flows through the same formatting pipeline as column values.
           effectiveColumnName = workingVariable.metadataKey
@@ -209,14 +292,62 @@ export const validateMarkupVariables = (markupVariables: MarkupVariable[], data:
   const availableColumns = data.length > 0 ? Object.keys(data[0]) : []
 
   markupVariables.forEach((variable, index) => {
+    const sourceType = getMarkupVariableSourceType(variable)
+    const usesDataDrivenIcons = isDataDrivenIconsVariable(variable)
+
     if (!variable.tag || !variable.tag.match(/^{{.+}}$/)) {
       errors.push(`Variable ${index + 1}: Tag must be in format {{tagName}}`)
     }
 
-    if (!variable.metadataKey && !variable.columnName) {
+    if (sourceType === 'icon') {
+      if (!variable.iconId) {
+        errors.push(`Variable ${index + 1}: Icon is required`)
+      }
+
+      if (variable.svgScale !== undefined) {
+        const parsedScale = Number(variable.svgScale)
+        if (!Number.isFinite(parsedScale) || parsedScale <= 0) {
+          errors.push(`Variable ${index + 1}: Icon scale must be greater than 0`)
+        }
+      }
+
+      return
+    }
+
+    if (sourceType === 'metadata') {
+      if (!variable.metadataKey) {
+        errors.push(`Variable ${index + 1}: Metadata field is required`)
+      }
+
+      return
+    }
+
+    if (!variable.columnName) {
       errors.push(`Variable ${index + 1}: Column name is required`)
-    } else if (variable.columnName && availableColumns.length > 0 && !availableColumns.includes(variable.columnName)) {
+    } else if (
+      availableColumns.length > 0 &&
+      !availableColumns.includes(variable.columnName)
+    ) {
       errors.push(`Variable ${index + 1}: Column "${variable.columnName}" not found in data`)
+    }
+
+    if (usesDataDrivenIcons) {
+      if (!variable.columnName) {
+        errors.push(`Variable ${index + 1}: Data-driven icon column is required`)
+      } else if (availableColumns.length > 0 && !availableColumns.includes(variable.columnName)) {
+        errors.push(`Variable ${index + 1}: Data-driven icon column "${variable.columnName}" not found in data`)
+      }
+
+      if (!variable.svgMappings || variable.svgMappings.length === 0) {
+        errors.push(`Variable ${index + 1}: Icon mappings are required`)
+      }
+
+      if (variable.svgScale !== undefined) {
+        const parsedScale = Number(variable.svgScale)
+        if (!Number.isFinite(parsedScale) || parsedScale <= 0) {
+          errors.push(`Variable ${index + 1}: Icon scale must be greater than 0`)
+        }
+      }
     }
 
     variable.conditions.forEach((condition, condIndex) => {

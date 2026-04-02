@@ -1,6 +1,7 @@
 import { ComponentStyles } from '@cdc/core/types/ComponentStyles'
 import { ComponentThemes } from '@cdc/core/types/ComponentThemes'
 import { Version } from '@cdc/core/types/Version'
+import { TrendIndicatorConfig } from '@cdc/core/helpers/trendIndicator'
 
 export type Config = {
   // supporting text in the box
@@ -47,4 +48,5 @@ export type Config = {
   locale: string
   markupVariables?: any[]
   enableMarkupVariables?: boolean
+  trendIndicator?: TrendIndicatorConfig
 }

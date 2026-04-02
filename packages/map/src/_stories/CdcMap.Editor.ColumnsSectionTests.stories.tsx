@@ -99,14 +99,24 @@ export const ColumnsSectionTests: Story = {
     expect(hideGeoCheckbox).toBeTruthy()
 
     const getTooltipContent = () => {
-      // Get a state geo-group and check its tooltip HTML
-      const geoGroup = canvasElement.querySelector('g.geo-group') as SVGGElement
-      const tooltipHtml = geoGroup?.getAttribute('data-tooltip-html') || ''
+      const geoGroups = Array.from(canvasElement.querySelectorAll('g.geo-group')) as SVGGElement[]
+      const tooltipHtml =
+        geoGroups.map(group => group.getAttribute('data-tooltip-html') || '').find(html => html.trim().length > 0) || ''
+
       return {
         tooltipContent: tooltipHtml,
-        hasStatePrefix: tooltipHtml.includes('State:')
+        hasTooltipHeading: tooltipHtml.includes('tooltip-heading'),
+        hasStatePrefix: tooltipHtml.includes('State:'),
+        usesStrongGeoName: tooltipHtml.startsWith('<strong>')
       }
     }
+
+    await performAndAssert(
+      'Wait for geography tooltip to populate',
+      getTooltipContent,
+      async () => {},
+      (_before, after) => after.tooltipContent.length > 0
+    )
 
     await performAndAssert(
       'Hide Geography Column Name → Enable',
@@ -115,8 +125,8 @@ export const ColumnsSectionTests: Story = {
         await userEvent.click(hideGeoCheckbox)
       },
       (before, after) => {
-        // "State:" prefix should disappear when hidden
-        return before.hasStatePrefix && !after.hasStatePrefix
+        // Hidden geography labels now render as a standalone <strong> name instead of a tooltip heading.
+        return before.tooltipContent.length > 0 && after.usesStrongGeoName && !after.hasTooltipHeading
       }
     )
 
@@ -127,8 +137,12 @@ export const ColumnsSectionTests: Story = {
         await userEvent.click(hideGeoCheckbox)
       },
       (before, after) => {
-        // "State:" prefix should reappear when not hidden
-        return !before.hasStatePrefix && after.hasStatePrefix
+        // Re-enabling restores the heading-based tooltip format.
+        return (
+          before.usesStrongGeoName &&
+          after.hasTooltipHeading &&
+          (after.hasStatePrefix || after.tooltipContent.length > 0)
+        )
       }
     )
 

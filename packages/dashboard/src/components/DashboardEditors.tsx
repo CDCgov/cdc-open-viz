@@ -77,6 +77,11 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
         <CdcDataBite
           key={visualizationKey}
           config={{ ...visualizationConfig, newViz: true }}
+          rawData={
+            state.data?.[visualizationConfig.dataKey] ||
+            state.config.datasets?.[visualizationConfig.dataKey]?.data ||
+            []
+          }
           isEditor={true}
           setConfig={_updateConfig}
           isDashboard={true}
@@ -89,6 +94,11 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
         <CdcWaffleChart
           key={visualizationKey}
           config={visualizationConfig}
+          rawData={
+            state.data?.[visualizationConfig.dataKey] ||
+            state.config.datasets?.[visualizationConfig.dataKey]?.data ||
+            []
+          }
           isEditor={true}
           setConfig={_updateConfig}
           isDashboard={true}
@@ -101,6 +111,11 @@ const DashboardEditors: React.FC<DashboardEditorProps> = ({
         <CdcMarkupInclude
           key={visualizationKey}
           config={visualizationConfig}
+          rawData={
+            state.data?.[visualizationConfig.dataKey] ||
+            state.config.datasets?.[visualizationConfig.dataKey]?.data ||
+            []
+          }
           isEditor={true}
           setConfig={_updateConfig}
           isDashboard={true}

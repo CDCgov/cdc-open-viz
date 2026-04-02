@@ -4,6 +4,11 @@ declare module '*.svg?url' {
     export default content
 }
 
+declare module '*.svg?raw' {
+    const content: string
+    export default content
+}
+
 declare module '*.json'
 
 declare module '*.csv?raw' {

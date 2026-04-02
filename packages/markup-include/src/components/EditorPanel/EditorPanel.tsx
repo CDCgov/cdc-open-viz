@@ -26,12 +26,13 @@ type MarkupIncludeEditorPanelProps = {
 }
 
 const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
-  const { config, data, isDashboard, loading, setParentConfig, updateConfig } = useContext(ConfigContext)
+  const { config, data, editorData, isDashboard, loading, setParentConfig, updateConfig } = useContext(ConfigContext)
   const { contentEditor, theme, visual } = config || {}
   const { inlineHTML, srcUrl, title, useInlineHTML } = contentEditor || {}
   const isTp5Style = contentEditor?.style === 'tp5'
   const updateField = updateFieldFactory(config, updateConfig, true)
   const styleTreatment = (visual as any)?.tp5Treatment ? 'tp5' : 'legacy'
+  const markupEditorData = Array.isArray(editorData) ? editorData : data || []
 
   const handleStyleTreatmentChange = (value: string) => {
     const useTp5Treatment = value === 'tp5'
@@ -222,7 +223,7 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
           <Accordion.Section title='Markup Variables'>
             <MarkupVariablesEditor
               markupVariables={config.markupVariables || []}
-              data={data || []}
+              data={markupEditorData}
               datasets={datasets}
               config={config}
               onChange={handleMarkupVariablesChange}

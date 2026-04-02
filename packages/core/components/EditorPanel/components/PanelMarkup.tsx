@@ -10,6 +10,8 @@ type PanelMarkupProps = {
   markupVariables: MarkupVariable[]
   /** Dataset to extract column names and values from */
   data: any[]
+  /** Optional unfiltered data source to prefer for editor mapping options */
+  editorData?: any[]
   /** Whether markup variables feature is enabled */
   enableMarkupVariables: boolean
   /** Callback when variables are added, updated, or removed */
@@ -30,16 +32,19 @@ const PanelMarkup: React.FC<PanelMarkupProps> = ({
   name,
   markupVariables,
   data,
+  editorData,
   enableMarkupVariables,
   onMarkupVariablesChange,
   onToggleEnable,
   withAccordion = true,
   dataMetadata
 }) => {
+  const sourceData = Array.isArray(editorData) && editorData.length ? editorData : data
+
   const content = (
     <MarkupVariablesEditor
       markupVariables={markupVariables || []}
-      data={data}
+      data={sourceData}
       onChange={onMarkupVariablesChange}
       enableMarkupVariables={enableMarkupVariables || false}
       onToggleEnable={onToggleEnable}

@@ -36,6 +36,7 @@ export const VisualSectionTests: StoryObj<typeof CdcMap> = {
 
     // Open the Visual accordion
     await openAccordion(canvas, 'Visual')
+    await waitForPresence('path.single-geo', canvasElement)
 
     // ==========================================================================
     // TEST: Header Theme
@@ -141,10 +142,17 @@ export const VisualSectionTests: StoryObj<typeof CdcMap> = {
         await userEvent.selectOptions(geoBorderColorSelect, 'sameAsBackground')
       },
       (before, after) => {
-        // After changing to white, one of the stroke values should change
+        // After changing to white, geo paths should still exist and their rendered stroke should become white.
         const beforeStroke = before.strokeAttr || before.strokeStyle || before.computedStroke
         const afterStroke = after.strokeAttr || after.strokeStyle || after.computedStroke
-        return beforeStroke !== '' && afterStroke !== '' && beforeStroke !== afterStroke
+        return (
+          before.pathCount > 0 &&
+          after.pathCount > 0 &&
+          beforeStroke !== '' &&
+          afterStroke !== '' &&
+          beforeStroke !== afterStroke &&
+          after.computedStroke === 'rgb(255, 255, 255)'
+        )
       }
     )
 

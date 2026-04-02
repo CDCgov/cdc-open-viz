@@ -539,6 +539,176 @@ describe('processMarkupVariables', () => {
     })
   })
 
+  describe('Icon Output', () => {
+    const trendData = [
+      { state: 'California', trend: 'Up' },
+      { state: 'Texas', trend: 'Down' }
+    ]
+
+    it('should render inline SVG for a static icon variable', () => {
+      const variables: MarkupVariable[] = [
+        {
+          sourceType: 'icon',
+          name: 'Trend Up',
+          tag: '{{trend-arrow-up}}',
+          iconId: 'trend-arrow-up',
+          svgScale: 1.2,
+          conditions: []
+        }
+      ]
+
+      const result = processMarkupVariables('Static: {{trend-arrow-up}}', trendData, variables)
+
+      expect(result.processedContent).toContain('<svg')
+      expect(result.processedContent).toContain('transform: scale(1.2)')
+    })
+
+    it('should render inline SVG for the no-change icon variable', () => {
+      const variables: MarkupVariable[] = [
+        {
+          sourceType: 'icon',
+          name: 'Trend No Change',
+          tag: '{{trend-arrow-no-change}}',
+          iconId: 'trend-arrow-no-change',
+          conditions: []
+        }
+      ]
+
+      const result = processMarkupVariables('Static: {{trend-arrow-no-change}}', trendData, variables)
+
+      expect(result.processedContent).toContain('<svg')
+      expect(result.processedContent).toContain('rotate(90deg)')
+    })
+
+    it('should return empty output for an icon variable without an icon id', () => {
+      const variables: MarkupVariable[] = [
+        {
+          sourceType: 'icon',
+          name: 'Broken Icon',
+          tag: '{{broken-icon}}',
+          conditions: []
+        }
+      ]
+
+      const result = processMarkupVariables('{{broken-icon}}', trendData, variables)
+
+      expect(result.processedContent).toBe('')
+    })
+
+    it('should render inline SVG when a single mapped value is resolved', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Trend',
+          tag: '{{trend}}',
+          outputType: 'svg',
+          columnName: 'trend',
+          svgMappings: [{ sourceValue: 'Up', svgId: 'trend-arrow-up' }],
+          conditions: [{ columnName: 'state', isOrIsNotEqualTo: 'is', value: 'California' }]
+        }
+      ]
+
+      const content = 'Trend: {{trend}}'
+      const result = processMarkupVariables(content, trendData, variables)
+
+      expect(result.processedContent).toContain('<svg')
+      expect(result.processedContent).toContain('cove-trend-arrow')
+    })
+
+    it('should apply svgScale to the inline SVG style', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Trend',
+          tag: '{{trend}}',
+          outputType: 'svg',
+          columnName: 'trend',
+          svgMappings: [{ sourceValue: 'Up', svgId: 'trend-arrow-up' }],
+          svgScale: 1.5,
+          conditions: []
+        }
+      ]
+
+      const content = '{{trend}}'
+      const result = processMarkupVariables(content, trendData, variables)
+
+      expect(result.processedContent).toContain('transform: scale(1.5)')
+    })
+
+    it('should render multiple SVGs when multiple values are resolved', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Trend',
+          tag: '{{trend}}',
+          outputType: 'svg',
+          columnName: 'trend',
+          svgMappings: [
+            { sourceValue: 'Up', svgId: 'trend-arrow-up' },
+            { sourceValue: 'Down', svgId: 'trend-arrow-down' }
+          ],
+          conditions: []
+        }
+      ]
+
+      const content = '{{trend}}'
+      const result = processMarkupVariables(content, trendData, variables)
+
+      const svgCount = result.processedContent.match(/<svg/g)?.length || 0
+      expect(svgCount).toBe(2)
+    })
+
+    it('should render the no-change SVG when a mapped value resolves to it', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Trend',
+          tag: '{{trend}}',
+          outputType: 'svg',
+          columnName: 'trend',
+          svgMappings: [{ sourceValue: 'Up', svgId: 'trend-arrow-no-change' }],
+          conditions: [{ columnName: 'state', isOrIsNotEqualTo: 'is', value: 'California' }]
+        }
+      ]
+
+      const content = '{{trend}}'
+      const result = processMarkupVariables(content, trendData, variables)
+
+      expect(result.processedContent).toContain('<svg')
+      expect(result.processedContent).toContain('rotate(90deg)')
+    })
+
+    it('should default icon scale to 0.8 when no svgScale is provided', () => {
+      const variables: MarkupVariable[] = [
+        {
+          sourceType: 'icon',
+          name: 'Trend Up',
+          tag: '{{trend-arrow-up}}',
+          iconId: 'trend-arrow-up',
+          conditions: []
+        }
+      ]
+
+      const result = processMarkupVariables('{{trend-arrow-up}}', trendData, variables)
+
+      expect(result.processedContent).toContain('transform: scale(0.8)')
+    })
+
+    it('should return empty string when the mapped value is missing', () => {
+      const variables: MarkupVariable[] = [
+        {
+          name: 'Trend',
+          tag: '{{trend}}',
+          outputType: 'svg',
+          columnName: 'trend',
+          svgMappings: [{ sourceValue: 'Up', svgId: 'trend-arrow-up' }],
+          conditions: [{ columnName: 'state', isOrIsNotEqualTo: 'is', value: 'Texas' }]
+        }
+      ]
+
+      const content = '{{trend}}'
+      const result = processMarkupVariables(content, trendData, variables)
+
+      expect(result.processedContent).toBe('')
+    })
+  })
+
   describe('Edge Cases', () => {
     it('should handle empty data array', () => {
       const variables: MarkupVariable[] = [{ name: 'Value', tag: '{{value}}', columnName: 'value', conditions: [] }]
@@ -725,5 +895,51 @@ describe('validateMarkupVariables', () => {
     const errors = validateMarkupVariables(variables, testData)
     expect(errors).toHaveLength(0)
     expect(errors.find(e => e.includes('not found in data'))).toBeUndefined()
+  })
+
+  it('should validate data-driven icon requirements', () => {
+    const variables: MarkupVariable[] = [
+      {
+        name: 'Trend',
+        tag: '{{trend}}',
+        outputType: 'svg',
+        columnName: 'trend',
+        svgMappings: [{ sourceValue: 'Up', svgId: 'trend-arrow-up' }],
+        conditions: []
+      }
+    ]
+
+    const errors = validateMarkupVariables(variables, [{ trend: 'Up' }])
+    expect(errors).toHaveLength(0)
+  })
+
+  it('should require icon mappings when data-driven icons are enabled', () => {
+    const variables: MarkupVariable[] = [
+      {
+        name: 'Trend',
+        tag: '{{trend}}',
+        outputType: 'svg',
+        columnName: 'trend',
+        svgMappings: [],
+        conditions: []
+      }
+    ]
+
+    const errors = validateMarkupVariables(variables, [{ trend: 'Up' }])
+    expect(errors).toContain('Variable 1: Icon mappings are required')
+  })
+
+  it('should validate icon source requirements', () => {
+    const variables: MarkupVariable[] = [
+      {
+        sourceType: 'icon',
+        name: 'Trend Up',
+        tag: '{{trend-up}}',
+        conditions: []
+      }
+    ]
+
+    const errors = validateMarkupVariables(variables, testData)
+    expect(errors).toContain('Variable 1: Icon is required')
   })
 })
