@@ -807,7 +807,8 @@ const CountyMap = () => {
     const countyStrokeWidth = lineWidth * (useHsaStrokeStyling ? 0.45 : 0.8) * strokeScale
     const hsaStrokeWidth = lineWidth * 0.7 * strokeScale
     const countyStrokeColor = useHsaStrokeStyling ? '#a9aeb1' : geoStrokeColor
-    const hsaStrokeColor = '#303030'
+    const isZoomedIntoState = focus.id
+    const hsaStrokeColor = isZoomedIntoState ? '#000' : '#303030'
     const stateStrokeColor = useHsaStrokeStyling ? '#000000' : '#1c1d1f'
 
     // Enforces stroke style of the county lines
