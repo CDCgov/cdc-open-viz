@@ -5,11 +5,19 @@ import { Visualization } from '../../types/Visualization'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import { Column } from '../../types/Column'
 import _ from 'lodash'
-import React, { useState, useMemo } from 'react'
-import FieldSetWrapper from './FieldSetWrapper'
+import React, { useMemo } from 'react'
+import { Draggable } from '@hello-pangea/dnd'
+import GroupedList from './GroupedList'
 import { useDataColumns } from '../../hooks/useDataColumns'
 import Alert from '../Alert/components/Alert'
 import Button from '../elements/Button'
+import {
+  Accordion,
+  AccordionItem,
+  AccordionItemButton,
+  AccordionItemHeading,
+  AccordionItemPanel
+} from 'react-accessible-accordion'
 
 interface ColumnsEditorProps {
   config: Partial<Visualization>
@@ -18,18 +26,14 @@ interface ColumnsEditorProps {
   hiddenColumnNames?: string[]
 }
 
-type OpenControls = [Record<string, boolean>, Function] // useState type
-
-const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenControls }> = ({
+const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; index: number }> = ({
   config,
   deleteColumn,
   updateField,
   hiddenColumnNames = [],
   colKey,
-  controls
+  index
 }) => {
-  const [openControls, setOpenControls] = controls
-
   const editColumn = (key, value) => {
     if (key === 'dataTable' && value === true) {
       const newColumns = _.cloneDeep(config.columns) // must pass new columns object to trigger re-render of DataTableEditor
@@ -50,9 +54,6 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
     if (value !== colKey) {
       newColumns[value] = newColumn
       delete newColumns[colKey]
-      const newControls = { ..._.cloneDeep(openControls), [value]: true }
-      delete newControls[colKey]
-      setOpenControls(newControls)
     }
     updateField(null, null, 'columns', newColumns)
   }
@@ -77,203 +78,239 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; controls: OpenCo
   const colName = config.columns[colKey]?.name
 
   return (
-    <FieldSetWrapper
-      fieldName={colName}
-      fieldKey={colKey}
-      fieldType='Column'
-      controls={controls}
-      deleteField={() => deleteColumn(colKey)}
-    >
-      <Select
-        label='Column'
-        value={config.columns[colKey]?.name}
-        fieldName='name'
-        section={'columns'}
-        initial={'-Select-'}
-        options={availableColumns}
-        updateField={(_section, _subsection, _fieldName, value) => changeName(value)}
-      />
-      {config.type !== 'table' && (
-        <Select
-          label='Associate to Series'
-          value={config.columns[colKey]?.series}
-          fieldName={'series'}
-          section='columns'
-          initial={'Select series'}
-          options={
-            config.visualizationType === 'Pie'
-              ? config.runtime?.seriesKeys || []
-              : config.series?.map(series => series.dataKey) || []
-          }
-          updateField={(_section, _subsection, _fieldName, value) => editColumn('series', value)}
-        />
-      )}
-
-      <TextField
-        value={config.columns[colKey].label}
-        section='columns'
-        subsection={colKey}
-        fieldName='label'
-        label='Label'
-        updateField={updateField}
-      />
-      <ul className='column-edit'>
-        <li className='three-col'>
-          <TextField
-            value={config.columns[colKey].prefix}
-            section='columns'
-            subsection={colKey}
-            fieldName='prefix'
-            label='Prefix'
-            updateField={updateField}
-          />
-          <TextField
-            value={config.columns[colKey].suffix}
-            section='columns'
-            subsection={colKey}
-            fieldName='suffix'
-            label='Suffix'
-            updateField={updateField}
-          />
-          <TextField
-            type='number'
-            value={config.columns[colKey].roundToPlace}
-            section='columns'
-            subsection={colKey}
-            fieldName='roundToPlace'
-            label='Round'
-            updateField={updateField}
-          />
-        </li>
-        <li>
-          <label className='checkbox'>
-            <input
-              type='checkbox'
-              checked={config.columns[colKey].commas}
-              onChange={event => {
-                editColumn('commas', event.target.checked)
-              }}
-            />
-            <span className='edit-label'>Add Commas to Numbers</span>
-          </label>
-        </li>
-        <li>
-          {config.table.showVertical && (
-            <>
-              <label className='checkbox'>
-                <input
-                  type='checkbox'
-                  checked={config.columns[colKey].dataTable ?? true}
-                  onChange={event => {
-                    editColumn('dataTable', event.target.checked)
-                  }}
-                />
-                <span className='edit-label'>Show in Data Table</span>
-              </label>
-              {(config.confidenceKeys?.upper === colName || config.confidenceKeys?.lower === colName) && (
-                <Alert
-                  type="danger"
-                  message="Confidence Interval column - required for 508 compliance"
-                  showCloseButton={false}
-                  iconSize={14}
-                />
-              )}
-            </>
-          )}
-        </li>
-        {config.visualizationType === 'Pie' && (
-          <li>
-            <label className='checkbox'>
-              <input
-                type='checkbox'
-                checked={config.columns[colKey].showInViz}
-                onChange={event => {
-                  editColumn('showInViz', event.target.checked)
-                }}
-              />
-              <span className='edit-label'>Show in Visualization</span>
-            </label>
-          </li>
-        )}
-        {config.type !== 'table' && (
-          <li>
-            <label className='checkbox'>
-              <input
-                type='checkbox'
-                checked={config.columns[colKey].tooltips || false}
-                onChange={event => {
-                  updateField('columns', colKey, 'tooltips', event.target.checked)
-                }}
-              />
-              <span className='edit-label'>Show in tooltip</span>
-            </label>
-          </li>
-        )}
-
-        {config.visualizationType === 'Forest Plot' && (
-          <>
-            <li>
-              <label className='checkbox'>
-                <input
-                  type='checkbox'
-                  checked={config.columns[colKey].forestPlot || false}
-                  onChange={event => {
-                    editColumn('forestPlot', event.target.checked)
-                  }}
-                />
-                <span className='edit-label'>Show in Forest Plot</span>
-              </label>
-            </li>
-            <li>
-              <label className='checkbox'>
-                <input
-                  type='checkbox'
-                  checked={config.columns[colKey].forestPlotAlignRight || false}
-                  onChange={event => {
-                    editColumn('forestPlotAlignRight', event.target.checked)
-                  }}
-                />
-                <span className='edit-label'>Align Right</span>
-              </label>
-            </li>
-
-            {!config.columns[colKey].forestPlotAlignRight && (
-              <li>
-                <label className='text'>
-                  <span className='edit-label'>Forest Plot Starting Point</span>
-                  <input
-                    type='number'
-                    value={config.columns[colKey].forestPlotStartingPoint || 0}
-                    onChange={event => {
-                      editColumn('forestPlotStartingPoint', event.target.value)
+    <Draggable key={colKey} draggableId={`column-${colKey}`} index={index}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          className={snapshot.isDragging ? 'currently-dragging' : ''}
+          style={provided.draggableProps.style}
+        >
+          <Accordion allowZeroExpanded>
+            <AccordionItem className='series-item series-item--chart'>
+              <AccordionItemHeading className='series-item__title'>
+                <AccordionItemButton className='accordion__button'>
+                  <Icon display='move' size={15} style={{ cursor: 'default' }} />
+                  {colName || `Column ${index + 1}`}
+                </AccordionItemButton>
+              </AccordionItemHeading>
+              <AccordionItemPanel>
+                <div className='series-item__panel-actions'>
+                  <Button
+                    type='button'
+                    variant='danger'
+                    size='sm'
+                    className='grouped-list__remove'
+                    onClick={event => {
+                      event.preventDefault()
+                      deleteColumn(colKey)
                     }}
+                  >
+                    Remove
+                  </Button>
+                </div>
+                <Select
+                  label='Column'
+                  value={config.columns[colKey]?.name}
+                  fieldName='name'
+                  section={'columns'}
+                  initial={'-Select-'}
+                  options={availableColumns}
+                  updateField={(_section, _subsection, _fieldName, value) => changeName(value)}
+                />
+                {config.type !== 'table' && (
+                  <Select
+                    label='Associate to Series'
+                    value={config.columns[colKey]?.series}
+                    fieldName={'series'}
+                    section='columns'
+                    initial={'Select series'}
+                    options={
+                      config.visualizationType === 'Pie'
+                        ? config.runtime?.seriesKeys || []
+                        : config.series?.map(series => series.dataKey) || []
+                    }
+                    updateField={(_section, _subsection, _fieldName, value) => editColumn('series', value)}
+                  />
+                )}
+
+                <TextField
+                  value={config.columns[colKey].label}
+                  section='columns'
+                  subsection={colKey}
+                  fieldName='label'
+                  label='Label'
+                  updateField={updateField}
+                />
+                <ul className='column-edit'>
+                  <li className='three-col'>
+                    <TextField
+                      value={config.columns[colKey].prefix}
+                      section='columns'
+                      subsection={colKey}
+                      fieldName='prefix'
+                      label='Prefix'
+                      updateField={updateField}
+                    />
+                    <TextField
+                      value={config.columns[colKey].suffix}
+                      section='columns'
+                      subsection={colKey}
+                      fieldName='suffix'
+                      label='Suffix'
+                      updateField={updateField}
+                    />
+                    <TextField
+                      type='number'
+                      value={config.columns[colKey].roundToPlace}
+                      section='columns'
+                      subsection={colKey}
+                      fieldName='roundToPlace'
+                      label='Round'
+                      updateField={updateField}
+                    />
+                  </li>
+                  <li>
+                    <label className='checkbox'>
+                      <input
+                        type='checkbox'
+                        checked={config.columns[colKey].commas}
+                        onChange={event => {
+                          editColumn('commas', event.target.checked)
+                        }}
+                      />
+                      <span className='edit-label'>Add Commas to Numbers</span>
+                    </label>
+                  </li>
+                  <li>
+                    {config.table.showVertical && (
+                      <>
+                        <label className='checkbox'>
+                          <input
+                            type='checkbox'
+                            checked={config.columns[colKey].dataTable ?? true}
+                            onChange={event => {
+                              editColumn('dataTable', event.target.checked)
+                            }}
+                          />
+                          <span className='edit-label'>Show in Data Table</span>
+                        </label>
+                        {(config.confidenceKeys?.upper === colName || config.confidenceKeys?.lower === colName) && (
+                          <Alert
+                            type='danger'
+                            message='Confidence Interval column - required for 508 compliance'
+                            showCloseButton={false}
+                            iconSize={14}
+                          />
+                        )}
+                      </>
+                    )}
+                  </li>
+                  {config.visualizationType === 'Pie' && (
+                    <li>
+                      <label className='checkbox'>
+                        <input
+                          type='checkbox'
+                          checked={config.columns[colKey].showInViz}
+                          onChange={event => {
+                            editColumn('showInViz', event.target.checked)
+                          }}
+                        />
+                        <span className='edit-label'>Show in Visualization</span>
+                      </label>
+                    </li>
+                  )}
+                  {config.type !== 'table' && (
+                    <li>
+                      <label className='checkbox'>
+                        <input
+                          type='checkbox'
+                          checked={config.columns[colKey].tooltips || false}
+                          onChange={event => {
+                            updateField('columns', colKey, 'tooltips', event.target.checked)
+                          }}
+                        />
+                        <span className='edit-label'>Show in tooltip</span>
+                      </label>
+                    </li>
+                  )}
+
+                  {config.visualizationType === 'Forest Plot' && (
+                    <>
+                      <li>
+                        <label className='checkbox'>
+                          <input
+                            type='checkbox'
+                            checked={config.columns[colKey].forestPlot || false}
+                            onChange={event => {
+                              editColumn('forestPlot', event.target.checked)
+                            }}
+                          />
+                          <span className='edit-label'>Show in Forest Plot</span>
+                        </label>
+                      </li>
+                      <li>
+                        <label className='checkbox'>
+                          <input
+                            type='checkbox'
+                            checked={config.columns[colKey].forestPlotAlignRight || false}
+                            onChange={event => {
+                              editColumn('forestPlotAlignRight', event.target.checked)
+                            }}
+                          />
+                          <span className='edit-label'>Align Right</span>
+                        </label>
+                      </li>
+
+                      {!config.columns[colKey].forestPlotAlignRight && (
+                        <li>
+                          <label className='text'>
+                            <span className='edit-label'>Forest Plot Starting Point</span>
+                            <input
+                              type='number'
+                              value={config.columns[colKey].forestPlotStartingPoint || 0}
+                              onChange={event => {
+                                editColumn('forestPlotStartingPoint', event.target.value)
+                              }}
+                            />
+                          </label>
+                        </li>
+                      )}
+                    </>
+                  )}
+                </ul>
+                <label>
+                  <span className='edit-label column-heading'>Order</span>
+                  <input
+                    onWheel={e => e.currentTarget.blur()}
+                    type='number'
+                    min='1'
+                    value={config.columns[colKey].order}
+                    onChange={e => updateField('columns', colKey, 'order', parseInt(e.target.value))}
                   />
                 </label>
-              </li>
-            )}
-          </>
-        )}
-      </ul>
-      <label>
-        <span className='edit-label column-heading'>Order</span>
-        <input
-          onWheel={e => e.currentTarget.blur()}
-          type='number'
-          min='1'
-          value={config.columns[colKey].order}
-          onChange={e => updateField('columns', colKey, 'order', parseInt(e.target.value))}
-        />
-      </label>
-    </FieldSetWrapper>
+              </AccordionItemPanel>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      )}
+    </Draggable>
   )
 }
 
 const ColumnsEditor: React.FC<ColumnsEditorProps> = ({ config, updateField, deleteColumn, hiddenColumnNames = [] }) => {
-  const openControls = useState({})
-  const additionalColumns = Object.keys(config.columns).filter(colKey => {
-    const columnName = config.columns[colKey]?.name || colKey
-    return !hiddenColumnNames.includes(columnName)
-  })
+  const additionalColumns = Object.keys(config.columns)
+    .filter(colKey => {
+      const columnName = config.columns[colKey]?.name || colKey
+      return !hiddenColumnNames.includes(columnName)
+    })
+    .sort((a, b) => {
+      const orderA = config.columns[a]?.order ?? Number.MAX_SAFE_INTEGER
+      const orderB = config.columns[b]?.order ?? Number.MAX_SAFE_INTEGER
+      if (orderA !== orderB) return orderA - orderB
+      return a.localeCompare(b)
+    })
 
   // just adds a new column but not set to any data yet
   const addColumnConfig = number => {
@@ -290,41 +327,64 @@ const ColumnsEditor: React.FC<ColumnsEditorProps> = ({ config, updateField, dele
       roundToPlace: 0,
       commas: false,
       showInViz: false,
-      forestPlotStartingPoint: 0
+      forestPlotStartingPoint: 0,
+      order: additionalColumns.length + 1
     }
-    const [controls, setControls] = openControls
-    setControls({ ...controls, [columnKey]: true })
     updateField('columns', null, columnKey, newColumn)
+  }
+
+  const handleColumnReorder = (sourceIndex: number, destinationIndex: number) => {
+    const reorderedColumns = [...additionalColumns]
+    const [movedColumn] = reorderedColumns.splice(sourceIndex, 1)
+    reorderedColumns.splice(destinationIndex, 0, movedColumn)
+
+    const updatedColumns = _.cloneDeep(config.columns)
+    reorderedColumns.forEach((colKey, index) => {
+      updatedColumns[colKey] = {
+        ...updatedColumns[colKey],
+        order: index + 1
+      }
+    })
+
+    updateField(null, null, 'columns', updatedColumns)
   }
 
   return (
     <>
       {'navigation' !== config.type && (
         <fieldset>
-          <label>
-            <span className='edit-label'>
-              Configurations
-              <Tooltip style={{ textTransform: 'none' }}>
-                <Tooltip.Target>
-                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                </Tooltip.Target>
-                <Tooltip.Content>
-                  <p>You can specify additional columns to display in tooltips and / or the supporting data table.</p>
-                </Tooltip.Content>
-              </Tooltip>
-            </span>
-          </label>
-          {additionalColumns.map((val, i) => (
-            <FieldSet
-              key={val + i}
-              controls={openControls}
-              config={config}
-              deleteColumn={deleteColumn}
-              updateField={updateField}
-              hiddenColumnNames={hiddenColumnNames}
-              colKey={val}
-            />
-          ))}
+          <GroupedList
+            items={additionalColumns}
+            label={
+              <>
+                Configurations
+                <Tooltip style={{ textTransform: 'none' }}>
+                  <Tooltip.Target>
+                    <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                  </Tooltip.Target>
+                  <Tooltip.Content>
+                    <p>You can specify additional columns to display in tooltips and / or the supporting data table.</p>
+                  </Tooltip.Content>
+                </Tooltip>
+              </>
+            }
+            droppableId='columns-configurations-order'
+            onDragEnd={({ source, destination }) => {
+              if (!destination || source.index === destination.index) return
+              handleColumnReorder(source.index, destination.index)
+            }}
+            renderItem={(colKey, index) => (
+              <FieldSet
+                key={colKey}
+                config={config}
+                deleteColumn={deleteColumn}
+                updateField={updateField}
+                hiddenColumnNames={hiddenColumnNames}
+                colKey={colKey}
+                index={index}
+              />
+            )}
+          />
           <Button
             variant='editor-primary'
             onClick={event => {

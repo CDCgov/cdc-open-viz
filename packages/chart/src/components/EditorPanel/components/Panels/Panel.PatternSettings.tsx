@@ -1,4 +1,5 @@
 import { useContext, FC } from 'react'
+import { Draggable } from '@hello-pangea/dnd'
 import {
   Accordion,
   AccordionItem,
@@ -6,6 +7,7 @@ import {
   AccordionItemPanel,
   AccordionItemButton
 } from 'react-accessible-accordion'
+import GroupedList from '@cdc/core/components/EditorPanel/GroupedList'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import Button from '@cdc/core/components/elements/Button'
@@ -152,6 +154,21 @@ const PanelPatternSettings: FC<PanelProps> = props => {
 
   const fieldOptions = getFieldOptions()
   const currentPatterns: Record<string, LegendPattern> = legendCfg.patterns || {}
+
+  const handlePatternReorder = (sourceIndex: number, destinationIndex: number) => {
+    const patternEntries = Object.entries(currentPatterns)
+    const [movedPattern] = patternEntries.splice(sourceIndex, 1)
+    patternEntries.splice(destinationIndex, 0, movedPattern)
+
+    const newPatterns = Object.fromEntries(patternEntries)
+    updateConfig({
+      ...config,
+      legend: {
+        ...config.legend,
+        patterns: newPatterns
+      }
+    })
+  }
 
   // Check if all patterns pass contrast requirements
   const checkPatternContrasts = () => {
@@ -308,125 +325,160 @@ const PanelPatternSettings: FC<PanelProps> = props => {
               message='Pattern colors must comply with <a href="https://www.w3.org/TR/WCAG21/">WCAG 2.1</a> 3:1 contrast ratio.'
               showCloseButton={false}
             />
-            <br />
           </>
         )}
 
-        {/* Individual Pattern Configurations */}
-        {Object.entries(currentPatterns).map(([patternKey, pattern], index) => {
-          const p: LegendPattern = pattern || {}
-          const domPatternKey = `${sanitizeToSvgId(patternKey)}-${index}`
+        <GroupedList
+          items={Object.entries(currentPatterns)}
+          label='Pattern'
+          droppableId='chart-patterns-order'
+          onDragEnd={({ source, destination }) => {
+            if (!destination || source.index === destination.index) return
+            handlePatternReorder(source.index, destination.index)
+          }}
+          renderItem={([patternKey, pattern], index) => {
+            const p: LegendPattern = pattern || {}
+            const domPatternKey = `${sanitizeToSvgId(patternKey)}-${index}`
 
-          return (
-            <Accordion allowZeroExpanded key={`pattern-accordion-${index}`}>
-              <AccordionItem>
-                <AccordionItemHeading>
-                  <AccordionItemButton>
-                    {p.dataKey && p.dataValue
-                      ? `${p.dataKey}: ${p.dataValue}`
-                      : p.dataValue
-                      ? `All Series: ${p.dataValue}`
-                      : `Pattern ${index + 1}`}
-                  </AccordionItemButton>
-                </AccordionItemHeading>
-                <AccordionItemPanel>
-                  {p.contrastCheck ?? true ? (
-                    <Alert type='success' message='This pattern passes contrast checks' showCloseButton={false} />
-                  ) : (
-                    <Alert
-                      type='danger'
-                      message='Error: <a href="https://webaim.org/resources/contrastchecker/" target="_blank"> Review Color Contrast</a>'
-                      showCloseButton={false}
-                    />
-                  )}
+            return (
+              <Draggable
+                key={`pattern-${patternKey}-${index}`}
+                draggableId={`pattern-${patternKey}-${index}`}
+                index={index}
+              >
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    className={snapshot.isDragging ? 'currently-dragging' : ''}
+                    style={provided.draggableProps.style}
+                  >
+                    <Accordion allowZeroExpanded>
+                      <AccordionItem className='series-item series-item--chart'>
+                        <AccordionItemHeading className='series-item__title'>
+                          <AccordionItemButton className='accordion__button'>
+                            <Icon display='move' size={15} style={{ cursor: 'default' }} />
+                            {p.dataKey && p.dataValue
+                              ? `${p.dataKey}: ${p.dataValue}`
+                              : p.dataValue
+                              ? `All Series: ${p.dataValue}`
+                              : `Pattern ${index + 1}`}
+                          </AccordionItemButton>
+                        </AccordionItemHeading>
+                        <AccordionItemPanel>
+                          <div className='series-item__panel-actions'>
+                            <Button
+                              type='button'
+                              variant='danger'
+                              size='sm'
+                              className='grouped-list__remove'
+                              onClick={() => handleRemovePattern(patternKey)}
+                            >
+                              Remove Pattern
+                            </Button>
+                          </div>
+                          {p.contrastCheck ?? true ? (
+                            <Alert
+                              type='success'
+                              message='This pattern passes contrast checks'
+                              showCloseButton={false}
+                            />
+                          ) : (
+                            <Alert
+                              type='danger'
+                              message='Error: <a href="https://webaim.org/resources/contrastchecker/" target="_blank"> Review Color Contrast</a>'
+                              showCloseButton={false}
+                            />
+                          )}
 
-                  <Select
-                    label='Data Key:'
-                    value={p.dataKey || ''}
-                    options={fieldOptions}
-                    initial='Select Data Key'
-                    fieldName={`pattern-datakey-${domPatternKey}`}
-                    updateField={(section, subsection, fieldName, value) =>
-                      handlePatternUpdate(patternKey, 'dataKey', value)
-                    }
-                  />
-
-                  <label htmlFor={`pattern-datavalue-${domPatternKey}`}>
-                    Data Value:
-                    <input
-                      type='text'
-                      id={`pattern-datavalue-${domPatternKey}`}
-                      value={p.dataValue || ''}
-                      onChange={e => handlePatternUpdate(patternKey, 'dataValue', e.target.value)}
-                      placeholder='Enter data value'
-                    />
-                  </label>
-
-                  <label htmlFor={`pattern-label-${domPatternKey}`}>
-                    Label (optional):
-                    <input
-                      type='text'
-                      id={`pattern-label-${domPatternKey}`}
-                      value={p.label || ''}
-                      onChange={e => handlePatternUpdate(patternKey, 'label', e.target.value)}
-                    />
-                  </label>
-
-                  <Select
-                    label='Pattern Type:'
-                    value={p.shape || 'circles'}
-                    options={patternTypes}
-                    fieldName={`pattern-type-${domPatternKey}`}
-                    updateField={(section, subsection, fieldName, value) =>
-                      handlePatternUpdate(patternKey, 'shape', value)
-                    }
-                  />
-
-                  <Select
-                    label='Pattern Size:'
-                    value={getPatternSizeText(p.patternSize || 8)}
-                    options={patternSizes}
-                    fieldName={`pattern-size-${domPatternKey}`}
-                    updateField={(section, subsection, fieldName, value) =>
-                      handlePatternUpdate(patternKey, 'patternSize', getPatternSizeNumeric(value))
-                    }
-                  />
-
-                  <div className='mt-3'>
-                    <label htmlFor={`pattern-color-${domPatternKey}`}>
-                      Pattern Color
-                      <Tooltip style={{ textTransform: 'none' }}>
-                        <Tooltip.Target>
-                          <Icon
-                            display='question'
-                            style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                          <Select
+                            label='Data Key:'
+                            value={p.dataKey || ''}
+                            options={fieldOptions}
+                            initial='Select Data Key'
+                            fieldName={`pattern-datakey-${domPatternKey}`}
+                            updateField={(section, subsection, fieldName, value) =>
+                              handlePatternUpdate(patternKey, 'dataKey', value)
+                            }
                           />
-                        </Tooltip.Target>
-                        <Tooltip.Content>
-                          <p>
-                            If this setting is used, it is the responsibility of the visualization author to verify the
-                            visualization colors meet WCAG 3:1 contrast ratios.
-                          </p>
-                        </Tooltip.Content>
-                      </Tooltip>
-                      <input
-                        type='text'
-                        value={p.color || ''}
-                        id={`pattern-color-${domPatternKey}`}
-                        onChange={e => handlePatternUpdate(patternKey, 'color', e.target.value)}
-                        placeholder='#666666'
-                      />
-                    </label>
-                  </div>
 
-                  <Button onClick={() => handleRemovePattern(patternKey)} className='btn btn-danger'>
-                    Remove Pattern
-                  </Button>
-                </AccordionItemPanel>
-              </AccordionItem>
-            </Accordion>
-          )
-        })}
+                          <label htmlFor={`pattern-datavalue-${domPatternKey}`}>
+                            Data Value:
+                            <input
+                              type='text'
+                              id={`pattern-datavalue-${domPatternKey}`}
+                              value={p.dataValue || ''}
+                              onChange={e => handlePatternUpdate(patternKey, 'dataValue', e.target.value)}
+                              placeholder='Enter data value'
+                            />
+                          </label>
+
+                          <label htmlFor={`pattern-label-${domPatternKey}`}>
+                            Label (optional):
+                            <input
+                              type='text'
+                              id={`pattern-label-${domPatternKey}`}
+                              value={p.label || ''}
+                              onChange={e => handlePatternUpdate(patternKey, 'label', e.target.value)}
+                            />
+                          </label>
+
+                          <Select
+                            label='Pattern Type:'
+                            value={p.shape || 'circles'}
+                            options={patternTypes}
+                            fieldName={`pattern-type-${domPatternKey}`}
+                            updateField={(section, subsection, fieldName, value) =>
+                              handlePatternUpdate(patternKey, 'shape', value)
+                            }
+                          />
+
+                          <Select
+                            label='Pattern Size:'
+                            value={getPatternSizeText(p.patternSize || 8)}
+                            options={patternSizes}
+                            fieldName={`pattern-size-${domPatternKey}`}
+                            updateField={(section, subsection, fieldName, value) =>
+                              handlePatternUpdate(patternKey, 'patternSize', getPatternSizeNumeric(value))
+                            }
+                          />
+
+                          <div className='mt-3'>
+                            <label htmlFor={`pattern-color-${domPatternKey}`}>
+                              Pattern Color
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon
+                                    display='question'
+                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                                  />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    If this setting is used, it is the responsibility of the visualization author to
+                                    verify the visualization colors meet WCAG 3:1 contrast ratios.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                              <input
+                                type='text'
+                                value={p.color || ''}
+                                id={`pattern-color-${domPatternKey}`}
+                                onChange={e => handlePatternUpdate(patternKey, 'color', e.target.value)}
+                                placeholder='#666666'
+                              />
+                            </label>
+                          </div>
+                        </AccordionItemPanel>
+                      </AccordionItem>
+                    </Accordion>
+                  </div>
+                )}
+              </Draggable>
+            )
+          }}
+        />
 
         {/* Add Pattern Button */}
         <Button variant='editor-primary' onClick={handleAddPattern}>

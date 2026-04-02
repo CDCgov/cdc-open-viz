@@ -10,13 +10,20 @@ import { MultiSelectFilter, VizFilter, VizFilterStyle } from '../../../types/Viz
 import { handleSorting } from '../../Filters/helpers/handleSorting'
 import { filterOrderOptions } from '../../../helpers/filterOrderOptions'
 import { filterStyleOptions } from '../../Filters'
-import FieldSetWrapper from '../FieldSetWrapper'
+import GroupedList from '../GroupedList'
 
 import FilterOrder from './components/FilterOrder'
 import { useMemo, useState } from 'react'
 import MultiSelect from '../../MultiSelect'
 import NestedDropdownEditor from './NestedDropdownEditor'
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import { Draggable } from '@hello-pangea/dnd'
+import {
+  Accordion,
+  AccordionItem,
+  AccordionItemButton,
+  AccordionItemHeading,
+  AccordionItemPanel
+} from 'react-accessible-accordion'
 import Button from '../../elements/Button'
 
 type VizFilterProps = {
@@ -27,11 +34,14 @@ type VizFilterProps = {
 }
 
 const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawData, hasFootnotes }) => {
-  const openControls = useState({})
   const [isNestedDragHovered, setIsNestedDragHovered] = useState(false)
   const dataColumns = useMemo(() => {
     return uniq(flatten(rawData?.map(row => Object.keys(row))))
   }, [rawData])
+  const editableFilters = useMemo(
+    () => (config.filters || []).map((filter, index) => ({ filter, index })).filter(({ filter }) => filter.type !== 'url'),
+    [config.filters]
+  )
 
   // Helper function to get filter values from various sources
   const getFilterValues = (filter: VizFilter) => {
@@ -135,22 +145,13 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
 
   const handleFilterReorder = (idx1: number, idx2: number) => {
     if (idx1 === undefined || idx2 === undefined || idx1 === idx2) return
+    const sourceIndex = editableFilters[idx1]?.index
+    const destinationIndex = editableFilters[idx2]?.index
+    if (sourceIndex === undefined || destinationIndex === undefined) return
     const filters = cloneDeep(config.filters)
-    const [movedFilter] = filters.splice(idx1, 1)
-    filters.splice(idx2, 0, movedFilter)
+    const [movedFilter] = filters.splice(sourceIndex, 1)
+    filters.splice(destinationIndex, 0, movedFilter)
     updateField(null, null, 'filters', filters)
-  }
-
-  const getItemStyle = (isDragging: boolean, draggableStyle: any) => ({
-    ...draggableStyle
-  })
-
-  const sortableItemStyles = {
-    animate: false,
-    animateReplay: true,
-    display: 'block',
-    boxSizing: 'border-box' as const,
-    border: '1px solid #D1D1D1'
   }
 
   return (
@@ -185,231 +186,239 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
             fieldName='filterIntro'
           />
           <br />
-          <DragDropContext
-            onDragEnd={({ source, destination }) => handleFilterReorder(source.index, destination?.index)}
-          >
-            <Droppable droppableId='filters_list'>
-              {provided => (
-                <ul {...provided.droppableProps} ref={provided.innerRef} className='draggable-field-list'>
-                  {/* Whether filters should apply onChange or Apply Button */}
-
-                  {config.filters.map((filter, filterIndex) => {
-                    if (filter.type === 'url') return <></>
-                    return (
-                      <Draggable
-                        key={filter.id || `filter-${filterIndex}`}
-                        draggableId={`filter-${filter.id || filterIndex}`}
-                        index={filterIndex}
-                        isDragDisabled={isNestedDragHovered}
-                      >
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className={snapshot.isDragging ? 'currently-dragging' : ''}
-                            style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
-                          >
-                            <FieldSetWrapper
-                              key={filter.columnName}
-                              fieldName={filter.columnName}
-                              fieldKey={filterIndex}
-                              fieldType='Filter'
-                              controls={openControls}
-                              deleteField={() => removeFilter(filterIndex)}
-                              draggable={true}
+          <GroupedList
+            items={editableFilters}
+            label='Filters'
+            droppableId='filters_list'
+            onDragEnd={({ source, destination }) => {
+              if (!destination) return
+              handleFilterReorder(source.index, destination.index)
+            }}
+            renderItem={({ filter, index: filterIndex }, index) => (
+              <Draggable
+                key={filter.id || `filter-${filterIndex}`}
+                draggableId={`filter-${filter.id || filterIndex}`}
+                index={index}
+                isDragDisabled={isNestedDragHovered}
+              >
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    className={snapshot.isDragging ? 'currently-dragging' : ''}
+                    style={provided.draggableProps.style}
+                  >
+                    <Accordion allowZeroExpanded>
+                      <AccordionItem className='series-item series-item--chart'>
+                        <AccordionItemHeading className='series-item__title'>
+                          <AccordionItemButton className='accordion__button'>
+                            <Icon display='move' size={15} style={{ cursor: 'default' }} />
+                            {filter.label || filter.columnName || `Filter ${filterIndex + 1}`}
+                          </AccordionItemButton>
+                        </AccordionItemHeading>
+                        <AccordionItemPanel>
+                          <div className='series-item__panel-actions'>
+                            <Button
+                              type='button'
+                              variant='danger'
+                              size='sm'
+                              className='grouped-list__remove'
+                              onClick={event => {
+                                event.preventDefault()
+                                removeFilter(filterIndex)
+                              }}
                             >
+                              Remove
+                            </Button>
+                          </div>
+                          <Select
+                            value={filter.filterStyle}
+                            fieldName='filterStyle'
+                            label='Filter Style'
+                            updateField={(_section, _subsection, _field, value) =>
+                              updateFilterStyle(filterIndex, value)
+                            }
+                            options={filterStyleOptions}
+                          />
+
+                          {filter.filterStyle !== 'nested-dropdown' ? (
+                            <>
                               <Select
-                                value={filter.filterStyle}
-                                fieldName='filterStyle'
-                                label='Filter Style'
+                                value={filter.columnName}
+                                fieldName='columnName'
+                                label='Filter'
                                 updateField={(_section, _subsection, _field, value) =>
-                                  updateFilterStyle(filterIndex, value)
+                                  handleNameChange(filterIndex, value)
                                 }
-                                options={filterStyleOptions}
+                                options={dataColumns}
+                                initial='- Select Option -'
                               />
 
-                              {filter.filterStyle !== 'nested-dropdown' ? (
-                                <>
-                                  <Select
-                                    value={filter.columnName}
-                                    fieldName='columnName'
-                                    label='Filter'
-                                    updateField={(_section, _subsection, _field, value) =>
-                                      handleNameChange(filterIndex, value)
-                                    }
-                                    options={dataColumns}
-                                    initial='- Select Option -'
-                                  />
+                              {filter.columnName && (
+                                <Select
+                                  value={filter.defaultValue}
+                                  options={
+                                    filter.resetLabel
+                                      ? [filter.resetLabel, ...getFilterValues(filter)]
+                                      : getFilterValues(filter)
+                                  }
+                                  updateField={(_section, _subSection, _key, value) => {
+                                    updateFilterDefaultValue(filterIndex, value)
+                                  }}
+                                  label={`Filter Default Value${filter.columnName ? ` (${filter.columnName})` : ''
+                                    }`}
+                                  initial='Select'
+                                />
+                              )}
 
-                                  {filter.columnName && (
-                                    <Select
-                                      value={filter.defaultValue}
-                                      options={
-                                        filter.resetLabel
-                                          ? [filter.resetLabel, ...getFilterValues(filter)]
-                                          : getFilterValues(filter)
-                                      }
-                                      updateField={(_section, _subSection, _key, value) => {
-                                        updateFilterDefaultValue(filterIndex, value)
-                                      }}
-                                      label={`Filter Default Value${
-                                        filter.columnName ? ` (${filter.columnName})` : ''
-                                      }`}
-                                      initial='Select'
-                                    />
-                                  )}
+                              <label>
+                                <span className='edit-label column-heading'>Label</span>
+                                <input
+                                  type='text'
+                                  value={filter.label}
+                                  onChange={e => {
+                                    updateFilterProp('label', filterIndex, e.target.value)
+                                  }}
+                                />
+                              </label>
 
-                                  <label>
-                                    <span className='edit-label column-heading'>Label</span>
-                                    <input
-                                      type='text'
-                                      value={filter.label}
-                                      onChange={e => {
-                                        updateFilterProp('label', filterIndex, e.target.value)
-                                      }}
-                                    />
-                                  </label>
+                              {filter.filterStyle === 'multi-select' && (
+                                <TextField
+                                  label='Select Limit'
+                                  value={(filter as MultiSelectFilter).selectLimit}
+                                  updateField={updateField}
+                                  section='filters'
+                                  subsection={filterIndex}
+                                  fieldName='selectLimit'
+                                  type='number'
+                                  tooltip={
+                                    <Tooltip style={{ textTransform: 'none' }}>
+                                      <Tooltip.Target>
+                                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                      </Tooltip.Target>
+                                      <Tooltip.Content>
+                                        <p>The maximum number of items that can be selected.</p>
+                                      </Tooltip.Content>
+                                    </Tooltip>
+                                  }
+                                />
+                              )}
 
-                                  {filter.filterStyle === 'multi-select' && (
-                                    <TextField
-                                      label='Select Limit'
-                                      value={(filter as MultiSelectFilter).selectLimit}
-                                      updateField={updateField}
-                                      section='filters'
-                                      subsection={filterIndex}
-                                      fieldName='selectLimit'
-                                      type='number'
-                                      tooltip={
-                                        <Tooltip style={{ textTransform: 'none' }}>
-                                          <Tooltip.Target>
-                                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                          </Tooltip.Target>
-                                          <Tooltip.Content>
-                                            <p>The maximum number of items that can be selected.</p>
-                                          </Tooltip.Content>
-                                        </Tooltip>
-                                      }
-                                    />
-                                  )}
-
-                                  <Select
-                                    value={filter.order || 'asc'}
-                                    fieldName='order'
-                                    label='Filter Order'
-                                    updateField={(_section, _subSection, _field, value) => {
-                                      updateFilterProp('order', filterIndex, value)
-                                      if (filter.orderColumn && value !== 'column')
-                                        updateFilterProp('orderColumn', filterIndex, '')
-                                    }}
-                                    options={filterOrderOptions}
-                                  />
-                                  {filter.order === 'cust' && (
-                                    <FilterOrder
-                                      orderedValues={filter.orderedValues || filter.values}
-                                      handleFilterOrder={(index1, index2) =>
-                                        handleFilterOrder(index1, index2, filterIndex)
-                                      }
-                                      onNestedDragAreaHover={setIsNestedDragHovered}
-                                    />
-                                  )}
-                                  {filter.order === 'column' && (
-                                    <Select
-                                      value={filter.orderColumn}
-                                      fieldName='orderColumn'
-                                      label='Order Column'
-                                      updateField={(_section, _subSection, _field, value) =>
-                                        updateFilterProp('orderColumn', filterIndex, value)
-                                      }
-                                      options={dataColumns}
-                                    />
-                                  )}
-                                  <label>
-                                    <span className='edit-label column-heading'>
-                                      Default Value Set By Query String Parameter
-                                    </span>
-                                    <input
-                                      type='text'
-                                      value={filter.setByQueryParameter}
-                                      onChange={e => {
-                                        updateFilterProp('setByQueryParameter', filterIndex, e.target.value)
-                                      }}
-                                    />
-                                  </label>
-
-                                  <label>
-                                    <input
-                                      type='checkbox'
-                                      checked={filter.showDropdown === undefined ? true : filter.showDropdown}
-                                      onChange={e => {
-                                        updateFilterProp('showDropdown', filterIndex, e.target.checked)
-                                      }}
-                                    />
-                                    <span className='edit-showDropdown column-heading'>Show Filter</span>
-                                  </label>
-                                </>
-                              ) : (
-                                <NestedDropdownEditor
-                                  config={config}
-                                  dataColumns={dataColumns}
-                                  filterIndex={filterIndex}
-                                  rawData={rawData}
-                                  handleGroupingCustomOrder={(index1, index2) =>
+                              <Select
+                                value={filter.order || 'asc'}
+                                fieldName='order'
+                                label='Filter Order'
+                                updateField={(_section, _subSection, _field, value) => {
+                                  updateFilterProp('order', filterIndex, value)
+                                  if (filter.orderColumn && value !== 'column')
+                                    updateFilterProp('orderColumn', filterIndex, '')
+                                }}
+                                options={filterOrderOptions}
+                              />
+                              {filter.order === 'cust' && (
+                                <FilterOrder
+                                  orderedValues={filter.orderedValues || filter.values}
+                                  handleFilterOrder={(index1, index2) =>
                                     handleFilterOrder(index1, index2, filterIndex)
                                   }
-                                  handleNameChange={value => handleNameChange(filterIndex, value)}
-                                  updateField={updateField}
-                                  updateFilterStyle={updateFilterStyle}
                                   onNestedDragAreaHover={setIsNestedDragHovered}
                                 />
                               )}
-                              {hasFootnotes && (
-                                <label>
-                                  <input
-                                    type='checkbox'
-                                    checked={!!filter.filterFootnotes}
-                                    onChange={e => {
-                                      updateFilterProp('filterFootnotes', filterIndex, e.target.checked)
-                                    }}
-                                  />
-                                  <span className='edit-showDropdown column-heading'>Filter Footnotes</span>
-                                </label>
+                              {filter.order === 'column' && (
+                                <Select
+                                  value={filter.orderColumn}
+                                  fieldName='orderColumn'
+                                  label='Order Column'
+                                  updateField={(_section, _subSection, _field, value) =>
+                                    updateFilterProp('orderColumn', filterIndex, value)
+                                  }
+                                  options={dataColumns}
+                                />
                               )}
                               <label>
                                 <span className='edit-label column-heading'>
-                                  Filter Parents{' '}
-                                  <Tooltip style={{ textTransform: 'none' }}>
-                                    <Tooltip.Target>
-                                      <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                    </Tooltip.Target>
-                                    <Tooltip.Content>
-                                      <p>
-                                        A selected parent's value will be used to filter the available options of this
-                                        child filter.
-                                      </p>
-                                    </Tooltip.Content>
-                                  </Tooltip>
+                                  Default Value Set By Query String Parameter
                                 </span>
-                                <MultiSelect
-                                  fieldName='parents'
-                                  updateField={(_section, _subsection, _fieldname, value) => {
-                                    updateFilterProp('parents', filterIndex, value)
+                                <input
+                                  type='text'
+                                  value={filter.setByQueryParameter}
+                                  onChange={e => {
+                                    updateFilterProp('setByQueryParameter', filterIndex, e.target.value)
                                   }}
-                                  options={getParentFilterOptions(filterIndex)}
-                                  selected={config.filters[filterIndex].parents}
                                 />
                               </label>
-                            </FieldSetWrapper>
-                          </div>
-                        )}
-                      </Draggable>
-                    )
-                  })}
-                  {provided.placeholder}
-                </ul>
-              )}
-            </Droppable>
-          </DragDropContext>
+
+                              <label>
+                                <input
+                                  type='checkbox'
+                                  checked={filter.showDropdown === undefined ? true : filter.showDropdown}
+                                  onChange={e => {
+                                    updateFilterProp('showDropdown', filterIndex, e.target.checked)
+                                  }}
+                                />
+                                <span className='edit-showDropdown column-heading'>Show Filter</span>
+                              </label>
+                            </>
+                          ) : (
+                            <NestedDropdownEditor
+                              config={config}
+                              dataColumns={dataColumns}
+                              filterIndex={filterIndex}
+                              rawData={rawData}
+                              handleGroupingCustomOrder={(index1, index2) =>
+                                handleFilterOrder(index1, index2, filterIndex)
+                              }
+                              handleNameChange={value => handleNameChange(filterIndex, value)}
+                              updateField={updateField}
+                              updateFilterStyle={updateFilterStyle}
+                              onNestedDragAreaHover={setIsNestedDragHovered}
+                            />
+                          )}
+                          {hasFootnotes && (
+                            <label>
+                              <input
+                                type='checkbox'
+                                checked={!!filter.filterFootnotes}
+                                onChange={e => {
+                                  updateFilterProp('filterFootnotes', filterIndex, e.target.checked)
+                                }}
+                              />
+                              <span className='edit-showDropdown column-heading'>Filter Footnotes</span>
+                            </label>
+                          )}
+                          <label>
+                            <span className='edit-label column-heading'>
+                              Filter Parents{' '}
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    A selected parent's value will be used to filter the available options of this
+                                    child filter.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            </span>
+                            <MultiSelect
+                              fieldName='parents'
+                              updateField={(_section, _subsection, _fieldname, value) => {
+                                updateFilterProp('parents', filterIndex, value)
+                              }}
+                              options={getParentFilterOptions(filterIndex)}
+                              selected={config.filters[filterIndex].parents}
+                            />
+                          </label>
+                        </AccordionItemPanel>
+                      </AccordionItem>
+                    </Accordion>
+                  </div>
+                )}
+              </Draggable>
+            )}
+          />
           <Button type='button' variant='editor-primary' onClick={addNewFilter}>
             Add Filter
           </Button>

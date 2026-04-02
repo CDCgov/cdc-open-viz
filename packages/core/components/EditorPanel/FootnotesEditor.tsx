@@ -1,15 +1,25 @@
 import React, { useState } from 'react'
+import { Draggable } from '@hello-pangea/dnd'
 import { UpdateFieldFunc } from '../../types/UpdateFieldFunc'
 import _ from 'lodash'
 import Footnotes, { Footnote } from '../../types/Footnotes'
 import { footnotesSymbols } from '../../helpers/footnoteSymbols'
+import GroupedList from './GroupedList'
 import { TextField, Select } from './Inputs'
+import Icon from '../ui/Icon'
 import { Datasets } from '@cdc/core/types/DataSet'
 import DataTransform from '../../helpers/DataTransform'
 import fetchRemoteData from '../../helpers/fetchRemoteData'
 import Loader from '../Loader'
 import { AnyVisualization } from '../../types/Visualization'
 import Button from '../elements/Button'
+import {
+  Accordion,
+  AccordionItem,
+  AccordionItemButton,
+  AccordionItemHeading,
+  AccordionItemPanel
+} from 'react-accessible-accordion'
 interface FootnotesEditorProps {
   config: AnyVisualization
   updateField: UpdateFieldFunc<Footnote[] | Object>
@@ -58,6 +68,13 @@ const FootnotesEditor: React.FC<FootnotesEditorProps> = ({ config, updateField, 
   const deleteStaticFootnote = footnoteIndex => {
     const footnoteCopy = _.cloneDeep(footnotesConfig.staticFootnotes)
     footnoteCopy.splice(footnoteIndex, 1)
+    updateField('footnotes', null, 'staticFootnotes', footnoteCopy)
+  }
+
+  const moveStaticFootnote = (sourceIndex, destinationIndex) => {
+    const footnoteCopy = _.cloneDeep(footnotesConfig.staticFootnotes || [])
+    const [movedFootnote] = footnoteCopy.splice(sourceIndex, 1)
+    footnoteCopy.splice(destinationIndex, 0, movedFootnote)
     updateField('footnotes', null, 'staticFootnotes', footnoteCopy)
   }
 
@@ -133,44 +150,79 @@ const FootnotesEditor: React.FC<FootnotesEditorProps> = ({ config, updateField, 
 
       <hr />
 
-      <em>Static Footnotes</em>
+      <GroupedList
+        items={footnotesConfig.staticFootnotes}
+        label='Static Footnotes'
+        droppableId='static-footnotes-order'
+        onDragEnd={({ source, destination }) => {
+          if (!destination || source.index === destination.index) return
+          moveStaticFootnote(source.index, destination.index)
+        }}
+        renderItem={(note, index) => {
+          const symbolOptions = [
+            { value: '', label: '--Select--' },
+            ...footnotesSymbols.map(([value, label]) => ({ value, label }))
+          ]
 
-      {footnotesConfig.staticFootnotes?.map((note, index) => {
-        // Convert tuple format to {value, label} format for Select component
-        const symbolOptions = [
-          { value: '', label: '--Select--' },
-          ...footnotesSymbols.map(([value, label]) => ({ value, label }))
-        ]
-
-        return (
-          <div key={index} className='row border p-2'>
-            <div className='col-8'>
-              <Select
-                label='Symbol'
-                value={note.symbol}
-                options={symbolOptions}
-                fieldName='symbol'
-                updateField={(section, subsection, fieldName, value) =>
-                  updateStaticFootnote(index, { ...note, symbol: value })
-                }
-              />{' '}
-              <TextField
-                label='Text'
-                value={note.text}
-                fieldName='text'
-                updateField={(section, subsection, fieldName, value) =>
-                  updateStaticFootnote(index, { ...note, text: value })
-                }
-              />
-            </div>
-            <div className='col-2 ms-4'>
-              <Button variant='danger' className='p-1' onClick={() => deleteStaticFootnote(index)}>
-                Delete
-              </Button>
-            </div>
-          </div>
-        )
-      })}
+          return (
+            <Draggable key={`static-footnote-${index}`} draggableId={`static-footnote-${index}`} index={index}>
+              {(provided, snapshot) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                  className={snapshot.isDragging ? 'currently-dragging' : ''}
+                  style={provided.draggableProps.style}
+                >
+                  <Accordion allowZeroExpanded>
+                    <AccordionItem className='series-item series-item--chart'>
+                      <AccordionItemHeading className='series-item__title'>
+                        <AccordionItemButton className='accordion__button'>
+                          <Icon display='move' size={15} style={{ cursor: 'default' }} />
+                          {note.symbol ? `Footnote ${note.symbol}` : `Footnote ${index + 1}`}
+                        </AccordionItemButton>
+                      </AccordionItemHeading>
+                      <AccordionItemPanel>
+                        <div className='series-item__panel-actions'>
+                          <Button
+                            type='button'
+                            variant='danger'
+                            size='sm'
+                            className='grouped-list__remove'
+                            onClick={event => {
+                              event.preventDefault()
+                              deleteStaticFootnote(index)
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                        <Select
+                          label='Symbol'
+                          value={note.symbol}
+                          options={symbolOptions}
+                          fieldName='symbol'
+                          updateField={(section, subsection, fieldName, value) =>
+                            updateStaticFootnote(index, { ...note, symbol: value })
+                          }
+                        />
+                        <TextField
+                          label='Text'
+                          value={note.text}
+                          fieldName='text'
+                          updateField={(section, subsection, fieldName, value) =>
+                            updateStaticFootnote(index, { ...note, text: value })
+                          }
+                        />
+                      </AccordionItemPanel>
+                    </AccordionItem>
+                  </Accordion>
+                </div>
+              )}
+            </Draggable>
+          )
+        }}
+      />
       <Button variant='editor-primary' onClick={addStaticFootnote}>
         Add Static Footnote
       </Button>
