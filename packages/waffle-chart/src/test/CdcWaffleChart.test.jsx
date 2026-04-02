@@ -26,6 +26,44 @@ afterEach(() => {
 })
 
 describe('Waffle Chart', () => {
+  const createBaseConfig = overrides => ({
+    type: 'waffle-chart',
+    title: 'Test Waffle',
+    showTitle: true,
+    visualizationType: 'Waffle',
+    shape: 'circle',
+    data: [{ value: 42 }],
+    filters: [],
+    content: 'Test content',
+    subtext: 'Test subtext',
+    dataColumn: 'value',
+    dataFunction: 'Sum',
+    customDenom: false,
+    dataDenom: '100',
+    dataDenomColumn: '',
+    dataDenomFunction: 'Sum',
+    showPercent: true,
+    showDenominator: false,
+    valueDescription: 'out of',
+    suffix: '%',
+    roundToPlace: 0,
+    nodeWidth: 10,
+    nodeSpacer: 2,
+    theme: 'theme-blue',
+    visual: {
+      border: false,
+      accent: false,
+      background: false,
+      hideBackgroundColor: false,
+      borderColorTheme: false,
+      whiteBackground: false,
+      colors: {
+        'theme-blue': '#005eaa'
+      }
+    },
+    ...overrides
+  })
+
   it('Can be built in isolation', async () => {
     const pkgDir = path.join(__dirname, '..')
     const result = await testStandaloneBuild(pkgDir)
@@ -35,47 +73,20 @@ describe('Waffle Chart', () => {
   it('moves the trend indicator below the value when a trend label is configured', async () => {
     const { container } = render(
       <CdcWaffleChart
-        config={{
-          type: 'waffle-chart',
-          title: 'Test Waffle',
-          showTitle: true,
+        config={createBaseConfig({
           visualizationType: 'TP5 Waffle',
           shape: 'square',
           data: [{ value: 42, total: 100, trend: 'increase' }],
-          filters: [],
-          content: 'Test content',
-          subtext: 'Test subtext',
-          dataColumn: 'value',
-          dataFunction: 'Sum',
           customDenom: true,
           dataDenomColumn: 'total',
-          dataDenomFunction: 'Sum',
           showPercent: true,
-          showDenominator: false,
-          valueDescription: 'out of',
-          suffix: '%',
-          roundToPlace: 0,
-          nodeWidth: 10,
-          nodeSpacer: 2,
-          theme: 'theme-blue',
           trendIndicator: {
             mode: 'categorical',
             column: 'trend',
             mappings: [{ sourceValue: 'increase', arrowType: 'up' }],
             upLabel: 'Increasing'
-          },
-          visual: {
-            border: false,
-            accent: false,
-            background: false,
-            hideBackgroundColor: false,
-            borderColorTheme: false,
-            whiteBackground: false,
-            colors: {
-              'theme-blue': '#005eaa'
-            }
           }
-        }}
+        })}
       />
     )
 
@@ -92,47 +103,20 @@ describe('Waffle Chart', () => {
   it('moves the trend indicator below the value when a footer trend label is configured', async () => {
     const { container } = render(
       <CdcWaffleChart
-        config={{
-          type: 'waffle-chart',
-          title: 'Test Waffle',
-          showTitle: true,
+        config={createBaseConfig({
           visualizationType: 'TP5 Waffle',
           shape: 'square',
           data: [{ value: 42, total: 100, trend: 'increase' }],
-          filters: [],
-          content: 'Test content',
-          subtext: 'Test subtext',
-          dataColumn: 'value',
-          dataFunction: 'Sum',
           customDenom: true,
           dataDenomColumn: 'total',
-          dataDenomFunction: 'Sum',
           showPercent: true,
-          showDenominator: false,
-          valueDescription: 'out of',
-          suffix: '%',
-          roundToPlace: 0,
-          nodeWidth: 10,
-          nodeSpacer: 2,
-          theme: 'theme-blue',
           trendIndicator: {
             mode: 'categorical',
             column: 'trend',
             mappings: [{ sourceValue: 'increase', arrowType: 'up' }],
             trendLabel: '(compared to one year prior)'
-          },
-          visual: {
-            border: false,
-            accent: false,
-            background: false,
-            hideBackgroundColor: false,
-            borderColorTheme: false,
-            whiteBackground: false,
-            colors: {
-              'theme-blue': '#005eaa'
-            }
           }
-        }}
+        })}
       />
     )
 
@@ -149,46 +133,19 @@ describe('Waffle Chart', () => {
   it('keeps the trend indicator inline when no trend label is configured', async () => {
     const { container } = render(
       <CdcWaffleChart
-        config={{
-          type: 'waffle-chart',
-          title: 'Test Waffle',
-          showTitle: true,
+        config={createBaseConfig({
           visualizationType: 'TP5 Waffle',
           shape: 'square',
           data: [{ value: 42, total: 100, trend: 'increase' }],
-          filters: [],
-          content: 'Test content',
-          subtext: 'Test subtext',
-          dataColumn: 'value',
-          dataFunction: 'Sum',
           customDenom: true,
           dataDenomColumn: 'total',
-          dataDenomFunction: 'Sum',
           showPercent: true,
-          showDenominator: false,
-          valueDescription: 'out of',
-          suffix: '%',
-          roundToPlace: 0,
-          nodeWidth: 10,
-          nodeSpacer: 2,
-          theme: 'theme-blue',
           trendIndicator: {
             mode: 'categorical',
             column: 'trend',
             mappings: [{ sourceValue: 'increase', arrowType: 'up' }]
-          },
-          visual: {
-            border: false,
-            accent: false,
-            background: false,
-            hideBackgroundColor: false,
-            borderColorTheme: false,
-            whiteBackground: false,
-            colors: {
-              'theme-blue': '#005eaa'
-            }
           }
-        }}
+        })}
       />
     )
 
@@ -367,5 +324,31 @@ describe('Waffle Chart', () => {
     await waitFor(() => {
       expect(container.querySelector('.mock-trend-arrow-wrap')).not.toBeInTheDocument()
     })
+  })
+
+  it('renders denominator 10 as a 5 by 2 grid in visible denominator mode', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          data: [{ value: 4 }],
+          dataDenom: '10',
+          showPercent: false,
+          showDenominator: true,
+          suffix: ''
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      const nodes = container.querySelectorAll('.cove-waffle-chart svg .cdc-waffle-chart__node')
+      expect(nodes).toHaveLength(10)
+    })
+
+    const nodes = Array.from(container.querySelectorAll('.cove-waffle-chart svg circle'))
+    const uniqueX = new Set(nodes.map(node => node.getAttribute('cx'))).size
+    const uniqueY = new Set(nodes.map(node => node.getAttribute('cy'))).size
+
+    expect(uniqueX).toBe(5)
+    expect(uniqueY).toBe(2)
   })
 })

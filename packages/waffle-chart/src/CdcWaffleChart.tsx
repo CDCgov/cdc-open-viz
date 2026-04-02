@@ -51,6 +51,20 @@ import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 const TP5_NODE_WIDTH = 13
 const TP5_NODE_SPACER = 3
 
+const getDynamicWaffleGrid = (unitCount: number) => {
+  // Ten reads better as two balanced rows than the default 4 x 3 layout.
+  if (unitCount === 10) {
+    return { columns: 5, rows: 2 }
+  }
+
+  const columns = Math.ceil(Math.sqrt(unitCount))
+
+  return {
+    columns,
+    rows: Math.ceil(unitCount / columns)
+  }
+}
+
 type CdcWaffleChartProps = {
   configUrl?: string
   config?: Config
@@ -387,8 +401,9 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       }
     }
 
-    const columns = renderMode === 'dynamic-denominator' ? Math.ceil(Math.sqrt(unitCount)) : 10
-    const rows = renderMode === 'dynamic-denominator' ? Math.ceil(unitCount / columns) : 10
+    const dynamicGrid = renderMode === 'dynamic-denominator' ? getDynamicWaffleGrid(unitCount) : null
+    const columns = dynamicGrid?.columns ?? 10
+    const rows = dynamicGrid?.rows ?? 10
 
     return {
       isTP5,
