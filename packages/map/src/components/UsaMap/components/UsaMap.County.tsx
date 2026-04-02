@@ -790,7 +790,7 @@ const CountyMap = () => {
   // Fast render using cached Path2D objects — called during zoom/pan for smooth performance.
   // Skips canvas resize and projection setup; only applies the current zoom transform and redraws.
   const renderFrame = () => {
-    if (!canvasRef.current || !runtimeLegend.items.length) return
+    if (!canvasRef.current || !runtimeLegend.items.length || !topoData.mapData) return
 
     const canvas = canvasRef.current
     const context = canvas.getContext('2d')
