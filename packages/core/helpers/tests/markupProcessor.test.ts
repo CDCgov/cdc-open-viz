@@ -552,7 +552,6 @@ describe('processMarkupVariables', () => {
           name: 'Trend Up',
           tag: '{{trend-arrow-up}}',
           iconId: 'trend-arrow-up',
-          svgScale: 1.2,
           conditions: []
         }
       ]
@@ -561,7 +560,7 @@ describe('processMarkupVariables', () => {
 
       expect(result.processedContent).toContain('<svg')
       expect(result.processedContent).toContain('fill: currentColor')
-      expect(result.processedContent).toContain('transform: scale(1.2)')
+      expect(result.processedContent).toContain('transform: scale(0.8)')
     })
 
     it('should render inline SVG for the no-change icon variable', () => {
@@ -637,23 +636,21 @@ describe('processMarkupVariables', () => {
       expect(result.processedContent).toContain('fill: currentColor')
     })
 
-    it('should apply svgScale to the inline SVG style', () => {
-      const variables: MarkupVariable[] = [
-        {
-          name: 'Trend',
-          tag: '{{trend}}',
-          outputType: 'svg',
-          columnName: 'trend',
-          svgMappings: [{ sourceValue: 'Up', svgId: 'trend-arrow-up' }],
-          svgScale: 1.5,
-          conditions: []
-        }
-      ]
+    it('should ignore legacy svgScale values and use the shared default scale', () => {
+      const legacyVariable = {
+        name: 'Trend',
+        tag: '{{trend}}',
+        outputType: 'svg',
+        columnName: 'trend',
+        svgMappings: [{ sourceValue: 'Up', svgId: 'trend-arrow-up' }],
+        svgScale: 1.5,
+        conditions: []
+      } as unknown as MarkupVariable
 
-      const content = '{{trend}}'
-      const result = processMarkupVariables(content, trendData, variables)
+      const result = processMarkupVariables('{{trend}}', trendData, [legacyVariable])
 
-      expect(result.processedContent).toContain('transform: scale(1.5)')
+      expect(result.processedContent).toContain('transform: scale(0.8)')
+      expect(result.processedContent).not.toContain('transform: scale(1.5)')
     })
 
     it('should render multiple SVGs when multiple values are resolved', () => {
@@ -698,7 +695,7 @@ describe('processMarkupVariables', () => {
       expect(result.processedContent).not.toContain('rotate(')
     })
 
-    it('should default icon scale to 0.8 when no svgScale is provided', () => {
+    it('should always use the shared default icon scale', () => {
       const variables: MarkupVariable[] = [
         {
           sourceType: 'icon',
@@ -974,6 +971,20 @@ describe('validateMarkupVariables', () => {
 
     const errors = validateMarkupVariables(variables, [{ trend: 'Up' }])
     expect(errors).toContain('Variable 1: Icon mappings are required')
+  })
+
+  it('should ignore legacy svgScale values during validation', () => {
+    const legacyVariable = {
+      sourceType: 'icon',
+      name: 'Trend Up',
+      tag: '{{trend-up}}',
+      iconId: 'trend-arrow-up',
+      svgScale: -1,
+      conditions: []
+    } as unknown as MarkupVariable
+
+    const errors = validateMarkupVariables([legacyVariable], testData)
+    expect(errors).toHaveLength(0)
   })
 
   it('should validate icon source requirements', () => {

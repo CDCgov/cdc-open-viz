@@ -38,18 +38,9 @@ export const SVG_REGISTRY_OPTIONS = (Object.keys(SVG_REGISTRY) as SvgRegistryId[
 
 export const DEFAULT_SVG_SCALE = 0.8
 
-const normalizeSvgScale = (scale?: number): number => {
-  const parsed = Number(scale)
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    return DEFAULT_SVG_SCALE
-  }
-  return parsed
-}
-
 const buildSvgMarkup = (
   svgId: SvgRegistryId,
   options: {
-    scale?: number
     className?: string
     ariaLabel?: string
   } = {}
@@ -57,10 +48,9 @@ const buildSvgMarkup = (
   const entry = SVG_REGISTRY[svgId]
   if (!entry) return ''
 
-  const scale = normalizeSvgScale(options.scale)
   const className = options.className?.trim()
   const ariaLabel = options.ariaLabel || entry.ariaLabel
-  const style = `display: block; width: 1em; height: 1em; fill: currentColor; color: inherit; transform: scale(${scale}); transform-origin: center;`
+  const style = `display: block; width: 1em; height: 1em; fill: currentColor; color: inherit; transform: scale(${DEFAULT_SVG_SCALE}); transform-origin: center;`
   const svgMarkup = entry.rawSvg.trim()
   const classAttribute = className ? ` class="${className}"` : ''
 
@@ -70,7 +60,6 @@ const buildSvgMarkup = (
 export const buildInlineSvg = (
   svgId: SvgRegistryId,
   options: {
-    scale?: number
     className?: string
     ariaLabel?: string
   } = {}
