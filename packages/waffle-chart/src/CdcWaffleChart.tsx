@@ -40,6 +40,7 @@ import {
 } from '@cdc/core/helpers/trendIndicator'
 import type { TrendResolution } from '@cdc/core/helpers/trendIndicator'
 import { aggregateByDataFunction } from '@cdc/core/helpers/dataAggregation'
+import numberFromString from '@cdc/core/helpers/numberFromString'
 import { resolveWaffleNumericTrend } from './helpers/waffleNumericTrend'
 
 // images
@@ -254,36 +255,16 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     const denomColumnData = filteredData.map(a => a[dataDenomColumn])
     const historicalColumnData = trendSourceData.map(a => a[trendIndicator?.column])
 
-    //Filter the column's data for numerical values only
-    let numericalData = columnData
-      .filter(value => {
-        let include = false
-        if (Number(value) || Number.isFinite(Number(value))) {
-          include = true
-        }
-        return include
-      })
-      .map(Number)
+    const getFiniteNumericValues = (values: unknown[]): number[] => {
+      return values
+        .map(value => numberFromString(value))
+        .filter(value => typeof value === 'number' && Number.isFinite(value))
+    }
 
-    let historicalNumericalData = historicalColumnData
-      .filter(value => {
-        let include = false
-        if (Number(value) || Number.isFinite(Number(value))) {
-          include = true
-        }
-        return include
-      })
-      .map(Number)
-
-    let numericalDenomData = denomColumnData
-      .filter(value => {
-        let include = false
-        if (Number(value) || Number.isFinite(Number(value))) {
-          include = true
-        }
-        return include
-      })
-      .map(Number)
+    // Keep waffle aggregation aligned with the shared numeric trend parsing rules.
+    let numericalData = getFiniteNumericValues(columnData)
+    let historicalNumericalData = getFiniteNumericValues(historicalColumnData)
+    let numericalDenomData = getFiniteNumericValues(denomColumnData)
 
     const calculateByFunction = (values, fn, shouldRound = true) => {
       const toOutput = value => {

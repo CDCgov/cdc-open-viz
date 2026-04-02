@@ -50,12 +50,11 @@
   "trendIndicator": {
     "mode": "numeric",
     "column": "oldrate",
-    "numericRules": {
-      "upThreshold": 0,
-      "downThreshold": 0
-    },
+    "numericThreshold": 0,
     "mappings": [],
     "showNoChangeArrows": false,
+    "upLabel": "",
+    "downLabel": "",
     "noChangeLabel": ""
   },
   "markupVariables": [],

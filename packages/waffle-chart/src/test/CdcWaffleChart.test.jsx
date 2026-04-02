@@ -312,4 +312,60 @@ describe('Waffle Chart', () => {
       expect(container.querySelector('.mock-trend-arrow-wrap')).not.toBeInTheDocument()
     })
   })
+
+  it('ignores blank historical values when resolving numeric trends', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={{
+          type: 'waffle-chart',
+          title: 'Test Waffle',
+          showTitle: true,
+          visualizationType: 'TP5 Waffle',
+          shape: 'square',
+          data: [
+            { value: 10, total: 100, historical: ' ' },
+            { value: 10, total: 100, historical: 10 }
+          ],
+          filters: [],
+          content: 'Test content',
+          subtext: 'Test subtext',
+          dataColumn: 'value',
+          dataFunction: 'Mean (Average)',
+          customDenom: true,
+          dataDenom: '100',
+          dataDenomColumn: '',
+          dataDenomFunction: 'Sum',
+          showPercent: true,
+          showDenominator: false,
+          valueDescription: 'out of',
+          suffix: '%',
+          roundToPlace: 0,
+          nodeWidth: 10,
+          nodeSpacer: 2,
+          theme: 'theme-blue',
+          trendIndicator: {
+            mode: 'numeric',
+            column: 'historical',
+            numericThreshold: 0,
+            upLabel: 'Increasing'
+          },
+          visual: {
+            border: false,
+            accent: false,
+            background: false,
+            hideBackgroundColor: false,
+            borderColorTheme: false,
+            whiteBackground: false,
+            colors: {
+              'theme-blue': '#005eaa'
+            }
+          }
+        }}
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.mock-trend-arrow-wrap')).not.toBeInTheDocument()
+    })
+  })
 })

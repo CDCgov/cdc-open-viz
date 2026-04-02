@@ -37,7 +37,8 @@ type MarkupVariablesEditorProps = {
 
 export type { MarkupVariablesEditorProps }
 
-const METADATA_DOCS_PLACEHOLDER_URL = 'https://example.com/docs/add-metadata'
+const METADATA_DOCS_URL =
+  'https://www.cdc.gov/cove/data-toolkit/index.html#cdc_toolkit_main_toolkit_cat_3-json-file-format'
 const SMALL_NUMBER_FIELD_WRAPPER_STYLE = { maxWidth: '5rem' }
 type MarkupVariableEditorSourceType = MarkupVariableSourceType
 type MarkupVariableIconMode = 'static' | 'data-driven'
@@ -733,7 +734,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                     <p style={{ marginBottom: '0.5rem' }}>
                                       This config does not currently contain any data file metadata.
                                     </p>
-                                    <a href={METADATA_DOCS_PLACEHOLDER_URL} target='_blank' rel='noreferrer'>
+                                    <a href={METADATA_DOCS_URL} target='_blank' rel='noreferrer'>
                                       Learn how to add metadata
                                     </a>
                                   </div>

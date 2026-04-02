@@ -1,10 +1,10 @@
+import type { SvgRegistryId } from '../helpers/svgRegistry'
+
 export type MarkupCondition = {
   columnName: string
   isOrIsNotEqualTo: 'is' | 'is not'
   value: string
 }
-
-import type { SvgRegistryId } from '../helpers/svgRegistry'
 
 export type MarkupVariableSourceType = 'column' | 'metadata' | 'icon'
 
