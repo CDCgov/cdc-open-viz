@@ -288,9 +288,9 @@ const PatternSettings = ({ name }: PanelProps) => {
               </Accordion>
             )
           })}
-        <button className='btn btn-primary full-width mt-2' onClick={handleAddGeoPattern}>
+        <Button variant='primary' fullWidth className='mt-2' onClick={handleAddGeoPattern}>
           Add Geo Pattern
-        </button>
+        </Button>
       </AccordionItemPanel>
     </AccordionItem>
   )

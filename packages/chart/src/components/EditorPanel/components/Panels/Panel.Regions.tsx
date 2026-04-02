@@ -10,6 +10,7 @@ import { type ChartConfig } from '../../../../types/ChartConfig.js'
 import { TextField, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
+import Button from '@cdc/core/components/elements/Button'
 import { type ChartContext } from '../../../../types/ChartContext.js'
 import { type PanelProps } from '../PanelProps.js'
 import ConfigContext from '../../../../ConfigContext.js'
@@ -61,16 +62,18 @@ const RegionSettings = memo(({ config, updateConfig }: { config: ChartConfig; up
       {config.regions &&
         config.regions.map(({ label, color, from, to, background, range = 'Custom' }, i) => (
           <div className='edit-block' key={`region-${i}`}>
-            <button
+            <Button
               type='button'
-              className='btn btn-danger remove-column'
+              variant='danger'
+              size='sm'
+              className='regions-remove-button'
               onClick={event => {
                 event.preventDefault()
                 removeColumn(i)
               }}
             >
               Remove
-            </button>
+            </Button>
             <TextField value={label} label='Region Label' fieldName='label' i={i} updateField={updateField} />
             <div className='two-col-inputs'>
               <TextField
@@ -166,16 +169,16 @@ const RegionSettings = memo(({ config, updateConfig }: { config: ChartConfig; up
           </div>
         ))}
       {!config.regions && <p style={{ textAlign: 'center' }}>There are currently no regions.</p>}
-      <button
+      <Button
         type='button'
-        className='btn btn-primary full-width'
+        variant='editor-primary'
         onClick={e => {
           e.preventDefault()
           addColumn()
         }}
       >
         Add Region
-      </button>
+      </Button>
     </>
   )
 })

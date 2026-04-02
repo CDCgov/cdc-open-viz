@@ -50,6 +50,7 @@ import { MapContext } from '../../../types/MapContext.js'
 import Alert from '@cdc/core/components/Alert'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import Button from '@cdc/core/components/elements/Button'
 import StyleTreatmentSection from '@cdc/core/components/EditorPanel/sections/StyleTreatmentSection'
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
@@ -2105,15 +2106,15 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           </div>
                         ))}
                         {config.legend.specialClasses.length < 2 && (
-                          <button
-                            className='btn btn-primary full-width'
+                          <Button
+                            className='btn btn-primary full-width editor-panel-action-button'
                             onClick={e => {
                               e.preventDefault()
                               editColumn('primary', 'specialClassAdd', {})
                             }}
                           >
                             Add Special Class
-                          </button>
+                          </Button>
                         )}
                       </fieldset>
                     )}
@@ -2265,15 +2266,15 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             </ul>
                           </fieldset>
                         ))}
-                        <button
-                          className={'btn btn-primary full-width'}
+                        <Button
+                          className={'btn btn-primary full-width editor-panel-action-button'}
                           onClick={event => {
                             event.preventDefault()
                             addAdditionalColumn(additionalColumns.length + 1)
                           }}
                         >
                           Add Column
-                        </button>
+                        </Button>
                       </fieldset>
                     )}
                     {'category' === config.legend.type && (
@@ -2321,8 +2322,8 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                               </label>
                             </fieldset>
                           ))}
-                        <button
-                          className={'btn btn-primary full-width'}
+                        <Button
+                          className={'btn btn-primary full-width editor-panel-action-button'}
                           onClick={event => {
                             event.preventDefault()
                             const updatedAdditionaCategories = [...(config.legend.additionalCategories || [])]
@@ -2331,7 +2332,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           }}
                         >
                           Add Category
-                        </button>
+                        </Button>
                       </fieldset>
                     )}
                   </AccordionItemPanel>
@@ -3681,13 +3682,13 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           )
                         })}
 
-                      <button
+                      <Button
                         type='button'
                         onClick={() => editCityStyles('add', 0, '', '')}
-                        className='btn btn-primary full-width'
+                        className='btn btn-primary full-width editor-panel-action-button'
                       >
                         Add city style
-                      </button>
+                      </Button>
                     </>
                     <label htmlFor='opacity'>
                       <TextField
@@ -3808,9 +3809,9 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         </>
                       )
                     })}
-                    <button className={'btn btn-primary full-width'} onClick={handleAddLayer}>
+                    <Button variant='primary' fullWidth className='editor-panel-action-button' onClick={handleAddLayer}>
                       Add Map Layer
-                    </button>
+                    </Button>
                     <p className='layer-purpose-details'>
                       Context should be added to your visualization or associated page to describe the significance of
                       layers that are added to maps.

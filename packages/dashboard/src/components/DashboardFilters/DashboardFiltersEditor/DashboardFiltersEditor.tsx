@@ -22,6 +22,7 @@ import { FILTER_STYLE } from '../../../types/FilterStyles'
 import { handleSorting } from '@cdc/core/components/Filters'
 import { removeDashboardFilter } from '../../../helpers/removeDashboardFilter'
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd'
+import Button from '@cdc/core/components/elements/Button'
 
 type DashboardFitlersEditorProps = {
   vizConfig: DashboardFilters
@@ -314,9 +315,9 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
               )}
             </Droppable>
           </DragDropContext>
-          <button onClick={addNewFilter} className='btn btn-primary full-width'>
+          <Button variant='primary' fullWidth onClick={addNewFilter}>
             Add Filter
-          </button>
+          </Button>
           {canAddExisting ? (
             <label>
               <span className='edit-label column-heading'>
@@ -347,9 +348,9 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
               />
             </label>
           ) : (
-            <button onClick={() => setCanAddExisting(true)} className='btn btn-primary full-width mt-2'>
+            <Button variant='primary' fullWidth className='mt-2' onClick={() => setCanAddExisting(true)}>
               Add Existing Dashboard Filter
-            </button>
+            </Button>
           )}
         </AccordionItemPanel>
       </AccordionItem>

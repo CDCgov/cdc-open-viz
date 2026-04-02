@@ -3,6 +3,7 @@ import '../scss/choose-vis-tab.scss'
 
 import ConfigContext, { EditorDispatchContext } from '@cdc/core/contexts/EditorContext'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
+import Button from '@cdc/core/components/elements/Button'
 
 import AlabamaGraphic from '@cdc/core/assets/icon-map-alabama.svg'
 import AreaChartIcon from '@cdc/core/assets/icon-area-chart.svg'
@@ -274,15 +275,16 @@ const ChooseTab: React.FC = (): JSX.Element => {
             placeholder='{ }'
             value={pastedConfig}
           />
-          <button
-            className='btn btn-primary px-4 ms-2'
+          <Button
+            variant='primary'
+            className='px-4 ms-2'
             type='submit'
             id='load-data'
             disabled={!pastedConfig}
             onClick={() => importConfig(pastedConfig)}
           >
             Load
-          </button>
+          </Button>
         </div>
       </div>
     </div>

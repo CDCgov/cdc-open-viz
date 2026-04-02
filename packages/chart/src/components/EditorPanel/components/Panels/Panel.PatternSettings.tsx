@@ -429,9 +429,9 @@ const PanelPatternSettings: FC<PanelProps> = props => {
         })}
 
         {/* Add Pattern Button */}
-        <button className='btn btn-primary full-width mt-2' onClick={handleAddPattern}>
+        <Button variant='editor-primary' onClick={handleAddPattern}>
           Add Pattern
-        </button>
+        </Button>
 
         {Object.keys(currentPatterns).length === 0 && (
           <p style={{ color: '#666', fontStyle: 'italic' }}>

@@ -50,6 +50,7 @@
     transform 220ms var(--transition-expo-out);
 
   &.secondary,
+  &.cove-button--secondary,
   &.btn-secondary {
     background-color: var(--cove-button-secondary);
     color: var(--cove-button-secondary-font-color);
@@ -123,11 +124,36 @@
   }
 
   &.fluid,
+  &.cove-button--full-width,
   &.full-width {
     width: 100%;
   }
 
+  &.cove-button--editor-primary {
+    background-color: var(--cove-button-primary);
+    color: var(--cove-button-primary-font-color);
+    border: 0;
+
+    &:not(:first-child) {
+      margin-top: 1rem;
+    }
+
+    &:disabled {
+      background-color: var(--cove-button-primary-disabled);
+      color: var(--cove-button-primary-disabled-font-color);
+      border: none;
+    }
+
+    @media (hover: hover) {
+      &:hover:not(:disabled) {
+        background-color: var(--cove-button-primary-hover);
+        box-shadow: var(--cove-button-primary-shadow);
+      }
+    }
+  }
+
   &.success,
+  &.cove-button--success,
   &.cove-button--success,
   &.btn-success {
     background-color: #44aa41;
@@ -138,6 +164,7 @@
   }
 
   &.warn,
+  &.cove-button--danger,
   &.cove-button--warn,
   &.btn-danger {
     background-color: #d73636;
@@ -147,12 +174,56 @@
     }
   }
 
+  &.cove-button--warning,
   &.btn-warning {
     background-color: #fbab18;
     color: var(--cool-gray-90);
 
     &:hover {
       background-color: color.adjust(#fbab18, $lightness: -5%);
+    }
+  }
+
+  &.cove-button--light,
+  &.btn-light {
+    background-color: var(--lightestGray);
+    color: var(--cool-gray-90);
+    border: 1px solid var(--lightGray);
+
+    &:hover {
+      background-color: #e7e7e7;
+      border-color: var(--cool-gray-30);
+    }
+  }
+
+  &.cove-button--link,
+  &.btn-link {
+    background-color: transparent;
+    color: var(--colors-blue-vivid-60);
+    border: 0;
+    padding-left: 0;
+    padding-right: 0;
+    box-shadow: none;
+    transform: none;
+
+    &:hover {
+      background-color: transparent;
+      color: #0b4778;
+      text-decoration: underline;
+      box-shadow: none;
+      transform: none;
+    }
+  }
+
+  &.cove-button--outline-warning,
+  &.btn-outline-warning {
+    background-color: transparent;
+    color: #856404;
+    border: 1px solid #ffc107;
+
+    &:hover {
+      background-color: #ffc107;
+      color: #212529;
     }
   }
 
@@ -165,6 +236,7 @@
     }
   }
 
+  &.cove-button--sm,
   &.btn-sm {
     min-height: 1.875rem;
     padding: 0.25rem 0.625rem;

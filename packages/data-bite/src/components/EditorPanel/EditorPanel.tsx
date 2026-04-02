@@ -262,7 +262,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                 <ul className='filters-list'>
                   {config.filters.map((filter: any, index: number) => (
                     <fieldset className='edit-block' key={index}>
-                      <button
+                      <Button
                         type='button'
                         className='btn btn-danger'
                         onClick={() => {
@@ -270,7 +270,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                         }}
                       >
                         Remove
-                      </button>
+                      </Button>
                       <Select
                         value={filter.columnName ? filter.columnName : ''}
                         fieldName='columnName'
@@ -302,7 +302,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                   </fieldset>
                 </div>
               )}
-              <Button type='button' onClick={addNewFilter} className='btn btn-primary full-width mt-3'>
+              <Button type='button' variant='primary' fullWidth className='mt-3' onClick={addNewFilter}>
                 Add Filter
               </Button>
             </Accordion.Section>
@@ -552,9 +552,9 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                         </ul>
                       </>
                     )}
-                    <button type='button' onClick={images.add} className='btn btn-primary full-width'>
+                    <Button type='button' variant='primary' fullWidth onClick={images.add}>
                       Add Dynamic Image
-                    </button>
+                    </Button>
                   </>
                 )}
               </Accordion.Section>

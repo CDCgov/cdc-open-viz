@@ -20,6 +20,7 @@ import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
 import MultiSelect from '@cdc/core/components/MultiSelect'
+import Button from '@cdc/core/components/elements/Button'
 import { viewports } from '@cdc/core/helpers/getViewport'
 import { approvedCurveTypes } from '@cdc/core/helpers/lineChartHelpers'
 import PanelMarkup from '@cdc/core/components/EditorPanel/components/PanelMarkup'
@@ -184,7 +185,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
             return (
               <div key={`preliminaryData-${i}`} className='edit-block'>
                 <p> {type === 'suppression' ? 'Suppressed' : 'Effect'} Data</p>
-                <button
+                <Button
                   type='button'
                   className='btn btn-danger'
                   onClick={event => {
@@ -193,7 +194,7 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
                   }}
                 >
                   Remove
-                </button>
+                </Button>
 
                 <Select
                   value={type}
@@ -468,14 +469,13 @@ const PreliminaryData: React.FC<PreliminaryProps> = ({ config, updateConfig, dat
             )
           }
         )}
-
-      <button type='button' onClick={addColumn} className='btn btn-primary full-width'>
+      <Button type='button' variant='editor-primary' onClick={addColumn}>
         {config.visualizationType === 'Line'
           ? 'Add Special Line'
           : config.visualizationType === 'Bar'
           ? ' Add Special Bar'
           : 'Add Special Bar/Line'}
-      </button>
+      </Button>
     </>
   )
 }
@@ -547,7 +547,7 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
           return (
             <div key={`preliminaryData-${i}`} className='edit-block'>
               <p>Axis Category {i + 1}</p>
-              <button
+              <Button
                 type='button'
                 className='btn btn-danger'
                 onClick={event => {
@@ -556,7 +556,7 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
                 }}
               >
                 Remove
-              </button>
+              </Button>
               <TextField
                 tooltip={
                   <Tooltip style={{ textTransform: 'none' }}>
@@ -602,9 +602,9 @@ const CategoricalAxis: React.FC<CategoricalAxisProps> = ({ config, updateConfig,
           )
         })}
 
-      <button type='button' onClick={addColumn} className='btn btn-primary full-width'>
+      <Button type='button' variant='editor-primary' onClick={addColumn}>
         Add Axis Category
-      </button>
+      </Button>
     </>
   )
 }
@@ -2586,8 +2586,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             ))}
                           </Accordion>
 
-                          <button
-                            className='btn btn-primary full-width'
+                          <Button
+                            variant='editor-primary'
                             onClick={e => {
                               e.preventDefault()
                               const anchors = [...config.yAxis.anchors]
@@ -2602,7 +2602,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             }}
                           >
                             Add Anchor
-                          </button>
+                          </Button>
                         </div>
                       )}
                       {visHasAnchors() && config.orientation === 'horizontal' && (
@@ -2708,8 +2708,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             ))}
                           </Accordion>
 
-                          <button
-                            className='btn btn-primary full-width'
+                          <Button
+                            variant='editor-primary'
                             onClick={e => {
                               e.preventDefault()
                               const anchors = [...config.xAxis.anchors]
@@ -2724,7 +2724,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             }}
                           >
                             Add Anchor
-                          </button>
+                          </Button>
                         </div>
                       )}
                       {/* end: anchors */}
@@ -3737,12 +3737,12 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 highlightedBarValues.map((highlightedBarValue, i) => (
                                   <fieldset>
                                     <div className='edit-block' key={`highlighted-bar-${i}`}>
-                                      <button
+                                      <Button
                                         className='btn btn-danger'
                                         onClick={e => handleRemoveHighlightedBar(e, i)}
                                       >
                                         Remove
-                                      </button>
+                                      </Button>
                                       <p>Highlighted Bar {i + 1}</p>
                                       <Select
                                         value={config.highlightedBarValues[i].value}
@@ -3798,12 +3798,9 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                     </div>
                                   </fieldset>
                                 ))}
-                              <button
-                                className='btn btn-primary full-width'
-                                onClick={e => handleAddNewHighlightedBar(e)}
-                              >
+                              <Button variant='editor-primary' onClick={e => handleAddNewHighlightedBar(e)}>
                                 Add Highlighted Bar
-                              </button>
+                              </Button>
                             </>
                           )}
                         </>
@@ -3993,8 +3990,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             ))}
                           </Accordion>
 
-                          <button
-                            className='btn btn-primary full-width'
+                          <Button
+                            variant='editor-primary'
                             onClick={e => {
                               e.preventDefault()
                               const anchors = [...config.xAxis.anchors]
@@ -4009,7 +4006,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             }}
                           >
                             Add Anchor
-                          </button>
+                          </Button>
                         </div>
                       )}
 
@@ -4119,8 +4116,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             ))}
                           </Accordion>
 
-                          <button
-                            className='btn btn-primary full-width'
+                          <Button
+                            variant='editor-primary'
                             onClick={e => {
                               e.preventDefault()
                               const anchors = [...config.yAxis.anchors]
@@ -4135,7 +4132,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             }}
                           >
                             Add Anchor
-                          </button>
+                          </Button>
                         </div>
                       )}
                     </AccordionItemPanel>
@@ -4379,7 +4376,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                           {config.legend.seriesHighlight &&
                             config.legend.seriesHighlight.map((val, i) => (
                               <fieldset className='edit-block' key={`${val}-${i}`}>
-                                <button
+                                <Button
                                   className='btn btn-danger'
                                   onClick={event => {
                                     event.preventDefault()
@@ -4392,7 +4389,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                   }}
                                 >
                                   Remove
-                                </button>
+                                </Button>
                                 <Select
                                   value={config.legend.seriesHighlight[i]}
                                   fieldName='seriesHighlight'
@@ -4408,8 +4405,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 />
                               </fieldset>
                             ))}
-                          <button
-                            className={'btn btn-primary full-width'}
+                          <Button
+                            variant='editor-primary'
                             onClick={event => {
                               event.preventDefault()
                               const legendColumns = getLegendColumns()
@@ -4425,7 +4422,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             }}
                           >
                             Add Isolate Value
-                          </button>
+                          </Button>
                         </fieldset>
                       )}
                       {/* end: isolated values */}

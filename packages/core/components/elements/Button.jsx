@@ -8,8 +8,11 @@ import './button.scss'
 const Button = ({
   style,
   role,
+  variant,
+  size,
   hoverStyle = {},
   fluid = false,
+  fullWidth = false,
   loading = false,
   loadingText = 'Loading...',
   flexCenter,
@@ -20,19 +23,26 @@ const Button = ({
   ...attributes
 }) => {
   const buttonRef = useRef(null)
+  const isEditorPrimary = variant === 'editor-primary'
 
   const [buttonState, setButtonState] = useState('out')
   const [customStyles, setCustomStyles] = useState({ ...style })
   const [childrenWidth, setChildrenWidth] = useState()
   const [loadtextWidth, setLoadtextWidth] = useState()
 
+  const variantClassName = variant && variant !== 'primary' ? ` cove-button--${variant}` : ''
+  const sizeClassName = size ? ` cove-button--${size}` : ''
+
   const attributesObj = {
     ...attributes,
     style: customStyles,
     className:
       'cove-button' +
+      variantClassName +
+      sizeClassName +
       (flexCenter || 'loader' === role ? ' cove-button--flex-center' : '') +
       (fluid ? ' fluid' : '') +
+      (fullWidth || isEditorPrimary ? ' cove-button--full-width' : '') +
       (loading ? ' loading' : '') +
       (attributes.className ? ' ' + attributes.className : '') +
       (secondary ? ' secondary' : ''),
@@ -90,8 +100,12 @@ const Button = ({
     <button
       {...attributesObj}
       onClick={e => {
-        e.preventDefault()
-        return loading || onClick(e)
+        if (loading) {
+          e.preventDefault()
+          return true
+        }
+
+        return onClick?.(e)
       }}
       disabled={loading || attributesObj.disabled}
       ref={buttonRef}
@@ -126,10 +140,26 @@ const Button = ({
 Button.propTypes = {
   /** Specify special role type for button */
   role: PropTypes.oneOf(['loader']),
+  /** Applies a built-in visual treatment */
+  variant: PropTypes.oneOf([
+    'primary',
+    'editor-primary',
+    'secondary',
+    'success',
+    'danger',
+    'warning',
+    'light',
+    'link',
+    'outline-warning'
+  ]),
+  /** Applies a built-in size treatment */
+  size: PropTypes.oneOf(['sm']),
   /** Provide object with styles that overwrite base styles when hovered */
   hoverStyle: PropTypes.object,
   /** Enables button to stretch to the full width of the content */
   fluid: PropTypes.bool,
+  /** Stretches the button to the full width of its container */
+  fullWidth: PropTypes.bool,
   /** Displays loading spinner on button while condition is true **/
   loading: PropTypes.bool,
   /** Set text to appear during loading animation **/

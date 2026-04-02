@@ -9,6 +9,7 @@ import React, { useState, useMemo } from 'react'
 import FieldSetWrapper from './FieldSetWrapper'
 import { useDataColumns } from '../../hooks/useDataColumns'
 import Alert from '../Alert/components/Alert'
+import Button from '../elements/Button'
 
 interface ColumnsEditorProps {
   config: Partial<Visualization>
@@ -324,15 +325,15 @@ const ColumnsEditor: React.FC<ColumnsEditorProps> = ({ config, updateField, dele
               colKey={val}
             />
           ))}
-          <button
-            className={'btn btn-primary'}
+          <Button
+            variant='editor-primary'
             onClick={event => {
               event.preventDefault()
               addColumnConfig(additionalColumns.length + 1)
             }}
           >
             Add Configuration
-          </button>
+          </Button>
         </fieldset>
       )}
       {'category' === config.legend?.type && (
@@ -378,8 +379,9 @@ const ColumnsEditor: React.FC<ColumnsEditorProps> = ({ config, updateField, dele
                 />
               </fieldset>
             ))}
-          <button
-            className={'btn btn-primary full-width'}
+          <Button
+            variant='primary'
+            fullWidth
             onClick={event => {
               event.preventDefault()
               const updatedAdditionaCategories = [...(config.legend.additionalCategories || [])]
@@ -388,7 +390,7 @@ const ColumnsEditor: React.FC<ColumnsEditorProps> = ({ config, updateField, dele
             }}
           >
             Add Category
-          </button>
+          </Button>
         </fieldset>
       )}
     </>

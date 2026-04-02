@@ -271,10 +271,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                       )}
                     </div>
                     <div className='d-flex gap-2'>
-                      <Button
-                        className='btn-sm'
-                        onClick={() => setEditingIndex(editingIndex === index ? null : index)}
-                      >
+                      <Button size='sm' onClick={() => setEditingIndex(editingIndex === index ? null : index)}>
                         {editingIndex === index ? 'Close' : 'Edit'}
                       </Button>
                     </div>
@@ -437,10 +434,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                         }}
                                       />
                                     </div>
-                                    <Button
-                                      className='btn-sm btn-danger'
-                                      onClick={() => removeCondition(index, conditionIndex)}
-                                    >
+                                    <Button variant='danger' size='sm' onClick={() => removeCondition(index, conditionIndex)}>
                                       Remove Condition
                                     </Button>
                                   </div>
@@ -448,10 +442,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                               </div>
                             )}
 
-                            <Button
-                              className='btn-sm'
-                              onClick={() => addCondition(index)}
-                            >
+                            <Button size='sm' onClick={() => addCondition(index)}>
                               <Icon display='plus' size={14} className='mr-1' />
                               Add Condition
                             </Button>
@@ -485,7 +476,8 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
 
                       <div className='mt-3 pt-3 border-t' style={{ textAlign: 'center' }}>
                         <Button
-                          className='btn-sm btn-danger'
+                          variant='danger'
+                          size='sm'
                           onClick={() => {
                             if (window.confirm(`Are you sure you want to delete the variable "${variable.name || 'Unnamed Variable'}"?`)) {
                               removeVariable(index)
@@ -502,7 +494,7 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
             </div>
           )}
 
-          <Button className='btn-primary' onClick={addVariable}>
+          <Button variant='primary' onClick={addVariable}>
             <Icon display='plus' size={16} className='mr-2' />
             Add Variable
           </Button>

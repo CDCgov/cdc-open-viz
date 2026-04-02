@@ -9,6 +9,7 @@ import DataTransform from '../../helpers/DataTransform'
 import fetchRemoteData from '../../helpers/fetchRemoteData'
 import Loader from '../Loader'
 import { AnyVisualization } from '../../types/Visualization'
+import Button from '../elements/Button'
 interface FootnotesEditorProps {
   config: AnyVisualization
   updateField: UpdateFieldFunc<Footnote[] | Object>
@@ -163,16 +164,16 @@ const FootnotesEditor: React.FC<FootnotesEditorProps> = ({ config, updateField, 
               />
             </div>
             <div className='col-2 ms-4'>
-              <button className='btn btn-danger p-1' onClick={() => deleteStaticFootnote(index)}>
+              <Button variant='danger' className='p-1' onClick={() => deleteStaticFootnote(index)}>
                 Delete
-              </button>
+              </Button>
             </div>
           </div>
         )
       })}
-      <button className='btn btn-primary' onClick={addStaticFootnote}>
+      <Button variant='editor-primary' onClick={addStaticFootnote}>
         Add Static Footnote
-      </button>
+      </Button>
     </>
   )
 }

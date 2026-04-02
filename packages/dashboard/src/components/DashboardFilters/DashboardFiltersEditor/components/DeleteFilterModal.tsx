@@ -3,6 +3,7 @@ import Modal from '@cdc/core/components/ui/Modal'
 import { DashboardContext } from '../../../../DashboardContext'
 import { useContext } from 'react'
 import { DashboardFilters } from '../../../../types/DashboardFilters'
+import Button from '@cdc/core/components/elements/Button'
 
 type DeleteFilterProps = {
   removeFilterCompletely: (number) => void
@@ -31,25 +32,25 @@ const DeleteFilterModal: React.FC<DeleteFilterProps> = ({
       <Modal.Content>
         <p>{message}</p>
         {filterUsedByMany && (
-          <button
-            className='btn btn-warning'
+          <Button
+            variant='warning'
             onClick={() => {
               removeFilterFromViz(filterIndex)
               overlay?.actions.toggleOverlay()
             }}
           >
             Delete from Visualization
-          </button>
+          </Button>
         )}
-        <button
-          className='btn btn-danger'
+        <Button
+          variant='danger'
           onClick={() => {
             removeFilterCompletely(filterIndex)
             overlay?.actions.toggleOverlay()
           }}
         >
           Delete{filterUsedByMany ? ' Completely' : ''}
-        </button>
+        </Button>
       </Modal.Content>
     </Modal>
   )

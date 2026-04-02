@@ -19,6 +19,7 @@ import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
 import { errorMessages } from '../helpers/errorMessages'
 import { DataSet } from '@cdc/core/types/DataSet'
 import Icon from '@cdc/core/components/ui/Icon'
+import Button from '@cdc/core/components/elements/Button'
 
 const TableFilter = memo(({ globalFilter, setGlobalFilter = () => {}, disabled = false }: any) => {
   const [filterValue, setFilterValue] = useState(globalFilter ?? '')
@@ -61,25 +62,27 @@ const Footer = memo(({ previousPage, nextPage, canPreviousPage, canNextPage, pag
   <footer className='data-table-pagination mt-2'>
     <ul>
       <li>
-        <button
+        <Button
           onClick={() => previousPage()}
           className='btn btn-prev display-flex align-items-center justify-content-center'
           disabled={!canPreviousPage}
           title='Previous Page'
+          flexCenter
         >
           {' '}
           <GrFormPrevious />
-        </button>
+        </Button>
       </li>
       <li className='me-2'>
-        <button
+        <Button
           onClick={() => nextPage()}
           className='btn btn-next display-flex align-items-center justify-content-center'
           disabled={!canNextPage}
           title='Next Page'
+          flexCenter
         >
           <MdNavigateNext />
-        </button>
+        </Button>
       </li>
     </ul>
     <span>

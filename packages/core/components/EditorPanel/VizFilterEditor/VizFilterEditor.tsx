@@ -17,6 +17,7 @@ import { useMemo, useState } from 'react'
 import MultiSelect from '../../MultiSelect'
 import NestedDropdownEditor from './NestedDropdownEditor'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import Button from '../../elements/Button'
 
 type VizFilterProps = {
   config: Visualization
@@ -409,12 +410,17 @@ const VizFilterEditor: React.FC<VizFilterProps> = ({ config, updateField, rawDat
               )}
             </Droppable>
           </DragDropContext>
+          <Button type='button' variant='editor-primary' onClick={addNewFilter}>
+            Add Filter
+          </Button>
         </>
       )}
       {!config.filters && <p style={{ textAlign: 'center' }}>There are currently no filters.</p>}
-      <button type='button' onClick={addNewFilter} className='btn btn-primary full-width'>
-        Add Filter
-      </button>
+      {!config.filters && (
+        <Button type='button' variant='editor-primary' onClick={addNewFilter}>
+          Add Filter
+        </Button>
+      )}
     </>
   )
 }

@@ -9,6 +9,7 @@ import { updatePaletteNames } from '@cdc/core/helpers/updatePaletteNames'
 import { getColorPaletteVersion } from '@cdc/core/helpers/getColorPaletteVersion'
 import Icon from '@cdc/core/components/ui/Icon'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import Button from '@cdc/core/components/elements/Button'
 import { buildForecastPaletteOptions } from '../../../../helpers/buildForecastPaletteOptions'
 import { getSeriesColumnConfig, upsertSeriesColumnConfig } from '../../../../helpers/seriesColumnSettings'
 
@@ -375,8 +376,8 @@ const SeriesDropdownConfidenceInterval = props => {
             )
           })}
         </Accordion>
-        <button
-          className='btn btn-primary full-width'
+        <Button
+          variant='editor-primary'
           onClick={e => {
             e.preventDefault()
             let copiedIndex = null
@@ -397,7 +398,7 @@ const SeriesDropdownConfidenceInterval = props => {
           }}
         >
           Add Confidence Interval Group
-        </button>
+        </Button>
       </fieldset>
     </div>
   )
@@ -660,9 +661,14 @@ const SeriesButtonRemove = props => {
   return (
     config.series &&
     config.series.length > 1 && (
-      <button className='series-list__remove' onClick={e => handleRemoveSeries(e, series, index)}>
+      <Button
+        variant='danger'
+        size='sm'
+        className='series-list__remove'
+        onClick={e => handleRemoveSeries(e, series, index)}
+      >
         Remove
-      </button>
+      </Button>
     )
   )
 }
