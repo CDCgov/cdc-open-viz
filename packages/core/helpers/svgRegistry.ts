@@ -38,6 +38,9 @@ export const SVG_REGISTRY_OPTIONS = (Object.keys(SVG_REGISTRY) as SvgRegistryId[
 
 export const DEFAULT_SVG_SCALE = 0.8
 
+const INLINE_SVG_WRAPPER_CLASS = 'cove-inline-svg'
+const INLINE_SVG_ICON_CLASS = 'cove-inline-svg__icon'
+
 const buildSvgMarkup = (
   svgId: SvgRegistryId,
   options: {
@@ -48,9 +51,17 @@ const buildSvgMarkup = (
   const entry = SVG_REGISTRY[svgId]
   if (!entry) return ''
 
-  const className = options.className?.trim()
+  const className = [INLINE_SVG_ICON_CLASS, options.className?.trim()].filter(Boolean).join(' ')
   const ariaLabel = options.ariaLabel || entry.ariaLabel
-  const style = `display: block; width: 1em; height: 1em; fill: currentColor; color: inherit; transform: scale(${DEFAULT_SVG_SCALE}); transform-origin: center;`
+  const style = [
+    'display: block',
+    'width: var(--cove-inline-svg-inner-width, 1em)',
+    'height: var(--cove-inline-svg-inner-height, 1em)',
+    'fill: currentColor',
+    'color: inherit',
+    `transform: scale(${DEFAULT_SVG_SCALE})`,
+    'transform-origin: center'
+  ].join('; ') + ';'
   const svgMarkup = entry.rawSvg.trim()
   const classAttribute = className ? ` class="${className}"` : ''
 
@@ -64,9 +75,18 @@ export const buildInlineSvg = (
     ariaLabel?: string
   } = {}
 ): string => {
-  const wrapperStyle =
-    'display: inline-flex; align-items: center; justify-content: center; width: 1em; height: 1em; height: 1lh; vertical-align: bottom; line-height: inherit; overflow: visible;'
+  const wrapperStyle = [
+    'display: inline-flex',
+    'align-items: center',
+    'justify-content: center',
+    'width: var(--cove-inline-svg-width, 1em)',
+    'height: var(--cove-inline-svg-height-fallback, 1em)',
+    'height: var(--cove-inline-svg-height, 1lh)',
+    'vertical-align: bottom',
+    'line-height: inherit',
+    'overflow: visible'
+  ].join('; ') + ';'
   const decoratedSvgMarkup = buildSvgMarkup(svgId, options)
 
-  return `<span class="cove-inline-svg" style="${wrapperStyle}">${decoratedSvgMarkup}</span>`
+  return `<span class="${INLINE_SVG_WRAPPER_CLASS}" style="${wrapperStyle}">${decoratedSvgMarkup}</span>`
 }

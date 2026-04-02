@@ -559,6 +559,7 @@ describe('processMarkupVariables', () => {
       const result = processMarkupVariables('Static: {{trend-arrow-up}}', trendData, variables)
 
       expect(result.processedContent).toContain('<svg')
+      expect(result.processedContent).toContain('class="cove-inline-svg__icon"')
       expect(result.processedContent).toContain('fill: currentColor')
       expect(result.processedContent).toContain('transform: scale(0.8)')
     })
@@ -709,6 +710,8 @@ describe('processMarkupVariables', () => {
       const result = processMarkupVariables('{{trend-arrow-up}}', trendData, variables)
 
       expect(result.processedContent).toContain('transform: scale(0.8)')
+      expect(result.processedContent).toContain('width: var(--cove-inline-svg-inner-width, 1em)')
+      expect(result.processedContent).toContain('height: var(--cove-inline-svg-inner-height, 1em)')
       expect(result.processedContent).not.toContain('rotate(')
       expect(result.processedContent).not.toContain('scale(-1, 1)')
     })
@@ -729,7 +732,9 @@ describe('processMarkupVariables', () => {
       expect(result.processedContent).toContain('class="cove-inline-svg"')
       expect(result.processedContent).toContain('display: inline-flex')
       expect(result.processedContent).toContain('align-items: center')
-      expect(result.processedContent).toContain('height: 1lh')
+      expect(result.processedContent).toContain('width: var(--cove-inline-svg-width, 1em)')
+      expect(result.processedContent).toContain('height: var(--cove-inline-svg-height-fallback, 1em)')
+      expect(result.processedContent).toContain('height: var(--cove-inline-svg-height, 1lh)')
       expect(result.processedContent).toContain('vertical-align: bottom')
       expect(result.processedContent).toContain('display: block')
     })
