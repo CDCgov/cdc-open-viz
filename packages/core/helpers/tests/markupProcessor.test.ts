@@ -560,6 +560,9 @@ describe('processMarkupVariables', () => {
 
       expect(result.processedContent).toContain('<svg')
       expect(result.processedContent).toContain('class="cove-inline-svg__icon"')
+      expect(result.processedContent).toContain('aria-hidden="true"')
+      expect(result.processedContent).not.toContain('role="img"')
+      expect(result.processedContent).not.toContain('aria-label=')
       expect(result.processedContent).toContain('fill: currentColor')
       expect(result.processedContent).toContain('transform: scale(0.8)')
     })
@@ -597,7 +600,7 @@ describe('processMarkupVariables', () => {
       const result = processMarkupVariables('Static: {{trend-arrow-down}}', trendData, variables)
 
       expect(result.processedContent).toContain('<svg')
-      expect(result.processedContent).toContain('aria-label="Trend down"')
+      expect(result.processedContent).toContain('aria-hidden="true"')
       expect(result.processedContent).not.toContain('rotate(')
       expect(result.processedContent).not.toContain('scale(-1, 1)')
     })
@@ -633,7 +636,7 @@ describe('processMarkupVariables', () => {
       const result = processMarkupVariables(content, trendData, variables)
 
       expect(result.processedContent).toContain('<svg')
-      expect(result.processedContent).toContain('aria-label="Trend up"')
+      expect(result.processedContent).toContain('aria-hidden="true"')
       expect(result.processedContent).toContain('fill: currentColor')
     })
 

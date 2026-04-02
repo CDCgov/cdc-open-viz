@@ -1,8 +1,6 @@
 import parse from 'html-react-parser'
 import { TrendArrowType, TREND_ARROW_DOWN, TREND_ARROW_NO_CHANGE } from '../../helpers/trendIndicator'
-import arrowUpSvg from '../../assets/user-icons/arrow-up.svg?raw'
-import arrowDownSvg from '../../assets/user-icons/arrow-down.svg?raw'
-import arrowRightSvg from '../../assets/user-icons/arrow-right.svg?raw'
+import { SVG_REGISTRY, SvgRegistryId, getSvgRegistryLabel } from '../../helpers/svgRegistry'
 import './trend-arrow.css'
 
 type TrendArrowProps = {
@@ -13,18 +11,23 @@ type TrendArrowProps = {
 }
 
 const TrendArrow = ({ arrowType, wrapperClassName = '', ariaLabel, label }: TrendArrowProps) => {
-  const rawSvg =
+  const svgId: SvgRegistryId =
     arrowType === TREND_ARROW_DOWN
-      ? arrowDownSvg
+      ? 'trend-arrow-down'
       : arrowType === TREND_ARROW_NO_CHANGE
-      ? arrowRightSvg
-      : arrowUpSvg
+      ? 'trend-arrow-no-change'
+      : 'trend-arrow-up'
+  const rawSvg = SVG_REGISTRY[svgId].rawSvg
   const trendArrowWrapClasses = ['cove-trend-arrow__wrap', wrapperClassName].filter(Boolean).join(' ')
   const trimmedLabel = label?.trim()
-  const resolvedAriaLabel = ariaLabel || `Trend ${arrowType}${trimmedLabel ? `: ${trimmedLabel}` : ''}`
+  const defaultAriaLabel = getSvgRegistryLabel(svgId) || `Trend ${arrowType}`
+  const resolvedAriaLabel = ariaLabel || `${defaultAriaLabel}${trimmedLabel ? `: ${trimmedLabel}` : ''}`
+  const iconAccessibilityAttributes = trimmedLabel
+    ? 'aria-hidden="true" focusable="false"'
+    : `role="img" aria-label="${resolvedAriaLabel}" focusable="false"`
   const iconMarkup = rawSvg
     .trim()
-    .replace('<svg', `<svg class="cove-trend-arrow" role="img" aria-label="${resolvedAriaLabel}"`)
+    .replace('<svg', `<svg class="cove-trend-arrow" ${iconAccessibilityAttributes}`)
 
   return (
     <span className={trendArrowWrapClasses}>

@@ -46,6 +46,7 @@ const buildSvgMarkup = (
   options: {
     className?: string
     ariaLabel?: string
+    decorative?: boolean
   } = {}
 ): string => {
   const entry = SVG_REGISTRY[svgId]
@@ -53,6 +54,7 @@ const buildSvgMarkup = (
 
   const className = [INLINE_SVG_ICON_CLASS, options.className?.trim()].filter(Boolean).join(' ')
   const ariaLabel = options.ariaLabel || entry.ariaLabel
+  const decorative = options.decorative ?? true
   const style = [
     'display: block',
     'width: var(--cove-inline-svg-inner-width, 1em)',
@@ -64,8 +66,11 @@ const buildSvgMarkup = (
   ].join('; ') + ';'
   const svgMarkup = entry.rawSvg.trim()
   const classAttribute = className ? ` class="${className}"` : ''
+  const accessibilityAttributes = decorative
+    ? ' aria-hidden="true" focusable="false"'
+    : ` role="img" aria-label="${ariaLabel}" focusable="false"`
 
-  return svgMarkup.replace('<svg', `<svg${classAttribute} role="img" aria-label="${ariaLabel}" style="${style}"`)
+  return svgMarkup.replace('<svg', `<svg${classAttribute}${accessibilityAttributes} style="${style}"`)
 }
 
 export const buildInlineSvg = (
@@ -73,6 +78,7 @@ export const buildInlineSvg = (
   options: {
     className?: string
     ariaLabel?: string
+    decorative?: boolean
   } = {}
 ): string => {
   const wrapperStyle = [
