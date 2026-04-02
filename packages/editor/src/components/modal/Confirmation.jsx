@@ -5,12 +5,12 @@ export const ConfirmationModal = props => {
     <>
       <p className='message'>{props.message}</p>
       <div className='confirmation-buttons'>
-        <div className='btn btn-inline' onClick={props.onCancel}>
+        <button type='button' className='btn btn-inline' onClick={props.onCancel}>
           No
-        </div>
-        <div className='btn btn-inline' onClick={props.onConfirm}>
+        </button>
+        <button type='button' className='btn btn-inline' onClick={props.onConfirm}>
           Yes
-        </div>
+        </button>
       </div>
     </>
   )

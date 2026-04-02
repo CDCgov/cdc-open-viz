@@ -1,0 +1,188 @@
+.button-audit {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  font-family: var(--app-font-main);
+}
+
+.button-audit__section {
+  border: 1px solid var(--lightGray);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  background: #fff;
+}
+
+.button-audit__title {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.button-audit__copy {
+  margin: 0 0 1rem;
+  color: var(--mediumGray);
+  font-size: 0.9rem;
+}
+
+.button-audit__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.button-audit__grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.button-audit__modal-button {
+  background: #005eaa;
+  color: #fff;
+  border: 0;
+  padding: 0.4em 0.8em;
+  font-size: 1em;
+  display: inline-block;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 10px 0 0 10px;
+}
+
+.button-audit__expand-collapse {
+  background-color: var(--lightestGray);
+  border: 1px solid var(--lightGray);
+  color: #000;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+}
+
+.button-audit__shared-filter-pill {
+  display: inline-block;
+  border-radius: 1em;
+  border: 1px solid gray;
+  background-color: #fff;
+  padding: 0.5em;
+  cursor: pointer;
+}
+
+.button-audit__builder-row {
+  max-width: 420px;
+  padding: 2em 1em 1em;
+  border: 1px solid #c2c2c2;
+  background: #f2f2f2;
+}
+
+.button-audit__configure-row {
+  background: none;
+  display: block;
+  padding: 0.25rem 0.5rem;
+  border: 0;
+  color: var(--blue);
+  cursor: pointer;
+}
+
+.button-audit__widget-card {
+  max-width: 220px;
+  min-height: 120px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #eaeaea;
+  background: #fff;
+}
+
+.button-audit__widget-menu {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.button-audit__widget-configure {
+  background: none;
+  height: 20px;
+  margin: 0 5px;
+  padding: 0;
+  width: 20px;
+  border: 0;
+  cursor: pointer;
+  color: var(--mediumGray);
+}
+
+.button-audit__geo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 1fr));
+  gap: 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.button-audit__geo-button {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--lightGray);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0.75em;
+  transition: 0.2s all;
+  width: 100%;
+  color: var(--mediumGray);
+}
+
+.button-audit__geo-button--active {
+  background: #fff;
+  border-color: #005eaa;
+  color: #005eaa;
+  box-shadow: inset 5px 0 0 #005eaa;
+}
+
+.button-audit__zoom-frame {
+  position: relative;
+  min-height: 4rem;
+  border: 1px dashed var(--lightGray);
+}
+
+.button-audit__zoom-controls {
+  position: absolute;
+  left: 1em;
+  bottom: 1em;
+  display: flex;
+}
+
+.button-audit__zoom-button {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.65);
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  display: flex;
+  height: 1.75em;
+  justify-content: center;
+  padding: 0.2em;
+  width: 1.75em;
+  cursor: pointer;
+}
+
+.button-audit__zoom-button + .button-audit__zoom-button {
+  margin-left: 0.25em;
+}
+
+.button-audit__zoom-reset {
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  margin-left: 5px;
+  border: 0;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+}
+
+.button-audit__map-nav-submit {
+  height: 50px;
+  min-width: 7rem;
+  padding: 0 1rem;
+}
