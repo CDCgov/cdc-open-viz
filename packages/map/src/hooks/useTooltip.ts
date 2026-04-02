@@ -78,10 +78,15 @@ const useTooltip = props => {
   }
 
   const handleTooltipPrimaryColumn = (tooltipValue, column) => {
-    const { hidePrimaryColumnInTooltip } = config.general as { hidePrimaryColumnInTooltip: boolean }
+    const { hidePrimaryColumnInTooltip, hideGeoColumnInTooltip } = config.general as {
+      hidePrimaryColumnInTooltip: boolean
+      hideGeoColumnInTooltip: boolean
+    }
     let tooltipPrefix = column.label?.length > 0 ? column.label : ''
-    if ((column.name === config.columns.primary.name && hidePrimaryColumnInTooltip) || !tooltipPrefix)
-      return `<li class="tooltip-body">${tooltipValue}</li>`
+    const hidePrimaryLabel = column.name === config.columns.primary.name && hidePrimaryColumnInTooltip
+    const hideGeoLabel = column.name === config.columns.geo.name && hideGeoColumnInTooltip
+
+    if (hidePrimaryLabel || hideGeoLabel || !tooltipPrefix) return `<li class="tooltip-body">${tooltipValue}</li>`
     return `<li class="tooltip-body">${tooltipPrefix}: ${tooltipValue}</li>`
   }
 

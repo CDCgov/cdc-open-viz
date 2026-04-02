@@ -1792,6 +1792,24 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         updateField={updateField}
                       />
                       <TextField
+                        value={columns.geo.label}
+                        section='columns'
+                        subsection='geo'
+                        fieldName='label'
+                        label='Geography Column Label'
+                        updateField={updateField}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Enter a label for the geography column in tooltips and the data table.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                      <TextField
                         value={config.general.geoLabelOverride}
                         section='general'
                         fieldName='geoLabelOverride'
@@ -1833,6 +1851,22 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           }}
                         />
                       </label>
+                      <CheckBox
+                        value={config.columns.geo?.dataTable || false}
+                        section='columns'
+                        subsection='geo'
+                        fieldName='dataTable'
+                        label='Show in Data Table'
+                        updateField={updateField}
+                      />
+                      <CheckBox
+                        value={config.columns.geo?.tooltip || false}
+                        section='columns'
+                        subsection='geo'
+                        fieldName='tooltip'
+                        label='Show in Tooltips'
+                        updateField={updateField}
+                      />
                       <label className='mt-2'>
                         <span className='edit-label column-heading'>Order</span>
                         <input
@@ -2173,10 +2207,19 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             <Select
                               label='Column'
                               value={config.columns[val] ? config.columns[val].name : ''}
-                              options={columnsOptions.map(option => ({
-                                value: option.props.value,
-                                label: option.props.children
-                              }))}
+                              options={columnsOptions
+                                .filter(option => {
+                                  const optionValue = option.props.value
+                                  return (
+                                    optionValue === '' ||
+                                    optionValue !== config.columns.geo?.name ||
+                                    optionValue === config.columns[val]?.name
+                                  )
+                                })
+                                .map(option => ({
+                                  value: option.props.value,
+                                  label: option.props.children
+                                }))}
                               onChange={event => {
                                 editColumn(val, 'name', event.target.value)
                               }}
