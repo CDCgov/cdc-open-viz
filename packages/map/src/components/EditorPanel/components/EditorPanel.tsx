@@ -1324,6 +1324,15 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         }}
                       />
                     )}
+                    {config.general.geoType === 'us-county' && (
+                      <CheckBox
+                        value={config.general.showHSABoundaries || false}
+                        fieldName='showHSABoundaries'
+                        label='Show HSA Boundaries'
+                        updateField={updateField}
+                        section='general'
+                      />
+                    )}
                     {(config.general.geoType === 'us-county' || config.general.geoType === 'single-state') && (
                       <Select
                         label='County Census Year'
