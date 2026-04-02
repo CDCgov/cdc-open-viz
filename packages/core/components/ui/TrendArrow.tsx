@@ -1,5 +1,8 @@
+import parse from 'html-react-parser'
 import { TrendArrowType, TREND_ARROW_DOWN, TREND_ARROW_NO_CHANGE } from '../../helpers/trendIndicator'
-import TrendArrowIcon from '../../assets/user-icons/arrow-up.svg'
+import arrowUpSvg from '../../assets/user-icons/arrow-up.svg?raw'
+import arrowDownSvg from '../../assets/user-icons/arrow-down.svg?raw'
+import arrowRightSvg from '../../assets/user-icons/arrow-right.svg?raw'
 import './trend-arrow.css'
 
 type TrendArrowProps = {
@@ -10,22 +13,23 @@ type TrendArrowProps = {
 }
 
 const TrendArrow = ({ arrowType, wrapperClassName = '', ariaLabel, label }: TrendArrowProps) => {
-  const isDownArrow = arrowType === TREND_ARROW_DOWN
-  const isNoChangeArrow = arrowType === TREND_ARROW_NO_CHANGE
+  const rawSvg =
+    arrowType === TREND_ARROW_DOWN
+      ? arrowDownSvg
+      : arrowType === TREND_ARROW_NO_CHANGE
+      ? arrowRightSvg
+      : arrowUpSvg
   const trendArrowWrapClasses = ['cove-trend-arrow__wrap', wrapperClassName].filter(Boolean).join(' ')
   const trimmedLabel = label?.trim()
   const resolvedAriaLabel = ariaLabel || `Trend ${arrowType}${trimmedLabel ? `: ${trimmedLabel}` : ''}`
+  const iconMarkup = rawSvg
+    .trim()
+    .replace('<svg', `<svg class="cove-trend-arrow" role="img" aria-label="${resolvedAriaLabel}"`)
 
   return (
     <span className={trendArrowWrapClasses}>
       {trimmedLabel && <span className='cove-trend-arrow__label'>{trimmedLabel}</span>}
-      <TrendArrowIcon
-        className={['cove-trend-arrow', isDownArrow ? 'is-down' : '', isNoChangeArrow ? 'is-no-change' : '']
-          .filter(Boolean)
-          .join(' ')}
-        role='img'
-        aria-label={resolvedAriaLabel}
-      />
+      {parse(iconMarkup)}
     </span>
   )
 }

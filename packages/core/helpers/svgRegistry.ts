@@ -1,4 +1,6 @@
 import arrowUpSvg from '../assets/user-icons/arrow-up.svg?raw'
+import arrowDownSvg from '../assets/user-icons/arrow-down.svg?raw'
+import arrowRightSvg from '../assets/user-icons/arrow-right.svg?raw'
 import arrowUpRightFromSquareSvg from '../assets/user-icons/arrow-up-right-from-square.svg?raw'
 
 // Registry SVGs should come from static assets (not inline JSX).
@@ -8,14 +10,12 @@ export const SVG_REGISTRY = {
     ariaLabel: 'Trend up'
   },
   'trend-arrow-down': {
-    rawSvg: arrowUpSvg,
-    ariaLabel: 'Trend down',
-    isDown: true
+    rawSvg: arrowDownSvg,
+    ariaLabel: 'Trend down'
   },
   'trend-arrow-no-change': {
-    rawSvg: arrowUpSvg,
-    ariaLabel: 'Trend no change',
-    rotationDegrees: 90
+    rawSvg: arrowRightSvg,
+    ariaLabel: 'Trend no change'
   },
   'link-external': {
     rawSvg: arrowUpRightFromSquareSvg,
@@ -46,18 +46,7 @@ const normalizeSvgScale = (scale?: number): number => {
   return parsed
 }
 
-const buildSvgTransform = (scale: number, isDown?: boolean, rotationDegrees = 0): string => {
-  const baseTransform = `scale(${scale})`
-  const directionalTransform = isDown
-    ? 'scale(-1, 1) rotate(180deg)'
-    : rotationDegrees
-    ? `rotate(${rotationDegrees}deg)`
-    : ''
-
-  return [baseTransform, directionalTransform].filter(Boolean).join(' ')
-}
-
-export const buildInlineSvg = (
+const buildSvgMarkup = (
   svgId: SvgRegistryId,
   options: {
     scale?: number
@@ -69,12 +58,26 @@ export const buildInlineSvg = (
   if (!entry) return ''
 
   const scale = normalizeSvgScale(options.scale)
-  const isDown = 'isDown' in entry && entry.isDown
-  const rotationDegrees = 'rotationDegrees' in entry ? entry.rotationDegrees : 0
-  const className = ['cove-trend-arrow', isDown ? 'is-down' : '', options.className].filter(Boolean).join(' ')
+  const className = options.className?.trim()
   const ariaLabel = options.ariaLabel || entry.ariaLabel
-  const style = `width: 1em; height: 1em; transform: ${buildSvgTransform(scale, isDown, rotationDegrees)}; transform-origin: center;`
+  const style = `display: block; width: 1em; height: 1em; fill: currentColor; color: inherit; transform: scale(${scale}); transform-origin: center;`
   const svgMarkup = entry.rawSvg.trim()
+  const classAttribute = className ? ` class="${className}"` : ''
 
-  return svgMarkup.replace('<svg', `<svg class="${className}" role="img" aria-label="${ariaLabel}" style="${style}"`)
+  return svgMarkup.replace('<svg', `<svg${classAttribute} role="img" aria-label="${ariaLabel}" style="${style}"`)
+}
+
+export const buildInlineSvg = (
+  svgId: SvgRegistryId,
+  options: {
+    scale?: number
+    className?: string
+    ariaLabel?: string
+  } = {}
+): string => {
+  const wrapperStyle =
+    'display: inline-flex; align-items: center; justify-content: center; width: 1em; height: 1em; height: 1lh; vertical-align: bottom; line-height: inherit; overflow: visible;'
+  const decoratedSvgMarkup = buildSvgMarkup(svgId, options)
+
+  return `<span class="cove-inline-svg" style="${wrapperStyle}">${decoratedSvgMarkup}</span>`
 }
