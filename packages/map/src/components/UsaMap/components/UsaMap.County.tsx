@@ -296,7 +296,14 @@ const CountyMap = () => {
 
   const getZoomScale = () => zoomTransformRef.current?.k || 1
 
-  const paintCountyGeo = (context, path2d: Path2D, geoData, canvasWidth: number, strokeWidth?: number) => {
+  const paintCountyGeo = (
+    context,
+    path2d: Path2D,
+    geoData,
+    canvasWidth: number,
+    strokeWidth?: number,
+    strokeColor?: string
+  ) => {
     const legendValues =
       geoData !== undefined
         ? applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
@@ -342,7 +349,7 @@ const CountyMap = () => {
       }
     }
 
-    context.strokeStyle = geoStrokeColor
+    context.strokeStyle = strokeColor ?? geoStrokeColor
     context.lineWidth = strokeWidth ?? lineWidth
     context.stroke(path2d)
 
@@ -796,11 +803,15 @@ const CountyMap = () => {
     applyZoomTransform(context)
     const zoomScale = getZoomScale()
     const strokeScale = zoomScale ? 1 / zoomScale : 1
-    const countyStrokeWidth = lineWidth * 0.8 * strokeScale
-    const hsaStrokeWidth = lineWidth * 1.4 * strokeScale
+    const useHsaStrokeStyling = config.general.showHSABoundaries
+    const countyStrokeWidth = lineWidth * (useHsaStrokeStyling ? 0.45 : 0.8) * strokeScale
+    const hsaStrokeWidth = lineWidth * 0.7 * strokeScale
+    const countyStrokeColor = useHsaStrokeStyling ? '#a9aeb1' : geoStrokeColor
+    const hsaStrokeColor = '#303030'
+    const stateStrokeColor = useHsaStrokeStyling ? '#000000' : '#1c1d1f'
 
     // Enforces stroke style of the county lines
-    context.strokeStyle = geoStrokeColor
+    context.strokeStyle = countyStrokeColor
     context.lineWidth = countyStrokeWidth
 
     // Iterates through each state/county topo and renders it using cached Path2D
@@ -813,21 +824,11 @@ const CountyMap = () => {
       if (!path2d) return
 
       const geoData = runtimeData[geo.id]
-      paintCountyGeo(context, path2d, geoData, canvas.width, countyStrokeWidth)
-    })
-
-    // State borders
-    context.strokeStyle = '#1c1d1f'
-    context.lineWidth = lineWidth * 1.25 * strokeScale
-    topoData.states.forEach(state => {
-      if (!state.id) return
-      const path2d = cache.get('state_border_' + state.id)
-      if (path2d) {
-        context.stroke(path2d)
-      }
+      paintCountyGeo(context, path2d, geoData, canvas.width, countyStrokeWidth, countyStrokeColor)
     })
 
     if (config.general.showHSABoundaries) {
+      context.strokeStyle = hsaStrokeColor
       context.lineWidth = hsaStrokeWidth
       topoData.hsas?.forEach(hsa => {
         if (!hsa?.groupId) return
@@ -838,6 +839,17 @@ const CountyMap = () => {
         }
       })
     }
+
+    // State borders
+    context.strokeStyle = stateStrokeColor
+    context.lineWidth = lineWidth * 1.25 * strokeScale
+    topoData.states.forEach(state => {
+      if (!state.id) return
+      const path2d = cache.get('state_border_' + state.id)
+      if (path2d) {
+        context.stroke(path2d)
+      }
+    })
 
     // If the focused state is found in the geo data, render it with a thicker outline
     if (focus.index !== -1) {
