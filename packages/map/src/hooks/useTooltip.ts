@@ -85,6 +85,17 @@ const useTooltip = props => {
     return `<li class="tooltip-body">${tooltipPrefix}: ${tooltipValue}</li>`
   }
 
+  const formatTooltipColumnValue = (row, column, columnKey) => {
+    if (!row) return config.tooltips?.noDataLabel || 'No Data'
+
+    if (column.name === config.columns.geo.name) {
+      const displayOverride = row?.[config.columns.geo?.displayColumn]
+      return displayGeoName(row[column.name], displayOverride)
+    }
+
+    return displayDataAsText(row[column.name], columnKey, config)
+  }
+
   /**
    *
    * @param {String} toolTipText - previous tooltipText to build upon
@@ -110,9 +121,7 @@ const useTooltip = props => {
           let tooltipValue = handleTooltipSpecialClassText(specialClasses, column, row, '', columnKey)
 
           if (!tooltipValue) {
-            tooltipValue = row
-              ? displayDataAsText(row[column.name], columnKey, config)
-              : config.tooltips?.noDataLabel || 'No Data'
+            tooltipValue = formatTooltipColumnValue(row, column, columnKey)
           }
 
           toolTipText += handleTooltipPrimaryColumn(tooltipValue, column)
