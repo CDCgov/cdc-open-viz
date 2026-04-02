@@ -29,6 +29,7 @@ import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel
 import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Icon from '@cdc/core/components/ui/Icon'
+import GroupedList from '@cdc/core/components/EditorPanel/GroupedList'
 import InputToggle from '@cdc/core/components/inputs/InputToggle'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
@@ -2020,105 +2021,6 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       </>
                     }
 
-                    {'navigation' !== config.general.type && (
-                      <fieldset className='primary-fieldset edit-block'>
-                        <label>
-                          <span className='edit-label'>
-                            Special Classes
-                            <Tooltip style={{ textTransform: 'none' }}>
-                              <Tooltip.Target>
-                                <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                              </Tooltip.Target>
-                              <Tooltip.Content>
-                                <p>
-                                  For secondary values such as "NA", the system can automatically color-code them in
-                                  shades of gray, one shade for each special class.
-                                </p>
-                              </Tooltip.Content>
-                            </Tooltip>
-                          </span>
-                        </label>
-                        {config.legend.specialClasses.length === 2 && (
-                          <Alert
-                            type='info'
-                            message='If a third special class is needed you can apply a pattern to set it apart.'
-                            showCloseButton={false}
-                          />
-                        )}
-                        {specialClasses.map((specialClass, i) => (
-                          <div className='edit-block' key={`special-class-${i}`}>
-                            <button
-                              className='remove-column'
-                              onClick={e => {
-                                e.preventDefault()
-                                editColumn('primary', 'specialClassDelete', i)
-                              }}
-                            >
-                              Remove
-                            </button>
-                            <p>Special Class {i + 1}</p>
-                            <Select
-                              label='Data Key'
-                              value={specialClass.key}
-                              options={columnsOptions.map(option => ({
-                                value: option.key,
-                                label: option.key
-                              }))}
-                              onChange={event => {
-                                editColumn('primary', 'specialClassEdit', {
-                                  prop: 'key',
-                                  index: i,
-                                  value: event.target.value
-                                })
-                              }}
-                            />
-                            <Select
-                              label='Value'
-                              value={specialClass.value}
-                              options={[
-                                { value: '', label: '- Select Value -' },
-                                ...(columnsByKey[specialClass.key] || [])
-                                  .sort()
-                                  .map(option => ({ value: option, label: option }))
-                              ]}
-                              onChange={event => {
-                                editColumn('primary', 'specialClassEdit', {
-                                  prop: 'value',
-                                  index: i,
-                                  value: event.target.value
-                                })
-                              }}
-                            />
-                            <label>
-                              <span className='edit-label column-heading'>Label</span>
-                              <input
-                                type='text'
-                                value={specialClass.label}
-                                onChange={e => {
-                                  editColumn('primary', 'specialClassEdit', {
-                                    prop: 'label',
-                                    index: i,
-                                    value: e.target.value
-                                  })
-                                }}
-                              />
-                            </label>
-                          </div>
-                        ))}
-                        {config.legend.specialClasses.length < 2 && (
-                          <Button
-                            className='btn btn-primary full-width editor-panel-action-button'
-                            onClick={e => {
-                              e.preventDefault()
-                              editColumn('primary', 'specialClassAdd', {})
-                            }}
-                          >
-                            Add Special Class
-                          </Button>
-                        )}
-                      </fieldset>
-                    )}
-
                     <label className='edit-block navigate column-heading'>
                       <span className='edit-label column-heading'>
                         Navigation
@@ -2146,132 +2048,258 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       <fieldset className='primary-fieldset edit-block'>
                         <label>
                           <span className='edit-label'>
-                            Additional Columns
+                            Special Classes
                             <Tooltip style={{ textTransform: 'none' }}>
                               <Tooltip.Target>
                                 <Icon display='question' style={{ marginLeft: '0.5rem' }} />
                               </Tooltip.Target>
                               <Tooltip.Content>
                                 <p>
-                                  You can specify additional columns to display in tooltips and / or the supporting data
-                                  table.
+                                  For secondary values such as "NA", the system can automatically color-code them in
+                                  shades of gray, one shade for each special class.
                                 </p>
                               </Tooltip.Content>
                             </Tooltip>
                           </span>
                         </label>
-                        {additionalColumns.map(val => (
-                          <fieldset className='edit-block' key={val}>
-                            <button
-                              className='remove-column'
-                              onClick={event => {
-                                event.preventDefault()
-                                removeAdditionalColumn(val)
-                              }}
-                            >
-                              Remove
-                            </button>
-                            <Select
-                              label='Column'
-                              value={config.columns[val] ? config.columns[val].name : ''}
-                              options={columnsOptions.map(option => ({
-                                value: option.props.value,
-                                label: option.props.children
-                              }))}
-                              onChange={event => {
-                                editColumn(val, 'name', event.target.value)
-                              }}
-                            />
-                            <TextField
-                              value={columns[val].label}
-                              section='columns'
-                              subsection={val}
-                              fieldName='label'
-                              label='Label'
-                              updateField={updateField}
-                            />
-                            <ul className='column-edit'>
-                              <li className='three-col'>
-                                <TextField
-                                  value={columns[val].prefix}
-                                  section='columns'
-                                  subsection={val}
-                                  fieldName='prefix'
-                                  label='Prefix'
-                                  updateField={updateField}
-                                />
-                                <TextField
-                                  value={columns[val].suffix}
-                                  section='columns'
-                                  subsection={val}
-                                  fieldName='suffix'
-                                  label='Suffix'
-                                  updateField={updateField}
-                                />
-                                <TextField
-                                  type='number'
-                                  value={columns[val].roundToPlace}
-                                  section='columns'
-                                  subsection={val}
-                                  fieldName='roundToPlace'
-                                  label='Round'
-                                  updateField={updateField}
-                                />
-                              </li>
-                              <CheckBox
-                                value={config.columns[val].useCommas}
-                                section='columns'
-                                subsection={val}
-                                fieldName='useCommas'
-                                label='Add Commas to Numbers'
-                                updateField={updateField}
-                                onChange={event => {
-                                  editColumn(val, 'useCommas', event.target.checked)
-                                }}
-                              />
-                              <CheckBox
-                                value={config.columns[val].dataTable}
-                                section='columns'
-                                subsection={val}
-                                fieldName='dataTable'
-                                label='Show in Data Table'
-                                updateField={updateField}
-                                onChange={event => {
-                                  editColumn(val, 'dataTable', event.target.checked)
-                                }}
-                              />
-                              <CheckBox
-                                value={config.columns[val].tooltip}
-                                section='columns'
-                                subsection={val}
-                                fieldName='tooltip'
-                                label='Show in Tooltips'
-                                updateField={updateField}
-                                onChange={event => {
-                                  editColumn(val, 'tooltip', event.target.checked)
-                                }}
-                              />
-                              <label>
-                                <span className='edit-label column-heading'>Order</span>
-                                <input
-                                  onWheel={e => e.currentTarget.blur()}
-                                  type='number'
-                                  min='1'
-                                  value={config.columns[val]?.order ?? ''}
-                                  onChange={event => {
-                                    updateColumnOrder(val, event.target.value)
-                                  }}
-                                />
-                              </label>
-                            </ul>
-                          </fieldset>
-                        ))}
+                        {config.legend.specialClasses.length === 2 && (
+                          <Alert
+                            type='info'
+                            message='If a third special class is needed you can apply a pattern to set it apart.'
+                            showCloseButton={false}
+                          />
+                        )}
+                        <GroupedList
+                          items={specialClasses}
+                          label='Special Classes'
+                          droppableId='map-special-classes'
+                          draggable={false}
+                          renderItem={(specialClass, i) => (
+                            <Accordion allowZeroExpanded key={`special-class-${i}`}>
+                              <AccordionItem className='series-item series-item--chart'>
+                                <AccordionItemHeading className='series-item__title'>
+                                  <AccordionItemButton className='accordion__button'>
+                                    {specialClass.label || specialClass.value || `Special Class ${i + 1}`}
+                                  </AccordionItemButton>
+                                </AccordionItemHeading>
+                                <AccordionItemPanel>
+                                  <div className='series-item__panel-actions'>
+                                    <Button
+                                      type='button'
+                                      variant='danger'
+                                      size='sm'
+                                      className='grouped-list__remove'
+                                      onClick={() => editColumn('primary', 'specialClassDelete', i)}
+                                    >
+                                      Remove
+                                    </Button>
+                                  </div>
+                                  <Select
+                                    label='Data Key'
+                                    value={specialClass.key}
+                                    options={columnsOptions.map(option => ({
+                                      value: option.key,
+                                      label: option.key
+                                    }))}
+                                    onChange={event => {
+                                      editColumn('primary', 'specialClassEdit', {
+                                        prop: 'key',
+                                        index: i,
+                                        value: event.target.value
+                                      })
+                                    }}
+                                  />
+                                  <Select
+                                    label='Value'
+                                    value={specialClass.value}
+                                    options={[
+                                      { value: '', label: '- Select Value -' },
+                                      ...(columnsByKey[specialClass.key] || [])
+                                        .sort()
+                                        .map(option => ({ value: option, label: option }))
+                                    ]}
+                                    onChange={event => {
+                                      editColumn('primary', 'specialClassEdit', {
+                                        prop: 'value',
+                                        index: i,
+                                        value: event.target.value
+                                      })
+                                    }}
+                                  />
+                                  <label>
+                                    <span className='edit-label column-heading'>Label</span>
+                                    <input
+                                      type='text'
+                                      value={specialClass.label}
+                                      onChange={e => {
+                                        editColumn('primary', 'specialClassEdit', {
+                                          prop: 'label',
+                                          index: i,
+                                          value: e.target.value
+                                        })
+                                      }}
+                                    />
+                                  </label>
+                                </AccordionItemPanel>
+                              </AccordionItem>
+                            </Accordion>
+                          )}
+                        />
+                        {config.legend.specialClasses.length < 2 && (
+                          <Button
+                            type='button'
+                            variant='editor-primary'
+                            onClick={() => editColumn('primary', 'specialClassAdd', {})}
+                          >
+                            Add Special Class
+                          </Button>
+                        )}
+                      </fieldset>
+                    )}
+                    {'navigation' !== config.general.type && (
+                      <fieldset className='primary-fieldset edit-block'>
+                        <GroupedList
+                          items={additionalColumns}
+                          label={
+                            <>
+                              Additional Columns
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    You can specify additional columns to display in tooltips and / or the supporting
+                                    data table.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            </>
+                          }
+                          droppableId='map-additional-columns'
+                          draggable={false}
+                          renderItem={val => (
+                            <Accordion allowZeroExpanded key={val}>
+                              <AccordionItem className='series-item series-item--chart'>
+                                <AccordionItemHeading className='series-item__title'>
+                                  <AccordionItemButton className='accordion__button'>
+                                    {columns[val]?.label || config.columns[val]?.name || 'New Column'}
+                                  </AccordionItemButton>
+                                </AccordionItemHeading>
+                                <AccordionItemPanel>
+                                  <div className='series-item__panel-actions'>
+                                    <Button
+                                      type='button'
+                                      variant='danger'
+                                      size='sm'
+                                      className='grouped-list__remove'
+                                      onClick={() => removeAdditionalColumn(val)}
+                                    >
+                                      Remove
+                                    </Button>
+                                  </div>
+                                  <Select
+                                    label='Column'
+                                    value={config.columns[val] ? config.columns[val].name : ''}
+                                    options={columnsOptions.map(option => ({
+                                      value: option.props.value,
+                                      label: option.props.children
+                                    }))}
+                                    onChange={event => {
+                                      editColumn(val, 'name', event.target.value)
+                                    }}
+                                  />
+                                  <TextField
+                                    value={columns[val].label}
+                                    section='columns'
+                                    subsection={val}
+                                    fieldName='label'
+                                    label='Label'
+                                    updateField={updateField}
+                                  />
+                                  <ul className='column-edit'>
+                                    <li className='three-col'>
+                                      <TextField
+                                        value={columns[val].prefix}
+                                        section='columns'
+                                        subsection={val}
+                                        fieldName='prefix'
+                                        label='Prefix'
+                                        updateField={updateField}
+                                      />
+                                      <TextField
+                                        value={columns[val].suffix}
+                                        section='columns'
+                                        subsection={val}
+                                        fieldName='suffix'
+                                        label='Suffix'
+                                        updateField={updateField}
+                                      />
+                                      <TextField
+                                        type='number'
+                                        value={columns[val].roundToPlace}
+                                        section='columns'
+                                        subsection={val}
+                                        fieldName='roundToPlace'
+                                        label='Round'
+                                        updateField={updateField}
+                                      />
+                                    </li>
+                                    <CheckBox
+                                      value={config.columns[val].useCommas}
+                                      section='columns'
+                                      subsection={val}
+                                      fieldName='useCommas'
+                                      label='Add Commas to Numbers'
+                                      updateField={updateField}
+                                      onChange={event => {
+                                        editColumn(val, 'useCommas', event.target.checked)
+                                      }}
+                                    />
+                                    <CheckBox
+                                      value={config.columns[val].dataTable}
+                                      section='columns'
+                                      subsection={val}
+                                      fieldName='dataTable'
+                                      label='Show in Data Table'
+                                      updateField={updateField}
+                                      onChange={event => {
+                                        editColumn(val, 'dataTable', event.target.checked)
+                                      }}
+                                    />
+                                    <CheckBox
+                                      value={config.columns[val].tooltip}
+                                      section='columns'
+                                      subsection={val}
+                                      fieldName='tooltip'
+                                      label='Show in Tooltips'
+                                      updateField={updateField}
+                                      onChange={event => {
+                                        editColumn(val, 'tooltip', event.target.checked)
+                                      }}
+                                    />
+                                    <label>
+                                      <span className='edit-label column-heading'>Order</span>
+                                      <input
+                                        onWheel={e => e.currentTarget.blur()}
+                                        type='number'
+                                        min='1'
+                                        value={config.columns[val]?.order ?? ''}
+                                        onChange={event => {
+                                          updateColumnOrder(val, event.target.value)
+                                        }}
+                                      />
+                                    </label>
+                                  </ul>
+                                </AccordionItemPanel>
+                              </AccordionItem>
+                            </Accordion>
+                          )}
+                        />
                         <Button
-                          className={'btn btn-primary full-width editor-panel-action-button'}
-                          onClick={event => {
-                            event.preventDefault()
-                            addAdditionalColumn(additionalColumns.length + 1)
-                          }}
+                          type='button'
+                          variant='editor-primary'
+                          onClick={() => addAdditionalColumn(additionalColumns.length + 1)}
                         >
                           Add Column
                         </Button>
@@ -3622,71 +3650,82 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     )}
                     {/* <AdditionalCityStyles /> */}
                     <>
-                      {config.visual.additionalCityStyles.length > 0 &&
-                        config.visual.additionalCityStyles.map(({ label, column, value, shape }, i) => {
-                          return (
-                            <div className='edit-block' key={`additional-city-style-${i}`}>
-                              <button
-                                className='remove-column'
-                                onClick={e => {
-                                  e.preventDefault()
-                                  editCityStyles('remove', i, '', '')
-                                }}
-                              >
-                                Remove
-                              </button>
-                              <p>City Style {i + 1}</p>
-                              <Select
-                                label='Column with configuration value'
-                                value={column}
-                                options={columnsOptions.map(c => c.key)}
-                                onChange={e => {
-                                  editCityStyles('update', i, 'column', e.target.value)
-                                }}
-                              />
-                              <label>
-                                <span className='edit-label column-heading'>Value to Trigger</span>
-                                <input
-                                  type='text'
-                                  value={value}
+                      <GroupedList
+                        items={config.visual.additionalCityStyles}
+                        label='Additional City Styles'
+                        droppableId='map-city-styles'
+                        draggable={false}
+                        renderItem={({ label, column, value, shape }, i) => (
+                          <Accordion allowZeroExpanded key={`additional-city-style-${i}`}>
+                            <AccordionItem className='series-item series-item--chart'>
+                              <AccordionItemHeading className='series-item__title'>
+                                <AccordionItemButton className='accordion__button'>
+                                  {label || column || `City Style ${i + 1}`}
+                                </AccordionItemButton>
+                              </AccordionItemHeading>
+                              <AccordionItemPanel>
+                                <div className='series-item__panel-actions'>
+                                  <Button
+                                    type='button'
+                                    variant='danger'
+                                    size='sm'
+                                    className='grouped-list__remove'
+                                    onClick={() => editCityStyles('remove', i, '', '')}
+                                  >
+                                    Remove
+                                  </Button>
+                                </div>
+                                <Select
+                                  label='Column with configuration value'
+                                  value={column}
+                                  options={columnsOptions.map(c => c.key)}
                                   onChange={e => {
-                                    editCityStyles('update', i, 'value', e.target.value)
-                                  }}
-                                ></input>
-                              </label>
-                              <Select
-                                label='Shape'
-                                value={shape}
-                                options={[
-                                  { value: '', label: '- Select Option -' },
-                                  ...['Circle', 'Square', 'Triangle', 'Diamond', 'Star', 'Pin']
-                                    .filter(val => String(config.visual.cityStyle).toLowerCase() !== val.toLowerCase())
-                                    .map(val => ({ value: val, label: val }))
-                                ]}
-                                onChange={e => {
-                                  editCityStyles('update', i, 'shape', e.target.value)
-                                }}
-                              />
-                              <label>
-                                <span className='edit-label column-heading'>Label</span>
-                                <input
-                                  key={i}
-                                  type='text'
-                                  value={label}
-                                  onChange={e => {
-                                    editCityStyles('update', i, 'label', e.target.value)
+                                    editCityStyles('update', i, 'column', e.target.value)
                                   }}
                                 />
-                              </label>
-                            </div>
-                          )
-                        })}
+                                <label>
+                                  <span className='edit-label column-heading'>Value to Trigger</span>
+                                  <input
+                                    type='text'
+                                    value={value}
+                                    onChange={e => {
+                                      editCityStyles('update', i, 'value', e.target.value)
+                                    }}
+                                  />
+                                </label>
+                                <Select
+                                  label='Shape'
+                                  value={shape}
+                                  options={[
+                                    { value: '', label: '- Select Option -' },
+                                    ...['Circle', 'Square', 'Triangle', 'Diamond', 'Star', 'Pin']
+                                      .filter(
+                                        val => String(config.visual.cityStyle).toLowerCase() !== val.toLowerCase()
+                                      )
+                                      .map(val => ({ value: val, label: val }))
+                                  ]}
+                                  onChange={e => {
+                                    editCityStyles('update', i, 'shape', e.target.value)
+                                  }}
+                                />
+                                <label>
+                                  <span className='edit-label column-heading'>Label</span>
+                                  <input
+                                    key={i}
+                                    type='text'
+                                    value={label}
+                                    onChange={e => {
+                                      editCityStyles('update', i, 'label', e.target.value)
+                                    }}
+                                  />
+                                </label>
+                              </AccordionItemPanel>
+                            </AccordionItem>
+                          </Accordion>
+                        )}
+                      />
 
-                      <Button
-                        type='button'
-                        onClick={() => editCityStyles('add', 0, '', '')}
-                        className='btn btn-primary full-width editor-panel-action-button'
-                      >
+                      <Button type='button' variant='editor-primary' onClick={() => editCityStyles('add', 0, '', '')}>
                         Add city style
                       </Button>
                     </>
@@ -3731,85 +3770,98 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                   </AccordionItemHeading>
                   <AccordionItemPanel>
                     {config.map.layers.length === 0 && <p>There are currently no layers.</p>}
-
-                    {config.map.layers.map((layer, index) => {
-                      return (
-                        <>
-                          <Accordion allowZeroExpanded>
-                            <AccordionItem className='series-item map-layers-list'>
-                              <AccordionItemHeading className='series-item__title map-layers-list--title'>
-                                <AccordionItemButton>{`Layer ${index + 1}: ${layer.name}`}</AccordionItemButton>
-                              </AccordionItemHeading>
-                              <AccordionItemPanel>
-                                <div className='map-layers-panel'>
-                                  <label htmlFor='layerName'>Layer Name:</label>
-                                  <input
-                                    type='text'
-                                    name='layerName'
-                                    value={layer.name}
-                                    onChange={e => handleMapLayer(e, index, 'name')}
-                                  />
-                                  <label htmlFor='layerFilename'>File:</label>
-                                  <input
-                                    type='text'
-                                    name='layerFilename'
-                                    value={layer.url}
-                                    onChange={e => handleMapLayer(e, index, 'url')}
-                                  />
-                                  <label htmlFor='layerNamespace'>TOPOJSON Namespace:</label>
-                                  <input
-                                    type='text'
-                                    name='layerNamespace'
-                                    value={layer.namespace}
-                                    onChange={e => handleMapLayer(e, index, 'namespace')}
-                                  />
-                                  <label htmlFor='layerFill'>Fill Color:</label>
-                                  <input
-                                    type='text'
-                                    name='layerFill'
-                                    value={layer.fill}
-                                    onChange={e => handleMapLayer(e, index, 'fill')}
-                                  />
-                                  <label htmlFor='layerFill'>Fill Opacity (%):</label>
-                                  <input
-                                    type='number'
-                                    min={0}
-                                    max={100}
-                                    name='layerFill'
-                                    value={layer.fillOpacity ? layer.fillOpacity * 100 : ''}
-                                    onChange={e => handleMapLayer(e, index, 'fillOpacity')}
-                                  />
-                                  <label htmlFor='layerStroke'>Stroke Color:</label>
-                                  <input
-                                    type='text'
-                                    name='layerStroke'
-                                    value={layer.stroke}
-                                    onChange={e => handleMapLayer(e, index, 'stroke')}
-                                  />
-                                  <label htmlFor='layerStroke'>Stroke Width:</label>
-                                  <input
-                                    type='number'
-                                    min={0}
-                                    max={5}
-                                    name='layerStrokeWidth'
-                                    value={layer.strokeWidth}
-                                    onChange={e => handleMapLayer(e, index, 'strokeWidth')}
-                                  />
-                                  <label htmlFor='layerTooltip'>Tooltip:</label>
-                                  <textarea
-                                    name='layerTooltip'
-                                    value={layer.tooltip}
-                                    onChange={e => handleMapLayer(e, index, 'tooltip')}
-                                  ></textarea>
-                                  <button onClick={e => handleRemoveLayer(e, index)}>Remove Layer</button>
-                                </div>
-                              </AccordionItemPanel>
-                            </AccordionItem>
-                          </Accordion>
-                        </>
-                      )
-                    })}
-                    <Button variant='primary' fullWidth className='editor-panel-action-button' onClick={handleAddLayer}>
+                    <GroupedList
+                      items={config.map.layers}
+                      label='Custom Map Layers'
+                      droppableId='map-custom-layers'
+                      draggable={false}
+                      renderItem={(layer, index) => (
+                        <Accordion allowZeroExpanded key={`map-layer-${index}`}>
+                          <AccordionItem className='series-item series-item--chart map-layers-list'>
+                            <AccordionItemHeading className='series-item__title map-layers-list--title'>
+                              <AccordionItemButton className='accordion__button'>
+                                {`Layer ${index + 1}: ${layer.name}`}
+                              </AccordionItemButton>
+                            </AccordionItemHeading>
+                            <AccordionItemPanel>
+                              <div className='series-item__panel-actions'>
+                                <Button
+                                  type='button'
+                                  variant='danger'
+                                  size='sm'
+                                  className='grouped-list__remove'
+                                  onClick={e => handleRemoveLayer(e, index)}
+                                >
+                                  Remove Layer
+                                </Button>
+                              </div>
+                              <div className='map-layers-panel'>
+                                <label htmlFor='layerName'>Layer Name:</label>
+                                <input
+                                  type='text'
+                                  name='layerName'
+                                  value={layer.name}
+                                  onChange={e => handleMapLayer(e, index, 'name')}
+                                />
+                                <label htmlFor='layerFilename'>File:</label>
+                                <input
+                                  type='text'
+                                  name='layerFilename'
+                                  value={layer.url}
+                                  onChange={e => handleMapLayer(e, index, 'url')}
+                                />
+                                <label htmlFor='layerNamespace'>TOPOJSON Namespace:</label>
+                                <input
+                                  type='text'
+                                  name='layerNamespace'
+                                  value={layer.namespace}
+                                  onChange={e => handleMapLayer(e, index, 'namespace')}
+                                />
+                                <label htmlFor='layerFill'>Fill Color:</label>
+                                <input
+                                  type='text'
+                                  name='layerFill'
+                                  value={layer.fill}
+                                  onChange={e => handleMapLayer(e, index, 'fill')}
+                                />
+                                <label htmlFor='layerFill'>Fill Opacity (%):</label>
+                                <input
+                                  type='number'
+                                  min={0}
+                                  max={100}
+                                  name='layerFill'
+                                  value={layer.fillOpacity ? layer.fillOpacity * 100 : ''}
+                                  onChange={e => handleMapLayer(e, index, 'fillOpacity')}
+                                />
+                                <label htmlFor='layerStroke'>Stroke Color:</label>
+                                <input
+                                  type='text'
+                                  name='layerStroke'
+                                  value={layer.stroke}
+                                  onChange={e => handleMapLayer(e, index, 'stroke')}
+                                />
+                                <label htmlFor='layerStroke'>Stroke Width:</label>
+                                <input
+                                  type='number'
+                                  min={0}
+                                  max={5}
+                                  name='layerStrokeWidth'
+                                  value={layer.strokeWidth}
+                                  onChange={e => handleMapLayer(e, index, 'strokeWidth')}
+                                />
+                                <label htmlFor='layerTooltip'>Tooltip:</label>
+                                <textarea
+                                  name='layerTooltip'
+                                  value={layer.tooltip}
+                                  onChange={e => handleMapLayer(e, index, 'tooltip')}
+                                ></textarea>
+                              </div>
+                            </AccordionItemPanel>
+                          </AccordionItem>
+                        </Accordion>
+                      )}
+                    />
+                    <Button type='button' variant='editor-primary' onClick={handleAddLayer}>
                       Add Map Layer
                     </Button>
                     <p className='layer-purpose-details'>

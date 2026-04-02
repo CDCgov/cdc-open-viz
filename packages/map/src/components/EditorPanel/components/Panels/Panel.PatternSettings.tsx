@@ -10,6 +10,7 @@ import ConfigContext from '../../../../context'
 import { useLegendMemoContext } from '../../../../context/LegendMemoContext'
 import { type MapContext } from '../../../../types/MapContext'
 import Button from '@cdc/core/components/elements/Button'
+import GroupedList from '@cdc/core/components/EditorPanel/GroupedList'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import { Select } from '@cdc/core/components/EditorPanel/Inputs'
@@ -178,9 +179,12 @@ const PatternSettings = ({ name }: PanelProps) => {
           />
         )}
         <br />
-
-        {patterns &&
-          patterns.map((pattern, patternIndex) => {
+        <GroupedList
+          items={patterns}
+          label='Geo Patterns'
+          droppableId='map-geo-patterns'
+          draggable={false}
+          renderItem={(pattern, patternIndex) => {
             const dataValueOptions = [...new Set(data?.map(d => d?.[pattern?.dataKey]))]
             const dataKeyOptions = Object.keys(data[0])
             dataValueOptions.unshift('Select')
@@ -191,14 +195,25 @@ const PatternSettings = ({ name }: PanelProps) => {
 
             return (
               <Accordion allowZeroExpanded key={`accordion-pattern--${patternIndex}`}>
-                <AccordionItem>
-                  <AccordionItemHeading>
-                    <AccordionItemButton>
+                <AccordionItem className='series-item series-item--chart'>
+                  <AccordionItemHeading className='series-item__title'>
+                    <AccordionItemButton className='accordion__button'>
                       {pattern.dataKey ? `${pattern.dataKey}: ${pattern.dataValue ?? 'No Value'}` : 'Select Column'}
                     </AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
                     <>
+                      <div className='series-item__panel-actions'>
+                        <Button
+                          type='button'
+                          variant='danger'
+                          size='sm'
+                          className='grouped-list__remove'
+                          onClick={() => handleRemovePattern(patternIndex)}
+                        >
+                          Remove Pattern
+                        </Button>
+                      </div>
                       {pattern.contrastCheck ?? true ? (
                         <Alert type='success' message='This pattern passes contrast checks' />
                       ) : (
@@ -234,7 +249,7 @@ const PatternSettings = ({ name }: PanelProps) => {
                         <input
                           type='text'
                           onChange={e => handlePatternFieldUpdate('label', e.target.value, patternIndex)}
-                          id={`pattern-dataValue--${patternIndex}`}
+                          id={`pattern-label--${patternIndex}`}
                           value={pattern.label === '' ? '' : pattern.label}
                         />
                       </label>
@@ -279,16 +294,14 @@ const PatternSettings = ({ name }: PanelProps) => {
                           />
                         </label>
                       </div>
-                      <Button onClick={e => handleRemovePattern(patternIndex)} className='btn btn-danger'>
-                        Remove Pattern
-                      </Button>
                     </>
                   </AccordionItemPanel>
                 </AccordionItem>
               </Accordion>
             )
-          })}
-        <Button variant='primary' fullWidth className='mt-2' onClick={handleAddGeoPattern}>
+          }}
+        />
+        <Button variant='editor-primary' onClick={handleAddGeoPattern}>
           Add Geo Pattern
         </Button>
       </AccordionItemPanel>

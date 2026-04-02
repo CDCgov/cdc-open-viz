@@ -25,3 +25,17 @@
 .grouped-list__items--drag-over {
   border-color: #d1d1d1;
 }
+
+.grouped-list .accordion:not(:last-child) .series-item__title {
+  border-bottom: 1px solid #ccc;
+}
+
+.grouped-list .series-item__panel-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 0 10px;
+}
+
+.grouped-list .grouped-list__remove {
+  margin-left: auto;
+}
