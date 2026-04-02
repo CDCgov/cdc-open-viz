@@ -1,0 +1,27 @@
+.grouped-list {
+  margin-top: 1rem;
+}
+
+.grouped-list__label {
+  align-items: center;
+  display: flex;
+  font-size: 0.8em;
+  font-weight: 600;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.grouped-list__items {
+  border: 1px solid #d1d1d1;
+  border-radius: 2px;
+  box-sizing: border-box;
+  list-style: none;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.grouped-list__items--drag-over {
+  border-color: #d1d1d1;
+}

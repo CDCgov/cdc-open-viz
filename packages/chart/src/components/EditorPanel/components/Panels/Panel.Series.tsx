@@ -21,7 +21,7 @@ import {
   AccordionItemPanel,
   AccordionItemButton
 } from 'react-accessible-accordion'
-import { Draggable, DragDropContext, Droppable } from '@hello-pangea/dnd'
+import { Draggable } from '@hello-pangea/dnd'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 
 const SeriesContext = React.createContext({})
@@ -653,7 +653,7 @@ const SeriesButtonRemove = props => {
     }
   }
 
-  const handleRemoveSeries = (e, series, index) => {
+  const handleRemoveSeries = (e, series) => {
     e.preventDefault()
     removeSeries(series.dataKey)
   }
@@ -661,12 +661,7 @@ const SeriesButtonRemove = props => {
   return (
     config.series &&
     config.series.length > 1 && (
-      <Button
-        variant='danger'
-        size='sm'
-        className='series-list__remove'
-        onClick={e => handleRemoveSeries(e, series, index)}
-      >
+      <Button variant='danger' size='sm' className='grouped-list__remove' onClick={e => handleRemoveSeries(e, series)}>
         Remove
       </Button>
     )
@@ -716,11 +711,13 @@ const SeriesItem = props => {
                 >
                   <Icon display='move' size={15} style={{ cursor: 'default' }} />
                   {series.dataKey}
-                  <Series.Button.Remove series={series} index={i} />
                 </AccordionItemButton>
               </AccordionItemHeading>
               {chartsWithOptions.includes(config.visualizationType) && (
                 <AccordionItemPanel>
+                  <div className='series-item__panel-actions'>
+                    <Series.Button.Remove series={series} index={i} />
+                  </div>
                   <Series.Input.Name series={series} index={i} />
                   <Series.Input.ColumnSettings series={series} index={i} />
                   {showDynamicCategory && (
@@ -779,22 +776,6 @@ const SeriesItem = props => {
   )
 }
 
-const SeriesList = props => {
-  const { series, getItemStyle, sortableItemStyles, chartsWithOptions } = props
-  return series.map((series, i) => {
-    return (
-      <SeriesItem
-        getItemStyle={getItemStyle}
-        sortableItemStyles={sortableItemStyles}
-        chartsWithOptions={chartsWithOptions}
-        series={series}
-        index={i}
-        key={`series-list-${i}`}
-      />
-    )
-  })
-}
-
 const Series = {
   Wrapper: SeriesWrapper,
   Dropdown: {
@@ -817,8 +798,7 @@ const Series = {
   Button: {
     Remove: SeriesButtonRemove
   },
-  Item: SeriesItem,
-  List: SeriesList
+  Item: SeriesItem
 }
 
 export default Series

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, memo, useContext, useMemo } from 'react'
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import { Draggable } from '@hello-pangea/dnd'
 import chroma from 'chroma-js'
 import { isDateScale } from '@cdc/core/helpers/cove/date'
 import {
@@ -16,6 +16,7 @@ import AdvancedEditor from '@cdc/core/components/AdvancedEditor'
 import Icon from '@cdc/core/components/ui/Icon'
 import ColumnsEditor from '@cdc/core/components/EditorPanel/ColumnsEditor'
 import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
+import GroupedList from '@cdc/core/components/EditorPanel/GroupedList'
 import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import { Select, TextField, CheckBox } from '@cdc/core/components/EditorPanel/Inputs'
@@ -1775,49 +1776,40 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                   getColumns={getColumns}
                                   handleForecastPaletteSelection={handleForecastPaletteSelection}
                                 >
-                                  <fieldset>
-                                    <legend className='edit-label d-flex align-items-center'>
-                                      Displaying
-                                      <Tooltip style={{ textTransform: 'none' }}>
-                                        <Tooltip.Target>
-                                          <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                                        </Tooltip.Target>
-                                        <Tooltip.Content>
-                                          <p>
-                                            A data series is a set of related data points plotted in a chart and
-                                            typically represented in the chart legend.
-                                          </p>
-                                        </Tooltip.Content>
-                                      </Tooltip>
-                                    </legend>
-                                  </fieldset>
-
-                                  <DragDropContext
-                                    onDragEnd={({ source, destination }) =>
-                                      handleSeriesChange(source.index, destination.index)
+                                  <GroupedList
+                                    items={config.series}
+                                    droppableId='chart-series-order'
+                                    label={
+                                      <>
+                                        Displaying
+                                        <Tooltip style={{ textTransform: 'none' }}>
+                                          <Tooltip.Target>
+                                            <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                          </Tooltip.Target>
+                                          <Tooltip.Content>
+                                            <p>
+                                              A data series is a set of related data points plotted in a chart and
+                                              typically represented in the chart legend.
+                                            </p>
+                                          </Tooltip.Content>
+                                        </Tooltip>
+                                      </>
                                     }
-                                  >
-                                    <Droppable droppableId='filter_order'>
-                                      {/* prettier-ignore */}
-                                      {provided => {
-                                        return (
-                                          <ul
-                                            {...provided.droppableProps}
-                                            className='series-list'
-                                            ref={provided.innerRef}
-                                          >
-                                            <Panels.Series.List
-                                              series={config.series}
-                                              getItemStyle={getItemStyle}
-                                              sortableItemStyles={sortableItemStyles}
-                                              chartsWithOptions={chartsWithOptions}
-                                            />
-                                            {provided.placeholder}
-                                          </ul>
-                                        )
-                                      }}
-                                    </Droppable>
-                                  </DragDropContext>
+                                    onDragEnd={({ source, destination }) => {
+                                      if (!destination || source.index === destination.index) return
+                                      handleSeriesChange(source.index, destination.index)
+                                    }}
+                                    renderItem={(series, index) => (
+                                      <Panels.Series.Item
+                                        getItemStyle={getItemStyle}
+                                        sortableItemStyles={sortableItemStyles}
+                                        chartsWithOptions={chartsWithOptions}
+                                        series={series}
+                                        index={index}
+                                        key={`series-list-${index}`}
+                                      />
+                                    )}
+                                  />
                                 </Panels.Series.Wrapper>
                               )}
                             </>
