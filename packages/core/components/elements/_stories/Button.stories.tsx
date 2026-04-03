@@ -17,8 +17,12 @@ const meta: Meta<typeof Button> = {
     fullWidth: false
   },
   decorators: [
-    Story => (
-      <div className='cove-visualization theme-blue'>
+    (Story, context) => (
+      <div
+        className={`cove-visualization ${
+          String(context.args.variant || '').startsWith('theme-') ? context.args.variant : 'theme-blue'
+        }`}
+      >
         <Story />
       </div>
     )
@@ -34,7 +38,27 @@ export const Playground: Story = {
     },
     variant: {
       control: 'select',
-      options: ['primary', 'editor-primary', 'secondary', 'success', 'danger', 'warning', 'light', 'link', 'outline-warning']
+      options: [
+        'primary',
+        'editor-primary',
+        'theme-purple',
+        'theme-brown',
+        'theme-teal',
+        'theme-pink',
+        'theme-orange',
+        'theme-slate',
+        'theme-indigo',
+        'theme-cyan',
+        'theme-green',
+        'theme-amber',
+        'secondary',
+        'success',
+        'danger',
+        'warning',
+        'light',
+        'link',
+        'outline-warning'
+      ]
     },
     size: {
       control: 'select',

@@ -185,6 +185,19 @@
     }
   }
 
+  &.cove-button--theme-primary {
+    background-color: var(--cove-button-primary);
+    color: #fff;
+    border: 0;
+
+    &:disabled {
+      background-color: var(--cove-button-primary-disabled);
+      color: var(--cove-button-primary-disabled-font-color);
+      border: none;
+      filter: none;
+    }
+  }
+
   &.success,
   &.cove-button--success,
   &.cove-button--success,
@@ -224,7 +237,7 @@
   &.cove-button--warning,
   &.btn-warning {
     background-color: #fbab18;
-    color: var(--cool-gray-90);
+    color: #fff;
 
     &:hover {
       background-color: color.adjust(#fbab18, $lightness: -5%);

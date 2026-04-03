@@ -332,11 +332,12 @@ const Filters: React.FC<FilterProps> = ({
           {filterBehavior === 'Apply Button' ? (
             <div className='filters-section__buttons'>
               <Button
+                variant={general?.headerColor ? general.headerColor : theme}
                 onClick={e => {
                   handleApplyButton(filters)
                 }}
                 disabled={!showApplyButton}
-                className={[general?.headerColor ? general.headerColor : theme, 'apply', 'me-2'].join(' ')}
+                className='me-2'
               >
                 Apply
               </Button>

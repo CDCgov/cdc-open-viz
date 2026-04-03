@@ -24,15 +24,34 @@ const Button = ({
   ...attributes
 }) => {
   const buttonRef = useRef(null)
-  const isEditorPrimary = variant === 'editor-primary'
-  const useLegacySecondaryClass = secondary && !variant
+  const normalizedVariant = variant === 'theme-blue' ? 'primary' : variant
+  const themedVariants = [
+    'theme-purple',
+    'theme-brown',
+    'theme-teal',
+    'theme-pink',
+    'theme-orange',
+    'theme-slate',
+    'theme-indigo',
+    'theme-cyan',
+    'theme-green',
+    'theme-amber'
+  ]
+  const isThemedVariant = themedVariants.includes(normalizedVariant)
+  const isEditorPrimary = normalizedVariant === 'editor-primary'
+  const useLegacySecondaryClass = secondary && !normalizedVariant
+  const themedModeClassName = isThemedVariant && secondary ? ' cove-button--theme-secondary' : ''
 
   const [buttonState, setButtonState] = useState('out')
   const [customStyles, setCustomStyles] = useState({ ...style })
   const [childrenWidth, setChildrenWidth] = useState()
   const [loadtextWidth, setLoadtextWidth] = useState()
 
-  const variantClassName = variant && variant !== 'primary' ? ` cove-button--${variant}` : ''
+  const variantClassName =
+    normalizedVariant && normalizedVariant !== 'primary'
+      ? ` cove-button--${isThemedVariant ? 'theme-primary' : normalizedVariant}`
+      : ''
+  const themeClassName = isThemedVariant ? ` ${normalizedVariant}` : ''
   const sizeClassName = size ? ` cove-button--${size}` : ''
 
   const attributesObj = {
@@ -41,6 +60,8 @@ const Button = ({
     className:
       'cove-button' +
       variantClassName +
+      themedModeClassName +
+      themeClassName +
       sizeClassName +
       (animated ? ' cove-button--animated' : '') +
       (flexCenter || 'loader' === role ? ' cove-button--flex-center' : '') +
@@ -147,6 +168,16 @@ Button.propTypes = {
   variant: PropTypes.oneOf([
     'primary',
     'editor-primary',
+    'theme-purple',
+    'theme-brown',
+    'theme-teal',
+    'theme-pink',
+    'theme-orange',
+    'theme-slate',
+    'theme-indigo',
+    'theme-cyan',
+    'theme-green',
+    'theme-amber',
     'secondary',
     'success',
     'danger',
