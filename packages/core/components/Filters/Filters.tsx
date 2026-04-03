@@ -340,9 +340,9 @@ const Filters: React.FC<FilterProps> = ({
               >
                 Apply
               </Button>
-              <button className='btn btn-link' disabled={initialFiltersActive} onClick={handleFiltersReset}>
+              <Button variant='link' disabled={initialFiltersActive} onClick={handleFiltersReset}>
                 Clear Filters
-              </button>
+              </Button>
             </div>
           ) : (
             <></>

@@ -1,16 +1,17 @@
 import React from 'react'
+import Button from '@cdc/core/components/elements/Button'
 
 export const ConfirmationModal = props => {
   return (
     <>
       <p className='message'>{props.message}</p>
       <div className='confirmation-buttons'>
-        <div className='btn btn-inline' onClick={props.onCancel}>
+        <Button type='button' className='btn btn-inline' onClick={props.onCancel}>
           No
-        </div>
-        <div className='btn btn-inline' onClick={props.onConfirm}>
+        </Button>
+        <Button type='button' className='btn btn-inline' onClick={props.onConfirm}>
           Yes
-        </div>
+        </Button>
       </div>
     </>
   )

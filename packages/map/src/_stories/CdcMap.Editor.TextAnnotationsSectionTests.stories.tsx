@@ -69,8 +69,8 @@ export const TextAnnotationsSectionTests: Story = {
     // TEST: Change Annotation Text
     // ==========================================================================
     // Wait for the annotation sub-accordion to appear and find the button with "New Annotation" or "Select Column"
-    await waitForPresence('.cove-accordion__button', canvasElement)
-    const annotationAccordionButtons = canvasElement.querySelectorAll('.cove-accordion__button')
+    await waitForPresence('.accordion__button', canvasElement)
+    const annotationAccordionButtons = canvasElement.querySelectorAll('.accordion__button')
     const annotationAccordionButton = Array.from(annotationAccordionButtons).find(
       btn => btn.textContent?.includes('New annotation') || btn.textContent?.includes('Select Column')
     ) as HTMLElement

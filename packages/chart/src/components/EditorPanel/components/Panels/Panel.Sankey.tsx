@@ -115,16 +115,16 @@ const SankeySettings: React.FC<PanelProps> = props => {
             </div>
           ))}
         {data?.storyNodeText?.length < 3 && (
-          <button
+          <Button
             type='button'
-            className='btn btn-primary full-width'
+            variant='editor-primary'
             onClick={e => {
               e.preventDefault()
               addStoryNode()
             }}
           >
             Add StoryNode
-          </button>
+          </Button>
         )}
         {config.data?.[0]?.tooltips?.length > 0 && (
           <CheckBox

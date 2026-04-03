@@ -5,6 +5,7 @@ import { DashboardContext, DashboardDispatchContext } from '../../DashboardConte
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
 import Icon from '@cdc/core/components/ui/Icon'
+import Button from '@cdc/core/components/elements/Button'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { iconHash } from '../../helpers/iconHash'
 import _ from 'lodash'
@@ -167,12 +168,12 @@ const Widget = ({
         {widgetConfig?.rowIdx !== undefined && (
           <div className='widget-menu'>
             {isConfigurationReady && (
-              <button title='Configure Visualization' className='btn btn-configure' onClick={editWidget}>
+              <Button title='Configure Visualization' className='btn btn-configure' onClick={editWidget}>
                 {iconHash['tools']}
-              </button>
+              </Button>
             )}
             {needsDataConfiguration && (
-              <button
+              <Button
                 title='Configure Data'
                 className='btn btn-configure'
                 onClick={() => {
@@ -182,7 +183,7 @@ const Widget = ({
                 }}
               >
                 {iconHash['gear']}
-              </button>
+              </Button>
             )}
             <div className='widget-menu-item' onClick={deleteWidget}>
               <Icon display='close' base />
