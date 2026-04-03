@@ -20,8 +20,7 @@ type CalculateLeftYAxisWidthProps = {
 }
 
 const AXIS_LABEL_PADDING = 5
-const MIN_LEFT_AXIS_WIDTH = 16
-const DEFAULT_AXIS_LABEL_SPACE = 30
+const MIN_LEFT_AXIS_WIDTH = 0
 const MAX_LEFT_AXIS_WIDTH_RATIO = 0.45
 
 type TickValueProps = Omit<
@@ -54,7 +53,7 @@ const measureWidestLabel = (labels: string[], tickLabelFont: string) => {
 }
 
 const clampYAxisWidth = (calculatedWidth: number, parentWidth: number) => {
-  const maxAllowedWidth = Math.max(parentWidth * MAX_LEFT_AXIS_WIDTH_RATIO, MIN_LEFT_AXIS_WIDTH)
+  const maxAllowedWidth = parentWidth * MAX_LEFT_AXIS_WIDTH_RATIO
   return Math.max(MIN_LEFT_AXIS_WIDTH, Math.min(Math.ceil(calculatedWidth), maxAllowedWidth))
 }
 
@@ -94,7 +93,7 @@ const getHorizonChartWidth = ({
       ? config.runtime.seriesKeys
       : config.series?.map(series => series.dataKey) || []
   const labels = seriesKeys.map(seriesKey => String(config.runtime?.seriesLabels?.[seriesKey] || seriesKey))
-  const labelWidth = measureWidestLabel(labels, tickLabelFont)
+  const labelWidth = config.yAxis.hideLabel ? 0 : measureWidestLabel(labels, tickLabelFont)
   const calculatedWidth =
     labelWidth +
     DEFAULT_TICK_LENGTH +
@@ -114,11 +113,7 @@ const getHorizontalAxisWidth = ({
   tickLabelWidth: number
 }) => {
   const horizontalTickWidth = tickLabelWidth + DEFAULT_TICK_LENGTH + TICK_LABEL_MARGIN_RIGHT
-  return Math.max(
-    horizontalTickWidth + horizontalYAxisLabelSpace,
-    categoryLabelSpace + horizontalYAxisLabelSpace,
-    !config.yAxis.hideLabel && config.runtime.yAxis.label ? DEFAULT_AXIS_LABEL_SPACE : 0
-  )
+  return Math.max(horizontalTickWidth + horizontalYAxisLabelSpace, categoryLabelSpace + horizontalYAxisLabelSpace)
 }
 
 const getCategoricalAxisWidth = ({
@@ -128,7 +123,7 @@ const getCategoricalAxisWidth = ({
 }: Pick<CalculateLeftYAxisWidthProps, 'config' | 'tickLabelFont'> & {
   baseWidth: number
 }) => {
-  if (config.yAxis.type !== 'categorical' || config.orientation !== 'vertical') {
+  if (config.yAxis.type !== 'categorical' || config.orientation !== 'vertical' || config.yAxis.hideLabel) {
     return baseWidth
   }
 
@@ -162,16 +157,18 @@ export const calculateLeftYAxisWidth = ({
     inlineLabel,
     labelsAboveGridlines
   })
-  const tickLabelWidth = measureWidestLabel(formattedTicks, tickLabelFont)
+  const tickLabelWidth = config.yAxis.hideLabel ? 0 : measureWidestLabel(formattedTicks, tickLabelFont)
 
   const valueOnLinePadding = hideAxis
     ? Math.abs(VALUE_ON_LINE_PADDING_NO_AXIS)
     : Math.abs(VALUE_ON_LINE_PADDING_WITH_AXIS)
   const tickPadding = labelsAboveGridlines ? valueOnLinePadding : TICK_LABEL_MARGIN_RIGHT + DEFAULT_TICK_LENGTH
   const verticalAxisLabelSpace = getAxisLabelSpace(config, axisLabelFontSize)
+  const reservedTickLabelWidth = labelsAboveGridlines ? 0 : tickLabelWidth
+  const reservedTickPadding = labelsAboveGridlines || config.yAxis.hideLabel ? 0 : tickPadding
 
   const defaultCalculatedWidth =
-    tickLabelWidth + tickPadding + verticalAxisLabelSpace + Number(config.yAxis.axisPadding || 0)
+    reservedTickLabelWidth + reservedTickPadding + verticalAxisLabelSpace + Number(config.yAxis.axisPadding || 0)
 
   if (config.orientation === 'horizontal') {
     const calculatedWidth = getHorizontalAxisWidth({

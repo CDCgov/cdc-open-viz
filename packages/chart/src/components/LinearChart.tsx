@@ -301,18 +301,30 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     shouldAbbreviate
   })
 
-  // Calculate category label space for horizontal category axes
+  // Horizontal charts swap axes at runtime, but the left-side category label visibility
+  // still follows config.yAxis.hideLabel to match the actual axis renderers.
   const categoryLabelSpace = useMemo(() => {
+    if (config.yAxis.hideLabel) return 0
+
     return calculateHorizontalBarCategoryLabelWidth({
       yScale,
       chartWidth: parentWidth,
       formatDate,
       parseDate,
       tickLabelFont: GET_TEXT_WIDTH_FONT,
-      xAxisType: config.runtime.xAxis?.type,
+      xAxisType: runtime.xAxis?.type,
       labelPlacement: config.yAxis.labelPlacement
     })
-  }, [isHorizontal, config.visualizationType, config.yAxis.labelPlacement, yScale, parentWidth])
+  }, [
+    config.yAxis.hideLabel,
+    config.yAxis.labelPlacement,
+    yScale,
+    parentWidth,
+    formatDate,
+    parseDate,
+    GET_TEXT_WIDTH_FONT,
+    runtime.xAxis?.type
+  ])
 
   const horizontalYAxisLabelSpace = runtime.yAxis.label && !config.hideYAxisLabel ? 30 : 0
 
