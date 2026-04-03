@@ -24,8 +24,9 @@ const HoverLine: React.FC<HoverLineProps> = ({ tooltipData, xMax, yMax, point, o
   const showHorizontalHoverLine = horizontalHoverLine || (horizontalHoverLine && isScatterPlot)
 
   const getX = () => {
-    if (point.x > xMax + yAxisWidth) return xMax
     if (point.x < yAxisWidth) return yAxisWidth
+    if (xMax === undefined) return point.x
+    if (point.x > xMax + yAxisWidth) return xMax + yAxisWidth
     return point.x
   }
 

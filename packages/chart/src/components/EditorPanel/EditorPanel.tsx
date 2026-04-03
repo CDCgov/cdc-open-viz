@@ -726,7 +726,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   }, [config.visualizationType])
 
   const { hasRightAxis } = useRightAxis({ config: config, yMax: 0, data: config.data, updateConfig })
-  const usesDynamicLeftYAxisWidth = config.type === 'chart' && config.visualizationType !== 'Spark Line'
 
   const getItemStyle = (isDragging, draggableStyle) => ({
     ...draggableStyle
