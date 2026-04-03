@@ -178,7 +178,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const isDateTime = config.xAxis.type === 'date-time'
   const inlineLabelHasNoSpace = !inlineLabel?.includes(' ')
   const needsYAxisAutoPadding = inlineLabel && !inlineLabelHasNoSpace
-  const yLabelOffset = isNaN(parseInt(`${runtime.yAxis.labelOffset}`)) ? 0 : parseInt(`${runtime.yAxis.labelOffset}`)
   const tickLabelFontSize = isMobileFontViewport(vizViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
   const axisLabelFontSize = isMobileFontViewport(vizViewport) ? AXIS_LABEL_FONT_SIZE_SMALL : AXIS_LABEL_FONT_SIZE
   const GET_TEXT_WIDTH_FONT = `normal ${tickLabelFontSize}px Nunito, sans-serif`
@@ -616,7 +615,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               xMax={xMax}
               yAxisWidth={yAxisWidth}
               numTicks={handleNumTicks}
-              yLabelOffset={yLabelOffset}
               axisLabelFontSize={axisLabelFontSize}
             />
           )}
@@ -820,7 +818,6 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                 suffixWidth={suffixWidth}
                 horizontalYAxisLabelSpace={horizontalYAxisLabelSpace}
                 categoryLabelSpace={categoryLabelSpace}
-                yLabelOffset={yLabelOffset}
               />
             )}
           {config.yAxis.type === 'categorical' && config.orientation === 'vertical' && (

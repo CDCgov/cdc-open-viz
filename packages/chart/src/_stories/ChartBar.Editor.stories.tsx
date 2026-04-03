@@ -519,6 +519,7 @@ export const BarLeftValueAxisTests: Story = {
     const canvas = within(canvasElement)
     await waitForEditor(canvas)
     await openAccordion(canvas, 'Left Value Axis')
+    expect(canvas.queryByLabelText(/^label offset$/i)).toBeNull()
 
     // ============================================================================
     // TEST: Axis Type Dropdown
@@ -1171,6 +1172,7 @@ export const DateCategoryAxisSectionTests: StoryObj<typeof Chart> = {
 
     // Open the Date/Category Axis accordion section
     await openAccordion(canvas, 'Date/Category Axis')
+    expect(canvas.queryByLabelText(/^label offset$/i)).toBeNull()
 
     // ============================================================================
     // TEST: Data Scaling Type - Categorical to Date
