@@ -523,7 +523,7 @@ export default function CdcDashboard({
               classes={[`dashboard-title`, `${config.dashboard.theme ?? 'theme-blue'}`]}
             />
             {/* Description */}
-            {description && <div className='subtext mb-4'>{parse(description)}</div>}
+            {description && <div className='subtext cove-prose mb-4'>{parse(description)}</div>}
             {/* Visualizations */}
             {filteredRows?.map((row, index) => (
               <VisualizationRow

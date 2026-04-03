@@ -20,13 +20,13 @@ const Footnotes: React.FC<FootnotesProps> = ({ footnotes, footerClassName = 'mt-
   }
 
   return (
-    <footer className={`col-12 m-3 ${footerClassName} mb-0`}>
+    <footer className={`col-12 ${footerClassName}`}>
       <ul className='cove-footnotes'>
         {footnotes.map((note, i) => {
           return (
             <li key={`${note.symbol || 'footnote-'}${i}`} className='mb-1'>
               {note.symbol && <span className='me-1'>{note.symbol}</span>}
-              {processFootnoteText(note.text)}
+              <div className='cove-prose'>{processFootnoteText(note.text)}</div>
             </li>
           )
         })}

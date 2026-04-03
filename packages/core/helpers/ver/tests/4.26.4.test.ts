@@ -128,6 +128,76 @@ describe('update_4_26_4', () => {
     expect(result.contentEditor.style).toBe('default')
   })
 
+  it('backfills sourceType for standalone markup variables', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.3',
+      markupVariables: [
+        {
+          name: 'State',
+          tag: '{{state}}',
+          columnName: 'state',
+          conditions: []
+        },
+        {
+          name: 'Last Updated',
+          tag: '{{lastUpdated}}',
+          metadataKey: 'lastUpdated',
+          conditions: []
+        }
+      ]
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.markupVariables[0].sourceType).toBe('column')
+    expect(result.markupVariables[1].sourceType).toBe('metadata')
+    expect(config.markupVariables[0].sourceType).toBeUndefined()
+  })
+
+  it('preserves existing markup variable source types', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.3',
+      markupVariables: [
+        {
+          sourceType: 'icon',
+          name: 'Trend Up',
+          tag: '{{trend-arrow-up}}',
+          iconId: 'trend-arrow-up',
+          conditions: []
+        }
+      ]
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.markupVariables[0].sourceType).toBe('icon')
+  })
+
+  it('leaves null and undefined markup variables unchanged during sourceType backfill', () => {
+    const config: any = {
+      type: 'chart',
+      version: '4.26.3',
+      markupVariables: [
+        null,
+        undefined,
+        {
+          name: 'State',
+          tag: '{{state}}',
+          columnName: 'state',
+          conditions: []
+        }
+      ]
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.markupVariables[0]).toBeNull()
+    expect(result.markupVariables[1]).toBeUndefined()
+    expect(result.markupVariables[2].sourceType).toBe('column')
+  })
+
   it('does not mutate original chart config', () => {
     const config: any = {
       type: 'chart',
@@ -156,5 +226,155 @@ describe('update_4_26_4', () => {
 
     expect(config.contentEditor.style).toBeUndefined()
     expect(result.contentEditor.style).toBe('default')
+  })
+
+  it('overrides waffle mode configs with new value descriptor defaults', () => {
+    const config: any = {
+      type: 'waffle-chart',
+      visualizationType: 'Waffle',
+      valueDescription: 'out of',
+      showPercent: false,
+      showDenominator: true
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.valueDescription).toBe('')
+    expect(result.showPercent).toBe(true)
+    expect(result.showDenominator).toBe(false)
+    expect(result.version).toBe('4.26.4')
+  })
+
+  it('does not modify gauge mode waffle-chart configs', () => {
+    const config: any = {
+      type: 'waffle-chart',
+      visualizationType: 'Gauge',
+      valueDescription: 'out of',
+      showPercent: false,
+      showDenominator: true
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.valueDescription).toBe('out of')
+    expect(result.showPercent).toBe(false)
+    expect(result.showDenominator).toBe(true)
+  })
+
+  it('updates waffle visualizations but not gauge visualizations in mixed dashboards', () => {
+    const config: any = {
+      type: 'dashboard',
+      visualizations: {
+        waffle: {
+          type: 'waffle-chart',
+          visualizationType: 'Waffle',
+          valueDescription: 'legacy',
+          showPercent: false,
+          showDenominator: true
+        },
+        gauge: {
+          type: 'waffle-chart',
+          visualizationType: 'TP5 Gauge',
+          valueDescription: 'keep',
+          showPercent: false,
+          showDenominator: true
+        }
+      }
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.visualizations.waffle.valueDescription).toBe('')
+    expect(result.visualizations.waffle.showPercent).toBe(true)
+    expect(result.visualizations.waffle.showDenominator).toBe(false)
+
+    expect(result.visualizations.gauge.valueDescription).toBe('keep')
+    expect(result.visualizations.gauge.showPercent).toBe(false)
+    expect(result.visualizations.gauge.showDenominator).toBe(true)
+  })
+
+  it('leaves configs with missing or unexpected visualizationType unchanged', () => {
+    const missingTypeConfig: any = {
+      type: 'waffle-chart',
+      valueDescription: 'legacy',
+      showPercent: false,
+      showDenominator: true
+    }
+
+    const unexpectedTypeConfig: any = {
+      type: 'waffle-chart',
+      visualizationType: 'Unknown Mode',
+      valueDescription: 'legacy',
+      showPercent: false,
+      showDenominator: true
+    }
+
+    const missingTypeResult = update_4_26_4(missingTypeConfig)
+    const unexpectedTypeResult = update_4_26_4(unexpectedTypeConfig)
+
+    expect(missingTypeResult.valueDescription).toBe('legacy')
+    expect(missingTypeResult.showPercent).toBe(false)
+    expect(missingTypeResult.showDenominator).toBe(true)
+
+    expect(unexpectedTypeResult.valueDescription).toBe('legacy')
+    expect(unexpectedTypeResult.showPercent).toBe(false)
+    expect(unexpectedTypeResult.showDenominator).toBe(true)
+  })
+
+  it('recursively updates nested dashboard visualizations', () => {
+    const config: any = {
+      type: 'dashboard',
+      visualizations: {
+        nestedDashboard: {
+          type: 'dashboard',
+          visualizations: {
+            nestedWaffle: {
+              type: 'waffle-chart',
+              visualizationType: 'TP5 Waffle',
+              valueDescription: 'legacy',
+              showPercent: false,
+              showDenominator: true
+            }
+          }
+        }
+      }
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.visualizations.nestedDashboard.visualizations.nestedWaffle.valueDescription).toBe('')
+    expect(result.visualizations.nestedDashboard.visualizations.nestedWaffle.showPercent).toBe(true)
+    expect(result.visualizations.nestedDashboard.visualizations.nestedWaffle.showDenominator).toBe(false)
+  })
+
+  it('recursively backfills markup variable source types inside dashboards', () => {
+    const config: any = {
+      type: 'dashboard',
+      version: '4.26.3',
+      visualizations: {
+        nestedChart: {
+          type: 'chart',
+          markupVariables: [
+            {
+              name: 'State',
+              tag: '{{state}}',
+              columnName: 'state',
+              conditions: []
+            },
+            {
+              name: 'Source',
+              tag: '{{source}}',
+              metadataKey: 'source',
+              conditions: []
+            }
+          ]
+        }
+      }
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.visualizations.nestedChart.markupVariables[0].sourceType).toBe('column')
+    expect(result.visualizations.nestedChart.markupVariables[1].sourceType).toBe('metadata')
   })
 })

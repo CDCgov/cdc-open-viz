@@ -69,14 +69,14 @@
 // TODO after v2 refactor remove header reference colors
 // Use .font-color/.bg-color, etc. in color definitions or something similar
 // Remove box shadows if we're no longer using them
-&.cove-visualization.is-editor .sidebar+.cove-visualization__body {
+&.cove-visualization.is-editor .sidebar + .cove-visualization__body {
   margin: 3em auto 0 !important;
   max-width: 35em !important;
   background-color: var(--lightestGray);
   height: fit-content;
 }
 
-.sidebar+.cove-visualization__body .bite-content-container:not(.component--hide-background-color) {
+.sidebar + .cove-visualization__body .bite-content-container:not(.component--hide-background-color) {
   background-color: var(--lightestGray);
 }
 
@@ -88,15 +88,18 @@
     background: transparent;
   }
 
+  .cove-value-with-trend {
+    display: inline-flex;
+    align-items: baseline;
+  }
 
   &.bite__style--gradient {
     background: transparent !important;
   }
 
-  >.cove-visualization__body-wrap {
+  > .cove-visualization__body-wrap {
     @include cove-visualization-body-wrap-inline-padding;
   }
-
 
   // General: Bite Style > Graphic
   &.bite__style--graphic {
@@ -164,7 +167,7 @@
     background: none !important;
     container-type: inline-size;
 
-    >.cove-visualization__body-wrap {
+    > .cove-visualization__body-wrap {
       padding: 0 !important;
     }
 
@@ -186,25 +189,27 @@
     }
 
     .cdc-callout__body {
-      flex-wrap: nowrap;
-      gap: 0.5rem;
+      display: grid;
+      align-items: start;
+      column-gap: 0.5rem;
+      row-gap: 0.75rem;
       flex: auto;
     }
 
-    // Container query: wrap when width is less than 576px
+    .cdc-callout__body--content-right {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+
     @container (max-width: 576px) {
-      .cdc-callout__body {
-        flex-wrap: wrap;
+      .cdc-callout__body--content-right {
+        grid-template-columns: minmax(0, 1fr);
       }
     }
 
-    &.use-wrap .cdc-callout__body {
-      flex-wrap: wrap;
-
-      .cdc-callout__databite,
-      .cdc-callout__content {
-        flex-basis: 100%;
-      }
+    .cdc-callout__body--content-below,
+    .cdc-callout__body--trend-below {
+      grid-template-columns: minmax(0, 1fr);
+      flex-direction: column !important; // When forced to flex by dashboard TP5 equal-height context, preserve stacked layout
     }
 
     .cdc-callout__databite {
@@ -215,6 +220,57 @@
       font-size: 2rem;
     }
 
+    .cdc-callout__metric-block {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      min-width: 0;
+    }
+
+    .cdc-callout__value-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2em;
+      line-height: 1;
+      min-width: 0;
+    }
+
+    .cdc-callout__value {
+      display: inline-block;
+    }
+
+    .cdc-callout__trend-slot {
+      display: inline-flex;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .cdc-callout__trend-row {
+      margin-top: 0.2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      row-gap: 0.2rem;
+      min-width: 0;
+    }
+
+    .cdc-callout__trend-slot--below {
+      min-width: 0;
+    }
+
+    .cdc-callout__trend-footer-label {
+      color: var(--cool-gray-90, #1c1d1f);
+      font-family: var(--app-font-main);
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5rem;
+    }
+
+    .cdc-callout__body--content-below .cdc-callout__content-slot,
+    .cdc-callout__body--trend-below .cdc-callout__content-slot {
+      grid-column: 1;
+    }
+
     .cdc-callout__flag {
       position: absolute;
       top: -0.36rem;
@@ -222,7 +278,6 @@
       width: 1.84rem;
       height: auto;
     }
-
 
     .cdc-callout__content {
       row-gap: var(--cove-visualization-section-gap, 1.5rem);
@@ -238,7 +293,7 @@
       padding: 0 !important;
       background: white;
 
-      >.cove-visualization__body-wrap {
+      > .cove-visualization__body-wrap {
         padding: 0 !important;
       }
 
@@ -247,7 +302,6 @@
         background: transparent;
       }
     }
-
   }
 
   &.component--hide-background-color .bite .bite-content-container {
@@ -482,7 +536,6 @@
     &.bite--is-compact-style .bite-content-container {
       align-items: center;
     }
-
   }
 }
 

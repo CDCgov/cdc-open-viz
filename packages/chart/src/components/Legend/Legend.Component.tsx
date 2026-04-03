@@ -117,8 +117,8 @@ const Legend: React.FC<LegendProps> = forwardRef(
       >
         {(legend.label || legend.description) && (
           <div className={legend.description ? 'mb-3' : 'mb-2'}>
-            {legend.label && <h3 className='fw-bold'>{parse(legend.label)}</h3>}
-            {legend.description && <p className='mt-2'>{parse(legend.description)}</p>}
+            {legend.label && <h3 className='fw-bold cove-prose'>{parse(legend.label)}</h3>}
+            {legend.description && <p className='mt-2 cove-prose'>{parse(legend.description)}</p>}
           </div>
         )}
         <LegendGradient
@@ -242,7 +242,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                               </>
                             )}
                           </>
-                          <LegendLabel align='left' className='m-0'>
+                          <LegendLabel align='left' className='m-0 cove-prose'>
                             {parse(label.text)}
                           </LegendLabel>
                         </LegendItem>
@@ -361,7 +361,7 @@ const Legend: React.FC<LegendProps> = forwardRef(
                               />
                             </svg>
                           </span>
-                          <LegendLabel align='left' className='m-0'>
+                          <LegendLabel align='left' className='m-0 cove-prose'>
                             {parse(String((pattern as any)?.label || key))}
                           </LegendLabel>
                         </LegendItem>

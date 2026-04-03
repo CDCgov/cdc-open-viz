@@ -44,11 +44,11 @@ Use repo-local script commands for consistency (`yarn ...`) and avoid relying on
 For unit targeting, include the extra `--` after `yarn test-unit` so Yarn 1 forwards flags to Lerna.
 
 - Unit tests for one package/file:
-  - `yarn test-unit -- --scope @cdc/<package-name> -- src/.../<file>.test.<js|jsx|ts|tsx>`
-  - Example: `yarn test-unit -- --scope @cdc/dashboard -- src/test/CdcDashboardComponent.test.tsx`
+  - `yarn test-unit:quick -- --scope @cdc/<package-name> -- src/.../<file>.test.<js|jsx|ts|tsx>`
+  - Example: `yarn test-unit:quick -- --scope @cdc/dashboard -- src/test/CdcDashboardComponent.test.tsx`
 - Storybook tests for one story file:
-  - `yarn test-storybook packages/.../_stories/<file>.stories.<js|jsx|ts|tsx>`
-  - Example: `yarn test-storybook packages/chart/src/_stories/ChartEditor.stories.tsx`
+  - `yarn test-storybook:quick packages/.../_stories/<file>.stories.<js|jsx|ts|tsx>`
+  - Example: `yarn test-storybook:quick packages/chart/src/_stories/ChartEditor.stories.tsx`
 
 ### Quick Suites (For Broad Changes)
 

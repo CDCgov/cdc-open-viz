@@ -1,5 +1,6 @@
 import cloneConfig from '../cloneConfig'
 import { DashboardConfig } from '@cdc/dashboard/src/types/DashboardConfig'
+import { getMarkupVariableSourceType } from '../../types/MarkupVariable'
 
 const disableExtraChartVisualSettings = config => {
   if (config.type === 'chart') {
@@ -26,9 +27,45 @@ const addMarkupIncludeStyle = config => {
   }
 }
 
+const applyWaffleValueDescriptorDefaults = config => {
+  if (
+    config.type === 'waffle-chart' &&
+    (config.visualizationType === 'Waffle' || config.visualizationType === 'TP5 Waffle')
+  ) {
+    config.valueDescription = ''
+    config.showPercent = true
+    config.showDenominator = false
+  }
+
+  if (config.type === 'dashboard' && config.visualizations) {
+    Object.values((config as DashboardConfig).visualizations).forEach(visualization => {
+      applyWaffleValueDescriptorDefaults(visualization)
+    })
+  }
+}
+
+const applyMarkupVariableSourceTypes = config => {
+  if (!Array.isArray(config.markupVariables)) {
+    return
+  }
+
+  config.markupVariables = config.markupVariables.map(variable => {
+    if (!variable) {
+      return variable
+    }
+
+    return {
+      ...variable,
+      sourceType: getMarkupVariableSourceType(variable)
+    }
+  })
+}
+
 const run_4_26_4_migrations = config => {
   disableExtraChartVisualSettings(config)
   addMarkupIncludeStyle(config)
+  applyWaffleValueDescriptorDefaults(config)
+  applyMarkupVariableSourceTypes(config)
 
   if (config.type === 'dashboard' && config.visualizations) {
     Object.values((config as DashboardConfig).visualizations).forEach(visualization => {

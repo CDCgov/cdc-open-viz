@@ -2,6 +2,7 @@ import { useEffect, useCallback, useRef, useReducer, useMemo } from 'react'
 // external
 import DOMPurify from 'dompurify'
 import axios from 'axios'
+import parse from 'html-react-parser'
 
 // cdc
 import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
@@ -30,6 +31,7 @@ type CdcMarkupIncludeProps = {
   datasets: Datasets
   isDashboard: boolean
   isEditor: boolean
+  rawData?: any[]
   setConfig: any
   interactionLabel?: string
 }
@@ -45,6 +47,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   datasets,
   isDashboard = true,
   isEditor = false,
+  rawData,
   setConfig: setParentConfig,
   interactionLabel = 'no link provided'
 }) => {
@@ -76,6 +79,18 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   // Support markupVariables at root level or inside contentEditor
   const markupVariables = config?.markupVariables || contentEditorMarkupVariables || []
+  const editorData = useMemo(() => {
+    if (isDashboard && isEditor && Array.isArray(rawData) && rawData.length) {
+      return rawData
+    }
+
+    const assignedDatasetData = config?.dataKey ? datasets?.[config.dataKey]?.data : undefined
+    if (Array.isArray(assignedDatasetData) && assignedDatasetData.length) {
+      return assignedDatasetData
+    }
+
+    return data || []
+  }, [config?.dataKey, data, datasets, isDashboard, isEditor, rawData])
 
   const { inlineHTML, srcUrl, title, useInlineHTML, style: contentStyle } = contentEditor || {}
   const markupIncludeStyle = contentStyle || 'default'
@@ -281,8 +296,35 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const hideMarkupInclude = processedMarkup.shouldHideSection
   const _showNoDataMessage = processedMarkup.shouldShowNoDataMessage
 
+  const processedTitle = useMemo(() => {
+    if (!config?.enableMarkupVariables || !markupVariables?.length || !title) return title
+    return processMarkupVariables(title, data || [], markupVariables, {
+      isEditor,
+      showNoDataMessage,
+      allowHideSection,
+      filters: config?.filters || [],
+      datasets,
+      configDataKey: config?.dataKey,
+      locale: config?.locale,
+      dataMetadata: config?.dataMetadata
+    }).processedContent
+  }, [
+    title,
+    data,
+    markupVariables,
+    config?.enableMarkupVariables,
+    config?.filters,
+    config?.dataKey,
+    config?.locale,
+    config?.dataMetadata,
+    isEditor,
+    showNoDataMessage,
+    allowHideSection,
+    datasets
+  ])
+
   if (loading === false) {
-    const hasTp5Title = title && title.trim()
+    const hasTp5Title = processedTitle && processedTitle.trim()
     content = !hideMarkupInclude && (
       <VisualizationContent
         innerClassName={`markup-include-content-container ${innerContainerClasses.join(' ')}`.trim()}
@@ -308,7 +350,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         header={
           !isTp5Style ? (
             <Title
-              title={title}
+              title={processedTitle}
               isDashboard={isDashboard}
               titleStyle={contentEditor?.titleStyle}
               config={config}
@@ -332,8 +374,8 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         {isTp5Style ? (
           <div className='markup-include-tp5 cdc-callout d-flex flex-column h-100'>
             {hasTp5Title && (
-              <h3 className='cdc-callout__heading fw-bold flex-shrink-0 d-flex align-items-start'>
-                <span>{title.trim()}</span>
+              <h3 className='cdc-callout__heading cove-prose fw-bold flex-shrink-0 d-flex align-items-start'>
+                <span>{parse(processedTitle.trim())}</span>
               </h3>
             )}
             <div className='cdc-callout__body d-flex flex-row align-content-start flex-grow-1'>
@@ -346,7 +388,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
                 {!markupError && !_showNoDataMessage && (
                   <div id={scopeId}>
                     {scopedCSS && <style>{scopedCSS}</style>}
-                    <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
+                    <div className='cove-prose' dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
                   </div>
                 )}
                 {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
@@ -363,7 +405,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
             {!markupError && !_showNoDataMessage && (
               <div id={scopeId}>
                 {scopedCSS && <style>{scopedCSS}</style>}
-                <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
+                <div className='cove-prose' dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
               </div>
             )}
             {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
@@ -386,7 +428,9 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   return (
     <ErrorBoundary component='CdcMarkupInclude'>
-      <ConfigContext.Provider value={{ config, updateConfig, loading, data: data, setParentConfig, isDashboard }}>
+      <ConfigContext.Provider
+        value={{ config, updateConfig, loading, data: data, editorData, setParentConfig, isDashboard }}
+      >
         {!config?.newViz && config?.runtime && config?.runtime.editorErrorMessage && <Error />}
         <VisualizationContainer
           config={config as any}

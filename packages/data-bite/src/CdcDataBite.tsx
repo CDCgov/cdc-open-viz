@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useReducer } from 'react'
+import { useEffect, useCallback, useMemo, useReducer } from 'react'
 import { Fragment } from 'react'
 
 // contexts & initial state
@@ -12,6 +12,7 @@ import Title from '@cdc/core/components/ui/Title'
 import CircleCallout from './components/CircleCallout'
 import GradientBite from './components/GradientBite'
 import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
+import TrendArrow from '@cdc/core/components/ui/TrendArrow'
 
 // external
 import ResizeObserver from 'resize-observer-polyfill'
@@ -30,6 +31,7 @@ import useDataVizClasses from '@cdc/core/helpers/useDataVizClasses'
 import cacheBustingString from '@cdc/core/helpers/cacheBustingString'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
+import { aggregateByDataFunction } from '@cdc/core/helpers/dataAggregation'
 import { Config } from './types/Config'
 import dataBiteReducer from './store/db.reducer'
 import { IMAGE_POSITION_LEFT, IMAGE_POSITION_RIGHT, IMAGE_POSITION_TOP, IMAGE_POSITION_BOTTOM } from './constants'
@@ -48,6 +50,14 @@ import {
   DATA_FUNCTION_RANGE,
   DATA_FUNCTION_SUM
 } from '@cdc/core/helpers/constants'
+import {
+  resolveTrendIndicator,
+  TREND_ARROW_DOWN,
+  TREND_ARROW_NO_CHANGE,
+  TREND_ARROW_UP,
+  TREND_MODE_CATEGORICAL,
+  TREND_MODE_NUMERIC
+} from '@cdc/core/helpers/trendIndicator'
 
 // styles
 import './scss/main.scss'
@@ -57,6 +67,7 @@ type CdcDataBiteProps = {
   configUrl: string
   isDashboard: boolean
   isEditor: boolean
+  rawData?: Record<string, any>[]
   setConfig: () => {}
   link: any
   interactionLabel: string
@@ -68,6 +79,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     config: configObj,
     isDashboard = false,
     isEditor = false,
+    rawData = [],
     setConfig: setParentConfig,
     link,
     interactionLabel = ''
@@ -125,6 +137,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     biteStyle,
     filters,
     subtext,
+    trendIndicator,
     markupVariables,
     enableMarkupVariables
   } = config
@@ -225,6 +238,100 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     return result.processedContent
   }
 
+  const getFilteredDataRows = useCallback(() => {
+    let filteredDataRows = Array.isArray(config.data) ? config.data : []
+
+    ;(filters || []).forEach(filter => {
+      if (filter.columnName && filter.columnValue) {
+        filteredDataRows = filteredDataRows.filter(row => row[filter.columnName] === filter.columnValue)
+      }
+    })
+
+    return filteredDataRows
+  }, [config.data, filters])
+
+  const getRowsForMainNumericCalculation = useCallback(() => {
+    const filteredDataRows = getFilteredDataRows()
+    const allRows = Array.isArray(config.data) ? config.data : []
+    return filteredDataRows.length ? filteredDataRows : allRows
+  }, [config.data, getFilteredDataRows])
+
+  const trendResolution = useMemo(() => {
+    const mode = trendIndicator?.mode
+    const shouldUseMainCalculationRows =
+      mode === TREND_MODE_NUMERIC || (mode === TREND_MODE_CATEGORICAL && dataFunction === DATA_FUNCTION_PASSTHROUGH)
+    const trendDataRows = shouldUseMainCalculationRows ? getRowsForMainNumericCalculation() : getFilteredDataRows()
+
+    return resolveTrendIndicator({
+      data: trendDataRows,
+      trendIndicator,
+      mainDataFunction: dataFunction,
+      mainDataColumn: dataColumn,
+      allowNumericMode: true
+    })
+  }, [trendIndicator, dataFunction, dataColumn, getRowsForMainNumericCalculation, getFilteredDataRows])
+
+  const resolvedTrendLabel = useMemo(() => {
+    if (trendResolution.state !== 'resolved' || !trendResolution.arrowType) {
+      return ''
+    }
+
+    const label =
+      trendResolution.arrowType === TREND_ARROW_UP
+        ? trendIndicator?.upLabel
+        : trendResolution.arrowType === TREND_ARROW_DOWN
+        ? trendIndicator?.downLabel
+        : trendResolution.arrowType === TREND_ARROW_NO_CHANGE
+        ? trendIndicator?.noChangeLabel
+        : ''
+
+    const raw = typeof label === 'string' ? label.trim() : ''
+    return raw ? processContentWithMarkup(raw) : ''
+  }, [
+    trendIndicator?.downLabel,
+    trendIndicator?.noChangeLabel,
+    trendIndicator?.upLabel,
+    trendResolution.arrowType,
+    trendResolution.state,
+    enableMarkupVariables,
+    markupVariables,
+    config.data,
+    config.filters,
+    config.locale,
+    config.dataMetadata
+  ])
+  const resolvedTrendFooterLabel = useMemo(() => {
+    const raw = typeof trendIndicator?.trendLabel === 'string' ? trendIndicator.trendLabel.trim() : ''
+    return raw ? processContentWithMarkup(raw) : ''
+  }, [
+    trendIndicator?.trendLabel,
+    enableMarkupVariables,
+    markupVariables,
+    config.data,
+    config.filters,
+    config.locale,
+    config.dataMetadata
+  ])
+
+  const renderTrendArrow = ({ wrapperClassName = '' } = {}) => {
+    if (trendResolution.state !== 'resolved' || !trendResolution.arrowType) {
+      return null
+    }
+    const ariaLabel = `Trend ${trendResolution.arrowType}${resolvedTrendLabel ? `: ${resolvedTrendLabel}` : ''}`
+    const resolvedWrapperClassName = [wrapperClassName, resolvedTrendLabel ? 'cove-trend-arrow__wrap--with-label' : '']
+      .filter(Boolean)
+      .join(' ')
+
+    return (
+      <TrendArrow
+        arrowType={trendResolution.arrowType}
+        label={resolvedTrendLabel}
+        ariaLabel={ariaLabel}
+        wrapperClassName={resolvedWrapperClassName}
+      />
+    )
+  }
+
   const calculateDataBite = (includePrefixSuffix = true) => {
     //If either the column or function aren't set, do not calculate
     if (!dataColumn || !dataFunction) {
@@ -255,94 +362,6 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       return String(result)
     }
 
-    // filter null and 0 out from count data
-    const getColumnCount = arr => {
-      if (config.dataFormat.ignoreZeros) {
-        numericalData = numericalData.filter(item => item && item)
-        return numericalData.length
-      } else {
-        return numericalData.length
-      }
-    }
-
-    const getColumnSum = arr => {
-      // first validation
-      if (arr === undefined || arr === null) {
-        console.error('Enter valid value for getColumnSum function ')
-        return
-      }
-      // second validation
-      if (arr.length === 0 || !Array.isArray(arr)) {
-        console.error('Arguments are not valid getColumnSum function ')
-        return
-      }
-      let sum = 0
-      if (arr.length > 1) {
-        /// first convert each element to number then add using reduce method to escape string concatination.
-        sum = arr.map(el => Number(el)).reduce((sum, x) => sum + x)
-      } else {
-        sum = Number(arr[0])
-      }
-      return applyPrecision(sum)
-    }
-
-    const getColumnMean = arr => {
-      // add default params to escape errors on runtime
-      // first validation
-      if (arr === undefined || arr === null || !Array.isArray(arr)) {
-        console.error('Enter valid parameter getColumnMean function')
-        return
-      }
-
-      if (config.dataFormat.ignoreZeros) {
-        arr = arr.filter(num => num !== 0)
-      }
-
-      let mean = 0
-      if (arr.length > 1) {
-        /// first convert each element to number then add using reduce method to escape string concatination.
-        mean = arr.map(el => Number(el)).reduce((a, b) => a + b) / arr.length
-      } else {
-        mean = Number(arr[0])
-      }
-      return applyPrecision(mean)
-    }
-
-    const getMode = (arr = []) => {
-      // add default params to escape errors on runtime
-      // this function accepts any array and returns array of strings
-      let freq = {}
-      let max = -Infinity
-
-      for (let i = 0; i < arr.length; i++) {
-        if (freq[arr[i]]) {
-          freq[arr[i]] += 1
-        } else {
-          freq[arr[i]] = 1
-        }
-
-        if (freq[arr[i]] > max) {
-          max = freq[arr[i]]
-        }
-      }
-
-      let res = []
-
-      for (let key in freq) {
-        if (freq[key] === max) res.push(key)
-      }
-
-      return res
-    }
-
-    const getMedian = arr => {
-      if (!arr.length) return
-      const mid = Math.floor(arr.length / 2),
-        nums = [...arr].sort((a, b) => a - b)
-      const value = arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2
-      return applyPrecision(value)
-    }
-
     const applyLocaleString = value => {
       if (value === undefined || value === null) return
       if (Number.isNaN(value) || typeof value === 'number') {
@@ -363,18 +382,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
     let dataBite = ''
 
-    //Optionally filter the data based on the user's filter
-    let filteredData = config.data
-
-    filters.map(filter => {
-      if (filter.columnName && filter.columnValue) {
-        return (filteredData = filteredData.filter(function (e) {
-          return e[filter.columnName] === filter.columnValue
-        }))
-      } else {
-        return false
-      }
-    })
+    const filteredData = getFilteredDataRows()
 
     if (dataFunction === DATA_FUNCTION_PASSTHROUGH) {
       const sourceData = filteredData.length ? filteredData : config.data
@@ -407,44 +415,51 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     }
 
     switch (dataFunction) {
-      case DATA_FUNCTION_COUNT:
-        dataBite = getColumnCount(numericalData)
+      case DATA_FUNCTION_COUNT: {
+        const countValues = config.dataFormat.ignoreZeros ? numericalData.filter(item => item && item) : numericalData
+        const countResult = aggregateByDataFunction(countValues, DATA_FUNCTION_COUNT)
+        dataBite = String(countResult)
         break
+      }
       case DATA_FUNCTION_SUM:
-        dataBite = getColumnSum(numericalData)
-        break
-      case DATA_FUNCTION_MEAN:
-        dataBite = getColumnMean(numericalData)
-        break
       case DATA_FUNCTION_MEDIAN:
-        dataBite = getMedian(numericalData)
-        break
       case DATA_FUNCTION_MAX:
-        dataBite = Math.max(...numericalData)
+      case DATA_FUNCTION_MIN: {
+        const aggregateResult = aggregateByDataFunction(numericalData, dataFunction)
+        dataBite = String(aggregateResult)
         break
-      case DATA_FUNCTION_MIN:
-        dataBite = Math.min(...numericalData)
+      }
+      case DATA_FUNCTION_MEAN: {
+        const meanValues = config.dataFormat.ignoreZeros ? numericalData.filter(num => num !== 0) : numericalData
+        const meanResult = aggregateByDataFunction(meanValues, DATA_FUNCTION_MEAN)
+        dataBite = String(meanResult)
         break
-      case DATA_FUNCTION_MODE:
-        dataBite = getMode(numericalData).join('')
+      }
+      case DATA_FUNCTION_MODE: {
+        const modeValues = aggregateByDataFunction(numericalData, DATA_FUNCTION_MODE)
+        dataBite = Array.isArray(modeValues) ? modeValues.join('') : String(modeValues)
         break
+      }
       case DATA_FUNCTION_RANGE:
-        let rangeMin = Math.min(...numericalData)
-        let rangeMax = Math.max(...numericalData)
-        rangeMin = applyPrecision(rangeMin)
-        rangeMax = applyPrecision(rangeMax)
-        if (config.dataFormat.commas) {
-          rangeMin = applyLocaleString(rangeMin)
-          rangeMax = applyLocaleString(rangeMax)
+        const rangeValues = aggregateByDataFunction(numericalData, DATA_FUNCTION_RANGE)
+        if (Array.isArray(rangeValues) && rangeValues.length === 2) {
+          let rangeMin = applyPrecision(rangeValues[0])
+          let rangeMax = applyPrecision(rangeValues[1])
+          if (config.dataFormat.commas) {
+            rangeMin = applyLocaleString(rangeMin)
+            rangeMax = applyLocaleString(rangeMax)
+          }
+          dataBite =
+            config.dataFormat.prefix +
+            rangeMin +
+            config.dataFormat.suffix +
+            ' - ' +
+            config.dataFormat.prefix +
+            rangeMax +
+            config.dataFormat.suffix
+        } else {
+          dataBite = String(rangeValues)
         }
-        dataBite =
-          config.dataFormat.prefix +
-          rangeMin +
-          config.dataFormat.suffix +
-          ' - ' +
-          config.dataFormat.prefix +
-          rangeMax +
-          config.dataFormat.suffix
         break
       default:
         console.warn('Data bite function not recognized: ' + dataFunction) // eslint-disable-line no-console
@@ -496,7 +511,9 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
   let body = <Loading />
   const isCompactStyle = config.general?.isCompactStyle ?? false
   const bodySubtext =
-    subtext && !isCompactStyle ? <p className='bite-subtext mt-0'>{parse(processContentWithMarkup(subtext))}</p> : null
+    subtext && !isCompactStyle ? (
+      <p className='bite-subtext cove-prose mt-0'>{parse(processContentWithMarkup(subtext))}</p>
+    ) : null
 
   const DataImage = useCallback(() => {
     let operators = {
@@ -649,6 +666,17 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
     const showBite = undefined !== dataColumn && undefined !== dataFunction
     const isTp5 = showBite && biteStyle === 'tp5'
+    const hasTrendArrow = trendResolution.state === 'resolved' && !!trendResolution.arrowType
+    const shouldUseTrendBelow = Boolean(hasTrendArrow && (resolvedTrendLabel || resolvedTrendFooterLabel))
+    const shouldUseContentBelow = Boolean(config.visual?.useWrap || shouldUseTrendBelow)
+    const tp5BodyLayoutClasses = [
+      'cdc-callout__body',
+      'flex-grow-1',
+      shouldUseContentBelow ? 'cdc-callout__body--content-below' : 'cdc-callout__body--content-right',
+      shouldUseTrendBelow ? 'cdc-callout__body--trend-below' : 'cdc-callout__body--trend-inline'
+    ]
+      .filter(Boolean)
+      .join(' ')
     const bodyClasses = [
       ...innerContainerClasses,
       ...contentClasses,
@@ -691,13 +719,38 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
               )}
 
               {config.visual?.showTitle && title && title.trim() && (
-                <h3 className='cdc-callout__heading fw-bold flex-shrink-0 d-flex align-items-start'>
+                <h3 className='cdc-callout__heading cove-prose fw-bold flex-shrink-0 d-flex align-items-start'>
                   <span>{parse(processContentWithMarkup(title))}</span>
                 </h3>
               )}
-              <div className='cdc-callout__body d-flex flex-row align-content-start flex-grow-1'>
-                {showBite && <div className='cdc-callout__databite flex-shrink-0  me-3'>{calculateDataBite(true)}</div>}
-                <div className='cdc-callout__content flex-grow-1 d-flex flex-column  min-w-0'>
+              <div className={tp5BodyLayoutClasses}>
+                {showBite && (
+                  <div className='cdc-callout__databite cdc-callout__metric-block flex-shrink-0'>
+                    <div className='cdc-callout__value-row'>
+                      <span className='cdc-callout__value'>{calculateDataBite(true)}</span>
+                      {!shouldUseTrendBelow && hasTrendArrow && (
+                        <span className='cdc-callout__trend-slot cdc-callout__trend-slot--inline'>
+                          {renderTrendArrow({
+                            wrapperClassName: 'cove-trend-arrow__wrap--inline'
+                          })}
+                        </span>
+                      )}
+                    </div>
+                    {shouldUseTrendBelow && hasTrendArrow && (
+                      <div className='cdc-callout__trend-row'>
+                        <span className='cdc-callout__trend-slot cdc-callout__trend-slot--below'>
+                          {renderTrendArrow({
+                            wrapperClassName: 'cove-trend-arrow__wrap--below'
+                          })}
+                        </span>
+                        {resolvedTrendFooterLabel && (
+                          <span className='cdc-callout__trend-footer-label'>{resolvedTrendFooterLabel}</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+                <div className='cdc-callout__content cove-prose cdc-callout__content-slot flex-grow-1 d-flex flex-column min-w-0'>
                   <p className='mb-0'>{parse(processContentWithMarkup(biteBody))}</p>
                   {subtext && !isCompactStyle && (
                     <p className='bite-subtext fst-italic flex-shrink-0'>{parse(processContentWithMarkup(subtext))}</p>
@@ -724,22 +777,28 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
                     </div>
                   )}
                   {showBite && 'split' === biteStyle && (
-                    <div className='bite-value' style={{ fontSize: biteFontSize + 'px' }}>
+                    <div className='bite-value cove-value-with-trend' style={{ fontSize: biteFontSize + 'px' }}>
                       {calculateDataBite()}
                     </div>
                   )}
                   <Fragment>
-                    <div className='bite-content__text-wrap'>
+                    <div className='bite-content__text-wrap cove-prose'>
                       <p className='bite-text'>
                         {showBite && 'body' === biteStyle && (
-                          <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
+                          <span
+                            className='bite-value data-bite-body cove-value-with-trend'
+                            style={{ fontSize: biteFontSize + 'px' }}
+                          >
                             {calculateDataBite()}
                           </span>
                         )}
                         {parse(processContentWithMarkup(biteBody))}
                       </p>
                       {showBite && 'end' === biteStyle && (
-                        <span className='bite-value data-bite-body' style={{ fontSize: biteFontSize + 'px' }}>
+                        <span
+                          className='bite-value data-bite-body cove-value-with-trend'
+                          style={{ fontSize: biteFontSize + 'px' }}
+                        >
                           {calculateDataBite()}
                         </span>
                       )}
@@ -766,7 +825,16 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
 
   return (
     <Context.Provider
-      value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, isEditor }}
+      value={{
+        config,
+        updateConfig,
+        loading,
+        data: config.data,
+        editorData: isDashboard && isEditor && Array.isArray(rawData) && rawData.length ? rawData : config.data,
+        setParentConfig,
+        isDashboard,
+        isEditor
+      }}
     >
       {biteStyle !== 'gradient' && (
         <VisualizationContainer

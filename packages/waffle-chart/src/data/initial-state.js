@@ -4,8 +4,8 @@ export default {
   visualizationType: 'Waffle',
   visualizationSubType: 'linear',
   showPercent: true,
-  showDenominator: true,
-  valueDescription: 'out of',
+  showDenominator: false,
+  valueDescription: '',
   content: '',
   subtext: '',
   orientation: 'horizontal',
@@ -38,6 +38,7 @@ export default {
     border: true,
     accent: false,
     background: false,
+    useWrap: false,
     hideBackgroundColor: false,
     borderColorTheme: false,
     colors: {
@@ -53,6 +54,17 @@ export default {
       'theme-green': '#4b830d',
       'theme-amber': '#fbab18'
     }
+  },
+  trendIndicator: {
+    mode: null,
+    column: '',
+    numericThreshold: 0,
+    mappings: [],
+    showNoChangeArrows: false,
+    upLabel: '',
+    downLabel: '',
+    noChangeLabel: '',
+    trendLabel: ''
   },
   markupVariables: [],
   enableMarkupVariables: false

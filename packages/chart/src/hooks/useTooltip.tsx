@@ -720,7 +720,7 @@ export const useTooltip = props => {
     const displayText = activeLabel ? `${activeLabel}: ${newValue}` : newValue
 
     return (
-      <li style={style} className='tooltip-body mb-1'>
+      <li style={style} className='tooltip-body mb-1 cove-prose'>
         {displayText !== undefined ? parse(String(displayText)) : displayText}
       </li>
     )

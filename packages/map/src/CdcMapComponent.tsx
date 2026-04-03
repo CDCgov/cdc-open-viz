@@ -498,7 +498,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     />
                   ) : undefined
                 }
-                bodySubtext={processedSubtext.length > 0 ? <p className='subtext'>{parse(processedSubtext)}</p> : null}
+                bodySubtext={
+                  processedSubtext.length > 0 ? <p className='subtext cove-prose'>{parse(processedSubtext)}</p> : null
+                }
                 bodyFooter={
                   <>
                     {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink
@@ -569,13 +571,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     {config.annotations?.length > 0 && <Annotation.Dropdown />}
 
                     {processedFootnotes && (
-                      <section className='footnotes pt-2 mt-4'>{parse(processedFootnotes)}</section>
+                      <section className='footnotes cove-prose pt-2 mt-4'>{parse(processedFootnotes)}</section>
                     )}
                   </>
                 }
                 header={isTp5Treatment ? null : mapTitle}
                 messageIsIntroText={!!processedIntroText}
-                message={processedIntroText ? parse(processedIntroText) : null}
+                message={processedIntroText ? <div className='cove-prose'>{parse(processedIntroText)}</div> : null}
               >
                 <>
                   {isTp5Treatment && <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />}

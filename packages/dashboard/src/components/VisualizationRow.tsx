@@ -404,6 +404,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                 <CdcDataBite
                   key={col.widget}
                   config={visualizationConfig}
+                  rawData={rawData?.[visualizationConfig.dataKey] || []}
                   setConfig={newConfig => {
                     updateChildConfig(col.widget, newConfig)
                   }}
@@ -416,6 +417,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                 <CdcWaffleChart
                   key={col.widget}
                   config={visualizationConfig}
+                  rawData={rawData?.[visualizationConfig.dataKey] || []}
                   setConfig={newConfig => {
                     updateChildConfig(col.widget, newConfig)
                   }}
