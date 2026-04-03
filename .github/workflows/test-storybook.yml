@@ -8,13 +8,15 @@ on:
 jobs:
   storybook-tests:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: yarn
@@ -23,7 +25,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build Packages
-        run: lerna run build
+        run: yarn build
 
       - name: Install Playwright with dependencies
         run: npx playwright install chromium --with-deps

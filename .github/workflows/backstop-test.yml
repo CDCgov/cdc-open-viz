@@ -6,14 +6,16 @@ on:
 jobs:
   backstop-tests:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     timeout-minutes: 60
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: yarn
@@ -22,7 +24,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build packages
-        run: lerna run build
+        run: yarn build
 
       - name: Start Storybook
         run: yarn storybook -p 6006 &
