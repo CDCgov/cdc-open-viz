@@ -1,0 +1,236 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": []
+  },
+  "rows": [
+    {
+      "uuid": "__​undefined__",
+      "toggle": "__​undefined__",
+      "equalHeight": "__​undefined__",
+      "columns": [
+        {
+          "width": 12,
+          "widget": "map1765464578529"
+        },
+        {},
+        {}
+      ]
+    }
+  ],
+  "visualizations": {
+    "map1765464578529": {
+      "annotations": [],
+      "general": {
+        "navigationTarget": "_self",
+        "noDataMessage": "No State Selected",
+        "annotationDropdownText": "Annotations",
+        "geoBorderColor": "darkGray",
+        "headerColor": "theme-blue",
+        "title": "",
+        "showTitle": true,
+        "showSidebar": true,
+        "showDownloadMediaButton": false,
+        "displayAsHex": false,
+        "displayStateLabels": true,
+        "territoriesAlwaysShow": false,
+        "language": "en",
+        "geoType": "us-county",
+        "geoLabelOverride": "",
+        "hasRegions": false,
+        "fullBorder": false,
+        "type": "data",
+        "convertFipsCodes": true,
+        "palette": {
+          "isReversed": true,
+          "name": "sequential_bluereverse",
+          "version": "2.0"
+        },
+        "allowMapZoom": true,
+        "hideGeoColumnInTooltip": false,
+        "hidePrimaryColumnInTooltip": false,
+        "statesPicked": []
+      },
+      "type": "map",
+      "columns": {
+        "geo": {
+          "name": "fips",
+          "label": "Location",
+          "tooltip": false,
+          "dataTable": true
+        },
+        "primary": {
+          "dataTable": true,
+          "tooltip": true,
+          "prefix": "",
+          "suffix": "",
+          "name": "category",
+          "label": "category",
+          "roundToPlace": 0
+        },
+        "navigate": {
+          "name": ""
+        },
+        "latitude": {
+          "name": ""
+        },
+        "longitude": {
+          "name": ""
+        }
+      },
+      "legend": {
+        "descriptions": {},
+        "specialClasses": [],
+        "unified": false,
+        "singleColumn": false,
+        "singleRow": false,
+        "verticalSorted": false,
+        "showSpecialClassesLast": false,
+        "dynamicDescription": false,
+        "numberOfItems": 3,
+        "position": "side",
+        "title": "",
+        "style": "circles",
+        "subStyle": "linear blocks",
+        "tickRotation": "",
+        "type": "category",
+        "singleColumnLegend": false,
+        "hideBorder": false,
+        "groupBy": ""
+      },
+      "filters": [],
+      "table": {
+        "wrapColumns": false,
+        "label": "Data Table",
+        "expanded": false,
+        "limitHeight": false,
+        "height": "",
+        "caption": "",
+        "showDownloadUrl": false,
+        "showDataTableLink": true,
+        "showDownloadLinkBelow": true,
+        "showFullGeoNameInCSV": false,
+        "forceDisplay": true,
+        "download": false,
+        "indexLabel": "",
+        "cellMinWidth": "0",
+        "collapsible": true
+      },
+      "tooltips": {
+        "appearanceType": "hover",
+        "linkLabel": "Learn More",
+        "opacity": 90
+      },
+      "visual": {
+        "minBubbleSize": 1,
+        "maxBubbleSize": 20,
+        "extraBubbleBorder": false,
+        "cityStyle": "circle",
+        "cityStyleLabel": "",
+        "showBubbleZeros": false,
+        "additionalCityStyles": [],
+        "geoCodeCircleSize": 8
+      },
+      "mapPosition": {
+        "coordinates": [0, 30],
+        "zoom": 1
+      },
+      "map": {
+        "layers": [],
+        "patterns": []
+      },
+      "hexMap": {
+        "type": "",
+        "shapeGroups": [
+          {
+            "legendTitle": "",
+            "legendDescription": "",
+            "items": [
+              {
+                "key": "",
+                "shape": "Arrow Up",
+                "column": "",
+                "operator": "=",
+                "value": ""
+              }
+            ]
+          }
+        ]
+      },
+      "filterBehavior": "Filter Change",
+      "filterIntro": "",
+      "smallMultiples": {
+        "mode": "",
+        "tileColumn": "",
+        "tilesPerRowDesktop": 2,
+        "tilesPerRowMobile": 1,
+        "tileOrderType": "asc",
+        "tileOrder": [],
+        "tileTitles": {},
+        "synchronizedTooltips": true
+      },
+      "markupVariables": [],
+      "enableMarkupVariables": false,
+      "openModal": true,
+      "uid": "map1765464578529",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "dataKey": "rt_estimates_map",
+      "showEditorPanel": true
+    }
+  },
+  "table": {
+    "label": "Data Table",
+    "show": true,
+    "showDownloadUrl": false,
+    "showDownloadLinkBelow": true,
+    "showVertical": true
+  },
+  "id": 15,
+  "category": "General",
+  "label": "Dashboard",
+  "type": "dashboard",
+  "subType": null,
+  "orientation": null,
+  "icon": {
+    "type": {},
+    "key": null,
+    "ref": null,
+    "props": {},
+    "_owner": null,
+    "_store": {}
+  },
+  "content": "Present multiple data visualizations with shared filter controls.",
+  "newViz": true,
+  "visualizationType": null,
+  "activeVizButtonID": 15,
+  "runtime": {},
+  "version": "4.25.11",
+  "migrations": {
+    "addColorMigration": true
+  },
+  "general": {
+    "palette": {
+      "version": "1.0",
+      "backups": [
+        {
+          "name": "__​undefined__",
+          "version": "1.0",
+          "isReversed": "__​undefined__"
+        }
+      ]
+    }
+  },
+  "datasets": {
+    "rt_estimates_map": {
+      "dataFileSize": 1780203,
+      "dataFileName": "https://cfa-public.apps.ecpaas-dev.cdc.gov/od-public?$datakey=rt_estimates_map&disease=%22COVID-19%22&$limit=5000",
+      "dataFileSourceType": "url",
+      "dataFileFormat": "JSON",
+      "preview": true,
+      "dataUrl": "https://cfa-public.apps.ecpaas-dev.cdc.gov/od-public?$datakey=rt_estimates_map&disease=%22COVID-19%22&$limit=5000"
+    }
+  }
+}

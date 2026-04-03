@@ -114,6 +114,9 @@ const Visualization = forwardRef<HTMLDivElement, VisualizationWrapper>((props, r
         if (config.visual?.whiteBackground) {
           classes.push('white-background-style')
         }
+        if (config.visual?.useWrap) {
+          classes.push('use-wrap')
+        }
       }
 
       return classes

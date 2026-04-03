@@ -3,7 +3,6 @@
 // Let core styles handle color palette
 
 .cove-visualization.type-waffle-chart {
-
   .cove-waffle-chart__subtext.subtext,
   .cove-waffle-chart__subtext.subtext.fst-italic {
     line-height: var(--visualization-body-line-height);
@@ -11,6 +10,53 @@
 
   .cove-visualization__body {
     @include cove-visualization-body-padding;
+  }
+
+  .cove-value-with-trend {
+    display: inline-flex;
+    align-items: baseline;
+  }
+
+  .cove-waffle-chart__value-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  .cove-waffle-chart__value-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2em;
+    line-height: 1;
+    min-width: 0;
+  }
+
+  .cove-waffle-chart__trend-slot {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .cove-waffle-chart__trend-row {
+    margin-top: 0.2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    row-gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .cove-waffle-chart__value-block .cove-trend-arrow__label {
+    line-height: 1;
+  }
+
+  .cove-waffle-chart__trend-footer-label {
+    color: var(--cool-gray-90, #1c1d1f);
+    font-family: var(--app-font-main);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5rem;
   }
 
   .cove-gauge-chart {
@@ -23,7 +69,7 @@
       justify-items: center;
       align-items: flex-start;
 
-      &>svg {
+      & > svg {
         margin: 0.7em 0;
       }
     }
@@ -96,7 +142,6 @@
 }
 
 @at-root {
-
   .cove-waffle-chart.font-small,
   .cove-gauge-chart.font-small #{&} {
     .cove-waffle-chart__data--primary {
@@ -134,7 +179,6 @@
 // TP5 Style for Waffle Chart
 .type-waffle-chart {
   &.waffle__style--tp5 {
-
     .cove-visualization__body,
     .cove-visualization__body.component--has-legacy-border,
     .cove-visualization__body.component--has-border-color-theme,
@@ -144,7 +188,7 @@
       background: none !important;
       container-type: inline-size;
 
-      >.cove-visualization__body-wrap {
+      > .cove-visualization__body-wrap {
         padding: 0 !important;
       }
     }
@@ -229,7 +273,6 @@
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
-
       .cove-visualization__body,
       .cove-visualization__body.component--has-legacy-border,
       .cove-visualization__body.component--has-border-color-theme,
@@ -238,7 +281,7 @@
         padding: 0 !important;
         background: white !important;
 
-        >.cove-visualization__body-wrap {
+        > .cove-visualization__body-wrap {
           padding: 0 !important;
         }
       }
@@ -253,7 +296,6 @@
 
   // TP5 Style for Gauge Chart
   &.gauge__style--tp5 {
-
     .cove-visualization__body,
     .cove-visualization__body.component--has-legacy-border,
     .cove-visualization__body.component--has-border-color-theme,
@@ -263,7 +305,7 @@
       background: none !important;
       container-type: inline-size;
 
-      >.cove-visualization__body-wrap {
+      > .cove-visualization__body-wrap {
         padding: 0 !important;
       }
     }
@@ -301,7 +343,7 @@
       width: 100%;
     }
 
-    .cove-gauge-chart__chart>svg {
+    .cove-gauge-chart__chart > svg {
       display: block;
       width: 100%;
     }
@@ -338,6 +380,17 @@
       min-height: 1rem; // Ensure minimum height even when empty
     }
 
+    &.use-wrap {
+      .cove-gauge-chart__body {
+        flex-wrap: wrap;
+      }
+
+      .cove-gauge-chart__value-section,
+      .cove-gauge-chart__content {
+        flex-basis: 100%;
+      }
+    }
+
     .cove-waffle-chart__data--primary {
       font-size: 2rem;
       color: var(--colors-cyan-60v);
@@ -357,7 +410,6 @@
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
-
       .cove-visualization__body,
       .cove-visualization__body.component--has-legacy-border,
       .cove-visualization__body.component--has-border-color-theme,
@@ -366,7 +418,7 @@
         padding: 0 !important;
         background: white !important;
 
-        >.cove-visualization__body-wrap {
+        > .cove-visualization__body-wrap {
           padding: 0 !important;
         }
       }
