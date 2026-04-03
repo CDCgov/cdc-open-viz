@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { SharedFilter } from '../../../../types/SharedFilter'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
+import Button from '@cdc/core/components/elements/Button'
 
 type APIModalProps = {
   filter: SharedFilter
@@ -107,8 +108,9 @@ const APIModal: React.FC<APIModalProps> = ({ filter, isNestedDropdown, updateAPI
         )}
       </div>
       <div className='d-flex justify-content-end mt-2'>
-        <button
-          className='btn btn-primary mt-2'
+        <Button
+          variant='primary'
+          className='mt-2'
           onClick={() =>
             updateAPIFilter(
               APIEndpoint,
@@ -120,7 +122,7 @@ const APIModal: React.FC<APIModalProps> = ({ filter, isNestedDropdown, updateAPI
           }
         >
           Save
-        </button>
+        </Button>
       </div>
     </fieldset>
   )

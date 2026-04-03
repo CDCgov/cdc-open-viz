@@ -1,7 +1,7 @@
 import React from 'react'
 import _ from 'lodash'
 import { isCoveDeveloperMode } from '../../helpers/queryStringUtils'
-import { 
+import {
   hasPaletteBackup, 
   getOriginalPaletteName, 
   rollbackPaletteToOriginal,
@@ -9,6 +9,7 @@ import {
   getOriginalTwoColorPaletteName,
   rollbackTwoColorPaletteToOriginal
 } from '../../helpers/palettes/utils'
+import Button from '../elements/Button'
 import './PaletteSelector.css'
 
 interface DeveloperPaletteRollbackProps {
@@ -99,14 +100,14 @@ const DeveloperPaletteRollback: React.FC<DeveloperPaletteRollbackProps> = ({
           {infoText}
         </small>
       </div>
-      <button
+      <Button
         type="button"
         className="btn btn-sm btn-outline-warning"
         onClick={handleRollback}
         title={`Rollback to original palette: ${displayPaletteName}`}
       >
         Rollback Palette
-      </button>
+      </Button>
     </div>
   )
 }

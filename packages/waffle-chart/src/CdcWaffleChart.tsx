@@ -17,6 +17,7 @@ import { DATA_OPERATORS } from '@cdc/core/helpers/constants'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
+import Button from '@cdc/core/components/elements/Button'
 
 import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
@@ -618,9 +619,9 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         <section className='waiting-container'>
           <h3>Finish Configuring</h3>
           <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-          <button className='btn btn-primary' style={{ margin: '1em auto' }} onClick={confirmDone}>
+          <Button variant='primary' style={{ margin: '1em auto' }} onClick={confirmDone}>
             I'm Done
-          </button>
+          </Button>
         </section>
       </section>
     )

@@ -19,6 +19,7 @@ import { filterOrderOptions } from '@cdc/core/helpers/filterOrderOptions'
 import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/components/FilterOrder'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Modal from '@cdc/core/components/ui/Modal'
+import Button from '@cdc/core/components/elements/Button'
 
 type FilterEditorProps = {
   config: DashboardConfig
@@ -419,12 +420,13 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                   </div>
                 )}
 
-                <button
+                <Button
+                  variant='primary'
+                  className='mt-2'
                   onClick={() => handleEditAPIValues(filter, isNestedDropdown, updateAPIFilter)}
-                  className='btn btn-primary mt-2'
                 >
                   Edit API Values
-                </button>
+                </Button>
               </div>
 
               <label>

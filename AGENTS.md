@@ -17,6 +17,7 @@ Before working on a specific area, read the relevant context document from the `
 | `docs/PALETTE_MIGRATION.md`      | Working with color palettes or the palette selection system. Covers the v1 → v2 migration, helper functions, and configuration structure.                                       |
 | `docs/COVE_EVENTS.md`            | Adding analytics events or working with the metrics system. Documents the event format, available event types, and usage patterns.                                              |
 | `docs/VISUALIZATION_WRAPPERS.md` | Working on visualization wrapper structure, shell layout, or wrapper consistency. Covers `VisualizationContainer`, `VisualizationContent`, compatibility modes, and guardrails. |
+| `docs/BUTTON_SYSTEM.md`          | Working on shared buttons, legacy `.btn` migration, or button styling consistency. Covers the `Button` prop API, migration rules, compatibility aliases, and current exceptions. |
 
 ### Creating New Context Documents
 

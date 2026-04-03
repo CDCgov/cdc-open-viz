@@ -6,14 +6,17 @@
   --cove-button-primary: var(--colors-blue-vivid-60);
   --cove-button-primary-font-color: #fff;
   --cove-button-primary-hover: #0b4778;
+  --cove-button-primary-shadow: 0 0.5rem 1.1rem rgb(0 94 162 / 22%);
   --cove-button-primary-disabled: var(--cool-gray-10);
   --cove-button-primary-disabled-font-color: var(--cool-gray-90);
 
   --cove-button-secondary: #fff;
   --cove-button-secondary-font-color: var(--colors-blue-vivid-60);
   --cove-button-secondary-border-color: var(--colors-blue-vivid-60);
-  --cove-button-secondary-hover: #0b4778;
-  --cove-button-secondary-hover-font-color: #fff;
+  --cove-button-secondary-hover: var(--quaternary);
+  --cove-button-secondary-hover-font-color: #0b4778;
+  --cove-button-secondary-hover-border-color: #0b4778;
+  --cove-button-secondary-shadow: 0 0.5rem 1rem rgb(0 94 162 / 12%);
   --cove-button-secondary-disabled: #f5f6f7;
   --cove-button-secondary-disabled-font-color: var(--cool-gray-90);
   --cove-button-secondary-disabled-border-color: var(--cool-gray-10);
@@ -43,16 +46,23 @@
   border: 0;
   outline: none;
   transition: background-color 500ms var(--transition-expo-out), color 500ms var(--transition-expo-out),
-    border-color 500ms var(--transition-expo-out);
+    border-color 500ms var(--transition-expo-out), box-shadow 220ms var(--transition-expo-out),
+    transform 220ms var(--transition-expo-out);
 
-  &.secondary {
+  &.secondary,
+  &.cove-button--secondary,
+  &.btn-secondary {
     background-color: var(--cove-button-secondary);
     color: var(--cove-button-secondary-font-color);
     border: 1px solid var(--cove-button-secondary-border-color);
 
-    &:hover {
-      background-color: var(--cove-button-secondary-hover);
-      color: var(--cove-button-secondary-hover-font-color);
+    @media (hover: hover) {
+      &:hover {
+        background-color: var(--cove-button-secondary-hover);
+        color: var(--cove-button-secondary-hover-font-color);
+        border-color: var(--cove-button-secondary-hover-border-color);
+        box-shadow: var(--cove-button-secondary-shadow);
+      }
     }
 
     &:disabled {
@@ -78,8 +88,17 @@
     cursor: pointer;
   }
 
-  &:hover:not(:disabled) {
-    background-color: var(--cove-button-primary-hover);
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background-color: var(--cove-button-primary-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--cove-button-primary-shadow);
+    }
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: none;
   }
   &:focus {
     outline: 2px dashed var(--colors-blue-vivid-60) !important;
@@ -104,11 +123,38 @@
     cursor: default;
   }
 
-  &.fluid {
+  &.fluid,
+  &.cove-button--full-width,
+  &.full-width {
     width: 100%;
   }
 
-  &.success {
+  &.cove-button--editor-primary {
+    background-color: var(--cove-button-primary);
+    color: var(--cove-button-primary-font-color);
+    border: 0;
+
+    &:not(:first-child) {
+      margin-top: 1rem;
+    }
+
+    &:disabled {
+      background-color: var(--cove-button-primary-disabled);
+      color: var(--cove-button-primary-disabled-font-color);
+      border: none;
+    }
+
+    @media (hover: hover) {
+      &:hover:not(:disabled) {
+        background-color: var(--cove-button-primary-hover);
+        box-shadow: var(--cove-button-primary-shadow);
+      }
+    }
+  }
+
+  &.success,
+  &.cove-button--success,
+  &.btn-success {
     background-color: #44aa41;
 
     &:hover {
@@ -116,7 +162,10 @@
     }
   }
 
-  &.warn {
+  &.warn,
+  &.cove-button--danger,
+  &.cove-button--warn,
+  &.btn-danger {
     background-color: #d73636;
 
     &:hover {
@@ -124,12 +173,73 @@
     }
   }
 
-  &.muted {
+  &.cove-button--warning,
+  &.btn-warning {
+    background-color: #fbab18;
+    color: var(--cool-gray-90);
+
+    &:hover {
+      background-color: color.adjust(#fbab18, $lightness: -5%);
+    }
+  }
+
+  &.cove-button--light,
+  &.btn-light {
+    background-color: var(--lightestGray);
+    color: var(--cool-gray-90);
+    border: 1px solid var(--lightGray);
+
+    &:hover {
+      background-color: #e7e7e7;
+      border-color: var(--cool-gray-30);
+    }
+  }
+
+  &.cove-button--link,
+  &.btn-link {
+    background-color: transparent;
+    color: var(--colors-blue-vivid-60);
+    border: 0;
+    padding-left: 0;
+    padding-right: 0;
+    box-shadow: none;
+    transform: none;
+
+    &:hover {
+      background-color: transparent;
+      color: #0b4778;
+      text-decoration: underline;
+      box-shadow: none;
+      transform: none;
+    }
+  }
+
+  &.cove-button--outline-warning,
+  &.btn-outline-warning {
+    background-color: transparent;
+    color: #856404;
+    border: 1px solid #ffc107;
+
+    &:hover {
+      background-color: #ffc107;
+      color: #212529;
+    }
+  }
+
+  &.muted,
+  &.cove-button--muted {
     background-color: #a0a0a0;
 
     &:hover {
       background-color: color.adjust(#a0a0a0, $lightness: -5%);
     }
+  }
+
+  &.cove-button--sm,
+  &.btn-sm {
+    min-height: 1.875rem;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.875rem;
   }
 
   &.cove-button--flex-center {

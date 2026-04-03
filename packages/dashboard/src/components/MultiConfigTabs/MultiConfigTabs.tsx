@@ -2,6 +2,7 @@ import { createRef, useContext, useMemo, useState } from 'react'
 import { DashboardContext, DashboardDispatchContext } from '../../DashboardContext'
 import Modal from '@cdc/core/components/ui/Modal'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
+import Button from '@cdc/core/components/elements/Button'
 import './multiconfigtabs.styles.css'
 
 const AreYouSure = deleteCallback => {
@@ -9,9 +10,9 @@ const AreYouSure = deleteCallback => {
     <Modal>
       <Modal.Content>
         <p>Are you sure you want to delete this dashboard? </p>
-        <button className='btn btn-danger' onClick={deleteCallback}>
+        <Button variant='danger' onClick={deleteCallback}>
           DELETE
-        </button>
+        </Button>
       </Modal.Content>
     </Modal>
   )
@@ -79,16 +80,16 @@ const Tab = ({ name, handleClick, tabs, index, active }) => {
         {editing ? (
           <div className='d-flex'>
             <input type='text' defaultValue={name} onBlur={saveName} ref={inputRef} />
-            <button className='btn btn-link save' onClick={saveName}>
+            <Button variant='link' className='save' onClick={saveName}>
               save
-            </button>
+            </Button>
           </div>
         ) : (
           <>
             {name}
-            <button className='btn btn-danger border-0 ms-1' onClick={handleRemove}>
+            <Button variant='danger' className='border-0 ms-1' onClick={handleRemove}>
               X
-            </button>
+            </Button>
           </>
         )}
       </div>

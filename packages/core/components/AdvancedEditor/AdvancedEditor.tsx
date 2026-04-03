@@ -7,6 +7,7 @@ import './advanced-editor-styles.css'
 import _ from 'lodash'
 import Tooltip from '../ui/Tooltip'
 import EmbedEditor from './EmbedEditor'
+import Button from '../elements/Button'
 
 const UNDEFINED_SENTINELS = new Set(['__undefined__', '__\u200bundefined__'])
 
@@ -33,7 +34,7 @@ export const AdvancedEditor = ({
   config,
   convertStateToConfig,
   stripConfig = config => config,
-  onExpandCollapse = () => {}
+  onExpandCollapse = () => { }
 }) => {
   const [advancedToggle, _setAdvancedToggle] = useState(false)
   const [configTextboxValue, setConfigTextbox] = useState<Record<string, any>>({})
@@ -124,15 +125,15 @@ export const AdvancedEditor = ({
               rootName=''
               collapse={collapseFields}
             />
-            <button
-              className='btn btn-success m-2 p-2'
+            <Button
+              variant='editor-primary'
               onClick={() => {
                 loadConfig(sanitizeConfigForAdvancedEditor(configTextboxValue))
                 setAdvancedToggle(!advancedToggle)
               }}
             >
               Apply Configuration Changes
-            </button>
+            </Button>
           </React.Fragment>
         )}
       </div>

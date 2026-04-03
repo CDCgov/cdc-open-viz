@@ -9,6 +9,7 @@ import NestedDropdown from '@cdc/core/components/NestedDropdown'
 import { getNestedOptions } from '@cdc/core/components/Filters/helpers/getNestedOptions'
 import { MouseEventHandler } from 'react'
 import Loader from '@cdc/core/components/Loader'
+import Button from '@cdc/core/components/elements/Button'
 import _ from 'lodash'
 import { DROPDOWN_STYLES } from '@cdc/core/components/Filters/components/Dropdown'
 import Tabs from '@cdc/core/components/Filters/components/Tabs'
@@ -213,9 +214,10 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
         )
       })}
       {showSubmit && (
-        <>
-          <button
-            className='btn btn-primary mb-1 me-2'
+        <div className='dashboard-filters__actions'>
+          <Button
+            variant='primary'
+            className='mb-1 me-2'
             onClick={applyFilters}
             disabled={show.some(filterIndex => {
               const emptyFilterValues = [undefined, '', '- Select -']
@@ -226,13 +228,13 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
             })}
           >
             {applyFiltersButtonText || 'GO!'}
-          </button>
+          </Button>
           {handleReset && (
-            <button className='btn btn-link mb-1' onClick={handleReset}>
+            <Button variant='link' className='mb-1' onClick={handleReset}>
               Clear Filters
-            </button>
+            </Button>
           )}
-        </>
+        </div>
       )}
     </form>
   )

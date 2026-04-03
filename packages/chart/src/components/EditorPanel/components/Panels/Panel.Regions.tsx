@@ -1,15 +1,19 @@
 import { memo, useContext } from 'react'
+import { Draggable } from '@hello-pangea/dnd'
 import { useEditorPermissions } from '../../useEditorPermissions.js'
 import {
+  Accordion,
   AccordionItem,
   AccordionItemHeading,
   AccordionItemPanel,
   AccordionItemButton
 } from 'react-accessible-accordion'
 import { type ChartConfig } from '../../../../types/ChartConfig.js'
+import GroupedList from '@cdc/core/components/EditorPanel/GroupedList'
 import { TextField, Select } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
+import Button from '@cdc/core/components/elements/Button'
 import { type ChartContext } from '../../../../types/ChartContext.js'
 import { type PanelProps } from '../PanelProps.js'
 import ConfigContext from '../../../../ConfigContext.js'
@@ -53,129 +57,170 @@ const RegionSettings = memo(({ config, updateConfig }: { config: ChartConfig; up
     updateConfig({ ...config, regions })
   }
 
+  const moveRegion = (sourceIndex, destinationIndex) => {
+    const regions = config.regions ? [...config.regions] : []
+    const [movedRegion] = regions.splice(sourceIndex, 1)
+    regions.splice(destinationIndex, 0, movedRegion)
+    updateConfig({ ...config, regions })
+  }
+
   const fromOptions = ['Fixed', 'Previous Days']
   const toOptions = ['Last Date', 'Fixed']
 
   return (
     <>
-      {config.regions &&
-        config.regions.map(({ label, color, from, to, background, range = 'Custom' }, i) => (
-          <div className='edit-block' key={`region-${i}`}>
-            <button
-              type='button'
-              className='btn btn-danger remove-column'
-              onClick={event => {
-                event.preventDefault()
-                removeColumn(i)
-              }}
-            >
-              Remove
-            </button>
-            <TextField value={label} label='Region Label' fieldName='label' i={i} updateField={updateField} />
-            <div className='two-col-inputs'>
-              <TextField
-                value={color}
-                label='Text Color'
-                fieldName='color'
-                updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}
-              />
-              <TextField
-                value={background}
-                label='Background'
-                fieldName='background'
-                updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}
-              />
-            </div>
+      <GroupedList
+        items={config.regions}
+        label='Regions'
+        droppableId='chart-regions-order'
+        onDragEnd={({ source, destination }) => {
+          if (!destination || source.index === destination.index) return
+          moveRegion(source.index, destination.index)
+        }}
+        renderItem={({ label, color, from, to, background, range = 'Custom' }, i) => (
+          <Draggable key={`region-${i}`} draggableId={`region-${i}`} index={i}>
+            {(provided, snapshot) => (
+              <div
+                className={snapshot.isDragging ? 'currently-dragging' : ''}
+                style={provided.draggableProps.style}
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+              >
+                <Accordion allowZeroExpanded preExpanded={['panel']}>
+                  <AccordionItem uuid='panel' className='series-item series-item--chart'>
+                    <AccordionItemHeading className='series-item__title'>
+                      <AccordionItemButton className='accordion__button'>
+                        <Icon display='move' size={15} style={{ cursor: 'default' }} />
+                        {label || `Region ${i + 1}`}
+                      </AccordionItemButton>
+                    </AccordionItemHeading>
+                    <AccordionItemPanel>
+                      <div className='series-item__panel-actions'>
+                        <Button
+                          type='button'
+                          variant='danger'
+                          size='sm'
+                          className='grouped-list__remove'
+                          onClick={event => {
+                            event.preventDefault()
+                            removeColumn(i)
+                          }}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                      <TextField value={label} label='Region Label' fieldName='label' i={i} updateField={updateField} />
+                      <div className='two-col-inputs'>
+                        <TextField
+                          value={color}
+                          label='Text Color'
+                          fieldName='color'
+                          updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}
+                        />
+                        <TextField
+                          value={background}
+                          label='Background'
+                          fieldName='background'
+                          updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}
+                        />
+                      </div>
 
-            <Select
-              value={config.regions[i].fromType ?? 'Fixed'}
-              label='Minimum Region Type'
-              initial={'Select'}
-              required={true}
-              onChange={e => {
-                if (e.target.value !== '' && e.target.value !== 'Select') {
-                  const newRegions = [...config.regions]
-                  newRegions[i].fromType = e.target.value
-                  updateConfig({
-                    ...config,
-                    regions: newRegions
-                  })
-                }
-                e.target.value = ''
-              }}
-              options={fromOptions}
-            />
+                      <Select
+                        value={config.regions[i].fromType ?? 'Fixed'}
+                        label='Minimum Region Type'
+                        initial={'Select'}
+                        required={true}
+                        onChange={e => {
+                          if (e.target.value !== '' && e.target.value !== 'Select') {
+                            const newRegions = [...config.regions]
+                            newRegions[i].fromType = e.target.value
+                            updateConfig({
+                              ...config,
+                              regions: newRegions
+                            })
+                          }
+                          e.target.value = ''
+                        }}
+                        options={fromOptions}
+                      />
 
-            {(config.regions[i].fromType === 'Fixed' ||
-              config.regions[i].fromType === 'Previous Days' ||
-              !config.regions[i].fromType) && (
-              <>
-                <TextField
-                  value={from}
-                  label={
-                    config.regions[i].fromType === 'Fixed' || !config.regions[i]?.fromType
-                      ? 'From Value'
-                      : 'Previous Number of Days'
-                  }
-                  fieldName='from'
-                  updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}
-                  tooltip={
-                    <Tooltip style={{ textTransform: 'none' }}>
-                      <Tooltip.Target>
-                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
-                      </Tooltip.Target>
-                      <Tooltip.Content>
-                        <p>
-                          When using categorical (linear scale) match the data set value. When using date (linear / date
-                          time scale) match the x-axis value.
-                        </p>
-                      </Tooltip.Content>
-                    </Tooltip>
-                  }
-                />
-              </>
+                      {(config.regions[i].fromType === 'Fixed' ||
+                        config.regions[i].fromType === 'Previous Days' ||
+                        !config.regions[i].fromType) && (
+                        <>
+                          <TextField
+                            value={from}
+                            label={
+                              config.regions[i].fromType === 'Fixed' || !config.regions[i]?.fromType
+                                ? 'From Value'
+                                : 'Previous Number of Days'
+                            }
+                            fieldName='from'
+                            updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    When using categorical (linear scale) match the data set value. When using date
+                                    (linear / date time scale) match the x-axis value.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                        </>
+                      )}
+
+                      <Select
+                        value={config.regions[i].toType ?? 'Fixed'}
+                        label='Maximum Region Type'
+                        initial={'Select'}
+                        required={true}
+                        onChange={e => {
+                          if (e.target.value !== '' && e.target.value !== 'Select') {
+                            const newRegions = [...config.regions]
+                            newRegions[i].toType = e.target.value
+                            updateConfig({
+                              ...config,
+                              regions: newRegions
+                            })
+                          }
+                          e.target.value = ''
+                        }}
+                        options={toOptions}
+                      />
+
+                      {(config.regions[i].toType === 'Fixed' || !config.regions[i].toType) && (
+                        <TextField
+                          value={to}
+                          label='To Value'
+                          fieldName='to'
+                          updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}
+                        />
+                      )}
+                    </AccordionItemPanel>
+                  </AccordionItem>
+                </Accordion>
+              </div>
             )}
-
-            <Select
-              value={config.regions[i].toType ?? 'Fixed'}
-              label='Maximum Region Type'
-              initial={'Select'}
-              required={true}
-              onChange={e => {
-                if (e.target.value !== '' && e.target.value !== 'Select') {
-                  const newRegions = [...config.regions]
-                  newRegions[i].toType = e.target.value
-                  updateConfig({
-                    ...config,
-                    regions: newRegions
-                  })
-                }
-                e.target.value = ''
-              }}
-              options={toOptions}
-            />
-
-            {(config.regions[i].toType === 'Fixed' || !config.regions[i].toType) && (
-              <TextField
-                value={to}
-                label='To Value'
-                fieldName='to'
-                updateField={(section, subsection, fieldName, value) => regionUpdate(fieldName, value, i)}
-              />
-            )}
-          </div>
-        ))}
+          </Draggable>
+        )}
+      />
       {!config.regions && <p style={{ textAlign: 'center' }}>There are currently no regions.</p>}
-      <button
+      <Button
         type='button'
-        className='btn btn-primary full-width'
+        variant='editor-primary'
         onClick={e => {
           e.preventDefault()
           addColumn()
         }}
       >
         Add Region
-      </button>
+      </Button>
     </>
   )
 })

@@ -38,13 +38,21 @@ export const FiltersSectionTests: Story = {
     // ==========================================================================
     // TEST: Add Filter and configure it to filter by STATE
     // ==========================================================================
-    const addFilterButton = canvas.getByRole('button', { name: /Add Filter/i })
+    const filtersAccordionButton = canvas
+      .getAllByRole('button', { name: /^Filters$/i })
+      .find(button => button.closest('[data-accordion-component="AccordionItem"], .accordion__item'))
+    const filtersAccordion = filtersAccordionButton?.closest(
+      '[data-accordion-component="AccordionItem"], .accordion__item'
+    )
+    expect(filtersAccordion).toBeTruthy()
+
+    const addFilterButton = within(filtersAccordion as HTMLElement).getByRole('button', { name: /Add Filter/i })
 
     await performAndAssert(
       'Add Filter → Click button',
       () => {
-        const filtersList = canvasElement.querySelector('.draggable-field-list')
-        const collapsedFilters = filtersList?.querySelectorAll('.editor-field-item') || []
+        const filtersList = filtersAccordion?.querySelector('.grouped-list__items')
+        const collapsedFilters = filtersList?.querySelectorAll('.series-item--chart') || []
         return {
           hasFiltersList: Boolean(filtersList),
           hasCollapsedFilter: collapsedFilters.length > 0
@@ -59,16 +67,31 @@ export const FiltersSectionTests: Story = {
       }
     )
 
-    // Find and expand the collapsed filter (click the header expand button)
-    const filtersList = canvasElement.querySelector('.draggable-field-list')
-    const expandButton = filtersList?.querySelector('.editor-field-item__header button') as HTMLButtonElement
-    await userEvent.click(expandButton)
+    // Filter item starts expanded (preExpanded); find the visible filter panel content
+    const filtersList = filtersAccordion?.querySelector('.grouped-list__items')
 
-    // Wait for the expanded filter content
-    await waitForPresence('.draggable-field-list .editor-field-item__content', canvasElement)
+    const getFilterBlock = () => {
+      return Array.from(filtersAccordion?.querySelectorAll('select') || [])
+        .find(select => {
+          const label = select.closest('label')
+          const labelSpan = label?.querySelector('.edit-label')
+          return labelSpan?.textContent?.includes('Filter Style')
+        })
+        ?.closest(
+          '[data-accordion-component="AccordionPanel"], .series-item, .editor-field-item__content'
+        ) as HTMLElement
+    }
+
+    await performAndAssert(
+      'Wait for added filter panel to render',
+      () => Boolean(getFilterBlock()),
+      async () => {},
+      (_before, after) => after
+    )
 
     // Find the newly added filter section content
-    const filterBlock = filtersList?.querySelector('.editor-field-item__content') as HTMLElement
+    const filterBlock = getFilterBlock()
+    expect(filterBlock).toBeTruthy()
 
     // ==========================================================================
     // TEST: Select STATE as the filter column
@@ -80,7 +103,7 @@ export const FiltersSectionTests: Story = {
     }) as HTMLSelectElement
 
     const getDefaultValueState = () => {
-      const updatedFilterBlock = filtersList?.querySelector('.editor-field-item__content') as HTMLElement
+      const updatedFilterBlock = getFilterBlock()
       const defaultValueSelect = Array.from(updatedFilterBlock?.querySelectorAll('select') || []).find(select => {
         const label = select.closest('label')
         const labelSpan = label?.querySelector('.edit-label')
@@ -136,7 +159,7 @@ export const FiltersSectionTests: Story = {
     // ==========================================================================
     // TEST: Select Alabama as the default filter value
     // ==========================================================================
-    const updatedFilterBlock = filtersList?.querySelector('.editor-field-item__content') as HTMLElement
+    const updatedFilterBlock = getFilterBlock()
     const defaultValueSelect = Array.from(updatedFilterBlock?.querySelectorAll('select') || []).find(select => {
       const label = select.closest('label')
       const labelSpan = label?.querySelector('.edit-label')

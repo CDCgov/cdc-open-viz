@@ -493,6 +493,16 @@ export const PieChartWithHTMLFootnotes: Story = {
           Footnote: '<strong>7 states</strong> with 60-79% coverage<br>Target: Move to <em>high category</em>'
         }
       ],
+      xAxis: {
+        label: 'Coverage Category',
+        dataKey: 'Category',
+        type: 'categorical'
+      },
+      yAxis: {
+        label: 'Percentage',
+        dataKey: 'Percentage',
+        type: 'linear'
+      },
       series: [
         {
           dataKey: 'Percentage',
