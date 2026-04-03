@@ -442,7 +442,6 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     if (trendResolution?.state !== 'resolved' || !trendResolution?.arrowType) {
       return null
     }
-    const ariaLabel = `Trend ${trendResolution.arrowType}${resolvedTrendLabel ? `: ${resolvedTrendLabel}` : ''}`
     const resolvedWrapperClassName = [wrapperClassName, resolvedTrendLabel ? 'cove-trend-arrow__wrap--with-label' : '']
       .filter(Boolean)
       .join(' ')
@@ -451,7 +450,6 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       <TrendArrow
         arrowType={trendResolution.arrowType}
         label={resolvedTrendLabel}
-        ariaLabel={ariaLabel}
         wrapperClassName={resolvedWrapperClassName}
       />
     )

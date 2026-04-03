@@ -6,11 +6,10 @@ import './trend-arrow.css'
 type TrendArrowProps = {
   arrowType: TrendArrowType
   wrapperClassName?: string
-  ariaLabel?: string
   label?: string
 }
 
-const TrendArrow = ({ arrowType, wrapperClassName = '', ariaLabel, label }: TrendArrowProps) => {
+const TrendArrow = ({ arrowType, wrapperClassName = '', label }: TrendArrowProps) => {
   const svgId: SvgRegistryId =
     arrowType === TREND_ARROW_DOWN
       ? 'trend-arrow-down'
@@ -21,10 +20,9 @@ const TrendArrow = ({ arrowType, wrapperClassName = '', ariaLabel, label }: Tren
   const trendArrowWrapClasses = ['cove-trend-arrow__wrap', wrapperClassName].filter(Boolean).join(' ')
   const trimmedLabel = label?.trim()
   const defaultAriaLabel = getSvgRegistryLabel(svgId) || `Trend ${arrowType}`
-  const resolvedAriaLabel = ariaLabel || `${defaultAriaLabel}${trimmedLabel ? `: ${trimmedLabel}` : ''}`
   const iconAccessibilityAttributes = trimmedLabel
     ? 'aria-hidden="true" focusable="false"'
-    : `role="img" aria-label="${resolvedAriaLabel}" focusable="false"`
+    : `role="img" aria-label="${defaultAriaLabel}" focusable="false"`
   const iconMarkup = rawSvg
     .trim()
     .replace('<svg', `<svg class="cove-trend-arrow" ${iconAccessibilityAttributes}`)
