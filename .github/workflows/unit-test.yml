@@ -1,23 +1,22 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
 name: Unit Test CI
 
 on:
   pull_request:
-    branches: ['dev']
+    branches: ["dev"]
 
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js 20.x
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: 'npm'
-      - run: yarn install --production=false
-      - run: lerna run build
-      - run: npm run test --workspaces
+          cache: "yarn"
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - run: yarn test-unit
