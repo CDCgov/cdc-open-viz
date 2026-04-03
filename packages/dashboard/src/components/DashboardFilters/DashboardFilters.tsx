@@ -164,6 +164,7 @@ const DashboardFilters: React.FC<DashboardFilterProps> = ({
               <NestedDropdown
                 activeGroup={(filter.queuedActive?.[0] || filter.active) as string}
                 activeSubGroup={(filter.queuedActive?.[1] || filter.subGrouping?.active) as string}
+                displaySubgroupingOnly={filter.displaySubgroupingOnly}
                 filterIndex={filterIndex}
                 options={_key ? getNestedDropdownOptions(apiFilterDropdowns[_key]) : nestedOptions}
                 listLabel={label}

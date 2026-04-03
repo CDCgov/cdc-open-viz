@@ -116,6 +116,7 @@ const Options: React.FC<{
 type NestedDropdownProps = {
   activeGroup: string
   activeSubGroup?: string
+  displaySubgroupingOnly?: boolean
   filterIndex: number
   listLabel: string
   handleSelectedItems: ([group, subgroup]: [string, string]) => void
@@ -127,6 +128,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   options,
   activeGroup,
   activeSubGroup,
+  displaySubgroupingOnly = false,
   filterIndex,
   listLabel,
   handleSelectedItems,
@@ -138,8 +140,9 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
 
   const inputValue = useMemo(() => {
     // value from props
-    return activeSubGroup ? `${activeGroup} - ${activeSubGroup}` : ''
-  }, [activeGroup, activeSubGroup])
+    if (!activeSubGroup) return ''
+    return displaySubgroupingOnly ? activeSubGroup : `${activeGroup} - ${activeSubGroup}`
+  }, [activeGroup, activeSubGroup, displaySubgroupingOnly])
   const inputPlaceholder = useMemo(() => {
     if (loading) return 'Loading...'
     return inputValue || '- Select -'

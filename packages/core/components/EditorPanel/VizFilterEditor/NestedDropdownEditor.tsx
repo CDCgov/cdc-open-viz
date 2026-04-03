@@ -217,6 +217,18 @@ const NestedDropdownEditor: React.FC<NestedDropdownEditorProps> = ({
         )}
       </label>
 
+      <label>
+        <input
+          type='checkbox'
+          checked={!!filter.displaySubgroupingOnly}
+          aria-label='Display subgrouping only'
+          onChange={e => {
+            updateGroupingFilterProp('displaySubgroupingOnly', e.target.checked)
+          }}
+        />
+        <span> Display subgrouping only</span>
+      </label>
+
       <div className='mt-2'>
         <div className='edit-label column-heading float-right'>{filter.columnName} </div>
         <Select

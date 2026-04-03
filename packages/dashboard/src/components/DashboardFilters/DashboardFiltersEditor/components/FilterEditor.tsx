@@ -453,6 +453,16 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                 </span>
               </label>
 
+              <label>
+                <input
+                  type='checkbox'
+                  checked={!!filter.displaySubgroupingOnly}
+                  aria-label='Display subgrouping only'
+                  onChange={e => updateFilterProp('displaySubgroupingOnly', e.target.checked)}
+                />
+                <span> Display subgrouping only</span>
+              </label>
+
               {!!parentFilters.length && (
                 <label>
                   <span className='edit-label column-heading mt-1'>Parent Filter(s): </span>
@@ -597,6 +607,16 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                         </Tooltip.Content>
                       </Tooltip>
                     </span>
+                  </label>
+
+                  <label>
+                    <input
+                      type='checkbox'
+                      checked={!!filter.displaySubgroupingOnly}
+                      aria-label='Display subgrouping only'
+                      onChange={e => updateFilterProp('displaySubgroupingOnly', e.target.checked)}
+                    />
+                    <span> Display subgrouping only</span>
                   </label>
                 </>
               )}
