@@ -60,6 +60,15 @@ export const Icon_Sizing: Story = {
         showHeader: true,
         title: 'SVG icon sizing',
         useInlineHTML: true,
+        markupVariables: [
+          {
+            sourceType: 'icon',
+            name: 'link-external',
+            tag: '{{link-external}}',
+            iconId: 'link-external',
+            conditions: []
+          }
+        ],
         inlineHTML: `
           <p class="icon-sizing-inline">Rate <span class="icon-sizing-inline-target">{{link-external}}</span> increased</p>
           <div
@@ -71,16 +80,7 @@ export const Icon_Sizing: Story = {
           </div>
         `
       },
-      enableMarkupVariables: true,
-      markupVariables: [
-        {
-          sourceType: 'icon',
-          name: 'link-external',
-          tag: '{{link-external}}',
-          iconId: 'link-external',
-          conditions: []
-        }
-      ]
+      enableMarkupVariables: true
     } as any,
     isEditor: false
   },
