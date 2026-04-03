@@ -24,7 +24,6 @@ const Button = ({
   ...attributes
 }) => {
   const buttonRef = useRef(null)
-  const normalizedVariant = variant === 'theme-blue' ? 'primary' : variant
   const themedVariants = [
     'theme-purple',
     'theme-brown',
@@ -37,9 +36,9 @@ const Button = ({
     'theme-green',
     'theme-amber'
   ]
-  const isThemedVariant = themedVariants.includes(normalizedVariant)
-  const isEditorPrimary = normalizedVariant === 'editor-primary'
-  const useLegacySecondaryClass = secondary && !normalizedVariant
+  const isThemedVariant = themedVariants.includes(variant)
+  const isEditorPrimary = variant === 'editor-primary'
+  const useLegacySecondaryClass = secondary && !variant
   const themedModeClassName = isThemedVariant && secondary ? ' cove-button--theme-secondary' : ''
 
   const [buttonState, setButtonState] = useState('out')
@@ -48,10 +47,10 @@ const Button = ({
   const [loadtextWidth, setLoadtextWidth] = useState()
 
   const variantClassName =
-    normalizedVariant && normalizedVariant !== 'primary'
-      ? ` cove-button--${isThemedVariant ? 'theme-primary' : normalizedVariant}`
+    variant && variant !== 'primary'
+      ? ` cove-button--${isThemedVariant ? 'theme-primary' : variant}`
       : ''
-  const themeClassName = isThemedVariant ? ` ${normalizedVariant}` : ''
+  const themeClassName = isThemedVariant ? ` ${variant}` : ''
   const sizeClassName = size ? ` cove-button--${size}` : ''
 
   const attributesObj = {

@@ -57,6 +57,7 @@ const Filters: React.FC<FilterProps> = ({
   interactionLabel = ''
 }) => {
   const { filters, general, theme, filterBehavior } = visualizationConfig
+  const getApplyButtonVariant = (currentTheme?: string) => (currentTheme === 'theme-blue' ? 'primary' : currentTheme)
   const [showApplyButton, setShowApplyButton] = useState(false)
   // Handle Wrapping Filters
   const [wrappingFilters, setWrappingFilters] = useState<
@@ -332,7 +333,7 @@ const Filters: React.FC<FilterProps> = ({
           {filterBehavior === 'Apply Button' ? (
             <div className='filters-section__buttons'>
               <Button
-                variant={general?.headerColor ? general.headerColor : theme}
+                variant={getApplyButtonVariant(general?.headerColor ? general.headerColor : theme)}
                 onClick={e => {
                   handleApplyButton(filters)
                 }}
