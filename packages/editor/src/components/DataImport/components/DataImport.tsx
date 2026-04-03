@@ -33,6 +33,7 @@ import { supportedDataTypes } from '../helpers/supportedDataTypes'
 import { getFileExtension } from '../helpers/getFileExtension'
 import { parseTextByMimeType } from '../helpers/parseTextByMimeType'
 import { getMimeType } from '../helpers/getMimeType'
+import { applyAutoDetectedDateParseFormat } from '../helpers/applyAutoDetectedDateParseFormat'
 import {
   extractCoveData,
   getSampleVegaJson,
@@ -209,14 +210,21 @@ const DataImport = () => {
             payload: { datasetKey: newDatasetName || fileSource, dataset, oldDatasetKey }
           })
         } else {
+          const configWithAutoDetectedDateFormat = applyAutoDetectedDateParseFormat(
+            {
+              ...config,
+              ...tempConfig
+            },
+            newData as Record<string, unknown>[]
+          )
+
           let newConfig = {
-            ...config,
-            ...tempConfig,
+            ...configWithAutoDetectedDateFormat,
             data: newData,
             dataMetadata,
             dataFileName: fileSource, // new file source
             dataFileSourceType: fileSourceType, // new file source type
-            formattedData: transform.developerStandardize(newData, config.dataDescription)
+            formattedData: transform.developerStandardize(newData, configWithAutoDetectedDateFormat.dataDescription)
           }
           if (setDataURL) {
             newConfig.dataUrl = fileSource
@@ -238,12 +246,15 @@ const DataImport = () => {
             handleSetConfig(text, true, dataMetadata)
           } else {
             resetEditor(
-              {
-                data: text,
-                dataMetadata,
-                dataFileName: fileSource,
-                dataFileSourceType: fileSourceType
-              } as Visualization,
+              applyAutoDetectedDateParseFormat(
+                {
+                  data: text,
+                  dataMetadata,
+                  dataFileName: fileSource,
+                  dataFileSourceType: fileSourceType
+                } as Visualization,
+                text as Record<string, unknown>[]
+              ),
               'It appears that your data does not contain all of the columns that your last dataset contained. Continuing will reset your configuration. Do you want to continue?'
             )
           }

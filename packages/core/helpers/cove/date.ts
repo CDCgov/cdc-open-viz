@@ -2,6 +2,27 @@ import { timeFormat, timeParse, timeFormatLocale, type TimeLocaleDefinition } fr
 import { type Axis } from '@cdc/core/types/Axis'
 
 const NBSP = '\u00A0'
+const AUTO_DETECT_DATE_FORMATS = [
+  '%Y-%m-%d',
+  '%Y/%m/%d',
+  '%m/%d/%Y',
+  '%d/%m/%Y',
+  '%m-%d-%Y',
+  '%d-%m-%Y',
+  '%Y',
+  '%Y-%m',
+  '%Y/%m'
+] as const
+
+export type AutoDetectDateFormat = (typeof AUTO_DETECT_DATE_FORMATS)[number]
+
+export type DateFormatDetectionResult = {
+  detectedFormat?: AutoDetectDateFormat
+  isReliable: boolean
+  sampleSize: number
+  ambiguous: boolean
+  failureReason?: 'no_non_empty_values' | 'no_matching_format' | 'ambiguous'
+}
 
 /** Locale definitions for d3-time-format. Add new locales here as needed. */
 const localeDefinitions: Record<string, TimeLocaleDefinition> = {
@@ -68,6 +89,63 @@ export function formatDate(format = undefined, date, locale?: string) {
 
 export function parseDate(format = undefined, dateString) {
   return timeParse(format)(dateString) || new Date()
+}
+
+const normalizeDateSample = (value: unknown) => {
+  if (value === null || value === undefined) return ''
+  return String(value).trim()
+}
+
+const matchesDateFormatExactly = (format: AutoDetectDateFormat, value: string) => {
+  const parser = timeParse(format)
+  const formatter = timeFormat(format)
+  const parsedValue = parser(value)
+
+  if (!parsedValue) return false
+
+  return formatter(parsedValue) === value
+}
+
+export function detectDateParseFormat(values: unknown[]): DateFormatDetectionResult {
+  const samples = (values || []).map(normalizeDateSample).filter(Boolean)
+
+  if (!samples.length) {
+    return {
+      isReliable: false,
+      sampleSize: 0,
+      ambiguous: false,
+      failureReason: 'no_non_empty_values'
+    }
+  }
+
+  const matchingFormats = AUTO_DETECT_DATE_FORMATS.filter(format =>
+    samples.every(sample => matchesDateFormatExactly(format, sample))
+  )
+
+  if (matchingFormats.length === 1) {
+    return {
+      detectedFormat: matchingFormats[0],
+      isReliable: true,
+      sampleSize: samples.length,
+      ambiguous: false
+    }
+  }
+
+  if (matchingFormats.length > 1) {
+    return {
+      isReliable: false,
+      sampleSize: samples.length,
+      ambiguous: true,
+      failureReason: 'ambiguous'
+    }
+  }
+
+  return {
+    isReliable: false,
+    sampleSize: samples.length,
+    ambiguous: false,
+    failureReason: 'no_matching_format'
+  }
 }
 
 export const isDateScale = (axis: Axis) => {
