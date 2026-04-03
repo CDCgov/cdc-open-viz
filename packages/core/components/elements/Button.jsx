@@ -13,6 +13,7 @@ const Button = ({
   hoverStyle = {},
   fluid = false,
   fullWidth = false,
+  animated = false,
   loading = false,
   loadingText = 'Loading...',
   flexCenter,
@@ -24,6 +25,7 @@ const Button = ({
 }) => {
   const buttonRef = useRef(null)
   const isEditorPrimary = variant === 'editor-primary'
+  const useLegacySecondaryClass = secondary && !variant
 
   const [buttonState, setButtonState] = useState('out')
   const [customStyles, setCustomStyles] = useState({ ...style })
@@ -40,12 +42,13 @@ const Button = ({
       'cove-button' +
       variantClassName +
       sizeClassName +
+      (animated ? ' cove-button--animated' : '') +
       (flexCenter || 'loader' === role ? ' cove-button--flex-center' : '') +
       (fluid ? ' fluid' : '') +
       (fullWidth || isEditorPrimary ? ' cove-button--full-width' : '') +
       (loading ? ' loading' : '') +
       (attributes.className ? ' ' + attributes.className : '') +
-      (secondary ? ' secondary' : ''),
+      (useLegacySecondaryClass ? ' secondary' : ''),
     onMouseOver: () => setButtonState('in'),
     onMouseOut: () => setButtonState('out'),
     onFocus: () => setButtonState('in'),
@@ -162,6 +165,8 @@ Button.propTypes = {
   fullWidth: PropTypes.bool,
   /** Displays loading spinner on button while condition is true **/
   loading: PropTypes.bool,
+  /** Enables motion effects like hover lift/shadow */
+  animated: PropTypes.bool,
   /** Set text to appear during loading animation **/
   loadingText: PropTypes.string,
   /** Displays button as flex and centers all direct children nodes. Useful for aligning icons and text **/

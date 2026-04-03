@@ -14,7 +14,7 @@
   --cove-button-secondary-font-color: var(--colors-blue-vivid-60);
   --cove-button-secondary-border-color: var(--colors-blue-vivid-60);
   --cove-button-secondary-hover: var(--quaternary);
-  --cove-button-secondary-hover-font-color: #0b4778;
+  --cove-button-secondary-hover-font-color: #fff;
   --cove-button-secondary-hover-border-color: #0b4778;
   --cove-button-secondary-shadow: 0 0.5rem 1rem rgb(0 94 162 / 12%);
   --cove-button-secondary-disabled: #f5f6f7;
@@ -46,8 +46,7 @@
   border: 0;
   outline: none;
   transition: background-color 500ms var(--transition-expo-out), color 500ms var(--transition-expo-out),
-    border-color 500ms var(--transition-expo-out), box-shadow 220ms var(--transition-expo-out),
-    transform 220ms var(--transition-expo-out);
+    border-color 500ms var(--transition-expo-out);
 
   &.secondary,
   &.cove-button--secondary,
@@ -61,7 +60,18 @@
         background-color: var(--cove-button-secondary-hover);
         color: var(--cove-button-secondary-hover-font-color);
         border-color: var(--cove-button-secondary-hover-border-color);
-        box-shadow: var(--cove-button-secondary-shadow);
+      }
+    }
+
+    &.cove-button--animated {
+      transition: background-color 500ms var(--transition-expo-out), color 500ms var(--transition-expo-out),
+        border-color 500ms var(--transition-expo-out), box-shadow 220ms var(--transition-expo-out),
+        transform 220ms var(--transition-expo-out);
+
+      @media (hover: hover) {
+        &:hover {
+          box-shadow: var(--cove-button-secondary-shadow);
+        }
       }
     }
 
@@ -91,15 +101,27 @@
   @media (hover: hover) {
     &:hover:not(:disabled) {
       background-color: var(--cove-button-primary-hover);
-      transform: translateY(-1px);
-      box-shadow: var(--cove-button-primary-shadow);
     }
   }
 
-  &:active:not(:disabled) {
-    transform: translateY(0);
-    box-shadow: none;
+  &.cove-button--animated {
+    transition: background-color 500ms var(--transition-expo-out), color 500ms var(--transition-expo-out),
+      border-color 500ms var(--transition-expo-out), box-shadow 220ms var(--transition-expo-out),
+      transform 220ms var(--transition-expo-out);
+
+    @media (hover: hover) {
+      &:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: var(--cove-button-primary-shadow);
+      }
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: none;
+    }
   }
+
   &:focus {
     outline: 2px dashed var(--colors-blue-vivid-60) !important;
     outline-offset: 5px;
@@ -147,7 +169,18 @@
     @media (hover: hover) {
       &:hover:not(:disabled) {
         background-color: var(--cove-button-primary-hover);
-        box-shadow: var(--cove-button-primary-shadow);
+      }
+    }
+
+    &.cove-button--animated {
+      transition: background-color 500ms var(--transition-expo-out), color 500ms var(--transition-expo-out),
+        border-color 500ms var(--transition-expo-out), box-shadow 220ms var(--transition-expo-out),
+        transform 220ms var(--transition-expo-out);
+
+      @media (hover: hover) {
+        &:hover:not(:disabled) {
+          box-shadow: var(--cove-button-primary-shadow);
+        }
       }
     }
   }
@@ -157,9 +190,16 @@
   &.cove-button--success,
   &.btn-success {
     background-color: #44aa41;
+    color: #fff;
 
     &:hover {
       background-color: color.adjust(#44aa41, $lightness: 5%);
+    }
+
+    &:disabled {
+      background-color: var(--cove-button-primary-disabled);
+      color: var(--cove-button-primary-disabled-font-color);
+      border: none;
     }
   }
 
@@ -168,9 +208,16 @@
   &.cove-button--warn,
   &.btn-danger {
     background-color: #d73636;
+    color: #fff;
 
     &:hover {
       background-color: color.adjust(#d73636, $lightness: -5%);
+    }
+
+    &:disabled {
+      background-color: var(--cove-button-primary-disabled);
+      color: var(--cove-button-primary-disabled-font-color);
+      border: none;
     }
   }
 
@@ -181,6 +228,12 @@
 
     &:hover {
       background-color: color.adjust(#fbab18, $lightness: -5%);
+    }
+
+    &:disabled {
+      background-color: var(--cove-button-primary-disabled);
+      color: var(--cove-button-primary-disabled-font-color);
+      border: none;
     }
   }
 
@@ -193,6 +246,12 @@
     &:hover {
       background-color: #e7e7e7;
       border-color: var(--cool-gray-30);
+    }
+
+    &:disabled {
+      background-color: var(--cove-button-primary-disabled);
+      color: var(--cove-button-primary-disabled-font-color);
+      border: 1px solid var(--cool-gray-10);
     }
   }
 
@@ -213,6 +272,13 @@
       box-shadow: none;
       transform: none;
     }
+
+    &:disabled {
+      background-color: transparent;
+      color: var(--cool-gray-50);
+      border: 0;
+      text-decoration: none;
+    }
   }
 
   &.cove-button--outline-warning,
@@ -225,11 +291,18 @@
       background-color: #ffc107;
       color: #212529;
     }
+
+    &:disabled {
+      background-color: transparent;
+      color: var(--cool-gray-60);
+      border-color: var(--cool-gray-20);
+    }
   }
 
   &.muted,
   &.cove-button--muted {
     background-color: #a0a0a0;
+    color: #fff;
 
     &:hover {
       background-color: color.adjust(#a0a0a0, $lightness: -5%);
