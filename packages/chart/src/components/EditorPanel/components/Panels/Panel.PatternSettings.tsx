@@ -354,8 +354,8 @@ const PanelPatternSettings: FC<PanelProps> = props => {
                     className={snapshot.isDragging ? 'currently-dragging' : ''}
                     style={provided.draggableProps.style}
                   >
-                    <Accordion allowZeroExpanded>
-                      <AccordionItem className='series-item series-item--chart'>
+                    <Accordion allowZeroExpanded preExpanded={['panel']}>
+                      <AccordionItem uuid='panel' className='series-item series-item--chart'>
                         <AccordionItemHeading className='series-item__title'>
                           <AccordionItemButton className='accordion__button'>
                             <Icon display='move' size={15} style={{ cursor: 'default' }} />

@@ -28,6 +28,14 @@ export const ColumnsSectionTests: Story = {
     ...DEFAULT_ARGS
   },
   play: async ({ canvasElement }) => {
+    const setTextFieldValue = (input: HTMLInputElement | HTMLTextAreaElement, value: string) => {
+      const prototype =
+        input instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype
+      const valueSetter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set
+      valueSetter?.call(input, value)
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+      input.dispatchEvent(new Event('change', { bubbles: true }))
+    }
     const canvas = within(canvasElement)
 
     await waitForEditor(canvas)
@@ -39,7 +47,13 @@ export const ColumnsSectionTests: Story = {
     // TEST: Geography column select
     // Verifies: Changing geo column to invalid data makes map gray and legend shows "No data"
     // ==========================================================================
-    const columnsAccordion = canvasElement.querySelector('[aria-expanded="true"]')?.closest('.accordion__item')
+    const columnsAccordionButton = canvas
+      .getAllByRole('button', { name: /^Columns$/i })
+      .find(button => button.closest('[data-accordion-component="AccordionItem"], .accordion__item'))
+    const columnsAccordion = columnsAccordionButton?.closest(
+      '[data-accordion-component="AccordionItem"], .accordion__item'
+    )
+    expect(columnsAccordion).toBeTruthy()
     const geoColumnLabel = Array.from(columnsAccordion?.querySelectorAll('label') || []).find(label => {
       const columnHeading = label.querySelector('.edit-label.column-heading')
       return columnHeading?.textContent?.includes('Geography')
@@ -150,15 +164,18 @@ export const ColumnsSectionTests: Story = {
     // TEST: Geography Label field
     // Verifies: Custom geography label appears in tooltip instead of default "State:"
     // ==========================================================================
-    const geoLabelInput = canvas.getByLabelText(/Geography Label/i) as HTMLInputElement
+    const geoLabelInput = Array.from(columnsAccordion?.querySelectorAll('input[type="text"]') || []).find(input => {
+      const label = input.closest('label')
+      return label?.textContent?.includes('Geography Label')
+    }) as HTMLInputElement
     expect(geoLabelInput).toBeTruthy()
 
     await performAndAssert(
       'Geography Label → Add custom label',
       getTooltipContent,
       async () => {
-        await userEvent.clear(geoLabelInput)
-        await userEvent.type(geoLabelInput, 'Region')
+        geoLabelInput.scrollIntoView({ block: 'center' })
+        setTextFieldValue(geoLabelInput, 'Region')
       },
       (before, after) => {
         // Custom label "Region:" should appear in tooltip
@@ -267,8 +284,8 @@ export const ColumnsSectionTests: Story = {
       'Data Label → Add custom label',
       getDataTooltipContent,
       async () => {
-        await userEvent.clear(dataLabelInput)
-        await userEvent.type(dataLabelInput, 'Value')
+        dataLabelInput.scrollIntoView({ block: 'center' })
+        setTextFieldValue(dataLabelInput, 'Value')
       },
       (before, after) => {
         // Custom label "Value:" should appear in tooltip
@@ -306,8 +323,8 @@ export const ColumnsSectionTests: Story = {
       'Prefix → Add dollar sign',
       getPrefixVisualization,
       async () => {
-        await userEvent.clear(prefixInput)
-        await userEvent.type(prefixInput, '$')
+        prefixInput.scrollIntoView({ block: 'center' })
+        setTextFieldValue(prefixInput, '$')
       },
       (before, after) => {
         // Dollar sign should appear in both tooltip and legend
@@ -345,8 +362,8 @@ export const ColumnsSectionTests: Story = {
       'Suffix → Add percent sign',
       getSuffixVisualization,
       async () => {
-        await userEvent.clear(suffixInput)
-        await userEvent.type(suffixInput, '%')
+        suffixInput.scrollIntoView({ block: 'center' })
+        setTextFieldValue(suffixInput, '%')
       },
       (before, after) => {
         // Percent sign should appear in both tooltip and legend
@@ -387,8 +404,8 @@ export const ColumnsSectionTests: Story = {
       'Round → Set to 2 decimal places',
       getRoundingVisualization,
       async () => {
-        await userEvent.clear(roundInput)
-        await userEvent.type(roundInput, '2')
+        roundInput.scrollIntoView({ block: 'center' })
+        setTextFieldValue(roundInput, '2')
       },
       (before, after) => {
         // Numbers should now show 2 decimal places in both tooltip and legend
@@ -564,8 +581,8 @@ export const ColumnsSectionTests: Story = {
           return label?.textContent?.includes('Label')
         }) as HTMLInputElement
 
-        await userEvent.clear(labelInput)
-        await userEvent.type(labelInput, 'Alabama')
+        labelInput.scrollIntoView({ block: 'center' })
+        setTextFieldValue(labelInput, 'Alabama')
       },
       (before, after) => {
         // Check that "Alabama" text appears in the legend

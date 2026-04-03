@@ -390,34 +390,43 @@ export const DataTableSectionTests: Story = {
     isEditor: true
   },
   play: async ({ canvasElement }) => {
+    const setTextFieldValue = (input: HTMLInputElement | HTMLTextAreaElement, value: string) => {
+      const prototype =
+        input instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype
+      const valueSetter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set
+      valueSetter?.call(input, value)
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+      input.dispatchEvent(new Event('change', { bubbles: true }))
+    }
     const canvas = within(canvasElement)
     await waitForEditor(canvas)
 
-    // Check what accordion sections are actually available
     const accordionButtons = canvasElement.querySelectorAll(
       '.accordion__button, [data-accordion-component="AccordionItemButton"]'
     )
-
-    // Manually click the Data Table accordion button to avoid multiple element issue
     const dataTableAccordionButton = Array.from(accordionButtons).find(button => {
-      return (
-        button.textContent?.trim() === 'Data Table' &&
-        button.getAttribute('data-accordion-component') === 'AccordionItemButton'
-      )
+      return button.textContent?.trim() === 'Data Table'
     }) as HTMLElement
 
-    if (!dataTableAccordionButton) {
-      return
+    expect(dataTableAccordionButton).toBeTruthy()
+    if (dataTableAccordionButton.getAttribute('aria-expanded') !== 'true') {
+      await userEvent.click(dataTableAccordionButton)
+      await new Promise(resolve => setTimeout(resolve, 500))
     }
 
-    await userEvent.click(dataTableAccordionButton)
-    await new Promise(resolve => setTimeout(resolve, 500))
+    // Scope all input queries to the open Data Table panel to avoid collision
+    // with Columns section's Label inputs (which are now pre-expanded)
+    const dataTableAccordionItem = dataTableAccordionButton.closest('[data-accordion-component="AccordionItem"]')
+    const dataTablePanel = dataTableAccordionItem?.querySelector(
+      '[data-accordion-component="AccordionPanel"]'
+    ) as HTMLElement
+    const panelScope = dataTablePanel || canvasElement
 
     // ============================================================================
     // TEST: Data Table Title/Label Update
     // ============================================================================
 
-    const allInputs = canvasElement.querySelectorAll('input, textarea')
+    const allInputs = panelScope.querySelectorAll('input, textarea')
 
     // Find title/label input
     const titleInput = Array.from(allInputs).find(control => {
@@ -426,8 +435,8 @@ export const DataTableSectionTests: Story = {
     }) as HTMLInputElement
 
     if (titleInput) {
-      await userEvent.clear(titleInput)
-      await userEvent.type(titleInput, 'Updated Data Table Title Test')
+      titleInput.scrollIntoView({ block: 'center' })
+      setTextFieldValue(titleInput, 'Updated Data Table Title Test')
       await new Promise(resolve => setTimeout(resolve, 500))
     }
 
@@ -441,8 +450,8 @@ export const DataTableSectionTests: Story = {
     }) as HTMLInputElement
 
     if (captionInput) {
-      await userEvent.clear(captionInput)
-      await userEvent.type(captionInput, 'This is a test table caption for verification')
+      captionInput.scrollIntoView({ block: 'center' })
+      setTextFieldValue(captionInput, 'This is a test table caption for verification')
       await new Promise(resolve => setTimeout(resolve, 500))
     }
 
@@ -794,6 +803,7 @@ export const DataTableSectionTests: Story = {
           await performAndAssert(
             'Clear Default Sort Column',
             () => ({
+              selectedSortColumn: sortColumnSelect.value,
               hasSortList: !!canvasElement.querySelector('.sort-list'),
               headers: Array.from(canvasElement.querySelectorAll('th')).map(h => h.className)
             }),
@@ -802,7 +812,7 @@ export const DataTableSectionTests: Story = {
             },
             (_before, after) => {
               const noSort = !after.headers.some(c => c.includes('sort-asc') || c.includes('sort-desc'))
-              return noSort && !after.hasSortList
+              return noSort && after.selectedSortColumn === ''
             }
           )
         }
