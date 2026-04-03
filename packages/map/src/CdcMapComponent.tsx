@@ -14,6 +14,7 @@ import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Title from '@cdc/core/components/ui/Title'
 import Waiting from '@cdc/core/components/Waiting'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
+import { supportedStatesFipsCodes } from './data/supported-geos'
 
 // types
 import { type MapConfig } from './types/MapConfig'
@@ -24,7 +25,12 @@ import './scss/main.scss'
 import './cdcMapComponent.styles.css'
 
 // Core Helpers
-import { getQueryStringFilterValue, isFilterHiddenByQuery } from '@cdc/core/helpers/queryStringUtils'
+import {
+  getQueryStringFilterValue,
+  isFilterHiddenByQuery,
+  removeQueryParam,
+  updateQueryParam
+} from '@cdc/core/helpers/queryStringUtils'
 import { generateRuntimeFilters } from './helpers/generateRuntimeFilters'
 import { type MapReducerType, MapState } from './store/map.reducer'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
@@ -47,7 +53,6 @@ import { generateRuntimeLegend } from './helpers/generateRuntimeLegend'
 import generateRuntimeData from './helpers/generateRuntimeData'
 import { reloadURLData } from './helpers/urlDataHelpers'
 import { observeMapSvgLoaded } from './helpers/mapObserverHelpers'
-import { buildBodyWrapClassNames, buildSectionClassNames } from './helpers/componentHelpers'
 import { shouldShowDataTable, filterCountyTableRuntimeDataByStateCode } from './helpers/dataTableHelpers'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 
@@ -66,7 +71,6 @@ import useLegendMemo from './hooks/useLegendMemo'
 import { LegendMemoProvider } from './context/LegendMemoContext'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { getInitialState, mapReducer } from './store/map.reducer'
-import { RuntimeData } from './types/RuntimeData'
 import defaults from './data/initial-state'
 import { LEGACY_MAP_DEFAULTS } from './data/legacy-defaults'
 import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
@@ -79,6 +83,7 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { ENABLE_CHART_MAP_TP5_TREATMENT } from '@cdc/core/helpers/constants'
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
+import { useQueryParamsListener } from '@cdc/core/hooks/useQueryParamsListener'
 
 type CdcMapComponent = {
   config: MapConfig
@@ -163,6 +168,16 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     } else {
       dispatch({ type: 'SET_RUNTIME_FILTERS', payload: data })
     }
+  }
+
+  const setFilters = (filters: VizFilter[]) => {
+    const filterCopy = _.cloneDeep(filters)
+    if (config.general.showStateDropdown) {
+      const stateFilter = filterCopy.pop()
+      const stateCode = (stateFilter?.active as string) || ''
+      setFilteredStateCode(stateCode)
+    }
+    _setRuntimeData(filterCopy)
   }
 
   // Refs
@@ -360,6 +375,19 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     />
   )
 
+  const STATE_CODE = 'state-code'
+  const setFilteredStateCode = (stateCode: string) => {
+    const stateCodePattern = /^\d\d$/
+    if (!stateCodePattern.test(stateCode)) {
+      removeQueryParam(STATE_CODE)
+    } else {
+      updateQueryParam(STATE_CODE, stateCode)
+    }
+    dispatch({ type: 'SET_FILTERED_STATE_CODE', payload: stateCode })
+  }
+
+  useQueryParamsListener(STATE_CODE, setFilteredStateCode)
+
   const mapProps = {
     setParentConfig,
     container,
@@ -381,7 +409,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeLegend,
     scale,
     setConfig,
-    setFilteredStateCode: (stateCode: string) => dispatch({ type: 'SET_FILTERED_STATE_CODE', payload: stateCode }),
+    setFilteredStateCode,
     setSharedFilter,
     setSharedFilterValue,
     config,
@@ -448,6 +476,24 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     </a>
   )
 
+  const applyStateFilter = (config: MapConfig): MapConfig => {
+    if (config.general.showStateDropdown) {
+      const stateFilter = {
+        label: 'Select State',
+        labels: supportedStatesFipsCodes,
+        values: Object.keys(supportedStatesFipsCodes),
+        resetLabel: 'All States',
+        staticFilter: true,
+        active: filteredStateCode
+      } as VizFilter
+      return {
+        ...config,
+        filters: [...(config.filters || []), stateFilter]
+      }
+    }
+    return config
+  }
+
   return (
     <LegendMemoProvider legendMemo={legendMemo} legendSpecialClassLastMemo={legendSpecialClassLastMemo}>
       <ConfigContext.Provider value={mapProps}>
@@ -486,14 +532,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   .filter(Boolean)
                   .join(' ')}
                 filters={
-                  config?.filters?.length > 0 ? (
+                  config?.filters?.length > 0 || config.general.showStateDropdown ? (
                     <Filters
-                      config={config}
-                      setConfig={setConfig}
-                      filteredData={runtimeFilters}
-                      setFilters={_setRuntimeData}
+                      config={applyStateFilter(config)}
+                      setFilters={setFilters}
                       dimensions={dimensions}
-                      standaloneMap={!config}
                       interactionLabel={interactionLabel}
                     />
                   ) : undefined

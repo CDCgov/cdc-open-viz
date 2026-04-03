@@ -1,4 +1,3 @@
-
 /**
  * Subscribes a listener function to a custom event on the document.
  * @param eventName - The name of the event to listen for.
@@ -8,7 +7,6 @@ function subscribe(eventName: string, listener: EventListenerOrEventListenerObje
   document.addEventListener(eventName, listener)
 }
 
-
 /**
  * Unsubscribes a listener function from a custom event on the document.
  * @param eventName - The name of the event to stop listening for.
@@ -17,7 +15,6 @@ function subscribe(eventName: string, listener: EventListenerOrEventListenerObje
 function unsubscribe(eventName: string, listener: EventListenerOrEventListenerObject): void {
   document.removeEventListener(eventName, listener)
 }
-
 
 /**
  * Publishes (dispatches) a custom event with optional data payload on the document.
@@ -29,4 +26,13 @@ function publish(eventName: string, data?: any): void {
   document.dispatchEvent(event)
 }
 
-export { publish, subscribe, unsubscribe }
+/**
+ * Dispatches a custom 'querychange' event on the document to signal that URL query parameters have changed.
+ * can be used with useQueryParamsListener hook.
+ */
+export const QUERY_CHANGE_EVENT = 'querychange'
+function querychange() {
+  document.dispatchEvent(new CustomEvent(QUERY_CHANGE_EVENT))
+}
+
+export { publish, subscribe, unsubscribe, querychange }
