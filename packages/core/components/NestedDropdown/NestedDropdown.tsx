@@ -50,16 +50,24 @@ const Options: React.FC<{
         onKeyUp={handleKeyUp}
         className={`nested-dropdown-group-${filterIndex}`}
       >
-        <span className={'font-weight-bold fw-bold'}>{label} </span>
-        {
-          <span className='list-arrow' aria-hidden='true'>
+        <span className='nested-dropdown-group-header'>
+          <span className='nested-dropdown-group-label'>{label} </span>
+          <span className='list-arrow nested-dropdown-group-arrow' aria-hidden='true'>
             {isTierOneExpanded ? (
-              <Icon display='caretFilledUp' alt='arrow pointing up' />
+              <Icon
+                display='caretFilledDown'
+                alt='arrow pointing down'
+                className='nested-dropdown-group-arrow-icon'
+              />
             ) : (
-              <Icon display='caretFilledDown' alt='arrow pointing down' />
+              <Icon
+                display='caretFilledDown'
+                alt='arrow pointing right'
+                className='nested-dropdown-group-arrow-icon nested-dropdown-group-arrow-icon--collapsed'
+              />
             )}
           </span>
-        }
+        </span>
         <ul
           aria-expanded={isTierOneExpanded}
           role='group'
@@ -132,6 +140,10 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
     // value from props
     return activeSubGroup ? `${activeGroup} - ${activeSubGroup}` : ''
   }, [activeGroup, activeSubGroup])
+  const inputPlaceholder = useMemo(() => {
+    if (loading) return 'Loading...'
+    return inputValue || '- Select -'
+  }, [inputValue, loading])
   const [inputHasFocus, setInputHasFocus] = useState(false)
   const [isListOpened, setIsListOpened] = useState(false)
   const nestedDropdownRef = useRef(null)
@@ -139,10 +151,11 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   const searchDropdown = useRef(null)
 
   const chooseSelectedSubGroup = (tierOne: string | number, tierTwo: string | number) => {
-    searchInput.current.focus()
     setUserSearchTerm(null)
+    setInputHasFocus(false)
     setIsListOpened(false)
     handleSelectedItems([String(tierOne), String(tierTwo)])
+    searchInput.current?.blur()
   }
 
   const handleKeyUp = e => {
@@ -228,6 +241,17 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
     setUserSearchTerm(newSearchTerm)
   }
 
+  const handleInputFocus = () => {
+    setInputHasFocus(true)
+
+    if (userSearchTerm === null) {
+      setUserSearchTerm('')
+      requestAnimationFrame(() => {
+        searchInput.current?.setSelectionRange?.(0, 0)
+      })
+    }
+  }
+
   const handleOnBlur = (e: React.FocusEvent<HTMLLIElement, Element>): void => {
     if (
       e.relatedTarget === null ||
@@ -240,6 +264,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
     ) {
       setInputHasFocus(false)
       setIsListOpened(false)
+      setUserSearchTerm(null)
     } else {
       ; (e.relatedTarget as HTMLElement).focus()
     }
@@ -275,12 +300,12 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
             tabIndex={0}
             value={userSearchTerm !== null ? userSearchTerm : inputValue}
             onChange={handleSearchTermChange}
-            placeholder={loading ? 'Loading...' : '- Select -'}
+            placeholder={inputPlaceholder}
             disabled={loading || !options?.length}
             onClick={() => {
               if (inputHasFocus) setIsListOpened(!isListOpened)
             }}
-            onFocus={() => setInputHasFocus(true)}
+            onFocus={handleInputFocus}
           />
           <span className='list-arrow' aria-hidden={true}>
             {isListOpened ? (
