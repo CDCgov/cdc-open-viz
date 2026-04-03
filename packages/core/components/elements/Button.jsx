@@ -13,6 +13,7 @@ const Button = ({
   hoverStyle = {},
   fluid = false,
   fullWidth = false,
+  animated = false,
   loading = false,
   loadingText = 'Loading...',
   flexCenter,
@@ -23,14 +24,33 @@ const Button = ({
   ...attributes
 }) => {
   const buttonRef = useRef(null)
+  const themedVariants = [
+    'theme-purple',
+    'theme-brown',
+    'theme-teal',
+    'theme-pink',
+    'theme-orange',
+    'theme-slate',
+    'theme-indigo',
+    'theme-cyan',
+    'theme-green',
+    'theme-amber'
+  ]
+  const isThemedVariant = themedVariants.includes(variant)
   const isEditorPrimary = variant === 'editor-primary'
+  const useLegacySecondaryClass = secondary && !variant
+  const themedModeClassName = isThemedVariant && secondary ? ' cove-button--theme-secondary' : ''
 
   const [buttonState, setButtonState] = useState('out')
   const [customStyles, setCustomStyles] = useState({ ...style })
   const [childrenWidth, setChildrenWidth] = useState()
   const [loadtextWidth, setLoadtextWidth] = useState()
 
-  const variantClassName = variant && variant !== 'primary' ? ` cove-button--${variant}` : ''
+  const variantClassName =
+    variant && variant !== 'primary'
+      ? ` cove-button--${isThemedVariant ? 'theme-primary' : variant}`
+      : ''
+  const themeClassName = isThemedVariant ? ` ${variant}` : ''
   const sizeClassName = size ? ` cove-button--${size}` : ''
 
   const attributesObj = {
@@ -39,13 +59,16 @@ const Button = ({
     className:
       'cove-button' +
       variantClassName +
+      themedModeClassName +
+      themeClassName +
       sizeClassName +
+      (animated ? ' cove-button--animated' : '') +
       (flexCenter || 'loader' === role ? ' cove-button--flex-center' : '') +
       (fluid ? ' fluid' : '') +
       (fullWidth || isEditorPrimary ? ' cove-button--full-width' : '') +
       (loading ? ' loading' : '') +
       (attributes.className ? ' ' + attributes.className : '') +
-      (secondary ? ' secondary' : ''),
+      (useLegacySecondaryClass ? ' secondary' : ''),
     onMouseOver: () => setButtonState('in'),
     onMouseOut: () => setButtonState('out'),
     onFocus: () => setButtonState('in'),
@@ -144,6 +167,16 @@ Button.propTypes = {
   variant: PropTypes.oneOf([
     'primary',
     'editor-primary',
+    'theme-purple',
+    'theme-brown',
+    'theme-teal',
+    'theme-pink',
+    'theme-orange',
+    'theme-slate',
+    'theme-indigo',
+    'theme-cyan',
+    'theme-green',
+    'theme-amber',
     'secondary',
     'success',
     'danger',
@@ -162,6 +195,8 @@ Button.propTypes = {
   fullWidth: PropTypes.bool,
   /** Displays loading spinner on button while condition is true **/
   loading: PropTypes.bool,
+  /** Enables motion effects like hover lift/shadow */
+  animated: PropTypes.bool,
   /** Set text to appear during loading animation **/
   loadingText: PropTypes.string,
   /** Displays button as flex and centers all direct children nodes. Useful for aligning icons and text **/

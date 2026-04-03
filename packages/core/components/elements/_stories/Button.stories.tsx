@@ -9,9 +9,20 @@ const classNames = ['', 'cove-button--success', 'cove-button--warn', 'cove-butto
 const meta: Meta<typeof Button> = {
   title: 'Components/Atoms/Button',
   component: Button,
+  args: {
+    children: 'Button',
+    variant: 'primary',
+    disabled: false,
+    loading: false,
+    fullWidth: false
+  },
   decorators: [
-    Story => (
-      <div className='cove-visualization theme-blue'>
+    (Story, context) => (
+      <div
+        className={`cove-visualization ${
+          String(context.args.variant || '').startsWith('theme-') ? context.args.variant : 'theme-blue'
+        }`}
+      >
         <Story />
       </div>
     )
@@ -19,6 +30,61 @@ const meta: Meta<typeof Button> = {
 }
 
 type Story = StoryObj<typeof Button>
+
+export const Playground: Story = {
+  argTypes: {
+    children: {
+      control: 'text'
+    },
+    variant: {
+      control: 'select',
+      options: [
+        'primary',
+        'editor-primary',
+        'theme-purple',
+        'theme-brown',
+        'theme-teal',
+        'theme-pink',
+        'theme-orange',
+        'theme-slate',
+        'theme-indigo',
+        'theme-cyan',
+        'theme-green',
+        'theme-amber',
+        'secondary',
+        'success',
+        'danger',
+        'warning',
+        'light',
+        'link',
+        'outline-warning'
+      ]
+    },
+    size: {
+      control: 'select',
+      options: [undefined, 'sm']
+    },
+    fullWidth: {
+      control: 'boolean'
+    },
+    disabled: {
+      control: 'boolean'
+    },
+    loading: {
+      control: 'boolean'
+    },
+    secondary: {
+      control: 'boolean'
+    }
+  },
+  render: args => (
+    <div style={{ width: '100%', padding: '1rem' }}>
+      <div style={{ maxWidth: '32rem' }}>
+        <Button {...args} />
+      </div>
+    </div>
+  )
+}
 
 export const Primary: Story = {
   render: args => (

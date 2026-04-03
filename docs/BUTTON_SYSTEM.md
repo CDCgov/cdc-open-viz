@@ -25,6 +25,19 @@ Current supported props for button styling:
   - `editor-primary`
     - always full width; no `fullWidth` prop needed
     - adds top margin when it is not the first child in its container
+  - themed primary variants
+    - `theme-purple`
+    - `theme-brown`
+    - `theme-teal`
+    - `theme-pink`
+    - `theme-orange`
+    - `theme-slate`
+    - `theme-indigo`
+    - `theme-cyan`
+    - `theme-green`
+    - `theme-amber`
+    - intended for theme-colored apply/primary actions that should follow the current visualization theme
+    - can also be combined with `secondary` for a theme-colored secondary treatment
   - `secondary`
   - `success`
   - `danger`
@@ -57,6 +70,8 @@ Use props for semantics:
 
 ```tsx
 <Button variant='primary'>Save</Button>
+<Button variant='theme-cyan'>Apply</Button>
+<Button variant='theme-cyan' secondary>Secondary Apply</Button>
 <Button variant='danger'>Delete</Button>
 <Button variant='link'>Clear Filters</Button>
 <Button variant='light' size='sm'>Collapse</Button>
