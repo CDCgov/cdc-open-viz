@@ -26,6 +26,7 @@ Current supported props for button styling:
     - always full width; no `fullWidth` prop needed
     - adds top margin when it is not the first child in its container
   - themed primary variants
+    - `theme-blue`
     - `theme-purple`
     - `theme-brown`
     - `theme-teal`

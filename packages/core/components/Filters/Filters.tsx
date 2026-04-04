@@ -5,6 +5,7 @@ import parse from 'html-react-parser'
 
 // CDC
 import Button from '../elements/Button'
+import type { ButtonVariant } from '../elements/Button'
 import MultiSelect from '../MultiSelect'
 import ComboBox from '../ComboBox'
 import { Visualization } from '../../types/Visualization'
@@ -57,7 +58,8 @@ const Filters: React.FC<FilterProps> = ({
   interactionLabel = ''
 }) => {
   const { filters, general, theme, filterBehavior } = visualizationConfig
-  const getApplyButtonVariant = (currentTheme?: string) => (currentTheme === 'theme-blue' ? 'primary' : currentTheme)
+  const getApplyButtonVariant = (currentTheme?: string): ButtonVariant | undefined =>
+    currentTheme === 'theme-blue' ? 'primary' : (currentTheme as ButtonVariant | undefined)
   const [showApplyButton, setShowApplyButton] = useState(false)
   // Handle Wrapping Filters
   const [wrappingFilters, setWrappingFilters] = useState<

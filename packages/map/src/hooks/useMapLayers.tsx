@@ -53,7 +53,7 @@ export default function useMapLayers(config: MapConfig, setConfig, pathGenerator
     setConfig(newConfig)
   }
 
-  const handleAddLayer = (e: Event) => {
+  const handleAddLayer = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     const placeHolderLayer = {
       name: 'New Custom Layer',
