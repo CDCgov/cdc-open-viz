@@ -20,15 +20,45 @@ const escapeCsv = value => {
   return stringValue
 }
 
+const compareStrings = (left, right) => {
+  const normalizedLeft = left.toLowerCase()
+  const normalizedRight = right.toLowerCase()
+
+  if (normalizedLeft < normalizedRight) {
+    return -1
+  }
+
+  if (normalizedLeft > normalizedRight) {
+    return 1
+  }
+
+  return 0
+}
+
+const dedupeRows = rows => {
+  const seenRows = new Set()
+
+  return rows.filter(row => {
+    const rowKey = row.join('\u0000')
+
+    if (seenRows.has(rowKey)) {
+      return false
+    }
+
+    seenRows.add(rowKey)
+    return true
+  })
+}
+
 const readJson = async filePath => {
   const fileContents = await readFile(filePath, 'utf8')
   return JSON.parse(fileContents)
 }
 
-const collectPackageRows = async (manifestPath, packagePathLabel) => {
+const collectPackageRows = async manifestPath => {
   const manifest = await readJson(manifestPath)
   const dependencies = Object.entries(manifest.dependencies ?? {})
-    .sort(([left], [right]) => left.localeCompare(right))
+    .sort(([left], [right]) => compareStrings(left, right))
     .map(([dependency, version]) => [dependency, version])
 
   return dependencies
@@ -59,10 +89,18 @@ const main = async () => {
   ]
 
   const rowGroups = await Promise.all(
-    manifestPaths.map(manifestPath => collectPackageRows(manifestPath, path.relative(repoRoot, manifestPath)))
+    manifestPaths.map(manifestPath => collectPackageRows(manifestPath))
   )
 
-  const rows = rowGroups.flat()
+  const rows = dedupeRows(rowGroups.flat()).sort(([leftDependency, leftVersion], [rightDependency, rightVersion]) => {
+      const dependencyComparison = compareStrings(leftDependency, rightDependency)
+
+      if (dependencyComparison !== 0) {
+        return dependencyComparison
+      }
+
+      return compareStrings(leftVersion, rightVersion)
+    })
   const outputLines = [
     csvHeaders.join(','),
     ...rows.map(row => row.map(escapeCsv).join(','))
