@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useMemo, useState, useRef, useEffect } from 'react'
 import { SVG_REGISTRY, SvgRegistryId, buildInlineSvg } from '../../../helpers/svgRegistry'
 import Icon from '../../ui/Icon'
 
@@ -9,6 +9,12 @@ type SvgIconSelectProps = {
   options: Option[]
   onChange: (value: string) => void
 }
+
+const OPTION_HEIGHT = 41
+const MAX_VISIBLE_OPTIONS = 5
+const LIST_VERTICAL_PADDING = 8
+
+const labelCollator = new Intl.Collator(undefined, { sensitivity: 'base' })
 
 const SvgIconPreview = ({ svgId }: { svgId: string }) => {
   if (!svgId || !(svgId in SVG_REGISTRY)) return null
@@ -22,10 +28,20 @@ const SvgIconPreview = ({ svgId }: { svgId: string }) => {
 
 const SvgIconSelect = ({ value, options, onChange }: SvgIconSelectProps) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [listPos, setListPos] = useState<{ top: number; left: number } | null>(null)
   const [hoveredValue, setHoveredValue] = useState<string | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const buttonRef = useRef<HTMLButtonElement>(null)
+
+  const sortedOptions = useMemo(() => {
+    const pinnedOptions = options.filter(option => !option.value)
+    const iconOptions = options
+      .filter(option => option.value)
+      .slice()
+      .sort((a, b) => labelCollator.compare(a.label, b.label))
+
+    return [...pinnedOptions, ...iconOptions]
+  }, [options])
+
+  const shouldScroll = sortedOptions.length > MAX_VISIBLE_OPTIONS
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -37,24 +53,15 @@ const SvgIconSelect = ({ value, options, onChange }: SvgIconSelectProps) => {
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  const openDropdown = () => {
-    if (buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect()
-      // position: fixed uses viewport coords — do NOT add window.scrollY/X
-      setListPos({ top: rect.bottom, left: rect.left })
-    }
-    setIsOpen(open => !open)
-  }
-
   const selectedOption = options.find(o => o.value === value) ?? options[0]
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} style={{ position: 'relative', display: 'inline-block' }}>
       <button
-        ref={buttonRef}
         type='button'
         className='cove-form-select py-2 ps-2 d-block'
         style={{
+          position: 'relative',
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -62,56 +69,76 @@ const SvgIconSelect = ({ value, options, onChange }: SvgIconSelectProps) => {
           width: '5rem',
           minWidth: '5rem',
           height: '41px',
-          paddingRight: '0.75rem',
+          paddingRight: '2rem',
           background: 'white',
           border: '1px solid #d9dce1',
           borderRadius: '0.25rem',
           cursor: 'pointer',
           textAlign: 'left'
         }}
-        onClick={openDropdown}
+        onClick={() => setIsOpen(open => !open)}
         aria-haspopup='listbox'
         aria-expanded={isOpen}
       >
         <span style={{ display: 'inline-flex', alignItems: 'center', minWidth: 0 }}>
-          <SvgIconPreview svgId={selectedOption?.value} />
+          {selectedOption?.value && (
+            <span style={{ position: 'relative', top: '-2px', display: 'inline-flex', alignItems: 'center' }}>
+              <SvgIconPreview svgId={selectedOption.value} />
+            </span>
+          )}
           {!selectedOption?.value && <span style={{ flex: 1 }}>{selectedOption?.label}</span>}
         </span>
-        <Icon display='caretDown' size={16} color='#5c6670' />
+        <span
+          aria-hidden='true'
+          style={{
+            position: 'absolute',
+            right: '8px',
+            top: 'calc(50% + 2px)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+            transform: 'translateY(-50%)'
+          }}
+        >
+          <Icon display='caretDown' size={16} color='#5c6670' />
+        </span>
       </button>
-      {isOpen && listPos && (
+      {isOpen && (
         <ul
           role='listbox'
           aria-label='Select an icon'
           style={{
-            position: 'fixed',
-            top: listPos.top,
-            left: listPos.left,
+            position: 'absolute',
+            top: 'calc(100% + 0.25rem)',
+            left: 0,
             zIndex: 99999,
             background: 'white',
             border: '1px solid #d9dce1',
             borderRadius: '0.25rem',
             boxShadow: '0 4px 12px rgba(28, 29, 31, 0.08)',
             width: 'max-content',
+            minWidth: '100%',
             margin: 0,
             padding: '0.25rem 0',
             listStyle: 'none',
-            maxHeight: '200px',
-            overflowY: 'auto'
+            maxHeight: shouldScroll ? `${OPTION_HEIGHT * MAX_VISIBLE_OPTIONS + LIST_VERTICAL_PADDING}px` : undefined,
+            overflowY: shouldScroll ? 'auto' : undefined
           }}
         >
-          {options.map(option => (
+          {sortedOptions.map(option => (
             <li
               key={option.value}
               role='option'
               aria-selected={option.value === value}
               tabIndex={0}
               style={{
+                boxSizing: 'border-box',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                minHeight: '41px',
-                padding: '0.5rem 0.75rem',
+                height: `${OPTION_HEIGHT}px`,
+                padding: '0 0.75rem',
                 cursor: 'pointer',
                 background: option.value === value || hoveredValue === option.value ? '#e9ecef' : 'white'
               }}
