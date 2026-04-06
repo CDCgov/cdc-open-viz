@@ -378,12 +378,14 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const STATE_CODE = 'state-code'
   const setFilteredStateCode = (stateCode: string) => {
     const stateCodePattern = /^\d\d$/
-    if (!stateCodePattern.test(stateCode)) {
+    const normalizedStateCode = stateCodePattern.test(stateCode) ? stateCode : ''
+
+    if (!normalizedStateCode) {
       removeQueryParam(STATE_CODE)
     } else {
-      updateQueryParam(STATE_CODE, stateCode)
+      updateQueryParam(STATE_CODE, normalizedStateCode)
     }
-    dispatch({ type: 'SET_FILTERED_STATE_CODE', payload: stateCode })
+    dispatch({ type: 'SET_FILTERED_STATE_CODE', payload: normalizedStateCode })
   }
 
   useQueryParamsListener(STATE_CODE, setFilteredStateCode)
