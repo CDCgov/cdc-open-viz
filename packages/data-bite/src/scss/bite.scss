@@ -190,6 +190,7 @@
 
     .cdc-callout__body {
       display: grid;
+      align-content: start;
       align-items: start;
       column-gap: 0.5rem;
       row-gap: 0.75rem;
@@ -197,7 +198,7 @@
     }
 
     .cdc-callout__body--content-right {
-      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-columns: fit-content(40%) minmax(0, 1fr);
     }
 
     @container (max-width: 576px) {
@@ -213,7 +214,6 @@
     }
 
     .cdc-callout__databite {
-      padding-top: 2px;
       width: auto;
       line-height: 1; // Tight line height for numbers
       color: var(--colors-cyan-60v, #007a99);

@@ -107,10 +107,7 @@ export const processMarkupVariables = (
         const usesDataDrivenIcons = isDataDrivenIconsVariable(workingVariable)
 
         if (sourceType === 'icon') {
-          const svgMarkup =
-            workingVariable.iconId && SVG_REGISTRY[workingVariable.iconId]
-              ? buildInlineSvg(workingVariable.iconId, { scale: workingVariable.svgScale })
-              : ''
+          const svgMarkup = workingVariable.iconId && SVG_REGISTRY[workingVariable.iconId] ? buildInlineSvg(workingVariable.iconId) : ''
 
           if (showNoDataMessage && svgMarkup === '') {
             noDataMessageChecker.push(true)
@@ -142,9 +139,7 @@ export const processMarkupVariables = (
               workingVariable.columnName,
               workingVariable.svgMappings || []
             )
-            svgMarkup = resolvedSvgIds.length
-              ? resolvedSvgIds.map(svgId => buildInlineSvg(svgId, { scale: workingVariable.svgScale })).join(' ')
-              : ''
+            svgMarkup = resolvedSvgIds.length ? resolvedSvgIds.map(svgId => buildInlineSvg(svgId)).join(' ') : ''
           }
 
           if (showNoDataMessage && svgMarkup === '') {
@@ -304,13 +299,6 @@ export const validateMarkupVariables = (markupVariables: MarkupVariable[], data:
         errors.push(`Variable ${index + 1}: Icon is required`)
       }
 
-      if (variable.svgScale !== undefined) {
-        const parsedScale = Number(variable.svgScale)
-        if (!Number.isFinite(parsedScale) || parsedScale <= 0) {
-          errors.push(`Variable ${index + 1}: Icon scale must be greater than 0`)
-        }
-      }
-
       return
     }
 
@@ -340,13 +328,6 @@ export const validateMarkupVariables = (markupVariables: MarkupVariable[], data:
 
       if (!variable.svgMappings || variable.svgMappings.length === 0) {
         errors.push(`Variable ${index + 1}: Icon mappings are required`)
-      }
-
-      if (variable.svgScale !== undefined) {
-        const parsedScale = Number(variable.svgScale)
-        if (!Number.isFinite(parsedScale) || parsedScale <= 0) {
-          errors.push(`Variable ${index + 1}: Icon scale must be greater than 0`)
-        }
       }
     }
 
