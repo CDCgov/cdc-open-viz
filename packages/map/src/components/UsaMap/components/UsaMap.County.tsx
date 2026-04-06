@@ -1,5 +1,6 @@
-import { useEffect, useState, useRef, useContext } from 'react'
+import { useEffect, useState, useRef, useContext, useMemo } from 'react'
 import { geoCentroid, geoPath, geoContains } from 'd3-geo'
+import type { GeoGeometryObjects } from 'd3-geo'
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity } from 'd3-zoom'
 import { select as d3Select } from 'd3-selection'
 import { feature, merge } from 'topojson-client'
@@ -23,6 +24,23 @@ import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { createCanvasPattern, PatternType } from '../../../helpers/createCanvasPattern'
 import { getPatternForRow } from '../../../helpers/getPatternForRow'
 
+type Geometry = GeoGeometryObjects & { id?: string; properties: { name: string } }
+type Focus = {
+  id: string
+  index: number
+  center: [number, number]
+  feature: Geometry
+}
+type TopoData = {
+  year?: string
+  counties: Geometry[]
+  states: Geometry[]
+  hsas: { groupId: string; feature: Geometry }[]
+  mapData: Geometry[]
+  countyIndecies: Record<string, [number, number]>
+  projection: any
+}
+
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
 }
@@ -42,13 +60,13 @@ const getTopoData = (year, showHSABoundaries) => {
         response = await response.json()
       }
 
-      let topoData = {
+      let topoData: TopoData = {
         year: undefined,
-        counties: undefined,
-        states: undefined,
+        counties: [],
+        states: [],
         hsas: [],
         mapData: [],
-        countyIndecies: undefined,
+        countyIndecies: {},
         projection: undefined
       }
 
@@ -80,7 +98,6 @@ const getTopoData = (year, showHSABoundaries) => {
       topoData.states.sort(sortById)
       topoData.counties.sort(sortById)
       topoData.mapData = topoData.states.concat(topoData.counties).filter(geo => geo.id !== '51620') //Not sure why, but Franklin City, VA is very broken and messes up the rendering
-      topoData.countyIndecies = {}
       topoData.states.forEach(state => {
         let minIndex = topoData.mapData.length - 1
         let maxIndex = 0
@@ -152,8 +169,7 @@ const getCurrentTopoYear = (config: MapConfig, runtimeFilters) => {
 }
 
 const isTopoReady = (topoData, config: MapConfig, runtimeFilters) => {
-  let currentYear = getCurrentTopoYear(config, runtimeFilters)
-
+  const currentYear = getCurrentTopoYear(config, runtimeFilters)
   return topoData.year && (!currentYear || currentYear === topoData.year)
 }
 
@@ -165,6 +181,7 @@ const CountyMap = () => {
     runtimeFilters,
     runtimeLegend,
     setConfig,
+    filteredStateCode,
     setFilteredStateCode,
     config,
     tooltipId,
@@ -178,8 +195,18 @@ const CountyMap = () => {
   const geoStrokeColor = getGeoStrokeColor(config)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
-  const [focus, setFocus] = useState({})
-  const [topoData, setTopoData] = useState({})
+  const [topoData, setTopoData] = useState<TopoData>({} as TopoData)
+  const focus = useMemo(() => {
+    if (!isTopoReady(topoData, config, runtimeFilters) || !filteredStateCode) return {} as Focus
+    const stateGeo = topoData.states.find(state => state.id === filteredStateCode)
+    if (!stateGeo) return {} as Focus
+    return {
+      id: stateGeo.id,
+      index: topoData.mapData.findIndex(geo => geo.id === stateGeo.id),
+      center: geoCentroid(stateGeo),
+      feature: stateGeo
+    } as Focus
+  }, [filteredStateCode, topoData, config, runtimeFilters])
   const [hasMoved, setHasMoved] = useState(false)
 
   const pathGenerator = geoPath().projection(geoAlbersUsaTerritories())
@@ -370,7 +397,6 @@ const CountyMap = () => {
       mapPosition: { coordinates: [0, 30], zoom: 1 }
     })
     setFilteredStateCode('')
-    setFocus({})
     resetZoomTransform()
   }
 
@@ -448,7 +474,7 @@ const CountyMap = () => {
     const pointCoordinates = topoData.projection.invert([mapX, mapY])
 
     // Use d3 geoContains method to find the state geo data that the user clicked inside
-    let clickedState
+    let clickedState: Geometry
     for (let i = 0; i < topoData.states.length; i++) {
       if (geoContains(topoData.states[i], pointCoordinates)) {
         clickedState = topoData.states[i]
@@ -484,15 +510,6 @@ const CountyMap = () => {
         })
         setFilteredStateCode(clickedState.id)
 
-        let focusIndex = -1
-        for (let i = 0; i < topoData.mapData.length; i++) {
-          if (topoData.mapData[i].id === clickedState.id) {
-            focusIndex = i
-            break
-          }
-        }
-
-        setFocus({ id: clickedState.id, index: focusIndex, center: geoCentroid(clickedState), feature: clickedState })
         publishAnalyticsEvent({
           vizType: config.type,
           vizSubType: getVizSubType(config),
@@ -941,7 +958,6 @@ const CountyMap = () => {
   useEffect(() => {
     if (!config.general.allowMapZoom) {
       setFilteredStateCode('')
-      setFocus({})
       setHasMoved(false)
       resetZoomTransform()
     }

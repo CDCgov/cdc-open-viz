@@ -17,6 +17,7 @@
     "language": "en",
     "geoType": "us-county",
     "showHSABoundaries": true,
+    "showStateDropdown": true,
     "geoLabelOverride": "",
     "hasRegions": false,
     "fullBorder": false,
