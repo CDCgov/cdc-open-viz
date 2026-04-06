@@ -239,7 +239,7 @@ const HexSettingShapeColumns = props => {
                             <button
                               className='cove-button cove-button--warn'
                               style={{ background: 'none', border: '1px solid red', color: 'red', marginTop: '15px' }}
-                              onClick={e => {
+                              onClick={() => {
                                 let newGroups = [
                                   ...config.hexMap.shapeGroups.slice(0, shapeGroupIndex),
                                   ...config.hexMap.shapeGroups.slice(shapeGroupIndex + 1)
