@@ -1,4 +1,4 @@
-import Button from './Button.jsx'
+import Button from './Button'
 import React from 'react'
 import { missingRequiredSections } from '../../helpers/missingRequiredSections.js'
 const Confirm = props => {

@@ -1,9 +1,45 @@
 import React, { useState, useEffect, useRef } from 'react'
-import PropTypes from 'prop-types'
 
 import LoadSpin from '../ui/LoadSpin'
 
 import './button.scss'
+
+export type ButtonVariant =
+  | 'primary'
+  | 'editor-primary'
+  | 'theme-blue'
+  | 'theme-purple'
+  | 'theme-brown'
+  | 'theme-teal'
+  | 'theme-pink'
+  | 'theme-orange'
+  | 'theme-slate'
+  | 'theme-indigo'
+  | 'theme-cyan'
+  | 'theme-green'
+  | 'theme-amber'
+  | 'secondary'
+  | 'success'
+  | 'danger'
+  | 'warning'
+  | 'light'
+  | 'link'
+  | 'outline-warning'
+
+type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'role'> & {
+  role?: 'loader'
+  variant?: ButtonVariant
+  size?: 'sm'
+  hoverStyle?: React.CSSProperties
+  fluid?: boolean
+  fullWidth?: boolean
+  animated?: boolean
+  loading?: boolean
+  loadingText?: string
+  flexCenter?: boolean
+  active?: boolean
+  secondary?: boolean
+}
 
 const Button = ({
   style,
@@ -13,6 +49,7 @@ const Button = ({
   hoverStyle = {},
   fluid = false,
   fullWidth = false,
+  animated = false,
   loading = false,
   loadingText = 'Loading...',
   flexCenter,
@@ -21,16 +58,36 @@ const Button = ({
   children,
   secondary,
   ...attributes
-}) => {
-  const buttonRef = useRef(null)
+}: ButtonProps) => {
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const themedVariants = [
+    'theme-blue',
+    'theme-purple',
+    'theme-brown',
+    'theme-teal',
+    'theme-pink',
+    'theme-orange',
+    'theme-slate',
+    'theme-indigo',
+    'theme-cyan',
+    'theme-green',
+    'theme-amber'
+  ]
+  const isThemedVariant = !!variant && themedVariants.includes(variant)
   const isEditorPrimary = variant === 'editor-primary'
+  const useLegacySecondaryClass = secondary && !variant
+  const themedModeClassName = isThemedVariant && secondary ? ' cove-button--theme-secondary' : ''
 
   const [buttonState, setButtonState] = useState('out')
-  const [customStyles, setCustomStyles] = useState({ ...style })
-  const [childrenWidth, setChildrenWidth] = useState()
-  const [loadtextWidth, setLoadtextWidth] = useState()
+  const [customStyles, setCustomStyles] = useState<React.CSSProperties>({ ...style })
+  const [childrenWidth, setChildrenWidth] = useState<number | undefined>()
+  const [loadtextWidth, setLoadtextWidth] = useState<number | undefined>()
 
-  const variantClassName = variant && variant !== 'primary' ? ` cove-button--${variant}` : ''
+  const variantClassName =
+    variant && variant !== 'primary'
+      ? ` cove-button--${isThemedVariant ? 'theme-primary' : variant}`
+      : ''
+  const themeClassName = isThemedVariant ? ` ${variant}` : ''
   const sizeClassName = size ? ` cove-button--${size}` : ''
 
   const attributesObj = {
@@ -39,13 +96,16 @@ const Button = ({
     className:
       'cove-button' +
       variantClassName +
+      themedModeClassName +
+      themeClassName +
       sizeClassName +
+      (animated ? ' cove-button--animated' : '') +
       (flexCenter || 'loader' === role ? ' cove-button--flex-center' : '') +
       (fluid ? ' fluid' : '') +
       (fullWidth || isEditorPrimary ? ' cove-button--full-width' : '') +
       (loading ? ' loading' : '') +
       (attributes.className ? ' ' + attributes.className : '') +
-      (secondary ? ' secondary' : ''),
+      (useLegacySecondaryClass ? ' secondary' : ''),
     onMouseOver: () => setButtonState('in'),
     onMouseOut: () => setButtonState('out'),
     onFocus: () => setButtonState('in'),
@@ -53,10 +113,11 @@ const Button = ({
   }
 
   useEffect(() => {
-    if ('loader' === role && buttonRef.current) {
+    if ('loader' === role && buttonRef.current && buttonRef.current.parentNode) {
+      const parentNode = buttonRef.current.parentNode
       //Create ghost object and text nodes for children
       const ghostSpan = document.createElement('span')
-      const ghostContent = document.createTextNode(children)
+      const ghostContent = document.createTextNode(children as string)
       ghostSpan.style.opacity = '0'
       ghostSpan.style.visibility = 'hidden'
 
@@ -71,18 +132,18 @@ const Button = ({
       ghostLoaderSpan.appendChild(ghostLoaderContent)
 
       //Append objects to document
-      buttonRef.current.parentNode.insertBefore(ghostSpan, buttonRef.current)
-      buttonRef.current.parentNode.insertBefore(ghostLoaderSpan, buttonRef.current)
+      parentNode.insertBefore(ghostSpan, buttonRef.current)
+      parentNode.insertBefore(ghostLoaderSpan, buttonRef.current)
 
       //Register ghost width values in state
       setChildrenWidth(ghostSpan.offsetWidth + 2) //Toss in a 2px to account for subpixel offset
       setLoadtextWidth(ghostLoaderSpan.offsetWidth + 2) //Toss in a 2px to account for subpixel offset
 
       //Remove ghost objects form document
-      buttonRef.current.parentNode.removeChild(ghostSpan)
-      buttonRef.current.parentNode.removeChild(ghostLoaderSpan)
+      parentNode.removeChild(ghostSpan)
+      parentNode.removeChild(ghostLoaderSpan)
     }
-    return () => {}
+    return () => { }
   }, [buttonRef, children, loadingText, role])
 
   useEffect(() => {
@@ -118,14 +179,14 @@ const Button = ({
                 className='cove-button__text'
                 style={loading ? { width: loadtextWidth + 'px' } : { width: childrenWidth + 'px' }}
               >
-                <div className='cove-button__text--loading' style={loading ? { opacity: 1 } : null}>
+                <div className='cove-button__text--loading' style={loading ? { opacity: 1 } : undefined}>
                   {loadingText}
                 </div>
-                <div className='cove-button__text--children' style={loading ? { opacity: 0 } : null}>
+                <div className='cove-button__text--children' style={loading ? { opacity: 0 } : undefined}>
                   {children}
                 </div>
               </span>
-              <div className='cove-button__load-spin' style={loading ? { width: '28px', opacity: 1 } : null}>
+              <div className='cove-button__load-spin' style={loading ? { width: '28px', opacity: 1 } : undefined}>
                 <LoadSpin className='ms-1' size={20} />
               </div>
             </>
@@ -135,39 +196,6 @@ const Button = ({
       )}
     </button>
   )
-}
-
-Button.propTypes = {
-  /** Specify special role type for button */
-  role: PropTypes.oneOf(['loader']),
-  /** Applies a built-in visual treatment */
-  variant: PropTypes.oneOf([
-    'primary',
-    'editor-primary',
-    'secondary',
-    'success',
-    'danger',
-    'warning',
-    'light',
-    'link',
-    'outline-warning'
-  ]),
-  /** Applies a built-in size treatment */
-  size: PropTypes.oneOf(['sm']),
-  /** Provide object with styles that overwrite base styles when hovered */
-  hoverStyle: PropTypes.object,
-  /** Enables button to stretch to the full width of the content */
-  fluid: PropTypes.bool,
-  /** Stretches the button to the full width of its container */
-  fullWidth: PropTypes.bool,
-  /** Displays loading spinner on button while condition is true **/
-  loading: PropTypes.bool,
-  /** Set text to appear during loading animation **/
-  loadingText: PropTypes.string,
-  /** Displays button as flex and centers all direct children nodes. Useful for aligning icons and text **/
-  flexCenter: PropTypes.bool,
-  /** When value condition is true, retains any custom, inline `style={}` defined **/
-  active: PropTypes.bool
 }
 
 export default Button

@@ -135,18 +135,6 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     }
   }
 
-  .btn {
-    // Expand and Collapse Buttons for Multiviz Dashboard
-    &.expand-collapse-buttons {
-      align-items: center;
-      background-color: var(--lightestGray);
-      border: 1px var(--lightGray) solid;
-      color: black;
-      display: inline-flex;
-      justify-content: center;
-    }
-  }
-
   .dashboard-filters__actions {
     align-items: flex-end;
     display: flex;

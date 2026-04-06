@@ -8,10 +8,10 @@ const ExpandCollapseButtons: React.FC<ExpandCollapseButtonsProps> = ({ setAllExp
   return (
     <div className='d-block '>
       <div className='d-flex flex-row-reverse mb-2'>
-        <Button className='btn expand-collapse-buttons' onClick={() => setAllExpanded(false)}>
+        <Button variant='light' onClick={() => setAllExpanded(false)}>
           - Collapse All
         </Button>
-        <Button className='btn expand-collapse-buttons me-2' onClick={() => setAllExpanded(true)}>
+        <Button variant='light' className='me-2' onClick={() => setAllExpanded(true)}>
           + Expand All
         </Button>
       </div>
