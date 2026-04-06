@@ -9,9 +9,9 @@ export const useQueryParamsListener = (param: string, callback: Function) =>
       callback(val)
     }
 
-    window.addEventListener(QUERY_CHANGE_EVENT, handleQueryChange)
+    document.addEventListener(QUERY_CHANGE_EVENT, handleQueryChange)
 
     return () => {
-      window.removeEventListener(QUERY_CHANGE_EVENT, handleQueryChange)
+      document.removeEventListener(QUERY_CHANGE_EVENT, handleQueryChange)
     }
   }, [param, callback])

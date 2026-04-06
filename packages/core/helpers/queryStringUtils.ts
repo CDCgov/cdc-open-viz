@@ -66,7 +66,7 @@ export function updateQueryString(queryParams) {
     .map(queryParam => `${queryParam}=${encodeURIComponent(queryParams[queryParam])}`)
     .join('&')}`
   window.history.pushState({ path: updateUrl }, '', updateUrl)
-  events.querychange()
+  events.publish(events.QUERY_CHANGE_EVENT)
 }
 
 export function updateQueryParam(key: string, value: number | string) {

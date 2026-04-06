@@ -23,7 +23,6 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { createCanvasPattern, PatternType } from '../../../helpers/createCanvasPattern'
 import { getPatternForRow } from '../../../helpers/getPatternForRow'
-import { getQueryParam, removeQueryParam } from '@cdc/core/helpers/queryStringUtils'
 
 type Geometry = GeoGeometryObjects & { id?: string; properties: { name: string } }
 type Focus = {
@@ -207,7 +206,7 @@ const CountyMap = () => {
       center: geoCentroid(stateGeo),
       feature: stateGeo
     } as Focus
-  }, [filteredStateCode, topoData])
+  }, [filteredStateCode, topoData, config, runtimeFilters])
   const [hasMoved, setHasMoved] = useState(false)
 
   const pathGenerator = geoPath().projection(geoAlbersUsaTerritories())
