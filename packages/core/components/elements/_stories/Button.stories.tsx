@@ -41,6 +41,7 @@ export const Playground: Story = {
       options: [
         'primary',
         'editor-primary',
+        'theme-blue',
         'theme-purple',
         'theme-brown',
         'theme-teal',
