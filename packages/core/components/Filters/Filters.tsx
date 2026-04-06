@@ -43,17 +43,13 @@ type FilterProps = {
   dimensions?: DimensionsType
   config: Visualization
   setFilters: Function
-  standaloneMap?: boolean
-  excludedData?: Object[]
   interactionLabel?: string
 }
 
 const Filters: React.FC<FilterProps> = ({
   config: visualizationConfig,
   dimensions,
-  standaloneMap,
   setFilters,
-  excludedData,
   interactionLabel = ''
 }) => {
   const { filters, general, theme, filterBehavior } = visualizationConfig
@@ -104,7 +100,7 @@ const Filters: React.FC<FilterProps> = ({
     })
   }
 
-  const handleApplyButton = newFilters => {
+  const handleApplyButton = (newFilters: VizFilter[]) => {
     let needsQueryUpdate = false
     const queryParams = getQueryParams()
     newFilters.forEach(newFilter => {
