@@ -2867,6 +2867,15 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         <AccordionItemButton>Filters</AccordionItemButton>
                       </AccordionItemHeading>
                       <AccordionItemPanel>
+                        {config.general.geoType === 'us-county' && (
+                          <CheckBox
+                            value={config.general.showStateDropdown || false}
+                            fieldName='showStateDropdown'
+                            label='Show State Dropdown'
+                            updateField={updateField}
+                            section='general'
+                          />
+                        )}
                         <VizFilterEditor
                           config={config}
                           updateField={updateField}

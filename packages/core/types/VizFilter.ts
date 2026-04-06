@@ -7,6 +7,7 @@ export type FilterBase = {
   showDropdown: boolean
   id: number
   parents: number[]
+  staticFilter?: boolean
 }
 
 export type VizFilterStyle =

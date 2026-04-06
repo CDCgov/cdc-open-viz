@@ -128,6 +128,7 @@ const includes = (arr: any[], val: any): boolean => {
 export const addValuesToFilters = (filters: VizFilter[], data: any[] | MapData): Array<VizFilter> => {
   const filtersLookup = _.keyBy(filters, 'id')
   return filters?.map(filter => {
+    if (filter.staticFilter) return filter
     const filterCopy = _.cloneDeep(filter)
     let filteredData = data
     const isMapData = !Array.isArray(data)
