@@ -119,9 +119,9 @@
     color: var(--cool-gray-90);
     cursor: pointer;
     font-family: var(--app-font-secondary);
-    font-size: 0.778rem;
+    font-size: 0.883rem;
     font-weight: 300;
-    padding: 0.5rem 0.5rem;
+    padding: 0.3rem 0.3rem;
     transition: background-color 0.15s ease-in-out;
     user-select: none;
   }
