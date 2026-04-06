@@ -480,14 +480,16 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   const applyStateFilter = (config: MapConfig): MapConfig => {
     if (config.general.showStateDropdown) {
-      const stateFilter = {
+      const stateFilter: VizFilter = {
+        columnName: 'state',
         label: 'Select State',
+        filterStyle: 'dropdown',
         labels: supportedStatesFipsCodes,
         values: Object.keys(supportedStatesFipsCodes),
         resetLabel: 'All States',
         staticFilter: true,
         active: filteredStateCode
-      } as VizFilter
+      }
       return {
         ...config,
         filters: [...(config.filters || []), stateFilter]
