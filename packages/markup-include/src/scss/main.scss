@@ -41,6 +41,13 @@
       font-size: 1rem;
     }
 
+    .cdc-callout--data-color {
+      .cdc-callout__heading,
+      .cdc-callout__content {
+        color: inherit;
+      }
+    }
+
     &.white-background-style {
       .markup-include-tp5 {
         border: 1px solid #009ec1 !important;
@@ -78,7 +85,7 @@
     // keep markup include images inlines on dashboards
     // e.g. requested to help here: https://www.cdc.gov/fluview/surveillance/2026-week-10.html
     // needed for backwards compatibility with existing dashboards, but also to prevent any future issues with images in markup include visualizations being forced to display as blocks
-    span>img {
+    span > img {
       display: inline;
     }
   }

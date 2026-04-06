@@ -1,10 +1,11 @@
-import { useContext, useRef } from 'react'
+import { useContext, useMemo, useRef } from 'react'
 
 // Context
 import ConfigContext from '../../ConfigContext'
 
 // Helpers
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
+import { useDataColumns } from '@cdc/core/hooks/useDataColumns'
 
 // Components
 import { EditorPanel as BaseEditorPanel } from '@cdc/core/components/EditorPanel/EditorPanel'
@@ -16,6 +17,9 @@ import MarkupVariablesEditor from '@cdc/core/components/EditorPanel/components/M
 import FootnotesEditor from '@cdc/core/components/EditorPanel/FootnotesEditor'
 import StyleTreatmentSection from '@cdc/core/components/EditorPanel/sections/StyleTreatmentSection'
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
+import { DataColorSelector } from '@cdc/core/components/DataColorSelector'
+import { DATA_COLOR_PRESETS } from '@cdc/core/helpers/dataColors'
+import Button from '@cdc/core/components/elements/Button'
 import { Datasets } from '@cdc/core/types/DataSet'
 
 // styles
@@ -33,6 +37,99 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
   const updateField = updateFieldFactory(config, updateConfig, true)
   const styleTreatment = (visual as any)?.tp5Treatment ? 'tp5' : 'legacy'
   const markupEditorData = Array.isArray(editorData) ? editorData : data || []
+  const columns = useDataColumns(markupEditorData)
+  const dataColorMappings = config.dataColors?.mappings || []
+
+  const dataColorValues = useMemo(() => {
+    const colorColumn = config.dataColors?.column
+    if (!colorColumn) return []
+
+    const uniqueValues = new Set<string>()
+    markupEditorData?.forEach(row => {
+      const value = row?.[colorColumn]
+      if (value !== undefined && value !== null) {
+        uniqueValues.add(String(value))
+      }
+    })
+
+    return Array.from(uniqueValues).sort()
+  }, [markupEditorData, config.dataColors?.column])
+
+  type DataColorDisplayEntry = { sourceValue: string; fromData: boolean; key: string }
+
+  const dataColorDisplayList = useMemo<DataColorDisplayEntry[]>(() => {
+    const dataSet = new Set(dataColorValues)
+    const list: DataColorDisplayEntry[] = dataColorValues.map(v => ({
+      sourceValue: v,
+      fromData: true,
+      key: `data-${v}`
+    }))
+    dataColorMappings.forEach((m, i) => {
+      if (!dataSet.has(m.sourceValue)) {
+        list.push({ sourceValue: m.sourceValue, fromData: false, key: `custom-${i}` })
+      }
+    })
+    return list
+  }, [dataColorValues, dataColorMappings])
+
+  const updateDataColorMapping = (sourceValue: string, color: string) => {
+    const nextMappings = [...dataColorMappings]
+    const existingIndex = nextMappings.findIndex(m => m.sourceValue === sourceValue)
+
+    if (!color) {
+      if (existingIndex > -1) {
+        nextMappings.splice(existingIndex, 1)
+      }
+    } else {
+      const nextMapping = { sourceValue, color }
+      if (existingIndex > -1) {
+        nextMappings[existingIndex] = nextMapping
+      } else {
+        nextMappings.push(nextMapping)
+      }
+    }
+
+    updateConfig({
+      ...config,
+      dataColors: {
+        ...config.dataColors,
+        mappings: nextMappings
+      }
+    })
+  }
+
+  const addCustomDataColorMapping = () => {
+    const nextMappings = [...dataColorMappings, { sourceValue: '', color: DATA_COLOR_PRESETS[0] }]
+    updateConfig({
+      ...config,
+      dataColors: {
+        ...config.dataColors,
+        mappings: nextMappings
+      }
+    })
+  }
+
+  const updateDataColorMappingValue = (oldValue: string, newValue: string) => {
+    const nextMappings = dataColorMappings.map(m => (m.sourceValue === oldValue ? { ...m, sourceValue: newValue } : m))
+    updateConfig({
+      ...config,
+      dataColors: {
+        ...config.dataColors,
+        mappings: nextMappings
+      }
+    })
+  }
+
+  const removeDataColorMapping = (sourceValue: string) => {
+    const nextMappings = dataColorMappings.filter(m => m.sourceValue !== sourceValue)
+    updateConfig({
+      ...config,
+      dataColors: {
+        ...config.dataColors,
+        mappings: nextMappings
+      }
+    })
+  }
 
   const handleStyleTreatmentChange = (value: string) => {
     const useTp5Treatment = value === 'tp5'
@@ -215,6 +312,68 @@ const EditorPanel: React.FC<MarkupIncludeEditorPanelProps> = ({ datasets }) => {
               />
             )}
           </Accordion.Section>
+          {isTp5Style && (
+            <Accordion.Section title='Data Driven Colors'>
+              <Select
+                value={config.dataColors?.column || ''}
+                section='dataColors'
+                fieldName='column'
+                label='Color Column'
+                updateField={updateField}
+                initial='Select'
+                options={columns}
+              />
+              {config.dataColors?.column && dataColorDisplayList.length > 0 && (
+                <div className='mt-2'>
+                  {dataColorDisplayList.map(({ sourceValue, fromData, key }) => {
+                    const selectedColor = dataColorMappings.find(m => m.sourceValue === sourceValue)?.color || ''
+
+                    return (
+                      <div className='cove-accordion__panel-row align-center mb-2' key={key}>
+                        <div className='cove-accordion__panel-col' style={{ flex: '1 1 0', minWidth: 0 }}>
+                          {fromData ? (
+                            sourceValue
+                          ) : (
+                            <input
+                              type='text'
+                              value={sourceValue}
+                              placeholder='Enter value'
+                              style={{ width: '100%' }}
+                              onChange={e => updateDataColorMappingValue(sourceValue, e.target.value)}
+                            />
+                          )}
+                        </div>
+                        <div className='cove-accordion__panel-col' style={{ flex: '0 0 4.5rem' }}>
+                          <DataColorSelector
+                            value={selectedColor}
+                            onChange={color => updateDataColorMapping(sourceValue, color)}
+                          />
+                        </div>
+                        <div className='cove-accordion__panel-col' style={{ flex: '0 0 1.5rem' }}>
+                          {!fromData && (
+                            <button
+                              type='button'
+                              className='btn btn-danger'
+                              style={{ padding: '0.15rem 0.45rem', lineHeight: 1 }}
+                              title='Remove mapping'
+                              onClick={() => removeDataColorMapping(sourceValue)}
+                            >
+                              −
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+              {config.dataColors?.column && (
+                <Button type='button' onClick={addCustomDataColorMapping} className='btn btn-primary full-width mt-3'>
+                  Add Color Mapping
+                </Button>
+              )}
+            </Accordion.Section>
+          )}
           {isDashboard && (
             <Accordion.Section title='Footnotes'>
               <FootnotesEditor config={config} updateField={updateField} datasets={datasets} />

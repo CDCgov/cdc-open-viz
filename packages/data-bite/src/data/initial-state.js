@@ -49,6 +49,10 @@ export default {
     noChangeLabel: '',
     trendLabel: ''
   },
+  dataColors: {
+    column: '',
+    mappings: []
+  },
   markupVariables: [],
   enableMarkupVariables: false
 }
