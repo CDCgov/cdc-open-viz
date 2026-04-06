@@ -8,8 +8,8 @@ import { GeneratedLegend } from '../helpers/generateRuntimeLegend'
 import { RuntimeData } from '../types/RuntimeData'
 import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
 
-const filteredStateCode = getQueryParam('state-code') || ''
 export const getInitialState = (configObj = {}): MapState => {
+  const filteredStateCode = typeof window !== 'undefined' ? getQueryParam('state-code') || '' : ''
   // Create defaults without palette version to avoid overriding legacy configs
   const defaultsWithoutPaletteaName = { ...defaults }
 
