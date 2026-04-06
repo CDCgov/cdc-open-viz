@@ -326,7 +326,7 @@ describe('Waffle Chart', () => {
     })
   })
 
-  it('renders denominator 10 as a 5 by 2 grid while preserving the 100-unit chart footprint', async () => {
+  it('renders denominator 10 as a 5 by 2 grid while preserving full width without extra SVG height', async () => {
     const { container } = render(
       <CdcWaffleChart
         config={createBaseConfig({
@@ -349,11 +349,15 @@ describe('Waffle Chart', () => {
     const uniqueY = new Set(nodes.map(node => node.getAttribute('cy'))).size
     const svg = container.querySelector('.cove-waffle-chart svg')
     const scaledGroup = svg?.querySelector('g')
+    const svgWidth = Number(svg?.getAttribute('width') || 0)
+    const svgHeight = Number(svg?.getAttribute('height') || 0)
 
     expect(uniqueX).toBe(5)
     expect(uniqueY).toBe(2)
     expect(svg).toHaveAttribute('width', '120')
-    expect(svg).toHaveAttribute('height', '120')
+    expect(svgWidth).toBe(120)
+    expect(svgHeight).toBeGreaterThan(40)
+    expect(svgHeight).toBeLessThan(svgWidth)
     expect(scaledGroup?.getAttribute('transform')).toContain('scale(')
     expect(scaledGroup?.getAttribute('transform')).not.toContain('scale(1)')
   })

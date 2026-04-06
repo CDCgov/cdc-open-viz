@@ -407,12 +407,15 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     const rows = dynamicGrid?.rows ?? 10
     const renderedWidth = nodeWidthNum * columns + nodeSpacerNum * (columns - 1)
     const renderedHeight = nodeWidthNum * rows + nodeSpacerNum * (rows - 1)
-    const chartWidth = nodeWidthNum * STANDARD_WAFFLE_GRID_SIZE + nodeSpacerNum * (STANDARD_WAFFLE_GRID_SIZE - 1)
-    const chartHeight = nodeWidthNum * STANDARD_WAFFLE_GRID_SIZE + nodeSpacerNum * (STANDARD_WAFFLE_GRID_SIZE - 1)
-    const scale =
-      renderMode === 'dynamic-denominator' ? Math.min(chartWidth / renderedWidth, chartHeight / renderedHeight) : 1
+    const standardChartWidth =
+      nodeWidthNum * STANDARD_WAFFLE_GRID_SIZE + nodeSpacerNum * (STANDARD_WAFFLE_GRID_SIZE - 1)
+    const standardChartHeight =
+      nodeWidthNum * STANDARD_WAFFLE_GRID_SIZE + nodeSpacerNum * (STANDARD_WAFFLE_GRID_SIZE - 1)
+    const scale = renderMode === 'dynamic-denominator' ? standardChartWidth / renderedWidth : 1
     const scaledWidth = renderedWidth * scale
     const scaledHeight = renderedHeight * scale
+    const chartWidth = standardChartWidth
+    const chartHeight = renderMode === 'dynamic-denominator' ? scaledHeight : standardChartHeight
     const offsetX = (chartWidth - scaledWidth) / 2
     const offsetY = 0
 
