@@ -318,7 +318,6 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     if (trendResolution.state !== 'resolved' || !trendResolution.arrowType) {
       return null
     }
-    const ariaLabel = `Trend ${trendResolution.arrowType}${resolvedTrendLabel ? `: ${resolvedTrendLabel}` : ''}`
     const resolvedWrapperClassName = [wrapperClassName, resolvedTrendLabel ? 'cove-trend-arrow__wrap--with-label' : '']
       .filter(Boolean)
       .join(' ')
@@ -327,7 +326,6 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       <TrendArrow
         arrowType={trendResolution.arrowType}
         label={resolvedTrendLabel}
-        ariaLabel={ariaLabel}
         wrapperClassName={resolvedWrapperClassName}
       />
     )

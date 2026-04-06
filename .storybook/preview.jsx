@@ -1,5 +1,4 @@
 import { previewTheme } from './coveSbThemes'
-import * as React from 'react'
 import '@cdc/core/styles/cove-main.scss'
 
 export const parameters = {

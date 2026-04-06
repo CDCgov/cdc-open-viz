@@ -11,7 +11,7 @@
         background: var(--lightestGray);
       }
       border: 1px solid var(--cool-gray-10);
-      border-radius: 5px;
+      border-radius: 0.333rem;
       display: inline-block;
       font-family: var(--app-font-secondary);
       font-size: var(--filter-select-font-size);
@@ -26,7 +26,7 @@
       }
       :is(div) {
         background: var(--lightGray);
-        border-radius: 5px;
+        border-radius: 0.333rem;
         display: inline-block;
         margin-bottom: 2px;
         margin-right: 5px;

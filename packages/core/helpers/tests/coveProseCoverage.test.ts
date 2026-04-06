@@ -18,6 +18,8 @@ const EXEMPT_FROM_COVE_PROSE = new Set([
   'packages/core/components/DataTable/components/ExpandCollapse.tsx',
   'packages/core/components/DataTable/helpers/chartCellMatrix.tsx',
   'packages/core/components/Table/components/Row.tsx',
+  // Trend arrow parses inline SVG icon markup, not user-authored prose.
+  'packages/core/components/ui/TrendArrow.tsx',
   // Annotation renderers are intentionally excluded from prose list styling.
   'packages/chart/src/components/Annotations/components/AnnotationList.tsx',
   'packages/chart/src/components/Annotations/components/AnnotationDraggable.tsx',

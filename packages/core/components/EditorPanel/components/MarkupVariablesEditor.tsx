@@ -7,7 +7,7 @@ import {
   getMarkupVariableSourceType,
   isDataDrivenIconsVariable
 } from '../../../types/MarkupVariable'
-import { DEFAULT_SVG_SCALE, SVG_REGISTRY_OPTIONS, getSvgRegistryLabel } from '../../../helpers/svgRegistry'
+import { SVG_REGISTRY_OPTIONS, getSvgRegistryLabel } from '../../../helpers/svgRegistry'
 import Button from '../../elements/Button'
 import { TextField, Select, CheckBox } from '../Inputs'
 import SvgIconSelect from './SvgIconSelect'
@@ -39,7 +39,6 @@ export type { MarkupVariablesEditorProps }
 
 const METADATA_DOCS_URL =
   'https://www.cdc.gov/cove/data-toolkit/index.html#cdc_toolkit_main_toolkit_cat_3-json-file-format'
-const SMALL_NUMBER_FIELD_WRAPPER_STYLE = { maxWidth: '5rem' }
 type MarkupVariableEditorSourceType = MarkupVariableSourceType
 type MarkupVariableIconMode = 'static' | 'data-driven'
 
@@ -181,13 +180,6 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
         errors.push('Icon is required')
       }
 
-      if (variable.svgScale !== undefined) {
-        const parsedScale = Number(variable.svgScale)
-        if (!Number.isFinite(parsedScale) || parsedScale <= 0) {
-          errors.push('Icon scale must be greater than 0')
-        }
-      }
-
       return errors
     }
 
@@ -224,12 +216,6 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
       }
       if (!variable.svgMappings || variable.svgMappings.length === 0) {
         errors.push('At least one icon mapping is required')
-      }
-      if (variable.svgScale !== undefined) {
-        const parsedScale = Number(variable.svgScale)
-        if (!Number.isFinite(parsedScale) || parsedScale <= 0) {
-          errors.push('Icon scale must be greater than 0')
-        }
       }
     }
 
@@ -428,9 +414,6 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
       </label>
     </div>
   )
-
-  const getNumericFieldValue = (value?: number) =>
-    value === undefined || Number.isNaN(Number(value)) ? DEFAULT_SVG_SCALE : Number(value)
 
   return (
     <div className='markup-variables-editor'>
@@ -682,25 +665,6 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                   />
                                 </div>
                                 {renderReadonlyField('Tag (auto-generated)', variable.tag, '{{icon-name}}')}
-
-                                <div className='mb-3' style={SMALL_NUMBER_FIELD_WRAPPER_STYLE}>
-                                  <TextField
-                                    type='number'
-                                    step={0.1}
-                                    value={getNumericFieldValue(variable.svgScale)}
-                                    fieldName='svgScale'
-                                    label='Icon Scale'
-                                    updateField={(_section, _subsection, _fieldName, value) => {
-                                      const parsedScale = value === '' ? undefined : Number(value)
-                                      updateVariable(index, {
-                                        svgScale:
-                                          parsedScale === undefined || Number.isNaN(parsedScale)
-                                            ? undefined
-                                            : parsedScale
-                                      })
-                                    }}
-                                  />
-                                </div>
                               </>
                             )}
 

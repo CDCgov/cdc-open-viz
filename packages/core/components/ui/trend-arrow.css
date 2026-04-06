@@ -40,11 +40,3 @@
 .cove-trend-arrow__wrap--inline .cove-trend-arrow__label {
   margin-left: 0.25em;
 }
-
-.cove-trend-arrow.is-down {
-  transform: scale(-1, 1) rotate(180deg);
-}
-
-.cove-trend-arrow.is-no-change {
-  transform: rotate(90deg);
-}

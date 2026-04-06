@@ -61,6 +61,18 @@ strong {
   }
 }
 
+// Markup-variable SVG icons default to line-height sizing so they align with
+// surrounding text. Authors can opt a specific icon instance into parent-height
+// sizing by adding `data-cove-svg-size="parent-height"` to the nearest wrapper:
+// `<span data-cove-svg-size="parent-height">{{link-external}}</span>`.
+[data-cove-svg-size='parent-height'] {
+  --cove-inline-svg-width: auto;
+  --cove-inline-svg-height-fallback: 100%;
+  --cove-inline-svg-height: 100%;
+  --cove-inline-svg-inner-width: auto;
+  --cove-inline-svg-inner-height: 100%;
+}
+
 .btn {
   &.full-width {
     width: 100%;

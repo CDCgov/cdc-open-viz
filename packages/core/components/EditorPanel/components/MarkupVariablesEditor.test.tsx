@@ -279,8 +279,8 @@ describe('MarkupVariablesEditor', () => {
       label.textContent?.replace(/\s+/g, ' ').trim()
     )
 
-    expect(labels).toEqual(['Source', 'Icon Mode', 'Icon', 'Variable Name', 'Tag (auto-generated)', 'Icon Scale'])
-    expect(within(basicSettingsItem).getByRole('spinbutton', { name: 'Icon Scale' })).toHaveValue(0.8)
+    expect(labels).toEqual(['Source', 'Icon Mode', 'Icon', 'Variable Name', 'Tag (auto-generated)'])
+    expect(within(basicSettingsItem).queryByRole('spinbutton', { name: 'Icon Scale' })).not.toBeInTheDocument()
 
     const iconButton = basicSettingsItem.querySelector('button[aria-haspopup="listbox"]') as HTMLButtonElement
     expect(iconButton).toBeTruthy()
