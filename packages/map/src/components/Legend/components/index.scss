@@ -1,4 +1,4 @@
-@import '@cdc/core/styles/v2/utils/breakpoints';
+@import '@cdc/core/styles/utils/breakpoints';
 
 .cdc-map-inner-container {
   .map-container.world aside.side {
@@ -30,8 +30,6 @@
         z-index: 1;
         box-sizing: content-box;
         max-width: 450px;
-        margin-top: 2em;
-        margin-bottom: 2em;
         align-self: flex-start;
         z-index: 4;
         right: 1em;
@@ -126,6 +124,7 @@
         &--pattern {
           cursor: default;
         }
+
         &:focus {
           outline: none;
         }

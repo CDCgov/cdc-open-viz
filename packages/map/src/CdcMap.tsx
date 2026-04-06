@@ -58,7 +58,8 @@ const CdcMap: React.FC<CdcMapProps> = ({
       ...configToLoad
     }
     if (newState.dataUrl) {
-      let newData = await fetchRemoteData(newState.dataUrl, 'map')
+      let { data: newData, dataMetadata } = await fetchRemoteData(newState.dataUrl)
+      newState.dataMetadata = dataMetadata
 
       if (newState.vegaConfig) {
         newData = extractCoveData(updateVegaData(newState.vegaConfig, newData))
@@ -78,18 +79,6 @@ const CdcMap: React.FC<CdcMapProps> = ({
       newState.data = transform.autoStandardize(newState.data)
       newState.data = transform.developerStandardize(newState.data, newState.dataDescription)
     }
-
-    Object.keys(newState).forEach(key => {
-      if ('object' === typeof newState[key] && false === Array.isArray(newState[key])) {
-        if (initialState[key]) {
-          Object.keys(initialState[key]).forEach(property => {
-            if (undefined === newState[key][property]) {
-              newState[key][property] = initialState[key][property]
-            }
-          })
-        }
-      }
-    })
 
     if (newState.columns.geo.name || newState.columns.geo.fips) {
       addUIDs(newState, newState.columns.geo.name || newState.columns.geo.fips)
@@ -113,7 +102,7 @@ const CdcMap: React.FC<CdcMapProps> = ({
     let _newConfig = cloneConfig(config ?? initialState)
 
     if (configUrl) {
-      _newConfig = await fetchRemoteData(configUrl)
+      _newConfig = await fetch(configUrl).then(r => r.json())
     }
     if ('object' === typeof _newConfig) {
       loadConfig(_newConfig)

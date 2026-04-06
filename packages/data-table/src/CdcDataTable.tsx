@@ -3,7 +3,7 @@ import { useCallback, useContext, useEffect, useReducer } from 'react'
 import DataTable from '@cdc/core/components/DataTable'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import Filters from '@cdc/core/components/Filters'
-import Layout from '@cdc/core/components/Layout'
+import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
 import Loading from '@cdc/core/components/Loading'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
@@ -30,8 +30,7 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
   const [state, dispatch] = useReducer(reducer, initialState)
 
   /* STATES */
-  const { config, showEditorPanel, columns, data, table, filters, currentViewport, filterIntro, filterBehavior } =
-    state as State
+  const { config, columns, data, table, filters, currentViewport, filterIntro, filterBehavior } = state as State
 
   /* CONFIG VARS */
   const { data: inputData, dataUrl, dataDescription } = config || {}
@@ -93,9 +92,12 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
 
     /* FETCH DATA */
     fetchRemoteData(`${dataUrl}`)
-      .then(resData => {
-        const processedData = processData(resData, dataDescription)
+      .then(({ data: fetchedData, dataMetadata }) => {
+        const processedData = processData(fetchedData, dataDescription)
         dispatch({ type: 'SET_DATA', payload: processedData })
+        if (config && Object.keys(dataMetadata).length > 0) {
+          dispatch({ type: 'SET_CONFIG', payload: { ...config, dataMetadata } as Config })
+        }
       })
       .catch(() => dispatch({ type: 'SET_DATA', payload: null }))
   }
@@ -137,18 +139,14 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
   if (invalidConfig || invalidData) throw new Error('Invalid config or data provided to CdcDataTable component')
 
   return (
-    <Layout.VisualizationWrapper
+    <VisualizationContainer
       ref={outerContainerRef}
       config={config}
       isEditor={isEditor}
-      showEditorPanel={showEditorPanel}
       currentViewport={currentViewport}
+      editorPanel={<EditorPanel dispatch={dispatch} state={state} />}
     >
-      {/* EDITOR */}
-      {isEditor && <EditorPanel dispatch={dispatch} state={state} />}
-
-      {/* FILTERS */}
-      <div className='bg-white z-1'>
+      <VisualizationContent bodyWrapClassName='bg-white z-1'>
         {filters && (
           <Filters
             config={config as unknown as Visualization}
@@ -173,8 +171,8 @@ const CdcDataTable = ({ config: configObj, configUrl, isEditor }: CdcDataTablePr
           expandDataTable={expanded}
           configUrl={configUrl}
         />
-      </div>
-    </Layout.VisualizationWrapper>
+      </VisualizationContent>
+    </VisualizationContainer>
   )
 }
 

@@ -1,4 +1,4 @@
-@import '../../../styles/v2/utils/variables';
+@import '../../../styles/utils/properties';
 
 $editorAnimationTimer: 400ms;
 $mediumGray: #e6e6e6;
@@ -81,7 +81,7 @@ $mediumGray: #e6e6e6;
 
   @at-root {
     .cove-editor {
-      width: $editorWidth;
+      width: var(--editorWidth);
     }
   }
 }
@@ -127,8 +127,8 @@ $mediumGray: #e6e6e6;
   background-color: #e6e6e6;
   transition: background-color 400ms cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden auto;
-  width: calc(100% - $editorWidth);
-  left: $editorWidth;
+  width: calc(100% - var(--editorWidth));
+  left: var(--editorWidth);
   @at-root {
     .cove-editor.panel-shown #{&} {
       background-color: #e7e7e7;

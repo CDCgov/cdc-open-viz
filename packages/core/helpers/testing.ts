@@ -343,7 +343,7 @@ export const assertVisualizationRendered = async (vizElement: HTMLElement) => {
     () => {
       const svgCount = vizElement.querySelectorAll('svg').length
       const canvasCount = vizElement.querySelectorAll('canvas').length
-      const hasCoveModule = !!vizElement.querySelector('.cdc-open-viz-module')
+      const hasCoveModule = !!vizElement.querySelector('.cove-visualization')
       const isDataBite = !!vizElement.querySelector('.bite-content')
       const isDataTable = !!vizElement.querySelector('.type-data-table')
       return { svgCount, canvasCount, hasCoveModule, isDataBite, isDataTable }

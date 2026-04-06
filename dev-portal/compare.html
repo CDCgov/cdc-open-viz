@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CDC Open Viz - UX Compare</title>
+  <style>
+    :root {
+      --page-bg: #eef2f6;
+      --panel-bg: #ffffff;
+      --panel-border: #d8e0e8;
+      --text-main: #17314a;
+      --text-muted: #5d7288;
+      --accent: #005ea2;
+      --card-shadow: 0 8px 24px rgb(17 24 39 / 8%);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "SF Pro Text", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgb(0 94 162 / 10%), transparent 28%),
+        linear-gradient(180deg, #f8fbfd 0%, var(--page-bg) 100%);
+      color: var(--text-main);
+    }
+
+    .app {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: grid;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding: 20px;
+      background: rgb(255 255 255 / 92%);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--panel-border);
+      border-radius: 20px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .toolbar__top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .toolbar h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      line-height: 1.1;
+    }
+
+    .toolbar p {
+      margin: 6px 0 0;
+      color: var(--text-muted);
+      max-width: 60rem;
+    }
+
+    .toolbar__meta {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .toolbar__controls {
+      display: grid;
+      gap: 12px;
+    }
+
+    .toolbar__control-row {
+      display: grid;
+      grid-template-columns: minmax(220px, 320px) 1fr auto;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .toolbar__slider-row {
+      display: grid;
+      <<<<<<< HEAD grid-template-columns: minmax(220px, 280px);
+      =======grid-template-columns: repeat(3, minmax(220px, 280px));
+      >>>>>>>dev gap: 12px;
+      align-items: start;
+    }
+
+    .search {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--panel-border);
+      background: #f8fafc;
+      color: var(--text-main);
+      font-size: 0.95rem;
+    }
+
+    .search:focus {
+      outline: 2px solid rgb(0 94 162 / 18%);
+      border-color: var(--accent);
+    }
+
+    .package-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .package-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--panel-border);
+      border-radius: 999px;
+      background: #f8fafc;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .package-pill input {
+      margin: 0;
+    }
+
+    .toolbar__actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .toolbar-control {
+      display: grid;
+      gap: 6px;
+      padding: 10px 12px;
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      background: #f8fafc;
+    }
+
+    .toolbar-control label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.9rem;
+      color: var(--text-main);
+    }
+
+    .toolbar-control span {
+      color: var(--text-muted);
+    }
+
+    .toolbar-control input[type='range'] {
+      width: 100%;
+    }
+
+    button {
+      border: 1px solid var(--panel-border);
+      background: #fff;
+      color: var(--text-main);
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-size: 0.92rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-width: 0;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--card-shadow);
+    }
+
+    .card__header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--panel-border);
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbfd 100%);
+    }
+
+    .card__title {
+      min-width: 0;
+    }
+
+    .card__title h2 {
+      margin: 0;
+      font-size: 0.98rem;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    .card__title p {
+      margin: 4px 0 0;
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      overflow-wrap: anywhere;
+    }
+
+    .card__package {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      height: fit-content;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgb(0 94 162 / 10%);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .card iframe {
+      width: 100%;
+      height: 720px;
+      border: 0;
+      background: #fff;
+    }
+
+    .empty {
+      padding: 48px 20px;
+      text-align: center;
+      color: var(--text-muted);
+      background: var(--panel-bg);
+      border: 1px dashed var(--panel-border);
+      border-radius: 18px;
+    }
+
+    .status-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      border: 1px solid var(--panel-border);
+      background: #fff;
+    }
+
+    .status-pill::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #c81e1e;
+    }
+
+    .status-pill.online::before {
+      background: #1a7f37;
+    }
+
+    @media (max-width: 1100px) {
+
+      .toolbar__control-row,
+      .toolbar__slider-row {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar__actions {
+        justify-content: flex-start;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <section class="toolbar">
+      <div class="toolbar__top">
+        <div>
+          <h1>UX Compare</h1>
+          <p>All available local examples rendered in a fixed two-column grid for quick wrapper, spacing, and typography
+            checks.</p>
+        </div>
+        <div class="toolbar__meta" id="summary">Loading examples…</div>
+      </div>
+
+      <div class="toolbar__controls">
+        <div class="toolbar__control-row">
+          <input class="search" id="search" type="search" placeholder="Filter by package, file name, or path" />
+          <div class="package-filters" id="package-filters"></div>
+          <div class="toolbar__actions">
+            <button id="show-all" type="button">Show All</button>
+            <button id="hide-all" type="button">Hide All</button>
+          </div>
+        </div>
+        <div class="toolbar__slider-row">
+          <div class="toolbar-control">
+            <label for="gap-range">Section Gap <span id="gap-value">24px</span></label>
+            <input id="gap-range" type="range" min="0" max="48" step="4" value="24" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="grid" id="grid"></main>
+  </div>
+
+  <script>
+    const packages = {
+      chart: 3001,
+      map: 3008,
+      dashboard: 3003,
+      'data-bite': 3004,
+      'data-table': 3005,
+      'filtered-text': 3007,
+      'markup-include': 3009,
+      'waffle-chart': 3010
+    }
+    const hiddenPackages = new Set(['dashboard'])
+
+    const grid = document.getElementById('grid')
+    const packageFilters = document.getElementById('package-filters')
+    const searchInput = document.getElementById('search')
+    const summary = document.getElementById('summary')
+    const showAllButton = document.getElementById('show-all')
+    const hideAllButton = document.getElementById('hide-all')
+    const gapRange = document.getElementById('gap-range')
+    const gapValue = document.getElementById('gap-value')
+
+    let entries = []
+    let packageStatus = {}
+    let lastRenderSignature = ''
+    let refreshTimer = null
+    const selectedPackages = new Set(Object.keys(packages).filter(packageName => !hiddenPackages.has(packageName)))
+    let sectionGap = Number(new URLSearchParams(window.location.search).get('sectionGap') || 24)
+
+    gapRange.value = String(sectionGap)
+    gapValue.textContent = `${sectionGap}px`
+
+    function createIframeUrl(packageName, configPath) {
+      return `http://localhost:${packages[packageName]}?config=${configPath}&sidebar=false&sectionGap=${sectionGap}`
+    }
+
+    function broadcastSectionGap() {
+      grid.querySelectorAll('iframe').forEach(frame => {
+        frame.contentWindow?.postMessage({ type: 'cove:setSectionGap', value: sectionGap }, '*')
+      })
+    }
+
+    function syncUrlState() {
+      const url = new URL(window.location)
+      if (sectionGap === 24) {
+        url.searchParams.delete('sectionGap')
+      } else {
+        url.searchParams.set('sectionGap', String(sectionGap))
+      }
+      history.replaceState({}, '', url.toString().replace(/%2F/g, '/'))
+    }
+
+    function renderPackageFilters(onlinePackages) {
+      packageFilters.innerHTML = ''
+
+      onlinePackages.forEach(packageName => {
+        const label = document.createElement('label')
+        label.className = 'package-pill'
+
+        const input = document.createElement('input')
+        input.type = 'checkbox'
+        input.checked = selectedPackages.has(packageName)
+        input.addEventListener('change', () => {
+          if (input.checked) {
+            selectedPackages.add(packageName)
+          } else {
+            selectedPackages.delete(packageName)
+          }
+          renderGrid()
+        })
+
+        const text = document.createElement('span')
+        text.textContent = packageName
+
+        label.append(input, text)
+        packageFilters.append(label)
+      })
+    }
+
+    function normalizeConfigPath(examplePath) {
+      return examplePath.startsWith('/examples/') ? examplePath : `/examples/${examplePath}`
+    }
+
+    function getExampleVariant(examplePath) {
+      return examplePath.toLowerCase().includes('tp5') ? 'tp5' : 'legacy'
+    }
+
+    function getVisualizationType(packageName, examplePath) {
+      const normalizedPath = examplePath.toLowerCase()
+      const fileName = normalizedPath.split('/').pop()
+
+      if (fileName.includes('gauge')) return 'gauge'
+      if (packageName === 'waffle-chart') return 'waffle'
+      return packageName
+    }
+
+    function formatVisualizationType(type) {
+      if (type === 'data-bite') return 'Data Bite'
+      if (type === 'data-table') return 'Data Table'
+      if (type === 'filtered-text') return 'Filtered Text'
+      if (type === 'markup-include') return 'Markup Include'
+      return type.replace(/(^|-)([a-z])/g, (_, separator, letter) => `${separator === '-' ? ' ' : ''}${letter.toUpperCase()}`)
+    }
+
+    function getVariantLabel(variant) {
+      return variant === 'tp5' ? 'TP5' : 'Legacy'
+    }
+
+    function getExamplePriority(examplePath, packageName, visualizationType, variant) {
+      const fileName = examplePath.split('/').pop().toLowerCase()
+      let score = 100
+
+      if (variant === 'legacy' && fileName === 'default.json') score -= 100
+      if (variant === 'legacy' && fileName === `${visualizationType}.json`) score -= 90
+      if (variant === 'tp5' && fileName === `tp5-${visualizationType}.json`) score -= 100
+      if (variant === 'tp5' && fileName === 'tp5-style.json') score -= 90
+      if (packageName === 'waffle-chart' && visualizationType === 'waffle' && fileName === 'tp5-waffle.json') score -= 95
+      if (fileName.includes('white')) score += 20
+      if (fileName.includes('example')) score += 10
+      if (fileName.includes('gallery')) score += 10
+
+      return score
+    }
+
+    function buildEntriesForPackage(packageName, jsonExamples) {
+      const groupedExamples = new Map()
+
+      jsonExamples.forEach(examplePath => {
+        const visualizationType = getVisualizationType(packageName, examplePath)
+        const variant = getExampleVariant(examplePath)
+        const groupKey = `${visualizationType}:${variant}`
+
+        if (!groupedExamples.has(groupKey)) {
+          groupedExamples.set(groupKey, [])
+        }
+
+        groupedExamples.get(groupKey).push(examplePath)
+      })
+
+      return [...groupedExamples.entries()]
+        .map(([groupKey, examplePaths]) => {
+          const [visualizationType, variant] = groupKey.split(':')
+          const selectedExample = [...examplePaths].sort((a, b) => {
+            const priorityDifference =
+              getExamplePriority(a, packageName, visualizationType, variant) -
+              getExamplePriority(b, packageName, visualizationType, variant)
+
+            if (priorityDifference !== 0) return priorityDifference
+            return a.localeCompare(b, undefined, { sensitivity: 'base' })
+          })[0]
+
+          const normalizedConfigPath = normalizeConfigPath(selectedExample)
+          const variantLabel = getVariantLabel(variant)
+          const title = `${formatVisualizationType(visualizationType)} ${variantLabel}`
+
+          return {
+            packageName,
+            visualizationType,
+            variant,
+            variantLabel,
+            configPath: normalizedConfigPath,
+            fileName: selectedExample.split('/').pop(),
+            title
+          }
+        })
+        .sort((a, b) => {
+          const packageComparison = a.packageName.localeCompare(b.packageName, undefined, { sensitivity: 'base' })
+          if (packageComparison !== 0) return packageComparison
+
+          const typeComparison = a.visualizationType.localeCompare(b.visualizationType, undefined, { sensitivity: 'base' })
+          if (typeComparison !== 0) return typeComparison
+
+          return a.variant.localeCompare(b.variant, undefined, { sensitivity: 'base' })
+        })
+    }
+
+    function renderGrid() {
+      const query = searchInput.value.trim().toLowerCase()
+      const visibleEntries = entries.filter(entry => {
+        if (!selectedPackages.has(entry.packageName)) return false
+        if (!query) return true
+
+        return [entry.packageName, entry.fileName, entry.configPath, entry.title, entry.variantLabel, entry.visualizationType].some(
+          value => value.toLowerCase().includes(query)
+        )
+      })
+
+      const visiblePackages = Object.keys(packages).filter(packageName => !hiddenPackages.has(packageName))
+      const onlineCount = visiblePackages.filter(packageName => packageStatus[packageName]).length
+      const offlinePackages = visiblePackages.filter(packageName => !packageStatus[packageName])
+      const statusMarkup = visiblePackages
+        .map(
+          packageName =>
+            `<span class="status-pill${packageStatus[packageName] ? ' online' : ''}">${packageName}</span>`
+        )
+        .join('')
+
+      summary.innerHTML = `
+        <span>${visibleEntries.length} visible of ${entries.length} local examples</span>
+        <span>${onlineCount}/${visiblePackages.length} packages online</span>
+        <span class="status-list">${statusMarkup}</span>
+      `
+
+      if (!visibleEntries.length) {
+        const message =
+          entries.length === 0
+            ? `Waiting for package dev servers. Offline: ${offlinePackages.join(', ')}`
+            : 'No matching examples. Adjust the package filters or search text.'
+        grid.innerHTML = `<div class="empty">${message}</div>`
+        return
+      }
+
+      grid.innerHTML = visibleEntries
+        .map(
+          entry => `
+              <article class="card">
+                <div class="card__header">
+                  <div class="card__title">
+                    <h2>${entry.title}</h2>
+                    <p>${entry.configPath}</p>
+                  </div>
+                  <div class="card__package">${entry.packageName}</div>
+                </div>
+                <iframe loading="lazy" src="${createIframeUrl(entry.packageName, entry.configPath)}" title="${entry.packageName} ${entry.fileName}"></iframe>
+              </article>
+            `
+        )
+        .join('')
+    }
+
+    async function fetchPackageExamples(packageName) {
+      try {
+        const response = await fetch(`http://localhost:${packages[packageName]}/__examples`)
+        const examples = await response.json()
+        return { packageName, examples }
+      } catch (error) {
+        return { packageName, examples: null }
+      }
+    }
+
+    async function init() {
+      await refreshExamples()
+      refreshTimer = window.setInterval(refreshExamples, 3000)
+    }
+
+    async function refreshExamples() {
+      const packageResults = await Promise.all(Object.keys(packages).map(fetchPackageExamples))
+      const onlinePackages = []
+
+      packageStatus = {}
+
+      const nextEntries = packageResults.flatMap(result => {
+        const online = Array.isArray(result.examples)
+        packageStatus[result.packageName] = online
+        if (!online) return []
+        if (hiddenPackages.has(result.packageName)) return []
+
+        onlinePackages.push(result.packageName)
+
+        const jsonExamples = result.examples
+          .filter(example => example.endsWith('.json'))
+          .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
+
+        return buildEntriesForPackage(result.packageName, jsonExamples)
+      })
+
+      const nextSignature = JSON.stringify({
+        packageStatus,
+        entries: nextEntries
+      })
+
+      if (nextSignature === lastRenderSignature) {
+        const visiblePackageCount = Object.keys(packages).filter(packageName => !hiddenPackages.has(packageName)).length
+        if (onlinePackages.length === visiblePackageCount && refreshTimer) {
+          window.clearInterval(refreshTimer)
+          refreshTimer = null
+        }
+        return
+      }
+
+      entries = nextEntries
+      lastRenderSignature = nextSignature
+      renderPackageFilters(onlinePackages)
+      renderGrid()
+
+      const visiblePackageCount = Object.keys(packages).filter(packageName => !hiddenPackages.has(packageName)).length
+      if (onlinePackages.length === visiblePackageCount && refreshTimer) {
+        window.clearInterval(refreshTimer)
+        refreshTimer = null
+      }
+    }
+
+    searchInput.addEventListener('input', renderGrid)
+
+    showAllButton.addEventListener('click', () => {
+      Object.keys(packages)
+        .filter(packageName => !hiddenPackages.has(packageName))
+        .forEach(packageName => selectedPackages.add(packageName))
+      packageFilters.querySelectorAll('input').forEach(input => {
+        input.checked = true
+      })
+      renderGrid()
+    })
+
+    hideAllButton.addEventListener('click', () => {
+      selectedPackages.clear()
+      packageFilters.querySelectorAll('input').forEach(input => {
+        input.checked = false
+      })
+      renderGrid()
+    })
+
+    gapRange.addEventListener('input', () => {
+      sectionGap = Number(gapRange.value)
+      gapValue.textContent = `${sectionGap}px`
+      syncUrlState()
+      broadcastSectionGap()
+    })
+
+    init()
+  </script>
+</body>
+
+</html>

@@ -170,7 +170,7 @@ const testDashboardRendering = async (canvasElement: HTMLElement, storyName: str
   })
 
   await step('Verify at least one visualization rendered', async () => {
-    const coveModules = canvasElement.querySelectorAll('.cdc-open-viz-module')
+    const coveModules = canvasElement.querySelectorAll('.cove-visualization')
     expect(coveModules.length).toBeGreaterThan(0)
   })
 

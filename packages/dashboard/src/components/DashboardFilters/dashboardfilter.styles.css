@@ -4,18 +4,18 @@
     font-weight: 700;
   }
   .btn {
+    align-self: flex-end;
     /* this is the height that is defined for the .form-control class in _forms.scss in bootstrap. */
     height: calc(1.5em + 0.75rem + 2px);
-    align-self: flex-end;
   }
   .loading-filter {
     position: relative;
     .spinner-border {
-      position: absolute;
-      top: 55%;
-      right: 10%;
-      width: 1.5rem;
       height: 1.5rem;
+      position: absolute;
+      right: 10%;
+      top: 55%;
+      width: 1.5rem;
     }
   }
   :is(select):disabled {

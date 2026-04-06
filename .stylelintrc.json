@@ -1,0 +1,12 @@
+{
+  "plugins": ["stylelint-order"],
+  "ignoreFiles": [
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/examples/**",
+    "**/devTemplate/**"
+  ],
+  "rules": {
+    "order/properties-alphabetical-order": true
+  }
+}

@@ -131,13 +131,24 @@ observer.observe(document.body, {
 
 // Listen for resize messages from embedded visualizations
 window.addEventListener('message', function (event) {
+  const type = event?.data?.type
+
+  // Ignore unrelated cross-window traffic (extensions, frameworks, etc.).
+  if (typeof type !== 'string' || !type.startsWith('cove:')) {
+    return
+  }
+
   if (!isValidMessageOrigin(event.origin)) {
-    console.warn('Embed Helper: Rejected message from invalid origin:', event.origin)
+    console.warn('CDC COVE Embed Helper: Rejected COVE message from invalid origin', {
+      origin: event.origin,
+      type,
+      id: event?.data?.id
+    })
     return
   }
 
   // Handle resize events
-  if (event.data && event.data.type === 'cove:resize') {
+  if (type === 'cove:resize') {
     const iframeId = event.data.id
     const height = event.data.height
 

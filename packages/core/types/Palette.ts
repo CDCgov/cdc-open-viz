@@ -10,6 +10,7 @@ export type PaletteBackup = {
 export type Palette = {
   name?: string
   customColors?: string[]
+  customColorsOrdered?: string[]
   version?: PaletteVersion
   isReversed?: boolean
   backups?: PaletteBackup[]

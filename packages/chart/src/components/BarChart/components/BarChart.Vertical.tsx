@@ -21,6 +21,8 @@ import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { type ChartContext } from '../../../types/ChartContext'
 import _ from 'lodash'
 import { getBarData } from '../helpers/getBarData'
+import { getPatternUrl as getPatternUrlForBar } from '../helpers/getPatternUrl'
+import { getChartPatternId } from '../../../helpers/getChartPatternId'
 
 const BarChartVertical = () => {
   const { xScale, yScale, xMax, yMax, seriesScale, convertLineToBarGraph, barChart } =
@@ -86,7 +88,7 @@ const BarChartVertical = () => {
     return (
       <defs>
         {Object.entries(config.legend.patterns).map(([key, pattern]) => {
-          const patternId = `chart-pattern-${key}`
+          const patternId = getChartPatternId(key)
           const size = pattern.patternSize || 8
 
           switch (pattern.shape) {
@@ -325,33 +327,15 @@ const BarChartVertical = () => {
                   }
 
                   // Check if this bar should use a pattern
-                  const getPatternUrl = (): string | null => {
-                    if (!config.legend.patterns || Object.keys(config.legend.patterns).length === 0) {
-                      return null
-                    }
-
-                    // Find a pattern that matches this specific bar
-                    for (const [patternKey, pattern] of Object.entries(config.legend.patterns)) {
-                      if (pattern.dataKey && pattern.dataValue) {
-                        // For grouped bar charts, check if the pattern's dataKey matches the current bar's series key
-                        // and if the pattern's dataValue matches the current bar's value
-                        if (pattern.dataKey === bar.key && String(bar.value) === String(pattern.dataValue)) {
-                          return `url(#chart-pattern-${patternKey})`
-                        }
-                        // Fallback for non-grouped charts: check datum field value
-                        else if (!config.series || config.series.length <= 1) {
-                          const dataFieldValue = datum[pattern.dataKey]
-                          if (String(dataFieldValue) === String(pattern.dataValue)) {
-                            return `url(#chart-pattern-${patternKey})`
-                          }
-                        }
-                      }
-                    }
-
-                    return null
-                  }
-
-                  const patternUrl = getPatternUrl()
+                  const patternUrl = getPatternUrlForBar({
+                    patterns: config.legend?.patterns,
+                    datum,
+                    seriesKey: bar.key,
+                    seriesValue: bar.value,
+                    seriesLabels: config.runtime?.seriesLabels,
+                    seriesKeys: config.series?.map(series => series.dataKey),
+                    allowNonSeriesFieldMatch: !config.series || config.series.length <= 1
+                  })
                   const baseBackground = getBarBackgroundColor(colorScale(config.runtime.seriesLabels[bar.key]))
 
                   // Confidence Interval Variables

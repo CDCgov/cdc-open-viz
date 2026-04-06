@@ -1,4 +1,4 @@
-import '../../styles/v2/components/input/index.scss'
+import './index.scss'
 
 interface InputProps {
   label?

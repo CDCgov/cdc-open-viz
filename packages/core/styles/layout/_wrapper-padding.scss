@@ -1,0 +1,27 @@
+@mixin cove-visualization-body-padding {
+  padding-top: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+  padding-left: 0;
+
+  &.component--has-legacy-border,
+  &.component--has-border-color-theme,
+  &.component--has-background,
+  &.component--has-accent {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+}
+
+
+@mixin cove-visualization-body-wrap-inline-padding {
+  padding-inline: 0;
+
+  .cove-visualization__body.component--has-legacy-border &,
+  .cove-visualization__body.component--has-border-color-theme &,
+  .cove-visualization__body.component--has-background &,
+  .cove-visualization__body.component--has-accent & {
+    padding-inline: 1rem;
+  }
+}

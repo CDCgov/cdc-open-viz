@@ -1,30 +1,30 @@
 .geo-buttons {
-  list-style: none;
   color: var(--mediumGray);
   display: grid;
+  list-style: none;
   button { width: 100% !important; }
   svg {
-    display: block;
-    max-width: 80px;
-    max-height: 40px;
-    margin: 0.5em auto;
     box-sizing: border-box;
+    display: block;
+    margin: 0.5em auto;
+    max-height: 40px;
+    max-width: 80px;
     path {
       fill: currentColor;
     }
   }
   button {
-    background: transparent;
-    padding: 0.3em 0.75em;
-    display: flex;
-    border: var(--lightGray) 1px solid;
-    width: 40%;
     align-items: center;
-    margin-right: 1em;
+    background: transparent;
+    border: var(--lightGray) 1px solid;
     cursor: pointer;
-    overflow: hidden;
+    display: flex;
     flex-direction: column;
+    margin-right: 1em;
+    overflow: hidden;
+    padding: 0.3em 0.75em;
     transition: 0.2s all;
+    width: 40%;
     svg {
       display: block;
       height: 25px;
@@ -32,8 +32,8 @@
       max-width: 100%;
     }
     span {
-      text-transform: none;
       font-size: 1em;
+      text-transform: none;
     }
     &:hover {
       background: #f2f2f2;
@@ -48,13 +48,13 @@
         fill: #005eaa;
       }
       &:before {
-        content: ' ';
-        width: 5px;
         background: #005eaa;
-        left: 0;
-        top: 0;
         bottom: 0;
+        content: ' ';
+        left: 0;
         position: absolute;
+        top: 0;
+        width: 5px;
       }
     }
   }
@@ -62,24 +62,24 @@
 
 .editor-toggle {
   background: #f2f2f2;
-  border-radius: 60px;
-  color: #000;
-  font-size: 1em;
   border: 0;
-  position: fixed;
-  z-index: 100;
-  transition: 0.1s background;
+  border-radius: 60px;
+  box-shadow: rgba(0, 0, 0, 0.5) 0 1px 2px;
+  color: #000;
   cursor: pointer;
-  width: 25px;
+  font-size: 1em;
   height: 25px;
   left: 307px;
-  box-shadow: rgba(0, 0, 0, 0.5) 0 1px 2px;
+  position: fixed;
+  transition: 0.1s background;
+  width: 25px;
+  z-index: 100;
   &:before {
-    top: 43%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    position: absolute;
     content: '\00ab';
+    left: 50%;
+    position: absolute;
+    top: 43%;
+    transform: translate(-50%, -50%);
   }
   &.collapsed {
     left: 1em;
@@ -93,3 +93,13 @@
   }
 }
 
+.column-section__header {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.column-section__title {
+  font-weight: 600;
+}

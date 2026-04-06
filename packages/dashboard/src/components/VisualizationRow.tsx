@@ -1,7 +1,7 @@
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
 import React, { useContext, useEffect, useMemo, useState } from 'react'
 import Toggle from './Toggle'
-import _ from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 import { ConfigRow } from '../types/ConfigRow'
 import CdcDataBite from '@cdc/data-bite/src/CdcDataBite'
 import CdcMap from '@cdc/map/src/CdcMapComponent'
@@ -140,6 +140,8 @@ const VisualizationRow: React.FC<VizRowProps> = ({
 
   // Equalize TP5 callout title heights and TP5 gauge message blocks for like visualizations in the same row
   useEffect(() => {
+    if (!row.equalHeight) return
+
     const rowElement = document.querySelector(`[data-row-index="${index}"]`)
     if (!rowElement) return
 
@@ -154,6 +156,11 @@ const VisualizationRow: React.FC<VizRowProps> = ({
       cleanups.forEach(cleanup => cleanup())
     }
   }, [index, row, config, filteredDataOverride])
+
+  const isFilterRow = row.columns.some(
+    col => col.widget && config.visualizations[col.widget]?.type === 'dashboardFilters'
+  )
+  const needsEqualHeight = !!row.equalHeight && !isFilterRow
 
   const show = useMemo(() => {
     if (row.toggle) {
@@ -201,7 +208,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
         )}
         {Object.keys(dataGroups).map(groupName => {
           const dataValue = dataGroups[groupName]
-          const _row = _.cloneDeep(row) // clone the row to avoid mutating the original row
+          const _row = cloneDeep(row) // clone the row to avoid mutating the original row
           const originalMultiVizColumn = _row.multiVizColumn // store original value before clearing
           _row.multiVizColumn = undefined // reset the multiVizColumn to avoid passing it to the child components
           _row.originalMultiVizColumn = originalMultiVizColumn // store for footnote filtering
@@ -229,7 +236,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
 
   return (
     <div
-      className={`row${row.equalHeight ? ' equal-height' : ''}${row.toggle ? ' toggle' : ''}`}
+      className={`row${needsEqualHeight ? ' equal-height' : ''}${row.toggle ? ' toggle' : ''}`}
       key={`row__${index}`}
       data-row-index={index}
     >
@@ -352,6 +359,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                     updateChildConfig(col.widget, newConfig)
                   }}
                   isDashboard={true}
+                  isEditor={config.editing === true}
                   interactionLabel={interactionLabel}
                 />
               )}
@@ -363,7 +371,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                     updateChildConfig(col.widget, newConfig)
                   }}
                   isDashboard={true}
-                  interactionLabel={link}
+                  interactionLabel={interactionLabel}
                 />
               )}
               {type === 'markup-include' && (

@@ -16,30 +16,38 @@ import {
  * Converts a geographic key to its display name.
  *
  * @param {string} key - The geographic key to convert.
- * @param {boolean} [convertFipsCodes=true] - Whether to convert FIPS codes.
+ * @param {string} [displayOverride] - If provided, returns this value immediately (used for translated/alternate display names).
  * @returns {string} - The display name for the geographic key.
  */
-export const displayGeoName = (key: string, convertFipsCodes = true): string => {
-  if (!convertFipsCodes) return key
-  let value = key
+export const displayGeoName = (key: string, displayOverride?: string): string => {
+  const rawKey = String(key || '')
+  const trimmedOverride = typeof displayOverride === 'string' ? displayOverride.trim() : ''
+  const normalizedKey = rawKey.toUpperCase()
+  const normalizedOverride = trimmedOverride.toUpperCase()
+
+  if (trimmedOverride && normalizedOverride !== normalizedKey) {
+    return trimmedOverride
+  }
+
+  let value = rawKey
   let wasLookedUp = false
 
   // Map to first item in values array which is the preferred label
-  if (stateKeys.includes(value)) {
-    value = titleCase(supportedStates[key][0])
+  if (stateKeys.includes(normalizedKey)) {
+    value = titleCase(supportedStates[normalizedKey][0])
     wasLookedUp = true
   }
 
-  if (territoryKeys.includes(value)) {
-    value = titleCase(supportedTerritories[key][0])
+  if (territoryKeys.includes(normalizedKey)) {
+    value = titleCase(supportedTerritories[normalizedKey][0])
     wasLookedUp = true
     if (value === 'U.s. Virgin Islands') {
       value = 'U.S. Virgin Islands'
     }
   }
 
-  if (countryKeys.includes(value)) {
-    value = titleCase(supportedCountries[key][0])
+  if (countryKeys.includes(normalizedKey)) {
+    value = titleCase(supportedCountries[normalizedKey][0])
     wasLookedUp = true
   }
 
@@ -64,7 +72,7 @@ export const displayGeoName = (key: string, convertFipsCodes = true): string => 
     wasLookedUp = true
   }
 
-  if (cityKeys.includes(value)) {
+  if (cityKeys.includes(normalizedKey)) {
     value = titleCase(String(value) || '')
     wasLookedUp = true
   }

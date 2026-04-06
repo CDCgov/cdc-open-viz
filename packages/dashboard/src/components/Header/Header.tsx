@@ -176,7 +176,6 @@ const Header = (props: HeaderProps) => {
                     Show Data Table(s)
                   </label>
                   <br />
-
                   <label>
                     <input
                       type='checkbox'
@@ -185,7 +184,6 @@ const Header = (props: HeaderProps) => {
                     />
                     Expanded by Default
                   </label>
-                  <br />
                 </div>
 
                 <div className='wrap'>
@@ -206,9 +204,6 @@ const Header = (props: HeaderProps) => {
                       onChange={e => changeConfigValue('table', 'height', e.target.value)}
                     />
                   )}
-                </div>
-
-                <div className='wrap'>
                   <label>
                     <input
                       type='checkbox'
@@ -217,6 +212,17 @@ const Header = (props: HeaderProps) => {
                     />
                     Show Download CSV Link
                   </label>
+                  {config.table.download && (
+                    <input
+                      type='text'
+                      placeholder='Customize label'
+                      defaultValue={config.table.downloadDataLabel}
+                      onChange={e => changeConfigValue('table', 'downloadDataLabel', e.target.value)}
+                    />
+                  )}
+                </div>
+
+                <div className='wrap'>
                   <label>
                     <input
                       type='checkbox'
@@ -225,6 +231,22 @@ const Header = (props: HeaderProps) => {
                     />
                     Show URL to Automatically Updated Data
                   </label>
+                  <label>
+                    <input
+                      type='checkbox'
+                      defaultChecked={config.table.downloadImageButton}
+                      onChange={e => changeConfigValue('table', 'downloadImageButton', e.target.checked)}
+                    />
+                    Show Download Image Button
+                  </label>
+                  {config.table.downloadImageButton && (
+                    <input
+                      type='text'
+                      placeholder='Customize label'
+                      defaultValue={config.table.downloadImageLabel}
+                      onChange={e => changeConfigValue('table', 'downloadImageLabel', e.target.value)}
+                    />
+                  )}
                 </div>
               </>
             )}

@@ -356,7 +356,7 @@ export const GeneralSectionTests: Story = {
     expect(showTitleCheckbox).toBeTruthy()
 
     const getTitleVisibility = () => {
-      const titleElement = canvasElement.querySelector('.cove-title, header.cove-component__header')
+      const titleElement = canvasElement.querySelector('.cove-title, header.cove-visualization__header')
       return {
         isPresent: Boolean(titleElement)
       }
@@ -414,7 +414,7 @@ export const GeneralSectionTests: Story = {
 
     const getTitleStyleVisual = () => {
       const coveTitleElement = canvasElement.querySelector('.cove-title')
-      const legacyTitleElement = canvasElement.querySelector('header.cove-component__header')
+      const legacyTitleElement = canvasElement.querySelector('header.cove-visualization__header')
 
       // For modern titles, check for h2 (large) or h3 (small) elements
       const hasH2 = Boolean(coveTitleElement?.querySelector('h2'))
@@ -1738,7 +1738,7 @@ export const FiltersSectionTests: Story = {
         const labelText = labels.join(',')
 
         // Verify filter dropdown is rendered
-        const vizContainer = canvasElement.querySelector('.cdc-open-viz-module')
+        const vizContainer = canvasElement.querySelector('.cove-visualization')
         const filterSelect = Array.from(vizContainer?.querySelectorAll('select') || []).find(select => {
           const options = Array.from(select.options).map(opt => opt.value)
           return options.includes('Alabama')
@@ -2189,22 +2189,29 @@ export const VisualSectionTests: StoryObj<typeof CdcMap> = {
     await performAndAssert(
       'Header Theme → Select purple theme',
       () => {
-        const innerContainer = canvasElement.querySelector('.cdc-map-inner-container')
-        const currentTheme = Array.from(innerContainer?.classList || []).find(cls => cls.startsWith('theme-'))
+        // Check via the HeaderThemeSelector's selected button state
+        const colorPalettes = canvasElement.querySelectorAll('.color-palette')
+        const themeColorPalette = Array.from(colorPalettes).find(palette =>
+          Array.from(palette.querySelectorAll('button')).some(btn => btn.classList.contains('theme-purple'))
+        )
+        const selectedThemeBtn = themeColorPalette?.querySelector('button.selected') as HTMLElement | null
         return {
-          currentTheme: currentTheme || ''
+          currentTheme: selectedThemeBtn
+            ? Array.from(selectedThemeBtn.classList).find(cls => cls.startsWith('theme-')) || ''
+            : ''
         }
       },
       async () => {
-        // Find the color palette and click on the purple theme button
-        const colorPalette = canvasElement.querySelector('.color-palette')
-        const purpleTheme = Array.from(colorPalette?.querySelectorAll('button') || []).find(button =>
-          button.classList.contains('theme-purple')
-        ) as HTMLElement
+        // Find the header theme selector and click purple
+        const colorPalettes = canvasElement.querySelectorAll('.color-palette')
+        const themeColorPalette = Array.from(colorPalettes).find(palette =>
+          Array.from(palette.querySelectorAll('button')).some(btn => btn.classList.contains('theme-purple'))
+        )
+        const purpleTheme = themeColorPalette?.querySelector('button.theme-purple') as HTMLElement
         await userEvent.click(purpleTheme)
       },
       (before, after) => {
-        // After clicking, the header should have the purple theme
+        // After clicking, the purple theme button should be selected
         return after.currentTheme === 'theme-purple'
       }
     )
@@ -2220,7 +2227,7 @@ export const VisualSectionTests: StoryObj<typeof CdcMap> = {
     await performAndAssert(
       'Show Title → Toggle off',
       () => {
-        const titleElement = canvasElement.querySelector('.cove-title, header.cove-component__header')
+        const titleElement = canvasElement.querySelector('.cove-title, header.cove-visualization__header')
         return {
           isPresent: Boolean(titleElement)
         }
@@ -2237,7 +2244,7 @@ export const VisualSectionTests: StoryObj<typeof CdcMap> = {
     await performAndAssert(
       'Show Title → Toggle back on',
       () => {
-        const titleElement = canvasElement.querySelector('.cove-title, header.cove-component__header')
+        const titleElement = canvasElement.querySelector('.cove-title, header.cove-visualization__header')
         return {
           isPresent: Boolean(titleElement)
         }
@@ -2743,6 +2750,108 @@ export const PatternSettingsSectionTests: Story = {
     )
 
     await performAndAssert(
+      'Pattern Settings → Broad match with blank dataKey (value 55)',
+      () => {
+        const allSvgs = canvasElement.querySelectorAll('svg')
+        let patternPathCount = 0
+
+        allSvgs.forEach(svg => {
+          const allPaths = Array.from(svg.querySelectorAll('path'))
+          patternPathCount += allPaths.filter(path => path.getAttribute('fill')?.startsWith('url(#')).length
+        })
+
+        return { patternPathCount }
+      },
+      async () => {
+        const dataKeySelect = canvasElement.querySelector('select[name^="pattern-dataKey--"]') as HTMLSelectElement
+        const dataValueInput = canvasElement.querySelector('input[id^="pattern-dataValue--"]') as HTMLInputElement
+        if (!dataKeySelect || !dataValueInput) throw new Error('Pattern data controls not found')
+
+        await userEvent.selectOptions(dataKeySelect, '')
+        await userEvent.clear(dataValueInput)
+        await userEvent.type(dataValueInput, '55')
+        await userEvent.tab()
+      },
+      (before, after) => after.patternPathCount > 0
+    )
+
+    await performAndAssert(
+      'Pattern Settings → Specific match beats broad match',
+      () => {
+        const allSvgs = canvasElement.querySelectorAll('svg')
+        const patternTypeById: Record<string, 'lines' | 'circles' | 'waves' | 'unknown'> = {}
+        const appliedRatePatternTypes = new Set<string>()
+
+        allSvgs.forEach(svg => {
+          const patterns = svg.querySelectorAll('pattern')
+          patterns.forEach(pattern => {
+            const patternId = pattern.getAttribute('id')
+            if (!patternId) return
+
+            if (pattern.querySelector('circle')) patternTypeById[patternId] = 'circles'
+            else if (pattern.querySelector('line')) patternTypeById[patternId] = 'lines'
+            else if (pattern.querySelector('path')) patternTypeById[patternId] = 'waves'
+            else patternTypeById[patternId] = 'unknown'
+          })
+
+          const ratePatternNodes = Array.from(svg.querySelectorAll('path.pattern-geoKey--Rate')).filter(node =>
+            node.getAttribute('fill')?.startsWith('url(#')
+          )
+
+          ratePatternNodes.forEach(node => {
+            const fill = node.getAttribute('fill')
+            const match = fill?.match(/^url\(#(.+)\)$/)
+            const patternId = match?.[1]
+            if (!patternId) return
+            appliedRatePatternTypes.add(patternTypeById[patternId] || 'unknown')
+          })
+        })
+
+        return {
+          hasRateCircle: appliedRatePatternTypes.has('circles'),
+          hasRateWave: appliedRatePatternTypes.has('waves')
+        }
+      },
+      async () => {
+        const firstDataKey = canvasElement.querySelector('select[name="pattern-dataKey--0"]') as HTMLSelectElement
+        const firstDataValue = canvasElement.querySelector('input[id="pattern-dataValue--0"]') as HTMLInputElement
+        const firstPatternType = canvasElement.querySelector('select[name="pattern-type--0"]') as HTMLSelectElement
+        if (!firstDataKey || !firstDataValue || !firstPatternType) {
+          throw new Error('First pattern controls not found')
+        }
+        await userEvent.selectOptions(firstDataKey, 'Rate')
+        await userEvent.clear(firstDataValue)
+        await userEvent.type(firstDataValue, '55')
+        await userEvent.selectOptions(firstPatternType, 'circles')
+
+        const buttons = Array.from(canvasElement.querySelectorAll('button'))
+        const addPatternButton = buttons.find(btn => btn.textContent?.includes('Add Geo Pattern'))
+        if (!addPatternButton) throw new Error('Add Geo Pattern button not found')
+        await userEvent.click(addPatternButton)
+
+        const accordionButtons = Array.from(canvasElement.querySelectorAll('.accordion__button'))
+        const selectColumnButtons = accordionButtons.filter(btn => btn.textContent?.includes('Select Column'))
+        const secondPatternAccordionButton = selectColumnButtons[selectColumnButtons.length - 1] as HTMLElement
+        if (!secondPatternAccordionButton) throw new Error('Second pattern accordion not found')
+        await userEvent.click(secondPatternAccordionButton)
+
+        const secondDataKey = canvasElement.querySelector('select[name="pattern-dataKey--1"]') as HTMLSelectElement
+        const secondDataValue = canvasElement.querySelector('input[id="pattern-dataValue--1"]') as HTMLInputElement
+        const secondPatternType = canvasElement.querySelector('select[name="pattern-type--1"]') as HTMLSelectElement
+
+        if (!secondDataKey || !secondDataValue || !secondPatternType) {
+          throw new Error('Second pattern controls not found')
+        }
+
+        await userEvent.selectOptions(secondDataKey, '')
+        await userEvent.clear(secondDataValue)
+        await userEvent.type(secondDataValue, '55')
+        await userEvent.selectOptions(secondPatternType, 'waves')
+      },
+      (before, after) => after.hasRateCircle && !after.hasRateWave
+    )
+
+    await performAndAssert(
       'Pattern Settings → Pattern remains after hover',
       () => {
         const allSvgs = canvasElement.querySelectorAll('svg')
@@ -3131,6 +3240,70 @@ export const SmallMultiplesSectionTests: Story = {
       (before, after) => {
         return after.titles.includes('Custom COVID Title') && !before.titles.includes('Custom COVID Title')
       }
+    )
+  }
+}
+
+export const WorldDataMapZoomControlsTest: Story = {
+  args: {
+    ...DEFAULT_ARGS
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await waitForPresence('.map-container', canvasElement)
+    await openAccordion(canvas, 'Type')
+
+    const getZoomControlsState = () => {
+      const zoomControls = canvasElement.querySelector('.zoom-controls')
+      const zoomInButton = canvasElement.querySelector('button[aria-label="Zoom In"]')
+      const zoomOutButton = canvasElement.querySelector('button[aria-label="Zoom Out"]')
+      const mapContainer = canvasElement.querySelector('.map-container')
+
+      return {
+        hasZoomControls: Boolean(zoomControls),
+        hasZoomInButton: Boolean(zoomInButton),
+        hasZoomOutButton: Boolean(zoomOutButton),
+        mapClasses: mapContainer ? Array.from(mapContainer.classList) : []
+      }
+    }
+
+    const worldButton = Array.from(canvasElement.querySelectorAll('.geo-buttons button')).find(button =>
+      button.textContent?.trim().toLowerCase().includes('world')
+    ) as HTMLButtonElement
+    expect(worldButton).toBeTruthy()
+
+    await performAndAssert(
+      'World Data Map → Switch geo type to world',
+      getZoomControlsState,
+      async () => {
+        await userEvent.click(worldButton)
+      },
+      (before, after) => !before.mapClasses.includes('world') && after.mapClasses.includes('world')
+    )
+
+    const mapTypeSelect = canvas.getByLabelText(/Map Type/i) as HTMLSelectElement
+    await performAndAssert(
+      'World Data Map → Switch type to data',
+      getZoomControlsState,
+      async () => {
+        await userEvent.selectOptions(mapTypeSelect, 'data')
+      },
+      (_before, after) => after.mapClasses.includes('world')
+    )
+
+    const allowMapZoomingCheckbox = canvas.getByLabelText(/Allow Map Zooming/i) as HTMLInputElement
+    expect(allowMapZoomingCheckbox).toBeTruthy()
+
+    await performAndAssert(
+      'World Data Map → Enable map zooming',
+      getZoomControlsState,
+      async () => {
+        await userEvent.click(allowMapZoomingCheckbox)
+      },
+      (before, after) =>
+        !before.hasZoomControls && after.hasZoomControls && after.hasZoomInButton && after.hasZoomOutButton
     )
   }
 }

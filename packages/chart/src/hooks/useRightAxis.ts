@@ -27,6 +27,20 @@ export default function useRightAxis({ config, yMax = 0, data = [] }) {
     minValue = config.yAxis.rightMin
   }
 
+  // Enforce smallest right axis max so small-data charts don't show misleading decimal ticks
+  const smallestRightAxisMaxRaw = config.yAxis.smallestRightAxisMax
+  let smallestRightAxisMax: number | null = null
+
+  if (smallestRightAxisMaxRaw !== null && smallestRightAxisMaxRaw !== undefined && smallestRightAxisMaxRaw !== '') {
+    const coercedSmallestRightAxisMax = Number(smallestRightAxisMaxRaw)
+    if (!Number.isNaN(coercedSmallestRightAxisMax)) {
+      smallestRightAxisMax = coercedSmallestRightAxisMax
+    }
+  }
+
+  if (smallestRightAxisMax !== null && max < smallestRightAxisMax) {
+    max = smallestRightAxisMax
+  }
   // if there is a bar series & the right axis doesn't include a negative number, default to zero
   const hasBarSeries = config.runtime?.barSeriesKeys?.length > 0
   const hasLineSeries = config.runtime?.lineSeriesKeys?.length > 0

@@ -1,16 +1,12 @@
-.markup-include {
-  .cove-component__content-wrap {
-    padding: 0;
+@import '@cdc/core/styles/layout/wrapper-padding';
 
-    &.has-top-padding {
-      padding-top: 1rem;
-      padding-bottom: 1rem;
-    }
+.cove-visualization.type-markup-include {
+  .cove-visualization__body {
+    @include cove-visualization-body-padding;
+  }
 
-    &.has-side-padding {
-      padding-left: 1rem;
-      padding-right: 1rem;
-    }
+  .cove-visualization__body-wrap {
+    @include cove-visualization-body-wrap-inline-padding;
 
     h1,
     h2,
@@ -22,9 +18,16 @@
       margin-top: auto;
       margin-bottom: auto;
     }
+
+    // keep markup include images inlines on dashboards
+    // e.g. requested to help here: https://www.cdc.gov/fluview/surveillance/2026-week-10.html
+    // needed for backwards compatibility with existing dashboards, but also to prevent any future issues with images in markup include visualizations being forced to display as blocks
+    span>img {
+      display: inline;
+    }
   }
 
-  .cove-component__content.component--hideBackgroundColor {
+  .cove-visualization__body.component--hide-background-color {
     background: transparent;
   }
 
@@ -47,6 +50,7 @@
     float: left;
   }
 }
+
 .cove-editor .cove-editor__content {
   padding-left: 350px;
   display: flex;

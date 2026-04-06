@@ -1,5 +1,4 @@
 import { useContext, FC, useMemo } from 'react'
-import _ from 'lodash'
 import cloneConfig from '@cdc/core/helpers/cloneConfig'
 
 // external libraries
@@ -31,13 +30,16 @@ import { LineChartConfig } from '../../../../types/ChartConfig'
 import { PaletteSelector, DeveloperPaletteRollback } from '@cdc/core/components/PaletteSelector'
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import { CustomColorsEditor } from '@cdc/core/components/CustomColorsEditor'
+import StyleTreatmentSection from '@cdc/core/components/EditorPanel/sections/StyleTreatmentSection'
 import { getColorScale } from '../../../../helpers/getColorScale'
-import '@cdc/core/styles/v2/components/editor.scss'
+import { ENABLE_CHART_MAP_TP5_TREATMENT_SELECTION, ENABLE_CHART_VISUAL_SETTINGS } from '@cdc/core/helpers/constants'
+import '@cdc/core/components/EditorPanel/editor.scss'
 import './panelVisual.styles.css'
 
 const PanelVisual: FC<PanelProps> = props => {
   const { config, updateConfig, colorPalettes, twoColorPalette } = useContext<ChartContext>(ConfigContext)
   const { visual } = config
+  const styleTreatment = config.titleStyle === 'legacy' && !visual?.tp5Treatment ? 'legacy' : 'tp5'
 
   const { setLollipopShape, updateField, handlePaletteSelection, handleTwoColorPaletteSelection } =
     useEditorPanelContext()
@@ -89,12 +91,44 @@ const PanelVisual: FC<PanelProps> = props => {
     }
   }
 
+  const handleStyleTreatmentChange = (value: string) => {
+    const useTp5Treatment = value === 'tp5'
+
+    updateConfig({
+      ...config,
+      titleStyle: useTp5Treatment ? 'small' : 'legacy',
+      visual: {
+        ...config.visual,
+        tp5Treatment: useTp5Treatment,
+        border: useTp5Treatment ? false : config.visual?.border,
+        borderColorTheme: useTp5Treatment ? false : config.visual?.borderColorTheme,
+        accent: useTp5Treatment ? false : config.visual?.accent
+      }
+    })
+  }
+
   return (
     <AccordionItem className='panel-visual'>
       <AccordionItemHeading>
         <AccordionItemButton>Visual</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
+        <HeaderThemeSelector selectedTheme={config.theme} onThemeSelect={theme => updateConfig({ ...config, theme })} />
+        {ENABLE_CHART_VISUAL_SETTINGS && (
+          <StyleTreatmentSection
+            styleTreatment={styleTreatment}
+            onStyleTreatmentChange={handleStyleTreatmentChange}
+            showStyleTreatment={ENABLE_CHART_MAP_TP5_TREATMENT_SELECTION}
+            border={visual?.border}
+            borderColorTheme={visual?.borderColorTheme}
+            accent={visual?.accent}
+            background={visual?.background}
+            hideBackgroundColor={visual?.hideBackgroundColor}
+            showBackground={config.visualizationType === 'Spark Line'}
+            showHideBackgroundColor={config.visualizationType === 'Spark Line'}
+            updateField={updateField}
+          />
+        )}
         {(config.barStyle === 'lollipop' || config.isLollipopChart) && (
           <>
             <fieldset className='header'>
@@ -272,7 +306,6 @@ const PanelVisual: FC<PanelProps> = props => {
             />
           </>
         )}
-        <HeaderThemeSelector selectedTheme={config.theme} onThemeSelect={theme => updateConfig({ ...config, theme })} />
         {(visSupportsNonSequentialPallete() || visSupportsNonSequentialPallete()) && (
           <>
             <label>
@@ -573,45 +606,6 @@ const PanelVisual: FC<PanelProps> = props => {
             updateField={updateField}
           />
         )}
-        {config.visualizationType === 'Spark Line' && (
-          <div className='cove-accordion__panel-section checkbox-group'>
-            <CheckBox
-              value={visual?.border}
-              section='visual'
-              fieldName='border'
-              label='Show Border'
-              updateField={updateField}
-            />
-            <CheckBox
-              value={visual?.borderColorTheme}
-              section='visual'
-              fieldName='borderColorTheme'
-              label='Use Border Color Theme'
-              updateField={updateField}
-            />
-            <CheckBox
-              value={visual?.accent}
-              section='visual'
-              fieldName='accent'
-              label='Use Accent Style'
-              updateField={updateField}
-            />
-            <CheckBox
-              value={visual?.background}
-              section='visual'
-              fieldName='background'
-              label='Use Theme Background Color'
-              updateField={updateField}
-            />
-            <CheckBox
-              value={visual?.hideBackgroundColor}
-              section='visual'
-              fieldName='hideBackgroundColor'
-              label='Hide Background Color'
-              updateField={updateField}
-            />
-          </div>
-        )}
         {(config.visualizationType === 'Line' || config.visualizationType === 'Combo') && (
           <CheckBox
             value={config.showLineSeriesLabels}
@@ -690,6 +684,15 @@ const PanelVisual: FC<PanelProps> = props => {
             }
           />
         </label>
+        {isCoveDeveloperMode() && (
+          <CheckBox
+            value={visual?.highlightWrappers}
+            section='visual'
+            fieldName='highlightWrappers'
+            label='Highlight Layout Wrappers'
+            updateField={updateField}
+          />
+        )}
       </AccordionItemPanel>
     </AccordionItem>
   )

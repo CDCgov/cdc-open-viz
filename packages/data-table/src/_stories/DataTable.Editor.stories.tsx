@@ -717,6 +717,97 @@ export const DataTableSectionTests: Story = {
       await userEvent.click(downloadOnlyVisibleCheckbox)
       await new Promise(resolve => setTimeout(resolve, 500))
     }
+
+    // ============================================================================
+    // TEST 8: DEFAULT SORT COLUMN
+    // Verifies: Selecting a sort column adds sort-asc class to a table header
+    // ============================================================================
+
+    const sortColumnSelect = Array.from(canvasElement.querySelectorAll('select')).find(s => {
+      const label = s.closest('label')?.textContent?.trim() || ''
+      return label.includes('Default Sort Column')
+    }) as HTMLSelectElement
+
+    if (sortColumnSelect) {
+      const sortOptions = Array.from(sortColumnSelect.options)
+        .map(o => o.value)
+        .filter(v => v && v !== '-Select-')
+
+      if (sortOptions.length > 0) {
+        // Use last option to avoid columns excluded by earlier tests
+        const sortTarget = sortOptions[sortOptions.length - 1]
+
+        await performAndAssert(
+          'Default Sort Column Selection',
+          () => {
+            const headers = canvasElement.querySelectorAll('th')
+            return { hasSortedHeader: Array.from(headers).some(h => h.className.includes('sort-asc')) }
+          },
+          async () => {
+            await userEvent.selectOptions(sortColumnSelect, sortTarget)
+          },
+          (_before, after) => after.hasSortedHeader
+        )
+
+        // ======================================================================
+        // TEST 9: SORT DIRECTION — DESCENDING
+        // Verifies: Changing direction flips header from sort-asc to sort-desc
+        // ======================================================================
+
+        const sortDirSelect = Array.from(canvasElement.querySelectorAll('select')).find(s => {
+          const label = s.closest('label')?.textContent?.trim() || ''
+          return label.includes('Sort Direction')
+        }) as HTMLSelectElement
+
+        if (sortDirSelect) {
+          await performAndAssert(
+            'Sort Direction — Descending',
+            () => {
+              const headers = canvasElement.querySelectorAll('th')
+              return { hasDescHeader: Array.from(headers).some(h => h.className.includes('sort-desc')) }
+            },
+            async () => {
+              await userEvent.selectOptions(sortDirSelect, 'desc')
+            },
+            (_before, after) => after.hasDescHeader
+          )
+
+          // ====================================================================
+          // TEST 10: SORT DIRECTION — CUSTOM
+          // Verifies: Selecting Custom shows the drag-and-drop sort list
+          // ====================================================================
+
+          await performAndAssert(
+            'Sort Direction — Custom',
+            () => ({ hasSortList: !!canvasElement.querySelector('.sort-list') }),
+            async () => {
+              await userEvent.selectOptions(sortDirSelect, 'custom')
+            },
+            (_before, after) => after.hasSortList
+          )
+
+          // ====================================================================
+          // TEST 11: CLEAR DEFAULT SORT
+          // Verifies: Resetting column removes sort classes and hides direction
+          // ====================================================================
+
+          await performAndAssert(
+            'Clear Default Sort Column',
+            () => ({
+              hasSortList: !!canvasElement.querySelector('.sort-list'),
+              headers: Array.from(canvasElement.querySelectorAll('th')).map(h => h.className)
+            }),
+            async () => {
+              await userEvent.selectOptions(sortColumnSelect, '')
+            },
+            (_before, after) => {
+              const noSort = !after.headers.some(c => c.includes('sort-asc') || c.includes('sort-desc'))
+              return noSort && !after.hasSortList
+            }
+          )
+        }
+      }
+    }
   }
 }
 

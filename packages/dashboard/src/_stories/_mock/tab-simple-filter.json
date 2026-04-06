@@ -1,0 +1,153 @@
+{
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": [
+      {
+        "key": "category",
+        "showDropdown": true,
+        "filterStyle": "tab-simple",
+        "values": ["Category A", "Category B", "Category C"],
+        "orderedValues": ["Category A", "Category B", "Category C"],
+        "type": "datafilter",
+        "columnName": "category",
+        "tier": 1,
+        "order": "cust",
+        "defaultValue": "Category A"
+      }
+    ]
+  },
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "dashboardFilters1"
+        }
+      ]
+    },
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "chart1"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "dashboardFilters1": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "newViz": true,
+      "uid": "dashboardFilters1",
+      "type": "dashboardFilters",
+      "sharedFilterIndexes": [0],
+      "visualizationType": "dashboardFilters"
+    },
+    "chart1": {
+      "filters": [],
+      "filterBehavior": "Filter Change",
+      "uid": "chart1",
+      "type": "chart",
+      "visualizationType": "Bar",
+      "title": "Sales by Category",
+      "showTitle": true,
+      "theme": "theme-blue",
+      "animate": false,
+      "dataKey": "./tab-simple-data.json",
+      "dataDescription": {
+        "horizontal": false,
+        "series": false
+      },
+      "xAxis": {
+        "dataKey": "product",
+        "type": "categorical",
+        "hideAxis": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 75,
+        "tickRotation": 0,
+        "labelColor": "#1c1d1f",
+        "tickLabelColor": "#1c1d1f",
+        "tickColor": "#1c1d1f",
+        "axisPadding": 200,
+        "padding": 5,
+        "sortDates": false,
+        "anchors": []
+      },
+      "yAxis": {
+        "hideAxis": false,
+        "hideLabel": false,
+        "hideTicks": false,
+        "size": 50,
+        "gridLines": false,
+        "labelColor": "#1c1d1f",
+        "tickLabelColor": "#1c1d1f",
+        "tickColor": "#1c1d1f",
+        "anchors": [],
+        "categories": []
+      },
+      "series": [
+        {
+          "dataKey": "sales",
+          "type": "Bar",
+          "axis": "Left",
+          "tooltip": true
+        }
+      ],
+      "orientation": "vertical",
+      "general": {
+        "showZeroValueData": true,
+        "palette": {
+          "name": "qualitative_bold",
+          "version": "1.0"
+        }
+      },
+      "columns": {},
+      "legend": {
+        "hide": true
+      },
+      "table": {
+        "label": "Data Table",
+        "show": false,
+        "sharedFilterColumns": ["category"]
+      },
+      "heights": {
+        "vertical": 300,
+        "horizontal": 750
+      },
+      "visual": {
+        "border": true,
+        "accent": true,
+        "background": true
+      },
+      "tooltips": {
+        "opacity": 90,
+        "singleSeries": false
+      },
+      "barThickness": 0.35
+    }
+  },
+  "datasets": {
+    "./tab-simple-data.json": {
+      "data": [
+        { "category": "Category A", "product": "Widget", "sales": "120" },
+        { "category": "Category A", "product": "Gadget", "sales": "85" },
+        { "category": "Category A", "product": "Doohickey", "sales": "210" },
+        { "category": "Category B", "product": "Widget", "sales": "95" },
+        { "category": "Category B", "product": "Gadget", "sales": "150" },
+        { "category": "Category B", "product": "Doohickey", "sales": "60" },
+        { "category": "Category C", "product": "Widget", "sales": "175" },
+        { "category": "Category C", "product": "Gadget", "sales": "110" },
+        { "category": "Category C", "product": "Doohickey", "sales": "140" }
+      ],
+      "dataFileSize": 500,
+      "dataFileName": "./tab-simple-data.json",
+      "dataFileSourceType": "file",
+      "dataFileFormat": "JSON",
+      "preview": true
+    }
+  },
+  "type": "dashboard",
+  "version": "4.26.1"
+}

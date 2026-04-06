@@ -1,0 +1,82 @@
+{
+  "general": {
+    "geoType": "single-state",
+    "geoBorderColor": "darkGray",
+    "headerColor": "theme-blue",
+    "showTitle": true,
+    "showSidebar": true,
+    "showDownloadButton": true,
+    "showDownloadMediaButton": false,
+    "displayAsHex": false,
+    "displayStateLabels": false,
+    "territoriesLabel": "Territories",
+    "language": "en",
+    "hasRegions": false,
+    "expandDataTable": false,
+    "fullBorder": false,
+    "type": "data",
+    "statesPicked": [
+      { "fipsCode": "01", "stateName": "Alabama" },
+      { "stateName": "Florida", "fipsCode": "12" },
+      { "stateName": "Georgia", "fipsCode": "13" },
+      { "stateName": "South Carolina", "fipsCode": "45" }
+    ],
+    "hideUnselectedStates": false,
+    "title": "Multi-State Map - Show Unselected States",
+    "subtext": "Unselected states are shown as light outlines for geographic context."
+  },
+  "type": "map",
+  "color": "orangered",
+  "columns": {
+    "geo": { "name": "FIPS Codes", "label": "Location", "tooltip": false, "dataTable": true },
+    "primary": {
+      "dataTable": true,
+      "tooltip": true,
+      "prefix": "",
+      "suffix": "%",
+      "name": "Percent Vaccinated",
+      "label": "Percent Vaccinated"
+    },
+    "navigate": { "name": "" }
+  },
+  "legend": {
+    "descriptions": {},
+    "specialClasses": [],
+    "unified": false,
+    "singleColumn": true,
+    "dynamicDescription": false,
+    "type": "equalinterval",
+    "numberOfItems": 4,
+    "position": "side",
+    "title": "Percent Vaccinated",
+    "description": ""
+  },
+  "filters": [],
+  "dataTable": { "title": "Data Table", "forceDisplay": true, "indexTitle": "Percent Vaccinated" },
+  "tooltips": { "appearanceType": "hover", "linkLabel": "Learn More", "capitalizeLabels": true },
+  "data": [
+    { "FIPS Codes": "01001", "County": "Autauga County", "Percent Vaccinated": 34.13 },
+    { "FIPS Codes": "01003", "County": "Baldwin County", "Percent Vaccinated": 37.55 },
+    { "FIPS Codes": "01005", "County": "Barbour County", "Percent Vaccinated": 32.78 },
+    { "FIPS Codes": "01073", "County": "Jefferson County", "Percent Vaccinated": 55.79 },
+    { "FIPS Codes": "01089", "County": "Madison County", "Percent Vaccinated": 57.67 },
+    { "FIPS Codes": "01097", "County": "Mobile County", "Percent Vaccinated": 39.18 },
+    { "FIPS Codes": "01101", "County": "Montgomery County", "Percent Vaccinated": 50.54 },
+    { "FIPS Codes": "12011", "County": "Broward County", "Percent Vaccinated": 73.98 },
+    { "FIPS Codes": "12031", "County": "Duval County", "Percent Vaccinated": 53.48 },
+    { "FIPS Codes": "12057", "County": "Hillsborough County", "Percent Vaccinated": 58.66 },
+    { "FIPS Codes": "12086", "County": "Miami-Dade County", "Percent Vaccinated": 91.5 },
+    { "FIPS Codes": "12095", "County": "Orange County", "Percent Vaccinated": 77.97 },
+    { "FIPS Codes": "12099", "County": "Palm Beach County", "Percent Vaccinated": 60.75 },
+    { "FIPS Codes": "13089", "County": "DeKalb County", "Percent Vaccinated": 50.4 },
+    { "FIPS Codes": "13121", "County": "Fulton County", "Percent Vaccinated": 44.58 },
+    { "FIPS Codes": "13067", "County": "Cobb County", "Percent Vaccinated": 51.43 },
+    { "FIPS Codes": "13135", "County": "Gwinnett County", "Percent Vaccinated": 42.55 },
+    { "FIPS Codes": "13051", "County": "Chatham County", "Percent Vaccinated": 50.47 },
+    { "FIPS Codes": "45019", "County": "Charleston County", "Percent Vaccinated": 63.1 },
+    { "FIPS Codes": "45045", "County": "Greenville County", "Percent Vaccinated": 45.84 },
+    { "FIPS Codes": "45079", "County": "Richland County", "Percent Vaccinated": 64.96 },
+    { "FIPS Codes": "45013", "County": "Beaufort County", "Percent Vaccinated": 60.82 },
+    { "FIPS Codes": "45051", "County": "Horry County", "Percent Vaccinated": 40.86 }
+  ]
+}

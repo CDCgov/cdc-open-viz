@@ -46,7 +46,7 @@ export const displayDataAsText = (value: string | number, columnName, state: Map
       if (columnObj.hasOwnProperty('useCommas') && columnObj.useCommas === true) {
         // Formats number to string with commas - allows up to 5 decimal places, if rounding is not defined.
         // Otherwise, uses the rounding value set at 'columnObj.roundToPlace'.
-        formattedValue = Number(value).toLocaleString('en-US', {
+        formattedValue = Number(value).toLocaleString(state.locale, {
           style: 'decimal',
           minimumFractionDigits: hasDecimal ? decimalPoint : 0,
           maximumFractionDigits: hasDecimal ? decimalPoint : 5

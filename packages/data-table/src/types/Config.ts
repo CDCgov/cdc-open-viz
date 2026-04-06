@@ -9,6 +9,7 @@ import { VizFilter } from '@cdc/core/types/VizFilter'
 export type Config = {
   columns?: Record<string, Column>
   data?: Object[]
+  dataMetadata?: Record<string, string>
   dataDescription: Partial<DataDescription>
   dataFormat?: DataFormat
   dataUrl?: string
@@ -16,6 +17,7 @@ export type Config = {
   filterBehavior?: FilterBehavior
   filterIntro?: string
   general?: General
+  locale: string
   table: Table
   type: 'table'
   version: Version

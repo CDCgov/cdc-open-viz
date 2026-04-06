@@ -53,5 +53,7 @@ export default {
       'theme-green': '#4b830d',
       'theme-amber': '#fbab18'
     }
-  }
+  },
+  markupVariables: [],
+  enableMarkupVariables: false
 }

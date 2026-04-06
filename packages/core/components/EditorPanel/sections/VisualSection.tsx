@@ -2,6 +2,7 @@ import { ReactNode } from 'react'
 import { CheckBox } from '../Inputs'
 import { HeaderThemeSelector } from '../../HeaderThemeSelector'
 import { UpdateFieldFunc } from '../../../types/UpdateFieldFunc'
+import { isCoveDeveloperMode } from '../../../helpers/queryStringUtils'
 
 export interface VisualSectionConfig {
   visual?: {
@@ -10,6 +11,7 @@ export interface VisualSectionConfig {
     accent?: boolean
     background?: boolean
     hideBackgroundColor?: boolean
+    highlightWrappers?: boolean
   }
   theme?: string
 }
@@ -151,6 +153,15 @@ export const VisualSection = <TConfig extends VisualSectionConfig = VisualSectio
           section='visual'
           fieldName='hideBackgroundColor'
           label='Hide Background Color'
+          updateField={updateField}
+        />
+      )}
+      {isCoveDeveloperMode() && (
+        <CheckBox
+          value={visual.highlightWrappers}
+          section='visual'
+          fieldName='highlightWrappers'
+          label='Highlight Layout Wrappers'
           updateField={updateField}
         />
       )}

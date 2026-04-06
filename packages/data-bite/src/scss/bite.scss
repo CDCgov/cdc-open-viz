@@ -1,3 +1,5 @@
+@import '@cdc/core/styles/layout/wrapper-padding';
+
 &.theme-blue {
   .bite-value {
     color: var(--primary);
@@ -67,32 +69,69 @@
 // TODO after v2 refactor remove header reference colors
 // Use .font-color/.bg-color, etc. in color definitions or something similar
 // Remove box shadows if we're no longer using them
-&.cdc-open-viz-module.isEditor .sidebar + .cove-component__content {
+&.cove-visualization.is-editor .sidebar+.cove-visualization__body {
   margin: 3em auto 0 !important;
   max-width: 35em !important;
-  background-color: initial;
+  background-color: var(--lightestGray);
   height: fit-content;
 }
 
-.sidebar + .cove-component__content .bite-content-container:not(.component--hide-background-color) {
-  background-color: white;
+.sidebar+.cove-visualization__body .bite-content-container:not(.component--hide-background-color) {
+  background-color: var(--lightestGray);
 }
 
-.cove-component__content {
-  padding: 0;
-  // Visual: Shadow
-  &.shadow {
-    box-shadow: rgba(0, 0, 0, 0.2) 0 3px 10px;
+.cove-visualization__body {
+  @include cove-visualization-body-padding;
+  background: var(--lightestGray);
+
+  &.component--hide-background-color {
+    background: transparent;
   }
 
-  .cove-component__inner {
-    padding: 1rem !important;
+
+  &.bite__style--gradient {
+    background: transparent !important;
   }
+
+  >.cove-visualization__body-wrap {
+    @include cove-visualization-body-wrap-inline-padding;
+  }
+
 
   // General: Bite Style > Graphic
   &.bite__style--graphic {
+    .bite-content-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+    }
+
     .bite-content {
       flex: 1;
+      min-width: 0;
+      justify-content: space-between;
+      gap: 0;
+      align-self: stretch;
+    }
+
+    .bite-content__text-wrap {
+      flex: 0 0 auto;
+    }
+
+    .bite-subtext {
+      align-self: flex-end;
+      width: 100%;
+      line-height: var(--visualization-body-line-height);
+    }
+
+    .bite-right .bite-content-container,
+    .bite-bottom .bite-content-container {
+      flex-direction: row-reverse;
+    }
+
+    .callout {
+      width: 33%;
+      margin: 0;
     }
   }
 
@@ -106,11 +145,13 @@
     .bite-content {
       flex-direction: row !important;
     }
+
     .bite-value {
       flex-basis: 25%;
       align-self: center;
       text-align: center;
     }
+
     .bite-content__text-wrap {
       flex: 75% !important;
     }
@@ -118,15 +159,17 @@
 
   // TP5 Style (default: callout with blue background)
   &.bite__style--tp5 {
-    padding: 0 !important;
     border: none !important;
-    height: 100%; // Allow height to fill parent container
+    padding: 0 !important;
     background: none !important;
     container-type: inline-size;
 
+    >.cove-visualization__body-wrap {
+      padding: 0 !important;
+    }
+
     .cdc-callout {
       gap: 0.7rem;
-      box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
       border: 1px solid #dff2f6 !important;
       margin: 0 !important;
       padding: 1.25rem;
@@ -155,6 +198,15 @@
       }
     }
 
+    &.use-wrap .cdc-callout__body {
+      flex-wrap: wrap;
+
+      .cdc-callout__databite,
+      .cdc-callout__content {
+        flex-basis: 100%;
+      }
+    }
+
     .cdc-callout__databite {
       padding-top: 2px;
       width: auto;
@@ -171,49 +223,50 @@
       height: auto;
     }
 
+
     .cdc-callout__content {
-      font-size: 1rem;
+      row-gap: var(--cove-visualization-section-gap, 1.5rem);
     }
 
     .bite-subtext {
-      margin-top: auto; // Push to bottom on desktop
       font-style: italic;
+      line-height: var(--visualization-body-line-height);
     }
 
     // White background variant (when "Use White Background Style" is checked)
     &.white-background-style {
+      padding: 0 !important;
       background: white;
+
+      >.cove-visualization__body-wrap {
+        padding: 0 !important;
+      }
 
       .cdc-callout {
         border: 1px solid #009ec1 !important;
         background: transparent;
-        box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
       }
     }
 
-    // White background with border (when both white background and Display Border are checked)
-    &.white-background-style.display-border {
-      .cdc-callout {
-        box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
-      }
-    }
+  }
+
+  &.component--hide-background-color .bite .bite-content-container {
+    background: transparent;
   }
 
   // General: Compact View
-  &.bite--isCompactStyle .bite .cove-component__content .bite-content {
+  &.bite--is-compact-style .bite .bite-content-container .bite-content {
     align-items: center;
+
     p.bite-text {
       margin-bottom: 0;
     }
   }
 
-  &.bite--isCompactStyle .bite .cove-component__content {
+  &.bite--is-compact-style .bite .bite-content-container {
     align-items: center;
   }
 
-  .cove-component__header + .bite {
-    border-top: 0;
-  }
   .bite {
     position: relative;
     overflow: hidden;
@@ -225,9 +278,6 @@
       border-top-left-radius: 3px;
       border-top-right-radius: 3px;
     }
-    .bite-content-container.component--hideBackgroundColor {
-      background: transparent;
-    }
 
     &.no-borders {
       border: none;
@@ -238,6 +288,7 @@
       display: flex;
       flex-wrap: wrap;
       width: 100%;
+      row-gap: var(--cove-visualization-section-gap, 1.5rem);
     }
 
     &.theme-blue {
@@ -318,10 +369,8 @@
       border-radius: 0.3em;
     }
 
-    .cove-component__content {
+    .bite-content-container {
       display: flex;
-      padding: 1em !important;
-      justify-content: space-between;
 
       .bite-content {
         display: flex;
@@ -339,12 +388,10 @@
         }
 
         .bite-text {
-          margin-bottom: 15px;
           color: #222;
         }
 
         .bite-subtext {
-          font-size: 0.9em;
           font-style: italic;
           flex-basis: 100%;
           width: 100%;
@@ -367,13 +414,14 @@
         width: 33%;
         margin-left: 1.5em;
       }
-      .cove-component__content {
+
+      .bite-content-container {
         flex-direction: row-reverse;
       }
     }
 
     &.bite-top {
-      .cove-component__content {
+      .bite-content-container {
         flex-direction: column;
 
         .bite-image {
@@ -392,7 +440,7 @@
     }
 
     &.bite-bottom {
-      .cove-component__content {
+      .bite-content-container {
         flex-direction: column;
 
         .bite-image {
@@ -411,7 +459,7 @@
     }
 
     &.bite-back {
-      .cove-component__content {
+      .bite-content-container {
         .bite-image {
           border-radius: 0 0 0.3em 0.3em;
           position: absolute;
@@ -423,26 +471,22 @@
     }
 
     // General: Compact View
-    &.bite--isCompactStyle .bite .cove-component__content .bite-content {
+    &.bite--is-compact-style .bite-content-container .bite-content {
       align-items: center;
+
       p.bite-text {
         margin-bottom: 0;
       }
     }
 
-    &.bite--isCompactStyle .bite .cove-component__content {
+    &.bite--is-compact-style .bite-content-container {
       align-items: center;
     }
 
-    .cove-component__header + .bite {
-      border-top: 0;
-    }
   }
 }
 
-.cove-component__content {
-  background: var(--lightestGray);
-
+.cove-visualization__body {
   &:not(.no-borders) {
     border-color: var(--lightGray);
     border-width: 1px;

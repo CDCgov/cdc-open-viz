@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { getMapRowData } from '../mapCellMatrix'
+import { getMapDataTableColumnKeys } from '../getMapDataTableColumnKeys'
 
 describe('getMapRowData', () => {
   const columns = {
@@ -76,5 +77,37 @@ describe('getMapRowData', () => {
         somethingElse: 'data5'
       }
     ])
+  })
+
+  it('orders visible columns using display order instead of config key order', () => {
+    const orderedConfig = {
+      ...config,
+      general: { ...config.general, geoType: 'us-state' }
+    }
+    const orderedColumns = {
+      geo: { dataTable: true, name: 'geo', label: 'Geo', order: 3 },
+      column1: { dataTable: true, name: 'column1', label: 'Column 1', order: 2 },
+      column2: { dataTable: true, name: 'column2', label: 'Column 2', order: 1 },
+      hidden: { dataTable: false, name: 'hidden', label: 'Hidden', order: 4 }
+    }
+
+    expect(getMapDataTableColumnKeys(orderedColumns)).toEqual(['column2', 'column1', 'geo'])
+
+    const orderedResult = getMapRowData(
+      rows,
+      orderedColumns,
+      orderedConfig,
+      formatLegendLocation,
+      runtimeData,
+      displayGeoName,
+      []
+    )
+
+    expect(Object.keys(orderedResult[0])).toEqual(['Column 2', 'Column 1', 'Geo'])
+    expect(orderedResult[0]).toEqual({
+      'Column 2': 'data4',
+      'Column 1': 'data3',
+      Geo: 'displayGeoName -> row2'
+    })
   })
 })

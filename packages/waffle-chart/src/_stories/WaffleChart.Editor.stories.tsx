@@ -87,12 +87,12 @@ export const GeneralSectionTests: Story = {
     // Poll for header text update
     await performAndAssert(
       'Title Update',
-      () => canvasElement.querySelector('.cove-component__header h2')?.textContent?.trim() || '',
+      () => canvasElement.querySelector('.cove-visualization__header h2')?.textContent?.trim() || '',
       async () => {}, // action already performed above
       (before, after) => after === 'Updated Waffle Chart Title E2E'
     )
 
-    const chartTitleHeader = canvasElement.querySelector('.cove-component__header h2')
+    const chartTitleHeader = canvasElement.querySelector('.cove-visualization__header h2')
     expect(chartTitleHeader).toBeTruthy()
     expect(chartTitleHeader.textContent.trim()).toBe('Updated Waffle Chart Title E2E')
 
@@ -120,7 +120,7 @@ export const GeneralSectionTests: Story = {
     )
     expect(showTitleCheckbox.checked).toBe(!wasChecked)
 
-    const chartTitleHeaderAfterToggle = canvasElement.querySelector('.cove-component__header')
+    const chartTitleHeaderAfterToggle = canvasElement.querySelector('.cove-visualization__header')
     if (showTitleCheckbox.checked) {
       expect(chartTitleHeaderAfterToggle).toBeTruthy()
       expect(chartTitleHeaderAfterToggle).not.toHaveStyle('display: none')
@@ -435,7 +435,7 @@ export const VisualSectionTests: Story = {
     await openAccordion(canvas, 'Chart Settings')
     // Core helper functions used throughout the visual tests
     const waffleRoot = () => canvasElement.querySelector('.cove-waffle-chart') as HTMLElement
-    const contentContainer = () => canvasElement.querySelector('.cove-component__content > div') as HTMLElement
+    const contentContainer = () => canvasElement.querySelector('.cove-visualization__body') as HTMLElement
     expect(waffleRoot()).toBeTruthy()
 
     // ============================================================================
@@ -658,7 +658,7 @@ export const VisualSectionTests: Story = {
 
     // ============================================================================
     // TEST 9: Theme Border Color Toggle
-    // Expectation: Class 'component--has-borderColorTheme' toggles.
+    // Expectation: Class 'component--has-border-color-theme' toggles.
     // ============================================================================
     // Find border color theme checkbox by exact label text
     const borderColorThemeCheckbox = canvas.getByLabelText('Use Border Color Theme') as HTMLInputElement
@@ -671,7 +671,8 @@ export const VisualSectionTests: Story = {
       async () => {
         await userEvent.click(borderColorThemeCheckbox)
       },
-      (before, after) => before !== after && (after.includes('borderColorTheme') || before.includes('borderColorTheme'))
+      (before, after) =>
+        before !== after && (after.includes('border-color-theme') || before.includes('border-color-theme'))
     )
 
     // ============================================================================
@@ -712,7 +713,7 @@ export const VisualSectionTests: Story = {
 
     // ============================================================================
     // TEST 12: Hide Background Color Toggle
-    // Expectation: Class 'component--hideBackgroundColor' toggles.
+    // Expectation: Class 'component--hide-background-color' toggles.
     // ============================================================================
     // Find hide background checkbox by exact label text
     const hideBackgroundCheckbox = canvas.getByLabelText('Hide Background Color') as HTMLInputElement

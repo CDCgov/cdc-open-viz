@@ -172,8 +172,22 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     const domainKeys = isPercentageMode ? dataKeys.filter(k => k !== labelForCalcArea) : dataKeys
     const numberOfKeys = domainKeys.length
 
-    let palette = getPaletteColors(config, colorPalettes)
-    palette = applyEnhancedColorDistribution(config, palette, numberOfKeys)
+    const orderedCustomColors = config.general?.palette?.customColorsOrdered
+    const customColors = config.general?.palette?.customColors
+    const shouldUseOrderedCustomColors = Array.isArray(orderedCustomColors) && orderedCustomColors.length > 0
+
+    let palette = shouldUseOrderedCustomColors ? orderedCustomColors : getPaletteColors(config, colorPalettes)
+    if (!shouldUseOrderedCustomColors && customColors?.length) {
+      palette = customColors
+    }
+
+    while (palette.length > 0 && palette.length < numberOfKeys) {
+      palette = palette.concat(palette)
+    }
+
+    palette = shouldUseOrderedCustomColors
+      ? palette.slice(0, numberOfKeys)
+      : applyEnhancedColorDistribution(config, palette, numberOfKeys)
 
     const unknownColor = isPercentageMode
       ? getComputedStyle(document.documentElement).getPropertyValue('--cool-gray-10').trim()
@@ -206,6 +220,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
     config.general?.palette?.name,
     config.general?.palette?.isReversed,
     config.general?.palette?.customColors,
+    config.general?.palette?.customColorsOrdered,
     config.palette
   ])
 
@@ -216,7 +231,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
 
   // Make sure the chart is visible if in the editor
   useEffect(() => {
-    const element = document.querySelector('.isEditor')
+    const element = document.querySelector('.is-editor')
     if (element) {
       // parent element is visible
       setAnimatePie(true)
@@ -421,7 +436,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
                 config.tooltips.opacity / 100
               }) !important`}</style>
               <TooltipWithBounds
-                className={'tooltip cdc-open-viz-module'}
+                className={'tooltip cove-visualization'}
                 left={tooltipLeft + centerX - radius}
                 top={tooltipTop}
               >

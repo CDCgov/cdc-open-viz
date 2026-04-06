@@ -1,17 +1,24 @@
 import numberFromString from '@cdc/core/helpers/numberFromString'
 
-const abbreviateNumber = num => {
+const abbreviationUnits: Record<string, { K: string; M: string; B: string }> = {
+  'es-MX': { K: ' mil', M: ' M', B: ' mil M' }
+}
+
+const defaultUnits = { K: 'K', M: 'M', B: 'B' }
+
+export const abbreviateNumber = (num, locale?: string) => {
+  const units = (locale && abbreviationUnits[locale]) || defaultUnits
   let unit = ''
   let absNum = Math.abs(num)
 
   if (absNum >= 1e9) {
-    unit = 'B'
+    unit = units.B
     num = num / 1e9
   } else if (absNum >= 1e6) {
-    unit = 'M'
+    unit = units.M
     num = num / 1e6
   } else if (absNum >= 1e3) {
-    unit = 'K'
+    unit = units.K
     num = num / 1e3
   }
 
@@ -106,15 +113,22 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   }
 
   if (axis === 'right') {
+    let rightRoundToPlace
+    if (addColRoundTo !== undefined) {
+      rightRoundToPlace = Number(addColRoundTo) || 0
+    } else {
+      rightRoundToPlace = rightRoundTo ? Number(rightRoundTo) : 0
+    }
+
     if (preserveOriginalDecimals) {
       stringFormattingOptions = {
-        useGrouping: config.dataFormat.rightCommas ? true : false
+        useGrouping: addColCommas !== undefined ? addColCommas : config.dataFormat.rightCommas ? true : false
       }
     } else {
       stringFormattingOptions = {
-        useGrouping: config.dataFormat.rightCommas ? true : false,
-        minimumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0,
-        maximumFractionDigits: rightRoundTo ? Number(rightRoundTo) : 0
+        useGrouping: addColCommas !== undefined ? addColCommas : config.dataFormat.rightCommas ? true : false,
+        minimumFractionDigits: rightRoundToPlace,
+        maximumFractionDigits: rightRoundToPlace
       }
     }
   }
@@ -163,20 +177,20 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   ) {
     num = num // eslint-disable-line
   } else {
-    num = num.toLocaleString('en-US', stringFormattingOptions)
+    num = num.toLocaleString(config.locale, stringFormattingOptions)
   }
   let result = ''
 
   if (abbreviated && axis === 'left' && shouldAbbreviate) {
-    num = abbreviateNumber(parseFloat(num))
+    num = abbreviateNumber(parseFloat(num), config?.locale)
   }
 
   if (bottomAbbreviated && axis === 'bottom' && shouldAbbreviate) {
-    num = abbreviateNumber(parseFloat(num))
+    num = abbreviateNumber(parseFloat(num), config?.locale)
   }
 
   if (!inlineLabel || addColPrefix) {
-    if (addColPrefix !== undefined && axis === 'left') {
+    if (addColPrefix !== undefined && ['left', 'right'].includes(axis)) {
       result = addColPrefix + result
     } else {
       if (prefix && axis === 'left') {
@@ -184,7 +198,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
       }
     }
 
-    if (rightPrefix && axis === 'right') {
+    if (rightPrefix && axis === 'right' && addColPrefix === undefined) {
       result += rightPrefix
     }
 
@@ -196,7 +210,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
   result += num
 
   if (!inlineLabel || addColSuffix) {
-    if (addColSuffix !== undefined && axis === 'left') {
+    if (addColSuffix !== undefined && ['left', 'right'].includes(axis)) {
       result += addColSuffix
     } else {
       if (suffix && axis === 'left') {
@@ -204,7 +218,7 @@ const formatNumber = (num, axis, shouldAbbreviate = false, config = null, addCol
       }
     }
 
-    if (rightSuffix && axis === 'right') {
+    if (rightSuffix && axis === 'right' && addColSuffix === undefined) {
       result += rightSuffix
     }
 

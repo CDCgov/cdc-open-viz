@@ -1,6 +1,7 @@
+// @vitest-environment jsdom
 // embed.test.ts
 
-import { expect, describe, it } from 'vitest'
+import { beforeAll, beforeEach, afterEach, expect, describe, it, vi } from 'vitest'
 import { isValidMessageOrigin } from '@cdc/core/helpers/embed/urlValidation'
 
 describe('URL Validation', () => {
@@ -164,6 +165,73 @@ describe('URL Validation', () => {
       it('rejects empty strings', () => {
         expect(isValidMessageOrigin('')).toBe(false)
       })
+    })
+  })
+
+  describe('embed helper message filtering', () => {
+    beforeAll(async () => {
+      await import('@cdc/core/helpers/embed/embedHelper.js')
+    })
+
+    beforeEach(() => {
+      document.body.innerHTML = ''
+    })
+
+    afterEach(() => {
+      vi.restoreAllMocks()
+      document.body.innerHTML = ''
+    })
+
+    it('ignores unrelated postMessage traffic without warning', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          origin: 'https://evil.com',
+          data: { type: 'webpack:status', foo: 'bar' }
+        })
+      )
+
+      expect(warnSpy).not.toHaveBeenCalled()
+    })
+
+    it('rejects cove messages from invalid origins and logs context once', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          origin: 'https://evil.com',
+          data: { type: 'cove:resize', id: 'cove-1', height: 420 }
+        })
+      )
+
+      expect(warnSpy).toHaveBeenCalledTimes(1)
+      expect(warnSpy).toHaveBeenCalledWith(
+        'CDC COVE Embed Helper: Rejected COVE message from invalid origin',
+        expect.objectContaining({
+          origin: 'https://evil.com',
+          type: 'cove:resize',
+          id: 'cove-1'
+        })
+      )
+    })
+
+    it('resizes iframe for valid cove:resize messages from allowed origins', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const iframe = document.createElement('iframe')
+      iframe.setAttribute('data-cove-id', 'cove-2')
+      iframe.style.height = '400px'
+      document.body.appendChild(iframe)
+
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          origin: 'https://www.cdc.gov',
+          data: { type: 'cove:resize', id: 'cove-2', height: 512 }
+        })
+      )
+
+      expect(iframe.style.height).toBe('512px')
+      expect(warnSpy).not.toHaveBeenCalled()
     })
   })
 })

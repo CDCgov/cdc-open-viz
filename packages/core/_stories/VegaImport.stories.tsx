@@ -120,7 +120,7 @@ export default meta
 const assertRendered = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
   await waitFor(
     () => {
-      const coveModule = canvasElement.querySelector('.cdc-open-viz-module')
+      const coveModule = canvasElement.querySelector('.cove-visualization')
       expect(coveModule).toBeTruthy()
     },
     { timeout: 15000 }
@@ -135,7 +135,7 @@ const assertRendered = async ({ canvasElement }: { canvasElement: HTMLElement })
 const assertMapRendered = async ({ canvasElement }: { canvasElement: HTMLElement }) => {
   await waitFor(
     () => {
-      const coveModule = canvasElement.querySelector('.cdc-open-viz-module')
+      const coveModule = canvasElement.querySelector('.cove-visualization')
       expect(coveModule).toBeTruthy()
     },
     { timeout: 15000 }
@@ -177,7 +177,7 @@ const assertConversionFailed =
     }
 
     // Verify no visualization rendered
-    const coveModule = canvasElement.querySelector('.cdc-open-viz-module')
+    const coveModule = canvasElement.querySelector('.cove-visualization')
     expect(coveModule).toBeNull()
   }
 
