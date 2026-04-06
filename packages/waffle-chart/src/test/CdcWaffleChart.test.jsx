@@ -326,7 +326,7 @@ describe('Waffle Chart', () => {
     })
   })
 
-  it('renders denominator 10 as a 5 by 2 grid in visible denominator mode', async () => {
+  it('renders denominator 10 as a 5 by 2 grid while preserving the 100-unit chart footprint', async () => {
     const { container } = render(
       <CdcWaffleChart
         config={createBaseConfig({
@@ -347,8 +347,14 @@ describe('Waffle Chart', () => {
     const nodes = Array.from(container.querySelectorAll('.cove-waffle-chart svg circle'))
     const uniqueX = new Set(nodes.map(node => node.getAttribute('cx'))).size
     const uniqueY = new Set(nodes.map(node => node.getAttribute('cy'))).size
+    const svg = container.querySelector('.cove-waffle-chart svg')
+    const scaledGroup = svg?.querySelector('g')
 
     expect(uniqueX).toBe(5)
     expect(uniqueY).toBe(2)
+    expect(svg).toHaveAttribute('width', '120')
+    expect(svg).toHaveAttribute('height', '120')
+    expect(scaledGroup?.getAttribute('transform')).toContain('scale(')
+    expect(scaledGroup?.getAttribute('transform')).not.toContain('scale(1)')
   })
 })
