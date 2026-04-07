@@ -122,6 +122,7 @@ const SvgIconSelect = ({ value, options, onChange }: SvgIconSelectProps) => {
             margin: 0,
             padding: '0.25rem 0',
             listStyle: 'none',
+            fontSize: '0.833rem',
             maxHeight: shouldScroll ? `${OPTION_HEIGHT * MAX_VISIBLE_OPTIONS + LIST_VERTICAL_PADDING}px` : undefined,
             overflowY: shouldScroll ? 'auto' : undefined
           }}
