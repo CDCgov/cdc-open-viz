@@ -119,7 +119,7 @@ const FieldSet: React.FC<ColumnsEditorProps & { colKey: string; index: number }>
                   options={availableColumns}
                   updateField={(_section, _subsection, _fieldName, value) => changeName(value)}
                 />
-                {config.type !== 'table' && (
+                {config.type !== 'table' && config.visualizationType !== 'HeatMap' && (
                   <Select
                     label='Associate to Series'
                     value={config.columns[colKey]?.series}

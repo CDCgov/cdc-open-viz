@@ -305,6 +305,9 @@ const createInitialState = () => {
       leftLabel: '',
       rightLabel: ''
     },
+    heatmap: {
+      cellPadding: 2
+    },
     area: {
       isStacked: false
     },

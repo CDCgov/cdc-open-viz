@@ -22,6 +22,7 @@ export const labelHash = {
   'Box Plot': 'Box Plot',
   'Forest Plot': 'Forest Plot',
   Forecasting: 'Forecasting',
+  HeatMap: 'HeatMap',
   'Warming Stripes': 'Warming Stripes',
   table: 'Table',
   'data-table': 'Data Table',

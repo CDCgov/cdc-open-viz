@@ -44,6 +44,7 @@ import ConfigContext, { ChartDispatchContext } from './ConfigContext'
 import PieChart from './components/PieChart'
 import RadarChart from './components/RadarChart'
 import SankeyChart from './components/Sankey'
+import HeatMap, { HeatMapGradientLegend } from './components/HeatMap'
 import LinearChart from './components/LinearChart'
 import { isDateScale, formatDate as coreFormatDate } from '@cdc/core/helpers/cove/date'
 
@@ -95,6 +96,7 @@ import { getColorScale } from './helpers/getColorScale'
 import { getTransformedData } from './helpers/getTransformedData'
 import { getPiePercent } from './helpers/getPiePercent'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
+import { calcInitialHeight } from './helpers/sizeHelpers'
 
 // styles
 import './scss/main.scss'
@@ -290,6 +292,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
 
     // Override palette defaults for Horizon Chart specifically
     if (loadedConfig?.visualizationType === 'Horizon Chart' && !loadedConfig?.general?.palette) {
+      if (!defaultsWithoutPalette.general) {
+        defaultsWithoutPalette.general = {}
+      }
+      defaultsWithoutPalette.general.palette = {
+        isReversed: false,
+        version: '2.0',
+        name: 'sequential_blue'
+      }
+    }
+
+    if (loadedConfig?.visualizationType === 'HeatMap' && !loadedConfig?.general?.palette) {
       if (!defaultsWithoutPalette.general) {
         defaultsWithoutPalette.general = {}
       }
@@ -528,6 +541,28 @@ const CdcChart: React.FC<CdcChartProps> = ({
       }
     }
 
+    if (newConfig.visualizationType === 'HeatMap') {
+      const heatMapSeriesKeys = newConfig.series.map(series => series.dataKey)
+      const heatMapSeriesLabels = newConfig.series.reduce<Record<string, string>>((acc, series) => {
+        acc[series.dataKey] = series.name || newConfig.columns?.[series.dataKey]?.label || series.dataKey
+        return acc
+      }, {})
+
+      newConfig.legend = {
+        ...newConfig.legend,
+        position: newConfig.legend?.position || 'top',
+        style: 'gradient',
+        subStyle: 'smooth'
+      }
+      newConfig.yAxis = {
+        ...newConfig.yAxis,
+        type: 'categorical'
+      }
+      newConfig.runtime.seriesKeys = heatMapSeriesKeys
+      newConfig.runtime.seriesLabelsAll = heatMapSeriesKeys
+      newConfig.runtime.seriesLabels = heatMapSeriesLabels
+    }
+
     if (isHorizontalVariant) {
       // For horizontal charts, axes are swapped, so processedYAxis goes to runtime.xAxis and vice versa
       const horizontalXAxisSource = cloneDeep((newConfig.yAxis as any)?.yAxis || newConfig.yAxis)
@@ -577,6 +612,19 @@ const CdcChart: React.FC<CdcChartProps> = ({
         newConfig.runtime.editorErrorMessage = 'Data column section must be set for pie charts.'
       } else if (missingSegmentLabels) {
         newConfig.runtime.editorErrorMessage = 'Segment labels section must be set for pie charts.'
+      } else {
+        newConfig.runtime.editorErrorMessage = ''
+      }
+    } else if (newConfig.visualizationType === 'HeatMap') {
+      const missingXColumn = !newConfig.xAxis.dataKey || newConfig.xAxis.dataKey === ''
+      const missingSeries = !Array.isArray(newConfig.series) || newConfig.series.length === 0
+
+      if (missingXColumn && missingSeries) {
+        newConfig.runtime.editorErrorMessage = 'Date/Category Axis and Data Series must be set for heatmaps.'
+      } else if (missingXColumn) {
+        newConfig.runtime.editorErrorMessage = 'Date/Category Axis must be set for heatmaps.'
+      } else if (missingSeries) {
+        newConfig.runtime.editorErrorMessage = 'Data Series must be set for heatmaps.'
       } else {
         newConfig.runtime.editorErrorMessage = ''
       }
@@ -1447,7 +1495,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {/* All charts with LinearChart */}
                   {filteredData &&
                     filteredData.length > 0 &&
-                    !['Spark Line', 'Line', 'Sankey', 'Pie', 'Radar'].includes(config.visualizationType) && (
+                    !['Spark Line', 'Line', 'Sankey', 'Pie', 'Radar', 'HeatMap'].includes(config.visualizationType) && (
                       <div ref={parentRef} style={{ width: `100%` }}>
                         <ParentSize>
                           {parent => (
@@ -1481,6 +1529,16 @@ const CdcChart: React.FC<CdcChartProps> = ({
                         />
                       )}
                     </ParentSize>
+                  )}
+                  {filteredData && filteredData.length > 0 && config.visualizationType === 'HeatMap' && (
+                    <div
+                      ref={parentRef}
+                      style={{ width: '100%', height: `${calcInitialHeight(config, currentViewport) || 400}px` }}
+                    >
+                      <ParentSize>
+                        {parent => <HeatMap parentWidth={parent.width} parentHeight={parent.height} />}
+                      </ParentSize>
+                    </div>
                   )}
                   {/* Line Chart */}
                   {filteredData &&
@@ -1546,10 +1604,14 @@ const CdcChart: React.FC<CdcChartProps> = ({
                     </ParentSize>
                   )}
                 </div>
+                {config.visualizationType === 'HeatMap' && config.legend?.position === 'top' && (
+                  <HeatMapGradientLegend />
+                )}
                 {/* Legend */}
                 {!config.legend.hide &&
                   config.visualizationType !== 'Spark Line' &&
                   config.visualizationType !== 'Sankey' &&
+                  config.visualizationType !== 'HeatMap' &&
                   !(config.visualizationType === 'Warming Stripes' && config.legend?.style === 'gradient') &&
                   !(config.visualizationType === 'Warming Stripes' && config.smallMultiples?.mode) && (
                     <Legend
@@ -1561,6 +1623,9 @@ const CdcChart: React.FC<CdcChartProps> = ({
                 {config.visualizationType === 'Warming Stripes' &&
                   config.legend?.style === 'gradient' &&
                   !config.smallMultiples?.mode && <WarmingStripesGradientLegend />}
+                {config.visualizationType === 'HeatMap' && config.legend?.position !== 'top' && (
+                  <HeatMapGradientLegend />
+                )}
               </LegendWrapper>
             </div>
           </VisualizationContent>

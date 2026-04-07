@@ -41,6 +41,7 @@ export type VisualizationType =
   | 'Box Plot'
   | 'Deviation Bar'
   | 'Forest Plot'
+  | 'HeatMap'
   | 'Horizon Chart'
   | 'Line'
   | 'Paired Bar'
@@ -173,6 +174,9 @@ export type AllChartsConfig = {
   footnotes: Footnotes
   forestPlot: ForestPlotConfigSettings
   formattedData: Object[] & { urlFiltered: boolean }
+  heatmap?: {
+    cellPadding?: number
+  }
   heights: {
     vertical: number
     horizontal: number

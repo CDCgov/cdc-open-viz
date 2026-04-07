@@ -1,0 +1,132 @@
+{
+  "type": "chart",
+  "visualizationType": "HeatMap",
+  "visualizationSubType": "regular",
+  "title": "Calendar HeatMap Test Data",
+  "showTitle": true,
+  "theme": "theme-blue",
+  "animate": false,
+  "orientation": "vertical",
+  "general": {
+    "palette": {
+      "name": "sequential_blue",
+      "version": "2.0",
+      "isReversed": false
+    }
+  },
+  "xAxis": {
+    "type": "categorical",
+    "dataKey": "day",
+    "label": "Day of Month",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "size": 84,
+    "tickRotation": 0,
+    "maxTickRotation": 0,
+    "axisPadding": 0,
+    "labelOffset": 0,
+    "anchors": []
+  },
+  "yAxis": {
+    "type": "categorical",
+    "label": "Month",
+    "hideAxis": false,
+    "hideLabel": false,
+    "hideTicks": false,
+    "gridLines": false,
+    "size": 120,
+    "axisPadding": 0,
+    "anchors": []
+  },
+  "heatmap": {
+    "cellPadding": 2
+  },
+  "legend": {
+    "hide": false,
+    "position": "bottom",
+    "style": "gradient",
+    "subStyle": "smooth",
+    "hideBorder": false,
+    "label": "Value"
+  },
+  "heights": {
+    "vertical": 840,
+    "horizontal": 840,
+    "mobileVertical": 560
+  },
+  "tooltips": {
+    "opacity": 90,
+    "singleSeries": false
+  },
+  "table": {
+    "show": true,
+    "showVertical": true,
+    "showDataTableLink": true,
+    "download": true,
+    "label": "Data Table"
+  },
+  "dataFormat": {
+    "commas": true,
+    "roundTo": 0,
+    "prefix": "",
+    "suffix": ""
+  },
+  "chartMessage": {
+    "noData": "No Data Available"
+  },
+  "series": [
+    { "dataKey": "January", "name": "January", "type": "HeatMap", "axis": "Left", "tooltip": true },
+    { "dataKey": "February", "name": "February", "type": "HeatMap", "axis": "Left", "tooltip": true },
+    { "dataKey": "March", "name": "March", "type": "HeatMap", "axis": "Left", "tooltip": true },
+    { "dataKey": "April", "name": "April", "type": "HeatMap", "axis": "Left", "tooltip": true },
+    { "dataKey": "May", "name": "May", "type": "HeatMap", "axis": "Left", "tooltip": true },
+    { "dataKey": "June", "name": "June", "type": "HeatMap", "axis": "Left", "tooltip": true },
+    { "dataKey": "July", "name": "July", "type": "HeatMap", "axis": "Left", "tooltip": true },
+    { "dataKey": "August", "name": "August", "type": "HeatMap", "axis": "Left", "tooltip": true },
+    { "dataKey": "September", "name": "September", "type": "HeatMap", "axis": "Left", "tooltip": true },
+    { "dataKey": "October", "name": "October", "type": "HeatMap", "axis": "Left", "tooltip": true },
+    { "dataKey": "November", "name": "November", "type": "HeatMap", "axis": "Left", "tooltip": true },
+    { "dataKey": "December", "name": "December", "type": "HeatMap", "axis": "Left", "tooltip": true }
+  ],
+  "columns": {
+    "dayColumn": {
+      "name": "day",
+      "label": "Day",
+      "dataTable": true
+    }
+  },
+  "data": [
+    { "day": 1, "January": 47, "February": 76, "March": 5, "April": 34, "May": 63, "June": 92, "July": 21, "August": 50, "September": 79, "October": 8, "November": 37, "December": 66 },
+    { "day": 2, "January": 64, "February": 93, "March": 22, "April": 51, "May": 80, "June": 9, "July": 38, "August": 67, "September": 96, "October": 25, "November": 54, "December": 83 },
+    { "day": 3, "January": 81, "February": 10, "March": 39, "April": 68, "May": 97, "June": 26, "July": 55, "August": 84, "September": 13, "October": 42, "November": 71, "December": 100 },
+    { "day": 4, "January": 98, "February": 27, "March": 56, "April": 85, "May": 14, "June": 43, "July": 72, "August": 1, "September": 30, "October": 59, "November": 88, "December": 17 },
+    { "day": 5, "January": 15, "February": 44, "March": 73, "April": 2, "May": 31, "June": 60, "July": 89, "August": 18, "September": 47, "October": 76, "November": 5, "December": 34 },
+    { "day": 6, "January": 32, "February": 61, "March": 90, "April": 19, "May": 48, "June": 77, "July": 6, "August": 35, "September": 64, "October": 93, "November": 22, "December": 51 },
+    { "day": 7, "January": 49, "February": 78, "March": 7, "April": 36, "May": 65, "June": 94, "July": 23, "August": 52, "September": 81, "October": 10, "November": 39, "December": 68 },
+    { "day": 8, "January": 66, "February": 95, "March": 24, "April": 53, "May": 82, "June": 11, "July": 40, "August": 69, "September": 98, "October": 27, "November": 56, "December": 85 },
+    { "day": 9, "January": 83, "February": 12, "March": 41, "April": 70, "May": 99, "June": 28, "July": 57, "August": 86, "September": 15, "October": 44, "November": 73, "December": 2 },
+    { "day": 10, "January": 100, "February": 29, "March": 58, "April": 87, "May": 16, "June": 45, "July": 74, "August": 3, "September": 32, "October": 61, "November": 90, "December": 19 },
+    { "day": 11, "January": 17, "February": 46, "March": 75, "April": 4, "May": 33, "June": 62, "July": 91, "August": 20, "September": 49, "October": 78, "November": 7, "December": 36 },
+    { "day": 12, "January": 34, "February": 63, "March": 92, "April": 21, "May": 50, "June": 79, "July": 8, "August": 37, "September": 66, "October": 95, "November": 24, "December": 53 },
+    { "day": 13, "January": 51, "February": 80, "March": 9, "April": 38, "May": 67, "June": 96, "July": 25, "August": 54, "September": 83, "October": 12, "November": 41, "December": 70 },
+    { "day": 14, "January": 68, "February": 97, "March": 26, "April": 55, "May": 84, "June": 13, "July": 42, "August": 71, "September": 100, "October": 29, "November": 58, "December": 87 },
+    { "day": 15, "January": 85, "February": 14, "March": 43, "April": 72, "May": 1, "June": 30, "July": 59, "August": 88, "September": 17, "October": 46, "November": 75, "December": 4 },
+    { "day": 16, "January": 2, "February": 31, "March": 60, "April": 89, "May": 18, "June": 47, "July": 76, "August": 5, "September": 34, "October": 63, "November": 92, "December": 21 },
+    { "day": 17, "January": 19, "February": 48, "March": 77, "April": 6, "May": 35, "June": 64, "July": 93, "August": 22, "September": 51, "October": 80, "November": 9, "December": 38 },
+    { "day": 18, "January": 36, "February": 65, "March": 94, "April": 23, "May": 52, "June": 81, "July": 10, "August": 39, "September": 68, "October": 97, "November": 26, "December": 55 },
+    { "day": 19, "January": 53, "February": 82, "March": 11, "April": 40, "May": 69, "June": 98, "July": 27, "August": 56, "September": 85, "October": 14, "November": 43, "December": 72 },
+    { "day": 20, "January": 70, "February": 99, "March": 28, "April": 57, "May": 86, "June": 15, "July": 44, "August": 73, "September": 2, "October": 31, "November": 60, "December": 89 },
+    { "day": 21, "January": 87, "February": 16, "March": 45, "April": 74, "May": 3, "June": 32, "July": 61, "August": 90, "September": 19, "October": 48, "November": 77, "December": 6 },
+    { "day": 22, "January": 4, "February": 33, "March": 62, "April": 91, "May": 20, "June": 49, "July": 78, "August": 7, "September": 36, "October": 65, "November": 94, "December": 23 },
+    { "day": 23, "January": 21, "February": 50, "March": 79, "April": 8, "May": 37, "June": 66, "July": 95, "August": 24, "September": 53, "October": 82, "November": 11, "December": 40 },
+    { "day": 24, "January": 38, "February": 67, "March": 96, "April": 25, "May": 54, "June": 83, "July": 12, "August": 41, "September": 70, "October": 99, "November": 28, "December": 57 },
+    { "day": 25, "January": 55, "February": 84, "March": 13, "April": 42, "May": 71, "June": 100, "July": 29, "August": 58, "September": 87, "October": 16, "November": 45, "December": 74 },
+    { "day": 26, "January": 72, "February": 1, "March": 30, "April": 59, "May": 88, "June": 17, "July": 46, "August": 75, "September": 4, "October": 33, "November": 62, "December": 91 },
+    { "day": 27, "January": 89, "February": 18, "March": 47, "April": 76, "May": 5, "June": 34, "July": 63, "August": 92, "September": 21, "October": 50, "November": 79, "December": 8 },
+    { "day": 28, "January": 6, "February": 35, "March": 64, "April": 93, "May": 22, "June": 51, "July": 80, "August": 9, "September": 38, "October": 67, "November": 96, "December": 25 },
+    { "day": 29, "January": 23, "February": 52, "March": 81, "April": 10, "May": 39, "June": 68, "July": 97, "August": 26, "September": 55, "October": 84, "November": 13, "December": 42 },
+    { "day": 30, "January": 40, "February": 69, "March": 98, "April": 27, "May": 56, "June": 85, "July": 14, "August": 43, "September": 72, "October": 1, "November": 30, "December": 59 },
+    { "day": 31, "January": 57, "February": 86, "March": 15, "April": 44, "May": 73, "June": 2, "July": 31, "August": 60, "September": 89, "October": 18, "November": 47, "December": 76 }
+  ]
+}
