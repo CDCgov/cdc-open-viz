@@ -55,6 +55,8 @@ describe('customSort()', () => {
 
     expect(() => customSort('region 2', null, sortBy, { type: 'map' })).not.toThrow()
     expect(customSort('region 2', null, sortBy, { type: 'map' })).toBeLessThan(0)
+    expect(() => customSort(null, 'region 2', sortBy, { type: 'map' })).not.toThrow()
+    expect(customSort(null, 'region 2', sortBy, { type: 'map' })).toBeGreaterThan(0)
   })
 
   it('falls back safely when map region labels do not end in digits', () => {
