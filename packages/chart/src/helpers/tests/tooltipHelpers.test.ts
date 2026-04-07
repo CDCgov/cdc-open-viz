@@ -37,14 +37,34 @@ describe('tooltipHelpers', () => {
     expect(shouldUseTooltipLegendMarkers(buildConfig())).toBe(true)
   })
 
-  it('disables markers when the legend is hidden or in a special mode', () => {
+  it('allows small-multiple tiles to use markers when the source legend is visible', () => {
+    expect(shouldUseTooltipLegendMarkers(buildConfig({ legend: { hide: true, tooltipLegendVisible: true } }))).toBe(
+      true
+    )
+  })
+
+  it('disables markers when the source legend is hidden or the legend is in a special mode', () => {
     expect(shouldUseTooltipLegendMarkers(buildConfig({ legend: { hide: true } }))).toBe(false)
+    expect(shouldUseTooltipLegendMarkers(buildConfig({ legend: { hide: true, tooltipLegendVisible: false } }))).toBe(
+      false
+    )
     expect(shouldUseTooltipLegendMarkers(buildConfig({ legend: { style: 'gradient' } }))).toBe(false)
     expect(shouldUseTooltipLegendMarkers(buildConfig({ legend: { groupBy: 'category' } }))).toBe(false)
-    expect(shouldUseTooltipLegendMarkers(buildConfig({ smallMultiples: { mode: 'by-series' } }))).toBe(false)
     expect(
       shouldUseTooltipLegendMarkers(
         buildConfig({
+          runtime: { seriesLabelsAll: ['Cases'], seriesKeys: ['cases'] },
+          series: [{ dataKey: 'cases' }]
+        })
+      )
+    ).toBe(false)
+  })
+
+  it('disables markers for single-series small-multiple tiles even when the source legend is visible', () => {
+    expect(
+      shouldUseTooltipLegendMarkers(
+        buildConfig({
+          legend: { hide: true, tooltipLegendVisible: true },
           runtime: { seriesLabelsAll: ['Cases'], seriesKeys: ['cases'] },
           series: [{ dataKey: 'cases' }]
         })

@@ -42,14 +42,14 @@ export const getTooltipMarkerShape = (config: ChartConfig): 'circle' | 'square' 
 export const shouldUseTooltipLegendMarkers = (config: ChartConfig): boolean => {
   const legendItemCount =
     config.runtime?.seriesLabelsAll?.length || config.runtime?.seriesKeys?.length || config.series?.length || 0
+  const sourceLegendVisible = config.legend?.tooltipLegendVisible ?? !config.legend?.hide
 
   return (
     TOOLTIP_MARKER_SUPPORTED_TYPES.has(config.visualizationType) &&
     legendItemCount > 1 &&
-    !config.legend?.hide &&
+    sourceLegendVisible &&
     config.legend?.style !== 'gradient' &&
-    !config.legend?.groupBy &&
-    !config.smallMultiples?.mode
+    !config.legend?.groupBy
   )
 }
 
