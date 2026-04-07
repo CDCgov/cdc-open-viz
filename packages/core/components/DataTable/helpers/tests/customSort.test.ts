@@ -49,4 +49,18 @@ describe('customSort()', () => {
     expect(customSort(b, a, sortBy, config)).lessThan(0)
     expect(customSort(b, a, sortBy, { type: 'notMap' })).lessThan(0)
   })
+
+  it('does not throw when map region values are null', () => {
+    const sortBy = { column: 'someColumn', asc: true, colIndex: 0 }
+
+    expect(() => customSort('region 2', null, sortBy, { type: 'map' })).not.toThrow()
+    expect(customSort('region 2', null, sortBy, { type: 'map' })).toBeLessThan(0)
+  })
+
+  it('falls back safely when map region labels do not end in digits', () => {
+    const sortBy = { column: 'someColumn', asc: true, colIndex: 0 }
+
+    expect(() => customSort('region east', 'region west', sortBy, { type: 'map' })).not.toThrow()
+    expect(customSort('region east', 'region west', sortBy, { type: 'map' })).toBeLessThan(0)
+  })
 })
