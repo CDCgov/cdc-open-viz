@@ -51,6 +51,7 @@ import Annotation from './Annotations'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
 import HoverLine from './HoverLine/HoverLine'
 import { SmallMultiples } from './SmallMultiples'
+import { type TooltipDisplayData } from '../helpers/tooltipHelpers'
 
 type LinearChartProps = {
   parentWidth: number
@@ -88,10 +89,7 @@ const WARMING_STRIPES_HEIGHT = 78
 // Time constants
 const MONTH_AS_MS = 1000 * 60 * 60 * 24 * 30
 
-type TooltipData = {
-  dataXPosition?: number
-  dataYPosition?: number
-}
+type TooltipData = Partial<TooltipDisplayData>
 
 type UseTooltipReturn<T = TooltipData> = {
   tooltipData: T | null
@@ -839,10 +837,10 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
         </svg>
         {!isDraggingAnnotation &&
           tooltipData &&
-          Object.entries(tooltipData.data).length > 0 &&
+          tooltipData.data?.length > 0 &&
           tooltipOpen &&
           showTooltip &&
-          !tooltipData?.data?.some(subArray => subArray.some(item => item === undefined)) &&
+          !tooltipData?.data?.some(row => row?.value === undefined) &&
           tooltipData.dataYPosition &&
           tooltipData.dataXPosition &&
           !config.tooltips.singleSeries && (
@@ -860,9 +858,16 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
               >
                 <ul>
                   {typeof tooltipData === 'object' &&
-                    Object.entries(tooltipData.data)
-                      .filter(([_, values]) => Array.isArray(values) && !values.includes(undefined))
-                      .map((item, index) => <TooltipListItem item={item} key={index} />)}
+                    tooltipData.data
+                      .filter(row => row && row.value !== undefined)
+                      .map((row, index) => (
+                        <TooltipListItem
+                          row={row}
+                          index={index}
+                          key={index}
+                          useMarkerColumn={tooltipData.useMarkerColumn}
+                        />
+                      ))}
                 </ul>
               </TooltipWithBounds>
             </>

@@ -26,6 +26,7 @@ import { getBarData } from '../helpers/getBarData'
 import { getHorizontalBarHeights } from '../helpers/getBarHeights'
 import { getPatternUrl as getPatternUrlForBar } from '../helpers/getPatternUrl'
 import { getChartPatternId } from '../../../helpers/getChartPatternId'
+import { buildSeriesTooltipListHtml } from '../../../helpers/tooltipHelpers'
 
 const BarChartHorizontal = () => {
   const { xScale, yScale, yMax, seriesScale, barChart } = useContext<BarChartContextValues>(BarChartContext)
@@ -243,11 +244,14 @@ const BarChartHorizontal = () => {
                     : xAxisValue
                   const additionalColTooltip = getAdditionalColumn(bar.key, hoveredBar)
                   const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
-                  const tooltip = `<ul>
-                  <li class="tooltip-heading"">${yAxisTooltip}</li>
-                  <li class="tooltip-body ">${tooltipBody}</li>
-                  <li class="tooltip-body ">${additionalColTooltip}</li>
-                    </li></ul>`
+                  const tooltip = buildSeriesTooltipListHtml({
+                    config,
+                    colorScale,
+                    heading: yAxisTooltip,
+                    seriesKey: bar.key,
+                    seriesText: tooltipBody,
+                    extraRows: additionalColTooltip ? [additionalColTooltip] : []
+                  })
 
                   // configure colors
                   let labelColor = APP_FONT_COLOR
