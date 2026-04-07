@@ -95,6 +95,35 @@ const PanelGeneral: FC<PanelProps> = props => {
                   }
                 })
               }
+
+              if (newVisType === 'HeatMap') {
+                updateConfig({
+                  ...config,
+                  visualizationType: newVisType,
+                  series: [],
+                  yAxis: {
+                    ...config.yAxis,
+                    type: 'categorical'
+                  },
+                  heatmap: {
+                    cellPadding: config.heatmap?.cellPadding || 2
+                  },
+                  legend: {
+                    ...config.legend,
+                    position: 'top',
+                    style: 'gradient',
+                    subStyle: 'smooth'
+                  },
+                  general: {
+                    ...config.general,
+                    palette: config.general?.palette || {
+                      isReversed: false,
+                      version: '2.0',
+                      name: 'sequential_blue'
+                    }
+                  }
+                })
+              }
             }}
           />
         )}

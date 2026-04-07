@@ -442,6 +442,40 @@ const buttons = [
     content: 'Display a forecasting chart to predict future data trends.'
   },
   {
+    id: 28,
+    category: 'Charts',
+    label: 'HeatMap',
+    type: 'chart',
+    subType: 'HeatMap',
+    orientation: 'vertical',
+    xAxis: {
+      type: 'categorical',
+      size: 75,
+      maxTickRotation: 45,
+      labelOffset: 0
+    },
+    yAxis: {
+      type: 'categorical'
+    },
+    heatmap: {
+      cellPadding: 2
+    },
+    general: {
+      palette: {
+        isReversed: false,
+        version: '2.0',
+        name: 'sequential_blue'
+      }
+    },
+    legend: {
+      position: 'top',
+      style: 'gradient',
+      subStyle: 'smooth'
+    },
+    icon: <WaffleChartIcon />,
+    content: 'Display a heatmap to compare intensity across two dimensions.'
+  },
+  {
     id: 27,
     category: 'Charts',
     label: 'Horizon Chart',

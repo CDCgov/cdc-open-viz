@@ -660,7 +660,7 @@ const SeriesButtonRemove = props => {
 
   return (
     config.series &&
-    config.series.length > 1 && (
+    (config.series.length > 1 || config.visualizationType === 'HeatMap') && (
       <Button variant='danger' size='sm' className='grouped-list__remove' onClick={e => handleRemoveSeries(e, series)}>
         Remove
       </Button>
@@ -710,7 +710,7 @@ const SeriesItem = props => {
                   }
                 >
                   <Icon display='move' size={15} style={{ cursor: 'default' }} />
-                  {series.dataKey}
+                  {config.visualizationType === 'HeatMap' ? series.name || series.dataKey : series.dataKey}
                 </AccordionItemButton>
               </AccordionItemHeading>
               {chartsWithOptions.includes(config.visualizationType) && (

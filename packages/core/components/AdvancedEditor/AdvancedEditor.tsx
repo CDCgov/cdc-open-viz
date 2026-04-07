@@ -34,9 +34,10 @@ export const AdvancedEditor = ({
   config,
   convertStateToConfig,
   stripConfig = config => config,
+  defaultExpanded = false,
   onExpandCollapse = () => { }
 }) => {
-  const [advancedToggle, _setAdvancedToggle] = useState(false)
+  const [advancedToggle, _setAdvancedToggle] = useState(defaultExpanded)
   const [configTextboxValue, setConfigTextbox] = useState<Record<string, any>>({})
   const setAdvancedToggle = val => {
     _setAdvancedToggle(val)
