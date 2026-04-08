@@ -153,10 +153,14 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   const searchInput = useRef(null)
   const searchDropdown = useRef(null)
 
-  const chooseSelectedSubGroup = (tierOne: string | number, tierTwo: string | number) => {
-    setUserSearchTerm(null)
+  const resetDropdownInteraction = () => {
     setInputHasFocus(false)
     setIsListOpened(false)
+    setUserSearchTerm(null)
+  }
+
+  const chooseSelectedSubGroup = (tierOne: string | number, tierTwo: string | number) => {
+    resetDropdownInteraction()
     handleSelectedItems([String(tierOne), String(tierTwo)])
     searchInput.current?.blur()
   }
@@ -227,8 +231,8 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
 
       case 'Escape':
         {
-          setIsListOpened(false)
-          searchInput.current.focus()
+          resetDropdownInteraction()
+          ;(e.target as HTMLElement)?.blur?.()
         }
         break
     }
@@ -265,9 +269,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
         `main-nested-dropdown-container-${filterIndex}`
       ].includes(e.relatedTarget.className)
     ) {
-      setInputHasFocus(false)
-      setIsListOpened(false)
-      setUserSearchTerm(null)
+      resetDropdownInteraction()
     } else {
       ; (e.relatedTarget as HTMLElement).focus()
     }

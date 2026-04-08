@@ -91,4 +91,30 @@ describe('NestedDropdown', () => {
 
     expect(handleSelectedItems).toHaveBeenCalledWith(['2024', 'Q3'])
   })
+
+  it.each([false, true])('restores the closed display text on escape when displaySubgroupingOnly=%s', flag => {
+    render(
+      <NestedDropdown
+        activeGroup='2023'
+        activeSubGroup='Q2'
+        displaySubgroupingOnly={flag}
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Year and Quarter'
+        options={options}
+      />
+    )
+
+    const input = getSearchInput()
+    const expectedClosedValue = flag ? 'Q2' : '2023 - Q2'
+
+    fireEvent.focus(input)
+    expect(input).toHaveValue('')
+
+    fireEvent.keyUp(input, { key: 'ArrowDown' })
+    fireEvent.keyUp(screen.getByRole('treeitem', { name: '2023' }), { key: 'Escape' })
+
+    expect(input).toHaveValue(expectedClosedValue)
+    expect(screen.getByRole('tree')).toHaveClass('hide')
+  })
 })
