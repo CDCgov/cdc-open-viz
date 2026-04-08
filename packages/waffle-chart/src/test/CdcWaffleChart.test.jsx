@@ -74,7 +74,10 @@ describe('Waffle Chart', () => {
     }
   }
 
-  const renderDynamicDenominatorChart = ({ numerator, denominator }) =>
+  const getPrimaryValueText = container =>
+    container.querySelector('.cove-waffle-chart__data--primary')?.textContent?.replace(/\s+/g, ' ').trim() || ''
+
+  const renderDynamicDenominatorChart = ({ numerator, denominator, roundToPlace = '' }) =>
     render(
       <CdcWaffleChart
         config={createBaseConfig({
@@ -84,7 +87,7 @@ describe('Waffle Chart', () => {
           showPercent: false,
           showDenominator: true,
           suffix: '',
-          roundToPlace: '',
+          roundToPlace,
           valueDescription: 'out of'
         })}
       />
@@ -407,7 +410,33 @@ describe('Waffle Chart', () => {
     }
   )
 
-  it('preserves exact numerator and denominator text while discretizing dynamic denominator dots', async () => {
+  it('uses the rounded displayed numerator for dynamic denominator waffle geometry when roundToPlace is 0', async () => {
+    const { container } = renderDynamicDenominatorChart({ numerator: 17.5, denominator: 20.2, roundToPlace: 0 })
+
+    await waitFor(() => {
+      expect(getRenderedNodeCounts(container)).toEqual({
+        total: 20,
+        filled: 18
+      })
+    })
+
+    expect(getPrimaryValueText(container)).toContain('18 out of 20.2')
+  })
+
+  it('uses the rounded displayed numerator for dynamic denominator waffle geometry when roundToPlace is 1', async () => {
+    const { container } = renderDynamicDenominatorChart({ numerator: 17.5, denominator: 20.2, roundToPlace: 1 })
+
+    await waitFor(() => {
+      expect(getRenderedNodeCounts(container)).toEqual({
+        total: 20,
+        filled: 17
+      })
+    })
+
+    expect(getPrimaryValueText(container)).toContain('17.5 out of 20.2')
+  })
+
+  it('preserves exact numerator and denominator text while discretizing dynamic denominator dots when roundToPlace is blank', async () => {
     const { container } = renderDynamicDenominatorChart({ numerator: 17.5, denominator: 20.2 })
 
     await waitFor(() => {
