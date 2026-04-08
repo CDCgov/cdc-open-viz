@@ -189,7 +189,11 @@ export const DataSectionTests: Story = {
       expect(el).toBeTruthy()
       return el
     }
-    const getValueText = () => getPrimaryEl().textContent?.trim() || ''
+    const getValueText = () => getPrimaryEl().textContent?.replace(/\s+/g, ' ').trim() || ''
+    const getDynamicDenominatorVisualState = () => ({
+      valueText: getValueText(),
+      ...getWaffleNodeState()
+    })
     const getWaffleNodeState = () => {
       const nodes = Array.from(canvasElement.querySelectorAll('.cove-waffle-chart svg .cdc-waffle-chart__node'))
       const chartType = (canvasElement.querySelector('select[name="visualizationType"]') as HTMLSelectElement)?.value
@@ -554,12 +558,12 @@ export const DataSectionTests: Story = {
     )
 
     // ============================================================================
-    // TEST 23: Non-Integer Numerator/Denominator Rounding
-    // Expectation: Mean 17.5 and denominator 20.2 round to 18 out of 20.
+    // TEST 23: Non-Integer Numerator/Denominator Rounding (Round=0)
+    // Expectation: Mean 17.5 and denominator 20.2 render 18 filled nodes out of 20 to match the rounded display value.
     // ============================================================================
     await performAndAssert(
-      'Dynamic Rounding Non-Integer Values',
-      getWaffleNodeState,
+      'Dynamic Rounding Non-Integer Values Round 0',
+      getDynamicDenominatorVisualState,
       async () => {
         await userEvent.selectOptions(dataFunctionSelect, 'Mean (Average)')
         await userEvent.selectOptions(dataColumnSelect, 'Deaths')
@@ -569,14 +573,32 @@ export const DataSectionTests: Story = {
         await userEvent.type(conditionalValueInput, '20')
         await userEvent.clear(staticDenomInput)
         await userEvent.type(staticDenomInput, '20.2')
+        await userEvent.clear(roundingInput)
+        await userEvent.type(roundingInput, '0')
         await setCheckboxState(showPercentCheckbox, false)
         await setCheckboxState(showDenominatorCheckbox, true)
       },
-      (_before, after) => after.total === 20 && after.filled === 18
+      (_before, after) =>
+        after.total === 20 && after.filled === 18 && after.valueText.includes('18 deaths out of total 20.2')
     )
 
     // ============================================================================
-    // TEST 24: Numerator Greater Than Denominator Fallback
+    // TEST 24: Non-Integer Numerator/Denominator Rounding (Round=1)
+    // Expectation: Mean 17.5 and denominator 20.2 render 17 filled nodes out of 20 while display shows 17.5.
+    // ============================================================================
+    await performAndAssert(
+      'Dynamic Rounding Non-Integer Values Round 1',
+      getDynamicDenominatorVisualState,
+      async () => {
+        await userEvent.clear(roundingInput)
+        await userEvent.type(roundingInput, '1')
+      },
+      (_before, after) =>
+        after.total === 20 && after.filled === 17 && after.valueText.includes('17.5 deaths out of total 20.2')
+    )
+
+    // ============================================================================
+    // TEST 25: Numerator Greater Than Denominator Fallback
     // Expectation: Falls back to fixed 100 nodes.
     // ============================================================================
     await performAndAssert(
@@ -589,7 +611,7 @@ export const DataSectionTests: Story = {
     )
 
     // ============================================================================
-    // TEST 25: TP5 Waffle Dynamic Denominator (7 out of 12)
+    // TEST 26: TP5 Waffle Dynamic Denominator (7 out of 12)
     // Expectation: 12 total TP5 nodes, 7 filled nodes.
     // ============================================================================
     await performAndAssert(
