@@ -6,8 +6,10 @@ import _ from 'lodash'
 import { Modal } from '../types/Modal'
 import { GeneratedLegend } from '../helpers/generateRuntimeLegend'
 import { RuntimeData } from '../types/RuntimeData'
+import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
 
 export const getInitialState = (configObj = {}): MapState => {
+  const filteredStateCode = typeof window !== 'undefined' ? getQueryParam('state-code') || '' : ''
   // Create defaults without palette version to avoid overriding legacy configs
   const defaultsWithoutPaletteaName = { ...defaults }
 
@@ -24,7 +26,7 @@ export const getInitialState = (configObj = {}): MapState => {
     coveLoadedHasRan: false,
     displayPanel: false,
     filteredCountryCode: '',
-    filteredStateCode: '',
+    filteredStateCode,
     isDraggingAnnotation: false,
     topoData: null,
     translate: [0, 0],

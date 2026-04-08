@@ -17,6 +17,7 @@ Before working on a specific area, read the relevant context document from the `
 | `docs/PALETTE_MIGRATION.md`      | Working with color palettes or the palette selection system. Covers the v1 → v2 migration, helper functions, and configuration structure.                                       |
 | `docs/COVE_EVENTS.md`            | Adding analytics events or working with the metrics system. Documents the event format, available event types, and usage patterns.                                              |
 | `docs/VISUALIZATION_WRAPPERS.md` | Working on visualization wrapper structure, shell layout, or wrapper consistency. Covers `VisualizationContainer`, `VisualizationContent`, compatibility modes, and guardrails. |
+| `docs/BUTTON_SYSTEM.md`          | Working on shared buttons, legacy `.btn` migration, or button styling consistency. Covers the `Button` prop API, migration rules, compatibility aliases, and current exceptions. |
 
 ### Creating New Context Documents
 
@@ -44,11 +45,11 @@ Use repo-local script commands for consistency (`yarn ...`) and avoid relying on
 For unit targeting, include the extra `--` after `yarn test-unit` so Yarn 1 forwards flags to Lerna.
 
 - Unit tests for one package/file:
-  - `yarn test-unit -- --scope @cdc/<package-name> -- src/.../<file>.test.<js|jsx|ts|tsx>`
-  - Example: `yarn test-unit -- --scope @cdc/dashboard -- src/test/CdcDashboardComponent.test.tsx`
+  - `yarn test-unit:quick -- --scope @cdc/<package-name> -- src/.../<file>.test.<js|jsx|ts|tsx>`
+  - Example: `yarn test-unit:quick -- --scope @cdc/dashboard -- src/test/CdcDashboardComponent.test.tsx`
 - Storybook tests for one story file:
-  - `yarn test-storybook packages/.../_stories/<file>.stories.<js|jsx|ts|tsx>`
-  - Example: `yarn test-storybook packages/chart/src/_stories/ChartEditor.stories.tsx`
+  - `yarn test-storybook:quick packages/.../_stories/<file>.stories.<js|jsx|ts|tsx>`
+  - Example: `yarn test-storybook:quick packages/chart/src/_stories/ChartEditor.stories.tsx`
 
 ### Quick Suites (For Broad Changes)
 

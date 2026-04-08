@@ -1,0 +1,88 @@
+{
+  "type": "waffle-chart",
+  "title": "Trend Arrow Waffle Chart",
+  "showTitle": true,
+  "visualizationType": "TP5 Waffle",
+  "visualizationSubType": "linear",
+  "showPercent": true,
+  "showDenominator": false,
+  "valueDescription": "",
+  "content": "Highlight a statistic, data point, or key fact about a topic using the relevant layout option:",
+  "subtext": "This is subtext or a citation.",
+  "orientation": "horizontal",
+  "filters": [],
+  "fontSize": "",
+  "overallFontSize": "medium",
+  "dataColumn": "Rate",
+  "dataFunction": "Mean (Average)",
+  "dataConditionalColumn": "",
+  "dataConditionalOperator": "",
+  "dataConditionalComparate": "",
+  "invalidComparate": false,
+  "customDenom": false,
+  "dataDenom": "100",
+  "dataDenomColumn": "",
+  "dataDenomFunction": "",
+  "prefix": "",
+  "suffix": "%",
+  "roundToPlace": "0",
+  "shape": "person",
+  "nodeWidth": "10",
+  "nodeSpacer": "2",
+  "theme": "theme-blue",
+  "gauge": {
+    "height": 35,
+    "width": "100%"
+  },
+  "visual": {
+    "border": true,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false,
+    "whiteBackground": false
+  },
+  "trendIndicator": {
+    "mode": "numeric",
+    "column": "oldrate",
+    "numericThreshold": 0,
+    "mappings": [],
+    "showNoChangeArrows": false,
+    "upLabel": "",
+    "downLabel": "",
+    "noChangeLabel": ""
+  },
+  "markupVariables": [],
+  "enableMarkupVariables": false,
+  "dataMetadata": {
+    "lastUpdated": "January 15, 2026",
+    "source": "CDC NREVSS"
+  },
+  "locale": "en-US",
+  "data": [
+    {
+      "STATE": "AL",
+      "Rate": "10",
+      "Location": "Home",
+      "oldrate": "7"
+    },
+    {
+      "STATE": "AK",
+      "Rate": "12",
+      "Location": "Home",
+      "oldrate": "13"
+    },
+    {
+      "STATE": "FL",
+      "Rate": "10",
+      "Location": "Work",
+      "oldrate": "10"
+    },
+    {
+      "STATE": "GA",
+      "Rate": "12",
+      "Location": "Work",
+      "oldrate": "11"
+    }
+  ]
+}

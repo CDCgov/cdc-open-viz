@@ -164,7 +164,9 @@ export type MapConfig = Visualization & {
     showDownloadImgButton: boolean
     includeContextInDownload?: boolean
     showDownloadPdfButton: boolean
+    showHSABoundaries?: boolean
     showSidebar: boolean
+    showStateDropdown?: boolean
     showTitle: boolean
     statesPicked: {
       fipsCode: string
@@ -215,6 +217,7 @@ export type MapConfig = Visualization & {
     download: boolean
     downloadDataLabel?: string
     downloadImageLabel?: string
+    downloadUrlLabel?: string
     showDownloadUrl: boolean
     showFullGeoNameInCSV: boolean
     forceDisplay: boolean

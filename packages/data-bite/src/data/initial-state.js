@@ -38,6 +38,17 @@ export default {
   general: {
     isCompactStyle: false
   },
+  trendIndicator: {
+    mode: null,
+    column: '',
+    numericThreshold: 0,
+    mappings: [],
+    showNoChangeArrows: false,
+    upLabel: '',
+    downLabel: '',
+    noChangeLabel: '',
+    trendLabel: ''
+  },
   markupVariables: [],
   enableMarkupVariables: false
 }

@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef, useContext } from 'react'
+import { useEffect, useState, useRef, useContext, useMemo } from 'react'
 import { geoCentroid, geoPath, geoContains } from 'd3-geo'
+import type { GeoGeometryObjects } from 'd3-geo'
 import { zoom as d3Zoom, zoomIdentity as d3ZoomIdentity } from 'd3-zoom'
 import { select as d3Select } from 'd3-selection'
-import { feature } from 'topojson-client'
+import { feature, merge } from 'topojson-client'
 import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import debounce from 'lodash.debounce'
 import Loading from '@cdc/core/components/Loading'
@@ -11,13 +12,7 @@ import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { useLegendMemoContext } from '../../../context/LegendMemoContext'
 import { drawShape, createShapeProperties } from '../helpers/shapes'
-import {
-  getGeoStrokeColor,
-  handleMapAriaLabels,
-  displayGeoName,
-  isLegendItemDisabled,
-  MAX_ZOOM_LEVEL
-} from '../../../helpers'
+import { getGeoStrokeColor, handleMapAriaLabels, displayGeoName, isLegendItemDisabled } from '../../../helpers'
 import { supportedStatesFipsCodes } from '../../../data/supported-geos'
 import useGeoClickHandler from '../../../hooks/useGeoClickHandler'
 import { applyLegendToRow } from '../../../helpers/applyLegendToRow'
@@ -29,6 +24,23 @@ import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { createCanvasPattern, PatternType } from '../../../helpers/createCanvasPattern'
 import { getPatternForRow } from '../../../helpers/getPatternForRow'
 
+type Geometry = GeoGeometryObjects & { id?: string; properties: { name: string } }
+type Focus = {
+  id: string
+  index: number
+  center: [number, number]
+  feature: Geometry
+}
+type TopoData = {
+  year?: string
+  counties: Geometry[]
+  states: Geometry[]
+  hsas: { groupId: string; feature: Geometry }[]
+  mapData: Geometry[]
+  countyIndecies: Record<string, [number, number]>
+  projection: any
+}
+
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
 }
@@ -39,7 +51,7 @@ const sortById = (a, b) => {
   return 0
 }
 
-const getTopoData = year => {
+const getTopoData = (year, showHSABoundaries) => {
   return new Promise(resolve => {
     const resolveWithTopo = async response => {
       if (response.status !== 200) {
@@ -48,28 +60,50 @@ const getTopoData = year => {
         response = await response.json()
       }
 
-      let topoData = {
+      let topoData: TopoData = {
         year: undefined,
-        counties: undefined,
-        states: undefined,
-        mapData: undefined,
-        countyIndecies: undefined,
+        counties: [],
+        states: [],
+        hsas: [],
+        mapData: [],
+        countyIndecies: {},
         projection: undefined
       }
 
       topoData.year = year || 'default'
       topoData.counties = feature(response, response.objects.counties).features
       topoData.states = feature(response, response.objects.states).features
+      if (showHSABoundaries) {
+        const mappingResponse = await import(
+          /* webpackChunkName: "hsa_fips_mapping" */ './../data/hsa_fips_mapping.json'
+        )
+        const hsaMapping = mappingResponse.default.reduce((acc, curr) => {
+          acc[curr.county_fips] = curr.hsa_no
+          return acc
+        }, {})
+        const countyGeometries = response.objects.counties.geometries
+        const geometriesByGroup = countyGeometries.reduce((acc, geometry) => {
+          const groupId = hsaMapping[geometry.id]
+          if (!groupId) return acc
+
+          if (!acc[groupId]) acc[groupId] = []
+          acc[groupId].push(geometry)
+          return acc
+        }, {} as Record<string, any[]>)
+        topoData.hsas = Object.entries(geometriesByGroup).map(([groupId, geometries]) => ({
+          groupId,
+          feature: merge(response as any, geometries)
+        }))
+      }
       topoData.states.sort(sortById)
       topoData.counties.sort(sortById)
       topoData.mapData = topoData.states.concat(topoData.counties).filter(geo => geo.id !== '51620') //Not sure why, but Franklin City, VA is very broken and messes up the rendering
-      topoData.countyIndecies = {}
       topoData.states.forEach(state => {
         let minIndex = topoData.mapData.length - 1
         let maxIndex = 0
 
         for (let i = 0; i < topoData.mapData.length; i++) {
-          if (topoData.mapData[i].id.length > 2 && topoData.mapData[i].id.indexOf(state.id) === 0) {
+          if (topoData.mapData[i].id?.length > 2 && topoData.mapData[i].id?.indexOf(state.id) === 0) {
             if (i < minIndex) minIndex = i
             if (i > maxIndex) maxIndex = i
           }
@@ -135,8 +169,7 @@ const getCurrentTopoYear = (config: MapConfig, runtimeFilters) => {
 }
 
 const isTopoReady = (topoData, config: MapConfig, runtimeFilters) => {
-  let currentYear = getCurrentTopoYear(config, runtimeFilters)
-
+  const currentYear = getCurrentTopoYear(config, runtimeFilters)
   return topoData.year && (!currentYear || currentYear === topoData.year)
 }
 
@@ -148,6 +181,7 @@ const CountyMap = () => {
     runtimeFilters,
     runtimeLegend,
     setConfig,
+    filteredStateCode,
     setFilteredStateCode,
     config,
     tooltipId,
@@ -161,8 +195,18 @@ const CountyMap = () => {
   const geoStrokeColor = getGeoStrokeColor(config)
   const { geoClickHandler } = useGeoClickHandler()
   const { applyTooltipsToGeo } = useApplyTooltipsToGeo()
-  const [focus, setFocus] = useState({})
-  const [topoData, setTopoData] = useState({})
+  const [topoData, setTopoData] = useState<TopoData>({} as TopoData)
+  const focus = useMemo(() => {
+    if (!isTopoReady(topoData, config, runtimeFilters) || !filteredStateCode) return {} as Focus
+    const stateGeo = topoData.states.find(state => state.id === filteredStateCode)
+    if (!stateGeo) return {} as Focus
+    return {
+      id: stateGeo.id,
+      index: topoData.mapData.findIndex(geo => geo.id === stateGeo.id),
+      center: geoCentroid(stateGeo),
+      feature: stateGeo
+    } as Focus
+  }, [filteredStateCode, topoData, config, runtimeFilters])
   const [hasMoved, setHasMoved] = useState(false)
 
   const pathGenerator = geoPath().projection(geoAlbersUsaTerritories())
@@ -177,27 +221,35 @@ const CountyMap = () => {
     }
   })
 
+  const getAndSetTopoData = currentYear => {
+    getTopoData(currentYear, config.general.showHSABoundaries).then(response => {
+      if (canvasRef.current) {
+        const context = canvasRef.current.getContext('2d') as CanvasRenderingContext2D
+        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
+      }
+      setTopoData(response)
+    })
+  }
+
   useEffect(() => {
-    let currentYear = getCurrentTopoYear(config, runtimeFilters)
+    const currentYear = getCurrentTopoYear(config, runtimeFilters)
 
     if (currentYear !== topoData.year) {
-      getTopoData(currentYear).then(response => {
-        if (canvasRef.current) {
-          const context = canvasRef.current.getContext('2d')
-          context.clearRect(canvasRef.current.width, canvasRef.current.height)
-        }
-        setTopoData(response)
-      })
+      getAndSetTopoData(currentYear)
     }
   }, [config.general.countyCensusYear, config.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
+
+  const prevShowHSABoundariesRef = useRef(config.general.showHSABoundaries)
+  useEffect(() => {
+    if (prevShowHSABoundariesRef.current === config.general.showHSABoundaries) return
+    const currentYear = getCurrentTopoYear(config, runtimeFilters)
+    getAndSetTopoData(currentYear)
+    prevShowHSABoundariesRef.current = config.general.showHSABoundaries
+  }, [config.general.showHSABoundaries])
 
   // Whenever the memo at the top is triggered and the map is called to re-render, call drawCanvas and update
   // The resize function so it includes the latest state variables
   useEffect(() => {
-    if (isTopoReady(topoData, config, runtimeFilters)) {
-      drawCanvas()
-    }
-
     const onResize = () => {
       if (canvasRef.current && isTopoReady(topoData, config, runtimeFilters)) {
         drawCanvas()
@@ -240,6 +292,11 @@ const CountyMap = () => {
       const d = pathGen(state)
       if (d) cache.set('state_border_' + state.id, new Path2D(d))
     })
+    topoData.hsas.forEach(hsa => {
+      if (!hsa?.groupId || !hsa?.feature) return
+      const d = pathGen(hsa.feature as any)
+      if (d) cache.set('hsa_border_' + hsa.groupId, new Path2D(d))
+    })
     geoPathCacheRef.current = cache
   }
 
@@ -266,7 +323,14 @@ const CountyMap = () => {
 
   const getZoomScale = () => zoomTransformRef.current?.k || 1
 
-  const paintCountyGeo = (context, path2d: Path2D, geoData, canvasWidth: number, strokeWidth?: number) => {
+  const paintCountyGeo = (
+    context,
+    path2d: Path2D,
+    geoData,
+    canvasWidth: number,
+    strokeWidth?: number,
+    strokeColor?: string
+  ) => {
     const legendValues =
       geoData !== undefined
         ? applyLegendToRow(geoData, config, runtimeLegend, legendMemo, legendSpecialClassLastMemo)
@@ -312,7 +376,7 @@ const CountyMap = () => {
       }
     }
 
-    context.strokeStyle = geoStrokeColor
+    context.strokeStyle = strokeColor ?? geoStrokeColor
     context.lineWidth = strokeWidth ?? lineWidth
     context.stroke(path2d)
 
@@ -333,7 +397,6 @@ const CountyMap = () => {
       mapPosition: { coordinates: [0, 30], zoom: 1 }
     })
     setFilteredStateCode('')
-    setFocus({})
     resetZoomTransform()
   }
 
@@ -411,7 +474,7 @@ const CountyMap = () => {
     const pointCoordinates = topoData.projection.invert([mapX, mapY])
 
     // Use d3 geoContains method to find the state geo data that the user clicked inside
-    let clickedState
+    let clickedState: Geometry
     for (let i = 0; i < topoData.states.length; i++) {
       if (geoContains(topoData.states[i], pointCoordinates)) {
         clickedState = topoData.states[i]
@@ -447,15 +510,6 @@ const CountyMap = () => {
         })
         setFilteredStateCode(clickedState.id)
 
-        let focusIndex = -1
-        for (let i = 0; i < topoData.mapData.length; i++) {
-          if (topoData.mapData[i].id === clickedState.id) {
-            focusIndex = i
-            break
-          }
-        }
-
-        setFocus({ id: clickedState.id, index: focusIndex, center: geoCentroid(clickedState), feature: clickedState })
         publishAnalyticsEvent({
           vizType: config.type,
           vizSubType: getVizSubType(config),
@@ -524,28 +578,6 @@ const CountyMap = () => {
     if (config.general.type !== 'us-geocode') {
       //If no tooltip is shown, or if the current geo associated with the tooltip shown is no longer containing the mouse, then rerender the tooltip
       if (isNaN(currentTooltipIndex) || !geoContains(topoData.mapData[currentTooltipIndex], pointCoordinates)) {
-        if (
-          !isNaN(currentTooltipIndex) &&
-          applyLegendToRow(
-            runtimeData[topoData.mapData[currentTooltipIndex].id],
-            config,
-            runtimeLegend,
-            legendMemo,
-            legendSpecialClassLastMemo
-          )
-        ) {
-          const prevPath2d = geoPathCacheRef.current.get(topoData.mapData[currentTooltipIndex].id)
-          if (prevPath2d) {
-            paintCountyGeo(
-              context,
-              prevPath2d,
-              runtimeData[topoData.mapData[currentTooltipIndex].id],
-              canvas.width,
-              lineWidth * strokeScale
-            )
-          }
-        }
-
         let hoveredState
         let county
         let countyIndex
@@ -583,10 +615,6 @@ const CountyMap = () => {
               return
             }
             context.globalAlpha = 1
-            const hoverPath2d = geoPathCacheRef.current.get(county.id)
-            if (hoverPath2d) {
-              paintCountyGeo(context, hoverPath2d, runtimeData[county.id], canvas.width, lineWidth * strokeScale)
-            }
           }
 
           // Track hover analytics event if this is a new location
@@ -779,7 +807,7 @@ const CountyMap = () => {
   // Fast render using cached Path2D objects — called during zoom/pan for smooth performance.
   // Skips canvas resize and projection setup; only applies the current zoom transform and redraws.
   const renderFrame = () => {
-    if (!canvasRef.current || !runtimeLegend.items.length) return
+    if (!canvasRef.current || !runtimeLegend.items.length || !topoData.mapData) return
 
     const canvas = canvasRef.current
     const context = canvas.getContext('2d')
@@ -792,10 +820,16 @@ const CountyMap = () => {
     applyZoomTransform(context)
     const zoomScale = getZoomScale()
     const strokeScale = zoomScale ? 1 / zoomScale : 1
-    const countyStrokeWidth = lineWidth * 0.8 * strokeScale
+    const useHsaStrokeStyling = config.general.showHSABoundaries
+    const countyStrokeWidth = lineWidth * (useHsaStrokeStyling ? 0.45 : 0.8) * strokeScale
+    const hsaStrokeWidth = lineWidth * 0.7 * strokeScale
+    const countyStrokeColor = useHsaStrokeStyling ? '#a9aeb1' : geoStrokeColor
+    const isZoomedIntoState = focus.id
+    const hsaStrokeColor = isZoomedIntoState ? '#000' : '#303030'
+    const stateStrokeColor = useHsaStrokeStyling ? '#000000' : '#1c1d1f'
 
     // Enforces stroke style of the county lines
-    context.strokeStyle = geoStrokeColor
+    context.strokeStyle = countyStrokeColor
     context.lineWidth = countyStrokeWidth
 
     // Iterates through each state/county topo and renders it using cached Path2D
@@ -808,11 +842,24 @@ const CountyMap = () => {
       if (!path2d) return
 
       const geoData = runtimeData[geo.id]
-      paintCountyGeo(context, path2d, geoData, canvas.width, countyStrokeWidth)
+      paintCountyGeo(context, path2d, geoData, canvas.width, countyStrokeWidth, countyStrokeColor)
     })
 
+    if (config.general.showHSABoundaries) {
+      context.strokeStyle = hsaStrokeColor
+      context.lineWidth = hsaStrokeWidth
+      topoData.hsas.forEach(hsa => {
+        if (!hsa?.groupId) return
+        const cacheKey = 'hsa_border_' + hsa.groupId
+        const path2d = cache.get(cacheKey)
+        if (path2d) {
+          context.stroke(path2d)
+        }
+      })
+    }
+
     // State borders
-    context.strokeStyle = '#1c1d1f'
+    context.strokeStyle = stateStrokeColor
     context.lineWidth = lineWidth * 1.25 * strokeScale
     topoData.states.forEach(state => {
       if (!state.id) return
@@ -911,7 +958,6 @@ const CountyMap = () => {
   useEffect(() => {
     if (!config.general.allowMapZoom) {
       setFilteredStateCode('')
-      setFocus({})
       setHasMoved(false)
       resetZoomTransform()
     }
@@ -951,14 +997,15 @@ const CountyMap = () => {
     resetZoomTransform()
   }, [focus?.id])
 
-  // If runtimeData is not defined, show loader
-  if (!runtimeData || !isTopoReady(topoData, config, runtimeFilters)) {
-    return (
-      <div style={{ height: 300 }}>
-        <Loading />
-      </div>
-    )
-  }
+  const isLoading = !runtimeData || !isTopoReady(topoData, config, runtimeFilters) || !canvasRef.current
+
+  useEffect(() => {
+    if (isLoading) {
+      return
+    }
+
+    drawCanvas()
+  }, [isLoading, topoData, focus, runtimeLegend, runtimeData, featureArray, config])
 
   const showManualZoomControls = config.general.allowMapZoom
   const showResetControl = (hasMoved || focus.id) && (showManualZoomControls || config.general.type === 'us-geocode')
@@ -967,6 +1014,11 @@ const CountyMap = () => {
 
   return (
     <ErrorBoundary component='CountyMap'>
+      {isLoading && (
+        <div style={{ height: 300 }}>
+          <Loading />
+        </div>
+      )}
       <canvas
         ref={canvasRef}
         aria-label={handleMapAriaLabels(config)}
@@ -976,12 +1028,12 @@ const CountyMap = () => {
           tooltipRef.current.setAttribute('data-index', null)
         }}
         onClick={canvasClick}
-        className='county-map-canvas'
+        className={'county-map-canvas' + (isLoading ? ' d-none' : '')}
         style={config.general.allowMapZoom ? undefined : { cursor: 'default' }}
       ></canvas>
 
       {showManualZoomControls && (
-        <div className='zoom-controls' data-html2canvas-ignore='true'>
+        <div className={'zoom-controls' + (isLoading ? ' d-none' : '')} data-html2canvas-ignore='true'>
           <button onClick={handleZoomIn} aria-label='Zoom In'>
             <svg viewBox='0 0 24 24' stroke='currentColor' strokeWidth='3'>
               <line x1='12' y1='5' x2='12' y2='19' />

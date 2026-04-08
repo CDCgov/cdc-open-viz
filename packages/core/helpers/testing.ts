@@ -320,7 +320,7 @@ export const testBooleanControl = async (checkbox: HTMLInputElement, getVisualSt
 /**
  * Assert that a visualization has rendered successfully.
  * Uses performAndAssert to poll until one of these conditions is met:
- *   ((svgCount > 0 || canvasCount > 0) && hasCoveModule) || isDataBite || isDataTable
+ *   ((svgCount > 0 || canvasCount > 0) && hasCoveModule) || isDataBite || isDataTable || isMarkupInclude
  *
  * Handles all visualization types:
  * - Charts (SVG-based)
@@ -328,6 +328,7 @@ export const testBooleanControl = async (checkbox: HTMLInputElement, getVisualSt
  * - Maps with canvas rendering (county maps via UsaMap.County)
  * - Data bites (.bite-content)
  * - Data tables (.data-table)
+ * - Markup includes (.type-markup-include)
  * - Waffle charts (SVG-based)
  *
  * Use as a play function in any Components/Templates/ story:
@@ -346,12 +347,18 @@ export const assertVisualizationRendered = async (vizElement: HTMLElement) => {
       const hasCoveModule = !!vizElement.querySelector('.cove-visualization')
       const isDataBite = !!vizElement.querySelector('.bite-content')
       const isDataTable = !!vizElement.querySelector('.type-data-table')
-      return { svgCount, canvasCount, hasCoveModule, isDataBite, isDataTable }
+      const isMarkupInclude =
+        !!vizElement.querySelector('.type-markup-include .markup-include-component') ||
+        !!vizElement.querySelector('.type-markup-include .cove-prose')
+      return { svgCount, canvasCount, hasCoveModule, isDataBite, isDataTable, isMarkupInclude }
     },
     async () => {},
     (_before, after) => {
       return (
-        ((after.svgCount > 0 || after.canvasCount > 0) && after.hasCoveModule) || after.isDataBite || after.isDataTable
+        ((after.svgCount > 0 || after.canvasCount > 0) && after.hasCoveModule) ||
+        after.isDataBite ||
+        after.isDataTable ||
+        after.isMarkupInclude
       )
     }
   )

@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import axios from 'axios'
+import { csvFormat } from 'd3'
 
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 
@@ -19,6 +20,7 @@ import CloseIcon from '@cdc/core/assets/icon-close.svg'
 import DataDesigner from '@cdc/core/components/managers/DataDesigner'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
+import Button from '@cdc/core/components/elements/Button'
 import { isSolrCsv, isSolrJson } from '@cdc/core/helpers/isSolr'
 import { type Visualization } from '@cdc/core/types/Visualization'
 import { type DataSet } from '@cdc/core/types/DataSet'
@@ -359,7 +361,7 @@ const DataImport = () => {
           Always load from URL (normally will only pull once)
         </label>
         <div className='d-flex justify-content-end mt-2 mb-3'>
-          <button
+          <Button
             className='btn btn-primary px-4'
             type='submit'
             id='load-data'
@@ -367,7 +369,7 @@ const DataImport = () => {
             onClick={() => loadData(null, externalURL, editingDataset)}
           >
             Save & Load
-          </button>
+          </Button>
         </div>
       </>
     )
@@ -388,7 +390,7 @@ const DataImport = () => {
     return (
       //todo convert to modal
       <>
-        <button
+        <Button
           className='btn danger'
           onClick={() =>
             resetEditor(
@@ -399,7 +401,7 @@ const DataImport = () => {
         >
           Clear
           <CloseIcon />
-        </button>
+        </Button>
         {/* DEV-851 link to replace file should pop file dialog */}
         {config.dataFileSourceType === 'file' && (
           <div className='link link-replace' {...getRootProps2()}>
@@ -433,6 +435,49 @@ const DataImport = () => {
     setEditingDataset(undefined)
     if (!datasetKeys.length) setAddingDataset(true)
     dispatch({ type: 'DELETE_DASHBOARD_DATASET', payload: { datasetKey } })
+  }
+
+  const downloadCSV = (data: Array<Record<string, unknown>>, filename: string) => {
+    // Normalize filename: strip query/hash, remove path, replace extension with .csv
+    let baseName = filename || ''
+
+    const queryIndex = baseName.indexOf('?')
+    const hashIndex = baseName.indexOf('#')
+    const cutoffIndex = queryIndex === -1 ? hashIndex : hashIndex === -1 ? queryIndex : Math.min(queryIndex, hashIndex)
+    if (cutoffIndex !== -1) {
+      baseName = baseName.substring(0, cutoffIndex)
+    }
+
+    const lastSlash = Math.max(baseName.lastIndexOf('/'), baseName.lastIndexOf('\\'))
+    if (lastSlash !== -1) {
+      baseName = baseName.substring(lastSlash + 1)
+    }
+
+    const lastDot = baseName.lastIndexOf('.')
+    if (lastDot > 0) {
+      baseName = baseName.substring(0, lastDot)
+    }
+
+    if (!baseName) {
+      baseName = 'data'
+    }
+
+    const name = `${baseName}.csv`
+    const blob = new Blob(['\uFEFF' + csvFormat(data)], { type: 'text/csv;charset=utf-8;' })
+    // @ts-ignore
+    if (typeof window.navigator.msSaveBlob === 'function') {
+      // @ts-ignore
+      navigator.msSaveBlob(blob, name)
+    } else {
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = name
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    }
   }
 
   const updateDataFromVegaConfig = pastedConfig => {
@@ -609,7 +654,7 @@ const DataImport = () => {
             </fieldset>
           )
         )}
-      <button
+      <Button
         className='btn full-width btn-primary'
         onClick={() => {
           setConfig({
@@ -621,7 +666,7 @@ const DataImport = () => {
         }}
       >
         Add New URL Filter
-      </button>
+      </Button>
     </>
   )
 
@@ -639,7 +684,7 @@ const DataImport = () => {
                   <th>Name</th>
                   <th>Size</th>
                   <th>Type</th>
-                  <th colSpan={3}>Actions</th>
+                  <th colSpan={4}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -651,17 +696,33 @@ const DataImport = () => {
                         <td className='p-1'>{displaySize(config.datasets[datasetKey].dataFileSize)}</td>
                         <td className='p-1'>{config.datasets[datasetKey].dataFileFormat}</td>
                         <td>
-                          <button
-                            className='btn btn-link p-1'
+                          <Button
+                            variant='link'
+                            className='p-1'
                             onClick={() => setGlobalDatasetProp(datasetKey, 'preview', true)}
                           >
                             Preview
+                          </Button>
+                        </td>
+                        <td>
+                          <button
+                            className='btn btn-link p-1'
+                            disabled={!config.datasets[datasetKey].data?.length}
+                            onClick={() =>
+                              downloadCSV(
+                                config.datasets[datasetKey].data,
+                                config.datasets[datasetKey].dataFileName || datasetKey
+                              )
+                            }
+                          >
+                            Download
                           </button>
                         </td>
                         <td>
                           {config.datasets[datasetKey].dataFileSourceType === 'url' && (
-                            <button
-                              className='btn btn-link p-1'
+                            <Button
+                              variant='link'
+                              className='p-1'
                               onClick={() => {
                                 if (editingDataset === datasetKey) {
                                   setEditingDataset(undefined)
@@ -677,13 +738,13 @@ const DataImport = () => {
                               }}
                             >
                               Edit
-                            </button>
+                            </Button>
                           )}
                         </td>
                         <td>
-                          <button className='btn btn-danger' onClick={() => removeDataset(datasetKey)}>
+                          <Button variant='danger' onClick={() => removeDataset(datasetKey)}>
                             X
-                          </button>
+                          </Button>
                         </td>
                       </tr>
                     )
@@ -719,6 +780,14 @@ const DataImport = () => {
                         )}
                       </div>
                       <div>{resetButton()}</div>
+                      {config.data?.length > 0 && (
+                        <button
+                          className='btn btn-link p-1'
+                          onClick={() => downloadCSV(config.data, config.dataFileName || 'data')}
+                        >
+                          Download CSV
+                        </button>
+                      )}
                     </div>
                   )}
 
@@ -727,6 +796,14 @@ const DataImport = () => {
                       <div className='url-source-options'>
                         <div>{loadDataFromUrl()}</div>
                         <div>{resetButton()}</div>
+                        {config.data?.length > 0 && (
+                          <button
+                            className='btn btn-link p-1'
+                            onClick={() => downloadCSV(config.data, config.dataFileName || 'data')}
+                          >
+                            Download CSV
+                          </button>
+                        )}
                       </div>
                       {config.dataUrl && (config.type === 'chart' || config.type === 'map') && urlFilters}
                     </>
@@ -750,15 +827,16 @@ const DataImport = () => {
                         placeholder='{ }'
                       />
                       <div className='mb-3 d-flex justify-content-end'>
-                        <button
-                          className='btn btn-primary px-4'
+                        <Button
+                          variant='primary'
+                          className='px-4'
                           type='submit'
                           id='load-data'
                           disabled={!pastedConfig}
                           onClick={() => updateDataFromVegaConfig(pastedConfig)}
                         >
                           Save & Load
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   </TabPane>
@@ -812,15 +890,16 @@ const DataImport = () => {
                       />
                     </label>
                     <div className='d-flex justify-content-end mt-2 mb-3'>
-                      <button
-                        className='btn btn-primary px-4'
+                      <Button
+                        variant='primary'
+                        className='px-4'
                         type='submit'
                         id='load-data'
                         disabled={!newDatasetName || !externalURL}
                         onClick={() => loadData(null, externalURL, editingDataset)}
                       >
                         Save & Load
-                      </button>
+                      </Button>
                     </div>
                   </TabPane>
                 </Tabs>
@@ -895,20 +974,17 @@ const DataImport = () => {
 
         {config.type === 'dashboard' && !addingDataset && (
           <div className='mt-2'>
-            <button className='btn btn-primary' onClick={() => setAddingDataset(true)}>
+            <Button variant='primary' onClick={() => setAddingDataset(true)}>
               + Add More Files
-            </button>
+            </Button>
           </div>
         )}
 
         {readyToConfigure && (
           <div className='mt-2'>
-            <button
-              className='btn btn-primary'
-              onClick={() => dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 2 })}
-            >
+            <Button variant='primary' onClick={() => dispatch({ type: 'EDITOR_SET_GLOBALACTIVE', payload: 2 })}>
               Configure your visualization
-            </button>
+            </Button>
           </div>
         )}
 

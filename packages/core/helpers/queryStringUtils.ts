@@ -1,3 +1,5 @@
+import * as events from './events'
+
 export function getQueryStringFilterValue(filter) {
   const urlParams = new URLSearchParams(window.location.search)
   if (filter.setByQueryParameter) {
@@ -64,6 +66,7 @@ export function updateQueryString(queryParams) {
     .map(queryParam => `${queryParam}=${encodeURIComponent(queryParams[queryParam])}`)
     .join('&')}`
   window.history.pushState({ path: updateUrl }, '', updateUrl)
+  events.publish(events.QUERY_CHANGE_EVENT)
 }
 
 export function updateQueryParam(key: string, value: number | string) {
