@@ -23,10 +23,12 @@ export type HeatMapColumn = {
   bins: HeatMapCell[]
 }
 
+type HeatMapSeries = { dataKey: string; name?: string }
+
 type BuildHeatMapDataOptions = {
   data: HeatMapSourceRow[]
   xDataKey: string
-  series?: { dataKey: string; name?: string }[]
+  series?: HeatMapSeries[]
   seriesLabels?: Record<string, string>
   xAxisType?: string
   parseDate?: (value: string, showError?: boolean) => Date
@@ -49,12 +51,39 @@ const toDisplayLabel = (value: any): string => {
   return String(value)
 }
 
+const isDateAxisType = (xAxisType?: string) => ['date', 'date-time'].includes(xAxisType || '')
+
+const getSeriesLabel = (seriesEntry: HeatMapSeries, seriesLabels?: Record<string, string>) =>
+  seriesEntry.name || seriesLabels?.[seriesEntry.dataKey] || seriesEntry.dataKey
+
+const createEmptyCell = (xValue: any, rowKey: string, rowLabel: string): HeatMapCell => ({
+  rowKey,
+  rowLabel,
+  xValue,
+  xLabel: toDisplayLabel(xValue),
+  value: null,
+  sourceRows: []
+})
+
+const getCellKey = (xValue: any, rowKey: string) => `${String(xValue)}__${String(rowKey)}`
+
+const getHeatMapValueDomain = (aggregated: Map<string, HeatMapCell>) => {
+  const values = Array.from(aggregated.values())
+    .map(cell => cell.value)
+    .filter((value): value is number => typeof value === 'number' && !Number.isNaN(value))
+
+  return {
+    minValue: values.length ? Math.min(...values) : 0,
+    maxValue: values.length ? Math.max(...values) : 0
+  }
+}
+
 const sortXValues = (
   values: any[],
   xAxisType: string | undefined,
   parseDate?: (value: string, showError?: boolean) => Date
 ) => {
-  if (!['date', 'date-time'].includes(xAxisType || '')) {
+  if (!isDateAxisType(xAxisType)) {
     return values
   }
 
@@ -92,7 +121,7 @@ export const buildHeatMapData = ({
       const numericValue = Number(row[seriesEntry.dataKey])
       if (Number.isNaN(numericValue)) return
 
-      const aggregateKey = `${String(xValue)}__${String(seriesEntry.dataKey)}`
+      const aggregateKey = getCellKey(xValue, seriesEntry.dataKey)
       const existing = aggregated.get(aggregateKey)
 
       if (existing) {
@@ -103,7 +132,7 @@ export const buildHeatMapData = ({
 
       aggregated.set(aggregateKey, {
         rowKey: seriesEntry.dataKey,
-        rowLabel: seriesEntry.name || seriesLabels?.[seriesEntry.dataKey] || seriesEntry.dataKey,
+        rowLabel: getSeriesLabel(seriesEntry, seriesLabels),
         xValue,
         xLabel: toDisplayLabel(xValue),
         value: numericValue,
@@ -114,22 +143,13 @@ export const buildHeatMapData = ({
 
   const orderedSeries = series.map(seriesEntry => ({
     rowKey: seriesEntry.dataKey,
-    rowLabel: seriesEntry.name || seriesLabels?.[seriesEntry.dataKey] || seriesEntry.dataKey
+    rowLabel: getSeriesLabel(seriesEntry, seriesLabels)
   }))
 
   const columns = orderedXValues.map(xValue => {
     const bins = orderedSeries.map(({ rowKey, rowLabel }) => {
-      const aggregateKey = `${String(xValue)}__${String(rowKey)}`
-      return (
-        aggregated.get(aggregateKey) || {
-          rowKey,
-          rowLabel,
-          xValue,
-          xLabel: toDisplayLabel(xValue),
-          value: null,
-          sourceRows: []
-        }
-      )
+      const aggregateKey = getCellKey(xValue, rowKey)
+      return aggregated.get(aggregateKey) || createEmptyCell(xValue, rowKey, rowLabel)
     })
 
     return {
@@ -140,12 +160,7 @@ export const buildHeatMapData = ({
     }
   })
 
-  const values = Array.from(aggregated.values())
-    .map(cell => cell.value)
-    .filter((value): value is number => typeof value === 'number' && !Number.isNaN(value))
-
-  const minValue = values.length ? Math.min(...values) : 0
-  const maxValue = values.length ? Math.max(...values) : 0
+  const { minValue, maxValue } = getHeatMapValueDomain(aggregated)
 
   return {
     columns,
