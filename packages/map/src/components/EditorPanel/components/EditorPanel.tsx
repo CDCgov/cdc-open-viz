@@ -3199,14 +3199,29 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         />
                       )}
                       {isLoadedFromUrl && (
-                        <CheckBox
-                          value={config.table.showDownloadUrl}
-                          section='table'
-                          subsection={null}
-                          fieldName='showDownloadUrl'
-                          label='Show URL to Automatically Updated Data'
-                          updateField={updateField}
-                        />
+                        <>
+                          <CheckBox
+                            value={config.table.showDownloadUrl}
+                            section='table'
+                            subsection={null}
+                            fieldName='showDownloadUrl'
+                            label='Show URL to Automatically Updated Data'
+                            updateField={updateField}
+                          />
+                          {config.table.showDownloadUrl && (
+                            <div className='ms-4 mt-2' style={{ maxWidth: 'calc(100% - 1.5rem)' }}>
+                              <TextField
+                                value={config.table.downloadUrlLabel}
+                                section='table'
+                                subsection={null}
+                                fieldName='downloadUrlLabel'
+                                label='Dataset Link Text'
+                                placeholder='Link to Dataset'
+                                updateField={updateField}
+                              />
+                            </div>
+                          )}
+                        </>
                       )}
                       <CheckBox
                         value={config.table.showFullGeoNameInCSV}

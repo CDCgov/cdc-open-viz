@@ -24,6 +24,7 @@ const createBlankDashboard: () => BlankMultiConfig = () => ({
     label: 'Data Table',
     show: false,
     showDownloadUrl: false,
+    downloadUrlLabel: '',
     showVertical: true
   }
 })

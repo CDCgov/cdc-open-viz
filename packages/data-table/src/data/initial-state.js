@@ -7,6 +7,7 @@ export default {
     height: '',
     caption: '',
     showDownloadUrl: false,
+    downloadUrlLabel: '',
     showDataTableLink: true,
     showDownloadLinkBelow: true,
     indexLabel: '',

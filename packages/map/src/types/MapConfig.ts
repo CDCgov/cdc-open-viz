@@ -217,6 +217,7 @@ export type MapConfig = Visualization & {
     download: boolean
     downloadDataLabel?: string
     downloadImageLabel?: string
+    downloadUrlLabel?: string
     showDownloadUrl: boolean
     showFullGeoNameInCSV: boolean
     forceDisplay: boolean

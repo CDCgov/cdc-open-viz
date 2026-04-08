@@ -19,7 +19,10 @@ interface DataTableProps {
 const PLACEHOLDER = '-Select-'
 
 const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDashboard, columns: dataColumns }) => {
-  const isLoadedFromUrl = config.dataKey?.includes('http://') || config?.dataKey?.includes('https://')
+  const hasUrlBackedDataSource =
+    config.type === 'table'
+      ? Boolean(config.runtimeDataUrl || config.dataUrl)
+      : config.dataFileSourceType === 'url' && Boolean(config.runtimeDataUrl || config.dataUrl || config.dataFileName)
   const excludedColumns = useMemo(() => {
     return Object.keys(config.columns)
       .map<[string, boolean]>(key => [config.columns[key].name, config.columns[key].dataTable])
@@ -374,14 +377,28 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           updateField={updateField}
         />
       )}
-      {isLoadedFromUrl && (
-        <CheckBox
-          value={config.table.showDownloadUrl}
-          fieldName='showDownloadUrl'
-          label='Show URL to Automatically Updated Data'
-          section='table'
-          updateField={updateField}
-        />
+      {hasUrlBackedDataSource && (
+        <>
+          <CheckBox
+            value={config.table.showDownloadUrl}
+            fieldName='showDownloadUrl'
+            label='Show URL to Automatically Updated Data'
+            section='table'
+            updateField={updateField}
+          />
+          {config.table.showDownloadUrl && (
+            <div className='ms-4 mt-2' style={{ maxWidth: 'calc(100% - 1.5rem)' }}>
+              <TextField
+                value={config.table.downloadUrlLabel}
+                section='table'
+                fieldName='downloadUrlLabel'
+                label='Dataset Link Text'
+                placeholder='Link to Dataset'
+                updateField={updateField}
+              />
+            </div>
+          )}
+        </>
       )}
       {config.type !== 'table' && (
         <CheckBox
