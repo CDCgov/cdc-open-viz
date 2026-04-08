@@ -12,7 +12,7 @@
 - Version: 20260408.133726
 
 ## Other Project Organization Information
-- Point of Contact: [imtech@cdc.gov](mailto:imtech@cdc.gov)(mailto:imtech@cdc.gov)
+- Point of Contact: [imtech@cdc.gov](mailto:imtech@cdc.gov)
 - Related Project(s): TODO: confirm related downstream wrapper or publishing repositories not documented in this repo
 - Program Official: [imtech@cdc.gov](mailto:imtech@cdc.gov)
 
