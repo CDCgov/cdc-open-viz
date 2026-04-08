@@ -733,7 +733,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
             )}
 
             {config.biteStyle === 'tp5' && (
-              <Accordion.Section title='Data Driven Colors'>
+              <Accordion.Section title='Data-Driven Colors'>
                 <Select
                   value={config.dataColors?.column || ''}
                   section='dataColors'
@@ -742,6 +742,19 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                   updateField={updateField}
                   initial='Select'
                   options={columns}
+                  tooltip={
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                      </Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>
+                          Choose a column whose values determine the background color of this visualization. Map each
+                          value to a color below. Text color adjusts automatically for contrast.
+                        </p>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  }
                 />
                 {config.dataColors?.column && dataColorDisplayList.length > 0 && (
                   <div className='mt-2'>

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { DATA_COLOR_PRESETS } from '../../helpers/dataColors'
-import './DataColorSelector.scss'
+import './DataColorSelector.css'
 
 interface DataColorSelectorProps {
   value: string

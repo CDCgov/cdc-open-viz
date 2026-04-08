@@ -54,6 +54,10 @@
         background: transparent;
         box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
       }
+
+      .cdc-callout--data-color {
+        border: none !important;
+      }
     }
 
     &.white-background-style.display-border {
