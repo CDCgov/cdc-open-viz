@@ -385,20 +385,18 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       Number.isFinite(parsedDenominator) &&
       parsedDenominator > 0 &&
       Number.isFinite(parsedNumerator) &&
-      parsedNumerator >= 0
+      parsedNumerator >= 0 &&
+      parsedNumerator <= parsedDenominator
     ) {
       const roundedDenominator = Math.round(parsedDenominator)
-      const roundedNumerator = Math.round(parsedNumerator)
 
-      if (
-        roundedDenominator >= 1 &&
-        roundedDenominator <= 99 &&
-        roundedNumerator >= 0 &&
-        roundedNumerator <= roundedDenominator
-      ) {
+      if (roundedDenominator >= 1 && roundedDenominator <= 99) {
         renderMode = 'dynamic-denominator'
         unitCount = roundedDenominator
-        filledCount = roundedNumerator
+        filledCount = Math.max(
+          0,
+          Math.min(roundedDenominator, Math.round((parsedNumerator / parsedDenominator) * roundedDenominator))
+        )
       }
     }
 
