@@ -555,7 +555,7 @@ export const DataSectionTests: Story = {
 
     // ============================================================================
     // TEST 23: Non-Integer Numerator/Denominator Rounding
-    // Expectation: Mean 17.5 and denominator 20.2 round to 18 out of 20.
+    // Expectation: Mean 17.5 and denominator 20.2 render 17 filled nodes out of 20.
     // ============================================================================
     await performAndAssert(
       'Dynamic Rounding Non-Integer Values',
@@ -572,7 +572,7 @@ export const DataSectionTests: Story = {
         await setCheckboxState(showPercentCheckbox, false)
         await setCheckboxState(showDenominatorCheckbox, true)
       },
-      (_before, after) => after.total === 20 && after.filled === 18
+      (_before, after) => after.total === 20 && after.filled === 17
     )
 
     // ============================================================================

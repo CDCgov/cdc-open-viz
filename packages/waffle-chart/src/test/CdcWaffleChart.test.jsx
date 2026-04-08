@@ -64,6 +64,32 @@ describe('Waffle Chart', () => {
     ...overrides
   })
 
+  const getRenderedNodeCounts = container => {
+    const nodes = Array.from(container.querySelectorAll('.cove-waffle-chart svg .cdc-waffle-chart__node'))
+    const filled = nodes.filter(node => Number(node.getAttribute('fill-opacity') ?? 1) >= 1).length
+
+    return {
+      total: nodes.length,
+      filled
+    }
+  }
+
+  const renderDynamicDenominatorChart = ({ numerator, denominator }) =>
+    render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          data: [{ value: numerator }],
+          dataFunction: 'Sum',
+          dataDenom: String(denominator),
+          showPercent: false,
+          showDenominator: true,
+          suffix: '',
+          roundToPlace: '',
+          valueDescription: 'out of'
+        })}
+      />
+    )
+
   it('Can be built in isolation', async () => {
     const pkgDir = path.join(__dirname, '..')
     const result = await testStandaloneBuild(pkgDir)
@@ -360,5 +386,46 @@ describe('Waffle Chart', () => {
     expect(svgHeight).toBeLessThan(svgWidth)
     expect(scaledGroup?.getAttribute('transform')).toContain('scale(')
     expect(scaledGroup?.getAttribute('transform')).not.toContain('scale(1)')
+  })
+
+  it.each([
+    ['1.2 out of 7 as 1 filled node', 1.2, 7, 7, 1],
+    ['1.6 out of 7 as 2 filled nodes', 1.6, 7, 7, 2],
+    ['2.6 out of 3.4 as 2 filled nodes', 2.6, 3.4, 3, 2],
+    ['1.49 out of 1.51 as 2 filled nodes', 1.49, 1.51, 2, 2]
+  ])(
+    'rounds dynamic denominator fills by raw ratio for %s',
+    async (_label, numerator, denominator, expectedTotal, expectedFilled) => {
+      const { container } = renderDynamicDenominatorChart({ numerator, denominator })
+
+      await waitFor(() => {
+        expect(getRenderedNodeCounts(container)).toEqual({
+          total: expectedTotal,
+          filled: expectedFilled
+        })
+      })
+    }
+  )
+
+  it('preserves exact numerator and denominator text while discretizing dynamic denominator dots', async () => {
+    const { container } = renderDynamicDenominatorChart({ numerator: 17.5, denominator: 20.2 })
+
+    await waitFor(() => {
+      expect(getRenderedNodeCounts(container)).toEqual({
+        total: 20,
+        filled: 17
+      })
+    })
+
+    expect(container.querySelector('.cove-waffle-chart__data--primary')).toHaveTextContent('17.5')
+    expect(container.querySelector('.cove-waffle-chart__data--primary')).toHaveTextContent('20.2')
+  })
+
+  it('falls back to fixed 100-node mode when numerator exceeds denominator', async () => {
+    const { container } = renderDynamicDenominatorChart({ numerator: 21, denominator: 20 })
+
+    await waitFor(() => {
+      expect(getRenderedNodeCounts(container).total).toBe(100)
+    })
   })
 })
