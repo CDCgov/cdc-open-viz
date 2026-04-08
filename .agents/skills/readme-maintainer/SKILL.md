@@ -4,7 +4,7 @@ name: "README Maintainer"
 argument-hint: "Optional focus, for example: refresh usage, prerequisites, or do a full accuracy pass"
 agent: "agent"
 ---
-Maintain [README.md](../../README.md) with an accuracy-first pass.
+Maintain [README.md](../../../README.md) with an accuracy-first pass.
 
 Requirements:
 - Inspect the current workspace before editing.
