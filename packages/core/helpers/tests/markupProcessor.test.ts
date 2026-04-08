@@ -571,7 +571,7 @@ describe('processMarkupVariables', () => {
       const variables: MarkupVariable[] = [
         {
           sourceType: 'icon',
-          name: 'Trend No Change',
+          name: 'Trend flat',
           tag: '{{trend-arrow-no-change}}',
           iconId: 'trend-arrow-no-change',
           conditions: []

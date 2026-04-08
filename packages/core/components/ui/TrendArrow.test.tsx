@@ -39,7 +39,7 @@ describe('TrendArrow', () => {
     expect(wrapper).toBeInTheDocument()
 
     const icon = container.querySelector('svg')
-    expect(screen.queryByRole('img', { name: 'Trend no change' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: 'Trend flat' })).not.toBeInTheDocument()
     expect(icon).toHaveAttribute('aria-hidden', 'true')
     expect(icon).toHaveAttribute('focusable', 'false')
     expect(icon).toHaveClass('cove-trend-arrow')
