@@ -513,11 +513,11 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     if (config.general.showStateDropdown && config.general.geoType === 'us-county') {
       const stateFilter: VizFilter = {
         columnName: 'state',
-        label: 'Select State',
+        label: 'Select Location',
         filterStyle: 'dropdown',
         labels: supportedStatesFipsCodes,
         values: Object.keys(supportedStatesFipsCodes),
-        resetLabel: 'All States',
+        resetLabel: 'United States',
         staticFilter: true,
         active: filteredStateCode
       }
