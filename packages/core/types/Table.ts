@@ -18,6 +18,7 @@ export type Table = {
   download?: boolean
   downloadDataLabel?: string
   downloadImageLabel?: string
+  downloadUrlLabel?: string
   downloadVisibleDataOnly?: boolean
   downloadImageButton?: boolean
   downloadPdfButton?: boolean
