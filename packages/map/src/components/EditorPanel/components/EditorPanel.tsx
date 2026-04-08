@@ -1857,6 +1857,16 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         />
                       </label>
                     </fieldset>
+                    {config.general.geoType === 'us-county' && config.general.showHSABoundaries && (
+                      <Select
+                        label='HSA Description Column'
+                        value={config.columns.hsa?.name}
+                        options={columnsOptions.map(c => c.key)}
+                        onChange={e => {
+                          editColumn('hsa', 'name', e.target.value)
+                        }}
+                      />
+                    )}
                     {'navigation' !== config.general.type && (
                       <fieldset className='primary-fieldset edit-block'>
                         <Select

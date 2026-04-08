@@ -7,6 +7,7 @@ import { MutableRefObject } from 'react'
 
 export type MapContext = {
   currentViewport: ViewPort
+  customNavigationHandler?: Function
   vizViewport?: ViewPort
   content: { geoName: string; keyedData: Record<string, any> }
   dimensions: DimensionsType

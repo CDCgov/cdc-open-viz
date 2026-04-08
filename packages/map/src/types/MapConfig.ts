@@ -66,6 +66,7 @@ type SimpleColumnProperties = Pick<EditorColumnProperties, 'name'>
 
 // Specific column types for better semantics
 type GeoColumnProperties = BaseColumnProperties & { displayColumn?: string }
+type HSAColumnProperties = SimpleColumnProperties
 type LatitudeColumnProperties = SimpleColumnProperties
 type LongitudeColumnProperties = SimpleColumnProperties
 type NavigateColumnProperties = SimpleColumnProperties
@@ -114,6 +115,7 @@ export type MapConfig = Visualization & {
   color: string
   columns: {
     geo: GeoColumnProperties
+    hsa: HSAColumnProperties
     primary: PrimaryColumnProperties
     navigate: NavigateColumnProperties
     latitude: LatitudeColumnProperties
