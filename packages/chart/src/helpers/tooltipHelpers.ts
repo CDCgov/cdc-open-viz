@@ -33,9 +33,6 @@ export type TooltipMarker = {
 
 const TOOLTIP_MARKER_SUPPORTED_TYPES = new Set(['Line', 'Area Chart', 'Combo', 'Bar', 'Scatter Plot'])
 
-export const hasTooltipLegendPatterns = (config: ChartConfig): boolean =>
-  !!config.legend?.patterns && Object.keys(config.legend.patterns).length > 0
-
 export const getTooltipMarkerShape = (config: ChartConfig): 'circle' | 'square' =>
   config.legend?.style === 'boxes' ? 'square' : 'circle'
 
@@ -129,7 +126,7 @@ export const buildTooltipBodyRowHtml = ({
     ? `<span class="tooltip-marker-swatch tooltip-marker-swatch--${markerShape}" style="background-color: ${markerColor};" aria-hidden="true"></span>`
     : ''
 
-  return `<li class="tooltip-body tooltip-body--marker-layout"><span class="tooltip-marker-slot">${marker}</span><span class="tooltip-body-content">${text}</span></li>`
+  return `<li class="tooltip-body tooltip-body--marker-layout"><span class="tooltip-marker-slot" aria-hidden="true">${marker}</span><span class="tooltip-body-content">${text}</span></li>`
 }
 
 export const buildTooltipListHtml = ({

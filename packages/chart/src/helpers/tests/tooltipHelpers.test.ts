@@ -140,6 +140,7 @@ describe('tooltipHelpers', () => {
 
     expect(withMarker).toContain('tooltip-body--marker-layout')
     expect(withMarker).toContain('tooltip-marker-slot')
+    expect(withMarker).toContain('tooltip-marker-slot" aria-hidden="true"')
     expect(withMarker).toContain('tooltip-marker-swatch')
     expect(withMarker).toContain('tooltip-marker-swatch--square')
     expect(withoutMarker).not.toContain('tooltip-body--marker-layout')
