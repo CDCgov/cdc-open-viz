@@ -22,7 +22,9 @@ export const applyAutoDetectedDateParseFormat = (
   }
   const xAxisKey = config.xAxis.dataKey
 
-  const hasXAxisKeyInImportedData = importedData.some(row => row && xAxisKey in row)
+  const hasXAxisKeyInImportedData = importedData.some(
+    row => row && Object.prototype.hasOwnProperty.call(row, xAxisKey)
+  )
 
   if (!hasXAxisKeyInImportedData) {
     return config
