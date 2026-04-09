@@ -13,7 +13,9 @@ export const applyAutoDetectedDateParseFormat = (
 
   const xAxisKey = config.xAxis.dataKey
 
-  if (!(xAxisKey in importedData[0])) {
+  const hasXAxisKeyInImportedData = importedData.some(row => row && xAxisKey in row)
+
+  if (!hasXAxisKeyInImportedData) {
     return config
   }
 

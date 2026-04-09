@@ -28,6 +28,11 @@ describe('applyAutoDetectedDateParseFormat', () => {
   ]
 
   const missingXAxisDateRows = [{ otherDate: '2024/03/15', value: 10 }]
+  const sparseFirstRowReliableDateRows = [
+    { otherDate: 'ignore-me', value: 8 },
+    { date: '2024/03/15', value: 10 },
+    { date: '2025/11/09', value: 12 }
+  ]
 
   it('auto-fills the chart xAxis date parse format when detection is reliable', () => {
     const result: any = applyAutoDetectedDateParseFormat(baseChartConfig, reliableSlashDateRows)
@@ -83,5 +88,11 @@ describe('applyAutoDetectedDateParseFormat', () => {
     const result: any = applyAutoDetectedDateParseFormat(baseChartConfig, missingXAxisDateRows)
 
     expect(result).toEqual(baseChartConfig)
+  })
+
+  it('still detects the date parse format when the first row is missing the x-axis key', () => {
+    const result: any = applyAutoDetectedDateParseFormat(baseChartConfig, sparseFirstRowReliableDateRows)
+
+    expect(result.xAxis.dateParseFormat).toBe('%Y/%m/%d')
   })
 })
