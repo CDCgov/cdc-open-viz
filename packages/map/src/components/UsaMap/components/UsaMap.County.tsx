@@ -8,6 +8,7 @@ import { geoAlbersUsaTerritories } from 'd3-composite-projections'
 import debounce from 'lodash.debounce'
 import Loading from '@cdc/core/components/Loading'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
+import usExtendedGeography from '../data/us-extended-geography.json'
 import useMapLayers from '../../../hooks/useMapLayers'
 import ConfigContext from '../../../context'
 import { useLegendMemoContext } from '../../../context/LegendMemoContext'
@@ -41,6 +42,17 @@ type TopoData = {
   projection: any
 }
 
+const dedupeFeaturesById = <T extends { id?: string }>(features: T[]): T[] => {
+  const seenIds = new Set<string>()
+
+  return features.filter(feature => {
+    if (!feature.id) return true
+    if (seenIds.has(feature.id)) return false
+    seenIds.add(feature.id)
+    return true
+  })
+}
+
 const getCountyTopoURL = year => {
   return `https://www.cdc.gov/TemplatePackage/contrib/data/county-topography/cb_${year}_us_county_20m.json`
 }
@@ -71,8 +83,12 @@ const getTopoData = (year, showHSABoundaries) => {
       }
 
       topoData.year = year || 'default'
-      topoData.counties = feature(response, response.objects.counties).features
-      topoData.states = feature(response, response.objects.states).features
+      topoData.counties = dedupeFeaturesById(
+        [response, usExtendedGeography].flatMap(topo => feature(topo, topo.objects.counties).features)
+      )
+      topoData.states = dedupeFeaturesById(
+        [response, usExtendedGeography].flatMap(topo => feature(topo, topo.objects.states).features)
+      )
       if (showHSABoundaries) {
         const mappingResponse = await import(
           /* webpackChunkName: "hsa_fips_mapping" */ './../data/hsa_fips_mapping.json'
