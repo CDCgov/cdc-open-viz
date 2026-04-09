@@ -28,8 +28,21 @@ export const applyAutoDetectedDateParseFormat = (
     return config
   }
 
-  const detection = detectDateParseFormat(importedData.map(row => row?.[xAxisKey]))
+  const dateDetectionSamples: unknown[] = []
 
+  for (const row of importedData) {
+    const value = row?.[xAxisKey]
+
+    if (value !== null && value !== undefined && value !== '') {
+      dateDetectionSamples.push(value)
+    }
+
+    if (dateDetectionSamples.length >= 50) {
+      break
+    }
+  }
+
+  const detection = detectDateParseFormat(dateDetectionSamples)
   if (!detection.isReliable || !detection.detectedFormat) {
     return config
   }
