@@ -552,7 +552,6 @@ describe('processMarkupVariables', () => {
           name: 'Trend Up',
           tag: '{{trend-arrow-up}}',
           iconId: 'trend-arrow-up',
-          svgScale: 1.2,
           conditions: []
         }
       ]
@@ -560,14 +559,19 @@ describe('processMarkupVariables', () => {
       const result = processMarkupVariables('Static: {{trend-arrow-up}}', trendData, variables)
 
       expect(result.processedContent).toContain('<svg')
-      expect(result.processedContent).toContain('transform: scale(1.2)')
+      expect(result.processedContent).toContain('class="cove-inline-svg__icon"')
+      expect(result.processedContent).toContain('aria-hidden="true"')
+      expect(result.processedContent).not.toContain('role="img"')
+      expect(result.processedContent).not.toContain('aria-label=')
+      expect(result.processedContent).toContain('fill: currentColor')
+      expect(result.processedContent).toContain('transform: scale(0.8)')
     })
 
     it('should render inline SVG for the no-change icon variable', () => {
       const variables: MarkupVariable[] = [
         {
           sourceType: 'icon',
-          name: 'Trend No Change',
+          name: 'Trend flat',
           tag: '{{trend-arrow-no-change}}',
           iconId: 'trend-arrow-no-change',
           conditions: []
@@ -577,7 +581,28 @@ describe('processMarkupVariables', () => {
       const result = processMarkupVariables('Static: {{trend-arrow-no-change}}', trendData, variables)
 
       expect(result.processedContent).toContain('<svg')
-      expect(result.processedContent).toContain('rotate(90deg)')
+      expect(result.processedContent).toContain('viewBox="0 0 512 384"')
+      expect(result.processedContent).toContain('M470.6 214.6')
+      expect(result.processedContent).not.toContain('rotate(')
+    })
+
+    it('should render inline SVG for the down icon variable without directional transforms', () => {
+      const variables: MarkupVariable[] = [
+        {
+          sourceType: 'icon',
+          name: 'Trend Down',
+          tag: '{{trend-arrow-down}}',
+          iconId: 'trend-arrow-down',
+          conditions: []
+        }
+      ]
+
+      const result = processMarkupVariables('Static: {{trend-arrow-down}}', trendData, variables)
+
+      expect(result.processedContent).toContain('<svg')
+      expect(result.processedContent).toContain('aria-hidden="true"')
+      expect(result.processedContent).not.toContain('rotate(')
+      expect(result.processedContent).not.toContain('scale(-1, 1)')
     })
 
     it('should return empty output for an icon variable without an icon id', () => {
@@ -611,26 +636,25 @@ describe('processMarkupVariables', () => {
       const result = processMarkupVariables(content, trendData, variables)
 
       expect(result.processedContent).toContain('<svg')
-      expect(result.processedContent).toContain('cove-trend-arrow')
+      expect(result.processedContent).toContain('aria-hidden="true"')
+      expect(result.processedContent).toContain('fill: currentColor')
     })
 
-    it('should apply svgScale to the inline SVG style', () => {
-      const variables: MarkupVariable[] = [
-        {
-          name: 'Trend',
-          tag: '{{trend}}',
-          outputType: 'svg',
-          columnName: 'trend',
-          svgMappings: [{ sourceValue: 'Up', svgId: 'trend-arrow-up' }],
-          svgScale: 1.5,
-          conditions: []
-        }
-      ]
+    it('should ignore legacy svgScale values and use the shared default scale', () => {
+      const legacyVariable = {
+        name: 'Trend',
+        tag: '{{trend}}',
+        outputType: 'svg',
+        columnName: 'trend',
+        svgMappings: [{ sourceValue: 'Up', svgId: 'trend-arrow-up' }],
+        svgScale: 1.5,
+        conditions: []
+      } as unknown as MarkupVariable
 
-      const content = '{{trend}}'
-      const result = processMarkupVariables(content, trendData, variables)
+      const result = processMarkupVariables('{{trend}}', trendData, [legacyVariable])
 
-      expect(result.processedContent).toContain('transform: scale(1.5)')
+      expect(result.processedContent).toContain('transform: scale(0.8)')
+      expect(result.processedContent).not.toContain('transform: scale(1.5)')
     })
 
     it('should render multiple SVGs when multiple values are resolved', () => {
@@ -671,10 +695,11 @@ describe('processMarkupVariables', () => {
       const result = processMarkupVariables(content, trendData, variables)
 
       expect(result.processedContent).toContain('<svg')
-      expect(result.processedContent).toContain('rotate(90deg)')
+      expect(result.processedContent).toContain('viewBox="0 0 512 384"')
+      expect(result.processedContent).not.toContain('rotate(')
     })
 
-    it('should default icon scale to 0.8 when no svgScale is provided', () => {
+    it('should always use the shared default icon scale', () => {
       const variables: MarkupVariable[] = [
         {
           sourceType: 'icon',
@@ -688,6 +713,33 @@ describe('processMarkupVariables', () => {
       const result = processMarkupVariables('{{trend-arrow-up}}', trendData, variables)
 
       expect(result.processedContent).toContain('transform: scale(0.8)')
+      expect(result.processedContent).toContain('width: var(--cove-inline-svg-inner-width, 1em)')
+      expect(result.processedContent).toContain('height: var(--cove-inline-svg-inner-height, 1em)')
+      expect(result.processedContent).not.toContain('rotate(')
+      expect(result.processedContent).not.toContain('scale(-1, 1)')
+    })
+
+    it('should vertically align inline SVG icons with surrounding text', () => {
+      const variables: MarkupVariable[] = [
+        {
+          sourceType: 'icon',
+          name: 'Trend Up',
+          tag: '{{trend-arrow-up}}',
+          iconId: 'trend-arrow-up',
+          conditions: []
+        }
+      ]
+
+      const result = processMarkupVariables('Rate {{trend-arrow-up}} increased', trendData, variables)
+
+      expect(result.processedContent).toContain('class="cove-inline-svg"')
+      expect(result.processedContent).toContain('display: inline-flex')
+      expect(result.processedContent).toContain('align-items: center')
+      expect(result.processedContent).toContain('width: var(--cove-inline-svg-width, 1em)')
+      expect(result.processedContent).toContain('height: var(--cove-inline-svg-height-fallback, 1em)')
+      expect(result.processedContent).toContain('height: var(--cove-inline-svg-height, 1lh)')
+      expect(result.processedContent).toContain('vertical-align: bottom')
+      expect(result.processedContent).toContain('display: block')
     })
 
     it('should return empty string when the mapped value is missing', () => {
@@ -927,6 +979,20 @@ describe('validateMarkupVariables', () => {
 
     const errors = validateMarkupVariables(variables, [{ trend: 'Up' }])
     expect(errors).toContain('Variable 1: Icon mappings are required')
+  })
+
+  it('should ignore legacy svgScale values during validation', () => {
+    const legacyVariable = {
+      sourceType: 'icon',
+      name: 'Trend Up',
+      tag: '{{trend-up}}',
+      iconId: 'trend-arrow-up',
+      svgScale: -1,
+      conditions: []
+    } as unknown as MarkupVariable
+
+    const errors = validateMarkupVariables([legacyVariable], testData)
+    expect(errors).toHaveLength(0)
   })
 
   it('should validate icon source requirements', () => {

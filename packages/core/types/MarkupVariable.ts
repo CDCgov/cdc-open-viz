@@ -27,7 +27,6 @@ export type MarkupVariable = {
   iconId?: SvgRegistryId
   outputType?: MarkupVariableOutputType
   svgMappings?: MarkupVariableSvgMapping[]
-  svgScale?: number
 }
 
 export const getMarkupVariableSourceType = (

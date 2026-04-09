@@ -17,6 +17,7 @@ import { DATA_OPERATORS } from '@cdc/core/helpers/constants'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
+import Button from '@cdc/core/components/elements/Button'
 
 import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
@@ -49,6 +50,21 @@ import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 // TP5 Style Constants
 const TP5_NODE_WIDTH = 13
 const TP5_NODE_SPACER = 3
+const STANDARD_WAFFLE_GRID_SIZE = 10
+
+const getDynamicWaffleGrid = (unitCount: number) => {
+  // Ten reads better as two balanced rows than the default 4 x 3 layout.
+  if (unitCount === 10) {
+    return { columns: 5, rows: 2 }
+  }
+
+  const columns = Math.ceil(Math.sqrt(unitCount))
+
+  return {
+    columns,
+    rows: Math.ceil(unitCount / columns)
+  }
+}
 
 type CdcWaffleChartProps = {
   configUrl?: string
@@ -369,25 +385,37 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       Number.isFinite(parsedDenominator) &&
       parsedDenominator > 0 &&
       Number.isFinite(parsedNumerator) &&
-      parsedNumerator >= 0
+      parsedNumerator >= 0 &&
+      parsedNumerator <= parsedDenominator
     ) {
       const roundedDenominator = Math.round(parsedDenominator)
-      const roundedNumerator = Math.round(parsedNumerator)
 
-      if (
-        roundedDenominator >= 1 &&
-        roundedDenominator <= 99 &&
-        roundedNumerator >= 0 &&
-        roundedNumerator <= roundedDenominator
-      ) {
+      if (roundedDenominator >= 1 && roundedDenominator <= 99) {
         renderMode = 'dynamic-denominator'
         unitCount = roundedDenominator
-        filledCount = roundedNumerator
+        filledCount = Math.max(
+          0,
+          Math.min(roundedDenominator, Math.round((parsedNumerator / parsedDenominator) * roundedDenominator))
+        )
       }
     }
 
-    const columns = renderMode === 'dynamic-denominator' ? Math.ceil(Math.sqrt(unitCount)) : 10
-    const rows = renderMode === 'dynamic-denominator' ? Math.ceil(unitCount / columns) : 10
+    const dynamicGrid = renderMode === 'dynamic-denominator' ? getDynamicWaffleGrid(unitCount) : null
+    const columns = dynamicGrid?.columns ?? 10
+    const rows = dynamicGrid?.rows ?? 10
+    const renderedWidth = nodeWidthNum * columns + nodeSpacerNum * (columns - 1)
+    const renderedHeight = nodeWidthNum * rows + nodeSpacerNum * (rows - 1)
+    const standardChartWidth =
+      nodeWidthNum * STANDARD_WAFFLE_GRID_SIZE + nodeSpacerNum * (STANDARD_WAFFLE_GRID_SIZE - 1)
+    const standardChartHeight =
+      nodeWidthNum * STANDARD_WAFFLE_GRID_SIZE + nodeSpacerNum * (STANDARD_WAFFLE_GRID_SIZE - 1)
+    const scale = renderMode === 'dynamic-denominator' ? standardChartWidth / renderedWidth : 1
+    const scaledWidth = renderedWidth * scale
+    const scaledHeight = renderedHeight * scale
+    const chartWidth = standardChartWidth
+    const chartHeight = renderMode === 'dynamic-denominator' ? scaledHeight : standardChartHeight
+    const offsetX = (chartWidth - scaledWidth) / 2
+    const offsetY = 0
 
     return {
       isTP5,
@@ -396,6 +424,11 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       filledCount,
       columns,
       rows,
+      chartWidth,
+      chartHeight,
+      offsetX,
+      offsetY,
+      scale,
       nodeWidthNum,
       nodeSpacerNum
     }
@@ -426,7 +459,6 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     if (trendResolution?.state !== 'resolved' || !trendResolution?.arrowType) {
       return null
     }
-    const ariaLabel = `Trend ${trendResolution.arrowType}${resolvedTrendLabel ? `: ${resolvedTrendLabel}` : ''}`
     const resolvedWrapperClassName = [wrapperClassName, resolvedTrendLabel ? 'cove-trend-arrow__wrap--with-label' : '']
       .filter(Boolean)
       .join(' ')
@@ -435,7 +467,6 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       <TrendArrow
         arrowType={trendResolution.arrowType}
         label={resolvedTrendLabel}
-        ariaLabel={ariaLabel}
         wrapperClassName={resolvedWrapperClassName}
       />
     )
@@ -554,17 +585,11 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   }, [theme, shape, config.visualizationType, config.visual?.whiteBackground, waffleRenderConfig])
 
   const setRatio = useCallback(() => {
-    return (
-      waffleRenderConfig.nodeWidthNum * waffleRenderConfig.columns +
-      waffleRenderConfig.nodeSpacerNum * (waffleRenderConfig.columns - 1)
-    )
+    return waffleRenderConfig.chartWidth
   }, [waffleRenderConfig])
 
   const setHeightRatio = useCallback(() => {
-    return (
-      waffleRenderConfig.nodeWidthNum * waffleRenderConfig.rows +
-      waffleRenderConfig.nodeSpacerNum * (waffleRenderConfig.rows - 1)
-    )
+    return waffleRenderConfig.chartHeight
   }, [waffleRenderConfig])
 
   const setSvgWidth = useCallback(() => {
@@ -618,9 +643,9 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         <section className='waiting-container'>
           <h3>Finish Configuring</h3>
           <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-          <button className='btn btn-primary' style={{ margin: '1em auto' }} onClick={confirmDone}>
+          <Button variant='primary' style={{ margin: '1em auto' }} onClick={confirmDone}>
             I'm Done
-          </button>
+          </Button>
         </section>
       </section>
     )
@@ -733,9 +758,13 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         >
           <div className='cove-waffle-chart__chart' style={{ width: setRatio() }}>
             <svg width={setSvgWidth()} height={setSvgHeight()} style={{ display: 'block' }}>
-              <Group top={1} left={1}>
+              <g
+                transform={`translate(${1 + waffleRenderConfig.offsetX}, ${1 + waffleRenderConfig.offsetY}) scale(${
+                  waffleRenderConfig.scale
+                })`}
+              >
                 {buildWaffle()}
-              </Group>
+              </g>
             </svg>
           </div>
           {(hasPrimaryValue || processedContent) && (

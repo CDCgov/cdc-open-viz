@@ -10,6 +10,7 @@ export default {
     label: 'Data Table',
     show: true,
     showDownloadUrl: false,
+    downloadUrlLabel: '',
     showDownloadLinkBelow: true,
     showVertical: true
   }

@@ -9,6 +9,7 @@ import Context from './context'
 import EditorPanel from './components/EditorPanel'
 import Loading from '@cdc/core/components/Loading'
 import Title from '@cdc/core/components/ui/Title'
+import Button from '@cdc/core/components/elements/Button'
 import CircleCallout from './components/CircleCallout'
 import GradientBite from './components/GradientBite'
 import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
@@ -317,7 +318,6 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
     if (trendResolution.state !== 'resolved' || !trendResolution.arrowType) {
       return null
     }
-    const ariaLabel = `Trend ${trendResolution.arrowType}${resolvedTrendLabel ? `: ${resolvedTrendLabel}` : ''}`
     const resolvedWrapperClassName = [wrapperClassName, resolvedTrendLabel ? 'cove-trend-arrow__wrap--with-label' : '']
       .filter(Boolean)
       .join(' ')
@@ -326,7 +326,6 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       <TrendArrow
         arrowType={trendResolution.arrowType}
         label={resolvedTrendLabel}
-        ariaLabel={ariaLabel}
         wrapperClassName={resolvedWrapperClassName}
       />
     )
@@ -648,7 +647,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
           <section className='waiting-container'>
             <h3>Finish Configuring</h3>
             <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-            <button
+            <Button
               className='btn btn-primary'
               style={{ margin: '1em auto' }}
               disabled={missingRequiredSections()}
@@ -658,7 +657,7 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
               }}
             >
               I'm Done
-            </button>
+            </Button>
           </section>
         </section>
       )

@@ -135,12 +135,15 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     }
   }
 
-  .btn {
-    // Expand and Collapse Buttons for Multiviz Dashboard
-    &.expand-collapse-buttons {
-      background-color: var(--lightestGray);
-      border: 1px var(--lightGray) solid;
-      color: black;
+  .dashboard-filters__actions {
+    align-items: flex-end;
+    display: flex;
+    flex: 0 0 auto;
+    width: auto;
+
+    > .cove-button {
+      flex: 0 0 auto;
+      width: auto;
     }
   }
 
@@ -511,9 +514,9 @@ button.row-menu__btn[title*='Equal Height Rows'] {
         }
 
         .cove-visualization .cove-visualization__body.bite__style--tp5 .cdc-callout__body {
-          display: flex !important;
+          display: grid !important;
           flex: 1 1 auto !important;
-          align-items: stretch !important;
+          align-items: start !important;
           min-height: 0 !important;
         }
 

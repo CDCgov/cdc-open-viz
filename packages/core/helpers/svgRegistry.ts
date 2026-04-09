@@ -1,4 +1,6 @@
 import arrowUpSvg from '../assets/user-icons/arrow-up.svg?raw'
+import arrowDownSvg from '../assets/user-icons/arrow-down.svg?raw'
+import arrowRightSvg from '../assets/user-icons/arrow-right.svg?raw'
 import arrowUpRightFromSquareSvg from '../assets/user-icons/arrow-up-right-from-square.svg?raw'
 
 // Registry SVGs should come from static assets (not inline JSX).
@@ -8,14 +10,12 @@ export const SVG_REGISTRY = {
     ariaLabel: 'Trend up'
   },
   'trend-arrow-down': {
-    rawSvg: arrowUpSvg,
-    ariaLabel: 'Trend down',
-    isDown: true
+    rawSvg: arrowDownSvg,
+    ariaLabel: 'Trend down'
   },
   'trend-arrow-no-change': {
-    rawSvg: arrowUpSvg,
-    ariaLabel: 'Trend no change',
-    rotationDegrees: 90
+    rawSvg: arrowRightSvg,
+    ariaLabel: 'Trend flat'
   },
   'link-external': {
     rawSvg: arrowUpRightFromSquareSvg,
@@ -38,43 +38,63 @@ export const SVG_REGISTRY_OPTIONS = (Object.keys(SVG_REGISTRY) as SvgRegistryId[
 
 export const DEFAULT_SVG_SCALE = 0.8
 
-const normalizeSvgScale = (scale?: number): number => {
-  const parsed = Number(scale)
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    return DEFAULT_SVG_SCALE
-  }
-  return parsed
-}
+const INLINE_SVG_WRAPPER_CLASS = 'cove-inline-svg'
+const INLINE_SVG_ICON_CLASS = 'cove-inline-svg__icon'
 
-const buildSvgTransform = (scale: number, isDown?: boolean, rotationDegrees = 0): string => {
-  const baseTransform = `scale(${scale})`
-  const directionalTransform = isDown
-    ? 'scale(-1, 1) rotate(180deg)'
-    : rotationDegrees
-    ? `rotate(${rotationDegrees}deg)`
-    : ''
-
-  return [baseTransform, directionalTransform].filter(Boolean).join(' ')
-}
-
-export const buildInlineSvg = (
+const buildSvgMarkup = (
   svgId: SvgRegistryId,
   options: {
-    scale?: number
     className?: string
     ariaLabel?: string
+    decorative?: boolean
   } = {}
 ): string => {
   const entry = SVG_REGISTRY[svgId]
   if (!entry) return ''
 
-  const scale = normalizeSvgScale(options.scale)
-  const isDown = 'isDown' in entry && entry.isDown
-  const rotationDegrees = 'rotationDegrees' in entry ? entry.rotationDegrees : 0
-  const className = ['cove-trend-arrow', isDown ? 'is-down' : '', options.className].filter(Boolean).join(' ')
+  const className = [INLINE_SVG_ICON_CLASS, options.className?.trim()].filter(Boolean).join(' ')
   const ariaLabel = options.ariaLabel || entry.ariaLabel
-  const style = `width: 1em; height: 1em; transform: ${buildSvgTransform(scale, isDown, rotationDegrees)}; transform-origin: center;`
+  const decorative = options.decorative ?? true
+  const style =
+    [
+      'display: block',
+      'width: var(--cove-inline-svg-inner-width, 1em)',
+      'height: var(--cove-inline-svg-inner-height, 1em)',
+      'fill: currentColor',
+      'color: inherit',
+      `transform: scale(${DEFAULT_SVG_SCALE})`,
+      'transform-origin: center'
+    ].join('; ') + ';'
   const svgMarkup = entry.rawSvg.trim()
+  const classAttribute = className ? ` class="${className}"` : ''
+  const accessibilityAttributes = decorative
+    ? ' aria-hidden="true" focusable="false"'
+    : ` role="img" aria-label="${ariaLabel}" focusable="false"`
 
-  return svgMarkup.replace('<svg', `<svg class="${className}" role="img" aria-label="${ariaLabel}" style="${style}"`)
+  return svgMarkup.replace('<svg', `<svg${classAttribute}${accessibilityAttributes} style="${style}"`)
+}
+
+export const buildInlineSvg = (
+  svgId: SvgRegistryId,
+  options: {
+    className?: string
+    ariaLabel?: string
+    decorative?: boolean
+  } = {}
+): string => {
+  const wrapperStyle =
+    [
+      'display: inline-flex',
+      'align-items: center',
+      'justify-content: center',
+      'width: var(--cove-inline-svg-width, 1em)',
+      'height: var(--cove-inline-svg-height-fallback, 1em)',
+      'height: var(--cove-inline-svg-height, 1lh)',
+      'vertical-align: bottom',
+      'line-height: inherit',
+      'overflow: visible'
+    ].join('; ') + ';'
+  const decoratedSvgMarkup = buildSvgMarkup(svgId, options)
+
+  return `<span class="${INLINE_SVG_WRAPPER_CLASS}" style="${wrapperStyle}">${decoratedSvgMarkup}</span>`
 }

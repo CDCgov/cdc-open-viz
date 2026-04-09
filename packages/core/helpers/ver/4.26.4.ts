@@ -61,11 +61,19 @@ const applyMarkupVariableSourceTypes = config => {
   })
 }
 
+const enableFullGeoNameCsvOnLegacyCountyMaps = config => {
+  if (config.type === 'map' && config.general?.geoType === 'us-county') {
+    config.table = config.table || {}
+    config.table.showFullGeoNameInCSV = true
+  }
+}
+
 const run_4_26_4_migrations = config => {
   disableExtraChartVisualSettings(config)
   addMarkupIncludeStyle(config)
   applyWaffleValueDescriptorDefaults(config)
   applyMarkupVariableSourceTypes(config)
+  enableFullGeoNameCsvOnLegacyCountyMaps(config)
 
   if (config.type === 'dashboard' && config.visualizations) {
     Object.values((config as DashboardConfig).visualizations).forEach(visualization => {

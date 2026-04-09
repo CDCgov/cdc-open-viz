@@ -377,4 +377,56 @@ describe('update_4_26_4', () => {
     expect(result.visualizations.nestedChart.markupVariables[0].sourceType).toBe('column')
     expect(result.visualizations.nestedChart.markupVariables[1].sourceType).toBe('metadata')
   })
+
+  it('enables full geo name CSV export for legacy county maps', () => {
+    const config: any = {
+      type: 'map',
+      version: '4.26.3',
+      general: { geoType: 'us-county' },
+      table: { showFullGeoNameInCSV: false }
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.table.showFullGeoNameInCSV).toBe(true)
+    expect(result.version).toBe('4.26.4')
+    expect(config.table.showFullGeoNameInCSV).toBe(false)
+  })
+
+  it('does not change non-county map CSV full geo name settings', () => {
+    const config: any = {
+      type: 'map',
+      version: '4.26.3',
+      general: { geoType: 'us' },
+      table: { showFullGeoNameInCSV: false }
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.table.showFullGeoNameInCSV).toBe(false)
+  })
+
+  it('enables full geo name CSV export for county maps inside dashboards', () => {
+    const config: any = {
+      type: 'dashboard',
+      version: '4.26.3',
+      visualizations: {
+        countyMap: {
+          type: 'map',
+          general: { geoType: 'us-county' },
+          table: { showFullGeoNameInCSV: false }
+        },
+        usMap: {
+          type: 'map',
+          general: { geoType: 'us' },
+          table: { showFullGeoNameInCSV: false }
+        }
+      }
+    }
+
+    const result = update_4_26_4(config)
+
+    expect(result.visualizations.countyMap.table.showFullGeoNameInCSV).toBe(true)
+    expect(result.visualizations.usMap.table.showFullGeoNameInCSV).toBe(false)
+  })
 })
