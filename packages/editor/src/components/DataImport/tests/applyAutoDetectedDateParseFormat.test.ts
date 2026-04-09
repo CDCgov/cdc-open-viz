@@ -48,6 +48,22 @@ describe('applyAutoDetectedDateParseFormat', () => {
     expect(result).toEqual(baseChartConfig)
   })
 
+  it('leaves the config unchanged when xAxis.dateParseFormat is already configured', () => {
+    const preconfiguredChartConfig: any = {
+      ...baseChartConfig,
+      xAxis: {
+        ...baseChartConfig.xAxis,
+        dateParseFormat: '%d/%m/%Y'
+      }
+    }
+
+    const result: any = applyAutoDetectedDateParseFormat(
+      preconfiguredChartConfig,
+      reliableSlashDateRows
+    )
+
+    expect(result).toEqual(preconfiguredChartConfig)
+  })
   it('does nothing for non-date chart axes', () => {
     const result: any = applyAutoDetectedDateParseFormat(
       {
