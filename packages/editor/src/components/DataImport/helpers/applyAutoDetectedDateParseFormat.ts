@@ -34,8 +34,9 @@ export const applyAutoDetectedDateParseFormat = (
 
   for (const row of importedData) {
     const value = row?.[xAxisKey]
+    const normalizedValue = typeof value === 'string' ? value.trim() : value
 
-    if (value !== null && value !== undefined && value !== '') {
+    if (normalizedValue !== null && normalizedValue !== undefined && normalizedValue !== '') {
       dateDetectionSamples.push(value)
     }
 
