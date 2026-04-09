@@ -51,6 +51,7 @@ import { MapContext } from '../../../types/MapContext.js'
 import Alert from '@cdc/core/components/Alert'
 import { updateFieldFactory } from '@cdc/core/helpers/updateFieldFactory'
 import { CheckBox, Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
+import DownloadUrlControls from '@cdc/core/components/EditorPanel/DownloadUrlControls'
 import Button from '@cdc/core/components/elements/Button'
 import StyleTreatmentSection from '@cdc/core/components/EditorPanel/sections/StyleTreatmentSection'
 import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
@@ -1207,7 +1208,11 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
       ))
   }
 
-  const isLoadedFromUrl = config?.dataKey?.includes('http://') || config?.dataKey?.includes('https://')
+  const isLoadedFromUrl =
+    config?.dataFileSourceType === 'url' ||
+    Boolean(config?.runtimeDataUrl || config?.dataUrl || config?.dataFileName) ||
+    config?.dataKey?.includes('http://') ||
+    config?.dataKey?.includes('https://')
 
   // Custom convertStateToConfig for map with map-specific logic
   const customConvertStateToConfig = () => {
@@ -3198,31 +3203,12 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           updateField={updateField}
                         />
                       )}
-                      {isLoadedFromUrl && (
-                        <>
-                          <CheckBox
-                            value={config.table.showDownloadUrl}
-                            section='table'
-                            subsection={null}
-                            fieldName='showDownloadUrl'
-                            label='Show URL to Automatically Updated Data'
-                            updateField={updateField}
-                          />
-                          {config.table.showDownloadUrl && (
-                            <div className='ms-4 mt-2' style={{ maxWidth: 'calc(100% - 1.5rem)' }}>
-                              <TextField
-                                value={config.table.downloadUrlLabel}
-                                section='table'
-                                subsection={null}
-                                fieldName='downloadUrlLabel'
-                                label='Dataset Link Text'
-                                placeholder='Link to Dataset'
-                                updateField={updateField}
-                              />
-                            </div>
-                          )}
-                        </>
-                      )}
+                      <DownloadUrlControls
+                        hasUrlBackedDataSource={Boolean(isLoadedFromUrl)}
+                        showDownloadUrl={config.table.showDownloadUrl}
+                        downloadUrlLabel={config.table.downloadUrlLabel}
+                        updateField={updateField}
+                      />
                       <CheckBox
                         value={config.table.showFullGeoNameInCSV}
                         section='table'

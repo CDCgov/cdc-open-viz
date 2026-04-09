@@ -8,6 +8,7 @@ import { Visualization } from '../../types/Visualization'
 import _ from 'lodash'
 import { Column } from '../../types/Column'
 import CustomSortOrder from './CustomSortOrder'
+import DownloadUrlControls from './DownloadUrlControls'
 
 interface DataTableProps {
   config: Partial<Visualization>
@@ -377,29 +378,12 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           updateField={updateField}
         />
       )}
-      {hasUrlBackedDataSource && (
-        <>
-          <CheckBox
-            value={config.table.showDownloadUrl}
-            fieldName='showDownloadUrl'
-            label='Show URL to Automatically Updated Data'
-            section='table'
-            updateField={updateField}
-          />
-          {config.table.showDownloadUrl && (
-            <div className='ms-4 mt-2' style={{ maxWidth: 'calc(100% - 1.5rem)' }}>
-              <TextField
-                value={config.table.downloadUrlLabel}
-                section='table'
-                fieldName='downloadUrlLabel'
-                label='Dataset Link Text'
-                placeholder='Link to Dataset'
-                updateField={updateField}
-              />
-            </div>
-          )}
-        </>
-      )}
+      <DownloadUrlControls
+        hasUrlBackedDataSource={hasUrlBackedDataSource}
+        showDownloadUrl={config.table.showDownloadUrl}
+        downloadUrlLabel={config.table.downloadUrlLabel}
+        updateField={updateField}
+      />
       {config.type !== 'table' && (
         <CheckBox
           value={config.table.showDownloadImgButton}
