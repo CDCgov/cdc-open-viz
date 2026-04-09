@@ -5,7 +5,8 @@ import smallMultiplesBigDataBars from './_mock/small_multiples/small_multiples_b
 import smallMultiplesLinesColors from './_mock/small_multiples/small_multiples_lines_colors.json'
 import smallMultiplesLines from './_mock/small_multiples/small_multiples_lines.json'
 import smallMultiplesStackedBars from './_mock/small_multiples/small_multiples_stacked_bars.json'
-import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
+import { expect } from 'storybook/test'
 
 const meta: Meta<typeof Chart> = {
   title: 'Components/Templates/Chart/Small Multiples',
@@ -14,6 +15,11 @@ const meta: Meta<typeof Chart> = {
 
 type Story = StoryObj<typeof Chart>
 
+const getTooltipHtmlValues = (canvasElement: HTMLElement) =>
+  Array.from(canvasElement.querySelectorAll('[data-tooltip-html]')).map(
+    element => element.getAttribute('data-tooltip-html') || ''
+  )
+
 export const smallMultiples_Bars: Story = {
   args: {
     config: smallMultiplesBars,
@@ -21,6 +27,11 @@ export const smallMultiples_Bars: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+    await waitForPresence('[data-tooltip-html]', canvasElement)
+
+    const tooltipHtmlValues = getTooltipHtmlValues(canvasElement)
+    expect(tooltipHtmlValues.length).toBeGreaterThan(0)
+    expect(tooltipHtmlValues.some(html => html.includes('tooltip-marker-swatch'))).toBe(false)
   }
 }
 
@@ -58,6 +69,11 @@ export const smallMultiples_StackedBars: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+    await waitForPresence('[data-tooltip-html]', canvasElement)
+
+    const tooltipHtmlValues = getTooltipHtmlValues(canvasElement)
+    expect(tooltipHtmlValues.length).toBeGreaterThan(0)
+    expect(tooltipHtmlValues.some(html => html.includes('tooltip-marker-swatch'))).toBe(true)
   }
 }
 export default meta
