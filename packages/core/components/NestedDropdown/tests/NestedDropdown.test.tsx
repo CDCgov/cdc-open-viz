@@ -115,6 +115,63 @@ describe('NestedDropdown', () => {
     fireEvent.keyUp(screen.getByRole('treeitem', { name: '2023' }), { key: 'Escape' })
 
     expect(input).toHaveValue(expectedClosedValue)
+    expect(input).toHaveFocus()
+    expect(screen.getByRole('tree')).toHaveClass('hide')
+  })
+
+  it('keeps the dropdown open when focus moves from the list back to the input', () => {
+    render(
+      <NestedDropdown
+        activeGroup='2023'
+        activeSubGroup='Q2'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Year and Quarter'
+        options={options}
+      />
+    )
+
+    const input = getSearchInput()
+
+    fireEvent.focus(input)
+    fireEvent.keyUp(input, { key: 'ArrowDown' })
+
+    const firstGroup = screen.getByRole('treeitem', { name: '2023' })
+    expect(firstGroup).toHaveFocus()
+
+    fireEvent.keyUp(firstGroup, { key: 'ArrowUp' })
+
+    expect(input).toHaveFocus()
+    expect(screen.getByRole('tree')).not.toHaveClass('hide')
+  })
+
+  it('keeps focus on the input when selecting a subgroup with the keyboard', () => {
+    const handleSelectedItems = vi.fn()
+
+    render(
+      <NestedDropdown
+        activeGroup='2023'
+        activeSubGroup='Q2'
+        filterIndex={0}
+        handleSelectedItems={handleSelectedItems}
+        listLabel='Year and Quarter'
+        options={options}
+      />
+    )
+
+    const input = getSearchInput()
+
+    input.focus()
+    fireEvent.keyUp(input, { key: 'ArrowDown' })
+    fireEvent.keyUp(screen.getByRole('treeitem', { name: '2023' }), { key: 'ArrowDown' })
+
+    const subgroup = screen.getByRole('treeitem', { name: '2023Q1' })
+    expect(subgroup).toHaveFocus()
+
+    fireEvent.keyUp(subgroup, { key: 'Enter' })
+
+    expect(handleSelectedItems).toHaveBeenCalledWith(['2023', 'Q1'])
+    expect(input).toHaveFocus()
     expect(screen.getByRole('tree')).toHaveClass('hide')
   })
 })

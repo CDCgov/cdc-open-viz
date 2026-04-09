@@ -91,4 +91,37 @@ describe('FilterEditor nested dropdown display toggle', () => {
 
     expect(updateFilterProp).toHaveBeenCalledWith('displaySubgroupingOnly', true)
   })
+
+  it.each([
+    [
+      'data-backed non-nested filters',
+      {
+        ...createNestedFilter('datafilter'),
+        filterStyle: 'dropdown'
+      }
+    ],
+    [
+      'api-backed non-nested filters',
+      {
+        ...createNestedFilter('urlfilter'),
+        filterStyle: 'dropdown'
+      }
+    ]
+  ])('does not render the checkbox for %s', (_label, filter) => {
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    expect(screen.queryByLabelText('Display subgrouping only')).not.toBeInTheDocument()
+  })
 })

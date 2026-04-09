@@ -61,4 +61,44 @@ describe('NestedDropdownEditor', () => {
 
     expect(updateField).toHaveBeenCalledWith('filters', 0, 'displaySubgroupingOnly', true)
   })
+
+  it('does not render the subgroup-only checkbox when the filter is not nested-dropdown', () => {
+    render(
+      <NestedDropdownEditor
+        config={
+          {
+            filters: [
+              {
+                label: 'Year and Quarter',
+                filterStyle: 'dropdown',
+                columnName: 'year',
+                values: ['2023', '2024'],
+                order: 'asc',
+                subGrouping: {
+                  columnName: 'quarter',
+                  valuesLookup: {
+                    '2023': { values: ['Q1', 'Q2'] },
+                    '2024': { values: ['Q3', 'Q4'] }
+                  }
+                }
+              }
+            ]
+          } as any
+        }
+        dataColumns={['year', 'quarter', 'region']}
+        filterIndex={0}
+        handleGroupingCustomOrder={vi.fn()}
+        handleNameChange={vi.fn()}
+        rawData={[
+          { year: '2023', quarter: 'Q1' },
+          { year: '2023', quarter: 'Q2' },
+          { year: '2024', quarter: 'Q3' }
+        ]}
+        updateField={vi.fn()}
+        updateFilterStyle={vi.fn()}
+      />
+    )
+
+    expect(screen.queryByLabelText('Display subgrouping only')).not.toBeInTheDocument()
+  })
 })

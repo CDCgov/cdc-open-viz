@@ -9,6 +9,11 @@
     display: flex;
     position: relative;
     width: 100%;
+
+    &:focus-within {
+      outline: dashed 2px rgb(0, 122, 153) !important;
+      outline-offset: 3px !important;
+    }
   }
 
   input.cove-combobox-input[role='combobox'] {
@@ -36,12 +41,12 @@
     border: 1px solid var(--cool-gray-10) !important;
     box-shadow: none;
     color: var(--cool-gray-90);
+    outline: none !important;
   }
 
   input.cove-combobox-input[role='combobox']:focus-visible {
     border-radius: 6px !important;
-    outline: dashed 2px rgb(0, 122, 153) !important;
-    outline-offset: 3px !important;
+    outline: none !important;
   }
 
   input.cove-combobox-input[role='combobox']:disabled {

@@ -162,7 +162,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   const chooseSelectedSubGroup = (tierOne: string | number, tierTwo: string | number) => {
     resetDropdownInteraction()
     handleSelectedItems([String(tierOne), String(tierTwo)])
-    searchInput.current?.blur()
+    searchInput.current?.focus()
   }
 
   const handleKeyUp = e => {
@@ -232,7 +232,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
       case 'Escape':
         {
           resetDropdownInteraction()
-          ;(e.target as HTMLElement)?.blur?.()
+          searchInput.current?.focus()
         }
         break
     }
@@ -259,19 +259,11 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
     }
   }
 
-  const handleOnBlur = (e: React.FocusEvent<HTMLLIElement, Element>): void => {
-    if (
-      e.relatedTarget === null ||
-      ![
-        `nested-dropdown-${filterIndex}`,
-        `nested-dropdown-group-${filterIndex}`,
-        `selectable-item-${filterIndex}`,
-        `main-nested-dropdown-container-${filterIndex}`
-      ].includes(e.relatedTarget.className)
-    ) {
+  const handleOnBlur = (e: FocusEvent): void => {
+    const relatedTarget = e.relatedTarget as Node | null
+
+    if (!relatedTarget || !nestedDropdownRef.current?.contains(relatedTarget)) {
       resetDropdownInteraction()
-    } else {
-      ; (e.relatedTarget as HTMLElement).focus()
     }
   }
 
@@ -302,6 +294,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
             aria-label='searchInput'
             aria-haspopup='true'
             aria-hidden='false'
+            autoComplete='off'
             tabIndex={0}
             value={userSearchTerm !== null ? userSearchTerm : inputValue}
             onChange={handleSearchTermChange}
