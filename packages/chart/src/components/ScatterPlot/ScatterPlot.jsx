@@ -6,7 +6,7 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { buildSeriesTooltipListHtml } from '../../helpers/tooltipHelpers'
 
-const ScatterPlot = ({ xScale, yScale }) => {
+const ScatterPlot = ({ xScale, yScale, yAxisWidth }) => {
   const {
     transformedData: data,
     config,
@@ -55,7 +55,7 @@ const ScatterPlot = ({ xScale, yScale }) => {
 </div>`
 
   return (
-    <Group className='scatter-plot' left={config.yAxis.size}>
+    <Group className='scatter-plot' left={yAxisWidth}>
       {data.map((item, dataIndex) => {
         // prettier-ignore
         return config.runtime.seriesKeys.map((s, index) => {

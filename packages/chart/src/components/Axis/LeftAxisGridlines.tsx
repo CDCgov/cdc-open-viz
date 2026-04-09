@@ -10,7 +10,6 @@ interface LeftAxisGridlinesProps {
   xMax: number
   yAxisWidth: number
   numTicks: number
-  yLabelOffset: number
   axisLabelFontSize: number
 }
 
@@ -19,7 +18,6 @@ const LeftAxisGridlines: React.FC<LeftAxisGridlinesProps> = ({
   xMax,
   yAxisWidth,
   numTicks,
-  yLabelOffset,
   axisLabelFontSize
 }) => {
   const { config } = useContext(ConfigContext)
@@ -60,7 +58,7 @@ const LeftAxisGridlines: React.FC<LeftAxisGridlinesProps> = ({
               className='y-label'
               textAnchor='middle'
               verticalAnchor='start'
-              transform={`translate(${-1 * yAxisWidth + yLabelOffset}, ${axisCenter}) rotate(-90)`}
+              transform={`translate(${-1 * yAxisWidth}, ${axisCenter}) rotate(-90)`}
               fontWeight='bold'
               fill={config.yAxis.labelColor}
               fontSize={axisLabelFontSize}

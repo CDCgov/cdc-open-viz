@@ -3,6 +3,7 @@ import { within, userEvent, expect } from 'storybook/test'
 import { performAndAssert, waitForEditor, openAccordion, MIN_ANIMATION_DELAY_MS } from '@cdc/core/helpers/testing'
 
 import Chart from '../CdcChartComponent'
+import comboConfig from './_mock/combo.json'
 import mockScatterPlot from './_mock/scatterplot_mock.json'
 import smallMultiplesLinesColorsConfig from './_mock/small_multiples/small_multiples_lines_colors.json'
 
@@ -650,6 +651,28 @@ export const SmallMultiplesSectionTests: Story = {
         return before.areaPathCount === 0 && after.areaPathCount > 0
       }
     )
+  }
+}
+
+export const ComboRightValueAxisSectionTests: Story = {
+  name: 'Combo Right Value Axis Section Tests',
+  args: {
+    config: {
+      ...comboConfig,
+      visualizationType: 'Combo',
+      orientation: 'vertical'
+    },
+    isEditor: true
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitForEditor(canvas)
+    await openAccordion(canvas, 'Right Value Axis')
+
+    const rightAxisLabelOffsetInput = canvas.getByLabelText(/^label offset$/i) as HTMLInputElement
+    expect(rightAxisLabelOffsetInput).toBeTruthy()
+    expect(rightAxisLabelOffsetInput.name).toContain('rightLabelOffsetSize')
   }
 }
 
