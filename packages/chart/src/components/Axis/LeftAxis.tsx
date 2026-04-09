@@ -36,7 +36,6 @@ interface LeftAxisProps {
   suffixWidth?: number
   horizontalYAxisLabelSpace?: number
   categoryLabelSpace?: number
-  yLabelOffset?: number
 }
 
 const LeftAxis: React.FC<LeftAxisProps> = ({
@@ -53,8 +52,7 @@ const LeftAxis: React.FC<LeftAxisProps> = ({
   suffixRef,
   suffixWidth = 0,
   horizontalYAxisLabelSpace = 0,
-  categoryLabelSpace = 0,
-  yLabelOffset = 0
+  categoryLabelSpace = 0
 }) => {
   const { config, colorScale, seriesHighlight } = useContext(ConfigContext)
   const { runtime, orientation, visualizationType, visualizationSubType, heights } = config
@@ -387,7 +385,7 @@ const LeftAxis: React.FC<LeftAxisProps> = ({
               className='y-label'
               textAnchor='middle'
               verticalAnchor='start'
-              transform={`translate(${-1 * yAxisWidth + yLabelOffset}, ${axisCenter}) rotate(-90)`}
+              transform={`translate(${-1 * yAxisWidth}, ${axisCenter}) rotate(-90)`}
               fontWeight='bold'
               fill={config.yAxis.labelColor}
               fontSize={axisLabelFontSize}

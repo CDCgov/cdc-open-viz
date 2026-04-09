@@ -8,6 +8,7 @@ export type LineChartProps = {
   getYAxisData: Function
   xMax: number
   yMax: number
+  yAxisWidth: number
   handleTooltipMouseOver: Function
   handleTooltipMouseOff: Function
   showTooltip: boolean

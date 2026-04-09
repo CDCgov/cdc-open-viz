@@ -50,7 +50,7 @@ export const useTooltip = props => {
     xScaleRef.current = xScale
   }, [xScale])
 
-  const Y_AXIS_SIZE = Number(config.yAxis.size || 0)
+  const Y_AXIS_SIZE = Number(props.yAxisWidth || 0)
 
   // function handles only Single series hovered data tooltips
   const findDataKeyByThreshold = (mouseY, datapoint) => {

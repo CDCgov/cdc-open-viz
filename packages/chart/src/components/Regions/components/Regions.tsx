@@ -35,6 +35,7 @@ type RegionsProps = {
   barWidth?: number
   totalBarsInGroup?: number
   xMax?: number
+  yAxisWidth?: number
 }
 
 type HighlightedAreaProps = {
@@ -70,7 +71,14 @@ const isLineLike = (type: string): boolean => type === VIZ_TYPES.LINE || type ==
 const isBarLike = (type: string): boolean => type === VIZ_TYPES.BAR || type === VIZ_TYPES.COMBO
 
 // TODO: should regions be removed on categorical axis?
-const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGroup = 1, yMax, xMax }) => {
+const Regions: React.FC<RegionsProps> = ({
+  xScale,
+  barWidth = 0,
+  totalBarsInGroup = 1,
+  yMax,
+  xMax,
+  yAxisWidth = 0
+}) => {
   const { parseDate, config } = useContext<ChartContext>(ConfigContext)
 
   const { regions, visualizationType, orientation, xAxis } = config
@@ -122,8 +130,8 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
     } else {
       from = xScale(region.from)
     }
-    // Add left padding (yAxis.size) + half bandwidth to center on the category
-    let scalePadding = Number(config.yAxis.size)
+    // Add left padding (yAxisWidth) + half bandwidth to center on the category
+    let scalePadding = yAxisWidth
     if (xScale.bandwidth) {
       scalePadding += xScale.bandwidth() / 2
     }
@@ -135,8 +143,8 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       return calculateLineLastDatePosition_Categorical()
     }
     let to = xScale(region.to)
-    // Add left padding (yAxis.size) + half bandwidth
-    let scalePadding = Number(config.yAxis.size)
+    // Add left padding (yAxisWidth) + half bandwidth
+    let scalePadding = yAxisWidth
     if (xScale.bandwidth) {
       scalePadding += xScale.bandwidth() / 2
     }
@@ -158,8 +166,8 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       const closestDate = findClosestDate(parsedDate, domain, d => d)
       from = xScale(closestDate)
     }
-    // Add left padding (yAxis.size) + half bandwidth
-    let scalePadding = Number(config.yAxis.size)
+    // Add left padding (yAxisWidth) + half bandwidth
+    let scalePadding = yAxisWidth
     if (xScale.bandwidth) {
       scalePadding += xScale.bandwidth() / 2
     }
@@ -179,8 +187,8 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
     const closestDate = findClosestDate(parsedDate, domain, d => d)
     let to = xScale(closestDate)
 
-    // Add left padding (yAxis.size) + half bandwidth
-    let scalePadding = Number(config.yAxis.size)
+    // Add left padding (yAxisWidth) + half bandwidth
+    let scalePadding = yAxisWidth
     if (xScale.bandwidth) {
       scalePadding += xScale.bandwidth() / 2
     }
@@ -190,13 +198,13 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
   const getLineFromValue_DateTime = (region: Region): number => {
     if (region.fromType === 'Previous Days') {
       const from = calculatePreviousDaysFrom(region, 'date-time')
-      return from + Number(config.yAxis.size)
+      return from + yAxisWidth
     }
     const date = new Date(region.from)
     const parsedDate = parseDate(formatDate(config.xAxis.dateParseFormat, date, config.locale)).getTime()
     let from = xScale(parsedDate)
     // For date-time, xScale returns correct position (no bandwidth), just add left padding
-    return from + Number(config.yAxis.size)
+    return from + yAxisWidth
   }
 
   const getLineToValue_DateTime = (region: Region): number => {
@@ -204,17 +212,17 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
       return calculateLineLastDatePosition_DateTime()
     }
     let to = xScale(parseDate(region.to).getTime())
-    return to + Number(config.yAxis.size)
+    return to + yAxisWidth
   }
 
   const calculateLineLastDatePosition_Categorical = (): number => {
-    const chartStart = Number(config.yAxis.size || 0)
+    const chartStart = yAxisWidth
     // Extend to the right edge of the chart
     return chartStart + (xMax || 0)
   }
 
   const calculateLineLastDatePosition_Date = (): number => {
-    const chartStart = Number(config.yAxis.size || 0)
+    const chartStart = yAxisWidth
     // For date scale line charts with Last Date, extend to the right edge of the chart
     return chartStart + (xMax || 0)
   }
@@ -223,8 +231,8 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
     const domain = xScale.domain()
     const lastDate = domain[domain.length - 1]
     const lastDatePosition = xScale(lastDate)
-    // Match the non-Last Date logic: just add yAxis.size
-    return Number(lastDatePosition + Number(config.yAxis.size))
+    // Match the non-Last Date logic: just add yAxisWidth
+    return Number(lastDatePosition + yAxisWidth)
   }
 
   // ============================================
@@ -389,7 +397,7 @@ const Regions: React.FC<RegionsProps> = ({ xScale, barWidth = 0, totalBarsInGrou
 
   if (!regions || orientation !== 'vertical') return null
 
-  const chartStart = Number(config.yAxis.size || 0)
+  const chartStart = yAxisWidth
   const chartEnd = xMax !== undefined ? chartStart + xMax : chartStart + 1000
 
   return regions.map((region: Region) => {

@@ -918,7 +918,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     }
   }, [config.visualizationType])
 
-  const { hasRightAxis } = useRightAxis({ config: config, yMax: config.yAxis.size, data: config.data, updateConfig })
+  const { hasRightAxis } = useRightAxis({ config: config, yMax: 0, data: config.data, updateConfig })
 
   const getItemStyle = (isDragging, draggableStyle) => ({
     ...draggableStyle
@@ -2229,38 +2229,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             }
                             updateField={updateFieldDeprecated}
                           />
-                          <TextField
-                            value={config.yAxis.size}
-                            type='number'
-                            section='yAxis'
-                            fieldName='size'
-                            label={config.orientation === 'horizontal' ? 'Size (Height)' : 'Size (Width)'}
-                            className='number-narrow'
-                            updateField={updateFieldDeprecated}
-                            tooltip={
-                              <Tooltip style={{ textTransform: 'none' }}>
-                                <Tooltip.Target>
-                                  <Icon
-                                    display='question'
-                                    style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
-                                  />
-                                </Tooltip.Target>
-                                <Tooltip.Content>
-                                  <p>{`Increase the size if elements in the ${config.orientation} axis are being crowded or hidden behind other elements.  Decrease if less space is required for the value axis.`}</p>
-                                </Tooltip.Content>
-                              </Tooltip>
-                            }
-                          />
-                          <TextField
-                            display={!visHasCategoricalAxis()}
-                            value={config.yAxis.labelOffset}
-                            section='yAxis'
-                            fieldName='labelOffset'
-                            label='Label offset'
-                            type='number'
-                            className='number-narrow'
-                            updateField={updateFieldDeprecated}
-                          />
                           {config.orientation === 'horizontal' && (
                             <CheckBox
                               value={config.isResponsiveTicks}
@@ -3540,18 +3508,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               updateField={updateFieldDeprecated}
                             />
                           )}
-                          {config.orientation === 'horizontal' && (
-                            <TextField
-                              value={config.xAxis.labelOffset}
-                              section='xAxis'
-                              fieldName='labelOffset'
-                              label='Label offset'
-                              type='number'
-                              className='number-narrow'
-                              updateField={updateFieldDeprecated}
-                            />
-                          )}
-
                           {/* Hiding this for now, not interested in moving the axis lines away from chart comp. right now. */}
                           {/* <TextField value={config.xAxis.axisPadding} type='number' max={10} min={0} section='xAxis' fieldName='axisPadding' label={'Axis Padding'} className='number-narrow' updateField={updateFieldDeprecated} /> */}
                           {(config.xAxis.type === 'continuous' || config.forestPlot.type === 'Logarithmic') && (

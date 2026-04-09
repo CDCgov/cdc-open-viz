@@ -540,7 +540,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
         ...horizontalYAxisSource,
         label: runtimeYAxisLabel ?? horizontalYAxisSource?.label
       }
-      newConfig.runtime.yAxis.labelOffset *= -1
 
       newConfig.runtime.horizontal = false
       newConfig.orientation = 'horizontal'

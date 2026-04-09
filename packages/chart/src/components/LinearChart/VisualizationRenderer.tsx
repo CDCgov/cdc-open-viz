@@ -76,13 +76,16 @@ const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
       )}
 
       {/* Paired Bar Chart */}
-      {visualizationType === 'Paired Bar' && <PairedBarChart originalWidth={parentWidth} width={xMax} height={yMax} />}
+      {visualizationType === 'Paired Bar' && (
+        <PairedBarChart originalWidth={parentWidth} width={xMax} height={yMax} yAxisWidth={yAxisWidth} />
+      )}
 
       {/* Scatter Plot */}
       {visualizationType === 'Scatter Plot' && (
         <ScatterPlot
           xScale={xScale}
           yScale={yScale}
+          yAxisWidth={yAxisWidth}
           getXAxisData={getXAxisData}
           getYAxisData={getYAxisData}
           xMax={xMax}
@@ -102,6 +105,7 @@ const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
           yScale={yScale}
           xMax={xMax}
           yMax={yMax}
+          yAxisWidth={yAxisWidth}
           synchronizedXValue={synchronizedXValue}
           showTooltip={showTooltip}
           handleTooltipMouseOff={handleTooltipMouseOff}
@@ -115,6 +119,7 @@ const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
           yScale={yScale}
           xMax={xMax}
           yMax={yMax}
+          yAxisWidth={yAxisWidth}
           handleTooltipMouseOver={handleTooltipMouseOver}
           handleTooltipMouseOff={handleTooltipMouseOff}
           tooltipData={tooltipData}
@@ -132,6 +137,7 @@ const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
           max={max}
           xScale={xScale}
           yScale={yScale}
+          yAxisWidth={yAxisWidth}
         />
       )}
 
@@ -156,6 +162,7 @@ const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
           yScale={yScale}
           yMax={yMax}
           xMax={xMax}
+          yAxisWidth={yAxisWidth}
           chartRef={svgRef}
           width={xMax}
           height={yMax}
@@ -193,6 +200,7 @@ const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
         <LineChart
           xScale={xScale}
           yScale={yScale}
+          yAxisWidth={yAxisWidth}
           getXAxisData={getXAxisData}
           getYAxisData={getYAxisData}
           xMax={xMax}
@@ -211,6 +219,7 @@ const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
         <LineChart
           xScale={xScale}
           yScale={yScale}
+          yAxisWidth={yAxisWidth}
           getXAxisData={getXAxisData}
           getYAxisData={getYAxisData}
           xMax={xMax}
@@ -229,6 +238,7 @@ const VisualizationRenderer: React.FC<VisualizationRendererProps> = ({
           tooltipData={tooltipData}
           xScale={xScale}
           yScale={yScale}
+          yAxisWidth={yAxisWidth}
           width={xMax}
           height={yMax}
           xScaleNoPadding={xScaleNoPadding}

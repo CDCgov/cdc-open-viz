@@ -10,7 +10,7 @@ import { APP_FONT_COLOR } from '@cdc/core/helpers/constants'
 import { getTextWidth } from '@cdc/core/helpers/getTextWidth'
 import { isMobileFontViewport } from '@cdc/core/helpers/viewports'
 
-const PairedBarChart = ({ width, height, originalWidth }) => {
+const PairedBarChart = ({ width, height, originalWidth, yAxisWidth }) => {
   const {
     config,
     colorScale,
@@ -93,7 +93,7 @@ const PairedBarChart = ({ width, height, originalWidth }) => {
           id='cdc-visualization__paired-bar-chart'
           width={originalWidth}
           height={height}
-          viewBox={`0 0 ${width + Number(config.runtime.yAxis.size)} ${height}`}
+          viewBox={`0 0 ${width + yAxisWidth} ${height}`}
           role='img'
           tabIndex={0}
         >
