@@ -1,7 +1,8 @@
 import { detectDateParseFormat, isDateScale } from '@cdc/core/helpers/cove/date'
 import { type Visualization } from '@cdc/core/types/Visualization'
 
-const isChartWithDateAxis = (config: Visualization) => config?.type === 'chart' && isDateScale(config?.xAxis)
+const isChartWithDateAxis = (config: Visualization) =>
+  config?.type === 'chart' && !!config?.xAxis && isDateScale(config.xAxis)
 
 export const applyAutoDetectedDateParseFormat = (
   config: Visualization,
