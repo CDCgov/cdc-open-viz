@@ -84,7 +84,9 @@ const getTopoData = (year, showHSABoundaries) => {
 
       topoData.year = year || 'default'
       topoData.counties = dedupeFeaturesById(
-        [response, usExtendedGeography].flatMap(topo => feature(topo, topo.objects.counties).features)
+        [response, usExtendedGeography]
+          .flatMap(topo => feature(topo, topo.objects.counties).features)
+          .filter(county => typeof county.id === 'string' && county.id.length > 2)
       )
       topoData.states = dedupeFeaturesById(
         [response, usExtendedGeography].flatMap(topo => feature(topo, topo.objects.states).features)
