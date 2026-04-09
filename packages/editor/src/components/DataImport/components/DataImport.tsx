@@ -247,15 +247,12 @@ const DataImport = () => {
             handleSetConfig(text, true, dataMetadata)
           } else {
             resetEditor(
-              applyAutoDetectedDateParseFormat(
-                {
-                  data: text,
-                  dataMetadata,
-                  dataFileName: fileSource,
-                  dataFileSourceType: fileSourceType
-                } as Visualization,
-                text as Record<string, unknown>[]
-              ),
+              {
+                data: text,
+                dataMetadata,
+                dataFileName: fileSource,
+                dataFileSourceType: fileSourceType
+              } as Visualization,
               'It appears that your data does not contain all of the columns that your last dataset contained. Continuing will reset your configuration. Do you want to continue?'
             )
           }

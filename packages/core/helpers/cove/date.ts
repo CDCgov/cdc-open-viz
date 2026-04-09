@@ -2,6 +2,7 @@ import { timeFormat, timeParse, timeFormatLocale, type TimeLocaleDefinition } fr
 import { type Axis } from '@cdc/core/types/Axis'
 
 const NBSP = '\u00A0'
+const MAX_AUTO_DETECT_DATE_SAMPLES = 50
 const AUTO_DETECT_DATE_FORMATS = [
   '%Y-%m-%d',
   '%Y/%m/%d',
@@ -13,6 +14,15 @@ const AUTO_DETECT_DATE_FORMATS = [
   '%Y-%m',
   '%Y/%m'
 ] as const
+const AUTO_DETECT_DATE_FORMATTERS = Object.fromEntries(
+  AUTO_DETECT_DATE_FORMATS.map(format => [
+    format,
+    {
+      parser: timeParse(format),
+      formatter: timeFormat(format)
+    }
+  ])
+) as Record<AutoDetectDateFormat, { parser: ReturnType<typeof timeParse>; formatter: ReturnType<typeof timeFormat> }>
 
 export type AutoDetectDateFormat = (typeof AUTO_DETECT_DATE_FORMATS)[number]
 
@@ -97,8 +107,7 @@ const normalizeDateSample = (value: unknown) => {
 }
 
 const matchesDateFormatExactly = (format: AutoDetectDateFormat, value: string) => {
-  const parser = timeParse(format)
-  const formatter = timeFormat(format)
+  const { parser, formatter } = AUTO_DETECT_DATE_FORMATTERS[format]
   const parsedValue = parser(value)
 
   if (!parsedValue) return false
@@ -107,7 +116,18 @@ const matchesDateFormatExactly = (format: AutoDetectDateFormat, value: string) =
 }
 
 export function detectDateParseFormat(values: unknown[]): DateFormatDetectionResult {
-  const samples = (values || []).map(normalizeDateSample).filter(Boolean)
+  const samples: string[] = []
+
+  for (const value of values || []) {
+    const normalizedValue = normalizeDateSample(value)
+    if (!normalizedValue) continue
+
+    samples.push(normalizedValue)
+
+    if (samples.length >= MAX_AUTO_DETECT_DATE_SAMPLES) {
+      break
+    }
+  }
 
   if (!samples.length) {
     return {

@@ -187,4 +187,14 @@ describe('detectDateParseFormat', () => {
       failureReason: 'no_non_empty_values'
     })
   })
+
+  it('caps the number of non-empty samples used for detection', () => {
+    const largeSample = Array.from({ length: 75 }, (_, index) => `2024/03/${String((index % 28) + 1).padStart(2, '0')}`)
+
+    expect(detectDateParseFormat(largeSample)).toMatchObject({
+      detectedFormat: '%Y/%m/%d',
+      isReliable: true,
+      sampleSize: 50
+    })
+  })
 })
