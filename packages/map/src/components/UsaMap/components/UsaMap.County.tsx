@@ -775,7 +775,7 @@ const CountyMap = () => {
       }
     }
 
-    if (focus.index !== -1) {
+    if (focus.index !== -1 && !config.general.showHSABoundaries) {
       const focusPath2d = geoPathCacheRef.current.get(topoData.mapData[focus.index]?.id)
       if (focusPath2d) {
         context.strokeStyle = geoStrokeColor
@@ -866,15 +866,12 @@ const CountyMap = () => {
       }
       paintCountyGeo(context, path2d, geoData, canvas.width, countyStrokeWidth, countyStrokeColor)
     })
-    if (countyHighlight) {
-      const { context, path2d, geoData, canvasWidth, strokeWidth, strokeColor } = countyHighlight
-      paintCountyGeo(context, path2d, geoData, canvasWidth, strokeWidth, strokeColor)
-    }
 
+    let hsaHighlight = null
     if (config.general.showHSABoundaries) {
       context.strokeStyle = hsaStrokeColor
       context.lineWidth = hsaStrokeWidth
-      let hsaHighlight = null
+
       topoData.hsas.forEach(hsa => {
         if (!hsa?.groupId) return
         const cacheKey = 'hsa_border_' + hsa.groupId
@@ -887,10 +884,6 @@ const CountyMap = () => {
           }
         }
       })
-      if (hsaHighlight) {
-        context.lineWidth = 3
-        context.stroke(hsaHighlight)
-      }
     }
 
     // State borders
@@ -986,6 +979,18 @@ const CountyMap = () => {
           }
         }
       })
+    }
+
+    // Highlight county last so it is visible on top of all other layers
+    if (countyHighlight) {
+      const { context, path2d, geoData, canvasWidth, strokeWidth, strokeColor } = countyHighlight
+      paintCountyGeo(context, path2d, geoData, canvasWidth, strokeWidth, strokeColor)
+    }
+    // Highlight HSA boundary if applicable
+    if (hsaHighlight) {
+      context.lineWidth = 3
+      context.strokeStyle = hsaStrokeColor
+      context.stroke(hsaHighlight)
     }
     context.restore()
   }
