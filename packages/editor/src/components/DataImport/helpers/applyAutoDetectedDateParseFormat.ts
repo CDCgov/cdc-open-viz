@@ -39,10 +39,6 @@ export const applyAutoDetectedDateParseFormat = (
     if (normalizedValue !== null && normalizedValue !== undefined && normalizedValue !== '') {
       dateDetectionSamples.push(value)
     }
-
-    if (dateDetectionSamples.length >= 50) {
-      break
-    }
   }
 
   const detection = detectDateParseFormat(dateDetectionSamples)
