@@ -8,13 +8,21 @@ import { isDateScale } from '@cdc/core/helpers/cove/date'
 // Third-party library imports
 import { localPoint } from '@visx/event'
 import { bisector } from 'd3-array'
-import _, { get } from 'lodash'
+import _ from 'lodash'
 import { getHorizontalBarHeights } from '../components/BarChart/helpers/getBarHeights'
 import {
   findColumnConfigByName,
   getSeriesColumnFormattingParams,
   getSeriesOwnedColumnNames
 } from '../helpers/seriesColumnSettings'
+import {
+  buildTooltipRow,
+  getTooltipSeriesMarker,
+  tooltipHasMarkerColumn,
+  type TooltipRow
+} from '../helpers/tooltipHelpers'
+import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
+import { getVizSubType, getVizTitle } from '@cdc/core/helpers/metrics/utils'
 
 export const useTooltip = props => {
   // Track the last X-axis value to prevent duplicate analytics events
@@ -22,6 +30,7 @@ export const useTooltip = props => {
   const {
     tableData: data,
     config,
+    colorScale,
     formatNumber,
     capitalize,
     formatDate,
@@ -33,7 +42,6 @@ export const useTooltip = props => {
   const { xScale, yScale, seriesScale, showTooltip, hideTooltip, interactionLabel = '' } = props
   const { xAxis, visualizationType, orientation, yAxis, runtime } = config
   const seriesOwnedColumnNames = getSeriesOwnedColumnNames(config.series)
-
   // Track the latest xScale in a ref to prevent stale closures
   const xScaleRef = useRef(xScale)
 
@@ -90,6 +98,33 @@ export const useTooltip = props => {
     return showMissingDataValue ? 'N/A' : formattedValue
   }
 
+  const createTooltipRow = ({
+    key,
+    value,
+    kind,
+    axisPosition,
+    seriesKey
+  }: {
+    key: string
+    value: string | number
+    kind: TooltipRow['kind']
+    axisPosition?: string
+    seriesKey?: string
+  }): TooltipRow =>
+    (() => {
+      const marker = kind === 'series' ? getTooltipSeriesMarker(config, colorScale, seriesKey || key) : null
+
+      return buildTooltipRow({
+        key,
+        value,
+        axisPosition,
+        kind,
+        seriesKey,
+        markerColor: marker?.markerColor ?? null,
+        markerShape: marker?.markerShape
+      })
+    })()
+
   /**
    * Handles the mouse over event for the tooltip.
    * @function handleTooltipMouseOver
@@ -108,7 +143,7 @@ export const useTooltip = props => {
     const singleSeriesValue = getYValueFromCoordinate(y, resolvedScaleValues)
 
     const columnsWithTooltips = []
-    const tooltipItems = [] as any[][]
+    const tooltipItems: TooltipRow[] = []
     for (const [colKey, column] of Object.entries(config.columns)) {
       const columnName = column.name || colKey
       if (seriesOwnedColumnNames.includes(columnName)) continue
@@ -135,10 +170,16 @@ export const useTooltip = props => {
         columnsWithTooltips.push([column.label, formattedValue])
       }
     }
-    const additionalTooltipItems = [] as [string, string | number][]
+    const additionalTooltipItems: TooltipRow[] = []
 
     columnsWithTooltips.forEach(columnData => {
-      additionalTooltipItems.push([columnData[0], columnData[1]])
+      additionalTooltipItems.push(
+        createTooltipRow({
+          key: columnData[0],
+          value: columnData[1],
+          kind: 'extra'
+        })
+      )
     })
 
     if (visualizationType === 'Pie') {
@@ -155,21 +196,46 @@ export const useTooltip = props => {
       const showPiePercent = config.dataFormat.showPiePercent || false
 
       if (showPiePercent && pieData[config.xAxis.dataKey] === 'Calculated Area') {
-        tooltipItems.push(['', 'Calculated Area'])
+        tooltipItems.push(
+          createTooltipRow({
+            key: '',
+            value: 'Calculated Area',
+            kind: 'heading'
+          })
+        )
       } else {
         tooltipItems.push(
-          [config.xAxis.dataKey, pieData[config.xAxis.dataKey]],
-          [
-            config.runtime.yAxis.label || config.runtime.yAxis.dataKey,
-            showPiePercent ? pctString(actualPieValue) : formatNumber(pieData[config.runtime.yAxis.dataKey])
-          ],
-          showPiePercent ? [] : ['Percent', pctString(pctOf360)]
+          createTooltipRow({
+            key: config.xAxis.dataKey,
+            value: pieData[config.xAxis.dataKey],
+            kind: 'heading'
+          }),
+          createTooltipRow({
+            key: config.runtime.yAxis.label || config.runtime.yAxis.dataKey,
+            value: showPiePercent ? pctString(actualPieValue) : formatNumber(pieData[config.runtime.yAxis.dataKey]),
+            kind: 'extra'
+          })
         )
+        if (!showPiePercent) {
+          tooltipItems.push(
+            createTooltipRow({
+              key: 'Percent',
+              value: pctString(pctOf360),
+              kind: 'extra'
+            })
+          )
+        }
       }
     }
 
     if (visualizationType === 'Forest Plot') {
-      tooltipItems.push([config.xAxis.dataKey, getClosestYValue(y)])
+      tooltipItems.push(
+        createTooltipRow({
+          key: config.xAxis.dataKey,
+          value: getClosestYValue(y),
+          kind: 'heading'
+        })
+      )
     }
 
     const isLinearChart = !['Pie', 'Forest Plot'].includes(visualizationType)
@@ -205,9 +271,34 @@ export const useTooltip = props => {
               ) {
                 return []
               } else if (seriesObjWithName && seriesObjWithName.name === '') {
-                return [['', formattedValue, getAxisPosition(seriesKey)]]
+                return [
+                  createTooltipRow({
+                    key: '',
+                    value: formattedValue,
+                    axisPosition: getAxisPosition(seriesKey),
+                    kind: 'series',
+                    seriesKey
+                  })
+                ]
+              } else if (config.xAxis?.dataKey == seriesKey) {
+                return [
+                  createTooltipRow({
+                    key: seriesKey,
+                    value: formattedValue,
+                    axisPosition: getAxisPosition(seriesKey),
+                    kind: 'heading'
+                  })
+                ]
               } else {
-                return [[seriesKey, formattedValue, getAxisPosition(seriesKey)]]
+                return [
+                  createTooltipRow({
+                    key: seriesKey,
+                    value: formattedValue,
+                    axisPosition: getAxisPosition(seriesKey),
+                    kind: 'series',
+                    seriesKey
+                  })
+                ]
               }
             })
         )
@@ -247,7 +338,15 @@ export const useTooltip = props => {
             if (resolvedScaleValue) {
               const value = resolvedScaleValue[series.originalDataKey]
               const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
-              tooltipItems.push([seriesKey, formattedValue, getAxisPosition(seriesKey)])
+              tooltipItems.push(
+                createTooltipRow({
+                  key: seriesKey,
+                  value: formattedValue,
+                  axisPosition: getAxisPosition(seriesKey),
+                  kind: 'series',
+                  seriesKey
+                })
+              )
             }
           }
         })
@@ -261,12 +360,31 @@ export const useTooltip = props => {
           const xVal = dataColumn[config.xAxis.dataKey]
           const closestXScaleValue = getXValueFromCoordinate(x - Y_AXIS_SIZE)
 
-          tooltipItems.push([config.xAxis.dataKey, closestXScaleValue || xVal])
+          tooltipItems.push(
+            createTooltipRow({
+              key: config.xAxis.dataKey,
+              value: closestXScaleValue || xVal,
+              kind: 'heading'
+            })
+          )
           const formattedValue = getFormattedValue(seriesKey, value, config, getAxisPosition)
-          tooltipItems.push([seriesKey, formattedValue])
+          tooltipItems.push(
+            createTooltipRow({
+              key: seriesKey,
+              value: formattedValue,
+              kind: 'series',
+              seriesKey
+            })
+          )
         } else if (dynamicSeries) {
           Object.keys(dataColumn).forEach(key => {
-            tooltipItems.push([key, dataColumn[key]])
+            tooltipItems.push(
+              createTooltipRow({
+                key,
+                value: dataColumn[key],
+                kind: key === config.xAxis.dataKey ? 'heading' : 'extra'
+              })
+            )
           })
         }
       }
@@ -283,16 +401,11 @@ export const useTooltip = props => {
     }
 
     // Strip link tags from all tooltip values
-    const cleanTooltipItems = [...tooltipItems, ...additionalTooltipItems].map(item => {
-      // item can be [key, value] or [key, value, axisPosition]
-      if (Array.isArray(item)) {
-        // Only strip from value (item[1])
-        const newItem = [...item]
-        newItem[1] = stripLinkTags(newItem[1])
-        return newItem
-      }
-      return item
-    })
+    const cleanTooltipItems = [...tooltipItems, ...additionalTooltipItems].map(item => ({
+      ...item,
+      value: stripLinkTags(item.value)
+    }))
+    const useMarkerColumn = tooltipHasMarkerColumn(cleanTooltipItems)
 
     const tooltipInformation = {
       tooltipLeft: dataXPosition,
@@ -300,7 +413,8 @@ export const useTooltip = props => {
       tooltipData: {
         data: cleanTooltipItems,
         dataXPosition,
-        dataYPosition
+        dataYPosition,
+        useMarkerColumn
       }
     }
     showTooltip(tooltipInformation)
@@ -654,9 +768,8 @@ export const useTooltip = props => {
     return originalColumnName
   }
 
-  const TooltipListItem = ({ item }) => {
-    const [index, additionalData] = item
-    const [key, value, axisPosition] = additionalData
+  const TooltipListItem = ({ row, index, useMarkerColumn = false }) => {
+    const { key, value, axisPosition, kind, markerColor, markerShape = 'circle' } = row
 
     if (visualizationType === 'Forest Plot') {
       if (key === config.xAxis.dataKey)
@@ -718,10 +831,26 @@ export const useTooltip = props => {
     }
     const activeLabel = getSeriesNameFromLabel(key)
     const displayText = activeLabel ? `${activeLabel}: ${newValue}` : newValue
+    const shouldRenderMarkerSlot = useMarkerColumn && kind !== 'heading'
+    const markerSlot = shouldRenderMarkerSlot ? (
+      <span className='tooltip-marker-slot' aria-hidden='true'>
+        {markerColor ? (
+          <span
+            className={`tooltip-marker-swatch tooltip-marker-swatch--${markerShape}`}
+            style={{ backgroundColor: markerColor }}
+          />
+        ) : null}
+      </span>
+    ) : null
+    const content = displayText !== undefined ? parse(String(displayText)) : displayText
 
     return (
-      <li style={style} className='tooltip-body mb-1 cove-prose'>
-        {displayText !== undefined ? parse(String(displayText)) : displayText}
+      <li
+        style={style}
+        className={`tooltip-body mb-1 cove-prose ${shouldRenderMarkerSlot ? 'tooltip-body--marker-layout' : ''}`}
+      >
+        {markerSlot}
+        {shouldRenderMarkerSlot ? <span className='tooltip-body-content'>{content}</span> : content}
       </li>
     )
   }
