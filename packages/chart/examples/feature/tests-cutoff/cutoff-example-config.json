@@ -1,7 +1,7 @@
 {
   "title": "Data Cutoff Example (< 0.1)",
   "theme": "theme-blue",
-  "dataUrl": "/examples/feature/tests-cutoff/cutoff-example-data.json",
+  "dataUrl": "/examples/feature/tests-cutoff/__data__/cutoff-example-data.json",
   "animate": true,
   "animateReplay": true,
   "visualizationType": "Line",
