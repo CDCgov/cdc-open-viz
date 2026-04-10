@@ -82,7 +82,7 @@ export const Data_Bite_TP5_Data_Colors: Story = {
     docs: {
       description: {
         story:
-          'TP5 Style with Data Colors - Background color changes based on the value in the "Status" column. Filter to different rows to see the background change. Open the "Data Colors" accordion to configure mappings.'
+          'TP5 Style with Data Colors - Background color changes based on the value in the "Status" column. Filter to different rows to see the background change. Open the "Data Driven Colors" accordion to configure mappings.'
       }
     }
   },
