@@ -147,4 +147,13 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
   input[type='range'] {
     appearance: auto !important;
   }
+
+  // Right now production uses bootstrap 5
+  // Editor uses bootstrap 4, so we need to support both
+  // This resolves issues for svg legend/datatable circle spacing
+  .me-2,
+  .mr-2 {
+    margin-right: 0.5rem !important;
+    margin-inline-end: 0.5rem !important;
+  }
 }
