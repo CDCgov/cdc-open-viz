@@ -611,17 +611,15 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                     </span>
                   </label>
 
-                  {filter.filterStyle === FILTER_STYLE.nestedDropdown && (
-                    <label>
-                      <input
-                        type='checkbox'
-                        checked={!!filter.displaySubgroupingOnly}
-                        aria-label='Display subgrouping only'
-                        onChange={e => updateFilterProp('displaySubgroupingOnly', e.target.checked)}
-                      />
-                      <span> Display subgrouping only</span>
-                    </label>
-                  )}
+                  <label>
+                    <input
+                      type='checkbox'
+                      checked={!!filter.displaySubgroupingOnly}
+                      aria-label='Display subgrouping only'
+                      onChange={e => updateFilterProp('displaySubgroupingOnly', e.target.checked)}
+                    />
+                    <span> Display subgrouping only</span>
+                  </label>
                 </>
               )}
               <Select
