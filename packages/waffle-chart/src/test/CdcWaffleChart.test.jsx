@@ -129,6 +129,34 @@ describe('Waffle Chart', () => {
     ).toBeInTheDocument()
   })
 
+  it('does not render a trend arrow for legacy waffle styles', async () => {
+    const { container } = render(
+      <CdcWaffleChart
+        config={createBaseConfig({
+          visualizationType: 'Waffle',
+          data: [{ value: 42, total: 100, trend: 'increase' }],
+          customDenom: true,
+          dataDenomColumn: 'total',
+          showPercent: true,
+          trendIndicator: {
+            mode: 'categorical',
+            column: 'trend',
+            mappings: [{ sourceValue: 'increase', arrowType: 'up' }],
+            upLabel: 'Increasing'
+          }
+        })}
+      />
+    )
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-waffle-chart__data--primary')).toBeInTheDocument()
+    })
+
+    expect(container.querySelector('.mock-trend-arrow-wrap')).not.toBeInTheDocument()
+    expect(container.querySelector('.cove-waffle-chart__trend-slot--inline')).not.toBeInTheDocument()
+    expect(container.querySelector('.cove-waffle-chart__trend-slot--below')).not.toBeInTheDocument()
+  })
+
   it('moves the trend indicator below the value when a footer trend label is configured', async () => {
     const { container } = render(
       <CdcWaffleChart
