@@ -506,8 +506,6 @@ const CountyMap = () => {
           if (filteredStateCode) {
             if (filteredStateCode === clickedState.id) {
               setFilteredCountyCode(county.id)
-            } else {
-              setFilteredCountyCode('')
             }
           }
         }
@@ -988,7 +986,7 @@ const CountyMap = () => {
     }
     // Highlight HSA boundary if applicable
     if (hsaHighlight) {
-      context.lineWidth = 3
+      context.lineWidth = 2.5 * strokeScale
       context.strokeStyle = hsaStrokeColor
       context.stroke(hsaHighlight)
     }

@@ -29,7 +29,8 @@ import {
   getQueryStringFilterValue,
   isFilterHiddenByQuery,
   removeQueryParam,
-  updateQueryParam
+  updateQueryParam,
+  updateQueryParams
 } from '@cdc/core/helpers/queryStringUtils'
 import { generateRuntimeFilters } from './helpers/generateRuntimeFilters'
 import { type MapReducerType, MapState } from './store/map.reducer'
@@ -177,13 +178,16 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       const [stateFilter, countyFilter] = filterCopy.filter(
         f => f.staticFilter && ['state', 'county'].includes(f.columnName)
       )
-      const stateCode = (stateFilter?.active as string) || ''
-      setFilteredStateCode(stateCode)
-      if (countyFilter) {
+      if (countyFilter?.active) {
+        // county changed
         const countyCode = (countyFilter.active as string) || ''
         setFilteredCountyCode(countyCode)
-        filterCopy.pop() // remove county filter
+      } else {
+        // state changed
+        const stateCode = (stateFilter?.active as string) || ''
+        setFilteredStateCode(stateCode)
       }
+      if (countyFilter) filterCopy.pop() // remove county filter
       filterCopy.pop() // remove state filter
     }
     _setRuntimeData(filterCopy)
@@ -390,11 +394,9 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     const stateCodePattern = /^\d\d$/
     const normalizedStateCode = stateCodePattern.test(stateCode) ? stateCode : ''
     if (!normalizedStateCode) {
-      removeQueryParam(STATE_CODE)
-      removeQueryParam(COUNTY_CODE)
+      updateQueryParams({ [STATE_CODE]: '', [COUNTY_CODE]: '' })
     } else if (normalizedStateCode !== filteredStateCode) {
-      updateQueryParam(STATE_CODE, normalizedStateCode)
-      removeQueryParam(COUNTY_CODE)
+      updateQueryParams({ [STATE_CODE]: normalizedStateCode, [COUNTY_CODE]: '' })
     }
   }
 
