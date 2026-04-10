@@ -46,16 +46,20 @@ const DataColorSelector: React.FC<DataColorSelectorProps> = ({ value, onChange }
     }
   }, [])
 
+  const handleScrollClose = useCallback(() => {
+    setIsOpen(false)
+  }, [])
+
   useEffect(() => {
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside)
-      window.addEventListener('scroll', () => setIsOpen(false), true)
+      window.addEventListener('scroll', handleScrollClose, true)
       return () => {
         document.removeEventListener('mousedown', handleClickOutside)
-        window.removeEventListener('scroll', () => setIsOpen(false), true)
+        window.removeEventListener('scroll', handleScrollClose, true)
       }
     }
-  }, [isOpen, handleClickOutside])
+  }, [isOpen, handleClickOutside, handleScrollClose])
 
   return (
     <>
