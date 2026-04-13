@@ -193,7 +193,7 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
       const formattedValue = formatColNumber(
         closestVal[config.columns[colKeys].name],
         'left',
-        true,
+        false,
         config,
         formattingParams
       )

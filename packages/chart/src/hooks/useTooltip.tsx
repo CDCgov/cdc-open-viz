@@ -93,7 +93,7 @@ export const useTooltip = props => {
     const formattedValue =
       seriesKey === config.xAxis.dataKey
         ? value
-        : formatColNumber(value, getAxisPosition(seriesKey), true, config, formattingParams)
+        : formatColNumber(value, getAxisPosition(seriesKey), false, config, formattingParams)
 
     return showMissingDataValue ? 'N/A' : formattedValue
   }
@@ -164,7 +164,7 @@ export const useTooltip = props => {
           : resolvedScaleValues[0]?.[colKey]
       const closestValue = config.visualizationType === 'Pie' ? pieColumnData : columnData
 
-      const formattedValue = formatColNumber(closestValue, 'left', true, config, formattingParams)
+      const formattedValue = formatColNumber(closestValue, 'left', false, config, formattingParams)
 
       if (column.tooltips) {
         columnsWithTooltips.push([column.label, formattedValue])
