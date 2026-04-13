@@ -178,15 +178,10 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
       const [stateFilter, countyFilter] = filterCopy.filter(
         f => f.staticFilter && ['state', 'county'].includes(f.columnName)
       )
-      if (countyFilter?.active) {
-        // county changed
-        const countyCode = (countyFilter.active as string) || ''
-        setFilteredCountyCode(countyCode)
-      } else {
-        // state changed
-        const stateCode = (stateFilter?.active as string) || ''
-        setFilteredStateCode(stateCode)
-      }
+      const stateCode = (stateFilter?.active as string) || ''
+      const countyCode = (countyFilter?.active as string) || ''
+
+      setFilteredStateCountyCode(stateCode, countyCode)
       if (countyFilter) filterCopy.pop() // remove county filter
       filterCopy.pop() // remove state filter
     }
@@ -390,36 +385,29 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
 
   const STATE_CODE = 'state-code'
   const COUNTY_CODE = 'county-code'
-  const setFilteredStateCode = (stateCode: string) => {
+  const setFilteredStateCountyCode = (stateCode: string, countyCode?: string) => {
     const stateCodePattern = /^\d\d$/
     const normalizedStateCode = stateCodePattern.test(stateCode) ? stateCode : ''
+    let _countyCode = ''
+    if (countyCode) {
+      const countyCodePattern = /^\d{5}$/
+      _countyCode = countyCodePattern.test(countyCode) ? countyCode : ''
+    }
     if (!normalizedStateCode) {
       updateQueryParams({ [STATE_CODE]: '', [COUNTY_CODE]: '' })
-    } else if (normalizedStateCode !== filteredStateCode) {
-      updateQueryParams({ [STATE_CODE]: normalizedStateCode, [COUNTY_CODE]: '' })
-    }
-  }
-
-  const setFilteredCountyCode = (countyCode: string) => {
-    const countyCodePattern = /^\d{5}$/
-    const normalizedCountyCode = countyCodePattern.test(countyCode) ? countyCode : ''
-    if (!normalizedCountyCode) {
-      removeQueryParam(COUNTY_CODE)
     } else {
-      updateQueryParam(COUNTY_CODE, normalizedCountyCode)
+      updateQueryParams({ [STATE_CODE]: normalizedStateCode, [COUNTY_CODE]: _countyCode })
     }
   }
 
-  const setFilteredStateCodeFromQuery = (stateCode: string) => {
-    dispatch({ type: 'SET_FILTERED_STATE_CODE', payload: stateCode })
+  const setFilteredStateCodeFromQuery = ({
+    [STATE_CODE]: stateCode,
+    [COUNTY_CODE]: countyCode
+  }: Record<string, string>) => {
+    dispatch({ type: 'SET_FILTERED_STATE_COUNTY_CODE', payload: { stateCode, countyCode } })
   }
 
-  const setFilteredCountyCodeFromQuery = (countyCode: string) => {
-    dispatch({ type: 'SET_FILTERED_COUNTY_CODE', payload: countyCode })
-  }
-
-  useQueryParamsListener(STATE_CODE, setFilteredStateCodeFromQuery)
-  useQueryParamsListener(COUNTY_CODE, setFilteredCountyCodeFromQuery)
+  useQueryParamsListener([STATE_CODE, COUNTY_CODE], setFilteredStateCodeFromQuery)
 
   const mapProps = {
     setParentConfig,
@@ -443,8 +431,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeLegend,
     scale,
     setConfig,
-    setFilteredCountyCode,
-    setFilteredStateCode,
+    setFilteredStateCountyCode,
     setSharedFilter,
     setSharedFilterValue,
     config,

@@ -184,9 +184,8 @@ const CountyMap = () => {
     runtimeLegend,
     setConfig,
     filteredStateCode,
-    setFilteredStateCode,
+    setFilteredStateCountyCode,
     filteredCountyCode,
-    setFilteredCountyCode,
     config,
     tooltipId,
     tooltipRef,
@@ -400,7 +399,7 @@ const CountyMap = () => {
       ...config,
       mapPosition: { coordinates: [0, 30], zoom: 1 }
     })
-    setFilteredStateCode('')
+    setFilteredStateCountyCode('')
     resetZoomTransform()
   }
 
@@ -487,6 +486,7 @@ const CountyMap = () => {
     }
 
     // If the user clicked outside of all states, no behavior
+    let clickedCounty = ''
     if (clickedState) {
       // If a county within the state was clicked and has data, call parent click handler
       if (topoData.countyIndecies[clickedState.id]) {
@@ -505,7 +505,7 @@ const CountyMap = () => {
           geoClickHandler(displayGeoName(county.id), runtimeData[county.id])
           if (filteredStateCode) {
             if (filteredStateCode === clickedState.id) {
-              setFilteredCountyCode(county.id)
+              clickedCounty = county.id || ''
             }
           }
         }
@@ -517,7 +517,7 @@ const CountyMap = () => {
           ...config,
           mapPosition: { coordinates: [0, 30], zoom: 3 }
         })
-        setFilteredStateCode(clickedState.id)
+        setFilteredStateCountyCode(clickedState.id, clickedCounty)
 
         publishAnalyticsEvent({
           vizType: config.type,
@@ -995,7 +995,7 @@ const CountyMap = () => {
 
   useEffect(() => {
     if (!config.general.allowMapZoom) {
-      setFilteredStateCode('')
+      setFilteredStateCountyCode('')
       setHasMoved(false)
       resetZoomTransform()
     }

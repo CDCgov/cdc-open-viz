@@ -57,8 +57,12 @@ export function getQueryParams() {
   return queryParams
 }
 
-export function getQueryParam(param) {
-  return getQueryParams()[param]
+export function getQueryParam(param: string) {
+  const value = getQueryParams()[param]
+  if (Array.isArray(value)) {
+    return value.join(',')
+  }
+  return value
 }
 
 export function updateQueryString(queryParams) {

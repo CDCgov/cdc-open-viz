@@ -82,10 +82,12 @@ const reducer = (state: MapState, action: MapActions): MapState => {
       return { ...state, displayPanel: action.payload }
     case 'SET_FILTERED_COUNTRY_CODE':
       return { ...state, filteredCountryCode: action.payload }
-    case 'SET_FILTERED_COUNTY_CODE':
-      return { ...state, filteredCountyCode: action.payload }
-    case 'SET_FILTERED_STATE_CODE':
-      return { ...state, filteredStateCode: action.payload, filteredCountyCode: '' }
+    case 'SET_FILTERED_STATE_COUNTY_CODE':
+      return {
+        ...state,
+        filteredStateCode: action.payload.stateCode || '',
+        filteredCountyCode: action.payload.countyCode || ''
+      }
     case 'SET_IS_DRAGGING_ANNOTATION':
       return { ...state, isDraggingAnnotation: action.payload }
     case 'SET_TOPO_DATA':

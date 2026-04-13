@@ -39,8 +39,7 @@ export type MapContext = {
   runtimeLegend
   setParentConfig: Function
   setRuntimeData: Function
-  setFilteredCountyCode: (countyCode: string) => void
-  setFilteredStateCode: (stateCode: string) => void
+  setFilteredStateCountyCode: (stateCode: string, countyCode?: string) => void
   setSharedFilterValue: Function
   setConfig: (newState: MapConfig) => MapConfig
   config: MapConfig
