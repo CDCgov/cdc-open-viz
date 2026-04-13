@@ -360,8 +360,8 @@
     "isStacked": false
   },
   "visualizationType": "Bar",
-  "dataUrl": "examples/feature/bar/tall-data.json",
-  "dataFileName": "tall-data.json",
+  "dataUrl": "examples/feature/bar/__data__/tall-data.json",
+  "dataFileName": "__data__/tall-data.json",
   "dataFileSourceType": "file",
   "dataDescription": {
     "horizontal": false,

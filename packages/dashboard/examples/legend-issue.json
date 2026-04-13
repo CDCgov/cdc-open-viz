@@ -16,7 +16,7 @@
       "dataFileSourceType": "url",
       "dataFileFormat": "JSON",
       "preview": true,
-      "dataUrl": "/examples/legend-issue-data.json"
+      "dataUrl": "/examples/__data__/legend-issue-data.json"
     }
   },
   "visualizationType": null,

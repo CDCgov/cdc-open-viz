@@ -113,6 +113,8 @@ function listJsonFiles(dir, baseDir, ancestorRealPaths = new Set()) {
 
   const entries = fs.readdirSync(dir, { withFileTypes: true })
   for (const entry of entries) {
+    if (entry.name === '__data__') continue
+
     const fullPath = path.join(dir, entry.name)
     if (isTraversableDirectory(entry, fullPath)) {
       files.push(...listJsonFiles(fullPath, baseDir, nextAncestorRealPaths))

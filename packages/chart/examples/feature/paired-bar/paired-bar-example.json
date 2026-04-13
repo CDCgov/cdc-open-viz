@@ -1,6 +1,6 @@
 {
   "title": "Paired Bar Chart Example",
-  "dataUrl": "/examples/feature/paired-bar/paired-bar-data.json",
+  "dataUrl": "/examples/feature/paired-bar/__data__/paired-bar-data.json",
   "animate": true,
   "animateReplay": true,
   "visualizationType": "Paired Bar",
