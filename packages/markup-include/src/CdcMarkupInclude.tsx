@@ -9,6 +9,7 @@ import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 import { publish } from '@cdc/core/helpers/events'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
+import { resolveDataColor } from '@cdc/core/helpers/dataColors'
 import ConfigContext from './ConfigContext'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
@@ -95,6 +96,14 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const { inlineHTML, srcUrl, title, useInlineHTML, style: contentStyle } = contentEditor || {}
   const markupIncludeStyle = contentStyle || 'default'
   const isTp5Style = markupIncludeStyle === 'tp5'
+
+  const dataColorResolution = useMemo(() => {
+    const dataArr = Array.isArray(data) ? data : []
+    return resolveDataColor({
+      data: dataArr,
+      dataColors: config?.dataColors
+    })
+  }, [data, config?.dataColors])
 
   const contentClasses = isTp5Style
     ? rawContentClasses.filter(
@@ -372,7 +381,16 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
         }
       >
         {isTp5Style ? (
-          <div className='markup-include-tp5 cdc-callout d-flex flex-column h-100'>
+          <div
+            className={`markup-include-tp5 cdc-callout d-flex flex-column h-100 ${
+              dataColorResolution.state === 'resolved' ? 'cdc-callout--data-color' : ''
+            }`}
+            style={
+              dataColorResolution.state === 'resolved'
+                ? { backgroundColor: dataColorResolution.color, color: dataColorResolution.textColor }
+                : undefined
+            }
+          >
             {hasTp5Title && (
               <h3 className='cdc-callout__heading cove-prose fw-bold flex-shrink-0 d-flex align-items-start'>
                 <span>{parse(processedTitle.trim())}</span>

@@ -73,6 +73,24 @@ export const Data_Bite_TP5_Style: Story = {
   }
 }
 
+export const Data_Bite_TP5_Data_Colors: Story = {
+  args: {
+    configUrl: '/packages/data-bite/examples/tp5-data-colors.json',
+    isEditor: true
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'TP5 Style with Data Colors - Background color changes based on the value in the "Status" column. Filter to different rows to see the background change. Open the "Data Driven Colors" accordion to configure mappings.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+  }
+}
+
 export const Data_Bite_TP5_White_Background: Story = {
   args: {
     configUrl: '/packages/data-bite/examples/tp5-white-background.json'

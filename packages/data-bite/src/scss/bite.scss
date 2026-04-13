@@ -283,6 +283,17 @@
       row-gap: var(--cove-visualization-section-gap, 1.5rem);
     }
 
+    .cdc-callout--data-color {
+      .cdc-callout__heading,
+      .cdc-callout__databite,
+      .cdc-callout__value,
+      .cdc-callout__trend-footer-label,
+      .cdc-callout__content,
+      .bite-subtext {
+        color: inherit;
+      }
+    }
+
     .bite-subtext {
       font-style: italic;
       line-height: var(--visualization-body-line-height);
@@ -300,6 +311,10 @@
       .cdc-callout {
         border: 1px solid #009ec1 !important;
         background: transparent;
+      }
+
+      .cdc-callout--data-color {
+        border: none !important;
       }
     }
   }

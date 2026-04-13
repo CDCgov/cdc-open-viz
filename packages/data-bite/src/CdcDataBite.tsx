@@ -59,6 +59,7 @@ import {
   TREND_MODE_CATEGORICAL,
   TREND_MODE_NUMERIC
 } from '@cdc/core/helpers/trendIndicator'
+import { resolveDataColor } from '@cdc/core/helpers/dataColors'
 
 // styles
 import './scss/main.scss'
@@ -271,6 +272,15 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
       allowNumericMode: true
     })
   }, [trendIndicator, dataFunction, dataColumn, getRowsForMainNumericCalculation, getFilteredDataRows])
+
+  const dataColorResolution = useMemo(() => {
+    const filteredRows = getFilteredDataRows()
+    const dataRows = filteredRows.length ? filteredRows : Array.isArray(config.data) ? config.data : []
+    return resolveDataColor({
+      data: dataRows,
+      dataColors: config.dataColors
+    })
+  }, [config.dataColors, config.data, getFilteredDataRows])
 
   const resolvedTrendLabel = useMemo(() => {
     if (trendResolution.state !== 'resolved' || !trendResolution.arrowType) {
@@ -711,9 +721,14 @@ const CdcDataBite = (props: CdcDataBiteProps) => {
             <div
               className={`bite-content cdc-callout d-flex flex-column h-100 ${
                 !config.visual?.whiteBackground ? 'dfe-block cdc-callout--data' : ''
-              }`}
+              } ${dataColorResolution.state === 'resolved' ? 'cdc-callout--data-color' : ''}`}
+              style={
+                dataColorResolution.state === 'resolved'
+                  ? { backgroundColor: dataColorResolution.color, color: dataColorResolution.textColor }
+                  : undefined
+              }
             >
-              {!config.visual?.whiteBackground && (
+              {!config.visual?.whiteBackground && dataColorResolution.state !== 'resolved' && (
                 <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
               )}
 

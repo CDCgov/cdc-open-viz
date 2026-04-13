@@ -346,6 +346,26 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
     updateVariable(variableIndex, { svgMappings: nextMappings })
   }
 
+  const addCustomSvgMapping = (variableIndex: number) => {
+    const variable = safeMarkupVariables[variableIndex]
+    const nextMappings = [...(variable.svgMappings || []), { sourceValue: '', svgId: '' as MarkupVariableSvgMapping['svgId'] }]
+    updateVariable(variableIndex, { svgMappings: nextMappings })
+  }
+
+  const updateSvgMappingValue = (variableIndex: number, oldValue: string, newValue: string) => {
+    const variable = safeMarkupVariables[variableIndex]
+    const nextMappings = (variable.svgMappings || []).map(m =>
+      m.sourceValue === oldValue ? { ...m, sourceValue: newValue } : m
+    )
+    updateVariable(variableIndex, { svgMappings: nextMappings })
+  }
+
+  const removeSvgMapping = (variableIndex: number, sourceValue: string) => {
+    const variable = safeMarkupVariables[variableIndex]
+    const nextMappings = (variable.svgMappings || []).filter(m => m.sourceValue !== sourceValue)
+    updateVariable(variableIndex, { svgMappings: nextMappings })
+  }
+
   const updateSourceType = (index: number, sourceType: MarkupVariableSourceType) => {
     const variable = safeMarkupVariables[index]
 
@@ -452,6 +472,20 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                   sourceType === 'column' && usesDataDrivenIcons && variable.columnName
                     ? getColumnValues(variable.columnName)
                     : []
+                const svgDisplayList = (() => {
+                  const dataSet = new Set(svgSourceValues)
+                  const list: { sourceValue: string; fromData: boolean; key: string }[] = svgSourceValues.map(v => ({
+                    sourceValue: v,
+                    fromData: true,
+                    key: `data-${v}`
+                  }))
+                  ;(variable.svgMappings || []).forEach((m, i) => {
+                    if (!dataSet.has(m.sourceValue)) {
+                      list.push({ sourceValue: m.sourceValue, fromData: false, key: `custom-${i}` })
+                    }
+                  })
+                  return list
+                })()
                 const iconLabel = getSvgRegistryLabel(variable.iconId) || 'Not selected'
 
                 return (
@@ -604,8 +638,8 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
 
                                     {variable.columnName ? (
                                       <>
-                                        {svgSourceValues.length > 0 ? (
-                                          svgSourceValues.map(sourceValue => {
+                                        {svgDisplayList.length > 0 ? (
+                                          svgDisplayList.map(({ sourceValue, fromData, key }) => {
                                             const selectedSvgId =
                                               variable.svgMappings?.find(mapping => mapping.sourceValue === sourceValue)
                                                 ?.svgId || ''
@@ -613,10 +647,24 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                             return (
                                               <div
                                                 className='cove-accordion__panel-row align-center mb-2'
-                                                key={sourceValue}
+                                                key={key}
                                               >
-                                                <div className='cove-accordion__panel-col flex-grow'>{sourceValue}</div>
-                                                <div className='cove-accordion__panel-col flex-grow'>
+                                                <div className='cove-accordion__panel-col' style={{ flex: '1 1 0', minWidth: 0 }}>
+                                                  {fromData ? (
+                                                    sourceValue
+                                                  ) : (
+                                                    <input
+                                                      type='text'
+                                                      value={sourceValue}
+                                                      placeholder='Enter value'
+                                                      style={{ width: '100%' }}
+                                                      onChange={e =>
+                                                        updateSvgMappingValue(index, sourceValue, e.target.value)
+                                                      }
+                                                    />
+                                                  )}
+                                                </div>
+                                                <div className='cove-accordion__panel-col' style={{ flex: '1 1 0', minWidth: 0 }}>
                                                   <SvgIconSelect
                                                     value={selectedSvgId}
                                                     options={[{ value: '', label: 'None' }, ...SVG_REGISTRY_OPTIONS]}
@@ -629,6 +677,19 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                                     }
                                                   />
                                                 </div>
+                                                <div className='cove-accordion__panel-col' style={{ flex: '0 0 1.5rem' }}>
+                                                  {!fromData && (
+                                                    <button
+                                                      type='button'
+                                                      className='btn btn-danger'
+                                                      style={{ padding: '0.15rem 0.45rem', lineHeight: 1 }}
+                                                      title='Remove mapping'
+                                                      onClick={() => removeSvgMapping(index, sourceValue)}
+                                                    >
+                                                      −
+                                                    </button>
+                                                  )}
+                                                </div>
                                               </div>
                                             )
                                           })
@@ -637,6 +698,13 @@ const MarkupVariablesEditor: React.FC<MarkupVariablesEditorProps> = ({
                                             No values found for the selected column.
                                           </div>
                                         )}
+                                        <Button
+                                          type='button'
+                                          onClick={() => addCustomSvgMapping(index)}
+                                          className='btn btn-primary full-width mt-2 mb-2'
+                                        >
+                                          Add Icon Mapping
+                                        </Button>
                                       </>
                                     ) : (
                                       <div className='text-sm text-gray-500 mb-2'>
