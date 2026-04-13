@@ -58,7 +58,7 @@ export function getQueryParams() {
 }
 
 export function getQueryParam(param: string) {
-  const value = getQueryParams()[param]
+  const value = getQueryParams()?.[param]
   if (Array.isArray(value)) {
     return value.join(',')
   }
@@ -71,7 +71,6 @@ export function updateQueryString(queryParams) {
     .join('&')}`
   window.history.pushState({ path: updateUrl }, '', updateUrl)
   events.publish(events.QUERY_CHANGE_EVENT)
-  console.log('Updated query string:', updateUrl)
 }
 
 export function updateQueryParams(newParams: Record<string, string>) {
