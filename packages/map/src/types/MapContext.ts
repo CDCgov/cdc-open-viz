@@ -7,12 +7,14 @@ import { MutableRefObject } from 'react'
 
 export type MapContext = {
   currentViewport: ViewPort
+  customNavigationHandler?: Function
   vizViewport?: ViewPort
   content: { geoName: string; keyedData: Record<string, any> }
   dimensions: DimensionsType
   displayDataAsText: string | number
   displayGeoName: (key: string, displayOverride?: string) => string
   filteredCountryCode: string
+  filteredCountyCode: string
   filteredStateCode: string
   generateRuntimeData: (
     configObj: MapConfig,
@@ -37,7 +39,7 @@ export type MapContext = {
   runtimeLegend
   setParentConfig: Function
   setRuntimeData: Function
-  setFilteredStateCode: (stateCode: string) => void
+  setFilteredStateCountyCode: (stateCode: string, countyCode?: string) => void
   setSharedFilterValue: Function
   setConfig: (newState: MapConfig) => MapConfig
   config: MapConfig

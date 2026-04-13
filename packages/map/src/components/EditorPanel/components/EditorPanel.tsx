@@ -1338,6 +1338,23 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         label='Show HSA Boundaries'
                         updateField={updateField}
                         section='general'
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon
+                                display='question'
+                                style={{ marginLeft: '0.5rem', display: 'inline-block', whiteSpace: 'nowrap' }}
+                              />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>
+                                Health Service Areas (HSAs) are a county or cluster of contiguous counties which are
+                                relatively self-contained with respect to hospital care. Set HSA description in tooltip
+                                under the Columns accordion.
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
                       />
                     )}
                     {(config.general.geoType === 'us-county' || config.general.geoType === 'single-state') && (
@@ -1862,6 +1879,26 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         />
                       </label>
                     </fieldset>
+                    {config.general.geoType === 'us-county' && config.general.showHSABoundaries && (
+                      <Select
+                        label='HSA Description Column'
+                        value={config.columns.hsa?.name}
+                        options={columnsOptions.map(c => c.key)}
+                        onChange={e => {
+                          editColumn('hsa', 'name', e.target.value)
+                        }}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Select the source column containing the HSA description.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                    )}
                     {'navigation' !== config.general.type && (
                       <fieldset className='primary-fieldset edit-block'>
                         <Select

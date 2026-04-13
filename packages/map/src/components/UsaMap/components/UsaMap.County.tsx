@@ -39,6 +39,7 @@ type TopoData = {
   mapData: Geometry[]
   countyIndecies: Record<string, [number, number]>
   projection: any
+  hsaMapping: Record<string, string>
 }
 
 const getCountyTopoURL = year => {
@@ -67,7 +68,8 @@ const getTopoData = (year, showHSABoundaries) => {
         hsas: [],
         mapData: [],
         countyIndecies: {},
-        projection: undefined
+        projection: undefined,
+        hsaMapping: {}
       }
 
       topoData.year = year || 'default'
@@ -80,7 +82,7 @@ const getTopoData = (year, showHSABoundaries) => {
         const hsaMapping = mappingResponse.default.reduce((acc, curr) => {
           acc[curr.county_fips] = curr.hsa_no
           return acc
-        }, {})
+        }, {} as Record<string, string>)
         const countyGeometries = response.objects.counties.geometries
         const geometriesByGroup = countyGeometries.reduce((acc, geometry) => {
           const groupId = hsaMapping[geometry.id]
@@ -94,6 +96,7 @@ const getTopoData = (year, showHSABoundaries) => {
           groupId,
           feature: merge(response as any, geometries)
         }))
+        topoData.hsaMapping = hsaMapping
       }
       topoData.states.sort(sortById)
       topoData.counties.sort(sortById)
@@ -112,7 +115,6 @@ const getTopoData = (year, showHSABoundaries) => {
         topoData.countyIndecies[state.id] = [minIndex, maxIndex]
       })
       topoData.projection = geoAlbersUsaTerritories()
-
       resolve(topoData)
     }
 
@@ -182,7 +184,8 @@ const CountyMap = () => {
     runtimeLegend,
     setConfig,
     filteredStateCode,
-    setFilteredStateCode,
+    setFilteredStateCountyCode,
+    filteredCountyCode,
     config,
     tooltipId,
     tooltipRef,
@@ -396,7 +399,7 @@ const CountyMap = () => {
       ...config,
       mapPosition: { coordinates: [0, 30], zoom: 1 }
     })
-    setFilteredStateCode('')
+    setFilteredStateCountyCode('')
     resetZoomTransform()
   }
 
@@ -483,6 +486,7 @@ const CountyMap = () => {
     }
 
     // If the user clicked outside of all states, no behavior
+    let clickedCounty = ''
     if (clickedState) {
       // If a county within the state was clicked and has data, call parent click handler
       if (topoData.countyIndecies[clickedState.id]) {
@@ -499,6 +503,11 @@ const CountyMap = () => {
         }
         if (county && runtimeData[county.id]) {
           geoClickHandler(displayGeoName(county.id), runtimeData[county.id])
+          if (filteredStateCode) {
+            if (filteredStateCode === clickedState.id) {
+              clickedCounty = county.id || ''
+            }
+          }
         }
       }
 
@@ -508,7 +517,7 @@ const CountyMap = () => {
           ...config,
           mapPosition: { coordinates: [0, 30], zoom: 3 }
         })
-        setFilteredStateCode(clickedState.id)
+        setFilteredStateCountyCode(clickedState.id, clickedCounty)
 
         publishAnalyticsEvent({
           vizType: config.type,
@@ -764,7 +773,7 @@ const CountyMap = () => {
       }
     }
 
-    if (focus.index !== -1) {
+    if (focus.index !== -1 && !config.general.showHSABoundaries) {
       const focusPath2d = geoPathCacheRef.current.get(topoData.mapData[focus.index]?.id)
       if (focusPath2d) {
         context.strokeStyle = geoStrokeColor
@@ -833,6 +842,7 @@ const CountyMap = () => {
     context.lineWidth = countyStrokeWidth
 
     // Iterates through each state/county topo and renders it using cached Path2D
+    let countyHighlight = null
     topoData.mapData.forEach(geo => {
       if (!geo.id) return
       if (focus.id && geo.id.length > 2 && geo.id.indexOf(focus.id) !== 0) return
@@ -842,18 +852,34 @@ const CountyMap = () => {
       if (!path2d) return
 
       const geoData = runtimeData[geo.id]
+      if (!config.general.showHSABoundaries && filteredCountyCode && geo.id === filteredCountyCode) {
+        countyHighlight = {
+          context,
+          path2d,
+          geoData,
+          canvasWidth: canvas.width,
+          strokeWidth: 2,
+          strokeColor: '#000000'
+        }
+      }
       paintCountyGeo(context, path2d, geoData, canvas.width, countyStrokeWidth, countyStrokeColor)
     })
 
+    let hsaHighlight = null
     if (config.general.showHSABoundaries) {
       context.strokeStyle = hsaStrokeColor
       context.lineWidth = hsaStrokeWidth
+
       topoData.hsas.forEach(hsa => {
         if (!hsa?.groupId) return
         const cacheKey = 'hsa_border_' + hsa.groupId
         const path2d = cache.get(cacheKey)
         if (path2d) {
-          context.stroke(path2d)
+          if (filteredCountyCode && topoData.hsaMapping[filteredCountyCode] === hsa.groupId) {
+            hsaHighlight = path2d
+          } else {
+            context.stroke(path2d)
+          }
         }
       })
     }
@@ -952,12 +978,24 @@ const CountyMap = () => {
         }
       })
     }
+
+    // Highlight county last so it is visible on top of all other layers
+    if (countyHighlight) {
+      const { context, path2d, geoData, canvasWidth, strokeWidth, strokeColor } = countyHighlight
+      paintCountyGeo(context, path2d, geoData, canvasWidth, strokeWidth, strokeColor)
+    }
+    // Highlight HSA boundary if applicable
+    if (hsaHighlight) {
+      context.lineWidth = 2.5 * strokeScale
+      context.strokeStyle = hsaStrokeColor
+      context.stroke(hsaHighlight)
+    }
     context.restore()
   }
 
   useEffect(() => {
     if (!config.general.allowMapZoom) {
-      setFilteredStateCode('')
+      setFilteredStateCountyCode('')
       setHasMoved(false)
       resetZoomTransform()
     }

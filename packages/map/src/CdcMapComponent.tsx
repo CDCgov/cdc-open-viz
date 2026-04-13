@@ -14,7 +14,7 @@ import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Title from '@cdc/core/components/ui/Title'
 import Waiting from '@cdc/core/components/Waiting'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
-import { supportedStatesFipsCodes } from './data/supported-geos'
+import { supportedStatesFipsCodes, supportedCounties } from './data/supported-geos'
 
 // types
 import { type MapConfig } from './types/MapConfig'
@@ -29,7 +29,8 @@ import {
   getQueryStringFilterValue,
   isFilterHiddenByQuery,
   removeQueryParam,
-  updateQueryParam
+  updateQueryParam,
+  updateQueryParams
 } from '@cdc/core/helpers/queryStringUtils'
 import { generateRuntimeFilters } from './helpers/generateRuntimeFilters'
 import { type MapReducerType, MapState } from './store/map.reducer'
@@ -129,6 +130,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     modal,
     accessibleStatus,
     filteredCountryCode,
+    filteredCountyCode,
     filteredStateCode,
     position,
     scale,
@@ -173,9 +175,15 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   const setFilters = (filters: VizFilter[]) => {
     const filterCopy = _.cloneDeep(filters)
     if (config.general.showStateDropdown) {
-      const stateFilter = filterCopy.pop()
+      const [stateFilter, countyFilter] = filterCopy.filter(
+        f => f.staticFilter && ['state', 'county'].includes(f.columnName)
+      )
       const stateCode = (stateFilter?.active as string) || ''
-      setFilteredStateCode(stateCode)
+      const countyCode = (countyFilter?.active as string) || ''
+
+      setFilteredStateCountyCode(stateCode, countyCode)
+      if (countyFilter) filterCopy.pop() // remove county filter
+      filterCopy.pop() // remove state filter
     }
     _setRuntimeData(filterCopy)
   }
@@ -376,21 +384,30 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   )
 
   const STATE_CODE = 'state-code'
-  const setFilteredStateCode = (stateCode: string) => {
+  const COUNTY_CODE = 'county-code'
+  const setFilteredStateCountyCode = (stateCode: string, countyCode?: string) => {
     const stateCodePattern = /^\d\d$/
     const normalizedStateCode = stateCodePattern.test(stateCode) ? stateCode : ''
+    let _countyCode = ''
+    if (countyCode) {
+      const countyCodePattern = /^\d{5}$/
+      _countyCode = countyCodePattern.test(countyCode) ? countyCode : ''
+    }
     if (!normalizedStateCode) {
-      removeQueryParam(STATE_CODE)
+      updateQueryParams({ [STATE_CODE]: '', [COUNTY_CODE]: '' })
     } else {
-      updateQueryParam(STATE_CODE, normalizedStateCode)
+      updateQueryParams({ [STATE_CODE]: normalizedStateCode, [COUNTY_CODE]: _countyCode })
     }
   }
 
-  const setFilteredStateCodeFromQuery = (stateCode: string) => {
-    dispatch({ type: 'SET_FILTERED_STATE_CODE', payload: stateCode })
+  const setFilteredStateCodeFromQuery = ({
+    [STATE_CODE]: stateCode,
+    [COUNTY_CODE]: countyCode
+  }: Record<string, string>) => {
+    dispatch({ type: 'SET_FILTERED_STATE_COUNTY_CODE', payload: { stateCode, countyCode } })
   }
 
-  useQueryParamsListener(STATE_CODE, setFilteredStateCodeFromQuery)
+  useQueryParamsListener([STATE_CODE, COUNTY_CODE], setFilteredStateCodeFromQuery)
 
   const mapProps = {
     setParentConfig,
@@ -401,6 +418,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     customNavigationHandler,
     dimensions,
     filteredCountryCode,
+    filteredCountyCode,
     filteredStateCode,
     isDashboard,
     isEditor,
@@ -413,7 +431,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeLegend,
     scale,
     setConfig,
-    setFilteredStateCode,
+    setFilteredStateCountyCode,
     setSharedFilter,
     setSharedFilterValue,
     config,
@@ -481,20 +499,34 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
   )
 
   const applyStateFilter = (config: MapConfig): MapConfig => {
-    if (config.general.showStateDropdown) {
+    if (config.general.showStateDropdown && config.general.geoType === 'us-county') {
       const stateFilter: VizFilter = {
         columnName: 'state',
-        label: 'Select State',
+        label: 'Select Location',
         filterStyle: 'dropdown',
         labels: supportedStatesFipsCodes,
         values: Object.keys(supportedStatesFipsCodes),
-        resetLabel: 'All States',
+        resetLabel: 'United States',
         staticFilter: true,
         active: filteredStateCode
       }
+      let countyFilter: VizFilter | undefined
+      if (filteredStateCode) {
+        const counties = Object.keys(supportedCounties).filter(countyCode => countyCode.startsWith(filteredStateCode))
+        countyFilter = {
+          columnName: 'county',
+          label: 'Select County',
+          filterStyle: 'dropdown',
+          labels: supportedCounties,
+          values: counties,
+          resetLabel: 'All Counties',
+          staticFilter: true,
+          active: filteredCountyCode
+        }
+      }
       return {
         ...config,
-        filters: [...(config.filters || []), stateFilter]
+        filters: [...(config.filters || []), stateFilter, ...(countyFilter ? [countyFilter] : [])]
       }
     }
     return config
