@@ -49,8 +49,10 @@ import TabSimpleFilterConfig from './_mock/tab-simple-filter.json'
 import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
 const DashboardFilterDesc = cloneDeep(DashboardFilterAsc)
 const DashboardFilterCust = cloneDeep(DashboardFilterAsc)
+const NestedParentChildFiltersSubgroupOnly = cloneDeep(NestedParentChildFilters)
 DashboardFilterDesc.dashboard.sharedFilters[0].order = 'desc'
 DashboardFilterCust.dashboard.sharedFilters[0].order = 'cust'
+NestedParentChildFiltersSubgroupOnly.dashboard.sharedFilters[1].displaySubgroupingOnly = true
 
 // On DashboardFilterCust change the sharedFilters[0].values and orderedValues to be in a custom order
 const customOrder = ['American Samoa', 'Alaska', 'Alabama', 'Arizona', 'Arkansas']
@@ -4788,8 +4790,7 @@ export const Nested_Dropdown_With_Parent_Child: Story = {
 
     // Verify defaultValue is applied on initial load (North region, 2023 Q2)
     expect(initialState.regionSelected).toBe('North')
-    expect(initialState.yearQuarterSelected).toContain('2023')
-    expect(initialState.yearQuarterSelected).toContain('Q2')
+    expect(initialState.yearQuarterSelected).toBe('2023 - Q2')
     expect(initialState.chartRendered).toBe(true)
 
     // Test 1: Change region to South → year options should update based on available data
@@ -4843,6 +4844,31 @@ export const Nested_Dropdown_With_Parent_Child: Story = {
         after.yearQuarterOptions.some(opt => opt.includes('2024')) &&
         after.chartRendered
     )
+  }
+}
+
+export const Nested_Dropdown_With_Parent_Child_Subgroup_Only: Story = {
+  args: {
+    config: NestedParentChildFiltersSubgroupOnly as unknown as Config,
+    isEditor: false
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Displays only the selected subgroup in the closed nested dropdown input while preserving the same filter behavior.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const regionFilter = (await canvas.findByLabelText('Region', { selector: 'select' })) as HTMLSelectElement
+    const yearQuarterInput = canvasElement.querySelector('.nested-dropdown input') as HTMLInputElement
+
+    await waitForOptionsToPopulate(regionFilter, 4)
+
+    expect(regionFilter.value).toBe('North')
+    expect(yearQuarterInput.value).toBe('Q2')
   }
 }
 

@@ -121,7 +121,6 @@ const ComboBox: React.FC<ComboBoxProps> = ({
     setQuery('')
     setFocused(false)
     setActiveIndex(-1)
-    inputRef.current?.blur()
   }
 
   // Handle input change (typing)
@@ -181,7 +180,6 @@ const ComboBox: React.FC<ComboBoxProps> = ({
         setQuery('')
         setFocused(false)
         setActiveIndex(-1)
-        inputRef.current?.blur()
         break
 
       case 'Tab':

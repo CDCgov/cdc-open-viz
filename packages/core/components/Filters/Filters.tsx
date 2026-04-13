@@ -308,6 +308,7 @@ const Filters: React.FC<FilterProps> = ({
                   <NestedDropdown
                     activeGroup={nestedActiveGroup}
                     activeSubGroup={nestedActiveSubGroup}
+                    displaySubgroupingOnly={singleFilter.displaySubgroupingOnly}
                     filterIndex={outerIndex}
                     options={getNestedOptions(singleFilter)}
                     listLabel={label}
