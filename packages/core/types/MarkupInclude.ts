@@ -2,6 +2,7 @@ import { Runtime } from '@cdc/core/types/Runtime'
 import { MarkupVariable } from './MarkupVariable'
 import { Visualization } from './Visualization'
 import { VizFilter } from './VizFilter'
+import { DataColorConfig } from '@cdc/core/helpers/dataColors'
 
 export type MarkupIncludeConfig = Visualization & {
   contentEditor: {
@@ -19,6 +20,7 @@ export type MarkupIncludeConfig = Visualization & {
     useInlineHTML: boolean
   }
   data?: Object[]
+  dataColors?: DataColorConfig
   dataMetadata?: Record<string, string>
   enableMarkupVariables?: boolean
   filters?: VizFilter[]

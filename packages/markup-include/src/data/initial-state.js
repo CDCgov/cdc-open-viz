@@ -26,6 +26,10 @@ export default {
     borderColorTheme: false,
     whiteBackground: false
   },
+  dataColors: {
+    column: '',
+    mappings: []
+  },
   markupVariables: [],
   enableMarkupVariables: false
 }

@@ -44,6 +44,7 @@ import GalleryDataBiteDashboard from './_mock/gallery-data-bite-dashboard.json'
 import TP5TestConfig from './_mock/tp5-test.json'
 import LineChartAnglesConfig from './_mock/dashboard-line-chart-angles.json'
 import TabSimpleFilterConfig from './_mock/tab-simple-filter.json'
+import DataDrivenColorsConfig from './_mock/dashboard-data-driven-colors.json'
 
 // Dashboard Filter Updates for Ascending, Descending, and Custom Order
 import DashboardFilterAsc from './_mock/dashboard-filter-asc.json'
@@ -118,6 +119,20 @@ export const TP5_Test_Dashboard: Story = {
   args: {
     config: TP5TestConfig,
     isEditor: false
+  }
+}
+
+export const DataDrivenColors: Story = {
+  args: {
+    config: DataDrivenColorsConfig as unknown as Config,
+    isEditor: false
+  }
+}
+
+export const DataDrivenColors_Editor: Story = {
+  args: {
+    config: DataDrivenColorsConfig as unknown as Config,
+    isEditor: true
   }
 }
 
