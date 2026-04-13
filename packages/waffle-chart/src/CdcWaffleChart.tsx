@@ -165,6 +165,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   const processedDownLabel = processedTextFields.downLabel
   const processedNoChangeLabel = processedTextFields.noChangeLabel
   const processedTrendLabel = processedTextFields.trendLabel
+  const supportsTrendIndicator = config.visualizationType === 'TP5 Waffle' || config.visualizationType === 'TP5 Gauge'
 
   const gaugeColor = config.visual.colors[config.theme]
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
@@ -452,7 +453,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       : ''
   const resolvedTrendLabel = typeof trendLabel === 'string' ? trendLabel.trim() : ''
   const resolvedTrendFooterLabel = typeof processedTrendLabel === 'string' ? processedTrendLabel.trim() : ''
-  const hasTrendArrow = trendResolution?.state === 'resolved' && !!trendResolution?.arrowType
+  const hasTrendArrow = supportsTrendIndicator && trendResolution?.state === 'resolved' && !!trendResolution?.arrowType
   const shouldUseTrendBelow = Boolean(hasTrendArrow && (resolvedTrendLabel || resolvedTrendFooterLabel))
 
   const renderTrendArrow = ({ wrapperClassName = '' } = {}) => {
