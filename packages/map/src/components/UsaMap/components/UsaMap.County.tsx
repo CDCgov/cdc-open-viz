@@ -845,7 +845,9 @@ const CountyMap = () => {
     let countyHighlight = null
     topoData.mapData.forEach(geo => {
       if (!geo.id) return
-      if (focus.id && geo.id.length > 2 && geo.id.indexOf(focus.id) !== 0) return
+      const hideCounty =
+        !config.general.showNeighboringStates && focus.id && geo.id.length > 2 && geo.id.indexOf(focus.id) !== 0
+      if (hideCounty) return
       if (!focus.id && config.general.type === 'us-geocode' && geo.id.length > 2) return
 
       const path2d = cache.get(geo.id)
@@ -900,7 +902,7 @@ const CountyMap = () => {
       const focusGeoId = topoData.mapData[focus.index]?.id
       const path2d = focusGeoId && cache.get(focusGeoId)
       if (path2d) {
-        context.strokeStyle = geoStrokeColor
+        context.strokeStyle = config.general.showNeighboringStates ? '#000000' : geoStrokeColor
         context.lineWidth = lineWidth * 2 * strokeScale
         context.stroke(path2d)
       }
