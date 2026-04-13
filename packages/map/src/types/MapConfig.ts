@@ -167,6 +167,7 @@ export type MapConfig = Visualization & {
     includeContextInDownload?: boolean
     showDownloadPdfButton: boolean
     showHSABoundaries?: boolean
+    showNeighboringStates?: boolean
     showSidebar: boolean
     showStateDropdown?: boolean
     showTitle: boolean
