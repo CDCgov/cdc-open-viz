@@ -15,7 +15,7 @@ describe('getCountyTopoSources', () => {
     expect(result).toEqual([baseTopo])
   })
 
-  it('returns base topo and extended geopgrahy when territories are shown', () => {
+  it('returns base topo and extended geography when territories are shown', () => {
     const result = getCountyTopoSources(baseTopo, true)
     expect(result).toEqual([baseTopo, usExtendedGeography])
   })
