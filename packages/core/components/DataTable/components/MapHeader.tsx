@@ -22,11 +22,11 @@ const ColumnHeadingText = ({ text, config }) => {
     return <ScreenReaderText as='span'>{notApplicableText}</ScreenReaderText>
   }
 
-  if( typeof text !== 'string'){
-    return parse('');
+  if (typeof text !== 'string') {
+    return parse('')
   }
 
-  return parse(text);
+  return parse(text)
 }
 
 const MapHeader = ({
