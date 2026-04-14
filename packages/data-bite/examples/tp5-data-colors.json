@@ -1,0 +1,77 @@
+{
+  "type": "data-bite",
+  "data": [
+    {
+      "Category": "Low Risk",
+      "Value": 1234,
+      "Status": "Low"
+    },
+    {
+      "Category": "Medium Risk",
+      "Value": 5678,
+      "Status": "Medium"
+    },
+    {
+      "Category": "High Risk",
+      "Value": 9012,
+      "Status": "High"
+    },
+    {
+      "Category": "Critical",
+      "Value": 3456,
+      "Status": "Critical"
+    }
+  ],
+  "dataBite": "",
+  "dataFunction": "Pass Through",
+  "dataColumn": "Value",
+  "bitePosition": "Left",
+  "biteFontSize": 36,
+  "fontSize": "medium",
+  "biteBody": "This data bite changes background color based on the Status column.",
+  "imageData": {
+    "display": "none",
+    "url": "",
+    "alt": "",
+    "options": []
+  },
+  "dataFormat": {
+    "roundToPlace": 0,
+    "commas": true,
+    "prefix": "",
+    "suffix": ""
+  },
+  "biteStyle": "tp5",
+  "filters": [
+    {
+      "columnName": "Category",
+      "columnValue": "High Risk"
+    }
+  ],
+  "subtext": "",
+  "title": "Risk Assessment",
+  "theme": "theme-blue",
+  "shadow": false,
+  "visual": {
+    "border": false,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false,
+    "showTitle": true
+  },
+  "general": {
+    "isCompactStyle": false
+  },
+  "dataColors": {
+    "column": "Status",
+    "mappings": [
+      { "sourceValue": "Low", "color": "#d7f2ed" },
+      { "sourceValue": "Medium", "color": "#fea82f" },
+      { "sourceValue": "High", "color": "#f45b53" },
+      { "sourceValue": "Critical", "color": "#a03169" }
+    ]
+  },
+  "markupVariables": [],
+  "enableMarkupVariables": false
+}

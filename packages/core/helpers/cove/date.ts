@@ -2,6 +2,37 @@ import { timeFormat, timeParse, timeFormatLocale, type TimeLocaleDefinition } fr
 import { type Axis } from '@cdc/core/types/Axis'
 
 const NBSP = '\u00A0'
+const MAX_AUTO_DETECT_DATE_SAMPLES = 50
+const AUTO_DETECT_DATE_FORMATS = [
+  '%Y-%m-%d',
+  '%Y/%m/%d',
+  '%m/%d/%Y',
+  '%d/%m/%Y',
+  '%m-%d-%Y',
+  '%d-%m-%Y',
+  '%Y',
+  '%Y-%m',
+  '%Y/%m'
+] as const
+const AUTO_DETECT_DATE_FORMATTERS = Object.fromEntries(
+  AUTO_DETECT_DATE_FORMATS.map(format => [
+    format,
+    {
+      parser: timeParse(format),
+      formatter: timeFormat(format)
+    }
+  ])
+) as Record<AutoDetectDateFormat, { parser: ReturnType<typeof timeParse>; formatter: ReturnType<typeof timeFormat> }>
+
+export type AutoDetectDateFormat = (typeof AUTO_DETECT_DATE_FORMATS)[number]
+
+export type DateFormatDetectionResult = {
+  detectedFormat?: AutoDetectDateFormat
+  isReliable: boolean
+  sampleSize: number
+  ambiguous: boolean
+  failureReason?: 'no_non_empty_values' | 'no_matching_format' | 'ambiguous'
+}
 
 /** Locale definitions for d3-time-format. Add new locales here as needed. */
 const localeDefinitions: Record<string, TimeLocaleDefinition> = {
@@ -68,6 +99,73 @@ export function formatDate(format = undefined, date, locale?: string) {
 
 export function parseDate(format = undefined, dateString) {
   return timeParse(format)(dateString) || new Date()
+}
+
+const normalizeDateSample = (value: unknown) => {
+  if (value === null || value === undefined) return ''
+  return String(value).trim()
+}
+
+const matchesDateFormatExactly = (format: AutoDetectDateFormat, value: string) => {
+  const { parser, formatter } = AUTO_DETECT_DATE_FORMATTERS[format]
+  const parsedValue = parser(value)
+
+  if (!parsedValue) return false
+
+  return formatter(parsedValue) === value
+}
+
+export function detectDateParseFormat(values: unknown[]): DateFormatDetectionResult {
+  const samples: string[] = []
+
+  for (const value of values || []) {
+    const normalizedValue = normalizeDateSample(value)
+    if (!normalizedValue) continue
+
+    samples.push(normalizedValue)
+
+    if (samples.length >= MAX_AUTO_DETECT_DATE_SAMPLES) {
+      break
+    }
+  }
+
+  if (!samples.length) {
+    return {
+      isReliable: false,
+      sampleSize: 0,
+      ambiguous: false,
+      failureReason: 'no_non_empty_values'
+    }
+  }
+
+  const matchingFormats = AUTO_DETECT_DATE_FORMATS.filter(format =>
+    samples.every(sample => matchesDateFormatExactly(format, sample))
+  )
+
+  if (matchingFormats.length === 1) {
+    return {
+      detectedFormat: matchingFormats[0],
+      isReliable: true,
+      sampleSize: samples.length,
+      ambiguous: false
+    }
+  }
+
+  if (matchingFormats.length > 1) {
+    return {
+      isReliable: false,
+      sampleSize: samples.length,
+      ambiguous: true,
+      failureReason: 'ambiguous'
+    }
+  }
+
+  return {
+    isReliable: false,
+    sampleSize: samples.length,
+    ambiguous: false,
+    failureReason: 'no_matching_format'
+  }
 }
 
 export const isDateScale = (axis: Axis) => {

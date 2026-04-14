@@ -1,4 +1,5 @@
 import Icon from '../ui/Icon'
+import Button from '../elements/Button'
 
 type OpenControls = [Record<string, boolean>, Function] // useState type
 
@@ -32,28 +33,29 @@ const FieldSet: React.FC<FieldSetProps> = ({
     if (!show)
       return (
         <div className='mb-1'>
-          <button type='button' className='btn btn-light' onClick={() => setShow(fieldKey, true)}>
+          <Button type='button' variant='light' onClick={() => setShow(fieldKey, true)}>
             <Icon display='caretDown' />
-          </button>
+          </Button>
           <span> {fieldName ? `${fieldName}` : 'New ' + fieldType}</span>
         </div>
       )
     return (
       <fieldset className='edit-block mb-1' key={fieldKey}>
         <div className='d-flex justify-content-between'>
-          <button type='button' className='btn btn-light' onClick={() => setShow(fieldKey, false)}>
+          <Button type='button' variant='light' onClick={() => setShow(fieldKey, false)}>
             <Icon display='caretUp' />
-          </button>
-          <button
+          </Button>
+          <Button
             type='button'
-            className='btn btn-danger btn-sm'
+            variant='danger'
+            size='sm'
             onClick={event => {
               event.preventDefault()
               deleteField()
             }}
           >
             Remove
-          </button>
+          </Button>
         </div>
         {children}
       </fieldset>
@@ -65,24 +67,25 @@ const FieldSet: React.FC<FieldSetProps> = ({
     <div className='editor-field-item'>
       <div className='editor-field-item__header'>
         <Icon display='move' size={15} style={{ marginRight: '0.5rem' }} />
-        <button type='button' className='btn btn-light' onClick={() => setShow(fieldKey, !show)}>
+        <Button type='button' variant='light' onClick={() => setShow(fieldKey, !show)}>
           <Icon display={show ? 'caretUp' : 'caretDown'} size={20} />
-        </button>
+        </Button>
         <span className='editor-field-item__name'>{fieldName ? `${fieldName}` : 'New ' + fieldType}</span>
       </div>
       {show && (
         <div className='editor-field-item__content'>
           <div className='editor-field-item__remove-wrapper'>
-            <button
+            <Button
               type='button'
-              className='btn btn-danger btn-sm'
+              variant='danger'
+              size='sm'
               onClick={event => {
                 event.preventDefault()
                 deleteField()
               }}
             >
               Remove
-            </button>
+            </Button>
           </div>
           {children}
         </div>

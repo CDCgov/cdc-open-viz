@@ -8,6 +8,7 @@ import {
   type FilterState
 } from '../../helpers/embed'
 import '../../helpers/embed/embedHelper.js' // Initialize embed helper for iframe resizing
+import Button from '../elements/Button'
 
 type EmbedEditorProps = {
   config?: any // Current visualization config
@@ -494,13 +495,13 @@ export const EmbedEditor: React.FC<EmbedEditorProps> = ({ config }) => {
                 gap: '10px'
               }}
             >
-              <button className='btn btn-secondary' onClick={handleCloseModal}>
+              <Button variant='secondary' onClick={handleCloseModal}>
                 Close
-              </button>
+              </Button>
               {activeTab === 'code' && (
-                <button className='btn btn-primary' onClick={handleCopyFromModal} style={{ minWidth: '120px' }}>
+                <Button variant='primary' onClick={handleCopyFromModal} style={{ minWidth: '120px' }}>
                   {embedCodeCopied ? '✓ Copied!' : 'Copy to Clipboard'}
-                </button>
+                </Button>
               )}
             </div>
           </div>

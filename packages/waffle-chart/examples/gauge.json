@@ -125,7 +125,7 @@
     "hideBackgroundColor": false,
     "borderColorTheme": false
   },
-  "dataUrl": "/examples/example-data.json",
+  "dataUrl": "/examples/__data__/example-data.json",
   "validated": 4.23,
   "runtime": {
     "uniqueId": 1690862969105,

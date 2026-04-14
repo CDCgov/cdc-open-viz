@@ -61,13 +61,38 @@ strong {
   }
 }
 
+// Markup-variable SVG icons default to line-height sizing so they align with
+// surrounding text. Authors can opt a specific icon instance into parent-height
+// sizing by adding `data-cove-svg-size="parent-height"` to the nearest wrapper:
+// `<span data-cove-svg-size="parent-height">{{link-external}}</span>`.
+[data-cove-svg-size='parent-height'] {
+  --cove-inline-svg-width: auto;
+  --cove-inline-svg-height-fallback: 100%;
+  --cove-inline-svg-height: 100%;
+  --cove-inline-svg-inner-width: auto;
+  --cove-inline-svg-inner-height: 100%;
+}
+
 .btn {
   &.full-width {
     width: 100%;
   }
 
-  &:hover {
-    transition: 0.1s background-color;
+  &:not(.btn-link) {
+    transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease,
+      transform 160ms ease;
+  }
+
+  @media (hover: hover) {
+    &:hover:not(:disabled):not(.disabled):not(.btn-link) {
+      transform: translateY(-1px);
+      box-shadow: 0 0.35rem 0.9rem rgb(0 94 170 / 16%);
+    }
+  }
+
+  &:active:not(:disabled):not(.disabled):not(.btn-link) {
+    transform: translateY(0);
+    box-shadow: 0 0.15rem 0.45rem rgb(0 94 170 / 12%);
   }
 
   &.secondary {
@@ -189,9 +214,12 @@ section.footnotes {
   background-color: var(--blue);
   border-color: var(--blue);
 
-  &:hover:not([disabled]) {
-    background-color: color.adjust($blue, $lightness: -5%);
-    border-color: color.adjust($blue, $lightness: -5%);
+  @media (hover: hover) {
+    &:hover:not([disabled]) {
+      background-color: color.adjust($blue, $lightness: -4%);
+      border-color: color.adjust($blue, $lightness: -4%);
+      box-shadow: 0 0.5rem 1.1rem rgb(0 94 170 / 22%);
+    }
   }
 }
 

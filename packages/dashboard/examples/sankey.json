@@ -4238,7 +4238,7 @@
         }
       ],
       "dataFileSize": 72,
-      "dataFileName": "data.json",
+      "dataFileName": "__data__/data.json",
       "dataFileSourceType": "file",
       "dataFileFormat": "JSON",
       "preview": false
@@ -4251,7 +4251,7 @@
         }
       ],
       "dataFileSize": 59,
-      "dataFileName": "data-2.json",
+      "dataFileName": "__data__/data-2.json",
       "dataFileSourceType": "file",
       "dataFileFormat": "JSON",
       "preview": false

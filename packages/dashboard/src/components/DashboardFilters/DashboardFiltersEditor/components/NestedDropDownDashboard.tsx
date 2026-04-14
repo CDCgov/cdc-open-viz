@@ -242,7 +242,7 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
         />
       )}
 
-      {/* Default Value for Sub Group */}
+      {/* Default Value for Subgroup */}
       {subGrouping?.columnName && (filter.defaultValue || filter.active) && subGrouping.valuesLookup && (
         <Select
           value={subGrouping.defaultValue}
@@ -255,7 +255,7 @@ const NestedDropDownDashboard: React.FC<NestedDropDownEditorDashboardProps> = ({
             const newSubGrouping = { ...subGrouping, defaultValue: value }
             updateFilterProp('subGrouping', newSubGrouping)
           }}
-          label={'Sub Group Default Value'}
+          label={'Subgroup Default Value'}
           initial={'Select'}
         />
       )}

@@ -5,6 +5,7 @@ import parse from 'html-react-parser'
 
 // CDC
 import Button from '../elements/Button'
+import type { ButtonVariant } from '../elements/Button'
 import MultiSelect from '../MultiSelect'
 import ComboBox from '../ComboBox'
 import { Visualization } from '../../types/Visualization'
@@ -43,20 +44,18 @@ type FilterProps = {
   dimensions?: DimensionsType
   config: Visualization
   setFilters: Function
-  standaloneMap?: boolean
-  excludedData?: Object[]
   interactionLabel?: string
 }
 
 const Filters: React.FC<FilterProps> = ({
   config: visualizationConfig,
   dimensions,
-  standaloneMap,
   setFilters,
-  excludedData,
   interactionLabel = ''
 }) => {
   const { filters, general, theme, filterBehavior } = visualizationConfig
+  const getApplyButtonVariant = (currentTheme?: string): ButtonVariant | undefined =>
+    currentTheme === 'theme-blue' ? 'primary' : (currentTheme as ButtonVariant | undefined)
   const [showApplyButton, setShowApplyButton] = useState(false)
   // Handle Wrapping Filters
   const [wrappingFilters, setWrappingFilters] = useState<
@@ -104,7 +103,7 @@ const Filters: React.FC<FilterProps> = ({
     })
   }
 
-  const handleApplyButton = newFilters => {
+  const handleApplyButton = (newFilters: VizFilter[]) => {
     let needsQueryUpdate = false
     const queryParams = getQueryParams()
     newFilters.forEach(newFilter => {
@@ -230,7 +229,7 @@ const Filters: React.FC<FilterProps> = ({
   return (
     <section className={getClasses().join(' ')}>
       {visualizationConfig.filterIntro && (
-        <p className='filters-section__intro-text mb-3'>{parse(visualizationConfig.filterIntro)}</p>
+        <p className='filters-section__intro-text cove-prose mb-3'>{parse(visualizationConfig.filterIntro)}</p>
       )}
       <div className='d-flex flex-wrap w-100 filters-section__wrapper align-items-end'>
         <>
@@ -309,6 +308,7 @@ const Filters: React.FC<FilterProps> = ({
                   <NestedDropdown
                     activeGroup={nestedActiveGroup}
                     activeSubGroup={nestedActiveSubGroup}
+                    displaySubgroupingOnly={singleFilter.displaySubgroupingOnly}
                     filterIndex={outerIndex}
                     options={getNestedOptions(singleFilter)}
                     listLabel={label}
@@ -332,17 +332,18 @@ const Filters: React.FC<FilterProps> = ({
           {filterBehavior === 'Apply Button' ? (
             <div className='filters-section__buttons'>
               <Button
+                variant={getApplyButtonVariant(general?.headerColor ? general.headerColor : theme)}
                 onClick={e => {
                   handleApplyButton(filters)
                 }}
                 disabled={!showApplyButton}
-                className={[general?.headerColor ? general.headerColor : theme, 'apply', 'me-2'].join(' ')}
+                className='me-2'
               >
                 Apply
               </Button>
-              <button className='btn btn-link' disabled={initialFiltersActive} onClick={handleFiltersReset}>
+              <Button variant='link' disabled={initialFiltersActive} onClick={handleFiltersReset}>
                 Clear Filters
-              </button>
+              </Button>
             </div>
           ) : (
             <></>

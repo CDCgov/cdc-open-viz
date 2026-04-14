@@ -189,7 +189,41 @@ export const DataSectionTests: Story = {
       expect(el).toBeTruthy()
       return el
     }
-    const getValueText = () => getPrimaryEl().textContent?.trim() || ''
+    const getValueText = () => getPrimaryEl().textContent?.replace(/\s+/g, ' ').trim() || ''
+    const getDynamicDenominatorVisualState = () => ({
+      valueText: getValueText(),
+      ...getWaffleNodeState()
+    })
+    const getWaffleNodeState = () => {
+      const nodes = Array.from(canvasElement.querySelectorAll('.cove-waffle-chart svg .cdc-waffle-chart__node'))
+      const chartType = (canvasElement.querySelector('select[name="visualizationType"]') as HTMLSelectElement)?.value
+      const isTP5 = chartType === 'TP5 Waffle'
+
+      const filled = nodes.filter(node => {
+        const fill = (node.getAttribute('fill') || '').toLowerCase()
+        if (isTP5) {
+          return fill === '#009ec1' || fill === 'rgb(0, 158, 193)'
+        }
+
+        const fillOpacity = node.getAttribute('fill-opacity')
+        if (fillOpacity !== null) {
+          return Number(fillOpacity) >= 1
+        }
+
+        return true
+      }).length
+
+      return {
+        total: nodes.length,
+        filled
+      }
+    }
+
+    const setCheckboxState = async (checkbox: HTMLInputElement, shouldBeChecked: boolean) => {
+      if (checkbox.checked !== shouldBeChecked) {
+        await userEvent.click(checkbox)
+      }
+    }
 
     // ============================================================================
     // TEST 1: Data Column Change (Deaths <-> Total Overdoses)
@@ -234,7 +268,7 @@ export const DataSectionTests: Story = {
     await userEvent.selectOptions(conditionalColumnSelect, 'Deaths')
     await userEvent.selectOptions(conditionalOperatorSelect, '<')
     // ============================================================================
-    // TEST 4: Conditional Value Entry (<5 fallback 1)
+    // TEST 4: Conditional Value Entry (<50)
     // Expectation: Primary value text changes (filter applied).
     // ============================================================================
     const conditionalValueInput = canvasElement.querySelector(
@@ -245,7 +279,7 @@ export const DataSectionTests: Story = {
       getValueText,
       async () => {
         await userEvent.clear(conditionalValueInput)
-        await userEvent.type(conditionalValueInput, '5')
+        await userEvent.type(conditionalValueInput, '50')
       },
       (before, after) => after !== before
     )
@@ -415,6 +449,192 @@ export const DataSectionTests: Story = {
         await userEvent.type(suffixInput, ' deaths')
       },
       (before, after) => after !== before && after.endsWith('deaths')
+    )
+
+    // ============================================================================
+    // TEST 16: Value Descriptor Placeholder Visibility
+    // Expectation: Value Descriptor input is visible in waffle mode with guidance placeholder.
+    // ============================================================================
+    const valueDescriptionInput = canvasElement.querySelector(
+      'input[name="null-null-valueDescription"]'
+    ) as HTMLInputElement
+    expect(valueDescriptionInput).toBeTruthy()
+    expect(valueDescriptionInput.placeholder).toBe('e.g., out of')
+
+    // ============================================================================
+    // TEST 17: Value Descriptor Update in Waffle Mode
+    // Expectation: Primary value text includes descriptor text.
+    // ============================================================================
+    await performAndAssert(
+      'Waffle Value Descriptor Update',
+      getValueText,
+      async () => {
+        await userEvent.clear(valueDescriptionInput)
+        await userEvent.type(valueDescriptionInput, 'out of total')
+      },
+      (_before, after) => after.includes('out of total')
+    )
+
+    // ============================================================================
+    // TEST 18: Show Percentage Toggle in Waffle Mode
+    // Expectation: Primary value text changes when switching value type.
+    // ============================================================================
+    const showPercentCheckbox = canvasElement.querySelector('input[name="showPercent"]') as HTMLInputElement
+    const showDenominatorCheckbox = canvasElement.querySelector('input[name="showDenominator"]') as HTMLInputElement
+    expect(showPercentCheckbox).toBeTruthy()
+    expect(showDenominatorCheckbox).toBeTruthy()
+    await performAndAssert(
+      'Waffle Show Percentage Toggle',
+      getValueText,
+      async () => {
+        await userEvent.click(showPercentCheckbox)
+      },
+      (before, after) => after !== before
+    )
+
+    // ============================================================================
+    // TEST 19: Dynamic Denominator Activation (4 out of 10)
+    // Expectation: 10 total nodes, 4 filled nodes.
+    // ============================================================================
+    await performAndAssert(
+      'Dynamic Denominator 4 out of 10',
+      getWaffleNodeState,
+      async () => {
+        await userEvent.selectOptions(dataFunctionSelect, 'Count')
+        await userEvent.selectOptions(conditionalColumnSelect, 'Deaths')
+        await userEvent.selectOptions(conditionalOperatorSelect, '<')
+        await userEvent.clear(conditionalValueInput)
+        await userEvent.type(conditionalValueInput, '50')
+        await setCheckboxState(customDenomCheckbox, false)
+        await userEvent.clear(staticDenomInput)
+        await userEvent.type(staticDenomInput, '10')
+        await setCheckboxState(showPercentCheckbox, false)
+        await setCheckboxState(showDenominatorCheckbox, true)
+      },
+      (_before, after) => after.total === 10 && after.filled === 4
+    )
+
+    // ============================================================================
+    // TEST 20: Show Denominator Off Fallback
+    // Expectation: Falls back to fixed 100 nodes.
+    // ============================================================================
+    await performAndAssert(
+      'Dynamic Fallback Show Denominator Off',
+      getWaffleNodeState,
+      async () => {
+        await setCheckboxState(showDenominatorCheckbox, false)
+      },
+      (_before, after) => after.total === 100
+    )
+
+    // ============================================================================
+    // TEST 21: Percentage On Fallback
+    // Expectation: Falls back to fixed 100 nodes.
+    // ============================================================================
+    await performAndAssert(
+      'Dynamic Fallback Percentage On',
+      getWaffleNodeState,
+      async () => {
+        await setCheckboxState(showDenominatorCheckbox, true)
+        await setCheckboxState(showPercentCheckbox, true)
+      },
+      (_before, after) => after.total === 100
+    )
+
+    // ============================================================================
+    // TEST 22: Denominator >= 100 Fallback
+    // Expectation: Falls back to fixed 100 nodes.
+    // ============================================================================
+    await performAndAssert(
+      'Dynamic Fallback Denominator >= 100',
+      getWaffleNodeState,
+      async () => {
+        await setCheckboxState(showPercentCheckbox, false)
+        await setCheckboxState(showDenominatorCheckbox, true)
+        await userEvent.clear(staticDenomInput)
+        await userEvent.type(staticDenomInput, '250')
+      },
+      (_before, after) => after.total === 100
+    )
+
+    // ============================================================================
+    // TEST 23: Non-Integer Numerator/Denominator Rounding (Round=0)
+    // Expectation: Mean 17.5 and denominator 20.2 render 18 filled nodes out of 20 to match the rounded display value.
+    // ============================================================================
+    await performAndAssert(
+      'Dynamic Rounding Non-Integer Values Round 0',
+      getDynamicDenominatorVisualState,
+      async () => {
+        await userEvent.selectOptions(dataFunctionSelect, 'Mean (Average)')
+        await userEvent.selectOptions(dataColumnSelect, 'Deaths')
+        await userEvent.selectOptions(conditionalColumnSelect, 'Deaths')
+        await userEvent.selectOptions(conditionalOperatorSelect, '<')
+        await userEvent.clear(conditionalValueInput)
+        await userEvent.type(conditionalValueInput, '20')
+        await userEvent.clear(staticDenomInput)
+        await userEvent.type(staticDenomInput, '20.2')
+        await userEvent.clear(roundingInput)
+        await userEvent.type(roundingInput, '0')
+        await setCheckboxState(showPercentCheckbox, false)
+        await setCheckboxState(showDenominatorCheckbox, true)
+      },
+      (_before, after) =>
+        after.total === 20 && after.filled === 18 && after.valueText.includes('18 deaths out of total 20.2')
+    )
+
+    // ============================================================================
+    // TEST 24: Non-Integer Numerator/Denominator Rounding (Round=1)
+    // Expectation: Mean 17.5 and denominator 20.2 render 17 filled nodes out of 20 while display shows 17.5.
+    // ============================================================================
+    await performAndAssert(
+      'Dynamic Rounding Non-Integer Values Round 1',
+      getDynamicDenominatorVisualState,
+      async () => {
+        await userEvent.clear(roundingInput)
+        await userEvent.type(roundingInput, '1')
+      },
+      (_before, after) =>
+        after.total === 20 && after.filled === 17 && after.valueText.includes('17.5 deaths out of total 20.2')
+    )
+
+    // ============================================================================
+    // TEST 25: Numerator Greater Than Denominator Fallback
+    // Expectation: Falls back to fixed 100 nodes.
+    // ============================================================================
+    await performAndAssert(
+      'Dynamic Fallback Numerator Greater Than Denominator',
+      getWaffleNodeState,
+      async () => {
+        await userEvent.selectOptions(dataFunctionSelect, 'Sum')
+      },
+      (_before, after) => after.total === 100
+    )
+
+    // ============================================================================
+    // TEST 26: TP5 Waffle Dynamic Denominator (7 out of 12)
+    // Expectation: 12 total TP5 nodes, 7 filled nodes.
+    // ============================================================================
+    await performAndAssert(
+      'TP5 Dynamic Denominator 7 out of 12',
+      getWaffleNodeState,
+      async () => {
+        await openAccordion(canvas, 'General')
+        const chartTypeSelect = canvasElement.querySelector('select[name="visualizationType"]') as HTMLSelectElement
+        await userEvent.selectOptions(chartTypeSelect, 'TP5 Waffle')
+
+        await openAccordion(canvas, 'Data')
+        await userEvent.selectOptions(dataFunctionSelect, 'Count')
+        await userEvent.selectOptions(dataColumnSelect, 'Deaths')
+        await userEvent.selectOptions(conditionalColumnSelect, 'Deaths')
+        await userEvent.selectOptions(conditionalOperatorSelect, '<')
+        await userEvent.clear(conditionalValueInput)
+        await userEvent.type(conditionalValueInput, '151')
+        await userEvent.clear(staticDenomInput)
+        await userEvent.type(staticDenomInput, '12')
+        await setCheckboxState(showPercentCheckbox, false)
+        await setCheckboxState(showDenominatorCheckbox, true)
+      },
+      (_before, after) => after.total === 12 && after.filled === 7
     )
   }
 }
@@ -823,7 +1043,7 @@ export const TP5GaugeGeneralSectionTests: Story = {
     // TEST 4: Message Update
     // Expectation: Gauge content text updates.
     // ============================================================================
-    const messageTextarea = canvas.getByLabelText(/message/i) as HTMLTextAreaElement
+    const messageTextarea = canvas.getByRole('textbox', { name: /message/i }) as HTMLTextAreaElement
     const newMessage = 'Updated TP5 gauge message text'
     await userEvent.clear(messageTextarea)
     await userEvent.type(messageTextarea, newMessage)
@@ -900,6 +1120,7 @@ export const TP5GaugeDataSectionTests: Story = {
       async () => {}, // action already performed above
       (before, after) => after.includes(newDescription)
     )
+    expect(valueDescriptionInput.placeholder).toBe('e.g., out of')
 
     // ============================================================================
     // TEST 3: Denominator Update

@@ -307,7 +307,7 @@ await performAndAssert(
 ## Creating New Tests: Quick Checklist
 
 1. ✅ Import helpers from `@cdc/core/helpers/testing`
-2. ✅ Use existing config: `import ExampleConfig from '../../examples/example-config.json'`
+2. ✅ Use existing config: `import ExampleConfig from '../../examples/default.json'`
 3. ✅ Set editor mode: `args: { config: ExampleConfig, isEditor: true }`
 4. ✅ Check EditorPanel.tsx for actual accordion sections
 5. ✅ Create one test story per accordion section

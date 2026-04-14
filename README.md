@@ -1,77 +1,180 @@
 # CDC Open Visualization Environment (COVE)
 
-- Name: CDC Open Visualization Environment (COVE)
-- Organization: Office of Communications
-- Contact Email: imtech@cdc.gov
+> A Yarn workspaces and Lerna monorepo for CDC visualization packages, shared editor/runtime infrastructure, Storybook previews, and partner embed support.
 
-CDC OpenViz is a collection of React components and related packages centered around data visualization. These components are used to power visualizations across cdc.gov and affiliated projects.
+---
 
-| Package                                                                               | Description                                                                              |
-| ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| [@cdc/map](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/map)             | React component for visualizing tabular data on a map of the United States or the world. |
-| [@cdc/chart](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/chart)         | React component for visualizing data with a chart.                                       |
-| [@cdc/editor](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/editor)       | React component for importing data and creating a map or chart configuration.            |
-| [@cdc/dashboard](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/dashboard) | React component to build and display multiple data visualizations.                       |
-| [@cdc/data-bite](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/data-bite) | React component for bringing attention to and visualizing a smaller data point.          |
+## Required Project Organization Information
+- Organization: Office of Communications (OC)
+- Contact Email: [imtech@cdc.gov](mailto:imtech@cdc.gov)
+- Status: Operations and Maintenance (O\&M)
+- Keywords: analytics, dashboard, visualization, chart
+- Version: 20260408.133726
 
-## Setup <a name="setup"></a>
+## Other Project Organization Information
+- Point of Contact: [imtech@cdc.gov](mailto:imtech@cdc.gov)
+- Related Project(s): N/A
+- Program Official: [imtech@cdc.gov](mailto:imtech@cdc.gov)
 
-This repository is a [monorepo](https://en.wikipedia.org/wiki/Monorepo) that is managed with [Lerna](https://github.com/lerna/lerna#readme) and uses [yarn](https://yarnpkg.com/) for package management. Make sure you have yarn installed before beginning. To work on individual packages you must setup the entire monorepo.
+---
 
-1. Start by cloning this repo and running `yarn install` at the root.
-2. Run `lerna bootstrap` and Lerna will initialize all the packages for you.
-3. (If using Windows) Change the import from 'react-table' to 'react-table/src' in the DataTable component of these pacakges: Map, Chart, Editor, Dashboard (TODO: fix this)
-4. Run `lerna run build` to build all of the packages in the correct order.
-5. To begin working on an individual package, run `lerna run --scope @cdc/package_name start`, replacing `package_name` with the package's name (ex: `@cdc/map`).
+## Project Description
 
-## Styling
+COVE is a collection of React-based visualization packages used to build charts, maps, dashboards, data callouts, filtered text, markup includes, and related authoring experiences. The repository also contains shared core utilities, Storybook stories, a local development portal, and an embed package for partner-facing iframe integrations.
 
-This has a Bootstrap 4 dependency. You'll want to include a copy of [Bootstrap 4.6](https://getbootstrap.com/docs/4.6/getting-started/introduction/#css) at the top level of your project.
+- **What does it do?** Builds and tests reusable CDC visualization packages such as `@cdc/chart`, `@cdc/map`, `@cdc/dashboard`, `@cdc/editor`, and supporting packages under `packages/`.
+- **What problem does it solve?** Centralizes shared visualization logic, styling, testing, and package release workflows in one monorepo so CDC visualization components can evolve consistently.
+- **Who is it for?** Developers maintaining CDC visualization packages, editor experiences, Storybook stories, and embed integrations.
 
-To include the cove core styling you'll need to first run the `lerna run build` command. This will create a file which you can reference `@cdc/core/dist/cove-main.css`. See `.storybook/preview.jsx` for an example of the import.
+---
 
-## Development Guidelines
+## Project Status
 
-**Please read!** These are important to know before you begin working on this project.
+This project is currently in **Production**.
 
-### Each package is designed to be imported as a module by another project.
+| Environment | Status |
+|-------------|--------|
+| Development | Active |
+| Staging     | Active |
+| Production  | Active |
 
-- This might be different from React projects you are used to working on, that build bundle files that can be included directly on HTML pages.
-- We don't include `react` or `react-dom` as dependencies in any package, since every project that would import these will have them. These are listed as `peerDependencies`.
-- We avoid adding any CDC specific functionality (ex. metrics calls) or logos in these packages, that should go in our wrapper codebase.
+---
 
-This pattern of packages being imported by another project is implemented internally at CDC. We have a wrapper codebase that imports these packages. The bundle generated from that wrapper is then served on pages.
+## Features
 
-### Tooling/Configuration is shared as much as possible among packages.
+- Independent workspace packages for charting, mapping, dashboards, editor tooling, tables, and smaller content modules.
+- Shared `@cdc/core` package for cross-cutting styles, helpers, hooks, and components.
+- Storybook 10 and Vite-based local development workflows, including a multi-package dev portal under `dev-portal/`.
+- Package-level test commands plus repo-level quick test entry points for unit and Storybook coverage.
+- Partner embed support through `@cdc/embed`.
+- Documentation for internal architecture and testing patterns in `docs/`.
 
-These shared elements are stored in the root of this repository. This ensures that if something breaks in our tooling, we only need to fix it in one spot. It also helps ensure consistency across packages. **Please do not break this guideline.** It is critical to allowing a small team to maintain this project effectively.
+### Workspace Packages
 
-- Code Linting configuration (ESLint/Lint Staged)
-- Build process (Webpack)
+| Package | Description |
+|---------|-------------|
+| `@cdc/chart` | React component for visualizing tabular data in various types of charts |
+| `@cdc/core` | Core components, styles, hooks, and helpers for the CDC Open Visualization project |
+| `@cdc/dashboard` | React component for combining multiple visualizations into a single dashboard |
+| `@cdc/data-bite` | React component for displaying a single piece of data in a card module |
+| `@cdc/data-table` | React standalone data table component |
+| `@cdc/editor` | React component for generating a new component entry |
+| `@cdc/embed` | Embeddable COVE visualizations for partner websites |
+| `@cdc/filtered-text` | React component for adding filtered text on dashboards |
+| `@cdc/map` | React component for visualizing tabular data on a map of the United States or the world |
+| `@cdc/markup-include` | React component for displaying HTML content from an outside link |
+| `@cdc/waffle-chart` | React component for displaying a single piece of data in a card module |
 
-### Each package has its own version number.
+---
 
-Sometimes we need to make fixes or add features to a specific package for our day to day work at cdc.gov which lends itself to different version numbers for each package.
+## Prerequisites
 
-### Tips for creating a new package.
+Before you begin, ensure you have the following installed:
 
-- When creating a new package, use lowercase for the folder name and don't use any kind of prefix.
-- The name of the package in `package.json` should be scoped with `@cdc/`. So if you're creating a new package called Foo, the folder path to it would be `packages/foo` and the package name would be `@cdc/foo`.
-- Lerna has specific commands to add packages - you can't just create the folder inside `/packages/`. If you're starting from scratch use [`lerna create`](https://www.npmjs.com/package/@lerna/create) and if you're importing a package that's already been created use [`lerna import`](https://www.npmjs.com/package/@lerna/import).
-- New packages should have their version start at 1.0.0 through development until they are first published and follow [Semantic Versioning guidelines](https://docs.npmjs.com/about-semantic-versioning) afterwards.
-- Respect the guidelines above and ask someone if you're unsure of something.
+- Node.js. This repo does not pin a version in `.nvmrc` or `.node-version`; use a version compatible with the checked-in Vite 7, Storybook 10, and Yarn-based toolchain.
+- Yarn Classic for the root `yarn ...` workflows documented in this repository.
+- Git.
 
-## Storybook
+---
 
-COVE makes use of [Storybook](https://storybook.js.org) to preview visualizations. Run it with `yarn storybook`.
+## Installation
 
-In addition to the static stories defined in the `_stories` directory, any COVE config can be viewed locally in Storybook with the following steps:
+1. Clone the repository.
+2. Install workspace dependencies from the repo root:
 
-1. `mkdir -p _stories/private/`
-2. `cp .storybook/autoGenerate.stories.tsx _stories/private/`
-3. Copy configs into `_stories/private/`
-4. `yarn storybook`
-5. You will see those configs under "Private" in Storybook
+```bash
+yarn install
+```
+
+3. Build all packages in dependency order:
+
+```bash
+yarn build
+```
+
+4. If you need the compiled shared stylesheet, build `@cdc/core` and reference `@cdc/core/dist/cove-main.css`.
+
+Bootstrap 4.6 styling is still expected by the packages. Include Bootstrap CSS in the host app when integrating these components.
+
+## Usage
+
+Start the shared Storybook instance:
+
+```bash
+yarn storybook
+```
+
+Run the local multi-package dev portal:
+
+```bash
+yarn dev:portal
+```
+
+Run a single package locally:
+
+```bash
+yarn dev:chart
+yarn dev:dashboard
+yarn dev:data-bite
+yarn dev:data-table
+yarn dev:editor
+yarn dev:filtered-text
+yarn dev:map
+yarn dev:markup-include
+yarn dev:waffle-chart
+```
+
+Generate the package usage CSV exported by the repo script:
+
+```bash
+yarn packages:csv
+```
+
+---
+
+## Configuration
+
+- Workspace management is defined at the repo root with Yarn workspaces and `lerna.json`.
+- Package source lives under `packages/`, with each package owning its own `build`, `start`, and `test` scripts.
+- Storybook configuration is driven from the repo root and package `_stories` directories.
+- The local development portal uses Vite configs in `dev-portal/`.
+- Example configs and fixtures are stored in package-level `examples/` and `tests/fixtures/` directories.
+- The current `.storybook/` directory contains the active repo-level Storybook configuration; older README workflows that referenced additional generator files are no longer documented here because those files are not present in this branch.
+
+---
+
+## Architecture
+
+The monorepo follows a tiered dependency model:
+
+- `@cdc/core` is the foundation package and should not depend on other internal packages.
+- Standalone visualization packages depend on `@cdc/core`.
+- Orchestrator packages such as `@cdc/dashboard` and `@cdc/editor` can depend on the full workspace.
+
+See [docs/PACKAGE_DEPENDENCIES.md](./docs/PACKAGE_DEPENDENCIES.md) for the full dependency rules and [docs/](./docs/) for focused implementation guidance such as dashboard filter flow, testing best practices, palette migration, visualization wrappers, and button system conventions.
+
+---
+
+## Testing
+
+Use repo-local Yarn scripts instead of global tooling.
+
+- Quick unit suite: `yarn test-unit:quick`
+- Quick Storybook suite: `yarn test-storybook:quick`
+- Full unit suite: `yarn test-unit`
+- Full Storybook suite: `yarn test-storybook`
+- Lint JavaScript and TypeScript sources: `yarn lint`
+- Lint CSS: `yarn lint:css`
+
+For targeted tests, follow the commands documented in [docs/TESTING_BEST_PRACTICES.md](./docs/TESTING_BEST_PRACTICES.md) and the repository-level testing instructions in `AGENTS.md`.
+
+---
+
+## Security
+
+### Reporting a Vulnerability
+
+**Do not open a public GitHub issue for security vulnerabilities.**
 
 ---
 

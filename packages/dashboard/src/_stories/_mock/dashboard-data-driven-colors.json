@@ -1,0 +1,171 @@
+{
+  "type": "dashboard",
+  "title": "COVID-19 County Case Tracker",
+  "description": "Select a state to view COVID-19 case counts by county. Background colors reflect the current alert status.",
+  "datasets": {
+    "covid-counties": {
+      "data": [
+        {
+          "State": "California",
+          "County1": "Los Angeles", "Cases1": "12847", "Status1": "Critical",
+          "County2": "San Diego", "Cases2": "4521", "Status2": "High",
+          "County3": "Sacramento", "Cases3": "1893", "Status3": "Medium"
+        },
+        {
+          "State": "Texas",
+          "County1": "Harris", "Cases1": "9734", "Status1": "High",
+          "County2": "Dallas", "Cases2": "7218", "Status2": "High",
+          "County3": "Travis", "Cases3": "2105", "Status3": "Medium"
+        },
+        {
+          "State": "New York",
+          "County1": "Kings", "Cases1": "3842", "Status1": "Medium",
+          "County2": "Queens", "Cases2": "3156", "Status2": "Medium",
+          "County3": "Erie", "Cases3": "987", "Status3": "Low"
+        },
+        {
+          "State": "Florida",
+          "County1": "Miami-Dade", "Cases1": "11203", "Status1": "Critical",
+          "County2": "Broward", "Cases2": "6890", "Status2": "High",
+          "County3": "Hillsborough", "Cases3": "3214", "Status3": "Medium"
+        },
+        {
+          "State": "Ohio",
+          "County1": "Franklin", "Cases1": "1542", "Status1": "Low",
+          "County2": "Cuyahoga", "Cases2": "1321", "Status2": "Low",
+          "County3": "Hamilton", "Cases3": "876", "Status3": "Low"
+        }
+      ]
+    }
+  },
+  "dashboard": {
+    "theme": "theme-blue",
+    "sharedFilters": [
+      {
+        "key": "State Filter",
+        "label": "Select State",
+        "columnName": "State",
+        "showDropdown": true,
+        "active": "California",
+        "values": ["California", "Florida", "New York", "Ohio", "Texas"],
+        "usedBy": ["bite-county-1", "bite-county-2", "bite-county-3"],
+        "tier": 1,
+        "type": "datafilter"
+      }
+    ]
+  },
+  "rows": [
+    [
+      { "width": 4, "widget": "bite-county-1" },
+      { "width": 4, "widget": "bite-county-2" },
+      { "width": 4, "widget": "bite-county-3" }
+    ]
+  ],
+  "visualizations": {
+    "bite-county-1": {
+      "uid": "bite-county-1",
+      "type": "data-bite",
+      "title": "County 1",
+      "biteStyle": "tp5",
+      "dataKey": "covid-counties",
+      "dataColumn": "Cases1",
+      "dataFunction": "Pass Through",
+      "biteBody": "confirmed cases",
+      "subtext": "",
+      "dataFormat": {
+        "roundToPlace": 0,
+        "commas": true,
+        "prefix": "",
+        "suffix": ""
+      },
+      "filters": [],
+      "theme": "theme-blue",
+      "visual": {
+        "border": false,
+        "accent": false,
+        "background": false,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false
+      },
+      "dataColors": {
+        "column": "Status1",
+        "mappings": [
+          { "sourceValue": "Low", "color": "#d7f2ed" },
+          { "sourceValue": "Medium", "color": "#b8e5ac" },
+          { "sourceValue": "High", "color": "#fea82f" },
+          { "sourceValue": "Critical", "color": "#a03169" }
+        ]
+      }
+    },
+    "bite-county-2": {
+      "uid": "bite-county-2",
+      "type": "data-bite",
+      "title": "County 2",
+      "biteStyle": "tp5",
+      "dataKey": "covid-counties",
+      "dataColumn": "Cases2",
+      "dataFunction": "Pass Through",
+      "biteBody": "confirmed cases",
+      "subtext": "",
+      "dataFormat": {
+        "roundToPlace": 0,
+        "commas": true,
+        "prefix": "",
+        "suffix": ""
+      },
+      "filters": [],
+      "theme": "theme-blue",
+      "visual": {
+        "border": false,
+        "accent": false,
+        "background": false,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false
+      },
+      "dataColors": {
+        "column": "Status2",
+        "mappings": [
+          { "sourceValue": "Low", "color": "#d7f2ed" },
+          { "sourceValue": "Medium", "color": "#b8e5ac" },
+          { "sourceValue": "High", "color": "#fea82f" },
+          { "sourceValue": "Critical", "color": "#a03169" }
+        ]
+      }
+    },
+    "bite-county-3": {
+      "uid": "bite-county-3",
+      "type": "data-bite",
+      "title": "County 3",
+      "biteStyle": "tp5",
+      "dataKey": "covid-counties",
+      "dataColumn": "Cases3",
+      "dataFunction": "Pass Through",
+      "biteBody": "confirmed cases",
+      "subtext": "",
+      "dataFormat": {
+        "roundToPlace": 0,
+        "commas": true,
+        "prefix": "",
+        "suffix": ""
+      },
+      "filters": [],
+      "theme": "theme-blue",
+      "visual": {
+        "border": false,
+        "accent": false,
+        "background": false,
+        "hideBackgroundColor": false,
+        "borderColorTheme": false
+      },
+      "dataColors": {
+        "column": "Status3",
+        "mappings": [
+          { "sourceValue": "Low", "color": "#d7f2ed" },
+          { "sourceValue": "Medium", "color": "#b8e5ac" },
+          { "sourceValue": "High", "color": "#fea82f" },
+          { "sourceValue": "Critical", "color": "#a03169" }
+        ]
+      }
+    }
+  }
+}

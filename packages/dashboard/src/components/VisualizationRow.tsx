@@ -1,5 +1,5 @@
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
-import React, { useContext, useEffect, useMemo, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import Toggle from './Toggle'
 import cloneDeep from 'lodash/cloneDeep'
 import { ConfigRow } from '../types/ConfigRow'
@@ -88,6 +88,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
 }) => {
   const { config, filteredData: dashboardFilteredData, data: rawData } = useContext(DashboardContext)
   const [toggledRow, setToggled] = React.useState<number>(0)
+  const rowRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (row.toggle) setToggled(0)
@@ -103,14 +104,17 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     }
   }, [toggledRow, row.toggle])
 
-  const setupTP5MinHeightEqualizer = (rowElement: Element, itemSelector: string) => {
-    const items = Array.from(rowElement.querySelectorAll(itemSelector)) as HTMLElement[]
-    if (items.length <= 1) return undefined
+  const setupMinHeightEqualizer = (rowElement: HTMLElement, selectors: string[]) => {
+    let items: HTMLElement[] = []
+    const selector = selectors.join(', ')
+    const resizeObserver = new ResizeObserver(() => equalizeHeights())
 
     const equalizeHeights = () => {
       items.forEach(item => {
         item.style.minHeight = ''
       })
+
+      if (items.length <= 1) return
 
       let maxHeight = 0
       items.forEach(item => {
@@ -125,42 +129,86 @@ const VisualizationRow: React.FC<VizRowProps> = ({
       }
     }
 
-    equalizeHeights()
+    const refreshItems = () => {
+      const nextItems = Array.from(rowElement.querySelectorAll(selector)) as HTMLElement[]
+      const nextSet = new Set(nextItems)
 
-    const resizeObserver = new ResizeObserver(() => {
+      items.forEach(item => {
+        if (!nextSet.has(item)) {
+          resizeObserver.unobserve(item)
+          item.style.minHeight = ''
+        }
+      })
+
+      nextItems.forEach(item => {
+        if (!items.includes(item)) {
+          resizeObserver.observe(item)
+        }
+      })
+
+      items = nextItems
       equalizeHeights()
+    }
+
+    const mutationObserver = new MutationObserver(() => {
+      refreshItems()
     })
 
-    items.forEach(item => {
-      resizeObserver.observe(item)
-    })
+    mutationObserver.observe(rowElement, { childList: true, subtree: true })
+    refreshItems()
 
-    return () => resizeObserver.disconnect()
+    return () => {
+      mutationObserver.disconnect()
+      resizeObserver.disconnect()
+      items.forEach(item => {
+        item.style.minHeight = ''
+      })
+    }
   }
 
-  // Equalize TP5 callout title heights and TP5 gauge message blocks for like visualizations in the same row
-  useEffect(() => {
-    if (!row.equalHeight) return
+  const tp5CountInRow = row.columns.reduce((count, col) => {
+    if (!col.widget) return count
+    const viz = config.visualizations[col.widget]
+    if (!viz) return count
 
-    const rowElement = document.querySelector(`[data-row-index="${index}"]`)
+    const isTp5DataBite = viz.type === 'data-bite' && (viz as any).biteStyle === 'tp5'
+    const isTp5WaffleOrGauge =
+      viz.type === 'waffle-chart' && (viz.visualizationType === 'TP5 Waffle' || viz.visualizationType === 'TP5 Gauge')
+    const isTp5MarkupInclude = viz.type === 'markup-include' && (viz as any).contentEditor?.style === 'tp5'
+
+    return isTp5DataBite || isTp5WaffleOrGauge || isTp5MarkupInclude ? count + 1 : count
+  }, 0)
+  const needsTP5AutoEqualization = tp5CountInRow > 1
+  const shouldEqualizeRow = !!row.equalHeight || needsTP5AutoEqualization
+
+  // Layer TP5 equalization for row-level title consistency and same-type internals.
+  useEffect(() => {
+    if (!shouldEqualizeRow) return
+
+    const rowElement = rowRef.current
     if (!rowElement) return
 
     const cleanups = [
-      setupTP5MinHeightEqualizer(rowElement, '.bite__style--tp5 .cdc-callout__heading'),
-      setupTP5MinHeightEqualizer(rowElement, '.waffle__style--tp5 .cdc-callout__heading'),
-      setupTP5MinHeightEqualizer(rowElement, '.gauge__style--tp5 .cdc-callout__heading'),
-      setupTP5MinHeightEqualizer(rowElement, '.gauge__style--tp5 .cove-gauge-chart__content')
-    ].filter(Boolean) as Array<() => void>
+      // Cross-type TP5 title alignment in the row.
+      setupMinHeightEqualizer(rowElement, [
+        '.bite__style--tp5 .cdc-callout__heading',
+        '.waffle__style--tp5 .cdc-callout__heading',
+        '.gauge__style--tp5 .cdc-callout__heading',
+        '.markup-include__style--tp5 .cdc-callout__heading'
+      ]),
+      // Same-type gauge internals alignment so gauge meters line up despite content variance.
+      setupMinHeightEqualizer(rowElement, ['.gauge__style--tp5 .cove-gauge-chart__content'])
+    ]
 
     return () => {
       cleanups.forEach(cleanup => cleanup())
     }
-  }, [index, row, config, filteredDataOverride])
+  }, [shouldEqualizeRow, row.columns, config.activeDashboard, filteredDataOverride, dashboardFilteredData[index]])
 
   const isFilterRow = row.columns.some(
     col => col.widget && config.visualizations[col.widget]?.type === 'dashboardFilters'
   )
-  const needsEqualHeight = !!row.equalHeight && !isFilterRow
+  const needsEqualHeight = shouldEqualizeRow && !isFilterRow
 
   const show = useMemo(() => {
     if (row.toggle) {
@@ -236,6 +284,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
 
   return (
     <div
+      ref={rowRef}
       className={`row${needsEqualHeight ? ' equal-height' : ''}${row.toggle ? ' toggle' : ''}`}
       key={`row__${index}`}
       data-row-index={index}
@@ -355,6 +404,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                 <CdcDataBite
                   key={col.widget}
                   config={visualizationConfig}
+                  rawData={rawData?.[visualizationConfig.dataKey] || []}
                   setConfig={newConfig => {
                     updateChildConfig(col.widget, newConfig)
                   }}
@@ -367,6 +417,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
                 <CdcWaffleChart
                   key={col.widget}
                   config={visualizationConfig}
+                  rawData={rawData?.[visualizationConfig.dataKey] || []}
                   setConfig={newConfig => {
                     updateChildConfig(col.widget, newConfig)
                   }}

@@ -8,7 +8,7 @@ type AnnotationListProps = {
 }
 
 const AnnotationList: React.FC<AnnotationListProps> = ({ useBootstrapVisibilityClasses = true }) => {
-  const { state: config } = useContext(ConfigContext)
+  const { config } = useContext(ConfigContext)
   const annotations = config.annotations || []
 
   const ulClasses = () => {

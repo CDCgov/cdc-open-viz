@@ -1,8 +1,7 @@
 import { type ReactNode, useContext } from 'react'
-import { displayGeoName, navigationHandler } from '../helpers'
+import { navigationHandler } from '../helpers'
 import ConfigContext from '../context'
 import useTooltip from './useTooltip'
-import { supportedStatesFipsCodes } from './../data/supported-geos'
 import parse from 'html-react-parser'
 import isDomainExternal from '@cdc/core/helpers/isDomainExternal'
 import ExternalIcon from './../images/external-link.svg'
@@ -10,7 +9,7 @@ import ExternalIcon from './../images/external-link.svg'
 const useApplyTooltipsToGeo = () => {
   const { config, customNavigationHandler } = useContext(ConfigContext)
   const navigationColumnName = config.columns.navigate.name
-  const { buildTooltip } = useTooltip({ config, displayGeoName, supportedStatesFipsCodes })
+  const { buildTooltip } = useTooltip(config)
 
   const applyTooltipsToGeo = (geoName: string, row: Object, returnType = 'string') => {
     let toolTipText: string | ReactNode = buildTooltip(row, geoName, '')
@@ -18,7 +17,11 @@ const useApplyTooltipsToGeo = () => {
     // We convert the markup into JSX and add a navigation link if it's going into a modal.
     if ('jsx' === returnType) {
       if (typeof toolTipText === 'string') {
-        toolTipText = [<div key='modal-content'>{parse(toolTipText)}</div>]
+        toolTipText = [
+          <div key='modal-content' className='cove-prose'>
+            {parse(toolTipText)}
+          </div>
+        ]
       }
 
       if (config.columns.hasOwnProperty('navigate') && row[navigationColumnName]) {

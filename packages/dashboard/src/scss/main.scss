@@ -8,11 +8,11 @@ button.row-menu__btn[title*='Equal Height Rows'] {
   @import 'editor-panel';
   @import 'grid';
 
-  .loading>div.la-ball-beat {
+  .loading > div.la-ball-beat {
     margin-top: 20%;
   }
 
-  >.cove-editor__content {
+  > .cove-editor__content {
     width: 100% !important;
     left: 0px;
   }
@@ -135,13 +135,15 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     }
   }
 
-  .btn {
+  .dashboard-filters__actions {
+    align-items: flex-end;
+    display: flex;
+    flex: 0 0 auto;
+    width: auto;
 
-    // Expand and Collapse Buttons for Multiviz Dashboard
-    &.expand-collapse-buttons {
-      background-color: var(--lightestGray);
-      border: 1px var(--lightGray) solid;
-      color: black;
+    > .cove-button {
+      flex: 0 0 auto;
+      width: auto;
     }
   }
 
@@ -200,11 +202,11 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     margin-bottom: 1.5rem;
 
     // Remove padding from first and last columns to keep content flush to edges
-    >[class*='col-']:first-child {
+    > [class*='col-']:first-child {
       padding-left: 0;
     }
 
-    >[class*='col-']:last-child {
+    > [class*='col-']:last-child {
       padding-right: 0;
     }
 
@@ -219,7 +221,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     .row {
       margin-bottom: 1.5rem;
 
-      >[class*='col-'] {
+      > [class*='col-'] {
         // Remove side padding when columns stack to full width
         padding-left: 0;
         padding-right: 0;
@@ -227,7 +229,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
       }
 
       // Last column doesn't need margin (row margin handles gap to next row)
-      >[class*='col-']:last-child {
+      > [class*='col-']:last-child {
         margin-bottom: 0;
       }
 
@@ -252,7 +254,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
 
     // Disable the module individual margin
     .map-container,
-    .cove-visualization.type-chart .cove-visualization__body>* {
+    .cove-visualization.type-chart .cove-visualization__body > * {
       margin-left: 0;
       margin-right: 0;
     }
@@ -327,7 +329,7 @@ button.row-menu__btn[title*='Equal Height Rows'] {
         align-items: stretch !important;
         min-height: 0 !important;
 
-        >* {
+        > * {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
@@ -345,10 +347,10 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           min-height: 0 !important;
           width: 100% !important;
 
-          >.cove-visualization__content,
-          >.cove-visualization__outer,
-          >.cove-visualization__inner,
-          >.cove-visualization__body {
+          > .cove-visualization__content,
+          > .cove-visualization__outer,
+          > .cove-visualization__inner,
+          > .cove-visualization__body {
             display: flex !important;
             flex-direction: column !important;
             flex: 1 1 auto !important;
@@ -356,9 +358,9 @@ button.row-menu__btn[title*='Equal Height Rows'] {
             min-height: 0 !important;
             width: 100% !important;
 
-            >.cove-visualization__inner,
-            >.cove-visualization__body,
-            >.cove-visualization__body-wrap {
+            > .cove-visualization__inner,
+            > .cove-visualization__body,
+            > .cove-visualization__body-wrap {
               display: flex !important;
               flex-direction: column !important;
               flex: 1 1 auto !important;
@@ -371,7 +373,8 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           .cove-visualization__outer,
           .cove-visualization__inner,
           .cove-visualization__body,
-          .cove-visualization__body-wrap {
+          .cove-visualization__body-wrap,
+          .markup-include-tp5 {
             display: flex !important;
             flex-direction: column !important;
             flex: 1 1 auto !important;
@@ -398,14 +401,17 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           min-height: 0 !important;
         }
 
-        .cove-visualization .cove-visualization__body.bite__style--tp5>.cove-visualization__body-wrap {
+        .cove-visualization .cove-visualization__body.bite__style--tp5 > .cove-visualization__body-wrap {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
           min-height: 0 !important;
         }
 
-        .cove-visualization .cove-visualization__body.bite__style--tp5>.cove-visualization__body-wrap>.cove-visualization__content-section {
+        .cove-visualization
+          .cove-visualization__body.bite__style--tp5
+          > .cove-visualization__body-wrap
+          > .cove-visualization__content-section {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
@@ -413,7 +419,11 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           width: 100% !important;
         }
 
-        .cove-visualization .cove-visualization__body.bite__style--tp5>.cove-visualization__body-wrap>.cove-visualization__content-section>.cdc-callout {
+        .cove-visualization
+          .cove-visualization__body.bite__style--tp5
+          > .cove-visualization__body-wrap
+          > .cove-visualization__content-section
+          > .cdc-callout {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
@@ -421,16 +431,27 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           width: 100% !important;
         }
 
-        .cove-visualization.waffle__style--tp5 .cove-visualization__body>.cove-visualization__body-wrap,
-        .cove-visualization.gauge__style--tp5 .cove-visualization__body>.cove-visualization__body-wrap {
+        .cove-visualization.waffle__style--tp5 .cove-visualization__body > .cove-visualization__body-wrap,
+        .cove-visualization.gauge__style--tp5 .cove-visualization__body > .cove-visualization__body-wrap,
+        .cove-visualization.markup-include__style--tp5 .cove-visualization__body > .cove-visualization__body-wrap {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
           min-height: 0 !important;
         }
 
-        .cove-visualization.waffle__style--tp5 .cove-visualization__body>.cove-visualization__body-wrap>.cove-visualization__content-section,
-        .cove-visualization.gauge__style--tp5 .cove-visualization__body>.cove-visualization__body-wrap>.cove-visualization__content-section {
+        .cove-visualization.waffle__style--tp5
+          .cove-visualization__body
+          > .cove-visualization__body-wrap
+          > .cove-visualization__content-section,
+        .cove-visualization.gauge__style--tp5
+          .cove-visualization__body
+          > .cove-visualization__body-wrap
+          > .cove-visualization__content-section,
+        .cove-visualization.markup-include__style--tp5
+          .cove-visualization__body
+          > .cove-visualization__body-wrap
+          > .cove-visualization__content-section {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
@@ -438,19 +459,64 @@ button.row-menu__btn[title*='Equal Height Rows'] {
           width: 100% !important;
         }
 
-        .cove-visualization.waffle__style--tp5 .cove-visualization__body>.cove-visualization__body-wrap>.cove-visualization__content-section>.cdc-callout,
-        .cove-visualization.gauge__style--tp5 .cove-visualization__body>.cove-visualization__body-wrap>.cove-visualization__content-section>.cdc-callout {
+        .cove-visualization.waffle__style--tp5
+          .cove-visualization__body
+          > .cove-visualization__body-wrap
+          > .cove-visualization__content-section
+          > .cdc-callout,
+        .cove-visualization.gauge__style--tp5
+          .cove-visualization__body
+          > .cove-visualization__body-wrap
+          > .cove-visualization__content-section
+          > .cdc-callout {
           display: flex !important;
           flex-direction: column !important;
           flex: 1 1 auto !important;
           min-height: 100% !important;
           width: 100% !important;
+        }
+
+        .cove-visualization.markup-include__style--tp5
+          .cove-visualization__body
+          > .cove-visualization__body-wrap
+          > .cove-visualization__content-section
+          > .markup-include-tp5 {
+          display: flex !important;
+          flex-direction: column !important;
+          flex: 1 1 auto !important;
+          min-height: 100% !important;
+          width: 100% !important;
+        }
+
+        .cove-visualization.markup-include__style--tp5
+          .cove-visualization__body
+          > .cove-visualization__body-wrap
+          > .cove-visualization__content-section
+          > .markup-include-tp5
+          > .cdc-callout__body,
+        .cove-visualization.markup-include__style--tp5
+          .cove-visualization__body
+          > .cove-visualization__body-wrap
+          > .cove-visualization__content-section
+          > .markup-include-tp5
+          > .cdc-callout__body
+          > .cdc-callout__content {
+          display: flex !important;
+          flex: 1 1 auto !important;
+          min-height: 0 !important;
+        }
+
+        .cove-visualization.markup-include__style--tp5 .markup-include-component--tp5 {
+          display: flex !important;
+          flex-direction: column !important;
+          flex: 1 1 auto !important;
+          min-height: 0 !important;
         }
 
         .cove-visualization .cove-visualization__body.bite__style--tp5 .cdc-callout__body {
-          display: flex !important;
+          display: grid !important;
           flex: 1 1 auto !important;
-          align-items: stretch !important;
+          align-items: start !important;
           min-height: 0 !important;
         }
 
@@ -478,10 +544,8 @@ button.row-menu__btn[title*='Equal Height Rows'] {
     // TP5 Waffle/Gauge adjustments when there are 2+ in a row
     .row:has(.waffle__style--tp5):has([class*='col-'] ~ [class*='col-']),
     .row:has(.gauge__style--tp5):has([class*='col-'] ~ [class*='col-']) {
-
       .waffle__style--tp5,
       .gauge__style--tp5 {
-
         .cdc-callout {
           flex: 1;
         }
@@ -497,8 +561,6 @@ button.row-menu__btn[title*='Equal Height Rows'] {
         }
 
         .cdc-callout__heading {
-          // Fixed minimum height to align titles - adjust based on design needs
-          min-height: 3em;
           display: flex;
           align-items: flex-start;
         }
@@ -506,6 +568,16 @@ button.row-menu__btn[title*='Equal Height Rows'] {
         // Hide icon when in multi-column layout, unless using white background
         &:not(.white-background-style) .cdc-callout__icon {
           display: none;
+        }
+      }
+    }
+
+    // TP5 Markup Include adjustments when there are 2+ in a row
+    .row:has(.markup-include__style--tp5):has([class*='col-'] ~ [class*='col-']) {
+      .markup-include__style--tp5 {
+        .cdc-callout__heading {
+          display: flex;
+          align-items: flex-start;
         }
       }
     }

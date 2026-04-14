@@ -2,6 +2,7 @@ export default {
   contentEditor: {
     inlineHTML: '<strong>Inline HTML</strong>',
     showHeader: true,
+    style: 'default',
     srcUrl: '#example',
     title: '',
     titleStyle: 'small',
@@ -22,7 +23,12 @@ export default {
     accent: false,
     background: false,
     hideBackgroundColor: false,
-    borderColorTheme: false
+    borderColorTheme: false,
+    whiteBackground: false
+  },
+  dataColors: {
+    column: '',
+    mappings: []
   },
   markupVariables: [],
   enableMarkupVariables: false

@@ -19,6 +19,7 @@ import { filterOrderOptions } from '@cdc/core/helpers/filterOrderOptions'
 import FilterOrder from '@cdc/core/components/EditorPanel/VizFilterEditor/components/FilterOrder'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Modal from '@cdc/core/components/ui/Modal'
+import Button from '@cdc/core/components/elements/Button'
 
 type FilterEditorProps = {
   config: DashboardConfig
@@ -56,7 +57,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
   const getVizTitle = (viz, vizKey) => {
     let vizName = viz.general?.title || viz.title || vizKey
     if (viz.visualizationType === 'markup-include') {
-      vizName = viz.contentEditor.title || vizKey
+      vizName = viz.contentEditor?.title || vizKey
     }
     return vizName
   }
@@ -419,12 +420,13 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                   </div>
                 )}
 
-                <button
+                <Button
+                  variant='primary'
+                  className='mt-2'
                   onClick={() => handleEditAPIValues(filter, isNestedDropdown, updateAPIFilter)}
-                  className='btn btn-primary mt-2'
                 >
                   Edit API Values
-                </button>
+                </Button>
               </div>
 
               <label>
@@ -450,6 +452,18 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                   </Tooltip>
                 </span>
               </label>
+
+              {isNestedDropdown && (
+                <label>
+                  <input
+                    type='checkbox'
+                    checked={!!filter.displaySubgroupingOnly}
+                    aria-label='Display subgrouping only'
+                    onChange={e => updateFilterProp('displaySubgroupingOnly', e.target.checked)}
+                  />
+                  <span> Display subgrouping only</span>
+                </label>
+              )}
 
               {!!parentFilters.length && (
                 <label>
@@ -595,6 +609,16 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                         </Tooltip.Content>
                       </Tooltip>
                     </span>
+                  </label>
+
+                  <label>
+                    <input
+                      type='checkbox'
+                      checked={!!filter.displaySubgroupingOnly}
+                      aria-label='Display subgrouping only'
+                      onChange={e => updateFilterProp('displaySubgroupingOnly', e.target.checked)}
+                    />
+                    <span> Display subgrouping only</span>
                   </label>
                 </>
               )}

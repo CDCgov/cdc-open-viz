@@ -15,6 +15,7 @@ import ToggleIcon from '../images/icon-toggle.svg'
 import { ConfigRow } from '../types/ConfigRow'
 import { DataDesignerModal } from './DataDesignerModal'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
+import Button from '@cdc/core/components/elements/Button'
 import { iconHash } from '../helpers/iconHash'
 import _ from 'lodash'
 import { Visualization } from '@cdc/core/types/Visualization'
@@ -191,7 +192,7 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
     <nav className='row-menu'>
       <ul className='row-menu__flyout'>{layoutList}</ul>
       {isMultiColumn && (
-        <button
+        <Button
           className={`btn row-menu__btn border-0${row.equalHeight ? ' btn-primary' : ''}`}
           title={row.equalHeight ? 'Disable Equal Height Rows' : 'Enable Equal Height Rows'}
           onClick={toggleEqualHeight}
@@ -201,33 +202,33 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
             <rect x='14' y='2' width='9' height='14' rx='1' />
             <line x1='0' y1='19' x2='24' y2='19' stroke='#fff' strokeWidth='2' strokeDasharray='3 2' />
           </svg>
-        </button>
+        </Button>
       )}
       <div className='spacer'></div>
-      <button
+      <Button
         className={`btn btn-primary row-menu__btn border-0`}
         title='Move Row Up'
         onClick={() => moveRow('up')}
         disabled={rowIdx === 0}
       >
         <Icon display='caretUp' color='#fff' size={25} />
-      </button>
-      <button
+      </Button>
+      <Button
         className={'btn btn-primary row-menu__btn border-0'}
         title='Move Row Down'
         onClick={() => moveRow('down')}
         disabled={rowIdx + 1 === rows.length}
       >
         <Icon display='caretDown' color='#fff' size={25} />
-      </button>
-      <button
+      </Button>
+      <Button
         className={'btn btn-danger row-menu__btn row-menu__btn--remove border-0'}
         title='Delete Row'
         onClick={deleteRow}
         disabled={rowIdx === 0 && rows.length === 1}
       >
         <Icon display='close' color='#fff' size={25} />
-      </button>
+      </Button>
     </nav>
   )
 }
@@ -241,7 +242,7 @@ const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
       <div className='builder-row' data-row-id={rowIdx}>
         <RowMenu rowIdx={rowIdx} />
         <span className='ms-2 mt-n3'>Row - {rowIdx + 1}</span>
-        <button
+        <Button
           title='Configure Data'
           className='btn btn-configure-row'
           onClick={() => {
@@ -249,7 +250,7 @@ const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
           }}
         >
           {iconHash['gearMulti']}
-        </button>
+        </Button>
         <div className='column-container'>
           {row.columns
             .filter(column => column.width)

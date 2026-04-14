@@ -16,6 +16,7 @@ import createBarElement from '@cdc/core/components/createBarElement'
 import { getHorizontalBarHeights } from '../helpers/getBarHeights'
 import { getPatternUrl as getPatternUrlForBar } from '../helpers/getPatternUrl'
 import { getChartPatternId } from '../../../helpers/getChartPatternId'
+import { buildSeriesTooltipListHtml } from '../../../helpers/tooltipHelpers'
 
 const BarChartStackedHorizontal = () => {
   const { yMax, yScale, xScale, barChart } = useContext<BarChartContextValues>(BarChartContext)
@@ -161,11 +162,14 @@ const BarChartStackedHorizontal = () => {
                 const textWidth = getTextWidth(xAxisValue, `normal ${labelFontSize}px sans-serif`)
                 const additionalColTooltip = getAdditionalColumn(bar.key, hoveredBar)
                 const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${xAxisValue}`
-                const tooltip = `<ul>
-                  <li class="tooltip-heading"">${yAxisTooltip}</li>
-                  <li class="tooltip-body ">${tooltipBody}</li>
-                  <li class="tooltip-body ">${additionalColTooltip}</li>
-                    </li></ul>`
+                const tooltip = buildSeriesTooltipListHtml({
+                  config,
+                  colorScale,
+                  heading: yAxisTooltip,
+                  seriesKey: bar.key,
+                  seriesText: tooltipBody,
+                  extraRows: additionalColTooltip ? [additionalColTooltip] : []
+                })
 
                 // Check if this bar should use a pattern
                 const patternUrl = getPatternUrlForBar({

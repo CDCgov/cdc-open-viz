@@ -4,9 +4,12 @@ import './footnotes.css'
 
 type FootnotesProps = {
   footnotes: Footnote[]
+  footerClassName?: string
 }
 
-const Footnotes: React.FC<FootnotesProps> = ({ footnotes }) => {
+const Footnotes: React.FC<FootnotesProps> = ({ footnotes, footerClassName = 'mt-1' }) => {
+  if (!footnotes?.length) return null
+
   // Convert newlines to <br> tags and parse HTML
   const processFootnoteText = (text: string) => {
     if (!text) return ''
@@ -17,13 +20,13 @@ const Footnotes: React.FC<FootnotesProps> = ({ footnotes }) => {
   }
 
   return (
-    <footer className='col-12 m-3 mt-1 mb-0'>
+    <footer className={`col-12 ${footerClassName}`}>
       <ul className='cove-footnotes'>
         {footnotes.map((note, i) => {
           return (
             <li key={`${note.symbol || 'footnote-'}${i}`} className='mb-1'>
               {note.symbol && <span className='me-1'>{note.symbol}</span>}
-              {processFootnoteText(note.text)}
+              <div className='cove-prose'>{processFootnoteText(note.text)}</div>
             </li>
           )
         })}

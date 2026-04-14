@@ -114,6 +114,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
     hideYAxisLabel: !isFirstInRow,
     legend: {
       ...tileConfig.legend,
+      tooltipLegendVisible: !config.legend?.hide,
       hide: true // Hide legends for all small multiple tiles
     },
     xAxis: {

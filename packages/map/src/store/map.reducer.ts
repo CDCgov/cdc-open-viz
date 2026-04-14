@@ -6,8 +6,11 @@ import _ from 'lodash'
 import { Modal } from '../types/Modal'
 import { GeneratedLegend } from '../helpers/generateRuntimeLegend'
 import { RuntimeData } from '../types/RuntimeData'
+import { getQueryParam } from '@cdc/core/helpers/queryStringUtils'
 
 export const getInitialState = (configObj = {}): MapState => {
+  const filteredStateCode = typeof window !== 'undefined' ? getQueryParam('state-code') || '' : ''
+  const filteredCountyCode = typeof window !== 'undefined' ? getQueryParam('county-code') || '' : ''
   // Create defaults without palette version to avoid overriding legacy configs
   const defaultsWithoutPaletteaName = { ...defaults }
 
@@ -24,7 +27,8 @@ export const getInitialState = (configObj = {}): MapState => {
     coveLoadedHasRan: false,
     displayPanel: false,
     filteredCountryCode: '',
-    filteredStateCode: '',
+    filteredCountyCode,
+    filteredStateCode,
     isDraggingAnnotation: false,
     topoData: null,
     translate: [0, 0],
@@ -47,6 +51,7 @@ export type MapState = {
   coveLoadedHasRan: boolean
   displayPanel: boolean
   filteredCountryCode: string
+  filteredCountyCode: string
   filteredStateCode: string
   isDraggingAnnotation: boolean
   topoData: object | null
@@ -77,8 +82,12 @@ const reducer = (state: MapState, action: MapActions): MapState => {
       return { ...state, displayPanel: action.payload }
     case 'SET_FILTERED_COUNTRY_CODE':
       return { ...state, filteredCountryCode: action.payload }
-    case 'SET_FILTERED_STATE_CODE':
-      return { ...state, filteredStateCode: action.payload }
+    case 'SET_FILTERED_STATE_COUNTY_CODE':
+      return {
+        ...state,
+        filteredStateCode: action.payload.stateCode || '',
+        filteredCountyCode: action.payload.countyCode || ''
+      }
     case 'SET_IS_DRAGGING_ANNOTATION':
       return { ...state, isDraggingAnnotation: action.payload }
     case 'SET_TOPO_DATA':

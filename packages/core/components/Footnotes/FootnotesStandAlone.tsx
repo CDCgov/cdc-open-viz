@@ -14,9 +14,18 @@ type StandAloneProps = {
   enableMarkupVariables?: boolean
   data?: Object[]
   dataMetadata?: Record<string, string>
+  footerClassName?: string
 }
 
-const FootnotesStandAlone: React.FC<StandAloneProps> = ({ config, filters, markupVariables = [], enableMarkupVariables = false, data = [], dataMetadata }) => {
+const FootnotesStandAlone: React.FC<StandAloneProps> = ({
+  config,
+  filters,
+  markupVariables = [],
+  enableMarkupVariables = false,
+  data = [],
+  dataMetadata,
+  footerClassName
+}) => {
   if (!config) return null
 
   // Helper function to process markup variables in footnote text
@@ -66,7 +75,7 @@ const FootnotesStandAlone: React.FC<StandAloneProps> = ({ config, filters, marku
     }))
   }, [config.staticFootnotes, markupVariables, enableMarkupVariables, data, filters])
 
-  return <Footnotes footnotes={[...apiFootnotes, ...staticFootnotes]} />
+  return <Footnotes footnotes={[...apiFootnotes, ...staticFootnotes]} footerClassName={footerClassName} />
 }
 
 export default FootnotesStandAlone

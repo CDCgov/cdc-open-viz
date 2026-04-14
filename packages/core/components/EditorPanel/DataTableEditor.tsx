@@ -8,6 +8,7 @@ import { Visualization } from '../../types/Visualization'
 import _ from 'lodash'
 import { Column } from '../../types/Column'
 import CustomSortOrder from './CustomSortOrder'
+import DownloadUrlControls from './DownloadUrlControls'
 
 interface DataTableProps {
   config: Partial<Visualization>
@@ -19,7 +20,10 @@ interface DataTableProps {
 const PLACEHOLDER = '-Select-'
 
 const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDashboard, columns: dataColumns }) => {
-  const isLoadedFromUrl = config.dataKey?.includes('http://') || config?.dataKey?.includes('https://')
+  const hasUrlBackedDataSource =
+    config.type === 'table'
+      ? Boolean(config.runtimeDataUrl || config.dataUrl)
+      : config.dataFileSourceType === 'url' && Boolean(config.runtimeDataUrl || config.dataUrl || config.dataFileName)
   const excludedColumns = useMemo(() => {
     return Object.keys(config.columns)
       .map<[string, boolean]>(key => [config.columns[key].name, config.columns[key].dataTable])
@@ -374,15 +378,12 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
           updateField={updateField}
         />
       )}
-      {isLoadedFromUrl && (
-        <CheckBox
-          value={config.table.showDownloadUrl}
-          fieldName='showDownloadUrl'
-          label='Show URL to Automatically Updated Data'
-          section='table'
-          updateField={updateField}
-        />
-      )}
+      <DownloadUrlControls
+        hasUrlBackedDataSource={hasUrlBackedDataSource}
+        showDownloadUrl={config.table.showDownloadUrl}
+        downloadUrlLabel={config.table.downloadUrlLabel}
+        updateField={updateField}
+      />
       {config.type !== 'table' && (
         <CheckBox
           value={config.table.showDownloadImgButton}

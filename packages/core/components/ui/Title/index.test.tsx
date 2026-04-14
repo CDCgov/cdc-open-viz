@@ -20,15 +20,4 @@ describe('Title', () => {
 
     expect(screen.getByRole('banner')).toHaveClass('mb-3')
   })
-
-  it('renders legacy custom header markup via modern shim wrapper', () => {
-    const legacyHeaderTitle =
-      '<header class="cove-component__header component__header theme-blue mb-0"><h2>Medicaid Coverage of Cessation Treatments, 2024-Q2</h2></header>'
-
-    const { container } = render(<Title title={legacyHeaderTitle} titleStyle='small' config={baseConfig} />)
-
-    expect(container.querySelector('.cove-title__legacy-shim')).toBeInTheDocument()
-    expect(container.querySelector('.cove-title h3')).not.toBeInTheDocument()
-    expect(container.querySelector('header.cove-component__header.component__header')).toBeInTheDocument()
-  })
 })

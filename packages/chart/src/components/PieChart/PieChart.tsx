@@ -24,14 +24,9 @@ import { handleChartAriaLabels } from '../../helpers/handleChartAriaLabels'
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import { scaleOrdinal } from '@visx/scale'
 import { getContrastColor } from '@cdc/core/helpers/cove/accessibility'
+import { type TooltipDisplayData } from '../../helpers/tooltipHelpers'
 
-type TooltipData = {
-  data: {
-    [key: string]: string | number
-  }
-  dataXPosition: number
-  dataYPosition: number
-}
+type TooltipData = TooltipDisplayData
 
 type PieChartProps = {
   parentWidth?: number
@@ -426,7 +421,7 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
         <div ref={triggerRef} />
         {!isDraggingAnnotation &&
           tooltipData &&
-          Object.entries(tooltipData.data).length > 0 &&
+          tooltipData.data?.length > 0 &&
           tooltipOpen &&
           showTooltip &&
           tooltipData.dataYPosition &&
@@ -442,7 +437,14 @@ const PieChart = React.forwardRef<SVGSVGElement, PieChartProps>((props, ref) => 
               >
                 <ul>
                   {typeof tooltipData === 'object' &&
-                    Object.entries(tooltipData.data).map((item, index) => <TooltipListItem item={item} key={index} />)}
+                    tooltipData.data.map((row, index) => (
+                      <TooltipListItem
+                        row={row}
+                        index={index}
+                        key={index}
+                        useMarkerColumn={tooltipData.useMarkerColumn}
+                      />
+                    ))}
                 </ul>
               </TooltipWithBounds>
             </>

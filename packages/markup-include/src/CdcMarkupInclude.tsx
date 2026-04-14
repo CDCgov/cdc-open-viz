@@ -2,12 +2,14 @@ import { useEffect, useCallback, useRef, useReducer, useMemo } from 'react'
 // external
 import DOMPurify from 'dompurify'
 import axios from 'axios'
+import parse from 'html-react-parser'
 
 // cdc
 import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 import { publish } from '@cdc/core/helpers/events'
 import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
+import { resolveDataColor } from '@cdc/core/helpers/dataColors'
 import ConfigContext from './ConfigContext'
 import coveUpdateWorker from '@cdc/core/helpers/coveUpdateWorker'
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
@@ -30,6 +32,7 @@ type CdcMarkupIncludeProps = {
   datasets: Datasets
   isDashboard: boolean
   isEditor: boolean
+  rawData?: any[]
   setConfig: any
   interactionLabel?: string
 }
@@ -45,6 +48,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   datasets,
   isDashboard = true,
   isEditor = false,
+  rawData,
   setConfig: setParentConfig,
   interactionLabel = 'no link provided'
 }) => {
@@ -64,7 +68,7 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   // Custom States
   const container = useRef()
 
-  const { innerContainerClasses, contentClasses } = useDataVizClasses(config || {})
+  const { innerContainerClasses, contentClasses: rawContentClasses } = useDataVizClasses(config || {})
   const { contentEditor, theme, visual } = config || {}
   const {
     showNoDataMessage,
@@ -76,9 +80,45 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   // Support markupVariables at root level or inside contentEditor
   const markupVariables = config?.markupVariables || contentEditorMarkupVariables || []
+  const editorData = useMemo(() => {
+    if (isDashboard && isEditor && Array.isArray(rawData) && rawData.length) {
+      return rawData
+    }
 
-  const { inlineHTML, srcUrl, title, useInlineHTML } = contentEditor || {}
+    const assignedDatasetData = config?.dataKey ? datasets?.[config.dataKey]?.data : undefined
+    if (Array.isArray(assignedDatasetData) && assignedDatasetData.length) {
+      return assignedDatasetData
+    }
 
+    return data || []
+  }, [config?.dataKey, data, datasets, isDashboard, isEditor, rawData])
+
+  const { inlineHTML, srcUrl, title, useInlineHTML, style: contentStyle } = contentEditor || {}
+  const markupIncludeStyle = contentStyle || 'default'
+  const isTp5Style = markupIncludeStyle === 'tp5'
+
+  const dataColorResolution = useMemo(() => {
+    const dataArr = Array.isArray(data) ? data : []
+    return resolveDataColor({
+      data: dataArr,
+      dataColors: config?.dataColors
+    })
+  }, [data, config?.dataColors])
+
+  const contentClasses = isTp5Style
+    ? rawContentClasses.filter(
+        cls =>
+          cls !== 'component--has-accent' &&
+          cls !== 'component--has-background' &&
+          cls !== 'component--hide-background-color' &&
+          cls !== 'component--has-border-color-theme'
+      )
+    : rawContentClasses
+
+  const shouldApplyTopPadding =
+    !isTp5Style &&
+    (visual?.border || visual?.background || (contentEditor?.title && contentEditor?.titleStyle === 'legacy'))
+  const shouldApplySidePadding = !isTp5Style && (visual?.border || visual?.accent || visual?.background)
   // Default Functions
   const updateConfig = newConfig => {
     Object.keys(defaults).forEach(key => {
@@ -265,12 +305,47 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
   const hideMarkupInclude = processedMarkup.shouldHideSection
   const _showNoDataMessage = processedMarkup.shouldShowNoDataMessage
 
+  const processedTitle = useMemo(() => {
+    if (!config?.enableMarkupVariables || !markupVariables?.length || !title) return title
+    return processMarkupVariables(title, data || [], markupVariables, {
+      isEditor,
+      showNoDataMessage,
+      allowHideSection,
+      filters: config?.filters || [],
+      datasets,
+      configDataKey: config?.dataKey,
+      locale: config?.locale,
+      dataMetadata: config?.dataMetadata
+    }).processedContent
+  }, [
+    title,
+    data,
+    markupVariables,
+    config?.enableMarkupVariables,
+    config?.filters,
+    config?.dataKey,
+    config?.locale,
+    config?.dataMetadata,
+    isEditor,
+    showNoDataMessage,
+    allowHideSection,
+    datasets
+  ])
+
   if (loading === false) {
+    const hasTp5Title = processedTitle && processedTitle.trim()
     content = !hideMarkupInclude && (
       <VisualizationContent
         innerClassName={`markup-include-content-container ${innerContainerClasses.join(' ')}`.trim()}
-        bodyClassName={`markup-include-component ${contentClasses.join(' ')}`.trim()}
-        message={
+        bodyClassName={`markup-include-component ${contentClasses.join(' ')}${
+          isTp5Style ? ' markup-include-component--tp5' : ''
+        }${isTp5Style && visual?.whiteBackground ? ' white-background-style' : ''}${
+          isTp5Style && visual?.whiteBackground && visual?.border ? ' display-border' : ''
+        }`.trim()}
+        bodyWrapClassName={`${isTp5Style ? 'markup-include-body-wrap--tp5' : ''}${
+          shouldApplyTopPadding ? ' has-top-padding' : ''
+        }${shouldApplySidePadding ? ' has-side-padding' : ''}`.trim()}
+        filters={
           config.filters && config.filters.length > 0 ? (
             <Filters
               config={config}
@@ -282,38 +357,78 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
           ) : null
         }
         header={
-          <Title
-            title={title}
-            isDashboard={isDashboard}
-            titleStyle={contentEditor?.titleStyle}
-            config={config}
-            classes={[`${theme}`, 'mb-0']}
-            noContent={!sanitizedHTML}
-          />
+          !isTp5Style ? (
+            <Title
+              title={processedTitle}
+              isDashboard={isDashboard}
+              titleStyle={contentEditor?.titleStyle}
+              config={config}
+              classes={[`${theme}`, 'mb-0']}
+              noContent={!sanitizedHTML}
+            />
+          ) : null
         }
         footer={
           <FootnotesStandAlone
-            config={configObj?.footnotes}
+            config={config?.footnotes}
             filters={config?.filters || []}
             markupVariables={markupVariables}
             enableMarkupVariables={config?.enableMarkupVariables}
             data={data}
             dataMetadata={config?.dataMetadata}
+            footerClassName={isTp5Style ? 'mt-3' : undefined}
           />
         }
       >
-        {_showNoDataMessage && (
-          <div className='no-data-message'>
-            <p>{`${noDataMessageText}`}</p>
+        {isTp5Style ? (
+          <div
+            className={`markup-include-tp5 cdc-callout d-flex flex-column h-100 ${
+              dataColorResolution.state === 'resolved' ? 'cdc-callout--data-color' : ''
+            }`}
+            style={
+              dataColorResolution.state === 'resolved'
+                ? { backgroundColor: dataColorResolution.color, color: dataColorResolution.textColor }
+                : undefined
+            }
+          >
+            {hasTp5Title && (
+              <h3 className='cdc-callout__heading cove-prose fw-bold flex-shrink-0 d-flex align-items-start'>
+                <span>{parse(processedTitle.trim())}</span>
+              </h3>
+            )}
+            <div className='cdc-callout__body d-flex flex-row align-content-start flex-grow-1'>
+              <div className='cdc-callout__content flex-grow-1 d-flex flex-column min-w-0'>
+                {_showNoDataMessage && (
+                  <div className='no-data-message'>
+                    <p>{`${noDataMessageText}`}</p>
+                  </div>
+                )}
+                {!markupError && !_showNoDataMessage && (
+                  <div id={scopeId}>
+                    {scopedCSS && <style>{scopedCSS}</style>}
+                    <div className='cove-prose' dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
+                  </div>
+                )}
+                {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
+              </div>
+            </div>
           </div>
+        ) : (
+          <>
+            {_showNoDataMessage && (
+              <div className='no-data-message'>
+                <p>{`${noDataMessageText}`}</p>
+              </div>
+            )}
+            {!markupError && !_showNoDataMessage && (
+              <div id={scopeId}>
+                {scopedCSS && <style>{scopedCSS}</style>}
+                <div className='cove-prose' dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
+              </div>
+            )}
+            {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
+          </>
         )}
-        {!markupError && !_showNoDataMessage && (
-          <div id={scopeId}>
-            {scopedCSS && <style>{scopedCSS}</style>}
-            <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
-          </div>
-        )}
-        {markupError && srcUrl && !_showNoDataMessage && <div className='warning'>{errorMessage}</div>}
       </VisualizationContent>
     )
   }
@@ -331,9 +446,15 @@ const CdcMarkupInclude: React.FC<CdcMarkupIncludeProps> = ({
 
   return (
     <ErrorBoundary component='CdcMarkupInclude'>
-      <ConfigContext.Provider value={{ config, updateConfig, loading, data: data, setParentConfig, isDashboard }}>
+      <ConfigContext.Provider
+        value={{ config, updateConfig, loading, data: data, editorData, setParentConfig, isDashboard }}
+      >
         {!config?.newViz && config?.runtime && config?.runtime.editorErrorMessage && <Error />}
-        <VisualizationContainer config={config} isEditor={isEditor} editorPanel={<EditorPanel datasets={datasets} />}>
+        <VisualizationContainer
+          config={config as any}
+          isEditor={isEditor}
+          editorPanel={<EditorPanel datasets={datasets} />}
+        >
           {content}
         </VisualizationContainer>
       </ConfigContext.Provider>

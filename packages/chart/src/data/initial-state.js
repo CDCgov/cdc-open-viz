@@ -156,6 +156,7 @@ const createInitialState = () => {
       height: '',
       caption: '',
       showDownloadUrl: false,
+      downloadUrlLabel: '',
       showDataTableLink: true,
       showDownloadLinkBelow: true,
       indexLabel: '',

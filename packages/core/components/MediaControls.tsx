@@ -10,6 +10,20 @@ const buttonText = {
   link: 'Link to Dataset'
 }
 
+const getStandaloneDatasetUrl = config => {
+  if (!config?.table?.showDownloadUrl) return null
+
+  if (config.type === 'table') {
+    return config.runtimeDataUrl || config.dataUrl || null
+  }
+
+  if (config.dataFileSourceType === 'url') {
+    return config.runtimeDataUrl || config.dataUrl || config.dataFileName || null
+  }
+
+  return null
+}
+
 const saveImageAs = (uri, filename) => {
   const ie = navigator.userAgent.match(/MSIE\s([\d.]+)/)
   const ie11 = navigator.userAgent.match(/Trident\/7.0/) && navigator.userAgent.match(/rv:11/)
@@ -212,12 +226,14 @@ const DownloadLink = ({
 // Link to CSV/JSON data
 const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
   let dataConfig = dashboardDataConfig || config
+  const standaloneDatasetUrl = getStandaloneDatasetUrl(config)
+  const linkText = config?.table?.downloadUrlLabel || buttonText.link
   // Handles Maps & Charts
-  if (dataConfig.dataFileSourceType === 'url' && dataConfig.dataFileName && config.table.showDownloadUrl) {
+  if (standaloneDatasetUrl && !dashboardDataConfig) {
     return (
       <a
-        href={dataConfig.dataFileName}
-        title={buttonText.link}
+        href={standaloneDatasetUrl}
+        title={linkText}
         target='_blank'
         onClick={() => {
           publishAnalyticsEvent({
@@ -230,7 +246,7 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
           })
         }}
       >
-        {buttonText.link}
+        {linkText}
       </a>
     )
   }
@@ -252,7 +268,7 @@ const Link = ({ config, dashboardDataConfig, interactionLabel }) => {
         })
       }}
     >
-      {buttonText.link}
+      {linkText}
     </a>
   ) : null
 }

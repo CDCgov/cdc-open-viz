@@ -23,13 +23,21 @@ type HorizonChartProps = {
   yScale: any
   xMax: number
   yMax: number
+  yAxisWidth: number
   handleTooltipMouseOver: (e: any, additionalData?: any) => void
   handleTooltipMouseOff: () => void
   tooltipData?: any
   showTooltip?: boolean
 }
 
-const HorizonChart = ({ xScale, xMax, yMax, handleTooltipMouseOver, handleTooltipMouseOff }: HorizonChartProps) => {
+const HorizonChart = ({
+  xScale,
+  xMax,
+  yMax,
+  yAxisWidth,
+  handleTooltipMouseOver,
+  handleTooltipMouseOff
+}: HorizonChartProps) => {
   // Get data and config from context
   const { transformedData: data, config, colorScale, rawData, parseDate } = useContext(ConfigContext)
 
@@ -94,7 +102,7 @@ const HorizonChart = ({ xScale, xMax, yMax, handleTooltipMouseOver, handleToolti
 
   return (
     <ErrorBoundary component='HorizonChart'>
-      <Group className='horizon-chart' key='horizon-wrapper' left={Number(config.yAxis.size)} height={Number(yMax)}>
+      <Group className='horizon-chart' key='horizon-wrapper' left={yAxisWidth} height={Number(yMax)}>
         {seriesKeys.map((seriesKey, index) => {
           const rowY = getRowY(index)
           return (

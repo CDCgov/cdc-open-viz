@@ -1,6 +1,6 @@
 {
   "type": "waffle-chart",
-  "dataUrl": "/examples/example-data.json",
+  "dataUrl": "/examples/__data__/example-data.json",
   "filters": [],
   "title": "Chart Title",
   "content": "of cases occurred in the home",

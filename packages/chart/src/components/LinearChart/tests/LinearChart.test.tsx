@@ -67,6 +67,11 @@ const renderLinearChart = (
   )
 }
 
+const getLeftAxisLabelTransforms = container =>
+  Array.from(container.querySelectorAll('.left-axis text.y-label'))
+    .map(label => label.getAttribute('transform'))
+    .filter(Boolean)
+
 describe('LinearChart', () => {
   describe('rendering', () => {
     it('renders without crashing', () => {
@@ -257,6 +262,148 @@ describe('LinearChart', () => {
       })
       // The axis line should be hidden, but grid lines may still render
       expect(container.querySelector('svg')).toBeTruthy()
+    })
+
+    it('ignores yAxis.labelOffset when positioning the vertical left-axis title', () => {
+      const baseRuntime = {
+        xAxis: {
+          type: 'date',
+          dataKey: 'Date',
+          label: 'X-Axis'
+        },
+        yAxis: {
+          size: 50,
+          label: 'Y-Axis',
+          gridLines: true,
+          labelOffset: 0
+        },
+        originalXAxis: {
+          dataKey: 'Date'
+        },
+        series: [],
+        seriesKeys: [],
+        seriesLabelsAll: [],
+        uniqueId: 'test-chart'
+      }
+
+      const baseRender = renderLinearChart({
+        yAxis: {
+          hideAxis: false,
+          hideLabel: false,
+          hideTicks: false,
+          size: '50',
+          gridLines: true,
+          label: 'Y-Axis',
+          tickRotation: 0,
+          anchors: [],
+          axisPadding: 0,
+          labelPlacement: 'On Date/Category Axis',
+          rightAxisSize: 0,
+          labelOffset: 0
+        },
+        runtime: baseRuntime
+      })
+      const offsetRender = renderLinearChart({
+        yAxis: {
+          hideAxis: false,
+          hideLabel: false,
+          hideTicks: false,
+          size: '50',
+          gridLines: true,
+          label: 'Y-Axis',
+          tickRotation: 0,
+          anchors: [],
+          axisPadding: 0,
+          labelPlacement: 'On Date/Category Axis',
+          rightAxisSize: 0,
+          labelOffset: 240
+        },
+        runtime: {
+          ...baseRuntime,
+          yAxis: {
+            ...baseRuntime.yAxis,
+            labelOffset: 240
+          }
+        }
+      })
+
+      const baseTransforms = getLeftAxisLabelTransforms(baseRender.container)
+      const offsetTransforms = getLeftAxisLabelTransforms(offsetRender.container)
+
+      expect(baseTransforms.length).toBeGreaterThan(0)
+      expect(offsetTransforms).toEqual(baseTransforms)
+    })
+
+    it('ignores horizontal xAxis.labelOffset when positioning the left-side axis title', () => {
+      const baseRuntime = {
+        xAxis: {
+          type: 'linear',
+          dataKey: 'Value',
+          label: 'X-Axis'
+        },
+        yAxis: {
+          size: 50,
+          label: 'Y-Axis',
+          gridLines: true,
+          labelOffset: 0
+        },
+        originalXAxis: {
+          dataKey: 'Date'
+        },
+        series: [],
+        seriesKeys: [],
+        seriesLabelsAll: [],
+        uniqueId: 'test-chart'
+      }
+
+      const baseRender = renderLinearChart({
+        orientation: 'horizontal',
+        xAxis: {
+          type: 'linear',
+          dataKey: 'Value',
+          label: 'X-Axis',
+          hideAxis: false,
+          hideLabel: false,
+          hideTicks: false,
+          size: '50',
+          tickRotation: 0,
+          maxTickRotation: 90,
+          anchors: [],
+          axisPadding: 0,
+          labelOffset: 0
+        },
+        runtime: baseRuntime
+      })
+      const offsetRender = renderLinearChart({
+        orientation: 'horizontal',
+        xAxis: {
+          type: 'linear',
+          dataKey: 'Value',
+          label: 'X-Axis',
+          hideAxis: false,
+          hideLabel: false,
+          hideTicks: false,
+          size: '50',
+          tickRotation: 0,
+          maxTickRotation: 90,
+          anchors: [],
+          axisPadding: 0,
+          labelOffset: 240
+        },
+        runtime: {
+          ...baseRuntime,
+          yAxis: {
+            ...baseRuntime.yAxis,
+            labelOffset: 240
+          }
+        }
+      })
+
+      const baseTransforms = getLeftAxisLabelTransforms(baseRender.container)
+      const offsetTransforms = getLeftAxisLabelTransforms(offsetRender.container)
+
+      expect(baseTransforms.length).toBeGreaterThan(0)
+      expect(offsetTransforms).toEqual(baseTransforms)
     })
   })
 

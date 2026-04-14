@@ -246,7 +246,7 @@
     { "Age Group": "45-54", "Male": "8259", "Female": "5633" },
     { "Age Group": "55-64", "Male": "1235", "Female": "810" }
   ],
-  "dataFileName": "paired-bar-formatted.json",
+  "dataFileName": "/examples/feature/paired-bar/__data__/paired-bar-formatted.json",
   "dataFileSourceType": "file",
   "formattedData": [
     { "Age Group": "65", "Male": "730", "Female": "402" },

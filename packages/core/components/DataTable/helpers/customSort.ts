@@ -10,11 +10,16 @@ export const customSort = (a, b, sortBy, config) => {
     valueB = standardizeStateName(b)
     // sort for Regions table for Map
     if (String(valueA).toLowerCase().includes('region') && String(valueB).toLowerCase().includes('region')) {
-      const numberA = parseInt(a.match(/\d+$/)[0], 10)
-      const numberB = parseInt(b.match(/\d+$/)[0], 10)
+      const regionMatchA = typeof valueA === 'string' ? valueA.match(/\d+$/) : null
+      const regionMatchB = typeof valueB === 'string' ? valueB.match(/\d+$/) : null
 
-      // Compare the numeric parts
-      return sortBy.asc ? Number(numberA) - Number(numberB) : Number(numberB) - Number(numberA)
+      if (regionMatchA && regionMatchB) {
+        const numberA = parseInt(regionMatchA[0], 10)
+        const numberB = parseInt(regionMatchB[0], 10)
+
+        // Compare the numeric parts
+        return sortBy.asc ? Number(numberA) - Number(numberB) : Number(numberB) - Number(numberA)
+      }
     }
   }
 

@@ -1,3 +1,5 @@
+import * as events from './events'
+
 export function getQueryStringFilterValue(filter) {
   const urlParams = new URLSearchParams(window.location.search)
   if (filter.setByQueryParameter) {
@@ -43,7 +45,7 @@ export function isFilterHiddenByQuery(filter) {
 }
 
 export function getQueryParams() {
-  const queryParams = {}
+  const queryParams: Record<string, string | string[]> = {}
   for (const [key, value] of Array.from(new URLSearchParams(window.location.search).entries())) {
     if (!queryParams[key]) queryParams[key] = value
     else {
@@ -55,8 +57,12 @@ export function getQueryParams() {
   return queryParams
 }
 
-export function getQueryParam(param) {
-  return getQueryParams()[param]
+export function getQueryParam(param: string) {
+  const value = getQueryParams()?.[param]
+  if (Array.isArray(value)) {
+    return value.join(',')
+  }
+  return value
 }
 
 export function updateQueryString(queryParams) {
@@ -64,6 +70,15 @@ export function updateQueryString(queryParams) {
     .map(queryParam => `${queryParam}=${encodeURIComponent(queryParams[queryParam])}`)
     .join('&')}`
   window.history.pushState({ path: updateUrl }, '', updateUrl)
+  events.publish(events.QUERY_CHANGE_EVENT)
+}
+
+export function updateQueryParams(newParams: Record<string, string>) {
+  const currentParams = getQueryParams()
+  const updatedParams = { ...currentParams, ...newParams }
+  // Remove any params with empty string values
+  const filteredParams = Object.fromEntries(Object.entries(updatedParams).filter(([_, value]) => value !== ''))
+  updateQueryString(filteredParams)
 }
 
 export function updateQueryParam(key: string, value: number | string) {

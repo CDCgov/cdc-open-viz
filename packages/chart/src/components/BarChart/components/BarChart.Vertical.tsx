@@ -23,6 +23,7 @@ import _ from 'lodash'
 import { getBarData } from '../helpers/getBarData'
 import { getPatternUrl as getPatternUrlForBar } from '../helpers/getPatternUrl'
 import { getChartPatternId } from '../../../helpers/getChartPatternId'
+import { buildSeriesTooltipListHtml } from '../../../helpers/tooltipHelpers'
 
 const BarChartVertical = () => {
   const { xScale, yScale, xMax, yMax, seriesScale, convertLineToBarGraph, barChart } =
@@ -229,12 +230,14 @@ const BarChartVertical = () => {
                     ? `${config.runtime.xAxis.label}: ${xAxisValue}`
                     : xAxisValue
                   const tooltipBody = `${config.runtime.seriesLabels[bar.key]}: ${yAxisValue}`
-
-                  const tooltip = `<ul>
-                  <li class="tooltip-heading">${xAxisTooltip}</li>
-                  <li class="tooltip-body ">${tooltipBody}</li>
-                  ${additionalColTooltip ? '<li class="tooltip-body ">' + additionalColTooltip + '</li>' : ''}
-                    </li></ul>`
+                  const tooltip = buildSeriesTooltipListHtml({
+                    config,
+                    colorScale,
+                    heading: xAxisTooltip,
+                    seriesKey: bar.key,
+                    seriesText: tooltipBody,
+                    extraRows: additionalColTooltip ? [additionalColTooltip] : []
+                  })
                   const { barHeight, isSuppressed, getBarY, absentDataLabel } = getBarConfig({
                     bar,
                     defaultBarHeight,
