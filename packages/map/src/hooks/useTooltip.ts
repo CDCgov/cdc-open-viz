@@ -86,11 +86,27 @@ const useTooltip = (config: MapConfig) => {
   }
 
   const handleTooltipPrimaryColumn = (tooltipValue, column) => {
-    const { hidePrimaryColumnInTooltip } = config.general as { hidePrimaryColumnInTooltip: boolean }
+    const { hidePrimaryColumnInTooltip, hideGeoColumnInTooltip } = config.general as {
+      hidePrimaryColumnInTooltip: boolean
+      hideGeoColumnInTooltip: boolean
+    }
     let tooltipPrefix = column.label?.length > 0 ? column.label : ''
-    if ((column.name === config.columns.primary.name && hidePrimaryColumnInTooltip) || !tooltipPrefix)
-      return `<li class="tooltip-body">${tooltipValue}</li>`
+    const hidePrimaryLabel = column.name === config.columns.primary.name && hidePrimaryColumnInTooltip
+    const hideGeoLabel = column.name === config.columns.geo.name && hideGeoColumnInTooltip
+
+    if (hidePrimaryLabel || hideGeoLabel || !tooltipPrefix) return `<li class="tooltip-body">${tooltipValue}</li>`
     return `<li class="tooltip-body">${tooltipPrefix}: ${tooltipValue}</li>`
+  }
+
+  const formatTooltipColumnValue = (row, column, columnKey) => {
+    if (!row) return config.tooltips?.noDataLabel || 'No Data'
+
+    if (column.name === config.columns.geo.name) {
+      const displayOverride = row?.[config.columns.geo?.displayColumn]
+      return displayGeoName(row[column.name], displayOverride)
+    }
+
+    return displayDataAsText(row[column.name], columnKey, config)
   }
 
   /**
@@ -118,9 +134,7 @@ const useTooltip = (config: MapConfig) => {
           let tooltipValue = handleTooltipSpecialClassText(specialClasses, column, row, '', columnKey)
 
           if (!tooltipValue) {
-            tooltipValue = row
-              ? displayDataAsText(row[column.name], columnKey, config)
-              : config.tooltips?.noDataLabel || 'No Data'
+            tooltipValue = formatTooltipColumnValue(row, column, columnKey)
           }
 
           toolTipText += handleTooltipPrimaryColumn(tooltipValue, column)
