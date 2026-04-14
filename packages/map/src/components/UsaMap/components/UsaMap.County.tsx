@@ -273,12 +273,12 @@ const CountyMap = () => {
     prevShowHSABoundariesRef.current = config.general.showHSABoundaries
   }, [config.general.showHSABoundaries])
 
-  const prevTerritoriesAllShowRef = useRef(config.general.territoriesAlwaysShow)
+  const prevTerritoriesAlwaysShowRef = useRef(config.general.territoriesAlwaysShow)
   useEffect(() => {
-    if (prevTerritoriesAllShowRef.current === config.general.territoriesAlwaysShow) return
+    if (prevTerritoriesAlwaysShowRef.current === config.general.territoriesAlwaysShow) return
     const currentYear = getCurrentTopoYear(config, runtimeFilters)
     getAndSetTopoData(currentYear)
-    prevTerritoriesAllShowRef.current = config.general.territoriesAlwaysShow
+    prevTerritoriesAlwaysShowRef.current = config.general.territoriesAlwaysShow
   }, [config.general.territoriesAlwaysShow])
 
   // Whenever the memo at the top is triggered and the map is called to re-render, call drawCanvas and update
