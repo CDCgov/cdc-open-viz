@@ -81,6 +81,39 @@ type MapEditorPanelProps = {
   datasets?: Datasets
 }
 
+type ColumnSectionProps = {
+  fieldKey: 'geo' | 'primary'
+  fieldName: string
+  show: boolean
+  setShow: (fieldKey: 'geo' | 'primary', value: boolean) => void
+  children: React.ReactNode
+}
+
+const ColumnSection = ({ fieldKey, fieldName, show, setShow, children }: ColumnSectionProps) => {
+  if (!show) {
+    return (
+      <div className='mb-1'>
+        <button type='button' className='btn btn-light' onClick={() => setShow(fieldKey, true)}>
+          <Icon display='caretDown' />
+        </button>
+        <span> {fieldName}</span>
+      </div>
+    )
+  }
+
+  return (
+    <fieldset className='primary-fieldset edit-block column-section' key={fieldKey}>
+      <div className='column-section__header'>
+        <button type='button' className='btn btn-light' onClick={() => setShow(fieldKey, false)}>
+          <Icon display='caretUp' />
+        </button>
+        <span className='column-section__title'>{fieldName}</span>
+      </div>
+      {children}
+    </fieldset>
+  )
+}
+
 const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const {
     setParentConfig,
@@ -124,10 +157,15 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
   const [loadedDefault, setLoadedDefault] = useState(false)
   const [activeFilterValueForDescription, setActiveFilterValueForDescription] = useState([0, 0])
   const [showConversionModal, setShowConversionModal] = useState(false)
+  const [columnSectionsOpen, setColumnSectionsOpen] = useState({ geo: true, primary: true })
   const [pendingPaletteSelection, setPendingPaletteSelection] = useState<{
     palette: string
     action: () => void
   } | null>(null)
+
+  const setColumnSectionOpen = (fieldKey: 'geo' | 'primary', value: boolean) => {
+    setColumnSectionsOpen(prev => ({ ...prev, [fieldKey]: value }))
+  }
 
   const {
     MapLayerHandlers: { handleMapLayer, handleAddLayer, handleRemoveLayer }
@@ -1790,7 +1828,12 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                     <AccordionItemButton>Columns</AccordionItemButton>
                   </AccordionItemHeading>
                   <AccordionItemPanel>
-                    <fieldset className='primary-fieldset edit-block'>
+                    <ColumnSection
+                      fieldKey='geo'
+                      fieldName='Geography'
+                      show={columnSectionsOpen.geo}
+                      setShow={setColumnSectionOpen}
+                    >
                       <label>
                         <span className='edit-label column-heading'>
                           Geography
@@ -1834,6 +1877,24 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         updateField={updateField}
                       />
                       <TextField
+                        value={columns.geo.label}
+                        section='columns'
+                        subsection='geo'
+                        fieldName='label'
+                        label='Geography Column Label'
+                        updateField={updateField}
+                        tooltip={
+                          <Tooltip style={{ textTransform: 'none' }}>
+                            <Tooltip.Target>
+                              <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                            </Tooltip.Target>
+                            <Tooltip.Content>
+                              <p>Enter a label for the geography column in tooltips and the data table.</p>
+                            </Tooltip.Content>
+                          </Tooltip>
+                        }
+                      />
+                      <TextField
                         value={config.general.geoLabelOverride}
                         section='general'
                         fieldName='geoLabelOverride'
@@ -1875,6 +1936,22 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           }}
                         />
                       </label>
+                      <CheckBox
+                        value={config.columns.geo?.dataTable || false}
+                        section='columns'
+                        subsection='geo'
+                        fieldName='dataTable'
+                        label='Show in Data Table'
+                        updateField={updateField}
+                      />
+                      <CheckBox
+                        value={config.columns.geo?.tooltip || false}
+                        section='columns'
+                        subsection='geo'
+                        fieldName='tooltip'
+                        label='Show in Tooltips'
+                        updateField={updateField}
+                      />
                       <label className='mt-2'>
                         <span className='edit-label column-heading'>Order</span>
                         <input
@@ -1887,7 +1964,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                           }}
                         />
                       </label>
-                    </fieldset>
+                    </ColumnSection>
                     {config.general.geoType === 'us-county' && config.general.showHSABoundaries && (
                       <Select
                         label='HSA Description Column'
@@ -1909,7 +1986,12 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                       />
                     )}
                     {'navigation' !== config.general.type && (
-                      <fieldset className='primary-fieldset edit-block'>
+                      <ColumnSection
+                        fieldKey='primary'
+                        fieldName='Data'
+                        show={columnSectionsOpen.primary}
+                        setShow={setColumnSectionOpen}
+                      >
                         <Select
                           label='Data Column'
                           value={columns.primary.name}
@@ -2030,7 +2112,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                             />
                           </label>
                         </ul>
-                      </fieldset>
+                      </ColumnSection>
                     )}
 
                     {config.general.type === 'bubble' && config.legend.type === 'category' && (

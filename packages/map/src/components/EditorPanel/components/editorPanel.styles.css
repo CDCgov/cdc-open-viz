@@ -2,17 +2,23 @@
   color: var(--mediumGray);
   display: grid;
   list-style: none;
-  button { width: 100% !important; }
+
+  button {
+    width: 100% !important;
+  }
+
   svg {
     box-sizing: border-box;
     display: block;
     margin: 0.5em auto;
     max-height: 40px;
     max-width: 80px;
+
     path {
       fill: currentColor;
     }
   }
+
   button {
     align-items: center;
     background: transparent;
@@ -25,28 +31,34 @@
     padding: 0.3em 0.75em;
     transition: 0.2s all;
     width: 40%;
+
     svg {
       display: block;
       height: 25px;
       margin: 0.5em auto;
       max-width: 100%;
     }
+
     span {
       font-size: 1em;
       text-transform: none;
     }
+
     &:hover {
       background: #f2f2f2;
       transition: 0.2s all;
     }
+
     &.active {
       background: #fff;
       border-color: #005eaa;
       color: #005eaa;
       position: relative;
+
       path {
         fill: #005eaa;
       }
+
       &:before {
         background: #005eaa;
         bottom: 0;
@@ -74,6 +86,7 @@
   transition: 0.1s background;
   width: 25px;
   z-index: 100;
+
   &:before {
     content: '\00ab';
     left: 50%;
@@ -81,13 +94,16 @@
     top: 43%;
     transform: translate(-50%, -50%);
   }
+
   &.collapsed {
     left: 1em;
     margin-left: 0;
+
     &:before {
       content: '\00bb';
     }
   }
+
   &:hover {
     background: rgba(255, 255, 255, 1);
   }
@@ -95,4 +111,15 @@
 
 .editor-panel-action-button {
   margin-top: 1rem;
+}
+
+.column-section__header {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.column-section__title {
+  font-weight: 600;
 }
