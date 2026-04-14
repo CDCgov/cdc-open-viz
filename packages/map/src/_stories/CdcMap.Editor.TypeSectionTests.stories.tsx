@@ -103,6 +103,9 @@ export const TypeSectionTests: Story = {
       getMapContainerState,
       async () => {
         await userEvent.selectOptions(subtypeSelect, 'us-county')
+        const territoriesCheckbox = canvas.getByLabelText(/Show All Territories/i) as HTMLInputElement
+        expect(territoriesCheckbox).toBeTruthy()
+        expect(territoriesCheckbox.disabled).toBe(false)
       },
       (before, after) => !before.classes.includes('us-county') && after.classes.includes('us-county')
     )
@@ -258,7 +261,6 @@ export const TypeSectionTests: Story = {
       },
       (before, after) => before.stateLabelCount === 0 && after.stateLabelCount > 0
     )
-
     await performAndAssert(
       'Show State Labels → Disable',
       getStateLabelsVisual,

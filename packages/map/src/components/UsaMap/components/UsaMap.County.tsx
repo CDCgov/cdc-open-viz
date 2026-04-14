@@ -64,7 +64,8 @@ const sortById = (a, b) => {
   return 0
 }
 
-const getTopoData = (year, showHSABoundaries) => {
+const getTopoData = (year, showHSABoundaries, territoriesAlwaysShow: boolean) => {
+  const showTerritories = territoriesAlwaysShow
   return new Promise(resolve => {
     const resolveWithTopo = async response => {
       if (response.status !== 200) {
@@ -85,14 +86,13 @@ const getTopoData = (year, showHSABoundaries) => {
       }
 
       topoData.year = year || 'default'
+      const topoSources = showTerritories ? [response, usExtendedGeography] : [response]
       topoData.counties = dedupeFeaturesById(
-        [response, usExtendedGeography]
+        topoSources
           .flatMap(topo => feature(topo, topo.objects.counties).features)
           .filter(county => typeof county.id === 'string' && county.id.length > 2)
       )
-      topoData.states = dedupeFeaturesById(
-        [response, usExtendedGeography].flatMap(topo => feature(topo, topo.objects.states).features)
-      )
+      topoData.states = dedupeFeaturesById(topoSources.flatMap(topo => feature(topo, topo.objects.states).features))
       if (showHSABoundaries) {
         const mappingResponse = await import(
           /* webpackChunkName: "hsa_fips_mapping" */ './../data/hsa_fips_mapping.json'
@@ -243,7 +243,7 @@ const CountyMap = () => {
   })
 
   const getAndSetTopoData = currentYear => {
-    getTopoData(currentYear, config.general.showHSABoundaries).then(response => {
+    getTopoData(currentYear, config.general.showHSABoundaries, config.general.territoriesAlwaysShow).then(response => {
       if (canvasRef.current) {
         const context = canvasRef.current.getContext('2d') as CanvasRenderingContext2D
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
@@ -267,6 +267,14 @@ const CountyMap = () => {
     getAndSetTopoData(currentYear)
     prevShowHSABoundariesRef.current = config.general.showHSABoundaries
   }, [config.general.showHSABoundaries])
+
+  const prevTerritoriesAllShowRef = useRef(config.general.territoriesAlwaysShow)
+  useEffect(() => {
+    if (prevTerritoriesAllShowRef.current === config.general.territoriesAlwaysShow) return
+    const currentYear = getCurrentTopoYear(config, runtimeFilters)
+    getAndSetTopoData(currentYear)
+    prevTerritoriesAllShowRef.current = config.general.territoriesAlwaysShow
+  }, [config.general.territoriesAlwaysShow])
 
   // Whenever the memo at the top is triggered and the map is called to re-render, call drawCanvas and update
   // The resize function so it includes the latest state variables
