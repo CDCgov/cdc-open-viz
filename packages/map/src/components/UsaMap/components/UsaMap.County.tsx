@@ -43,6 +43,16 @@ type TopoData = {
   hsaMapping: Record<string, string>
 }
 
+const US_TERRITORY_FIPS_PREFIXES = {
+  AMERICAN_SAMOA: '60',
+  GUAM: '66',
+  NORTHERN_MARIANA_ISLANDS: '69',
+  PUERTO_RICO: '72',
+  US_VIRGIN_ISLANDS: '78'
+} as const
+
+const US_TERRITORY_STATE_FIPS_PREFIXES = new Set<string>(Object.values(US_TERRITORY_FIPS_PREFIXES))
+
 const dedupeFeaturesById = <T extends { id?: string }>(features: T[]): T[] => {
   const seenIds = new Set<string>()
 
@@ -64,7 +74,8 @@ const sortById = (a, b) => {
   return 0
 }
 
-const getTopoData = (year, showHSABoundaries) => {
+const getTopoData = (year, showHSABoundaries, territoriesAlwaysShow: boolean) => {
+  const showTerritories = territoriesAlwaysShow
   return new Promise(resolve => {
     const resolveWithTopo = async response => {
       if (response.status !== 200) {
@@ -85,14 +96,24 @@ const getTopoData = (year, showHSABoundaries) => {
       }
 
       topoData.year = year || 'default'
+      const topoSources = showTerritories ? [response, usExtendedGeography] : [response]
       topoData.counties = dedupeFeaturesById(
-        [response, usExtendedGeography]
+        topoSources
           .flatMap(topo => feature(topo, topo.objects.counties).features)
           .filter(county => typeof county.id === 'string' && county.id.length > 2)
       )
-      topoData.states = dedupeFeaturesById(
-        [response, usExtendedGeography].flatMap(topo => feature(topo, topo.objects.states).features)
-      )
+      topoData.states = dedupeFeaturesById(topoSources.flatMap(topo => feature(topo, topo.objects.states).features))
+      // Additional filtering removes territory features that may still be present in the topology data when territories are hidden.
+      if (!showTerritories) {
+        topoData.states = topoData.states.filter(state => {
+          const statePrefix = state.id?.substring(0, 2)
+          return !statePrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(statePrefix)
+        })
+        topoData.counties = topoData.counties.filter(county => {
+          const countyPrefix = county.id?.substring(0, 2)
+          return !countyPrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix)
+        })
+      }
       if (showHSABoundaries) {
         const mappingResponse = await import(
           /* webpackChunkName: "hsa_fips_mapping" */ './../data/hsa_fips_mapping.json'
@@ -243,7 +264,7 @@ const CountyMap = () => {
   })
 
   const getAndSetTopoData = currentYear => {
-    getTopoData(currentYear, config.general.showHSABoundaries).then(response => {
+    getTopoData(currentYear, config.general.showHSABoundaries, config.general.territoriesAlwaysShow).then(response => {
       if (canvasRef.current) {
         const context = canvasRef.current.getContext('2d') as CanvasRenderingContext2D
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
@@ -267,6 +288,14 @@ const CountyMap = () => {
     getAndSetTopoData(currentYear)
     prevShowHSABoundariesRef.current = config.general.showHSABoundaries
   }, [config.general.showHSABoundaries])
+
+  const prevTerritoriesAlwaysShowRef = useRef(config.general.territoriesAlwaysShow)
+  useEffect(() => {
+    if (prevTerritoriesAlwaysShowRef.current === config.general.territoriesAlwaysShow) return
+    const currentYear = getCurrentTopoYear(config, runtimeFilters)
+    getAndSetTopoData(currentYear)
+    prevTerritoriesAlwaysShowRef.current = config.general.territoriesAlwaysShow
+  }, [config.general.territoriesAlwaysShow])
 
   // Whenever the memo at the top is triggered and the map is called to re-render, call drawCanvas and update
   // The resize function so it includes the latest state variables
