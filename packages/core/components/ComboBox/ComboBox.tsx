@@ -257,7 +257,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
         listboxRef.current &&
         !listboxRef.current.contains(target)
       ) {
-        setQuery('')
+        setQuery(null)
         setFocused(false)
         setActiveIndex(-1)
       }
