@@ -54,4 +54,55 @@ describe('ComboBox', () => {
     expect(input).toHaveAttribute('aria-expanded', 'false')
     expect(input).toHaveDisplayValue('2023')
   })
+
+  it('reopens and clears the input when clicked while already focused', () => {
+    const { input } = renderComboBox()
+
+    input.focus()
+    fireEvent.keyDown(input, { key: 'Escape' })
+
+    expect(input).toHaveFocus()
+    expect(input).toHaveAttribute('aria-expanded', 'false')
+    expect(input).toHaveDisplayValue('2023')
+
+    fireEvent.click(input)
+
+    expect(input).toHaveFocus()
+    expect(input).toHaveAttribute('aria-expanded', 'true')
+    expect(input).toHaveDisplayValue('')
+  })
+
+  it('starts editing the closed display value when backspace is pressed', () => {
+    const { input } = renderComboBox()
+
+    input.focus()
+    fireEvent.keyDown(input, { key: 'Escape' })
+
+    expect(input).toHaveDisplayValue('2023')
+    expect(input).toHaveAttribute('aria-expanded', 'false')
+
+    fireEvent.keyDown(input, { key: 'Backspace' })
+    fireEvent.change(input, { target: { value: '202' } })
+
+    expect(input).toHaveFocus()
+    expect(input).toHaveAttribute('aria-expanded', 'true')
+    expect(input).toHaveDisplayValue('202')
+  })
+
+  it('starts editing the closed display value when a character is typed', () => {
+    const { input } = renderComboBox()
+
+    input.focus()
+    fireEvent.keyDown(input, { key: 'Escape' })
+
+    expect(input).toHaveDisplayValue('2023')
+    expect(input).toHaveAttribute('aria-expanded', 'false')
+
+    fireEvent.keyDown(input, { key: '4' })
+    fireEvent.change(input, { target: { value: '20234' } })
+
+    expect(input).toHaveFocus()
+    expect(input).toHaveAttribute('aria-expanded', 'true')
+    expect(input).toHaveDisplayValue('20234')
+  })
 })

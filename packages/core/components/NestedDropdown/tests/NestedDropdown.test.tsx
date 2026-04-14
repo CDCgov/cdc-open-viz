@@ -174,4 +174,33 @@ describe('NestedDropdown', () => {
     expect(input).toHaveFocus()
     expect(screen.getByRole('tree')).toHaveClass('hide')
   })
+
+  it('reopens and clears the input when clicked while already focused', () => {
+    render(
+      <NestedDropdown
+        activeGroup='2023'
+        activeSubGroup='Q2'
+        filterIndex={0}
+        handleSelectedItems={vi.fn()}
+        listLabel='Year and Quarter'
+        options={options}
+      />
+    )
+
+    const input = getSearchInput()
+
+    fireEvent.focus(input)
+    fireEvent.keyUp(input, { key: 'ArrowDown' })
+    fireEvent.keyUp(screen.getByRole('treeitem', { name: '2023' }), { key: 'Escape' })
+
+    expect(input).toHaveFocus()
+    expect(input).toHaveValue('2023 - Q2')
+    expect(screen.getByRole('tree')).toHaveClass('hide')
+
+    fireEvent.click(input)
+
+    expect(input).toHaveFocus()
+    expect(input).toHaveValue('')
+    expect(screen.getByRole('tree')).not.toHaveClass('hide')
+  })
 })

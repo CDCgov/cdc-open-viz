@@ -31,7 +31,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
   placeholder = '- Select -',
   loading = false
 }) => {
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState<string | null>(null)
   const [focused, setFocused] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
 
@@ -109,16 +109,26 @@ const ComboBox: React.FC<ComboBoxProps> = ({
     return <>{parts}</>
   }
 
-  const noResults = focused && query.length > 0 && !filteredOptions.length
+  const noResults = focused && (query?.length || 0) > 0 && !filteredOptions.length
   const isListOpen = focused && !isDisabled
 
   const listboxId = `${comboboxId}-listbox`
   const labelId = label ? `${comboboxId}-label` : undefined
 
+  const resetInputForSearch = () => {
+    setQuery('')
+    setActiveIndex(-1)
+    setFocused(true)
+
+    requestAnimationFrame(() => {
+      inputRef.current?.setSelectionRange?.(0, 0)
+    })
+  }
+
   // Handle option selection
   const handleSelect = (option: Option) => {
     updateField(section, subsection, fieldName, String(option.value))
-    setQuery('')
+    setQuery(null)
     setFocused(false)
     setActiveIndex(-1)
   }
@@ -127,6 +137,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setQuery(value)
+    setFocused(true)
     setActiveIndex(-1)
   }
 
@@ -177,13 +188,13 @@ const ComboBox: React.FC<ComboBoxProps> = ({
 
       case 'Escape':
         e.preventDefault()
-        setQuery('')
+        setQuery(null)
         setFocused(false)
         setActiveIndex(-1)
         break
 
       case 'Tab':
-        setQuery('')
+        setQuery(null)
         setFocused(false)
         setActiveIndex(-1)
         break
@@ -200,8 +211,14 @@ const ComboBox: React.FC<ComboBoxProps> = ({
   // Handle input focus
   const handleFocus = () => {
     if (isDisabled) return
-    inputRef.current?.select()
-    setFocused(true)
+    resetInputForSearch()
+  }
+
+  // Replay the initial click behavior when the input already has focus
+  const handleInputClick = () => {
+    if (isDisabled || document.activeElement !== inputRef.current) return
+
+    resetInputForSearch()
   }
 
   // Handle input blur
@@ -210,7 +227,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
     const clickedInListbox = listboxRef.current && listboxRef.current.contains(relatedTarget)
 
     if (!clickedInListbox) {
-      setQuery('')
+      setQuery(null)
       setFocused(false)
       setActiveIndex(-1)
     }
@@ -251,7 +268,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
   }, [])
 
   const activeDescendantId = activeIndex >= 0 ? `${comboboxId}-option-${activeIndex}` : undefined
-  const displayValue = isDisabled ? '' : focused ? query : selectedOption?.label || ''
+  const displayValue = isDisabled ? '' : query !== null ? query : selectedOption?.label || ''
   const displayPlaceholder = isDisabled ? (loading ? 'Loading...' : '- Select -') : selectedOption?.label || placeholder
 
   return (
@@ -277,6 +294,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
           value={displayValue}
           onChange={handleInputChange}
           onFocus={handleFocus}
+          onClick={handleInputClick}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           placeholder={displayPlaceholder}
