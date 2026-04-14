@@ -103,11 +103,13 @@ export const TypeSectionTests: Story = {
       getMapContainerState,
       async () => {
         await userEvent.selectOptions(subtypeSelect, 'us-county')
+      },
+      (before, after) => !before.classes.includes('us-county') && after.classes.includes('us-county'),
+      () => {
         const territoriesCheckbox = canvas.getByLabelText(/Show All Territories/i) as HTMLInputElement
         expect(territoriesCheckbox).toBeTruthy()
         expect(territoriesCheckbox.disabled).toBe(false)
-      },
-      (before, after) => !before.classes.includes('us-county') && after.classes.includes('us-county')
+      }
     )
 
     await performAndAssert(
