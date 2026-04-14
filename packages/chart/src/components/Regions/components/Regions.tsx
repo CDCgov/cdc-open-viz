@@ -10,7 +10,8 @@ const VIZ_TYPES = {
   BAR: 'Bar',
   LINE: 'Line',
   AREA: 'Area Chart',
-  COMBO: 'Combo'
+  COMBO: 'Combo',
+  HORIZON: 'Horizon Chart'
 } as const
 
 type Region = {
@@ -64,8 +65,9 @@ const findClosestDate = <T,>(targetTime: number, domain: T[], getTime: (d: T) =>
   return closest
 }
 
-/** Check if visualization type is line-like (Line or Area Chart) */
-const isLineLike = (type: string): boolean => type === VIZ_TYPES.LINE || type === VIZ_TYPES.AREA
+/** Check if visualization type is line-like (Line, Area Chart, or Horizon Chart) */
+const isLineLike = (type: string): boolean =>
+  type === VIZ_TYPES.LINE || type === VIZ_TYPES.AREA || type === VIZ_TYPES.HORIZON
 
 /** Check if visualization type is bar-like (Bar or Combo) */
 const isBarLike = (type: string): boolean => type === VIZ_TYPES.BAR || type === VIZ_TYPES.COMBO
