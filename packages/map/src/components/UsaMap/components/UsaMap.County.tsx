@@ -64,8 +64,13 @@ const sortById = (a, b) => {
   return 0
 }
 
-const getTopoData = (year, showHSABoundaries, territoriesAlwaysShow: boolean) => {
-  const showTerritories = territoriesAlwaysShow
+const getTopoData = (
+  year,
+  showHSABoundaries,
+  territoriesAlwaysShow: boolean,
+  hasTerritoryFipsData: boolean = false
+) => {
+  const showTerritories = territoriesAlwaysShow || hasTerritoryFipsData
   return new Promise(resolve => {
     const resolveWithTopo = async response => {
       if (response.status !== 200) {
