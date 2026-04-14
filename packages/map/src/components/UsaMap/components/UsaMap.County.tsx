@@ -43,7 +43,7 @@ type TopoData = {
   hsaMapping: Record<string, string>
 }
 
-const US_COUNTY_TERRITORY_FIPS = {
+const US_TERRITORY_FIPS_PREFIXES = {
   AMERICAN_SAMOA: '60',
   GUAM: '66',
   NORTHERN_MARIANA_ISLANDS: '69',
@@ -51,7 +51,7 @@ const US_COUNTY_TERRITORY_FIPS = {
   US_VIRGIN_ISLANDS: '78'
 } as const
 
-const US_TERRITORY_STATE_FIPS_PREFIXES = new Set<string>(Object.values(US_COUNTY_TERRITORY_FIPS))
+const US_TERRITORY_STATE_FIPS_PREFIXES = new Set<string>(Object.values(US_TERRITORY_FIPS_PREFIXES))
 
 const dedupeFeaturesById = <T extends { id?: string }>(features: T[]): T[] => {
   const seenIds = new Set<string>()
