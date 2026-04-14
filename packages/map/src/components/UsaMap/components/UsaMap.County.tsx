@@ -103,7 +103,7 @@ const getTopoData = (year, showHSABoundaries, territoriesAlwaysShow: boolean) =>
           .filter(county => typeof county.id === 'string' && county.id.length > 2)
       )
       topoData.states = dedupeFeaturesById(topoSources.flatMap(topo => feature(topo, topo.objects.states).features))
-      // Additonal Check
+      // Additional filtering removes territory features that may still be present in the topology data when territories are hidden.
       if (!showTerritories) {
         topoData.states = topoData.states.filter(state => {
           const statePrefix = state.id?.substring(0, 2)
