@@ -1603,7 +1603,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         />
                       )}
 
-                    {'us' === config.general.geoType && (
+                    {['us', 'us-county'].includes(config.general.geoType) && (
                       <CheckBox
                         value={general.territoriesAlwaysShow || false}
                         section='general'
