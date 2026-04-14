@@ -1,6 +1,7 @@
 import { DataTableProps } from '../DataTable'
 import ScreenReaderText from '../../elements/ScreenReaderText'
 import { SortIcon } from './SortIcon'
+import parse from 'html-react-parser'
 import { getNewSortBy } from '../helpers/getNewSortBy'
 import { publishAnalyticsEvent } from '../../../helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
@@ -14,10 +15,18 @@ type MapHeaderProps = DataTableProps & {
 
 const ColumnHeadingText = ({ text, config }) => {
   let notApplicableText = 'Not Applicable'
-  if (text === '__series__' && config.table.indexLabel) return `${config.table.indexLabel} `
-  if (text === '__series__' && !config.table.indexLabel)
+  if (text === '__series__' && config.table.indexLabel) {
+    return parse(String(config.table.indexLabel))
+  }
+  if (text === '__series__' && !config.table.indexLabel) {
     return <ScreenReaderText as='span'>{notApplicableText}</ScreenReaderText>
-  return text
+  }
+
+  if( typeof text !== 'string'){
+    return parse('');
+  }
+
+  return parse(text);
 }
 
 const MapHeader = ({
@@ -35,6 +44,7 @@ const MapHeader = ({
     <tr>
       {orderedColumnKeys.map((column, index) => {
           let text
+
           if (column && column !== 'geo') {
             text = columns[column].label ? columns[column].label : columns[column].name
           } else {
@@ -43,6 +53,7 @@ const MapHeader = ({
           if (config.type === 'map' && (text === undefined || text === '')) {
             text = 'Location'
           }
+          const sortLabel = typeof text === 'string' ? text.replace(/<[^>]*>/g, '').trim() : ''
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
           return (
@@ -96,7 +107,7 @@ const MapHeader = ({
             >
               <ColumnHeadingText text={text} config={config} />
               <SortIcon ascending={sortByAsc} />
-              <span className='cdcdataviz-sr-only'>{`Sort by ${text} in ${
+              <span className='cdcdataviz-sr-only'>{`Sort by ${sortLabel} in ${
                 sortBy.column === column ? (!sortBy.asc ? 'descending' : 'ascending') : 'descending'
               } order`}</span>
             </th>
