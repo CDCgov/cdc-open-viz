@@ -145,16 +145,23 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
     if (loading) return 'Loading...'
     return inputValue || '- Select -'
   }, [inputValue, loading])
-  const [inputHasFocus, setInputHasFocus] = useState(false)
   const [isListOpened, setIsListOpened] = useState(false)
   const nestedDropdownRef = useRef(null)
   const searchInput = useRef(null)
   const searchDropdown = useRef(null)
 
   const resetDropdownInteraction = () => {
-    setInputHasFocus(false)
     setIsListOpened(false)
     setUserSearchTerm(null)
+  }
+
+  const replayInputInteraction = () => {
+    setIsListOpened(true)
+    setUserSearchTerm('')
+
+    requestAnimationFrame(() => {
+      searchInput.current?.setSelectionRange?.(0, 0)
+    })
   }
 
   const chooseSelectedSubGroup = (tierOne: string | number, tierTwo: string | number) => {
@@ -247,8 +254,6 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
   }
 
   const handleInputFocus = () => {
-    setInputHasFocus(true)
-
     if (userSearchTerm === null) {
       setUserSearchTerm('')
       requestAnimationFrame(() => {
@@ -263,6 +268,12 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
     if (!relatedTarget || !nestedDropdownRef.current?.contains(relatedTarget)) {
       resetDropdownInteraction()
     }
+  }
+
+  const handleInputClick = () => {
+    if (document.activeElement !== searchInput.current || loading || !options?.length) return
+
+    replayInputInteraction()
   }
 
   return (
@@ -293,9 +304,7 @@ const NestedDropdown: React.FC<NestedDropdownProps> = ({
             onChange={handleSearchTermChange}
             placeholder={inputPlaceholder}
             disabled={loading || !options?.length}
-            onClick={() => {
-              if (inputHasFocus) setIsListOpened(!isListOpened)
-            }}
+            onClick={handleInputClick}
             onFocus={handleInputFocus}
           />
           <span className='list-arrow' aria-hidden={true}>
