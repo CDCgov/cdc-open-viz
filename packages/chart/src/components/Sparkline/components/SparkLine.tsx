@@ -34,7 +34,7 @@ const SparkLine: React.FC<SparkLineProps> = props => {
   const margin = { top: 5, right: 20, bottom: 10, left: 10 }
   const height = Number(parentHeight)
 
-  const xMax = width - config.runtime.yAxis.size
+  const xMax = width - 50
   const yMax = height - margin.top - 20
 
   const getXAxisData = d =>

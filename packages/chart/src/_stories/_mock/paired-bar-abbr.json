@@ -366,7 +366,7 @@
       "Female": "500"
     }
   ],
-  "dataFileName": "paired-bar-formatted.json",
+  "dataFileName": "/examples/feature/paired-bar/__data__/paired-bar-formatted.json",
   "dataFileSourceType": "file",
   "formattedData": [
     {

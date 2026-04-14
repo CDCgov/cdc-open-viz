@@ -82,21 +82,48 @@ const examplesApiPlugin = () => ({
   }
 })
 
+function isTraversableDirectory(entry, fullPath) {
+  if (entry.isDirectory()) return true
+  if (!entry.isSymbolicLink()) return false
+
+  try {
+    return fs.statSync(fullPath).isDirectory()
+  } catch {
+    return false
+  }
+}
+
 // Recursively list JSON files in a directory
-function listJsonFiles(dir, baseDir) {
+function listJsonFiles(dir, baseDir, ancestorRealPaths = new Set()) {
   const files = []
   if (!fs.existsSync(dir)) return files
 
+  let realDir
+  try {
+    realDir = fs.realpathSync(dir)
+  } catch {
+    return files
+  }
+
+  // Prevent cycles when a symlink points back to an ancestor directory.
+  if (ancestorRealPaths.has(realDir)) return files
+
+  const nextAncestorRealPaths = new Set(ancestorRealPaths)
+  nextAncestorRealPaths.add(realDir)
+
   const entries = fs.readdirSync(dir, { withFileTypes: true })
   for (const entry of entries) {
+    if (entry.name === '__data__') continue
+
     const fullPath = path.join(dir, entry.name)
-    if (entry.isDirectory()) {
-      files.push(...listJsonFiles(fullPath, baseDir))
+    if (isTraversableDirectory(entry, fullPath)) {
+      files.push(...listJsonFiles(fullPath, baseDir, nextAncestorRealPaths))
     } else if (entry.name.endsWith('.json')) {
       // Get relative path from examples dir
       files.push(path.relative(baseDir, fullPath))
     }
   }
+
   return files.sort()
 }
 

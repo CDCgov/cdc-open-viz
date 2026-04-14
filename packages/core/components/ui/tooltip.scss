@@ -67,6 +67,42 @@
       }
     }
 
+    .tooltip-body--marker-layout {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+
+    .tooltip-marker-slot {
+      display: inline-flex;
+      flex: 0 0 12px;
+      width: 12px;
+      min-height: 1em;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tooltip-marker-swatch {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border: rgba(0, 0, 0, 0.3) 1px solid;
+      box-sizing: border-box;
+    }
+
+    .tooltip-marker-swatch--circle {
+      border-radius: 999px;
+    }
+
+    .tooltip-marker-swatch--square {
+      border-radius: 0;
+    }
+
+    .tooltip-body-content {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
     .tooltip-heading {
       display: block;
       font-weight: var(--cove-tooltip-heading-fontWeight) !important;

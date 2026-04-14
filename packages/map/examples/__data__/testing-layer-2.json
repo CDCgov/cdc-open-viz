@@ -1,0 +1,61 @@
+{
+  "type": "Topology",
+  "arcs": [
+    [
+      [
+        0,
+        96
+      ],
+      [
+        101,
+        -7
+      ],
+      [
+        -1,
+        -89
+      ],
+      [
+        -87,
+        12
+      ],
+      [
+        -13,
+        84
+      ]
+    ]
+  ],
+  "transform": {
+    "scale": [
+      0.13053063168316828,
+      0.06265089895833335
+    ],
+    "translate": [
+      -105.5395304,
+      42.6239805
+    ]
+  },
+  "objects": {
+    "cove": {
+      "type": "GeometryCollection",
+      "geometries": [
+        {
+          "arcs": [
+            [
+              0
+            ]
+          ],
+          "type": "Polygon",
+          "properties": {
+            "name": "Polygon 3",
+            "styleUrl": "#poly-000000-1200-77-nodesc",
+            "fill-opacity": 0.30196078431372547,
+            "fill": "#000000",
+            "stroke-opacity": 1,
+            "stroke": "#000000",
+            "stroke-width": 1.2
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,6 +1,8 @@
 import { Version } from '@cdc/core/types/Version'
 import { MarkupConfig } from '@cdc/core/types/MarkupVariable'
 import { VizFilter } from '@cdc/core/types/VizFilter'
+import { TrendIndicatorConfig } from '@cdc/core/helpers/trendIndicator'
+import { DataColorConfig } from '@cdc/core/helpers/dataColors'
 
 export type Config = {
   type: string
@@ -45,6 +47,8 @@ export type Config = {
   general: {
     isCompactStyle: boolean
   }
+  trendIndicator?: TrendIndicatorConfig
+  dataColors?: DataColorConfig
   version: Version
   locale: string
 } & MarkupConfig

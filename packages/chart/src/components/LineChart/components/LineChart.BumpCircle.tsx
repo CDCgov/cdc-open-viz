@@ -10,10 +10,11 @@ type LineChartBumpCircleProp = {
   xScale: any
   yScale: any
   parseDate: any
+  yAxisWidth: number
 }
 
 const LineChartBumpCircle = (props: LineChartBumpCircleProp) => {
-  const { config, xScale, yScale, parseDate } = props
+  const { config, xScale, yScale, parseDate, yAxisWidth } = props
 
   // get xScale and yScale...
   if (!config?.runtime?.series) return
@@ -55,7 +56,7 @@ const LineChartBumpCircle = (props: LineChartBumpCircleProp) => {
       let axis_dataKey = d[config.xAxis.dataKey]
       return (
         <React.Fragment key={`bump-circle-${series_dataKey}-${dataIndex}`}>
-          <Group left={Number(config.runtime.yAxis.size)}>
+          <Group left={yAxisWidth}>
             {series_dataKey && (
               <>
                 <circle

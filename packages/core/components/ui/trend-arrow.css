@@ -1,0 +1,42 @@
+.cove-trend-arrow__wrap {
+  align-items: baseline;
+  display: inline-flex;
+}
+
+.cove-trend-arrow {
+  display: inline-block;
+  fill: currentColor;
+  flex-shrink: 0;
+  height: 1.25rem;
+  width: 1.25rem;
+}
+
+.cove-trend-arrow__wrap--inline {
+  transform: translateY(-2px);
+}
+
+.cove-trend-arrow__wrap--inline .cove-trend-arrow {
+  height: 1.3rem;
+  width: 1.3rem;
+}
+
+.cove-trend-arrow__wrap--below .cove-trend-arrow {
+  transform: translateY(2px);
+}
+
+.cove-trend-arrow__wrap--below .cove-trend-arrow {
+  height: 1rem;
+  width: 1rem;
+}
+
+.cove-trend-arrow__wrap--below.cove-trend-arrow__wrap--with-label .cove-trend-arrow {
+  margin-left: 0.1em;
+}
+
+.cove-trend-arrow__label {
+  font-size: 1.25rem;
+}
+
+.cove-trend-arrow__wrap--inline .cove-trend-arrow__label {
+  margin-left: 0.25em;
+}

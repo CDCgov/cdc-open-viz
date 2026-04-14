@@ -84,6 +84,6 @@
   "data": [],
   "dataFileName": "metadata-test-data",
   "dataFileSourceType": "",
-  "dataUrl": "/packages/dashboard/examples/data/data-with-metadata.json",
+  "dataUrl": "/packages/dashboard/examples/__data__/data-with-metadata.json",
   "type": "dashboard"
 }

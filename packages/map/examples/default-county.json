@@ -33,12 +33,12 @@
     "layers": [
       {
         "name": "Layer One",
-        "url": "./examples/testing-layer.json",
+        "url": "./examples/__data__/testing-layer.json",
         "namespace": "cove"
       },
       {
         "name": "Layer Two",
-        "url": "./examples/testing-layer.json",
+        "url": "./examples/__data__/testing-layer.json",
         "namespace": "cove"
       }
     ]

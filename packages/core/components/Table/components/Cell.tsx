@@ -15,7 +15,7 @@ const Cell = ({ children, style, isBold = false, ariaLabel }) => {
   const ariaProps = ariaLabel ? { 'aria-label': ariaLabel } : {}
 
   // Keep whiteSpace on td style so it can be detected by tests and for proper rendering
-  const tdStyle = { ...style }
+  const tdStyle = { backgroundColor: 'initial', ...style }
   delete tdStyle.textOverflow
 
   return (

@@ -5,6 +5,73 @@
     @include cove-visualization-body-padding;
   }
 
+  .markup-include-component--tp5 {
+    padding: 0 !important;
+    border: none !important;
+    background: none !important;
+    container-type: inline-size;
+
+    .markup-include-tp5 {
+      gap: 0.7rem;
+      box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+      border: 1px solid var(--colors-cyan-15, #dff2f6) !important;
+      margin: 0 !important;
+      padding: 1.25rem;
+      border-radius: 0.25rem;
+      background-color: var(--colors-cyan-10, #eff9fa);
+    }
+
+    .cdc-callout__heading {
+      width: 100%;
+      font-size: 1.1rem;
+    }
+
+    .cdc-callout__body {
+      flex-wrap: nowrap;
+      flex: auto;
+    }
+
+    @container (max-width: 576px) {
+      .cdc-callout__body {
+        flex-wrap: wrap;
+      }
+    }
+
+    .cdc-callout__content {
+      font-size: 1rem;
+    }
+
+    .cdc-callout--data-color {
+      .cdc-callout__heading,
+      .cdc-callout__content {
+        color: inherit;
+      }
+    }
+
+    &.white-background-style {
+      .markup-include-tp5 {
+        border: 1px solid #009ec1 !important;
+        background: transparent;
+        box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+      }
+
+      .cdc-callout--data-color {
+        border: none !important;
+      }
+    }
+
+    &.white-background-style.display-border {
+      .markup-include-tp5 {
+        box-shadow: 0 2px 4px rgb(159 159 159 / 10%);
+      }
+    }
+
+    .cove-visualization__body-wrap,
+    .cove-visualization__content-section {
+      padding: 0;
+    }
+  }
+
   .cove-visualization__body-wrap {
     @include cove-visualization-body-wrap-inline-padding;
 
@@ -22,7 +89,7 @@
     // keep markup include images inlines on dashboards
     // e.g. requested to help here: https://www.cdc.gov/fluview/surveillance/2026-week-10.html
     // needed for backwards compatibility with existing dashboards, but also to prevent any future issues with images in markup include visualizations being forced to display as blocks
-    span>img {
+    span > img {
       display: inline;
     }
   }

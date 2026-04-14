@@ -14,6 +14,7 @@ import SkipTo from '@cdc/core/components/elements/SkipTo'
 import Title from '@cdc/core/components/ui/Title'
 import Waiting from '@cdc/core/components/Waiting'
 import FootnotesStandAlone from '@cdc/core/components/Footnotes/FootnotesStandAlone'
+import { supportedStatesFipsCodes, supportedCounties } from './data/supported-geos'
 
 // types
 import { type MapConfig } from './types/MapConfig'
@@ -24,7 +25,13 @@ import './scss/main.scss'
 import './cdcMapComponent.styles.css'
 
 // Core Helpers
-import { getQueryStringFilterValue, isFilterHiddenByQuery } from '@cdc/core/helpers/queryStringUtils'
+import {
+  getQueryStringFilterValue,
+  isFilterHiddenByQuery,
+  removeQueryParam,
+  updateQueryParam,
+  updateQueryParams
+} from '@cdc/core/helpers/queryStringUtils'
 import { generateRuntimeFilters } from './helpers/generateRuntimeFilters'
 import { type MapReducerType, MapState } from './store/map.reducer'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
@@ -47,7 +54,6 @@ import { generateRuntimeLegend } from './helpers/generateRuntimeLegend'
 import generateRuntimeData from './helpers/generateRuntimeData'
 import { reloadURLData } from './helpers/urlDataHelpers'
 import { observeMapSvgLoaded } from './helpers/mapObserverHelpers'
-import { buildBodyWrapClassNames, buildSectionClassNames } from './helpers/componentHelpers'
 import { shouldShowDataTable, filterCountyTableRuntimeDataByStateCode } from './helpers/dataTableHelpers'
 import { prepareSmallMultiplesDataTable } from './helpers/smallMultiplesHelpers'
 
@@ -66,7 +72,6 @@ import useLegendMemo from './hooks/useLegendMemo'
 import { LegendMemoProvider } from './context/LegendMemoContext'
 import { VizFilter } from '@cdc/core/types/VizFilter'
 import { getInitialState, mapReducer } from './store/map.reducer'
-import { RuntimeData } from './types/RuntimeData'
 import defaults from './data/initial-state'
 import { LEGACY_MAP_DEFAULTS } from './data/legacy-defaults'
 import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
@@ -79,6 +84,7 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { ENABLE_CHART_MAP_TP5_TREATMENT } from '@cdc/core/helpers/constants'
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
+import { useQueryParamsListener } from '@cdc/core/hooks/useQueryParamsListener'
 
 type CdcMapComponent = {
   config: MapConfig
@@ -124,6 +130,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     modal,
     accessibleStatus,
     filteredCountryCode,
+    filteredCountyCode,
     filteredStateCode,
     position,
     scale,
@@ -163,6 +170,22 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     } else {
       dispatch({ type: 'SET_RUNTIME_FILTERS', payload: data })
     }
+  }
+
+  const setFilters = (filters: VizFilter[]) => {
+    const filterCopy = _.cloneDeep(filters)
+    if (config.general.showStateDropdown) {
+      const [stateFilter, countyFilter] = filterCopy.filter(
+        f => f.staticFilter && ['state', 'county'].includes(f.columnName)
+      )
+      const stateCode = (stateFilter?.active as string) || ''
+      const countyCode = (countyFilter?.active as string) || ''
+
+      setFilteredStateCountyCode(stateCode, countyCode)
+      if (countyFilter) filterCopy.pop() // remove county filter
+      filterCopy.pop() // remove state filter
+    }
+    _setRuntimeData(filterCopy)
   }
 
   // Refs
@@ -360,6 +383,32 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     />
   )
 
+  const STATE_CODE = 'state-code'
+  const COUNTY_CODE = 'county-code'
+  const setFilteredStateCountyCode = (stateCode: string, countyCode?: string) => {
+    const stateCodePattern = /^\d\d$/
+    const normalizedStateCode = stateCodePattern.test(stateCode) ? stateCode : ''
+    let _countyCode = ''
+    if (countyCode) {
+      const countyCodePattern = /^\d{5}$/
+      _countyCode = countyCodePattern.test(countyCode) ? countyCode : ''
+    }
+    if (!normalizedStateCode) {
+      updateQueryParams({ [STATE_CODE]: '', [COUNTY_CODE]: '' })
+    } else {
+      updateQueryParams({ [STATE_CODE]: normalizedStateCode, [COUNTY_CODE]: _countyCode })
+    }
+  }
+
+  const setFilteredStateCodeFromQuery = ({
+    [STATE_CODE]: stateCode,
+    [COUNTY_CODE]: countyCode
+  }: Record<string, string>) => {
+    dispatch({ type: 'SET_FILTERED_STATE_COUNTY_CODE', payload: { stateCode, countyCode } })
+  }
+
+  useQueryParamsListener([STATE_CODE, COUNTY_CODE], setFilteredStateCodeFromQuery)
+
   const mapProps = {
     setParentConfig,
     container,
@@ -369,6 +418,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     customNavigationHandler,
     dimensions,
     filteredCountryCode,
+    filteredCountyCode,
     filteredStateCode,
     isDashboard,
     isEditor,
@@ -381,7 +431,7 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     runtimeLegend,
     scale,
     setConfig,
-    setFilteredStateCode: (stateCode: string) => dispatch({ type: 'SET_FILTERED_STATE_CODE', payload: stateCode }),
+    setFilteredStateCountyCode,
     setSharedFilter,
     setSharedFilterValue,
     config,
@@ -448,6 +498,40 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
     </a>
   )
 
+  const applyStateFilter = (config: MapConfig): MapConfig => {
+    if (config.general.showStateDropdown && config.general.geoType === 'us-county') {
+      const stateFilter: VizFilter = {
+        columnName: 'state',
+        label: 'Select Location',
+        filterStyle: 'dropdown',
+        labels: supportedStatesFipsCodes,
+        values: Object.keys(supportedStatesFipsCodes),
+        resetLabel: 'United States',
+        staticFilter: true,
+        active: filteredStateCode
+      }
+      let countyFilter: VizFilter | undefined
+      if (filteredStateCode) {
+        const counties = Object.keys(supportedCounties).filter(countyCode => countyCode.startsWith(filteredStateCode))
+        countyFilter = {
+          columnName: 'county',
+          label: 'Select County',
+          filterStyle: 'dropdown',
+          labels: supportedCounties,
+          values: counties,
+          resetLabel: 'All Counties',
+          staticFilter: true,
+          active: filteredCountyCode
+        }
+      }
+      return {
+        ...config,
+        filters: [...(config.filters || []), stateFilter, ...(countyFilter ? [countyFilter] : [])]
+      }
+    }
+    return config
+  }
+
   return (
     <LegendMemoProvider legendMemo={legendMemo} legendSpecialClassLastMemo={legendSpecialClassLastMemo}>
       <ConfigContext.Provider value={mapProps}>
@@ -486,19 +570,18 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                   .filter(Boolean)
                   .join(' ')}
                 filters={
-                  config?.filters?.length > 0 ? (
+                  config?.filters?.length > 0 || config.general.showStateDropdown ? (
                     <Filters
-                      config={config}
-                      setConfig={setConfig}
-                      filteredData={runtimeFilters}
-                      setFilters={_setRuntimeData}
+                      config={applyStateFilter(config)}
+                      setFilters={setFilters}
                       dimensions={dimensions}
-                      standaloneMap={!config}
                       interactionLabel={interactionLabel}
                     />
                   ) : undefined
                 }
-                bodySubtext={processedSubtext.length > 0 ? <p className='subtext'>{parse(processedSubtext)}</p> : null}
+                bodySubtext={
+                  processedSubtext.length > 0 ? <p className='subtext cove-prose'>{parse(processedSubtext)}</p> : null
+                }
                 bodyFooter={
                   <>
                     {isDashboard && config.table?.forceDisplay && config.table.showDataTableLink
@@ -569,13 +652,13 @@ const CdcMapComponent: React.FC<CdcMapComponent> = ({
                     {config.annotations?.length > 0 && <Annotation.Dropdown />}
 
                     {processedFootnotes && (
-                      <section className='footnotes pt-2 mt-4'>{parse(processedFootnotes)}</section>
+                      <section className='footnotes cove-prose pt-2 mt-4'>{parse(processedFootnotes)}</section>
                     )}
                   </>
                 }
                 header={isTp5Treatment ? null : mapTitle}
                 messageIsIntroText={!!processedIntroText}
-                message={processedIntroText ? parse(processedIntroText) : null}
+                message={processedIntroText ? <div className='cove-prose'>{parse(processedIntroText)}</div> : null}
               >
                 <>
                   {isTp5Treatment && <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />}

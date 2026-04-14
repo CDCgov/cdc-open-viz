@@ -13,6 +13,7 @@ import ConfigContext from '../ConfigContext'
 export const useSmallMultipleSynchronization = (
   xMax: number,
   yMax: number,
+  yAxisWidth: number,
   getXValueFromCoordinate: (x: number) => any
 ) => {
   const { config, handleSmallMultipleHover } = useContext(ConfigContext)
@@ -25,8 +26,6 @@ export const useSmallMultipleSynchronization = (
     }
   }
 
-  const yAxisSize = Number(config.yAxis.size || 0)
-
   const onMouseMove = (event: any) => {
     const svgRect = event.currentTarget.getBoundingClientRect()
     const x = event.clientX - svgRect.left
@@ -34,10 +33,10 @@ export const useSmallMultipleSynchronization = (
 
     // Only trigger synchronized tooltips when mouse is over the valid chart area
     // (to the right of the Y-axis and within chart bounds)
-    const isOverChartArea = x >= yAxisSize && x <= yAxisSize + xMax && y >= 0 && y <= yMax
+    const isOverChartArea = x >= yAxisWidth && x <= yAxisWidth + xMax && y >= 0 && y <= yMax
 
     if (isOverChartArea) {
-      const xAxisValue = getXValueFromCoordinate(x - yAxisSize)
+      const xAxisValue = getXValueFromCoordinate(x - yAxisWidth)
       if (xAxisValue !== null && xAxisValue !== undefined) {
         handleSmallMultipleHover(xAxisValue, y)
         return

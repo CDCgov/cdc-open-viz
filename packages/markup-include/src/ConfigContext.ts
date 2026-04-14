@@ -4,6 +4,7 @@ import { MarkupIncludeConfig } from '@cdc/core/types/MarkupInclude'
 type ConfigCTX = {
   config: MarkupIncludeConfig
   data: Object[]
+  editorData?: Object[]
   isDashboard: boolean
   loading: boolean
   setParentConfig: Function

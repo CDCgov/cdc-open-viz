@@ -7,13 +7,34 @@ import './advanced-editor-styles.css'
 import _ from 'lodash'
 import Tooltip from '../ui/Tooltip'
 import EmbedEditor from './EmbedEditor'
+import Button from '../elements/Button'
+
+const UNDEFINED_SENTINELS = new Set(['__undefined__', '__\u200bundefined__'])
+
+const sanitizeConfigForAdvancedEditor = <T,>(input: T): T => {
+  if (input === undefined || input === null) return input
+
+  // Normalize values so copy/export from JsonEditor stays valid JSON.
+  const serialized = JSON.stringify(input, (_key, value) => {
+    if (typeof value === 'string' && UNDEFINED_SENTINELS.has(value)) return undefined
+    return value
+  })
+
+  if (serialized === undefined) return input
+
+  try {
+    return JSON.parse(serialized)
+  } catch {
+    return input
+  }
+}
 
 export const AdvancedEditor = ({
   loadConfig,
   config,
   convertStateToConfig,
   stripConfig = config => config,
-  onExpandCollapse = () => {}
+  onExpandCollapse = () => { }
 }) => {
   const [advancedToggle, _setAdvancedToggle] = useState(false)
   const [configTextboxValue, setConfigTextbox] = useState<Record<string, any>>({})
@@ -28,18 +49,22 @@ export const AdvancedEditor = ({
   }
 
   const onUpdate: UpdateFunction = val => {
-    setConfigTextbox(val.newData)
+    setConfigTextbox(sanitizeConfigForAdvancedEditor(val.newData))
+  }
+
+  const getParsedConfig = () => {
+    let parsedConfig = stripConfig(config)
+    if (config.type !== 'dashboard') {
+      parsedConfig = convertStateToConfig()
+    }
+
+    return sanitizeConfigForAdvancedEditor(parsedConfig)
   }
 
   useEffect(() => {
     // Only process config when advanced editor is open to improve performance
     if (advancedToggle) {
-      let parsedConfig = stripConfig(config)
-      if (config.type !== 'dashboard') {
-        parsedConfig = convertStateToConfig()
-      }
-
-      setConfigTextbox(parsedConfig)
+      setConfigTextbox(getParsedConfig())
     }
   }, [config, advancedToggle])
 
@@ -47,11 +72,7 @@ export const AdvancedEditor = ({
   const handleToggleOpen = () => {
     if (!advancedToggle) {
       // Process config only when opening for the first time
-      let parsedConfig = stripConfig(config)
-      if (config.type !== 'dashboard') {
-        parsedConfig = convertStateToConfig()
-      }
-      setConfigTextbox(parsedConfig)
+      setConfigTextbox(getParsedConfig())
     }
     setAdvancedToggle(!advancedToggle)
   }
@@ -104,15 +125,15 @@ export const AdvancedEditor = ({
               rootName=''
               collapse={collapseFields}
             />
-            <button
-              className='btn btn-success m-2 p-2'
+            <Button
+              variant='editor-primary'
               onClick={() => {
-                loadConfig(configTextboxValue)
+                loadConfig(sanitizeConfigForAdvancedEditor(configTextboxValue))
                 setAdvancedToggle(!advancedToggle)
               }}
             >
               Apply Configuration Changes
-            </button>
+            </Button>
           </React.Fragment>
         )}
       </div>

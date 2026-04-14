@@ -17,6 +17,7 @@ import { DATA_OPERATORS } from '@cdc/core/helpers/constants'
 
 import ErrorBoundary from '@cdc/core/components/ErrorBoundary'
 import Loading from '@cdc/core/components/Loading'
+import Button from '@cdc/core/components/elements/Button'
 
 import ConfigContext from './ConfigContext'
 import EditorPanel from './components/EditorPanel'
@@ -30,6 +31,18 @@ import { processMarkupVariables } from '@cdc/core/helpers/markupProcessor'
 import './scss/main.scss'
 import Title from '@cdc/core/components/ui/Title'
 import { VisualizationContainer, VisualizationContent } from '@cdc/core/components/Layout'
+import TrendArrow from '@cdc/core/components/ui/TrendArrow'
+import {
+  resolveTrendIndicator,
+  TREND_ARROW_DOWN,
+  TREND_ARROW_NO_CHANGE,
+  TREND_ARROW_UP,
+  TREND_MODE_NUMERIC
+} from '@cdc/core/helpers/trendIndicator'
+import type { TrendResolution } from '@cdc/core/helpers/trendIndicator'
+import { aggregateByDataFunction } from '@cdc/core/helpers/dataAggregation'
+import numberFromString from '@cdc/core/helpers/numberFromString'
+import { resolveWaffleNumericTrend } from './helpers/waffleNumericTrend'
 
 // images
 import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
@@ -37,12 +50,28 @@ import CalloutFlag from '@cdc/core/assets/callout-flag.svg?url'
 // TP5 Style Constants
 const TP5_NODE_WIDTH = 13
 const TP5_NODE_SPACER = 3
+const STANDARD_WAFFLE_GRID_SIZE = 10
+
+const getDynamicWaffleGrid = (unitCount: number) => {
+  // Ten reads better as two balanced rows than the default 4 x 3 layout.
+  if (unitCount === 10) {
+    return { columns: 5, rows: 2 }
+  }
+
+  const columns = Math.ceil(Math.sqrt(unitCount))
+
+  return {
+    columns,
+    rows: Math.ceil(unitCount / columns)
+  }
+}
 
 type CdcWaffleChartProps = {
   configUrl?: string
   config?: Config
   isDashboard?: boolean
   isEditor?: boolean
+  rawData?: Record<string, any>[]
   link?: string
   setConfig?: () => void
   interactionLabel?: string
@@ -70,7 +99,8 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     dataDenom,
     dataDenomColumn,
     dataDenomFunction,
-    roundToPlace
+    roundToPlace,
+    trendIndicator
   } = config
 
   const processedTextFields = useMemo(() => {
@@ -79,7 +109,11 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         title,
         content,
         subtext,
-        valueDescription: config.valueDescription
+        valueDescription: config.valueDescription,
+        upLabel: trendIndicator?.upLabel,
+        downLabel: trendIndicator?.downLabel,
+        noChangeLabel: trendIndicator?.noChangeLabel,
+        trendLabel: trendIndicator?.trendLabel
       }
     }
 
@@ -92,20 +126,18 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
       dataMetadata: config.dataMetadata
     }
 
+    const process = (str: string | undefined) =>
+      str ? processMarkupVariables(str, config.data || [], config.markupVariables, markupOptions).processedContent : str
+
     return {
-      title: title
-        ? processMarkupVariables(title, config.data || [], config.markupVariables, markupOptions).processedContent
-        : title,
-      content: content
-        ? processMarkupVariables(content, config.data || [], config.markupVariables, markupOptions).processedContent
-        : content,
-      subtext: subtext
-        ? processMarkupVariables(subtext, config.data || [], config.markupVariables, markupOptions).processedContent
-        : subtext,
-      valueDescription: config.valueDescription
-        ? processMarkupVariables(config.valueDescription, config.data || [], config.markupVariables, markupOptions)
-            .processedContent
-        : config.valueDescription
+      title: process(title),
+      content: process(content),
+      subtext: process(subtext),
+      valueDescription: process(config.valueDescription),
+      upLabel: process(trendIndicator?.upLabel),
+      downLabel: process(trendIndicator?.downLabel),
+      noChangeLabel: process(trendIndicator?.noChangeLabel),
+      trendLabel: process(trendIndicator?.trendLabel)
     }
   }, [
     config.enableMarkupVariables,
@@ -115,6 +147,10 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     config.locale,
     config.dataMetadata,
     config.valueDescription,
+    trendIndicator?.upLabel,
+    trendIndicator?.downLabel,
+    trendIndicator?.noChangeLabel,
+    trendIndicator?.trendLabel,
     title,
     content,
     subtext,
@@ -125,58 +161,21 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
   const processedContent = processedTextFields.content
   const processedSubtext = processedTextFields.subtext
   const processedValueDescription = processedTextFields.valueDescription
+  const processedUpLabel = processedTextFields.upLabel
+  const processedDownLabel = processedTextFields.downLabel
+  const processedNoChangeLabel = processedTextFields.noChangeLabel
+  const processedTrendLabel = processedTextFields.trendLabel
+  const supportsTrendIndicator = config.visualizationType === 'TP5 Waffle' || config.visualizationType === 'TP5 Gauge'
 
   const gaugeColor = config.visual.colors[config.theme]
   let dataFontSize = config.fontSize ? { fontSize: config.fontSize + 'px' } : null
 
-  const [dataPercentage, waffleDenominator, waffleNumerator] = useMemo(() => {
+  const [dataPercentage, waffleDenominator, waffleNumerator, trendResolution] = useMemo<
+    [number | string, number | string | null, number | string, TrendResolution]
+  >(() => {
     //If either the column or function aren't set, do not calculate
     if (!dataColumn || !dataFunction) {
-      return ''
-    }
-
-    const getColumnSum = arr => {
-      if (Array.isArray(arr) && arr.length > 0) {
-        const sum = arr.reduce((sum, x) => sum + x)
-        return applyPrecision(sum)
-      }
-    }
-
-    const getColumnMean = arr => {
-      const mean = arr.length > 1 ? arr.reduce((a, b) => a + b) / arr.length : arr[0]
-      return applyPrecision(mean)
-    }
-
-    const getMode = arr => {
-      let freq = {}
-      let max = -Infinity
-
-      for (let i = 0; i < arr.length; i++) {
-        if (freq[arr[i]]) {
-          freq[arr[i]] += 1
-        } else {
-          freq[arr[i]] = 1
-        }
-
-        if (freq[arr[i]] > max) {
-          max = freq[arr[i]]
-        }
-      }
-
-      let res = []
-
-      for (let key in freq) {
-        if (freq[key] === max) res.push(key)
-      }
-
-      return res
-    }
-
-    const getMedian = arr => {
-      const mid = Math.floor(arr.length / 2),
-        nums = [...arr].sort((a, b) => a - b)
-      const value = arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2
-      return applyPrecision(value)
+      return ['', null, '', { state: 'disabled' }]
     }
 
     const applyPrecision = value => {
@@ -202,31 +201,64 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     let conditionalData = []
 
     if (dataConditionalColumn !== '' && dataConditionalOperator !== '' && dataConditionalComparate !== '') {
+      const numericComparate = Number(dataConditionalComparate)
+      const isNumericComparate = Number.isFinite(numericComparate)
+      const getNumericValue = value => {
+        const numericValue = Number(value)
+        return Number.isFinite(numericValue) ? numericValue : null
+      }
+
       switch (dataConditionalOperator) {
         case '<':
-          conditionalData = filteredData.filter(e => e[dataConditionalColumn] < dataConditionalComparate)
+          conditionalData = isNumericComparate
+            ? filteredData.filter(e => {
+                const numericValue = getNumericValue(e[dataConditionalColumn])
+                return numericValue !== null && numericValue < numericComparate
+              })
+            : []
           break
         case '>':
-          conditionalData = filteredData.filter(e => e[dataConditionalColumn] > dataConditionalComparate)
+          conditionalData = isNumericComparate
+            ? filteredData.filter(e => {
+                const numericValue = getNumericValue(e[dataConditionalColumn])
+                return numericValue !== null && numericValue > numericComparate
+              })
+            : []
           break
         case '<=':
-          conditionalData = filteredData.filter(e => e[dataConditionalColumn] <= dataConditionalComparate)
+          conditionalData = isNumericComparate
+            ? filteredData.filter(e => {
+                const numericValue = getNumericValue(e[dataConditionalColumn])
+                return numericValue !== null && numericValue <= numericComparate
+              })
+            : []
           break
         case '>=':
-          conditionalData = filteredData.filter(e => e[dataConditionalColumn] >= dataConditionalComparate)
+          conditionalData = isNumericComparate
+            ? filteredData.filter(e => {
+                const numericValue = getNumericValue(e[dataConditionalColumn])
+                return numericValue !== null && numericValue >= numericComparate
+              })
+            : []
           break
         case '=':
-          if (isNaN(Number(dataConditionalComparate))) {
+          if (!isNumericComparate) {
             conditionalData = filteredData.filter(e => String(e[dataConditionalColumn]) === dataConditionalComparate)
           } else {
-            conditionalData = filteredData.filter(e => e[dataConditionalColumn] === dataConditionalComparate)
+            conditionalData = filteredData.filter(e => {
+              const numericValue = getNumericValue(e[dataConditionalColumn])
+              return numericValue !== null && numericValue === numericComparate
+            })
           }
           break
         case '≠':
-          if (isNaN(Number(dataConditionalComparate))) {
+          if (!isNumericComparate) {
             conditionalData = filteredData.filter(e => String(e[dataConditionalColumn]) !== dataConditionalComparate)
           } else {
-            conditionalData = filteredData.filter(e => e[dataConditionalColumn] !== dataConditionalComparate)
+            conditionalData = filteredData.filter(e => {
+              const numericValue = getNumericValue(e[dataConditionalColumn])
+              return numericValue !== null && numericValue !== numericComparate
+            })
           }
           break
         default:
@@ -235,70 +267,84 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     }
 
     //Get the column's data
-    const columnData =
-      conditionalData.length > 0 ? conditionalData.map(a => a[dataColumn]) : filteredData.map(a => a[dataColumn])
+    const trendSourceData = conditionalData.length > 0 ? conditionalData : filteredData
+    const columnData = trendSourceData.map(a => a[dataColumn])
     const denomColumnData = filteredData.map(a => a[dataDenomColumn])
+    const historicalColumnData = trendSourceData.map(a => a[trendIndicator?.column])
 
-    //Filter the column's data for numerical values only
-    let numericalData = columnData
-      .filter(value => {
-        let include = false
-        if (Number(value) || Number.isFinite(Number(value))) {
-          include = true
-        }
-        return include
-      })
-      .map(Number)
-
-    let numericalDenomData = denomColumnData
-      .filter(value => {
-        let include = false
-        if (Number(value) || Number.isFinite(Number(value))) {
-          include = true
-        }
-        return include
-      })
-      .map(Number)
-
-    // Calculate numerator  ------------------
-    let waffleNumerator = ''
-
-    const numerFunctionList = {
-      [DATA_FUNCTION_COUNT]: String(numericalData.length),
-      [DATA_FUNCTION_SUM]: String(getColumnSum(numericalData)),
-      [DATA_FUNCTION_MEAN]: String(getColumnMean(numericalData)),
-      [DATA_FUNCTION_MEDIAN]: getMedian(numericalData).toString(),
-      [DATA_FUNCTION_MAX]: Math.max(...numericalData).toString(),
-      [DATA_FUNCTION_MIN]: Math.min(...numericalData).toString(),
-      [DATA_FUNCTION_MODE]: getMode(numericalData).join(', ')
+    const getFiniteNumericValues = (values: unknown[]): number[] => {
+      return values
+        .map(value => numberFromString(value))
+        .filter(value => typeof value === 'number' && Number.isFinite(value))
     }
 
-    waffleNumerator = numerFunctionList[dataFunction]
+    // Keep waffle aggregation aligned with the shared numeric trend parsing rules.
+    let numericalData = getFiniteNumericValues(columnData)
+    let historicalNumericalData = getFiniteNumericValues(historicalColumnData)
+    let numericalDenomData = getFiniteNumericValues(denomColumnData)
+
+    const calculateByFunction = (values, fn, shouldRound = true) => {
+      const toOutput = value => {
+        if (value === undefined || value === null) {
+          return String(value)
+        }
+
+        if (!shouldRound) {
+          return String(value)
+        }
+
+        return Number.isFinite(Number(value)) ? String(applyPrecision(value)) : String(value)
+      }
+
+      const aggregated = aggregateByDataFunction(values, fn)
+
+      if (Array.isArray(aggregated)) {
+        return aggregated.join(', ')
+      }
+
+      return toOutput(aggregated)
+    }
+
+    // Calculate numerator  ------------------
+    const trendCurrentNumerator = calculateByFunction(numericalData, dataFunction, false)
+    const trendHistoricalNumerator = calculateByFunction(historicalNumericalData, dataFunction, false)
+    const waffleNumerator = calculateByFunction(numericalData, dataFunction)
 
     // Calculate denominator ------------------
     let waffleDenominator = null
-
-    const denomFunctionList = {
-      [DATA_FUNCTION_COUNT]: String(numericalDenomData.length),
-      [DATA_FUNCTION_SUM]: String(getColumnSum(numericalDenomData)),
-      [DATA_FUNCTION_MEAN]: String(getColumnMean(numericalDenomData)),
-      [DATA_FUNCTION_MEDIAN]: getMedian(numericalDenomData).toString(),
-      [DATA_FUNCTION_MAX]: Math.max(...numericalDenomData).toString(),
-      [DATA_FUNCTION_MIN]: Math.min(...numericalDenomData).toString(),
-      [DATA_FUNCTION_MODE]: getMode(numericalDenomData).join(', ')
-    }
+    let trendDenominator = null
 
     if (customDenom && dataDenomColumn && dataDenomFunction) {
-      waffleDenominator = denomFunctionList[dataDenomFunction]
+      waffleDenominator = calculateByFunction(numericalDenomData, dataDenomFunction)
+      trendDenominator = calculateByFunction(numericalDenomData, dataDenomFunction, false)
     } else {
       waffleDenominator = dataDenom > 0 ? dataDenom : 100
+      trendDenominator = waffleDenominator
     }
+
+    const resolvedTrend =
+      trendIndicator?.mode === TREND_MODE_NUMERIC
+        ? resolveWaffleNumericTrend({
+            trendIndicator,
+            mainDataFunction: dataFunction,
+            currentNumerator: Number(trendCurrentNumerator),
+            historicalNumerator: Number(trendHistoricalNumerator),
+            denominator: Number(trendDenominator)
+          })
+        : resolveTrendIndicator({
+            data: trendSourceData,
+            trendIndicator,
+            mainDataFunction: dataFunction,
+            mainDataColumn: dataColumn,
+            allowNumericMode: false
+          })
 
     // @ts-ignore
     return [
-      applyPrecision((waffleNumerator / waffleDenominator) * 100),
+      applyPrecision((Number(waffleNumerator) / Number(waffleDenominator)) * 100),
       waffleDenominator,
-      applyPrecision(waffleNumerator)
+      applyPrecision(waffleNumerator),
+      resolvedTrend
     ]
   }, [
     config.data,
@@ -312,29 +358,175 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
     dataDenom,
     dataDenomColumn,
     dataDenomFunction,
-    roundToPlace
+    roundToPlace,
+    trendIndicator
   ])
+
+  const waffleRenderConfig = useMemo(() => {
+    const isTP5 = config.visualizationType === 'TP5 Waffle'
+    const parsedNodeWidth = isTP5 ? TP5_NODE_WIDTH : parseInt(nodeWidth, 10)
+    const parsedNodeSpacer = isTP5 ? TP5_NODE_SPACER : parseInt(nodeSpacer, 10)
+    const nodeWidthNum = Number.isFinite(parsedNodeWidth) && parsedNodeWidth > 0 ? parsedNodeWidth : 10
+    const nodeSpacerNum = Number.isFinite(parsedNodeSpacer) && parsedNodeSpacer >= 0 ? parsedNodeSpacer : 2
+
+    const fixedFilledCount = Math.max(0, Math.min(100, Math.round(Number(dataPercentage))))
+    const isWaffleType = config.visualizationType === 'Waffle' || config.visualizationType === 'TP5 Waffle'
+
+    let renderMode: 'fixed-100' | 'dynamic-denominator' = 'fixed-100'
+    let unitCount = 100
+    let filledCount = fixedFilledCount
+
+    const parsedDenominator = Number(waffleDenominator)
+    const parsedNumerator = Number(waffleNumerator)
+
+    if (
+      isWaffleType &&
+      config.showPercent === false &&
+      config.showDenominator === true &&
+      Number.isFinite(parsedDenominator) &&
+      parsedDenominator > 0 &&
+      Number.isFinite(parsedNumerator) &&
+      parsedNumerator >= 0 &&
+      parsedNumerator <= parsedDenominator
+    ) {
+      const roundedDenominator = Math.round(parsedDenominator)
+
+      if (roundedDenominator >= 1 && roundedDenominator <= 99) {
+        renderMode = 'dynamic-denominator'
+        unitCount = roundedDenominator
+        filledCount = Math.max(
+          0,
+          Math.min(roundedDenominator, Math.round((parsedNumerator / parsedDenominator) * roundedDenominator))
+        )
+      }
+    }
+
+    const dynamicGrid = renderMode === 'dynamic-denominator' ? getDynamicWaffleGrid(unitCount) : null
+    const columns = dynamicGrid?.columns ?? 10
+    const rows = dynamicGrid?.rows ?? 10
+    const renderedWidth = nodeWidthNum * columns + nodeSpacerNum * (columns - 1)
+    const renderedHeight = nodeWidthNum * rows + nodeSpacerNum * (rows - 1)
+    const standardChartWidth =
+      nodeWidthNum * STANDARD_WAFFLE_GRID_SIZE + nodeSpacerNum * (STANDARD_WAFFLE_GRID_SIZE - 1)
+    const standardChartHeight =
+      nodeWidthNum * STANDARD_WAFFLE_GRID_SIZE + nodeSpacerNum * (STANDARD_WAFFLE_GRID_SIZE - 1)
+    const scale = renderMode === 'dynamic-denominator' ? standardChartWidth / renderedWidth : 1
+    const scaledWidth = renderedWidth * scale
+    const scaledHeight = renderedHeight * scale
+    const chartWidth = standardChartWidth
+    const chartHeight = renderMode === 'dynamic-denominator' ? scaledHeight : standardChartHeight
+    const offsetX = (chartWidth - scaledWidth) / 2
+    const offsetY = 0
+
+    return {
+      isTP5,
+      renderMode,
+      unitCount,
+      filledCount,
+      columns,
+      rows,
+      chartWidth,
+      chartHeight,
+      offsetX,
+      offsetY,
+      scale,
+      nodeWidthNum,
+      nodeSpacerNum
+    }
+  }, [
+    config.visualizationType,
+    config.showPercent,
+    config.showDenominator,
+    dataPercentage,
+    waffleDenominator,
+    waffleNumerator,
+    nodeWidth,
+    nodeSpacer
+  ])
+  const trendLabel =
+    trendResolution?.arrowType === TREND_ARROW_UP
+      ? processedUpLabel
+      : trendResolution?.arrowType === TREND_ARROW_DOWN
+      ? processedDownLabel
+      : trendResolution?.arrowType === TREND_ARROW_NO_CHANGE
+      ? processedNoChangeLabel
+      : ''
+  const resolvedTrendLabel = typeof trendLabel === 'string' ? trendLabel.trim() : ''
+  const resolvedTrendFooterLabel = typeof processedTrendLabel === 'string' ? processedTrendLabel.trim() : ''
+  const hasTrendArrow = supportsTrendIndicator && trendResolution?.state === 'resolved' && !!trendResolution?.arrowType
+  const shouldUseTrendBelow = Boolean(hasTrendArrow && (resolvedTrendLabel || resolvedTrendFooterLabel))
+
+  const renderTrendArrow = ({ wrapperClassName = '' } = {}) => {
+    if (trendResolution?.state !== 'resolved' || !trendResolution?.arrowType) {
+      return null
+    }
+    const resolvedWrapperClassName = [wrapperClassName, resolvedTrendLabel ? 'cove-trend-arrow__wrap--with-label' : '']
+      .filter(Boolean)
+      .join(' ')
+
+    return (
+      <TrendArrow
+        arrowType={trendResolution.arrowType}
+        label={resolvedTrendLabel}
+        wrapperClassName={resolvedWrapperClassName}
+      />
+    )
+  }
+
+  const renderPrimaryValueBlock = (valueContent, className = '') => (
+    <div
+      className={['cove-waffle-chart__data--primary', 'cove-waffle-chart__value-block', className]
+        .filter(Boolean)
+        .join(' ')}
+      style={dataFontSize}
+    >
+      <div className='cove-waffle-chart__value-row'>
+        {valueContent}
+        {!shouldUseTrendBelow && hasTrendArrow && (
+          <span className='cove-waffle-chart__trend-slot cove-waffle-chart__trend-slot--inline'>
+            {renderTrendArrow({
+              wrapperClassName: 'cove-trend-arrow__wrap--inline'
+            })}
+          </span>
+        )}
+      </div>
+      {shouldUseTrendBelow && (
+        <div className='cove-waffle-chart__trend-row'>
+          <span className='cove-waffle-chart__trend-slot cove-waffle-chart__trend-slot--below'>
+            {renderTrendArrow({
+              wrapperClassName: 'cove-trend-arrow__wrap--below'
+            })}
+          </span>
+          {resolvedTrendFooterLabel && (
+            <span className='cove-waffle-chart__trend-footer-label'>{resolvedTrendFooterLabel}</span>
+          )}
+        </div>
+      )}
+    </div>
+  )
 
   const buildWaffle = useCallback(() => {
     let waffleData = []
-    // Use standardized values for TP5 style
-    const isTP5 = config.visualizationType === 'TP5 Waffle'
-    let nodeWidthNum = isTP5 ? TP5_NODE_WIDTH : parseInt(nodeWidth, 10)
-    let nodeSpacerNum = isTP5 ? TP5_NODE_SPACER : parseInt(nodeSpacer, 10)
+    const { isTP5, unitCount, filledCount, columns, rows, nodeWidthNum, nodeSpacerNum } = waffleRenderConfig
 
-    const calculatePos = (shape, axis, index, width, spacer) => {
-      let mod = axis === 'x' ? index % 10 : axis === 'y' ? Math.floor(index / 10) : null
+    const calculatePos = (shape, axis, index, width, spacer, columnCount, rowCount) => {
+      const columnFromRight = index % columnCount
+      const rowFromBottom = Math.floor(index / columnCount)
+      const column = columnCount - 1 - columnFromRight
+      const row = rowCount - 1 - rowFromBottom
+      const mod = axis === 'x' ? column : row
       return shape === 'circle' ? mod * (width + spacer) + width / 2 : mod * (width + spacer)
     }
 
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < unitCount; i++) {
+      const isFilled = i < filledCount
       let newNode = {
         shape: shape,
-        x: calculatePos(shape, 'x', i, nodeWidthNum, nodeSpacerNum),
-        y: calculatePos(shape, 'y', i, nodeWidthNum, nodeSpacerNum),
+        x: calculatePos(shape, 'x', i, nodeWidthNum, nodeSpacerNum, columns, rows),
+        y: calculatePos(shape, 'y', i, nodeWidthNum, nodeSpacerNum, columns, rows),
         color: config.visual.colors[theme],
-        opacity: i + 1 > 100 - Math.round(dataPercentage) ? 1 : 0.2,
-        isFilled: i + 1 > 100 - Math.round(dataPercentage)
+        opacity: isFilled ? 1 : 0.2,
+        isFilled
       }
       waffleData.push(newNode)
     }
@@ -391,24 +583,40 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         />
       )
     )
-  }, [theme, dataPercentage, shape, nodeWidth, nodeSpacer, config.visualizationType, config.visual?.whiteBackground])
+  }, [theme, shape, config.visualizationType, config.visual?.whiteBackground, waffleRenderConfig])
 
   const setRatio = useCallback(() => {
-    const isTP5 = config.visualizationType === 'TP5 Waffle'
-    const width = isTP5 ? TP5_NODE_WIDTH : nodeWidth
-    const spacer = isTP5 ? TP5_NODE_SPACER : nodeSpacer
-    return width * 10 + spacer * 9
-  }, [nodeWidth, nodeSpacer, config.visualizationType])
+    return waffleRenderConfig.chartWidth
+  }, [waffleRenderConfig])
 
-  const setSvgSize = useCallback(() => {
+  const setHeightRatio = useCallback(() => {
+    return waffleRenderConfig.chartHeight
+  }, [waffleRenderConfig])
+
+  const setSvgWidth = useCallback(() => {
     // Add 2px padding to account for strokes on edges
     return setRatio() + 2
-  }, [nodeWidth, nodeSpacer, config.visualizationType])
+  }, [setRatio])
+
+  const setSvgHeight = useCallback(() => {
+    // Add 2px padding to account for strokes on edges
+    return setHeightRatio() + 2
+  }, [setHeightRatio])
 
   const { contentClasses } = useDataVizClasses(config)
 
+  const primaryValue = (
+    <>
+      {prefix ? prefix : ' '}
+      {config.showPercent ? dataPercentage : waffleNumerator}
+      {suffix ? suffix + ' ' : ' '} {processedValueDescription}{' '}
+      {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
+    </>
+  )
+  const hasPrimaryValue = (config.showPercent ? dataPercentage : waffleNumerator) !== ''
+
   const xScale = scaleLinear({
-    domain: [0, waffleDenominator],
+    domain: [0, Number(waffleDenominator) || 0],
     range: [0, config.gauge.width]
   })
 
@@ -436,9 +644,9 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
         <section className='waiting-container'>
           <h3>Finish Configuring</h3>
           <p>Set all required options to the left and confirm below to display a preview of the chart.</p>
-          <button className='btn btn-primary' style={{ margin: '1em auto' }} onClick={confirmDone}>
+          <Button variant='primary' style={{ margin: '1em auto' }} onClick={confirmDone}>
             I'm Done
-          </button>
+          </Button>
         </section>
       </section>
     )
@@ -462,16 +670,11 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                   }`}
                 >
                   <div className='cove-gauge-chart__value-section flex-shrink-0'>
-                    <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
-                      {prefix ? prefix : ' '}
-                      {config.showPercent ? dataPercentage : waffleNumerator}
-                      {suffix ? suffix + ' ' : ' '} {processedValueDescription}{' '}
-                      {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
-                    </div>
+                    {renderPrimaryValueBlock(primaryValue)}
                   </div>
                   <div className='cove-gauge-chart__content flex-grow-1 d-flex flex-column min-w-0'>
                     {processedContent ? (
-                      <div className='cove-waffle-chart__data--text'>{parse(processedContent)}</div>
+                      <div className='cove-waffle-chart__data--text cove-prose'>{parse(processedContent)}</div>
                     ) : (
                       <div className='cove-waffle-chart__data--text' aria-hidden='true'>
                         &nbsp;
@@ -509,18 +712,15 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                   </Group>
                 </svg>
                 {processedSubtext && (
-                  <div className='cove-waffle-chart__subtext subtext fst-italic mt-2'>{parse(processedSubtext)}</div>
+                  <div className='cove-waffle-chart__subtext subtext cove-prose fst-italic mt-2'>
+                    {parse(processedSubtext)}
+                  </div>
                 )}
               </>
             ) : (
               <>
-                <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
-                  {prefix ? prefix : ' '}
-                  {config.showPercent ? dataPercentage : waffleNumerator}
-                  {suffix ? suffix + ' ' : ' '} {processedValueDescription}{' '}
-                  {config.showDenominator && waffleDenominator ? waffleDenominator : ' '}
-                </div>
-                <div className='cove-waffle-chart__data--text'>{parse(processedContent)}</div>
+                {renderPrimaryValueBlock(primaryValue)}
+                <div className='cove-waffle-chart__data--text cove-prose'>{parse(processedContent)}</div>
                 <svg height={config.gauge.height} width={'100%'}>
                   <Group>
                     <Bar
@@ -545,7 +745,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
                     />
                   </Group>
                 </svg>
-                <div className={'cove-waffle-chart__subtext subtext'}>{parse(processedSubtext)}</div>
+                <div className={'cove-waffle-chart__subtext subtext cove-prose'}>{parse(processedSubtext)}</div>
               </>
             )}
           </div>
@@ -558,25 +758,27 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
           }`}
         >
           <div className='cove-waffle-chart__chart' style={{ width: setRatio() }}>
-            <svg width={setSvgSize()} height={setSvgSize()} style={{ display: 'block' }}>
-              <Group top={1} left={1}>
+            <svg width={setSvgWidth()} height={setSvgHeight()} style={{ display: 'block' }}>
+              <g
+                transform={`translate(${1 + waffleRenderConfig.offsetX}, ${1 + waffleRenderConfig.offsetY}) scale(${
+                  waffleRenderConfig.scale
+                })`}
+              >
                 {buildWaffle()}
-              </Group>
+              </g>
             </svg>
           </div>
-          {(dataPercentage || processedContent) && (
+          {(hasPrimaryValue || processedContent) && (
             <div className='cove-waffle-chart__data'>
-              {dataPercentage && (
-                <div className='cove-waffle-chart__data--primary' style={dataFontSize}>
-                  {prefix ? prefix : null}
-                  {dataPercentage}
-                  {suffix ? suffix : null}
-                </div>
+              {hasPrimaryValue && renderPrimaryValueBlock(primaryValue)}
+              {processedContent && (
+                <div className='cove-waffle-chart__data--text cove-prose'>{parse(processedContent)}</div>
               )}
-              {processedContent && <div className='cove-waffle-chart__data--text'>{parse(processedContent)}</div>}
 
               {processedSubtext && (
-                <div className='cove-waffle-chart__subtext subtext fst-italic'>{parse(processedSubtext)}</div>
+                <div className='cove-waffle-chart__subtext subtext cove-prose fst-italic'>
+                  {parse(processedSubtext)}
+                </div>
               )}
             </div>
           )}
@@ -602,7 +804,7 @@ const WaffleChart = ({ config, isEditor, link = '', showConfigConfirm, updateCon
             <img src={CalloutFlag} alt='' className='cdc-callout__flag' aria-hidden='true' />
           )}
           {config.showTitle && processedTitle && processedTitle.trim() && (
-            <h3 className='cdc-callout__heading fw-bold flex-shrink-0'>{parse(processedTitle)}</h3>
+            <h3 className='cdc-callout__heading cove-prose fw-bold flex-shrink-0'>{parse(processedTitle)}</h3>
           )}
           <div className='w-100 mw-100 overflow-hidden'>{renderChartContent()}</div>
         </div>
@@ -635,6 +837,7 @@ const CdcWaffleChart = ({
   config: configObj,
   isDashboard = false,
   isEditor = false,
+  rawData = [],
   setConfig: setParentConfig,
   interactionLabel = ''
 }: CdcWaffleChartProps) => {
@@ -732,7 +935,16 @@ const CdcWaffleChart = ({
   return (
     <ErrorBoundary component='WaffleChart'>
       <ConfigContext.Provider
-        value={{ config, updateConfig, loading, data: config.data, setParentConfig, isDashboard, outerContainerRef }}
+        value={{
+          config,
+          updateConfig,
+          loading,
+          data: config.data,
+          editorData: isDashboard && isEditor && Array.isArray(rawData) && rawData.length ? rawData : config.data,
+          setParentConfig,
+          isDashboard,
+          outerContainerRef
+        }}
       >
         <VisualizationContainer
           config={config}

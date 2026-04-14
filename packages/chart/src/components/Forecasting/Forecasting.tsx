@@ -110,7 +110,7 @@ const prepareForecastData = (
   return segments.length > 0 ? segments : [sortedData]
 }
 
-const Forecasting = ({ xScale, yScale, height, width, handleTooltipMouseOver, handleTooltipMouseOff }) => {
+const Forecasting = ({ xScale, yScale, height, width, yAxisWidth, handleTooltipMouseOver, handleTooltipMouseOff }) => {
   const { transformedData: data, rawData, config, seriesHighlight, parseDate } = useContext(ConfigContext)
   const { xAxis, yAxis, legend, runtime } = config
   const DEBUG = false
@@ -143,7 +143,7 @@ const Forecasting = ({ xScale, yScale, height, width, handleTooltipMouseOver, ha
   return (
     data && (
       <ErrorBoundary component='ForecastingChart'>
-        <Group className='forecasting-items' key='forecasting-items-wrapper' left={Number(yAxis.size)}>
+        <Group className='forecasting-items' key='forecasting-items-wrapper' left={yAxisWidth}>
           {runtime.forecastingSeriesKeys?.map((group, index) => {
             if (!group || !group.stages) return false
             return group.stages.map((stage, stageIndex) => {

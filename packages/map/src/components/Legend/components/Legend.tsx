@@ -145,7 +145,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             }}
           >
             <LegendShape shape={config.legend.style === 'boxes' ? 'square' : 'circle'} fill={item.color} />
-            <span>{item.label}</span>
+            <span className='cove-prose'>{item.label}</span>
           </button>
         </li>
       )
@@ -288,7 +288,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
             {(legend.title || legend.description || legend.dynamicDescription) && (
               <div className='mb-3'>
                 {legend.title && (
-                  <h3 className={legendClasses.title.join(' ') || ''}>
+                  <h3 className={`${legendClasses.title.join(' ') || ''} cove-prose`.trim()}>
                     {parse(
                       config.enableMarkupVariables && config.markupVariables?.length > 0
                         ? processMarkupVariables(legend.title, config.data || [], config.markupVariables, {
@@ -302,7 +302,7 @@ const Legend = forwardRef<HTMLDivElement, LegendProps>((props, ref) => {
                   </h3>
                 )}
                 {legend.dynamicDescription === false && legend.description && (
-                  <p className={legendClasses.description.join(' ') || ''}>
+                  <p className={`${legendClasses.description.join(' ') || ''} cove-prose`.trim()}>
                     {parse(
                       config.enableMarkupVariables && config.markupVariables?.length > 0
                         ? processMarkupVariables(legend.description, config.data || [], config.markupVariables, {

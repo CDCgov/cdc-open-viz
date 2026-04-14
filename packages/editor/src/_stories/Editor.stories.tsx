@@ -103,6 +103,68 @@ export const LoadDataTableJsonConfig: Story = {
   }
 }
 
+export const DownloadDashboardDatasetCSV: Story = {
+  args: { config: {} },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+
+    await loadConfigFromTextArea(canvasElement, DashboardConfig)
+    await user.click(canvas.getByText('2. Import Data'))
+    await expect(canvas.findByText('Data Sources')).resolves.toBeTruthy()
+
+    const originalCreateObjectURL = URL.createObjectURL
+    let capturedBlob: Blob | null = null
+    URL.createObjectURL = (blob: Blob) => {
+      capturedBlob = blob
+      return 'blob:test-mock'
+    }
+
+    try {
+      const downloadBtn = await canvas.findByRole('button', { name: 'Download' })
+      await user.click(downloadBtn)
+
+      expect(capturedBlob).toBeTruthy()
+      const text = await capturedBlob!.text()
+      expect(text).toContain('Location')
+      expect(text).toContain('Rate')
+    } finally {
+      URL.createObjectURL = originalCreateObjectURL
+    }
+  }
+}
+
+export const DownloadSingleVizCSV: Story = {
+  args: { config: {} },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    const user = userEvent.setup()
+
+    await loadConfigFromTextArea(canvasElement, ChartEditorConfig)
+    await user.click(canvas.getByText('2. Import Data'))
+    await expect(canvas.findByText('Data Preview')).resolves.toBeTruthy()
+
+    const originalCreateObjectURL = URL.createObjectURL
+    let capturedBlob: Blob | null = null
+    URL.createObjectURL = (blob: Blob) => {
+      capturedBlob = blob
+      return 'blob:test-mock'
+    }
+
+    try {
+      const downloadBtn = await canvas.findByRole('button', { name: 'Download CSV' })
+      await user.click(downloadBtn)
+
+      expect(capturedBlob).toBeTruthy()
+      const text = await capturedBlob!.text()
+      expect(text).toContain('Year')
+      expect(text).toContain('Category')
+    } finally {
+      URL.createObjectURL = originalCreateObjectURL
+    }
+  }
+}
+
 export const InvalidJsonShowsValidationAlert: Story = {
   args: {
     config: {}
