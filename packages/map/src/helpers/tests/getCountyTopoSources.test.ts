@@ -10,7 +10,7 @@ describe('getCountyTopoSources', () => {
     }
   }
 
-  it('return only the base topo when territories are hidden', () => {
+  it('returns only the base topo when territories are hidden', () => {
     const result = getCountyTopoSources(baseTopo, false)
     expect(result).toEqual([baseTopo])
   })
