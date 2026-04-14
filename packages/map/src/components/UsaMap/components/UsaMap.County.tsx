@@ -43,6 +43,16 @@ type TopoData = {
   hsaMapping: Record<string, string>
 }
 
+const US_COUNTY_TERRITORY_FIPS = {
+  AMERICAN_SAMOA: '60',
+  GUAM: '66',
+  NORTHERN_MARIANA_ISLANDS: '69',
+  PUERTO_RICO: '72',
+  US_VIRGIN_ISLANDS: '78'
+} as const
+
+const US_TERRITORY_STATE_FIPS_PREFIXES = new Set<string>(Object.values(US_COUNTY_TERRITORY_FIPS))
+
 const dedupeFeaturesById = <T extends { id?: string }>(features: T[]): T[] => {
   const seenIds = new Set<string>()
 
@@ -64,13 +74,8 @@ const sortById = (a, b) => {
   return 0
 }
 
-const getTopoData = (
-  year,
-  showHSABoundaries,
-  territoriesAlwaysShow: boolean,
-  hasTerritoryFipsData: boolean = false
-) => {
-  const showTerritories = territoriesAlwaysShow || hasTerritoryFipsData
+const getTopoData = (year, showHSABoundaries, territoriesAlwaysShow: boolean) => {
+  const showTerritories = territoriesAlwaysShow
   return new Promise(resolve => {
     const resolveWithTopo = async response => {
       if (response.status !== 200) {
@@ -98,6 +103,17 @@ const getTopoData = (
           .filter(county => typeof county.id === 'string' && county.id.length > 2)
       )
       topoData.states = dedupeFeaturesById(topoSources.flatMap(topo => feature(topo, topo.objects.states).features))
+      // Additonal Check
+      if (!showTerritories) {
+        topoData.states = topoData.states.filter(state => {
+          const statePrefix = state.id?.substring(0, 2)
+          return !statePrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(statePrefix)
+        })
+        topoData.counties = topoData.counties.filter(county => {
+          const countyPrefix = county.id?.substring(0, 2)
+          return !countyPrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix)
+        })
+      }
       if (showHSABoundaries) {
         const mappingResponse = await import(
           /* webpackChunkName: "hsa_fips_mapping" */ './../data/hsa_fips_mapping.json'
