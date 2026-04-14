@@ -53,7 +53,7 @@ const MapHeader = ({
           if (config.type === 'map' && (text === undefined || text === '')) {
             text = 'Location'
           }
-          const sortLabel = typeof text === 'string' ? text.replace(/<[^>]*>/g, '').trim() : ''
+          const sortLabel = typeof text === 'string' ? new DOMParser().parseFromString(text, 'text/html').body.textContent?.trim() || '' : ''
           const newSortBy = getNewSortBy(sortBy, column, index)
           const sortByAsc = sortBy.column === column ? sortBy.asc : undefined
           return (
