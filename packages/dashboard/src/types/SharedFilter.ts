@@ -8,6 +8,7 @@ export type SharedFilter = FilterBase & {
   filterStyle: FilterStyle
   queryParameter?: string
   setByQueryParameter?: string
+  displaySubgroupingOnly?: boolean
   active?: string | string[]
   queuedActive?: string | string[]
   usedBy?: (string | number)[] // if number used by whole row, else used by specific viz

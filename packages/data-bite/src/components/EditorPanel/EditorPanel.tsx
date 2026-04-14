@@ -29,6 +29,8 @@ import { VisualSection } from '@cdc/core/components/EditorPanel/sections/VisualS
 import Accordion from '@cdc/core/components/ui/Accordion'
 import { TREND_MODE_CATEGORICAL, TREND_MODE_NUMERIC } from '@cdc/core/helpers/trendIndicator'
 import { NUMERIC_TREND_ELIGIBLE_FUNCTIONS } from '@cdc/core/helpers/dataAggregation'
+import { DataColorSelector } from '@cdc/core/components/DataColorSelector'
+import { DATA_COLOR_PRESETS } from '@cdc/core/helpers/dataColors'
 
 type DataBiteEditorPanelProps = {
   // Add any props if needed
@@ -84,6 +86,19 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
     return Array.from(uniqueValues).sort()
   }, [editorData, data, config.trendIndicator?.column])
 
+  type TrendDisplayEntry = { sourceValue: string; fromData: boolean; key: string }
+
+  const trendDisplayList = useMemo<TrendDisplayEntry[]>(() => {
+    const dataSet = new Set(trendColumnValues)
+    const list: TrendDisplayEntry[] = trendColumnValues.map(v => ({ sourceValue: v, fromData: true, key: `data-${v}` }))
+    trendMappings.forEach((m, i) => {
+      if (!dataSet.has(m.sourceValue)) {
+        list.push({ sourceValue: m.sourceValue, fromData: false, key: `custom-${i}` })
+      }
+    })
+    return list
+  }, [trendColumnValues, trendMappings])
+
   const setTrendMode = (mode: string) => {
     updateConfig({
       ...config,
@@ -115,6 +130,133 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
       ...config,
       trendIndicator: {
         ...config.trendIndicator,
+        mappings: nextMappings
+      }
+    })
+  }
+
+  const addCustomTrendMapping = () => {
+    const nextMappings = [...trendMappings, { sourceValue: '', arrowType: TREND_ARROW_TYPES[0] }]
+    updateConfig({
+      ...config,
+      trendIndicator: {
+        ...config.trendIndicator,
+        mappings: nextMappings
+      }
+    })
+  }
+
+  const updateTrendMappingValue = (oldValue: string, newValue: string) => {
+    const nextMappings = trendMappings.map(m => (m.sourceValue === oldValue ? { ...m, sourceValue: newValue } : m))
+    updateConfig({
+      ...config,
+      trendIndicator: {
+        ...config.trendIndicator,
+        mappings: nextMappings
+      }
+    })
+  }
+
+  const removeTrendMapping = (sourceValue: string) => {
+    const nextMappings = trendMappings.filter(m => m.sourceValue !== sourceValue)
+    updateConfig({
+      ...config,
+      trendIndicator: {
+        ...config.trendIndicator,
+        mappings: nextMappings
+      }
+    })
+  }
+
+  const dataColorMappings = config.dataColors?.mappings || []
+
+  const dataColorValues = useMemo(() => {
+    const colorColumn = config.dataColors?.column
+    if (!colorColumn) return []
+
+    const sourceData = Array.isArray(editorData) && editorData.length ? editorData : data
+    const uniqueValues = new Set<string>()
+    sourceData?.forEach(row => {
+      const value = row?.[colorColumn]
+      if (value !== undefined && value !== null) {
+        uniqueValues.add(String(value))
+      }
+    })
+
+    return Array.from(uniqueValues).sort()
+  }, [editorData, data, config.dataColors?.column])
+
+  type DataColorDisplayEntry = { sourceValue: string; fromData: boolean; key: string }
+
+  const dataColorDisplayList = useMemo<DataColorDisplayEntry[]>(() => {
+    const dataSet = new Set(dataColorValues)
+    const list: DataColorDisplayEntry[] = dataColorValues.map(v => ({
+      sourceValue: v,
+      fromData: true,
+      key: `data-${v}`
+    }))
+    dataColorMappings.forEach((m, i) => {
+      if (!dataSet.has(m.sourceValue)) {
+        list.push({ sourceValue: m.sourceValue, fromData: false, key: `custom-${i}` })
+      }
+    })
+    return list
+  }, [dataColorValues, dataColorMappings])
+
+  const updateDataColorMapping = (sourceValue: string, color: string) => {
+    const nextMappings = [...dataColorMappings]
+    const existingIndex = nextMappings.findIndex(m => m.sourceValue === sourceValue)
+
+    if (!color) {
+      if (existingIndex > -1) {
+        nextMappings.splice(existingIndex, 1)
+      }
+    } else {
+      const nextMapping = { sourceValue, color }
+      if (existingIndex > -1) {
+        nextMappings[existingIndex] = nextMapping
+      } else {
+        nextMappings.push(nextMapping)
+      }
+    }
+
+    updateConfig({
+      ...config,
+      dataColors: {
+        ...config.dataColors,
+        mappings: nextMappings
+      }
+    })
+  }
+
+  const addCustomDataColorMapping = () => {
+    const nextMappings = [...dataColorMappings, { sourceValue: '', color: DATA_COLOR_PRESETS[0] }]
+    updateConfig({
+      ...config,
+      dataColors: {
+        ...config.dataColors,
+        mappings: nextMappings
+      }
+    })
+  }
+
+  const updateDataColorMappingValue = (oldValue: string, newValue: string) => {
+    const nextMappings = dataColorMappings.map(m => (m.sourceValue === oldValue ? { ...m, sourceValue: newValue } : m))
+    updateConfig({
+      ...config,
+      dataColors: {
+        ...config.dataColors,
+        mappings: nextMappings
+      }
+    })
+  }
+
+  const removeDataColorMapping = (sourceValue: string) => {
+    const nextMappings = dataColorMappings.filter(m => m.sourceValue !== sourceValue)
+    updateConfig({
+      ...config,
+      dataColors: {
+        ...config.dataColors,
         mappings: nextMappings
       }
     })
@@ -359,14 +501,26 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                               In categorical mode, arrows appear only when filters resolve to exactly one row.
                             </span>
                           )}
-                          {trendColumnValues.map(sourceValue => {
+                          {trendDisplayList.map(({ sourceValue, fromData, key }) => {
                             const selectedArrowType =
                               trendMappings.find(mapping => mapping.sourceValue === sourceValue)?.arrowType || ''
 
                             return (
-                              <div className='cove-accordion__panel-row align-center mb-2' key={sourceValue}>
-                                <div className='cove-accordion__panel-col flex-grow'>{sourceValue}</div>
-                                <div className='cove-accordion__panel-col flex-grow'>
+                              <div className='cove-accordion__panel-row align-center mb-2' key={key}>
+                                <div className='cove-accordion__panel-col' style={{ flex: '1 1 0', minWidth: 0 }}>
+                                  {fromData ? (
+                                    sourceValue
+                                  ) : (
+                                    <input
+                                      type='text'
+                                      value={sourceValue}
+                                      placeholder='Enter value'
+                                      style={{ width: '100%' }}
+                                      onChange={e => updateTrendMappingValue(sourceValue, e.target.value)}
+                                    />
+                                  )}
+                                </div>
+                                <div className='cove-accordion__panel-col' style={{ flex: '1 1 0', minWidth: 0 }}>
                                   <Select
                                     label=''
                                     value={selectedArrowType}
@@ -380,9 +534,29 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                                     onChange={e => updateTrendMapping(sourceValue, e.target.value)}
                                   />
                                 </div>
+                                <div className='cove-accordion__panel-col' style={{ flex: '0 0 1.5rem' }}>
+                                  {!fromData && (
+                                    <button
+                                      type='button'
+                                      className='btn btn-danger'
+                                      style={{ padding: '0.15rem 0.45rem', lineHeight: 1 }}
+                                      title='Remove mapping'
+                                      onClick={() => removeTrendMapping(sourceValue)}
+                                    >
+                                      −
+                                    </button>
+                                  )}
+                                </div>
                               </div>
                             )
                           })}
+                          <Button
+                            type='button'
+                            onClick={addCustomTrendMapping}
+                            className='btn btn-primary full-width mt-3'
+                          >
+                            Add Trend Mapping
+                          </Button>
                         </>
                       )}
                       {trendMode === TREND_MODE_NUMERIC && (
@@ -484,7 +658,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                 <ul className='filters-list'>
                   {config.filters.map((filter: any, index: number) => (
                     <fieldset className='edit-block' key={index}>
-                      <Button
+                      <button
                         type='button'
                         className='btn btn-danger'
                         onClick={() => {
@@ -492,7 +666,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                         }}
                       >
                         Remove
-                      </Button>
+                      </button>
                       <Select
                         value={filter.columnName ? filter.columnName : ''}
                         fieldName='columnName'
@@ -524,7 +698,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                   </fieldset>
                 </div>
               )}
-              <Button type='button' variant='primary' fullWidth className='mt-3' onClick={addNewFilter}>
+              <Button type='button' onClick={addNewFilter} className='btn btn-primary full-width mt-3'>
                 Add Filter
               </Button>
             </Accordion.Section>
@@ -555,6 +729,82 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                 updateField={updateField}
               />
               */}
+              </Accordion.Section>
+            )}
+
+            {config.biteStyle === 'tp5' && (
+              <Accordion.Section title='Data-Driven Colors'>
+                <Select
+                  value={config.dataColors?.column || ''}
+                  section='dataColors'
+                  fieldName='column'
+                  label='Color Column'
+                  updateField={updateField}
+                  initial='Select'
+                  options={columns}
+                  tooltip={
+                    <Tooltip style={{ textTransform: 'none' }}>
+                      <Tooltip.Target>
+                        <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                      </Tooltip.Target>
+                      <Tooltip.Content>
+                        <p>
+                          Choose a column whose values determine the background color of this visualization. Map each
+                          value to a color below. Text color adjusts automatically for contrast.
+                        </p>
+                      </Tooltip.Content>
+                    </Tooltip>
+                  }
+                />
+                {config.dataColors?.column && dataColorDisplayList.length > 0 && (
+                  <div className='mt-2'>
+                    {dataColorDisplayList.map(({ sourceValue, fromData, key }) => {
+                      const selectedColor = dataColorMappings.find(m => m.sourceValue === sourceValue)?.color || ''
+
+                      return (
+                        <div className='cove-accordion__panel-row align-center mb-2' key={key}>
+                          <div className='cove-accordion__panel-col' style={{ flex: '1 1 0', minWidth: 0 }}>
+                            {fromData ? (
+                              sourceValue
+                            ) : (
+                              <input
+                                type='text'
+                                value={sourceValue}
+                                placeholder='Enter value'
+                                style={{ width: '100%' }}
+                                onChange={e => updateDataColorMappingValue(sourceValue, e.target.value)}
+                              />
+                            )}
+                          </div>
+                          <div className='cove-accordion__panel-col' style={{ flex: '0 0 4.5rem' }}>
+                            <DataColorSelector
+                              value={selectedColor}
+                              onChange={color => updateDataColorMapping(sourceValue, color)}
+                            />
+                          </div>
+                          <div className='cove-accordion__panel-col' style={{ flex: '0 0 1.5rem' }}>
+                            {!fromData && (
+                              <button
+                                type='button'
+                                className='btn btn-danger'
+                                style={{ padding: '0.15rem 0.45rem', lineHeight: 1 }}
+                                title='Remove mapping'
+                                onClick={() => removeDataColorMapping(sourceValue)}
+                              >
+                                −
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+                {config.dataColors?.column && (
+                  <Button type='button' onClick={addCustomDataColorMapping} className='btn btn-primary full-width mt-3'>
+                    Add Color Mapping
+                  </Button>
+                )}
               </Accordion.Section>
             )}
 
@@ -774,9 +1024,9 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                         </ul>
                       </>
                     )}
-                    <Button type='button' variant='primary' fullWidth onClick={images.add}>
+                    <button type='button' onClick={images.add} className='btn btn-primary full-width'>
                       Add Dynamic Image
-                    </Button>
+                    </button>
                   </>
                 )}
               </Accordion.Section>
