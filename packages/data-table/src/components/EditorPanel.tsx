@@ -28,7 +28,7 @@ const EditorPanel = ({ state, dispatch }) => {
 
     // Find/assign the value to be updated
     const valueCopy = _.cloneDeep(curValue)
-    if (!subsection) valueCopy[fieldName] = newValue
+    if (subsection === null || subsection === undefined) valueCopy[fieldName] = newValue
     else {
       if (!valueCopy[subsection]) valueCopy[subsection] = {}
       valueCopy[subsection][fieldName] = newValue

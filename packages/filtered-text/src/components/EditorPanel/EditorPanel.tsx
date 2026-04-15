@@ -139,8 +139,8 @@ const EditorPanel: React.FC<FilteredTextEditorPanelProps> = () => {
                     </Tooltip.Target>
                     <Tooltip.Content>
                       <p>
-                        To refine the highlighted data point, specify one or more filters (e.g., "Male" and "Female"
-                        for a column called "Sex").
+                        To refine the highlighted data point, specify one or more filters (e.g., "Male" and "Female" for
+                        a column called "Sex").
                       </p>
                     </Tooltip.Content>
                   </Tooltip>
