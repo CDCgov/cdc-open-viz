@@ -1,10 +1,6 @@
 import { renderHook } from '@testing-library/react'
 import useTooltip from './useTooltip'
 
-const supportedStatesFipsCodes = {
-  '01': 'Alabama'
-}
-
 const createConfig = (hideGeoColumnInTooltip: boolean) => ({
   general: {
     geoType: 'world',
@@ -41,18 +37,8 @@ describe('useTooltip', () => {
   it('hides the geography column label in the tooltip body when configured', () => {
     const row = { Country: 'ssd', Value: 10 }
 
-    const { result: visibleResult } = renderHook(() =>
-      useTooltip({
-        config: createConfig(false),
-        supportedStatesFipsCodes
-      })
-    )
-    const { result: hiddenResult } = renderHook(() =>
-      useTooltip({
-        config: createConfig(true),
-        supportedStatesFipsCodes
-      })
-    )
+    const { result: visibleResult } = renderHook(() => useTooltip(createConfig(false) as any))
+    const { result: hiddenResult } = renderHook(() => useTooltip(createConfig(true) as any))
 
     const visibleTooltip = visibleResult.current.buildTooltip(row, 'South Sudan')
     const hiddenTooltip = hiddenResult.current.buildTooltip(row, 'South Sudan')
