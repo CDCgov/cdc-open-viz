@@ -1,0 +1,69 @@
+{
+  "version": "4.26.4",
+  "color": "pinkpurple",
+  "general": {
+    "title": "Minimal US Map",
+    "geoType": "us",
+    "type": "data",
+    "showTitle": true
+  },
+  "type": "map",
+  "columns": {
+    "geo": {
+      "name": "FIPS Codes",
+      "label": "Location",
+      "tooltip": false,
+      "dataTable": true
+    },
+    "primary": {
+      "name": "Rate",
+      "label": "Rate",
+      "prefix": "",
+      "suffix": "%",
+      "tooltip": true,
+      "dataTable": true
+    },
+    "navigate": {
+      "name": ""
+    },
+    "latitude": {
+      "name": ""
+    },
+    "longitude": {
+      "name": ""
+    }
+  },
+  "legend": {
+    "type": "equalnumber",
+    "numberOfItems": 3,
+    "position": "side",
+    "style": "circles",
+    "title": "Legend",
+    "description": "",
+    "descriptions": {},
+    "specialClasses": [],
+    "unified": false,
+    "singleColumn": false,
+    "singleRow": false,
+    "verticalSorted": false,
+    "showSpecialClassesLast": false,
+    "dynamicDescription": false,
+    "hideBorder": false
+  },
+  "filters": [],
+  "filterBehavior": "Filter Change",
+  "data": [
+    {
+      "FIPS Codes": "01",
+      "Rate": 10
+    },
+    {
+      "FIPS Codes": "02",
+      "Rate": 20
+    },
+    {
+      "FIPS Codes": "04",
+      "Rate": 30
+    }
+  ]
+}

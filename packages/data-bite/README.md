@@ -14,11 +14,13 @@ npm install @cdc/data-bite
 
 Use the package by passing a `config` object directly:
 
+<!-- README_EXAMPLE_CONFIG_START -->
 ```jsx
 import CdcDataBite from '@cdc/data-bite'
 
 const config = {
   type: 'data-bite',
+  version: '4.26.4',
   title: 'Data / Fact',
   biteBody: 'Highlight a statistic, data point, or key fact.',
   data: [{ Value: 1234 }],
@@ -36,30 +38,9 @@ function App() {
 
 export default App
 ```
+<!-- README_EXAMPLE_CONFIG_END -->
 
 You can also load configuration from a URL with `<CdcDataBite configUrl='/path/to/config.json' />`.
-
-## Minimum Config
-
-The same minimum working config is documented in [CONFIG.md](./CONFIG.md) and validated from the source file at `packages/data-bite/examples/minimal-example.json`.
-
-<!-- MINIMAL_CONFIG_START -->
-```json
-{
-  "type": "data-bite",
-  "version": "4.26.4",
-  "title": "Data / Fact",
-  "biteBody": "Highlight a statistic, data point, or key fact.",
-  "data": [
-    {
-      "Value": 1234
-    }
-  ],
-  "dataColumn": "Value",
-  "dataFunction": "Pass Through"
-}
-```
-<!-- MINIMAL_CONFIG_END -->
 
 ## Configuration
 

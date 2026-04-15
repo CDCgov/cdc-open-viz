@@ -2,28 +2,51 @@
 
 [![npm](https://img.shields.io/npm/v/@cdc/markup-include)](https://www.npmjs.com/package/@cdc/markup-include)
 
-`<CdcMarkupInclude />` is a React component produced by the CDC for importing HTML markup data from a separate source link.
+`<CdcMarkupInclude />` renders authored HTML and optional markup variables inside the CDC shell.
+The primary configuration reference is [CONFIG.md](./CONFIG.md).
 
-This package is part of the larger [CDC Open Visualization](https://github.com/CDCgov/cdc-open-viz) project.
+## Installation
 
-### Installation and Usage
-
-1. Install the package in your React project `npm install @cdc/markup-include`
-2. Import the component and begin using in your code.
-
-```JSX
-import CdcMarkupInclude from '@cdc/markup-include'
-
-function App() {
-
-  return (
-    <div className="App">
-      <CdcMarkupInclude config={configObj} />
-    </div>
-  );
-}
-
-export default App;
+```bash
+npm install @cdc/markup-include
 ```
 
-Note, you must pass in a configuration object. Configuration objects can be created with the [Editor package](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/editor).
+## Quick Start
+
+Use the package by passing a `config` object directly:
+
+<!-- README_EXAMPLE_CONFIG_START -->
+```jsx
+import CdcMarkupInclude from '@cdc/markup-include'
+
+const config = {
+  type: 'markup-include',
+  version: '4.26.4',
+  theme: 'theme-blue',
+  contentEditor: {
+    inlineHTML: '<p>Markup include minimum example.</p>',
+    showHeader: true,
+    srcUrl: '',
+    title: 'Markup Include',
+    useInlineHTML: true
+  }
+}
+
+function App() {
+  return <CdcMarkupInclude config={config} />
+}
+
+export default App
+```
+<!-- README_EXAMPLE_CONFIG_END -->
+
+## Configuration
+
+Read the full package contract in [CONFIG.md](./CONFIG.md).
+
+## Properties
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `config` | `object` | Markup include configuration object. |
+| `configUrl` | `string` | Optional URL to a JSON config file fetched at runtime. |

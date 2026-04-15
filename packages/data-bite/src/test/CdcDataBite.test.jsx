@@ -1,5 +1,6 @@
 import path from 'node:path'
 import fs from 'node:fs'
+import vm from 'node:vm'
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { testStandaloneBuild } from '@cdc/core/helpers/tests/testStandaloneBuild.ts'
@@ -26,12 +27,14 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-const extractMarkedJsonBlock = (content, label) => {
+const extractMarkedExampleConfig = (content, label) => {
   const match = content.match(
-    /<!-- MINIMAL_CONFIG_START -->\s*```json\s*([\s\S]*?)\s*```\s*<!-- MINIMAL_CONFIG_END -->/
+    /<!-- README_EXAMPLE_CONFIG_START -->\s*```jsx\s*([\s\S]*?)\s*```\s*<!-- README_EXAMPLE_CONFIG_END -->/
   )
-  expect(match, `${label} should contain a marked minimal config JSON block`).toBeTruthy()
-  return JSON.parse(match[1])
+  expect(match, `${label} should contain a marked README example block`).toBeTruthy()
+  const configMatch = match[1].match(/const config = (\{[\s\S]*?\})\n\nfunction App\(\)/)
+  expect(configMatch, `${label} should define const config before function App()`).toBeTruthy()
+  return vm.runInNewContext(`(${configMatch[1]})`)
 }
 
 describe('Data Bite', () => {
@@ -65,7 +68,7 @@ describe('Data Bite', () => {
     const readmePath = path.join(pkgRoot, 'README.md')
 
     const minimalExample = JSON.parse(fs.readFileSync(minimalExamplePath, 'utf8'))
-    const readmeBlock = extractMarkedJsonBlock(fs.readFileSync(readmePath, 'utf8'), 'README.md')
+    const readmeBlock = extractMarkedExampleConfig(fs.readFileSync(readmePath, 'utf8'), 'README.md')
 
     expect(readmeBlock).toEqual(minimalExample)
     expect(minimalExample.version).toBeTruthy()

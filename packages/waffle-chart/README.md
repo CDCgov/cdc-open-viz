@@ -2,32 +2,61 @@
 
 [![npm](https://img.shields.io/npm/v/@cdc/waffle-chart)](https://www.npmjs.com/package/@cdc/waffle-chart)
 
-`<CdcWaffleChart />` is a React component produced by the CDC for highlighting/displaying a single piece of data in a card format. This package is part of the larger [CDC Open Visualization](https://github.com/CDCgov/cdc-open-viz) project.
+`<CdcWaffleChart />` is a React component for displaying a single highlighted value in a card-style layout.
 
-### Installation and Usage
+## Installation
 
-1. Install the package in your React project `npm install @cdc/waffle-chart`
-2. Import the component and begin using in your code.
-
-```JSX
-import CdcWaffleChart from '@cdc/waffle-chart'
-
-function App() {
-
-  return (
-    <div className="App">
-      <CdcWaffleChart config={configObj} />
-    </div>
-  );
-}
-
-export default App;
+```bash
+npm install @cdc/waffle-chart
 ```
 
-Note, you must pass in a configuration object. Configuration objects can be created with the [Editor package](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/editor).
+## Quick Start
 
-### Properties
+Pass a `config` object directly to the component:
 
-| Property | Type   | Description                                                                                                                      |
-| -------- | ------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| config   | String | A JavaScript object with the configuration for the waffle chart. Pass either this or the configUrl property to setup your chart. |
+<!-- README_EXAMPLE_CONFIG_START -->
+```jsx
+import CdcWaffleChart from '@cdc/waffle-chart'
+
+const config = {
+  type: 'waffle-chart',
+  version: '4.26.4',
+  title: 'Chart Title',
+  showTitle: true,
+  visualizationType: 'Waffle',
+  shape: 'circle',
+  data: [{ Value: 42 }],
+  dataColumn: 'Value',
+  dataFunction: 'Sum',
+  content: 'of cases occurred in the home',
+  subtext: 'Chart subtext or citation',
+  suffix: '%',
+  theme: 'theme-blue'
+}
+
+function App() {
+  return (
+    <div className='App'>
+      <CdcWaffleChart config={config} />
+    </div>
+  )
+}
+
+export default App
+```
+<!-- README_EXAMPLE_CONFIG_END -->
+
+You can also load configuration from a URL with `<CdcWaffleChart configUrl='/path/to/config.json' />`.
+
+## Configuration
+
+The primary reference for authoring configs is [CONFIG.md](./CONFIG.md).
+
+Shared nested config types used by `@cdc/waffle-chart` are documented in the canonical [`@cdc/core` shared config reference](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md).
+
+## Properties
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `config` | `object` | Configuration object for the waffle chart. This is the primary integration path for React consumers. |
+| `configUrl` | `string` | Optional URL to a JSON config file. Use this when you want the component to fetch its config at runtime. |
