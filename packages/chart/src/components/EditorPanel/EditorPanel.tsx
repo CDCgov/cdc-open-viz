@@ -1217,7 +1217,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   // prettier-ignore
   const {
     highlightedBarValues,
-    highlightedSeriesValues,
+    getHighlightedSeriesValues,
     handleUpdateHighlightedBar,
     handleAddNewHighlightedBar,
     handleRemoveHighlightedBar,
@@ -1845,7 +1845,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     handleUpdateHighlightedBar,
     handleRemoveHighlightedBar,
     isPaletteReversed: config.general?.palette?.isReversed,
-    highlightedSeriesValues,
+    getHighlightedSeriesValues,
     handleUpdateHighlightedBorderWidth,
     handleUpdateHighlightedBarColor,
     setLollipopShape,
@@ -3659,8 +3659,8 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                         onChange={e => handleUpdateHighlightedBar(e, i)}
                                         options={[
                                           { value: '', label: '- Select Value -' },
-                                          ...(highlightedSeriesValues
-                                            ? [...new Set(highlightedSeriesValues)]
+                                          ...(getHighlightedSeriesValues
+                                            ? [...new Set(getHighlightedSeriesValues())]
                                                 .sort()
                                                 .map(option => ({ value: option, label: option }))
                                             : [])
