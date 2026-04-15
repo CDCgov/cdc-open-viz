@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import DataBite from '../CdcDataBite'
-import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
+import { assertVisualizationRendered, getDisplayValue, waitForPresence } from '@cdc/core/helpers/testing'
 import { expect } from 'storybook/test'
+import MinimalExampleConfig from '../../examples/minimal-example.json'
 
 const meta: Meta<typeof DataBite> = {
   title: 'Components/Templates/Data Bite',
@@ -105,6 +106,26 @@ export const Data_Bite_TP5_White_Background: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+  }
+}
+
+export const Data_Bite_Minimal_Config: Story = {
+  args: {
+    config: MinimalExampleConfig
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Minimum working consumer config. This story validates the source-of-truth minimal example used by the package README and CONFIG reference.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    expect(canvasElement.textContent).toContain('Data / Fact')
+    expect(canvasElement.textContent).toContain('Highlight a statistic, data point, or key fact.')
+    expect(getDisplayValue(canvasElement)).toMatch(/\d/)
   }
 }
 

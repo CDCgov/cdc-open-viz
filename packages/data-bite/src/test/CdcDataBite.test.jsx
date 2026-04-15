@@ -1,4 +1,5 @@
 import path from 'node:path'
+import fs from 'node:fs'
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { testStandaloneBuild } from '@cdc/core/helpers/tests/testStandaloneBuild.ts'
@@ -25,6 +26,14 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
+const extractMarkedJsonBlock = (content, label) => {
+  const match = content.match(
+    /<!-- MINIMAL_CONFIG_START -->\s*```json\s*([\s\S]*?)\s*```\s*<!-- MINIMAL_CONFIG_END -->/
+  )
+  expect(match, `${label} should contain a marked minimal config JSON block`).toBeTruthy()
+  return JSON.parse(match[1])
+}
+
 describe('Data Bite', () => {
   it('Can be built in isolation', async () => {
     const pkgDir = path.join(__dirname, '..')
@@ -48,6 +57,18 @@ describe('Data Bite', () => {
 
     expect(await screen.findByText('Test body')).toBeInTheDocument()
     expect(screen.getByText('Test subtext')).toBeInTheDocument()
+  })
+
+  it('keeps the minimal example in sync with the README docs', () => {
+    const pkgRoot = path.join(__dirname, '..', '..')
+    const minimalExamplePath = path.join(pkgRoot, 'examples', 'minimal-example.json')
+    const readmePath = path.join(pkgRoot, 'README.md')
+
+    const minimalExample = JSON.parse(fs.readFileSync(minimalExamplePath, 'utf8'))
+    const readmeBlock = extractMarkedJsonBlock(fs.readFileSync(readmePath, 'utf8'), 'README.md')
+
+    expect(readmeBlock).toEqual(minimalExample)
+    expect(minimalExample.version).toBeTruthy()
   })
 
   it('moves the trend indicator below the value when a trend label is configured', () => {
