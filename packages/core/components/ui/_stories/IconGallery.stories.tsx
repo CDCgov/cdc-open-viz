@@ -159,8 +159,7 @@ const meta: Meta = {
                       <span style={{
                         fontSize: '12px',
                         fontWeight: 'bold',
-                        textAlign: 'center',
-                        color: '#333'
+                        textAlign: 'center'
                       }}>
                         {icon.name}
                       </span>
@@ -258,8 +257,7 @@ export const Gallery = {
                   <span style={{
                     fontSize: '12px',
                     fontWeight: 'bold',
-                    textAlign: 'center',
-                    color: '#333'
+                    textAlign: 'center'
                   }}>
                     {icon.name}
                   </span>

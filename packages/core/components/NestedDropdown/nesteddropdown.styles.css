@@ -49,7 +49,6 @@
   }
 
   [class^='selectable-item-'] {
-    color: var(--cool-gray-90);
     font-size: 0.833rem !important;
     font-weight: 300;
     list-style: none;
@@ -158,7 +157,6 @@
   }
 
   .nested-dropdown-group-label {
-    color: var(--cool-gray-90);
     font-size: 0.833rem !important;
     font-weight: 600 !important;
   }
