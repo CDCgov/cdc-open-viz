@@ -162,6 +162,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const triggerRef = useRef()
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
+  const yAxisTopTitleRef = useRef<HTMLDivElement>(null)
   const tooltipRef = useRef(null)
 
   const dataRef = useIntersectionObserver(triggerRef, {
@@ -178,7 +179,9 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const needsYAxisAutoPadding = inlineLabel && !inlineLabelHasNoSpace
   const tickLabelFontSize = isMobileFontViewport(vizViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
   const axisLabelFontSize = isMobileFontViewport(vizViewport) ? AXIS_LABEL_FONT_SIZE_SMALL : AXIS_LABEL_FONT_SIZE
+  const topAxisLabelFontSize = AXIS_LABEL_FONT_SIZE
   const GET_TEXT_WIDTH_FONT = `normal ${tickLabelFontSize}px Nunito, sans-serif`
+  const showTopYAxisTitle = yAxis.titlePlacement === 'top' && !config.hideYAxisLabel && Boolean(runtime.yAxis?.label)
 
   // zero if not forest plot
   const forestRowsHeight = isForestPlot ? config.data.length * config.forestPlot.rowHeight : 0
@@ -508,6 +511,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
     const isForestPlot = visualizationType === 'Forest Plot'
     const topLabelOnGridline = topYLabelRef.current && yAxis.labelsAboveGridlines
+    const topYAxisTitleHeight = showTopYAxisTitle ? yAxisTopTitleRef.current?.getBoundingClientRect().height || 0 : 0
 
     // Heights to add
     const forestRowsHeight = isForestPlot ? config.data.length * forestPlot.rowHeight : 0
@@ -519,7 +523,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
     // Parent container height (includes brush if active)
     const brushHeightWithMargin = config.xAxis.brushActive ? BRUSH_HEIGHT + BRUSH_MARGIN : 0
-    const parentHeight = svgHeight + brushHeightWithMargin
+    const parentHeight = svgHeight + brushHeightWithMargin + topYAxisTitleHeight
 
     if (!parentRef.current) return
     parentRef.current.style.height = `${parentHeight}px`
@@ -552,6 +556,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     config.xAxis.brushActive,
     currentViewport,
     topYLabelRef.current,
+    showTopYAxisTitle,
     initialHeight,
     parentWidth,
     axisBottomSizeKey
@@ -596,6 +601,18 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
         style={{ width: `${parentWidth}px`, overflow: 'visible', position: 'relative' }}
         className='tooltip-boundary'
       >
+        {showTopYAxisTitle && (
+          <div
+            ref={yAxisTopTitleRef}
+            className='y-axis-top-title'
+            style={{
+              color: config.yAxis.labelColor,
+              fontSize: `${topAxisLabelFontSize}px`
+            }}
+          >
+            {runtime.yAxis.label}
+          </div>
+        )}
         <svg
           ref={internalSvgRef}
           onMouseMove={onMouseMove}

@@ -72,6 +72,21 @@ const getLeftAxisLabelTransforms = container =>
     .map(label => label.getAttribute('transform'))
     .filter(Boolean)
 
+const sidePlacementYAxis = {
+  hideAxis: false,
+  hideLabel: false,
+  hideTicks: false,
+  size: '50',
+  gridLines: true,
+  label: 'Y-Axis',
+  titlePlacement: 'side',
+  tickRotation: 0,
+  anchors: [],
+  axisPadding: 0,
+  labelPlacement: 'On Date/Category Axis',
+  rightAxisSize: 0
+}
+
 describe('LinearChart', () => {
   describe('rendering', () => {
     it('renders without crashing', () => {
@@ -238,6 +253,22 @@ describe('LinearChart', () => {
       expect(leftAxis).toBeTruthy()
     })
 
+    it('renders the top y-axis title outside the svg when titlePlacement is top', () => {
+      const { container } = renderLinearChart()
+
+      expect(container.querySelector('.y-axis-top-title')?.textContent).toBe('Y-Axis')
+      expect(container.querySelector('.left-axis text.y-label')).toBeFalsy()
+    })
+
+    it('renders the side y-axis title inside the svg when titlePlacement is side', () => {
+      const { container } = renderLinearChart({
+        yAxis: sidePlacementYAxis
+      })
+
+      expect(container.querySelector('.y-axis-top-title')).toBeFalsy()
+      expect(container.querySelector('.left-axis text.y-label')).toBeTruthy()
+    })
+
     it('renders bottom axis group', () => {
       const { container } = renderLinearChart()
       const bottomAxis = container.querySelector('.bottom-axis')
@@ -247,17 +278,8 @@ describe('LinearChart', () => {
     it('hides Y axis when hideAxis is true', () => {
       const { container } = renderLinearChart({
         yAxis: {
-          hideAxis: true,
-          hideLabel: false,
-          hideTicks: false,
-          size: '50',
-          gridLines: true,
-          label: 'Y-Axis',
-          tickRotation: 0,
-          anchors: [],
-          axisPadding: 0,
-          labelPlacement: 'On Date/Category Axis',
-          rightAxisSize: 0
+          ...sidePlacementYAxis,
+          hideAxis: true
         }
       })
       // The axis line should be hidden, but grid lines may still render
@@ -288,34 +310,14 @@ describe('LinearChart', () => {
 
       const baseRender = renderLinearChart({
         yAxis: {
-          hideAxis: false,
-          hideLabel: false,
-          hideTicks: false,
-          size: '50',
-          gridLines: true,
-          label: 'Y-Axis',
-          tickRotation: 0,
-          anchors: [],
-          axisPadding: 0,
-          labelPlacement: 'On Date/Category Axis',
-          rightAxisSize: 0,
+          ...sidePlacementYAxis,
           labelOffset: 0
         },
         runtime: baseRuntime
       })
       const offsetRender = renderLinearChart({
         yAxis: {
-          hideAxis: false,
-          hideLabel: false,
-          hideTicks: false,
-          size: '50',
-          gridLines: true,
-          label: 'Y-Axis',
-          tickRotation: 0,
-          anchors: [],
-          axisPadding: 0,
-          labelPlacement: 'On Date/Category Axis',
-          rightAxisSize: 0,
+          ...sidePlacementYAxis,
           labelOffset: 240
         },
         runtime: {
@@ -372,6 +374,7 @@ describe('LinearChart', () => {
           axisPadding: 0,
           labelOffset: 0
         },
+        yAxis: sidePlacementYAxis,
         runtime: baseRuntime
       })
       const offsetRender = renderLinearChart({
@@ -390,6 +393,7 @@ describe('LinearChart', () => {
           axisPadding: 0,
           labelOffset: 240
         },
+        yAxis: sidePlacementYAxis,
         runtime: {
           ...baseRuntime,
           yAxis: {
