@@ -82,23 +82,26 @@ export const AdvancedEditor = ({
     dashboard: ['Dashboard', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
     map: ['Maps', 'https://www.cdc.gov/cove/index.html', <MapIcon />],
     'markup-include': ['Markup Include', 'https://www.cdc.gov/cove/index.html', <MarkupIncludeIcon />],
+    'filtered-text': ['Filtered Text', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
+    table: ['Data Table', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
     'data-bite': ['Data Bite', 'https://www.cdc.gov/cove/index.html', <ChartIcon />],
     'waffle-chart': ['Waffle Chart', 'https://www.cdc.gov/cove/index.html', <ChartIcon />]
   }
+  const typeMeta = typeLookup[config.type] || ['Visualization', 'https://www.cdc.gov/cove/index.html', <ChartIcon />]
 
   if (!config.type) return <></>
   return (
     <>
       <a
-        href={typeLookup[config.type][1]}
+        href={typeMeta[1]}
         target='_blank'
         rel='noopener noreferrer'
         className='guidance-link'
         style={{ cursor: 'pointer !important' }}
       >
-        {typeLookup[config.type][2]}
+        {typeMeta[2]}
         <div>
-          <span className='heading-3'>Get Help with {typeLookup[config.type][0]}</span>
+          <span className='heading-3'>Get Help with {typeMeta[0]}</span>
           <p>Examples and documentation</p>
         </div>
       </a>
