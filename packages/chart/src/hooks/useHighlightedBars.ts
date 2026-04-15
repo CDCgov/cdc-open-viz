@@ -5,21 +5,14 @@ import { ChartConfig } from '../types/ChartConfig'
 export const useHighlightedBars = (config: ChartConfig, updateConfig: (config) => void) => {
   const { formatDate, parseDate } = useContext(ConfigContext)
 
-  let highlightedSeries = [] // only allow single series for highlights
-  let highlightedSeriesKey = ''
-  let highlightedBarValues = []
-  let highlightedSeriesValues = []
+  const highlightedSeries = config.series?.length > 0 && config.data ? config.series[0] : [] // only allow single series for highlights
+  const highlightedSeriesKey = config.series?.length > 0 && config.data ? config.series[0].dataKey : ''
+  const highlightedBarValues = config.series?.length > 0 && config.data ? config.highlightedBarValues : []
 
-  if (config.series?.length > 0 && config.data) {
-    highlightedSeries = config.series[0] // only allow single series for highlights
-    highlightedSeriesKey = config.series[0].dataKey
-    highlightedBarValues = config.highlightedBarValues
-    highlightedSeriesValues = config.data.map(item => item[config.xAxis.dataKey])
-  } else {
-    highlightedSeries = [] // only allow single series for highlights
-    highlightedSeriesKey = ''
-    highlightedBarValues = []
-    highlightedSeriesValues = []
+  const getHighlightedSeriesValues = () => {
+    if (!(config.series?.length > 0 && config.data)) return []
+
+    return config.data.map(item => item[config.xAxis.dataKey])
   }
 
   const handleUpdateHighlightedBorderWidth = (e, index) => {
@@ -144,7 +137,7 @@ export const useHighlightedBars = (config: ChartConfig, updateConfig: (config) =
     highlightedSeries,
     highlightedSeriesKey,
     highlightedBarValues,
-    highlightedSeriesValues,
+    getHighlightedSeriesValues,
     handleUpdateHighlightedBar,
     handleAddNewHighlightedBar,
     handleRemoveHighlightedBar,

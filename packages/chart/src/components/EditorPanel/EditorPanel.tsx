@@ -1217,7 +1217,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   // prettier-ignore
   const {
     highlightedBarValues,
-    highlightedSeriesValues,
+    getHighlightedSeriesValues,
     handleUpdateHighlightedBar,
     handleAddNewHighlightedBar,
     handleRemoveHighlightedBar,
@@ -1827,6 +1827,27 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   const hasDynamicCategory = ![undefined, '- Select - '].includes(config.series?.[0]?.dynamicCategory)
   const hasMultipleSeries = config.series?.length > 1
 
+  const highlightedSeriesOptions = useMemo(() => {
+    if (
+      !(
+        config.visualizationType === 'Bar' &&
+        config.series?.length === 1 &&
+        config.highlightedBarValues?.length > 0 &&
+        getHighlightedSeriesValues
+      )
+    ) {
+      return []
+    }
+
+    return [...new Set(getHighlightedSeriesValues())].sort().map(option => ({ value: option, label: option }))
+  }, [
+    config.visualizationType,
+    config.series?.length,
+    config.highlightedBarValues?.length,
+    config.data,
+    config.xAxis.dataKey
+  ])
+
   const editorContextValues = {
     addNewExclusion,
     data,
@@ -1845,7 +1866,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
     handleUpdateHighlightedBar,
     handleRemoveHighlightedBar,
     isPaletteReversed: config.general?.palette?.isReversed,
-    highlightedSeriesValues,
+    getHighlightedSeriesValues,
     handleUpdateHighlightedBorderWidth,
     handleUpdateHighlightedBarColor,
     setLollipopShape,
@@ -3659,11 +3680,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                         onChange={e => handleUpdateHighlightedBar(e, i)}
                                         options={[
                                           { value: '', label: '- Select Value -' },
-                                          ...(highlightedSeriesValues
-                                            ? [...new Set(highlightedSeriesValues)]
-                                                .sort()
-                                                .map(option => ({ value: option, label: option }))
-                                            : [])
+                                          ...highlightedSeriesOptions
                                         ]}
                                       />
                                       <label>
