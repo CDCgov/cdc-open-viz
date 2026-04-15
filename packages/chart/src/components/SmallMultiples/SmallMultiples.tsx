@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState, useMemo, useCallback } from 'react'
+import React, { useContext, useEffect, useRef, useState, useMemo, useCallback, useLayoutEffect } from 'react'
 import SmallMultipleTile from './SmallMultipleTile'
 import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
@@ -168,7 +168,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
   )
 
   // Align tile header heights per row
-  useEffect(() => {
+  useLayoutEffect(() => {
     const headerEntries = Object.entries(headerRefs.current).filter(([_, ref]) => ref) as TileHeaderEntries
     if (headerEntries.length === 0) return
 
@@ -209,7 +209,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
   }, [tileItems, tilesPerRow])
 
   // Calculate container height from measured tile heights
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!parentRef.current) return
 
     const measuredHeights = Object.values(tileHeights)
@@ -223,7 +223,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     const totalHeight = numberOfRows * maxTileHeight + totalGapsHeight
 
     parentRef.current.style.height = `${totalHeight}px`
-  }, [tileHeights, numberOfRows, isMobile, parentRef, tilesPerRow])
+  }, [tileHeights, numberOfRows, isMobile, parentRef])
 
   if (tileItems.length === 0) {
     return null

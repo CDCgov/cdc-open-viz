@@ -1,5 +1,5 @@
 import DataTableStandAlone from '@cdc/core/components/DataTable/DataTableStandAlone'
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import Toggle from './Toggle'
 import cloneDeep from 'lodash/cloneDeep'
 import { ConfigRow } from '../types/ConfigRow'
@@ -182,7 +182,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   const shouldEqualizeRow = !!row.equalHeight || needsTP5AutoEqualization
 
   // Layer TP5 equalization for row-level title consistency and same-type internals.
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!shouldEqualizeRow) return
 
     const rowElement = rowRef.current

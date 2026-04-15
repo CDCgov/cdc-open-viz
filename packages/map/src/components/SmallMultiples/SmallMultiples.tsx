@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useRef, useEffect, useCallback } from 'react'
+import React, { useContext, useMemo, useRef, useEffect, useCallback, useLayoutEffect } from 'react'
 import SmallMultipleTile from './SmallMultipleTile'
 import ConfigContext from '../../context'
 import { MapContext } from '../../types/MapContext'
@@ -71,7 +71,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = () => {
   )
 
   // Align tile header heights per row
-  useEffect(() => {
+  useLayoutEffect(() => {
     const headerEntries = Object.entries(headerRefs.current).filter(([_, ref]) => ref) as TileHeaderEntries
     if (headerEntries.length === 0) return
 
