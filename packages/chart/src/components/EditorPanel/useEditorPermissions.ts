@@ -274,16 +274,7 @@ export const useEditorPermissions = () => {
   }
 
   const visSupportsRegions = () => {
-    const disabledCharts = [
-      'Forest Plot',
-      'Horizon Chart',
-      'Pie',
-      'Paired Bar',
-      'Radar',
-      'Spark Line',
-      'Sankey',
-      'Warming Stripes'
-    ]
+    const disabledCharts = ['Forest Plot', 'Pie', 'Paired Bar', 'Radar', 'Spark Line', 'Sankey', 'Warming Stripes']
     if (disabledCharts.includes(visualizationType)) return false
     return true
   }
