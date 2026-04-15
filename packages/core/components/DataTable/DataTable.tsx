@@ -407,7 +407,7 @@ const DataTable = (props: DataTableProps) => {
           <MediaControls.Link config={config} dashboardDataConfig={dataConfig} interactionLabel={interactionLabel} />
           {hasDownloadLink && (
             <DownloadButton
-              rawData={getDownloadData()}
+              getRawData={getDownloadData}
               fileName={`${vizTitle || 'data-table'}.csv`}
               interactionLabel={interactionLabel}
               config={config}
