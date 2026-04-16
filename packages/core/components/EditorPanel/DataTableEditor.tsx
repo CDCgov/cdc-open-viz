@@ -284,11 +284,18 @@ const DataTableEditor: React.FC<DataTableProps> = ({ config, updateField, isDash
         <CheckBox
           value={config.table.showBottomCollapse}
           fieldName='showBottomCollapse'
-          label='Show collapse below table'
+          label='Show collapse below tables'
           section='table'
           updateField={updateField}
         />
       )}
+      <CheckBox
+        value={config.table.search ?? false}
+        fieldName='search'
+        label='Enable Search'
+        section='table'
+        updateField={updateField}
+      />
       <Select
         value={config.table.defaultSort?.column || ''}
         fieldName='column'

@@ -3208,6 +3208,14 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         label='Show collapse below table'
                         updateField={updateField}
                       />
+                      <CheckBox
+                        value={config.table.search ?? false}
+                        section='table'
+                        subsection={null}
+                        fieldName='search'
+                        label='Enable Search'
+                        updateField={updateField}
+                      />
                       <Select
                         value={config.table.defaultSort?.column || ''}
                         fieldName='column'

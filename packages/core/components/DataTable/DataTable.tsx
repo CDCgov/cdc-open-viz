@@ -108,6 +108,8 @@ const DataTable = (props: DataTableProps) => {
 
   const [expanded, setExpanded] = useState(expandDataTable)
 
+  const [query, setQuery] = useState('')
+
   // Initialize sort state from config.table.defaultSort
   const defaultSort = config.table?.defaultSort
   const [sortBy, setSortBy] = useState<any>(() => {
@@ -178,7 +180,16 @@ const DataTable = (props: DataTableProps) => {
       break
   }
 
-  const rawRows = Object.keys(runtimeData).filter(column => column != 'columns')
+  const normalizedQuery = query.trim().toLowerCase()
+  const searchedRuntimeData = useMemo(() => {
+    if (!config.table.search || normalizedQuery === '') return runtimeData
+    return runtimeData.filter(row => {
+      return Object.values(row).some(value => String(value).toLowerCase().includes(normalizedQuery))
+    })
+  }, [runtimeData, normalizedQuery, config.table.search])
+
+
+  const rawRows = Object.keys(searchedRuntimeData).filter(column => column !== 'columns')
 
   // Determine if custom order sort is active (user hasn't overridden by clicking a column header)
   const isCustomOrderActive =
@@ -194,16 +205,16 @@ const DataTable = (props: DataTableProps) => {
           let dataB
           if (config.type === 'map' && config.columns) {
             const sortByColName = config.columns[sortBy.column].name
-            dataA = runtimeData[a][sortByColName]
-            dataB = runtimeData[b][sortByColName]
+            dataA = searchedRuntimeData[a][sortByColName]
+            dataB = searchedRuntimeData[b][sortByColName]
           }
           if (['chart', 'dashboard', 'table'].includes(config.type)) {
-            dataA = runtimeData[a][sortBy.column]
-            dataB = runtimeData[b][sortBy.column]
+            dataA = searchedRuntimeData[a][sortBy.column]
+            dataB = searchedRuntimeData[b][sortBy.column]
           }
           if (!dataA && !dataB && config.type === 'chart' && config.xAxis && config.xAxis.type === 'date-time') {
-            dataA = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[a][config.xAxis.dataKey])
-            dataB = timeParse(config.runtime.xAxis.dateParseFormat)(runtimeData[b][config.xAxis.dataKey])
+            dataA = timeParse(config.runtime.xAxis.dateParseFormat)(searchedRuntimeData[a][config.xAxis.dataKey])
+            dataB = timeParse(config.runtime.xAxis.dateParseFormat)(searchedRuntimeData[b][config.xAxis.dataKey])
           }
           // Use custom order when active
           if (isCustomOrderActive && dataA !== undefined && dataB !== undefined) {
@@ -259,7 +270,7 @@ const DataTable = (props: DataTableProps) => {
             : config.runtime?.seriesKeys),
     [config.runtime?.seriesKeys]) // eslint-disable-line
 
-  const hasNoData = runtimeData.length === 0
+  const hasNoData = searchedRuntimeData.length === 0
   const getClassNames = (): string => {
     const classes = ['data-table-container']
 
@@ -356,13 +367,13 @@ const DataTable = (props: DataTableProps) => {
             ...props,
             rows,
             wrapColumns,
-            runtimeData,
+            runtimeData: searchedRuntimeData,
             viewport,
             legendMemo: props.legendMemo || defaultLegendMemo,
             legendSpecialClassLastMemo: props.legendSpecialClassLastMemo || defaultLegendSpecialClassLastMemo,
             runtimeLegend: props.runtimeLegend || defaultRuntimeLegend
           })
-        : chartCellMatrix({ rows, ...props, runtimeData, isVertical, sortBy, hasRowType, viewport })
+        : chartCellMatrix({ rows, ...props, runtimeData: searchedRuntimeData, isVertical, sortBy, hasRowType, viewport })
 
     const useBottomExpandCollapse = config.table.showBottomCollapse && expanded && Array.isArray(childrenMatrix)
 
@@ -436,6 +447,18 @@ const DataTable = (props: DataTableProps) => {
             />
           )}
           <div className='table-container' style={limitHeight}>
+            {config.table.search && (
+            <div className='data-table-search'>
+              <label htmlFor={`${tabbingId}-search`}>Search table</label>
+              <input
+                id={`${tabbingId}-search`}
+                type='search'
+                value={query}
+                placeholder={config.table.searchPlaceholder || 'Filter...'}
+                onChange={event => setQuery(event.target.value)}
+              />
+            </div>
+            )}
             <Table
               preliminaryData={config.preliminaryData}
               viewport={viewport}
@@ -458,7 +481,7 @@ const DataTable = (props: DataTableProps) => {
                   />
                 ) : (
                   <ChartHeader
-                    data={runtimeData}
+                    data={searchedRuntimeData}
                     {...props}
                     hasRowType={hasRowType}
                     isVertical={isVertical}
@@ -475,7 +498,7 @@ const DataTable = (props: DataTableProps) => {
                   expanded ? 'data-table' : 'data-table cdcdataviz-sr-only'
                 }${isVertical ? '' : ' horizontal'}`,
                 'aria-live': 'assertive',
-                'aria-rowcount': config?.data?.length ? config.data.length : -1,
+                'aria-rowcount': searchedRuntimeData?.length || -1,
                 hidden: !expanded,
                 cellMinWidth: 100
               }}
