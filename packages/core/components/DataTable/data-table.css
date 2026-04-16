@@ -108,6 +108,10 @@
         background-size: 10px 5px;
         color: #fff !important;
         cursor: pointer;
+
+        a {
+          color: inherit;
+        }
       }
 
       th:last-child,
