@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import EditorActions from './editor.actions'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { devToolsWrapper } from '@cdc/core/helpers/withDevTools'
@@ -24,6 +23,7 @@ const reducer = (state: EditorState, action: EditorActions): EditorState => {
       const { dataset, datasetKey, oldDatasetKey } = action.payload
       const oldDataset = oldDatasetKey ? state.config?.datasets[oldDatasetKey] : {}
       const config = cloneConfig(state.config)
+      const nextDatasets = cloneDatasets(config.datasets, currentDataset => ({ ...currentDataset, preview: false }))
       if (oldDatasetKey) {
         const changeDatasets = _config => {
           _config.rows?.forEach(row => {
@@ -38,16 +38,15 @@ const reducer = (state: EditorState, action: EditorActions): EditorState => {
           })
         }
         applyMultiDashboards(config, changeDatasets)
-        delete config.datasets[oldDatasetKey]
+        delete nextDatasets[oldDatasetKey]
       }
-      Object.values(config.datasets).forEach(dataset => {
-        dataset.preview = false
-      })
-      config.datasets[datasetKey] = { ...oldDataset, ...dataset }
+      nextDatasets[datasetKey] = { ...oldDataset, ...dataset }
+      config.datasets = nextDatasets
       return { ...state, config }
     }
     case 'DELETE_DASHBOARD_DATASET': {
       const { datasetKey } = action.payload
+      const wasPreviewDataset = !!state.config?.datasets?.[datasetKey]?.preview
       const deleteDatasetKeys = _config => {
         _config.rows?.forEach(row => {
           if (row.dataKey === datasetKey) {
@@ -62,7 +61,11 @@ const reducer = (state: EditorState, action: EditorActions): EditorState => {
       }
       const config = cloneConfig(state.config)
       applyMultiDashboards(config, deleteDatasetKeys)
-      delete config.datasets[datasetKey]
+      const nextDatasets = cloneDatasets(config.datasets, currentDataset => currentDataset, datasetKey)
+      if (wasPreviewDataset) {
+        selectFallbackPreviewDataset(nextDatasets)
+      }
+      config.datasets = nextDatasets
       return { ...state, config }
     }
     case 'EDITOR_TEMP_SAVE': {
@@ -89,6 +92,30 @@ const applyMultiDashboards = (config: Record<string, any>, mutationFunc: Functio
     })
   }
   mutationFunc(config)
+}
+
+const cloneDatasets = (
+  datasets: Record<string, any> = {},
+  transform = dataset => dataset,
+  omittedDatasetKey?: string
+) =>
+  // Rebuild the dataset map with fresh dataset objects so React can observe dataset-level changes.
+  Object.fromEntries(
+    Object.entries(datasets)
+      .filter(([key]) => key !== omittedDatasetKey)
+      .map(([key, dataset]) => [key, transform({ ...dataset })])
+  )
+
+const selectFallbackPreviewDataset = (datasets: Record<string, any>) => {
+  // Keep preview ownership explicit after deletion so the editor never depends on stale flags.
+  Object.values(datasets).forEach((dataset: any) => {
+    dataset.preview = false
+  })
+
+  const nextPreviewDataset = Object.values(datasets).find((dataset: any) => Array.isArray(dataset.data))
+  if (nextPreviewDataset) {
+    nextPreviewDataset.preview = true
+  }
 }
 
 export default devToolsWrapper<EditorState, EditorActions>(reducer)
