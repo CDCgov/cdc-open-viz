@@ -60,11 +60,7 @@ jobs:
                 const signal = ensureSignal(pkg)
                 const relative = file.slice(pkgPrefix.length)
 
-                if (
-                  relative === 'CONFIG.md' ||
-                  relative === 'README.md' ||
-                  relative === 'examples/minimal-example.json'
-                ) {
+                if (relative === 'CONFIG.md') {
                   signal.packageDocsChanged = true
                 }
 
