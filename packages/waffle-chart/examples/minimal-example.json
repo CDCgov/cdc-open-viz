@@ -1,0 +1,19 @@
+{
+  "type": "waffle-chart",
+  "version": "4.26.4",
+  "title": "Chart Title",
+  "showTitle": true,
+  "visualizationType": "Waffle",
+  "shape": "circle",
+  "data": [
+    {
+      "Value": 42
+    }
+  ],
+  "dataColumn": "Value",
+  "dataFunction": "Sum",
+  "content": "of cases occurred in the home",
+  "subtext": "Chart subtext or citation",
+  "suffix": "%",
+  "theme": "theme-blue"
+}
