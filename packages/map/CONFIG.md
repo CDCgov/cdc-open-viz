@@ -1,6 +1,8 @@
 # `@cdc/map` Configuration Reference
 
-This document covers the `@cdc/map`-owned config contract. Shared nested structures such as `filters`, `table`, `annotations`, `markupVariables`, `general.palette`, `general.headerColor`, and the shared column/property shapes are documented in the canonical [`@cdc/core` shared config reference](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md). If you are reading this inside the monorepo, use `packages/core/CONFIG.md`. If you are reading this from an external app that installed COVE packages, use `node_modules/@cdc/core/CONFIG.md` when available. Otherwise, use the canonical GitHub link above.
+This document covers the `@cdc/map`-owned config contract. Shared nested structures such as `filters`, `table`, `annotations`, `markupVariables`, `general.palette`, `general.headerColor`, and the shared column/property shapes are documented in the [`@cdc/core` config reference](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md).
+
+To follow those shared types locally, use `packages/core/CONFIG.md` in this monorepo or `node_modules/@cdc/core/CONFIG.md` in an installed app. If neither path is available, use the GitHub link above.
 
 ## Organization
 

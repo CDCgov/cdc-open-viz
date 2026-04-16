@@ -46,7 +46,7 @@ You can also load configuration from a URL with `<CdcDataBite configUrl='/path/t
 
 The primary reference for authoring configs is [CONFIG.md](./CONFIG.md).
 
-Shared nested config types used by `@cdc/data-bite` are documented in [`@cdc/core` shared config reference](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md).
+If you are reading this in a context where relative Markdown links do not open correctly, use the [GitHub copy of the data bite config reference](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/data-bite/CONFIG.md).
 
 ## Properties
 

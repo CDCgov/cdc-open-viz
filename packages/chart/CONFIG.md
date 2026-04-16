@@ -2,9 +2,9 @@
 
 This document describes the supported configuration contract for `@cdc/chart`.
 
-Shared nested types such as `Axis`, `Series`, `Legend`, `Table`, `Runtime`, `Annotation`, `Region`, `BoxPlot`, `ConfidenceInterval`, `VizFilter`, `FilterBehavior`, `MarkupVariable`, `Footnotes`, and `General` are shared across packages and should be referenced from the canonical `@cdc/core` config reference:
-[packages/core/CONFIG.md](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md)
-If you are reading this inside the monorepo, use `packages/core/CONFIG.md`. If you are reading this from an external app that installed COVE packages, use `node_modules/@cdc/core/CONFIG.md` when available. Otherwise, use the canonical GitHub link above.
+Shared nested types such as `Axis`, `Series`, `Legend`, `Table`, `Runtime`, `Annotation`, `Region`, `BoxPlot`, `ConfidenceInterval`, `VizFilter`, `FilterBehavior`, `MarkupVariable`, `Footnotes`, and `General` are documented in the [`@cdc/core` config reference](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md).
+
+To follow those shared types locally, use `packages/core/CONFIG.md` in this monorepo or `node_modules/@cdc/core/CONFIG.md` in an installed app. If neither path is available, use the GitHub link above.
 
 ## Organization
 

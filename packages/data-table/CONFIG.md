@@ -1,6 +1,8 @@
 # `@cdc/data-table` Configuration Reference
 
-This document covers the `@cdc/data-table` config contract. Shared nested structures such as `Table`, `Column`, `VizFilter`, `FilterBehavior`, `DataDescription`, and `General` are documented in the canonical [`@cdc/core` config reference](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md). If you are reading this inside the monorepo, use `packages/core/CONFIG.md`. If you are reading this from an external app that installed COVE packages, use `node_modules/@cdc/core/CONFIG.md` when available. Otherwise, use the canonical GitHub link above.
+This document covers the `@cdc/data-table` config contract. Shared nested structures such as `Table`, `Column`, `VizFilter`, `FilterBehavior`, `DataDescription`, and `General` are documented in the [`@cdc/core` config reference](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md).
+
+To follow those shared types locally, use `packages/core/CONFIG.md` in this monorepo or `node_modules/@cdc/core/CONFIG.md` in an installed app. If neither path is available, use the GitHub link above.
 
 ## Organization
 

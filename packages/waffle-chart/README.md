@@ -52,7 +52,7 @@ You can also load configuration from a URL with `<CdcWaffleChart configUrl='/pat
 
 The primary reference for authoring configs is [CONFIG.md](./CONFIG.md).
 
-Shared nested config types used by `@cdc/waffle-chart` are documented in the canonical [`@cdc/core` shared config reference](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md).
+If you are reading this in a context where relative Markdown links do not open correctly, use the [GitHub copy of the waffle chart config reference](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/waffle-chart/CONFIG.md).
 
 ## Properties
 

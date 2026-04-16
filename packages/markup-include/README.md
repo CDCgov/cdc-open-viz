@@ -41,7 +41,9 @@ export default App
 
 ## Configuration
 
-Read the full package contract in [CONFIG.md](./CONFIG.md).
+The primary reference for authoring configs is [CONFIG.md](./CONFIG.md).
+
+If you are reading this in a context where relative Markdown links do not open correctly, use the [GitHub copy of the markup include config reference](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/markup-include/CONFIG.md).
 
 ## Properties
 
