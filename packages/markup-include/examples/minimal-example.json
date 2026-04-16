@@ -4,7 +4,6 @@
   "theme": "theme-blue",
   "contentEditor": {
     "inlineHTML": "<p>Markup include minimum example.</p>",
-    "showHeader": true,
     "srcUrl": "",
     "title": "Markup Include",
     "useInlineHTML": true

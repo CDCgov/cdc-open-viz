@@ -179,6 +179,8 @@ That example should:
 
 Minimal examples should change rarely.
 
+Do not change the example `version` string during routine config-doc maintenance unless the work explicitly includes a human-requested version update. Treat the example version as a separately managed value, even if package metadata or other repo files suggest a different version.
+
 Do update the minimal example when:
 
 - the true minimum working config changes,

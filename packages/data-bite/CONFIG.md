@@ -4,6 +4,7 @@ This document describes the supported configuration contract for `@cdc/data-bite
 
 Shared types referenced in this file are documented in the canonical `@cdc/core` shared config reference:
 [packages/core/CONFIG.md](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md)
+If you are reading this inside the monorepo, use `packages/core/CONFIG.md`. If you are reading this from an external app that installed COVE packages, use `node_modules/@cdc/core/CONFIG.md` when available. Otherwise, use the canonical GitHub link above.
 
 ## Organization
 
@@ -57,7 +58,7 @@ Controls numeric formatting after the metric has been calculated.
 | `dataFormat.commas`       | `boolean` | No       | `true`                           | Adds locale-aware digit grouping for numeric outputs.                | `true`, `false`                                                                                                               |
 | `dataFormat.prefix`       | `string`  | No       | `''`                             | Text prepended to the rendered metric.                               | Common examples: `$`, `+`, `~`                                                                                                |
 | `dataFormat.suffix`       | `string`  | No       | `'%'`                            | Text appended to the rendered metric.                                | Set to `''` when no suffix is wanted.                                                                                         |
-| `dataFormat.ignoreZeros`  | `boolean` | No       | `false` in practice when omitted | Excludes zero values from `Count` and `Mean (Average)` calculations. | Used only by those two functions. This field is supported by runtime/editor code even though older package types may omit it. |
+| `dataFormat.ignoreZeros`  | `boolean` | No       | `false`                           | Excludes zero values from `Count` and `Mean (Average)` calculations. | Used only by those two functions. This field is supported by runtime/editor code even though older package types may omit it. |
 
 ### `DataBiteFilter`
 
@@ -170,10 +171,12 @@ Package-specific behavior:
 
 These fields sometimes appear in saved configs, copied editor state, or migrated legacy configs, but consumers generally do not need to author or maintain them:
 
-| Field or group                                         | Why you can ignore it                                                                             |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| `runtime.*`                                            | Internal runtime state created by the package during initialization.                              |
-| `newViz`                                               | Editor-only flag used by the preview and confirmation flow.                                       |
-| `shadow`                                               | Deprecated legacy field. Shadows are no longer used by data bites.                                |
-| `errors`, `category`, `label`, `icon`, `content`, `id` | Editor/export metadata rather than consumer-facing config.                                        |
-| `formattedData`, `datasets`                            | Editor or transformation artifacts that are not part of the supported standalone config contract. |
+| Field or group                                                                 | Why you can ignore it                                                                             |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| `runtime.*`                                                                    | Internal runtime state created by the package during initialization.                              |
+| `newViz`                                                                       | Editor-only flag used by the preview and confirmation flow.                                       |
+| `shadow`                                                                       | Deprecated legacy field. Shadows are no longer used by data bites.                                |
+| `errors`, `category`, `label`, `icon`, `content`, `id`                         | Editor/export metadata rather than consumer-facing config.                                        |
+| `currentViewport`, `subType`, `orientation`, `visualizationType`, `activeVizButtonID` | Editor/runtime metadata copied into saved configs by some flows.                                  |
+| `dataFileName`, `dataFileSourceType`, `migrations`, `formattedData`, `datasets` | Editor or transformation artifacts that are not part of the supported standalone config contract. |
+| `general.palette`                                                              | Shared palette metadata sometimes written by editor flows but not authored as part of this package. |

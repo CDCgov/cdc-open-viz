@@ -1,22 +1,20 @@
 # `@cdc/map` Configuration Reference
 
-This document describes the supported configuration contract for `@cdc/map`.
-
-Shared nested config types used here are documented in the canonical [`@cdc/core` shared config reference](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md).
+This document covers the `@cdc/map`-owned config contract. Shared nested structures such as `filters`, `table`, `annotations`, `markupVariables`, `general.palette`, `general.headerColor`, and the shared column/property shapes are documented in the canonical [`@cdc/core` shared config reference](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md). If you are reading this inside the monorepo, use `packages/core/CONFIG.md`. If you are reading this from an external app that installed COVE packages, use `node_modules/@cdc/core/CONFIG.md` when available. Otherwise, use the canonical GitHub link above.
 
 ## Organization
 
-The config is documented in the same order the package loads and renders it:
+The sections below follow the package’s real config surface:
 
 | Section | Covers |
 | --- | --- |
-| Identity and data source | Package identity, data loading, and saved-config metadata |
-| Geography and columns | Geo type, map mode, and column mapping for the active dataset |
-| Classification and palette | Legend behavior, palette selection, and category ordering |
-| Filtering and tables | Filters, data table behavior, and tooltip text |
-| Map features | Custom layers, patterns, hex maps, small multiples, annotations, and markup variables |
-| Layout and interactivity | Shell styling, map position, zoom, and tooltip interaction |
-| Fields You Can Ignore | Runtime/editor artifacts and other legacy fields |
+| Identity and data source | Package identity plus loader metadata |
+| Geography and columns | Map mode, geography controls, and package-specific column wiring |
+| Copy and shell controls | Title, intro/subtext, download toggles, and map shell behavior |
+| Classification and palette | Map-specific legend behavior and palette notes |
+| Map features | Overlays, patterns, hex maps, and small multiples |
+| Layout and interactivity | Map positioning, visual shell settings, and tooltip behavior |
+| Fields You Can Ignore | Legacy/editor artifacts that may still appear in saved configs |
 
 ## Minimum Working Config
 
@@ -28,100 +26,93 @@ The copy-pasteable minimum config lives in [README.md](./README.md). Its source 
 | --- | --- | --- | --- | --- | --- |
 | `type` | `string` | Yes | None | Identifies the package. | Must be `map`. |
 | `version` | `string` | No | None | Saved COVE version for migration purposes. | Use the current package version when authoring a new config. |
-| `color` | `string` | No | `bluegreen` fallback | Legacy palette name kept for compatibility with older saved configs. | Prefer `general.palette.name` when authoring new configs. |
-| `data` | `object[]` | Conditionally | `[]` | Inline dataset used to render the map. | Required unless `dataUrl` is provided. |
-| `dataUrl` | `string` | Conditionally | None | Remote dataset URL fetched at load time. | If both `data` and `dataUrl` are present, the fetched data wins. |
-| `dataDescription` | `object` | No | None | Shared data-standardization metadata used when loading remote data. | Shared type documented in core. |
-| `dataMetadata` | `any` | No | None | Metadata returned by `fetchRemoteData()`. | Exposed to markup variables and other runtime helpers. |
+| `color` | `string` | No | Legacy fallback | Legacy palette name kept for backward compatibility. | Prefer `general.palette.name` when authoring new configs. |
+
+The following data-loading fields are shared and documented in core: `data`, `dataUrl`, `runtimeDataUrl`, `dataDescription`, `dataMetadata`, and `dataKey` for dashboard-driven embeds.
 
 ## Geography and Columns
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `general.geoType` | `string` | Yes | `single-state` in defaults | Chooses the geography family being rendered. | `us`, `us-region`, `us-county`, `world`, `us-geocode`, `world-geocode`, `bubble`, `single-state`, `google-map` |
+| `general.geoType` | `string` | Yes | `single-state` | Chooses the geography family being rendered. | `us`, `us-region`, `us-county`, `world`, `us-geocode`, `world-geocode`, `bubble`, `single-state`, `google-map` |
 | `general.type` | `string` | Yes | `data` | Chooses the interaction mode. | `data`, `navigation`, `us-geocode`, `world-geocode`, `bubble` |
+| `columns.geo` | `object` | Yes | See package defaults | Geography lookup column. | Uses shared column properties from core; `displayColumn` is map-specific and is used when the displayed geography label differs from the lookup field. |
+| `columns.primary` | `object` | Conditionally | See package defaults | Main data column used for classification and tooltips. | Uses shared column properties from core. Required for data maps and bubble maps. |
+| `columns.navigate` | `object` | Conditionally | `{ name: '' }` | URL column used in navigation mode. | Required when `general.type` is `navigation`. |
+| `columns.latitude` | `object` | Conditionally | `{ name: '' }` | Latitude column for geocode and bubble maps. | Required for `us-geocode` and `world-geocode`. |
+| `columns.longitude` | `object` | Conditionally | `{ name: '' }` | Longitude column for geocode and bubble maps. | Required for `us-geocode` and `world-geocode`. |
+| `columns.categorical` | `object` | No | `{ name: '' }` | Category column for bubble maps using categorical legends. | `name` only. |
+| `columns.hsa` | `object` | No | `{ name: '' }` | Optional HSA column used by county maps when HSA boundaries are shown. | `name` only. |
+
+## Copy And Shell Controls
+
+| Field | Type | Required | Default | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- | --- |
 | `general.title` | `string` | No | `''` | Main map title. | Hidden when `showTitle` is `false`. |
+| `general.titleStyle` | `string` | No | `small` | Chooses the visual title treatment. | `legacy`, `large`, `small` |
 | `general.showTitle` | `boolean` | No | `true` | Shows or hides the title. | `true`, `false` |
-| `general.headerColor` | [`ComponentThemes`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#shared-primitives) | No | `theme-blue` | Shared header theme token. | See the shared core reference for valid values. |
+| `general.superTitle` | `string` | No | `''` | Optional small line above the main title. | Editor-managed. |
+| `general.language` | `string` | No | `en` | Language code used by some map helpers and editor defaults. | Usually an ISO locale/language code. |
+| `general.introText` | `string` | No | `''` | Intro copy shown in the shell. | Supports markup variables when enabled. |
+| `general.subtext` | `string` | No | `''` | Supporting copy shown below the visualization. | Supports basic HTML plus markup variables when enabled. |
+| `general.footnotes` | `string` | No | `''` | Optional footnote copy. | Shared footnotes shape is documented in core. |
 | `general.navigationTarget` | `string` | No | `_self` | Target used when the map opens navigation URLs. | `_self`, `_blank` |
-| `general.geoLabelOverride` | `string` | No | `''` | Optional label override for geography names. | Used in titles and legend copy. |
-| `general.territoriesLabel` | `string` | No | `Territories` | Label used for territories in US maps. | Often left at the default. |
-| `general.convertFipsCodes` | `boolean` | No | `true` | Normalizes FIPS-like geography values. | Helpful for US maps that use mixed FIPS formats. |
-| `general.displayStateLabels` | `boolean` | No | `false` | Shows state labels directly on the map. | `true`, `false` |
+| `general.showSidebar` | `boolean` | No | `true` | Shows the legend/sidebar region. | Set to `false` for navigation and bubble layouts. |
+| `general.noDataMessage` | `string` | No | `No State Selected` | Message shown when a single-state map has no active selection. | Package-specific copy. |
+| `general.annotationDropdownText` | `string` | No | `Annotations` | Label shown for the annotation dropdown. | Used when annotation dropdowns are enabled. |
+| `general.showAnnotationDropdown` | `boolean` | No | `false` | Shows the annotation dropdown in the shell. | Editor-driven toggle. |
+| `general.geoBorderColor` | `string` | No | `darkGray` | Border color used for geography outlines. | `darkGray`, `sameAsBackground`, and other editor-supported color tokens. |
+| `general.geoLabelOverride` | `string` | No | `''` | Overrides the geography label used in tooltips and other copy. | Useful when the map should say "Country", "State/Territory", or similar. |
+| `general.fullBorder` | `boolean` | No | `false` | Adds a full border around navigation maps. | Mainly relevant when `general.type` is `navigation`. |
+| `general.headerColor` | `string` | No | `theme-blue` | Shared header theme token. | See core docs for the full token list. |
+| `general.displayStateLabels` | `boolean` | No | `true` | Shows state labels directly on the map. | `true`, `false` |
 | `general.displayAsHex` | `boolean` | No | `false` | Switches the US map to a hex-style treatment. | Works with `hexMap`. |
-| `general.territoriesAlwaysShow` | `boolean` | No | `false` | Keeps US territories visible even when they would normally be hidden. | `true`, `false` |
-| `general.allowMapZoom` | `boolean` | No | `true` | Enables zooming on supported map types. | Disabled for some editor flows. |
-| `general.showSidebar` | `boolean` | No | `true` | Shows the legend/sidebar region. | `false` is only practical for some navigation/bubble layouts. |
+| `general.equalNumberOptIn` | `boolean` | No | `false` | Enables the newer equal-number legend path. | Used when `legend.separateZero` and equal-number classification interact. |
+| `general.allowMapZoom` | `boolean` | No | `true` | Enables zooming on supported map types. | Disabled in some editor flows and unsupported map modes. |
+| `general.convertFipsCodes` | `boolean` | No | `true` | Normalizes FIPS-like geography values. | Helpful for US maps that use mixed FIPS formats. |
 | `general.hideGeoColumnInTooltip` | `boolean` | No | `false` | Hides the geography field name in tooltips. | `true`, `false` |
 | `general.hidePrimaryColumnInTooltip` | `boolean` | No | `false` | Hides the primary data field name in tooltips. | `true`, `false` |
-| `general.showDownloadMediaButton` | `boolean` | No | `false` | Enables the media download button. | Often paired with `showDownloadImgButton` in editor state. |
+| `general.showDownloadMediaButton` | `boolean` | No | `false` | Enables the media download button. | Often paired with the image/PDF toggles below. |
 | `general.showDownloadImgButton` | `boolean` | No | `false` | Enables PNG/image download. | Editor-managed field. |
-| `general.showDownloadPdfButton` | `boolean` | No | `false` | Enables PDF download. | Editor-managed field. |
 | `general.includeContextInDownload` | `boolean` | No | `false` | Includes heading and explanatory context in image downloads. | Only meaningful when image downloads are enabled. |
-| `general.equalNumberOptIn` | `boolean` | No | `false` | Switches the equal-number legend behavior to the newer quantile logic. | Used when `legend.type` is `equalnumber`. |
-| `general.showHSABoundaries` | `boolean` | No | `false` | Shows HSA boundaries on supported maps. | Mainly relevant for health-system maps. |
-| `general.showNeighboringStates` | `boolean` | No | `false` | Includes neighboring states in the map outline. | Only relevant for certain US map modes. |
-| `general.showStateDropdown` | `boolean` | No | `false` | Shows a state picker in supported single-state views. | Only relevant for single-state maps. |
-| `columns.geo` | `object` | Yes | See package defaults | Geography lookup column. | `name`, `label`, `tooltip`, `dataTable`, and optional `displayColumn`. |
-| `columns.primary` | `object` | Yes | See package defaults | Main data column used for classification and tooltips. | Supports `name`, `label`, `prefix`, `suffix`, `roundToPlace`, `tooltip`, `dataTable`, and editor-only `useCommas`. |
-| `columns.navigate` | `object` | No | `{ name: '' }` | URL column used in navigation mode. | `name` is the important field. |
-| `columns.latitude` | `object` | No | `{ name: '' }` | Latitude column for geocode and bubble maps. | `name` only. |
-| `columns.longitude` | `object` | No | `{ name: '' }` | Longitude column for geocode and bubble maps. | `name` only. |
-| `columns.categorical` | `object` | No | `{ name: '' }` | Category column for bubble maps using categorical legends. | `name` only. |
-| `columns.hsa` | `object` | No | `{ name: '' }` | Optional HSA column used by some specialized map flows. | `name` only. |
-| `columns.additionalColumnN` | `object` | No | Added by the editor | Extra columns added in the editor for data tables and tooltips. | These are editor-generated and may appear in saved configs. |
+| `general.showDownloadPdfButton` | `boolean` | No | `false` | Enables PDF download. | Editor-managed field. |
+| `general.showHSABoundaries` | `boolean` | No | `false` | Shows HSA boundaries on supported county maps. | Mainly relevant for health-system maps. |
+| `general.showNeighboringStates` | `boolean` | No | `false` | Includes neighboring states in the county map outline. | Only relevant for county maps. |
+| `general.showStateDropdown` | `boolean` | No | `false` | Shows a state picker in county views. | Only relevant for county maps. |
+| `general.hideUnselectedStates` | `boolean` | No | `true` when states are picked | Controls whether selected-state maps hide or keep unselected states visible. | Only meaningful when `statesPicked` is populated on single-state maps. |
+| `general.statesPicked` | `object[]` | No | `[]` | Selected states for single-state maps. | Each item has `fipsCode` and `stateName`. |
+| `general.countriesPicked` | `object[]` | No | `[]` | Selected countries for world maps. | Each item has `iso` and `name`. |
+| `general.hideUnselectedCountries` | `boolean` | No | `false` | Controls whether unselected countries are hidden or grayed out. | Only meaningful when `countriesPicked` is populated. |
+| `general.territoriesAlwaysShow` | `boolean` | No | `false` | Keeps US territories visible even when they would normally be hidden. | `true`, `false` |
+| `general.territoriesLabel` | `string` | No | `Territories` | Label used for territories in US maps. | Often left at the default. |
+| `general.hasRegions` | `boolean` | No | `false` | Marks the map as region-aware for some data-loading and editor flows. | Mainly used by US regional map flows. |
 
-## Classification and Palette
+The canonical palette configuration is shared in core. This package still accepts the legacy `color` field for older saved configs, but new configs should author `general.palette` instead.
 
-| Field | Type | Required | Default | Description | Allowed values / Notes |
-| --- | --- | --- | --- | --- | --- |
-| `legend.type` | `string` | Yes | `equalnumber` or `category` depending on defaults | Chooses how data classes are calculated. | `equalnumber`, `equalinterval`, `category` |
-| `legend.numberOfItems` | `number` | No | `3` or `5` depending on the starting config | Number of legend buckets for numeric maps. | Ignored for `category` legends. |
-| `legend.position` | `string` | No | `top`/`side` depending on defaults | Placement of the legend. | `top`, `bottom`, `side` |
-| `legend.style` | `string` | No | `gradient` in modern defaults | Visual style for the legend. | `circles`, `boxes`, `gradient` |
-| `legend.subStyle` | `string` | No | `linear blocks` | Gradient sub-style. | `linear blocks`, `smooth` |
-| `legend.title` | `string` | No | `''` | Legend heading text. | Hidden when empty. |
-| `legend.description` | `string` | No | `''` | Legend explanatory text. | Hidden when `dynamicDescription` is enabled. |
-| `legend.descriptions` | `object` | No | `{}` | Per-category description map for dynamic legends. | Used with filter-driven descriptions. |
-| `legend.specialClasses` | `object[] \| string[]` | No | `[]` | Special class definitions or legacy special-class names. | Legacy string arrays are still repaired by the editor. |
-| `legend.unified` | `boolean` | No | `false` | Uses the full dataset when building legend classes. | Otherwise the legend follows the active runtime filters. |
-| `legend.singleColumn` | `boolean` | No | `false` | Forces a single-column legend layout. | Only meaningful for side legends. |
-| `legend.singleRow` | `boolean` | No | `false` | Forces a single-row legend layout. | Only meaningful for top/bottom legends. |
-| `legend.verticalSorted` | `boolean` | No | `false` | Sorts legend items vertically. | Hidden for gradient legends. |
-| `legend.showSpecialClassesLast` | `boolean` | No | `false` | Moves special classes to the end of the legend. | Useful when special classes should not interrupt the main scale. |
-| `legend.dynamicDescription` | `boolean` | No | `false` | Swaps the legend description for filter-specific text. | Mainly used in editor-driven workflows. |
-| `legend.groupBy` | `string` | No | `''` | Groups categorical legends by another column. | Only meaningful when `legend.type` is `category`. |
-| `general.palette` | `object` | No | `{ isReversed: false }` in defaults | Canonical palette configuration. | `name`, `version`, `isReversed`, and optional `customColors`/`customColorsOrdered`. |
-| `color` | `string` | No | `bluegreen` fallback | Legacy palette name retained for compatibility. | Prefer `general.palette.name` in new configs. |
+## Classification And Palette
 
-## Filtering and Tables
+Legend configuration is shared with core. The map package honors the shared legend contract plus these map-specific behaviors:
 
-| Field | Type | Required | Default | Description | Allowed values / Notes |
-| --- | --- | --- | --- | --- | --- |
-| `filters` | `VizFilter[]` | No | `[]` | Shared filter configuration used to narrow the dataset. | See the shared core reference for `VizFilter`-shaped fields. |
-| `filterBehavior` | `string` | No | `Filter Change` | Controls when the map updates in response to filter changes. | Runtime/editor behavior uses this as a mode label. |
-| `filterIntro` | `string` | No | `''` | Introductory copy shown near filters. | Optional explanatory text. |
-| `table.label` | `string` | No | `Data Table` | Data table heading. | Displayed when the table is shown. |
-| `table.expanded` | `boolean` | No | `false` | Starts the data table expanded. | `true`, `false` |
-| `table.limitHeight` | `boolean` | No | `false` | Limits the table height and enables scrolling. | `true`, `false` |
-| `table.height` | `string` | No | `''` | Explicit table height when `limitHeight` is enabled. | CSS length value. |
-| `table.caption` | `string` | No | `''` | Table caption text. | Optional accessibility text. |
-| `table.download` | `boolean` | No | `false` | Shows the CSV download link. | `true`, `false` |
-| `table.downloadDataLabel` | `string` | No | `''` | Label for the CSV download link. | Editor-managed field. |
-| `table.downloadImageLabel` | `string` | No | `''` | Label for the image download link. | Editor-managed field. |
-| `table.downloadUrlLabel` | `string` | No | `''` | Label for the source URL download link. | Editor-managed field. |
-| `table.showDownloadUrl` | `boolean` | No | `false` | Shows the source URL download link. | `true`, `false` |
-| `table.showDownloadLinkBelow` | `boolean` | No | `true` in older configs | Places the download link below the table. | Editor-managed legacy field. |
-| `table.showDataTableLink` | `boolean` | No | `true` | Shows the data table link in the shell. | Especially useful in dashboard mode. |
-| `table.showFullGeoNameInCSV` | `boolean` | No | `false` | Exports full geography names in CSV downloads. | `true`, `false` |
-| `table.forceDisplay` | `boolean` | No | `true` | Forces the table to display even when it would normally be hidden. | Defaulted by the package runtime. |
-| `table.indexLabel` | `string` | No | `''` | Label used for the table index column. | Often left blank. |
-| `table.cellMinWidth` | `string` | No | `''` or `0` depending on config | Minimum cell width in the table. | CSS length value. |
-| `table.wrapColumns` | `boolean` | No | `false` | Wraps table cell content instead of truncating it. | `true`, `false` |
-| `tooltips.appearanceType` | `string` | No | `hover` | Chooses hover tooltips or click-to-open popovers. | `hover`, `click` |
-| `tooltips.linkLabel` | `string` | No | `Learn More` | Label used for tooltip links. | Editor-managed. |
-| `tooltips.noDataLabel` | `string` | No | `''` | Text shown when a tooltip row has no data. | Optional. |
-| `tooltips.opacity` | `number` | No | `90` | Tooltip opacity. | 0-100 in editor flows. |
+| Behavior | Details |
+| --- | --- |
+| `legend.separateZero` | When `true`, numeric legends split zero into its own class unless `general.equalNumberOptIn` changes the scaling path. |
+| `legend.categoryValuesOrder` | Controls the order of categorical legend items and small-multiple tile sorting. |
+| `legend.additionalCategories` | Adds extra category labels to the legend. |
+| `legend.groupBy` | Groups categorical legend items when the editor uses grouped category views. |
+| `legend.tickRotation` | Rotates legend tick labels in supported layouts. |
+| `legend.hideBorder` | Hides the legend border when `true`. The default is `true` for the package’s current initial state. |
+| `legend.singleColumnLegend` | Legacy flag used by older legend layouts. |
+| `legend.separators` | Optional separator metadata used by gradient legends. |
+
+## Filtering And Tables
+
+Shared filter and table structures are documented in core. Map-specific behavior includes:
+
+| Behavior | Details |
+| --- | --- |
+| `filterBehavior` | Controls whether the map updates immediately or waits for an explicit filter change in supporting editor flows. |
+| `filterIntro` | Intro copy shown near the filter UI. |
+| `table.forceDisplay` | Keeps the data table visible even when the current mode would normally hide it. |
 
 ## Map Features
 
@@ -131,8 +122,8 @@ Custom overlay or base layers added by the editor.
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `name` | `string` | No | `''` | Display name for the layer. | Mostly used by the editor UI. |
-| `url` | `string` | Yes | None | Layer source URL. | Usually a GeoJSON or TopoJSON file. |
+| `name` | `string` | Yes | None | Display name for the layer. | Used in the editor accordion label. |
+| `url` | `string` | Yes | None | Layer source URL. | Usually GeoJSON or TopoJSON. |
 | `namespace` | `string` | No | `''` | SVG namespace / layer prefix. | Used when building layer ids. |
 | `fill` | `string` | No | `''` | Fill color for the layer. | CSS color string. |
 | `fillOpacity` | `number` | No | `''` | Fill opacity for the layer. | Numeric opacity value. |
@@ -167,7 +158,7 @@ Pattern overlays applied to matching geography rows.
 | --- | --- | --- | --- | --- | --- |
 | `legendTitle` | `string` | No | `''` | Title for the shape group in the legend. | Optional. |
 | `legendDescription` | `string` | No | `''` | Description for the shape group. | Optional. |
-| `items` | `object[]` | No | `[]` | Shape rules that determine which arrow or icon is shown. | Each item can match by `column`, `operator`, and `value`. |
+| `items` | `object[]` | No | `[]` | Shape rules that determine which arrow or icon is shown. | Each item can match by `key`, `column`, `operator`, and `value`. |
 
 `hexMap.shapeGroups[].items[]`
 
@@ -194,21 +185,15 @@ Only supported for `us`, `single-state`, and `us-region` map types.
 | `smallMultiples.tileTitles` | `object` | No | `{}` | Optional custom title map per tile key. | Keys are tile identifiers. |
 | `smallMultiples.synchronizedTooltips` | `boolean` | No | `true` | Keeps tooltips synchronized across tiles. | `true`, `false` |
 
-### Annotations and Markup
+### `annotations` and `markupVariables`
+
+These structures are shared with core. In map configs, the important package-specific behavior is that annotation dropdowns are only visible when `general.showAnnotationDropdown` is enabled, and markup variables are applied to title, intro, subtext, legend, and other supported text fields when `enableMarkupVariables` is true.
+
+## Layout And Interactivity
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `annotations` | `Annotation[]` | No | `[]` | Shared annotation structures used by the map editor and runtime. | Shared type documented in core. |
-| `general.showAnnotationDropdown` | `boolean` | No | `false` | Shows the annotations dropdown in the shell. | Editor-driven field. |
-| `general.annotationDropdownText` | `string` | No | `Annotations` | Text shown in the annotation dropdown. | Editor-driven field. |
-| `enableMarkupVariables` | `boolean` | No | `false` | Enables placeholder replacement in supported text fields. | Shared type documented in core. |
-| `markupVariables` | `any[]` | No | `[]` | Variable definitions available to authored text. | Shared type documented in core. |
-
-## Layout and Interactivity
-
-| Field | Type | Required | Default | Description | Allowed values / Notes |
-| --- | --- | --- | --- | --- | --- |
-| `mapPosition.coordinates` | `[number, number]` | No | `[0, 30]` for world maps, otherwise `[0, 0]` in many flows | Initial map center. | The runtime may reset this when the geography changes. |
+| `mapPosition.coordinates` | `[number, number]` | No | `[0, 30]` | Initial map center. | The runtime may reset this when the geography changes. |
 | `mapPosition.zoom` | `number` | No | `1` | Initial map zoom. | Editor/runtime may reset it when geography changes. |
 | `visual.border` | `boolean` | No | `false` | Enables a component border. | Shared shell styling flag. |
 | `visual.borderColorTheme` | `boolean` | No | `false` | Uses the theme color for the border. | Shared shell styling flag. |
@@ -237,9 +222,11 @@ These fields may appear in saved configs, editor exports, or runtime state, but 
 | Field or group | Why you can ignore it |
 | --- | --- |
 | `runtime.*` | Internal runtime state created by the package during initialization. |
-| `mapPosition` | Usually managed by the package based on geography and user interaction. |
-| `defaultData`, `formattedData`, `datasets` | Editor or transformation artifacts rather than hand-authored standalone config. |
+| `defaultData`, `formattedData`, `datasets`, `runtimeDataUrl`, `dataMetadata` | Loader/runtime artifacts rather than hand-authored standalone config. |
 | `sharing.*` | Loader/export metadata that belongs to editor or embed flows. |
 | `usingWidgetLoader` | Internal loader flag. |
 | `newViz` | Editor-only preview/confirmation flag. |
-| `statePicked`, `countriesPicked`, `showDownloadButton`, `expandDataTable` | Legacy editor state that can appear in old saved configs. |
+| `columns.additionalColumnN` | Editor-generated extra columns for data-table and tooltip workflows. |
+| `general.countyCensusYear`, `general.filterControlsCountyYear`, `general.filterControlsStatesPicked` | Editor-only controls that are surfaced for some county and single-state flows. |
+| `statePicked` | Legacy saved-config artifact from older editor flows. |
+| `showDownloadButton`, `expandDataTable` | Legacy editor state from older configs. |

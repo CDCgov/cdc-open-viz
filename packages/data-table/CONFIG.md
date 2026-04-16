@@ -1,77 +1,72 @@
 # `@cdc/data-table` Configuration Reference
 
-This document describes the supported configuration contract for `@cdc/data-table`.
-
-Shared nested types such as `Table`, `VizFilter`, `FilterBehavior`, `DataDescription`, and `Column` are shared across packages and should be referenced from the canonical `@cdc/core` config reference:
-[packages/core/CONFIG.md](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md)
+This document covers the `@cdc/data-table` config contract. Shared nested structures such as `Table`, `Column`, `VizFilter`, `FilterBehavior`, `DataDescription`, and `General` are documented in the canonical [`@cdc/core` config reference](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md). If you are reading this inside the monorepo, use `packages/core/CONFIG.md`. If you are reading this from an external app that installed COVE packages, use `node_modules/@cdc/core/CONFIG.md` when available. Otherwise, use the canonical GitHub link above.
 
 ## Organization
 
-The data table config is documented in the order the package processes it:
+The sections below follow the same order the package processes config:
 
 | Section | Covers |
 | --- | --- |
-| Identity and data source | Package identity, versioning, locale, and incoming data |
-| Table setup | Table behavior, columns, and formatting |
-| Filters | Shared filter configuration and filter behavior |
-| Fields You Can Ignore | Runtime state and editor-only artifacts |
+| Identity and data source | Package identity, versioning, input data, and locale |
+| Shared table, column, and general settings | Shared core structures used by the table renderer |
+| Data formatting | Package-owned number-format defaults |
+| Filters and intro text | Shared filters plus the package-specific filter intro string |
+| Fields You Can Ignore | Runtime state and legacy artifacts you may encounter in saved configs |
 
 ## Minimum Working Config
 
-For the copy-pasteable minimum config, use the example in [README.md](./README.md). The source of truth for that example lives at `packages/data-table/examples/minimal-example.json`, and automated tests keep the README block in sync with that file.
-
-All other package fields are optional and will be backfilled from package defaults unless you override them.
+Use the copy-pasteable example in [README.md](./README.md). The source of truth for that block lives at [`packages/data-table/examples/minimal-example.json`](./examples/minimal-example.json), and the package test keeps the README example in sync with that file.
 
 ## Identity and Data Source
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `type` | `string` | Yes | None | Identifies the visualization package. | Must be `table` for standalone data-table configs. |
-| `version` | [`Version`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#version) | Yes | None | Saved config version used by migration logic. | Keep this current so old saved configs can be upgraded safely. |
-| `visualizationType` | `string` | Yes | None | Selects the rendering mode used by the shared data table component. | Must be `Table` for this package. |
-| `data` | `object[]` | Conditionally | `[]` | Inline dataset rendered in the table. | Required unless `dataUrl` is provided. |
-| `dataUrl` | `string` | Conditionally | None | Remote JSON or CSV URL fetched at load time. | If both `data` and `dataUrl` are present, the fetched data wins. |
-| `dataDescription` | [`DataDescription`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#datadescription) | No | None | Shared developer-standardization metadata for fetched data. | Used only when the table loads remote data. |
-| `dataMetadata` | `Record<string, string>` | No | None | Metadata dictionary exposed to shared markup variables. | Usually populated automatically from remote data fetches. |
-| `locale` | `string` | Yes | Browser/runtime default | Locale used for number, date, and download formatting. | Any valid `Intl` locale is accepted. |
+| `type` | `string` | Yes | None | Identifies the package. | Must be `table` for this visualization. |
+| `version` | [`Version`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#version) | Yes | None | Saved config version used by migration logic. | Older configs are backfilled to the latest package version on load. |
+| `visualizationType` | `string` | Yes | None | Selects the shared data-table rendering mode. | Must be `Table` for this package. |
+| `data` | `object[]` | No | `[]` | Inline dataset rendered by the table. | If both `data` and `dataUrl` are present, inline `data` wins. |
+| `dataUrl` | `string` | No | None | Remote JSON or CSV URL fetched at load time. | Used only when `data` is not provided. |
+| `dataDescription` | [`Partial<DataDescription>`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#datadescription) | No | None | Optional developer-standardization metadata for input data. | See the shared core reference for the `DataDescription` shape. |
+| `dataMetadata` | `Record<string, string>` | No | None | Metadata returned by a remote data fetch. | Runtime-populated; usually omit from authored configs. |
+| `locale` | `string` | No | Browser/runtime default | Locale used for date and number formatting. | Any valid `Intl` locale is accepted. |
 
-## Table Setup
+## Shared Table, Column, and General Settings
 
-| Field | Type | Required | Default | Description | Allowed values / Notes |
-| --- | --- | --- | --- | --- | --- |
-| `table` | `Table` | No | Package defaults | Shared table behavior and display settings. | Controls the label, caption, collapse state, download controls, and visible-row behavior. |
-| `columns` | `Record<string, Column>` | No | `{}` | Column-level display and formatting overrides. | Each key should match an input data column unless you are intentionally remapping the display. |
-| `dataFormat` | `object` | No | `{}` | Global number-format defaults for the table. | Supports commas, prefix/suffix, and round-to settings. |
-
-### `columns`
-
-Each entry in `columns` controls one source column. The package only reads the column-specific settings it needs, so you can author the smallest useful subset.
+These settings are shared core structures, so their field-by-field definitions live in [`@cdc/core/CONFIG.md`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md). The notes below capture the data-table-specific behavior.
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `columns.<key>.name` | `string` | No | The map key | Source column name. | Usually only needed when the editor has renamed the display key. |
-| `columns.<key>.label` | `string` | No | The source column name | Header text shown in the table. | Commonly changed when raw field names are not human-friendly. |
-| `columns.<key>.prefix` | `string` | No | `''` | Text prepended to the rendered value. | Useful for currency and signed metrics. |
-| `columns.<key>.suffix` | `string` | No | `''` | Text appended to the rendered value. | Useful for percentages and units. |
-| `columns.<key>.roundToPlace` | `number` | No | `0` | Number of decimal places to keep. | Must be `0` or greater. |
-| `columns.<key>.commas` | `boolean` | No | `false` | Adds locale-aware digit grouping. | `true`, `false`. |
-| `columns.<key>.dataTable` | `boolean` | No | `true` | Includes or hides the column in the table output. | `false` removes the column from the table. |
-| `columns.<key>.showInViz` | `boolean` | No | `true` | Keeps the column available to the visualization side. | Mostly relevant when the same config drives both a chart and a table. |
-| `columns.<key>.order` | `number` | No | `undefined` | Explicit display order. | Lower numbers appear earlier. |
-| `columns.<key>.startingPoint` | `string` | No | `0` | Baseline value used by shared formatting helpers. | Mostly legacy compatibility. |
-| `columns.<key>.series` | `string` | No | `undefined` | Optional series grouping label. | Used by shared table helpers and chart-adjacent flows. |
-| `columns.<key>.tooltips` | `boolean` | No | `true` | Enables tooltip formatting for the column. | Shared table and chart helpers may read this flag. |
-| `columns.<key>.forestPlot` | `boolean` | No | `false` | Includes the column in forest plot output. | Only meaningful in shared chart/table flows. |
-| `columns.<key>.forestPlotAlignRight` | `boolean` | No | `false` | Right-aligns the forest plot column. | Forest plot specific. |
-| `columns.<key>.forestPlotStartingPoint` | `number` | No | `0` | Starting point for forest plot range calculations. | Forest plot specific. |
+| `table` | `Table` | No | Package defaults | Shared table behavior and display settings. | When omitted, the package seeds the table block from `packages/data-table/src/data/initial-state.js` (`label: 'Data Table'`, `expanded: true`, `showVertical: true`, and the missing/suppressed labels enabled). |
+| `columns` | `Record<string, Column>` | No | `{}` | Shared per-column display and formatting overrides. | Keys should match source column names; see the shared `Column` docs for the supported field set. |
+| `general` | `General` | No | None | Shared display toggles used by the table renderer. | This package reads `general.showMissingDataLabel` and `general.showSuppressedSymbol` when present. |
 
-## Filters
+## Data Formatting
+
+`dataFormat` is package-owned and defaults to an empty object. The shared number formatter falls back to sensible defaults when individual fields are omitted.
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `filters` | `VizFilter[]` | No | `[]` | Interactive filters that narrow the active dataset. | Shared filter contract from `@cdc/core`. |
-| `filterBehavior` | `FilterBehavior` | No | `Filter Change` | Chooses whether filters apply immediately or through a button. | `Filter Change`, `Apply Button`. |
-| `filterIntro` | `string` | No | `''` | Helper text shown above the filter controls. | Useful for explaining what the filters do. |
+| `dataFormat` | `object` | No | `{}` | Global number-format defaults for table values. | See the fields below. |
+
+### `dataFormat`
+
+| Field | Type | Required | Default | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- | --- |
+| `dataFormat.abbreviated` | `boolean` | No | `false` | Abbreviates large numbers with locale-aware short units. | `true`, `false`. |
+| `dataFormat.commas` | `boolean` | No | `false` | Adds locale-aware digit grouping. | `true`, `false`. |
+| `dataFormat.prefix` | `string` | No | `''` | Text prepended to rendered values. | Common examples are currency symbols or signed prefixes. |
+| `dataFormat.preserveOriginalDecimals` | `boolean` | No | `false` | Keeps incoming decimal precision instead of forcing a fixed precision. | `true`, `false`. |
+| `dataFormat.roundTo` | `number` | No | `0` | Number of decimal places to keep. | Values below `0` are treated as `0`. |
+| `dataFormat.suffix` | `string` | No | `''` | Text appended to rendered values. | Common examples are `%` or a unit label. |
+
+## Filters And Intro Text
+
+| Field | Type | Required | Default | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- | --- |
+| `filters` | `VizFilter[]` | No | `[]` | Interactive filters that narrow the active dataset. | See the shared `VizFilter` docs. |
+| `filterBehavior` | `FilterBehavior` | No | `Filter Change` | Chooses whether filters apply immediately or wait for an explicit apply action. | `Apply Button` defers updates until the user clicks apply. |
+| `filterIntro` | `string` | No | `''` | Helper text shown above the filter controls. | Useful for giving users context about the filter set. |
 
 ## Fields You Can Ignore
 
@@ -80,7 +75,7 @@ These fields sometimes appear in saved configs, copied editor state, or migratio
 | Field or group | Why you can ignore it |
 | --- | --- |
 | `showEditorPanel` | Editor-only UI state. |
-| `runtime.*` | Internal runtime state created while the table is loading and rendering. |
 | `config` | Reducer-managed merged config snapshot. |
-| `dataFormat.*` when omitted | Package defaults supply the formatting contract. |
+| `runtime.*` | Internal runtime state created while the table is loading and rendering. |
 | `table.sharedFilterColumns` | Runtime-added helper used by dashboards and shared filters. |
+| `dataFormat.right*`, `dataFormat.bottom*`, `dataFormat.showPiePercent` | Legacy chart-oriented formatting fields that can show up in copied configs, but are not part of the data-table authoring surface. |
