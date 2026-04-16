@@ -26,8 +26,22 @@ export const useBarChart = (handleTooltipMouseOver, handleTooltipMouseOff, confi
 
   const isHorizontal = orientation === 'horizontal'
   const barBorderWidth = 1
-  const lollipopBarWidth = config.lollipopSize === 'large' ? 7 : config.lollipopSize === 'medium' ? 6 : 5
-  const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10
+  const lollipopBarWidth =
+    config.lollipopSize === 'x-large'
+      ? 8
+      : config.lollipopSize === 'large'
+      ? 7
+      : config.lollipopSize === 'medium'
+      ? 6
+      : 5
+  const lollipopShapeSize =
+    config.lollipopSize === 'x-large'
+      ? 16
+      : config.lollipopSize === 'large'
+      ? 14
+      : config.lollipopSize === 'medium'
+      ? 12
+      : 10
   const isLabelBelowBar = config.yAxis.labelPlacement === 'Below Bar'
   const displayNumbersOnBar = config.yAxis.displayNumbersOnBar
   const section = config.orientation === 'horizontal' ? 'yAxis' : 'xAxis'

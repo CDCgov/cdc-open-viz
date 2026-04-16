@@ -193,7 +193,7 @@ export type AllChartsConfig = {
   lineDatapointStyle: 'hidden' | 'always show' | 'hover'
   lollipopColorStyle: 'regular' | 'two-tone'
   lollipopShape: string
-  lollipopSize: 'small' | 'medium' | 'large'
+  lollipopSize: 'small' | 'medium' | 'large' | 'x-large'
   newViz: boolean
   orientation: ChartOrientation
   palette: string

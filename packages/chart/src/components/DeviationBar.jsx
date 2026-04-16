@@ -40,8 +40,22 @@ export default function DeviationBar({ height, xScale }) {
   const hasNegativeValues = data.some(d => d[seriesKey] < 0)
   const shouldShowTargetLine = hasNegativeValues || target > 0 || xScale.domain()[0] < 0
   const borderWidth = config.barHasBorder === 'true' ? 1 : 0
-  const lollipopBarHeight = config.lollipopSize === 'large' ? 7 : config.lollipopSize === 'medium' ? 6 : 5
-  const lollipopShapeSize = config.lollipopSize === 'large' ? 14 : config.lollipopSize === 'medium' ? 12 : 10
+  const lollipopBarHeight =
+    config.lollipopSize === 'x-large'
+      ? 8
+      : config.lollipopSize === 'large'
+      ? 7
+      : config.lollipopSize === 'medium'
+      ? 6
+      : 5
+  const lollipopShapeSize =
+    config.lollipopSize === 'x-large'
+      ? 16
+      : config.lollipopSize === 'large'
+      ? 14
+      : config.lollipopSize === 'medium'
+      ? 12
+      : 10
 
   const targetX = Math.max(xScale(0), Math.min(xScale(target), xScale(maxVal)))
 

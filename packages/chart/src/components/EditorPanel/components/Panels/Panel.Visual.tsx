@@ -160,7 +160,7 @@ const PanelVisual: FC<PanelProps> = props => {
               fieldName='lollipopSize'
               label='Lollipop Size'
               updateField={updateField}
-              options={['small', 'medium', 'large']}
+              options={['small', 'medium', 'large', 'x-large']}
             />
           </>
         )}

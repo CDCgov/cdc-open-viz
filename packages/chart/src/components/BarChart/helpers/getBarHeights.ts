@@ -12,6 +12,7 @@ export const getHorizontalBarHeights = <T>(config: Partial<ChartConfig>, bars: (
     const stackCount = config.runtime.seriesKeys.length
     if (config.isLollipopChart) {
       const lollipopSizes = {
+        'x-large': 8,
         large: 7,
         medium: 6,
         small: 5
