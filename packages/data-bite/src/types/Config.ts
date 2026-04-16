@@ -11,9 +11,9 @@ export type Config = {
   dataBite: string
   dataFunction: string
   dataColumn: string
-  bitePosition: string
+  bitePosition: 'Left' | 'Right' | 'Top' | 'Bottom'
   biteFontSize: number
-  fontSize: string
+  fontSize: 'small' | 'medium' | 'large' | 'x-large'
   biteBody: string
   imageData: {
     display: string
@@ -27,7 +27,7 @@ export type Config = {
     prefix: string
     suffix: string
   }
-  biteStyle: string
+  biteStyle: 'graphic' | 'split' | 'title' | 'body' | 'end' | 'gradient' | 'tp5'
   filters: VizFilter[]
   subtext: string
   title: string

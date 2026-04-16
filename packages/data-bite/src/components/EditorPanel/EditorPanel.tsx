@@ -832,7 +832,7 @@ const EditorPanel: React.FC<DataBiteEditorPanelProps> = () => {
                         fieldName='fontSize'
                         label='Overall Font Size'
                         updateField={updateField}
-                        options={['small', 'medium', 'large']}
+                        options={['small', 'medium', 'large', 'x-large']}
                       />
                     </>
                   }
