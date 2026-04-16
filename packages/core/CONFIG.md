@@ -319,6 +319,7 @@ Column configs provide shared per-column display, formatting, and table behavior
 | `verticalSorted` | `boolean` | No | Sorts vertical legends in supported layouts. | Optional. |
 | `groupBy` | `string` | No | Grouping key for advanced legend layouts. | Optional. |
 | `colorCode` | `string` | No | Shared color-code metadata. | Optional. |
+| `tooltipLegendVisible` | `boolean` | No | Keeps tooltip legend markers available even when the visible legend is hidden. | Currently used by chart tooltip rendering; when omitted, charts fall back to `!legend.hide`. |
 | `additionalCategories` | `string[]` | No | Extra categories added to the legend. | Optional. |
 
 ### `Annotation`

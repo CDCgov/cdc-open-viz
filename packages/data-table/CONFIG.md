@@ -39,7 +39,7 @@ These settings are shared core structures, so their field-by-field definitions l
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `table` | `Table` | No | Package defaults | Shared table behavior and display settings. | When omitted, the package seeds the table block from `packages/data-table/src/data/initial-state.js` (`label: 'Data Table'`, `expanded: true`, `showVertical: true`, and the missing/suppressed labels enabled). |
+| `table` | `Table` | No | Package defaults | Shared table behavior and display settings. | When omitted, the package seeds the table block from `packages/data-table/src/data/initial-state.js` (`label: 'Data Table'`, `expanded: true`, `showVertical: true`, `downloadUrlLabel: ''`, and the missing/suppressed labels enabled). |
 | `columns` | `Record<string, Column>` | No | `{}` | Shared per-column display and formatting overrides. | Keys should match source column names; see the shared `Column` docs for the supported field set. |
 | `general` | `General` | No | None | Shared display toggles used by the table renderer. | This package reads `general.showMissingDataLabel` and `general.showSuppressedSymbol` when present. |
 

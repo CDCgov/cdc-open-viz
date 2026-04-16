@@ -108,7 +108,7 @@ Dashboard flows can also select data from `datasets` with `dataKey`.
 | `isLollipopChart` | `boolean` | No | `false` | Renders bars as lollipop charts. | Often pairs with `lollipopShape` and `lollipopColorStyle`. |
 | `lollipopShape` | `circle \| square` | No | `circle` | Shape used for lollipop heads. | The editor currently exposes `circle` and `square`. |
 | `lollipopColorStyle` | `regular \| two-tone` | No | `two-tone` | Chooses lollipop color treatment. | Changes how the head and stick colors are resolved. |
-| `lollipopSize` | `small \| medium \| large` | No | `small` | Controls lollipop head and stem sizing. | Mainly used when `barStyle` is `lollipop` or `isLollipopChart` is true. |
+| `lollipopSize` | `small \| medium \| large \| x-large` | No | `small` | Controls lollipop head and stem sizing. | Mainly used when `barStyle` is `lollipop` or `isLollipopChart` is true. |
 | `lineDatapointStyle` | `hidden \| always show \| hover` | No | `hover` | Controls line chart point visibility. | Affects line and combo charts. |
 | `lineDatapointColor` | `Same as Line \| Lighter than Line` | No | `Same as Line` | Chooses the point color relative to the line. | Affects line markers and hover styles. |
 | `isolatedDotsSameSize` | `boolean` | No | `false` | Keeps isolated line dots the same size as normal dots. | Only used by line-chart variants. |
@@ -118,6 +118,7 @@ Dashboard flows can also select data from `datasets` with `dataKey`.
 | `tipRounding` | `top \| full` | No | `top` | Controls tooltip rounding behavior. | Legacy-friendly display option. |
 | `dataFormat` | `object` | No | `{}` | Controls global number formatting. | Includes prefix/suffix, comma handling, and rounding knobs used across chart families. |
 | `tooltips` | `object` | No | `{ opacity: 90, singleSeries: false, dateDisplayFormat: '%B %-d, %Y' }` | Tooltip display settings. | Controls opacity, single-series mode, and tooltip date formatting. |
+| `legend.tooltipLegendVisible` | `boolean` | No | Inherits `!legend.hide` | Keeps tooltip series markers visible even when the main legend is hidden. | Only affects multi-series chart types that support tooltip legend markers. |
 | `topAxis.hasLine` | `boolean` | No | `false` | Draws a top axis line in supported chart types. | Mostly used by bar and line layouts. |
 | `general` | [`General`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#general) | No | Shared core default | Shared chart-wide settings such as missing-data labels and palette selection. | Chart-specific runtime also reads `general.useIntelligentLineChartLabels`; see core for shared fields like `showMissingDataLabel`, `showSuppressedSymbol`, `showZeroValueData`, `hideNullValue`, and `palette`. |
 | `visual` | `object` | No | `{ border: false, borderColorTheme: false, accent: false, background: false, hideBackgroundColor: false, tp5Treatment: false, tp5Background: false, verticalHoverLine: false, horizontalHoverLine: false, lineDatapointSymbol: 'none', maximumShapeAmount: 7 }` | Shared chart shell styling flags. | Includes border/background toggles, hover lines, and line-datapoint symbol control. |
