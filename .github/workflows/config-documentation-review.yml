@@ -1,4 +1,4 @@
-name: Config Documentation Review Comment
+name: Config Documentation Review
 
 on:
   pull_request_target:
