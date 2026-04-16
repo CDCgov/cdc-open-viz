@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { within, expect } from 'storybook/test'
 import CdcMap from '../CdcMap'
+import MinimalExampleConfig from '../../examples/minimal-example.json'
 import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 import EqualNumberOptInExample from './_mock/DEV-7286.json'
 import EqualNumberMap from './_mock/equal-number.json'
@@ -64,6 +65,17 @@ export const Equal_Number_Opt_In: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+  }
+}
+
+export const Minimal_Config: Story = {
+  args: {
+    config: MinimalExampleConfig
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    expect(canvasElement.querySelector('.map-container')).toBeInTheDocument()
+    expect(canvasElement.textContent).toContain('Minimal US Map')
   }
 }
 

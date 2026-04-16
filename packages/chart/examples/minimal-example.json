@@ -1,0 +1,24 @@
+{
+  "version": "4.26.4",
+  "type": "chart",
+  "visualizationType": "Bar",
+  "title": "Minimal Chart",
+  "data": [
+    {
+      "category": "A",
+      "value": 1
+    },
+    {
+      "category": "B",
+      "value": 2
+    }
+  ],
+  "xAxis": {
+    "dataKey": "category"
+  },
+  "series": [
+    {
+      "dataKey": "value"
+    }
+  ]
+}

@@ -14,6 +14,7 @@ import pieConfig from './_mock/pie_with_data.json'
 import pieCalculatedArea from './_mock/pie_calculated_area.json'
 import areaChartStacked from './_mock/area_chart_stacked.json'
 import multipleLines from './_mock/short_dates.json'
+import MinimalExampleConfig from '../../examples/minimal-example.json'
 import { editConfigKeys } from '@cdc/core/helpers/configHelpers'
 import { assertVisualizationRendered, waitForPresence } from '@cdc/core/helpers/testing'
 import { expect } from 'storybook/test'
@@ -168,6 +169,17 @@ export const Metadata_Backward_Compat_Plain_Array: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+  }
+}
+
+export const Minimal_Config: Story = {
+  args: {
+    config: MinimalExampleConfig,
+    isEditor: false
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    expect(canvasElement.textContent).toContain('Minimal Chart')
   }
 }
 
