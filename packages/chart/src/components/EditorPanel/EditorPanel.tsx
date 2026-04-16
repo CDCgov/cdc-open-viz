@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, memo, useContext, useMemo } from 'react'
 import { Draggable } from '@hello-pangea/dnd'
 import chroma from 'chroma-js'
-import { isDateScale } from '@cdc/core/helpers/cove/date'
+import { getAutoDetectedDateParseFormat, isDateScale } from '@cdc/core/helpers/cove/date'
 import {
   Accordion,
   AccordionItem,
@@ -967,6 +967,17 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
   }
 
   const updateField = updateFieldFactory(config, updateConfig)
+  const getAutoDetectedXAxisDateParseFormat = (dataKey = config.xAxis.dataKey, axisType = config.xAxis.type) => {
+    const hasExistingDateParseFormat =
+      typeof config.xAxis.dateParseFormat === 'string' && config.xAxis.dateParseFormat.trim() !== ''
+
+    if (hasExistingDateParseFormat || !['date', 'date-time'].includes(axisType)) {
+      return undefined
+    }
+
+    return getAutoDetectedDateParseFormat(config.data as Record<string, unknown>[], dataKey)
+  }
+
   const updateFieldDeprecated = (section, subsection, fieldName, newValue) => {
     if (isDebug)
       console.error(
@@ -1009,6 +1020,21 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       })
       return
     }
+
+    if (section === 'xAxis' && !truthy(subsection) && fieldName === 'dataKey') {
+      const autoDetectedDateParseFormat = getAutoDetectedXAxisDateParseFormat(newValue)
+
+      updateConfig({
+        ...config,
+        xAxis: {
+          ...config.xAxis,
+          dataKey: newValue,
+          ...(autoDetectedDateParseFormat ? { dateParseFormat: autoDetectedDateParseFormat } : {})
+        }
+      })
+      return
+    }
+
     if (null === section && null === subsection) {
       // special case that allows for updating the config object directly
       if (!truthy(fieldName)) console.error('fieldName is required')
@@ -2903,11 +2929,19 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                 section='xAxis'
                                 fieldName='type'
                                 updateField={(_section, _subsection, _fieldName, value) => {
+                                  const autoDetectedDateParseFormat = getAutoDetectedXAxisDateParseFormat(
+                                    config.xAxis.dataKey,
+                                    value
+                                  )
+
                                   updateConfig({
                                     ...config,
                                     xAxis: {
                                       ...config.xAxis,
-                                      type: value
+                                      type: value,
+                                      ...(autoDetectedDateParseFormat
+                                        ? { dateParseFormat: autoDetectedDateParseFormat }
+                                        : {})
                                     }
                                   })
                                 }}

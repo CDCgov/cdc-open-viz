@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { detectDateParseFormat, formatDate, getDateRenderFormat } from '../cove/date'
+import { detectDateParseFormat, formatDate, getAutoDetectedDateParseFormat, getDateRenderFormat } from '../cove/date'
 
 const NBSP = '\u00A0'
 
@@ -196,5 +196,44 @@ describe('detectDateParseFormat', () => {
       isReliable: true,
       sampleSize: 50
     })
+  })
+})
+
+describe('getAutoDetectedDateParseFormat', () => {
+  it('detects a reliable format from a selected data key', () => {
+    expect(
+      getAutoDetectedDateParseFormat(
+        [
+          { date: '2024/03/15', value: 10 },
+          { date: '2025/11/09', value: 12 }
+        ],
+        'date'
+      )
+    ).toBe('%Y/%m/%d')
+  })
+
+  it('ignores rows that do not include the selected data key', () => {
+    expect(
+      getAutoDetectedDateParseFormat(
+        [
+          { otherDate: 'ignore-me', value: 8 },
+          { date: '2024/03/15', value: 10 },
+          { date: '2025/11/09', value: 12 }
+        ],
+        'date'
+      )
+    ).toBe('%Y/%m/%d')
+  })
+
+  it('returns undefined when the sample is ambiguous', () => {
+    expect(
+      getAutoDetectedDateParseFormat(
+        [
+          { date: '01/02/2024', value: 10 },
+          { date: '02/03/2024', value: 12 }
+        ],
+        'date'
+      )
+    ).toBeUndefined()
   })
 })
