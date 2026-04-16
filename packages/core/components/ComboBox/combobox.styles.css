@@ -11,6 +11,7 @@
     width: 100%;
 
     &:focus-within {
+      border-radius: 6px !important;
       outline: dashed 2px rgb(0, 122, 153) !important;
       outline-offset: 3px !important;
     }

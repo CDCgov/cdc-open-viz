@@ -19,7 +19,7 @@ export type EditorPanelContext = {
   handleUpdateHighlightedBarColor?: Function
   handleUpdateHighlightedBorderWidth?: Function
   highlightedBarValues?: Function
-  highlightedSeriesValues?: Function
+  getHighlightedSeriesValues?: Function
   isPaletteReversed?: boolean
   handleRemoveHighlightedBar?: Function
   setLollipopShape?: Function
