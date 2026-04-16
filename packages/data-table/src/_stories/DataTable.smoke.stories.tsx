@@ -2,7 +2,9 @@ import { Meta, StoryObj } from '@storybook/react-vite'
 import CdcDataTable from '../CdcDataTable'
 
 import DataTableConfig from '../../examples/data-table-example.json'
+import MinimalExampleConfig from '../../examples/minimal-example.json'
 import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import { expect } from 'storybook/test'
 
 const smokeTestData = [
   {
@@ -116,11 +118,12 @@ type Story = StoryObj<typeof CdcDataTable>
 
 export const DataTable: Story = {
   args: {
-    config: { ...smokeTestConfig, filters: [] },
+    config: MinimalExampleConfig,
     isEditor: false
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+    expect(canvasElement.textContent).toContain('2020')
   }
 }
 export const DataTable_Filters: Story = {

@@ -2,35 +2,75 @@
 
 [![npm](https://img.shields.io/npm/v/@cdc/dashboard)](https://www.npmjs.com/package/@cdc/dashboard)
 
-`<CdcDashboard />` is a React component produced by the CDC for combining multiple visualizations into a single module. Some supported visualization types are CdcMap and CdcChart. This package is part of the larger [CDC Open Visualization](https://github.com/CDCgov/cdc-open-viz) project.
+`<CdcDashboard />` combines multiple visualizations into a single dashboard shell.
+The primary configuration reference is [CONFIG.md](./CONFIG.md).
 
-### Installation and Usage
+## Installation
 
-1. Install the package in your React project `npm install @cdc/dashboard`
-2. Import the component and begin using in your code.
-
-```JSX
-import CdcChart from '@cdc/dashboard'
-
-function App() {
-
-  return (
-    <div className="App">
-      <CdcDashboard config={configObj} />
-    </div>
-  );
-}
-
-export default App;
+```bash
+npm install @cdc/dashboard
 ```
 
-Note, you must pass in a configuration object. Configuration objects can be created with the [Editor package](https://github.com/CDCgov/cdc-open-viz/tree/main/packages/editor).
+## Quick Start
 
-Sample config data can be found in [packages/dashboard/examples](https://github.com/CDCgov/cdc-open-viz/tree/integration/packages/dashboard/examples).
+Use the package by passing a `config` object directly:
 
-### Properties
+<!-- README_EXAMPLE_CONFIG_START -->
+```jsx
+import CdcDashboard from '@cdc/dashboard'
 
-| Property  | Type   | Description                                                                                                                       |
-| --------- | ------ | --------------------------------------------------------------------------------------------------------------------------------- |
-| config    | String | A JavaScript object with the configuration for the dashboard. Pass either this or the configUrl property to setup your dashboard. |
-| configUrl | String | Pass a URL to a .json file and it will be consumed and used as the configuration.                                                 |
+const config = {
+  type: 'dashboard',
+  version: '4.26.4',
+  dashboard: {
+    theme: 'theme-blue',
+    title: 'Dashboard Example',
+    titleStyle: 'small',
+    sharedFilters: []
+  },
+  data: [],
+  rows: [
+    {
+      columns: [
+        {
+          width: 12,
+          widget: 'markup-1'
+        }
+      ]
+    }
+  ],
+  visualizations: {
+    'markup-1': {
+      type: 'markup-include',
+      theme: 'theme-blue',
+      contentEditor: {
+        inlineHTML: '<p>Minimal dashboard example</p>',
+        showHeader: true,
+        srcUrl: '',
+        title: 'Dashboard Example',
+        useInlineHTML: true
+      }
+    }
+  }
+}
+
+function App() {
+  return <CdcDashboard config={config} />
+}
+
+export default App
+```
+<!-- README_EXAMPLE_CONFIG_END -->
+
+## Configuration
+
+The primary reference for authoring configs is [CONFIG.md](./CONFIG.md).
+
+If you are reading this in a context where relative Markdown links do not open correctly, use the [GitHub copy of the dashboard config reference](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/dashboard/CONFIG.md).
+
+## Properties
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `config` | `object` | Dashboard configuration object. Pass this or `configUrl` to initialize the dashboard. |
+| `configUrl` | `string` | URL to a JSON config file that will be fetched at runtime. |
