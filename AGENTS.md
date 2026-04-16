@@ -2,34 +2,9 @@
 
 This file helps AI coding assistants understand how to work with this repository. Use it as an index to these sections:
 
-- [Context Documents](#context-documents): Deep guidance for specific systems and workflows.
 - [Testing Commands](#testing-commands): Required testing strategy plus targeted/quick/full test commands.
-
-## Context Documents
-
-Before working on a specific area, read the relevant context document from the `docs/` directory:
-
-| Document                         | When to Use                                                                                                                                                                     |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `docs/TESTING_BEST_PRACTICES.md` | Writing or reviewing editor interaction tests. Covers the `performAndAssert` pattern, testing helpers, and common pitfalls to avoid.                                            |
-| `docs/CONFIG_DOCUMENTATION_GUIDE.md` | Creating or updating package `CONFIG.md` files. Covers ownership rules, recommended section order, minimum-config workflow, shared `@cdc/core` references, and validation strategy. |
-| `docs/DASHBOARD_FILTERS_FLOW.md` | Working on dashboard filtering, data flow, or filter-related bugs. Contains flow diagrams, data transformation pipelines, and refactoring notes.                                |
-| `docs/PACKAGE_DEPENDENCIES.md`   | Adding imports between packages or understanding the monorepo architecture. Explains the allowed dependency hierarchy (core → visualizations → orchestrators).                  |
-| `docs/PALETTE_MIGRATION.md`      | Working with color palettes or the palette selection system. Covers the v1 → v2 migration, helper functions, and configuration structure.                                       |
-| `docs/COVE_EVENTS.md`            | Adding analytics events or working with the metrics system. Documents the event format, available event types, and usage patterns.                                              |
-| `docs/VISUALIZATION_WRAPPERS.md` | Working on visualization wrapper structure, shell layout, or wrapper consistency. Covers `VisualizationContainer`, `VisualizationContent`, compatibility modes, and guardrails. |
-| `docs/BUTTON_SYSTEM.md`          | Working on shared buttons, legacy `.btn` migration, or button styling consistency. Covers the `Button` prop API, migration rules, compatibility aliases, and current exceptions. |
-
-### Creating New Context Documents
-
-When you complete work on a substantial feature or complex system, **prompt the user** to consider creating a new context document if:
-
-- The feature involves non-obvious data flow or state management
-- There are important patterns or conventions that future developers should follow
-- The implementation has gotchas, edge cases, or decisions that aren't self-evident from the code
-- Multiple files or packages interact in ways that would take time to rediscover
-
-Suggest a document name and brief outline. Context documents are not user documentation—they're notes for developers (human or AI) who will work on this area again.
+- [Context Documents](#context-documents): Deep guidance for specific systems and workflows.
+- [Config Documentation Maintenance](#config-documentation-maintenance): Rules for keeping package `CONFIG.md` files and shared config docs up to date.
 
 ## Testing Commands
 
@@ -65,3 +40,44 @@ Run full suites only when the user explicitly requests them:
 
 - `yarn test-unit`
 - `yarn test-storybook`
+
+## Context Documents
+
+Before working on a specific area, read the relevant context document from the `docs/` directory:
+
+| Document                             | When to Use                                                                                                                                                                      |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docs/TESTING_BEST_PRACTICES.md`     | Writing or reviewing editor interaction tests. Covers the `performAndAssert` pattern, testing helpers, and common pitfalls to avoid.                                             |
+| `docs/CONFIG_DOCUMENTATION_GUIDE.md` | Maintaining or creating package `CONFIG.md` files. Covers maintenance triggers, ownership rules, README example workflow, shared `@cdc/core` references, and new-package setup.  |
+| `docs/DASHBOARD_FILTERS_FLOW.md`     | Working on dashboard filtering, data flow, or filter-related bugs. Contains flow diagrams, data transformation pipelines, and refactoring notes.                                 |
+| `docs/PACKAGE_DEPENDENCIES.md`       | Adding imports between packages or understanding the monorepo architecture. Explains the allowed dependency hierarchy (core → visualizations → orchestrators).                   |
+| `docs/PALETTE_MIGRATION.md`          | Working with color palettes or the palette selection system. Covers the v1 → v2 migration, helper functions, and configuration structure.                                        |
+| `docs/COVE_EVENTS.md`                | Adding analytics events or working with the metrics system. Documents the event format, available event types, and usage patterns.                                               |
+| `docs/VISUALIZATION_WRAPPERS.md`     | Working on visualization wrapper structure, shell layout, or wrapper consistency. Covers `VisualizationContainer`, `VisualizationContent`, compatibility modes, and guardrails.  |
+| `docs/BUTTON_SYSTEM.md`              | Working on shared buttons, legacy `.btn` migration, or button styling consistency. Covers the `Button` prop API, migration rules, compatibility aliases, and current exceptions. |
+
+### Creating New Context Documents
+
+When you complete work on a substantial feature or complex system, **prompt the user** to consider creating a new context document if:
+
+- The feature involves non-obvious data flow or state management
+- There are important patterns or conventions that future developers should follow
+- The implementation has gotchas, edge cases, or decisions that aren't self-evident from the code
+- Multiple files or packages interact in ways that would take time to rediscover
+
+Suggest a document name and brief outline. Context documents are not user documentation—they're notes for developers (human or AI) who will work on this area again.
+
+## Config Documentation Maintenance
+
+When a change affects consumer-facing configuration, you must review the relevant config documentation as part of the same change.
+
+For full guidance, see [docs/CONFIG_DOCUMENTATION_GUIDE.md](./docs/CONFIG_DOCUMENTATION_GUIDE.md).
+
+This applies when you change:
+
+- authorable config fields,
+- package defaults or initial state,
+- supported enum values,
+- migrations or legacy-config handling,
+- editor-exported config that consumers are likely to encounter,
+- runtime behavior that changes how a documented field is interpreted.
