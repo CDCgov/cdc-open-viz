@@ -12,7 +12,7 @@
     "axios": "^1.13.2",
     "chroma-js": "^3.1.2",
     "d3-format": "^3.1.2",
-    "dompurify": "^3.3.1",
+    "dompurify": "^3.4.0",
     "papaparse": "^5.5.2",
     "react-table": "^7.8.0"
   },
@@ -123,7 +123,9 @@
     "tar": "^7.5.11",
     "flatted": ">=3.4.2",
     "effect": ">=3.20.0",
-    "handlebars": ">=4.7.9"
+    "handlebars": ">=4.7.9",
+    "**/follow-redirects": "^1.16.0",
+    "**/babel-plugin-macros/**/yaml": "^1.10.3"
   },
   "scripts": {
     "backstop:approve": "backstop approve",

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Yarn Audit"
+  short_description: "Resolve Yarn dependency audit findings"
+  default_prompt: "Use $yarn-audit to investigate and fix `yarn audit --groups dependencies` issues, using syncpack when workspace versions need to be aligned."
