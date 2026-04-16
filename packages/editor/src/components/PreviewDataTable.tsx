@@ -1,4 +1,4 @@
-import React, { useState, useContext, useMemo, useCallback, useEffect, useRef, memo } from 'react'
+import React, { useState, useContext, useMemo, useEffect, useRef, memo } from 'react'
 import {
   useTable,
   useBlockLayout,
@@ -18,7 +18,6 @@ import { GrFormPrevious } from 'react-icons/gr'
 import validateFipsCodeLength from '@cdc/core/helpers/validateFipsCodeLength'
 import { errorMessages } from '../helpers/errorMessages'
 import { DataSet } from '@cdc/core/types/DataSet'
-import Icon from '@cdc/core/components/ui/Icon'
 import Button from '@cdc/core/components/elements/Button'
 
 const TableFilter = memo(({ globalFilter, setGlobalFilter = () => {}, disabled = false }: any) => {
@@ -113,7 +112,12 @@ const PreviewDataTable = () => {
     return normalizedData
   }
   const setTableData = td => {
-    if (!Array.isArray(td) || td.length === 0) return
+    if (!Array.isArray(td) || td.length === 0) {
+      // When the active dataset is removed, clear the cached source so the placeholder can render again.
+      lastDataSourceRef.current = null
+      _setTableData(null)
+      return
+    }
     if (lastDataSourceRef.current === td) return
 
     lastDataSourceRef.current = td
@@ -145,6 +149,10 @@ const PreviewDataTable = () => {
     const loadData = async () => {
       if (!config.data) {
         if (config.type === 'dashboard') {
+          if (!previewData) {
+            setTableData(null)
+            return
+          }
           await handleDashboardData(config.datasets)
         } else {
           if (config.dataUrl) {
