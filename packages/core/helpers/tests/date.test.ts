@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { detectDateParseFormat, formatDate, getDateRenderFormat } from '../cove/date'
+import { detectDateParseFormat, formatDate, getAutoDetectedDateParseFormat, getDateRenderFormat } from '../cove/date'
 
 const NBSP = '\u00A0'
 
@@ -196,5 +196,70 @@ describe('detectDateParseFormat', () => {
       isReliable: true,
       sampleSize: 50
     })
+  })
+})
+
+describe('getAutoDetectedDateParseFormat', () => {
+  it('detects a reliable format from a selected data key', () => {
+    expect(
+      getAutoDetectedDateParseFormat(
+        [
+          { date: '2024/03/15', value: 10 },
+          { date: '2025/11/09', value: 12 }
+        ],
+        'date'
+      )
+    ).toBe('%Y/%m/%d')
+  })
+
+  it('ignores rows that do not include the selected data key', () => {
+    expect(
+      getAutoDetectedDateParseFormat(
+        [
+          { otherDate: 'ignore-me', value: 8 },
+          { date: '2024/03/15', value: 10 },
+          { date: '2025/11/09', value: 12 }
+        ],
+        'date'
+      )
+    ).toBe('%Y/%m/%d')
+  })
+
+  it('ignores non-row values before sampling matching records', () => {
+    expect(
+      getAutoDetectedDateParseFormat(
+        [null, 'not-a-row', 42, ['2024/03/01'], { date: '2024/03/15' }, { date: '2025/11/09' }],
+        'date'
+      )
+    ).toBe('%Y/%m/%d')
+  })
+
+  it('returns undefined when the sample is ambiguous', () => {
+    expect(
+      getAutoDetectedDateParseFormat(
+        [
+          { date: '01/02/2024', value: 10 },
+          { date: '02/03/2024', value: 12 }
+        ],
+        'date'
+      )
+    ).toBeUndefined()
+  })
+
+  it('stops scanning rows once the auto-detect sample limit is reached', () => {
+    const requiredSamples = Array.from({ length: 50 }, (_, index) => ({
+      date: `2024/03/${String((index % 28) + 1).padStart(2, '0')}`,
+      value: index
+    }))
+
+    const rowAfterSampleLimit: Record<string, unknown> = {}
+    Object.defineProperty(rowAfterSampleLimit, 'date', {
+      enumerable: true,
+      get() {
+        throw new Error('should not read rows after reaching the sample limit')
+      }
+    })
+
+    expect(getAutoDetectedDateParseFormat([...requiredSamples, rowAfterSampleLimit], 'date')).toBe('%Y/%m/%d')
   })
 })
