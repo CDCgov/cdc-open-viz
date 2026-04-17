@@ -34,6 +34,38 @@ export type DateFormatDetectionResult = {
   failureReason?: 'no_non_empty_values' | 'no_matching_format' | 'ambiguous'
 }
 
+export function getAutoDetectedDateParseFormat(
+  rows: readonly unknown[] | undefined,
+  dataKey: string | undefined
+): AutoDetectDateFormat | undefined {
+  if (!dataKey || !rows?.length) {
+    return undefined
+  }
+
+  const dateDetectionSamples: unknown[] = []
+
+  for (const row of rows) {
+    if (!row || typeof row !== 'object' || !Object.prototype.hasOwnProperty.call(row, dataKey)) {
+      continue
+    }
+
+    const value = (row as Record<string, unknown>)[dataKey]
+    const normalizedValue = typeof value === 'string' ? value.trim() : value
+
+    if (normalizedValue !== null && normalizedValue !== undefined && normalizedValue !== '') {
+      dateDetectionSamples.push(value)
+
+      if (dateDetectionSamples.length >= MAX_AUTO_DETECT_DATE_SAMPLES) {
+        break
+      }
+    }
+  }
+
+  const detection = detectDateParseFormat(dateDetectionSamples)
+
+  return detection.isReliable ? detection.detectedFormat : undefined
+}
+
 /** Locale definitions for d3-time-format. Add new locales here as needed. */
 const localeDefinitions: Record<string, TimeLocaleDefinition> = {
   'es-MX': {
