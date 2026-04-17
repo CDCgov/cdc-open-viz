@@ -1023,15 +1023,17 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
 
     if (section === 'xAxis' && !truthy(subsection) && fieldName === 'dataKey') {
       const autoDetectedDateParseFormat = getAutoDetectedXAxisDateParseFormat(newValue)
-
-      updateConfig({
+      const updatedConfig = {
         ...config,
         xAxis: {
           ...config.xAxis,
           dataKey: newValue,
           ...(autoDetectedDateParseFormat ? { dateParseFormat: autoDetectedDateParseFormat } : {})
         }
-      })
+      }
+
+      enforceRestrictions(updatedConfig)
+      updateConfig(updatedConfig)
       return
     }
 
