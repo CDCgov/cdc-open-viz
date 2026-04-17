@@ -451,6 +451,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const internalSvgRef = useProgrammaticTooltip({
     svgRef,
     getCoordinateFromXValue,
+    getXValueFromCoordinate,
     config,
     yAxisWidth,
     setPoint,
