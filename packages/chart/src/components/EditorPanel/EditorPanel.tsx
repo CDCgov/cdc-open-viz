@@ -975,7 +975,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
       return undefined
     }
 
-    return getAutoDetectedDateParseFormat(config.data as Record<string, unknown>[], dataKey)
+    return getAutoDetectedDateParseFormat(config.data, dataKey)
   }
 
   const updateFieldDeprecated = (section, subsection, fieldName, newValue) => {

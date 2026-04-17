@@ -35,7 +35,7 @@ export type DateFormatDetectionResult = {
 }
 
 export function getAutoDetectedDateParseFormat(
-  rows: Record<string, unknown>[] | undefined,
+  rows: readonly unknown[] | undefined,
   dataKey: string | undefined
 ): AutoDetectDateFormat | undefined {
   if (!dataKey || !rows?.length) {
@@ -45,15 +45,19 @@ export function getAutoDetectedDateParseFormat(
   const dateDetectionSamples: unknown[] = []
 
   for (const row of rows) {
-    if (!row || !Object.prototype.hasOwnProperty.call(row, dataKey)) {
+    if (!row || typeof row !== 'object' || !Object.prototype.hasOwnProperty.call(row, dataKey)) {
       continue
     }
 
-    const value = row[dataKey]
+    const value = (row as Record<string, unknown>)[dataKey]
     const normalizedValue = typeof value === 'string' ? value.trim() : value
 
     if (normalizedValue !== null && normalizedValue !== undefined && normalizedValue !== '') {
       dateDetectionSamples.push(value)
+
+      if (dateDetectionSamples.length >= MAX_AUTO_DETECT_DATE_SAMPLES) {
+        break
+      }
     }
   }
 

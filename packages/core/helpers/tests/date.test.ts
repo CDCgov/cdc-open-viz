@@ -225,6 +225,15 @@ describe('getAutoDetectedDateParseFormat', () => {
     ).toBe('%Y/%m/%d')
   })
 
+  it('ignores non-row values before sampling matching records', () => {
+    expect(
+      getAutoDetectedDateParseFormat(
+        [null, 'not-a-row', 42, ['2024/03/01'], { date: '2024/03/15' }, { date: '2025/11/09' }],
+        'date'
+      )
+    ).toBe('%Y/%m/%d')
+  })
+
   it('returns undefined when the sample is ambiguous', () => {
     expect(
       getAutoDetectedDateParseFormat(
@@ -235,5 +244,22 @@ describe('getAutoDetectedDateParseFormat', () => {
         'date'
       )
     ).toBeUndefined()
+  })
+
+  it('stops scanning rows once the auto-detect sample limit is reached', () => {
+    const requiredSamples = Array.from({ length: 50 }, (_, index) => ({
+      date: `2024/03/${String((index % 28) + 1).padStart(2, '0')}`,
+      value: index
+    }))
+
+    const rowAfterSampleLimit: Record<string, unknown> = {}
+    Object.defineProperty(rowAfterSampleLimit, 'date', {
+      enumerable: true,
+      get() {
+        throw new Error('should not read rows after reaching the sample limit')
+      }
+    })
+
+    expect(getAutoDetectedDateParseFormat([...requiredSamples, rowAfterSampleLimit], 'date')).toBe('%Y/%m/%d')
   })
 })
