@@ -29,7 +29,7 @@ const createInitialState = () => {
       showDownloadMediaButton: false,
       displayAsHex: false,
       displayStateLabels: true,
-      territoriesAlwaysShow: false,
+      territoriesAlwaysShow: true,
       language: 'en',
       geoType: 'single-state',
       geoLabelOverride: '',
