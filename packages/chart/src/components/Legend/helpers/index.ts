@@ -40,8 +40,6 @@ export const getMarginBottom = (isLegendBottom, config) => {
 
   if (isLegendTop) marginBottom = 27
 
-  if (isLegendTop && config.yAxis?.inlineLabel) marginBottom += 9
-
   if (isLegendBottom) marginBottom += 9
 
   if (hasSuppression) marginBottom += 40
