@@ -32,7 +32,7 @@ const LegendGroup = ({ formatLabels }) => {
 
   const groups: string[] = getSubGroups(data, config.legend.groupBy)
 
-  const classNames = ['legend-group', 'container', config.legend.position, currentViewport, 'row']
+  const classNames = ['legend-group', 'legend-group-grid', 'container', config.legend.position, currentViewport]
 
   const gridCol =
     currentViewport === 'xs'
@@ -46,6 +46,8 @@ const LegendGroup = ({ formatLabels }) => {
   const isSigleCol = config.legend.position === 'bottom' || config.legend.position === 'top' ? gridCol : 'col-12'
 
   let classNameItem = ['legend-group group-item', isSigleCol]
+
+  if (groups.length === 0) return null
 
   return (
     <div className={classNames.join(' ')}>

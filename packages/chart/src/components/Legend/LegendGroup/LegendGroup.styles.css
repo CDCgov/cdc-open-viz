@@ -17,6 +17,11 @@
     }
   }
 
+  .legend-group-grid {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
   .legend-group.top,
   .legend-group.bottom {
     grid-gap: 10px;
