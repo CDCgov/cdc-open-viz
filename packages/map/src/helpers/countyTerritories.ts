@@ -1,4 +1,4 @@
-const US_TERRITORY_STATE_FIPS_PREFIXES = new Set(['60', '66', '69', '72', '78'])
+export const US_TERRITORY_STATE_FIPS_PREFIXES = new Set(['60', '66', '69', '72', '78'])
 
 export type CountyTerritoryVisibility = {
   showTerritories: boolean
