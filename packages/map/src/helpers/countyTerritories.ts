@@ -26,7 +26,7 @@ export const getCountyTerritoryVisibility = (
     })
   }
 
-  const showTerritories = Boolean(territoriesAlwaysShow) && countyIds.size > 0
+  const showTerritories = territoriesAlwaysShow !== false && countyIds.size > 0
   const key = `${showTerritories}:${Array.from(statePrefixes).sort().join(',')}`
 
   return {
