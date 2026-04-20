@@ -85,7 +85,7 @@ The following data-loading fields are shared and documented in core: `data`, `da
 | `general.statesPicked` | `object[]` | No | `[]` | Selected states for single-state maps. | Each item has `fipsCode` and `stateName`. |
 | `general.countriesPicked` | `object[]` | No | `[]` | Selected countries for world maps. | Each item has `iso` and `name`. |
 | `general.hideUnselectedCountries` | `boolean` | No | `false` | Controls whether unselected countries are hidden or grayed out. | Only meaningful when `countriesPicked` is populated. |
-| `general.territoriesAlwaysShow` | `boolean` | No | `true` | Keeps US territories visible even when they would normally be hidden. | `true`, `false` |
+| `general.territoriesAlwaysShow` | `boolean` | No | `true` | Keeps US territories visible even when they would normally be hidden. | `true`, `false`. When omitted, the runtime/editor treat it as `true`; legacy county maps are backfilled to `true` during migration unless they already set an explicit value. |
 | `general.territoriesLabel` | `string` | No | `Territories` | Label used for territories in US maps. | Often left at the default. |
 | `general.hasRegions` | `boolean` | No | `false` | Marks the map as region-aware for some data-loading and editor flows. | Mainly used by US regional map flows. |
 
@@ -230,5 +230,6 @@ These fields may appear in saved configs, editor exports, or runtime state, but 
 | `newViz` | Editor-only preview/confirmation flag. |
 | `columns.additionalColumnN` | Editor-generated extra columns for data-table and tooltip workflows. |
 | `general.countyCensusYear`, `general.filterControlsCountyYear`, `general.filterControlsStatesPicked` | Editor-only controls that are surfaced for some county and single-state flows. |
+| `general.territoriesAlwayShow` | Misspelled legacy artifact from an older migration bug. The runtime repairs this to `general.territoriesAlwaysShow`; do not author it manually. |
 | `statePicked` | Legacy saved-config artifact from older editor flows. |
 | `showDownloadButton`, `expandDataTable` | Legacy editor state from older configs. |

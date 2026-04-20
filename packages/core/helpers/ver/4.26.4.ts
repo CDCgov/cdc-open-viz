@@ -44,6 +44,12 @@ const applyWaffleValueDescriptorDefaults = config => {
   }
 }
 
+const applyTerritoryMapDefaults = config => {
+  if (config.general.territoriesAlwaysShow === undefined) {
+    config.general.territoriesAlwaysShow = true
+  }
+}
+
 const applyMarkupVariableSourceTypes = config => {
   if (!Array.isArray(config.markupVariables)) {
     return
@@ -74,6 +80,7 @@ const run_4_26_4_migrations = config => {
   applyWaffleValueDescriptorDefaults(config)
   applyMarkupVariableSourceTypes(config)
   enableFullGeoNameCsvOnLegacyCountyMaps(config)
+  applyTerritoryMapDefaults(config)
 
   if (config.type === 'dashboard' && config.visualizations) {
     Object.values((config as DashboardConfig).visualizations).forEach(visualization => {
