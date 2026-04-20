@@ -1,30 +1,38 @@
 const US_TERRITORY_STATE_FIPS_PREFIXES = new Set(['60', '66', '69', '72', '78'])
 
-export const getVisibleCountyTerritoryPrefixes = (runtimeData?: Record<string, any>): Set<string> => {
-  if (!runtimeData) return new Set()
-
-  return new Set(
-    Object.keys(runtimeData)
-      .filter(key => key.length > 2 && US_TERRITORY_STATE_FIPS_PREFIXES.has(key.slice(0, 2)))
-      .map(key => key.slice(0, 2))
-  )
+export type CountyTerritoryVisibility = {
+  showTerritories: boolean
+  statePrefixes: Set<string>
+  countyIds: Set<string>
+  key: string
 }
 
-export const getVisibleCountyTerritoryIds = (runtimeData?: Record<string, any>): Set<string> => {
-  if (!runtimeData) return new Set()
-
-  return new Set(
-    Object.keys(runtimeData).filter(key => key.length > 2 && US_TERRITORY_STATE_FIPS_PREFIXES.has(key.slice(0, 2)))
-  )
-}
-
-export const hasCountyTerritoryData = (runtimeData?: Record<string, any>): boolean => {
-  return getVisibleCountyTerritoryPrefixes(runtimeData).size > 0
-}
-
-export const shouldShowCountyTerritories = (
+export const getCountyTerritoryVisibility = (
   territoriesAlwaysShow: boolean | undefined,
   runtimeData?: Record<string, any>
-): boolean => {
-  return Boolean(territoriesAlwaysShow) && hasCountyTerritoryData(runtimeData)
+): CountyTerritoryVisibility => {
+  const countyIds = new Set<string>()
+  const statePrefixes = new Set<string>()
+
+  if (runtimeData) {
+    Object.keys(runtimeData).forEach(key => {
+      if (key.length <= 2) return
+
+      const statePrefix = key.slice(0, 2)
+      if (!US_TERRITORY_STATE_FIPS_PREFIXES.has(statePrefix)) return
+
+      countyIds.add(key)
+      statePrefixes.add(statePrefix)
+    })
+  }
+
+  const showTerritories = Boolean(territoriesAlwaysShow) && countyIds.size > 0
+  const key = `${showTerritories}:${Array.from(statePrefixes).sort().join(',')}`
+
+  return {
+    showTerritories,
+    statePrefixes,
+    countyIds,
+    key
+  }
 }

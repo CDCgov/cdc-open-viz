@@ -1,22 +1,22 @@
 import { describe, expect, it } from 'vitest'
-import {
-  getVisibleCountyTerritoryIds,
-  getVisibleCountyTerritoryPrefixes,
-  hasCountyTerritoryData,
-  shouldShowCountyTerritories
-} from '../countyTerritories'
+import { getCountyTerritoryVisibility } from '../countyTerritories'
 
 describe('countyTerritories', () => {
-  it('detects county territory rows from runtime data', () => {
+  it('collects visible territory prefixes and county ids from runtime data', () => {
     const runtimeData = {
       '06001': { uid: '06001', value: 1 },
       '72001': { uid: '72001', value: 2 }
     }
 
-    expect(hasCountyTerritoryData(runtimeData)).toBe(true)
+    const visibility = getCountyTerritoryVisibility(true, runtimeData)
+
+    expect(visibility.showTerritories).toBe(true)
+    expect(Array.from(visibility.statePrefixes)).toEqual(['72'])
+    expect(Array.from(visibility.countyIds)).toEqual(['72001'])
+    expect(visibility.key).toBe('true:72')
   })
 
-  it('returns the visible territory prefixes from runtime data', () => {
+  it('collects multiple territory prefixes and ignores non-territory counties', () => {
     const runtimeData = {
       '72001': { uid: '72001', value: 1 },
       '72003': { uid: '72003', value: 2 },
@@ -24,38 +24,11 @@ describe('countyTerritories', () => {
       '06001': { uid: '06001', value: 4 }
     }
 
-    expect(Array.from(getVisibleCountyTerritoryPrefixes(runtimeData))).toEqual(['72', '78'])
-  })
+    const visibility = getCountyTerritoryVisibility(true, runtimeData)
 
-  it('returns the visible territory county ids from runtime data', () => {
-    const runtimeData = {
-      '72001': { uid: '72001', value: 1 },
-      '78010': { uid: '78010', value: 2 },
-      '06001': { uid: '06001', value: 3 }
-    }
-
-    expect(Array.from(getVisibleCountyTerritoryIds(runtimeData))).toEqual(['72001', '78010'])
-  })
-
-  it('ignores non-territory county rows', () => {
-    const runtimeData = {
-      '06001': { uid: '06001', value: 1 },
-      '12001': { uid: '12001', value: 2 }
-    }
-
-    expect(hasCountyTerritoryData(runtimeData)).toBe(false)
-  })
-
-  it('shows county territories when the config flag is enabled', () => {
-    expect(shouldShowCountyTerritories(true, {})).toBe(false)
-  })
-
-  it('shows county territories when territory county data exists', () => {
-    const runtimeData = {
-      '78010': { uid: '78010', value: 2 }
-    }
-
-    expect(shouldShowCountyTerritories(true, runtimeData)).toBe(true)
+    expect(Array.from(visibility.statePrefixes)).toEqual(['72', '78'])
+    expect(Array.from(visibility.countyIds)).toEqual(['72001', '72003', '78010'])
+    expect(visibility.key).toBe('true:72,78')
   })
 
   it('hides county territories when the config flag is disabled even if territory data exists', () => {
@@ -63,7 +36,12 @@ describe('countyTerritories', () => {
       '72001': { uid: '72001', value: 1 }
     }
 
-    expect(shouldShowCountyTerritories(false, runtimeData)).toBe(false)
+    const visibility = getCountyTerritoryVisibility(false, runtimeData)
+
+    expect(visibility.showTerritories).toBe(false)
+    expect(Array.from(visibility.statePrefixes)).toEqual(['72'])
+    expect(Array.from(visibility.countyIds)).toEqual(['72001'])
+    expect(visibility.key).toBe('false:72')
   })
 
   it('hides county territories when the config flag is enabled but no territory data exists', () => {
@@ -71,6 +49,11 @@ describe('countyTerritories', () => {
       '06001': { uid: '06001', value: 1 }
     }
 
-    expect(shouldShowCountyTerritories(true, runtimeData)).toBe(false)
+    const visibility = getCountyTerritoryVisibility(true, runtimeData)
+
+    expect(visibility.showTerritories).toBe(false)
+    expect(Array.from(visibility.statePrefixes)).toEqual([])
+    expect(Array.from(visibility.countyIds)).toEqual([])
+    expect(visibility.key).toBe('false:')
   })
 })
