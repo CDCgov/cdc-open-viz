@@ -24,6 +24,11 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { createCanvasPattern, PatternType } from '../../../helpers/createCanvasPattern'
 import { getPatternForRow } from '../../../helpers/getPatternForRow'
+import {
+  getVisibleCountyTerritoryIds,
+  getVisibleCountyTerritoryPrefixes,
+  shouldShowCountyTerritories
+} from '../../../helpers/countyTerritories'
 
 type Geometry = GeoGeometryObjects & { id?: string; properties: { name: string } }
 type Focus = {
@@ -43,15 +48,7 @@ type TopoData = {
   hsaMapping: Record<string, string>
 }
 
-const US_TERRITORY_FIPS_PREFIXES = {
-  AMERICAN_SAMOA: '60',
-  GUAM: '66',
-  NORTHERN_MARIANA_ISLANDS: '69',
-  PUERTO_RICO: '72',
-  US_VIRGIN_ISLANDS: '78'
-} as const
-
-const US_TERRITORY_STATE_FIPS_PREFIXES = new Set<string>(Object.values(US_TERRITORY_FIPS_PREFIXES))
+const US_TERRITORY_STATE_FIPS_PREFIXES = new Set(['60', '66', '69', '72', '78'])
 
 const dedupeFeaturesById = <T extends { id?: string }>(features: T[]): T[] => {
   const seenIds = new Set<string>()
@@ -74,8 +71,13 @@ const sortById = (a, b) => {
   return 0
 }
 
-const getTopoData = (year, showHSABoundaries, territoriesAlwaysShow: boolean) => {
-  const showTerritories = territoriesAlwaysShow
+const getTopoData = (
+  year,
+  showHSABoundaries,
+  showTerritories: boolean,
+  visibleTerritoryPrefixes: Set<string>,
+  visibleTerritoryCountyIds: Set<string>
+) => {
   return new Promise(resolve => {
     const resolveWithTopo = async response => {
       if (response.status !== 200) {
@@ -112,6 +114,23 @@ const getTopoData = (year, showHSABoundaries, territoriesAlwaysShow: boolean) =>
         topoData.counties = topoData.counties.filter(county => {
           const countyPrefix = county.id?.substring(0, 2)
           return !countyPrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix)
+        })
+      } else {
+        topoData.states = topoData.states.filter(state => {
+          const statePrefix = state.id?.substring(0, 2)
+          return (
+            !statePrefix ||
+            !US_TERRITORY_STATE_FIPS_PREFIXES.has(statePrefix) ||
+            visibleTerritoryPrefixes.has(statePrefix)
+          )
+        })
+        topoData.counties = topoData.counties.filter(county => {
+          const countyPrefix = county.id?.substring(0, 2)
+          return (
+            !countyPrefix ||
+            !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix) ||
+            visibleTerritoryCountyIds.has(county.id)
+          )
         })
       }
       if (showHSABoundaries) {
@@ -254,6 +273,10 @@ const CountyMap = () => {
   const pathGenerator = geoPath().projection(geoAlbersUsaTerritories())
 
   const { featureArray } = useMapLayers(config, setConfig, pathGenerator, tooltipId)
+  const visibleTerritoryPrefixes = getVisibleCountyTerritoryPrefixes(runtimeData)
+  const visibleTerritoryCountyIds = getVisibleCountyTerritoryIds(runtimeData)
+  const visibleTerritoryKey = Array.from(visibleTerritoryPrefixes).join(',')
+  const showCountyTerritories = shouldShowCountyTerritories(config.general.territoriesAlwaysShow, runtimeData)
 
   useEffect(() => {
     if (containerEl) {
@@ -264,7 +287,13 @@ const CountyMap = () => {
   })
 
   const getAndSetTopoData = currentYear => {
-    getTopoData(currentYear, config.general.showHSABoundaries, config.general.territoriesAlwaysShow).then(response => {
+    getTopoData(
+      currentYear,
+      config.general.showHSABoundaries,
+      showCountyTerritories,
+      visibleTerritoryPrefixes,
+      visibleTerritoryCountyIds
+    ).then(response => {
       if (canvasRef.current) {
         const context = canvasRef.current.getContext('2d') as CanvasRenderingContext2D
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
@@ -279,7 +308,13 @@ const CountyMap = () => {
     if (currentYear !== topoData.year) {
       getAndSetTopoData(currentYear)
     }
-  }, [config.general.countyCensusYear, config.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
+  }, [
+    config.general.countyCensusYear,
+    config.general.filterControlsCountyYear,
+    JSON.stringify(runtimeFilters),
+    showCountyTerritories,
+    visibleTerritoryKey
+  ])
 
   const prevShowHSABoundariesRef = useRef(config.general.showHSABoundaries)
   useEffect(() => {
@@ -289,13 +324,14 @@ const CountyMap = () => {
     prevShowHSABoundariesRef.current = config.general.showHSABoundaries
   }, [config.general.showHSABoundaries])
 
-  const prevTerritoriesAlwaysShowRef = useRef(config.general.territoriesAlwaysShow)
+  const prevTerritoryVisibilityRef = useRef(`${showCountyTerritories}:${visibleTerritoryKey}`)
   useEffect(() => {
-    if (prevTerritoriesAlwaysShowRef.current === config.general.territoriesAlwaysShow) return
+    const territoryVisibilityKey = `${showCountyTerritories}:${visibleTerritoryKey}`
+    if (prevTerritoryVisibilityRef.current === territoryVisibilityKey) return
     const currentYear = getCurrentTopoYear(config, runtimeFilters)
     getAndSetTopoData(currentYear)
-    prevTerritoriesAlwaysShowRef.current = config.general.territoriesAlwaysShow
-  }, [config.general.territoriesAlwaysShow])
+    prevTerritoryVisibilityRef.current = territoryVisibilityKey
+  }, [showCountyTerritories, visibleTerritoryKey])
 
   // Whenever the memo at the top is triggered and the map is called to re-render, call drawCanvas and update
   // The resize function so it includes the latest state variables

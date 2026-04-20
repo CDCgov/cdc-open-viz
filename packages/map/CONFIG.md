@@ -85,7 +85,7 @@ The following data-loading fields are shared and documented in core: `data`, `da
 | `general.statesPicked` | `object[]` | No | `[]` | Selected states for single-state maps. | Each item has `fipsCode` and `stateName`. |
 | `general.countriesPicked` | `object[]` | No | `[]` | Selected countries for world maps. | Each item has `iso` and `name`. |
 | `general.hideUnselectedCountries` | `boolean` | No | `false` | Controls whether unselected countries are hidden or grayed out. | Only meaningful when `countriesPicked` is populated. |
-| `general.territoriesAlwaysShow` | `boolean` | No | `true` | Keeps US territories visible even when they would normally be hidden. | `true`, `false`. When omitted, the runtime/editor treat it as `true`; legacy county maps are backfilled to `true` during migration unless they already set an explicit value. |
+| `general.territoriesAlwaysShow` | `boolean` | No | `true` | Controls whether county/state territory callouts are allowed to render. | `true`, `false`. On county maps, `false` hides all territory counties; `true` only renders territory counties that have matching runtime data. When omitted, the runtime/editor treat it as `true`; legacy county maps are backfilled to `true` during migration unless they already set an explicit value. |
 | `general.territoriesLabel` | `string` | No | `Territories` | Label used for territories in US maps. | Often left at the default. |
 | `general.hasRegions` | `boolean` | No | `false` | Marks the map as region-aware for some data-loading and editor flows. | Mainly used by US regional map flows. |
 
