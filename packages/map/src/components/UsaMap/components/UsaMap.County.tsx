@@ -24,7 +24,11 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { createCanvasPattern, PatternType } from '../../../helpers/createCanvasPattern'
 import { getPatternForRow } from '../../../helpers/getPatternForRow'
-import { getCountyTerritoryVisibility, type CountyTerritoryVisibility } from '../../../helpers/countyTerritories'
+import {
+  getCountyTerritoryVisibility,
+  type CountyTerritoryVisibility,
+  US_TERRITORY_STATE_FIPS_PREFIXES
+} from '../../../helpers/countyTerritories'
 
 type Geometry = GeoGeometryObjects & { id?: string; properties: { name: string } }
 type Focus = {
@@ -43,8 +47,6 @@ type TopoData = {
   projection: any
   hsaMapping: Record<string, string>
 }
-
-const US_TERRITORY_STATE_FIPS_PREFIXES = new Set(['60', '66', '69', '72', '78'])
 
 const dedupeFeaturesById = <T extends { id?: string }>(features: T[]): T[] => {
   const seenIds = new Set<string>()
