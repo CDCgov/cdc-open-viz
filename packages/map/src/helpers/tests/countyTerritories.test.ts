@@ -11,8 +11,8 @@ describe('countyTerritories', () => {
     const visibility = getCountyTerritoryVisibility(true, runtimeData)
 
     expect(visibility.showTerritories).toBe(true)
-    expect(Array.from(visibility.statePrefixes)).toEqual(['72'])
-    expect(Array.from(visibility.countyIds)).toEqual(['72001'])
+    expect(Array.from(visibility.statePrefixes).sort()).toEqual(['72'])
+    expect(Array.from(visibility.countyIds).sort()).toEqual(['72001'])
     expect(visibility.key).toBe('true:72')
   })
 
@@ -26,8 +26,8 @@ describe('countyTerritories', () => {
 
     const visibility = getCountyTerritoryVisibility(true, runtimeData)
 
-    expect(Array.from(visibility.statePrefixes)).toEqual(['72', '78'])
-    expect(Array.from(visibility.countyIds)).toEqual(['72001', '72003', '78010'])
+    expect(Array.from(visibility.statePrefixes).sort()).toEqual(['72', '78'])
+    expect(Array.from(visibility.countyIds).sort()).toEqual(['72001', '72003', '78010'])
     expect(visibility.key).toBe('true:72,78')
   })
 
@@ -39,8 +39,8 @@ describe('countyTerritories', () => {
     const visibility = getCountyTerritoryVisibility(false, runtimeData)
 
     expect(visibility.showTerritories).toBe(false)
-    expect(Array.from(visibility.statePrefixes)).toEqual(['72'])
-    expect(Array.from(visibility.countyIds)).toEqual(['72001'])
+    expect(Array.from(visibility.statePrefixes).sort()).toEqual(['72'])
+    expect(Array.from(visibility.countyIds).sort()).toEqual(['72001'])
     expect(visibility.key).toBe('false:72')
   })
 
@@ -52,8 +52,8 @@ describe('countyTerritories', () => {
     const visibility = getCountyTerritoryVisibility(true, runtimeData)
 
     expect(visibility.showTerritories).toBe(false)
-    expect(Array.from(visibility.statePrefixes)).toEqual([])
-    expect(Array.from(visibility.countyIds)).toEqual([])
+    expect(Array.from(visibility.statePrefixes).sort()).toEqual([])
+    expect(Array.from(visibility.countyIds).sort()).toEqual([])
     expect(visibility.key).toBe('false:')
   })
 })
