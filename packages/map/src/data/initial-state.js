@@ -29,7 +29,7 @@ const createInitialState = () => {
       showDownloadMediaButton: false,
       displayAsHex: false,
       displayStateLabels: true,
-      territoriesAlwaysShow: true,
+      territoriesAlwaysShow: undefined, // Will be set to true by default for US County maps in the migration helper
       language: 'en',
       geoType: 'single-state',
       geoLabelOverride: '',
