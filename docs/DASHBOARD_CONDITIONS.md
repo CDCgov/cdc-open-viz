@@ -21,7 +21,7 @@ V1 supports:
 
 - one inline `dashboardCondition` per row
 - one inline `dashboardCondition` per row column/widget
-- operators `hasRows`, `hasNoRows`, and `columnHasAnyValue`
+- operators `hasData`, `hasNoData`, and `columnHasAnyValue`
 - shared-filter scoping through the existing `usedBy` model
 
 V1 does not support:
@@ -34,13 +34,13 @@ V1 does not support:
 
 ## Terminology
 
-| Term | Meaning |
-| --- | --- |
-| Modular Dashboards | The overall feature: dashboards whose rows/widgets can be conditionally shown or hidden. |
-| Dashboard Condition | The inline config object attached to a row or row column. |
-| Condition target | The row-level or column-level thing a dashboard condition belongs to. |
-| Shared filter target | A visualization key, row index, or dashboard-condition id that can appear in `sharedFilters[].usedBy`. |
-| Unresolved | The condition cannot be evaluated yet, usually because its dataset is not loaded or an applicable filter is still at reset state. |
+| Term                 | Meaning                                                                                                                           |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Modular Dashboards   | The overall feature: dashboards whose rows/widgets can be conditionally shown or hidden.                                          |
+| Dashboard Condition  | The inline config object attached to a row or row column.                                                                         |
+| Condition target     | The row-level or column-level thing a dashboard condition belongs to.                                                             |
+| Shared filter target | A visualization key, row index, or dashboard-condition id that can appear in `sharedFilters[].usedBy`.                            |
+| Unresolved           | The condition cannot be evaluated yet, usually because its dataset is not loaded or an applicable filter is still at reset state. |
 
 ## Config Shape
 
@@ -50,7 +50,7 @@ The v1 config shape is:
 type DashboardCondition = {
   id?: string
   datasetKey?: string
-  operator?: 'hasRows' | 'hasNoRows' | 'columnHasAnyValue'
+  operator?: 'hasData' | 'hasNoData' | 'columnHasAnyValue'
   columnName?: string
   values?: string[]
 }
@@ -112,7 +112,7 @@ This keeps render-time logic simple:
 - `[]` means resolved-empty
 - non-empty array means resolved-non-empty
 
-That distinction is what allows `hasNoRows` to work without treating unresolved state as empty data.
+That distinction is what allows `hasNoData` to work without treating unresolved state as empty data.
 
 ## Why Conditions Use Their Own Filtered Data
 
@@ -165,11 +165,11 @@ Implementation lives in:
 
 This distinction is central to the feature.
 
-| State | Meaning | Render behavior |
-| --- | --- | --- |
-| No `filteredData[conditionId]` entry | Unresolved | Hidden |
-| `filteredData[conditionId] = []` | Resolved, empty | `hasNoRows` passes |
-| `filteredData[conditionId] = [ ... ]` | Resolved, non-empty | `hasRows` may pass |
+| State                                 | Meaning             | Render behavior    |
+| ------------------------------------- | ------------------- | ------------------ |
+| No `filteredData[conditionId]` entry  | Unresolved          | Hidden             |
+| `filteredData[conditionId] = []`      | Resolved, empty     | `hasNoData` passes |
+| `filteredData[conditionId] = [ ... ]` | Resolved, non-empty | `hasData` may pass |
 
 Typical unresolved cases:
 
@@ -201,13 +201,21 @@ The editor uses full dataset access when authoring `columnHasAnyValue`:
 
 That is separate from runtime visibility, which uses precomputed filtered condition data.
 
+Current editor behavior to preserve:
+
+- row and widget condition controls are separate from data-configuration controls
+- the condition control shows a dedicated icon instead of text-only `If`
+- condition buttons render with an active visual state when a condition already exists
+- the modal uses a `Condition Type` dropdown with `No condition` representing the absence of `dashboardCondition`
+- tooltips explain the condition-type choices and the column/value authoring flow for `columnHasAnyValue`
+
 ## Supported Operators
 
-### `hasRows`
+### `hasData`
 
 Passes when the filtered condition dataset contains at least one row.
 
-### `hasNoRows`
+### `hasNoData`
 
 Passes when the filtered condition dataset resolves successfully and is empty.
 
@@ -219,6 +227,14 @@ Comparison behavior:
 
 - values are compared with string coercion
 - this allows dataset numbers like `2024` to match authored values like `'2024'`
+
+## Contract Note
+
+The saved operator values are now:
+
+- `hasData`
+- `hasNoData`
+- `columnHasAnyValue`
 
 ## V1 Exclusions
 
@@ -237,15 +253,15 @@ If a config somehow contains a dashboard condition on one of those unsupported r
 
 ## Key Files
 
-| File | Role |
-| --- | --- |
-| [packages/dashboard/src/helpers/dashboardConditions.ts](../packages/dashboard/src/helpers/dashboardConditions.ts) | Dashboard-condition ids and operator evaluation |
-| [packages/dashboard/src/helpers/dashboardFilterTargets.ts](../packages/dashboard/src/helpers/dashboardFilterTargets.ts) | Shared-filter target resolution for rows, visualizations, and dashboard conditions |
-| [packages/dashboard/src/helpers/getFilteredData.ts](../packages/dashboard/src/helpers/getFilteredData.ts) | Runtime filtered-data precompute, now including condition targets |
-| [packages/dashboard/src/helpers/getUpdateConfig.ts](../packages/dashboard/src/helpers/getUpdateConfig.ts) | Config-update precompute, also includes condition targets |
-| [packages/dashboard/src/components/VisualizationRow.tsx](../packages/dashboard/src/components/VisualizationRow.tsx) | Runtime row/column visibility decisions |
-| [packages/dashboard/src/components/DashboardConditionModal.tsx](../packages/dashboard/src/components/DashboardConditionModal.tsx) | Inline condition authoring modal |
-| [packages/dashboard/src/components/DashboardFilters/DashboardFiltersEditor/components/FilterEditor.tsx](../packages/dashboard/src/components/DashboardFilters/DashboardFiltersEditor/components/FilterEditor.tsx) | Shared-filter `usedBy` targeting UI, now includes dashboard-condition targets |
+| File                                                                                                                                                                                                              | Role                                                                               |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| [packages/dashboard/src/helpers/dashboardConditions.ts](../packages/dashboard/src/helpers/dashboardConditions.ts)                                                                                                 | Dashboard-condition ids and operator evaluation                                    |
+| [packages/dashboard/src/helpers/dashboardFilterTargets.ts](../packages/dashboard/src/helpers/dashboardFilterTargets.ts)                                                                                           | Shared-filter target resolution for rows, visualizations, and dashboard conditions |
+| [packages/dashboard/src/helpers/getFilteredData.ts](../packages/dashboard/src/helpers/getFilteredData.ts)                                                                                                         | Runtime filtered-data precompute, now including condition targets                  |
+| [packages/dashboard/src/helpers/getUpdateConfig.ts](../packages/dashboard/src/helpers/getUpdateConfig.ts)                                                                                                         | Config-update precompute, also includes condition targets                          |
+| [packages/dashboard/src/components/VisualizationRow.tsx](../packages/dashboard/src/components/VisualizationRow.tsx)                                                                                               | Runtime row/column visibility decisions                                            |
+| [packages/dashboard/src/components/DashboardConditionModal.tsx](../packages/dashboard/src/components/DashboardConditionModal.tsx)                                                                                 | Inline condition authoring modal                                                   |
+| [packages/dashboard/src/components/DashboardFilters/DashboardFiltersEditor/components/FilterEditor.tsx](../packages/dashboard/src/components/DashboardFilters/DashboardFiltersEditor/components/FilterEditor.tsx) | Shared-filter `usedBy` targeting UI, now includes dashboard-condition targets      |
 
 ## Intentional Compatibility Decisions
 

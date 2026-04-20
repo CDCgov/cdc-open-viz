@@ -162,6 +162,7 @@ const Widget = ({
   const rowSupportsDashboardConditions = widgetConfig
     ? dashboardConditionsSupportedForRow(config.rows[widgetConfig.rowIdx])
     : false
+  const hasDashboardCondition = !!columnData?.dashboardCondition
 
   const widgetContent = (
     <div
@@ -173,14 +174,14 @@ const Widget = ({
         {widgetConfig?.rowIdx !== undefined && (
           <div className='widget-menu'>
             {isConfigurationReady && (
-              <Button title='Configure Visualization' className='btn btn-configure' onClick={editWidget}>
+              <Button title='Configure Visualization' className='btn-configure' onClick={editWidget}>
                 {iconHash['tools']}
               </Button>
             )}
             {needsDataConfiguration && (
               <Button
                 title='Configure Data'
-                className='btn btn-configure'
+                className='btn-configure'
                 onClick={() => {
                   overlay?.actions.openOverlay(
                     <DataDesignerModal rowIndex={widgetConfig.rowIdx} vizKey={widgetConfig.uid} />
@@ -196,7 +197,7 @@ const Widget = ({
                   ? 'Configure Dashboard Condition'
                   : 'Dashboard conditions are not available for toggle or multi-visualization rows'
               }
-              className='btn btn-configure'
+              className={`btn-configure btn-configure--condition${hasDashboardCondition ? ' is-active' : ''}`}
               disabled={!rowSupportsDashboardConditions}
               onClick={() => {
                 overlay?.actions.openOverlay(
@@ -204,7 +205,7 @@ const Widget = ({
                 )
               }}
             >
-              If
+              {iconHash['condition']}
             </Button>
             <div className='widget-menu-item' onClick={deleteWidget}>
               <Icon display='close' base />

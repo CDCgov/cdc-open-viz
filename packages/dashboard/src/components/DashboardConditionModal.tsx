@@ -6,30 +6,47 @@ import Modal from '@cdc/core/components/ui/Modal'
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
+import Tooltip from '@cdc/core/components/ui/Tooltip'
+import Icon from '@cdc/core/components/ui/Icon'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
 import { createDashboardConditionId } from '../helpers/dashboardConditions'
 import { dashboardConditionsSupportedForRow } from '../helpers/dashboardFilterTargets'
 import { DashboardCondition } from '../types/ConfigRow'
 
+import './dashboard-condition-modal.css'
+
 type DashboardConditionModalProps = {
   rowIndex: number
   columnIndex?: number
 }
 
+type ConditionTypeOption = DashboardCondition['operator'] | ''
+
 type DashboardConditionFormState = {
   datasetKey: string
-  operator: DashboardCondition['operator']
+  operator: ConditionTypeOption
   columnName: string
   values: string[]
 }
 
 const getDashboardConditionFormState = (dashboardCondition?: DashboardCondition): DashboardConditionFormState => ({
   datasetKey: dashboardCondition?.datasetKey || '',
-  operator: dashboardCondition?.operator || 'hasRows',
+  operator: dashboardCondition?.operator || '',
   columnName: dashboardCondition?.columnName || '',
   values: dashboardCondition?.values || []
 })
+
+const tooltipIcon = (label: string) => (
+  <Tooltip style={{ textTransform: 'none' }}>
+    <Tooltip.Target>
+      <Icon display='question' style={{ marginLeft: '0.5rem' }} alt={label} />
+    </Tooltip.Target>
+    <Tooltip.Content>
+      <p className='dashboard-condition-modal__tooltip-text'>{label}</p>
+    </Tooltip.Content>
+  </Tooltip>
+)
 
 export const DashboardConditionModal: React.FC<DashboardConditionModalProps> = ({ rowIndex, columnIndex }) => {
   const { config } = useContext(DashboardContext)
@@ -40,7 +57,6 @@ export const DashboardConditionModal: React.FC<DashboardConditionModalProps> = (
   const row = config.rows[rowIndex]
   const existingDashboardCondition =
     columnIndex === undefined ? row.dashboardCondition : row.columns[columnIndex]?.dashboardCondition
-  const [enabled, setEnabled] = useState(!!existingDashboardCondition)
   const [formState, setFormState] = useState<DashboardConditionFormState>(
     getDashboardConditionFormState(existingDashboardCondition)
   )
@@ -54,17 +70,21 @@ export const DashboardConditionModal: React.FC<DashboardConditionModalProps> = (
     columnIndex === undefined
       ? `Row ${rowIndex + 1} Dashboard Condition`
       : `Row ${rowIndex + 1} Column ${columnIndex + 1} Dashboard Condition`
+  const targetLabel = columnIndex === undefined ? 'row' : 'component'
 
   const availableDatasets = Object.keys(config.datasets || {})
   const needsValueMatch = formState.operator === 'columnHasAnyValue'
+  const hasCondition = !!formState.operator
+  const shouldShowColumnSelect = needsValueMatch && !!formState.datasetKey
+  const shouldShowValueSelect = shouldShowColumnSelect && !!formState.columnName
 
   const canSave = useMemo(() => {
-    if (!enabled) return true
+    if (!hasCondition) return true
     if (!formState.datasetKey || !formState.operator) return false
     if (!needsValueMatch) return true
 
     return !!formState.columnName && formState.values.length > 0
-  }, [enabled, formState, needsValueMatch])
+  }, [formState, hasCondition, needsValueMatch])
 
   const updateDashboardCondition = (dashboardCondition?: DashboardCondition) => {
     if (columnIndex === undefined) {
@@ -158,138 +178,142 @@ export const DashboardConditionModal: React.FC<DashboardConditionModalProps> = (
     <Modal>
       <Modal.Content>
         {loadingColumns && <Loader fullScreen />}
-        <h3>{title}</h3>
-        <label className='d-block mb-3'>
-          <input
-            checked={enabled}
-            onChange={event => setEnabled(event.target.checked)}
-            style={{ marginRight: '0.5rem' }}
-            type='checkbox'
-          />
-          Enable this dashboard condition
-        </label>
+        <div className='dashboard-condition-modal'>
+          <h3>{title}</h3>
 
-        {enabled && (
-          <>
+          <div className='dashboard-condition-modal__fields'>
             <Select
-              label='Dashboard Condition Dataset'
+              className='dashboard-condition-modal__select py-2 ps-2 w-100 d-block'
+              fieldName='operator'
+              label='Condition Type'
               options={[
-                { value: '', label: '- Select Option -' },
-                ...availableDatasets.map(key => ({ value: key, label: key }))
+                { value: '', label: 'Always show' },
+                { value: 'hasData', label: "Show when there's data" },
+                { value: 'hasNoData', label: "Show when there's no data" },
+                { value: 'columnHasAnyValue', label: 'Show when column has a value' }
               ]}
-              value={formState.datasetKey}
-              onChange={event => {
-                const datasetKey = event.target.value
-                setFormState(currentState => ({
-                  ...currentState,
-                  datasetKey,
-                  columnName: datasetKey === currentState.datasetKey ? currentState.columnName : '',
-                  values: datasetKey === currentState.datasetKey ? currentState.values : []
-                }))
-              }}
-            />
-
-            <Select
-              label='Operator'
-              options={[
-                { value: 'hasRows', label: 'Has Rows' },
-                { value: 'hasNoRows', label: 'Has No Rows' },
-                { value: 'columnHasAnyValue', label: 'Column Has Any Value' }
-              ]}
+              tooltip={tooltipIcon(
+                `Choose whether this ${targetLabel} should appear when the filtered condition dataset has data, has no data, or contains one of the selected column values.`
+              )}
               value={formState.operator}
               onChange={event => {
-                const operator = event.target.value as DashboardCondition['operator']
+                const operator = event.target.value as ConditionTypeOption
                 setFormState(currentState => ({
                   ...currentState,
                   operator,
+                  datasetKey: operator ? currentState.datasetKey : '',
                   columnName: operator === 'columnHasAnyValue' ? currentState.columnName : '',
                   values: operator === 'columnHasAnyValue' ? currentState.values : []
                 }))
               }}
             />
 
-            {needsValueMatch && (
+            {hasCondition && (
               <>
                 <Select
-                  label='Column'
+                  className='dashboard-condition-modal__select py-2 ps-2 w-100 d-block'
+                  fieldName='datasetKey'
+                  label='Condition Dataset'
                   options={[
                     { value: '', label: '- Select Option -' },
-                    ...columns.map(columnName => ({ value: columnName, label: columnName }))
+                    ...availableDatasets.map(key => ({ value: key, label: key }))
                   ]}
-                  value={formState.columnName}
+                  value={formState.datasetKey}
                   onChange={event => {
-                    const columnName = event.target.value
+                    const datasetKey = event.target.value
                     setFormState(currentState => ({
                       ...currentState,
-                      columnName,
-                      values: columnName === currentState.columnName ? currentState.values : []
+                      datasetKey,
+                      columnName: datasetKey === currentState.datasetKey ? currentState.columnName : '',
+                      values: datasetKey === currentState.datasetKey ? currentState.values : []
                     }))
                   }}
                 />
 
-                <MultiSelect
-                  fieldName='values'
-                  label='Values'
-                  options={selectedColumnValues.map(value => ({ value, label: value }))}
-                  selected={formState.values}
-                  updateField={(_section, _subSection, _fieldName, values) => {
-                    setFormState(currentState => ({
-                      ...currentState,
-                      values
-                    }))
-                  }}
-                />
+                {shouldShowColumnSelect && (
+                  <>
+                    <Select
+                      className='dashboard-condition-modal__select py-2 ps-2 w-100 d-block'
+                      fieldName='columnName'
+                      label='Column'
+                      options={[
+                        { value: '', label: '- Select Option -' },
+                        ...columns.map(columnName => ({ value: columnName, label: columnName }))
+                      ]}
+                      tooltip={tooltipIcon('Select the dataset column to inspect for this condition.')}
+                      value={formState.columnName}
+                      onChange={event => {
+                        const columnName = event.target.value
+                        setFormState(currentState => ({
+                          ...currentState,
+                          columnName,
+                          values: columnName === currentState.columnName ? currentState.values : []
+                        }))
+                      }}
+                    />
+
+                    {shouldShowValueSelect && (
+                      <div className='dashboard-condition-modal__multiselect-field'>
+                        <span className='edit-label column-heading'>
+                          Column Values
+                          {tooltipIcon(
+                            'Choose one or more matching values from the selected column. This condition passes when the filtered dataset contains at least one row with one of these values.'
+                          )}
+                        </span>
+                        <MultiSelect
+                          fieldName='values'
+                          options={selectedColumnValues.map(value => ({ value, label: value }))}
+                          selected={formState.values}
+                          updateField={(_section, _subSection, _fieldName, values) => {
+                            setFormState(currentState => ({
+                              ...currentState,
+                              values
+                            }))
+                          }}
+                        />
+                      </div>
+                    )}
+                  </>
+                )}
               </>
             )}
-          </>
-        )}
+          </div>
 
-        {errorMessage && <p className='text-danger'>{errorMessage}</p>}
+          {errorMessage && <p className='text-danger'>{errorMessage}</p>}
 
-        <div className='d-flex gap-2 mt-3'>
-          <Button
-            disabled={!canSave}
-            onClick={() => {
-              if (!enabled) {
-                updateDashboardCondition(undefined)
-                closeModal()
-                return
-              }
-
-              const nextCondition: DashboardCondition = {
-                id: existingDashboardCondition?.id || createDashboardConditionId(),
-                datasetKey: formState.datasetKey,
-                operator: formState.operator
-              }
-
-              if (needsValueMatch) {
-                nextCondition.columnName = formState.columnName
-                nextCondition.values = formState.values
-              }
-
-              updateDashboardCondition(nextCondition)
-              closeModal()
-            }}
-            variant='primary'
-          >
-            Save
-          </Button>
-
-          {!!existingDashboardCondition && (
+          <div className='d-flex gap-2 mt-3'>
             <Button
+              disabled={!canSave}
               onClick={() => {
-                updateDashboardCondition(undefined)
+                if (!hasCondition || !formState.operator) {
+                  updateDashboardCondition(undefined)
+                  closeModal()
+                  return
+                }
+
+                const nextCondition: DashboardCondition = {
+                  id: existingDashboardCondition?.id || createDashboardConditionId(),
+                  datasetKey: formState.datasetKey,
+                  operator: formState.operator
+                }
+
+                if (needsValueMatch) {
+                  nextCondition.columnName = formState.columnName
+                  nextCondition.values = formState.values
+                }
+
+                updateDashboardCondition(nextCondition)
                 closeModal()
               }}
-              variant='secondary'
+              variant='primary'
             >
-              Remove
+              Save
             </Button>
-          )}
 
-          <Button onClick={closeModal} variant='secondary'>
-            Cancel
-          </Button>
+            <Button onClick={closeModal} variant='secondary'>
+              Cancel
+            </Button>
+          </div>
         </div>
       </Modal.Content>
     </Modal>

@@ -88,11 +88,11 @@ export const evaluateDashboardCondition = (
     return { matches: false, resolved: false }
   }
 
-  if (dashboardCondition.operator === 'hasRows') {
+  if (dashboardCondition.operator === 'hasData') {
     return { matches: filteredData.length > 0, resolved: true }
   }
 
-  if (dashboardCondition.operator === 'hasNoRows') {
+  if (dashboardCondition.operator === 'hasNoData') {
     return { matches: filteredData.length === 0, resolved: true }
   }
 

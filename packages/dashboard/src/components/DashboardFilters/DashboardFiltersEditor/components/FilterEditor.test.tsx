@@ -27,14 +27,14 @@ const baseConfig = {
           dashboardCondition: {
             id: 'row-1-col-1-condition',
             datasetKey: 'nested-data.json',
-            operator: 'hasRows'
+            operator: 'hasData'
           }
         }
       ],
       dashboardCondition: {
         id: 'row-1-condition',
         datasetKey: 'nested-data.json',
-        operator: 'hasRows'
+        operator: 'hasData'
       },
       expandCollapseAllButtons: false
     },
@@ -46,14 +46,14 @@ const baseConfig = {
           dashboardCondition: {
             id: 'row-2-col-1-condition',
             datasetKey: 'nested-data.json',
-            operator: 'hasRows'
+            operator: 'hasData'
           }
         }
       ],
       dashboardCondition: {
         id: 'row-2-condition',
         datasetKey: 'nested-data.json',
-        operator: 'hasRows'
+        operator: 'hasData'
       },
       expandCollapseAllButtons: false,
       toggle: true

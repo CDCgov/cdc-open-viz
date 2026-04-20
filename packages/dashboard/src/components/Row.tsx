@@ -195,7 +195,8 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
       <ul className='row-menu__flyout'>{layoutList}</ul>
       {isMultiColumn && (
         <Button
-          className={`btn row-menu__btn border-0${row.equalHeight ? ' btn-primary' : ''}`}
+          variant={row.equalHeight ? 'primary' : undefined}
+          className='row-menu__btn border-0'
           title={row.equalHeight ? 'Disable Equal Height Rows' : 'Enable Equal Height Rows'}
           onClick={toggleEqualHeight}
         >
@@ -208,7 +209,8 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
       )}
       <div className='spacer'></div>
       <Button
-        className={`btn btn-primary row-menu__btn border-0`}
+        variant='primary'
+        className='row-menu__btn border-0'
         title='Move Row Up'
         onClick={() => moveRow('up')}
         disabled={rowIdx === 0}
@@ -216,7 +218,8 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
         <Icon display='caretUp' color='#fff' size={25} />
       </Button>
       <Button
-        className={'btn btn-primary row-menu__btn border-0'}
+        variant='primary'
+        className='row-menu__btn border-0'
         title='Move Row Down'
         onClick={() => moveRow('down')}
         disabled={rowIdx + 1 === rows.length}
@@ -224,7 +227,8 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
         <Icon display='caretDown' color='#fff' size={25} />
       </Button>
       <Button
-        className={'btn btn-danger row-menu__btn row-menu__btn--remove border-0'}
+        variant='danger'
+        className='row-menu__btn row-menu__btn--remove border-0'
         title='Delete Row'
         onClick={deleteRow}
         disabled={rowIdx === 0 && rows.length === 1}
@@ -240,6 +244,7 @@ type RowProps = { row: ConfigRow; idx: number; uuid: number | string }
 const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
   const { overlay } = useGlobalContext()
   const supportsDashboardConditions = dashboardConditionsSupportedForRow(row)
+  const hasDashboardCondition = !!row.dashboardCondition
 
   return (
     <>
@@ -248,7 +253,7 @@ const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
         <span className='ms-2 mt-n3'>Row - {rowIdx + 1}</span>
         <Button
           title='Configure Data'
-          className='btn btn-configure-row'
+          className='btn-configure-row btn-configure-row--data'
           onClick={() => {
             overlay?.actions.openOverlay(<DataDesignerModal rowIndex={rowIdx} />)
           }}
@@ -261,13 +266,13 @@ const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
               ? 'Configure Dashboard Condition'
               : 'Dashboard conditions are not available for toggle or multi-visualization rows'
           }
-          className='btn btn-configure-row'
+          className={`btn-configure-row btn-configure-row--condition${hasDashboardCondition ? ' is-active' : ''}`}
           disabled={!supportsDashboardConditions}
           onClick={() => {
             overlay?.actions.openOverlay(<DashboardConditionModal rowIndex={rowIdx} />)
           }}
         >
-          If
+          {iconHash['condition']}
         </Button>
         <div className='column-container'>
           {row.columns

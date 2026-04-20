@@ -42,7 +42,7 @@
   align-items: center;
   background: transparent !important;
   border: 0;
-  border-radius: 0;
+  border-radius: 999px;
   box-shadow: none;
   color: var(--mediumGray);
   display: inline-flex;
@@ -57,9 +57,19 @@
 
 .widget-menu .cove-button.btn-configure:hover:not(:disabled),
 .widget-menu .cove-button.btn-configure:active:not(:disabled) {
-  background: transparent !important;
+  background: rgba(0, 94, 170, 0.08) !important;
   box-shadow: none;
   transform: none;
+}
+
+.widget-menu .cove-button.btn-configure.btn-configure--condition.is-active {
+  background: var(--blue) !important;
+  color: #fff;
+}
+
+.widget-menu .cove-button.btn-configure.btn-configure--condition.is-active:hover:not(:disabled),
+.widget-menu .cove-button.btn-configure.btn-configure--condition.is-active:active:not(:disabled) {
+  background: #004c8c !important;
 }
 
 .widget-menu .cove-button.btn-configure svg {

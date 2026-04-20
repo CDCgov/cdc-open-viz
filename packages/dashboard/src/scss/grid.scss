@@ -295,7 +295,7 @@ $red: #f74242;
     align-items: center;
     background: transparent !important;
     border: 0;
-    border-radius: 0;
+    border-radius: 999px;
     box-shadow: none;
     color: var(--blue);
     display: inline-flex;
@@ -310,9 +310,27 @@ $red: #f74242;
 
     &:hover:not(:disabled),
     &:active:not(:disabled) {
-      background: transparent !important;
+      background: rgba(0, 94, 170, 0.08) !important;
       box-shadow: none;
       transform: none;
+    }
+
+    &.btn-configure-row--data {
+      right: 3.5rem;
+    }
+
+    &.btn-configure-row--condition {
+      right: 1rem;
+    }
+
+    &.is-active {
+      background: var(--blue) !important;
+      color: #fff;
+    }
+
+    &.is-active:hover:not(:disabled),
+    &.is-active:active:not(:disabled) {
+      background: #004c8c !important;
     }
   }
 

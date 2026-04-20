@@ -110,7 +110,7 @@ describe('getFilteredData', () => {
           dashboardCondition: {
             id: 'row-condition-1',
             datasetKey: 'data1',
-            operator: 'hasRows'
+            operator: 'hasData'
           },
           columns: [
             {

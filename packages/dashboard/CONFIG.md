@@ -134,14 +134,14 @@ Dashboard conditions are optional visibility rules owned by rows and row columns
 | `rows[].dashboardCondition.id` | `string` | No | Auto-generated | Stable dashboard-condition target id used by shared-filter `usedBy`. | The editor generates and preserves this id once dashboard-condition authoring is enabled. |
 | `rows[].columns[].dashboardCondition.id` | `string` | No | Auto-generated | Stable dashboard-condition target id used by shared-filter `usedBy`. | Same behavior as row-level dashboard-condition ids. |
 | `*.dashboardCondition.datasetKey` | `string` | Yes when a dashboard condition is enabled | None | Dataset used to evaluate the dashboard condition. | May differ from the visualization dataset. |
-| `*.dashboardCondition.operator` | `string` | Yes when a dashboard condition is enabled | None | Dashboard-condition comparison mode. | `hasRows`, `hasNoRows`, `columnHasAnyValue` |
+| `*.dashboardCondition.operator` | `string` | Yes when a dashboard condition is enabled | None | Dashboard-condition comparison mode. | `hasData`, `hasNoData`, `columnHasAnyValue` |
 | `*.dashboardCondition.columnName` | `string` | Only for `columnHasAnyValue` | None | Dataset column inspected by the dashboard condition. | Must exist in the dashboard-condition dataset. |
 | `*.dashboardCondition.values` | `string[]` | Only for `columnHasAnyValue` | `[]` | One or more acceptable values. | Runtime uses loose string coercion so numeric dataset values can match authored strings. |
 
 | Behavior | Details |
 | --- | --- |
 | Shared filter application | Conditions apply matching scoped filters plus unscoped filters before evaluating the operator. Filters whose `columnName` is missing from the condition dataset are ignored for that condition. |
-| Unresolved inputs | If the condition dataset is unavailable or an applicable filter is still at reset state, the condition resolves as hidden rather than behaving like `hasNoRows`. |
+| Unresolved inputs | If the condition dataset is unavailable or an applicable filter is still at reset state, the condition resolves as hidden rather than behaving like `hasNoData`. |
 | Row suppression | A false row condition hides the full row. A false column condition hides only that widget slot while preserving grid width. |
 | v1 limitations | Toggle rows and multi-viz rows do not expose condition editing in the editor, and runtime ignores any condition config found there. |
 

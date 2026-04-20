@@ -113,7 +113,7 @@ const ModularDashboardConditionsConfig: Config = {
       dashboardCondition: {
         id: 'row-condition-story',
         datasetKey: 'row-condition-data',
-        operator: 'hasRows'
+        operator: 'hasData'
       },
       columns: [
         {

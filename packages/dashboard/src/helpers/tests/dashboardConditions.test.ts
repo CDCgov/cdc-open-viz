@@ -11,14 +11,14 @@ describe('dashboardConditions', () => {
     const rows = ensureRowConditionIds([
       {
         columns: [
-          { width: 6, widget: 'viz-1', dashboardCondition: { datasetKey: 'dataset-1', operator: 'hasRows' } },
+          { width: 6, widget: 'viz-1', dashboardCondition: { datasetKey: 'dataset-1', operator: 'hasData' } },
           {
             width: 6,
             widget: 'viz-2',
-            dashboardCondition: { id: 'column-condition-2', datasetKey: 'dataset-1', operator: 'hasRows' }
+            dashboardCondition: { id: 'column-condition-2', datasetKey: 'dataset-1', operator: 'hasData' }
           }
         ],
-        dashboardCondition: { datasetKey: 'dataset-1', operator: 'hasRows' },
+        dashboardCondition: { datasetKey: 'dataset-1', operator: 'hasData' },
         expandCollapseAllButtons: false
       }
     ] as any)
@@ -32,16 +32,16 @@ describe('dashboardConditions', () => {
     const { nameLookup, options } = getDashboardConditionTargetOptions([
       {
         columns: [
-          { width: 12, widget: 'viz-1', dashboardCondition: { id: 'column-condition-1', operator: 'hasRows' } }
+          { width: 12, widget: 'viz-1', dashboardCondition: { id: 'column-condition-1', operator: 'hasData' } }
         ],
-        dashboardCondition: { id: 'row-condition-1', operator: 'hasRows' },
+        dashboardCondition: { id: 'row-condition-1', operator: 'hasData' },
         expandCollapseAllButtons: false
       },
       {
         columns: [
-          { width: 12, widget: 'viz-2', dashboardCondition: { id: 'column-condition-2', operator: 'hasRows' } }
+          { width: 12, widget: 'viz-2', dashboardCondition: { id: 'column-condition-2', operator: 'hasData' } }
         ],
-        dashboardCondition: { id: 'row-condition-2', operator: 'hasRows' },
+        dashboardCondition: { id: 'row-condition-2', operator: 'hasData' },
         expandCollapseAllButtons: false,
         toggle: true
       }
@@ -53,9 +53,9 @@ describe('dashboardConditions', () => {
     expect(nameLookup['row-condition-2']).toBeUndefined()
   })
 
-  it('treats reset-state filters as unresolved instead of hasNoRows', () => {
+  it('treats reset-state filters as unresolved instead of hasNoData', () => {
     const filteredData = getDashboardConditionFilteredData(
-      { id: 'row-condition-1', datasetKey: 'condition-data', operator: 'hasNoRows' },
+      { id: 'row-condition-1', datasetKey: 'condition-data', operator: 'hasNoData' },
       {
         sharedFilters: [
           {
@@ -78,7 +78,7 @@ describe('dashboardConditions', () => {
 
   it('ignores filters whose columns are missing from the condition dataset', () => {
     const filteredData = getDashboardConditionFilteredData(
-      { id: 'row-condition-1', datasetKey: 'condition-data', operator: 'hasRows' },
+      { id: 'row-condition-1', datasetKey: 'condition-data', operator: 'hasData' },
       {
         sharedFilters: [
           {
@@ -117,7 +117,7 @@ describe('dashboardConditions', () => {
 
   it('does not treat unrelated unscoped filters without matching dataset columns as unresolved', () => {
     const filteredData = getDashboardConditionFilteredData(
-      { id: 'row-condition-1', datasetKey: 'condition-data', operator: 'hasRows' },
+      { id: 'row-condition-1', datasetKey: 'condition-data', operator: 'hasData' },
       {
         sharedFilters: [
           {
@@ -147,7 +147,7 @@ describe('dashboardConditions', () => {
 
   it('treats missing precomputed condition data as unresolved', () => {
     const result = evaluateDashboardCondition(
-      { id: 'row-condition-1', datasetKey: 'condition-data', operator: 'hasNoRows' },
+      { id: 'row-condition-1', datasetKey: 'condition-data', operator: 'hasNoData' },
       undefined
     )
 

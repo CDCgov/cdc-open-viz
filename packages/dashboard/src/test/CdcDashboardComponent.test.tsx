@@ -120,7 +120,7 @@ describe('CdcDashboardComponent', () => {
             dashboardCondition: {
               id: 'row-condition-1',
               datasetKey: 'row-condition-data',
-              operator: 'hasRows'
+              operator: 'hasData'
             },
             expandCollapseAllButtons: false
           },
