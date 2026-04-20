@@ -45,6 +45,7 @@ const applyWaffleValueDescriptorDefaults = config => {
 }
 
 const applyTerritoryMapDefaults = config => {
+  if (config.type !== 'map' || !config.general) return
   if (config.general.territoriesAlwaysShow === undefined) {
     config.general.territoriesAlwaysShow = true
   }
