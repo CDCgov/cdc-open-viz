@@ -35,9 +35,11 @@ export const addVisualization = (type, subType) => {
       }
       break
     case 'data-bite':
-    case 'waffle-chart':
     case 'filtered-text':
       newVisualizationConfig.visualizationType = type
+      break
+    case 'waffle-chart':
+      newVisualizationConfig.visualizationType = subType
       break
     case 'table': {
       const tableConfig: Table = {
