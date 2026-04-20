@@ -1092,7 +1092,7 @@ const CountyMap = () => {
     }
 
     drawCanvas()
-  }, [isLoading, topoData, focus, runtimeLegend, runtimeData, featureArray, config])
+  }, [isLoading, topoData, focus, runtimeLegend, runtimeData, featureArray, config, filteredCountyCode])
 
   const showManualZoomControls = config.general.allowMapZoom
   const showResetControl = (hasMoved || focus.id) && (showManualZoomControls || config.general.type === 'us-geocode')
