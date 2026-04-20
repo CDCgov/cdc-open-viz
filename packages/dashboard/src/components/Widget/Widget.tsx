@@ -10,7 +10,9 @@ import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { iconHash } from '../../helpers/iconHash'
 import _ from 'lodash'
 import { DataDesignerModal } from '../DataDesignerModal'
+import { DashboardConditionModal } from '../DashboardConditionModal'
 import { labelHash } from '@cdc/core/helpers/labelHash'
+import { dashboardConditionsSupportedForRow } from '../../helpers/dashboardFilterTargets'
 import './widget.styles.css'
 
 type WidgetConfig = AnyVisualization & { rowIdx: number; colIdx: number }
@@ -157,6 +159,9 @@ const Widget = ({
   }
 
   const needsDataConfiguration = !dataConfiguredForRow && widgetConfig?.type !== 'dashboardFilters'
+  const rowSupportsDashboardConditions = widgetConfig
+    ? dashboardConditionsSupportedForRow(config.rows[widgetConfig.rowIdx])
+    : false
 
   const widgetContent = (
     <div
@@ -185,6 +190,22 @@ const Widget = ({
                 {iconHash['gear']}
               </Button>
             )}
+            <Button
+              title={
+                rowSupportsDashboardConditions
+                  ? 'Configure Dashboard Condition'
+                  : 'Dashboard conditions are not available for toggle or multi-visualization rows'
+              }
+              className='btn btn-configure'
+              disabled={!rowSupportsDashboardConditions}
+              onClick={() => {
+                overlay?.actions.openOverlay(
+                  <DashboardConditionModal rowIndex={widgetConfig.rowIdx} columnIndex={widgetConfig.colIdx} />
+                )
+              }}
+            >
+              If
+            </Button>
             <div className='widget-menu-item' onClick={deleteWidget}>
               <Icon display='close' base />
             </div>

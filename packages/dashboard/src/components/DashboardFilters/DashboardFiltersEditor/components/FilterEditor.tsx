@@ -1,7 +1,7 @@
-import { getVizRowColumnLocator } from '../../../../helpers/getVizRowColumnLocator'
 import { Select, TextField } from '@cdc/core/components/EditorPanel/Inputs'
 import DataTransform from '@cdc/core/helpers/DataTransform'
 import { useEffect, useMemo, useState } from 'react'
+import { getSharedFilterTargetOptions } from '../../../../helpers/dashboardFilterTargets'
 import { SharedFilter } from '../../../../types/SharedFilter'
 
 import fetchRemoteData from '@cdc/core/helpers/fetchRemoteData'
@@ -10,7 +10,6 @@ import Icon from '@cdc/core/components/ui/Icon'
 import MultiSelect from '@cdc/core/components/MultiSelect'
 import Loading from '@cdc/core/components/Loading'
 import { DashboardConfig } from '../../../../types/DashboardConfig'
-import { Visualization } from '@cdc/core/types/Visualization'
 import { hasDashboardApplyBehavior } from '../../../../helpers/hasDashboardApplyBehavior'
 import APIModal from './APIModal'
 import NestedDropDownDashboard from './NestedDropDownDashboard'
@@ -52,8 +51,6 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
     .filter(({ key }) => key !== filter.key)
     .map(({ key }) => key)
 
-  const vizRowColumnLocator = getVizRowColumnLocator(config.rows)
-
   const getVizTitle = (viz, vizKey) => {
     let vizName = viz.general?.title || viz.title || vizKey
     if (viz.visualizationType === 'markup-include') {
@@ -63,32 +60,9 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
   }
 
   const [usedByNameLookup, usedByOptions] = useMemo(() => {
-    const nameLookup = {}
-    const vizOptions = Object.keys(config.visualizations).filter(vizKey => {
-      const vizLookup = vizRowColumnLocator[vizKey]
-      if (!vizLookup) return false
-      const viz = config.visualizations[vizKey] as Visualization
-      if (viz.type === 'dashboardFilters') return false
-      const vizName = getVizTitle(viz, vizKey)
-
-      nameLookup[vizKey] = vizName
-      const usesSharedFilter = viz.usesSharedFilter
-      const rowIndex = vizLookup.row
-      const dataConfiguredOnRow = config.rows[rowIndex].dataKey
-      return filter.setBy !== vizKey && !usesSharedFilter && !dataConfiguredOnRow
-    })
-    const rowOptions: number[] = []
-
-    config.rows.forEach((row, rowIndex) => {
-      if (!!row.dataKey) {
-        nameLookup[rowIndex] = `Row ${rowIndex + 1}`
-        rowOptions.push(rowIndex)
-      }
-    })
-
-    const rowsNotSelected = rowOptions.filter(row => !filter.usedBy || filter.usedBy.indexOf(row.toString()) === -1)
-    return [nameLookup, [...vizOptions, ...rowsNotSelected]]
-  }, [config.visualizations, filter.usedBy, filter.setBy, vizRowColumnLocator])
+    const { nameLookup, options } = getSharedFilterTargetOptions(config, filter)
+    return [nameLookup, options]
+  }, [config, filter])
 
   const useParameters = useMemo(() => {
     if (filter.subGrouping) return !!(filter.setByQueryParameter && filter.subGrouping?.setByQueryParameter)
@@ -293,7 +267,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                   {filter.filterBy === 'Query String' && filter.usedBy && filter.usedBy.length > 0 && (
                     <div className='bg-info-subtle p-2 my-2' style={{ fontSize: '0.9em' }}>
                       <Icon display='info' style={{ marginRight: '0.5rem' }} />
-                      Will apply to datasets used by selected widgets
+                      Will apply to datasets used by selected targets
                     </div>
                   )}
                   {filter.filterBy === 'File Name' && (
@@ -489,8 +463,8 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                     </Tooltip.Target>
                     <Tooltip.Content>
                       <p>
-                        Select if you would like specific visualizations or rows to use this filter. Otherwise the
-                        filter will be added to all api requests.
+                        Select if you would like specific visualizations, rows, or dashboard condition targets to use
+                        this filter. Otherwise the filter will be added to all api requests.
                       </p>
                     </Tooltip.Content>
                   </Tooltip>
@@ -643,8 +617,8 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                     </Tooltip.Target>
                     <Tooltip.Content>
                       <p>
-                        Select if you would like specific visualizations or rows to use this filter. Otherwise the
-                        filter will be added to all api requests.
+                        Select if you would like specific visualizations, rows, or dashboard condition targets to use
+                        this filter. Otherwise the filter will be added to all api requests.
                       </p>
                     </Tooltip.Content>
                   </Tooltip>

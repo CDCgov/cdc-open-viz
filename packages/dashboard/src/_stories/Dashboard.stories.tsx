@@ -55,6 +55,134 @@ DashboardFilterDesc.dashboard.sharedFilters[0].order = 'desc'
 DashboardFilterCust.dashboard.sharedFilters[0].order = 'cust'
 NestedParentChildFiltersSubgroupOnly.dashboard.sharedFilters[1].displaySubgroupingOnly = true
 
+const ModularDashboardConditionsConfig: Config = {
+  type: 'dashboard',
+  version: '4.26.4',
+  dashboard: {
+    theme: 'theme-blue',
+    title: 'Modular Dashboards v1 Conditions',
+    titleStyle: 'small',
+    sharedFilters: [
+      {
+        key: 'Availability',
+        type: 'datafilter',
+        filterStyle: 'dropdown',
+        columnName: 'availability',
+        showDropdown: true,
+        usedBy: ['row-condition-story'],
+        values: ['Show', 'Hide'],
+        active: 'Show',
+        order: 'asc',
+        parents: []
+      },
+      {
+        key: 'Region',
+        type: 'datafilter',
+        filterStyle: 'dropdown',
+        columnName: 'region',
+        showDropdown: true,
+        usedBy: ['column-condition-story'],
+        values: ['East', 'West'],
+        active: 'East',
+        order: 'asc',
+        parents: []
+      }
+    ]
+  },
+  data: [],
+  datasets: {
+    'visual-data': {
+      data: [{ title: 'Visualization dataset' }]
+    },
+    'row-condition-data': {
+      data: [{ availability: 'Show' }]
+    },
+    'column-condition-data': {
+      data: [
+        { region: 'East', visibility: 1 },
+        { region: 'West', visibility: 0 }
+      ]
+    }
+  },
+  rows: [
+    {
+      columns: [{ width: 12, widget: 'dashboard-filters-conditions' }],
+      expandCollapseAllButtons: false
+    },
+    {
+      dashboardCondition: {
+        id: 'row-condition-story',
+        datasetKey: 'row-condition-data',
+        operator: 'hasRows'
+      },
+      columns: [
+        {
+          width: 6,
+          widget: 'markup-condition-a',
+          dashboardCondition: {
+            id: 'column-condition-story',
+            datasetKey: 'column-condition-data',
+            operator: 'columnHasAnyValue',
+            columnName: 'visibility',
+            values: ['1']
+          }
+        },
+        {
+          width: 6,
+          widget: 'markup-condition-b'
+        }
+      ],
+      expandCollapseAllButtons: false
+    }
+  ],
+  visualizations: {
+    'dashboard-filters-conditions': {
+      uid: 'dashboard-filters-conditions',
+      type: 'dashboardFilters',
+      visualizationType: 'dashboardFilters',
+      sharedFilterIndexes: [0, 1],
+      filterBehavior: 'Filter Change',
+      filters: [],
+      autoLoad: true
+    },
+    'markup-condition-a': {
+      uid: 'markup-condition-a',
+      type: 'markup-include',
+      visualizationType: 'markup-include',
+      dataKey: 'visual-data',
+      filterBehavior: 'Filter Change',
+      theme: 'theme-blue',
+      contentEditor: {
+        inlineHTML:
+          '<p>This column stays visible while <strong>Region</strong> is East and hides while keeping its width when Region is West.</p>',
+        showHeader: true,
+        srcUrl: '',
+        title: 'Component-Level Condition',
+        useInlineHTML: true
+      }
+    },
+    'markup-condition-b': {
+      uid: 'markup-condition-b',
+      type: 'markup-include',
+      visualizationType: 'markup-include',
+      dataKey: 'visual-data',
+      filterBehavior: 'Filter Change',
+      theme: 'theme-blue',
+      contentEditor: {
+        inlineHTML:
+          '<p>This companion column stays rendered so you can see row-level hiding separately from component-level hiding.</p>',
+        showHeader: true,
+        srcUrl: '',
+        title: 'Always Visible Companion',
+        useInlineHTML: true
+      }
+    }
+  },
+  table: {
+    show: false
+  }
+}
+
 // On DashboardFilterCust change the sharedFilters[0].values and orderedValues to be in a custom order
 const customOrder = ['American Samoa', 'Alaska', 'Alabama', 'Arizona', 'Arkansas']
 DashboardFilterCust.dashboard.sharedFilters[0].orderedValues = customOrder
@@ -111,6 +239,13 @@ export const Example_2: Story = {
 export const Example_3: Story = {
   args: {
     config: ExampleConfig_3,
+    isEditor: false
+  }
+}
+
+export const Modular_Dashboard_Conditions: Story = {
+  args: {
+    config: ModularDashboardConditionsConfig,
     isEditor: false
   }
 }

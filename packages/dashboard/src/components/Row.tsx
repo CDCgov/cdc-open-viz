@@ -14,12 +14,14 @@ import EightFourColIcon from '../images/icon-col-8-4.svg'
 import ToggleIcon from '../images/icon-toggle.svg'
 import { ConfigRow } from '../types/ConfigRow'
 import { DataDesignerModal } from './DataDesignerModal'
+import { DashboardConditionModal } from './DashboardConditionModal'
 import { useGlobalContext } from '@cdc/core/components/GlobalContext'
 import Button from '@cdc/core/components/elements/Button'
 import { iconHash } from '../helpers/iconHash'
 import _ from 'lodash'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { labelHash } from '@cdc/core/helpers/labelHash'
+import { dashboardConditionsSupportedForRow } from '../helpers/dashboardFilterTargets'
 
 type RowMenuProps = {
   rowIdx: number
@@ -237,6 +239,8 @@ type RowProps = { row: ConfigRow; idx: number; uuid: number | string }
 
 const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
   const { overlay } = useGlobalContext()
+  const supportsDashboardConditions = dashboardConditionsSupportedForRow(row)
+
   return (
     <>
       <div className='builder-row' data-row-id={rowIdx}>
@@ -250,6 +254,20 @@ const Row: React.FC<RowProps> = ({ row, idx: rowIdx, uuid }) => {
           }}
         >
           {iconHash['gearMulti']}
+        </Button>
+        <Button
+          title={
+            supportsDashboardConditions
+              ? 'Configure Dashboard Condition'
+              : 'Dashboard conditions are not available for toggle or multi-visualization rows'
+          }
+          className='btn btn-configure-row'
+          disabled={!supportsDashboardConditions}
+          onClick={() => {
+            overlay?.actions.openOverlay(<DashboardConditionModal rowIndex={rowIdx} />)
+          }}
+        >
+          If
         </Button>
         <div className='column-container'>
           {row.columns

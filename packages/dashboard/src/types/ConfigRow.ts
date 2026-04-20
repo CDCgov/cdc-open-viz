@@ -1,5 +1,13 @@
 import { ConfigureData } from '@cdc/core/types/ConfigureData'
 
+export type DashboardCondition = {
+  id?: string
+  datasetKey?: string
+  operator?: 'hasRows' | 'hasNoRows' | 'columnHasAnyValue'
+  columnName?: string
+  values?: string[]
+}
+
 type Col = {
   equalHeight?: boolean
   width: number | null
@@ -7,6 +15,7 @@ type Col = {
   widget?: string
   toggleName?: string
   uuid?: string | number
+  dashboardCondition?: DashboardCondition
 }
 
 export type ConfigRow = {
@@ -17,4 +26,5 @@ export type ConfigRow = {
   equalHeight?: boolean
   multiVizColumn?: string
   originalMultiVizColumn?: string
+  dashboardCondition?: DashboardCondition
 } & ConfigureData

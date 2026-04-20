@@ -498,7 +498,10 @@ export default function CdcDashboard({
     const { config } = state
     const { title, description } = config.dashboard || {}
 
-    const filteredRows = config.rows?.filter(row => row.columns.filter(col => col.widget).length !== 0)
+    const filteredRows =
+      config.rows
+        ?.map((row, index) => ({ row, index }))
+        .filter(({ row }) => row.columns.filter(col => col.widget).length !== 0) || []
 
     body = (
       <>
@@ -525,7 +528,7 @@ export default function CdcDashboard({
             {/* Description */}
             {description && <div className='subtext cove-prose mb-4'>{parse(description)}</div>}
             {/* Visualizations */}
-            {filteredRows?.map((row, index) => (
+            {filteredRows.map(({ row, index }, renderIndex) => (
               <VisualizationRow
                 key={`row__${index}`}
                 allExpanded={allExpanded}
@@ -539,7 +542,7 @@ export default function CdcDashboard({
                 currentViewport={currentViewport}
                 inNoDataState={inNoDataState}
                 interactionLabel={interactionLabel}
-                isLastRow={index === filteredRows.length - 1}
+                isLastRow={renderIndex === filteredRows.length - 1}
               />
             ))}
 

@@ -18,8 +18,63 @@ const baseConfig = {
       ]
     }
   },
-  rows: [],
-  visualizations: {}
+  rows: [
+    {
+      columns: [
+        {
+          width: 12,
+          widget: 'viz-1',
+          dashboardCondition: {
+            id: 'row-1-col-1-condition',
+            datasetKey: 'nested-data.json',
+            operator: 'hasRows'
+          }
+        }
+      ],
+      dashboardCondition: {
+        id: 'row-1-condition',
+        datasetKey: 'nested-data.json',
+        operator: 'hasRows'
+      },
+      expandCollapseAllButtons: false
+    },
+    {
+      columns: [
+        {
+          width: 12,
+          widget: 'viz-2',
+          dashboardCondition: {
+            id: 'row-2-col-1-condition',
+            datasetKey: 'nested-data.json',
+            operator: 'hasRows'
+          }
+        }
+      ],
+      dashboardCondition: {
+        id: 'row-2-condition',
+        datasetKey: 'nested-data.json',
+        operator: 'hasRows'
+      },
+      expandCollapseAllButtons: false,
+      toggle: true
+    }
+  ],
+  visualizations: {
+    'viz-1': {
+      uid: 'viz-1',
+      type: 'markup-include',
+      contentEditor: {
+        title: 'First Markup'
+      }
+    },
+    'viz-2': {
+      uid: 'viz-2',
+      type: 'markup-include',
+      contentEditor: {
+        title: 'Toggle Markup'
+      }
+    }
+  }
 } as any
 
 const createNestedFilter = (type: 'datafilter' | 'urlfilter') =>
@@ -123,5 +178,39 @@ describe('FilterEditor nested dropdown display toggle', () => {
     )
 
     expect(screen.queryByLabelText('Display subgrouping only')).not.toBeInTheDocument()
+  })
+
+  it('includes dashboard condition targets in the Used By options for supported rows', () => {
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: {
+            sharedFilters: [
+              {
+                ...createNestedFilter('datafilter'),
+                filterStyle: 'dropdown'
+              }
+            ]
+          }
+        }}
+        filter={{
+          ...createNestedFilter('datafilter'),
+          filterStyle: 'dropdown'
+        }}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    const expandButtons = screen.getAllByLabelText('Expand')
+    fireEvent.click(expandButtons[0])
+
+    expect(screen.getByText('Row 1 Dashboard Condition')).toBeInTheDocument()
+    expect(screen.getByText('Row 1 Column 1 Dashboard Condition')).toBeInTheDocument()
+    expect(screen.queryByText('Row 2 Dashboard Condition')).not.toBeInTheDocument()
+    expect(screen.queryByText('Row 2 Column 1 Dashboard Condition')).not.toBeInTheDocument()
   })
 })

@@ -56,6 +56,8 @@ Rows, datasets, and child visualizations also use the shared `ConfigureData` fie
 | `rows[].columns[]` | `object` | Yes | None | Column slots inside each row. | A column is populated when `widget` points to a visualization key. |
 | `rows[].columns[].width` | `number \| null` | Yes | `null` on empty placeholders | Column width in the dashboard grid. | `12` is a full-width column. |
 | `rows[].columns[].widget` | `string` | No | None | Visualization key rendered in that slot. | Must match a key in `visualizations`. |
+| `rows[].dashboardCondition` | `DashboardCondition` | No | None | Optional post-filter visibility rule for the entire row. | Evaluated after shared dashboard filtering; unresolved inputs hide the row. Not supported on toggle or multi-viz rows in v1. |
+| `rows[].columns[].dashboardCondition` | `DashboardCondition` | No | None | Optional post-filter visibility rule for a single column/widget. | Hidden widgets keep their original column width. If every widget column in a row is hidden, the row does not render. |
 | `rows[].toggle` | `boolean` | No | `false` | Turns a row into a toggle row. | Only one column is shown at a time. |
 | `rows[].equalHeight` | `boolean` | No | `false` | Forces equal-height cards within the row. | TP5 layouts may also trigger equalization automatically. |
 | `rows[].multiVizColumn` | `string` | No | None | Column used to split one visualization into multiple cards. | Used by multi-viz dashboard flows. |
@@ -95,7 +97,7 @@ Dashboard filters are split between the dashboard shell and the `dashboardFilter
 | `dashboard.sharedFilters[].order` | `string` | No | `asc` | Sort order for generated filter values. | `cust`, `desc`, `asc`, `column` |
 | `dashboard.sharedFilters[].orderedValues` | `string[]` | No | None | Custom display order when `order` is `cust`. | Preserved by editor and runtime sort helpers. |
 | `dashboard.sharedFilters[].parents` | `string[]` | No | `[]` | Parent filter labels for nested filter chains. | Used by cascading URL and data filters. |
-| `dashboard.sharedFilters[].usedBy` | `(string \| number)[]` | No | None | Widgets or rows that consume the filter. | Numbers refer to row indexes; strings refer to visualization keys. |
+| `dashboard.sharedFilters[].usedBy` | `(string \| number)[]` | No | None | Widgets, rows, or dashboard condition targets that consume the filter. | Numbers refer to row indexes; strings refer to visualization keys or auto-generated dashboard condition ids. Unscoped filters still apply everywhere they are otherwise compatible. |
 | `dashboard.sharedFilters[].defaultValue` | `string` | No | None | Default selection when no other active value is available. | Used by data and nested-dropdown filters. |
 | `dashboard.sharedFilters[].resetLabel` | `string` | No | None | Reset option label. | Often shown as `All`, `Reset`, or similar. |
 | `dashboard.sharedFilters[].labels` | `Record<string, string>` | No | None | Alternate display labels for raw values. | Shared label mapping from `@cdc/core`. |
@@ -122,6 +124,26 @@ Dashboard filters are split between the dashboard shell and the `dashboardFilter
 | `dashboard.sharedFilters[].datasetKey` | `string` | No | None | Dataset key whose filename should be rewritten. | Required when `filterBy` is `File Name`. |
 | `dashboard.sharedFilters[].fileName` | `string` | No | None | File-name template for file-name URL filters. | Can include `${query}` as a placeholder for the active filter value. |
 | `dashboard.sharedFilters[].whitespaceReplacement` | `string` | No | `Keep Spaces` | How spaces are rewritten in file-name filters. | `Keep Spaces`, `Remove Spaces`, `Replace With Underscore` |
+
+## Dashboard Conditions
+
+Dashboard conditions are optional visibility rules owned by rows and row columns.
+
+| Field | Type | Required | Default | Description | Allowed values / Notes |
+| --- | --- | --- | --- | --- | --- |
+| `rows[].dashboardCondition.id` | `string` | No | Auto-generated | Stable dashboard-condition target id used by shared-filter `usedBy`. | The editor generates and preserves this id once dashboard-condition authoring is enabled. |
+| `rows[].columns[].dashboardCondition.id` | `string` | No | Auto-generated | Stable dashboard-condition target id used by shared-filter `usedBy`. | Same behavior as row-level dashboard-condition ids. |
+| `*.dashboardCondition.datasetKey` | `string` | Yes when a dashboard condition is enabled | None | Dataset used to evaluate the dashboard condition. | May differ from the visualization dataset. |
+| `*.dashboardCondition.operator` | `string` | Yes when a dashboard condition is enabled | None | Dashboard-condition comparison mode. | `hasRows`, `hasNoRows`, `columnHasAnyValue` |
+| `*.dashboardCondition.columnName` | `string` | Only for `columnHasAnyValue` | None | Dataset column inspected by the dashboard condition. | Must exist in the dashboard-condition dataset. |
+| `*.dashboardCondition.values` | `string[]` | Only for `columnHasAnyValue` | `[]` | One or more acceptable values. | Runtime uses loose string coercion so numeric dataset values can match authored strings. |
+
+| Behavior | Details |
+| --- | --- |
+| Shared filter application | Conditions apply matching scoped filters plus unscoped filters before evaluating the operator. Filters whose `columnName` is missing from the condition dataset are ignored for that condition. |
+| Unresolved inputs | If the condition dataset is unavailable or an applicable filter is still at reset state, the condition resolves as hidden rather than behaving like `hasNoRows`. |
+| Row suppression | A false row condition hides the full row. A false column condition hides only that widget slot while preserving grid width. |
+| v1 limitations | Toggle rows and multi-viz rows do not expose condition editing in the editor, and runtime ignores any condition config found there. |
 
 ### `APIFilter`
 

@@ -1,6 +1,8 @@
 import { DashboardState } from '../store/dashboard.reducer'
 import { Dashboard } from '../types/Dashboard'
 import { SharedFilter } from '../types/SharedFilter'
+import { getDashboardConditionFilteredData } from './dashboardConditions'
+import { getDashboardConditionTargets } from './dashboardFilterTargets'
 import { filterData } from './filterData'
 import { getFormattedData } from './getFormattedData'
 import { getVizKeys } from './getVizKeys'
@@ -43,6 +45,17 @@ export const getFilteredData = (
       } else {
         newFilteredData[index] = _data || []
       }
+    }
+  })
+  getDashboardConditionTargets(config.rows).forEach(target => {
+    const filteredData = getDashboardConditionFilteredData(
+      target.dashboardCondition,
+      config.dashboard,
+      (dataOverride || state.data) as Record<string, any[]>
+    )
+
+    if (filteredData !== undefined) {
+      newFilteredData[target.id] = filteredData
     }
   })
   return newFilteredData

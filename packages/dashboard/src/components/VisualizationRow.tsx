@@ -11,6 +11,8 @@ import CdcFilteredText from '@cdc/filtered-text/src/CdcFilteredText'
 import DashboardSharedFilters, { APIFilterDropdowns } from './DashboardFilters'
 import { DashboardContext } from '../DashboardContext'
 import { ViewPort } from '@cdc/core/types/ViewPort'
+import { evaluateDashboardCondition } from '../helpers/dashboardConditions'
+import { dashboardConditionsSupportedForRow } from '../helpers/dashboardFilterTargets'
 import { getVizConfig } from '../helpers/getVizConfig'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import CollapsibleVisualizationRow from './CollapsibleVisualizationRow'
@@ -219,6 +221,37 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   }, [config.activeDashboard, toggledRow])
 
   const _data = dashboardFilteredData[index] || row.formattedData || []
+  const shouldIgnoreDashboardConditions = !dashboardConditionsSupportedForRow(row)
+  const rowDashboardCondition = useMemo(() => {
+    if (shouldIgnoreDashboardConditions || !row.dashboardCondition) {
+      return { matches: true, resolved: true }
+    }
+
+    return evaluateDashboardCondition(row.dashboardCondition, dashboardFilteredData[row.dashboardCondition.id])
+  }, [dashboardFilteredData, row.dashboardCondition, shouldIgnoreDashboardConditions])
+  const columnDashboardConditionEvaluations = useMemo(
+    () =>
+      row.columns.map(column => {
+        if (shouldIgnoreDashboardConditions || !column.dashboardCondition) {
+          return { matches: true, resolved: true }
+        }
+
+        return evaluateDashboardCondition(
+          column.dashboardCondition,
+          dashboardFilteredData[column.dashboardCondition.id]
+        )
+      }),
+    [dashboardFilteredData, row.columns, shouldIgnoreDashboardConditions]
+  )
+  const hasVisibleWidgetColumn = row.columns.some(
+    (column, columnIndex) =>
+      !!column.width && !!column.widget && columnDashboardConditionEvaluations[columnIndex]?.matches
+  )
+
+  if (!rowDashboardCondition.matches || !hasVisibleWidgetColumn) {
+    return null
+  }
+
   const dataGroups =
     row.multiVizColumn &&
     _data.reduce((acc, dataRow) => {
@@ -294,8 +327,18 @@ const VisualizationRow: React.FC<VizRowProps> = ({
       )}
       {row.columns.map((col, colIndex) => {
         if (col.width) {
-          if (!col.widget)
-            return <div key={`row__${index}__col__${colIndex}`} className={`col-12 col-md-${col.width}`}></div>
+          const hiddenByDashboardCondition = !!col.widget && !columnDashboardConditionEvaluations[colIndex]?.matches
+          if (!col.widget || hiddenByDashboardCondition) {
+            return (
+              <div
+                key={`row__${index}__col__${colIndex}`}
+                className={`col-12 col-md-${col.width}${
+                  hiddenByDashboardCondition ? ' dashboard-condition-hidden' : ''
+                }`}
+                data-dashboard-condition-hidden={hiddenByDashboardCondition || undefined}
+              ></div>
+            )
+          }
 
           const visualizationConfig = getVizConfig(
             col.widget,
