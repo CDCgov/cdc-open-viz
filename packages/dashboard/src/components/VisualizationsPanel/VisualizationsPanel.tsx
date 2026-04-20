@@ -43,7 +43,7 @@ const VisualizationsPanel = () => {
       <span className='subheading-3'>Misc.</span>
       <div className='drag-grid'>
         <Widget addVisualization={() => addVisualization('data-bite', '')} type='data-bite' />
-        <Widget addVisualization={() => addVisualization('waffle-chart', '')} type='waffle-chart' />
+        <Widget addVisualization={() => addVisualization('waffle-chart', 'Waffle')} type='waffle-chart' />
         <Widget addVisualization={() => addVisualization('markup-include', '')} type='markup-include' />
         <Widget addVisualization={() => addVisualization('filtered-text', '')} type='filtered-text' />
         <Widget addVisualization={() => addVisualization('dashboardFilters', '')} type='dashboardFilters' />
