@@ -56,4 +56,17 @@ describe('countyTerritories', () => {
     expect(Array.from(visibility.countyIds).sort()).toEqual([])
     expect(visibility.key).toBe('false:')
   })
+
+  it('treats an omitted config flag as enabled by default but still hides territories when no territory data exists', () => {
+    const runtimeData = {
+      '06001': { uid: '06001', value: 1 }
+    }
+
+    const visibility = getCountyTerritoryVisibility(undefined, runtimeData)
+
+    expect(visibility.showTerritories).toBe(false)
+    expect(Array.from(visibility.statePrefixes)).toEqual([])
+    expect(Array.from(visibility.countyIds)).toEqual([])
+    expect(visibility.key).toBe('false:')
+  })
 })
