@@ -11,6 +11,7 @@ import {
 import ColumnsEditor from '@cdc/core/components/EditorPanel/ColumnsEditor'
 import DataTableEditor from '@cdc/core/components/EditorPanel/DataTableEditor'
 import VizFilterEditor from '@cdc/core/components/EditorPanel/VizFilterEditor'
+import AdvancedEditor from '@cdc/core/components/AdvancedEditor/AdvancedEditor'
 import { EditorPanelDispatch } from '@cdc/core/components/EditorPanel/EditorPanelDispatch'
 import { Select } from '@cdc/core/components/EditorPanel/Inputs'
 import Tooltip from '@cdc/core/components/ui/Tooltip'
@@ -27,7 +28,7 @@ const EditorPanel = ({ state, dispatch }) => {
 
     // Find/assign the value to be updated
     const valueCopy = _.cloneDeep(curValue)
-    if (!subsection) valueCopy[fieldName] = newValue
+    if (subsection === null || subsection === undefined) valueCopy[fieldName] = newValue
     else {
       if (!valueCopy[subsection]) valueCopy[subsection] = {}
       valueCopy[subsection][fieldName] = newValue
@@ -59,6 +60,17 @@ const EditorPanel = ({ state, dispatch }) => {
   const updateConfigField = (_section, _subsection, fieldName, newValue) => {
     dispatch({ type: 'SET_CONFIG', payload: { ...config, [fieldName]: newValue } })
   }
+
+  const updateConfig = nextConfig => {
+    dispatch({ type: 'SET_CONFIG', payload: nextConfig })
+    dispatch({ type: 'SET_TABLE', payload: nextConfig.table })
+    dispatch({ type: 'SET_COLUMNS', payload: nextConfig.columns || {} })
+    dispatch({ type: 'SET_FILTERS', payload: nextConfig.filters || [] })
+    dispatch({ type: 'SET_FILTER_BEHAVIOR', payload: nextConfig.filterBehavior })
+    dispatch({ type: 'SET_FILTER_INTRO', payload: nextConfig.filterIntro })
+  }
+
+  const convertStateToConfig = () => config
 
   return (
     <EditorPanelDispatch
@@ -135,6 +147,7 @@ const EditorPanel = ({ state, dispatch }) => {
                 </AccordionItemPanel>
               </AccordionItem>
             </Accordion>
+            <AdvancedEditor loadConfig={updateConfig} config={config} convertStateToConfig={convertStateToConfig} />
           </form>
         </section>
       )}

@@ -1,0 +1,9 @@
+{
+  "type": "data-bite",
+  "version": "4.26.4",
+  "title": "Data / Fact",
+  "biteBody": "Highlight a statistic, data point, or key fact.",
+  "data": [{ "Value": 1234 }],
+  "dataColumn": "Value",
+  "dataFunction": "Pass Through"
+}

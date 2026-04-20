@@ -1,0 +1,16 @@
+{
+  "version": "4.26.4",
+  "type": "table",
+  "visualizationType": "Table",
+  "locale": "en-US",
+  "data": [
+    {
+      "year": "2020",
+      "value": 77.3
+    },
+    {
+      "year": "2021",
+      "value": 76.4
+    }
+  ]
+}

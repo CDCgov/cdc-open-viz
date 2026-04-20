@@ -1,0 +1,34 @@
+{
+  "type": "dashboard",
+  "version": "4.26.4",
+  "dashboard": {
+    "theme": "theme-blue",
+    "title": "Dashboard Example",
+    "titleStyle": "small",
+    "sharedFilters": []
+  },
+  "data": [],
+  "rows": [
+    {
+      "columns": [
+        {
+          "width": 12,
+          "widget": "markup-1"
+        }
+      ]
+    }
+  ],
+  "visualizations": {
+    "markup-1": {
+      "type": "markup-include",
+      "theme": "theme-blue",
+      "contentEditor": {
+        "inlineHTML": "<p>Minimal dashboard example</p>",
+        "showHeader": true,
+        "srcUrl": "",
+        "title": "Dashboard Example",
+        "useInlineHTML": true
+      }
+    }
+  }
+}

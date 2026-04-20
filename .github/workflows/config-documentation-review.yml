@@ -1,0 +1,151 @@
+name: Config Documentation Review
+
+on:
+  pull_request_target:
+    branches: [dev, test]
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  comment-config-doc-review:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Review config doc maintenance signals
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner
+            const repo = context.repo.repo
+            const prNumber = context.payload.pull_request.number
+            const marker = '<!-- config-doc-review-comment -->'
+
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner,
+              repo,
+              pull_number: prNumber,
+              per_page: 100
+            })
+
+            const changed = files.map(file => file.filename)
+            const packageNames = ['data-bite', 'chart', 'dashboard', 'data-table', 'map', 'markup-include', 'waffle-chart']
+
+            const packageSignals = new Map()
+
+            const ensureSignal = pkg => {
+              if (!packageSignals.has(pkg)) {
+                packageSignals.set(pkg, {
+                  configCodeChanged: [],
+                  packageDocsChanged: false
+                })
+              }
+              return packageSignals.get(pkg)
+            }
+
+            const configCodePatterns = [
+              /^\/src\/types?\//,
+              /^\/types\//,
+              /^\/src\/data\/initial-state\./,
+              /^\/src\/data\/legacy-defaults\./,
+              /migrat/i
+            ]
+
+            for (const file of changed) {
+              for (const pkg of packageNames) {
+                const pkgPrefix = `packages/${pkg}/`
+                if (!file.startsWith(pkgPrefix)) continue
+
+                const signal = ensureSignal(pkg)
+                const relative = file.slice(pkgPrefix.length)
+
+                if (relative === 'CONFIG.md') {
+                  signal.packageDocsChanged = true
+                }
+
+                if (configCodePatterns.some(pattern => pattern.test(`/${relative}`))) {
+                  signal.configCodeChanged.push(file)
+                }
+              }
+            }
+
+            const coreConfigChanged = changed.includes('packages/core/CONFIG.md')
+            const coreSharedCodeChanged = changed.some(file =>
+              file.startsWith('packages/core/types/') ||
+              file.startsWith('packages/core/components/DataTable/types/') ||
+              /packages\/core\/.*migrat/i.test(file)
+            )
+
+            const flaggedPackages = [...packageSignals.entries()]
+              .filter(([, signal]) => signal.configCodeChanged.length > 0 && !signal.packageDocsChanged && !coreConfigChanged)
+
+            const messages = []
+
+            for (const [pkg, signal] of flaggedPackages) {
+              messages.push(
+                `- \`packages/${pkg}\`: config-related code changed, but \`packages/${pkg}/CONFIG.md\` was not updated.`
+              )
+            }
+
+            if (coreSharedCodeChanged && !coreConfigChanged) {
+              messages.push(
+                '- `packages/core`: shared config-related code changed, but `packages/core/CONFIG.md` was not updated.'
+              )
+            }
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number: prNumber,
+              per_page: 100
+            })
+
+            const existing = comments.find(comment =>
+              comment.user.type === 'Bot' && comment.body && comment.body.includes(marker)
+            )
+
+            if (messages.length === 0) {
+              const resolvedBody = [
+                marker,
+                '✅ Config documentation review looks complete for this PR.',
+                '',
+                'No additional `CONFIG.md` follow-up is currently flagged.'
+              ].join('\n')
+
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  owner,
+                  repo,
+                  comment_id: existing.id,
+                  body: resolvedBody
+                })
+              }
+              core.info('Config documentation review is clear for this PR.')
+              return
+            }
+
+            const body = [
+              marker,
+              '⚠️ Config documentation probably needs to be updated based on the changes in this PR.',
+              '',
+              ...messages,
+              '',
+              'If this PR changes consumer-facing config behavior, please update the relevant config docs. Otherwise, no action may be needed.'
+            ].join('\n')
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body
+              })
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: prNumber,
+                body
+              })
+            }

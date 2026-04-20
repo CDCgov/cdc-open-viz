@@ -1,8 +1,10 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect } from 'storybook/test'
 
 import WaffleChart from '../CdcWaffleChart'
 import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
+import MinimalExampleConfig from '../../examples/minimal-example.json'
 
 const meta: Meta<typeof WaffleChart> = {
   title: 'Components/Templates/WaffleChart',
@@ -261,6 +263,25 @@ export const TP5_Gauge_White_Background: Story = {
   },
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+  }
+}
+
+export const Minimal_Config: Story = {
+  args: {
+    config: MinimalExampleConfig
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Minimum working consumer config shared by the README, CONFIG reference, and sync test.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+    expect(canvasElement.querySelector('.cove-waffle-chart')).toBeInTheDocument()
+    expect(canvasElement.textContent).toContain('Chart Title')
+    expect(canvasElement.textContent).toContain('42')
   }
 }
 
