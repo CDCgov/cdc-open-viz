@@ -253,10 +253,9 @@ describe('LinearChart', () => {
       expect(leftAxis).toBeTruthy()
     })
 
-    it('renders the top y-axis title outside the svg when titlePlacement is top', () => {
+    it('does not render the side y-axis title inside the svg when titlePlacement is top', () => {
       const { container } = renderLinearChart()
 
-      expect(container.querySelector('.y-axis-top-title')?.textContent).toBe('Y-Axis')
       expect(container.querySelector('.left-axis text.y-label')).toBeFalsy()
     })
 

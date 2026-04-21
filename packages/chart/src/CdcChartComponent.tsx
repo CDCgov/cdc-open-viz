@@ -1275,6 +1275,26 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return classes
   }
 
+  const showTopYAxisTitle =
+    config.yAxis?.titlePlacement === 'top' && !config.hideYAxisLabel && Boolean(config.runtime?.yAxis?.label)
+
+  const renderTopYAxisTitle = () =>
+    showTopYAxisTitle ? <div className='y-axis-top-title'>{config.runtime.yAxis.label}</div> : null
+
+  const renderLinearChartWithParentSize = (
+    getParentWidth: (parent: { width: number; height: number }) => number = parent => parent.width,
+    wrapperStyle: React.CSSProperties = { width: '100%' }
+  ) => (
+    <>
+      {renderTopYAxisTitle()}
+      <div ref={parentRef} style={wrapperStyle}>
+        <ParentSize>
+          {parent => <LinearChart ref={svgRef} parentWidth={getParentWidth(parent)} parentHeight={parent.height} />}
+        </ParentSize>
+      </div>
+    </>
+  )
+
   if (!isLoading) {
     const tableLink = (
       <a href={`#data-table-${config.dataKey}`} className='margin-left-href'>
@@ -1446,15 +1466,8 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {/* All charts with LinearChart */}
                   {filteredData &&
                     filteredData.length > 0 &&
-                    !['Spark Line', 'Line', 'Sankey', 'Pie', 'Radar'].includes(config.visualizationType) && (
-                      <div ref={parentRef} style={{ width: `100%` }}>
-                        <ParentSize>
-                          {parent => (
-                            <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
-                          )}
-                        </ParentSize>
-                      </div>
-                    )}
+                    !['Spark Line', 'Line', 'Sankey', 'Pie', 'Radar'].includes(config.visualizationType) &&
+                    renderLinearChartWithParentSize()}
 
                   {filteredData && filteredData.length > 0 && config.visualizationType === 'Pie' && (
                     <ParentSize className='justify-content-center d-flex' style={{ width: `100%` }}>
@@ -1485,34 +1498,17 @@ const CdcChart: React.FC<CdcChartProps> = ({
                   {filteredData &&
                     filteredData.length > 0 &&
                     config.visualizationType === 'Line' &&
-                    (convertLineToBarGraph ? (
-                      <div ref={parentRef} style={{ width: `100%` }}>
-                        <ParentSize>
-                          {parent => (
-                            <LinearChart ref={svgRef} parentWidth={parent.width} parentHeight={parent.height} />
-                          )}
-                        </ParentSize>
-                      </div>
-                    ) : (
-                      <div ref={parentRef} style={{ width: '100%' }}>
-                        <ParentSize>
-                          {parent => {
-                            const labelMargin = 120
-                            const widthReduction =
-                              config.showLineSeriesLabels && (config.legend.position !== 'right' || config.legend.hide)
-                                ? labelMargin
-                                : 0
-                            return (
-                              <LinearChart
-                                ref={svgRef}
-                                parentWidth={parent.width - widthReduction}
-                                parentHeight={parent.height}
-                              />
-                            )
-                          }}
-                        </ParentSize>
-                      </div>
-                    ))}
+                    (convertLineToBarGraph
+                      ? renderLinearChartWithParentSize()
+                      : renderLinearChartWithParentSize(parent => {
+                          const labelMargin = 120
+                          const widthReduction =
+                            config.showLineSeriesLabels && (config.legend.position !== 'right' || config.legend.hide)
+                              ? labelMargin
+                              : 0
+
+                          return parent.width - widthReduction
+                        }))}
                   {/* Sparkline */}
                   {config.visualizationType === 'Spark Line' && (
                     <>
