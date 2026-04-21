@@ -207,7 +207,12 @@ const Widget = ({
             >
               {iconHash['condition']}
             </Button>
-            <div className='widget-menu-item' onClick={deleteWidget}>
+            <div
+              className='widget-menu-item'
+              title='Remove Component'
+              aria-label='Remove Component'
+              onClick={deleteWidget}
+            >
               <Icon display='close' base />
             </div>
           </div>
