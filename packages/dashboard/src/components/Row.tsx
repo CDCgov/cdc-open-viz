@@ -21,7 +21,11 @@ import { iconHash } from '../helpers/iconHash'
 import _ from 'lodash'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { labelHash } from '@cdc/core/helpers/labelHash'
-import { dashboardConditionsSupportedForRow } from '../helpers/dashboardFilterTargets'
+import {
+  cleanupSharedFilterUsedByTargets,
+  dashboardConditionsSupportedForRow,
+  remapRowTargetsInSharedFilters
+} from '../helpers/dashboardFilterTargets'
 
 type RowMenuProps = {
   rowIdx: number
@@ -33,7 +37,13 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
   const rows = _.cloneDeep(config.rows)
   const row = config.rows[rowIdx]
 
-  const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
+  const updateConfig = config => {
+    const cleanedSharedFilters = cleanupSharedFilterUsedByTargets(config)
+    dispatch({
+      type: 'UPDATE_CONFIG',
+      payload: [{ ...config, dashboard: { ...config.dashboard, sharedFilters: cleanedSharedFilters } }]
+    })
+  }
   const curr = useMemo(() => {
     if (row.toggle) return 'toggle'
     return row.columns.reduce((acc, curr) => {
@@ -93,7 +103,16 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
     rows[newIdx].uuid = Date.now()
     rows[rowIdx].uuid = Date.now()
 
-    updateConfig({ ...config, rows })
+    const remappedSharedFilters = remapRowTargetsInSharedFilters(
+      config.dashboard.sharedFilters || [],
+      targetRowIndex => {
+        if (targetRowIndex === rowIdx) return newIdx
+        if (targetRowIndex === newIdx) return rowIdx
+        return targetRowIndex
+      }
+    )
+
+    updateConfig({ ...config, rows, dashboard: { ...config.dashboard, sharedFilters: remappedSharedFilters } })
 
     // TODO: Migrate this animation to a React animation library once one is selected for COVE. This is pretty minor so can stay for now.
     let calcRowMove = dir === 'down' ? 202 : -202
@@ -122,6 +141,14 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
 
   const deleteRow = () => {
     let newVisualizations = { ...config.visualizations }
+    const remappedSharedFilters = remapRowTargetsInSharedFilters(
+      config.dashboard.sharedFilters || [],
+      targetRowIndex => {
+        if (targetRowIndex === rowIdx) return null
+        if (targetRowIndex > rowIdx) return targetRowIndex - 1
+        return targetRowIndex
+      }
+    )
 
     //delete the instantiated widgets
     if (rows[rowIdx] && rows[rowIdx].columns && rows[rowIdx].columns.length && config.visualizations) {
@@ -134,7 +161,12 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
 
     rows.splice(rowIdx, 1) // delete the row
 
-    updateConfig({ ...config, rows, visualizations: newVisualizations })
+    updateConfig({
+      ...config,
+      rows,
+      visualizations: newVisualizations,
+      dashboard: { ...config.dashboard, sharedFilters: remappedSharedFilters }
+    })
   }
 
   const layoutList = [

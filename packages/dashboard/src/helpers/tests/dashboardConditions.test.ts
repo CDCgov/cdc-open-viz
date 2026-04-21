@@ -4,7 +4,11 @@ import {
   evaluateDashboardCondition,
   getDashboardConditionFilteredData
 } from '../dashboardConditions'
-import { getDashboardConditionTargetOptions } from '../dashboardFilterTargets'
+import {
+  cleanupSharedFilterUsedByTargets,
+  getDashboardConditionTargetOptions,
+  remapRowTargetsInSharedFilters
+} from '../dashboardFilterTargets'
 
 describe('dashboardConditions', () => {
   it('assigns missing condition ids and preserves existing ones', () => {
@@ -152,5 +156,69 @@ describe('dashboardConditions', () => {
     )
 
     expect(result).toEqual({ matches: false, resolved: false })
+  })
+
+  it('cleans orphaned widget and dashboard condition targets out of shared filter usedBy', () => {
+    const sharedFilters = cleanupSharedFilterUsedByTargets({
+      dashboard: {
+        sharedFilters: [
+          {
+            key: 'Region',
+            type: 'datafilter',
+            columnName: 'region',
+            usedBy: ['viz-1', 'deleted-viz', 'row-condition-1', 'deleted-condition']
+          }
+        ]
+      },
+      rows: [
+        {
+          dataKey: 'row-data',
+          columns: [{ width: 12, widget: 'viz-1', dashboardCondition: { id: 'row-condition-1', operator: 'hasData' } }]
+        }
+      ],
+      visualizations: {
+        'viz-1': { uid: 'viz-1', type: 'markup-include', visualizationType: 'markup-include' }
+      }
+    } as any)
+
+    expect(sharedFilters[0].usedBy).toEqual(['viz-1', 'row-condition-1'])
+  })
+
+  it('remaps row usedBy targets when rows are deleted or moved', () => {
+    const deletedRowTargets = remapRowTargetsInSharedFilters(
+      [
+        {
+          key: 'Row Filter',
+          type: 'datafilter',
+          columnName: 'region',
+          usedBy: [0, 1, '2', 'viz-1']
+        }
+      ] as any,
+      rowIndex => {
+        if (rowIndex === 1) return null
+        if (rowIndex > 1) return rowIndex - 1
+        return rowIndex
+      }
+    )
+
+    expect(deletedRowTargets[0].usedBy).toEqual([0, '1', 'viz-1'])
+
+    const movedRowTargets = remapRowTargetsInSharedFilters(
+      [
+        {
+          key: 'Row Filter',
+          type: 'datafilter',
+          columnName: 'region',
+          usedBy: [0, 1, 'viz-1']
+        }
+      ] as any,
+      rowIndex => {
+        if (rowIndex === 0) return 1
+        if (rowIndex === 1) return 0
+        return rowIndex
+      }
+    )
+
+    expect(movedRowTargets[0].usedBy).toEqual([1, 0, 'viz-1'])
   })
 })

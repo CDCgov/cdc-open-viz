@@ -8,6 +8,7 @@ import { Dashboard } from '../types/Dashboard'
 import { ConfigRow } from '../types/ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { initialState } from '../DashboardContext'
+import { cleanupSharedFilterUsedByTargets } from '../helpers/dashboardFilterTargets'
 
 type BlankMultiConfig = {
   dashboard: Partial<Dashboard>
@@ -220,7 +221,16 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         }
         return row
       })
-      return { ...state, config: saveMultiChanges({ ...state.config, rows: newRows }, state.config.activeDashboard) }
+      const nextConfig = { ...state.config, rows: newRows }
+      const nextSharedFilters = cleanupSharedFilterUsedByTargets(nextConfig)
+
+      return {
+        ...state,
+        config: saveMultiChanges(
+          { ...nextConfig, dashboard: { ...state.config.dashboard, sharedFilters: nextSharedFilters } },
+          state.config.activeDashboard
+        )
+      }
     }
     case 'DELETE_WIDGET': {
       const { uid } = action.payload
@@ -238,18 +248,23 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
 
       const filteredRows = _.map(newRows, row => ({
         ...row,
-        columns: row.columns.map(column => (column.widget === uid ? _.omit(column, 'widget') : column))
+        columns: row.columns.map(column =>
+          column.widget === uid ? _.omit(column, ['widget', 'dashboardCondition']) : column
+        )
       }))
+
+      const nextConfig = {
+        ...state.config,
+        dashboard: { ...state.config.dashboard, sharedFilters: newSharedFilters },
+        visualizations: newVisualizations,
+        rows: filteredRows
+      }
+      const cleanedSharedFilters = cleanupSharedFilterUsedByTargets(nextConfig)
 
       return {
         ...state,
         config: saveMultiChanges(
-          {
-            ...state.config,
-            dashboard: { ...state.config.dashboard, sharedFilters: newSharedFilters },
-            visualizations: newVisualizations,
-            rows: filteredRows
-          },
+          { ...nextConfig, dashboard: { ...nextConfig.dashboard, sharedFilters: cleanedSharedFilters } },
           state.config.activeDashboard
         )
       }

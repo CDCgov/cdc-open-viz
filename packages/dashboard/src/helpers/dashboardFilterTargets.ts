@@ -23,6 +23,11 @@ export const dashboardConditionsSupportedForRow = (row?: ConfigRow) =>
 
 const normalizeTarget = (target: SharedFilterTarget) => `${target}`
 
+const dedupeSharedFilterTargets = (targets: SharedFilterTarget[]) =>
+  targets.filter(
+    (value, index, values) => values.findIndex(entry => normalizeTarget(entry) === normalizeTarget(value)) === index
+  )
+
 export const matchesSharedFilterTarget = (usedBy: SharedFilter['usedBy'], target: SharedFilterTarget) =>
   !!usedBy?.some(entry => normalizeTarget(entry) === normalizeTarget(target))
 
@@ -132,10 +137,69 @@ export const getSharedFilterTargetOptions = (
 
   return {
     nameLookup,
-    options: options.filter(
-      (value, index, values) => values.findIndex(entry => normalizeTarget(entry) === normalizeTarget(value)) === index
-    )
+    options: dedupeSharedFilterTargets(options)
   }
+}
+
+export const getValidSharedFilterTargets = (config: DashboardConfig): Set<string> => {
+  const validTargets = new Set<string>()
+  const vizRowColumnLocator = getVizRowColumnLocator(config.rows)
+
+  Object.keys(config.visualizations || {}).forEach(vizKey => {
+    const vizLookup = vizRowColumnLocator[vizKey]
+    if (!vizLookup) return
+
+    const viz = config.visualizations[vizKey] as any
+    if (viz.type === 'dashboardFilters') return
+
+    validTargets.add(normalizeTarget(vizKey))
+  })
+
+  config.rows.forEach((row, rowIndex) => {
+    if (row.dataKey) {
+      validTargets.add(normalizeTarget(rowIndex))
+    }
+  })
+
+  getDashboardConditionTargetOptions(config.rows).options.forEach(option => {
+    validTargets.add(normalizeTarget(option))
+  })
+
+  return validTargets
+}
+
+export const remapRowTargetsInSharedFilters = (
+  sharedFilters: SharedFilter[],
+  remapRowIndex: (rowIndex: number) => number | null
+): SharedFilter[] =>
+  sharedFilters.map(sharedFilter => {
+    if (!sharedFilter.usedBy) return sharedFilter
+
+    const nextUsedBy = dedupeSharedFilterTargets(
+      sharedFilter.usedBy.flatMap(target => {
+        const isNumericRowTarget = typeof target === 'number' || (typeof target === 'string' && /^-?\d+$/.test(target))
+        if (!isNumericRowTarget) return [target]
+
+        const mappedRowIndex = remapRowIndex(Number(target))
+        return mappedRowIndex === null ? [] : [typeof target === 'number' ? mappedRowIndex : `${mappedRowIndex}`]
+      })
+    )
+
+    return nextUsedBy === sharedFilter.usedBy ? sharedFilter : { ...sharedFilter, usedBy: nextUsedBy }
+  })
+
+export const cleanupSharedFilterUsedByTargets = (config: DashboardConfig): SharedFilter[] => {
+  const validTargets = getValidSharedFilterTargets(config)
+
+  return (config.dashboard?.sharedFilters || []).map(sharedFilter => {
+    if (!sharedFilter.usedBy) return sharedFilter
+
+    const nextUsedBy = dedupeSharedFilterTargets(
+      sharedFilter.usedBy.filter(target => validTargets.has(normalizeTarget(target)))
+    )
+
+    return nextUsedBy === sharedFilter.usedBy ? sharedFilter : { ...sharedFilter, usedBy: nextUsedBy }
+  })
 }
 
 export const getApplicableFiltersForTarget = (
