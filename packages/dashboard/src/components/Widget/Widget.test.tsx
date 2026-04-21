@@ -41,12 +41,16 @@ describe('Widget', () => {
                   columns: [
                     {
                       width: 12,
-                      widget: 'markup-1',
-                      dashboardCondition: {
-                        id: 'column-condition-1',
-                        datasetKey: 'condition-data',
-                        operator: 'hasData'
-                      }
+                      conditionalWidgets: [
+                        {
+                          widget: 'markup-1',
+                          dashboardCondition: {
+                            id: 'column-condition-1',
+                            datasetKey: 'condition-data',
+                            operator: 'hasData'
+                          }
+                        }
+                      ]
                     }
                   ],
                   expandCollapseAllButtons: false
@@ -91,6 +95,7 @@ describe('Widget', () => {
                   uid: 'markup-1',
                   rowIdx: 0,
                   colIdx: 0,
+                  entryIdx: 0,
                   type: 'markup-include',
                   visualizationType: 'markup-include',
                   contentEditor: { title: 'Example' }

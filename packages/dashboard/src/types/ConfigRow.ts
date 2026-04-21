@@ -8,14 +8,19 @@ export type DashboardCondition = {
   values?: string[]
 }
 
+export type ConditionalWidget = {
+  widget: string
+  dashboardCondition?: DashboardCondition
+}
+
 type Col = {
   equalHeight?: boolean
   width: number | null
   hide?: boolean
   widget?: string
+  conditionalWidgets?: ConditionalWidget[]
   toggleName?: string
   uuid?: string | number
-  dashboardCondition?: DashboardCondition
 }
 
 export type ConfigRow = {

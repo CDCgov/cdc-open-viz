@@ -15,12 +15,13 @@ describe('dashboardConditions', () => {
     const rows = ensureRowConditionIds([
       {
         columns: [
-          { width: 6, widget: 'viz-1', dashboardCondition: { datasetKey: 'dataset-1', operator: 'hasData' } },
           {
             width: 6,
-            widget: 'viz-2',
-            dashboardCondition: { id: 'column-condition-2', datasetKey: 'dataset-1', operator: 'hasData' }
-          }
+            conditionalWidgets: [
+              { widget: 'viz-1', dashboardCondition: { datasetKey: 'dataset-1', operator: 'hasData' } }
+            ]
+          },
+          { width: 6, widget: 'viz-2' }
         ],
         dashboardCondition: { datasetKey: 'dataset-1', operator: 'hasData' },
         expandCollapseAllButtons: false
@@ -28,32 +29,37 @@ describe('dashboardConditions', () => {
     ] as any)
 
     expect(rows[0].dashboardCondition?.id).toMatch(/^dashboard-condition-/)
-    expect(rows[0].columns[0].dashboardCondition?.id).toMatch(/^dashboard-condition-/)
-    expect(rows[0].columns[1].dashboardCondition?.id).toBe('column-condition-2')
+    expect(rows[0].columns[0].conditionalWidgets?.[0].dashboardCondition?.id).toMatch(/^dashboard-condition-/)
+    expect(rows[0].columns[1]).toMatchObject({ widget: 'viz-2' })
   })
 
   it('includes row and column dashboard condition targets for supported rows only', () => {
     const { nameLookup, options } = getDashboardConditionTargetOptions([
       {
         columns: [
-          { width: 12, widget: 'viz-1', dashboardCondition: { id: 'column-condition-1', operator: 'hasData' } }
+          {
+            width: 12,
+            conditionalWidgets: [
+              { widget: 'viz-1', dashboardCondition: { id: 'column-condition-1', operator: 'hasData' } },
+              { widget: 'viz-3', dashboardCondition: { id: 'column-condition-3', operator: 'hasNoData' } }
+            ]
+          }
         ],
         dashboardCondition: { id: 'row-condition-1', operator: 'hasData' },
         expandCollapseAllButtons: false
       },
       {
-        columns: [
-          { width: 12, widget: 'viz-2', dashboardCondition: { id: 'column-condition-2', operator: 'hasData' } }
-        ],
+        columns: [{ width: 12, widget: 'viz-2' }],
         dashboardCondition: { id: 'row-condition-2', operator: 'hasData' },
         expandCollapseAllButtons: false,
         toggle: true
       }
     ] as any)
 
-    expect(options).toEqual(['row-condition-1', 'column-condition-1'])
+    expect(options).toEqual(['row-condition-1', 'column-condition-1', 'column-condition-3'])
     expect(nameLookup['row-condition-1']).toBe('Row 1 Dashboard Condition')
-    expect(nameLookup['column-condition-1']).toBe('Row 1 Column 1 Dashboard Condition')
+    expect(nameLookup['column-condition-1']).toBe('Row 1 Column 1 Component 1 Dashboard Condition')
+    expect(nameLookup['column-condition-3']).toBe('Row 1 Column 1 Component 2 Dashboard Condition')
     expect(nameLookup['row-condition-2']).toBeUndefined()
   })
 
@@ -173,7 +179,14 @@ describe('dashboardConditions', () => {
       rows: [
         {
           dataKey: 'row-data',
-          columns: [{ width: 12, widget: 'viz-1', dashboardCondition: { id: 'row-condition-1', operator: 'hasData' } }]
+          columns: [
+            {
+              width: 12,
+              conditionalWidgets: [
+                { widget: 'viz-1', dashboardCondition: { id: 'row-condition-1', operator: 'hasData' } }
+              ]
+            }
+          ]
         }
       ],
       visualizations: {

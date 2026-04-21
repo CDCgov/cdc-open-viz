@@ -20,7 +20,7 @@ The important design constraint is:
 V1 supports:
 
 - one inline `dashboardCondition` per row
-- one inline `dashboardCondition` per row column/widget
+- one conditional column with ordered candidate widgets when a component-level dashboard condition is needed
 - operators `hasData`, `hasNoData`, and `columnHasAnyValue`
 - shared-filter scoping through the existing `usedBy` model
 
@@ -59,7 +59,16 @@ type DashboardCondition = {
 It is used here:
 
 - `rows[].dashboardCondition`
-- `rows[].columns[].dashboardCondition`
+- `rows[].columns[].conditionalWidgets[].dashboardCondition`
+
+Conditional columns also introduce:
+
+```ts
+type ConditionalWidget = {
+  widget: string
+  dashboardCondition?: DashboardCondition
+}
+```
 
 Notes:
 
@@ -67,6 +76,8 @@ Notes:
 - The editor creates the id when the condition is first saved.
 - `datasetKey` may differ from the dataset used by the controlled visualization.
 - `columnName` and `values` are only meaningful for `columnHasAnyValue`.
+- component-level conditions always live on `conditionalWidgets[]` entries.
+- saving the first component condition converts a simple `column.widget` into `conditionalWidgets[0]`.
 
 ## High-Level Flow
 
@@ -152,7 +163,9 @@ The target helper file is intentionally broader than dashboard conditions alone.
 The runtime rules are:
 
 - A row-level `dashboardCondition` must pass for the row to render.
-- A column-level `dashboardCondition` must pass for that widget to render.
+- A simple column-level `dashboardCondition` must pass for that widget to render.
+- A conditional column renders the first candidate widget whose entry-level `dashboardCondition` passes.
+- If no conditional entry matches, the column renders empty and keeps its grid width.
 - Row and column conditions combine with implicit AND.
 - Hidden widgets preserve their grid width.
 - If every widget column in a row is hidden, the row does not render.
@@ -208,6 +221,9 @@ Current editor behavior to preserve:
 - condition buttons render with an active visual state when a condition already exists
 - the modal uses a `Condition Type` dropdown with `No condition` representing the absence of `dashboardCondition`
 - tooltips explain the condition-type choices and the column/value authoring flow for `columnHasAnyValue`
+- a column stays in simple mode until the first widget condition is explicitly saved
+- the second conditional component slot appears only after the first conditional entry has a saved condition
+- cleanup back to simple mode happens only after completed save or delete actions, not while the first condition is still being authored
 
 ## Supported Operators
 
@@ -255,6 +271,7 @@ If a config somehow contains a dashboard condition on one of those unsupported r
 
 | File                                                                                                                                                                                                              | Role                                                                               |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| [packages/dashboard/src/helpers/dashboardColumnWidgets.ts](../packages/dashboard/src/helpers/dashboardColumnWidgets.ts)                                                                                           | Column widget source-of-truth, first-match resolution, and collapse normalization  |
 | [packages/dashboard/src/helpers/dashboardConditions.ts](../packages/dashboard/src/helpers/dashboardConditions.ts)                                                                                                 | Dashboard-condition ids and operator evaluation                                    |
 | [packages/dashboard/src/helpers/dashboardFilterTargets.ts](../packages/dashboard/src/helpers/dashboardFilterTargets.ts)                                                                                           | Shared-filter target resolution for rows, visualizations, and dashboard conditions |
 | [packages/dashboard/src/helpers/getFilteredData.ts](../packages/dashboard/src/helpers/getFilteredData.ts)                                                                                                         | Runtime filtered-data precompute, now including condition targets                  |
@@ -310,6 +327,10 @@ When adding behavior, test these cases first:
 
 - row condition true/false
 - column condition true/false
+- conditional column first-match wins
+- conditional column no-match renders empty
+- conversion into conditional mode only after the first condition save
+- collapse back to simple mode when one unconditioned entry remains
 - unresolved vs resolved-empty
 - different condition dataset than visualization dataset
 - sibling components with independent conditions

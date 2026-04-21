@@ -2,6 +2,7 @@ import { ConfigRow, DashboardCondition } from '../types/ConfigRow'
 import { DashboardConfig } from '../types/DashboardConfig'
 import { Dashboard } from '../types/Dashboard'
 import { SharedFilter } from '../types/SharedFilter'
+import { getConditionalWidgets, hasConditionalWidgets } from './dashboardColumnWidgets'
 import { getVizRowColumnLocator } from './getVizRowColumnLocator'
 
 export type SharedFilterTarget = string | number
@@ -16,6 +17,7 @@ export type DashboardConditionTarget = {
   dashboardCondition: DashboardCondition
   rowIndex: number
   columnIndex?: number
+  entryIndex?: number
 }
 
 export const dashboardConditionsSupportedForRow = (row?: ConfigRow) =>
@@ -34,11 +36,19 @@ export const matchesSharedFilterTarget = (usedBy: SharedFilter['usedBy'], target
 export const getDashboardConditionLabel = (
   rowIndex: number,
   dashboardCondition: DashboardCondition | undefined,
-  columnIndex?: number
+  columnIndex?: number,
+  entryIndex?: number
 ) => {
   if (!dashboardCondition?.id) return null
   if (columnIndex === undefined) {
     return { id: dashboardCondition.id, label: `Row ${rowIndex + 1} Dashboard Condition` }
+  }
+
+  if (entryIndex !== undefined) {
+    return {
+      id: dashboardCondition.id,
+      label: `Row ${rowIndex + 1} Column ${columnIndex + 1} Component ${entryIndex + 1} Dashboard Condition`
+    }
   }
 
   return {
@@ -61,11 +71,21 @@ export const getDashboardConditionTargetOptions = (rows: ConfigRow[]): SharedFil
     }
 
     row.columns.forEach((column, columnIndex) => {
-      const columnDashboardCondition = getDashboardConditionLabel(rowIndex, column.dashboardCondition, columnIndex)
-      if (!columnDashboardCondition) return
+      if (hasConditionalWidgets(column)) {
+        getConditionalWidgets(column).forEach((entry, entryIndex) => {
+          const conditionalWidgetDashboardCondition = getDashboardConditionLabel(
+            rowIndex,
+            entry.dashboardCondition,
+            columnIndex,
+            entryIndex
+          )
+          if (!conditionalWidgetDashboardCondition) return
 
-      nameLookup[columnDashboardCondition.id] = columnDashboardCondition.label
-      options.push(columnDashboardCondition.id)
+          nameLookup[conditionalWidgetDashboardCondition.id] = conditionalWidgetDashboardCondition.label
+          options.push(conditionalWidgetDashboardCondition.id)
+        })
+        return
+      }
     })
   })
 
@@ -85,13 +105,19 @@ export const getDashboardConditionTargets = (rows: ConfigRow[]): DashboardCondit
     }
 
     row.columns?.forEach((column, columnIndex) => {
-      if (!column.dashboardCondition?.id) return
-      targets.push({
-        id: column.dashboardCondition.id,
-        dashboardCondition: column.dashboardCondition,
-        rowIndex,
-        columnIndex
-      })
+      if (hasConditionalWidgets(column)) {
+        getConditionalWidgets(column).forEach((entry, entryIndex) => {
+          if (!entry.dashboardCondition?.id) return
+          targets.push({
+            id: entry.dashboardCondition.id,
+            dashboardCondition: entry.dashboardCondition,
+            rowIndex,
+            columnIndex,
+            entryIndex
+          })
+        })
+        return
+      }
     })
 
     return targets

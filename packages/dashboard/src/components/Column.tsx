@@ -3,10 +3,11 @@ import { useDrop } from 'react-dnd'
 
 import { DashboardContext } from '../DashboardContext'
 import Widget from './Widget/Widget'
+import { getColumnWidgetEntries, hasConditionalWidgets } from '../helpers/dashboardColumnWidgets'
 
 type ColumnProps = {
   // column data passed from parent
-  data: Object[]
+  data: any
   // row index
   rowIdx: number
   // column index
@@ -15,7 +16,25 @@ type ColumnProps = {
   toggleRow: boolean
 }
 
-const Column: React.FC<ColumnProps> = ({ data, rowIdx, colIdx, toggleRow }) => {
+type ColumnWidgetSlotProps = {
+  columnData: any
+  rowIdx: number
+  colIdx: number
+  toggleRow: boolean
+  entryIndex?: number
+  widgetKey?: string
+  dashboardCondition?: any
+}
+
+const ColumnWidgetSlot: React.FC<ColumnWidgetSlotProps> = ({
+  columnData,
+  rowIdx,
+  colIdx,
+  toggleRow,
+  entryIndex,
+  widgetKey,
+  dashboardCondition
+}) => {
   const { config } = useContext(DashboardContext)
 
   const [{ isOver, canDrop }, drop] = useDrop(
@@ -24,9 +43,10 @@ const Column: React.FC<ColumnProps> = ({ data, rowIdx, colIdx, toggleRow }) => {
       drop: () => ({
         rowIdx,
         colIdx,
+        entryIdx: entryIndex,
         canDrop
       }),
-      canDrop: () => !data.widget,
+      canDrop: () => !widgetKey,
       collect: monitor => ({
         isOver: monitor.isOver(),
         canDrop: !!monitor.canDrop()
@@ -35,10 +55,10 @@ const Column: React.FC<ColumnProps> = ({ data, rowIdx, colIdx, toggleRow }) => {
     [config.activeDashboard]
   )
 
-  const widget = data.widget ? config?.visualizations[data.widget] : null
-  if (widget && !widget.uid) widget.uid = data.widget
+  const widget = widgetKey ? config?.visualizations[widgetKey] : null
+  if (widget && !widget.uid) widget.uid = widgetKey
 
-  let classNames = ['builder-column', 'column-size--' + data.width]
+  let classNames = ['builder-column__slot']
 
   if (isOver && canDrop) {
     classNames.push('column--drop')
@@ -59,9 +79,9 @@ const Column: React.FC<ColumnProps> = ({ data, rowIdx, colIdx, toggleRow }) => {
     <div className={classNames.join(' ')} ref={drop}>
       {widget ? (
         <Widget
-          columnData={data}
+          columnData={{ ...columnData, widget: widgetKey, dashboardCondition }}
           title={handleTitle(widget)}
-          widgetConfig={{ rowIdx, colIdx, ...widget }}
+          widgetConfig={{ rowIdx, colIdx, entryIdx: entryIndex, ...widget }}
           type={widget.visualizationType ?? widget.general?.geoType}
           toggleRow={toggleRow}
           widgetInRow
@@ -70,6 +90,51 @@ const Column: React.FC<ColumnProps> = ({ data, rowIdx, colIdx, toggleRow }) => {
         <p className='builder-column__text'>
           Drag and drop <br /> visualization
         </p>
+      )}
+    </div>
+  )
+}
+
+const Column: React.FC<ColumnProps> = ({ data, rowIdx, colIdx, toggleRow }) => {
+  const conditionalMode = hasConditionalWidgets(data)
+  const widgetEntries = getColumnWidgetEntries(data)
+  const canAddAnother = conditionalMode && !!widgetEntries[0]?.dashboardCondition
+
+  return (
+    <div className={['builder-column', 'column-size--' + data.width].join(' ')}>
+      {conditionalMode ? (
+        <>
+          {widgetEntries.map((entry, entryIndex) => (
+            <ColumnWidgetSlot
+              key={`${rowIdx}-${colIdx}-${entryIndex}-${entry.widget}`}
+              columnData={data}
+              rowIdx={rowIdx}
+              colIdx={colIdx}
+              toggleRow={toggleRow}
+              entryIndex={entryIndex}
+              widgetKey={entry.widget}
+              dashboardCondition={entry.dashboardCondition}
+            />
+          ))}
+          {canAddAnother && (
+            <ColumnWidgetSlot
+              columnData={data}
+              rowIdx={rowIdx}
+              colIdx={colIdx}
+              toggleRow={toggleRow}
+              entryIndex={widgetEntries.length}
+            />
+          )}
+        </>
+      ) : (
+        <ColumnWidgetSlot
+          columnData={data}
+          rowIdx={rowIdx}
+          colIdx={colIdx}
+          toggleRow={toggleRow}
+          widgetKey={data.widget}
+          dashboardCondition={data.dashboardCondition}
+        />
       )}
     </div>
   )

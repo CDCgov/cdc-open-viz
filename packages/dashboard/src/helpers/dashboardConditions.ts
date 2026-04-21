@@ -1,5 +1,6 @@
 import { Dashboard } from '../types/Dashboard'
 import { ConfigRow, DashboardCondition } from '../types/ConfigRow'
+import { getConditionalWidgets, hasConditionalWidgets } from './dashboardColumnWidgets'
 import { filterData, isFilterAtResetState } from './filterData'
 import { getApplicableFiltersForTarget } from './dashboardFilterTargets'
 
@@ -20,14 +21,23 @@ export const ensureRowConditionIds = (rows: ConfigRow[]): ConfigRow[] =>
     }
 
     nextRow.columns = nextRow.columns.map(column => {
-      if (!column.dashboardCondition || column.dashboardCondition.id) return column
-      return {
-        ...column,
-        dashboardCondition: {
-          ...column.dashboardCondition,
-          id: createDashboardConditionId()
+      if (hasConditionalWidgets(column)) {
+        return {
+          ...column,
+          conditionalWidgets: getConditionalWidgets(column).map(entry => {
+            if (!entry.dashboardCondition || entry.dashboardCondition.id) return entry
+
+            return {
+              ...entry,
+              dashboardCondition: {
+                ...entry.dashboardCondition,
+                id: createDashboardConditionId()
+              }
+            }
+          })
         }
       }
+      return column
     })
 
     return nextRow

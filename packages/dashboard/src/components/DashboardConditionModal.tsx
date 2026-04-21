@@ -10,6 +10,7 @@ import Tooltip from '@cdc/core/components/ui/Tooltip'
 import Icon from '@cdc/core/components/ui/Icon'
 import { useContext, useEffect, useMemo, useState } from 'react'
 import { DashboardContext, DashboardDispatchContext } from '../DashboardContext'
+import { hasConditionalWidgets, normalizeConditionalColumn } from '../helpers/dashboardColumnWidgets'
 import { createDashboardConditionId } from '../helpers/dashboardConditions'
 import { dashboardConditionsSupportedForRow } from '../helpers/dashboardFilterTargets'
 import { DashboardCondition } from '../types/ConfigRow'
@@ -19,6 +20,7 @@ import './dashboard-condition-modal.css'
 type DashboardConditionModalProps = {
   rowIndex: number
   columnIndex?: number
+  entryIndex?: number
 }
 
 type ConditionTypeOption = DashboardCondition['operator'] | ''
@@ -48,15 +50,26 @@ const tooltipIcon = (label: string) => (
   </Tooltip>
 )
 
-export const DashboardConditionModal: React.FC<DashboardConditionModalProps> = ({ rowIndex, columnIndex }) => {
+export const DashboardConditionModal: React.FC<DashboardConditionModalProps> = ({
+  rowIndex,
+  columnIndex,
+  entryIndex
+}) => {
   const { config } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
   const { overlay } = useGlobalContext()
   const transform = new DataTransform()
 
   const row = config.rows[rowIndex]
+  const column = columnIndex === undefined ? undefined : row.columns[columnIndex]
+  const isConditionalEntryEditor =
+    columnIndex !== undefined && entryIndex !== undefined && hasConditionalWidgets(column)
   const existingDashboardCondition =
-    columnIndex === undefined ? row.dashboardCondition : row.columns[columnIndex]?.dashboardCondition
+    columnIndex === undefined
+      ? row.dashboardCondition
+      : isConditionalEntryEditor
+      ? column?.conditionalWidgets?.[entryIndex]?.dashboardCondition
+      : undefined
   const [formState, setFormState] = useState<DashboardConditionFormState>(
     getDashboardConditionFormState(existingDashboardCondition)
   )
@@ -69,6 +82,8 @@ export const DashboardConditionModal: React.FC<DashboardConditionModalProps> = (
   const title =
     columnIndex === undefined
       ? `Row ${rowIndex + 1} Dashboard Condition`
+      : isConditionalEntryEditor
+      ? `Row ${rowIndex + 1} Column ${columnIndex + 1} Component ${entryIndex + 1} Dashboard Condition`
       : `Row ${rowIndex + 1} Column ${columnIndex + 1} Dashboard Condition`
   const targetLabel = columnIndex === undefined ? 'row' : 'component'
 
@@ -92,9 +107,37 @@ export const DashboardConditionModal: React.FC<DashboardConditionModalProps> = (
       return
     }
 
-    const columns = row.columns.map((column, currentColumnIndex) =>
-      currentColumnIndex === columnIndex ? { ...column, dashboardCondition } : column
-    )
+    const columns = row.columns.map((currentColumn, currentColumnIndex) => {
+      if (currentColumnIndex !== columnIndex) return currentColumn
+
+      if (isConditionalEntryEditor) {
+        const conditionalWidgets = [...(currentColumn.conditionalWidgets || [])]
+        conditionalWidgets[entryIndex] = {
+          ...conditionalWidgets[entryIndex],
+          dashboardCondition
+        }
+
+        return normalizeConditionalColumn({
+          ...currentColumn,
+          conditionalWidgets
+        })
+      }
+
+      if (!dashboardCondition) {
+        return currentColumn
+      }
+
+      return normalizeConditionalColumn({
+        ...currentColumn,
+        widget: undefined,
+        conditionalWidgets: [
+          {
+            widget: currentColumn.widget,
+            dashboardCondition
+          }
+        ]
+      })
+    })
     dispatch({ type: 'UPDATE_ROW', payload: { rowIndex, rowData: { columns } } })
   }
 

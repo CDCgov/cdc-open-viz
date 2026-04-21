@@ -53,11 +53,11 @@ Rows, datasets, and child visualizations also use the shared `ConfigureData` fie
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `rows` | `ConfigRow[]` | Yes | `[{ columns: [{ width: 12 }] }]` in practice | Layout rows that place widgets on the page. | The dashboard can render without explicit row chrome, but it needs at least one row for visible widgets. |
-| `rows[].columns[]` | `object` | Yes | None | Column slots inside each row. | A column is populated when `widget` points to a visualization key. |
+| `rows[].columns[]` | `object` | Yes | None | Column slots inside each row. | A column is populated when `widget` points to a visualization key, or when `conditionalWidgets` holds one or more candidate widgets. |
 | `rows[].columns[].width` | `number \| null` | Yes | `null` on empty placeholders | Column width in the dashboard grid. | `12` is a full-width column. |
-| `rows[].columns[].widget` | `string` | No | None | Visualization key rendered in that slot. | Must match a key in `visualizations`. |
+| `rows[].columns[].widget` | `string` | No | None | Visualization key rendered in that slot in simple mode. | Must match a key in `visualizations`. Ignored when `conditionalWidgets.length > 0`. |
+| `rows[].columns[].conditionalWidgets` | `ConditionalWidget[]` | No | None | Ordered candidate widgets for one column slot. | First matching entry wins. If no entry matches, the column renders empty. |
 | `rows[].dashboardCondition` | `DashboardCondition` | No | None | Optional post-filter visibility rule for the entire row. | Evaluated after shared dashboard filtering; unresolved inputs hide the row. Not supported on toggle or multi-viz rows in v1. |
-| `rows[].columns[].dashboardCondition` | `DashboardCondition` | No | None | Optional post-filter visibility rule for a single column/widget. | Hidden widgets keep their original column width. If every widget column in a row is hidden, the row does not render. |
 | `rows[].toggle` | `boolean` | No | `false` | Turns a row into a toggle row. | Only one column is shown at a time. |
 | `rows[].equalHeight` | `boolean` | No | `false` | Forces equal-height cards within the row. | TP5 layouts may also trigger equalization automatically. |
 | `rows[].multiVizColumn` | `string` | No | None | Column used to split one visualization into multiple cards. | Used by multi-viz dashboard flows. |
@@ -132,7 +132,8 @@ Dashboard conditions are optional visibility rules owned by rows and row columns
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
 | `rows[].dashboardCondition.id` | `string` | No | Auto-generated | Stable dashboard-condition target id used by shared-filter `usedBy`. | The editor generates and preserves this id once dashboard-condition authoring is enabled. |
-| `rows[].columns[].dashboardCondition.id` | `string` | No | Auto-generated | Stable dashboard-condition target id used by shared-filter `usedBy`. | Same behavior as row-level dashboard-condition ids. |
+| `rows[].columns[].conditionalWidgets[].widget` | `string` | Yes in conditional mode | None | Visualization key for one candidate component in the column. | Must match a key in `visualizations`. Author order defines priority. |
+| `rows[].columns[].conditionalWidgets[].dashboardCondition.id` | `string` | No | Auto-generated | Stable dashboard-condition target id used by shared-filter `usedBy`. | Conditional entries expose labels like `Row 1 Column 2 Component 1 Dashboard Condition` in shared-filter targeting. |
 | `*.dashboardCondition.datasetKey` | `string` | Yes when a dashboard condition is enabled | None | Dataset used to evaluate the dashboard condition. | May differ from the visualization dataset. |
 | `*.dashboardCondition.operator` | `string` | Yes when a dashboard condition is enabled | None | Dashboard-condition comparison mode. | `hasData`, `hasNoData`, `columnHasAnyValue` |
 | `*.dashboardCondition.columnName` | `string` | Only for `columnHasAnyValue` | None | Dataset column inspected by the dashboard condition. | Must exist in the dashboard-condition dataset. |
@@ -142,7 +143,9 @@ Dashboard conditions are optional visibility rules owned by rows and row columns
 | --- | --- |
 | Shared filter application | Conditions apply matching scoped filters plus unscoped filters before evaluating the operator. Filters whose `columnName` is missing from the condition dataset are ignored for that condition. |
 | Unresolved inputs | If the condition dataset is unavailable or an applicable filter is still at reset state, the condition resolves as hidden rather than behaving like `hasNoData`. |
-| Row suppression | A false row condition hides the full row. A false column condition hides only that widget slot while preserving grid width. |
+| Conditional columns | `conditionalWidgets` lets one dashboard column hold multiple candidate components while still rendering as one slot. Runtime uses the first matching entry in author order. |
+| Simple/conditional cleanup | The editor automatically collapses conditional mode back to simple mode when only one unconditioned entry remains after a completed save or delete action. |
+| Row suppression | A false row condition hides the full row. A no-match conditional column hides only that widget slot while preserving grid width. |
 | v1 limitations | Toggle rows and multi-viz rows do not expose condition editing in the editor, and runtime ignores any condition config found there. |
 
 ### `APIFilter`

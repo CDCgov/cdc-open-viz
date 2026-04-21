@@ -26,6 +26,7 @@ import {
   dashboardConditionsSupportedForRow,
   remapRowTargetsInSharedFilters
 } from '../helpers/dashboardFilterTargets'
+import { getColumnPrimaryWidget, getColumnWidgetKeys } from '../helpers/dashboardColumnWidgets'
 
 type RowMenuProps = {
   rowIdx: number
@@ -58,7 +59,7 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
     const newRows = _.cloneDeep(rows)
     newRows[rowIdx].toggle = toggle
     const rowColumns = newRows[rowIdx].columns
-    const columnsWithWidgets = rowColumns.filter(c => c.widget)
+    const columnsWithWidgets = rowColumns.filter(c => getColumnWidgetKeys(c).length > 0)
 
     const totalWidgets = columnsWithWidgets.length
     if (totalWidgets > layout.length) {
@@ -71,7 +72,8 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
 
       // Adds placeholder column name that defaults to the visualization type.
       newRows[rowIdx].columns.forEach((col, idx) => {
-        col.toggleName = col.toggleName || labelHash[config.visualizations[col.widget]?.type] || undefined
+        const primaryWidget = getColumnPrimaryWidget(col)
+        col.toggleName = col.toggleName || labelHash[config.visualizations[primaryWidget]?.type] || undefined
       })
 
       newRows[rowIdx].columns = layout.map((width, colIndex) => {
@@ -153,9 +155,9 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
     //delete the instantiated widgets
     if (rows[rowIdx] && rows[rowIdx].columns && rows[rowIdx].columns.length && config.visualizations) {
       rows[rowIdx].columns.forEach(column => {
-        if (column.widget) {
-          delete newVisualizations[column.widget]
-        }
+        getColumnWidgetKeys(column).forEach(widgetKey => {
+          delete newVisualizations[widgetKey]
+        })
       })
     }
 

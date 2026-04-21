@@ -16,7 +16,7 @@ vi.mock('@cdc/core/components/ui/Tooltip', () => {
   return { default: Tooltip }
 })
 
-const buildConfig = (dashboardCondition = undefined) =>
+const buildConfig = () =>
   ({
     type: 'dashboard',
     dashboard: {
@@ -32,7 +32,7 @@ const buildConfig = (dashboardCondition = undefined) =>
     },
     rows: [
       {
-        columns: [{ width: 12, widget: 'markup-1', dashboardCondition }],
+        columns: [{ width: 12, widget: 'markup-1' }],
         expandCollapseAllButtons: false
       }
     ],
@@ -52,7 +52,23 @@ const buildConfig = (dashboardCondition = undefined) =>
     }
   } as any)
 
-const renderModal = (dashboardCondition = undefined) => {
+const buildConditionalConfig = (dashboardCondition = undefined) =>
+  ({
+    ...buildConfig(),
+    rows: [
+      {
+        columns: [
+          {
+            width: 12,
+            conditionalWidgets: [{ widget: 'markup-1', dashboardCondition }]
+          }
+        ],
+        expandCollapseAllButtons: false
+      }
+    ]
+  } as any)
+
+const renderModal = () => {
   const dispatch = vi.fn()
   const toggleOverlay = vi.fn()
 
@@ -73,7 +89,7 @@ const renderModal = (dashboardCondition = undefined) => {
       <DashboardContext.Provider
         value={{
           ...initialState,
-          config: buildConfig(dashboardCondition),
+          config: buildConfig(),
           outerContainerRef: vi.fn(),
           setParentConfig: vi.fn(),
           isDebug: false,
@@ -115,7 +131,16 @@ const renderRowModal = (dashboardCondition = undefined) => {
       <DashboardContext.Provider
         value={{
           ...initialState,
-          config: buildConfig(dashboardCondition),
+          config: {
+            ...buildConfig(),
+            rows: [
+              {
+                columns: [{ width: 12, widget: 'markup-1' }],
+                dashboardCondition,
+                expandCollapseAllButtons: false
+              }
+            ]
+          },
           outerContainerRef: vi.fn(),
           setParentConfig: vi.fn(),
           isDebug: false,
@@ -134,6 +159,47 @@ const renderRowModal = (dashboardCondition = undefined) => {
   )
 
   return { dispatch, toggleOverlay }
+}
+
+const renderConditionalEntryModal = (dashboardCondition = undefined) => {
+  const dispatch = vi.fn()
+
+  render(
+    <GlobalContext.Provider
+      value={{
+        overlay: {
+          object: null,
+          show: true,
+          disableBgClose: false,
+          actions: {
+            openOverlay: vi.fn(),
+            toggleOverlay: vi.fn()
+          }
+        }
+      }}
+    >
+      <DashboardContext.Provider
+        value={{
+          ...initialState,
+          config: buildConditionalConfig(dashboardCondition),
+          outerContainerRef: vi.fn(),
+          setParentConfig: vi.fn(),
+          isDebug: false,
+          isEditor: true,
+          reloadURLData: vi.fn(),
+          loadAPIFilters: vi.fn(),
+          setAPIFilterDropdowns: vi.fn(),
+          setAPILoading: vi.fn()
+        }}
+      >
+        <DashboardDispatchContext.Provider value={dispatch}>
+          <DashboardConditionModal rowIndex={0} columnIndex={0} entryIndex={0} />
+        </DashboardDispatchContext.Provider>
+      </DashboardContext.Provider>
+    </GlobalContext.Provider>
+  )
+
+  return { dispatch }
 }
 
 describe('DashboardConditionModal', () => {
@@ -187,10 +253,15 @@ describe('DashboardConditionModal', () => {
         rowData: {
           columns: [
             expect.objectContaining({
-              dashboardCondition: expect.objectContaining({
-                datasetKey: 'condition-data',
-                operator: 'hasData'
-              })
+              conditionalWidgets: [
+                expect.objectContaining({
+                  widget: 'markup-1',
+                  dashboardCondition: expect.objectContaining({
+                    datasetKey: 'condition-data',
+                    operator: 'hasData'
+                  })
+                })
+              ]
             })
           ]
         }
@@ -199,8 +270,44 @@ describe('DashboardConditionModal', () => {
     expect(toggleOverlay).toHaveBeenCalledWith(false)
   })
 
-  it('clears the condition when No Condition is selected', () => {
-    const { dispatch } = renderModal({
+  it('converts a simple column into conditional mode only after save', () => {
+    const { dispatch } = renderModal()
+
+    fireEvent.change(screen.getByRole('combobox', { name: /Condition Type/i }), { target: { value: 'hasData' } })
+    fireEvent.change(screen.getAllByRole('combobox')[1], {
+      target: { value: 'condition-data' }
+    })
+
+    expect(dispatch).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'UPDATE_ROW',
+      payload: {
+        rowIndex: 0,
+        rowData: {
+          columns: [
+            expect.objectContaining({
+              widget: undefined,
+              conditionalWidgets: [
+                expect.objectContaining({
+                  widget: 'markup-1',
+                  dashboardCondition: expect.objectContaining({
+                    datasetKey: 'condition-data',
+                    operator: 'hasData'
+                  })
+                })
+              ]
+            })
+          ]
+        }
+      }
+    })
+  })
+
+  it('collapses a one-entry conditional column back to simple mode when its condition is removed', () => {
+    const { dispatch } = renderConditionalEntryModal({
       id: 'existing-condition',
       datasetKey: 'condition-data',
       operator: 'hasData'
@@ -214,7 +321,33 @@ describe('DashboardConditionModal', () => {
       payload: {
         rowIndex: 0,
         rowData: {
-          columns: [expect.objectContaining({ dashboardCondition: undefined })]
+          columns: [
+            expect.objectContaining({
+              widget: 'markup-1',
+              conditionalWidgets: undefined
+            })
+          ]
+        }
+      }
+    })
+  })
+
+  it('collapses conditional mode back to simple mode when the last condition is removed', () => {
+    const { dispatch } = renderConditionalEntryModal({
+      id: 'existing-condition',
+      datasetKey: 'condition-data',
+      operator: 'hasData'
+    })
+
+    fireEvent.change(screen.getByRole('combobox', { name: /Condition Type/i }), { target: { value: '' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'UPDATE_ROW',
+      payload: {
+        rowIndex: 0,
+        rowData: {
+          columns: [expect.objectContaining({ widget: 'markup-1', conditionalWidgets: undefined })]
         }
       }
     })

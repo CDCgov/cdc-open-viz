@@ -13,6 +13,7 @@ import { DashboardContext } from '../DashboardContext'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import { evaluateDashboardCondition } from '../helpers/dashboardConditions'
 import { dashboardConditionsSupportedForRow } from '../helpers/dashboardFilterTargets'
+import { getColumnWidgetEntries } from '../helpers/dashboardColumnWidgets'
 import { getVizConfig } from '../helpers/getVizConfig'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import CollapsibleVisualizationRow from './CollapsibleVisualizationRow'
@@ -169,8 +170,9 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   }
 
   const tp5CountInRow = row.columns.reduce((count, col) => {
-    if (!col.widget) return count
-    const viz = config.visualizations[col.widget]
+    const widgetKey = getColumnWidgetEntries(col)[0]?.widget
+    if (!widgetKey) return count
+    const viz = config.visualizations[widgetKey]
     if (!viz) return count
 
     const isTp5DataBite = viz.type === 'data-bite' && (viz as any).biteStyle === 'tp5'
@@ -207,9 +209,10 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     }
   }, [shouldEqualizeRow, row.columns, config.activeDashboard, filteredDataOverride, dashboardFilteredData[index]])
 
-  const isFilterRow = row.columns.some(
-    col => col.widget && config.visualizations[col.widget]?.type === 'dashboardFilters'
-  )
+  const isFilterRow = row.columns.some(col => {
+    const widgetKey = getColumnWidgetEntries(col)[0]?.widget
+    return widgetKey && config.visualizations[widgetKey]?.type === 'dashboardFilters'
+  })
   const needsEqualHeight = shouldEqualizeRow && !isFilterRow
 
   const show = useMemo(() => {
@@ -229,23 +232,39 @@ const VisualizationRow: React.FC<VizRowProps> = ({
 
     return evaluateDashboardCondition(row.dashboardCondition, dashboardFilteredData[row.dashboardCondition.id])
   }, [dashboardFilteredData, row.dashboardCondition, shouldIgnoreDashboardConditions])
-  const columnDashboardConditionEvaluations = useMemo(
-    () =>
-      row.columns.map(column => {
-        if (shouldIgnoreDashboardConditions || !column.dashboardCondition) {
-          return { matches: true, resolved: true }
-        }
+  const resolveColumnWidgetEntry = (column: ConfigRow['columns'][number]) => {
+    const matchedEntry = getColumnWidgetEntries(column).find(entry => {
+      if (shouldIgnoreDashboardConditions || !entry.dashboardCondition) {
+        return true
+      }
 
-        return evaluateDashboardCondition(
-          column.dashboardCondition,
-          dashboardFilteredData[column.dashboardCondition.id]
-        )
-      }),
+      return evaluateDashboardCondition(entry.dashboardCondition, dashboardFilteredData[entry.dashboardCondition.id])
+        .matches
+    })
+
+    if (!matchedEntry) {
+      return { matches: false, resolved: true, widget: undefined }
+    }
+
+    if (shouldIgnoreDashboardConditions || !matchedEntry.dashboardCondition) {
+      return { matches: true, resolved: true, widget: matchedEntry.widget }
+    }
+
+    return {
+      ...evaluateDashboardCondition(
+        matchedEntry.dashboardCondition,
+        dashboardFilteredData[matchedEntry.dashboardCondition.id]
+      ),
+      widget: matchedEntry.widget
+    }
+  }
+  const columnDashboardConditionEvaluations = useMemo(
+    () => row.columns.map(column => resolveColumnWidgetEntry(column)),
     [dashboardFilteredData, row.columns, shouldIgnoreDashboardConditions]
   )
   const hasVisibleWidgetColumn = row.columns.some(
-    (column, columnIndex) =>
-      !!column.width && !!column.widget && columnDashboardConditionEvaluations[columnIndex]?.matches
+    (_column, columnIndex) =>
+      !!row.columns[columnIndex].width && !!columnDashboardConditionEvaluations[columnIndex]?.widget
   )
 
   if (!rowDashboardCondition.matches || !hasVisibleWidgetColumn) {
@@ -327,8 +346,9 @@ const VisualizationRow: React.FC<VizRowProps> = ({
       )}
       {row.columns.map((col, colIndex) => {
         if (col.width) {
-          const hiddenByDashboardCondition = !!col.widget && !columnDashboardConditionEvaluations[colIndex]?.matches
-          if (!col.widget || hiddenByDashboardCondition) {
+          const resolvedWidget = columnDashboardConditionEvaluations[colIndex]?.widget
+          const hiddenByDashboardCondition = !!getColumnWidgetEntries(col).length && !resolvedWidget
+          if (!resolvedWidget) {
             return (
               <div
                 key={`row__${index}__col__${colIndex}`}
@@ -341,7 +361,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
           }
 
           const visualizationConfig = getVizConfig(
-            col.widget,
+            resolvedWidget,
             index,
             config,
             rawData,
@@ -354,9 +374,9 @@ const VisualizationRow: React.FC<VizRowProps> = ({
 
           const setsSharedFilter =
             config.dashboard.sharedFilters &&
-            config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget).length > 0
+            config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === resolvedWidget).length > 0
           const setSharedFilterValue = setsSharedFilter
-            ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === col.widget)[0].active
+            ? config.dashboard.sharedFilters.filter(sharedFilter => sharedFilter.setBy === resolvedWidget)[0].active
             : undefined
           const tableLink = (
             <a
@@ -414,12 +434,12 @@ const VisualizationRow: React.FC<VizRowProps> = ({
             >
               {type === 'chart' && (
                 <CdcChart
-                  key={col.widget}
+                  key={resolvedWidget}
                   config={visualizationConfig as ChartConfig}
                   dashboardConfig={config}
                   datasets={config.datasets}
                   setConfig={newConfig => {
-                    updateChildConfig(col.widget, newConfig)
+                    updateChildConfig(resolvedWidget, newConfig)
                   }}
                   setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
                   isDashboard={true}
@@ -429,10 +449,10 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               )}
               {type === 'map' && (
                 <CdcMap
-                  key={col.widget}
+                  key={resolvedWidget}
                   config={visualizationConfig}
                   setConfig={newConfig => {
-                    updateChildConfig(col.widget, newConfig)
+                    updateChildConfig(resolvedWidget, newConfig)
                   }}
                   showLoader={false}
                   setSharedFilter={setsSharedFilter ? setSharedFilter : undefined}
@@ -445,11 +465,11 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               )}
               {type === 'data-bite' && (
                 <CdcDataBite
-                  key={col.widget}
+                  key={resolvedWidget}
                   config={visualizationConfig}
                   rawData={rawData?.[visualizationConfig.dataKey] || []}
                   setConfig={newConfig => {
-                    updateChildConfig(col.widget, newConfig)
+                    updateChildConfig(resolvedWidget, newConfig)
                   }}
                   isDashboard={true}
                   isEditor={config.editing === true}
@@ -458,11 +478,11 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               )}
               {type === 'waffle-chart' && (
                 <CdcWaffleChart
-                  key={col.widget}
+                  key={resolvedWidget}
                   config={visualizationConfig}
                   rawData={rawData?.[visualizationConfig.dataKey] || []}
                   setConfig={newConfig => {
-                    updateChildConfig(col.widget, newConfig)
+                    updateChildConfig(resolvedWidget, newConfig)
                   }}
                   isDashboard={true}
                   interactionLabel={interactionLabel}
@@ -470,22 +490,22 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               )}
               {type === 'markup-include' && (
                 <CdcMarkupInclude
-                  key={col.widget}
+                  key={resolvedWidget}
                   config={visualizationConfig}
                   datasets={config.datasets}
                   isDashboard={true}
                   setConfig={newConfig => {
-                    updateChildConfig(col.widget, newConfig)
+                    updateChildConfig(resolvedWidget, newConfig)
                   }}
                   interactionLabel={interactionLabel}
                 />
               )}
               {type === 'filtered-text' && (
                 <CdcFilteredText
-                  key={col.widget}
+                  key={resolvedWidget}
                   config={visualizationConfig}
                   setConfig={newConfig => {
-                    updateChildConfig(col.widget, newConfig)
+                    updateChildConfig(resolvedWidget, newConfig)
                   }}
                   isDashboard={true}
                 />
@@ -493,9 +513,9 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               {type === 'dashboardFilters' && (
                 <DashboardSharedFilters
                   setConfig={newConfig => {
-                    updateChildConfig(col.widget, newConfig)
+                    updateChildConfig(resolvedWidget, newConfig)
                   }}
-                  key={col.widget}
+                  key={resolvedWidget}
                   visualizationConfig={visualizationConfig as DashboardFilters}
                   apiFilterDropdowns={apiFilterDropdowns}
                   currentViewport={currentViewport}
@@ -504,11 +524,11 @@ const VisualizationRow: React.FC<VizRowProps> = ({
               )}
               {type === 'table' && (
                 <DataTableStandAlone
-                  key={col.widget}
+                  key={resolvedWidget}
                   updateConfig={newConfig => {
-                    updateChildConfig(col.widget, newConfig)
+                    updateChildConfig(resolvedWidget, newConfig)
                   }}
-                  visualizationKey={col.widget}
+                  visualizationKey={resolvedWidget}
                   config={visualizationConfig as TableConfig}
                   viewport={currentViewport}
                   interactionLabel={interactionLabel}

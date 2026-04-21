@@ -23,12 +23,16 @@ const baseConfig = {
       columns: [
         {
           width: 12,
-          widget: 'viz-1',
-          dashboardCondition: {
-            id: 'row-1-col-1-condition',
-            datasetKey: 'nested-data.json',
-            operator: 'hasData'
-          }
+          conditionalWidgets: [
+            {
+              widget: 'viz-1',
+              dashboardCondition: {
+                id: 'row-1-col-1-condition',
+                datasetKey: 'nested-data.json',
+                operator: 'hasData'
+              }
+            }
+          ]
         }
       ],
       dashboardCondition: {
@@ -209,7 +213,7 @@ describe('FilterEditor nested dropdown display toggle', () => {
     fireEvent.click(expandButtons[0])
 
     expect(screen.getByText('Row 1 Dashboard Condition')).toBeInTheDocument()
-    expect(screen.getByText('Row 1 Column 1 Dashboard Condition')).toBeInTheDocument()
+    expect(screen.getByText('Row 1 Column 1 Component 1 Dashboard Condition')).toBeInTheDocument()
     expect(screen.queryByText('Row 2 Dashboard Condition')).not.toBeInTheDocument()
     expect(screen.queryByText('Row 2 Column 1 Dashboard Condition')).not.toBeInTheDocument()
   })

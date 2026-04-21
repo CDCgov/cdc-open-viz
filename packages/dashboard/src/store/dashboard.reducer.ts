@@ -9,6 +9,7 @@ import { ConfigRow } from '../types/ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { initialState } from '../DashboardContext'
 import { cleanupSharedFilterUsedByTargets } from '../helpers/dashboardFilterTargets'
+import { ConditionalWidget, hasConditionalWidgets, normalizeConditionalColumn } from '../helpers/dashboardColumnWidgets'
 
 type BlankMultiConfig = {
   dashboard: Partial<Dashboard>
@@ -38,6 +39,58 @@ export type DashboardState = {
   preview: boolean
   tabSelected: Tab
   filtersApplied: boolean
+}
+
+const clearWidgetFromColumn = (column, widgetId: string, entryIdx?: number) => {
+  if (hasConditionalWidgets(column)) {
+    const nextConditionalWidgets = column.conditionalWidgets.filter((entry, index) => {
+      if (entryIdx !== undefined) return index !== entryIdx
+      return entry.widget !== widgetId
+    })
+
+    return normalizeConditionalColumn({
+      ...column,
+      conditionalWidgets: nextConditionalWidgets
+    })
+  }
+
+  if (column.widget !== widgetId) return column
+
+  return {
+    ...column,
+    widget: undefined
+  }
+}
+
+const assignWidgetToColumn = (column, widgetEntry: ConditionalWidget, targetEntryIdx?: number) => {
+  if (targetEntryIdx !== undefined || hasConditionalWidgets(column)) {
+    const nextConditionalWidgets = [...(column.conditionalWidgets || [])]
+    const resolvedTargetEntryIndex = targetEntryIdx ?? nextConditionalWidgets.length
+    nextConditionalWidgets[resolvedTargetEntryIndex] = widgetEntry
+
+    return normalizeConditionalColumn({
+      ...column,
+      widget: undefined,
+      conditionalWidgets: nextConditionalWidgets.filter(entry => !!entry?.widget)
+    })
+  }
+
+  return {
+    ...column,
+    widget: widgetEntry.widget
+  }
+}
+
+const getWidgetEntryFromColumn = (column, widgetId: string, entryIdx?: number): ConditionalWidget | undefined => {
+  if (hasConditionalWidgets(column)) {
+    const conditionalWidget = entryIdx !== undefined ? column.conditionalWidgets[entryIdx] : undefined
+    if (conditionalWidget?.widget === widgetId) return conditionalWidget
+
+    return column.conditionalWidgets.find(entry => entry.widget === widgetId)
+  }
+
+  if (column.widget !== widgetId) return undefined
+  return { widget: widgetId }
 }
 
 const reducer = (state: DashboardState, action: DashboardActions): DashboardState => {
@@ -165,10 +218,14 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       return { ...state, config: { ...state.config, rows: newRows } }
     }
     case 'ADD_VISUALIZATION': {
-      const { newViz, rowIdx, colIdx } = action.payload
+      const { newViz, rowIdx, colIdx, entryIdx } = action.payload
       const vizKey = newViz.uid
       const newRows = _.cloneDeep(state.config.rows)
-      newRows[rowIdx].columns[colIdx].widget = vizKey
+      newRows[rowIdx].columns[colIdx] = assignWidgetToColumn(
+        newRows[rowIdx].columns[colIdx],
+        { widget: vizKey },
+        entryIdx
+      )
       return {
         ...state,
         config: saveMultiChanges(
@@ -178,10 +235,24 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
       }
     }
     case 'MOVE_VISUALIZATION': {
-      const { rowIdx, colIdx, widget } = action.payload
+      const { rowIdx, colIdx, entryIdx, widget } = action.payload
       const newRows = _.cloneDeep(state.config.rows)
-      newRows[widget.rowIdx].columns[widget.colIdx].widget = null
-      newRows[rowIdx].columns[colIdx].widget = widget.uid
+      const widgetEntry = getWidgetEntryFromColumn(
+        newRows[widget.rowIdx].columns[widget.colIdx],
+        widget.uid,
+        widget.entryIdx
+      )
+
+      if (!widgetEntry) {
+        return state
+      }
+
+      newRows[widget.rowIdx].columns[widget.colIdx] = clearWidgetFromColumn(
+        newRows[widget.rowIdx].columns[widget.colIdx],
+        widget.uid,
+        widget.entryIdx
+      )
+      newRows[rowIdx].columns[colIdx] = assignWidgetToColumn(newRows[rowIdx].columns[colIdx], widgetEntry, entryIdx)
       return {
         ...state,
         config: saveMultiChanges({ ...state.config, rows: newRows }, state.config.activeDashboard)
@@ -248,9 +319,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
 
       const filteredRows = _.map(newRows, row => ({
         ...row,
-        columns: row.columns.map(column =>
-          column.widget === uid ? _.omit(column, ['widget', 'dashboardCondition']) : column
-        )
+        columns: row.columns.map(column => normalizeConditionalColumn(clearWidgetFromColumn(column, uid)))
       }))
 
       const nextConfig = {

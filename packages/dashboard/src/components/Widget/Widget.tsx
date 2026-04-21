@@ -13,9 +13,10 @@ import { DataDesignerModal } from '../DataDesignerModal'
 import { DashboardConditionModal } from '../DashboardConditionModal'
 import { labelHash } from '@cdc/core/helpers/labelHash'
 import { dashboardConditionsSupportedForRow } from '../../helpers/dashboardFilterTargets'
+import { hasConditionalWidgets } from '../../helpers/dashboardColumnWidgets'
 import './widget.styles.css'
 
-type WidgetConfig = AnyVisualization & { rowIdx: number; colIdx: number }
+type WidgetConfig = AnyVisualization & { rowIdx: number; colIdx: number; entryIdx?: number }
 type WidgetProps = {
   title: string
   columnData?: any
@@ -51,14 +52,14 @@ const Widget = ({
 
     if (!result) return null
 
-    const { rowIdx, colIdx } = result
+    const { rowIdx, colIdx, entryIdx } = result
 
     if (undefined !== widgetConfig?.rowIdx) {
-      dispatch({ type: 'MOVE_VISUALIZATION', payload: { rowIdx, colIdx, widget: widgetConfig } })
+      dispatch({ type: 'MOVE_VISUALIZATION', payload: { rowIdx, colIdx, entryIdx, widget: widgetConfig } })
     } else if (!!addVisualization) {
       // Item does not exist, instantiate a new one
       const newViz = addVisualization()
-      dispatch({ type: 'ADD_VISUALIZATION', payload: { newViz, rowIdx, colIdx } })
+      dispatch({ type: 'ADD_VISUALIZATION', payload: { newViz, rowIdx, colIdx, entryIdx } })
     }
   }
 
@@ -162,6 +163,9 @@ const Widget = ({
   const rowSupportsDashboardConditions = widgetConfig
     ? dashboardConditionsSupportedForRow(config.rows[widgetConfig.rowIdx])
     : false
+  const isConditionalEntry = widgetConfig
+    ? hasConditionalWidgets(config.rows[widgetConfig.rowIdx]?.columns?.[widgetConfig.colIdx])
+    : false
   const hasDashboardCondition = !!columnData?.dashboardCondition
 
   const widgetContent = (
@@ -201,7 +205,11 @@ const Widget = ({
               disabled={!rowSupportsDashboardConditions}
               onClick={() => {
                 overlay?.actions.openOverlay(
-                  <DashboardConditionModal rowIndex={widgetConfig.rowIdx} columnIndex={widgetConfig.colIdx} />
+                  <DashboardConditionModal
+                    rowIndex={widgetConfig.rowIdx}
+                    columnIndex={widgetConfig.colIdx}
+                    entryIndex={isConditionalEntry ? widgetConfig.entryIdx : undefined}
+                  />
                 )
               }}
             >
