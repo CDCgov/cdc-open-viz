@@ -159,6 +159,37 @@ $red: #f74242;
   }
 }
 
+.builder-column--conditional {
+  align-items: stretch;
+  background: none;
+  border: none;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: auto;
+  justify-content: flex-start;
+}
+
+.builder-column--conditional__slot {
+  align-items: center;
+  background-color: transparent;
+  border: 2px dashed #c2c2c2;
+  display: flex;
+  flex: 0 0 180px;
+  justify-content: center;
+  min-height: 180px;
+  position: relative;
+  width: 100%;
+
+  &:hover {
+    border-color: color.adjust(#c2c2c2, $lightness: -20%);
+  }
+
+  &.column--populated {
+    background: none;
+    border: none;
+  }
+}
+
 .column--drop {
   background-color: #e8f4ff;
   border: 2px dashed var(--blue)-light;
