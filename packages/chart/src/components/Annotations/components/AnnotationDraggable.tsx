@@ -218,7 +218,7 @@ const Annotations = ({
               return (
                 <HtmlLabel
                   className='annotation__desktop-label'
-                  containerStyle={{ width: `${labelWidth}px` }}
+                  containerStyle={{ width: 'fit-content', maxWidth: `${labelWidth}px` }}
                   horizontalAnchor={horizontalAnchor}
                   verticalAnchor={verticalAnchor}
                   showAnchorLine={false}
