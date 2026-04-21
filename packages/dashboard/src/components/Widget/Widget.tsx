@@ -13,13 +13,12 @@ import { DataDesignerModal } from '../DataDesignerModal'
 import { DashboardConditionModal } from '../DashboardConditionModal'
 import { labelHash } from '@cdc/core/helpers/labelHash'
 import { dashboardConditionsSupportedForRow } from '../../helpers/dashboardFilterTargets'
-import { hasConditionalWidgets } from '../../helpers/dashboardColumnWidgets'
+import { getConditionalWidgets, hasConditionalWidgets } from '../../helpers/dashboardColumnWidgets'
 import './widget.styles.css'
 
 type WidgetConfig = AnyVisualization & { rowIdx: number; colIdx: number; entryIdx?: number }
 type WidgetProps = {
   title: string
-  columnData?: any
   widgetConfig?: WidgetConfig
   addVisualization?: Function
   type: string
@@ -29,7 +28,6 @@ type WidgetProps = {
 
 const Widget = ({
   title,
-  columnData,
   widgetConfig,
   addVisualization,
   type,
@@ -39,10 +37,11 @@ const Widget = ({
   const { overlay } = useGlobalContext()
   const { config, data, isEditor } = useContext(DashboardContext)
   const dispatch = useContext(DashboardDispatchContext)
+  const column = widgetConfig ? config.rows[widgetConfig.rowIdx]?.columns?.[widgetConfig.colIdx] : undefined
 
   const [isEditing, setIsEditing] = useState(false)
   const [toggleName, setToggleName] = useState(
-    columnData?.toggleName || labelHash[config?.visualizations[columnData?.widget]?.type] || ''
+    column?.toggleName || labelHash[config?.visualizations[widgetConfig?.uid as string]?.type || type] || ''
   )
 
   const transform = new DataTransform()
@@ -163,10 +162,11 @@ const Widget = ({
   const rowSupportsDashboardConditions = widgetConfig
     ? dashboardConditionsSupportedForRow(config.rows[widgetConfig.rowIdx])
     : false
-  const isConditionalEntry = widgetConfig
-    ? hasConditionalWidgets(config.rows[widgetConfig.rowIdx]?.columns?.[widgetConfig.colIdx])
-    : false
-  const hasDashboardCondition = !!columnData?.dashboardCondition
+  const conditionalWidgets = hasConditionalWidgets(column) ? getConditionalWidgets(column) : []
+  const hasDashboardCondition =
+    widgetConfig && widgetConfig.entryIdx !== undefined
+      ? !!conditionalWidgets[widgetConfig.entryIdx]?.dashboardCondition
+      : false
 
   const widgetContent = (
     <div
@@ -208,7 +208,7 @@ const Widget = ({
                   <DashboardConditionModal
                     rowIndex={widgetConfig.rowIdx}
                     columnIndex={widgetConfig.colIdx}
-                    entryIndex={isConditionalEntry ? widgetConfig.entryIdx : undefined}
+                    entryIndex={widgetConfig.entryIdx}
                   />
                 )
               }}

@@ -17,24 +17,14 @@ type ColumnProps = {
 }
 
 type ColumnWidgetSlotProps = {
-  columnData: any
   rowIdx: number
   colIdx: number
   toggleRow: boolean
   entryIndex?: number
   widgetKey?: string
-  dashboardCondition?: any
 }
 
-const ColumnWidgetSlot: React.FC<ColumnWidgetSlotProps> = ({
-  columnData,
-  rowIdx,
-  colIdx,
-  toggleRow,
-  entryIndex,
-  widgetKey,
-  dashboardCondition
-}) => {
+const ColumnWidgetSlot: React.FC<ColumnWidgetSlotProps> = ({ rowIdx, colIdx, toggleRow, entryIndex, widgetKey }) => {
   const { config } = useContext(DashboardContext)
 
   const [{ isOver, canDrop }, drop] = useDrop(
@@ -79,7 +69,6 @@ const ColumnWidgetSlot: React.FC<ColumnWidgetSlotProps> = ({
     <div className={classNames.join(' ')} ref={drop}>
       {widget ? (
         <Widget
-          columnData={{ ...columnData, widget: widgetKey, dashboardCondition }}
           title={handleTitle(widget)}
           widgetConfig={{ rowIdx, colIdx, entryIdx: entryIndex, ...widget }}
           type={widget.visualizationType ?? widget.general?.geoType}
@@ -107,34 +96,19 @@ const Column: React.FC<ColumnProps> = ({ data, rowIdx, colIdx, toggleRow }) => {
           {widgetEntries.map((entry, entryIndex) => (
             <ColumnWidgetSlot
               key={`${rowIdx}-${colIdx}-${entryIndex}-${entry.widget}`}
-              columnData={data}
               rowIdx={rowIdx}
               colIdx={colIdx}
               toggleRow={toggleRow}
               entryIndex={entryIndex}
               widgetKey={entry.widget}
-              dashboardCondition={entry.dashboardCondition}
             />
           ))}
           {canAddAnother && (
-            <ColumnWidgetSlot
-              columnData={data}
-              rowIdx={rowIdx}
-              colIdx={colIdx}
-              toggleRow={toggleRow}
-              entryIndex={widgetEntries.length}
-            />
+            <ColumnWidgetSlot rowIdx={rowIdx} colIdx={colIdx} toggleRow={toggleRow} entryIndex={widgetEntries.length} />
           )}
         </>
       ) : (
-        <ColumnWidgetSlot
-          columnData={data}
-          rowIdx={rowIdx}
-          colIdx={colIdx}
-          toggleRow={toggleRow}
-          widgetKey={data.widget}
-          dashboardCondition={data.dashboardCondition}
-        />
+        <ColumnWidgetSlot rowIdx={rowIdx} colIdx={colIdx} toggleRow={toggleRow} widgetKey={data.widget} />
       )}
     </div>
   )
