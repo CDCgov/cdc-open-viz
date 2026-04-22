@@ -9,12 +9,9 @@ const parseMigrationVersion = (version: string): ParsedMigrationVersion => {
   const match = version.match(/^(\d+)\.(\d+)\.(\d+)(?:-(\d+))?$/)
 
   if (!match) {
-    return {
-      major: Number.NaN,
-      minor: Number.NaN,
-      patch: Number.NaN,
-      suffix: Number.NaN
-    }
+    throw new Error(
+      `Invalid migration version "${version}". Expected format "major.minor.patch" or "major.minor.patch-suffix".`
+    )
   }
 
   return {
