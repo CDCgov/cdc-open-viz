@@ -1,10 +1,38 @@
 import { Meta, StoryObj } from '@storybook/react-vite'
 import CdcEditor from '../CdcEditor'
-import { within, userEvent, expect } from 'storybook/test'
+import { within, userEvent, expect, waitFor } from 'storybook/test'
 import ChartEditorConfig from '../../../chart/src/_stories/_mock/editor-tests/bar-chart-editor-test.json'
 import MapConfig from '../../../map/src/_stories/_mock/default-patterns.json'
 import DashboardConfig from '../../../dashboard/src/_stories/_mock/dashboard_no_filter.json'
 import DataTableConfig from '../../../data-table/examples/data-table-example.json'
+import countyHsaToggle from '../../../map/examples/county-hsa-toggle.json'
+
+const legacyCountyEditorConfig = {
+  ...countyHsaToggle,
+  version: '4.26.3',
+  general: {
+    ...countyHsaToggle.general,
+    title: 'Legacy County Editor Build Regression',
+    showHSABoundaries: false,
+    territoriesAlwaysShow: false
+  },
+  data: countyHsaToggle.data.filter(row => ['01001', '01003', '72001', '72127'].includes(row['FIPS Codes']))
+}
+
+const replacementCountyCsvWithPR = [
+  'FIPS Codes,Percent Vaccinated',
+  '01001,34.13',
+  '01003,37.55',
+  '72001,91.99',
+  '72127,71.69'
+].join('\n')
+
+const replacementCountyCsvWithoutPR = [
+  'FIPS Codes,Percent Vaccinated',
+  '01001,34.13',
+  '01003,37.55',
+  '06001,62.40'
+].join('\n')
 
 const loadConfigFromTextArea = async (canvasElement, config) => {
   const user = userEvent.setup()
@@ -24,6 +52,30 @@ const assertImportDataTabAccessible = async canvas => {
   const user = userEvent.setup()
   await user.click(canvas.getByText('2. Import Data'))
   await expect(canvas.findByText('Data Preview')).resolves.toBeTruthy()
+}
+
+const uploadReplacementDataFile = async (canvasElement, fileName, fileContents) => {
+  const user = userEvent.setup()
+  const replaceFileInput = canvasElement.querySelector('.data-source-options .loaded-file input[type="file"]') as
+    | HTMLInputElement
+    | undefined
+
+  expect(replaceFileInput).toBeTruthy()
+  await user.upload(replaceFileInput!, new File([fileContents], fileName, { type: 'text/csv' }))
+}
+
+const assertMapBuildFromEditor = async (canvasElement, expectedFips: string) => {
+  const canvas = within(canvasElement)
+  const user = userEvent.setup()
+
+  await waitFor(() => expect(canvasElement.textContent).toContain(expectedFips))
+
+  const configureButton = await canvas.findByRole('button', { name: 'Configure your visualization' })
+  await user.click(configureButton)
+
+  await waitFor(() => expect(canvasElement.querySelector('.map-container canvas')).toBeInTheDocument(), {
+    timeout: 10000
+  })
 }
 
 const meta: Meta<typeof CdcEditor> = {
@@ -198,5 +250,38 @@ export const InvalidJsonShowsValidationAlert: Story = {
       window.alert = originalAlert
       window.onerror = originalOnError
     }
+  }
+}
+
+export const LegacyCountyMapBuildsAfterReplacingDataWithPR: Story = {
+  args: {
+    config: {}
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await loadConfigFromTextArea(canvasElement, legacyCountyEditorConfig)
+    await assertImportDataTabAccessible(canvas)
+    await waitFor(() => expect(canvasElement.textContent).toContain('72001'))
+
+    await uploadReplacementDataFile(canvasElement, 'county-with-pr.csv', replacementCountyCsvWithPR)
+    await assertMapBuildFromEditor(canvasElement, '72127')
+  }
+}
+
+export const LegacyCountyMapBuildsAfterReplacingDataWithoutPR: Story = {
+  args: {
+    config: {}
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await loadConfigFromTextArea(canvasElement, legacyCountyEditorConfig)
+    await assertImportDataTabAccessible(canvas)
+    await waitFor(() => expect(canvasElement.textContent).toContain('72001'))
+
+    await uploadReplacementDataFile(canvasElement, 'county-without-pr.csv', replacementCountyCsvWithoutPR)
+    await waitFor(() => expect(canvasElement.textContent).not.toContain('72001'))
+    await assertMapBuildFromEditor(canvasElement, '06001')
   }
 }

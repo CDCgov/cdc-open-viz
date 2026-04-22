@@ -33,6 +33,12 @@ const applyWaffleValueDescriptorDefaults = config => {
 
 const applyTerritoryMapDefaults = config => {
   if (config.type !== 'map' || !config.general) return
+  if (config.general.geoType === 'us-county') {
+    config.migrations = config.migrations || {}
+    if (config.migrations.preserveDataBackedCountyTerritories === undefined) {
+      config.migrations.preserveDataBackedCountyTerritories = true
+    }
+  }
   if (config.general.territoriesAlwaysShow === undefined) {
     config.general.territoriesAlwaysShow = true
   }

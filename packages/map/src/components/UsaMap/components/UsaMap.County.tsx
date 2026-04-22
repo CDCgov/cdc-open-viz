@@ -107,7 +107,7 @@ const getTopoData = (year, showHSABoundaries, territoryVisibility: CountyTerrito
           const countyPrefix = county.id?.substring(0, 2)
           return !countyPrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix)
         })
-      } else {
+      } else if (!territoryVisibility.showAllTerritories) {
         topoData.states = topoData.states.filter(state => {
           const statePrefix = state.id?.substring(0, 2)
           return (
@@ -263,11 +263,26 @@ const CountyMap = () => {
   const [hasMoved, setHasMoved] = useState(false)
 
   const pathGenerator = geoPath().projection(geoAlbersUsaTerritories())
+  const sourceData = (config as any).preFilterData as Record<string, any>[] | undefined
+  const preserveDataBackedTerritories = Boolean((config as any).migrations?.preserveDataBackedCountyTerritories)
 
   const { featureArray } = useMapLayers(config, setConfig, pathGenerator, tooltipId)
   const territoryVisibility = useMemo(
-    () => getCountyTerritoryVisibility(config.general.territoriesAlwaysShow, runtimeData),
-    [config.general.territoriesAlwaysShow, runtimeData]
+    () =>
+      getCountyTerritoryVisibility(
+        config.general.territoriesAlwaysShow,
+        runtimeData,
+        sourceData,
+        config.columns.geo.name,
+        preserveDataBackedTerritories
+      ),
+    [
+      config.general.territoriesAlwaysShow,
+      runtimeData,
+      sourceData,
+      config.columns.geo.name,
+      preserveDataBackedTerritories
+    ]
   )
 
   useEffect(() => {
