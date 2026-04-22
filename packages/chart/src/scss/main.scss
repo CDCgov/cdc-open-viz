@@ -68,7 +68,6 @@
     .legend-wrapper .tooltip-boundary {
       display: flex;
       flex-wrap: wrap;
-      row-gap: var(--cove-visualization-section-gap, 1.5rem);
       order: 2;
 
       aside {
@@ -403,10 +402,6 @@
 
     &.legend-hidden>svg {
       width: 100% !important;
-    }
-
-    &.dashboard-brush {
-      margin-bottom: 2.5em;
     }
 
     // Brush touch support

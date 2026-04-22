@@ -1241,7 +1241,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return kebabCase(string)
   }
   const getChartWrapperClasses = () => {
-    const isLegendOnBottom = legend?.position === 'bottom' || isLegendWrapViewport(currentViewport)
     const classes = ['chart-container', 'visualization-container', 'p-relative']
     const visualSettingClasses = ['component--has-border-color-theme', 'component--has-accent']
     if (legend?.position) {
@@ -1255,8 +1254,6 @@ const CdcChart: React.FC<CdcChartProps> = ({
     if (contentClasses.includes('sparkline')) classes.push('sparkline')
     if (lineDatapointClass) classes.push(lineDatapointClass)
     if (!config.barHasBorder) classes.push('chart-bar--no-border')
-    if (config.xAxis.brushActive && dashboardConfig?.type === 'dashboard' && (!isLegendOnBottom || legend.hide))
-      classes.push('dashboard-brush')
 
     if (!ENABLE_CHART_VISUAL_SETTINGS) {
       const filtered = classes.filter(className => !visualSettingClasses.includes(className))
