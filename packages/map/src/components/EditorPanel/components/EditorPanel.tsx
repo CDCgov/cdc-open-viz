@@ -1647,7 +1647,7 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         section='general'
                         subsection={null}
                         fieldName='territoriesAlwaysShow'
-                        label='Show All Territories'
+                        label='Show Available Territories'
                         updateField={updateField}
                       />
                     )}
