@@ -129,9 +129,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const { inlineLabel } = config.yAxis
 
   // HOOKS  % STATES
-  // When brush is active, use tableData (full dataset) for min/max calculation
-  // so the y-axis shows the full range, but still use filtered data for rendering
-  const dataForMinMax = config.xAxis.brushActive && tableData && tableData.length > 0 ? tableData : data
+  const useBrushFullRange = config.xAxis.brushActive && !config.xAxis.brushDynamicYAxis
+  const dataForMinMax = useBrushFullRange && tableData && tableData.length > 0 ? tableData : data
   const { minValue, maxValue, existPositiveValue, isAllLine } = useReduceData(config, dataForMinMax)
 
   const { visSupportsSmallMultiples } = useEditorPermissions()
@@ -163,6 +162,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const xAxisLabelRefs = useRef([])
   const xAxisTitleRef = useRef(null)
   const tooltipRef = useRef(null)
+  const brushLayoutRef = useRef<{ yAxisWidth: number; xMax: number } | null>(null)
+  const brushLayoutDepsRef = useRef<{ parentWidth: number; tableData: any } | null>(null)
 
   const dataRef = useIntersectionObserver(triggerRef, {
     freezeOnceVisible: false
@@ -262,6 +263,21 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
 
   // Chart width calculation using the current y-axis width
   const xMax = parentWidth - yAxisWidth - (hasRightAxis ? config.yAxis.rightAxisSize : 0)
+
+  // Stabilize brush container dimensions when brushDynamicYAxis is enabled.
+  // Without this, y-axis rescaling on each brush change creates a feedback loop:
+  // brush drag → y-domain change → tick label width change → xMax shift → brush jumps.
+  // We freeze the brush coordinate system and only update on real layout changes.
+  const isDynamicBrushYAxis = config.xAxis.brushDynamicYAxis
+  const isFirstBrushLayout = !brushLayoutDepsRef.current
+  const viewportResized = brushLayoutDepsRef.current?.parentWidth !== parentWidth
+  const dataReloaded = brushLayoutDepsRef.current?.tableData !== tableData
+  if (!isDynamicBrushYAxis || isFirstBrushLayout || viewportResized || dataReloaded) {
+    brushLayoutRef.current = { yAxisWidth, xMax }
+    brushLayoutDepsRef.current = { parentWidth, tableData }
+  }
+  const stableBrushYAxisWidth = isDynamicBrushYAxis ? brushLayoutRef.current!.yAxisWidth : yAxisWidth
+  const stableBrushXMax = isDynamicBrushYAxis ? brushLayoutRef.current!.xMax : xMax
 
   const {
     xScale,
@@ -948,8 +964,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             style={{
               position: 'relative',
               marginTop: `${BRUSH_MARGIN}px`,
-              left: `${yAxisWidth}px`,
-              width: `${Math.max(xMax, BRUSH_MIN_WIDTH)}px`,
+              left: `${stableBrushYAxisWidth}px`,
+              width: `${Math.max(stableBrushXMax, BRUSH_MIN_WIDTH)}px`,
               height: `${BRUSH_HEIGHT}px`,
               pointerEvents: 'auto',
               zIndex: 15,
@@ -960,7 +976,11 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             }}
             className='brush-overlay'
           >
-            <BrushSelector key={brushKeyRef.current} xMax={Math.max(xMax, BRUSH_MIN_WIDTH)} yMax={BRUSH_HEIGHT} />
+            <BrushSelector
+              key={brushKeyRef.current}
+              xMax={Math.max(stableBrushXMax, BRUSH_MIN_WIDTH)}
+              yMax={BRUSH_HEIGHT}
+            />
           </div>
         )}
       </div>

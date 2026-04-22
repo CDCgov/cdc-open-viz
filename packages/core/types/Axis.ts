@@ -55,4 +55,5 @@ export type Axis = {
   sortByRecentDate: boolean
   brushActive: boolean
   brushDefaultRecentDateCount?: number
+  brushDynamicYAxis?: boolean
 }

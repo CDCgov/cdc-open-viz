@@ -55,9 +55,8 @@ const getMinMax = ({
   max = enteredMaxValue && isMaxValid ? Number(enteredMaxValue) : Number.MIN_VALUE
   const { lower, upper } = config?.confidenceKeys || {}
 
-  // When brush is active, use tableData (full dataset) for min/max calculations
-  // so the y-axis shows the full range, but still use filtered data for rendering
-  const dataForMinMax = config.xAxis.brushActive && tableData && tableData.length > 0 ? tableData : data
+  const useBrushFullRange = config.xAxis.brushActive && !config.xAxis.brushDynamicYAxis
+  const dataForMinMax = useBrushFullRange && tableData && tableData.length > 0 ? tableData : data
 
   if (lower && upper && config.visualizationType === 'Bar') {
     const buffer = min < 0 ? 1.1 : 0
