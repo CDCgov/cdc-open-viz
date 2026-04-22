@@ -3284,6 +3284,34 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               />
                               {config.xAxis.brushActive && (
                                 <>
+                                  <CheckBox
+                                    value={config.xAxis.brushDynamicYAxis}
+                                    section='xAxis'
+                                    fieldName='brushDynamicYAxis'
+                                    label='Dynamic Y-Axis'
+                                    updateField={updateFieldDeprecated}
+                                    tooltip={
+                                      <Tooltip style={{ textTransform: 'none' }}>
+                                        <Tooltip.Target>
+                                          <Icon
+                                            display='question'
+                                            style={{
+                                              marginLeft: '0.5rem',
+                                              display: 'inline-block',
+                                              whiteSpace: 'nowrap'
+                                            }}
+                                          />
+                                        </Tooltip.Target>
+                                        <Tooltip.Content>
+                                          <p>
+                                            When enabled, the Y-axis rescales to fit only the data visible in the
+                                            current brush selection. When disabled, the Y-axis shows the full data
+                                            range.
+                                          </p>
+                                        </Tooltip.Content>
+                                      </Tooltip>
+                                    }
+                                  />
                                   <TextField
                                     value={config.xAxis.brushDefaultRecentDateCount ?? ''}
                                     placeholder='Default (35%)'
@@ -3311,34 +3339,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                                             When set, the brush slider will initially select this many recent data
                                             points instead of the default 35%. Leave empty to use the default
                                             percentage-based selection.
-                                          </p>
-                                        </Tooltip.Content>
-                                      </Tooltip>
-                                    }
-                                  />
-                                  <CheckBox
-                                    value={config.xAxis.brushDynamicYAxis}
-                                    section='xAxis'
-                                    fieldName='brushDynamicYAxis'
-                                    label='Dynamic Y-Axis'
-                                    updateField={updateFieldDeprecated}
-                                    tooltip={
-                                      <Tooltip style={{ textTransform: 'none' }}>
-                                        <Tooltip.Target>
-                                          <Icon
-                                            display='question'
-                                            style={{
-                                              marginLeft: '0.5rem',
-                                              display: 'inline-block',
-                                              whiteSpace: 'nowrap'
-                                            }}
-                                          />
-                                        </Tooltip.Target>
-                                        <Tooltip.Content>
-                                          <p>
-                                            When enabled, the Y-axis rescales to fit only the data visible in the
-                                            current brush selection. When disabled, the Y-axis shows the full data
-                                            range.
                                           </p>
                                         </Tooltip.Content>
                                       </Tooltip>
