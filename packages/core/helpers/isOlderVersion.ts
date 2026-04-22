@@ -1,7 +1,10 @@
+import { compareMigrationVersions } from './ver/compareMigrationVersions'
+
 /**
  * Determines if the previous version is older than the current version.
  *
- * This function compares two version strings in the format "major.minor.patch".
+ * This function compares config migration version strings in the format
+ * "major.minor.patch" or "major.minor.patch-numeric-suffix".
  * It returns `true` if the `previousVersion` is older than the `currentVersion`,
  * otherwise it returns `false`.
  *
@@ -11,10 +14,5 @@
  */
 export default function isOlderVersion(previousVersion: string, currentVersion: string): boolean {
   if (!previousVersion) return true
-  const [prevMajor, prevMinor, prevPatch] = previousVersion.split('.').map(Number)
-  const [currMajor, currMinor, currPatch] = currentVersion.split('.').map(Number)
-  if (currMajor > prevMajor) return false
-  if (currMajor === prevMajor && currMinor > prevMinor) return false
-  if (currMajor === prevMajor && currMinor === prevMinor && currPatch > prevPatch) return false
-  return true
+  return compareMigrationVersions(previousVersion, currentVersion) < 0
 }
