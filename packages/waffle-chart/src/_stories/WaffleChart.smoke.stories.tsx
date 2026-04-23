@@ -5,6 +5,7 @@ import { expect } from 'storybook/test'
 import WaffleChart from '../CdcWaffleChart'
 import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 import MinimalExampleConfig from '../../examples/minimal-example.json'
+import LegacyCountExampleConfig from '../../tests/fixtures/legacy-count-config.json'
 
 const meta: Meta<typeof WaffleChart> = {
   title: 'Components/Templates/WaffleChart',
@@ -195,6 +196,26 @@ export const Gauge: Story = {
   ),
   play: async ({ canvasElement }) => {
     await assertVisualizationRendered(canvasElement)
+  }
+}
+
+export const Legacy_Count_Config_Prop_Path: Story = {
+  args: {
+    config: JSON.parse(JSON.stringify(LegacyCountExampleConfig))
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Loads the legacy count example through the direct config prop path used by dashboard/editor-style renderers. Useful for reproducing config-object initialization behavior without going through configUrl.'
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+
+    const primaryValue = canvasElement.querySelector('.cove-waffle-chart__data--primary') as HTMLElement | null
+    expect(primaryValue).toBeTruthy()
   }
 }
 

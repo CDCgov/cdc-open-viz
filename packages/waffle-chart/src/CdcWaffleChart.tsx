@@ -912,10 +912,11 @@ const CdcWaffleChart = ({
     }
   }, [config, container])
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  // Keep direct config-prop usage in sync with parent data updates
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (!configObj?.dataUrl) {
-      updateConfig({ ...defaults, ...configObj })
+    if (configObj && config && JSON.stringify(configObj.data) !== JSON.stringify(config.data)) {
+      loadConfig().catch(err => console.warn(err))
     }
   }, [configObj?.data])
 
