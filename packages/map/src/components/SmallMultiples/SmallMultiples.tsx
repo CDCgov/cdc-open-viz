@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useRef, useEffect, useCallback, useLayoutEffect } from 'react'
+import React, { useContext, useMemo, useRef, useCallback, useLayoutEffect } from 'react'
 import SmallMultipleTile from './SmallMultipleTile'
 import ConfigContext from '../../context'
 import { MapContext } from '../../types/MapContext'

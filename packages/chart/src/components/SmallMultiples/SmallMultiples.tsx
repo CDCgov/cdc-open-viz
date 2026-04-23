@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState, useMemo, useCallback, useLayoutEffect } from 'react'
+import React, { useContext, useRef, useState, useMemo, useCallback, useLayoutEffect } from 'react'
 import SmallMultipleTile from './SmallMultipleTile'
 import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'

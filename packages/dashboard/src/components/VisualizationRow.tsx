@@ -87,7 +87,7 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   interactionLabel = ''
 }) => {
   const { config, filteredData: dashboardFilteredData, data: rawData } = useContext(DashboardContext)
-  const [toggledRow, setToggled] = React.useState<number>(0)
+  const [toggledRow, setToggled] = useState<number>(0)
   const rowRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
