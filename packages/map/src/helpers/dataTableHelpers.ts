@@ -1,6 +1,6 @@
 import {
-  stateFipsToTwoDigit as stateCodeToAbbreviation,
-  supportedStatesFipsCodes as supportedStateCodes
+  stateFipsToTwoDigit as stateFipsToAbbreviation,
+  supportedStatesFipsCodes as supportedStateFipsCodes
 } from '../data/supported-geos'
 
 /**
@@ -23,8 +23,8 @@ export const filterCountyTableRuntimeDataByStateCode = (runtimeData: any, stateC
   const runtimeKeys = Object.keys(runtimeData)
   if (runtimeKeys.length === 0) return runtimeData
 
-  const stateName = supportedStateCodes[stateCode]
-  const stateAbbreviation = stateCodeToAbbreviation[stateCode]
+  const stateName = supportedStateFipsCodes[stateCode]
+  const stateAbbreviation = stateFipsToAbbreviation[stateCode]
   const normalizedSelectedStateCode = String(stateCode).replace(/^0+/, '')
   const paddedSelectedStateCode = normalizedSelectedStateCode.padStart(2, '0')
   const stateColumnNames = Object.values(config?.columns || {})
@@ -43,13 +43,12 @@ export const filterCountyTableRuntimeDataByStateCode = (runtimeData: any, stateC
   ]
   const allStateColumns = [...new Set([...stateColumnNames, ...commonStateFieldNames])]
 
-  // Fail-safe: check if UIDs look like FIPS codes OR if any state column exists in the data
-  const sampleRow = runtimeData[runtimeKeys[0]]
-  const uidLooksFips = runtimeKeys.some(uid => /^\d{2}/.test(String(uid)))
-  const hasStateColumn = allStateColumns.some(col => sampleRow?.[col] !== undefined)
+  // Fail-safe: check if UIDs look like county FIPS codes (5 digits) OR if any state column exists in the data
+  const hasCountyFipsUids = runtimeKeys.some(uid => /^\d{5}$/.test(String(uid)))
+  const hasStateColumn = runtimeKeys.some(uid => allStateColumns.some(col => runtimeData[uid]?.[col] !== undefined))
 
-  // If data has neither FIPS-style UIDs nor any recognizable state columns, don't filter
-  if (!uidLooksFips && !hasStateColumn) {
+  // If data has neither county FIPS UIDs nor any recognizable state columns, don't filter
+  if (!hasCountyFipsUids && !hasStateColumn) {
     return runtimeData
   }
 
