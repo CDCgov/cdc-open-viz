@@ -3285,7 +3285,7 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                               {config.xAxis.brushActive && (
                                 <>
                                   <CheckBox
-                                    value={config.xAxis.brushDynamicYAxis}
+                                    value={!!config.xAxis.brushDynamicYAxis}
                                     section='xAxis'
                                     fieldName='brushDynamicYAxis'
                                     label='Dynamic Y-Axis'
