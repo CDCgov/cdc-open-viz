@@ -5,7 +5,7 @@ import { expect } from 'storybook/test'
 import WaffleChart from '../CdcWaffleChart'
 import { assertVisualizationRendered } from '@cdc/core/helpers/testing'
 import MinimalExampleConfig from '../../examples/minimal-example.json'
-import LegacyCountExampleConfig from '../../examples/private/waffle-chart-example-count.json'
+import LegacyCountExampleConfig from '../../tests/fixtures/legacy-count-config.json'
 
 const meta: Meta<typeof WaffleChart> = {
   title: 'Components/Templates/WaffleChart',

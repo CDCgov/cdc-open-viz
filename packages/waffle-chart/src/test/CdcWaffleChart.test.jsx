@@ -6,7 +6,7 @@ import { render, waitFor } from '@testing-library/react'
 import { testStandaloneBuild } from '@cdc/core/helpers/tests/testStandaloneBuild.ts'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import CdcWaffleChart from '../CdcWaffleChart'
-import legacyCountExampleConfig from '../../examples/private/waffle-chart-example-count.json'
+import legacyCountExampleConfig from '../../tests/fixtures/legacy-count-config.json'
 
 vi.mock('resize-observer-polyfill', () => ({
   default: vi.fn(() => ({
