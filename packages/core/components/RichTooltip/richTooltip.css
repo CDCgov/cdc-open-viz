@@ -11,6 +11,5 @@
   text-underline-offset: 0.25rem;
 }
 .tooltip-link:hover {
-  color: var(--cool-gray-90);
   text-decoration-color: #009ec1;
 }

@@ -250,7 +250,7 @@ const UsaRegionMap = () => {
             <path tabIndex={-1} className='single-geo' stroke={geoStrokeColor} strokeWidth={1} d={path} />
             <g id={`region-${index + 1}-label`}>
               <circle fill='#fff' stroke='#999' cx={CIRCLE_RADIUS} cy={CIRCLE_RADIUS} r={CIRCLE_RADIUS} />
-              <text fill='#333' x='15px' y='20px' textAnchor='middle'>
+              <text fill='var(--baseColor)' x='15px' y='20px' textAnchor='middle'>
                 {index + 1}
               </text>
             </g>

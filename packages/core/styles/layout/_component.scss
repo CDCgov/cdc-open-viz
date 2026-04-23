@@ -54,7 +54,6 @@
       .cove-visualization__header {
         background: transparent;
         border: 0;
-        color: var(--cool-gray-90, #1f2937);
         margin: 0 0 1rem;
         padding: 0;
         border-radius: 0;
@@ -62,7 +61,6 @@
 
       .cove-visualization__title h2,
       .cove-visualization__header h2 {
-        color: var(--cool-gray-90, #1f2937);
         font-family: var(--fonts-nunito, var(--app-font-secondary));
         font-size: 1.1rem;
         font-weight: 700;
