@@ -30,14 +30,6 @@ const applyWaffleValueDescriptorDefaults = config => {
     config.showDenominator = false
   }
 }
-
-const applyTerritoryMapDefaults = config => {
-  if (config.type !== 'map' || !config.general) return
-  if (config.general.territoriesAlwaysShow === undefined) {
-    config.general.territoriesAlwaysShow = true
-  }
-}
-
 const applyMarkupVariableSourceTypes = config => {
   if (!Array.isArray(config.markupVariables)) {
     return
@@ -55,6 +47,13 @@ const applyMarkupVariableSourceTypes = config => {
   })
 }
 
+const applyCountyMapDefaults = config => {
+  if (config.type === 'map' && config.general?.geoType === 'us-county') {
+    config.migrations = config.migrations || {}
+    config.migrations.showPuertoRico = true
+  }
+}
+
 const enableFullGeoNameCsvOnLegacyCountyMaps = config => {
   if (config.type === 'map' && config.general?.geoType === 'us-county') {
     config.table = config.table || {}
@@ -68,7 +67,7 @@ const run_4_26_4_1_migrations = config => {
   applyWaffleValueDescriptorDefaults(config)
   applyMarkupVariableSourceTypes(config)
   enableFullGeoNameCsvOnLegacyCountyMaps(config)
-  applyTerritoryMapDefaults(config)
+  applyCountyMapDefaults(config)
 
   if (config.type === 'dashboard' && config.visualizations) {
     Object.values((config as DashboardConfig).visualizations).forEach(visualization => {
