@@ -4390,7 +4390,12 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                             <strong style={{ fontSize: '13px', display: 'block', marginBottom: '0.25rem' }}>
                               Preview:
                             </strong>
-                            <p style={{ fontSize: '13px', margin: 0, fontStyle: 'italic' }}>{resolvedAltText}</p>
+                            <p
+                              data-testid='alt-text-preview'
+                              style={{ fontSize: '13px', margin: 0, fontStyle: 'italic' }}
+                            >
+                              {resolvedAltText}
+                            </p>
                           </div>
                         </>
                       )

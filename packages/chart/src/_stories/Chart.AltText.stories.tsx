@@ -134,7 +134,7 @@ export const EditorWithMetadata: Story = {
       await new Promise(resolve => setTimeout(resolve, MIN_ANIMATION_DELAY_MS))
     }
 
-    const previewText = canvasElement.querySelector('[style*="font-style: italic"]')
+    const previewText = canvasElement.querySelector('[data-testid="alt-text-preview"]')
     expect(previewText).toBeTruthy()
     expect(previewText?.textContent).toContain('COVID-19 test positivity')
   }
