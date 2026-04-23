@@ -36,6 +36,7 @@ import { isLegendWrapViewport, isMobileFontViewport } from '@cdc/core/helpers/vi
 import { calcInitialHeight } from '../helpers/sizeHelpers'
 import { calculateHorizontalBarCategoryLabelWidth } from '../helpers/calculateHorizontalBarCategoryLabelWidth'
 import { calculateLeftYAxisWidth } from '../helpers/calculateLeftYAxisWidth'
+import { getAxisLabelFontSize } from '../helpers/axisLabelFontSize'
 
 // Hooks
 import useReduceData from '../hooks/useReduceData'
@@ -69,9 +70,6 @@ const DEFAULT_LEFT_Y_AXIS_WIDTH = 50
 // Font sizes
 const TICK_LABEL_FONT_SIZE = 16
 const TICK_LABEL_FONT_SIZE_SMALL = 13
-const AXIS_LABEL_FONT_SIZE = 18
-const AXIS_LABEL_FONT_SIZE_SMALL = 14
-
 // Label positioning constants
 const BELOW_BAR_TEXT_OFFSET = -6.5
 const LABEL_PADDING_OFFSET = 8
@@ -177,7 +175,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const inlineLabelHasNoSpace = !inlineLabel?.includes(' ')
   const needsYAxisAutoPadding = (inlineLabel && !inlineLabelHasNoSpace) || config.yAxis?.titlePlacement === 'top'
   const tickLabelFontSize = isMobileFontViewport(vizViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
-  const axisLabelFontSize = isMobileFontViewport(vizViewport) ? AXIS_LABEL_FONT_SIZE_SMALL : AXIS_LABEL_FONT_SIZE
+  const axisLabelFontSize = getAxisLabelFontSize(vizViewport)
   const GET_TEXT_WIDTH_FONT = `normal ${tickLabelFontSize}px Nunito, sans-serif`
 
   // zero if not forest plot
