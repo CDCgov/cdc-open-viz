@@ -24,6 +24,11 @@ import { publishAnalyticsEvent } from '@cdc/core/helpers/metrics/helpers'
 import { getVizTitle, getVizSubType } from '@cdc/core/helpers/metrics/utils'
 import { createCanvasPattern, PatternType } from '../../../helpers/createCanvasPattern'
 import { getPatternForRow } from '../../../helpers/getPatternForRow'
+import {
+  getCountyTerritoryVisibility,
+  type CountyTerritoryVisibility,
+  US_TERRITORY_STATE_FIPS_PREFIXES
+} from '../../../helpers/countyTerritories'
 
 type Geometry = GeoGeometryObjects & { id?: string; properties: { name: string } }
 type Focus = {
@@ -42,16 +47,6 @@ type TopoData = {
   projection: any
   hsaMapping: Record<string, string>
 }
-
-const US_TERRITORY_FIPS_PREFIXES = {
-  AMERICAN_SAMOA: '60',
-  GUAM: '66',
-  NORTHERN_MARIANA_ISLANDS: '69',
-  PUERTO_RICO: '72',
-  US_VIRGIN_ISLANDS: '78'
-} as const
-
-const US_TERRITORY_STATE_FIPS_PREFIXES = new Set<string>(Object.values(US_TERRITORY_FIPS_PREFIXES))
 
 const dedupeFeaturesById = <T extends { id?: string }>(features: T[]): T[] => {
   const seenIds = new Set<string>()
@@ -74,8 +69,7 @@ const sortById = (a, b) => {
   return 0
 }
 
-const getTopoData = (year, showHSABoundaries, territoriesAlwaysShow: boolean) => {
-  const showTerritories = territoriesAlwaysShow
+const getTopoData = (year, showHSABoundaries, territoryVisibility: CountyTerritoryVisibility, showPuertoRico) => {
   return new Promise(resolve => {
     const resolveWithTopo = async response => {
       if (response.status !== 200) {
@@ -96,7 +90,7 @@ const getTopoData = (year, showHSABoundaries, territoriesAlwaysShow: boolean) =>
       }
 
       topoData.year = year || 'default'
-      const topoSources = showTerritories ? [response, usExtendedGeography] : [response]
+      const topoSources = territoryVisibility.showTerritories ? [response, usExtendedGeography] : [response]
       topoData.counties = dedupeFeaturesById(
         topoSources
           .flatMap(topo => feature(topo, topo.objects.counties).features)
@@ -104,14 +98,37 @@ const getTopoData = (year, showHSABoundaries, territoriesAlwaysShow: boolean) =>
       )
       topoData.states = dedupeFeaturesById(topoSources.flatMap(topo => feature(topo, topo.objects.states).features))
       // Additional filtering removes territory features that may still be present in the topology data when territories are hidden.
-      if (!showTerritories) {
+      if (!territoryVisibility.showTerritories) {
         topoData.states = topoData.states.filter(state => {
           const statePrefix = state.id?.substring(0, 2)
+          if (statePrefix === '72') return showPuertoRico
           return !statePrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(statePrefix)
         })
         topoData.counties = topoData.counties.filter(county => {
           const countyPrefix = county.id?.substring(0, 2)
+          if (countyPrefix === '72') return showPuertoRico
+          if (showPuertoRico) {
+            return !countyPrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix)
+          }
+
           return !countyPrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix)
+        })
+      } else {
+        topoData.states = topoData.states.filter(state => {
+          const statePrefix = state.id?.substring(0, 2)
+          return (
+            !statePrefix ||
+            !US_TERRITORY_STATE_FIPS_PREFIXES.has(statePrefix) ||
+            territoryVisibility.statePrefixes.has(statePrefix)
+          )
+        })
+        topoData.counties = topoData.counties.filter(county => {
+          const countyPrefix = county.id?.substring(0, 2)
+          return (
+            !countyPrefix ||
+            !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix) ||
+            territoryVisibility.countyIds.has(county.id)
+          )
         })
       }
       if (showHSABoundaries) {
@@ -254,6 +271,10 @@ const CountyMap = () => {
   const pathGenerator = geoPath().projection(geoAlbersUsaTerritories())
 
   const { featureArray } = useMapLayers(config, setConfig, pathGenerator, tooltipId)
+  const territoryVisibility = useMemo(
+    () => getCountyTerritoryVisibility(config.general.territoriesAlwaysShow, runtimeData),
+    [config.general.territoriesAlwaysShow, runtimeData]
+  )
 
   useEffect(() => {
     if (containerEl) {
@@ -264,7 +285,12 @@ const CountyMap = () => {
   })
 
   const getAndSetTopoData = currentYear => {
-    getTopoData(currentYear, config.general.showHSABoundaries, config.general.territoriesAlwaysShow).then(response => {
+    getTopoData(
+      currentYear,
+      config.general.showHSABoundaries,
+      territoryVisibility,
+      config.migrations.showPuertoRico
+    ).then(response => {
       if (canvasRef.current) {
         const context = canvasRef.current.getContext('2d') as CanvasRenderingContext2D
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
@@ -279,7 +305,12 @@ const CountyMap = () => {
     if (currentYear !== topoData.year) {
       getAndSetTopoData(currentYear)
     }
-  }, [config.general.countyCensusYear, config.general.filterControlsCountyYear, JSON.stringify(runtimeFilters)])
+  }, [
+    config.general.countyCensusYear,
+    config.general.filterControlsCountyYear,
+    JSON.stringify(runtimeFilters),
+    territoryVisibility.key
+  ])
 
   const prevShowHSABoundariesRef = useRef(config.general.showHSABoundaries)
   useEffect(() => {
@@ -289,13 +320,13 @@ const CountyMap = () => {
     prevShowHSABoundariesRef.current = config.general.showHSABoundaries
   }, [config.general.showHSABoundaries])
 
-  const prevTerritoriesAlwaysShowRef = useRef(config.general.territoriesAlwaysShow)
+  const prevTerritoryVisibilityRef = useRef(territoryVisibility.key)
   useEffect(() => {
-    if (prevTerritoriesAlwaysShowRef.current === config.general.territoriesAlwaysShow) return
+    if (prevTerritoryVisibilityRef.current === territoryVisibility.key) return
     const currentYear = getCurrentTopoYear(config, runtimeFilters)
     getAndSetTopoData(currentYear)
-    prevTerritoriesAlwaysShowRef.current = config.general.territoriesAlwaysShow
-  }, [config.general.territoriesAlwaysShow])
+    prevTerritoryVisibilityRef.current = territoryVisibility.key
+  }, [territoryVisibility.key])
 
   // Whenever the memo at the top is triggered and the map is called to re-render, call drawCanvas and update
   // The resize function so it includes the latest state variables
@@ -937,6 +968,7 @@ const CountyMap = () => {
     context.strokeStyle = stateStrokeColor
     context.lineWidth = lineWidth * 1.25 * strokeScale
     topoData.states.forEach(state => {
+      if (config.migrations.showPuertoRico == false) return
       if (!state.id) return
       const path2d = cache.get('state_border_' + state.id)
       if (path2d) {
@@ -1092,7 +1124,7 @@ const CountyMap = () => {
     }
 
     drawCanvas()
-  }, [isLoading, topoData, focus, runtimeLegend, runtimeData, featureArray, config])
+  }, [isLoading, topoData, focus, runtimeLegend, runtimeData, featureArray, config, filteredCountyCode])
 
   const showManualZoomControls = config.general.allowMapZoom
   const showResetControl = (hasMoved || focus.id) && (showManualZoomControls || config.general.type === 'us-geocode')

@@ -161,7 +161,7 @@ const UsaMap = () => {
 
   useEffect(() => {
     if (general.territoriesAlwaysShow) {
-      // show all Territories whether in the data or not
+      // Show Available Territories whether in the data or not
       setTerritoriesData(territoriesKeys)
     } else {
       // Territories need to show up if they're in the data at all, not just if they're "active". That's why this is different from Cities

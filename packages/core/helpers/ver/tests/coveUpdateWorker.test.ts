@@ -83,5 +83,91 @@ describe('coveUpdateWorker', () => {
 
       expect(subDash.visualizations.mi1.contentEditor.style).toBe('default')
     })
+
+    it('runs 4.26.4 and then 4.26.4-1 for configs starting at 4.26.3', () => {
+      const config: any = {
+        type: 'dashboard',
+        version: '4.26.3',
+        rows: [],
+        visualizations: {
+          chart1: {
+            type: 'chart',
+            visual: {
+              border: true,
+              borderColorTheme: true,
+              accent: true,
+              background: true,
+              hideBackgroundColor: true
+            }
+          },
+          markup1: {
+            type: 'markup-include'
+          }
+        }
+      }
+
+      const result = coveUpdateWorker(config)
+
+      expect(result.visualizations.chart1.visual).toEqual({
+        border: false,
+        borderColorTheme: false,
+        accent: false,
+        background: false,
+        hideBackgroundColor: false
+      })
+      expect(result.visualizations.markup1.contentEditor.style).toBe('default')
+      expect(result.version).toBe('4.26.4-1')
+    })
+
+    it('applies the 4.26.4-1 repair logic to configs already stamped 4.26.4', () => {
+      const config: any = {
+        type: 'dashboard',
+        version: '4.26.4',
+        rows: [],
+        visualizations: {
+          nestedDashboard: {
+            type: 'dashboard',
+            rows: [],
+            visualizations: {
+              markup1: {
+                type: 'markup-include'
+              },
+              territoryMap: {
+                type: 'map',
+                general: {}
+              }
+            }
+          }
+        }
+      }
+
+      const result = coveUpdateWorker(config)
+      const nested = result.visualizations.nestedDashboard.visualizations
+
+      expect(nested.markup1.contentEditor.style).toBe('default')
+      expect(nested.territoryMap.general.territoriesAlwaysShow).toBe(true)
+      expect(result.version).toBe('4.26.4-1')
+    })
+
+    it('does not rerun 4.26.4-1 when config is already at 4.26.4-1', () => {
+      const config: any = {
+        type: 'dashboard',
+        version: '4.26.4-1',
+        rows: [],
+        visualizations: {
+          territoryMap: {
+            type: 'map',
+            general: {
+              territoriesAlwaysShow: false
+            }
+          }
+        }
+      }
+
+      const result = coveUpdateWorker(config)
+
+      expect(result.visualizations.territoryMap.general.territoriesAlwaysShow).toBe(false)
+      expect(result.version).toBe('4.26.4-1')
+    })
   })
 })

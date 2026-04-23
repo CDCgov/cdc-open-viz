@@ -106,7 +106,7 @@ export const TypeSectionTests: Story = {
       },
       (before, after) => !before.classes.includes('us-county') && after.classes.includes('us-county'),
       () => {
-        const territoriesCheckbox = canvas.getByLabelText(/Show All Territories/i) as HTMLInputElement
+        const territoriesCheckbox = canvas.getByLabelText(/Show Available Territories/i) as HTMLInputElement
         expect(territoriesCheckbox).toBeTruthy()
         expect(territoriesCheckbox.disabled).toBe(false)
       }
@@ -273,11 +273,11 @@ export const TypeSectionTests: Story = {
     )
 
     // ==========================================================================
-    // TEST: Show All Territories checkbox
+    // TEST: Show Available Territories checkbox
     // Verifies: Territory SVG elements appear/disappear in visualization
     // ==========================================================================
     const territoriesLabel = Array.from(canvasElement.querySelectorAll('label')).find(label =>
-      label.textContent?.includes('Show All Territories')
+      label.textContent?.includes('Show Available Territories')
     )
     const territoriesCheckbox = territoriesLabel?.querySelector('input[type="checkbox"]') as HTMLInputElement
     expect(territoriesCheckbox).toBeTruthy()
@@ -292,7 +292,7 @@ export const TypeSectionTests: Story = {
     }
 
     await performAndAssert(
-      'Show All Territories → Enable',
+      'Show Available Territories → Enable',
       getTerritoriesVisual,
       async () => {
         await userEvent.click(territoriesCheckbox)
@@ -301,7 +301,7 @@ export const TypeSectionTests: Story = {
     )
 
     await performAndAssert(
-      'Show All Territories → Disable',
+      'Show Available Territories → Disable',
       getTerritoriesVisual,
       async () => {
         await userEvent.click(territoriesCheckbox)

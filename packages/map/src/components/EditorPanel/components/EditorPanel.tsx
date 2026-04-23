@@ -1643,12 +1643,24 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
 
                     {['us', 'us-county'].includes(config.general.geoType) && (
                       <CheckBox
-                        value={general.territoriesAlwaysShow || false}
+                        value={general.territoriesAlwaysShow ?? true}
                         section='general'
                         subsection={null}
                         fieldName='territoriesAlwaysShow'
-                        label='Show All Territories'
-                        updateField={updateField}
+                        label='Show Available Territories'
+                        updateField={() => {
+                          setConfig({
+                            ...config,
+                            general: {
+                              ...config.general,
+                              territoriesAlwaysShow: !(general.territoriesAlwaysShow ?? true)
+                            },
+                            migrations: {
+                              ...config.migrations,
+                              showPuertoRico: false
+                            }
+                          })
+                        }}
                       />
                     )}
                   </AccordionItemPanel>
