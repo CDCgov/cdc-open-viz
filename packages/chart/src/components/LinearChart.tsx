@@ -37,6 +37,7 @@ import { calcInitialHeight } from '../helpers/sizeHelpers'
 import { calculateHorizontalBarCategoryLabelWidth } from '../helpers/calculateHorizontalBarCategoryLabelWidth'
 import { calculateLeftYAxisWidth } from '../helpers/calculateLeftYAxisWidth'
 import { getAxisLabelFontSize } from '../helpers/axisLabelFontSize'
+import { shouldUseYAxisAutoPadding } from '../helpers/needsYAxisAutoPadding'
 
 // Hooks
 import useReduceData from '../hooks/useReduceData'
@@ -172,8 +173,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   const isForestPlot = visualizationType === 'Forest Plot'
   const isDateTime = config.xAxis.type === 'date-time'
-  const inlineLabelHasNoSpace = !inlineLabel?.includes(' ')
-  const needsYAxisAutoPadding = inlineLabel && !inlineLabelHasNoSpace //|| config.yAxis?.titlePlacement === 'top'
+  const needsYAxisAutoPadding = shouldUseYAxisAutoPadding(config)
   const tickLabelFontSize = isMobileFontViewport(vizViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
   const axisLabelFontSize = getAxisLabelFontSize(vizViewport)
   const GET_TEXT_WIDTH_FONT = `normal ${tickLabelFontSize}px Nunito, sans-serif`

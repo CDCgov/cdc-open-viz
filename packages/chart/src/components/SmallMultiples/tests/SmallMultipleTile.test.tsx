@@ -23,7 +23,47 @@ vi.mock('../../LinearChart', () => ({
 }))
 
 describe('SmallMultipleTile', () => {
-  it('renders the top y-axis title below the tile title for every tile and sizes it from tile width', () => {
+  it('renders the top y-axis title below the tile title on the first tile in a row and sizes it from tile width', () => {
+    const config = createMockConfig({
+      smallMultiples: {
+        mode: 'by-series',
+        tilesPerRowDesktop: 3,
+        tilesPerRowMobile: 1
+      },
+      series: [{ dataKey: 'Value', type: 'Line' }] as any,
+      runtime: {
+        ...createMockConfig().runtime,
+        series: [{ dataKey: 'Value', type: 'Line' }] as any,
+        seriesKeys: ['Value'],
+        seriesLabels: { Value: 'Value' },
+        seriesLabelsAll: ['Value']
+      } as any
+    })
+
+    const context = createMockChartContext(config, {
+      vizViewport: 'lg'
+    } as any)
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <SmallMultipleTile mode='by-series' config={config} data={[]} tileKey='Value' seriesKey='Value' isFirstInRow />
+      </ConfigContext.Provider>
+    )
+
+    const header = container.querySelector('.tile-header')
+    const title = screen.getByText('Value')
+    const topLabel = container.querySelector('.y-axis-top-title')
+
+    expect(header).toBeTruthy()
+    expect(title).toBeTruthy()
+    expect(topLabel).toBeTruthy()
+    expect(topLabel).toHaveTextContent('Y-Axis')
+    expect(topLabel).toHaveStyle({ fontSize: '14px' })
+    expect(header?.firstElementChild).toBe(title)
+    expect(header?.lastElementChild).toBe(topLabel)
+  })
+
+  it('does not render the top y-axis title on non-leading tiles in a row', () => {
     const config = createMockConfig({
       smallMultiples: {
         mode: 'by-series',
@@ -57,16 +97,6 @@ describe('SmallMultipleTile', () => {
       </ConfigContext.Provider>
     )
 
-    const header = container.querySelector('.tile-header')
-    const title = screen.getByText('Value')
-    const topLabel = container.querySelector('.y-axis-top-title')
-
-    expect(header).toBeTruthy()
-    expect(title).toBeTruthy()
-    expect(topLabel).toBeTruthy()
-    expect(topLabel).toHaveTextContent('Y-Axis')
-    expect(topLabel).toHaveStyle({ fontSize: '14px' })
-    expect(header?.firstElementChild).toBe(title)
-    expect(header?.lastElementChild).toBe(topLabel)
+    expect(container.querySelector('.y-axis-top-title')).toBeFalsy()
   })
 })

@@ -112,7 +112,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
   tileConfig = {
     ...tileConfig,
     hideXAxisLabel: !isFirstInRow,
-    hideYAxisLabel: tileConfig.yAxis?.titlePlacement === 'top' ? false : !isFirstInRow,
+    hideYAxisLabel: !isFirstInRow,
     legend: {
       ...tileConfig.legend,
       tooltipLegendVisible: !config.legend?.hide,
