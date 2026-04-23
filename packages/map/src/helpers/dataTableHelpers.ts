@@ -23,8 +23,8 @@ export const filterCountyTableRuntimeDataByStateCode = (runtimeData: any, stateC
   const runtimeKeys = Object.keys(runtimeData)
   if (runtimeKeys.length === 0) return runtimeData
 
-  const stateName = supportedStateFipsCodes[stateCode]
-  const stateAbbreviation = stateFipsToAbbreviation[stateCode]
+  const stateName = supportedStateFipsCodes?.[stateCode]
+  const stateAbbreviation = stateFipsToAbbreviation?.[stateCode]
   const normalizedSelectedStateCode = String(stateCode).replace(/^0+/, '')
   const paddedSelectedStateCode = normalizedSelectedStateCode.padStart(2, '0')
   const stateColumnNames = Object.values(config?.columns || {})
