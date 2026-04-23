@@ -1,0 +1,95 @@
+{
+  "title": "Legacy Count Waffle",
+  "showTitle": true,
+  "visualizationType": "Waffle",
+  "visualizationSubType": "linear",
+  "showPercent": true,
+  "showDenominator": true,
+  "valueDescription": "out of",
+  "content": "Of all inputs are from Federal sources",
+  "subtext": "",
+  "orientation": "horizontal",
+  "data": [
+    {
+      "Location": "Alaska",
+      "Year": "2021",
+      "Type": "Federal",
+      "Amount": "1436"
+    },
+    {
+      "Location": "Alaska",
+      "Year": "2021",
+      "Type": "Local",
+      "Amount": "1672"
+    },
+    {
+      "Location": "Alaska",
+      "Year": "2021",
+      "Type": "State",
+      "Amount": "1554"
+    },
+    {
+      "Location": "Alabama",
+      "Year": "2021",
+      "Type": "Federal",
+      "Amount": "1434"
+    },
+    {
+      "Location": "Alabama",
+      "Year": "2021",
+      "Type": "Local",
+      "Amount": "1670"
+    },
+    {
+      "Location": "Alabama",
+      "Year": "2021",
+      "Type": "State",
+      "Amount": "1552"
+    }
+  ],
+  "filters": [],
+  "fontSize": "",
+  "overallFontSize": "medium",
+  "dataColumn": "Amount",
+  "dataFunction": "Count",
+  "dataConditionalColumn": "Type",
+  "dataConditionalOperator": "=",
+  "dataConditionalComparate": "Federal",
+  "invalidComparate": false,
+  "customDenom": true,
+  "dataDenom": "100",
+  "dataDenomColumn": "Amount",
+  "dataDenomFunction": "Count",
+  "suffix": "%",
+  "roundToPlace": "0",
+  "shape": "square",
+  "nodeWidth": "13",
+  "nodeSpacer": "2",
+  "theme": "theme-green",
+  "type": "waffle-chart",
+  "gauge": {
+    "height": 35,
+    "width": "100%"
+  },
+  "visual": {
+    "border": true,
+    "accent": false,
+    "background": false,
+    "hideBackgroundColor": false,
+    "borderColorTheme": false,
+    "colors": {
+      "theme-blue": "#005eaa",
+      "theme-purple": "#712177",
+      "theme-brown": "#705043",
+      "theme-teal": "#00695c",
+      "theme-pink": "#af4448",
+      "theme-orange": "#bb4d00",
+      "theme-slate": "#29434e",
+      "theme-indigo": "#26418f",
+      "theme-cyan": "#006778",
+      "theme-green": "#4b830d",
+      "theme-amber": "#fbab18"
+    }
+  },
+  "version": "4.24.9"
+}
