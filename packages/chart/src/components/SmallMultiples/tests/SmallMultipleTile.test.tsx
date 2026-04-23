@@ -1,0 +1,72 @@
+import React from 'react'
+import { render, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+import ConfigContext from '../../../ConfigContext'
+import SmallMultipleTile from '../SmallMultipleTile'
+import { createMockChartContext, createMockConfig } from '../../LinearChart/tests/mockConfigContext'
+
+vi.stubGlobal(
+  'ResizeObserver',
+  vi.fn(callback => ({
+    observe: vi.fn(() => callback([{ contentRect: { width: 200, height: 300 } }])),
+    unobserve: vi.fn(),
+    disconnect: vi.fn()
+  }))
+)
+
+vi.mock('@visx/responsive/lib/components/ParentSize', () => ({
+  default: ({ children }) => children({ width: 200, height: 300 })
+}))
+
+vi.mock('../../LinearChart', () => ({
+  default: () => <div data-testid='mock-linear-chart' />
+}))
+
+describe('SmallMultipleTile', () => {
+  it('renders the top y-axis title below the tile title for every tile and sizes it from tile width', () => {
+    const config = createMockConfig({
+      smallMultiples: {
+        mode: 'by-series',
+        tilesPerRowDesktop: 3,
+        tilesPerRowMobile: 1
+      },
+      series: [{ dataKey: 'Value', type: 'Line' }] as any,
+      runtime: {
+        ...createMockConfig().runtime,
+        series: [{ dataKey: 'Value', type: 'Line' }] as any,
+        seriesKeys: ['Value'],
+        seriesLabels: { Value: 'Value' },
+        seriesLabelsAll: ['Value']
+      } as any
+    })
+
+    const context = createMockChartContext(config, {
+      vizViewport: 'lg'
+    } as any)
+
+    const { container } = render(
+      <ConfigContext.Provider value={context}>
+        <SmallMultipleTile
+          mode='by-series'
+          config={config}
+          data={[]}
+          tileKey='Value'
+          seriesKey='Value'
+          isFirstInRow={false}
+        />
+      </ConfigContext.Provider>
+    )
+
+    const header = container.querySelector('.tile-header')
+    const title = screen.getByText('Value')
+    const topLabel = container.querySelector('.y-axis-top-title')
+
+    expect(header).toBeTruthy()
+    expect(title).toBeTruthy()
+    expect(topLabel).toBeTruthy()
+    expect(topLabel).toHaveTextContent('Y-Axis')
+    expect(topLabel).toHaveStyle({ fontSize: '14px' })
+    expect(header?.firstElementChild).toBe(title)
+    expect(header?.lastElementChild).toBe(topLabel)
+  })
+})
