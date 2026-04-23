@@ -173,7 +173,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const isForestPlot = visualizationType === 'Forest Plot'
   const isDateTime = config.xAxis.type === 'date-time'
   const inlineLabelHasNoSpace = !inlineLabel?.includes(' ')
-  const needsYAxisAutoPadding = (inlineLabel && !inlineLabelHasNoSpace) || config.yAxis?.titlePlacement === 'top'
+  const needsYAxisAutoPadding = inlineLabel && !inlineLabelHasNoSpace //|| config.yAxis?.titlePlacement === 'top'
   const tickLabelFontSize = isMobileFontViewport(vizViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
   const axisLabelFontSize = getAxisLabelFontSize(vizViewport)
   const GET_TEXT_WIDTH_FONT = `normal ${tickLabelFontSize}px Nunito, sans-serif`
