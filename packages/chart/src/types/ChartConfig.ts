@@ -143,7 +143,14 @@ type Visual = {
   maximumShapeAmount: 7
 }
 
+export type AltTextConfig = {
+  type?: 'static' | 'metadata'
+  value?: string
+  metadataKey?: string
+}
+
 export type AllChartsConfig = {
+  altText?: AltTextConfig
   annotations: Annotation[]
   animate: boolean
   general: General
