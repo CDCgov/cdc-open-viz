@@ -1,5 +1,5 @@
 import {
-  stateFipsToTwoDigit as stateFipsToAbbreviation,
+  stateFipsToTwoDigit as stateCodeToAbbreviation,
   supportedStatesFipsCodes as supportedStateCodes
 } from '../data/supported-geos'
 
@@ -13,18 +13,47 @@ export const shouldShowDataTable = (config: any, table: any, general: any, loadi
 /**
  * Filters county runtime data to a selected state code for data table display.
  * Keeps the original non-enumerable fromHash metadata when present.
+ * Fail-safe: if no recognizable state columns exist in the data, returns original
+ * data unfiltered (avoids breaking misconfigured datasets). If valid state columns
+ * exist but a state has no data, returns empty result as expected.
  */
 export const filterCountyTableRuntimeDataByStateCode = (runtimeData: any, stateCode: string, config?: any) => {
   if (!runtimeData || runtimeData.init || !stateCode) return runtimeData
 
-  const filtered = {}
+  const runtimeKeys = Object.keys(runtimeData)
+  if (runtimeKeys.length === 0) return runtimeData
+
   const stateName = supportedStateCodes[stateCode]
-  const stateAbbreviation = stateFipsToAbbreviation[stateCode]
+  const stateAbbreviation = stateCodeToAbbreviation[stateCode]
   const normalizedSelectedStateCode = String(stateCode).replace(/^0+/, '')
   const paddedSelectedStateCode = normalizedSelectedStateCode.padStart(2, '0')
   const stateColumnNames = Object.values(config?.columns || {})
     .map((column: any) => column?.name)
-    .filter((name: string) => !!name && /(state|territory|fips)/i.test(name))
+    .filter((name: string) => !!name && /(state|territory|fips|jurisdiction)/i.test(name))
+
+  // Also check common state field names directly in the data rows
+  const commonStateFieldNames = [
+    'jurisdiction',
+    'state',
+    'State',
+    'state_name',
+    'stateName',
+    'State/Territory',
+    'state_territory_name'
+  ]
+  const allStateColumns = [...new Set([...stateColumnNames, ...commonStateFieldNames])]
+
+  // Fail-safe: check if UIDs look like FIPS codes OR if any state column exists in the data
+  const sampleRow = runtimeData[runtimeKeys[0]]
+  const uidLooksFips = runtimeKeys.some(uid => /^\d{2}/.test(String(uid)))
+  const hasStateColumn = allStateColumns.some(col => sampleRow?.[col] !== undefined)
+
+  // If data has neither FIPS-style UIDs nor any recognizable state columns, don't filter
+  if (!uidLooksFips && !hasStateColumn) {
+    return runtimeData
+  }
+
+  const filtered = {}
 
   if (runtimeData.fromHash !== undefined) {
     Object.defineProperty(filtered, 'fromHash', {
@@ -38,7 +67,8 @@ export const filterCountyTableRuntimeDataByStateCode = (runtimeData: any, stateC
     const normalizedUidPrefix = uidPrefix.startsWith('0') ? uidPrefix.slice(1) : uidPrefix
     const matchesUidPrefix =
       uidPrefix === paddedSelectedStateCode || normalizedUidPrefix === normalizedSelectedStateCode
-    const matchesStateColumn = stateColumnNames.some((columnName: string) => {
+
+    const matchesStateColumn = allStateColumns.some((columnName: string) => {
       const rawValue = row?.[columnName]
       if (rawValue === undefined || rawValue === null) return false
 
