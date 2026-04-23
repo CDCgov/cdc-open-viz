@@ -69,7 +69,7 @@ const sortById = (a, b) => {
   return 0
 }
 
-const getTopoData = (year, showHSABoundaries, territoryVisibility: CountyTerritoryVisibility) => {
+const getTopoData = (year, showHSABoundaries, territoryVisibility: CountyTerritoryVisibility, showPuertoRico) => {
   return new Promise(resolve => {
     const resolveWithTopo = async response => {
       if (response.status !== 200) {
@@ -101,10 +101,16 @@ const getTopoData = (year, showHSABoundaries, territoryVisibility: CountyTerrito
       if (!territoryVisibility.showTerritories) {
         topoData.states = topoData.states.filter(state => {
           const statePrefix = state.id?.substring(0, 2)
+          if (statePrefix === '72') return showPuertoRico
           return !statePrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(statePrefix)
         })
         topoData.counties = topoData.counties.filter(county => {
           const countyPrefix = county.id?.substring(0, 2)
+          if (countyPrefix === '72') return showPuertoRico
+          if (showPuertoRico) {
+            return !countyPrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix)
+          }
+
           return !countyPrefix || !US_TERRITORY_STATE_FIPS_PREFIXES.has(countyPrefix)
         })
       } else {
@@ -279,7 +285,12 @@ const CountyMap = () => {
   })
 
   const getAndSetTopoData = currentYear => {
-    getTopoData(currentYear, config.general.showHSABoundaries, territoryVisibility).then(response => {
+    getTopoData(
+      currentYear,
+      config.general.showHSABoundaries,
+      territoryVisibility,
+      config.migrations.showPuertoRico
+    ).then(response => {
       if (canvasRef.current) {
         const context = canvasRef.current.getContext('2d') as CanvasRenderingContext2D
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
@@ -957,6 +968,7 @@ const CountyMap = () => {
     context.strokeStyle = stateStrokeColor
     context.lineWidth = lineWidth * 1.25 * strokeScale
     topoData.states.forEach(state => {
+      if (config.migrations.showPuertoRico == false) return
       if (!state.id) return
       const path2d = cache.get('state_border_' + state.id)
       if (path2d) {
