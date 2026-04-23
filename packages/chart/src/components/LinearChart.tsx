@@ -177,6 +177,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
   const tickLabelFontSize = isMobileFontViewport(vizViewport) ? TICK_LABEL_FONT_SIZE_SMALL : TICK_LABEL_FONT_SIZE
   const axisLabelFontSize = getAxisLabelFontSize(vizViewport)
   const GET_TEXT_WIDTH_FONT = `normal ${tickLabelFontSize}px Nunito, sans-serif`
+  const showTopYAxisTitle =
+    config.yAxis?.titlePlacement === 'top' && !config.hideYAxisLabel && Boolean(config.runtime?.yAxis?.label)
 
   // zero if not forest plot
   const forestRowsHeight = isForestPlot ? config.data.length * config.forestPlot.rowHeight : 0
@@ -588,120 +590,126 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     <React.Fragment></React.Fragment>
   ) : (
     <ErrorBoundary component='LinearChart'>
-      {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
-      <div
-        style={{ width: `${parentWidth}px`, overflow: 'visible', position: 'relative' }}
-        className='tooltip-boundary'
-      >
-        <svg
-          ref={internalSvgRef}
-          onMouseMove={onMouseMove}
-          width={parentWidth}
-          height={isNoDataAvailable ? 1 : calculatedSvgHeight ?? parentHeight}
-          className={`linear ${config.animate ? 'animated' : ''} ${animatedChart && config.animate ? 'animate' : ''} ${
-            debugSvg && 'debug'
-          } ${isDraggingAnnotation && 'dragging-annotation'}`}
-          role='img'
-          aria-label={handleChartAriaLabels(config)}
-          style={{ overflow: 'visible' }}
-          onMouseLeave={() => {
-            setShowHoverLine(false)
-            handleChartMouseLeave()
-            onMouseLeave()
-          }}
-          onMouseEnter={() => {
-            setShowHoverLine(true)
-            handleChartMouseEnter()
-          }}
+      <>
+        {showTopYAxisTitle && (
+          <div className='y-axis-top-title' style={{ fontSize: `${axisLabelFontSize}px` }}>
+            {config.runtime.yAxis.label}
+          </div>
+        )}
+        {/* ! Notice - div needed for tooltip boundaries (flip/flop) */}
+        <div
+          style={{ width: `${parentWidth}px`, overflow: 'visible', position: 'relative' }}
+          className='tooltip-boundary'
         >
-          {!isDraggingAnnotation && <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>}{' '}
-          {/* GRID LINES */}
-          {/* Actual LeftAxis is drawn after visualization */}
-          {!TYPES_WITHOUT_GRID.includes(visualizationType as any) && config.yAxis.type !== 'categorical' && (
-            <LeftAxisGridlines
+          <svg
+            ref={internalSvgRef}
+            onMouseMove={onMouseMove}
+            width={parentWidth}
+            height={isNoDataAvailable ? 1 : calculatedSvgHeight ?? parentHeight}
+            className={`linear ${config.animate ? 'animated' : ''} ${
+              animatedChart && config.animate ? 'animate' : ''
+            } ${debugSvg && 'debug'} ${isDraggingAnnotation && 'dragging-annotation'}`}
+            role='img'
+            aria-label={handleChartAriaLabels(config)}
+            style={{ overflow: 'visible' }}
+            onMouseLeave={() => {
+              setShowHoverLine(false)
+              handleChartMouseLeave()
+              onMouseLeave()
+            }}
+            onMouseEnter={() => {
+              setShowHoverLine(true)
+              handleChartMouseEnter()
+            }}
+          >
+            {!isDraggingAnnotation && <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>}{' '}
+            {/* GRID LINES */}
+            {/* Actual LeftAxis is drawn after visualization */}
+            {!TYPES_WITHOUT_GRID.includes(visualizationType as any) && config.yAxis.type !== 'categorical' && (
+              <LeftAxisGridlines
+                yScale={yScale}
+                xMax={xMax}
+                yAxisWidth={yAxisWidth}
+                numTicks={handleNumTicks}
+                axisLabelFontSize={axisLabelFontSize}
+              />
+            )}
+            {/* Horizontal chart grid lines */}
+            {runtime.xAxis.gridLines && orientation === 'horizontal' && (
+              <Group left={yAxisWidth}>
+                {xScale.ticks(xTickCount).map((tickValue, i) => {
+                  const tickPosition = xScale(tickValue)
+                  return (
+                    <Line
+                      key={`horizontal-gridline-${tickValue}-${i}`}
+                      from={{ x: tickPosition, y: 0 }}
+                      to={{ x: tickPosition, y: yMax }}
+                      stroke='#d6d6d6'
+                    />
+                  )
+                })}
+              </Group>
+            )}
+            {visualizationType === 'Paired Bar' && (
+              <PairedBarAxis
+                g1xScale={g1xScale}
+                g2xScale={g2xScale}
+                yMax={yMax}
+                xMax={xMax}
+                yAxisWidth={yAxisWidth}
+                bottomLabelStart={bottomLabelStart}
+                tickLabelFontSize={tickLabelFontSize}
+                axisLabelFontSize={axisLabelFontSize}
+                axisBottomRef={axisBottomRef}
+                xAxisLabelRefs={xAxisLabelRefs}
+                tickLabelFont={GET_TEXT_WIDTH_FONT}
+              />
+            )}
+            {/* Visualization Renderer - handles all chart type rendering */}
+            <VisualizationRenderer
+              xScale={xScale}
               yScale={yScale}
               xMax={xMax}
-              yAxisWidth={yAxisWidth}
-              numTicks={handleNumTicks}
-              axisLabelFontSize={axisLabelFontSize}
-            />
-          )}
-          {/* Horizontal chart grid lines */}
-          {runtime.xAxis.gridLines && orientation === 'horizontal' && (
-            <Group left={yAxisWidth}>
-              {xScale.ticks(xTickCount).map((tickValue, i) => {
-                const tickPosition = xScale(tickValue)
-                return (
-                  <Line
-                    key={`horizontal-gridline-${tickValue}-${i}`}
-                    from={{ x: tickPosition, y: 0 }}
-                    to={{ x: tickPosition, y: yMax }}
-                    stroke='#d6d6d6'
-                  />
-                )
-              })}
-            </Group>
-          )}
-          {visualizationType === 'Paired Bar' && (
-            <PairedBarAxis
-              g1xScale={g1xScale}
-              g2xScale={g2xScale}
               yMax={yMax}
-              xMax={xMax}
+              seriesScale={seriesScale}
+              xScaleNoPadding={xScaleNoPadding}
+              min={min}
+              max={max}
+              parentWidth={parentWidth}
               yAxisWidth={yAxisWidth}
-              bottomLabelStart={bottomLabelStart}
-              tickLabelFontSize={tickLabelFontSize}
-              axisLabelFontSize={axisLabelFontSize}
-              axisBottomRef={axisBottomRef}
-              xAxisLabelRefs={xAxisLabelRefs}
-              tickLabelFont={GET_TEXT_WIDTH_FONT}
+              forestHeight={forestHeight}
+              animatedChart={animatedChart}
+              tooltipData={tooltipData}
+              showTooltip={showTooltip}
+              handleTooltipMouseOver={handleTooltipMouseOver}
+              handleTooltipMouseOff={handleTooltipMouseOff}
+              handleTooltipClick={handleTooltipClick}
+              getXAxisData={getXAxisData}
+              getYAxisData={getYAxisData}
+              svgRef={svgRef}
+              forestPlotRightLabelRef={forestPlotRightLabelRef}
+              synchronizedXValue={synchronizedXValue}
             />
-          )}
-          {/* Visualization Renderer - handles all chart type rendering */}
-          <VisualizationRenderer
-            xScale={xScale}
-            yScale={yScale}
-            xMax={xMax}
-            yMax={yMax}
-            seriesScale={seriesScale}
-            xScaleNoPadding={xScaleNoPadding}
-            min={min}
-            max={max}
-            parentWidth={parentWidth}
-            yAxisWidth={yAxisWidth}
-            forestHeight={forestHeight}
-            animatedChart={animatedChart}
-            tooltipData={tooltipData}
-            showTooltip={showTooltip}
-            handleTooltipMouseOver={handleTooltipMouseOver}
-            handleTooltipMouseOff={handleTooltipMouseOff}
-            handleTooltipClick={handleTooltipClick}
-            getXAxisData={getXAxisData}
-            getYAxisData={getYAxisData}
-            svgRef={svgRef}
-            forestPlotRightLabelRef={forestPlotRightLabelRef}
-            synchronizedXValue={synchronizedXValue}
-          />
-          {/* Brush moved to separate overlay - no longer in main SVG */}
-          {/* y anchors */}
-          {config.yAxis.anchors &&
-            config.yAxis.anchors.map((anchor, index) => {
-              let position = yScale(anchor.value)
-              let middleOffset = 0
+            {/* Brush moved to separate overlay - no longer in main SVG */}
+            {/* y anchors */}
+            {config.yAxis.anchors &&
+              config.yAxis.anchors.map((anchor, index) => {
+                let position = yScale(anchor.value)
+                let middleOffset = 0
 
-              if (!anchor.value) return
-              if (config.yAxis.labelPlacement === 'Below Bar') {
-                middleOffset =
-                  BELOW_BAR_TEXT_OFFSET + Number(config.series.length * config.barHeight) / config.series.length
-              } else {
-                middleOffset = LABEL_PADDING_OFFSET
-              }
+                if (!anchor.value) return
+                if (config.yAxis.labelPlacement === 'Below Bar') {
+                  middleOffset =
+                    BELOW_BAR_TEXT_OFFSET + Number(config.series.length * config.barHeight) / config.series.length
+                } else {
+                  middleOffset = LABEL_PADDING_OFFSET
+                }
 
-              if (!position) return
+                if (!position) return
 
-              return (
-                // prettier-ignore
-                <Line
+                return (
+                  // prettier-ignore
+                  <Line
                   key={`yAxis-${anchor.value}--${index}`}
                   strokeDasharray={handleLineType(anchor.lineStyle)}
                   stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
@@ -709,35 +717,35 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   from={{ x: Number(yAxisWidth), y: position - middleOffset }}
                   to={{ x: Number(yAxisWidth) + Number(xMax), y: position - middleOffset }}
                 />
-              )
-            })}
-          {/* x anchors */}
-          {config.xAxis.anchors &&
-            config.xAxis.anchors.map((anchor, index) => {
-              let newX = xAxis
-              if (orientation === 'horizontal') {
-                newX = yAxis
-              }
-
-              const getAnchorPosition = (): number | undefined => {
-                let position: number | undefined
-
-                position = isDateScale(newX) ? xScale(parseDate(anchor.value, false)) : xScale(anchor.value)
-                if (config.xAxis.type === 'categorical' || config.xAxis.type === 'date') {
-                  position = position
-                    ? position + (newX.type === 'categorical' || newX.type === 'date' ? xScale.bandwidth() : 0) / 2
-                    : 0
+                )
+              })}
+            {/* x anchors */}
+            {config.xAxis.anchors &&
+              config.xAxis.anchors.map((anchor, index) => {
+                let newX = xAxis
+                if (orientation === 'horizontal') {
+                  newX = yAxis
                 }
-                return position
-              }
 
-              let anchorPosition = getAnchorPosition()
+                const getAnchorPosition = (): number | undefined => {
+                  let position: number | undefined
 
-              if (!anchorPosition) return
+                  position = isDateScale(newX) ? xScale(parseDate(anchor.value, false)) : xScale(anchor.value)
+                  if (config.xAxis.type === 'categorical' || config.xAxis.type === 'date') {
+                    position = position
+                      ? position + (newX.type === 'categorical' || newX.type === 'date' ? xScale.bandwidth() : 0) / 2
+                      : 0
+                  }
+                  return position
+                }
 
-              return (
-                // prettier-ignore
-                <Line
+                let anchorPosition = getAnchorPosition()
+
+                if (!anchorPosition) return
+
+                return (
+                  // prettier-ignore
+                  <Line
                   key={`xAxis-${anchor.value}--${index}`}
                   strokeDasharray={handleLineType(anchor.lineStyle)}
                   stroke={anchor.color ? anchor.color : 'rgba(0,0,0,1)'}
@@ -746,222 +754,223 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
                   from={{ x: Number(anchorPosition) + Number(yAxisWidth), y: 0 }}
                   to={{ x: Number(anchorPosition) + Number(yAxisWidth), y: yMax }}
                 />
-              )
-            })}
-          {/* we are handling regions in bar charts differently, so that we can calculate the bar group into the region space. */}
-          {/* prettier-ignore */}
-          {config.visualizationType !== 'Bar' && config.visualizationType !== 'Combo' && (
-            <Regions
-              xScale={xScale}
-              handleTooltipClick={handleTooltipClick}
-              handleTooltipMouseOff={handleTooltipMouseOff}
-              handleTooltipMouseOver={handleTooltipMouseOver}
-              showTooltip={showTooltip}
-              hideTooltip={hideTooltip}
-              tooltipData={tooltipData}
-              yMax={yMax}
-              xMax={xMax}
-              yAxisWidth={yAxisWidth}
-            />
-          )}
-          {isNoDataAvailable && (
-            <Text
-              x={yAxisWidth + Number(xMax / 2)}
-              y={initialHeight / 2 - (config.xAxis.padding || 0) / 2}
-              textAnchor='middle'
-            >
-              {config.chartMessage.noData}
-            </Text>
-          )}
-          {showHoverLine && (
-            <>
-              <HoverLine
-                xMax={xMax}
-                yMax={yMax}
-                point={point}
+                )
+              })}
+            {/* we are handling regions in bar charts differently, so that we can calculate the bar group into the region space. */}
+            {/* prettier-ignore */}
+            {config.visualizationType !== 'Bar' && config.visualizationType !== 'Combo' && (
+              <Regions
+                xScale={xScale}
+                handleTooltipClick={handleTooltipClick}
+                handleTooltipMouseOff={handleTooltipMouseOff}
+                handleTooltipMouseOver={handleTooltipMouseOver}
+                showTooltip={showTooltip}
+                hideTooltip={hideTooltip}
                 tooltipData={tooltipData}
-                orientation='horizontal'
+                yMax={yMax}
+                xMax={xMax}
                 yAxisWidth={yAxisWidth}
               />
-              <HoverLine
-                xMax={xMax}
-                yMax={yMax}
-                point={point}
-                tooltipData={tooltipData}
-                orientation='vertical'
-                yAxisWidth={yAxisWidth}
-              />
-            </>
-          )}
-          <Group left={yAxisWidth}>
-            <Annotation.Draggable
-              xScale={xScale}
-              yScale={yScale}
-              xScaleAnnotation={xScaleAnnotation}
-              yScaleAnnotation={yScaleAnnotation}
-              xMax={xMax}
-              yMax={yMax}
-              seriesScale={seriesScale}
-              svgRef={svgRef}
-              onDragStateChange={handleDragStateChange}
-            />
-          </Group>
-          {/* Highlighted regions */}
-          {/* Y axis */}
-          {/* Horizon charts don't have a grid but should be rendered with a left axis */}
-          {(!TYPES_WITHOUT_GRID.includes(visualizationType as any) || visualizationType === 'Horizon Chart') &&
-            config.yAxis.type !== 'categorical' && (
-              <LeftAxis
+            )}
+            {isNoDataAvailable && (
+              <Text
+                x={yAxisWidth + Number(xMax / 2)}
+                y={initialHeight / 2 - (config.xAxis.padding || 0) / 2}
+                textAnchor='middle'
+              >
+                {config.chartMessage.noData}
+              </Text>
+            )}
+            {showHoverLine && (
+              <>
+                <HoverLine
+                  xMax={xMax}
+                  yMax={yMax}
+                  point={point}
+                  tooltipData={tooltipData}
+                  orientation='horizontal'
+                  yAxisWidth={yAxisWidth}
+                />
+                <HoverLine
+                  xMax={xMax}
+                  yMax={yMax}
+                  point={point}
+                  tooltipData={tooltipData}
+                  orientation='vertical'
+                  yAxisWidth={yAxisWidth}
+                />
+              </>
+            )}
+            <Group left={yAxisWidth}>
+              <Annotation.Draggable
+                xScale={xScale}
                 yScale={yScale}
+                xScaleAnnotation={xScaleAnnotation}
+                yScaleAnnotation={yScaleAnnotation}
+                xMax={xMax}
+                yMax={yMax}
+                seriesScale={seriesScale}
+                svgRef={svgRef}
+                onDragStateChange={handleDragStateChange}
+              />
+            </Group>
+            {/* Highlighted regions */}
+            {/* Y axis */}
+            {/* Horizon charts don't have a grid but should be rendered with a left axis */}
+            {(!TYPES_WITHOUT_GRID.includes(visualizationType as any) || visualizationType === 'Horizon Chart') &&
+              config.yAxis.type !== 'categorical' && (
+                <LeftAxis
+                  yScale={yScale}
+                  xScale={xScale}
+                  yMax={yMax}
+                  xMax={xMax}
+                  yAxisWidth={yAxisWidth}
+                  numTicks={handleNumTicks}
+                  tickLabelFontSize={tickLabelFontSize}
+                  axisLabelFontSize={axisLabelFontSize}
+                  handleLeftTickFormatting={handleLeftTickFormatting}
+                  topYLabelRef={topYLabelRef}
+                  suffixRef={suffixRef}
+                  suffixWidth={suffixWidth}
+                  horizontalYAxisLabelSpace={horizontalYAxisLabelSpace}
+                  categoryLabelSpace={categoryLabelSpace}
+                />
+              )}
+            {config.yAxis.type === 'categorical' && config.orientation === 'vertical' && (
+              <CategoricalYAxis
+                yScale={yScale}
+                xMax={xMax}
+                yMax={yMax}
+                leftSize={yAxisWidth - config.yAxis.axisPadding}
+              />
+            )}
+            {/* Right Axis */}
+            {hasRightAxis && (
+              <RightAxis
+                yScaleRight={yScaleRight}
+                yMax={yMax}
+                xMax={xMax}
+                yAxisWidth={yAxisWidth}
+                tickLabelFontSize={tickLabelFontSize}
+                axisLabelFontSize={axisLabelFontSize}
+              />
+            )}
+            {hasTopAxis && config.topAxis.hasLine && (
+              <AxisTop
+                stroke='#333'
+                left={yAxisWidth}
+                scale={xScale}
+                hideTicks
+                hideZero
+                tickLabelProps={() => ({
+                  fill: 'transparent'
+                })}
+              />
+            )}
+            {/* X axis */}
+            {visualizationType !== 'Paired Bar' && visualizationType !== 'Spark Line' && (
+              <BottomAxis
+                axisBottomRef={axisBottomRef}
                 xScale={xScale}
                 yMax={yMax}
                 xMax={xMax}
                 yAxisWidth={yAxisWidth}
-                numTicks={handleNumTicks}
+                xTickCount={xTickCount}
                 tickLabelFontSize={tickLabelFontSize}
                 axisLabelFontSize={axisLabelFontSize}
-                handleLeftTickFormatting={handleLeftTickFormatting}
-                topYLabelRef={topYLabelRef}
-                suffixRef={suffixRef}
-                suffixWidth={suffixWidth}
-                horizontalYAxisLabelSpace={horizontalYAxisLabelSpace}
-                categoryLabelSpace={categoryLabelSpace}
+                handleBottomTickFormatting={handleBottomTickFormatting}
+                useDateSpanMonths={useDateSpanMonths}
+                dateSpanMonths={dateSpanMonths}
+                xAxisDataMapped={xAxisDataMapped}
+                uniqueXAxisDataMapped={uniqueXAxisDataMapped}
+                isDateTime={isDateTime}
+                bottomLabelStart={bottomLabelStart}
+                parentWidth={parentWidth}
+                xAxisLabelRefs={xAxisLabelRefs}
+                xAxisTitleRef={xAxisTitleRef}
+                getManualStep={getManualStep}
               />
             )}
-          {config.yAxis.type === 'categorical' && config.orientation === 'vertical' && (
-            <CategoricalYAxis
-              yScale={yScale}
-              xMax={xMax}
-              yMax={yMax}
-              leftSize={yAxisWidth - config.yAxis.axisPadding}
+          </svg>
+          {!isDraggingAnnotation &&
+            tooltipData &&
+            tooltipData.data?.length > 0 &&
+            tooltipOpen &&
+            showTooltip &&
+            !tooltipData?.data?.some(row => row?.value === undefined) &&
+            tooltipData.dataYPosition &&
+            tooltipData.dataXPosition &&
+            !config.tooltips.singleSeries && (
+              <>
+                <style>{`.tooltip {background-color: rgba(255,255,255, ${
+                  config.tooltips.opacity / 100
+                }) !important;`}</style>
+                <style>{`.tooltip {max-width:300px} !important; word-wrap: break-word; `}</style>
+                <TooltipWithBounds
+                  ref={tooltipRef}
+                  key={Math.random()}
+                  className={'tooltip cove-visualization'}
+                  left={tooltipLeft}
+                  top={tooltipTop}
+                >
+                  <ul>
+                    {typeof tooltipData === 'object' &&
+                      tooltipData.data
+                        .filter(row => row && row.value !== undefined)
+                        .map((row, index) => (
+                          <TooltipListItem
+                            row={row}
+                            index={index}
+                            key={index}
+                            useMarkerColumn={tooltipData.useMarkerColumn}
+                          />
+                        ))}
+                  </ul>
+                </TooltipWithBounds>
+              </>
+            )}
+          {config.visualizationType === 'Bump Chart' && (
+            <ReactTooltip
+              id={`bump-chart`}
+              variant='light'
+              arrowColor='rgba(0,0,0,0)'
+              className='tooltip'
+              style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
             />
           )}
-          {/* Right Axis */}
-          {hasRightAxis && (
-            <RightAxis
-              yScaleRight={yScaleRight}
-              yMax={yMax}
-              xMax={xMax}
-              yAxisWidth={yAxisWidth}
-              tickLabelFontSize={tickLabelFontSize}
-              axisLabelFontSize={axisLabelFontSize}
+          {!isDraggingAnnotation && (
+            <ReactTooltip
+              id={`cdc-open-viz-tooltip-${runtime.uniqueId}`}
+              variant='light'
+              arrowColor='rgba(0,0,0,0)'
+              className='tooltip'
+              style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
             />
           )}
-          {hasTopAxis && config.topAxis.hasLine && (
-            <AxisTop
-              stroke='#333'
-              left={yAxisWidth}
-              scale={xScale}
-              hideTicks
-              hideZero
-              tickLabelProps={() => ({
-                fill: 'transparent'
-              })}
-            />
+          <div className='animation-trigger' ref={triggerRef} />
+          {/* SEPARATED BRUSH - Independent SVG overlay */}
+          {config.xAxis.brushActive && config.xAxis.type !== 'categorical' && xMax > 0 && (
+            <div
+              style={{
+                position: 'relative',
+                marginTop: `${BRUSH_MARGIN}px`,
+                left: `${yAxisWidth}px`,
+                width: `${Math.max(xMax, BRUSH_MIN_WIDTH)}px`,
+                height: `${BRUSH_HEIGHT}px`,
+                pointerEvents: 'auto',
+                zIndex: 15,
+                touchAction: 'none', // Enable touch interactions for brush
+                WebkitTouchCallout: 'none',
+                WebkitUserSelect: 'none',
+                userSelect: 'none'
+              }}
+              className='brush-overlay'
+            >
+              <BrushSelector key={brushKeyRef.current} xMax={Math.max(xMax, BRUSH_MIN_WIDTH)} yMax={BRUSH_HEIGHT} />
+            </div>
           )}
-          {/* X axis */}
-          {visualizationType !== 'Paired Bar' && visualizationType !== 'Spark Line' && (
-            <BottomAxis
-              axisBottomRef={axisBottomRef}
-              xScale={xScale}
-              yMax={yMax}
-              xMax={xMax}
-              yAxisWidth={yAxisWidth}
-              xTickCount={xTickCount}
-              tickLabelFontSize={tickLabelFontSize}
-              axisLabelFontSize={axisLabelFontSize}
-              handleBottomTickFormatting={handleBottomTickFormatting}
-              useDateSpanMonths={useDateSpanMonths}
-              dateSpanMonths={dateSpanMonths}
-              xAxisDataMapped={xAxisDataMapped}
-              uniqueXAxisDataMapped={uniqueXAxisDataMapped}
-              isDateTime={isDateTime}
-              bottomLabelStart={bottomLabelStart}
-              parentWidth={parentWidth}
-              xAxisLabelRefs={xAxisLabelRefs}
-              xAxisTitleRef={xAxisTitleRef}
-              getManualStep={getManualStep}
-            />
-          )}
-        </svg>
-        {!isDraggingAnnotation &&
-          tooltipData &&
-          tooltipData.data?.length > 0 &&
-          tooltipOpen &&
-          showTooltip &&
-          !tooltipData?.data?.some(row => row?.value === undefined) &&
-          tooltipData.dataYPosition &&
-          tooltipData.dataXPosition &&
-          !config.tooltips.singleSeries && (
-            <>
-              <style>{`.tooltip {background-color: rgba(255,255,255, ${
-                config.tooltips.opacity / 100
-              }) !important;`}</style>
-              <style>{`.tooltip {max-width:300px} !important; word-wrap: break-word; `}</style>
-              <TooltipWithBounds
-                ref={tooltipRef}
-                key={Math.random()}
-                className={'tooltip cove-visualization'}
-                left={tooltipLeft}
-                top={tooltipTop}
-              >
-                <ul>
-                  {typeof tooltipData === 'object' &&
-                    tooltipData.data
-                      .filter(row => row && row.value !== undefined)
-                      .map((row, index) => (
-                        <TooltipListItem
-                          row={row}
-                          index={index}
-                          key={index}
-                          useMarkerColumn={tooltipData.useMarkerColumn}
-                        />
-                      ))}
-                </ul>
-              </TooltipWithBounds>
-            </>
-          )}
-        {config.visualizationType === 'Bump Chart' && (
-          <ReactTooltip
-            id={`bump-chart`}
-            variant='light'
-            arrowColor='rgba(0,0,0,0)'
-            className='tooltip'
-            style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
-          />
-        )}
-        {!isDraggingAnnotation && (
-          <ReactTooltip
-            id={`cdc-open-viz-tooltip-${runtime.uniqueId}`}
-            variant='light'
-            arrowColor='rgba(0,0,0,0)'
-            className='tooltip'
-            style={{ background: `rgba(255,255,255, ${config.tooltips.opacity / 100})`, color: 'black' }}
-          />
-        )}
-        <div className='animation-trigger' ref={triggerRef} />
-        {/* SEPARATED BRUSH - Independent SVG overlay */}
-        {config.xAxis.brushActive && config.xAxis.type !== 'categorical' && xMax > 0 && (
-          <div
-            style={{
-              position: 'relative',
-              marginTop: `${BRUSH_MARGIN}px`,
-              left: `${yAxisWidth}px`,
-              width: `${Math.max(xMax, BRUSH_MIN_WIDTH)}px`,
-              height: `${BRUSH_HEIGHT}px`,
-              pointerEvents: 'auto',
-              zIndex: 15,
-              touchAction: 'none', // Enable touch interactions for brush
-              WebkitTouchCallout: 'none',
-              WebkitUserSelect: 'none',
-              userSelect: 'none'
-            }}
-            className='brush-overlay'
-          >
-            <BrushSelector key={brushKeyRef.current} xMax={Math.max(xMax, BRUSH_MIN_WIDTH)} yMax={BRUSH_HEIGHT} />
-          </div>
-        )}
-      </div>
+        </div>
+      </>
     </ErrorBoundary>
   )
 })

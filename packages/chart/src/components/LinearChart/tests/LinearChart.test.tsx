@@ -259,6 +259,25 @@ describe('LinearChart', () => {
       expect(container.querySelector('.left-axis text.y-label')).toBeFalsy()
     })
 
+    it('renders the top y-axis title outside the tooltip boundary when titlePlacement is top', () => {
+      const { container } = renderLinearChart()
+      const topLabel = container.querySelector('.y-axis-top-title')
+      const tooltipBoundary = container.querySelector('.tooltip-boundary')
+
+      expect(topLabel).toBeTruthy()
+      expect(tooltipBoundary).toBeTruthy()
+      expect(tooltipBoundary?.contains(topLabel as Node)).toBe(false)
+      expect(topLabel?.nextElementSibling).toBe(tooltipBoundary)
+    })
+
+    it('uses the compact top y-axis title font size for narrow visualization viewports', () => {
+      const { container } = renderLinearChart({}, { vizViewport: 'xs' })
+      const topLabel = container.querySelector('.y-axis-top-title')
+
+      expect(topLabel).toBeTruthy()
+      expect(topLabel).toHaveStyle({ fontSize: '14px' })
+    })
+
     it('renders the side y-axis title inside the svg when titlePlacement is side', () => {
       const { container } = renderLinearChart({
         yAxis: sidePlacementYAxis

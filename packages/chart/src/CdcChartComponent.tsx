@@ -74,7 +74,6 @@ import { getVisibleAnnotations } from './components/Annotations/helpers/getVisib
 import { DataTransform } from '@cdc/core/helpers/DataTransform'
 import { backfillDefaults } from '@cdc/core/helpers/backfillDefaults'
 import { isLegendWrapViewport } from '@cdc/core/helpers/viewports'
-import { getAxisLabelFontSize } from './helpers/axisLabelFontSize'
 import { missingRequiredSections } from '@cdc/core/helpers/missingRequiredSections'
 import { filterVizData } from '@cdc/core/helpers/filterVizData'
 import { addValuesToFilters } from '@cdc/core/helpers/addValuesToFilters'
@@ -1277,23 +1276,11 @@ const CdcChart: React.FC<CdcChartProps> = ({
     return classes
   }
 
-  const showTopYAxisTitle =
-    config.yAxis?.titlePlacement === 'top' && !config.hideYAxisLabel && Boolean(config.runtime?.yAxis?.label)
-  const topYAxisTitleFontSize = getAxisLabelFontSize(vizViewport)
-
-  const renderTopYAxisTitle = () =>
-    showTopYAxisTitle ? (
-      <div className='y-axis-top-title' style={{ fontSize: `${topYAxisTitleFontSize}px` }}>
-        {config.runtime.yAxis.label}
-      </div>
-    ) : null
-
   const renderLinearChartWithParentSize = (
     getParentWidth: (parent: { width: number; height: number }) => number = parent => parent.width,
     wrapperStyle: React.CSSProperties = { width: '100%' }
   ) => (
     <>
-      {renderTopYAxisTitle()}
       <div ref={parentRef} style={wrapperStyle}>
         <ParentSize>
           {parent => <LinearChart ref={svgRef} parentWidth={getParentWidth(parent)} parentHeight={parent.height} />}
