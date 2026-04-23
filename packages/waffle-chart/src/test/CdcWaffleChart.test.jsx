@@ -6,6 +6,7 @@ import { render, waitFor } from '@testing-library/react'
 import { testStandaloneBuild } from '@cdc/core/helpers/tests/testStandaloneBuild.ts'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import CdcWaffleChart from '../CdcWaffleChart'
+import legacyCountExampleConfig from '../../examples/private/waffle-chart-example-count.json'
 
 vi.mock('resize-observer-polyfill', () => ({
   default: vi.fn(() => ({
@@ -40,6 +41,7 @@ const extractMarkedExampleConfig = (content, label) => {
 describe('Waffle Chart', () => {
   const createBaseConfig = overrides => ({
     type: 'waffle-chart',
+    version: '4.26.4-1',
     title: 'Test Waffle',
     showTitle: true,
     visualizationType: 'Waffle',
@@ -121,6 +123,19 @@ describe('Waffle Chart', () => {
 
     expect(readmeBlock).toEqual(minimalExample)
     expect(minimalExample.version).toBeTruthy()
+  })
+
+  it('renders the legacy count example through the direct config prop path', async () => {
+    const config = JSON.parse(JSON.stringify(legacyCountExampleConfig))
+
+    const { container } = render(<CdcWaffleChart config={config} />)
+
+    await waitFor(() => {
+      expect(container.querySelector('.cove-waffle-chart')).toBeInTheDocument()
+    })
+
+    expect(getPrimaryValueText(container)).toBeTruthy()
+    expect(getPrimaryValueText(container)).not.toContain('out of')
   })
 
   it('moves the trend indicator below the value when a trend label is configured', async () => {
