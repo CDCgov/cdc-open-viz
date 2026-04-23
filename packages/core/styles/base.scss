@@ -19,6 +19,7 @@ body.post-type-cdc_visualization .cdc-editor .configure .editor-panel {
   line-height: 1.5;
   font-weight: 400;
   font-style: normal;
+  color: var(--baseColor);
   text-rendering: optimizeLegibility;
   // Force printing chart images
   -webkit-print-color-adjust: exact !important; /* Chrome, Safari 6 – 15.3, Edge */
