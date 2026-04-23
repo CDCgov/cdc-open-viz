@@ -3,7 +3,7 @@ import SmallMultipleTile from './SmallMultipleTile'
 import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
 import useScales from '../../hooks/useScales'
-import { shouldUseYAxisAutoPadding } from '../../helpers/needsYAxisAutoPadding'
+import { getYAxisAutoPaddingMode } from '../../helpers/getYAxisAutoPaddingMode'
 import { createCombinedDataForYAxis, applyTileOrder, createTileColorScale } from '../../helpers/smallMultiplesHelpers'
 import { isMobileSmallMultiplesViewport } from '@cdc/core/helpers/viewports'
 import './SmallMultiples.css'
@@ -106,7 +106,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     combinedDataForYAxis.data
   )
 
-  const needsYAxisAutoPadding = shouldUseYAxisAutoPadding(config)
+  const yAxisAutoPaddingMode = getYAxisAutoPaddingMode(config)
 
   const { min, max } = useScales({
     config: combinedDataForYAxis.config,
@@ -119,7 +119,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     xAxisDataMapped: [],
     xMax: parentWidth,
     yMax: parentHeight,
-    needsYAxisAutoPadding,
+    yAxisAutoPaddingMode,
     currentViewport
   })
 

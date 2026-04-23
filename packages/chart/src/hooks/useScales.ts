@@ -15,6 +15,7 @@ import { ChartConfig } from '../types/ChartConfig'
 import { ChartContext } from '../types/ChartContext'
 import _ from 'lodash'
 import { getYAxisAutoPadding } from '../helpers/getYAxisAutoPadding'
+import { YAxisAutoPaddingMode } from '../helpers/getYAxisAutoPaddingMode'
 import getMinMax from '../helpers/getMinMax'
 import { countNumOfTicks } from '../helpers/countNumOfTicks'
 
@@ -39,7 +40,7 @@ type useScaleProps = {
   xAxisDataMapped: Object[] // array of x axis date/category items
   xMax: number // chart svg width
   yMax: number // chart svg height
-  needsYAxisAutoPadding?: boolean // whether Y-axis needs auto padding for label overflow
+  yAxisAutoPaddingMode?: YAxisAutoPaddingMode // why Y-axis auto padding should run
   currentViewport?: string // current viewport for tick calculation
 }
 
@@ -55,7 +56,7 @@ const useScales = (properties: useScaleProps) => {
     maxValue,
     existPositiveValue,
     isAllLine,
-    needsYAxisAutoPadding,
+    yAxisAutoPaddingMode = 'none',
     currentViewport
   } = properties
 
@@ -91,11 +92,13 @@ const useScales = (properties: useScaleProps) => {
   const handleNumTicks = isForestPlot ? config.data.length : yTickCount
 
   // Apply auto-padding if needed
-  if (needsYAxisAutoPadding && !isHorizontal) {
-    for (let i = 0; i < 3; i++) {
+  if (yAxisAutoPaddingMode !== 'none' && !isHorizontal) {
+    const maxPasses = yAxisAutoPaddingMode === 'inline-label' ? 3 : 1
+
+    for (let i = 0; i < maxPasses; i++) {
       const scale = composeYScale({ min, max, yMax, config, leftMax })
-      const padding = getYAxisAutoPadding(scale, handleNumTicks, maxValue, minValue, config)
-      if (i === 0 || padding > 0) {
+      const padding = getYAxisAutoPadding(scale, handleNumTicks, maxValue, minValue, config, yAxisAutoPaddingMode)
+      if (padding > 0 || (maxPasses > 1 && i === 0)) {
         const adjustedConfig = { ...config, yAxis: { ...config.yAxis, scalePadding: padding, enablePadding: true } }
         const result = getMinMax({ ...minMaxProps, config: adjustedConfig })
         min = result.min
