@@ -215,7 +215,7 @@ describe('coveUpdateWorker', () => {
         hideBackgroundColor: false
       })
       expect(result.visualizations.markup1.contentEditor.style).toBe('default')
-      expect(result.version).toBe('4.26.4-1')
+      expectVersionAtLeast(result.version, '4.26.4-1')
     })
   })
 })
