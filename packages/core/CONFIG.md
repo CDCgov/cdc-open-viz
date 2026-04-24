@@ -42,7 +42,7 @@ Use these values anywhere a package accepts a shared theme token.
 
 | Type | Description | Format |
 | --- | --- | --- |
-| `string` | Semantic version string used to record the COVE version associated with a saved config. Plain three-part versions are the normal case. Config migration ordering is guaranteed for `<major>.<minor>.<patch>` and versions with a numeric suffix, where a missing suffix is treated as `0`. | `<major>.<minor>.<patch>` or `<major>.<minor>.<patch>-<numeric-suffix>` |
+| `string` | Semantic version string used to record the COVE version associated with a saved config. Plain three-part versions are the normal case. Config migration ordering is guaranteed for `<major>.<minor>.<patch>` and versions with a numeric suffix, where a missing suffix is treated as `0`. Malformed saved versions are treated as `0.0.0` during migration ordering so the full migration chain still runs. | `<major>.<minor>.<patch>` or `<major>.<minor>.<patch>-<numeric-suffix>` |
 
 Examples: `4.26.4`, `4.26.4-1`
 

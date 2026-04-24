@@ -138,6 +138,35 @@ describe('detectDateParseFormat', () => {
     })
   })
 
+  it('detects canonical formats when samples omit leading zeroes', () => {
+    expect(detectDateParseFormat(['2024/3/5', '2025/11/9'])).toMatchObject({
+      detectedFormat: '%Y/%m/%d',
+      isReliable: true
+    })
+
+    expect(detectDateParseFormat(['3/15/2024', '11/9/2025'])).toMatchObject({
+      detectedFormat: '%m/%d/%Y',
+      isReliable: true
+    })
+
+    expect(detectDateParseFormat(['15/3/2024', '9/11/2025'])).toMatchObject({
+      detectedFormat: '%d/%m/%Y',
+      isReliable: true
+    })
+  })
+
+  it('detects canonical formats when padded and unpadded samples are mixed', () => {
+    expect(detectDateParseFormat(['2024/03/5', '2025/11/09'])).toMatchObject({
+      detectedFormat: '%Y/%m/%d',
+      isReliable: true
+    })
+
+    expect(detectDateParseFormat(['03/5/2024', '11/13/2025'])).toMatchObject({
+      detectedFormat: '%m/%d/%Y',
+      isReliable: true
+    })
+  })
+
   it('detects year-only and year-month formats', () => {
     expect(detectDateParseFormat(['2024', '2025'])).toMatchObject({
       detectedFormat: '%Y',
@@ -172,8 +201,42 @@ describe('detectDateParseFormat', () => {
     })
   })
 
+  it('rejects samples with unsupported separators or non-numeric parts', () => {
+    expect(detectDateParseFormat(['2024.03.15'])).toMatchObject({
+      isReliable: false,
+      failureReason: 'no_matching_format'
+    })
+
+    expect(detectDateParseFormat(['Mar 15 2024'])).toMatchObject({
+      isReliable: false,
+      failureReason: 'no_matching_format'
+    })
+  })
+
+  it('uses sample shape to narrow candidates before exact parsing', () => {
+    expect(detectDateParseFormat(['2024/03/15', '2025/11/09'])).toMatchObject({
+      detectedFormat: '%Y/%m/%d',
+      isReliable: true,
+      ambiguous: false
+    })
+
+    expect(detectDateParseFormat(['2024-03', '2025-11'])).toMatchObject({
+      detectedFormat: '%Y-%m',
+      isReliable: true,
+      ambiguous: false
+    })
+  })
+
   it('treats dual-valid samples as ambiguous', () => {
     expect(detectDateParseFormat(['01/02/2024', '02/03/2024'])).toMatchObject({
+      isReliable: false,
+      ambiguous: true,
+      failureReason: 'ambiguous'
+    })
+  })
+
+  it('still treats unpadded dual-valid samples as ambiguous', () => {
+    expect(detectDateParseFormat(['1/2/2024', '2/3/2024'])).toMatchObject({
       isReliable: false,
       ambiguous: true,
       failureReason: 'ambiguous'
@@ -206,6 +269,18 @@ describe('getAutoDetectedDateParseFormat', () => {
         [
           { date: '2024/03/15', value: 10 },
           { date: '2025/11/09', value: 12 }
+        ],
+        'date'
+      )
+    ).toBe('%Y/%m/%d')
+  })
+
+  it('detects a reliable format from a selected data key when month/day zeroes are omitted', () => {
+    expect(
+      getAutoDetectedDateParseFormat(
+        [
+          { date: '2024/3/5', value: 10 },
+          { date: '2025/11/9', value: 12 }
         ],
         'date'
       )
