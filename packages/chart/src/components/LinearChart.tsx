@@ -322,7 +322,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     runtime.xAxis?.type
   ])
 
-  const horizontalYAxisLabelSpace = runtime.yAxis.label && !config.hideYAxisLabel ? 30 : 0
+  const horizontalYAxisLabelSpace =
+    runtime.yAxis.label && !config.hideYAxisLabel && config.yAxis.titlePlacement !== 'top' ? 30 : 0
 
   const [yTickCount, xTickCount] = ['yAxis', 'xAxis'].map(axis =>
     countNumOfTicks({ axis, max, runtime, currentViewport, isHorizontal, data, config, min })
