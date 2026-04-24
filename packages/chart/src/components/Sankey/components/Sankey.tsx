@@ -43,7 +43,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
   useEffect(() => {
     let largest = 0
     groupRefs?.current?.map(g => {
-      const groupWidth = g?.getBoundingClientRect().width
+      const groupWidth = g?.getBBox?.().width || g?.getBoundingClientRect?.().width || 0
       if (groupWidth > largest) {
         largest = groupWidth
       }
@@ -458,7 +458,7 @@ const Sankey = ({ width, height, runtime }: SankeyProps) => {
         >
           <Group className='links'>{allLinks}</Group>
           <Group className='nodes'>{allNodes}</Group>
-          <Group className='finalNodes' style={{ display: 'none' }}>
+          <Group className='finalNodes' style={{ visibility: 'hidden', pointerEvents: 'none' }} aria-hidden='true'>
             {finalNodes}
           </Group>
         </svg>
