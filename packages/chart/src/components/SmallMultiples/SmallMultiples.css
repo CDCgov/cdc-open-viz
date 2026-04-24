@@ -19,6 +19,10 @@
   margin-bottom: 0.5rem;
 }
 
+.small-multiples-container--with-top-y-axis-title .tile-header {
+  margin-bottom: 0;
+}
+
 .tile-header--with-top-y-axis-title {
   margin-bottom: 0;
 }

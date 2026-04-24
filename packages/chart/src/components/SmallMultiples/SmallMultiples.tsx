@@ -228,8 +228,15 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     return null
   }
 
+  const hasTopYAxisTitle =
+    config.yAxis?.titlePlacement === 'top' && !config.hideYAxisLabel && Boolean(config.runtime?.yAxis?.label)
+
   return (
-    <div className='small-multiples-container'>
+    <div
+      className={`small-multiples-container${
+        hasTopYAxisTitle ? ' small-multiples-container--with-top-y-axis-title' : ''
+      }`}
+    >
       <div className='small-multiples-grid' style={gridStyle}>
         {tileItems.map((item, index) => {
           const customColorScale = createTileColorScale(item, config, colorScale, index, tileItems.length)
