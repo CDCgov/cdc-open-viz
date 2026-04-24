@@ -21,7 +21,7 @@ V1 supports:
 
 - one inline `dashboardCondition` per row
 - one conditional column with ordered candidate widgets when a component-level dashboard condition is needed
-- operators `hasData`, `hasNoData`, and `columnHasAnyValue`
+- operators `hasData`, `hasNoData`, `columnHasAnyValue`, and `filtersIncomplete`
 - shared-filter scoping through the existing `usedBy` model
 
 V1 does not support:
@@ -50,7 +50,7 @@ The v1 config shape is:
 type DashboardCondition = {
   id?: string
   datasetKey?: string
-  operator?: 'hasData' | 'hasNoData' | 'columnHasAnyValue'
+  operator?: 'hasData' | 'hasNoData' | 'columnHasAnyValue' | 'filtersIncomplete'
   columnName?: string
   values?: string[]
 }
@@ -75,6 +75,7 @@ Notes:
 - `id` is treated as required at runtime once a condition exists, but is still optional in the type because older or hand-authored configs may omit it.
 - The editor creates the id when the condition is first saved.
 - `datasetKey` may differ from the dataset used by the controlled visualization.
+- `filtersIncomplete` is a dashboard-state condition and does not use `datasetKey`, `columnName`, or `values`.
 - `columnName` and `values` are only meaningful for `columnHasAnyValue`.
 - component-level conditions always live on `conditionalWidgets[]` entries.
 - saving the first component condition converts a simple `column.widget` into `conditionalWidgets[0]`.
@@ -102,11 +103,12 @@ Dashboard conditions are added as a third target type in the same `filteredData`
 For each dashboard condition target:
 
 1. Find the condition target id.
-2. Read the condition dataset from `dashboardCondition.datasetKey`.
-3. Collect applicable shared filters for that condition target.
-4. Ignore filters whose `columnName` is missing from the condition dataset.
-5. If an applicable filter is still at reset state, treat the condition as unresolved.
-6. Otherwise filter the condition dataset and store the result at `filteredData[dashboardCondition.id]`.
+2. For `filtersIncomplete`, collect applicable shared filters for that condition target and store a resolved match when any applicable visible filter is at reset state.
+3. For data operators, read the condition dataset from `dashboardCondition.datasetKey`.
+4. Collect applicable shared filters for that condition target.
+5. Ignore filters whose `columnName` is missing from the condition dataset.
+6. If an applicable filter is still at reset state, treat the condition as unresolved.
+7. Otherwise filter the condition dataset and store the result at `filteredData[dashboardCondition.id]`.
 
 This logic lives in:
 
@@ -169,6 +171,8 @@ The runtime rules are:
 - Row and column conditions combine with implicit AND.
 - Hidden widgets preserve their grid width.
 - If every widget column in a row is hidden, the row does not render.
+- Dashboards without a `filtersIncomplete` condition keep the legacy incomplete-filter row suppression and static `Please complete your selection to continue.` message.
+- Dashboards with at least one `filtersIncomplete` condition suppress that static reset-filter message and let authored conditional rows/widgets handle the incomplete-filter state.
 
 Implementation lives in:
 
@@ -190,6 +194,8 @@ Typical unresolved cases:
 - an applicable shared filter is still at reset state
 
 This is why unresolved conditions must not be treated as a synonym for empty filtered results.
+
+`filtersIncomplete` is the exception to the data-operator unresolved rule. It is resolved from dashboard filter state alone: it passes when any applicable visible shared filter is at reset state, and fails when applicable filters are complete or absent.
 
 ## Editor Model
 
@@ -239,6 +245,12 @@ Passes when the filtered condition dataset resolves successfully and is empty.
 
 Passes when at least one filtered row contains a value that loosely matches one of the authored string values.
 
+### `filtersIncomplete`
+
+Passes when any visible shared filter applicable to the condition target is at reset state. It uses the same targeting rules as other dashboard conditions, including unscoped shared filters through `getApplicableFiltersForTarget(..., { includeUnscoped: true })`.
+
+It ignores filters scoped only to unrelated rows, widgets, or condition ids. It is intended for authored "please select filters" content and does not match data/API loading states by itself.
+
 Comparison behavior:
 
 - values are compared with string coercion
@@ -251,6 +263,7 @@ The saved operator values are now:
 - `hasData`
 - `hasNoData`
 - `columnHasAnyValue`
+- `filtersIncomplete`
 
 ## V1 Exclusions
 

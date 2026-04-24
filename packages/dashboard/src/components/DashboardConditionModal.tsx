@@ -89,17 +89,20 @@ export const DashboardConditionModal: React.FC<DashboardConditionModalProps> = (
 
   const availableDatasets = Object.keys(config.datasets || {})
   const needsValueMatch = formState.operator === 'columnHasAnyValue'
+  const usesDashboardFilterState = formState.operator === 'filtersIncomplete'
   const hasCondition = !!formState.operator
-  const shouldShowColumnSelect = needsValueMatch && !!formState.datasetKey
+  const shouldShowDatasetSelect = hasCondition && !usesDashboardFilterState
+  const shouldShowColumnSelect = shouldShowDatasetSelect && needsValueMatch && !!formState.datasetKey
   const shouldShowValueSelect = shouldShowColumnSelect && !!formState.columnName
 
   const canSave = useMemo(() => {
     if (!hasCondition) return true
+    if (usesDashboardFilterState) return true
     if (!formState.datasetKey || !formState.operator) return false
     if (!needsValueMatch) return true
 
     return !!formState.columnName && formState.values.length > 0
-  }, [formState, hasCondition, needsValueMatch])
+  }, [formState, hasCondition, needsValueMatch, usesDashboardFilterState])
 
   const updateDashboardCondition = (dashboardCondition?: DashboardCondition) => {
     if (columnIndex === undefined) {
@@ -233,10 +236,11 @@ export const DashboardConditionModal: React.FC<DashboardConditionModalProps> = (
                 { value: '', label: 'Always show' },
                 { value: 'hasData', label: "Show when there's data" },
                 { value: 'hasNoData', label: "Show when there's no data" },
-                { value: 'columnHasAnyValue', label: 'Show when column has a value' }
+                { value: 'columnHasAnyValue', label: 'Show when column has a value' },
+                { value: 'filtersIncomplete', label: 'Show when filters are incomplete' }
               ]}
               tooltip={tooltipIcon(
-                `Choose whether this ${targetLabel} should appear when the filtered condition dataset has data, has no data, or contains one of the selected column values.`
+                `Choose whether this ${targetLabel} should appear when the filtered condition dataset has data, has no data, contains one of the selected column values, or when targeted filters are incomplete.`
               )}
               value={formState.operator}
               onChange={event => {
@@ -244,14 +248,14 @@ export const DashboardConditionModal: React.FC<DashboardConditionModalProps> = (
                 setFormState(currentState => ({
                   ...currentState,
                   operator,
-                  datasetKey: operator ? currentState.datasetKey : '',
+                  datasetKey: operator && operator !== 'filtersIncomplete' ? currentState.datasetKey : '',
                   columnName: operator === 'columnHasAnyValue' ? currentState.columnName : '',
                   values: operator === 'columnHasAnyValue' ? currentState.values : []
                 }))
               }}
             />
 
-            {hasCondition && (
+            {shouldShowDatasetSelect && (
               <>
                 <Select
                   className='dashboard-condition-modal__select py-2 ps-2 w-100 d-block'
@@ -336,8 +340,11 @@ export const DashboardConditionModal: React.FC<DashboardConditionModalProps> = (
 
                 const nextCondition: DashboardCondition = {
                   id: existingDashboardCondition?.id || createDashboardConditionId(),
-                  datasetKey: formState.datasetKey,
                   operator: formState.operator
+                }
+
+                if (!usesDashboardFilterState) {
+                  nextCondition.datasetKey = formState.datasetKey
                 }
 
                 if (needsValueMatch) {

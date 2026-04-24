@@ -214,6 +214,39 @@ export const remapRowTargetsInSharedFilters = (
     return nextUsedBy === sharedFilter.usedBy ? sharedFilter : { ...sharedFilter, usedBy: nextUsedBy }
   })
 
+const getDashboardConditionTargetPosition = (target: DashboardConditionTarget) =>
+  [target.rowIndex, target.columnIndex ?? 'row', target.entryIndex ?? 'row'].join(':')
+
+export const remapDashboardConditionTargetsInSharedFilters = (
+  sharedFilters: SharedFilter[],
+  previousRows: ConfigRow[],
+  nextRows: ConfigRow[]
+): SharedFilter[] => {
+  const previousTargetsByPosition = new Map(
+    getDashboardConditionTargets(previousRows).map(target => [getDashboardConditionTargetPosition(target), target.id])
+  )
+  const remappedConditionIds = new Map<string, string>()
+
+  getDashboardConditionTargets(nextRows).forEach(target => {
+    const previousId = previousTargetsByPosition.get(getDashboardConditionTargetPosition(target))
+    if (previousId && previousId !== target.id) {
+      remappedConditionIds.set(normalizeTarget(previousId), target.id)
+    }
+  })
+
+  if (remappedConditionIds.size === 0) return sharedFilters
+
+  return sharedFilters.map(sharedFilter => {
+    if (!sharedFilter.usedBy) return sharedFilter
+
+    const nextUsedBy = dedupeSharedFilterTargets(
+      sharedFilter.usedBy.map(target => remappedConditionIds.get(normalizeTarget(target)) || target)
+    )
+
+    return nextUsedBy === sharedFilter.usedBy ? sharedFilter : { ...sharedFilter, usedBy: nextUsedBy }
+  })
+}
+
 export const cleanupSharedFilterUsedByTargets = (config: DashboardConfig): SharedFilter[] => {
   const validTargets = getValidSharedFilterTargets(config)
 

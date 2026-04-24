@@ -134,15 +134,16 @@ Dashboard conditions are optional visibility rules owned by rows and row columns
 | `rows[].dashboardCondition.id` | `string` | No | Auto-generated | Stable dashboard-condition target id used by shared-filter `usedBy`. | The editor generates and preserves this id once dashboard-condition authoring is enabled. |
 | `rows[].columns[].conditionalWidgets[].widget` | `string` | Yes in conditional mode | None | Visualization key for one candidate component in the column. | Must match a key in `visualizations`. Author order defines priority. |
 | `rows[].columns[].conditionalWidgets[].dashboardCondition.id` | `string` | No | Auto-generated | Stable dashboard-condition target id used by shared-filter `usedBy`. | Conditional entries expose labels like `Row 1 Column 2 Component 1 Dashboard Condition` in shared-filter targeting. |
-| `*.dashboardCondition.datasetKey` | `string` | Yes when a dashboard condition is enabled | None | Dataset used to evaluate the dashboard condition. | May differ from the visualization dataset. |
-| `*.dashboardCondition.operator` | `string` | Yes when a dashboard condition is enabled | None | Dashboard-condition comparison mode. | `hasData`, `hasNoData`, `columnHasAnyValue` |
+| `*.dashboardCondition.datasetKey` | `string` | Yes except for `filtersIncomplete` | None | Dataset used to evaluate data-backed dashboard conditions. | May differ from the visualization dataset. Not used by `filtersIncomplete`. |
+| `*.dashboardCondition.operator` | `string` | Yes when a dashboard condition is enabled | None | Dashboard-condition comparison mode. | `hasData`, `hasNoData`, `columnHasAnyValue`, `filtersIncomplete` |
 | `*.dashboardCondition.columnName` | `string` | Only for `columnHasAnyValue` | None | Dataset column inspected by the dashboard condition. | Must exist in the dashboard-condition dataset. |
 | `*.dashboardCondition.values` | `string[]` | Only for `columnHasAnyValue` | `[]` | One or more acceptable values. | Runtime uses loose string coercion so numeric dataset values can match authored strings. |
 
 | Behavior | Details |
 | --- | --- |
-| Shared filter application | Conditions apply matching scoped filters plus unscoped filters before evaluating the operator. Filters whose `columnName` is missing from the condition dataset are ignored for that condition. |
-| Unresolved inputs | If the condition dataset is unavailable or an applicable filter is still at reset state, the condition resolves as hidden rather than behaving like `hasNoData`. |
+| Shared filter application | Conditions apply matching scoped filters plus unscoped filters before evaluating the operator. Filters whose `columnName` is missing from the condition dataset are ignored for data-backed conditions. |
+| `filtersIncomplete` targeting | `filtersIncomplete` uses the condition id as its shared-filter target and includes unscoped filters. It passes only when an applicable visible filter is at reset state, and ignores filters scoped to unrelated targets. |
+| Unresolved inputs | For data-backed operators, if the condition dataset is unavailable or an applicable filter is still at reset state, the condition resolves as hidden rather than behaving like `hasNoData`. `filtersIncomplete` resolves from filter reset state instead of dataset availability. |
 | Conditional columns | `conditionalWidgets` lets one dashboard column hold multiple candidate components while still rendering as one slot. Runtime uses the first matching entry in author order. |
 | Simple/conditional cleanup | The editor automatically collapses conditional mode back to simple mode when only one unconditioned entry remains after a completed save or delete action. |
 | Row suppression | A false row condition hides the full row. A no-match conditional column hides only that widget slot while preserving grid width. |

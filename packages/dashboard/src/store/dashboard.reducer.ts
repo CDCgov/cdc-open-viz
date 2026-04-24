@@ -8,7 +8,10 @@ import { Dashboard } from '../types/Dashboard'
 import { ConfigRow } from '../types/ConfigRow'
 import { AnyVisualization } from '@cdc/core/types/Visualization'
 import { initialState } from '../DashboardContext'
-import { cleanupSharedFilterUsedByTargets } from '../helpers/dashboardFilterTargets'
+import {
+  cleanupSharedFilterUsedByTargets,
+  remapDashboardConditionTargetsInSharedFilters
+} from '../helpers/dashboardFilterTargets'
 import { hasConditionalWidgets, normalizeConditionalColumn } from '../helpers/dashboardColumnWidgets'
 
 type BlankMultiConfig = {
@@ -276,13 +279,22 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         }
         return row
       })
-      const nextConfig = { ...state.config, rows: newRows }
+      const remappedSharedFilters = remapDashboardConditionTargetsInSharedFilters(
+        state.config.dashboard.sharedFilters || [],
+        state.config.rows,
+        newRows
+      )
+      const nextConfig = {
+        ...state.config,
+        dashboard: { ...state.config.dashboard, sharedFilters: remappedSharedFilters },
+        rows: newRows
+      }
       const nextSharedFilters = cleanupSharedFilterUsedByTargets(nextConfig)
 
       return {
         ...state,
         config: saveMultiChanges(
-          { ...nextConfig, dashboard: { ...state.config.dashboard, sharedFilters: nextSharedFilters } },
+          { ...nextConfig, dashboard: { ...nextConfig.dashboard, sharedFilters: nextSharedFilters } },
           state.config.activeDashboard
         )
       }

@@ -376,4 +376,45 @@ describe('DashboardConditionModal', () => {
 
     expect(saveButton).not.toBeDisabled()
   })
+
+  it('allows filtersIncomplete without dataset, column, or values', () => {
+    const { dispatch } = renderModal()
+
+    fireEvent.change(screen.getByRole('combobox', { name: /Condition Type/i }), {
+      target: { value: 'filtersIncomplete' }
+    })
+
+    expect(screen.getByRole('option', { name: 'Show when filters are incomplete' })).toBeInTheDocument()
+    expect(screen.getAllByRole('combobox')).toHaveLength(1)
+    expect(screen.queryByText('Column Values')).not.toBeInTheDocument()
+
+    const saveButton = screen.getByRole('button', { name: 'Save' })
+    expect(saveButton).not.toBeDisabled()
+
+    fireEvent.click(saveButton)
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'UPDATE_ROW',
+      payload: {
+        rowIndex: 0,
+        rowData: {
+          columns: [
+            expect.objectContaining({
+              conditionalWidgets: [
+                expect.objectContaining({
+                  widget: 'markup-1',
+                  dashboardCondition: expect.objectContaining({
+                    operator: 'filtersIncomplete'
+                  })
+                })
+              ]
+            })
+          ]
+        }
+      }
+    })
+    expect(
+      dispatch.mock.calls[0][0].payload.rowData.columns[0].conditionalWidgets[0].dashboardCondition
+    ).not.toHaveProperty('datasetKey')
+  })
 })

@@ -6,6 +6,7 @@ import _ from 'lodash'
 import { DashboardConfig } from '../types/DashboardConfig'
 import { ConfigRow } from '../types/ConfigRow'
 import { getVizRowColumnLocator } from './getVizRowColumnLocator'
+import { getDashboardConditionDatasetKeys } from './dashboardConditions'
 
 export const isUpdateNeeded = (
   filters: SharedFilter[],
@@ -31,11 +32,17 @@ type GetDatasetKeysParams = Pick<DashboardConfig, 'visualizations' | 'datasets' 
 export const getDatasetKeys = ({ visualizations, datasets, rows }: GetDatasetKeysParams): string[] => {
   const vizDataKeys = Object.values(visualizations).map(viz => viz.dataKey)
   const rowDataKeys = rows.map(row => row.dataKey)
+  const dashboardConditionDataKeys = getDashboardConditionDatasetKeys(rows)
   const footnoteDataKeys = Object.values(visualizations)
     .map(viz => viz.footnotes?.dataKey)
     .filter(Boolean)
   // ensure to only load datasets for the specific dashboard tab.
-  const datasetsUsedByDashboard = _.uniq([...vizDataKeys, ...rowDataKeys, ...footnoteDataKeys])
+  const datasetsUsedByDashboard = _.uniq([
+    ...vizDataKeys,
+    ...rowDataKeys,
+    ...dashboardConditionDataKeys,
+    ...footnoteDataKeys
+  ])
   return Object.keys(datasets).filter(datasetKey => datasetsUsedByDashboard.includes(datasetKey))
 }
 

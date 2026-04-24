@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import {
+  dashboardRowsUseFiltersIncomplete,
   ensureRowConditionIds,
   evaluateDashboardCondition,
-  getDashboardConditionFilteredData
+  getDashboardConditionFilteredData,
+  hasIncompleteFiltersForDashboardCondition
 } from '../dashboardConditions'
 import {
   cleanupSharedFilterUsedByTargets,
@@ -84,6 +86,92 @@ describe('dashboardConditions', () => {
     )
 
     expect(filteredData).toBeUndefined()
+  })
+
+  it('detects filtersIncomplete conditions without requiring a dataset', () => {
+    expect(
+      dashboardRowsUseFiltersIncomplete([
+        {
+          columns: [
+            {
+              width: 12,
+              conditionalWidgets: [
+                {
+                  widget: 'markup-1',
+                  dashboardCondition: { id: 'column-condition-1', operator: 'filtersIncomplete' }
+                }
+              ]
+            }
+          ],
+          expandCollapseAllButtons: false
+        }
+      ] as any)
+    ).toBe(true)
+
+    const filteredData = getDashboardConditionFilteredData(
+      { id: 'column-condition-1', operator: 'filtersIncomplete' },
+      {
+        sharedFilters: [
+          {
+            key: 'Region',
+            type: 'datafilter',
+            columnName: 'region',
+            showDropdown: true,
+            active: '',
+            usedBy: ['column-condition-1']
+          }
+        ]
+      } as any,
+      {}
+    )
+
+    expect(filteredData).toEqual([{}])
+    expect(
+      evaluateDashboardCondition({ id: 'column-condition-1', operator: 'filtersIncomplete' }, filteredData)
+    ).toEqual({ matches: true, resolved: true })
+  })
+
+  it('uses condition-target filter semantics for filtersIncomplete, including unscoped filters', () => {
+    const dashboard = {
+      sharedFilters: [
+        {
+          key: 'Unscoped Region',
+          type: 'datafilter',
+          columnName: 'region',
+          showDropdown: true,
+          active: '',
+          usedBy: []
+        }
+      ]
+    } as any
+
+    expect(
+      hasIncompleteFiltersForDashboardCondition({ id: 'column-condition-1', operator: 'filtersIncomplete' }, dashboard)
+    ).toBe(true)
+  })
+
+  it('ignores reset filters scoped only to unrelated targets for filtersIncomplete', () => {
+    const filteredData = getDashboardConditionFilteredData(
+      { id: 'column-condition-1', operator: 'filtersIncomplete' },
+      {
+        sharedFilters: [
+          {
+            key: 'Other Region',
+            type: 'datafilter',
+            columnName: 'region',
+            showDropdown: true,
+            active: '',
+            usedBy: ['other-condition']
+          }
+        ]
+      } as any,
+      {}
+    )
+
+    expect(filteredData).toEqual([])
+    expect(
+      evaluateDashboardCondition({ id: 'column-condition-1', operator: 'filtersIncomplete' }, filteredData)
+    ).toEqual({ matches: false, resolved: true })
   })
 
   it('ignores filters whose columns are missing from the condition dataset', () => {

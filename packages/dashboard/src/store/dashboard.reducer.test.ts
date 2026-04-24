@@ -139,4 +139,50 @@ describe('dashboard reducer conditional columns', () => {
       }
     ])
   })
+
+  it('remaps shared filter targets when a condition edit replaces an id in the same slot', () => {
+    const state = baseState()
+    state.config.dashboard.sharedFilters = [
+      {
+        key: 'County',
+        type: 'datafilter',
+        columnName: 'county',
+        usedBy: ['condition-1', 'condition-2']
+      }
+    ] as any
+
+    const nextState = reducer(state, {
+      type: 'UPDATE_ROW',
+      payload: {
+        rowIndex: 0,
+        rowData: {
+          columns: [
+            {
+              width: 12,
+              conditionalWidgets: [
+                {
+                  widget: 'viz-1',
+                  dashboardCondition: {
+                    id: 'condition-1-replacement',
+                    datasetKey: 'condition-data',
+                    operator: 'hasData'
+                  }
+                },
+                {
+                  widget: 'viz-2',
+                  dashboardCondition: {
+                    id: 'condition-2',
+                    datasetKey: 'condition-data',
+                    operator: 'hasNoData'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    } as any)
+
+    expect(nextState.config.dashboard.sharedFilters[0].usedBy).toEqual(['condition-1-replacement', 'condition-2'])
+  })
 })

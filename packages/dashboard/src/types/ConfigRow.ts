@@ -3,7 +3,7 @@ import { ConfigureData } from '@cdc/core/types/ConfigureData'
 export type DashboardCondition = {
   id?: string
   datasetKey?: string
-  operator?: 'hasData' | 'hasNoData' | 'columnHasAnyValue'
+  operator?: 'hasData' | 'hasNoData' | 'columnHasAnyValue' | 'filtersIncomplete'
   columnName?: string
   values?: string[]
 }

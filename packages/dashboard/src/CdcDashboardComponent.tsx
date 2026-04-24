@@ -48,6 +48,7 @@ import { ViewPort } from '@cdc/core/types/ViewPort'
 import VisualizationRow from './components/VisualizationRow'
 import { getVizConfig } from './helpers/getVizConfig'
 import { getFilteredData } from './helpers/getFilteredData'
+import { dashboardRowsUseFiltersIncomplete } from './helpers/dashboardConditions'
 import { getVizRowColumnLocator } from './helpers/getVizRowColumnLocator'
 import { Responsive, VisualizationContainer } from '@cdc/core/components/Layout'
 import * as reloadURLHelpers from './helpers/reloadURLHelpers'
@@ -60,6 +61,7 @@ import { shouldLoadAllFilters } from './helpers/shouldLoadAllFilters'
 import { subscribe, unsubscribe } from '@cdc/core/helpers/events'
 import DashboardEditors from './components/DashboardEditors'
 import { updateChildFilters } from './helpers/updateChildFilters'
+import { getColumnWidgetEntries } from './helpers/dashboardColumnWidgets'
 
 type DashboardProps = Omit<WCMSProps, 'configUrl'> & {
   initialState: InitialState
@@ -82,6 +84,16 @@ export default function CdcDashboard({
 
   const isPreview = state.tabSelected === 'Dashboard Preview'
 
+  const hasFiltersIncompleteCondition = useMemo(
+    () => dashboardRowsUseFiltersIncomplete(state.config.rows || []),
+    [state.config.rows]
+  )
+
+  const hasIncompleteSharedFilters = useMemo(() => {
+    const sharedFilters = state.config.dashboard?.sharedFilters || []
+    return sharedFilters.some(isFilterAtResetState)
+  }, [state.config.dashboard?.sharedFilters])
+
   const inNoDataState = useMemo(() => {
     const hasApplyBehavior = hasDashboardApplyBehavior(state.config.visualizations)
 
@@ -89,10 +101,7 @@ export default function CdcDashboard({
       return true
     }
 
-    // Check if any filters are at their reset state (incomplete)
-    const sharedFilters = state.config.dashboard?.sharedFilters || []
-    const hasResetFilters = sharedFilters.some(isFilterAtResetState)
-    if (hasResetFilters) {
+    if (hasIncompleteSharedFilters && !hasFiltersIncompleteCondition) {
       return true
     }
 
@@ -101,6 +110,7 @@ export default function CdcDashboard({
     // Check if there are any visualizations that actually need data
     // Markup-includes without dataKey don't require dashboard data
     const visualizationsNeedingData = Object.values(state.config.visualizations).filter(viz => {
+      if (viz.type === 'dashboardFilters') return false
       return viz.type !== 'markup-include' || viz.dataKey
     })
 
@@ -109,7 +119,13 @@ export default function CdcDashboard({
 
     if (!vals.length) return true
     return vals.some(val => val === undefined)
-  }, [state.data, state.config.visualizations, state.config.dashboard?.sharedFilters, state.filtersApplied])
+  }, [
+    state.data,
+    state.config.visualizations,
+    state.filtersApplied,
+    hasIncompleteSharedFilters,
+    hasFiltersIncompleteCondition
+  ])
 
   const vizRowColumnLocator = getVizRowColumnLocator(state.config.rows)
 
@@ -501,7 +517,7 @@ export default function CdcDashboard({
     const filteredRows =
       config.rows
         ?.map((row, index) => ({ row, index }))
-        .filter(({ row }) => row.columns.filter(col => col.widget).length !== 0) || []
+        .filter(({ row }) => row.columns.some(col => getColumnWidgetEntries(col).length > 0)) || []
 
     body = (
       <>

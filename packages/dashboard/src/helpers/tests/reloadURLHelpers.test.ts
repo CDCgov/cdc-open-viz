@@ -1,4 +1,4 @@
-import { isUpdateNeeded, getDataURL, getNewFileName, filterUsedByDataUrl } from '../reloadURLHelpers'
+import { isUpdateNeeded, getDataURL, getDatasetKeys, getNewFileName, filterUsedByDataUrl } from '../reloadURLHelpers'
 import { SharedFilter } from '../../types/SharedFilter'
 
 describe('isUpdateNeeded', () => {
@@ -190,6 +190,49 @@ describe('getNewFileName', () => {
 
     filter.whitespaceReplacement = 'Replace With Underscore'
     expect(getNewFileName(newFileName, filter, datasetKey)).toBe('State_Active_Filter')
+  })
+})
+
+describe('getDatasetKeys', () => {
+  it('includes datasets used only by dashboard conditions', () => {
+    const datasetKeys = getDatasetKeys({
+      datasets: {
+        conditionData: { data: [{ county: 'Adams County' }] },
+        unusedData: { data: [{ county: 'Clark County' }] }
+      },
+      visualizations: {
+        filters: { type: 'dashboardFilters' },
+        explainer: { type: 'markup-include' }
+      },
+      rows: [
+        {
+          columns: [
+            {
+              width: 12,
+              conditionalWidgets: [
+                {
+                  widget: 'explainer',
+                  dashboardCondition: {
+                    id: 'has-data-condition',
+                    datasetKey: 'conditionData',
+                    operator: 'hasData'
+                  }
+                },
+                {
+                  widget: 'filters-incomplete',
+                  dashboardCondition: {
+                    id: 'filters-incomplete-condition',
+                    operator: 'filtersIncomplete'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    } as any)
+
+    expect(datasetKeys).toEqual(['conditionData'])
   })
 })
 

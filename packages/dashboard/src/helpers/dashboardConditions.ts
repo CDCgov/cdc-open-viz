@@ -2,7 +2,7 @@ import { Dashboard } from '../types/Dashboard'
 import { ConfigRow, DashboardCondition } from '../types/ConfigRow'
 import { getConditionalWidgets, hasConditionalWidgets } from './dashboardColumnWidgets'
 import { filterData, isFilterAtResetState } from './filterData'
-import { getApplicableFiltersForTarget } from './dashboardFilterTargets'
+import { dashboardConditionsSupportedForRow, getApplicableFiltersForTarget } from './dashboardFilterTargets'
 
 export type DashboardConditionEvaluation = {
   matches: boolean
@@ -44,11 +44,41 @@ export const ensureRowConditionIds = (rows: ConfigRow[]): ConfigRow[] =>
   })
 
 const dashboardConditionHasRequiredInputs = (dashboardCondition?: DashboardCondition) => {
-  if (!dashboardCondition?.datasetKey || !dashboardCondition.operator) return false
+  if (!dashboardCondition?.operator) return false
+  if (dashboardCondition.operator === 'filtersIncomplete') return true
+  if (!dashboardCondition.datasetKey) return false
   if (dashboardCondition.operator !== 'columnHasAnyValue') return true
 
   return !!dashboardCondition.columnName && !!dashboardCondition.values?.length
 }
+
+export const dashboardConditionUsesFiltersIncomplete = (dashboardCondition?: DashboardCondition) =>
+  dashboardCondition?.operator === 'filtersIncomplete'
+
+export const dashboardRowsUseFiltersIncomplete = (rows: ConfigRow[] = []) =>
+  rows.some(row => {
+    if (!dashboardConditionsSupportedForRow(row)) return false
+    if (dashboardConditionUsesFiltersIncomplete(row.dashboardCondition)) return true
+
+    return row.columns?.some(column =>
+      getConditionalWidgets(column).some(entry => dashboardConditionUsesFiltersIncomplete(entry.dashboardCondition))
+    )
+  })
+
+export const getDashboardConditionDatasetKeys = (rows: ConfigRow[] = []) =>
+  rows.flatMap(row => {
+    if (!dashboardConditionsSupportedForRow(row)) return []
+
+    const rowDatasetKey = row.dashboardCondition?.datasetKey ? [row.dashboardCondition.datasetKey] : []
+    const columnDatasetKeys =
+      row.columns?.flatMap(column =>
+        getConditionalWidgets(column).flatMap(entry =>
+          entry.dashboardCondition?.datasetKey ? [entry.dashboardCondition.datasetKey] : []
+        )
+      ) || []
+
+    return [...rowDatasetKey, ...columnDatasetKeys]
+  })
 
 const getDashboardConditionApplicableFilters = (
   dashboard: Dashboard,
@@ -61,6 +91,18 @@ const getDashboardConditionApplicableFilters = (
   return candidateFilters.filter(filter => !!filter.columnName && datasetColumns.includes(filter.columnName))
 }
 
+export const hasIncompleteFiltersForDashboardCondition = (
+  dashboardCondition: DashboardCondition | undefined,
+  dashboard: Dashboard
+) => {
+  if (!dashboardCondition?.id) return false
+
+  const applicableFilters = getApplicableFiltersForTarget(dashboard, dashboardCondition.id, { includeUnscoped: true })
+  if (!applicableFilters) return false
+
+  return applicableFilters.some(isFilterAtResetState)
+}
+
 export const getDashboardConditionFilteredData = (
   dashboardCondition: DashboardCondition | undefined,
   dashboard: Dashboard,
@@ -68,6 +110,10 @@ export const getDashboardConditionFilteredData = (
 ): Record<string, any>[] | undefined => {
   if (!dashboardConditionHasRequiredInputs(dashboardCondition)) {
     return undefined
+  }
+
+  if (dashboardCondition.operator === 'filtersIncomplete') {
+    return hasIncompleteFiltersForDashboardCondition(dashboardCondition, dashboard) ? [{}] : []
   }
 
   const rawDataset = data[dashboardCondition.datasetKey]
@@ -104,6 +150,10 @@ export const evaluateDashboardCondition = (
 
   if (dashboardCondition.operator === 'hasNoData') {
     return { matches: filteredData.length === 0, resolved: true }
+  }
+
+  if (dashboardCondition.operator === 'filtersIncomplete') {
+    return { matches: filteredData.length > 0, resolved: true }
   }
 
   const matches = filteredData.some(row => {
