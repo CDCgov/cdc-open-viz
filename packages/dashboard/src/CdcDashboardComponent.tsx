@@ -105,7 +105,9 @@ export default function CdcDashboard({
       return true
     }
 
-    const vals = reloadURLHelpers.getDatasetKeys(state.config).map(key => state.data[key])
+    const vals = reloadURLHelpers
+      .getDatasetKeys(state.config, { includeDashboardConditionDatasetKeys: false })
+      .map(key => state.data[key])
 
     // Check if there are any visualizations that actually need data
     // Markup-includes without dataKey don't require dashboard data
@@ -122,6 +124,8 @@ export default function CdcDashboard({
   }, [
     state.data,
     state.config.visualizations,
+    state.config.datasets,
+    state.config.rows,
     state.filtersApplied,
     hasIncompleteSharedFilters,
     hasFiltersIncompleteCondition

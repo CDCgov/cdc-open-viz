@@ -234,6 +234,33 @@ describe('getDatasetKeys', () => {
 
     expect(datasetKeys).toEqual(['conditionData'])
   })
+
+  it('can exclude datasets used only by dashboard conditions', () => {
+    const datasetKeys = getDatasetKeys(
+      {
+        datasets: {
+          conditionData: { data: [{ county: 'Adams County' }] },
+          contentData: { data: [{ county: 'Baker County' }] }
+        },
+        visualizations: {
+          chart: { type: 'chart', dataKey: 'contentData' }
+        },
+        rows: [
+          {
+            columns: [{ width: 12, widget: 'chart' }],
+            dashboardCondition: {
+              id: 'has-data-condition',
+              datasetKey: 'conditionData',
+              operator: 'hasData'
+            }
+          }
+        ]
+      } as any,
+      { includeDashboardConditionDatasetKeys: false }
+    )
+
+    expect(datasetKeys).toEqual(['contentData'])
+  })
 })
 
 describe('filterUsedByDataUrl', () => {
@@ -277,5 +304,30 @@ describe('filterUsedByDataUrl', () => {
     const filter = { usedBy: ['viz1', 'viz2', 2], datasetKey: 'dataset1' }
     const datasetKey = 'dataset1'
     expect(filterUsedByDataUrl(filter, datasetKey, visualizations, [{}, {}, { dataKey: 'dataset1' }])).toBe(true)
+  })
+
+  it('should return true when used by a dashboard condition that matches the datasetKey', () => {
+    const filter = { usedBy: ['condition-1'], datasetKey: 'dataset1' }
+    const rows = [
+      {
+        columns: [
+          {
+            width: 12,
+            conditionalWidgets: [
+              {
+                widget: 'viz1',
+                dashboardCondition: {
+                  id: 'condition-1',
+                  datasetKey: 'dataset1',
+                  operator: 'hasData'
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+
+    expect(filterUsedByDataUrl(filter, 'dataset1', visualizations, rows as any)).toBe(true)
   })
 })

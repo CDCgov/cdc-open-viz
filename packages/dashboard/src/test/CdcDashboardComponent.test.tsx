@@ -382,6 +382,96 @@ describe('CdcDashboardComponent', () => {
     expect(screen.queryByText('Please complete your selection to continue.')).not.toBeInTheDocument()
   })
 
+  it('does not show the legacy message while condition-only data is loading', () => {
+    const initialState = {
+      config: {
+        type: 'dashboard',
+        dashboard: {
+          title: 'Dashboard Title',
+          titleStyle: 'small',
+          theme: 'theme-blue',
+          sharedFilters: [
+            {
+              key: 'Region',
+              type: 'datafilter',
+              columnName: 'region',
+              showDropdown: true,
+              active: '',
+              usedBy: ['filters-incomplete-condition', 'condition-only-data']
+            }
+          ]
+        },
+        visualizations: {
+          'markup-incomplete': {
+            type: 'markup-include',
+            contentEditor: {
+              inlineHTML: '<p>Select filters authored content</p>',
+              showHeader: true,
+              srcUrl: '',
+              title: 'Incomplete',
+              useInlineHTML: true
+            }
+          },
+          'markup-results': {
+            type: 'markup-include',
+            contentEditor: {
+              inlineHTML: '<p>Filtered results content</p>',
+              showHeader: true,
+              srcUrl: '',
+              title: 'Results',
+              useInlineHTML: true
+            }
+          }
+        },
+        rows: [
+          {
+            columns: [
+              {
+                width: 12,
+                conditionalWidgets: [
+                  {
+                    widget: 'markup-incomplete',
+                    dashboardCondition: {
+                      id: 'filters-incomplete-condition',
+                      operator: 'filtersIncomplete'
+                    }
+                  }
+                ]
+              }
+            ],
+            expandCollapseAllButtons: false
+          },
+          {
+            columns: [{ width: 12, widget: 'markup-results' }],
+            dashboardCondition: {
+              id: 'condition-only-data',
+              datasetKey: 'condition-data',
+              operator: 'hasData'
+            },
+            expandCollapseAllButtons: false
+          }
+        ],
+        datasets: {
+          'condition-data': { data: [{ region: 'North' }] }
+        },
+        table: {}
+      },
+      data: {},
+      loading: false,
+      filteredData: {
+        'filters-incomplete-condition': [{}]
+      },
+      preview: false,
+      tabSelected: 'Dashboard Preview',
+      filtersApplied: true
+    } as InitialState
+
+    render(<CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />)
+
+    expect(screen.getByText('Select filters authored content')).toBeInTheDocument()
+    expect(screen.queryByText('Please complete your selection to continue.')).not.toBeInTheDocument()
+  })
+
   it('renders normal conditioned content after filters become complete', () => {
     const initialState = {
       config: {
