@@ -14,17 +14,88 @@ const AUTO_DETECT_DATE_FORMATS = [
   '%Y-%m',
   '%Y/%m'
 ] as const
-const AUTO_DETECT_DATE_FORMATTERS = Object.fromEntries(
-  AUTO_DETECT_DATE_FORMATS.map(format => [
-    format,
-    {
-      parser: timeParse(format),
-      formatter: timeFormat(format)
-    }
-  ])
-) as Record<AutoDetectDateFormat, { parser: ReturnType<typeof timeParse>; formatter: ReturnType<typeof timeFormat> }>
 
 export type AutoDetectDateFormat = (typeof AUTO_DETECT_DATE_FORMATS)[number]
+
+type AutoDetectDateFormatDefinition = {
+  detectedFormat: AutoDetectDateFormat
+  separator: '' | '/' | '-'
+  partCount: number
+  parseFormats: readonly string[]
+}
+
+const AUTO_DETECT_DATE_FORMAT_DEFINITIONS: readonly AutoDetectDateFormatDefinition[] = [
+  {
+    detectedFormat: '%Y-%m-%d',
+    separator: '-',
+    partCount: 3,
+    parseFormats: ['%Y-%m-%d', '%Y-%m-%-d', '%Y-%-m-%d', '%Y-%-m-%-d']
+  },
+  {
+    detectedFormat: '%Y/%m/%d',
+    separator: '/',
+    partCount: 3,
+    parseFormats: ['%Y/%m/%d', '%Y/%m/%-d', '%Y/%-m/%d', '%Y/%-m/%-d']
+  },
+  {
+    detectedFormat: '%m/%d/%Y',
+    separator: '/',
+    partCount: 3,
+    parseFormats: ['%m/%d/%Y', '%m/%-d/%Y', '%-m/%d/%Y', '%-m/%-d/%Y']
+  },
+  {
+    detectedFormat: '%d/%m/%Y',
+    separator: '/',
+    partCount: 3,
+    parseFormats: ['%d/%m/%Y', '%d/%-m/%Y', '%-d/%m/%Y', '%-d/%-m/%Y']
+  },
+  {
+    detectedFormat: '%m-%d-%Y',
+    separator: '-',
+    partCount: 3,
+    parseFormats: ['%m-%d-%Y', '%m-%-d-%Y', '%-m-%d-%Y', '%-m-%-d-%Y']
+  },
+  {
+    detectedFormat: '%d-%m-%Y',
+    separator: '-',
+    partCount: 3,
+    parseFormats: ['%d-%m-%Y', '%d-%-m-%Y', '%-d-%m-%Y', '%-d-%-m-%Y']
+  },
+  {
+    detectedFormat: '%Y',
+    separator: '',
+    partCount: 1,
+    parseFormats: ['%Y']
+  },
+  {
+    detectedFormat: '%Y-%m',
+    separator: '-',
+    partCount: 2,
+    parseFormats: ['%Y-%m', '%Y-%-m']
+  },
+  {
+    detectedFormat: '%Y/%m',
+    separator: '/',
+    partCount: 2,
+    parseFormats: ['%Y/%m', '%Y/%-m']
+  }
+] as const
+
+const AUTO_DETECT_DATE_FORMATTERS = Object.fromEntries(
+  AUTO_DETECT_DATE_FORMAT_DEFINITIONS.map(({ detectedFormat, parseFormats }) => [
+    detectedFormat,
+    parseFormats.map(parseFormat => ({
+      parser: timeParse(parseFormat),
+      formatter: timeFormat(parseFormat)
+    }))
+  ])
+) as Record<
+  AutoDetectDateFormat,
+  {
+    parser: ReturnType<typeof timeParse>
+    formatter: ReturnType<typeof timeFormat>
+  }[]
+>
 
 export type DateFormatDetectionResult = {
   detectedFormat?: AutoDetectDateFormat
@@ -138,13 +209,82 @@ const normalizeDateSample = (value: unknown) => {
   return String(value).trim()
 }
 
+const getNumericDateParts = (value: string) => {
+  const separatorMatches = value.match(/[/-]/g) || []
+  const uniqueSeparators = [...new Set(separatorMatches)]
+
+  if (uniqueSeparators.length > 1) {
+    return null
+  }
+
+  const separator = (uniqueSeparators[0] || '') as '' | '/' | '-'
+  const parts = separator ? value.split(separator) : [value]
+
+  if (!parts.every(part => /^\d+$/.test(part))) {
+    return null
+  }
+
+  return { separator, parts }
+}
+
+const sampleMatchesFormatShape = (sample: string, detectedFormat: AutoDetectDateFormat) => {
+  const numericDateParts = getNumericDateParts(sample)
+
+  if (!numericDateParts) {
+    return false
+  }
+
+  const formatDefinition = AUTO_DETECT_DATE_FORMAT_DEFINITIONS.find(
+    definition => definition.detectedFormat === detectedFormat
+  )
+
+  if (!formatDefinition) {
+    return false
+  }
+
+  if (
+    numericDateParts.separator !== formatDefinition.separator ||
+    numericDateParts.parts.length !== formatDefinition.partCount
+  ) {
+    return false
+  }
+
+  if (detectedFormat === '%Y') {
+    return numericDateParts.parts[0].length === 4
+  }
+
+  if (detectedFormat === '%Y-%m' || detectedFormat === '%Y/%m') {
+    return numericDateParts.parts[0].length === 4
+  }
+
+  if (detectedFormat === '%Y-%m-%d' || detectedFormat === '%Y/%m/%d') {
+    return numericDateParts.parts[0].length === 4
+  }
+
+  if (
+    detectedFormat === '%m/%d/%Y' ||
+    detectedFormat === '%d/%m/%Y' ||
+    detectedFormat === '%m-%d-%Y' ||
+    detectedFormat === '%d-%m-%Y'
+  ) {
+    return numericDateParts.parts[2].length === 4
+  }
+
+  return true
+}
+
 const matchesDateFormatExactly = (format: AutoDetectDateFormat, value: string) => {
-  const { parser, formatter } = AUTO_DETECT_DATE_FORMATTERS[format]
-  const parsedValue = parser(value)
+  if (!sampleMatchesFormatShape(value, format)) {
+    return false
+  }
 
-  if (!parsedValue) return false
+  return AUTO_DETECT_DATE_FORMATTERS[format].some(({ parser, formatter }) => {
+    const parsedValue = parser(value)
 
-  return formatter(parsedValue) === value
+    if (!parsedValue) return false
+
+    return formatter(parsedValue) === value
+  })
 }
 
 export function detectDateParseFormat(values: unknown[]): DateFormatDetectionResult {
@@ -170,9 +310,13 @@ export function detectDateParseFormat(values: unknown[]): DateFormatDetectionRes
     }
   }
 
-  const matchingFormats = AUTO_DETECT_DATE_FORMATS.filter(format =>
-    samples.every(sample => matchesDateFormatExactly(format, sample))
-  )
+  let candidateFormats = AUTO_DETECT_DATE_FORMATS.filter(format => sampleMatchesFormatShape(samples[0], format))
+
+  for (const sample of samples.slice(1)) {
+    candidateFormats = candidateFormats.filter(format => sampleMatchesFormatShape(sample, format))
+  }
+
+  const matchingFormats = candidateFormats.filter(format => samples.every(sample => matchesDateFormatExactly(format, sample)))
 
   if (matchingFormats.length === 1) {
     return {
