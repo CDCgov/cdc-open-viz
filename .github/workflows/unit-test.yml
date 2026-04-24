@@ -2,7 +2,7 @@ name: Unit Test CI
 
 on:
   pull_request:
-    branches: [dev, test]
+    branches: [dev]
 
 jobs:
   unit-tests:
