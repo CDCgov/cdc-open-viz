@@ -198,7 +198,7 @@ describe('update_4_26_4_1', () => {
             },
             nestedTerritoryMap: {
               type: 'map',
-              general: {}
+              general: { geoType: 'us-county' }
             }
           }
         }
@@ -214,7 +214,7 @@ describe('update_4_26_4_1', () => {
     expect(nested.nestedWaffle.showDenominator).toBe(false)
     expect(nested.nestedChart.markupVariables[0].sourceType).toBe('column')
     expect(nested.nestedCountyMap.table.showFullGeoNameInCSV).toBe(true)
-    expect(nested.nestedTerritoryMap.general.territoriesAlwaysShow).toBe(true)
+    expect(nested.nestedTerritoryMap.migrations.showPuertoRico).toBe(true)
   })
 
   it('does not change non-county map CSV full geo name settings', () => {
