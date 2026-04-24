@@ -17,15 +17,9 @@ const AUTO_DETECT_DATE_FORMATS = [
 
 export type AutoDetectDateFormat = (typeof AUTO_DETECT_DATE_FORMATS)[number]
 
-type DateSampleShape = {
-  separator: '' | '/' | '-'
-  partCount: number
-  parts: string[]
-}
-
 type AutoDetectDateFormatDefinition = {
   detectedFormat: AutoDetectDateFormat
-  separator: DateSampleShape['separator']
+  separator: '' | '/' | '-'
   partCount: number
   parseFormats: readonly string[]
 }
@@ -215,32 +209,28 @@ const normalizeDateSample = (value: unknown) => {
   return String(value).trim()
 }
 
-const detectDateSampleShape = (value: string): DateSampleShape | undefined => {
+const getNumericDateParts = (value: string) => {
   const separatorMatches = value.match(/[/-]/g) || []
   const uniqueSeparators = [...new Set(separatorMatches)]
 
   if (uniqueSeparators.length > 1) {
-    return undefined
+    return null
   }
 
-  const separator = (uniqueSeparators[0] || '') as DateSampleShape['separator']
+  const separator = (uniqueSeparators[0] || '') as '' | '/' | '-'
   const parts = separator ? value.split(separator) : [value]
 
   if (!parts.every(part => /^\d+$/.test(part))) {
-    return undefined
+    return null
   }
 
-  return {
-    separator,
-    partCount: parts.length,
-    parts
-  }
+  return { separator, parts }
 }
 
 const sampleMatchesFormatShape = (sample: string, detectedFormat: AutoDetectDateFormat) => {
-  const shape = detectDateSampleShape(sample)
+  const numericDateParts = getNumericDateParts(sample)
 
-  if (!shape) {
+  if (!numericDateParts) {
     return false
   }
 
@@ -252,20 +242,23 @@ const sampleMatchesFormatShape = (sample: string, detectedFormat: AutoDetectDate
     return false
   }
 
-  if (shape.separator !== formatDefinition.separator || shape.partCount !== formatDefinition.partCount) {
+  if (
+    numericDateParts.separator !== formatDefinition.separator ||
+    numericDateParts.parts.length !== formatDefinition.partCount
+  ) {
     return false
   }
 
   if (detectedFormat === '%Y') {
-    return shape.parts[0].length === 4
+    return numericDateParts.parts[0].length === 4
   }
 
   if (detectedFormat === '%Y-%m' || detectedFormat === '%Y/%m') {
-    return shape.parts[0].length === 4
+    return numericDateParts.parts[0].length === 4
   }
 
   if (detectedFormat === '%Y-%m-%d' || detectedFormat === '%Y/%m/%d') {
-    return shape.parts[0].length === 4
+    return numericDateParts.parts[0].length === 4
   }
 
   if (
@@ -274,7 +267,7 @@ const sampleMatchesFormatShape = (sample: string, detectedFormat: AutoDetectDate
     detectedFormat === '%m-%d-%Y' ||
     detectedFormat === '%d-%m-%Y'
   ) {
-    return shape.parts[2].length === 4
+    return numericDateParts.parts[2].length === 4
   }
 
   return true
