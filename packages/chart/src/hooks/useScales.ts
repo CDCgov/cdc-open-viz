@@ -66,9 +66,13 @@ const useScales = (properties: useScaleProps) => {
   const isHorizontal = config.orientation === 'horizontal'
   const { visualizationType, xAxis, forestPlot, runtime } = config
   const isForestPlot = visualizationType === 'Forest Plot'
+  const shouldApplyYAxisAutoPadding = yAxisAutoPaddingMode !== 'none' && !isHorizontal
+  const minMaxConfig = shouldApplyYAxisAutoPadding
+    ? { ...config, yAxis: { ...config.yAxis, enablePadding: false, scalePadding: 0 } }
+    : config
 
   const minMaxProps = {
-    config,
+    config: minMaxConfig,
     minValue,
     maxValue,
     existPositiveValue,
@@ -92,14 +96,17 @@ const useScales = (properties: useScaleProps) => {
   const handleNumTicks = isForestPlot ? config.data.length : yTickCount
 
   // Apply auto-padding if needed
-  if (yAxisAutoPaddingMode !== 'none' && !isHorizontal) {
+  if (shouldApplyYAxisAutoPadding) {
     const maxPasses = yAxisAutoPaddingMode === 'inline-label' ? 3 : 1
 
     for (let i = 0; i < maxPasses; i++) {
-      const scale = composeYScale({ min, max, yMax, config, leftMax })
-      const padding = getYAxisAutoPadding(scale, handleNumTicks, maxValue, minValue, config, yAxisAutoPaddingMode)
+      const scale = composeYScale({ min, max, yMax, config: minMaxConfig, leftMax })
+      const padding = getYAxisAutoPadding(scale, handleNumTicks, maxValue, minValue, minMaxConfig, yAxisAutoPaddingMode)
       if (padding > 0 || (maxPasses > 1 && i === 0)) {
-        const adjustedConfig = { ...config, yAxis: { ...config.yAxis, scalePadding: padding, enablePadding: true } }
+        const adjustedConfig = {
+          ...minMaxConfig,
+          yAxis: { ...minMaxConfig.yAxis, scalePadding: padding, enablePadding: true }
+        }
         const result = getMinMax({ ...minMaxProps, config: adjustedConfig })
         min = result.min
         max = result.max

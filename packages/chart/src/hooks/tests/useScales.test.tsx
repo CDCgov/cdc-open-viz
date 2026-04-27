@@ -75,4 +75,31 @@ describe('useScales', () => {
 
     expect(mockGetYAxisAutoPadding).toHaveBeenCalledTimes(1)
   })
+
+  it('ignores manual y-axis padding while calculating auto-padding', () => {
+    const configWithManualPadding = createMockConfig({
+      yAxis: {
+        ...createMockConfig().yAxis,
+        enablePadding: true,
+        scalePadding: 90
+      }
+    })
+
+    renderHook(() => useScales({ ...baseProps, config: configWithManualPadding, yAxisAutoPaddingMode: 'top-title' }), {
+      wrapper: createWrapper()
+    })
+
+    expect(mockGetMinMax.mock.calls[0][0].config.yAxis).toMatchObject({
+      enablePadding: false,
+      scalePadding: 0
+    })
+    expect(mockGetYAxisAutoPadding.mock.calls[0][4].yAxis).toMatchObject({
+      enablePadding: false,
+      scalePadding: 0
+    })
+    expect(mockGetMinMax.mock.calls[1][0].config.yAxis).toMatchObject({
+      enablePadding: true,
+      scalePadding: 10
+    })
+  })
 })
