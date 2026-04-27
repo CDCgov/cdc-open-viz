@@ -42,7 +42,6 @@ import getMinMax from '../../helpers/getMinMax'
 
 import { type ChartContext } from '../../types/ChartContext'
 import { type ChartConfig } from '../../types/ChartConfig'
-import { handleChartAriaLabels } from '../../helpers/handleChartAriaLabels'
 
 import '@cdc/core/components/EditorPanel/EditorPanel.styles.css'
 import './editor-panel.scss'
@@ -4305,103 +4304,6 @@ const EditorPanel: React.FC<ChartEditorPanelProps> = ({ datasets }) => {
                     dataMetadata={config.dataMetadata}
                   />
                 )}
-                <AccordionItem>
-                  <AccordionItemHeading>
-                    <AccordionItemButton>Accessible Alt Text</AccordionItemButton>
-                  </AccordionItemHeading>
-                  <AccordionItemPanel>
-                    {(() => {
-                      const metadataKeys = Object.keys(config.dataMetadata || {})
-                      const hasMetadata = metadataKeys.length > 0
-                      const altTextType = config.altText?.type || ''
-                      const resolvedAltText = handleChartAriaLabels(config)
-                      return (
-                        <>
-                          <Select
-                            value={altTextType}
-                            fieldName='type'
-                            label='Alt Text Source'
-                            options={[
-                              { value: '', label: 'None (use auto-generated)' },
-                              { value: 'static', label: 'Static (manual override)' },
-                              { value: 'metadata', label: 'Data File Metadata' }
-                            ]}
-                            updateField={(_section, _subsection, _fieldName, value) => {
-                              if (value === '') {
-                                updateField(null, null, 'altText', undefined)
-                              } else {
-                                updateField(null, null, 'altText', { type: value })
-                              }
-                            }}
-                          />
-                          {altTextType === 'static' && (
-                            <TextField
-                              value={config.altText?.value || ''}
-                              fieldName='value'
-                              type='textarea'
-                              label='Alt Text'
-                              placeholder='Describe the chart and its key insights for screen readers...'
-                              updateField={(_section, _subsection, _fieldName, value) => {
-                                updateField(null, null, 'altText', {
-                                  ...config.altText,
-                                  value
-                                })
-                              }}
-                            />
-                          )}
-                          {altTextType === 'metadata' && (
-                            <>
-                              {hasMetadata ? (
-                                <Select
-                                  value={config.altText?.metadataKey || ''}
-                                  fieldName='metadataKey'
-                                  label='Metadata Field'
-                                  options={[
-                                    { value: '', label: 'Select Metadata Field...' },
-                                    ...metadataKeys.map(key => ({
-                                      value: key,
-                                      label: `${key}: ${config.dataMetadata[key]}`
-                                    }))
-                                  ]}
-                                  updateField={(_section, _subsection, _fieldName, value) => {
-                                    updateField(null, null, 'altText', {
-                                      ...config.altText,
-                                      metadataKey: value
-                                    })
-                                  }}
-                                />
-                              ) : (
-                                <p style={{ fontSize: '13px', color: '#888' }}>
-                                  No metadata fields are available. Your data file must be a JSON object with a{' '}
-                                  <code>data</code> array and sibling key-value pairs, for example:{' '}
-                                  <code>{`{ "altDescription": "...", "data": [...] }`}</code>
-                                </p>
-                              )}
-                            </>
-                          )}
-                          <div
-                            style={{
-                              marginTop: '1rem',
-                              padding: '0.75rem',
-                              background: '#f5f5f5',
-                              borderRadius: '4px'
-                            }}
-                          >
-                            <strong style={{ fontSize: '13px', display: 'block', marginBottom: '0.25rem' }}>
-                              Preview:
-                            </strong>
-                            <p
-                              data-testid='alt-text-preview'
-                              style={{ fontSize: '13px', margin: 0, fontStyle: 'italic' }}
-                            >
-                              {resolvedAltText}
-                            </p>
-                          </div>
-                        </>
-                      )
-                    })()}
-                  </AccordionItemPanel>
-                </AccordionItem>
                 <Panels.SmallMultiples name='Small Multiples' />
               </Accordion>
               {config.type !== 'Spark Line' && (

@@ -128,7 +128,7 @@ export const EditorWithMetadata: Story = {
       await new Promise(resolve => setTimeout(resolve, MIN_ANIMATION_DELAY_MS))
     }
 
-    await openAccordion(canvas, 'Accessible Alt Text')
+    await openAccordion(canvas, 'General')
 
     if (MIN_ANIMATION_DELAY_MS > 0) {
       await new Promise(resolve => setTimeout(resolve, MIN_ANIMATION_DELAY_MS))
