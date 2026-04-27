@@ -18,7 +18,7 @@ export const getYAxisAutoPadding = (
   maxValue: number,
   minValue: number,
   config: ChartConfig,
-  mode: YAxisAutoPaddingMode
+  mode: Exclude<YAxisAutoPaddingMode, 'none'>
 ): number => {
   // Early returns for cases where auto padding is not needed
   if (!yScale?.ticks || config.orientation === 'horizontal' || config.yAxis?.max) {
