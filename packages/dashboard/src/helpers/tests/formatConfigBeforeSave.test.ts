@@ -49,6 +49,44 @@ describe('cleanSharedFilters', () => {
     ])
   })
 
+  it('retains filters when sharedFilterIndexes are stored as numbers', () => {
+    const config: DashboardConfig = {
+      dashboard: {
+        sharedFilters: [
+          { id: 1, type: 'filter1' },
+          { id: 2, type: 'filter2' }
+        ]
+      },
+      visualizations: {
+        viz1: { type: 'dashboardFilters', sharedFilterIndexes: [0, 1] }
+      }
+    }
+
+    cleanSharedFilters(config)
+
+    expect(config.dashboard.sharedFilters).toHaveLength(2)
+  })
+
+  it('incorrectly removes a filter when sharedFilterIndexes are stored as strings (regression: DashboardFiltersEditor must store numbers)', () => {
+    // Documents the bug that DashboardFiltersEditor.tsx:344 fixed by wrapping e.target.value in Number().
+    // String indices fail the strict-equality includes() check inside cleanSharedFilters,
+    // causing a valid filter to be treated as unused and deleted on save.
+    const config: DashboardConfig = {
+      dashboard: {
+        sharedFilters: [{ id: 1, type: 'filter1' }]
+      },
+      visualizations: {
+        viz1: { type: 'dashboardFilters', sharedFilterIndexes: ['0'] as any }
+      }
+    }
+
+    cleanSharedFilters(config)
+
+    // Filter should have been kept (it is referenced at index 0) but string '0' !== number 0
+    // causes it to be treated as unused and removed.
+    expect(config.dashboard.sharedFilters).toHaveLength(0)
+  })
+
   it('should remove values from urlfilter type shared filters', () => {
     const config: DashboardConfig = {
       dashboard: {

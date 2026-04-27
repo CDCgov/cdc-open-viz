@@ -32,7 +32,7 @@ const Column: React.FC<ColumnProps> = ({ data, rowIdx, colIdx, toggleRow }) => {
         canDrop: !!monitor.canDrop()
       })
     }),
-    [config.activeDashboard]
+    [config.activeDashboard, data.widget]
   )
 
   const widget = data.widget ? config?.visualizations[data.widget] : null

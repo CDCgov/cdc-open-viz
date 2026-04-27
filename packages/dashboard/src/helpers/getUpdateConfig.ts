@@ -56,7 +56,7 @@ export const getUpdateConfig =
 
       visualizationKeys.forEach(visualizationKey => {
         const row = vizRowColumnLocator[visualizationKey]
-        if (newConfig.rows[row]?.datakey) return // data configured on the row level
+        if (newConfig.rows[row]?.dataKey) return // data configured on the row level
         const applicableFilters = newConfig.dashboard.sharedFilters.filter(
           sharedFilter => sharedFilter.usedBy && sharedFilter.usedBy.indexOf(visualizationKey) !== -1
         )

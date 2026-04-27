@@ -51,6 +51,60 @@ const createNestedFilter = (type: 'datafilter' | 'urlfilter') =>
       : {})
   } as any)
 
+describe('FilterEditor API filter subgroup text selector', () => {
+  it('displays subgroupTextSelector value from apiFilter', () => {
+    const filter = {
+      ...createNestedFilter('urlfilter'),
+      apiFilter: {
+        apiEndpoint: '/api/nested-options',
+        valueSelector: 'year',
+        subgroupValueSelector: 'quarter',
+        subgroupTextSelector: 'quarterName'
+      }
+    } as any
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    expect(screen.getByDisplayValue('quarterName')).toBeInTheDocument()
+  })
+
+  it('shows empty string when subgroupTextSelector is absent', () => {
+    const filter = createNestedFilter('urlfilter') as any
+
+    render(
+      <FilterEditor
+        config={{
+          ...baseConfig,
+          dashboard: { sharedFilters: [filter] }
+        }}
+        filter={filter}
+        filterIndex={0}
+        onNestedDragAreaHover={vi.fn()}
+        toggleNestedQueryParameters={vi.fn()}
+        updateFilterProp={vi.fn()}
+      />
+    )
+
+    const inputs = screen.getAllByRole('textbox')
+    const subgroupTextInput = inputs.find(el =>
+      el.closest('label')?.textContent?.includes('Subgroup Display Text Selector')
+    )
+    expect(subgroupTextInput).toHaveValue('')
+  })
+})
+
 describe('FilterEditor nested dropdown display toggle', () => {
   it.each([
     ['data-backed nested filters', createNestedFilter('datafilter')],

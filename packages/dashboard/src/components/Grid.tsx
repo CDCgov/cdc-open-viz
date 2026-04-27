@@ -23,7 +23,7 @@ const Grid = () => {
   return (
     <div className='builder-grid'>
       {(rows || []).map((row, idx) => (
-        <Row row={row} idx={idx} uuid={row.uuid} key={idx} />
+        <Row row={row} idx={idx} uuid={row.uuid} key={(row.uuid ?? idx) as string | number} />
       ))}
       <Button variant='primary' className='col' onClick={addRow}>
         Add Row

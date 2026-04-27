@@ -341,7 +341,7 @@ const DashboardFiltersEditor: React.FC<DashboardFitlersEditorProps> = ({ vizConf
                 onChange={e => {
                   updateConfig({
                     ...vizConfig,
-                    sharedFilterIndexes: [...vizConfig.sharedFilterIndexes, e.target.value]
+                    sharedFilterIndexes: [...vizConfig.sharedFilterIndexes, Number(e.target.value)]
                   })
                   setCanAddExisting(false)
                 }}

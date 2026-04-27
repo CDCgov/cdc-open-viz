@@ -406,7 +406,7 @@ const FilterEditor: React.FC<FilterEditorProps> = ({
                     </label>
                     <label>
                       <span>Subgroup Display Text Selector: </span>
-                      <input value={filter?.apifilter?.subgroupTextSelector || ''} disabled />
+                      <input value={filter?.apiFilter?.subgroupTextSelector || ''} disabled />
                       <Tooltip style={{ textTransform: 'none' }}>
                         <Tooltip.Target>
                           <Icon display='question' style={{ marginLeft: '0.5rem' }} />
