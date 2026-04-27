@@ -102,6 +102,9 @@ const DataImport = () => {
     try {
       // eslint-disable-next-line no-unused-vars
       const response = await fetch(dataURL.toString())
+      if (!response.ok) {
+        throw new Error(`HTTP error ${response.status}`)
+      }
       responseBlob = await response.blob()
 
       // Sometimes the files are coming in as plain text types... Maybe when saved from Macs
