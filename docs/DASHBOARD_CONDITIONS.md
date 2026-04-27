@@ -173,6 +173,7 @@ The runtime rules are:
 - If every widget column in a row is hidden, the row does not render.
 - Dashboards without a `filtersIncomplete` condition keep the legacy incomplete-filter row suppression and static `Please complete your selection to continue.` message.
 - Dashboards with at least one `filtersIncomplete` condition suppress that static reset-filter message and let authored conditional rows/widgets handle the incomplete-filter state.
+- A `filtersIncomplete` condition does not disable incomplete-filter suppression for ordinary data-backed rows/widgets; it only replaces the static message with authored conditional content.
 
 Implementation lives in:
 

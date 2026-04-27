@@ -142,7 +142,7 @@ Dashboard conditions are optional visibility rules owned by rows and conditional
 | Behavior | Details |
 | --- | --- |
 | Shared filter application | Conditions apply matching scoped filters plus unscoped filters before evaluating the operator. Filters whose `columnName` is missing from the condition dataset are ignored for data-backed conditions. |
-| `filtersIncomplete` targeting | `filtersIncomplete` uses the condition id as its shared-filter target and includes unscoped filters. It passes only when an applicable visible filter is at reset state, and ignores filters scoped to unrelated targets. |
+| `filtersIncomplete` targeting | `filtersIncomplete` uses the condition id as its shared-filter target and includes unscoped filters. It passes only when an applicable visible filter is at reset state, and ignores filters scoped to unrelated targets. Use it for static helper content, such as a markup include message. It replaces the default incomplete-filter message but does not make ordinary data-backed rows or widgets render while filters are incomplete. |
 | Unresolved inputs | For data-backed operators, if the condition dataset is unavailable or an applicable filter is still at reset state, the condition resolves as hidden rather than behaving like `hasNoData`. `filtersIncomplete` resolves from filter reset state instead of dataset availability. |
 | Conditional columns | `conditionalWidgets` lets one dashboard column hold multiple candidate components while still rendering as one slot. Runtime uses the first matching entry in author order. |
 | Simple/conditional cleanup | The editor automatically collapses conditional mode back to simple mode when only one unconditioned entry remains after a completed save or delete action. |

@@ -240,7 +240,7 @@ export const DashboardConditionModal: React.FC<DashboardConditionModalProps> = (
                 { value: 'filtersIncomplete', label: 'Show when filters are incomplete' }
               ]}
               tooltip={tooltipIcon(
-                `Choose whether this ${targetLabel} should appear when the filtered condition dataset has data, has no data, contains one of the selected column values, or when targeted filters are incomplete.`
+                `Choose whether this ${targetLabel} should appear when the filtered condition dataset has data, has no data, contains one of the selected column values, or when targeted filters are incomplete. Use "Show when filters are incomplete" for static helper content, such as a markup include message explaining that filters must be selected to proceed.`
               )}
               value={formState.operator}
               onChange={event => {

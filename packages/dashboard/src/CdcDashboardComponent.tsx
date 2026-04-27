@@ -101,7 +101,7 @@ export default function CdcDashboard({
       return true
     }
 
-    if (hasIncompleteSharedFilters && !hasFiltersIncompleteCondition) {
+    if (hasIncompleteSharedFilters) {
       return true
     }
 
@@ -566,7 +566,11 @@ export default function CdcDashboard({
               />
             ))}
 
-            {inNoDataState ? <div className='mt-5'>Please complete your selection to continue.</div> : <></>}
+            {inNoDataState && !(hasIncompleteSharedFilters && hasFiltersIncompleteCondition) ? (
+              <div className='mt-5'>Please complete your selection to continue.</div>
+            ) : (
+              <></>
+            )}
 
             {/* Image or PDF Inserts */}
             <section className='download-buttons'>

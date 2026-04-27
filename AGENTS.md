@@ -3,8 +3,13 @@
 This file helps AI coding assistants understand how to work with this repository. Use it as an index to these sections:
 
 - [Testing Commands](#testing-commands): Required testing strategy plus targeted/quick/full test commands.
+- [Branch Comparison](#branch-comparison): Default base branch for feature diffs.
 - [Context Documents](#context-documents): Deep guidance for specific systems and workflows.
 - [Config Documentation Maintenance](#config-documentation-maintenance): Rules for keeping package `CONFIG.md` files and shared config docs up to date.
+
+## Branch Comparison
+
+Feature branches usually branch from `dev`; compare against `dev` by default when determining what a feature contains.
 
 ## Testing Commands
 
