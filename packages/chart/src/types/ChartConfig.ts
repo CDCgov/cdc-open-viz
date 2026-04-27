@@ -143,11 +143,8 @@ type Visual = {
   maximumShapeAmount: 7
 }
 
-export type AltTextConfig = {
-  type?: 'static' | 'metadata'
-  value?: string
-  metadataKey?: string
-}
+import { type AltTextConfig } from '@cdc/core/types/AltText'
+export type { AltTextConfig }
 
 export type AllChartsConfig = {
   altText?: AltTextConfig

@@ -1,4 +1,4 @@
-import type { AltTextConfig } from '../types/ChartConfig'
+import type { AltTextConfig } from '@cdc/core/types/AltText'
 
 const getAutoLabel = (state: { visualizationType?: string; title?: string }): string => {
   let ariaLabel = ''

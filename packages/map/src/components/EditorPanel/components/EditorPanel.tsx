@@ -58,6 +58,7 @@ import { HeaderThemeSelector } from '@cdc/core/components/HeaderThemeSelector'
 import useColumnsRequiredChecker from '../../../hooks/useColumnsRequiredChecker'
 import { addUIDs } from '../../../helpers'
 import generateRuntimeData from '../../../helpers/generateRuntimeData'
+import { handleMapAriaLabels } from '../../../helpers/handleMapAriaLabels'
 
 import '@cdc/core/components/EditorPanel/editor.scss'
 import './editorPanel.styles.css'
@@ -1819,6 +1820,108 @@ const EditorPanel: React.FC<MapEditorPanelProps> = ({ datasets }) => {
                         </Tooltip>
                       }
                     />
+
+                    {/* Accessible Alt Text */}
+                    {(() => {
+                      const metadataKeys = Object.keys(config.dataMetadata || {})
+                      const hasMetadata = metadataKeys.length > 0
+                      const altTextType = config.altText?.type || ''
+                      const resolvedAltText = handleMapAriaLabels(config)
+                      return (
+                        <>
+                          <Select
+                            value={altTextType}
+                            fieldName='type'
+                            label='Alt Text Source'
+                            options={[
+                              { value: '', label: 'None (use auto-generated)' },
+                              { value: 'static', label: 'Static (manual override)' },
+                              { value: 'metadata', label: 'Data File Metadata' }
+                            ]}
+                            updateField={(_section, _subsection, _fieldName, value) => {
+                              if (value === '') {
+                                updateField(null, null, 'altText', undefined)
+                              } else {
+                                updateField(null, null, 'altText', { type: value })
+                              }
+                            }}
+                            tooltip={
+                              <Tooltip style={{ textTransform: 'none' }}>
+                                <Tooltip.Target>
+                                  <Icon display='question' style={{ marginLeft: '0.5rem' }} />
+                                </Tooltip.Target>
+                                <Tooltip.Content>
+                                  <p>
+                                    Override the auto-generated screen reader description for the map. Use "Static" for
+                                    a manually written description, or "Data File Metadata" to pull it from a key in
+                                    your data file.
+                                  </p>
+                                </Tooltip.Content>
+                              </Tooltip>
+                            }
+                          />
+                          {altTextType === 'static' && (
+                            <TextField
+                              value={config.altText?.value || ''}
+                              fieldName='value'
+                              type='textarea'
+                              label='Alt Text'
+                              placeholder='Describe the map and its key insights for screen readers...'
+                              updateField={(_section, _subsection, _fieldName, value) => {
+                                updateField(null, null, 'altText', { ...config.altText, value })
+                              }}
+                            />
+                          )}
+                          {altTextType === 'metadata' && (
+                            <>
+                              {hasMetadata ? (
+                                <Select
+                                  value={config.altText?.metadataKey || ''}
+                                  fieldName='metadataKey'
+                                  label='Metadata Field'
+                                  options={[
+                                    { value: '', label: 'Select Metadata Field...' },
+                                    ...metadataKeys.map(key => ({
+                                      value: key,
+                                      label: `${key}: ${config.dataMetadata[key]}`
+                                    }))
+                                  ]}
+                                  updateField={(_section, _subsection, _fieldName, value) => {
+                                    updateField(null, null, 'altText', { ...config.altText, metadataKey: value })
+                                  }}
+                                />
+                              ) : (
+                                <p style={{ fontSize: '13px', color: '#888' }}>
+                                  No metadata fields are available. Your data file must be a JSON object with a{' '}
+                                  <code>data</code> array and sibling key-value pairs, for example:{' '}
+                                  <code>{`{ "altDescription": "...", "data": [...] }`}</code>
+                                </p>
+                              )}
+                            </>
+                          )}
+                          {altTextType && (
+                            <div
+                              style={{
+                                marginTop: '0.5rem',
+                                padding: '0.75rem',
+                                background: '#f5f5f5',
+                                borderRadius: '4px'
+                              }}
+                            >
+                              <strong style={{ fontSize: '13px', display: 'block', marginBottom: '0.25rem' }}>
+                                Preview:
+                              </strong>
+                              <p
+                                data-testid='alt-text-preview'
+                                style={{ fontSize: '13px', margin: 0, fontStyle: 'italic' }}
+                              >
+                                {resolvedAltText}
+                              </p>
+                            </div>
+                          )}
+                        </>
+                      )
+                    })()}
                   </AccordionItemPanel>
                 </AccordionItem>
                 <AccordionItem>
