@@ -12,18 +12,17 @@ const Grid = () => {
   const rows = config.rows
   const updateConfig = config => dispatch({ type: 'UPDATE_CONFIG', payload: [config] })
   const addRow = () => {
-    const blankRow: Partial<ConfigRow> = { columns: [{ width: 12 }] }
+    const blankRow: Partial<ConfigRow> = { columns: [{ width: 12 }], uuid: Date.now() }
     updateConfig({
       ...config,
-      rows: [...rows, blankRow],
-      uuid: Date.now()
+      rows: [...rows, blankRow]
     })
   }
 
   return (
     <div className='builder-grid'>
       {(rows || []).map((row, idx) => (
-        <Row row={row} idx={idx} uuid={row.uuid} key={(row.uuid ?? idx) as string | number} />
+        <Row row={row} idx={idx} uuid={row.uuid ?? idx} key={row.uuid ?? idx} />
       ))}
       <Button variant='primary' className='col' onClick={addRow}>
         Add Row
