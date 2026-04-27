@@ -8,7 +8,7 @@ export const addVisualization = (type, subType) => {
     filterBehavior: 'Filter Change',
     newViz: type !== 'table',
     openModal: modalWillOpen,
-    uid: type + Date.now(),
+    uid: `${type}${Date.now()}${Math.random().toString(36).slice(2, 7)}`,
     type
   }
 

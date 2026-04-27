@@ -120,19 +120,29 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
 
   const deleteRow = () => {
     let newVisualizations = { ...config.visualizations }
+    let newSharedFilters = _.cloneDeep(config.dashboard.sharedFilters)
 
-    //delete the instantiated widgets
     if (rows[rowIdx] && rows[rowIdx].columns && rows[rowIdx].columns.length && config.visualizations) {
       rows[rowIdx].columns.forEach(column => {
         if (column.widget) {
           delete newVisualizations[column.widget]
+          newSharedFilters.forEach(sharedFilter => {
+            if (sharedFilter.usedBy) {
+              sharedFilter.usedBy = sharedFilter.usedBy.filter(uid => uid !== column.widget)
+            }
+          })
         }
       })
     }
 
-    rows.splice(rowIdx, 1) // delete the row
+    rows.splice(rowIdx, 1)
 
-    updateConfig({ ...config, rows, visualizations: newVisualizations })
+    updateConfig({
+      ...config,
+      rows,
+      visualizations: newVisualizations,
+      dashboard: { ...config.dashboard, sharedFilters: newSharedFilters }
+    })
   }
 
   const layoutList = [
