@@ -120,7 +120,7 @@ const reducer = (state: DashboardState, action: DashboardActions): DashboardStat
         return dashboard
       })
       const newConfig = { ...state.config, label: action.payload.new } // make sure active label is updated
-      return applyMultiDashboards({ ...state, newConfig }, newMultiDashboards)
+      return applyMultiDashboards({ ...state, config: newConfig }, newMultiDashboards)
     }
     case 'REORDER_MULTIDASHBOARDS': {
       const { newIndex, currentIndex } = action.payload
