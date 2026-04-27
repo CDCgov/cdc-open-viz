@@ -1,4 +1,4 @@
-import type { AltTextConfig } from '@cdc/core/types/AltText'
+import type { AltTextConfig, AltTextEntry } from '@cdc/core/types/AltText'
 
 const getAutoLabel = (state: { visualizationType?: string; title?: string }): string => {
   let ariaLabel = ''
@@ -11,29 +11,38 @@ const getAutoLabel = (state: { visualizationType?: string; title?: string }): st
   return ariaLabel
 }
 
+const resolveEntry = (
+  entry: AltTextEntry | undefined,
+  dataMetadata: Record<string, string> | undefined
+): string | undefined => {
+  if (entry?.type === 'static' && entry.value) {
+    return entry.value
+  }
+  if (entry?.type === 'metadata' && entry.metadataKey && dataMetadata) {
+    const metadataValue = dataMetadata[entry.metadataKey]
+    if (metadataValue) return metadataValue
+  }
+  return undefined
+}
+
+export type ChartAriaLabels = { title: string; description?: string }
+
 export const handleChartAriaLabels = (state: {
   visualizationType?: string
   title?: string
   altText?: AltTextConfig
   dataMetadata?: Record<string, string>
-}): string => {
+}): ChartAriaLabels => {
   try {
     if (!state.visualizationType) throw Error('handleChartAriaLabels: no visualization type found in state')
 
     const { altText, dataMetadata } = state
+    const title = resolveEntry(altText?.title, dataMetadata) ?? getAutoLabel(state)
+    const description = resolveEntry(altText?.description, dataMetadata)
 
-    if (altText?.type === 'static' && altText.value) {
-      return altText.value
-    }
-
-    if (altText?.type === 'metadata' && altText.metadataKey && dataMetadata) {
-      const metadataValue = dataMetadata[altText.metadataKey]
-      if (metadataValue) return metadataValue
-    }
-
-    return getAutoLabel(state)
+    return { title, description }
   } catch (e) {
     console.error('COVE: ', e.message) // eslint-disable-line
-    return 'Data visualization container'
+    return { title: 'Data visualization container' }
   }
 }

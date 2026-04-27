@@ -7,6 +7,7 @@
   "animate": false,
   "orientation": "vertical",
   "dataMetadata": {
+    "altTitle": "COVID-19 test positivity trend chart",
     "altDescription": "Line chart showing COVID-19 test positivity rising from 4% to 12% over the last eight weeks, which may indicate growing community spread.",
     "lastUpdated": "2024-09-21",
     "source": "CDC NREVSS"

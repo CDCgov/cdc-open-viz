@@ -1287,7 +1287,7 @@ const CdcChart: React.FC<CdcChartProps> = ({
         {!missingRequiredSections(config) && !config.newViz && (
           <VisualizationContent
             innerClassName={`type-${makeClassName(config.visualizationType)}`}
-            innerProps={{ 'aria-label': handleChartAriaLabels(config), tabIndex: 0 }}
+            innerProps={{ tabIndex: 0 }}
             bodyClassName={bodyClasses.join(' ')}
             bodyWrapClassName={isTp5Treatment ? 'cdc-callout d-flex flex-column tp5-chart-callout' : ''}
             filters={

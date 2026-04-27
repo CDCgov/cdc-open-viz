@@ -2,6 +2,7 @@ import React, {
   forwardRef,
   useContext,
   useEffect,
+  useId,
   useLayoutEffect,
   useImperativeHandle,
   useMemo,
@@ -121,6 +122,12 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
     tableData,
     transformedData: data,
   } = useContext(ConfigContext)
+
+  // SVG accessibility: title/desc pattern
+  const a11y = handleChartAriaLabels(config)
+  const svgTitleId = useId()
+  const svgDescId = useId()
+  const svgLabelledBy = a11y.description ? `${svgTitleId} ${svgDescId}` : svgTitleId
 
   // CONFIG
   // todo: start destructuring this file for conciseness
@@ -604,7 +611,7 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             debugSvg && 'debug'
           } ${isDraggingAnnotation && 'dragging-annotation'}`}
           role='img'
-          aria-label={handleChartAriaLabels(config)}
+          aria-labelledby={svgLabelledBy}
           style={{ overflow: 'visible' }}
           onMouseLeave={() => {
             setShowHoverLine(false)
@@ -616,6 +623,8 @@ const LinearChart = forwardRef<SVGAElement, LinearChartProps>(({ parentHeight, p
             handleChartMouseEnter()
           }}
         >
+          <title id={svgTitleId}>{a11y.title}</title>
+          {a11y.description && <desc id={svgDescId}>{a11y.description}</desc>}
           {!isDraggingAnnotation && <Bar width={parentWidth} height={initialHeight} fill={'transparent'}></Bar>}{' '}
           {/* GRID LINES */}
           {/* Actual LeftAxis is drawn after visualization */}

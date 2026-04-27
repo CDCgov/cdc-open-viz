@@ -9,6 +9,7 @@
   },
   "type": "map",
   "dataMetadata": {
+    "altTitle": "US COVID-19 case rate map",
     "altDescription": "Choropleth map of the United States showing COVID-19 case rates per 100,000 population. Rates are highest in the Southeast, with Alabama, Mississippi, and Louisiana exceeding 50 per 100,000.",
     "lastUpdated": "2024-09-21",
     "source": "CDC COVID Data Tracker"
