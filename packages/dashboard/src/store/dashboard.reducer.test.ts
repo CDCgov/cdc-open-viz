@@ -38,4 +38,12 @@ describe('RENAME_DASHBOARD_TAB', () => {
     const next = reducer(state, { type: 'RENAME_DASHBOARD_TAB', payload: { current: 'Tab A', new: 'Renamed' } })
     expect(next.config.multiDashboards[1].label).toBe('Tab B')
   })
+
+  it('does not mutate the previous multiDashboards state', () => {
+    const state = makeState()
+    const next = reducer(state, { type: 'RENAME_DASHBOARD_TAB', payload: { current: 'Tab A', new: 'Renamed' } })
+
+    expect(state.config.multiDashboards[0].label).toBe('Tab A')
+    expect(next.config.multiDashboards[0].label).toBe('Renamed')
+  })
 })
