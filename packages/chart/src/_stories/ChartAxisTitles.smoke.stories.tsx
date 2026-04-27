@@ -61,3 +61,16 @@ export const Paired_Bar: Story = {
     await assertVisualizationRendered(canvasElement)
   }
 }
+
+export const Top_Y_Axis_Title: Story = {
+  args: {
+    config: editConfigKeys(longXLabelsConfig, [
+      { path: ['yAxis', 'label'], value: 'Number of emergency department visits' },
+      { path: ['runtime', 'yAxis', 'label'], value: 'Number of emergency department visits' },
+      { path: ['yAxis', 'titlePlacement'], value: 'top' }
+    ])
+  },
+  play: async ({ canvasElement }) => {
+    await assertVisualizationRendered(canvasElement)
+  }
+}

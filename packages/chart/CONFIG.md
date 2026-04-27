@@ -55,7 +55,7 @@ Dashboard flows can also select data from `datasets` with `dataKey`.
 | `visualizationSubType` | `string` | No | `regular` | Selects the sub-mode within a chart family. | The editor currently exposes `regular` and `stacked`; `stacked` is used by bar and combo charts. |
 | `orientation` | `vertical \| horizontal` | No | `vertical` | Controls the primary chart orientation. | `Bar` and `Box Plot` support both directions; `Deviation Bar` is horizontal only. |
 | `xAxis` | [`Axis`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#axis) | Conditionally | Shared core default | X-axis / category-axis configuration. | Required for most chart types and for pie category wiring. See `@cdc/core` for nested fields. |
-| `yAxis` | [`Axis`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#axis) | Conditionally | Shared core default | Y-axis / measure-axis configuration. | Required for `Pie` charts and shared with multi-axis chart flows. See `@cdc/core` for nested fields. |
+| `yAxis` | [`Axis`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#axis) | Conditionally | Shared core default | Y-axis / measure-axis configuration. | Required for `Pie` charts and shared with multi-axis chart flows. See `@cdc/core` for nested fields. In charts, `yAxis.titlePlacement` controls whether the title stays on the side or moves above the plot. Visible top titles also keep the chart's y-axis auto-padding behavior enabled, including small-multiple titles hidden only by tile layout. |
 | `series` | [`Series`](https://github.com/CDCgov/cdc-open-viz/blob/main/packages/core/CONFIG.md#series) | Conditionally | Shared core default | Measure series to render. | Required for non-pie charts unless `dynamicSeries` is enabled. |
 | `columns` | `Record<string, Column>` | No | `{}` | Column-level display and formatting overrides. | Column configs drive labels, prefixes, suffixes, and table visibility. |
 | `dynamicSeries` | `boolean` | No | `false` | Lets the chart generate series from the loaded dataset. | Useful when authoring against unknown or changing columns. |
@@ -129,13 +129,13 @@ Dashboard flows can also select data from `datasets` with `dataKey`.
 | `colorMatchLineSeriesLabels` | `boolean` | No | `false` | Matches end labels to the series color. | Only relevant when `showLineSeriesLabels` is enabled. |
 | `stackedAreaChartLineType` | `string` | No | `Linear` | Chooses the curve used by stacked area charts. | Mapped to the supported curve set in the editor. |
 | `hideXAxisLabel` | `boolean` | No | `false` | Hides the rendered x-axis label. | Mostly used by small multiples and compact layouts. |
-| `hideYAxisLabel` | `boolean` | No | `false` | Hides the rendered y-axis label. | Mostly used by small multiples and compact layouts. |
+| `hideYAxisLabel` | `boolean` | No | `false` | Hides the rendered y-axis label. | Mostly used by small multiples and compact layouts. Hidden top-positioned Y-axis titles do not trigger top-title auto-padding, except small multiples still preserve padding for titles hidden only by repeated-tile layout. In small multiples, the leading tile in each row keeps the y-axis title visible while the other tiles hide it, including when `yAxis.titlePlacement` is `top`. |
 
 ## Feature-Specific Enhancements
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
-| `smallMultiples` | `object` | No | Package-initialized defaults | Splits one chart into multiple tiles. | Supports tile order, per-tile titles, synchronized tooltips, independent axes, and optional area fill for line tiles. |
+| `smallMultiples` | `object` | No | Package-initialized defaults | Splits one chart into multiple tiles. | Supports tile order, per-tile titles, synchronized tooltips, independent axes, and optional area fill for line tiles. When `yAxis.titlePlacement` is `top`, the leading tile in each row renders that y-axis title in the tile header instead of inside the SVG plot area. |
 | `forestPlot` | `object` | No | Package-initialized defaults | Forest plot-specific rendering settings. | Includes row height, labels, pooled results, and scaling controls. |
 | `horizon` | `object` | No | Package-initialized defaults | Horizon chart settings. | Controls band count, spacing, and padding. |
 | `radar` | `object` | No | Package-initialized defaults | Radar chart display settings. | Controls rings, points, fill opacity, and axis label offset. |

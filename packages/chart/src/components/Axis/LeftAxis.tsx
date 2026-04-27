@@ -60,6 +60,7 @@ const LeftAxis: React.FC<LeftAxisProps> = ({
   const isLogarithmicAxis = config.yAxis.type === 'logarithmic'
   const { labelsAboveGridlines, hideAxis, inlineLabel } = config.yAxis
   const inlineLabelHasNoSpace = !inlineLabel?.includes(' ')
+  const showSideTitle = config.yAxis.titlePlacement !== 'top'
 
   return (
     <VisxAxisLeft
@@ -381,17 +382,19 @@ const LeftAxis: React.FC<LeftAxisProps> = ({
                 })
               })()}
 
-            <Text
-              className='y-label'
-              textAnchor='middle'
-              verticalAnchor='start'
-              transform={`translate(${-1 * yAxisWidth}, ${axisCenter}) rotate(-90)`}
-              fontWeight='bold'
-              fill={config.yAxis.labelColor}
-              fontSize={axisLabelFontSize}
-            >
-              {!config.hideYAxisLabel ? props.label : null}
-            </Text>
+            {showSideTitle && (
+              <Text
+                className='y-label'
+                textAnchor='middle'
+                verticalAnchor='start'
+                transform={`translate(${-1 * yAxisWidth}, ${axisCenter}) rotate(-90)`}
+                fontWeight='bold'
+                fill={config.yAxis.labelColor}
+                fontSize={axisLabelFontSize}
+              >
+                {!config.hideYAxisLabel ? props.label : null}
+              </Text>
+            )}
           </Group>
         )
       }}

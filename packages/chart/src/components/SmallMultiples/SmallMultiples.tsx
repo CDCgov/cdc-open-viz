@@ -3,6 +3,7 @@ import SmallMultipleTile from './SmallMultipleTile'
 import ConfigContext from '../../ConfigContext'
 import useReduceData from '../../hooks/useReduceData'
 import useScales from '../../hooks/useScales'
+import { getYAxisAutoPaddingMode } from '../../helpers/getYAxisAutoPaddingMode'
 import { createCombinedDataForYAxis, applyTileOrder, createTileColorScale } from '../../helpers/smallMultiplesHelpers'
 import { isMobileSmallMultiplesViewport } from '@cdc/core/helpers/viewports'
 import './SmallMultiples.css'
@@ -105,9 +106,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     combinedDataForYAxis.data
   )
 
-  const inlineLabel = config.yAxis?.inlineLabel
-  const inlineLabelHasNoSpace = !inlineLabel?.includes(' ')
-  const needsYAxisAutoPadding = inlineLabel && !inlineLabelHasNoSpace
+  const yAxisAutoPaddingMode = getYAxisAutoPaddingMode(config)
 
   const { min, max } = useScales({
     config: combinedDataForYAxis.config,
@@ -120,7 +119,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     xAxisDataMapped: [],
     xMax: parentWidth,
     yMax: parentHeight,
-    needsYAxisAutoPadding,
+    yAxisAutoPaddingMode,
     currentViewport
   })
 
@@ -229,8 +228,15 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     return null
   }
 
+  const hasTopYAxisTitle =
+    config.yAxis?.titlePlacement === 'top' && !config.hideYAxisLabel && Boolean(config.runtime?.yAxis?.label)
+
   return (
-    <div className='small-multiples-container'>
+    <div
+      className={`small-multiples-container${
+        hasTopYAxisTitle ? ' small-multiples-container--with-top-y-axis-title' : ''
+      }`}
+    >
       <div className='small-multiples-grid' style={gridStyle}>
         {tileItems.map((item, index) => {
           const customColorScale = createTileColorScale(item, config, colorScale, index, tileItems.length)
