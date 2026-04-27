@@ -115,14 +115,18 @@ describe('getFilteredData', () => {
           columns: [
             {
               width: 12,
-              widget: 'vizA',
-              dashboardCondition: {
-                id: 'column-condition-1',
-                datasetKey: 'data1',
-                operator: 'columnHasAnyValue',
-                columnName: 'name',
-                values: ['Alice']
-              }
+              conditionalWidgets: [
+                {
+                  widget: 'vizA',
+                  dashboardCondition: {
+                    id: 'column-condition-1',
+                    datasetKey: 'data1',
+                    operator: 'columnHasAnyValue',
+                    columnName: 'name',
+                    values: ['Alice']
+                  }
+                }
+              ]
             }
           ]
         }

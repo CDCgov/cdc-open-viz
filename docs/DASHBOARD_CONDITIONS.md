@@ -37,8 +37,8 @@ V1 does not support:
 | Term                 | Meaning                                                                                                                           |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | Modular Dashboards   | The overall feature: dashboards whose rows/widgets can be conditionally shown or hidden.                                          |
-| Dashboard Condition  | The inline config object attached to a row or row column.                                                                         |
-| Condition target     | The row-level or column-level thing a dashboard condition belongs to.                                                             |
+| Dashboard Condition  | The inline config object attached to a row or conditional widget entry.                                                           |
+| Condition target     | The row-level or component-level thing a dashboard condition belongs to.                                                          |
 | Shared filter target | A visualization key, row index, or dashboard-condition id that can appear in `sharedFilters[].usedBy`.                            |
 | Unresolved           | The condition cannot be evaluated yet, usually because its dataset is not loaded or an applicable filter is still at reset state. |
 
@@ -165,7 +165,7 @@ The target helper file is intentionally broader than dashboard conditions alone.
 The runtime rules are:
 
 - A row-level `dashboardCondition` must pass for the row to render.
-- A simple column-level `dashboardCondition` must pass for that widget to render.
+- A component-level `dashboardCondition` on a `conditionalWidgets[]` entry must pass for that widget to render.
 - A conditional column renders the first candidate widget whose entry-level `dashboardCondition` passes.
 - If no conditional entry matches, the column renders empty and keeps its grid width.
 - Row and column conditions combine with implicit AND.

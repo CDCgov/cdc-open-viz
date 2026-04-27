@@ -127,7 +127,7 @@ Dashboard filters are split between the dashboard shell and the `dashboardFilter
 
 ## Dashboard Conditions
 
-Dashboard conditions are optional visibility rules owned by rows and row columns.
+Dashboard conditions are optional visibility rules owned by rows and conditional widget entries.
 
 | Field | Type | Required | Default | Description | Allowed values / Notes |
 | --- | --- | --- | --- | --- | --- |
