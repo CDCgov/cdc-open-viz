@@ -1,9 +1,4 @@
-import { DashboardCondition } from '../types/ConfigRow'
-
-export type ConditionalWidget = {
-  widget: string
-  dashboardCondition?: DashboardCondition
-}
+import type { ConditionalWidget, DashboardCondition } from '../types/ConfigRow'
 
 type ColumnWithWidgets = {
   widget?: string | null

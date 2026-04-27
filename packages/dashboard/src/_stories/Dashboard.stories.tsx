@@ -118,14 +118,18 @@ const DashboardConditionsConfig: Config = {
       columns: [
         {
           width: 6,
-          widget: 'markup-condition-a',
-          dashboardCondition: {
-            id: 'column-condition-story',
-            datasetKey: 'column-condition-data',
-            operator: 'columnHasAnyValue',
-            columnName: 'visibility',
-            values: ['1']
-          }
+          conditionalWidgets: [
+            {
+              widget: 'markup-condition-a',
+              dashboardCondition: {
+                id: 'column-condition-story',
+                datasetKey: 'column-condition-data',
+                operator: 'columnHasAnyValue',
+                columnName: 'visibility',
+                values: ['1']
+              }
+            }
+          ]
         },
         {
           width: 6,

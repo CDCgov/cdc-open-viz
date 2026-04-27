@@ -54,7 +54,7 @@ const SimpleColumn: React.FC<SimpleColumnProps> = ({ data, rowIdx, colIdx, toggl
         canDrop: !!monitor.canDrop()
       })
     }),
-    [config.activeDashboard]
+    [config.activeDashboard, rowIdx, colIdx, data.widget]
   )
 
   const widget = data.widget ? config?.visualizations[data.widget] : null
@@ -121,7 +121,7 @@ const ConditionalColumnSlot: React.FC<ConditionalColumnSlotProps> = ({
         canDrop: !!monitor.canDrop()
       })
     }),
-    [config.activeDashboard]
+    [config.activeDashboard, rowIdx, colIdx, entryIndex, widgetKey]
   )
 
   const widget = widgetKey ? config?.visualizations[widgetKey] : null

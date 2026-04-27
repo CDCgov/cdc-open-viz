@@ -58,8 +58,8 @@ export const getUpdateConfig =
       })
 
       visualizationKeys.forEach(visualizationKey => {
-        const row = vizRowColumnLocator[visualizationKey]
-        if (newConfig.rows[row]?.datakey) return // data configured on the row level
+        const locator = vizRowColumnLocator[visualizationKey]
+        if (newConfig.rows[locator?.row]?.dataKey) return // data configured on the row level
         const applicableFilters = getApplicableFiltersForTarget(newConfig.dashboard, visualizationKey, {
           includeUnscoped: true
         })

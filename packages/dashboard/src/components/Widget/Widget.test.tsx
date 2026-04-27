@@ -78,15 +78,6 @@ describe('Widget', () => {
         >
           <DashboardDispatchContext.Provider value={vi.fn()}>
             <Widget
-              columnData={{
-                width: 12,
-                widget: 'markup-1',
-                dashboardCondition: {
-                  id: 'column-condition-1',
-                  datasetKey: 'condition-data',
-                  operator: 'hasData'
-                }
-              }}
               title='Example'
               toggleRow={false}
               type='markup-include'

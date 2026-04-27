@@ -20,7 +20,7 @@ describe('getUpdateConfig', () => {
       visualizations: {
         vizA: { dataKey: 'data1' }
       },
-      rows: [{ dataKey: 'data1', data: data.data1, columns: [{ width: 12, widget: 'vizA' }] }]
+      rows: [{ dataKey: 'data1', data: data.data1, columns: [] }, { columns: [{ width: 12, widget: 'vizA' }] }]
     } as any)
 
   const getFilteredData = (sharedFilters: SharedFilter[]) => {
@@ -37,7 +37,7 @@ describe('getUpdateConfig', () => {
       }
     ]
 
-    expect(getFilteredData(sharedFilters)).toEqual({ '0': [data.data1[0]], vizA: [data.data1[0]] })
+    expect(getFilteredData(sharedFilters)).toEqual({ '0': [data.data1[0]], '1': [], vizA: [data.data1[0]] })
   })
 
   it('should precompute visualization and row data for shared filters with empty usedBy', () => {
@@ -50,7 +50,7 @@ describe('getUpdateConfig', () => {
       }
     ]
 
-    expect(getFilteredData(sharedFilters)).toEqual({ '0': [data.data1[0]], vizA: [data.data1[0]] })
+    expect(getFilteredData(sharedFilters)).toEqual({ '0': [data.data1[0]], '1': [], vizA: [data.data1[0]] })
   })
 
   it('should keep explicit usedBy filters scoped during precompute', () => {
@@ -70,5 +70,23 @@ describe('getUpdateConfig', () => {
     ]
 
     expect(getFilteredData(sharedFilters)).toEqual({ '0': [data.data1[1]], vizA: [data.data1[0]] })
+  })
+
+  it('should not precompute visualization data when the visualization uses row-level data', () => {
+    const sharedFilters: SharedFilter[] = [
+      {
+        active: 'Alice',
+        columnName: 'name',
+        ...sharedFilterDefaults
+      }
+    ]
+    const config = {
+      ...getConfig(sharedFilters),
+      rows: [{ dataKey: 'data1', data: data.data1, columns: [{ width: 12, widget: 'vizA' }] }]
+    }
+
+    const [, filteredData] = getUpdateConfig({ data, filteredData: {} } as any)(config)
+
+    expect(filteredData).toEqual({ '0': [data.data1[0]] })
   })
 })
