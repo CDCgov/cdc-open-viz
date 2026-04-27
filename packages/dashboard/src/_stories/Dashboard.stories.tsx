@@ -55,12 +55,12 @@ DashboardFilterDesc.dashboard.sharedFilters[0].order = 'desc'
 DashboardFilterCust.dashboard.sharedFilters[0].order = 'cust'
 NestedParentChildFiltersSubgroupOnly.dashboard.sharedFilters[1].displaySubgroupingOnly = true
 
-const ModularDashboardConditionsConfig: Config = {
+const DashboardConditionsConfig: Config = {
   type: 'dashboard',
   version: '4.26.4',
   dashboard: {
     theme: 'theme-blue',
-    title: 'Modular Dashboards v1 Conditions',
+    title: 'Dashboard Conditions',
     titleStyle: 'small',
     sharedFilters: [
       {
@@ -243,9 +243,9 @@ export const Example_3: Story = {
   }
 }
 
-export const Modular_Dashboard_Conditions: Story = {
+export const Dashboard_Conditions: Story = {
   args: {
-    config: ModularDashboardConditionsConfig,
+    config: DashboardConditionsConfig,
     isEditor: false
   }
 }

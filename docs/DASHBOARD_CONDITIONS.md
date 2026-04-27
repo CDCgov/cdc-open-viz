@@ -1,8 +1,7 @@
-# Modular Dashboards / Dashboard Conditions
+# Dashboard Conditions
 
-This document explains the `Modular Dashboards` v1 feature in `@cdc/dashboard`.
+This document explains the dashboard conditions feature in `@cdc/dashboard`.
 
-- Use `Modular Dashboards` for the feature name in product or project discussions.
 - Use `dashboardCondition` / `Dashboard Condition` for the specific config object, UI labels, and code-level concepts.
 
 This is a developer context document. It is meant to help future contributors understand how the feature works, where the logic lives, and which behavior is intentional.
@@ -36,7 +35,6 @@ V1 does not support:
 
 | Term                 | Meaning                                                                                                                           |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| Modular Dashboards   | The overall feature: dashboards whose rows/widgets can be conditionally shown or hidden.                                          |
 | Dashboard Condition  | The inline config object attached to a row or conditional widget entry.                                                           |
 | Condition target     | The row-level or component-level thing a dashboard condition belongs to.                                                          |
 | Shared filter target | A visualization key, row index, or dashboard-condition id that can appear in `sharedFilters[].usedBy`.                            |
@@ -299,7 +297,7 @@ If a config somehow contains a dashboard condition on one of those unsupported r
 
 These decisions were made to reduce risk to existing dashboards:
 
-- The original modular-dashboard work avoided broad changes to legacy row/viz shared-filter behavior.
+- The original dashboard-conditions work avoided broad changes to legacy row/viz shared-filter behavior.
 - Row/viz filtered-data and config-precompute paths now intentionally share unscoped target semantics with dashboard conditions: missing `usedBy` and `usedBy: []` apply globally.
 - Remaining legacy quirks outside those paths, including table and footnote filtering behavior, are out of scope for this fix rather than patterns to copy.
 - Dashboard conditions were added alongside existing behavior rather than replacing every shared-filter code path.
