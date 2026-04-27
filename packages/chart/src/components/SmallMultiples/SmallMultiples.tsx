@@ -223,7 +223,7 @@ const SmallMultiples: React.FC<SmallMultiplesProps> = ({ config, data, svgRef, p
     const totalHeight = numberOfRows * maxTileHeight + totalGapsHeight
 
     parentRef.current.style.height = `${totalHeight}px`
-  }, [tileHeights, numberOfRows, isMobile, parentRef])
+  }, [tileHeights, numberOfRows, isMobile])
 
   if (tileItems.length === 0) {
     return null
