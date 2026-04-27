@@ -13,7 +13,10 @@ import { DashboardContext } from '../DashboardContext'
 import { ViewPort } from '@cdc/core/types/ViewPort'
 import { evaluateDashboardCondition } from '../helpers/dashboardConditions'
 import { dashboardConditionsSupportedForRow } from '../helpers/dashboardFilterTargets'
-import { getColumnWidgetEntries } from '../helpers/dashboardColumnWidgets'
+import {
+  getColumnWidgetEntries,
+  resolveColumnWidgetEntry as resolveDashboardColumnWidgetEntry
+} from '../helpers/dashboardColumnWidgets'
 import { getVizConfig } from '../helpers/getVizConfig'
 import { TableConfig } from '@cdc/core/components/DataTable/types/TableConfig'
 import CollapsibleVisualizationRow from './CollapsibleVisualizationRow'
@@ -169,8 +172,25 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     }
   }
 
-  const tp5CountInRow = row.columns.reduce((count, col) => {
-    const widgetKey = getColumnWidgetEntries(col)[0]?.widget
+  const shouldIgnoreDashboardConditions = !dashboardConditionsSupportedForRow(row)
+  const columnDashboardConditionEvaluations = useMemo(
+    () =>
+      row.columns.map(column =>
+        resolveDashboardColumnWidgetEntry(column, {
+          evaluateCondition: dashboardCondition => {
+            if (shouldIgnoreDashboardConditions || !dashboardCondition) {
+              return { matches: true, resolved: true }
+            }
+
+            return evaluateDashboardCondition(dashboardCondition, dashboardFilteredData[dashboardCondition.id])
+          }
+        })
+      ),
+    [dashboardFilteredData, row.columns, shouldIgnoreDashboardConditions]
+  )
+
+  const tp5CountInRow = columnDashboardConditionEvaluations.reduce((count, evaluation) => {
+    const widgetKey = evaluation?.widget
     if (!widgetKey) return count
     const viz = config.visualizations[widgetKey]
     if (!viz) return count
@@ -209,8 +229,8 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     }
   }, [shouldEqualizeRow, row.columns, config.activeDashboard, filteredDataOverride, dashboardFilteredData[index]])
 
-  const isFilterRow = row.columns.some(col => {
-    const widgetKey = getColumnWidgetEntries(col)[0]?.widget
+  const isFilterRow = columnDashboardConditionEvaluations.some(evaluation => {
+    const widgetKey = evaluation?.widget
     return widgetKey && config.visualizations[widgetKey]?.type === 'dashboardFilters'
   })
   const needsEqualHeight = shouldEqualizeRow && !isFilterRow
@@ -224,7 +244,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
   }, [config.activeDashboard, toggledRow])
 
   const _data = dashboardFilteredData[index] || row.formattedData || []
-  const shouldIgnoreDashboardConditions = !dashboardConditionsSupportedForRow(row)
   const rowDashboardCondition = useMemo(() => {
     if (shouldIgnoreDashboardConditions || !row.dashboardCondition) {
       return { matches: true, resolved: true }
@@ -232,36 +251,6 @@ const VisualizationRow: React.FC<VizRowProps> = ({
 
     return evaluateDashboardCondition(row.dashboardCondition, dashboardFilteredData[row.dashboardCondition.id])
   }, [dashboardFilteredData, row.dashboardCondition, shouldIgnoreDashboardConditions])
-  const resolveColumnWidgetEntry = (column: ConfigRow['columns'][number]) => {
-    const matchedEntry = getColumnWidgetEntries(column).find(entry => {
-      if (shouldIgnoreDashboardConditions || !entry.dashboardCondition) {
-        return true
-      }
-
-      return evaluateDashboardCondition(entry.dashboardCondition, dashboardFilteredData[entry.dashboardCondition.id])
-        .matches
-    })
-
-    if (!matchedEntry) {
-      return { matches: false, resolved: true, widget: undefined }
-    }
-
-    if (shouldIgnoreDashboardConditions || !matchedEntry.dashboardCondition) {
-      return { matches: true, resolved: true, widget: matchedEntry.widget }
-    }
-
-    return {
-      ...evaluateDashboardCondition(
-        matchedEntry.dashboardCondition,
-        dashboardFilteredData[matchedEntry.dashboardCondition.id]
-      ),
-      widget: matchedEntry.widget
-    }
-  }
-  const columnDashboardConditionEvaluations = useMemo(
-    () => row.columns.map(column => resolveColumnWidgetEntry(column)),
-    [dashboardFilteredData, row.columns, shouldIgnoreDashboardConditions]
-  )
   const hasVisibleWidgetColumn = row.columns.some(
     (_column, columnIndex) =>
       !!row.columns[columnIndex].width && !!columnDashboardConditionEvaluations[columnIndex]?.widget

@@ -1,8 +1,16 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import CdcDashboardComponent from '../CdcDashboardComponent'
 import type { InitialState } from '../types/InitialState'
+
+class ResizeObserverMock {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+vi.stubGlobal('ResizeObserver', ResizeObserverMock)
 
 describe('CdcDashboardComponent', () => {
   it('renders dashboard markup through the shared visualization shell', () => {
@@ -178,6 +186,191 @@ describe('CdcDashboardComponent', () => {
 
     const hiddenConditionColumn = container.querySelector('[data-dashboard-condition-hidden="true"]')
     expect(hiddenConditionColumn).toHaveClass('col-md-6')
+  })
+
+  it('uses the resolved conditional widget when excluding filter rows from equal height', () => {
+    const initialState = {
+      config: {
+        type: 'dashboard',
+        dashboard: {
+          title: 'Dashboard Title',
+          titleStyle: 'small',
+          theme: 'theme-blue',
+          sharedFilters: []
+        },
+        visualizations: {
+          'dashboard-filters-hidden': {
+            type: 'dashboardFilters',
+            visualizationType: 'dashboardFilters',
+            sharedFilterIndexes: []
+          },
+          'markup-visible': {
+            type: 'markup-include',
+            contentEditor: {
+              inlineHTML: '<p>Resolved markup content</p>',
+              showHeader: true,
+              srcUrl: '',
+              title: 'Resolved',
+              useInlineHTML: true
+            }
+          }
+        },
+        rows: [
+          {
+            equalHeight: true,
+            columns: [
+              {
+                width: 12,
+                conditionalWidgets: [
+                  {
+                    widget: 'dashboard-filters-hidden',
+                    dashboardCondition: {
+                      id: 'filters-condition',
+                      datasetKey: 'condition-data',
+                      operator: 'hasData'
+                    }
+                  },
+                  {
+                    widget: 'markup-visible',
+                    dashboardCondition: {
+                      id: 'markup-condition',
+                      datasetKey: 'condition-data',
+                      operator: 'hasData'
+                    }
+                  }
+                ]
+              }
+            ],
+            expandCollapseAllButtons: false
+          }
+        ],
+        datasets: {
+          'condition-data': { data: [{ value: 'show' }] }
+        },
+        table: {}
+      },
+      data: {
+        'condition-data': [{ value: 'show' }]
+      },
+      loading: false,
+      filteredData: {
+        'filters-condition': [],
+        'markup-condition': [{ value: 'show' }]
+      },
+      preview: false,
+      tabSelected: 'Dashboard Preview',
+      filtersApplied: true
+    } as InitialState
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    expect(screen.getByText('Resolved markup content')).toBeInTheDocument()
+    expect(container.querySelector('[data-row-index="0"]')).toHaveClass('equal-height')
+  })
+
+  it('counts resolved conditional TP5 widgets for automatic equal height', () => {
+    const initialState = {
+      config: {
+        type: 'dashboard',
+        dashboard: {
+          title: 'Dashboard Title',
+          titleStyle: 'small',
+          theme: 'theme-blue',
+          sharedFilters: []
+        },
+        visualizations: {
+          'markup-plain-hidden': {
+            type: 'markup-include',
+            contentEditor: {
+              inlineHTML: '<p>Plain hidden content</p>',
+              showHeader: true,
+              srcUrl: '',
+              title: 'Plain Hidden',
+              useInlineHTML: true
+            }
+          },
+          'markup-tp5-resolved': {
+            type: 'markup-include',
+            contentEditor: {
+              inlineHTML: '<p>Resolved TP5 content</p>',
+              showHeader: true,
+              srcUrl: '',
+              style: 'tp5',
+              title: 'Resolved TP5',
+              useInlineHTML: true
+            }
+          },
+          'markup-tp5-static': {
+            type: 'markup-include',
+            contentEditor: {
+              inlineHTML: '<p>Static TP5 content</p>',
+              showHeader: true,
+              srcUrl: '',
+              style: 'tp5',
+              title: 'Static TP5',
+              useInlineHTML: true
+            }
+          }
+        },
+        rows: [
+          {
+            columns: [
+              {
+                width: 6,
+                conditionalWidgets: [
+                  {
+                    widget: 'markup-plain-hidden',
+                    dashboardCondition: {
+                      id: 'plain-condition',
+                      datasetKey: 'condition-data',
+                      operator: 'hasData'
+                    }
+                  },
+                  {
+                    widget: 'markup-tp5-resolved',
+                    dashboardCondition: {
+                      id: 'tp5-condition',
+                      datasetKey: 'condition-data',
+                      operator: 'hasData'
+                    }
+                  }
+                ]
+              },
+              {
+                width: 6,
+                widget: 'markup-tp5-static'
+              }
+            ],
+            expandCollapseAllButtons: false
+          }
+        ],
+        datasets: {
+          'condition-data': { data: [{ value: 'show' }] }
+        },
+        table: {}
+      },
+      data: {
+        'condition-data': [{ value: 'show' }]
+      },
+      loading: false,
+      filteredData: {
+        'plain-condition': [],
+        'tp5-condition': [{ value: 'show' }]
+      },
+      preview: false,
+      tabSelected: 'Dashboard Preview',
+      filtersApplied: true
+    } as InitialState
+
+    const { container } = render(
+      <CdcDashboardComponent initialState={initialState} interactionLabel='dashboard-test' isEditor={false} />
+    )
+
+    expect(screen.getByText('Resolved TP5 content')).toBeInTheDocument()
+    expect(screen.getByText('Static TP5 content')).toBeInTheDocument()
+    expect(container.querySelector('[data-row-index="0"]')).toHaveClass('equal-height')
   })
 
   it('keeps the legacy incomplete-filter message when no filtersIncomplete condition exists', () => {
