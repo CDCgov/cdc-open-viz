@@ -108,11 +108,13 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
     }
   }
 
+  const titlePlacementIsTop = tileConfig.yAxis?.titlePlacement === 'top'
+
   // Small multiples-specific modifications
   tileConfig = {
     ...tileConfig,
     hideXAxisLabel: !isFirstInRow,
-    hideYAxisLabel: !isFirstInRow,
+    hideYAxisLabel: config.hideYAxisLabel || (!isFirstInRow && !titlePlacementIsTop),
     legend: {
       ...tileConfig.legend,
       tooltipLegendVisible: !config.legend?.hide,
@@ -127,9 +129,7 @@ const SmallMultipleTile: React.FC<SmallMultipleTileProps> = ({
 
   const displayTitle = getTileDisplayTitle(mode, seriesKey, tileValue, tileKey, config)
   const showTopYAxisTitle =
-    tileConfig.yAxis?.titlePlacement === 'top' &&
-    !tileConfig.hideYAxisLabel &&
-    Boolean(tileConfig.runtime?.yAxis?.label)
+    titlePlacementIsTop && isFirstInRow && !config.hideYAxisLabel && Boolean(tileConfig.runtime?.yAxis?.label)
 
   // Get the original context values to merge with our filtered config
   const originalContextValues = useContext(ConfigContext)

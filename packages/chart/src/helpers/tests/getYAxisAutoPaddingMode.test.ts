@@ -45,6 +45,21 @@ describe('getYAxisAutoPaddingMode', () => {
     ).toBe('top-title')
   })
 
+  it('returns none for hidden top y-axis titles', () => {
+    expect(
+      getYAxisAutoPaddingMode(
+        createMockConfig({
+          hideYAxisLabel: true,
+          yAxis: {
+            ...createMockConfig().yAxis,
+            titlePlacement: 'top',
+            inlineLabel: ''
+          }
+        })
+      )
+    ).toBe('none')
+  })
+
   it('returns none when neither trigger applies', () => {
     expect(
       getYAxisAutoPaddingMode(

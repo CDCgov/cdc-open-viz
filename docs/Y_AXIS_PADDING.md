@@ -59,10 +59,12 @@ The shared decision point is `getYAxisAutoPaddingMode(config)`, which returns:
 ### Mode Selection Rules
 
 - Return `'inline-label'` when `yAxis.inlineLabel` contains a space
-- Otherwise return `'top-title'` when `yAxis.titlePlacement === 'top'` and the Y-axis label has content
+- Otherwise return `'top-title'` when `yAxis.titlePlacement === 'top'`, the Y-axis label has content, and the Y-axis label is visible
 - Otherwise return `'none'`
 
 If both conditions are present, inline-label wins because collision prevention is the stricter requirement.
+
+Small multiples preserve consistent auto-padding for top titles hidden only by repeated-tile layout. Author-hidden Y-axis labels still return `'none'`.
 
 ## Runtime Behavior
 
@@ -85,9 +87,9 @@ This is the part that is easiest to miss:
 
 - Manual padding fields still exist in config
 - `getMinMax` still knows how to apply manual padding
-- But when auto-padding is active, `useScales` computes a new padding value and feeds that value back into the min/max calculation
+- But when auto-padding is active, `useScales` first clears manual padding from the min/max config, then computes a new padding value and feeds that value back into the min/max calculation
 
-So manual padding is not a clean source of truth once auto-padding turns on. It may influence an early scale calculation, but the effective padding is then replaced by the computed auto-padding value.
+So manual padding is not a source of truth once auto-padding turns on. Legacy `enablePadding` and `scalePadding` values are ignored at runtime, and the effective padding is replaced by the computed auto-padding value.
 
 That is why the editor now hides the manual Y-axis padding controls whenever auto-padding mode is not `'none'`.
 

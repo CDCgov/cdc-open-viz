@@ -53,4 +53,18 @@ describe('useEditorPermissions', () => {
 
     expect(result.current.visSupportsYPadding()).toBe(false)
   })
+
+  it('shows manual y-axis padding controls when a top y-axis title is hidden', () => {
+    const { result } = renderUseEditorPermissions({
+      hideYAxisLabel: true,
+      yAxis: {
+        ...createMockConfig().yAxis,
+        titlePlacement: 'top',
+        label: 'Y-Axis',
+        inlineLabel: ''
+      }
+    })
+
+    expect(result.current.visSupportsYPadding()).toBe(true)
+  })
 })

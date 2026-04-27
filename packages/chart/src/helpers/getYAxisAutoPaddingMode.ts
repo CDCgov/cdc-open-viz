@@ -9,7 +9,7 @@ export const getYAxisAutoPaddingMode = (config: ChartConfig): YAxisAutoPaddingMo
   }
 
   const yAxisTitle = String(config.yAxis?.label || config.runtime?.yAxis?.label || '').trim()
-  if (config.yAxis?.titlePlacement === 'top' && yAxisTitle) {
+  if (config.yAxis?.titlePlacement === 'top' && yAxisTitle && !config.hideYAxisLabel) {
     return 'top-title'
   }
 
