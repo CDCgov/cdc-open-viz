@@ -235,7 +235,9 @@ const VisualizationRow: React.FC<VizRowProps> = ({
     const applyFilters = dashboardFilters.filter(v => !v.autoLoad).flatMap(v => v.sharedFilterIndexes)
     if (hasDashboardApplyBehavior(config.visualizations) && vizConfig.autoLoad) {
       return applyFilters.some(index => {
-        const { queuedActive, active, subGrouping } = config.dashboard.sharedFilters[index]
+        const filter = config.dashboard.sharedFilters[index]
+        if (!filter) return false
+        const { queuedActive, active, subGrouping } = filter
         if (!active && !queuedActive) return true
         if (!queuedActive) return false
         // for nested dropdowns

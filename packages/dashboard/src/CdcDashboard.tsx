@@ -71,7 +71,8 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
       return acc
     }, {})
     getVizKeys(newConfig).forEach(vizKey => {
-      const formattedData = datasets[newConfig.visualizations[vizKey].dataKey]
+      const dataKey = newConfig.visualizations[vizKey].dataKey
+      const formattedData = dataKey ? datasets[dataKey] : undefined
       if (formattedData) {
         newConfig.visualizations[vizKey].formattedData = formattedData
       }
@@ -87,7 +88,7 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
   const loadSingleDashboard = async config => {
     let newConfig = { ...defaults, ...config } as DashboardConfig
 
-    if (config.datasets) {
+    if (config.datasets && Object.keys(config.datasets).length > 0) {
       return prepareDatasets(newConfig)
     } else {
       const dataKey = newConfig.dataFileName || 'backwards-compatibility'
@@ -141,6 +142,9 @@ const MultiDashboardWrapper: React.FC<MultiDashboardProps> = ({
       multiDashboards: multiConfig.multiDashboards,
       activeDashboard: selectedConfig
     } as MultiDashboardConfig
+    if (!newConfig.datasets || Object.keys(newConfig.datasets).length === 0) {
+      return { newConfig, datasets: {} }
+    }
     return prepareDatasets(newConfig)
   }
 

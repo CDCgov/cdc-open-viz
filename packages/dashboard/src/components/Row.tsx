@@ -20,6 +20,7 @@ import { iconHash } from '../helpers/iconHash'
 import _ from 'lodash'
 import { Visualization } from '@cdc/core/types/Visualization'
 import { labelHash } from '@cdc/core/helpers/labelHash'
+import { removeDashboardFilter } from '../helpers/removeDashboardFilter'
 
 type RowMenuProps = {
   rowIdx: number
@@ -120,9 +121,9 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
 
   const deleteRow = () => {
     let newVisualizations = { ...config.visualizations }
-    let newSharedFilters = _.cloneDeep(config.dashboard.sharedFilters)
+    let newSharedFilters = _.cloneDeep(config.dashboard.sharedFilters) || []
 
-    if (rows[rowIdx] && rows[rowIdx].columns && rows[rowIdx].columns.length && config.visualizations) {
+    if (rows[rowIdx]?.columns?.length && config.visualizations) {
       rows[rowIdx].columns.forEach(column => {
         if (column.widget) {
           delete newVisualizations[column.widget]
@@ -137,11 +138,25 @@ const RowMenu: React.FC<RowMenuProps> = ({ rowIdx }) => {
 
     rows.splice(rowIdx, 1)
 
+    // Remove shared filters no longer referenced by any remaining dashboardFilters widget,
+    // iterating in reverse so removals don't invalidate earlier indices. removeDashboardFilter
+    // shifts sharedFilterIndexes in all remaining vizs so indices stay consistent.
+    let currentFilters = newSharedFilters
+    let currentVizs = newVisualizations
+    for (let i = currentFilters.length - 1; i >= 0; i--) {
+      const isReferenced = Object.values(currentVizs).some(
+        v => v.type === 'dashboardFilters' && (v as any).sharedFilterIndexes?.includes(i)
+      )
+      if (!isReferenced) {
+        ;[currentFilters, currentVizs] = removeDashboardFilter(i, currentFilters, currentVizs as any)
+      }
+    }
+
     updateConfig({
       ...config,
       rows,
-      visualizations: newVisualizations,
-      dashboard: { ...config.dashboard, sharedFilters: newSharedFilters }
+      visualizations: currentVizs,
+      dashboard: { ...config.dashboard, sharedFilters: currentFilters }
     })
   }
 
