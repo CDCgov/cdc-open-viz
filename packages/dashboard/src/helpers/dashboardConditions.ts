@@ -12,33 +12,41 @@ export type DashboardConditionEvaluation = {
 export const createDashboardConditionId = () =>
   `dashboard-condition-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 
+// This runs during initial config preparation before coveUpdateWorker normalizes legacy dashboard rows.
+// Preserve pre-4.24.3 array-shaped rows for packages/core/helpers/ver/4.24.3.ts, and tolerate rows
+// without normalized columns. This constraint can be removed if CdcDashboard.tsx runs coveUpdateWorker
+// before getUpdateConfig in formatInitialState.
 export const ensureRowConditionIds = (rows: ConfigRow[]): ConfigRow[] =>
   rows.map(row => {
+    if (Array.isArray(row)) return row
+
     const nextRow = { ...row }
 
     if (nextRow.dashboardCondition && !nextRow.dashboardCondition.id) {
       nextRow.dashboardCondition = { ...nextRow.dashboardCondition, id: createDashboardConditionId() }
     }
 
-    nextRow.columns = nextRow.columns.map(column => {
-      if (hasConditionalWidgets(column)) {
-        return {
-          ...column,
-          conditionalWidgets: getConditionalWidgets(column).map(entry => {
-            if (!entry.dashboardCondition || entry.dashboardCondition.id) return entry
+    if (Array.isArray(nextRow.columns)) {
+      nextRow.columns = nextRow.columns.map(column => {
+        if (hasConditionalWidgets(column)) {
+          return {
+            ...column,
+            conditionalWidgets: getConditionalWidgets(column).map(entry => {
+              if (!entry.dashboardCondition || entry.dashboardCondition.id) return entry
 
-            return {
-              ...entry,
-              dashboardCondition: {
-                ...entry.dashboardCondition,
-                id: createDashboardConditionId()
+              return {
+                ...entry,
+                dashboardCondition: {
+                  ...entry.dashboardCondition,
+                  id: createDashboardConditionId()
+                }
               }
-            }
-          })
+            })
+          }
         }
-      }
-      return column
-    })
+        return column
+      })
+    }
 
     return nextRow
   })

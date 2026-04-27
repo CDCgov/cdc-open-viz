@@ -35,6 +35,25 @@ describe('dashboardConditions', () => {
     expect(rows[0].columns[1]).toMatchObject({ widget: 'viz-2' })
   })
 
+  it('assigns row condition ids without requiring normalized columns', () => {
+    const rows = ensureRowConditionIds([
+      {
+        dashboardCondition: { datasetKey: 'dataset-1', operator: 'hasData' },
+        expandCollapseAllButtons: false
+      }
+    ] as any)
+
+    expect(rows[0].dashboardCondition?.id).toMatch(/^dashboard-condition-/)
+    expect(rows[0]).not.toHaveProperty('columns')
+  })
+
+  it('preserves legacy array-shaped rows for version migrations', () => {
+    const legacyRow = [{ width: 12, widget: 'viz-1' }]
+    const rows = ensureRowConditionIds([legacyRow] as any)
+
+    expect(rows[0]).toBe(legacyRow)
+  })
+
   it('includes row and column dashboard condition targets for supported rows only', () => {
     const { nameLookup, options } = getDashboardConditionTargetOptions([
       {
